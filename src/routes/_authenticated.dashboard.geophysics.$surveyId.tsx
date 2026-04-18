@@ -28,6 +28,7 @@ function SurveyDetail() {
   const [creatingStation, setCreatingStation] = useState(false);
   const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [creatingLine, setCreatingLine] = useState(false);
+  const [importingCsv, setImportingCsv] = useState(false);
 
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>;
