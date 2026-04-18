@@ -1,29 +1,24 @@
 
-Add drill collar layer to ProjectMap.
+Add mineralized intercept calculation for drill holes.
 
-## Approach
-
-Need to check how easting/northing should convert to lat/lng. Looking at `drill_holes` schema, fields are `easting`/`northing` (numeric). Chile is UTM 19S typically. But many projects may store lat/lng directly in those fields. Safest: if values look like lat/lng range (-90..90, -180..180), use directly; otherwise treat as UTM 19S and convert via inline formula. Actually, simpler and more reliable: assume lat/lng for now (since static data uses lon/lat in geojson) and document. Better — auto-detect: if |easting|<=180 and |northing|<=90, treat as lng/lat; else UTM 19S → WGS84.
-
-Will add inline UTM→WGS84 converter (no deps).
-
-## Scope
-
-### 1. New file `src/components/map/drillCollarsLayer.ts`
-- `buildDrillCollarsLayer(L, holes)`: returns Leaflet GeoJSON/LayerGroup of circleMarkers
-- Color by status: proposed `#64748b`, in_progress `#f59e0b`, completed `#0d9488`, abandoned `#dc2626`
-- Inline `utmToLatLng(easting, northing, zone=19, south=true)` (standard formula)
-- Auto-detect coord system per hole
-- Popup: hole_id (mono bold), status badge, target_zone, planned/actual depth, progress %, az/dip
-
-### 2. New hook usage in `ProjectMap.tsx`
-- Import `useDrillHoles(activeProjectId)` 
-- Add useEffect to build/replace `drills:project` managed layer when holes change
-- Register in `LayerOpacityPanel` with group "Proyecto", visible by default
-- Add count chip "X sondajes"
-
-### 3. No DB changes, no deps.
+## Logic
+- `computeIntercepts(logs, cutoff, maxInternalDilution)`: sort by depth_from, walk intervals, group contiguous (gap ≤ maxInternalDilution, default 2m) where `au_gpt >= cutoff`. For each intercept: from, to, length, length-weighted Au/Cu/Ag averages, # intervals.
+- Length-weighted avg: `Σ(grade_i × len_i) / Σ(len_i)` (skip nulls per-element).
 
 ## Files
-- create: `src/components/map/drillCollarsLayer.ts`
-- edit: `src/components/ProjectMap.tsx` (add hook + effect + managed layer registration + chip)
+1. **New** `src/lib/drilling/intercepts.ts` — pure function + types. Default cutoff 0.5 g/t Au, default dilution 2m.
+2. **Edit** `src/components/drilling/CoreLogPanel.tsx`:
+   - Cutoff input (number, default 0.5) + dilution input (default 2m) in header
+   - New "Intercepts mineralizados" section above intervals table: highlighted card-table with from-to, length, Au g/t (bold amber), Cu%, Ag g/t, # intervalos
+   - Empty state if no intercepts
+3. **Edit** `src/routes/_authenticated.dashboard.drilling.tsx`:
+   - For each hole, fetch its logs lazily via batch (single query: `drill_core_logs` filtered by `hole_id IN (...)` for current project)
+   - Compute best intercept per hole (longest, or highest grade·length)
+   - Add new column "Mejor intercept" showing e.g. `12.5m @ 2.34 g/t Au` colored amber, or "—"
+   - Use cutoff 0.5 (fixed at table level; configurable in panel)
+
+## Approach for table column
+- New hook `useProjectCoreLogs(projectId)` returning all logs grouped by hole_id (single query, low overhead for typical project sizes <10k intervals).
+- Compute intercepts per hole in `useMemo`.
+
+## No DB changes, no deps.
