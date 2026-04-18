@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio,
+  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload,
 } from "lucide-react";
 import {
   useSurvey,
@@ -10,6 +10,7 @@ import {
   type Line,
 } from "@/hooks/useGeophysicsCRUD";
 import { useProjects } from "@/hooks/useProjects";
+import { StationCsvImport } from "@/components/geophysics/StationCsvImport";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/geophysics/$surveyId")({
@@ -27,6 +28,7 @@ function SurveyDetail() {
   const [creatingStation, setCreatingStation] = useState(false);
   const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [creatingLine, setCreatingLine] = useState(false);
+  const [importingCsv, setImportingCsv] = useState(false);
 
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>;
@@ -81,6 +83,7 @@ function SurveyDetail() {
         <StationsTab
           stations={stations}
           onCreate={() => setCreatingStation(true)}
+          onImport={() => setImportingCsv(true)}
           onEdit={(s) => setEditingStation(s)}
           onDeleted={refresh}
         />
@@ -110,6 +113,14 @@ function SurveyDetail() {
           initial={editingLine}
           onClose={() => { setCreatingLine(false); setEditingLine(null); }}
           onSaved={() => { setCreatingLine(false); setEditingLine(null); refresh(); }}
+        />
+      )}
+      {importingCsv && active && (
+        <StationCsvImport
+          projectId={active.id}
+          surveyId={survey.id}
+          onClose={() => setImportingCsv(false)}
+          onSaved={() => { setImportingCsv(false); refresh(); }}
         />
       )}
     </div>
@@ -144,11 +155,13 @@ function TabBtn({ active, onClick, icon, label }: { active: boolean; onClick: ()
 function StationsTab({
   stations,
   onCreate,
+  onImport,
   onEdit,
   onDeleted,
 }: {
   stations: Station[];
   onCreate: () => void;
+  onImport: () => void;
   onEdit: (s: Station) => void;
   onDeleted: () => void;
 }) {
@@ -175,6 +188,9 @@ function StationsTab({
               <Download className="w-3 h-3" /> CSV
             </button>
           )}
+          <button onClick={onImport} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded border border-border text-xs font-mono hover:bg-accent">
+            <Upload className="w-3 h-3" /> Importar CSV
+          </button>
           <button onClick={onCreate} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold/90">
             <Plus className="w-3 h-3" /> Nueva estación
           </button>
