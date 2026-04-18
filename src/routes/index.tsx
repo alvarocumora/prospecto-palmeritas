@@ -1142,12 +1142,32 @@ function Budget() {
 
 function TrackminGeoIntel() {
   const [active, setActive] = useState<TabId>("overview");
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    toast.info("Generando PDF — recorriendo módulos…");
+    try {
+      await exportFullReport({
+        sections: TABS.map((t) => ({ id: t.id, label: t.label })),
+        setActive: (id) => setActive(id as TabId),
+        getCurrent: () => active,
+      });
+      toast.success("PDF exportado correctamente");
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo generar el PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <TopNav active={active} setActive={setActive} />
+      <TopNav active={active} setActive={setActive} onExport={handleExport} exporting={exporting} />
 
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
+      <main className="max-w-[1400px] mx-auto px-6 py-8" data-export-root>
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-hint">
           <span>{PROJECT.ref}</span>
