@@ -97,33 +97,8 @@ export function ProjectMap() {
         }
       );
 
-      // OneGeology Portal — geología de Chile (SERNAGEOMIN servida vía WMS internacional).
-      const oneGeologyChile = L.tileLayer.wms(
-        "https://mrdata.usgs.gov/services/onegeology/chile",
-        {
-          layers: "GSC_Chile_BedrockGeology",
-          format: "image/png",
-          transparent: true,
-          opacity: 0.6,
-          attribution:
-            'Geología &copy; SERNAGEOMIN vía <a href="https://onegeology.org">OneGeology Portal</a>',
-          version: "1.3.0",
-          uppercase: true,
-        }
-      );
-
-      // SERNAGEOMIN WMS oficial — fallback (puede no responder fuera de Chile).
-      const sernageominGeology = L.tileLayer.wms(
-        "https://catastro.sernageomin.cl/arcgis/services/PUBLICO/Mapa_Geologico_Chile_1M/MapServer/WMSServer",
-        {
-          layers: "0",
-          format: "image/png",
-          transparent: true,
-          opacity: 0.55,
-          attribution: "Geología &copy; SERNAGEOMIN",
-          version: "1.3.0",
-        }
-      );
+      // Nota: los WMS oficiales de SERNAGEOMIN y OneGeology Chile están descontinuados
+      // (DNS muerto / mapfile removido por USGS). Macrostrat queda como única fuente.
 
       L.control
         .layers(
@@ -135,8 +110,6 @@ export function ProjectMap() {
           },
           {
             "Geología Macrostrat (global)": macrostratGeology,
-            "Geología OneGeology · Chile": oneGeologyChile,
-            "Geología SERNAGEOMIN 1:1M (CL)": sernageominGeology,
           },
           { position: "topright", collapsed: true }
         )
