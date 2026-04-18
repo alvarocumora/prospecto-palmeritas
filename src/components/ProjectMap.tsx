@@ -540,6 +540,10 @@ export function ProjectMap() {
         </span>
         <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
       </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <MagnetometryLegend stats={magStats} />
+      </div>
     </div>
   );
 }
