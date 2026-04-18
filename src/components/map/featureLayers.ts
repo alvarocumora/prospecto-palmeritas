@@ -16,6 +16,17 @@ export function addProjectFeatures(
   });
   L.geoJSON(data.aoi, {
     pointToLayer: (_f, latlng) => L.marker(latlng, { icon: centroidIcon }),
+    style: (f) =>
+      f?.geometry?.type === "Polygon"
+        ? {
+            color: "#F0C96B",
+            weight: 2,
+            opacity: 0.9,
+            fillColor: "#F0C96B",
+            fillOpacity: 0.06,
+            dashArray: "4 4",
+          }
+        : {},
     onEachFeature: (f, layer) => {
       const p = f.properties ?? {};
       layer.bindPopup(
