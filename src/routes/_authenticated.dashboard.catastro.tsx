@@ -203,7 +203,7 @@ function CatastroModule() {
                   <Th>Vencimiento</Th>
                   <Th>Área (ha)</Th>
                   <Th>AOI</Th>
-                  <Th></Th>
+                  <Th> </Th>
                 </tr>
               </thead>
               <tbody>
