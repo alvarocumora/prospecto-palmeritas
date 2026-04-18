@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as turf from "@turf/turf";
+import type { Feature, Geometry } from "geojson";
 import { CATASTRO_STYLE, type CatastroOrigen } from "./overlays";
 import type { AnyFC } from "./types";
 import type { AoiPolygon } from "./aoiPolygon";
@@ -64,7 +65,7 @@ function enrichRows(
       let dist = Number.NaN;
       let intersects = false;
       try {
-        const ft = f as turf.Feature<turf.Geometry>;
+        const ft = f as Feature<Geometry>;
         const c = turf.centroid(ft);
         dist = turf.distance(aoiCentroidPt, c, { units: "kilometers" });
         if (aoi && (ft.geometry.type === "Polygon" || ft.geometry.type === "MultiPolygon")) {
@@ -237,7 +238,7 @@ export function computeAoiIntersections(
   for (const origen of ORIGEN_ORDER) {
     for (const f of featuresByOrigen[origen] ?? []) {
       try {
-        const ft = f as turf.Feature<turf.Geometry>;
+        const ft = f as Feature<Geometry>;
         if (ft.geometry.type !== "Polygon" && ft.geometry.type !== "MultiPolygon") continue;
         if (turf.booleanIntersects(aoi, ft)) {
           const p = (f.properties ?? {}) as Record<string, unknown>;
