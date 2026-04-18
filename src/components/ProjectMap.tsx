@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Maximize2, Minimize2, Wrench, Ruler, Crosshair, Eye, EyeOff, Download } from "lucide-react";
 import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -46,6 +47,7 @@ const DEFAULT_VISIBLE: ReadonlySet<CatastroOrigen> = new Set([
 
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const leafletRef = useRef<LeafletNS | null>(null);
   const layerControlRef = useRef<Control.Layers | null>(null);
@@ -53,8 +55,15 @@ export function ProjectMap() {
   const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const aoiRef = useRef<AoiPolygon | null>(null);
   const geophysicsLayerRef = useRef<LayerGroup | null>(null);
+  const measureLineRef = useRef<Layer | null>(null);
+  const measurePointsRef = useRef<[number, number][]>([]);
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [measuring, setMeasuring] = useState(false);
+  const [measureDist, setMeasureDist] = useState<number | null>(null);
+  const [geophysicsVisible, setGeophysicsVisible] = useState(true);
   const { data: geoph } = useGeophysicsData();
 
   const loadCatastroData = useCallback(async () => {
@@ -196,6 +205,96 @@ export function ProjectMap() {
     geophysicsLayerRef.current = layer;
   }, [geoph]);
 
+  // Toggle geophysics layer visibility
+  const toggleGeophysics = useCallback(() => {
+    const map = mapRef.current;
+    const layer = geophysicsLayerRef.current;
+    if (!map || !layer) return;
+    if (map.hasLayer(layer)) {
+      map.removeLayer(layer);
+      setGeophysicsVisible(false);
+    } else {
+      layer.addTo(map);
+      setGeophysicsVisible(true);
+    }
+  }, []);
+
+  // Fullscreen toggle
+  const toggleFullscreen = useCallback(async () => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      await el.requestFullscreen?.();
+    } else {
+      await document.exitFullscreen?.();
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = () => {
+      const fs = !!document.fullscreenElement;
+      setIsFullscreen(fs);
+      setTimeout(() => mapRef.current?.invalidateSize(), 200);
+    };
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // Center on AOI
+  const centerOnAoi = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.setView(CENTER, 16, { animate: true });
+  }, []);
+
+  // Measure tool
+  const clearMeasure = useCallback(() => {
+    const map = mapRef.current;
+    if (map && measureLineRef.current) map.removeLayer(measureLineRef.current);
+    measureLineRef.current = null;
+    measurePointsRef.current = [];
+    setMeasureDist(null);
+  }, []);
+
+  const toggleMeasure = useCallback(() => {
+    const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    if (measuring) {
+      clearMeasure();
+      setMeasuring(false);
+      map.getContainer().style.cursor = "";
+      return;
+    }
+    setMeasuring(true);
+    map.getContainer().style.cursor = "crosshair";
+  }, [measuring, clearMeasure]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!map || !L || !measuring) return;
+    const onClick = (e: { latlng: { lat: number; lng: number } }) => {
+      const pt: [number, number] = [e.latlng.lat, e.latlng.lng];
+      measurePointsRef.current.push(pt);
+      if (measureLineRef.current) map.removeLayer(measureLineRef.current);
+      const line = L.polyline(measurePointsRef.current, { color: "#F5A524", weight: 3, dashArray: "5 5" });
+      line.addTo(map);
+      measureLineRef.current = line;
+      // total distance
+      let total = 0;
+      const pts = measurePointsRef.current;
+      for (let i = 1; i < pts.length; i++) {
+        total += map.distance(pts[i - 1], pts[i]);
+      }
+      setMeasureDist(total);
+    };
+    map.on("click", onClick);
+    return () => {
+      map.off("click", onClick);
+    };
+  }, [measuring]);
+
   const renderChip = (origen: CatastroOrigen) => {
     const style = CATASTRO_STYLE[origen];
     const c = counts[origen];
@@ -221,11 +320,82 @@ export function ProjectMap() {
   return (
     <div className="space-y-3">
       <div
-        ref={containerRef}
-        data-export-map
-        className="h-72 md:h-96 w-full rounded border border-border overflow-hidden bg-bg-secondary"
-        style={{ zIndex: 0 }}
-      />
+        ref={wrapperRef}
+        className={`relative ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
+      >
+        <div
+          ref={containerRef}
+          data-export-map
+          className={`${isFullscreen ? "h-full" : "h-72 md:h-96"} w-full rounded border border-border overflow-hidden bg-bg-secondary`}
+          style={{ zIndex: 0 }}
+        />
+        {/* Floating control toolbar (top-left) */}
+        <div className="absolute top-2 left-2 z-[1000] flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="w-9 h-9 inline-flex items-center justify-center rounded border border-border bg-background/95 backdrop-blur text-foreground hover:bg-accent shadow-md transition-colors"
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setToolsOpen((v) => !v)}
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
+            title="Herramientas de gestión"
+          >
+            <Wrench className="w-4 h-4" />
+          </button>
+        </div>
+
+        {toolsOpen && (
+          <div className="absolute top-2 left-14 z-[1000] w-64 rounded border border-border bg-background/95 backdrop-blur shadow-lg p-3 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground font-semibold uppercase tracking-wide">Gestión de proyecto</span>
+              <button type="button" onClick={() => setToolsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">✕</button>
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Navegación</div>
+              <button type="button" onClick={centerOnAoi} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors">
+                <Crosshair className="w-3.5 h-3.5" /> Centrar en AOI
+              </button>
+              <button type="button" onClick={toggleMeasure} className={`w-full inline-flex items-center justify-between gap-2 px-2 py-1.5 rounded border ${measuring ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-secondary text-foreground hover:bg-accent"} transition-colors`}>
+                <span className="inline-flex items-center gap-2">
+                  <Ruler className="w-3.5 h-3.5" /> {measuring ? "Medir: ON" : "Medir distancia"}
+                </span>
+                {measureDist != null && <span className="text-[10px] text-foreground">{(measureDist / 1000).toFixed(2)} km</span>}
+              </button>
+              {measuring && (
+                <button type="button" onClick={clearMeasure} className="w-full text-[10px] text-muted-foreground hover:text-foreground">Limpiar mediciones</button>
+              )}
+            </div>
+            <div className="space-y-1.5 border-t border-border pt-2">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Geofísica</div>
+              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsLayerRef.current} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                {geophysicsVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {geophysicsVisible ? "Ocultar" : "Mostrar"} líneas/estaciones
+              </button>
+              {geoph && (
+                <div className="text-[10px] text-muted-foreground space-y-0.5 px-1">
+                  <div>Campañas: <strong className="text-foreground">{geoph.surveys.length}</strong></div>
+                  <div>Líneas: <strong className="text-foreground">{geoph.lines.length}</strong></div>
+                  <div>Estaciones: <strong className="text-foreground">{geoph.stations.length}</strong></div>
+                </div>
+              )}
+            </div>
+            <div className="space-y-1.5 border-t border-border pt-2">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Catastro</div>
+              <button type="button" onClick={handleExportPdf} disabled={Object.values(counts).every((n) => !n)} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                <Download className="w-3.5 h-3.5" /> PDF pertenencias
+              </button>
+              <button type="button" onClick={handleRefresh} disabled={refreshing} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                ↻ {refreshing ? "Refrescando…" : "Refrescar catastro"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
         <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
         {ORIGEN_ORDER.map(renderChip)}
