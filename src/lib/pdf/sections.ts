@@ -15,6 +15,7 @@ import {
   setRGB,
   tableCaption,
 } from "./primitives";
+import { drawCrossSection, drawGantt, drawPieChart } from "./figures";
 import type { GeologyData } from "@/hooks/useGeologyData";
 import type { GeophysicsData } from "@/hooks/useGeophysicsData";
 
@@ -525,6 +526,19 @@ export function renderSection7_DepositType(s: PdfState, geo: GeologyData | null)
       `La potencial transición a mesotermal en profundidad estaría caracterizada por aumento de calcopirita-pirrotina, ` +
       `alteración propilítica más intensa, y stockwork de cuarzo.`,
   );
+
+  h2(s, "Modelo conceptual");
+  p(
+    s,
+    `La sección esquemática siguiente ilustra la geometría inferida del sistema en una traza NW–SE: vetas subverticales ` +
+      `hospedadas en volcánicas de la Fm. Lo Valle, halo de alteración silícea–sericítica envolvente, labores antiguas en superficie, ` +
+      `y trayectorias de los sondajes diamantinos propuestos para test de continuidad en profundidad.`,
+  );
+  drawCrossSection(
+    s,
+    "Sección esquemática NW–SE del sistema epitermal–mesotermal Au–Cu del Prospecto Palmeras. " +
+      "Profundidades hasta 500 m. No a escala. Fuente: modelo conceptual Trackmin GeoIntel.",
+  );
 }
 
 export function renderSection8_Exploration(s: PdfState, geophys: GeophysicsData | null) {
@@ -672,6 +686,25 @@ export function renderSection12_Budget(s: PdfState) {
   // @ts-expect-error autotable adds lastAutoTable
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
 
+  // Pie chart of budget composition (vector)
+  drawPieChart(
+    s,
+    BUDGET.map((b, i) => ({
+      label: b.item,
+      amount: b.amount,
+      color: ([
+        [200, 146, 42],   // gold
+        [180, 110, 60],   // copper
+        [60, 140, 130],   // teal
+        [70, 110, 180],   // info blue
+        [150, 138, 128],  // muted
+        [110, 100, 92],   // hint
+      ] as [number, number, number][])[i % 6],
+    })),
+    `USD ${BUDGET_TOTAL.toLocaleString("en-US")}`,
+    "Distribución del presupuesto por ítem (donut chart). Sondaje DDH concentra el 58 % del programa.",
+  );
+
   h2(s, "Cronograma por fases");
   tableCaption(s, "Cronograma del programa de exploración.");
   autoTable(s.doc, {
@@ -685,6 +718,19 @@ export function renderSection12_Budget(s: PdfState) {
   });
   // @ts-expect-error autotable adds lastAutoTable
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Gantt chart (vector)
+  drawGantt(
+    s,
+    [
+      { phase: "F1", title: "Muestreo superficial", start: 0, span: 2, color: [200, 146, 42] },
+      { phase: "F2", title: "Geofísica IP / Mag", start: 2, span: 2, color: [70, 110, 180] },
+      { phase: "F3", title: "Sondajes DDH", start: 4, span: 4, color: [180, 110, 60] },
+      { phase: "F4", title: "Análisis + reporte", start: 8, span: 4, color: [60, 140, 130] },
+    ],
+    12,
+    "Cronograma Gantt del programa de exploración (12 meses, 4 fases secuenciales).",
+  );
 }
 
 export function renderSection13_Conclusions(s: PdfState) {
