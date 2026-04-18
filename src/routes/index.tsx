@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
+import { exportFullReport } from "@/lib/export-pdf";
+import { toast } from "sonner";
 import {
   Activity,
   AlertTriangle,
