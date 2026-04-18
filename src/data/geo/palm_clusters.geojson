@@ -1,0 +1,36 @@
+{
+  "type": "FeatureCollection",
+  "name": "palm_clusters",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cluster Ladera NW",
+        "count": 6,
+        "species": "Jubaea chilensis",
+        "source": "Inventario botánico Trackmin 2025 · validación campo"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11680, -33.89720] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cluster Cumbre",
+        "count": 4,
+        "species": "Jubaea chilensis",
+        "source": "Inventario botánico Trackmin 2025 · validación campo"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11540, -33.89820] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Cluster Ladera SE",
+        "count": 3,
+        "species": "Jubaea chilensis",
+        "source": "Inventario botánico Trackmin 2025 · validación campo"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11430, -33.89970] }
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "type": "FeatureCollection",
+  "name": "drill_collars",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ALH-DDH-001",
+        "azimuth": "090°",
+        "inclination": "-60°",
+        "depth": "250 m",
+        "target": "Veta aflorante → sulfuros",
+        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11540, -33.89845] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ALH-DDH-002",
+        "azimuth": "270°",
+        "inclination": "-55°",
+        "depth": "300 m",
+        "target": "Extensión lateral NW",
+        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11635, -33.89760] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ALH-DDH-003",
+        "azimuth": "045°",
+        "inclination": "-70°",
+        "depth": "200 m",
+        "target": "Intersección fallas",
+        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11590, -33.89915] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "ALH-DDH-004",
+        "azimuth": "135°",
+        "inclination": "-65°",
+        "depth": "280 m",
+        "target": "Mesotermal profunda",
+        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11460, -33.89880] }
+    }
+  ]
+}

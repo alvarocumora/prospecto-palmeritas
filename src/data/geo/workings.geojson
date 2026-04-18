@@ -1,0 +1,33 @@
+{
+  "type": "FeatureCollection",
+  "name": "workings",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pique Prehispánico 1",
+        "type": "Pique manual",
+        "source": "Reconocimiento de labores antiguas Trackmin 2025"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11580, -33.89800] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Socavón Colonial",
+        "type": "Socavón ~25m",
+        "source": "Reconocimiento de labores antiguas Trackmin 2025"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11505, -33.89880] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Pique Republicano",
+        "type": "Pique 8m",
+        "source": "Reconocimiento de labores antiguas Trackmin 2025"
+      },
+      "geometry": { "type": "Point", "coordinates": [-71.11470, -33.89930] }
+    }
+  ]
+}
