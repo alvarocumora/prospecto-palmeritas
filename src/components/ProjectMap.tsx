@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { Layer } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
@@ -73,7 +74,7 @@ export function ProjectMap() {
 
       // --- Load Catastro Minero around AOI (~3 km half-size) ---
       const bbox = bboxAround(CENTER, 3);
-      const overlays: Record<string, L.Layer> = { ...geoOverlays };
+      const overlays: Record<string, Layer> = { ...geoOverlays };
 
       const [explotRes, exploRes] = await Promise.allSettled([
         loadCatastroLayer(L, "explotacion", bbox),
