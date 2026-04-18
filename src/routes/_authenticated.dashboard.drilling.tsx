@@ -12,6 +12,8 @@ import {
   type DrillHole,
   type HoleStatus,
 } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { computeIntercepts, bestIntercept, formatIntercept } from "@/lib/drilling/intercepts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
@@ -31,10 +33,20 @@ function DrillingModule() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { data, loading, refresh } = useDrillHoles(active?.id ?? null);
+  const { byHole, refresh: refreshLogs } = useProjectCoreLogs(active?.id ?? null);
   const [filter, setFilter] = useState<HoleStatus | "all">("all");
   const [editing, setEditing] = useState<DrillHole | null>(null);
   const [creating, setCreating] = useState(false);
   const [logHole, setLogHole] = useState<DrillHole | null>(null);
+
+  const bestByHole = useMemo(() => {
+    const m: Record<string, ReturnType<typeof bestIntercept>> = {};
+    for (const h of data) {
+      const logs = byHole[h.id] ?? [];
+      m[h.id] = bestIntercept(computeIntercepts(logs, 0.5, 2));
+    }
+    return m;
+  }, [data, byHole]);
 
   const filtered = useMemo(
     () => (filter === "all" ? data : data.filter((h) => h.status === filter)),
@@ -65,6 +77,7 @@ function DrillingModule() {
     else {
       toast.success("Sondaje eliminado");
       refresh();
+      refreshLogs();
     }
   };
 
@@ -131,6 +144,7 @@ function DrillingModule() {
                   <Th>Az/Dip</Th>
                   <Th>Plan/Real (m)</Th>
                   <Th>Avance</Th>
+                  <Th>Mejor intercept</Th>
                   <Th>Inicio</Th>
                   <Th>Fin</Th>
                   <Th> </Th>
@@ -174,6 +188,15 @@ function DrillingModule() {
                           </div>
                           <span className="text-[10px] text-text-secondary w-8 text-right">{pct}%</span>
                         </div>
+                      </Td>
+                      <Td>
+                        {bestByHole[h.id] ? (
+                          <span className="font-mono text-amber-600 font-semibold">
+                            {formatIntercept(bestByHole[h.id]!)}
+                          </span>
+                        ) : (
+                          <span className="text-text-secondary">—</span>
+                        )}
                       </Td>
                       <Td>{h.started_at ?? "—"}</Td>
                       <Td>{h.completed_at ?? "—"}</Td>
@@ -226,7 +249,7 @@ function DrillingModule() {
           hole={logHole}
           projectId={active.id}
           userId={user.id}
-          onClose={() => setLogHole(null)}
+          onClose={() => { setLogHole(null); refreshLogs(); }}
         />
       )}
     </div>

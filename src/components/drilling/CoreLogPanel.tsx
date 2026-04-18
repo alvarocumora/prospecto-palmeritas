@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, AlertTriangle, X } from "lucide-react";
+import { Plus, Pencil, Trash2, AlertTriangle, Sparkles } from "lucide-react";
 import { useDrillCoreLogs, type DrillCoreLog, type DrillHole } from "@/hooks/useDrilling";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,6 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  computeIntercepts,
+  DEFAULT_AU_CUTOFF,
+  DEFAULT_INTERNAL_DILUTION_M,
+} from "@/lib/drilling/intercepts";
 
 const inp = "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
 
@@ -26,6 +31,13 @@ export function CoreLogPanel({
   const { data: logs, loading, refresh } = useDrillCoreLogs(hole.id);
   const [editing, setEditing] = useState<DrillCoreLog | null>(null);
   const [creating, setCreating] = useState(false);
+  const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
+  const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
+
+  const intercepts = useMemo(
+    () => computeIntercepts(logs, cutoff, dilution),
+    [logs, cutoff, dilution]
+  );
 
   const overlaps = useMemo(() => {
     const set = new Set<string>();
@@ -70,6 +82,85 @@ export function CoreLogPanel({
           <span>Profundidad: <strong className="text-foreground">{hole.actual_depth ?? "—"}/{hole.planned_depth ?? "—"} m</strong></span>
           <span>Az/Dip: <strong className="text-foreground">{hole.azimuth ?? "—"}°/{hole.dip ?? "—"}°</strong></span>
           <span>Logueado: <strong className="text-foreground">{totalLogged.toFixed(2)} m</strong> en {logs.length} intervalos</span>
+        </div>
+
+        {/* Intercepts mineralizados */}
+        <div className="border border-amber-500/30 bg-amber-500/5 rounded p-3 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <Sparkles className="w-4 h-4 text-amber-500" />
+              Intercepts mineralizados
+              <span className="text-xs font-normal text-text-secondary">
+                ({intercepts.length})
+              </span>
+            </div>
+            <div className="flex items-center gap-2 text-[11px]">
+              <label className="flex items-center gap-1">
+                <span className="text-text-secondary">Cutoff Au g/t</span>
+                <input
+                  type="number"
+                  step="0.05"
+                  min="0"
+                  value={cutoff}
+                  onChange={(e) => setCutoff(Number(e.target.value) || 0)}
+                  className="w-16 px-1.5 py-0.5 bg-bg-secondary border border-border rounded text-xs"
+                />
+              </label>
+              <label className="flex items-center gap-1">
+                <span className="text-text-secondary">Dilución int. m</span>
+                <input
+                  type="number"
+                  step="0.5"
+                  min="0"
+                  value={dilution}
+                  onChange={(e) => setDilution(Number(e.target.value) || 0)}
+                  className="w-16 px-1.5 py-0.5 bg-bg-secondary border border-border rounded text-xs"
+                />
+              </label>
+            </div>
+          </div>
+          {intercepts.length === 0 ? (
+            <div className="text-xs text-text-secondary py-2 text-center">
+              Sin intercepts ≥ {cutoff} g/t Au con los parámetros actuales.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-[10px] uppercase tracking-wider text-text-secondary">
+                    <th className="px-2 py-1">Desde-Hasta (m)</th>
+                    <th className="px-2 py-1">Largo (m)</th>
+                    <th className="px-2 py-1">Au g/t</th>
+                    <th className="px-2 py-1">Cu %</th>
+                    <th className="px-2 py-1">Ag g/t</th>
+                    <th className="px-2 py-1"># int.</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {intercepts.map((it, i) => (
+                    <tr key={i} className="border-t border-amber-500/20">
+                      <td className="px-2 py-1 font-mono">
+                        {it.from.toFixed(2)}–{it.to.toFixed(2)}
+                      </td>
+                      <td className="px-2 py-1 font-mono font-semibold">
+                        {it.length.toFixed(2)}
+                      </td>
+                      <td className="px-2 py-1 font-mono font-bold text-amber-600">
+                        {it.au_gpt != null ? it.au_gpt.toFixed(3) : "—"}
+                      </td>
+                      <td className="px-2 py-1 font-mono">
+                        {it.cu_pct != null ? it.cu_pct.toFixed(3) : "—"}
+                      </td>
+                      <td className="px-2 py-1 font-mono">
+                        {it.ag_gpt != null ? it.ag_gpt.toFixed(2) : "—"}
+                      </td>
+                      <td className="px-2 py-1 text-text-secondary">{it.intervals}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         <div className="flex justify-between items-center">
