@@ -26,7 +26,7 @@ import {
   loadCatastro,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
-import { exportCatastroPdf } from "./map/exportCatastroPdf";
+
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 
