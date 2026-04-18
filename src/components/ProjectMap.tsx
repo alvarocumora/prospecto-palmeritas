@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Layer } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -33,6 +33,10 @@ import {
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<unknown>(null);
+  const [counts, setCounts] = useState<{ explotacion: number | null; exploracion: number | null }>({
+    explotacion: null,
+    exploracion: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -72,8 +76,8 @@ export function ProjectMap() {
         drills: drillsFC,
       });
 
-      // --- Load Catastro Minero around AOI (~3 km half-size) ---
-      const bbox = bboxAround(CENTER, 3);
+      // --- Load Catastro Minero around AOI (~8 km half-size) ---
+      const bbox = bboxAround(CENTER, 8);
       const overlays: Record<string, Layer> = { ...geoOverlays };
 
       const [explotRes, exploRes] = await Promise.allSettled([
@@ -82,16 +86,21 @@ export function ProjectMap() {
       ]);
       if (cancelled) return;
 
+      let explotCount: number | null = null;
+      let exploCount: number | null = null;
       if (explotRes.status === "fulfilled") {
-        overlays["Catastro · Pertenencias (explotación)"] = explotRes.value;
+        overlays[`Catastro · Pertenencias (${explotRes.value.count})`] = explotRes.value.layer;
+        explotCount = explotRes.value.count;
       } else {
         console.warn("Catastro explotación falló:", explotRes.reason);
       }
       if (exploRes.status === "fulfilled") {
-        overlays["Catastro · Concesiones (exploración)"] = exploRes.value;
+        overlays[`Catastro · Concesiones (${exploRes.value.count})`] = exploRes.value.layer;
+        exploCount = exploRes.value.count;
       } else {
         console.warn("Catastro exploración falló:", exploRes.reason);
       }
+      setCounts({ explotacion: explotCount, exploracion: exploCount });
 
       L.control
         .layers(basemaps, overlays, { position: "topright", collapsed: true })
@@ -119,6 +128,17 @@ export function ProjectMap() {
         className="h-72 md:h-96 w-full rounded border border-border overflow-hidden bg-bg-secondary"
         style={{ zIndex: 0 }}
       />
+      <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+        <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-gold/40 bg-gold/10 text-gold">
+          <span className="w-2 h-2 rounded-sm bg-gold" />
+          Pertenencias: <strong>{counts.explotacion ?? "…"}</strong>
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-info/40 bg-info/10 text-info">
+          <span className="w-2 h-2 rounded-sm bg-info" />
+          Concesiones: <strong>{counts.exploracion ?? "…"}</strong>
+        </span>
+      </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide

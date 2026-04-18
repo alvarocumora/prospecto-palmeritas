@@ -16,13 +16,13 @@ export async function loadCatastroLayer(
   L: LeafletNS,
   kind: CatastroKind,
   bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number }
-): Promise<LeafletGeoJSON> {
+): Promise<{ layer: LeafletGeoJSON; count: number }> {
   const url = catastroQueryUrl(kind, bbox);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Catastro ${kind} ${res.status}`);
   const fc = (await res.json()) as AnyFC;
   const style = CATASTRO_STYLE[kind];
-  return L.geoJSON(fc, {
+  const layer = L.geoJSON(fc, {
     style: () => ({
       color: style.color,
       weight: style.weight,
@@ -31,10 +31,11 @@ export async function loadCatastroLayer(
       fillOpacity: style.fillOpacity,
       dashArray: style.dashArray,
     }),
-    onEachFeature: (f, layer) => {
-      layer.bindPopup(catastroPopupHtml(kind, f.properties ?? {}));
+    onEachFeature: (f, l) => {
+      l.bindPopup(catastroPopupHtml(kind, f.properties ?? {}));
     },
   });
+  return { layer, count: fc.features?.length ?? 0 };
 }
 
 /** Returns a bbox in degrees around a center point with the given half-size in km. */
