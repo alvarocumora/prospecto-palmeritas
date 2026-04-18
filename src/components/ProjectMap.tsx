@@ -47,6 +47,7 @@ const DEFAULT_VISIBLE: ReadonlySet<CatastroOrigen> = new Set([
 
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const leafletRef = useRef<LeafletNS | null>(null);
   const layerControlRef = useRef<Control.Layers | null>(null);
@@ -54,8 +55,15 @@ export function ProjectMap() {
   const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const aoiRef = useRef<AoiPolygon | null>(null);
   const geophysicsLayerRef = useRef<LayerGroup | null>(null);
+  const measureLineRef = useRef<Layer | null>(null);
+  const measurePointsRef = useRef<[number, number][]>([]);
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [toolsOpen, setToolsOpen] = useState(false);
+  const [measuring, setMeasuring] = useState(false);
+  const [measureDist, setMeasureDist] = useState<number | null>(null);
+  const [geophysicsVisible, setGeophysicsVisible] = useState(true);
   const { data: geoph } = useGeophysicsData();
 
   const loadCatastroData = useCallback(async () => {
