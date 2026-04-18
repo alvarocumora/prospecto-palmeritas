@@ -1,64 +1,28 @@
 import { useEffect, useRef } from "react";
 
+import aoiData from "@/data/geo/aoi.geojson?url";
+import veinsData from "@/data/geo/veins.geojson?url";
+import palmsData from "@/data/geo/palm_clusters.geojson?url";
+import workingsData from "@/data/geo/workings.geojson?url";
+import drillsData from "@/data/geo/drill_collars.geojson?url";
+
 /**
  * Interactive Leaflet map for Prospecto Palmeras (TRK-ALH-001).
- * Renders project centroid, vein traces (subvertical N20°W–N30°E),
- * Jubaea chilensis palm cluster markers, historic workings,
- * and proposed DDH drill collars.
+ * Features (AOI centroid, vein traces, palm clusters, historic workings,
+ * proposed DDH collars) are loaded from GeoJSON files in src/data/geo,
+ * each carrying a `source` property surfaced in popups.
  *
  * Client-only: dynamically imports Leaflet to avoid SSR breakage in the Worker runtime.
  */
 
 const CENTER: [number, number] = [-33.898438, -71.115471];
 
-// Synthetic but geologically consistent vector data anchored on the project centroid.
-// Vein traces oriented N20°W to N30°E, ~400 m surface length.
-const VEINS: { name: string; coords: [number, number][]; strike: string }[] = [
-  {
-    name: "Veta Aflorante — Corte Principal",
-    strike: "N20°W",
-    coords: [
-      [-33.89665, -71.11595],
-      [-33.89845, -71.11540],
-      [-33.90020, -71.11488],
-    ],
-  },
-  {
-    name: "Veta Secundaria NE",
-    strike: "N30°E",
-    coords: [
-      [-33.89760, -71.11710],
-      [-33.89890, -71.11620],
-      [-33.90020, -71.11530],
-    ],
-  },
-];
+type AnyFC = GeoJSON.FeatureCollection<GeoJSON.Geometry, Record<string, unknown>>;
 
-const PALM_CLUSTERS: { name: string; pos: [number, number]; count: number }[] = [
-  { name: "Cluster Ladera NW", pos: [-33.89720, -71.11680], count: 6 },
-  { name: "Cluster Cumbre", pos: [-33.89820, -71.11540], count: 4 },
-  { name: "Cluster Ladera SE", pos: [-33.89970, -71.11430], count: 3 },
-];
-
-const WORKINGS: { name: string; pos: [number, number]; type: string }[] = [
-  { name: "Pique Prehispánico 1", pos: [-33.89800, -71.11580], type: "Pique manual" },
-  { name: "Socavón Colonial", pos: [-33.89880, -71.11505], type: "Socavón ~25m" },
-  { name: "Pique Republicano", pos: [-33.89930, -71.11470], type: "Pique 8m" },
-];
-
-const DRILL_COLLARS: {
-  id: string;
-  pos: [number, number];
-  azimuth: string;
-  inclination: string;
-  depth: string;
-  target: string;
-}[] = [
-  { id: "ALH-DDH-001", pos: [-33.89845, -71.11540], azimuth: "090°", inclination: "-60°", depth: "250 m", target: "Veta aflorante → sulfuros" },
-  { id: "ALH-DDH-002", pos: [-33.89760, -71.11635], azimuth: "270°", inclination: "-55°", depth: "300 m", target: "Extensión lateral NW" },
-  { id: "ALH-DDH-003", pos: [-33.89915, -71.11590], azimuth: "045°", inclination: "-70°", depth: "200 m", target: "Intersección fallas" },
-  { id: "ALH-DDH-004", pos: [-33.89880, -71.11460], azimuth: "135°", inclination: "-65°", depth: "280 m", target: "Mesotermal profunda" },
-];
+function sourceLine(src: unknown): string {
+  if (!src) return "";
+  return `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 ${String(src)}</div>`;
+}
 
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -71,8 +35,6 @@ export function ProjectMap() {
     (async () => {
       const L = (await import("leaflet")).default;
       if (cancelled || !containerRef.current) return;
-
-      // Avoid double-init on HMR / Strict Mode
       if (mapRef.current) return;
 
       const map = L.map(containerRef.current, {
@@ -122,7 +84,6 @@ export function ProjectMap() {
       cartoDark.addTo(map);
 
       // --- SERNAGEOMIN Geological WMS overlay ---
-      // Mapa Geológico de Chile escala 1:1.000.000 (SERNAGEOMIN)
       const sernageominGeology = L.tileLayer.wms(
         "https://catastro.sernageomin.cl/arcgis/services/PUBLICO/Mapa_Geologico_Chile_1M/MapServer/WMSServer",
         {
@@ -150,105 +111,142 @@ export function ProjectMap() {
         )
         .addTo(map);
 
-      // --- Project centroid ---
+      // --- Load all GeoJSON in parallel ---
+      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
+        [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
+          fetch(u).then((r) => r.json())
+        )
+      )) as AnyFC[];
+
+      if (cancelled) return;
+
+      // --- AOI centroid ---
       const centroidIcon = L.divIcon({
         className: "",
         html: `<div style="width:14px;height:14px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 4px color-mix(in oklab, var(--gold) 30%, transparent);border:2px solid var(--background);"></div>`,
         iconSize: [14, 14],
         iconAnchor: [7, 7],
       });
-      L.marker(CENTER, { icon: centroidIcon })
-        .addTo(map)
-        .bindPopup(
-          `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;">
-            <strong style="color:#C8922A;">PROSPECTO PALMERAS</strong><br/>
-            TRK-ALH-001<br/>
-            ${CENTER[0].toFixed(6)}, ${CENTER[1].toFixed(6)}
-          </div>`
-        );
+      L.geoJSON(aoiFC, {
+        pointToLayer: (_f, latlng) => L.marker(latlng, { icon: centroidIcon }),
+        onEachFeature: (f, layer) => {
+          const p = f.properties ?? {};
+          layer.bindPopup(
+            `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;">
+              <strong style="color:#C8922A;">${p.name ?? "AOI"}</strong><br/>
+              ${p.code ?? ""}<br/>
+              ${CENTER[0].toFixed(6)}, ${CENTER[1].toFixed(6)}
+              ${sourceLine(p.source)}
+            </div>`
+          );
+        },
+      }).addTo(map);
 
       // --- Vein traces ---
-      VEINS.forEach((v) => {
-        L.polyline(v.coords, {
-          color: "#F0C96B",
-          weight: 4,
-          opacity: 0.9,
-          dashArray: "1 0",
-        })
-          .addTo(map)
-          .bindPopup(
+      L.geoJSON(veinsFC, {
+        style: { color: "#F0C96B", weight: 4, opacity: 0.9 },
+        onEachFeature: (f, layer) => {
+          const p = f.properties ?? {};
+          layer.bindPopup(
             `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;">
-              <strong style="color:#C8922A;">${v.name}</strong><br/>
-              Rumbo: ${v.strike} · subvertical
+              <strong style="color:#C8922A;">${p.name}</strong><br/>
+              Rumbo: ${p.strike} · ${p.dip ?? ""}
+              ${sourceLine(p.source)}
             </div>`
           );
-      });
+        },
+      }).addTo(map);
 
       // --- Palm clusters ---
-      PALM_CLUSTERS.forEach((p) => {
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:20px;height:20px;border-radius:50%;background:color-mix(in oklab, #1D9E75 35%, transparent);border:2px solid #1D9E75;display:flex;align-items:center;justify-content:center;color:#F5F0EB;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;">${p.count}</div>`,
-          iconSize: [20, 20],
-          iconAnchor: [10, 10],
-        });
-        L.marker(p.pos, { icon })
-          .addTo(map)
-          .bindPopup(
+      L.geoJSON(palmsFC, {
+        pointToLayer: (f, latlng) => {
+          const count = (f.properties?.count as number) ?? 0;
+          const icon = L.divIcon({
+            className: "",
+            html: `<div style="width:20px;height:20px;border-radius:50%;background:color-mix(in oklab, #1D9E75 35%, transparent);border:2px solid #1D9E75;display:flex;align-items:center;justify-content:center;color:#F5F0EB;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;">${count}</div>`,
+            iconSize: [20, 20],
+            iconAnchor: [10, 10],
+          });
+          return L.marker(latlng, { icon });
+        },
+        onEachFeature: (f, layer) => {
+          const p = f.properties ?? {};
+          layer.bindPopup(
             `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;">
               <strong style="color:#1D9E75;">${p.name}</strong><br/>
-              ${p.count}× Jubaea chilensis<br/>
+              ${p.count}× ${p.species ?? "Jubaea chilensis"}<br/>
               <em style="color:#A89080;">Proxy estructural</em>
+              ${sourceLine(p.source)}
             </div>`
           );
-      });
+        },
+      }).addTo(map);
 
       // --- Historic workings ---
-      WORKINGS.forEach((w) => {
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:12px;height:12px;background:#CD7F32;border:1.5px solid #F5F0EB;transform:rotate(45deg);"></div>`,
-          iconSize: [12, 12],
-          iconAnchor: [6, 6],
-        });
-        L.marker(w.pos, { icon })
-          .addTo(map)
-          .bindPopup(
+      L.geoJSON(workingsFC, {
+        pointToLayer: (_f, latlng) => {
+          const icon = L.divIcon({
+            className: "",
+            html: `<div style="width:12px;height:12px;background:#CD7F32;border:1.5px solid #F5F0EB;transform:rotate(45deg);"></div>`,
+            iconSize: [12, 12],
+            iconAnchor: [6, 6],
+          });
+          return L.marker(latlng, { icon });
+        },
+        onEachFeature: (f, layer) => {
+          const p = f.properties ?? {};
+          layer.bindPopup(
             `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;">
-              <strong style="color:#CD7F32;">${w.name}</strong><br/>
-              ${w.type}
+              <strong style="color:#CD7F32;">${p.name}</strong><br/>
+              ${p.type}
+              ${sourceLine(p.source)}
             </div>`
           );
-      });
+        },
+      }).addTo(map);
 
       // --- Drill collars ---
-      DRILL_COLLARS.forEach((d) => {
-        const icon = L.divIcon({
-          className: "",
-          html: `<div style="width:18px;height:18px;border-radius:3px;background:color-mix(in oklab, #185FA5 50%, transparent);border:2px solid #185FA5;display:flex;align-items:center;justify-content:center;color:#F5F0EB;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;">D</div>`,
-          iconSize: [18, 18],
-          iconAnchor: [9, 9],
-        });
-        L.marker(d.pos, { icon })
-          .addTo(map)
-          .bindPopup(
+      L.geoJSON(drillsFC, {
+        pointToLayer: (_f, latlng) => {
+          const icon = L.divIcon({
+            className: "",
+            html: `<div style="width:18px;height:18px;border-radius:3px;background:color-mix(in oklab, #185FA5 50%, transparent);border:2px solid #185FA5;display:flex;align-items:center;justify-content:center;color:#F5F0EB;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;">D</div>`,
+            iconSize: [18, 18],
+            iconAnchor: [9, 9],
+          });
+          return L.marker(latlng, { icon });
+        },
+        onEachFeature: (f, layer) => {
+          const p = f.properties ?? {};
+          layer.bindPopup(
             `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.6;">
-              <strong style="color:#5DA3DD;">${d.id}</strong><br/>
-              Az ${d.azimuth} · Incl ${d.inclination}<br/>
-              Prof: ${d.depth}<br/>
-              <em style="color:#A89080;">${d.target}</em>
+              <strong style="color:#5DA3DD;">${p.id}</strong><br/>
+              Az ${p.azimuth} · Incl ${p.inclination}<br/>
+              Prof: ${p.depth}<br/>
+              <em style="color:#A89080;">${p.target}</em>
+              ${sourceLine(p.source)}
             </div>`
           );
-      });
+        },
+      }).addTo(map);
 
       // Fit to all features
-      const bounds = L.latLngBounds([
-        ...VEINS.flatMap((v) => v.coords),
-        ...PALM_CLUSTERS.map((p) => p.pos),
-        ...WORKINGS.map((w) => w.pos),
-        ...DRILL_COLLARS.map((d) => d.pos),
-      ]);
-      map.fitBounds(bounds, { padding: [30, 30] });
+      const collect: [number, number][] = [];
+      [veinsFC, palmsFC, workingsFC, drillsFC].forEach((fc) => {
+        fc.features.forEach((f) => {
+          if (f.geometry.type === "Point") {
+            const [lng, lat] = f.geometry.coordinates as [number, number];
+            collect.push([lat, lng]);
+          } else if (f.geometry.type === "LineString") {
+            (f.geometry.coordinates as [number, number][]).forEach(([lng, lat]) =>
+              collect.push([lat, lng])
+            );
+          }
+        });
+      });
+      if (collect.length) {
+        map.fitBounds(L.latLngBounds(collect), { padding: [30, 30] });
+      }
 
       cleanup = () => {
         map.remove();
