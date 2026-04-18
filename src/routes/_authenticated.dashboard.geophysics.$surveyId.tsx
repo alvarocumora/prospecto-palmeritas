@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio,
+  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload,
 } from "lucide-react";
 import {
   useSurvey,
@@ -10,6 +10,7 @@ import {
   type Line,
 } from "@/hooks/useGeophysicsCRUD";
 import { useProjects } from "@/hooks/useProjects";
+import { StationCsvImport } from "@/components/geophysics/StationCsvImport";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/geophysics/$surveyId")({
