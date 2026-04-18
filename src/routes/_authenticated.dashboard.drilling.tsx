@@ -144,6 +144,7 @@ function DrillingModule() {
                   <Th>Az/Dip</Th>
                   <Th>Plan/Real (m)</Th>
                   <Th>Avance</Th>
+                  <Th>Mejor intercept</Th>
                   <Th>Inicio</Th>
                   <Th>Fin</Th>
                   <Th> </Th>
@@ -187,6 +188,15 @@ function DrillingModule() {
                           </div>
                           <span className="text-[10px] text-text-secondary w-8 text-right">{pct}%</span>
                         </div>
+                      </Td>
+                      <Td>
+                        {bestByHole[h.id] ? (
+                          <span className="font-mono text-amber-600 font-semibold">
+                            {formatIntercept(bestByHole[h.id]!)}
+                          </span>
+                        ) : (
+                          <span className="text-text-secondary">—</span>
+                        )}
                       </Td>
                       <Td>{h.started_at ?? "—"}</Td>
                       <Td>{h.completed_at ?? "—"}</Td>
