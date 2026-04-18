@@ -83,6 +83,9 @@ export function ProjectMap() {
     if (exploRes.status === "fulfilled") {
       const label = `Catastro · Concesiones (${exploRes.value.count})`;
       ctrl.addOverlay(exploRes.value.layer, label);
+      // Activar por defecto la capa de concesiones (las pertenencias del FeatureServer
+      // público están vacías, así que solo esta capa aporta información visual).
+      exploRes.value.layer.addTo(map);
       catastroLayersRef.current.exploracion = exploRes.value.layer;
       catastroLabelsRef.current.exploracion = label;
       exploCount = exploRes.value.count;
