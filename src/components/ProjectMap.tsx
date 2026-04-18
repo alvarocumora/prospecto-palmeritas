@@ -211,7 +211,6 @@ export function ProjectMap() {
   const toggleGeophysics = useCallback(() => {
     const map = mapRef.current;
     const layer = geophysicsLayerRef.current;
-    console.log("[geophysics toggle]", { hasMap: !!map, hasLayer: !!layer, hasLayerOnMap: layer && map ? map.hasLayer(layer) : null });
     if (!map || !layer) return;
     if (map.hasLayer(layer)) {
       map.removeLayer(layer);
