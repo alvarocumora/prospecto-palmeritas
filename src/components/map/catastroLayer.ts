@@ -68,6 +68,8 @@ export function clearCatastroCache(): number {
 export type CatastroLoadResult = {
   /** One Leaflet GeoJSON layer per ORIGEN type, ready to be added to the map. */
   layersByOrigen: Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
+  /** Raw GeoJSON features bucketed by ORIGEN (for export / analysis). */
+  featuresByOrigen: Record<CatastroOrigen, AnyFC["features"]>;
   /** Feature counts per ORIGEN. */
   countsByOrigen: Record<CatastroOrigen, number>;
   total: number;
@@ -150,6 +152,7 @@ export async function loadCatastro(
 
   return {
     layersByOrigen,
+    featuresByOrigen: buckets,
     countsByOrigen,
     total: features.length,
     cached: fromCache,
