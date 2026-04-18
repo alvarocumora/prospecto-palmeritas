@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ProjectMap } from "@/components/ProjectMap";
 import {
   Activity,
   AlertTriangle,
@@ -313,26 +314,17 @@ function Overview() {
 
       {/* Map / Cross-section */}
       <Card delay={300} className="p-6">
-        <SectionTitle icon={MapPin} sub="Próximamente">
-          Mapa Geológico & Sección Esquemática
+        <SectionTitle icon={MapPin} sub="Vetas · Palmeras · Collares DDH">
+          Mapa Geológico Interactivo
         </SectionTitle>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Map placeholder */}
-          <div className="relative h-72 rounded border border-dashed border-border bg-bg-secondary overflow-hidden">
-            <div className="absolute inset-0 grid-texture opacity-40" />
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-              <MapPin className="w-8 h-8 text-gold mb-3" />
-              <div className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-                Distrito Alhué · RM
-              </div>
-              <div className="font-mono text-sm text-gold-light mt-1">{PROJECT.coords}</div>
-              <div className="text-xs text-hint mt-3">MAPA INTERACTIVO — PRÓXIMAMENTE</div>
-            </div>
-          </div>
+        <ProjectMap />
+      </Card>
 
-          {/* SVG cross-section */}
-          <CrossSection />
-        </div>
+      <Card delay={400} className="p-6">
+        <SectionTitle icon={Layers} sub="Profundidad 0–300 m">
+          Sección Esquemática Vertical
+        </SectionTitle>
+        <CrossSection />
       </Card>
     </div>
   );
