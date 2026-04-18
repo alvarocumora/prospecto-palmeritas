@@ -703,6 +703,77 @@ export type Database = {
           },
         ]
       }
+      mining_concessions: {
+        Row: {
+          area_ha: number | null
+          code: string
+          commune: string | null
+          concession_type: string
+          created_at: string
+          created_by: string
+          expires_at: string | null
+          geometry_geojson: Json | null
+          granted_at: string | null
+          holder: string | null
+          id: string
+          name: string
+          notes: string | null
+          project_id: string
+          region: string | null
+          source: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          code: string
+          commune?: string | null
+          concession_type?: string
+          created_at?: string
+          created_by: string
+          expires_at?: string | null
+          geometry_geojson?: Json | null
+          granted_at?: string | null
+          holder?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          project_id: string
+          region?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          code?: string
+          commune?: string | null
+          concession_type?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string | null
+          geometry_geojson?: Json | null
+          granted_at?: string | null
+          holder?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          project_id?: string
+          region?: string | null
+          source?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mining_concessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
