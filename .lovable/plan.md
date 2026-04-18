@@ -1,75 +1,67 @@
 
 
-## Módulo de Geofísica + Mejora AOI
+## Validación de cambios y plan de compilación
 
-Implementación en 4 frentes — todos los seleccionados.
+### Estado actual de los módulos
 
-### 1. Overlays geofísicos reales en el mapa
+**Implementados correctamente:**
+- `src/components/Geophysics.tsx` — tab nuevo con plan de adquisición, firmas esperadas, estaciones simuladas, bibliografía.
+- `src/hooks/useGeophysicsData.ts` — fetch de `geophysics_surveys/lines/stations` desde Supabase.
+- `src/components/map/geophysicsOverlays.ts` — WMS EMAG2 + WGM2012 + Hillshade Esri.
+- `src/components/map/geophysicsLayers.ts` — render de líneas (polylines dasheadas) y estaciones (circleMarkers escalados por nT).
+- `src/components/map/aoiPolygon.ts` — carga del polígono AOI cacheado.
+- `src/data/geo/aoi.geojson` — ahora contiene Polygon ~1.5×1.2 km además del centroide.
+- `supabase/migrations/2026...geophysics_tables.sql` — 3 tablas + RLS + seed sintético.
+- `src/components/map/exportCatastroPdf.ts` — usa `@turf/turf` para `booleanIntersects` + `distance` al centroide AOI; agrega columna **Dist (km)** y sección destacada de intersecciones.
+- `src/components/ProjectMap.tsx` — integra `aoiRef`, `geophysicsLayerRef`, overlays geofísicos en el control de capas.
+- `src/routes/index.tsx` — tab `geophysics` registrado en `TopNav`.
 
-Agregar al control de capas existente (junto a Macrostrat y Catastro):
+**Dependencias instaladas y verificadas:**
+- `@turf/turf ^7.3.4`, `jspdf ^4.2.1`, `jspdf-autotable ^5.0.7`, `leaflet ^1.9.4`, `react-leaflet ^5.0.0`.
 
-- **Anomalía magnética total (EMAG2 v3)** — NOAA NCEI WMS público. Capa `EMAG2_V3_SeaLevel` desde `gs.ngdc.noaa.gov/geoserver/web-mercator/wms`. Resolución 2-arcmin (~3.7 km), apropiada para contexto regional/distrital.
-- **Gravimetría Bouguer (WGM2012)** — BGI WMS `bgi.obs-mip.fr/.../wgm2012`. Anomalía Bouguer terrestre.
-- **Hillshade SRTM** — opcional bonus, tile layer ya disponible vía `services.arcgisonline.com/ArcGIS/rest/services/Elevation/World_Hillshade`.
+### Problema detectado
 
-Ambos overlays con opacidad 50–60% y nota de escala en la leyenda ("contexto regional, no escala prospecto"). El usuario los activa desde el toggle de capas.
+Hay un error de runtime activo: **"Importing a module script failed"** (UNHANDLED_PROMISE_REJECTION).
 
-### 2. Tab "Geofísica" nuevo
+Causa más probable: `import * as turf from "@turf/turf"` en `exportCatastroPdf.ts` arrastra el barrel completo de Turf (~150KB+ con muchos sub-paquetes ESM) y, al importarse a nivel top de un módulo que se carga junto al resto del bundle del mapa, dispara un fallo de carga del chunk en el preview SSR/edge. El módulo PDF solo se necesita cuando el usuario hace clic en "⇩ PDF pertenencias", no en el render inicial.
 
-Nueva pestaña en `TopNav` (ícono Radio o Waves). Componente `Geophysics()` con:
+### Plan de compilación / fixes
 
-- **Plan de adquisición** — tabla de 3 campañas planificadas para epitermal Au-Cu de baja sulfuración:
-  - Magnetometría terrestre: 12 km lineales, 25 m espaciado, costo ~USD 8k
-  - IP-Resistividad dipolo-dipolo: 6 km líneas, a=50m n=1–6, costo ~USD 45k
-  - CSAMT: 2 km líneas, 10 estaciones, profundidad 800m, costo ~USD 30k
-- **Tabla método → firma esperada** sobre vetas N20°W subverticales (alteración argílica → bajo magnético; sulfuros → alta cargabilidad; sílice → alta resistividad).
-- **Mapa de líneas planificadas** — render de las polylines IP/Mag/CSAMT sobre el mapa principal (mismo Leaflet).
-- **Bibliografía**: Hedenquist et al. 2000, Sillitoe 2010, Corbett & Leach 1998, Irvine & Smith 1990 (geofísica epitermal).
+**1. Lazy-load del módulo PDF (fix runtime error)**
 
-### 3. Tablas Supabase (nuevas)
-
-```text
-geophysics_surveys    — campaña: id, name, method, status, planned_km, cost_usd
-geophysics_lines      — id, survey_id, line_id, geometry_geojson, length_m
-geophysics_stations   — id, survey_id, lat, lng, station_id,
-                        mag_nt, ip_chargeability_mvv, ip_resistivity_ohmm,
-                        is_synthetic (bool), notes
+En `src/components/ProjectMap.tsx`, reemplazar:
+```ts
+import { exportCatastroPdf } from "./map/exportCatastroPdf";
 ```
-
-RLS: `Public can view`, `Authenticated owner can CRUD` (igual patrón que `lithology_units`). Seed con ~40 estaciones magnéticas sintéticas pero coherentes (anomalía baja sobre traza de vetas argílicas, alta en bordes con magnetita preservada) y 2 líneas IP cruzando vetas.
-
-Hook `useGeophysicsData()` análogo a `useGeologyData()`.
-
-### 4. Mejora: filtro AOI con turf.js
-
-- Agregar `@turf/turf` (ESM, ~150KB, edge-compat).
-- Reemplazar `aoi.geojson` Point por un Polygon AOI real (~1.5 km × 1.2 km centrado en el centroide actual).
-- En `exportCatastroPdf`: para cada feature calcular `turf.booleanIntersects(feature, aoiPolygon)` y `turf.distance(centroid(feature), aoiCentroid)`.
-- Nueva columna **"Dist (km)"** + nueva sección al inicio del PDF: **"Pertenencias que intersectan AOI"** (subset destacado).
-- En el mapa: pertenencias intersectantes con borde más grueso (weight 4).
-
-### Arquitectura
-
-```text
-src/components/map/
-  geophysicsOverlays.ts     ← EMAG2 + WGM2012 + Hillshade WMS
-  geophysicsLayers.ts        ← render líneas/estaciones desde Supabase
-  exportCatastroPdf.ts       ← +turf intersection + distancia
-src/data/geo/
-  aoi.geojson                ← Point → Polygon
-src/hooks/
-  useGeophysicsData.ts       ← surveys/lines/stations
-src/routes/index.tsx
-  + tab "geophysics"
-  + Geophysics() module
-supabase/migrations/
-  geophysics_tables.sql      ← 3 tablas + RLS + seed sintético
+por un dynamic import dentro del handler del botón:
+```ts
+const { exportCatastroPdf } = await import("./map/exportCatastroPdf");
 ```
+Esto saca `jspdf` + `jspdf-autotable` + `@turf/turf` del bundle inicial → arregla el "module script failed" y mejora TTI.
 
-### Notas técnicas
+**2. Imports finos de Turf (reducir peso ~80%)**
 
-- WMS de NOAA/BGI funcionan vía Leaflet `L.tileLayer.wms()`, sin API key.
-- Datos sintéticos llevan flag `is_synthetic=true` y badge visible "SIMULADO" en UI — nunca se confunden con datos reales medidos.
-- turf.js es pure-JS, compatible Worker SSR.
-- El tab se renderiza solo client-side (mapa Leaflet ya lo es).
+En `exportCatastroPdf.ts`, cambiar barrel por sub-paquetes:
+```ts
+import booleanIntersects from "@turf/boolean-intersects";
+import distance from "@turf/distance";
+import centroid from "@turf/centroid";
+```
+Los sub-paquetes ya vienen como deps transitivas de `@turf/turf`, no requiere instalación adicional.
+
+**3. Verificación post-fix**
+
+- Recargar preview → confirmar que no aparece el error de runtime.
+- Abrir tab **Geophysics** → tabla de campañas carga (3 filas), bibliografía visible.
+- En el mapa → toggle de capas muestra "Magnetometría EMAG2", "Gravimetría Bouguer WGM2012", "Hillshade SRTM"; activar al menos uno y confirmar tiles.
+- Click en "⇩ PDF pertenencias" → descarga PDF con sección "Pertenencias que intersectan AOI" + columna Dist (km).
+- Verificar que las estaciones magnéticas aparecen como círculos rojos/azules sobre el mapa (overlay activo por defecto).
+
+**4. Validación Supabase (read-only check)**
+
+Correr `SELECT count(*) FROM geophysics_surveys/lines/stations` para confirmar seed (3 / 2+ / ~40 filas) y `supabase--linter` para detectar policies faltantes en las nuevas tablas.
+
+### Alcance
+
+Solo dos archivos editados (`ProjectMap.tsx`, `exportCatastroPdf.ts`). Sin cambios de schema ni de UI. Riesgo bajo; el cambio es puramente de bundling.
 
