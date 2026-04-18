@@ -42,7 +42,7 @@ import {
   CartesianGrid,
 } from "recharts";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/dashboard/palmeras")({
   head: () => ({
     meta: [
       { title: "Trackmin GeoIntel · Prospecto Palmeras (TRK-ALH-001)" },
