@@ -24,6 +24,7 @@ import {
   loadCatastro,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
+import { exportCatastroPdf } from "./map/exportCatastroPdf";
 
 /**
  * Interactive Leaflet map for Prospecto Palmeras (TRK-ALH-001).
@@ -58,6 +59,7 @@ export function ProjectMap() {
   const leafletRef = useRef<LeafletNS | null>(null);
   const layerControlRef = useRef<Control.Layers | null>(null);
   const catastroLayersRef = useRef<CatastroLayersByOrigen>({});
+  const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
 
@@ -99,6 +101,13 @@ export function ProjectMap() {
       catastroLayersRef.current[origen] = layer;
     }
     setCounts(result.countsByOrigen);
+    featuresByOrigenRef.current = result.featuresByOrigen;
+  }, []);
+
+  const handleExportPdf = useCallback(() => {
+    const f = featuresByOrigenRef.current;
+    if (!f) return;
+    exportCatastroPdf(f, { center: CENTER, halfKm: 8 });
   }, []);
 
   const handleRefresh = useCallback(async () => {
