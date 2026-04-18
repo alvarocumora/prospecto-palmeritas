@@ -1,0 +1,18 @@
+{
+  "type": "FeatureCollection",
+  "name": "aoi",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Prospecto Palmeras — AOI",
+        "code": "TRK-ALH-001",
+        "source": "Trackmin GeoIntel · centroide proyecto (interno)"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-71.115471, -33.898438]
+      }
+    }
+  ]
+}

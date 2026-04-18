@@ -1,0 +1,40 @@
+{
+  "type": "FeatureCollection",
+  "name": "veins",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Veta Aflorante — Corte Principal",
+        "strike": "N20°W",
+        "dip": "subvertical",
+        "source": "Mapeo de superficie Trackmin 2025 · TRK-ALH-001"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-71.11595, -33.89665],
+          [-71.11540, -33.89845],
+          [-71.11488, -33.90020]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Veta Secundaria NE",
+        "strike": "N30°E",
+        "dip": "subvertical",
+        "source": "Mapeo de superficie Trackmin 2025 · TRK-ALH-001"
+      },
+      "geometry": {
+        "type": "LineString",
+        "coordinates": [
+          [-71.11710, -33.89760],
+          [-71.11620, -33.89890],
+          [-71.11530, -33.90020]
+        ]
+      }
+    }
+  ]
+}
