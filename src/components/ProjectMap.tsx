@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap } from "leaflet";
+import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
@@ -17,6 +17,8 @@ import {
   macrostratPopupHtml,
   type CatastroOrigen,
 } from "./map/overlays";
+import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
+import { buildGeophysicsLayer } from "./map/geophysicsLayers";
 import { addProjectFeatures } from "./map/featureLayers";
 import {
   bboxAround,
@@ -25,18 +27,9 @@ import {
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
 import { exportCatastroPdf } from "./map/exportCatastroPdf";
+import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
+import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 
-/**
- * Interactive Leaflet map for Prospecto Palmeras (TRK-ALH-001).
- * - Project features (AOI, vetas, palmeras, labores, collares) from local GeoJSON.
- * - Macrostrat geological raster overlay + click-to-query popup.
- * - SERNAGEOMIN Catastro Minero — single FeatureServer query (layer 2,
- *   `WGS84_Concesion`), filtered by `ID_SITUACION_CONCESION in (1,3)` and
- *   split client-side by `ORIGEN` into the same 4 categories used by the
- *   official viewer (Explotación 1983/1932, Exploración 1983, Estacamento).
- *
- * Client-only: dynamically imports Leaflet to avoid SSR breakage in the Worker.
- */
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
 
 const ORIGEN_ORDER: CatastroOrigen[] = [
@@ -46,8 +39,6 @@ const ORIGEN_ORDER: CatastroOrigen[] = [
   "ESTACAMENTO",
 ];
 
-// Activar por defecto las dos categorías más relevantes para el proyecto:
-// pertenencias de explotación (azules) y concesiones de exploración (verdes).
 const DEFAULT_VISIBLE: ReadonlySet<CatastroOrigen> = new Set([
   "EXPLOTA_1983",
   "EXPLORA_1983",
@@ -60,8 +51,11 @@ export function ProjectMap() {
   const layerControlRef = useRef<Control.Layers | null>(null);
   const catastroLayersRef = useRef<CatastroLayersByOrigen>({});
   const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
+  const aoiRef = useRef<AoiPolygon | null>(null);
+  const geophysicsLayerRef = useRef<LayerGroup | null>(null);
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
+  const { data: geoph } = useGeophysicsData();
 
   const loadCatastroData = useCallback(async () => {
     const L = leafletRef.current;
@@ -79,7 +73,6 @@ export function ProjectMap() {
       return;
     }
 
-    // Remove previous catastro layers from the layer control + map.
     for (const origen of ORIGEN_ORDER) {
       const prev = catastroLayersRef.current[origen];
       if (prev) {
@@ -89,7 +82,6 @@ export function ProjectMap() {
     }
     catastroLayersRef.current = {};
 
-    // Add new layers, in stacking order: estacamento (bottom) → explota_1983 (top)
     for (const origen of [...ORIGEN_ORDER].reverse()) {
       const layer = result.layersByOrigen[origen];
       const count = result.countsByOrigen[origen] ?? 0;
@@ -107,7 +99,7 @@ export function ProjectMap() {
   const handleExportPdf = useCallback(() => {
     const f = featuresByOrigenRef.current;
     if (!f) return;
-    exportCatastroPdf(f, { center: CENTER, halfKm: 8 });
+    exportCatastroPdf(f, { center: CENTER, halfKm: 8, aoi: aoiRef.current });
   }, []);
 
   const handleRefresh = useCallback(async () => {
@@ -144,8 +136,8 @@ export function ProjectMap() {
       const basemaps = buildBasemaps(L);
       basemaps["Esri Imagery"].addTo(map);
       const geoOverlays = buildGeologyOverlays(L);
+      const geophysicsWms = buildGeophysicsOverlays(L);
 
-      // --- Load project GeoJSON in parallel ---
       const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
         [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
           fetch(u).then((r) => r.json())
@@ -161,18 +153,17 @@ export function ProjectMap() {
         drills: drillsFC,
       });
 
-      // Layer control with geology overlays — catastro overlays are added dynamically.
-      const overlays: Record<string, Layer> = { ...geoOverlays };
+      aoiRef.current = (await loadAoiPolygon()) ?? null;
+
+      const overlays: Record<string, Layer> = { ...geoOverlays, ...geophysicsWms };
       const ctrl = L.control
         .layers(basemaps, overlays, { position: "topright", collapsed: true })
         .addTo(map);
       layerControlRef.current = ctrl;
 
-      // --- Initial Catastro load ---
       await loadCatastroData();
       if (cancelled) return;
 
-      // --- Macrostrat click-to-query popup ---
       wireMacrostratClickPopup(L, map, fetchMacrostratUnit, macrostratPopupHtml);
 
       cleanup = () => {
@@ -181,6 +172,7 @@ export function ProjectMap() {
         leafletRef.current = null;
         layerControlRef.current = null;
         catastroLayersRef.current = {};
+        geophysicsLayerRef.current = null;
       };
     })();
 
@@ -189,6 +181,19 @@ export function ProjectMap() {
       cleanup?.();
     };
   }, [loadCatastroData]);
+
+  // Add geophysics layer once data is loaded
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    const ctrl = layerControlRef.current;
+    if (!L || !map || !ctrl || !geoph || geophysicsLayerRef.current) return;
+    if (geoph.surveys.length === 0) return;
+    const layer = buildGeophysicsLayer(L, geoph.surveys, geoph.lines, geoph.stations);
+    ctrl.addOverlay(layer, `Geofísica planificada (${geoph.lines.length} líneas / ${geoph.stations.length} estaciones)`);
+    layer.addTo(map);
+    geophysicsLayerRef.current = layer;
+  }, [geoph]);
 
   const renderChip = (origen: CatastroOrigen) => {
     const style = CATASTRO_STYLE[origen];
@@ -236,7 +241,7 @@ export function ProjectMap() {
           onClick={handleExportPdf}
           disabled={Object.values(counts).every((n) => !n)}
           className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          title="Exportar PDF con la lista de pertenencias del bbox 8 km (ROL, titular, hectáreas, vencimiento)"
+          title="Exportar PDF: pertenencias del bbox 8 km + sección destacada con intersección AOI (turf.js)"
         >
           ⇩ PDF pertenencias
         </button>
@@ -266,7 +271,10 @@ export function ProjectMap() {
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH propuesto
         </span>
-        <span className="text-muted-foreground/70">· toggle de capas arriba-derecha del mapa · click → Macrostrat</span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
+        </span>
+        <span className="text-muted-foreground/70">· toggle de capas arriba-derecha · click → Macrostrat · WMS EMAG2/WGM2012 disponibles</span>
       </div>
     </div>
   );
