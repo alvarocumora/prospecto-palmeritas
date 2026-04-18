@@ -33,7 +33,9 @@ import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
+import { useDrillHoles } from "@/hooks/useDrilling";
 import { buildConcessionsLayer } from "./map/concessionLayer";
+import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
@@ -69,6 +71,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "catastro:EXPLORA_1983": { visible: true, opacity: 1 },
   "catastro:ESTACAMENTO": { visible: false, opacity: 1 },
   "concessions:project": { visible: true, opacity: 1 },
+  "drills:project": { visible: true, opacity: 1 },
 };
 
 export function ProjectMap() {
@@ -98,7 +101,9 @@ export function ProjectMap() {
   const { active } = useProjects();
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
+  const { data: drillHoles } = useDrillHoles(active?.id ?? null);
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
+  const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
@@ -318,6 +323,32 @@ export function ProjectMap() {
       ];
     });
   }, [concessions, active?.id]);
+
+  // Build drill collars layer for the active project
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (drillCollarsLayerRef.current) {
+      map.removeLayer(drillCollarsLayerRef.current);
+      drillCollarsLayerRef.current = null;
+    }
+    const layer = buildDrillCollarsLayer(L, drillHoles);
+    drillCollarsLayerRef.current = layer;
+    if (drillHoles.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "drills:project");
+      return [
+        ...without,
+        {
+          id: "drills:project",
+          label: `Sondajes del proyecto (${drillHoles.length})`,
+          group: "Proyecto",
+          layer,
+        },
+      ];
+    });
+  }, [drillHoles, active?.id]);
 
 
   // Fullscreen toggle
@@ -565,6 +596,9 @@ export function ProjectMap() {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
+        </span>
+        <span className="inline-flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
