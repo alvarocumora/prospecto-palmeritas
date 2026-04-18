@@ -31,6 +31,13 @@ export function CoreLogPanel({
   const { data: logs, loading, refresh } = useDrillCoreLogs(hole.id);
   const [editing, setEditing] = useState<DrillCoreLog | null>(null);
   const [creating, setCreating] = useState(false);
+  const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
+  const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
+
+  const intercepts = useMemo(
+    () => computeIntercepts(logs, cutoff, dilution),
+    [logs, cutoff, dilution]
+  );
 
   const overlaps = useMemo(() => {
     const set = new Set<string>();
