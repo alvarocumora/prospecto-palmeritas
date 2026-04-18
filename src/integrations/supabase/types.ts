@@ -25,6 +25,7 @@ export type Database = {
           id: string
           intensity: string | null
           name: string
+          project_id: string | null
           reference_id: string | null
           source: string | null
           updated_at: string
@@ -40,6 +41,7 @@ export type Database = {
           id?: string
           intensity?: string | null
           name: string
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           updated_at?: string
@@ -55,12 +57,20 @@ export type Database = {
           id?: string
           intensity?: string | null
           name?: string
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           updated_at?: string
           zone_code?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "alteration_zones_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "alteration_zones_reference_id_fkey"
             columns: ["reference_id"]
@@ -85,6 +95,7 @@ export type Database = {
           lithology: string | null
           mineralization: string | null
           notes: string | null
+          project_id: string | null
           recovery_pct: number | null
           rqd_pct: number | null
           structure: string | null
@@ -106,6 +117,7 @@ export type Database = {
           lithology?: string | null
           mineralization?: string | null
           notes?: string | null
+          project_id?: string | null
           recovery_pct?: number | null
           rqd_pct?: number | null
           structure?: string | null
@@ -127,6 +139,7 @@ export type Database = {
           lithology?: string | null
           mineralization?: string | null
           notes?: string | null
+          project_id?: string | null
           recovery_pct?: number | null
           rqd_pct?: number | null
           structure?: string | null
@@ -140,6 +153,13 @@ export type Database = {
             columns: ["hole_id"]
             isOneToOne: false
             referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drill_core_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -159,6 +179,7 @@ export type Database = {
           northing: number | null
           notes: string | null
           planned_depth: number | null
+          project_id: string | null
           started_at: string | null
           status: string
           target_zone: string | null
@@ -178,6 +199,7 @@ export type Database = {
           northing?: number | null
           notes?: string | null
           planned_depth?: number | null
+          project_id?: string | null
           started_at?: string | null
           status?: string
           target_zone?: string | null
@@ -197,12 +219,21 @@ export type Database = {
           northing?: number | null
           notes?: string | null
           planned_depth?: number | null
+          project_id?: string | null
           started_at?: string | null
           status?: string
           target_zone?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "drill_holes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       geo_references: {
         Row: {
@@ -213,6 +244,7 @@ export type Database = {
           doi: string | null
           id: string
           notes: string | null
+          project_id: string | null
           publisher: string | null
           title: string
           updated_at: string
@@ -227,6 +259,7 @@ export type Database = {
           doi?: string | null
           id?: string
           notes?: string | null
+          project_id?: string | null
           publisher?: string | null
           title: string
           updated_at?: string
@@ -241,13 +274,22 @@ export type Database = {
           doi?: string | null
           id?: string
           notes?: string | null
+          project_id?: string | null
           publisher?: string | null
           title?: string
           updated_at?: string
           url?: string | null
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "geo_references_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       geological_features: {
         Row: {
@@ -263,6 +305,7 @@ export type Database = {
           length_m: number | null
           lithology_id: string | null
           name: string
+          project_id: string | null
           reference_id: string | null
           source: string | null
           strike: string | null
@@ -282,6 +325,7 @@ export type Database = {
           length_m?: number | null
           lithology_id?: string | null
           name: string
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           strike?: string | null
@@ -301,6 +345,7 @@ export type Database = {
           length_m?: number | null
           lithology_id?: string | null
           name?: string
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           strike?: string | null
@@ -323,6 +368,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "geological_features_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "geological_features_reference_id_fkey"
             columns: ["reference_id"]
             isOneToOne: false
@@ -341,6 +393,7 @@ export type Database = {
           length_m: number | null
           line_id: string
           notes: string | null
+          project_id: string | null
           survey_id: string | null
           updated_at: string
         }
@@ -353,6 +406,7 @@ export type Database = {
           length_m?: number | null
           line_id: string
           notes?: string | null
+          project_id?: string | null
           survey_id?: string | null
           updated_at?: string
         }
@@ -365,10 +419,18 @@ export type Database = {
           length_m?: number | null
           line_id?: string
           notes?: string | null
+          project_id?: string | null
           survey_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "geophysics_lines_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "geophysics_lines_survey_id_fkey"
             columns: ["survey_id"]
@@ -390,6 +452,7 @@ export type Database = {
           lng: number
           mag_nt: number | null
           notes: string | null
+          project_id: string | null
           station_id: string
           survey_id: string | null
           updated_at: string
@@ -405,6 +468,7 @@ export type Database = {
           lng: number
           mag_nt?: number | null
           notes?: string | null
+          project_id?: string | null
           station_id: string
           survey_id?: string | null
           updated_at?: string
@@ -420,11 +484,19 @@ export type Database = {
           lng?: number
           mag_nt?: number | null
           notes?: string | null
+          project_id?: string | null
           station_id?: string
           survey_id?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "geophysics_stations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "geophysics_stations_survey_id_fkey"
             columns: ["survey_id"]
@@ -446,6 +518,7 @@ export type Database = {
           name: string
           notes: string | null
           planned_km: number | null
+          project_id: string | null
           station_spacing_m: number | null
           status: string
           updated_at: string
@@ -461,6 +534,7 @@ export type Database = {
           name: string
           notes?: string | null
           planned_km?: number | null
+          project_id?: string | null
           station_spacing_m?: number | null
           status?: string
           updated_at?: string
@@ -476,11 +550,20 @@ export type Database = {
           name?: string
           notes?: string | null
           planned_km?: number | null
+          project_id?: string | null
           station_spacing_m?: number | null
           status?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "geophysics_surveys_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lithology_units: {
         Row: {
@@ -493,6 +576,7 @@ export type Database = {
           formation: string | null
           id: string
           name: string
+          project_id: string | null
           reference_id: string | null
           rock_type: string | null
           source: string | null
@@ -509,6 +593,7 @@ export type Database = {
           formation?: string | null
           id?: string
           name: string
+          project_id?: string | null
           reference_id?: string | null
           rock_type?: string | null
           source?: string | null
@@ -525,6 +610,7 @@ export type Database = {
           formation?: string | null
           id?: string
           name?: string
+          project_id?: string | null
           reference_id?: string | null
           rock_type?: string | null
           source?: string | null
@@ -532,6 +618,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "lithology_units_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "lithology_units_reference_id_fkey"
             columns: ["reference_id"]
@@ -554,6 +647,7 @@ export type Database = {
           mineral: string
           occurrence: string | null
           paragenetic_stage: string | null
+          project_id: string | null
           reference_id: string | null
           source: string | null
           updated_at: string
@@ -570,6 +664,7 @@ export type Database = {
           mineral: string
           occurrence?: string | null
           paragenetic_stage?: string | null
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           updated_at?: string
@@ -586,11 +681,19 @@ export type Database = {
           mineral?: string
           occurrence?: string | null
           paragenetic_stage?: string | null
+          project_id?: string | null
           reference_id?: string | null
           source?: string | null
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "mineralogy_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mineralogy_reference_id_fkey"
             columns: ["reference_id"]
@@ -599,6 +702,125 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          organization: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          organization?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          organization?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      project_members: {
+        Row: {
+          created_at: string
+          id: string
+          invited_by: string | null
+          project_id: string
+          role: Database["public"]["Enums"]["project_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          project_id: string
+          role?: Database["public"]["Enums"]["project_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          invited_by?: string | null
+          project_id?: string
+          role?: Database["public"]["Enums"]["project_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_members_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          center_lat: number | null
+          center_lng: number | null
+          code: string
+          commodity: string | null
+          country: string | null
+          cover_image_url: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          name: string
+          region: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          center_lat?: number | null
+          center_lng?: number | null
+          code: string
+          commodity?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          name: string
+          region?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          center_lat?: number | null
+          center_lng?: number | null
+          code?: string
+          commodity?: string | null
+          country?: string | null
+          cover_image_url?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          name?: string
+          region?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       sampling_results: {
         Row: {
@@ -620,6 +842,7 @@ export type Database = {
           northing: number | null
           notes: string | null
           pb_ppm: number | null
+          project_id: string | null
           sample_code: string
           sample_type: string
           sampled_at: string | null
@@ -647,6 +870,7 @@ export type Database = {
           northing?: number | null
           notes?: string | null
           pb_ppm?: number | null
+          project_id?: string | null
           sample_code: string
           sample_type: string
           sampled_at?: string | null
@@ -674,6 +898,7 @@ export type Database = {
           northing?: number | null
           notes?: string | null
           pb_ppm?: number | null
+          project_id?: string | null
           sample_code?: string
           sample_type?: string
           sampled_at?: string | null
@@ -682,17 +907,36 @@ export type Database = {
           zn_ppm?: number | null
           zone?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "sampling_results_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_project_role: {
+        Args: {
+          _project_id: string
+          _roles: Database["public"]["Enums"]["project_role"][]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_project_member: {
+        Args: { _project_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      project_role: "owner" | "admin" | "geologist" | "viewer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -819,6 +1063,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      project_role: ["owner", "admin", "geologist", "viewer"],
+    },
   },
 } as const
