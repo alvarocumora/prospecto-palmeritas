@@ -19,23 +19,33 @@ export async function loadCatastroLayer(
 ): Promise<{ layer: LeafletGeoJSON; count: number }> {
   const url = catastroQueryUrl(kind, bbox);
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`Catastro ${kind} ${res.status}`);
-  const fc = (await res.json()) as AnyFC;
+  if (!res.ok) throw new Error(`Catastro ${kind} HTTP ${res.status}`);
+  const raw = (await res.json()) as unknown;
+  // ArcGIS sometimes returns 200 OK with {"error":{...}} body — guard against it.
+  if (raw && typeof raw === "object" && "error" in raw) {
+    const err = (raw as { error: { message?: string; details?: string[] } }).error;
+    throw new Error(`Catastro ${kind} API error: ${err.message || err.details?.[0] || "unknown"}`);
+  }
+  const fc = raw as AnyFC;
+  const features = Array.isArray(fc?.features) ? fc.features : [];
   const style = CATASTRO_STYLE[kind];
-  const layer = L.geoJSON(fc, {
-    style: () => ({
-      color: style.color,
-      weight: style.weight,
-      opacity: style.opacity,
-      fillColor: style.fillColor,
-      fillOpacity: style.fillOpacity,
-      dashArray: style.dashArray,
-    }),
-    onEachFeature: (f, l) => {
-      l.bindPopup(catastroPopupHtml(kind, f.properties ?? {}));
-    },
-  });
-  return { layer, count: fc.features?.length ?? 0 };
+  const layer = L.geoJSON(
+    { type: "FeatureCollection", features } as AnyFC,
+    {
+      style: () => ({
+        color: style.color,
+        weight: style.weight,
+        opacity: style.opacity,
+        fillColor: style.fillColor,
+        fillOpacity: style.fillOpacity,
+        dashArray: style.dashArray,
+      }),
+      onEachFeature: (f, l) => {
+        l.bindPopup(catastroPopupHtml(kind, f.properties ?? {}));
+      },
+    }
+  );
+  return { layer, count: features.length };
 }
 
 /** Returns a bbox in degrees around a center point with the given half-size in km. */

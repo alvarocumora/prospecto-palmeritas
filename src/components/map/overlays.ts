@@ -27,8 +27,9 @@ export function buildGeologyOverlays(L: LeafletNS) {
 const CATASTRO_BASE =
   "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/ArcGIS/rest/services/Marcelo_Layer/FeatureServer";
 
-const CATASTRO_FIELDS =
-  "NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_DIVISION";
+// Each FeatureServer layer has different fields, so we request all (*).
+// Layer 1 (Pertenencia): OBJECTID, SUPERFICIE, VERTICES, NOMBRE, EstadoRegistro, ID_CONCESION, FECHA_*
+// Layer 2 (Concesion):   NUMERO_ROL, DV_ROL, NOMBRE, HECTAREAS, FECHA_VENCIMIENTO, SITUACION_CONCESION, TIPO_CONCESION, COMUNA, TITULAR_DIVISION
 
 export type CatastroKind = "explotacion" | "exploracion";
 
@@ -45,7 +46,7 @@ export function catastroQueryUrl(
     inSR: "4326",
     outSR: "4326",
     spatialRel: "esriSpatialRelIntersects",
-    outFields: CATASTRO_FIELDS,
+    outFields: "*",
     returnGeometry: "true",
     f: "geojson",
   });
@@ -77,17 +78,25 @@ export function catastroPopupHtml(
 ): string {
   const titleColor = kind === "explotacion" ? "#C8922A" : "#5DA3DD";
   const label = kind === "explotacion" ? "Pertenencia (explotación)" : "Concesión (exploración)";
-  const rol = `${p.NUMERO_ROL ?? "—"}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
+  // Layer schemas differ: pertenencia exposes SUPERFICIE/VERTICES, concesion has NUMERO_ROL/HECTAREAS/etc.
+  const rol = p.NUMERO_ROL
+    ? `${p.NUMERO_ROL}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`
+    : (p.ID_CONCESION as string | undefined) ?? "—";
+  const area =
+    (p.HECTAREAS as number | undefined) ??
+    (p.SUPERFICIE as number | undefined) ??
+    null;
   const venc = p.FECHA_VENCIMIENTO
     ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
     : "—";
+  const titular = (p.TITULAR_DIVISION as string | undefined) ?? "—";
+  const comuna = (p.COMUNA as string | undefined) ?? "—";
   return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
     <strong style="color:${titleColor};">${p.NOMBRE ?? "Sin nombre"}</strong><br/>
     <span style="color:#A89080;">${label}</span><br/>
-    ROL: <strong>${rol}</strong><br/>
-    Titular: ${p.TITULAR_DIVISION ?? "—"}<br/>
-    Comuna: ${p.COMUNA ?? "—"} · ${p.HECTAREAS ?? "?"} ha<br/>
-    Vence: ${venc}<br/>
+    ROL/ID: <strong>${rol}</strong><br/>
+    ${kind === "exploracion" ? `Titular: ${titular}<br/>Comuna: ${comuna} · ` : ""}${area != null ? `${Number(area).toFixed(1)} ha` : ""}<br/>
+    ${kind === "exploracion" ? `Vence: ${venc}<br/>` : ""}
     <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Catastro Minero (ArcGIS REST)</div>
   </div>`;
 }
