@@ -128,6 +128,17 @@ export function ProjectMap() {
         className="h-72 md:h-96 w-full rounded border border-border overflow-hidden bg-bg-secondary"
         style={{ zIndex: 0 }}
       />
+      <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+        <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-gold/40 bg-gold/10 text-gold">
+          <span className="w-2 h-2 rounded-sm bg-gold" />
+          Pertenencias: <strong>{counts.explotacion ?? "…"}</strong>
+        </span>
+        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-info/40 bg-info/10 text-info">
+          <span className="w-2 h-2 rounded-sm bg-info" />
+          Concesiones: <strong>{counts.exploracion ?? "…"}</strong>
+        </span>
+      </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide
