@@ -33,10 +33,20 @@ function DrillingModule() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { data, loading, refresh } = useDrillHoles(active?.id ?? null);
+  const { byHole, refresh: refreshLogs } = useProjectCoreLogs(active?.id ?? null);
   const [filter, setFilter] = useState<HoleStatus | "all">("all");
   const [editing, setEditing] = useState<DrillHole | null>(null);
   const [creating, setCreating] = useState(false);
   const [logHole, setLogHole] = useState<DrillHole | null>(null);
+
+  const bestByHole = useMemo(() => {
+    const m: Record<string, ReturnType<typeof bestIntercept>> = {};
+    for (const h of data) {
+      const logs = byHole[h.id] ?? [];
+      m[h.id] = bestIntercept(computeIntercepts(logs, 0.5, 2));
+    }
+    return m;
+  }, [data, byHole]);
 
   const filtered = useMemo(
     () => (filter === "all" ? data : data.filter((h) => h.status === filter)),
