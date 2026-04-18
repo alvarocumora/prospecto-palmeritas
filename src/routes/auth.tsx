@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { Mountain, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -66,9 +67,8 @@ function AuthPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
-        <Link to="/" className="flex items-center justify-center gap-2 text-foreground hover:text-gold transition-colors">
-          <Mountain className="w-6 h-6 text-gold" />
-          <span className="font-mono font-bold tracking-tight">TRACKMIN GEOINTEL</span>
+        <Link to="/" className="flex items-center justify-center text-foreground hover:text-gold transition-colors">
+          <Logo size={28} />
         </Link>
 
         <div className="rounded border border-border bg-bg-secondary p-6 space-y-4">
@@ -150,7 +150,7 @@ function AuthPage() {
         </div>
 
         <p className="text-center text-[10px] font-mono text-muted-foreground">
-          Plataforma para exploración minera · catastro · geofísica
+          Geocapitals · catastro · geofísica · sondajes
         </p>
       </div>
     </div>

@@ -5,6 +5,7 @@ import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus, Loader2,
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -38,9 +39,8 @@ function AuthenticatedLayout() {
     <div className="min-h-screen flex bg-background text-foreground">
       {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-56 border-r border-border bg-bg-secondary">
-        <div className="px-4 h-14 flex items-center gap-2 border-b border-border">
-          <Mountain className="w-4 h-4 text-gold" />
-          <Link to="/" className="font-mono font-bold text-xs tracking-tight">TRACKMIN</Link>
+        <div className="px-4 h-14 flex items-center border-b border-border">
+          <Link to="/"><Logo size={18} textClassName="text-xs" /></Link>
         </div>
 
         {/* Project switcher */}
@@ -128,10 +128,7 @@ function AuthenticatedLayout() {
 
       {/* Mobile top bar */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 border-b border-border bg-background/95 backdrop-blur flex items-center justify-between px-3">
-        <Link to="/" className="flex items-center gap-1.5">
-          <Mountain className="w-4 h-4 text-gold" />
-          <span className="font-mono font-bold text-xs">TRACKMIN</span>
-        </Link>
+        <Link to="/"><Logo size={16} textClassName="text-xs" /></Link>
         <button
           type="button"
           onClick={async () => { await signOut(); navigate({ to: "/" }); }}
