@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import type { Layer } from "leaflet";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
@@ -8,7 +8,7 @@ import palmsData from "@/data/geo/palm_clusters.geojson?url";
 import workingsData from "@/data/geo/workings.geojson?url";
 import drillsData from "@/data/geo/drill_collars.geojson?url";
 
-import { CENTER, type AnyFC } from "./map/types";
+import { CENTER, type AnyFC, type LeafletNS } from "./map/types";
 import { buildBasemaps } from "./map/basemaps";
 import {
   buildGeologyOverlays,
@@ -18,6 +18,7 @@ import {
 import { addProjectFeatures } from "./map/featureLayers";
 import {
   bboxAround,
+  clearCatastroCache,
   loadCatastroLayer,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
@@ -30,20 +31,85 @@ import {
  *
  * Client-only: dynamically imports Leaflet to avoid SSR breakage in the Worker.
  */
+type CatastroLayers = { explotacion?: LeafletGeoJSON; exploracion?: LeafletGeoJSON };
+
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<unknown>(null);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const leafletRef = useRef<LeafletNS | null>(null);
+  const layerControlRef = useRef<Control.Layers | null>(null);
+  const catastroLayersRef = useRef<CatastroLayers>({});
+  const catastroLabelsRef = useRef<{ explotacion?: string; exploracion?: string }>({});
   const [counts, setCounts] = useState<{ explotacion: number | null; exploracion: number | null }>({
     explotacion: null,
     exploracion: null,
   });
+  const [refreshing, setRefreshing] = useState(false);
+
+  const loadCatastro = useCallback(async () => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    const ctrl = layerControlRef.current;
+    if (!L || !map || !ctrl) return;
+
+    const bbox = bboxAround(CENTER, 8);
+    const [explotRes, exploRes] = await Promise.allSettled([
+      loadCatastroLayer(L, "explotacion", bbox),
+      loadCatastroLayer(L, "exploracion", bbox),
+    ]);
+
+    // Remove previous catastro layers + their entries from the layer control.
+    (["explotacion", "exploracion"] as const).forEach((k) => {
+      const prev = catastroLayersRef.current[k];
+      if (prev) {
+        ctrl.removeLayer(prev);
+        if (map.hasLayer(prev)) map.removeLayer(prev);
+      }
+    });
+    catastroLayersRef.current = {};
+    catastroLabelsRef.current = {};
+
+    let explotCount: number | null = null;
+    let exploCount: number | null = null;
+    if (explotRes.status === "fulfilled") {
+      const label = `Catastro · Pertenencias (${explotRes.value.count})`;
+      ctrl.addOverlay(explotRes.value.layer, label);
+      catastroLayersRef.current.explotacion = explotRes.value.layer;
+      catastroLabelsRef.current.explotacion = label;
+      explotCount = explotRes.value.count;
+    } else {
+      console.warn("Catastro explotación falló:", explotRes.reason);
+    }
+    if (exploRes.status === "fulfilled") {
+      const label = `Catastro · Concesiones (${exploRes.value.count})`;
+      ctrl.addOverlay(exploRes.value.layer, label);
+      catastroLayersRef.current.exploracion = exploRes.value.layer;
+      catastroLabelsRef.current.exploracion = label;
+      exploCount = exploRes.value.count;
+    } else {
+      console.warn("Catastro exploración falló:", exploRes.reason);
+    }
+    setCounts({ explotacion: explotCount, exploracion: exploCount });
+  }, []);
+
+  const handleRefresh = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    setCounts({ explotacion: null, exploracion: null });
+    try {
+      clearCatastroCache();
+      await loadCatastro();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadCatastro, refreshing]);
 
   useEffect(() => {
     let cancelled = false;
     let cleanup: (() => void) | undefined;
 
     (async () => {
-      const L = (await import("leaflet")).default;
+      const L = (await import("leaflet")).default as unknown as LeafletNS;
       if (cancelled || !containerRef.current) return;
       if (mapRef.current) return;
 
@@ -55,6 +121,7 @@ export function ProjectMap() {
         attributionControl: true,
       });
       mapRef.current = map;
+      leafletRef.current = L;
 
       const basemaps = buildBasemaps(L);
       basemaps["CARTO Dark"].addTo(map);
@@ -76,35 +143,16 @@ export function ProjectMap() {
         drills: drillsFC,
       });
 
-      // --- Load Catastro Minero around AOI (~8 km half-size) ---
-      const bbox = bboxAround(CENTER, 8);
+      // Layer control with geology overlays — catastro overlays are added dynamically.
       const overlays: Record<string, Layer> = { ...geoOverlays };
-
-      const [explotRes, exploRes] = await Promise.allSettled([
-        loadCatastroLayer(L, "explotacion", bbox),
-        loadCatastroLayer(L, "exploracion", bbox),
-      ]);
-      if (cancelled) return;
-
-      let explotCount: number | null = null;
-      let exploCount: number | null = null;
-      if (explotRes.status === "fulfilled") {
-        overlays[`Catastro · Pertenencias (${explotRes.value.count})`] = explotRes.value.layer;
-        explotCount = explotRes.value.count;
-      } else {
-        console.warn("Catastro explotación falló:", explotRes.reason);
-      }
-      if (exploRes.status === "fulfilled") {
-        overlays[`Catastro · Concesiones (${exploRes.value.count})`] = exploRes.value.layer;
-        exploCount = exploRes.value.count;
-      } else {
-        console.warn("Catastro exploración falló:", exploRes.reason);
-      }
-      setCounts({ explotacion: explotCount, exploracion: exploCount });
-
-      L.control
+      const ctrl = L.control
         .layers(basemaps, overlays, { position: "topright", collapsed: true })
         .addTo(map);
+      layerControlRef.current = ctrl;
+
+      // --- Initial Catastro load ---
+      await loadCatastro();
+      if (cancelled) return;
 
       // --- Macrostrat click-to-query popup ---
       wireMacrostratClickPopup(L, map, fetchMacrostratUnit, macrostratPopupHtml);
@@ -112,6 +160,9 @@ export function ProjectMap() {
       cleanup = () => {
         map.remove();
         mapRef.current = null;
+        leafletRef.current = null;
+        layerControlRef.current = null;
+        catastroLayersRef.current = {};
       };
     })();
 
@@ -119,7 +170,7 @@ export function ProjectMap() {
       cancelled = true;
       cleanup?.();
     };
-  }, []);
+  }, [loadCatastro]);
 
   return (
     <div className="space-y-3">
@@ -138,6 +189,15 @@ export function ProjectMap() {
           <span className="w-2 h-2 rounded-sm bg-info" />
           Concesiones: <strong>{counts.exploracion ?? "…"}</strong>
         </span>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title="Limpia el cache local y vuelve a descargar el catastro desde SERNAGEOMIN"
+        >
+          {refreshing ? "Refrescando…" : "↻ Refrescar catastro"}
+        </button>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">

@@ -43,6 +43,25 @@ function writeCache(key: string, fc: AnyFC) {
   }
 }
 
+/** Removes all cached catastro entries from localStorage. */
+export function clearCatastroCache(): number {
+  if (typeof window === "undefined") return 0;
+  let removed = 0;
+  try {
+    const keys: string[] = [];
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (k && k.startsWith("catastro:")) keys.push(k);
+    }
+    for (const k of keys) {
+      window.localStorage.removeItem(k);
+      removed++;
+    }
+  } catch {
+    // ignore
+  }
+  return removed;
+}
 /**
  * Loads a Catastro layer (explotacion or exploracion) from SERNAGEOMIN's
  * ArcGIS FeatureServer for a given bbox and returns a Leaflet GeoJSON layer.
