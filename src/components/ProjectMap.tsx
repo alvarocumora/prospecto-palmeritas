@@ -204,6 +204,7 @@ export function ProjectMap() {
     ctrl.addOverlay(layer, `Geofísica planificada (${geoph.lines.length} líneas / ${geoph.stations.length} estaciones)`);
     layer.addTo(map);
     geophysicsLayerRef.current = layer;
+    setGeophysicsReady(true);
   }, [geoph]);
 
   // Toggle geophysics layer visibility
