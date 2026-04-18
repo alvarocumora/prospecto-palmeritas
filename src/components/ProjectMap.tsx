@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Layer } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -33,6 +33,10 @@ import {
 export function ProjectMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<unknown>(null);
+  const [counts, setCounts] = useState<{ explotacion: number | null; exploracion: number | null }>({
+    explotacion: null,
+    exploracion: null,
+  });
 
   useEffect(() => {
     let cancelled = false;
@@ -72,8 +76,8 @@ export function ProjectMap() {
         drills: drillsFC,
       });
 
-      // --- Load Catastro Minero around AOI (~3 km half-size) ---
-      const bbox = bboxAround(CENTER, 3);
+      // --- Load Catastro Minero around AOI (~8 km half-size) ---
+      const bbox = bboxAround(CENTER, 8);
       const overlays: Record<string, Layer> = { ...geoOverlays };
 
       const [explotRes, exploRes] = await Promise.allSettled([
@@ -82,16 +86,21 @@ export function ProjectMap() {
       ]);
       if (cancelled) return;
 
+      let explotCount: number | null = null;
+      let exploCount: number | null = null;
       if (explotRes.status === "fulfilled") {
-        overlays["Catastro · Pertenencias (explotación)"] = explotRes.value;
+        overlays[`Catastro · Pertenencias (${explotRes.value.count})`] = explotRes.value.layer;
+        explotCount = explotRes.value.count;
       } else {
         console.warn("Catastro explotación falló:", explotRes.reason);
       }
       if (exploRes.status === "fulfilled") {
-        overlays["Catastro · Concesiones (exploración)"] = exploRes.value;
+        overlays[`Catastro · Concesiones (${exploRes.value.count})`] = exploRes.value.layer;
+        exploCount = exploRes.value.count;
       } else {
         console.warn("Catastro exploración falló:", exploRes.reason);
       }
+      setCounts({ explotacion: explotCount, exploracion: exploCount });
 
       L.control
         .layers(basemaps, overlays, { position: "topright", collapsed: true })
