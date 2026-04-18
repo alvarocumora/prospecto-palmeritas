@@ -156,7 +156,17 @@ function StatusDot({ tone }: { tone: "teal" | "gold" | "alert" }) {
    NAV
    ============================================================ */
 
-function TopNav({ active, setActive }: { active: TabId; setActive: (t: TabId) => void }) {
+function TopNav({
+  active,
+  setActive,
+  onExport,
+  exporting,
+}: {
+  active: TabId;
+  setActive: (t: TabId) => void;
+  onExport: () => void;
+  exporting: boolean;
+}) {
   return (
     <header className="sticky top-0 z-40 bg-bg-secondary/95 backdrop-blur border-b border-border">
       <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-8">
@@ -193,9 +203,13 @@ function TopNav({ active, setActive }: { active: TabId; setActive: (t: TabId) =>
               {PROJECT.status}
             </span>
           </div>
-          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold/40 text-gold hover:bg-gold/10 font-mono text-xs uppercase tracking-wider transition-colors">
-            <Download className="w-3.5 h-3.5" />
-            Exportar PDF
+          <button
+            onClick={onExport}
+            disabled={exporting}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold/40 text-gold hover:bg-gold/10 font-mono text-xs uppercase tracking-wider transition-colors disabled:opacity-60 disabled:cursor-wait"
+          >
+            <Download className={`w-3.5 h-3.5 ${exporting ? "animate-pulse" : ""}`} />
+            {exporting ? "Generando…" : "Exportar PDF"}
           </button>
         </div>
       </div>
