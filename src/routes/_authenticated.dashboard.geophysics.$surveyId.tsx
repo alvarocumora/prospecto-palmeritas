@@ -83,6 +83,7 @@ function SurveyDetail() {
         <StationsTab
           stations={stations}
           onCreate={() => setCreatingStation(true)}
+          onImport={() => setImportingCsv(true)}
           onEdit={(s) => setEditingStation(s)}
           onDeleted={refresh}
         />
