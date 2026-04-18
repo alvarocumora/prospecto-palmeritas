@@ -24,6 +24,7 @@ import {
   loadCatastro,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
+import { exportCatastroPdf } from "./map/exportCatastroPdf";
 
 /**
  * Interactive Leaflet map for Prospecto Palmeras (TRK-ALH-001).
@@ -58,6 +59,7 @@ export function ProjectMap() {
   const leafletRef = useRef<LeafletNS | null>(null);
   const layerControlRef = useRef<Control.Layers | null>(null);
   const catastroLayersRef = useRef<CatastroLayersByOrigen>({});
+  const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
 
@@ -99,6 +101,13 @@ export function ProjectMap() {
       catastroLayersRef.current[origen] = layer;
     }
     setCounts(result.countsByOrigen);
+    featuresByOrigenRef.current = result.featuresByOrigen;
+  }, []);
+
+  const handleExportPdf = useCallback(() => {
+    const f = featuresByOrigenRef.current;
+    if (!f) return;
+    exportCatastroPdf(f, { center: CENTER, halfKm: 8 });
   }, []);
 
   const handleRefresh = useCallback(async () => {
@@ -224,9 +233,18 @@ export function ProjectMap() {
         </a>
         <button
           type="button"
+          onClick={handleExportPdf}
+          disabled={Object.values(counts).every((n) => !n)}
+          className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title="Exportar PDF con la lista de pertenencias del bbox 8 km (ROL, titular, hectáreas, vencimiento)"
+        >
+          ⇩ PDF pertenencias
+        </button>
+        <button
+          type="button"
           onClick={handleRefresh}
           disabled={refreshing}
-          className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           title="Limpia el cache local y vuelve a descargar el catastro desde SERNAGEOMIN"
         >
           {refreshing ? "Refrescando…" : "↻ Refrescar catastro"}
