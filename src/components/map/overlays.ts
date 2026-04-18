@@ -27,8 +27,9 @@ export function buildGeologyOverlays(L: LeafletNS) {
 const CATASTRO_BASE =
   "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/ArcGIS/rest/services/Marcelo_Layer/FeatureServer";
 
-const CATASTRO_FIELDS =
-  "NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_DIVISION";
+// Each FeatureServer layer has different fields, so we request all (*).
+// Layer 1 (Pertenencia): OBJECTID, SUPERFICIE, VERTICES, NOMBRE, EstadoRegistro, ID_CONCESION, FECHA_*
+// Layer 2 (Concesion):   NUMERO_ROL, DV_ROL, NOMBRE, HECTAREAS, FECHA_VENCIMIENTO, SITUACION_CONCESION, TIPO_CONCESION, COMUNA, TITULAR_DIVISION
 
 export type CatastroKind = "explotacion" | "exploracion";
 
@@ -45,7 +46,7 @@ export function catastroQueryUrl(
     inSR: "4326",
     outSR: "4326",
     spatialRel: "esriSpatialRelIntersects",
-    outFields: CATASTRO_FIELDS,
+    outFields: "*",
     returnGeometry: "true",
     f: "geojson",
   });
