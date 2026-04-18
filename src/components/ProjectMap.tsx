@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Layer } from "leaflet";
+import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
