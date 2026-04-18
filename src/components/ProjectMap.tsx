@@ -8,7 +8,7 @@ import palmsData from "@/data/geo/palm_clusters.geojson?url";
 import workingsData from "@/data/geo/workings.geojson?url";
 import drillsData from "@/data/geo/drill_collars.geojson?url";
 
-import { CENTER, type AnyFC } from "./map/types";
+import { CENTER, type AnyFC, type LeafletNS } from "./map/types";
 import { buildBasemaps } from "./map/basemaps";
 import {
   buildGeologyOverlays,
