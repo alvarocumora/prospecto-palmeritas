@@ -205,6 +205,96 @@ export function ProjectMap() {
     geophysicsLayerRef.current = layer;
   }, [geoph]);
 
+  // Toggle geophysics layer visibility
+  const toggleGeophysics = useCallback(() => {
+    const map = mapRef.current;
+    const layer = geophysicsLayerRef.current;
+    if (!map || !layer) return;
+    if (map.hasLayer(layer)) {
+      map.removeLayer(layer);
+      setGeophysicsVisible(false);
+    } else {
+      layer.addTo(map);
+      setGeophysicsVisible(true);
+    }
+  }, []);
+
+  // Fullscreen toggle
+  const toggleFullscreen = useCallback(async () => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      await el.requestFullscreen?.();
+    } else {
+      await document.exitFullscreen?.();
+    }
+  }, []);
+
+  useEffect(() => {
+    const handler = () => {
+      const fs = !!document.fullscreenElement;
+      setIsFullscreen(fs);
+      setTimeout(() => mapRef.current?.invalidateSize(), 200);
+    };
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+
+  // Center on AOI
+  const centerOnAoi = useCallback(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.setView(CENTER, 16, { animate: true });
+  }, []);
+
+  // Measure tool
+  const clearMeasure = useCallback(() => {
+    const map = mapRef.current;
+    if (map && measureLineRef.current) map.removeLayer(measureLineRef.current);
+    measureLineRef.current = null;
+    measurePointsRef.current = [];
+    setMeasureDist(null);
+  }, []);
+
+  const toggleMeasure = useCallback(() => {
+    const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    if (measuring) {
+      clearMeasure();
+      setMeasuring(false);
+      map.getContainer().style.cursor = "";
+      return;
+    }
+    setMeasuring(true);
+    map.getContainer().style.cursor = "crosshair";
+  }, [measuring, clearMeasure]);
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!map || !L || !measuring) return;
+    const onClick = (e: { latlng: { lat: number; lng: number } }) => {
+      const pt: [number, number] = [e.latlng.lat, e.latlng.lng];
+      measurePointsRef.current.push(pt);
+      if (measureLineRef.current) map.removeLayer(measureLineRef.current);
+      const line = L.polyline(measurePointsRef.current, { color: "#F5A524", weight: 3, dashArray: "5 5" });
+      line.addTo(map);
+      measureLineRef.current = line;
+      // total distance
+      let total = 0;
+      const pts = measurePointsRef.current;
+      for (let i = 1; i < pts.length; i++) {
+        total += map.distance(pts[i - 1], pts[i]);
+      }
+      setMeasureDist(total);
+    };
+    map.on("click", onClick);
+    return () => {
+      map.off("click", onClick);
+    };
+  }, [measuring]);
+
   const renderChip = (origen: CatastroOrigen) => {
     const style = CATASTRO_STYLE[origen];
     const c = counts[origen];
