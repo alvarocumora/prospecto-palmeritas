@@ -19,7 +19,8 @@ import {
   type CatastroOrigen,
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
-import { buildGeophysicsLayer } from "./map/geophysicsLayers";
+import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
+import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { addProjectFeatures } from "./map/featureLayers";
 import {
   bboxAround,
@@ -30,6 +31,7 @@ import {
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
+import { useProjects } from "@/hooks/useProjects";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
@@ -59,6 +61,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "geophys:wgm2012": { visible: false, opacity: 0.55 },
   "geophys:hillshade": { visible: false, opacity: 0.6 },
   "geophys:planned": { visible: true, opacity: 1 },
+  "geophys:real": { visible: true, opacity: 1 },
   "catastro:EXPLOTA_1983": { visible: true, opacity: 1 },
   "catastro:EXPLOTA_1932": { visible: false, opacity: 1 },
   "catastro:EXPLORA_1983": { visible: true, opacity: 1 },
@@ -74,6 +77,7 @@ export function ProjectMap() {
   const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const aoiRef = useRef<AoiPolygon | null>(null);
   const geophysicsLayerRef = useRef<LayerGroup | null>(null);
+  const geophysicsRealLayerRef = useRef<LayerGroup | null>(null);
   const measureLineRef = useRef<Layer | null>(null);
   const measurePointsRef = useRef<[number, number][]>([]);
 
@@ -87,7 +91,9 @@ export function ProjectMap() {
   const [measureDist, setMeasureDist] = useState<number | null>(null);
   const [managedLayers, setManagedLayers] = useState<ManagedLayer[]>([]);
   const [mapReady, setMapReady] = useState(false);
-  const { data: geoph } = useGeophysicsData();
+  const [magStats, setMagStats] = useState<MagStats | null>(null);
+  const { active } = useProjects();
+  const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
@@ -230,27 +236,58 @@ export function ProjectMap() {
     };
   }, [loadCatastroData]);
 
-  // Add geophysics layer once data is loaded
+  // Build geophysics layers (planned/synthetic + real captured) for the active project
   useEffect(() => {
     const L = leafletRef.current;
     const map = mapRef.current;
-    if (!L || !map || !geoph || geophysicsLayerRef.current) return;
-    if (geoph.surveys.length === 0) return;
-    const layer = buildGeophysicsLayer(L, geoph.surveys, geoph.lines, geoph.stations);
-    geophysicsLayerRef.current = layer;
+    if (!L || !map || !geoph) return;
+
+    const surveys = geoph.surveys;
+    const surveyIds = new Set(surveys.map((s) => s.id));
+    const linesAll = geoph.lines.filter((l) => l.survey_id == null || surveyIds.has(l.survey_id));
+    const stationsAll = geoph.stations.filter((s) => s.survey_id == null || surveyIds.has(s.survey_id));
+
+    const synLines = linesAll.filter((l) => l.is_synthetic);
+    const synStations = stationsAll.filter((s) => s.is_synthetic);
+    const realLines = linesAll.filter((l) => !l.is_synthetic);
+    const realStations = stationsAll.filter((s) => !s.is_synthetic);
+
+    if (geophysicsLayerRef.current) {
+      map.removeLayer(geophysicsLayerRef.current);
+      geophysicsLayerRef.current = null;
+    }
+    if (geophysicsRealLayerRef.current) {
+      map.removeLayer(geophysicsRealLayerRef.current);
+      geophysicsRealLayerRef.current = null;
+    }
+
+    const plannedLayer = buildGeophysicsLayer(L, surveys, synLines, synStations);
+    const realLayer = buildGeophysicsLayer(L, surveys, realLines, realStations, { realData: true });
+    geophysicsLayerRef.current = plannedLayer;
+    geophysicsRealLayerRef.current = realLayer;
+
+    setMagStats(computeMagStats(realStations));
+
     setManagedLayers((prev) => {
-      if (prev.some((p) => p.id === "geophys:planned")) return prev;
+      const without = prev.filter((p) => p.id !== "geophys:planned" && p.id !== "geophys:real");
       return [
-        ...prev,
+        ...without,
         {
           id: "geophys:planned",
-          label: `Geofísica planificada (${geoph.lines.length}L / ${geoph.stations.length}E)`,
+          label: `Geofísica planificada (${synLines.length}L / ${synStations.length}E)`,
           group: "Proyecto",
-          layer,
+          layer: plannedLayer,
+        },
+        {
+          id: "geophys:real",
+          label: `Geofísica capturada en campo (${realLines.length}L / ${realStations.length}E)`,
+          group: "Proyecto",
+          layer: realLayer,
         },
       ];
     });
-  }, [geoph]);
+  }, [geoph, active?.id]);
+
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
@@ -502,6 +539,10 @@ export function ProjectMap() {
           <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
         </span>
         <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-3">
+        <MagnetometryLegend stats={magStats} />
       </div>
     </div>
   );

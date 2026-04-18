@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 
 export type GeophysicsSurvey = {
   id: string;
+  project_id: string | null;
   name: string;
   method: string;
   status: string;
@@ -16,6 +17,7 @@ export type GeophysicsSurvey = {
 
 export type GeophysicsLine = {
   id: string;
+  project_id: string | null;
   survey_id: string | null;
   line_id: string;
   geometry_geojson: { type: "LineString"; coordinates: [number, number][] };
@@ -26,6 +28,7 @@ export type GeophysicsLine = {
 
 export type GeophysicsStation = {
   id: string;
+  project_id: string | null;
   survey_id: string | null;
   station_id: string;
   lat: number;
@@ -43,7 +46,11 @@ export type GeophysicsData = {
   stations: GeophysicsStation[];
 };
 
-export function useGeophysicsData() {
+/**
+ * Loads geophysics data, optionally scoped to a project.
+ * When projectId is provided, only rows belonging to that project (or with null project_id) are returned.
+ */
+export function useGeophysicsData(projectId?: string | null) {
   const [data, setData] = useState<GeophysicsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -52,11 +59,16 @@ export function useGeophysicsData() {
     let cancelled = false;
     (async () => {
       try {
-        const [surveys, lines, stations] = await Promise.all([
-          supabase.from("geophysics_surveys").select("*").order("display_order"),
-          supabase.from("geophysics_lines").select("*").order("line_id"),
-          supabase.from("geophysics_stations").select("*").order("station_id"),
-        ]);
+        setLoading(true);
+        const sQuery = supabase.from("geophysics_surveys").select("*").order("display_order");
+        const lQuery = supabase.from("geophysics_lines").select("*").order("line_id");
+        const stQuery = supabase.from("geophysics_stations").select("*").order("station_id");
+        if (projectId) {
+          sQuery.or(`project_id.eq.${projectId},project_id.is.null`);
+          lQuery.or(`project_id.eq.${projectId},project_id.is.null`);
+          stQuery.or(`project_id.eq.${projectId},project_id.is.null`);
+        }
+        const [surveys, lines, stations] = await Promise.all([sQuery, lQuery, stQuery]);
         const firstError = surveys.error || lines.error || stations.error;
         if (firstError) throw firstError;
         if (!cancelled) {
@@ -75,7 +87,7 @@ export function useGeophysicsData() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [projectId]);
 
   return { data, loading, error };
 }
