@@ -1,67 +1,107 @@
 
 
-## Validación de cambios y plan de compilación
+## Refactor del PDF — Estilo NI 43-101
 
-### Estado actual de los módulos
+### Diagnóstico del PDF actual
 
-**Implementados correctamente:**
-- `src/components/Geophysics.tsx` — tab nuevo con plan de adquisición, firmas esperadas, estaciones simuladas, bibliografía.
-- `src/hooks/useGeophysicsData.ts` — fetch de `geophysics_surveys/lines/stations` desde Supabase.
-- `src/components/map/geophysicsOverlays.ts` — WMS EMAG2 + WGM2012 + Hillshade Esri.
-- `src/components/map/geophysicsLayers.ts` — render de líneas (polylines dasheadas) y estaciones (circleMarkers escalados por nT).
-- `src/components/map/aoiPolygon.ts` — carga del polígono AOI cacheado.
-- `src/data/geo/aoi.geojson` — ahora contiene Polygon ~1.5×1.2 km además del centroide.
-- `supabase/migrations/2026...geophysics_tables.sql` — 3 tablas + RLS + seed sintético.
-- `src/components/map/exportCatastroPdf.ts` — usa `@turf/turf` para `booleanIntersects` + `distance` al centroide AOI; agrega columna **Dist (km)** y sección destacada de intersecciones.
-- `src/components/ProjectMap.tsx` — integra `aoiRef`, `geophysicsLayerRef`, overlays geofísicos en el control de capas.
-- `src/routes/index.tsx` — tab `geophysics` registrado en `TopNav`.
+El generador actual (`src/lib/export-pdf.ts`) usa **html2canvas para capturar cada tab** y pegar la imagen en el PDF. Resultado:
+- 50+ páginas con texto cortado, tablas partidas, mapas borrosos
+- Sin tabla de contenido, sin numeración de secciones, sin figuras numeradas
+- Texto no es seleccionable (todo es bitmap)
+- Encabezado "OVERVIEW/GEOLOGY/GEOPHYSICS" se repite por cada slice
+- Layout de pantalla ≠ layout de informe técnico
 
-**Dependencias instaladas y verificadas:**
-- `@turf/turf ^7.3.4`, `jspdf ^4.2.1`, `jspdf-autotable ^5.0.7`, `leaflet ^1.9.4`, `react-leaflet ^5.0.0`.
+### Solución: generador nativo con jsPDF + autoTable
 
-### Problema detectado
+Reemplazar **completamente** `src/lib/export-pdf.ts` por un generador estructurado que extrae los datos del proyecto (constantes en `src/routes/index.tsx`, hooks de Supabase) y los renderiza como informe NI 43-101 con texto vectorial, tablas reales y figuras numeradas.
 
-Hay un error de runtime activo: **"Importing a module script failed"** (UNHANDLED_PROMISE_REJECTION).
+### Estructura del nuevo informe (índice tipo Cornellana)
 
-Causa más probable: `import * as turf from "@turf/turf"` en `exportCatastroPdf.ts` arrastra el barrel completo de Turf (~150KB+ con muchos sub-paquetes ESM) y, al importarse a nivel top de un módulo que se carga junto al resto del bundle del mapa, dispara un fallo de carga del chunk en el preview SSR/edge. El módulo PDF solo se necesita cuando el usuario hace clic en "⇩ PDF pertenencias", no en el render inicial.
-
-### Plan de compilación / fixes
-
-**1. Lazy-load del módulo PDF (fix runtime error)**
-
-En `src/components/ProjectMap.tsx`, reemplazar:
-```ts
-import { exportCatastroPdf } from "./map/exportCatastroPdf";
+```text
+PORTADA               — título, operador, QP, fecha, CVE-like ID
+ÍNDICE DE CONTENIDO   — auto-generado con números de página
+RESUMEN EJECUTIVO     — abstract 1 página
+1. INTRODUCCIÓN
+2. CONFIANZA EN OTROS EXPERTOS
+3. LOCALIZACIÓN Y DESCRIPCIÓN DE LA PROPIEDAD
+   3.1 Ubicación y accesos
+   3.2 Descripción de la propiedad
+   3.3 Tipos de derechos mineros (tabla pertenencias SERNAGEOMIN)
+   3.4 Pertenencias intersectando AOI       ← reusa exportCatastroPdf
+4. CLIMA, INFRAESTRUCTURA, GEOMORFOLOGÍA
+5. HISTORIA DEL DISTRITO MINERO              ← labores antiguas
+6. MARCO GEOLÓGICO
+   6.1 Geología regional                    ← Fm. Lo Valle, distritos análogos
+   6.2 Geología local                        ← litología, alteración, mineralogía
+7. TIPO DE DEPÓSITO                          ← epitermal-mesotermal Au-Cu
+   7.1 Mineralización
+   7.2 Alteración hidrotermal
+8. EXPLORACIÓN
+   8.1 Levantamiento topográfico (AOI)
+   8.2 Geofísica                            ← campañas Mag/IP/CSAMT desde Supabase
+   8.3 Geoquímica / Muestreo                ← protocolo + QA/QC
+9. PROGRAMA DE PERFORACIÓN                   ← 4 DDH, especificaciones
+10. PREPARACIÓN, ANÁLISIS Y SEGURIDAD MUESTRA
+11. VERIFICACIÓN DE DATOS
+12. PRESUPUESTO Y CRONOGRAMA                 ← 4 fases USD 211K
+13. CONCLUSIONES Y RECOMENDACIONES
+14. REFERENCIAS BIBLIOGRÁFICAS
+ANEXO A — Listado completo pertenencias
+ANEXO B — Estaciones geofísicas
 ```
-por un dynamic import dentro del handler del botón:
-```ts
-const { exportCatastroPdf } = await import("./map/exportCatastroPdf");
+
+### Aproximación técnica
+
+**Generador único:** `src/lib/export-ni43101-pdf.ts`
+
+- **jsPDF A4 portrait** (no más landscape).
+- **Texto vectorial** con `doc.text()` + word-wrap (`doc.splitTextToSize`). Seleccionable, indexable, peso ~10× menor.
+- **`jspdf-autotable`** para todas las tablas (pertenencias, litología, sondajes, presupuesto, geofísica) — ya está instalado.
+- **Mapas y figuras** capturados puntualmente con `html2canvas` solo para el componente `<ProjectMap>` y la cross-section, insertados como **Figura N** numeradas con caption (no tabs completos).
+- **Numeración automática** de páginas, secciones, figuras y tablas con contadores.
+- **TOC con dot-leaders** generada en segunda pasada (jsPDF soporta marcadores de página).
+- **Header/footer minimalista**: arriba "TRACKMIN GeoIntel · TRK-ALH-001", abajo "Pág. X de Y · CONFIDENCIAL".
+- **Portada profesional**: título grande, foto AOI (capturar mapa centrado a buena resolución), bloque de metadatos en tabla, firma del QP.
+- **Datos extraídos directamente** desde:
+  - Constantes en `src/routes/index.tsx` (PROJECT, fases, presupuesto)
+  - `useGeologyData()` para litología/alteración
+  - `useGeophysicsData()` para campañas
+  - `loadCatastro()` para pertenencias (con intersección AOI vía turf)
+  - GeoJSON locales (drill_collars, veins, workings)
+
+### Archivos afectados
+
+```text
+NUEVO  src/lib/export-ni43101-pdf.ts       ← generador completo NI 43-101
+NUEVO  src/lib/pdf/sections.ts              ← una función por sección §1-§14
+NUEVO  src/lib/pdf/primitives.ts            ← header, footer, h1, h2, p, figure, toc
+NUEVO  src/lib/pdf/captureMap.ts            ← captura solo del mapa Leaflet (alta res)
+EDIT   src/routes/index.tsx                 ← TopNav.exportPdf llama al nuevo generador
+DEL    src/lib/export-pdf.ts                ← obsoleto (capturas de tabs)
 ```
-Esto saca `jspdf` + `jspdf-autotable` + `@turf/turf` del bundle inicial → arregla el "module script failed" y mejora TTI.
 
-**2. Imports finos de Turf (reducir peso ~80%)**
+### Flujo del botón "Exportar PDF"
 
-En `exportCatastroPdf.ts`, cambiar barrel por sub-paquetes:
-```ts
-import booleanIntersects from "@turf/boolean-intersects";
-import distance from "@turf/distance";
-import centroid from "@turf/centroid";
-```
-Los sub-paquetes ya vienen como deps transitivas de `@turf/turf`, no requiere instalación adicional.
+1. Usuario clickea **Exportar PDF** en TopNav.
+2. Toast: "Generando informe NI 43-101…".
+3. Carga lazy: `const { exportNI43101 } = await import("@/lib/export-ni43101-pdf")`.
+4. Hace fetch puntual de pertenencias + geofísica + geología.
+5. Captura mapa principal **una sola vez** a 2× DPR para Figura 1 (mapa de ubicación) y Figura 7 (geología regional).
+6. Renderiza secciones secuencialmente (texto + tablas), inserta figuras donde corresponde.
+7. Segunda pasada: completa números de página en el TOC.
+8. `doc.save("TRK-ALH-001_Informe_NI43-101_<fecha>.pdf")`.
 
-**3. Verificación post-fix**
+### Resultado esperado
 
-- Recargar preview → confirmar que no aparece el error de runtime.
-- Abrir tab **Geophysics** → tabla de campañas carga (3 filas), bibliografía visible.
-- En el mapa → toggle de capas muestra "Magnetometría EMAG2", "Gravimetría Bouguer WGM2012", "Hillshade SRTM"; activar al menos uno y confirmar tiles.
-- Click en "⇩ PDF pertenencias" → descarga PDF con sección "Pertenencias que intersectan AOI" + columna Dist (km).
-- Verificar que las estaciones magnéticas aparecen como círculos rojos/azules sobre el mapa (overlay activo por defecto).
+- ~25-30 páginas (vs 50+ actuales)
+- Texto seleccionable, tablas reales, figuras numeradas con caption
+- Estructura 1:1 con norma NI 43-101 / referencia Cornellana
+- Tamaño archivo ~1-2 MB (vs ~10 MB actual con bitmaps)
+- Una sola captura de mapa de alta calidad, no slices borrosos
 
-**4. Validación Supabase (read-only check)**
+### Notas
 
-Correr `SELECT count(*) FROM geophysics_surveys/lines/stations` para confirmar seed (3 / 2+ / ~40 filas) y `supabase--linter` para detectar policies faltantes en las nuevas tablas.
-
-### Alcance
-
-Solo dos archivos editados (`ProjectMap.tsx`, `exportCatastroPdf.ts`). Sin cambios de schema ni de UI. Riesgo bajo; el cambio es puramente de bundling.
+- Se mantiene `exportCatastroPdf` actual sin tocar (botón separado en mapa).
+- El nuevo PDF reusa la lógica turf de intersección AOI para Sección 3.4.
+- Bibliografía: Hedenquist, Sillitoe, Corbett & Leach, Gómez-Gajardo 2024 (ya referenciados en código).
 
