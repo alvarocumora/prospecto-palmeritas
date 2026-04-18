@@ -115,6 +115,14 @@ function SurveyDetail() {
           onSaved={() => { setCreatingLine(false); setEditingLine(null); refresh(); }}
         />
       )}
+      {importingCsv && active && (
+        <StationCsvImport
+          projectId={active.id}
+          surveyId={survey.id}
+          onClose={() => setImportingCsv(false)}
+          onSaved={() => { setImportingCsv(false); refresh(); }}
+        />
+      )}
     </div>
   );
 }
