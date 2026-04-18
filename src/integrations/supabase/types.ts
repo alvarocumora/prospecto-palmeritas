@@ -14,6 +14,62 @@ export type Database = {
   }
   public: {
     Tables: {
+      alteration_zones: {
+        Row: {
+          assemblage: string | null
+          color_hex: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          display_order: number
+          id: string
+          intensity: string | null
+          name: string
+          reference_id: string | null
+          source: string | null
+          updated_at: string
+          zone_code: string
+        }
+        Insert: {
+          assemblage?: string | null
+          color_hex?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          intensity?: string | null
+          name: string
+          reference_id?: string | null
+          source?: string | null
+          updated_at?: string
+          zone_code: string
+        }
+        Update: {
+          assemblage?: string | null
+          color_hex?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          intensity?: string | null
+          name?: string
+          reference_id?: string | null
+          source?: string | null
+          updated_at?: string
+          zone_code?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alteration_zones_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_core_logs: {
         Row: {
           ag_gpt: number | null
@@ -147,6 +203,251 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      geo_references: {
+        Row: {
+          authors: string | null
+          citation_key: string
+          created_at: string
+          created_by: string
+          doi: string | null
+          id: string
+          notes: string | null
+          publisher: string | null
+          title: string
+          updated_at: string
+          url: string | null
+          year: number | null
+        }
+        Insert: {
+          authors?: string | null
+          citation_key: string
+          created_at?: string
+          created_by: string
+          doi?: string | null
+          id?: string
+          notes?: string | null
+          publisher?: string | null
+          title: string
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Update: {
+          authors?: string | null
+          citation_key?: string
+          created_at?: string
+          created_by?: string
+          doi?: string | null
+          id?: string
+          notes?: string | null
+          publisher?: string | null
+          title?: string
+          updated_at?: string
+          url?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      geological_features: {
+        Row: {
+          alteration_id: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          dip: string | null
+          feature_code: string
+          feature_type: string
+          geometry_geojson: Json | null
+          id: string
+          length_m: number | null
+          lithology_id: string | null
+          name: string
+          reference_id: string | null
+          source: string | null
+          strike: string | null
+          updated_at: string
+          width_m: number | null
+        }
+        Insert: {
+          alteration_id?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          dip?: string | null
+          feature_code: string
+          feature_type: string
+          geometry_geojson?: Json | null
+          id?: string
+          length_m?: number | null
+          lithology_id?: string | null
+          name: string
+          reference_id?: string | null
+          source?: string | null
+          strike?: string | null
+          updated_at?: string
+          width_m?: number | null
+        }
+        Update: {
+          alteration_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          dip?: string | null
+          feature_code?: string
+          feature_type?: string
+          geometry_geojson?: Json | null
+          id?: string
+          length_m?: number | null
+          lithology_id?: string | null
+          name?: string
+          reference_id?: string | null
+          source?: string | null
+          strike?: string | null
+          updated_at?: string
+          width_m?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geological_features_alteration_id_fkey"
+            columns: ["alteration_id"]
+            isOneToOne: false
+            referencedRelation: "alteration_zones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geological_features_lithology_id_fkey"
+            columns: ["lithology_id"]
+            isOneToOne: false
+            referencedRelation: "lithology_units"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geological_features_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lithology_units: {
+        Row: {
+          age: string | null
+          color_hex: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          display_order: number
+          formation: string | null
+          id: string
+          name: string
+          reference_id: string | null
+          rock_type: string | null
+          source: string | null
+          unit_code: string
+          updated_at: string
+        }
+        Insert: {
+          age?: string | null
+          color_hex?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          display_order?: number
+          formation?: string | null
+          id?: string
+          name: string
+          reference_id?: string | null
+          rock_type?: string | null
+          source?: string | null
+          unit_code: string
+          updated_at?: string
+        }
+        Update: {
+          age?: string | null
+          color_hex?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          display_order?: number
+          formation?: string | null
+          id?: string
+          name?: string
+          reference_id?: string | null
+          rock_type?: string | null
+          source?: string | null
+          unit_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lithology_units_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mineralogy: {
+        Row: {
+          abundance: string | null
+          category: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          display_order: number
+          formula: string | null
+          id: string
+          mineral: string
+          occurrence: string | null
+          paragenetic_stage: string | null
+          reference_id: string | null
+          source: string | null
+          updated_at: string
+        }
+        Insert: {
+          abundance?: string | null
+          category?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          display_order?: number
+          formula?: string | null
+          id?: string
+          mineral: string
+          occurrence?: string | null
+          paragenetic_stage?: string | null
+          reference_id?: string | null
+          source?: string | null
+          updated_at?: string
+        }
+        Update: {
+          abundance?: string | null
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          display_order?: number
+          formula?: string | null
+          id?: string
+          mineral?: string
+          occurrence?: string | null
+          paragenetic_stage?: string | null
+          reference_id?: string | null
+          source?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mineralogy_reference_id_fkey"
+            columns: ["reference_id"]
+            isOneToOne: false
+            referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sampling_results: {
         Row: {
