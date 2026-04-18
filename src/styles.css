@@ -133,4 +133,17 @@
 
   /* Boost geological overlay legibility on top of dark basemaps */
   .macrostrat-overlay { mix-blend-mode: screen; filter: saturate(1.4) brightness(1.1); }
+
+  /* Reusable form input */
+  .input {
+    width: 100%;
+    padding: 0.375rem 0.625rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    border-radius: 0.25rem;
+    border: 1px solid var(--border);
+    background-color: var(--bg-secondary);
+    color: var(--foreground);
+  }
+  .input:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
 }

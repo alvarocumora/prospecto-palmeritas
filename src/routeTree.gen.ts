@@ -20,6 +20,7 @@ import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
+import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -82,6 +83,12 @@ const AuthenticatedDashboardCatastroRoute =
     path: '/dashboard/catastro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardGeophysicsSurveyIdRoute =
+  AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
+    id: '/$surveyId',
+    path: '/$surveyId',
+    getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,11 +96,12 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
-  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
+  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -101,11 +109,12 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
-  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
+  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -115,11 +124,12 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
-  '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
+  '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/sampling'
     | '/dashboard/'
+    | '/dashboard/geophysics/$surveyId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/sampling'
     | '/dashboard'
+    | '/dashboard/geophysics/$surveyId'
   id:
     | '__root__'
     | '/'
@@ -159,6 +171,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/geophysics/$surveyId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -247,13 +260,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/geophysics/$surveyId': {
+      id: '/_authenticated/dashboard/geophysics/$surveyId'
+      path: '/$surveyId'
+      fullPath: '/dashboard/geophysics/$surveyId'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
+    }
   }
 }
+
+interface AuthenticatedDashboardGeophysicsRouteChildren {
+  AuthenticatedDashboardGeophysicsSurveyIdRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+}
+
+const AuthenticatedDashboardGeophysicsRouteChildren: AuthenticatedDashboardGeophysicsRouteChildren =
+  {
+    AuthenticatedDashboardGeophysicsSurveyIdRoute:
+      AuthenticatedDashboardGeophysicsSurveyIdRoute,
+  }
+
+const AuthenticatedDashboardGeophysicsRouteWithChildren =
+  AuthenticatedDashboardGeophysicsRoute._addFileChildren(
+    AuthenticatedDashboardGeophysicsRouteChildren,
+  )
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
-  AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRoute
+  AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
@@ -263,7 +298,8 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
-  AuthenticatedDashboardGeophysicsRoute: AuthenticatedDashboardGeophysicsRoute,
+  AuthenticatedDashboardGeophysicsRoute:
+    AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,

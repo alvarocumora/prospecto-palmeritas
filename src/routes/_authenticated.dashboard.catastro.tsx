@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ModuleStub } from "./_authenticated.dashboard.geophysics";
+import { ModuleStub } from "@/components/ModuleStub";
 
 export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   head: () => ({ meta: [{ title: "Catastro — Trackmin GeoIntel" }] }),
