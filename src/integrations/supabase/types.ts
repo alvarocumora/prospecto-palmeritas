@@ -14,7 +14,224 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      drill_core_logs: {
+        Row: {
+          ag_gpt: number | null
+          alteration: string | null
+          au_gpt: number | null
+          created_at: string
+          created_by: string
+          cu_pct: number | null
+          depth_from: number
+          depth_to: number
+          hole_id: string
+          id: string
+          lithology: string | null
+          mineralization: string | null
+          notes: string | null
+          recovery_pct: number | null
+          rqd_pct: number | null
+          structure: string | null
+          sulfide_pct: number | null
+          updated_at: string
+          vein_pct: number | null
+        }
+        Insert: {
+          ag_gpt?: number | null
+          alteration?: string | null
+          au_gpt?: number | null
+          created_at?: string
+          created_by: string
+          cu_pct?: number | null
+          depth_from: number
+          depth_to: number
+          hole_id: string
+          id?: string
+          lithology?: string | null
+          mineralization?: string | null
+          notes?: string | null
+          recovery_pct?: number | null
+          rqd_pct?: number | null
+          structure?: string | null
+          sulfide_pct?: number | null
+          updated_at?: string
+          vein_pct?: number | null
+        }
+        Update: {
+          ag_gpt?: number | null
+          alteration?: string | null
+          au_gpt?: number | null
+          created_at?: string
+          created_by?: string
+          cu_pct?: number | null
+          depth_from?: number
+          depth_to?: number
+          hole_id?: string
+          id?: string
+          lithology?: string | null
+          mineralization?: string | null
+          notes?: string | null
+          recovery_pct?: number | null
+          rqd_pct?: number | null
+          structure?: string | null
+          sulfide_pct?: number | null
+          updated_at?: string
+          vein_pct?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drill_core_logs_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drill_holes: {
+        Row: {
+          actual_depth: number | null
+          azimuth: number | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          dip: number | null
+          easting: number | null
+          elevation: number | null
+          hole_id: string
+          id: string
+          northing: number | null
+          notes: string | null
+          planned_depth: number | null
+          started_at: string | null
+          status: string
+          target_zone: string | null
+          updated_at: string
+        }
+        Insert: {
+          actual_depth?: number | null
+          azimuth?: number | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          dip?: number | null
+          easting?: number | null
+          elevation?: number | null
+          hole_id: string
+          id?: string
+          northing?: number | null
+          notes?: string | null
+          planned_depth?: number | null
+          started_at?: string | null
+          status?: string
+          target_zone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          actual_depth?: number | null
+          azimuth?: number | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          dip?: number | null
+          easting?: number | null
+          elevation?: number | null
+          hole_id?: string
+          id?: string
+          northing?: number | null
+          notes?: string | null
+          planned_depth?: number | null
+          started_at?: string | null
+          status?: string
+          target_zone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sampling_results: {
+        Row: {
+          ag_gpt: number | null
+          as_ppm: number | null
+          au_gpt: number | null
+          certificate: string | null
+          created_at: string
+          created_by: string
+          cu_pct: number | null
+          depth_from: number | null
+          depth_to: number | null
+          easting: number | null
+          elevation: number | null
+          hg_ppm: number | null
+          id: string
+          lab: string | null
+          mo_ppm: number | null
+          northing: number | null
+          notes: string | null
+          pb_ppm: number | null
+          sample_code: string
+          sample_type: string
+          sampled_at: string | null
+          sb_ppm: number | null
+          updated_at: string
+          zn_ppm: number | null
+          zone: string | null
+        }
+        Insert: {
+          ag_gpt?: number | null
+          as_ppm?: number | null
+          au_gpt?: number | null
+          certificate?: string | null
+          created_at?: string
+          created_by: string
+          cu_pct?: number | null
+          depth_from?: number | null
+          depth_to?: number | null
+          easting?: number | null
+          elevation?: number | null
+          hg_ppm?: number | null
+          id?: string
+          lab?: string | null
+          mo_ppm?: number | null
+          northing?: number | null
+          notes?: string | null
+          pb_ppm?: number | null
+          sample_code: string
+          sample_type: string
+          sampled_at?: string | null
+          sb_ppm?: number | null
+          updated_at?: string
+          zn_ppm?: number | null
+          zone?: string | null
+        }
+        Update: {
+          ag_gpt?: number | null
+          as_ppm?: number | null
+          au_gpt?: number | null
+          certificate?: string | null
+          created_at?: string
+          created_by?: string
+          cu_pct?: number | null
+          depth_from?: number | null
+          depth_to?: number | null
+          easting?: number | null
+          elevation?: number | null
+          hg_ppm?: number | null
+          id?: string
+          lab?: string | null
+          mo_ppm?: number | null
+          northing?: number | null
+          notes?: string | null
+          pb_ppm?: number | null
+          sample_code?: string
+          sample_type?: string
+          sampled_at?: string | null
+          sb_ppm?: number | null
+          updated_at?: string
+          zn_ppm?: number | null
+          zone?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
