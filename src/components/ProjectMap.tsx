@@ -132,7 +132,7 @@ export function ProjectMap() {
           opacity: 0.55,
           attribution: "Geología &copy; SERNAGEOMIN",
           version: "1.3.0",
-        } as L.WMSOptions
+        }
       );
 
       L.control
