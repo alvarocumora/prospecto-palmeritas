@@ -236,27 +236,58 @@ export function ProjectMap() {
     };
   }, [loadCatastroData]);
 
-  // Add geophysics layer once data is loaded
+  // Build geophysics layers (planned/synthetic + real captured) for the active project
   useEffect(() => {
     const L = leafletRef.current;
     const map = mapRef.current;
-    if (!L || !map || !geoph || geophysicsLayerRef.current) return;
-    if (geoph.surveys.length === 0) return;
-    const layer = buildGeophysicsLayer(L, geoph.surveys, geoph.lines, geoph.stations);
-    geophysicsLayerRef.current = layer;
+    if (!L || !map || !geoph) return;
+
+    const surveys = geoph.surveys;
+    const surveyIds = new Set(surveys.map((s) => s.id));
+    const linesAll = geoph.lines.filter((l) => l.survey_id == null || surveyIds.has(l.survey_id));
+    const stationsAll = geoph.stations.filter((s) => s.survey_id == null || surveyIds.has(s.survey_id));
+
+    const synLines = linesAll.filter((l) => l.is_synthetic);
+    const synStations = stationsAll.filter((s) => s.is_synthetic);
+    const realLines = linesAll.filter((l) => !l.is_synthetic);
+    const realStations = stationsAll.filter((s) => !s.is_synthetic);
+
+    if (geophysicsLayerRef.current) {
+      map.removeLayer(geophysicsLayerRef.current);
+      geophysicsLayerRef.current = null;
+    }
+    if (geophysicsRealLayerRef.current) {
+      map.removeLayer(geophysicsRealLayerRef.current);
+      geophysicsRealLayerRef.current = null;
+    }
+
+    const plannedLayer = buildGeophysicsLayer(L, surveys, synLines, synStations);
+    const realLayer = buildGeophysicsLayer(L, surveys, realLines, realStations, { realData: true });
+    geophysicsLayerRef.current = plannedLayer;
+    geophysicsRealLayerRef.current = realLayer;
+
+    setMagStats(computeMagStats(realStations));
+
     setManagedLayers((prev) => {
-      if (prev.some((p) => p.id === "geophys:planned")) return prev;
+      const without = prev.filter((p) => p.id !== "geophys:planned" && p.id !== "geophys:real");
       return [
-        ...prev,
+        ...without,
         {
           id: "geophys:planned",
-          label: `Geofísica planificada (${geoph.lines.length}L / ${geoph.stations.length}E)`,
+          label: `Geofísica planificada (${synLines.length}L / ${synStations.length}E)`,
           group: "Proyecto",
-          layer,
+          layer: plannedLayer,
+        },
+        {
+          id: "geophys:real",
+          label: `Geofísica capturada en campo (${realLines.length}L / ${realStations.length}E)`,
+          group: "Proyecto",
+          layer: realLayer,
         },
       ];
     });
-  }, [geoph]);
+  }, [geoph, active?.id]);
+
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
