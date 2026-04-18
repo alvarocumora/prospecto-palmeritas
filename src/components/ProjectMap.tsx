@@ -92,8 +92,8 @@ export function ProjectMap() {
   const [managedLayers, setManagedLayers] = useState<ManagedLayer[]>([]);
   const [mapReady, setMapReady] = useState(false);
   const [magStats, setMagStats] = useState<MagStats | null>(null);
-  const { data: geoph } = useGeophysicsData();
   const { active } = useProjects();
+  const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
