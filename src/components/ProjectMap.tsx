@@ -64,6 +64,7 @@ export function ProjectMap() {
   const [measuring, setMeasuring] = useState(false);
   const [measureDist, setMeasureDist] = useState<number | null>(null);
   const [geophysicsVisible, setGeophysicsVisible] = useState(true);
+  const [geophysicsReady, setGeophysicsReady] = useState(false);
   const { data: geoph } = useGeophysicsData();
 
   const loadCatastroData = useCallback(async () => {
@@ -203,6 +204,7 @@ export function ProjectMap() {
     ctrl.addOverlay(layer, `Geofísica planificada (${geoph.lines.length} líneas / ${geoph.stations.length} estaciones)`);
     layer.addTo(map);
     geophysicsLayerRef.current = layer;
+    setGeophysicsReady(true);
   }, [geoph]);
 
   // Toggle geophysics layer visibility
@@ -274,25 +276,28 @@ export function ProjectMap() {
     const map = mapRef.current;
     const L = leafletRef.current;
     if (!map || !L || !measuring) return;
-    const onClick = (e: { latlng: { lat: number; lng: number } }) => {
-      const pt: [number, number] = [e.latlng.lat, e.latlng.lng];
+    const container = map.getContainer();
+    const handleClick = (ev: MouseEvent) => {
+      // Intercept clicks before Leaflet feature layers (popups) consume them
+      ev.stopPropagation();
+      ev.preventDefault();
+      const rect = container.getBoundingClientRect();
+      const x = ev.clientX - rect.left;
+      const y = ev.clientY - rect.top;
+      const latlng = map.containerPointToLatLng([x, y]);
+      const pt: [number, number] = [latlng.lat, latlng.lng];
       measurePointsRef.current.push(pt);
       if (measureLineRef.current) map.removeLayer(measureLineRef.current);
       const line = L.polyline(measurePointsRef.current, { color: "#F5A524", weight: 3, dashArray: "5 5" });
       line.addTo(map);
       measureLineRef.current = line;
-      // total distance
       let total = 0;
       const pts = measurePointsRef.current;
-      for (let i = 1; i < pts.length; i++) {
-        total += map.distance(pts[i - 1], pts[i]);
-      }
+      for (let i = 1; i < pts.length; i++) total += map.distance(pts[i - 1], pts[i]);
       setMeasureDist(total);
     };
-    map.on("click", onClick);
-    return () => {
-      map.off("click", onClick);
-    };
+    container.addEventListener("click", handleClick, true);
+    return () => container.removeEventListener("click", handleClick, true);
   }, [measuring]);
 
   const renderChip = (origen: CatastroOrigen) => {
@@ -372,7 +377,7 @@ export function ProjectMap() {
             </div>
             <div className="space-y-1.5 border-t border-border pt-2">
               <div className="text-muted-foreground/70 text-[10px] uppercase">Geofísica</div>
-              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsLayerRef.current} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsReady} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
                 {geophysicsVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 {geophysicsVisible ? "Ocultar" : "Mostrar"} líneas/estaciones
               </button>
