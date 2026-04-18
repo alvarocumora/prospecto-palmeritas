@@ -12,6 +12,8 @@ import {
   type DrillHole,
   type HoleStatus,
 } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { computeIntercepts, bestIntercept, formatIntercept } from "@/lib/drilling/intercepts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
