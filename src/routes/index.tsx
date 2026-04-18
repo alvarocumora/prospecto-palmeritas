@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
 import { GeophysicsModule } from "@/components/Geophysics";
 import { useGeologyData } from "@/hooks/useGeologyData";
-import { exportFullReport } from "@/lib/export-pdf";
+
 import { toast } from "sonner";
 import {
   Activity,
@@ -1236,17 +1236,17 @@ function TrackminGeoIntel() {
   const handleExport = async () => {
     if (exporting) return;
     setExporting(true);
-    toast.info("Generando PDF — recorriendo módulos…");
+    toast.info("Generando informe NI 43-101…");
     try {
-      await exportFullReport({
-        sections: TABS.map((t) => ({ id: t.id, label: t.label })),
+      const { exportNI43101 } = await import("@/lib/export-ni43101-pdf");
+      await exportNI43101({
         setActive: (id) => setActive(id as TabId),
         getCurrent: () => active,
       });
-      toast.success("PDF exportado correctamente");
+      toast.success("Informe NI 43-101 exportado correctamente");
     } catch (err) {
       console.error(err);
-      toast.error("No se pudo generar el PDF");
+      toast.error("No se pudo generar el informe");
     } finally {
       setExporting(false);
     }
