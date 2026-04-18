@@ -324,6 +324,32 @@ export function ProjectMap() {
     });
   }, [concessions, active?.id]);
 
+  // Build drill collars layer for the active project
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (drillCollarsLayerRef.current) {
+      map.removeLayer(drillCollarsLayerRef.current);
+      drillCollarsLayerRef.current = null;
+    }
+    const layer = buildDrillCollarsLayer(L, drillHoles);
+    drillCollarsLayerRef.current = layer;
+    if (drillHoles.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "drills:project");
+      return [
+        ...without,
+        {
+          id: "drills:project",
+          label: `Sondajes del proyecto (${drillHoles.length})`,
+          group: "Proyecto",
+          layer,
+        },
+      ];
+    });
+  }, [drillHoles, active?.id]);
+
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
