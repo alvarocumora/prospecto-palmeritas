@@ -91,8 +91,9 @@ export function ProjectMap() {
         {
           attribution:
             'Geología &copy; <a href="https://macrostrat.org">Macrostrat</a> (UW–Madison)',
-          opacity: 0.55,
+          opacity: 0.75,
           maxZoom: 16,
+          className: "macrostrat-overlay",
         }
       );
 
