@@ -1,32 +1,15 @@
 
-User wants a mobile-friendly (PWA-ish) geophysics field tool that uses GPS to capture stations in the field for the active project. Per Lovable PWA guidance: do NOT install vite-plugin-pwa or service workers (breaks preview). User just needs field GPS capture — a responsive mobile-optimized route with geolocation API is the right call. Mention installability later if they want it.
+Add a CSV bulk-import dialog for geophysics stations. Scope:
 
-Scope:
-- New mobile route `/dashboard/geophysics/$surveyId/field` (also accessible from survey detail)
-- Uses `navigator.geolocation.watchPosition` for live GPS
-- Shows distance from project center, accuracy, lat/lng/elev
-- Quick-capture form: pick survey + method (mag/IP), one-tap "Capturar estación" → inserts into `geophysics_stations` with current GPS
-- Mini live map (Leaflet) showing user location + recent stations + survey lines
-- Offline queue: if insert fails (no signal), buffer in localStorage and retry on reconnect
-- Mobile-first UI: large touch targets, sticky bottom action bar
+- New component `src/components/geophysics/StationCsvImport.tsx` — Dialog with:
+  - File input (.csv) + textarea paste alternative
+  - Parse client-side (no library needed; simple CSV parser handling quoted fields, commas, semicolons, tab separators)
+  - Header detection: required `station_id, lat, lng`; optional `mag_nt, ip_chargeability_mvv, ip_resistivity_ohmm, notes`
+  - Validate per-row: numeric lat (-90..90), lng (-180..180), numerics for mag/IP, non-empty station_id, dedupe within file
+  - Preview table (first 50 rows) with row-level error badges; counts of valid/invalid
+  - "Importar N estaciones" button → bulk insert via supabase.from("geophysics_stations").insert([...]) in chunks of 200, with project_id + survey_id + is_synthetic=false + created_by
+  - Toast + onSaved refresh
+- Wire into survey detail page (`/dashboard/geophysics/$surveyId`) — add "Importar CSV" button next to existing actions
+- Reuse existing `useSurvey().refresh` and auth user from useAuth
 
-Technical:
-- New file `src/routes/_authenticated.dashboard.geophysics.$surveyId.field.tsx`
-- New hook `src/hooks/useGeolocation.ts` (watchPosition wrapper, accuracy, error handling)
-- New hook `src/hooks/useOfflineQueue.ts` (localStorage buffer for failed inserts)
-- New component `src/components/geophysics/FieldCaptureMap.tsx` (Leaflet mini-map with user marker pulsing)
-- Add "Modo terreno" button in survey detail view linking to field route
-- Reuse `useSurvey` and `useGeophysicsMutations` hooks
-
-Field measurement inputs (manual, since phone has no magnetometer-grade sensor):
-- Mag (nT), IP chargeability (mV/V), IP resistivity (Ω·m) — optional numeric inputs
-- Auto-generated station_id (e.g. `ST-{count+1}` based on existing)
-- Notes field
-
-UX:
-- Big "📍 CAPTURAR" button at bottom (sticky)
-- GPS status indicator (color-coded by accuracy: <10m green, 10-30m amber, >30m red)
-- Distance from project center
-- List of last 5 captured stations with edit/delete
-
-Phase 1 only — not a full PWA install. Mention later if user wants installable shortcut.
+No DB changes needed (table already supports all fields). No new deps (parse CSV inline). 100% client-side validation; server still enforces RLS.
