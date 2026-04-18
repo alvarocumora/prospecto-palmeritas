@@ -184,14 +184,27 @@ export function ProjectMap() {
       />
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
         <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
-        <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-gold/40 bg-gold/10 text-gold">
-          <span className="w-2 h-2 rounded-sm bg-gold" />
+        <span
+          className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-gold/40 bg-gold/10 text-gold/70"
+          title="La capa pública de Pertenencias (explotación) de SERNAGEOMIN está vacía a nivel nacional (12 features). No es un error del proyecto."
+        >
+          <span className="w-2 h-2 rounded-sm bg-gold/60" />
           Pertenencias: <strong>{counts.explotacion ?? "…"}</strong>
+          <span className="text-[10px] opacity-70">(no publicado)</span>
         </span>
         <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-info/40 bg-info/10 text-info">
           <span className="w-2 h-2 rounded-sm bg-info" />
           Concesiones: <strong>{counts.exploracion ?? "…"}</strong>
         </span>
+        <a
+          href={`https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index?lat=${CENTER[0]}&lng=${CENTER[1]}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+          title="Abrir el visor oficial de SERNAGEOMIN para validar pertenencias y datos completos"
+        >
+          ↗ Visor SERNAGEOMIN
+        </a>
         <button
           type="button"
           onClick={handleRefresh}
