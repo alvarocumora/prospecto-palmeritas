@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Plus, Pencil, Trash2, AlertTriangle, X } from "lucide-react";
+import { Plus, Pencil, Trash2, AlertTriangle, Sparkles } from "lucide-react";
 import { useDrillCoreLogs, type DrillCoreLog, type DrillHole } from "@/hooks/useDrilling";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -9,6 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  computeIntercepts,
+  DEFAULT_AU_CUTOFF,
+  DEFAULT_INTERNAL_DILUTION_M,
+} from "@/lib/drilling/intercepts";
 
 const inp = "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
 
