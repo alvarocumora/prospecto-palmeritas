@@ -331,6 +331,157 @@ export type Database = {
           },
         ]
       }
+      geophysics_lines: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          geometry_geojson: Json
+          id: string
+          is_synthetic: boolean
+          length_m: number | null
+          line_id: string
+          notes: string | null
+          survey_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          geometry_geojson: Json
+          id?: string
+          is_synthetic?: boolean
+          length_m?: number | null
+          line_id: string
+          notes?: string | null
+          survey_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          geometry_geojson?: Json
+          id?: string
+          is_synthetic?: boolean
+          length_m?: number | null
+          line_id?: string
+          notes?: string | null
+          survey_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geophysics_lines_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "geophysics_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geophysics_stations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          ip_chargeability_mvv: number | null
+          ip_resistivity_ohmm: number | null
+          is_synthetic: boolean
+          lat: number
+          lng: number
+          mag_nt: number | null
+          notes: string | null
+          station_id: string
+          survey_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ip_chargeability_mvv?: number | null
+          ip_resistivity_ohmm?: number | null
+          is_synthetic?: boolean
+          lat: number
+          lng: number
+          mag_nt?: number | null
+          notes?: string | null
+          station_id: string
+          survey_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          ip_chargeability_mvv?: number | null
+          ip_resistivity_ohmm?: number | null
+          is_synthetic?: boolean
+          lat?: number
+          lng?: number
+          mag_nt?: number | null
+          notes?: string | null
+          station_id?: string
+          survey_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geophysics_stations_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "geophysics_surveys"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geophysics_surveys: {
+        Row: {
+          cost_usd: number | null
+          created_at: string
+          created_by: string | null
+          display_order: number
+          expected_depth_m: number | null
+          id: string
+          method: string
+          name: string
+          notes: string | null
+          planned_km: number | null
+          station_spacing_m: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cost_usd?: number | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          expected_depth_m?: number | null
+          id?: string
+          method: string
+          name: string
+          notes?: string | null
+          planned_km?: number | null
+          station_spacing_m?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cost_usd?: number | null
+          created_at?: string
+          created_by?: string | null
+          display_order?: number
+          expected_depth_m?: number | null
+          id?: string
+          method?: string
+          name?: string
+          notes?: string | null
+          planned_km?: number | null
+          station_spacing_m?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lithology_units: {
         Row: {
           age: string | null
