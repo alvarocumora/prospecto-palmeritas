@@ -688,7 +688,8 @@ function Sampling() {
     ["Sección pulida", "Núcleo veta brechada", "Selectivo", "Microscopía reflexión", "MEDIA"],
   ];
 
-  const tone = (p: string) => (p === "INMEDIATA" ? "alert" : p === "ALTA" ? "gold" : "teal") as const;
+  const tone = (p: string): "alert" | "gold" | "teal" =>
+    p === "INMEDIATA" ? "alert" : p === "ALTA" ? "gold" : "teal";
 
   return (
     <div className="space-y-6">
@@ -1032,7 +1033,7 @@ function Budget() {
                     fontSize: "12px",
                     color: "var(--foreground)",
                   }}
-                  formatter={(v: number) => `$${v.toLocaleString()}`}
+                  formatter={(v) => `$${Number(v).toLocaleString()}`}
                 />
               </PieChart>
             </ResponsiveContainer>
