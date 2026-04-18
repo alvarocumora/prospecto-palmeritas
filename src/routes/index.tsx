@@ -401,27 +401,51 @@ function CrossSection() {
    ============================================================ */
 
 function Geology() {
-  const litho = [
-    { unit: "Fm. Lo Valle", age: "Cret. Superior (~90–75 Ma)", lith: "Andesitas, tobas riolíticas", role: "Roca caja vetas Au–Cu" },
-    { unit: "Intrusivo granodiorítico", age: "Cret. Sup.–Paleoceno", lith: "Granodiorita, pórfido cuarcífero", role: "Fuente fluidos hidrotermales" },
-    { unit: "Diques pórfido", age: "Paleoceno", lith: "Pórfido andesítico–dacítico", role: "Conductos mineralizantes" },
-    { unit: "Cuaternario", age: "Pleistoceno–Holoceno", lith: "Coluvios, suelos residuales", role: "Cubierta — limita afloramientos" },
-  ];
+  const { data, loading, error } = useGeologyData();
 
   const districts = ["El Bronce de Petorca", "Chancón", "Las Palmas", "Minera Florida", "Alhué"];
-
-  const minerals = {
-    PRIMARIOS: ["Pirita", "Calcopirita", "Esfalerita", "Galena", "Electrum", "Cuarzo"],
-    SUPÉRGENOS: ["Goethita", "Limonita", "Malaquita", "Crisocola", "Jarosita", "Au libre"],
-    GANGA: ["Cuarzo hialino", "Calcedonia", "Sericita", "Clorita", "Epidota", "Calcita"],
-  };
-
   const history = [
     { era: "Prehispánico (~1000–1540)", text: "Pueblo Picunche — lavaderos Au — piques manuales" },
     { era: "Colonial (1540–1810)", text: "Sistema mita — palmeras como marcadores — socavones" },
     { era: "Republicano (1810+)", text: "Minería artesanal — distrito documentado Domeyko 1840s" },
     { era: "2026", text: "Expansión en estudio — programa exploración sistemático" },
   ];
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6">
+          <div className="font-mono text-xs text-hint uppercase tracking-widest">
+            Cargando datos geológicos…
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="space-y-6">
+        <Card className="p-6" accent="alert">
+          <SectionTitle icon={Mountain}>Error al cargar geología</SectionTitle>
+          <p className="text-sm text-muted-foreground">{error ?? "No se pudieron obtener los datos."}</p>
+        </Card>
+      </div>
+    );
+  }
+
+  const stagePrimary = (m: { paragenetic_stage: string | null; category: string | null }) =>
+    m.category === "ore" && (m.paragenetic_stage === "main" || m.paragenetic_stage === "early");
+  const stageSupergene = (m: { paragenetic_stage: string | null }) => m.paragenetic_stage === "supergene";
+
+  const groupedMinerals: Record<string, typeof data.minerals> = {
+    PRIMARIOS: data.minerals.filter(stagePrimary),
+    SUPÉRGENOS: data.minerals.filter(stageSupergene),
+    GANGA: data.minerals.filter((m) => m.category === "gangue" || m.category === "alteration"),
+  };
+
+  const veinFeature = data.features.find((f) => f.feature_type === "vein");
+  const primaryRef = data.references[0];
 
   return (
     <div className="space-y-6">
@@ -446,9 +470,12 @@ function Geology() {
             </Badge>
           ))}
         </div>
-        <div className="mt-4 text-xs text-muted-foreground border-t border-border pt-3">
-          Ref. clave: Gómez-Gajardo et al. 2024 · Ore Geology Reviews 169, 106062
-        </div>
+        {primaryRef && (
+          <div className="mt-4 text-xs text-muted-foreground border-t border-border pt-3">
+            Ref. clave: {primaryRef.authors} {primaryRef.year} · {primaryRef.publisher}
+            {primaryRef.doi && <> · DOI {primaryRef.doi}</>}
+          </div>
+        )}
       </Card>
 
       {/* Lithology */}
@@ -460,7 +487,7 @@ function Geology() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-border">
-                {["Unidad", "Edad", "Litología", "Rol minero"].map((h) => (
+                {["Unidad", "Edad", "Litología", "Descripción"].map((h) => (
                   <th key={h} className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint">
                     {h}
                   </th>
@@ -468,12 +495,18 @@ function Geology() {
               </tr>
             </thead>
             <tbody>
-              {litho.map((r) => (
-                <tr key={r.unit} className="border-b border-border/50 hover:bg-bg-secondary">
-                  <td className="py-3 px-3 font-mono text-foreground">{r.unit}</td>
+              {data.litho.map((r) => (
+                <tr key={r.id} className="border-b border-border/50 hover:bg-bg-secondary">
+                  <td className="py-3 px-3 font-mono text-foreground">
+                    <span
+                      className="inline-block w-2 h-2 rounded-sm mr-2 align-middle"
+                      style={{ background: r.color_hex ?? "var(--gold)" }}
+                    />
+                    {r.name}
+                  </td>
                   <td className="py-3 px-3 text-muted-foreground">{r.age}</td>
-                  <td className="py-3 px-3 text-foreground">{r.lith}</td>
-                  <td className="py-3 px-3 text-muted-foreground">{r.role}</td>
+                  <td className="py-3 px-3 text-foreground">{r.rock_type}</td>
+                  <td className="py-3 px-3 text-muted-foreground">{r.description}</td>
                 </tr>
               ))}
             </tbody>
@@ -481,16 +514,38 @@ function Geology() {
         </div>
       </Card>
 
-      {/* Outcrop cards */}
+      {/* Outcrop + Alteration */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card delay={200} className="p-6" accent="gold">
           <SectionTitle icon={Pickaxe}>Veta Principal</SectionTitle>
-          <ul className="space-y-2 text-sm text-foreground/90">
-            <li>• Coloración gris-negra a pardo oscuro</li>
-            <li>• Espesor estimado: <span className="font-mono text-gold-light">15–40 cm</span></li>
-            <li>• Textura: Brechada (apertura hidráulica repetida)</li>
-            <li>• Orientación: <span className="font-mono">Subvertical N20°W–N30°E</span></li>
-          </ul>
+          {veinFeature ? (
+            <ul className="space-y-2 text-sm text-foreground/90">
+              <li>• {veinFeature.name}</li>
+              {veinFeature.width_m && (
+                <li>
+                  • Espesor estimado:{" "}
+                  <span className="font-mono text-gold-light">
+                    {(veinFeature.width_m * 100).toFixed(0)} cm
+                  </span>
+                </li>
+              )}
+              {veinFeature.length_m && (
+                <li>
+                  • Largo mapeado:{" "}
+                  <span className="font-mono text-gold-light">{veinFeature.length_m} m</span>
+                </li>
+              )}
+              <li>
+                • Orientación:{" "}
+                <span className="font-mono">
+                  {veinFeature.strike} · {veinFeature.dip}
+                </span>
+              </li>
+              {veinFeature.description && <li>• {veinFeature.description}</li>}
+            </ul>
+          ) : (
+            <div className="text-sm text-muted-foreground">Sin features mapeadas.</div>
+          )}
           <div className="mt-4 flex flex-wrap gap-2">
             <Badge tone="gold">Núcleo brechado</Badge>
             <Badge tone="copper">Halo limonítico 20–60cm</Badge>
@@ -500,9 +555,14 @@ function Geology() {
         <Card delay={300} className="p-6" accent="copper">
           <SectionTitle icon={Sparkles}>Alteración Hidrotermal</SectionTitle>
           <ul className="space-y-2 text-sm text-foreground/90">
-            <li>• <span className="text-gold">Silicificación</span> proximal (cuarzo + sericita)</li>
-            <li>• <span className="text-copper">Fílica</span> intermedia (sericita + pirita diseminada)</li>
-            <li>• <span className="text-teal">Propilítica</span> distal (clorita + epidota + calcita)</li>
+            {data.alteration.map((a) => (
+              <li key={a.id}>
+                • <span style={{ color: a.color_hex ?? "var(--gold)" }}>{a.name}</span>{" "}
+                <span className="text-muted-foreground">
+                  ({a.intensity?.toLowerCase()}) — {a.assemblage}
+                </span>
+              </li>
+            ))}
           </ul>
           <div className="mt-4 p-3 rounded border border-border bg-bg-secondary text-xs text-muted-foreground">
             <span className="font-mono text-hint uppercase tracking-wider">Diagnóstico:</span> fluidos
@@ -517,21 +577,27 @@ function Geology() {
           Mineralogía
         </SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {Object.entries(minerals).map(([group, items]) => (
+          {Object.entries(groupedMinerals).map(([group, items]) => (
             <div key={group} className="rounded border border-border p-4 bg-bg-secondary">
-              <div className="font-mono text-[11px] uppercase tracking-widest text-gold mb-3">{group}</div>
+              <div className="font-mono text-[11px] uppercase tracking-widest text-gold mb-3">
+                {group} <span className="text-hint">({items.length})</span>
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {items.map((m) => (
                   <span
-                    key={m}
+                    key={m.id}
+                    title={m.formula ?? undefined}
                     className="px-2 py-1 rounded bg-card border border-border text-xs text-foreground font-mono"
                   >
-                    {m}
+                    {m.mineral}
                   </span>
                 ))}
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-3 text-[11px] font-mono text-hint">
+          {data.minerals.length} minerales catalogados · fuente Trackmin 2025
         </div>
       </Card>
 
@@ -550,6 +616,25 @@ function Geology() {
           ))}
         </ol>
       </Card>
+
+      {/* References */}
+      {data.references.length > 0 && (
+        <Card delay={600} className="p-6">
+          <SectionTitle icon={ScrollText} sub="Sección 2.6">
+            Referencias
+          </SectionTitle>
+          <ul className="space-y-2 text-sm">
+            {data.references.map((r) => (
+              <li key={r.id} className="text-foreground/90">
+                <span className="font-mono text-gold-light">{r.authors}</span>{" "}
+                {r.year && <span className="text-muted-foreground">({r.year})</span>} — {r.title}
+                {r.publisher && <span className="text-muted-foreground"> · {r.publisher}</span>}
+                {r.doi && <span className="text-hint font-mono text-xs"> · DOI {r.doi}</span>}
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
     </div>
   );
 }
