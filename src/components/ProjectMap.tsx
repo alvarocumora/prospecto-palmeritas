@@ -32,6 +32,8 @@ import {
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
+import { useMiningConcessions } from "@/hooks/useMiningConcessions";
+import { buildConcessionsLayer } from "./map/concessionLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
@@ -66,6 +68,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "catastro:EXPLOTA_1932": { visible: false, opacity: 1 },
   "catastro:EXPLORA_1983": { visible: true, opacity: 1 },
   "catastro:ESTACAMENTO": { visible: false, opacity: 1 },
+  "concessions:project": { visible: true, opacity: 1 },
 };
 
 export function ProjectMap() {
@@ -94,6 +97,8 @@ export function ProjectMap() {
   const [magStats, setMagStats] = useState<MagStats | null>(null);
   const { active } = useProjects();
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
+  const { data: concessions } = useMiningConcessions(active?.id ?? null);
+  const concessionsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
@@ -287,6 +292,32 @@ export function ProjectMap() {
       ];
     });
   }, [geoph, active?.id]);
+
+  // Build mining concessions layer for the active project
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (concessionsLayerRef.current) {
+      map.removeLayer(concessionsLayerRef.current);
+      concessionsLayerRef.current = null;
+    }
+    const layer = buildConcessionsLayer(L, concessions);
+    concessionsLayerRef.current = layer;
+    if (concessions.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "concessions:project");
+      return [
+        ...without,
+        {
+          id: "concessions:project",
+          label: `Concesiones del proyecto (${concessions.length})`,
+          group: "Catastro",
+          layer,
+        },
+      ];
+    });
+  }, [concessions, active?.id]);
 
 
   // Fullscreen toggle
