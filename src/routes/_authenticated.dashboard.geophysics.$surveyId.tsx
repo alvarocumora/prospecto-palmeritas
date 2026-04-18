@@ -180,6 +180,9 @@ function StationsTab({
               <Download className="w-3 h-3" /> CSV
             </button>
           )}
+          <button onClick={onImport} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded border border-border text-xs font-mono hover:bg-accent">
+            <Upload className="w-3 h-3" /> Importar CSV
+          </button>
           <button onClick={onCreate} className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold/90">
             <Plus className="w-3 h-3" /> Nueva estación
           </button>
