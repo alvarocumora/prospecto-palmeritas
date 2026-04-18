@@ -42,9 +42,10 @@ export async function loadCatastroLayer(
       }),
       onEachFeature: (f, l) => {
         l.bindPopup(catastroPopupHtml(kind, f.properties ?? {}));
-    },
-  });
-  return { layer, count: fc.features?.length ?? 0 };
+      },
+    }
+  );
+  return { layer, count: features.length };
 }
 
 /** Returns a bbox in degrees around a center point with the given half-size in km. */
