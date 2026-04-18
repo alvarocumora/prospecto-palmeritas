@@ -47,10 +47,11 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
   const startDraw = (tool: Exclude<DrawTool, null>) => {
     if (!map || !L) return;
     activeHandlerRef.current?.disable();
-    
-    // Access leaflet-draw via the global L extension
-    const Draw = (L as unknown as { Draw: Record<string, new (m: LeafletMap, opts?: unknown) => { enable: () => void; disable: () => void } } }).Draw;
-    let handler: { enable: () => void; disable: () => void };
+    type DrawHandler = { enable: () => void; disable: () => void };
+    type DrawCtor = new (m: LeafletMap, opts?: unknown) => DrawHandler;
+    type DrawNS = { Polygon: DrawCtor; Polyline: DrawCtor; Marker: DrawCtor };
+    const Draw = (L as unknown as { Draw: DrawNS }).Draw;
+    let handler: DrawHandler;
     
     if (tool === "polygon") {
       handler = new Draw.Polygon(map, { shapeOptions: { color: "#F5A524", weight: 2 } });
