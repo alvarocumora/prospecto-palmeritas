@@ -64,6 +64,7 @@ export function ProjectMap() {
   const [measuring, setMeasuring] = useState(false);
   const [measureDist, setMeasureDist] = useState<number | null>(null);
   const [geophysicsVisible, setGeophysicsVisible] = useState(true);
+  const [geophysicsReady, setGeophysicsReady] = useState(false);
   const { data: geoph } = useGeophysicsData();
 
   const loadCatastroData = useCallback(async () => {
