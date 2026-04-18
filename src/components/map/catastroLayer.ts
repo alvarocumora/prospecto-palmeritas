@@ -62,6 +62,8 @@ export function clearCatastroCache(): number {
   }
   return removed;
 }
+/**
+ * Loads a Catastro layer (explotacion or exploracion) from SERNAGEOMIN's
  * ArcGIS FeatureServer for a given bbox and returns a Leaflet GeoJSON layer.
  * Cached in localStorage with 24h TTL keyed by kind + rounded bbox.
  * The layer is NOT added to the map automatically — the caller decides.
