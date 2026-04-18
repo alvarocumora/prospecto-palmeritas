@@ -19,7 +19,8 @@ import {
   type CatastroOrigen,
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
-import { buildGeophysicsLayer } from "./map/geophysicsLayers";
+import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
+import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { addProjectFeatures } from "./map/featureLayers";
 import {
   bboxAround,
@@ -30,6 +31,7 @@ import {
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
+import { useProjects } from "@/hooks/useProjects";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
@@ -59,6 +61,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "geophys:wgm2012": { visible: false, opacity: 0.55 },
   "geophys:hillshade": { visible: false, opacity: 0.6 },
   "geophys:planned": { visible: true, opacity: 1 },
+  "geophys:real": { visible: true, opacity: 1 },
   "catastro:EXPLOTA_1983": { visible: true, opacity: 1 },
   "catastro:EXPLOTA_1932": { visible: false, opacity: 1 },
   "catastro:EXPLORA_1983": { visible: true, opacity: 1 },
