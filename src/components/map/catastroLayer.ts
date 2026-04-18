@@ -92,7 +92,7 @@ export async function loadCatastroLayer(
       },
     }
   );
-  return { layer, count: features.length };
+  return { layer, count: features.length, cached: fromCache };
 }
 
 /** Returns a bbox in degrees around a center point with the given half-size in km. */
