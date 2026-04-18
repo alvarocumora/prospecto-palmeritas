@@ -14,7 +14,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
+import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
+import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
+import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
+import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
+import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -41,10 +46,40 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardSamplingRoute =
+  AuthenticatedDashboardSamplingRouteImport.update({
+    id: '/dashboard/sampling',
+    path: '/dashboard/sampling',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsRoute =
+  AuthenticatedDashboardProjectsRouteImport.update({
+    id: '/dashboard/projects',
+    path: '/dashboard/projects',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardPalmerasRoute =
   AuthenticatedDashboardPalmerasRouteImport.update({
     id: '/dashboard/palmeras',
     path: '/dashboard/palmeras',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardGeophysicsRoute =
+  AuthenticatedDashboardGeophysicsRouteImport.update({
+    id: '/dashboard/geophysics',
+    path: '/dashboard/geophysics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardDrillingRoute =
+  AuthenticatedDashboardDrillingRouteImport.update({
+    id: '/dashboard/drilling',
+    path: '/dashboard/drilling',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCatastroRoute =
+  AuthenticatedDashboardCatastroRouteImport.update({
+    id: '/dashboard/catastro',
+    path: '/dashboard/catastro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 
@@ -52,14 +87,24 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRoutesById {
@@ -68,7 +113,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
 }
 export interface FileRouteTypes {
@@ -77,17 +127,37 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/dashboard/catastro'
+    | '/dashboard/drilling'
+    | '/dashboard/geophysics'
     | '/dashboard/palmeras'
+    | '/dashboard/projects'
+    | '/dashboard/sampling'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/reset-password' | '/dashboard/palmeras' | '/dashboard'
+  to:
+    | '/'
+    | '/auth'
+    | '/reset-password'
+    | '/dashboard/catastro'
+    | '/dashboard/drilling'
+    | '/dashboard/geophysics'
+    | '/dashboard/palmeras'
+    | '/dashboard/projects'
+    | '/dashboard/sampling'
+    | '/dashboard'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/_authenticated/dashboard/catastro'
+    | '/_authenticated/dashboard/drilling'
+    | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/palmeras'
+    | '/_authenticated/dashboard/projects'
+    | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/'
   fileRoutesById: FileRoutesById
 }
@@ -135,6 +205,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/sampling': {
+      id: '/_authenticated/dashboard/sampling'
+      path: '/dashboard/sampling'
+      fullPath: '/dashboard/sampling'
+      preLoaderRoute: typeof AuthenticatedDashboardSamplingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects': {
+      id: '/_authenticated/dashboard/projects'
+      path: '/dashboard/projects'
+      fullPath: '/dashboard/projects'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/palmeras': {
       id: '/_authenticated/dashboard/palmeras'
       path: '/dashboard/palmeras'
@@ -142,16 +226,47 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/geophysics': {
+      id: '/_authenticated/dashboard/geophysics'
+      path: '/dashboard/geophysics'
+      fullPath: '/dashboard/geophysics'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/drilling': {
+      id: '/_authenticated/dashboard/drilling'
+      path: '/dashboard/drilling'
+      fullPath: '/dashboard/drilling'
+      preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/catastro': {
+      id: '/_authenticated/dashboard/catastro'
+      path: '/dashboard/catastro'
+      fullPath: '/dashboard/catastro'
+      preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
+  AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
+  AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
+  AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
+  AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
+  AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
+  AuthenticatedDashboardGeophysicsRoute: AuthenticatedDashboardGeophysicsRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
+  AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
+  AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
 
