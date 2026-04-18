@@ -84,7 +84,19 @@ export function ProjectMap() {
 
       cartoDark.addTo(map);
 
-      // --- SERNAGEOMIN Geological WMS overlay ---
+      // --- Geological overlays ---
+      // Macrostrat: global geological map (raster tiles), funciona internacionalmente.
+      const macrostratGeology = L.tileLayer(
+        "https://tiles.macrostrat.org/carto/{z}/{x}/{y}.png",
+        {
+          attribution:
+            'Geología &copy; <a href="https://macrostrat.org">Macrostrat</a> (UW–Madison)',
+          opacity: 0.55,
+          maxZoom: 16,
+        }
+      );
+
+      // SERNAGEOMIN WMS oficial — puede no responder fuera de Chile.
       const sernageominGeology = L.tileLayer.wms(
         "https://catastro.sernageomin.cl/arcgis/services/PUBLICO/Mapa_Geologico_Chile_1M/MapServer/WMSServer",
         {
@@ -106,7 +118,8 @@ export function ProjectMap() {
             "OpenTopoMap": openTopo,
           },
           {
-            "Geología SERNAGEOMIN 1:1M": sernageominGeology,
+            "Geología Macrostrat (global)": macrostratGeology,
+            "Geología SERNAGEOMIN 1:1M (CL)": sernageominGeology,
           },
           { position: "topright", collapsed: true }
         )
