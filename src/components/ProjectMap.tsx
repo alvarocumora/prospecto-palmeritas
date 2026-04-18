@@ -18,6 +18,7 @@ import {
 import { addProjectFeatures } from "./map/featureLayers";
 import {
   bboxAround,
+  clearCatastroCache,
   loadCatastroLayer,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
