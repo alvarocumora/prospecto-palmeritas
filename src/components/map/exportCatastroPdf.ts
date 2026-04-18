@@ -1,6 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as turf from "@turf/turf";
+import booleanIntersects from "@turf/boolean-intersects";
+import distance from "@turf/distance";
+import centroid from "@turf/centroid";
+import { point } from "@turf/helpers";
 import type { Feature, Geometry } from "geojson";
 import { CATASTRO_STYLE, type CatastroOrigen } from "./overlays";
 import type { AnyFC } from "./types";
@@ -55,8 +58,8 @@ function enrichRows(
   centerLngLat: [number, number]
 ): EnrichedRow[] {
   const aoiCentroidPt = aoi
-    ? turf.centroid(aoi)
-    : turf.point([centerLngLat[0], centerLngLat[1]]);
+    ? centroid(aoi)
+    : point([centerLngLat[0], centerLngLat[1]]);
 
   const rows: EnrichedRow[] = [];
   for (const origen of ORIGEN_ORDER) {
@@ -66,10 +69,10 @@ function enrichRows(
       let intersects = false;
       try {
         const ft = f as Feature<Geometry>;
-        const c = turf.centroid(ft);
-        dist = turf.distance(aoiCentroidPt, c, { units: "kilometers" });
+        const c = centroid(ft);
+        dist = distance(aoiCentroidPt, c, { units: "kilometers" });
         if (aoi && (ft.geometry.type === "Polygon" || ft.geometry.type === "MultiPolygon")) {
-          intersects = turf.booleanIntersects(aoi, ft);
+          intersects = booleanIntersects(aoi, ft);
         }
       } catch {
         // ignore geometry errors
@@ -240,7 +243,7 @@ export function computeAoiIntersections(
       try {
         const ft = f as Feature<Geometry>;
         if (ft.geometry.type !== "Polygon" && ft.geometry.type !== "MultiPolygon") continue;
-        if (turf.booleanIntersects(aoi, ft)) {
+        if (booleanIntersects(aoi, ft)) {
           const p = (f.properties ?? {}) as Record<string, unknown>;
           const id = `${p.NUMERO_ROL ?? ""}-${p.DV_ROL ?? ""}-${p.NOMBRE ?? ""}`;
           out.add(id);

@@ -26,7 +26,7 @@ import {
   loadCatastro,
   wireMacrostratClickPopup,
 } from "./map/catastroLayer";
-import { exportCatastroPdf } from "./map/exportCatastroPdf";
+
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 
@@ -96,9 +96,10 @@ export function ProjectMap() {
     featuresByOrigenRef.current = result.featuresByOrigen;
   }, []);
 
-  const handleExportPdf = useCallback(() => {
+  const handleExportPdf = useCallback(async () => {
     const f = featuresByOrigenRef.current;
     if (!f) return;
+    const { exportCatastroPdf } = await import("./map/exportCatastroPdf");
     exportCatastroPdf(f, { center: CENTER, halfKm: 8, aoi: aoiRef.current });
   }, []);
 
