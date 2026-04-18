@@ -77,6 +77,7 @@ export function ProjectMap() {
   const featuresByOrigenRef = useRef<Record<CatastroOrigen, AnyFC["features"]> | null>(null);
   const aoiRef = useRef<AoiPolygon | null>(null);
   const geophysicsLayerRef = useRef<LayerGroup | null>(null);
+  const geophysicsRealLayerRef = useRef<LayerGroup | null>(null);
   const measureLineRef = useRef<Layer | null>(null);
   const measurePointsRef = useRef<[number, number][]>([]);
 
@@ -90,7 +91,9 @@ export function ProjectMap() {
   const [measureDist, setMeasureDist] = useState<number | null>(null);
   const [managedLayers, setManagedLayers] = useState<ManagedLayer[]>([]);
   const [mapReady, setMapReady] = useState(false);
+  const [magStats, setMagStats] = useState<MagStats | null>(null);
   const { data: geoph } = useGeophysicsData();
+  const { active } = useProjects();
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
