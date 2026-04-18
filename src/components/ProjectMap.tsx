@@ -377,7 +377,7 @@ export function ProjectMap() {
             </div>
             <div className="space-y-1.5 border-t border-border pt-2">
               <div className="text-muted-foreground/70 text-[10px] uppercase">Geofísica</div>
-              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsLayerRef.current} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsReady} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
                 {geophysicsVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 {geophysicsVisible ? "Ocultar" : "Mostrar"} líneas/estaciones
               </button>
