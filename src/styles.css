@@ -130,4 +130,7 @@
     50% { opacity: 0.7; box-shadow: 0 0 0 6px color-mix(in oklab, var(--gold) 0%, transparent); }
   }
   .animate-pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+
+  /* Boost geological overlay legibility on top of dark basemaps */
+  .macrostrat-overlay { mix-blend-mode: screen; filter: saturate(1.4) brightness(1.1); }
 }
