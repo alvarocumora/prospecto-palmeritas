@@ -572,6 +572,9 @@ export function ProjectMap() {
           <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
         </span>
         <span className="inline-flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
+        </span>
+        <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
         </span>
         <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
