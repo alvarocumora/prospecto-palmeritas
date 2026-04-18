@@ -21,83 +21,121 @@ export function buildGeologyOverlays(L: LeafletNS) {
 /**
  * Catastro Minero SERNAGEOMIN — public ArcGIS FeatureServer used by the
  * official viewer at https://appsngmaz.sernageomin.cl/catastro_SNGM.
- * Layer 1 = WGS84_Pertenencia (concesiones de explotación).
- * Layer 2 = WGS84_Concesion   (concesiones de exploración).
+ *
+ * IMPORTANT: The official viewer renders ALL property types (explotación 1983,
+ * explotación 1932, exploración 1983, estacamento) from layer 2
+ * (`WGS84_Concesion`), discriminated by the `ORIGEN` field. Layer 1
+ * (`WGS84_Pertenencia`) only holds 12 nationwide records and is NOT used by
+ * the official viewer for rendering — it is essentially deprecated/empty.
+ *
+ * Filter `ID_SITUACION_CONCESION in (1,3)` = constituidas (active titles).
+ * Filter `ID_SITUACION_CONCESION = 9`      = en proceso (in tramite).
  */
 const CATASTRO_BASE =
   "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/ArcGIS/rest/services/Marcelo_Layer/FeatureServer";
 
-// Each FeatureServer layer has different fields, so we request all (*).
-// Layer 1 (Pertenencia): OBJECTID, SUPERFICIE, VERTICES, NOMBRE, EstadoRegistro, ID_CONCESION, FECHA_*
-// Layer 2 (Concesion):   NUMERO_ROL, DV_ROL, NOMBRE, HECTAREAS, FECHA_VENCIMIENTO, SITUACION_CONCESION, TIPO_CONCESION, COMUNA, TITULAR_DIVISION
+// Field reference (layer 2 = WGS84_Concesion):
+//   ORIGEN, NUMERO_ROL, DV_ROL, NOMBRE, HECTAREAS, FECHA_VENCIMIENTO,
+//   SITUACION_CONCESION, ID_SITUACION_CONCESION, TIPO_CONCESION, COMUNA,
+//   TITULAR_DIVISION
 
-export type CatastroKind = "explotacion" | "exploracion";
+export type CatastroOrigen =
+  | "EXPLOTA_1983"
+  | "EXPLOTA_1932"
+  | "EXPLORA_1983"
+  | "ESTACAMENTO";
 
-export function catastroQueryUrl(
-  kind: CatastroKind,
-  bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number }
-): string {
-  const layer = kind === "explotacion" ? 1 : 2;
+/** Single query that fetches all 4 property types in a bbox (constituidas). */
+export function catastroQueryUrl(bbox: {
+  minLng: number;
+  minLat: number;
+  maxLng: number;
+  maxLat: number;
+}): string {
   const geometry = `${bbox.minLng},${bbox.minLat},${bbox.maxLng},${bbox.maxLat}`;
   const params = new URLSearchParams({
-    where: "1=1",
+    where: "ID_SITUACION_CONCESION in (1,3)",
     geometry,
     geometryType: "esriGeometryEnvelope",
     inSR: "4326",
     outSR: "4326",
     spatialRel: "esriSpatialRelIntersects",
-    outFields: "*",
+    outFields: "ORIGEN,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TITULAR_DIVISION,COMUNA",
     returnGeometry: "true",
     f: "geojson",
   });
-  return `${CATASTRO_BASE}/${layer}/query?${params.toString()}`;
+  return `${CATASTRO_BASE}/2/query?${params.toString()}`;
 }
 
-export const CATASTRO_STYLE = {
-  explotacion: {
-    color: "#C8922A",
-    weight: 1.5,
-    opacity: 0.9,
-    fillColor: "#C8922A",
-    fillOpacity: 0.18,
-    dashArray: undefined as string | undefined,
+/** Colors mirror the official SERNAGEOMIN viewer. */
+export const CATASTRO_STYLE: Record<
+  CatastroOrigen,
+  {
+    color: string;
+    weight: number;
+    opacity: number;
+    fillColor: string;
+    fillOpacity: number;
+    dashArray?: string;
+    label: string;
+  }
+> = {
+  EXPLOTA_1983: {
+    color: "#0F69B4",
+    fillColor: "#0F69B4",
+    weight: 1.2,
+    opacity: 0.95,
+    fillOpacity: 0.35,
+    label: "Explotación 1983",
   },
-  exploracion: {
-    color: "#5DA3DD",
-    weight: 1.5,
-    opacity: 0.9,
-    fillColor: "#5DA3DD",
-    fillOpacity: 0.12,
-    dashArray: "4 3",
+  EXPLOTA_1932: {
+    color: "#EB465F",
+    fillColor: "#EB465F",
+    weight: 1.2,
+    opacity: 0.95,
+    fillOpacity: 0.32,
+    label: "Explotación 1932",
   },
-} as const;
+  EXPLORA_1983: {
+    color: "#15D844",
+    fillColor: "#15D844",
+    weight: 1.2,
+    opacity: 0.95,
+    fillOpacity: 0.30,
+    label: "Exploración 1983",
+  },
+  ESTACAMENTO: {
+    color: "#ABFADB",
+    fillColor: "#ABFADB",
+    weight: 1.2,
+    opacity: 0.95,
+    fillOpacity: 0.30,
+    label: "Estacamento salitrero",
+  },
+};
 
-export function catastroPopupHtml(
-  kind: CatastroKind,
-  p: Record<string, unknown>
-): string {
-  const titleColor = kind === "explotacion" ? "#C8922A" : "#5DA3DD";
-  const label = kind === "explotacion" ? "Pertenencia (explotación)" : "Concesión (exploración)";
-  // Layer schemas differ: pertenencia exposes SUPERFICIE/VERTICES, concesion has NUMERO_ROL/HECTAREAS/etc.
+export function catastroPopupHtml(p: Record<string, unknown>): string {
+  const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+  const style = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
   const rol = p.NUMERO_ROL
     ? `${p.NUMERO_ROL}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`
-    : (p.ID_CONCESION as string | undefined) ?? "—";
-  const area =
-    (p.HECTAREAS as number | undefined) ??
-    (p.SUPERFICIE as number | undefined) ??
-    null;
+    : "—";
+  const area = p.HECTAREAS != null ? `${Number(p.HECTAREAS).toFixed(1)} ha` : "—";
   const venc = p.FECHA_VENCIMIENTO
     ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
     : "—";
   const titular = (p.TITULAR_DIVISION as string | undefined) ?? "—";
   const comuna = (p.COMUNA as string | undefined) ?? "—";
-  return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
-    <strong style="color:${titleColor};">${p.NOMBRE ?? "Sin nombre"}</strong><br/>
-    <span style="color:#A89080;">${label}</span><br/>
-    ROL/ID: <strong>${rol}</strong><br/>
-    ${kind === "exploracion" ? `Titular: ${titular}<br/>Comuna: ${comuna} · ` : ""}${area != null ? `${Number(area).toFixed(1)} ha` : ""}<br/>
-    ${kind === "exploracion" ? `Vence: ${venc}<br/>` : ""}
-    <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Catastro Minero (ArcGIS REST)</div>
+  const situacion = (p.SITUACION_CONCESION as string | undefined) ?? "—";
+  return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:260px;">
+    <strong style="color:${style.color};">${p.NOMBRE ?? "Sin nombre"}</strong><br/>
+    <span style="color:#A89080;">${style.label}</span><br/>
+    ROL: <strong>${rol}</strong><br/>
+    Situación: ${situacion}<br/>
+    Titular: ${titular}<br/>
+    Comuna: ${comuna} · ${area}<br/>
+    Vence: ${venc}
+    <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Catastro Minero (ArcGIS REST · capa WGS84_Concesion)</div>
   </div>`;
 }
 
