@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
+import { useGeologyData } from "@/hooks/useGeologyData";
 import { exportFullReport } from "@/lib/export-pdf";
 import { toast } from "sonner";
 import {
@@ -426,10 +427,10 @@ function Geology() {
   if (error || !data) {
     return (
       <div className="space-y-6">
-        <Card className="p-6" accent="alert">
-          <SectionTitle icon={Mountain}>Error al cargar geología</SectionTitle>
-          <p className="text-sm text-muted-foreground">{error ?? "No se pudieron obtener los datos."}</p>
-        </Card>
+      <Card className="p-6" accent="copper">
+        <SectionTitle icon={Mountain}>Error al cargar geología</SectionTitle>
+        <p className="text-sm text-muted-foreground">{error ?? "No se pudieron obtener los datos."}</p>
+      </Card>
       </div>
     );
   }
