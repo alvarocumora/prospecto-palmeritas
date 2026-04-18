@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
+import { GeophysicsModule } from "@/components/Geophysics";
 import { useGeologyData } from "@/hooks/useGeologyData";
 import { exportFullReport } from "@/lib/export-pdf";
 import { toast } from "sonner";
@@ -26,6 +27,7 @@ import {
   Calendar,
   Building2,
   ScrollText,
+  Radio,
 } from "lucide-react";
 import {
   PieChart,
@@ -68,11 +70,12 @@ const PROJECT = {
   created: "Abril 2026",
 };
 
-type TabId = "overview" | "geology" | "targets" | "sampling" | "drill" | "budget";
+type TabId = "overview" | "geology" | "geophysics" | "targets" | "sampling" | "drill" | "budget";
 
 const TABS: { id: TabId; label: string; icon: typeof Activity }[] = [
   { id: "overview", label: "Overview", icon: Activity },
   { id: "geology", label: "Geology", icon: Mountain },
+  { id: "geophysics", label: "Geophysics", icon: Radio },
   { id: "targets", label: "Targets", icon: Target },
   { id: "sampling", label: "Sampling", icon: TestTube2 },
   { id: "drill", label: "Drill Program", icon: Drill },
@@ -1266,6 +1269,9 @@ function TrackminGeoIntel() {
         <div key={active} className="animate-fade-up">
           {active === "overview" && <Overview />}
           {active === "geology" && <Geology />}
+          {active === "geophysics" && (
+            <GeophysicsModule Card={Card} SectionTitle={SectionTitle} Badge={Badge} />
+          )}
           {active === "targets" && <Targets />}
           {active === "sampling" && <Sampling />}
           {active === "drill" && <DrillProgram />}
