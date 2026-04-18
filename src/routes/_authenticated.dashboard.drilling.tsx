@@ -77,6 +77,7 @@ function DrillingModule() {
     else {
       toast.success("Sondaje eliminado");
       refresh();
+      refreshLogs();
     }
   };
 
