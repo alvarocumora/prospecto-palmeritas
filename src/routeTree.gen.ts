@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -89,6 +90,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
+  AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport.update({
+    id: '/field',
+    path: '/field',
+    getParentRoute: () => AuthenticatedDashboardGeophysicsSurveyIdRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,7 +108,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -114,7 +122,8 @@ export interface FileRoutesByTo {
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
-  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+  '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -129,7 +138,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+  '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -145,6 +155,7 @@ export interface FileRouteTypes {
     | '/dashboard/sampling'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/geophysics/$surveyId/field'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -158,6 +169,7 @@ export interface FileRouteTypes {
     | '/dashboard/sampling'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/geophysics/$surveyId/field'
   id:
     | '__root__'
     | '/'
@@ -172,6 +184,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
+    | '/_authenticated/dashboard/geophysics/$surveyId/field'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -267,17 +280,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/_authenticated/dashboard/geophysics/$surveyId/field': {
+      id: '/_authenticated/dashboard/geophysics/$surveyId/field'
+      path: '/field'
+      fullPath: '/dashboard/geophysics/$surveyId/field'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport
+      parentRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+    }
   }
 }
 
+interface AuthenticatedDashboardGeophysicsSurveyIdRouteChildren {
+  AuthenticatedDashboardGeophysicsSurveyIdFieldRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+}
+
+const AuthenticatedDashboardGeophysicsSurveyIdRouteChildren: AuthenticatedDashboardGeophysicsSurveyIdRouteChildren =
+  {
+    AuthenticatedDashboardGeophysicsSurveyIdFieldRoute:
+      AuthenticatedDashboardGeophysicsSurveyIdFieldRoute,
+  }
+
+const AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren =
+  AuthenticatedDashboardGeophysicsSurveyIdRoute._addFileChildren(
+    AuthenticatedDashboardGeophysicsSurveyIdRouteChildren,
+  )
+
 interface AuthenticatedDashboardGeophysicsRouteChildren {
-  AuthenticatedDashboardGeophysicsSurveyIdRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+  AuthenticatedDashboardGeophysicsSurveyIdRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
 }
 
 const AuthenticatedDashboardGeophysicsRouteChildren: AuthenticatedDashboardGeophysicsRouteChildren =
   {
     AuthenticatedDashboardGeophysicsSurveyIdRoute:
-      AuthenticatedDashboardGeophysicsSurveyIdRoute,
+      AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren,
   }
 
 const AuthenticatedDashboardGeophysicsRouteWithChildren =

@@ -43,9 +43,18 @@ function SurveyDetail() {
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
-      <Link to="/dashboard/geophysics" className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-gold mb-3">
-        <ArrowLeft className="w-3 h-3" /> Volver a campañas
-      </Link>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <Link to="/dashboard/geophysics" className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-gold">
+          <ArrowLeft className="w-3 h-3" /> Volver a campañas
+        </Link>
+        <Link
+          to="/dashboard/geophysics/$surveyId/field"
+          params={{ surveyId: survey.id }}
+          className="inline-flex items-center gap-1.5 text-xs font-mono bg-gold text-background px-3 py-1.5 rounded hover:opacity-90"
+        >
+          <Radio className="w-3 h-3" /> Modo terreno
+        </Link>
+      </div>
 
       <header className="mb-6">
         <div className="text-[10px] uppercase font-mono text-muted-foreground">{survey.method}</div>
