@@ -249,7 +249,7 @@ function DrillingModule() {
           hole={logHole}
           projectId={active.id}
           userId={user.id}
-          onClose={() => setLogHole(null)}
+          onClose={() => { setLogHole(null); refreshLogs(); }}
         />
       )}
     </div>
