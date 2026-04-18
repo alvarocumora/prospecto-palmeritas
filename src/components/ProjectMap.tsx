@@ -222,6 +222,7 @@ export function ProjectMap() {
     <div className="space-y-3">
       <div
         ref={containerRef}
+        data-export-map
         className="h-72 md:h-96 w-full rounded border border-border overflow-hidden bg-bg-secondary"
         style={{ zIndex: 0 }}
       />
