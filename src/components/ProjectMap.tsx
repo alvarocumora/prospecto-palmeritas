@@ -96,9 +96,10 @@ export function ProjectMap() {
     featuresByOrigenRef.current = result.featuresByOrigen;
   }, []);
 
-  const handleExportPdf = useCallback(() => {
+  const handleExportPdf = useCallback(async () => {
     const f = featuresByOrigenRef.current;
     if (!f) return;
+    const { exportCatastroPdf } = await import("./map/exportCatastroPdf");
     exportCatastroPdf(f, { center: CENTER, halfKm: 8, aoi: aoiRef.current });
   }, []);
 
