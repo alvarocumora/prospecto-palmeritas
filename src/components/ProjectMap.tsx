@@ -84,7 +84,8 @@ export function ProjectMap() {
       });
       mapRef.current = map;
 
-      L.tileLayer(
+      // --- Basemaps ---
+      const cartoDark = L.tileLayer(
         "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
         {
           attribution:
@@ -92,7 +93,62 @@ export function ProjectMap() {
           subdomains: "abcd",
           maxZoom: 19,
         }
-      ).addTo(map);
+      );
+      const esriImagery = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS User Community",
+          maxZoom: 19,
+        }
+      );
+      const esriTopo = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: "Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",
+          maxZoom: 19,
+        }
+      );
+      const openTopo = L.tileLayer(
+        "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+        {
+          attribution:
+            'Map data: &copy; <a href="https://openstreetmap.org">OSM</a>, SRTM | &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)',
+          subdomains: "abc",
+          maxZoom: 17,
+        }
+      );
+
+      cartoDark.addTo(map);
+
+      // --- SERNAGEOMIN Geological WMS overlay ---
+      // Mapa Geológico de Chile escala 1:1.000.000 (SERNAGEOMIN)
+      const sernageominGeology = L.tileLayer.wms(
+        "https://catastro.sernageomin.cl/arcgis/services/PUBLICO/Mapa_Geologico_Chile_1M/MapServer/WMSServer",
+        {
+          layers: "0",
+          format: "image/png",
+          transparent: true,
+          opacity: 0.55,
+          attribution: "Geología &copy; SERNAGEOMIN",
+          version: "1.3.0",
+        }
+      );
+
+      L.control
+        .layers(
+          {
+            "CARTO Dark": cartoDark,
+            "Esri Imagery": esriImagery,
+            "Esri Topo": esriTopo,
+            "OpenTopoMap": openTopo,
+          },
+          {
+            "Geología SERNAGEOMIN 1:1M": sernageominGeology,
+          },
+          { position: "topright", collapsed: true }
+        )
+        .addTo(map);
 
       // --- Project centroid ---
       const centroidIcon = L.divIcon({
