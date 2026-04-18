@@ -189,6 +189,15 @@ export function ProjectMap() {
           <span className="w-2 h-2 rounded-sm bg-info" />
           Concesiones: <strong>{counts.exploracion ?? "…"}</strong>
         </span>
+        <button
+          type="button"
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          title="Limpia el cache local y vuelve a descargar el catastro desde SERNAGEOMIN"
+        >
+          {refreshing ? "Refrescando…" : "↻ Refrescar catastro"}
+        </button>
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
         <span className="inline-flex items-center gap-1.5">
