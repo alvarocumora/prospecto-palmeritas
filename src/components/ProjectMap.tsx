@@ -133,7 +133,7 @@ export function ProjectMap() {
       leafletRef.current = L;
 
       const basemaps = buildBasemaps(L);
-      basemaps["CARTO Dark"].addTo(map);
+      basemaps["Esri Imagery"].addTo(map);
       const geoOverlays = buildGeologyOverlays(L);
 
       // --- Load project GeoJSON in parallel ---
