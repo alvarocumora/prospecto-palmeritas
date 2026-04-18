@@ -320,11 +320,82 @@ export function ProjectMap() {
   return (
     <div className="space-y-3">
       <div
-        ref={containerRef}
-        data-export-map
-        className="h-72 md:h-96 w-full rounded border border-border overflow-hidden bg-bg-secondary"
-        style={{ zIndex: 0 }}
-      />
+        ref={wrapperRef}
+        className={`relative ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
+      >
+        <div
+          ref={containerRef}
+          data-export-map
+          className={`${isFullscreen ? "h-full" : "h-72 md:h-96"} w-full rounded border border-border overflow-hidden bg-bg-secondary`}
+          style={{ zIndex: 0 }}
+        />
+        {/* Floating control toolbar (top-left) */}
+        <div className="absolute top-2 left-2 z-[1000] flex flex-col gap-1.5">
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="w-9 h-9 inline-flex items-center justify-center rounded border border-border bg-background/95 backdrop-blur text-foreground hover:bg-accent shadow-md transition-colors"
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </button>
+          <button
+            type="button"
+            onClick={() => setToolsOpen((v) => !v)}
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
+            title="Herramientas de gestión"
+          >
+            <Wrench className="w-4 h-4" />
+          </button>
+        </div>
+
+        {toolsOpen && (
+          <div className="absolute top-2 left-14 z-[1000] w-64 rounded border border-border bg-background/95 backdrop-blur shadow-lg p-3 text-xs font-mono space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground font-semibold uppercase tracking-wide">Gestión de proyecto</span>
+              <button type="button" onClick={() => setToolsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">✕</button>
+            </div>
+            <div className="space-y-1.5">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Navegación</div>
+              <button type="button" onClick={centerOnAoi} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors">
+                <Crosshair className="w-3.5 h-3.5" /> Centrar en AOI
+              </button>
+              <button type="button" onClick={toggleMeasure} className={`w-full inline-flex items-center justify-between gap-2 px-2 py-1.5 rounded border ${measuring ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-secondary text-foreground hover:bg-accent"} transition-colors`}>
+                <span className="inline-flex items-center gap-2">
+                  <Ruler className="w-3.5 h-3.5" /> {measuring ? "Medir: ON" : "Medir distancia"}
+                </span>
+                {measureDist != null && <span className="text-[10px] text-foreground">{(measureDist / 1000).toFixed(2)} km</span>}
+              </button>
+              {measuring && (
+                <button type="button" onClick={clearMeasure} className="w-full text-[10px] text-muted-foreground hover:text-foreground">Limpiar mediciones</button>
+              )}
+            </div>
+            <div className="space-y-1.5 border-t border-border pt-2">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Geofísica</div>
+              <button type="button" onClick={toggleGeophysics} disabled={!geophysicsLayerRef.current} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                {geophysicsVisible ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                {geophysicsVisible ? "Ocultar" : "Mostrar"} líneas/estaciones
+              </button>
+              {geoph && (
+                <div className="text-[10px] text-muted-foreground space-y-0.5 px-1">
+                  <div>Campañas: <strong className="text-foreground">{geoph.surveys.length}</strong></div>
+                  <div>Líneas: <strong className="text-foreground">{geoph.lines.length}</strong></div>
+                  <div>Estaciones: <strong className="text-foreground">{geoph.stations.length}</strong></div>
+                </div>
+              )}
+            </div>
+            <div className="space-y-1.5 border-t border-border pt-2">
+              <div className="text-muted-foreground/70 text-[10px] uppercase">Catastro</div>
+              <button type="button" onClick={handleExportPdf} disabled={Object.values(counts).every((n) => !n)} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                <Download className="w-3.5 h-3.5" /> PDF pertenencias
+              </button>
+              <button type="button" onClick={handleRefresh} disabled={refreshing} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+                ↻ {refreshing ? "Refrescando…" : "Refrescar catastro"}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
         <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
         {ORIGEN_ORDER.map(renderChip)}
