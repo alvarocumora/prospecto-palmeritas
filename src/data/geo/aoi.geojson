@@ -7,11 +7,31 @@
       "properties": {
         "name": "Prospecto Palmeras — AOI",
         "code": "TRK-ALH-001",
+        "kind": "centroid",
         "source": "Trackmin GeoIntel · centroide proyecto (interno)"
       },
       "geometry": {
         "type": "Point",
         "coordinates": [-71.115471, -33.898438]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "AOI Polygon ~1.5 × 1.2 km",
+        "code": "TRK-ALH-001-AOI",
+        "kind": "polygon",
+        "source": "Trackmin GeoIntel · polígono AOI rotado N20W (interno)"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [-71.122500, -33.903600],
+          [-71.110800, -33.901500],
+          [-71.108400, -33.893200],
+          [-71.120100, -33.895300],
+          [-71.122500, -33.903600]
+        ]]
       }
     }
   ]
