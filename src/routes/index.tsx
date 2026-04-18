@@ -19,7 +19,7 @@ export const Route = createFileRoute("/")({
         property: "og:description",
         content: "Catastro, geofísica, sondajes y muestreo en una sola plataforma para geólogos profesionales.",
       },
-      { property: "og:image", content: "/src/assets/hero-mining.jpg" },
+      
     ],
   }),
   component: LandingPage,
