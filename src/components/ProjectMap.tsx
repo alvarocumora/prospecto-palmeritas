@@ -33,7 +33,9 @@ import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
+import { useDrillHoles } from "@/hooks/useDrilling";
 import { buildConcessionsLayer } from "./map/concessionLayer";
+import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
@@ -69,6 +71,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "catastro:EXPLORA_1983": { visible: true, opacity: 1 },
   "catastro:ESTACAMENTO": { visible: false, opacity: 1 },
   "concessions:project": { visible: true, opacity: 1 },
+  "drills:project": { visible: true, opacity: 1 },
 };
 
 export function ProjectMap() {
@@ -98,7 +101,9 @@ export function ProjectMap() {
   const { active } = useProjects();
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
+  const { data: drillHoles } = useDrillHoles(active?.id ?? null);
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
+  const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
   const loadCatastroData = useCallback(async () => {
