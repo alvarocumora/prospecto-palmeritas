@@ -147,11 +147,13 @@ function TabBtn({ active, onClick, icon, label }: { active: boolean; onClick: ()
 function StationsTab({
   stations,
   onCreate,
+  onImport,
   onEdit,
   onDeleted,
 }: {
   stations: Station[];
   onCreate: () => void;
+  onImport: () => void;
   onEdit: (s: Station) => void;
   onDeleted: () => void;
 }) {
