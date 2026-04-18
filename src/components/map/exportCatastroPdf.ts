@@ -1,6 +1,9 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import * as turf from "@turf/turf";
+import booleanIntersects from "@turf/boolean-intersects";
+import distance from "@turf/distance";
+import centroid from "@turf/centroid";
+import { point } from "@turf/helpers";
 import type { Feature, Geometry } from "geojson";
 import { CATASTRO_STYLE, type CatastroOrigen } from "./overlays";
 import type { AnyFC } from "./types";
