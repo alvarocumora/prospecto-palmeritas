@@ -15,6 +15,7 @@ import {
   setRGB,
   tableCaption,
 } from "./primitives";
+import { drawCrossSection, drawGantt, drawPieChart } from "./figures";
 import type { GeologyData } from "@/hooks/useGeologyData";
 import type { GeophysicsData } from "@/hooks/useGeophysicsData";
 
