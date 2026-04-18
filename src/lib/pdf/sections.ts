@@ -526,6 +526,19 @@ export function renderSection7_DepositType(s: PdfState, geo: GeologyData | null)
       `La potencial transición a mesotermal en profundidad estaría caracterizada por aumento de calcopirita-pirrotina, ` +
       `alteración propilítica más intensa, y stockwork de cuarzo.`,
   );
+
+  h2(s, "Modelo conceptual");
+  p(
+    s,
+    `La sección esquemática siguiente ilustra la geometría inferida del sistema en una traza NW–SE: vetas subverticales ` +
+      `hospedadas en volcánicas de la Fm. Lo Valle, halo de alteración silícea–sericítica envolvente, labores antiguas en superficie, ` +
+      `y trayectorias de los sondajes diamantinos propuestos para test de continuidad en profundidad.`,
+  );
+  drawCrossSection(
+    s,
+    "Sección esquemática NW–SE del sistema epitermal–mesotermal Au–Cu del Prospecto Palmeras. " +
+      "Profundidades hasta 500 m. No a escala. Fuente: modelo conceptual Trackmin GeoIntel.",
+  );
 }
 
 export function renderSection8_Exploration(s: PdfState, geophys: GeophysicsData | null) {
