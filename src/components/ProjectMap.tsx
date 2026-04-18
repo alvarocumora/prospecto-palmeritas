@@ -293,6 +293,32 @@ export function ProjectMap() {
     });
   }, [geoph, active?.id]);
 
+  // Build mining concessions layer for the active project
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (concessionsLayerRef.current) {
+      map.removeLayer(concessionsLayerRef.current);
+      concessionsLayerRef.current = null;
+    }
+    const layer = buildConcessionsLayer(L, concessions);
+    concessionsLayerRef.current = layer;
+    if (concessions.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "concessions:project");
+      return [
+        ...without,
+        {
+          id: "concessions:project",
+          label: `Concesiones del proyecto (${concessions.length})`,
+          group: "Catastro",
+          layer,
+        },
+      ];
+    });
+  }, [concessions, active?.id]);
+
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
