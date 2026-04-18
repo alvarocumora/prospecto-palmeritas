@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
+import { exportFullReport } from "@/lib/export-pdf";
+import { toast } from "sonner";
 import {
   Activity,
   AlertTriangle,
@@ -154,7 +156,17 @@ function StatusDot({ tone }: { tone: "teal" | "gold" | "alert" }) {
    NAV
    ============================================================ */
 
-function TopNav({ active, setActive }: { active: TabId; setActive: (t: TabId) => void }) {
+function TopNav({
+  active,
+  setActive,
+  onExport,
+  exporting,
+}: {
+  active: TabId;
+  setActive: (t: TabId) => void;
+  onExport: () => void;
+  exporting: boolean;
+}) {
   return (
     <header className="sticky top-0 z-40 bg-bg-secondary/95 backdrop-blur border-b border-border">
       <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-8">
@@ -191,9 +203,13 @@ function TopNav({ active, setActive }: { active: TabId; setActive: (t: TabId) =>
               {PROJECT.status}
             </span>
           </div>
-          <button className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold/40 text-gold hover:bg-gold/10 font-mono text-xs uppercase tracking-wider transition-colors">
-            <Download className="w-3.5 h-3.5" />
-            Exportar PDF
+          <button
+            onClick={onExport}
+            disabled={exporting}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold/40 text-gold hover:bg-gold/10 font-mono text-xs uppercase tracking-wider transition-colors disabled:opacity-60 disabled:cursor-wait"
+          >
+            <Download className={`w-3.5 h-3.5 ${exporting ? "animate-pulse" : ""}`} />
+            {exporting ? "Generando…" : "Exportar PDF"}
           </button>
         </div>
       </div>
@@ -1126,12 +1142,32 @@ function Budget() {
 
 function TrackminGeoIntel() {
   const [active, setActive] = useState<TabId>("overview");
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (exporting) return;
+    setExporting(true);
+    toast.info("Generando PDF — recorriendo módulos…");
+    try {
+      await exportFullReport({
+        sections: TABS.map((t) => ({ id: t.id, label: t.label })),
+        setActive: (id) => setActive(id as TabId),
+        getCurrent: () => active,
+      });
+      toast.success("PDF exportado correctamente");
+    } catch (err) {
+      console.error(err);
+      toast.error("No se pudo generar el PDF");
+    } finally {
+      setExporting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <TopNav active={active} setActive={setActive} />
+      <TopNav active={active} setActive={setActive} onExport={handleExport} exporting={exporting} />
 
-      <main className="max-w-[1400px] mx-auto px-6 py-8">
+      <main className="max-w-[1400px] mx-auto px-6 py-8" data-export-root>
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 mb-6 font-mono text-xs text-hint">
           <span>{PROJECT.ref}</span>
