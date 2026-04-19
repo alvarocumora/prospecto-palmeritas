@@ -43,8 +43,8 @@ function DashboardHome() {
       ) : (
         <>
           {/* KPIs ejecutivos */}
-          <section className="mb-8">
-            <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">KPIs cross-proyecto</h2>
+          <section className="mb-6">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">KPIs operativos</h2>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Kpi icon={<FolderKanban className="w-4 h-4" />} label="Proyectos" value={loading ? "…" : String(kpis?.totalProjects ?? 0)} color="text-gold" />
               <Kpi icon={<Ruler className="w-4 h-4" />} label="m perforados" value={loading ? "…" : (kpis?.totalMetersDrilled ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} color="text-copper" />
@@ -54,6 +54,42 @@ function DashboardHome() {
               <Kpi icon={<TestTube2 className="w-4 h-4" />} label="Muestras" value={loading ? "…" : String(kpis?.totalSamples ?? 0)} />
               <Kpi icon={<TrendingUp className="w-4 h-4" />} label="Intercepts mes" value={loading ? "…" : String(kpis?.monthInterceptCount ?? 0)} color="text-gold" />
               <Kpi icon={<LayersIcon className="w-4 h-4" />} label="Capas marketplace" value="3+" />
+            </div>
+          </section>
+
+          {/* Gobernanza Fase 1 */}
+          <section className="mb-8">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3 inline-flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-teal" /> Gobernanza & calidad
+            </h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Link to="/dashboard/approvals" className="block">
+                <Kpi
+                  icon={<ClipboardCheck className="w-4 h-4" />}
+                  label="Pendientes revisión"
+                  value={loading ? "…" : String(kpis?.pendingReview ?? 0)}
+                  color={(kpis?.pendingReview ?? 0) > 0 ? "text-gold" : "text-muted-foreground"}
+                />
+              </Link>
+              <Kpi
+                icon={<CheckCircle2 className="w-4 h-4" />}
+                label="Aprobados"
+                value={loading ? "…" : String(kpis?.approvedRecords ?? 0)}
+                color="text-teal"
+              />
+              <Kpi
+                icon={<ClipboardCheck className="w-4 h-4" />}
+                label="Borradores"
+                value={loading ? "…" : String(kpis?.draftRecords ?? 0)}
+              />
+              <Link to="/dashboard/qaqc" className="block">
+                <Kpi
+                  icon={<AlertTriangle className="w-4 h-4" />}
+                  label={`QA/QC fail (${kpis?.qaqcTotal ?? 0})`}
+                  value={loading ? "…" : kpis?.qaqcFailRate != null ? `${kpis.qaqcFailRate.toFixed(1)}%` : "—"}
+                  color={(kpis?.qaqcFailRate ?? 0) > 10 ? "text-destructive" : (kpis?.qaqcFailRate ?? 0) > 0 ? "text-gold" : "text-teal"}
+                />
+              </Link>
             </div>
           </section>
 
