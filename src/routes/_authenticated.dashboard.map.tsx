@@ -36,6 +36,42 @@ function OperationalMap() {
   const [highGradeOnly, setHighGradeOnly] = useState(false);
   const [inspected, setInspected] = useState<InspectedFeature | null>(null);
   const [mapInst, setMapInst] = useState<{ map: LeafletMap; L: LeafletNS } | null>(null);
+  const [snapshotting, setSnapshotting] = useState(false);
+
+  const campaignName = useMemo(
+    () => (campaignId ? campaigns.find((c) => c.id === campaignId)?.name ?? null : null),
+    [campaignId, campaigns],
+  );
+
+  const handleSnapshot = async () => {
+    if (snapshotting) return;
+    setSnapshotting(true);
+    try {
+      const subtitle = [
+        campaignName ? `Campaña: ${campaignName}` : "Todas las campañas",
+        `${filteredSamples.length} muestras${highGradeOnly ? " (≥1 g/t)" : ""}`,
+      ].join(" · ");
+      const dataUrl = await captureMapSnapshot("[data-export-map]", {
+        title: active?.name ?? "Centro de Operaciones",
+        subtitle,
+        legend: AU_LEGEND.map((l) => ({ color: l.color, label: `Au ${l.label}` })),
+        scale: 2,
+      });
+      if (!dataUrl) {
+        toast.error("No se pudo capturar el mapa");
+        return;
+      }
+      const slug = (active?.code ?? active?.name ?? "mapa").toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const ts = new Date().toISOString().slice(0, 10);
+      downloadDataUrl(dataUrl, `snapshot-${slug}-${ts}.png`);
+      toast.success("Snapshot descargado");
+    } catch (err) {
+      console.error(err);
+      toast.error("Error al generar snapshot");
+    } finally {
+      setSnapshotting(false);
+    }
+  };
 
   const filteredSamples = useMemo(() => {
     let list = samples;
@@ -78,6 +114,16 @@ function OperationalMap() {
           <span className="text-[11px] font-mono text-muted-foreground hidden lg:inline whitespace-nowrap">
             <FlaskConical className="w-3 h-3 inline mr-1" /> {filteredSamples.length} muestras
           </span>
+          <button
+            type="button"
+            onClick={handleSnapshot}
+            disabled={snapshotting || !mapInst}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-background text-foreground hover:bg-accent disabled:opacity-50 text-[11px] font-mono whitespace-nowrap transition-colors"
+            title="Exportar snapshot PNG con leyenda y escala"
+          >
+            {snapshotting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-gold" />}
+            <span className="hidden sm:inline">Snapshot</span>
+          </button>
         </div>
       </header>
 
