@@ -346,7 +346,7 @@ export function ProjectMap() {
       map.removeLayer(drillCollarsLayerRef.current);
       drillCollarsLayerRef.current = null;
     }
-    const layer = buildDrillCollarsLayer(L, drillHoles);
+    const layer = buildDrillCollarsLayer(L, drillHoles, scoresByHole, scoreToHaloStyle);
     drillCollarsLayerRef.current = layer;
     if (drillHoles.length > 0) layer.addTo(map);
     setManagedLayers((prev) => {
@@ -361,7 +361,7 @@ export function ProjectMap() {
         },
       ];
     });
-  }, [drillHoles, active?.id]);
+  }, [drillHoles, scoresByHole, active?.id]);
 
 
   // Fullscreen toggle
