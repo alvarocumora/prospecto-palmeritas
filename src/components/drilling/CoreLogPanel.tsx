@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Trash2, AlertTriangle, Sparkles } from "lucide-react";
 import { useDrillCoreLogs, type DrillCoreLog, type DrillHole } from "@/hooks/useDrilling";
 import { StripLog } from "./StripLog";
