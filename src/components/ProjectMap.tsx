@@ -221,6 +221,30 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       });
       L.control.zoom({ position: "bottomleft" }).addTo(map);
       L.control.scale({ position: "bottomleft", imperial: false, maxWidth: 140 }).addTo(map);
+
+      // Minimap overview (bottom-right)
+      try {
+        const MiniMapMod = await import("leaflet-minimap");
+        await import("leaflet-minimap/dist/Control.MiniMap.min.css");
+        const MiniMap = (MiniMapMod as unknown as { default: new (layer: unknown, opts: unknown) => { addTo: (m: unknown) => void } }).default;
+        const miniLayer = L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          { attribution: "", maxZoom: 13 },
+        );
+        new MiniMap(miniLayer, {
+          position: "bottomright",
+          width: 160,
+          height: 110,
+          zoomLevelOffset: -5,
+          toggleDisplay: true,
+          minimized: false,
+          aimingRectOptions: { color: "#D4A24C", weight: 1, fillColor: "#D4A24C", fillOpacity: 0.15 },
+          shadowRectOptions: { color: "#D4A24C", weight: 1, opacity: 0, fillOpacity: 0 },
+        }).addTo(map);
+      } catch (err) {
+        console.warn("[minimap] failed to load:", err);
+      }
+
       mapRef.current = map;
       leafletRef.current = L;
 
