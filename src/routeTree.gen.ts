@@ -28,6 +28,7 @@ import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
+import { Route as AuthenticatedDashboardGeology3dRouteImport } from './routes/_authenticated.dashboard.geology3d'
 import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
@@ -147,6 +148,12 @@ const AuthenticatedDashboardGeophysicsRoute =
     path: '/dashboard/geophysics',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardGeology3dRoute =
+  AuthenticatedDashboardGeology3dRouteImport.update({
+    id: '/dashboard/geology3d',
+    path: '/dashboard/geology3d',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardFinanceRoute =
   AuthenticatedDashboardFinanceRouteImport.update({
     id: '/dashboard/finance',
@@ -221,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
@@ -251,6 +259,7 @@ export interface FileRoutesByTo {
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
@@ -283,6 +292,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/_authenticated/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
@@ -315,6 +325,7 @@ export interface FileRouteTypes {
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/finance'
+    | '/dashboard/geology3d'
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
@@ -345,6 +356,7 @@ export interface FileRouteTypes {
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/finance'
+    | '/dashboard/geology3d'
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
@@ -376,6 +388,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/finance'
+    | '/_authenticated/dashboard/geology3d'
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
@@ -537,6 +550,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/geology3d': {
+      id: '/_authenticated/dashboard/geology3d'
+      path: '/dashboard/geology3d'
+      fullPath: '/dashboard/geology3d'
+      preLoaderRoute: typeof AuthenticatedDashboardGeology3dRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/finance': {
       id: '/_authenticated/dashboard/finance'
       path: '/dashboard/finance'
@@ -649,6 +669,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRoute
+  AuthenticatedDashboardGeology3dRoute: typeof AuthenticatedDashboardGeology3dRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
@@ -674,6 +695,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardFinanceRoute: AuthenticatedDashboardFinanceRoute,
+  AuthenticatedDashboardGeology3dRoute: AuthenticatedDashboardGeology3dRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
