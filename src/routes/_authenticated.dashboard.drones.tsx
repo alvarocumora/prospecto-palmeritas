@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plane, Image as ImageIcon, Trash2, Upload, Plus } from "lucide-react";
+import { Plane, Image as ImageIcon, Trash2, Upload, Plus, FileImage } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -12,6 +12,7 @@ import {
   deleteRaster,
 } from "@/hooks/useDroneFlights";
 import { parseGeoFile } from "@/lib/geo/parseKml";
+import { RasterUploader } from "@/components/drones/RasterUploader";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drones")({
   head: () => ({
