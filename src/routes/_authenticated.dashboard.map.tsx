@@ -23,6 +23,7 @@ import { RasterControlPanel, type RasterSettings } from "@/components/drones/Ras
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
 import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
+import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { toast } from "sonner";
 
