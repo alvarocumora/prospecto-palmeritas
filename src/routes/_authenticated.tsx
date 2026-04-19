@@ -36,6 +36,7 @@ function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
   const role = useProjectRole();
+  const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [switcherOpen, setSwitcherOpen] = useState(false);
