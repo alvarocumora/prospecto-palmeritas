@@ -35,6 +35,17 @@ export function CoreLogPanel({
   const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
   const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({});
+
+  const scrollToRow = (id: string) => {
+    const row = rowRefs.current[id];
+    if (row) {
+      row.scrollIntoView({ block: "center", behavior: "smooth" });
+      setFlashId(id);
+      setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 1200);
+    }
+  };
 
   const intercepts = useMemo(
     () => computeIntercepts(logs, cutoff, dilution),
