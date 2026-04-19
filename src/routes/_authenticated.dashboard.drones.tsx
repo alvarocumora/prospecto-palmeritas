@@ -34,6 +34,7 @@ function DronesPage() {
   const [tab, setTab] = useState<"flights" | "rasters">("flights");
   const [showFlight, setShowFlight] = useState(false);
   const [showRaster, setShowRaster] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
 
   if (!active) {
     return <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto activo.</div>;
@@ -60,12 +61,23 @@ function DronesPage() {
           <div className="text-[10px] font-mono uppercase text-muted-foreground">Geocapitals · {active.name}</div>
           <h1 className="text-xl font-mono font-semibold flex items-center gap-2"><Plane className="w-5 h-5 text-info" /> Drones</h1>
         </div>
-        <button
-          onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster"}
-        </button>
+        <div className="flex items-center gap-2">
+          {tab === "rasters" && (
+            <button
+              onClick={() => setShowUploader(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold text-gold text-xs font-mono font-semibold hover:bg-gold/10"
+              title="Subir GeoTIFF, ortofoto o DSM directamente al proyecto"
+            >
+              <FileImage className="w-3.5 h-3.5" /> Subir GeoTIFF
+            </button>
+          )}
+          <button
+            onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
+          >
+            <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster (URL)"}
+          </button>
+        </div>
       </header>
 
       <div className="flex gap-1 border-b border-border">
@@ -105,6 +117,15 @@ function DronesPage() {
           flights={flights}
           onClose={() => setShowRaster(false)}
           onSaved={() => { setShowRaster(false); refresh(); }}
+        />
+      )}
+      {showUploader && (
+        <RasterUploader
+          projectId={active.id}
+          userId={user.id}
+          flights={flights}
+          onClose={() => setShowUploader(false)}
+          onSaved={() => { setShowUploader(false); refresh(); }}
         />
       )}
     </div>
