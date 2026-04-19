@@ -3,8 +3,7 @@ import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { ColumnLayer, ScatterplotLayer, PolygonLayer } from "@deck.gl/layers";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type { DrillHole } from "@/hooks/useDrilling";
-import type { DrillCoreLog } from "@/hooks/useProjectCoreLogs";
+import type { DrillHole, DrillCoreLog } from "@/hooks/useDrilling";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 import { Box } from "lucide-react";
 
@@ -63,7 +62,7 @@ export type Map3DViewProps = {
   centerLat: number;
   centerLng: number;
   holes: DrillHole[];
-  logsByHole: Map<string, DrillCoreLog[]>;
+  logsByHole: Record<string, DrillCoreLog[]>;
   targets: ExplorationTarget[];
   aoi?: GeoJSON.Feature<GeoJSON.Polygon> | null;
 };
@@ -133,7 +132,7 @@ export function Map3DView({
     return holes
       .filter((h) => h.northing != null && h.easting != null)
       .map((h) => {
-        const logs = logsByHole.get(h.id) ?? [];
+        const logs = logsByHole[h.id] ?? [];
         const maxAu = logs.reduce((m, l) => Math.max(m, l.au_gpt ?? 0), 0);
         const depth = h.actual_depth ?? h.planned_depth ?? 100;
         return {
@@ -213,7 +212,9 @@ export function Map3DView({
           getLineColor: [255, 255, 255, 255],
         }),
       ],
-      getTooltip: ({ object, layer }: { object: unknown; layer: { id: string } | null }) => {
+      getTooltip: (info) => {
+        const object = info.object as Record<string, unknown> | undefined;
+        const layer = info.layer;
         if (!object || !layer) return null;
         if (layer.id === "drill-holes-3d") {
           const o = object as { name: string; au: number; depth: number; status: string };
