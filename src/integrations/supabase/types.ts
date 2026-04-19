@@ -80,6 +80,39 @@ export type Database = {
           },
         ]
       }
+      audit_log: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+          payload: Json | null
+          project_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          payload?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          payload?: Json | null
+          project_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       drill_core_logs: {
         Row: {
           ag_gpt: number | null
@@ -777,35 +810,100 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          certifications: string[] | null
+          country: string | null
           created_at: string
           display_name: string | null
           email: string | null
           id: string
+          language: string | null
           organization: string | null
+          phone: string | null
+          specialty: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           avatar_url?: string | null
+          certifications?: string[] | null
+          country?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           id?: string
+          language?: string | null
           organization?: string | null
+          phone?: string | null
+          specialty?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           avatar_url?: string | null
+          certifications?: string[] | null
+          country?: string | null
           created_at?: string
           display_name?: string | null
           email?: string | null
           id?: string
+          language?: string | null
           organization?: string | null
+          phone?: string | null
+          specialty?: string | null
           updated_at?: string
           user_id?: string
         }
         Relationships: []
+      }
+      project_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          project_id: string
+          role: Database["public"]["Enums"]["project_role"]
+          status: string
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          project_id: string
+          role?: Database["public"]["Enums"]["project_role"]
+          status?: string
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          project_id?: string
+          role?: Database["public"]["Enums"]["project_role"]
+          status?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_invitations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_members: {
         Row: {
@@ -988,11 +1086,69 @@ export type Database = {
           },
         ]
       }
+      shared_layers: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          downloads_count: number
+          geometry_geojson: Json
+          id: string
+          is_public: boolean
+          name: string
+          owner_id: string | null
+          tags: string[] | null
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number
+          geometry_geojson: Json
+          id?: string
+          is_public?: boolean
+          name: string
+          owner_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          downloads_count?: number
+          geometry_geojson?: Json
+          id?: string
+          is_public?: boolean
+          name?: string
+          owner_id?: string | null
+          tags?: string[] | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      accept_project_invitation: { Args: { _token: string }; Returns: Json }
+      get_invitation_preview: {
+        Args: { _token: string }
+        Returns: {
+          email: string
+          expires_at: string
+          id: string
+          project_id: string
+          project_name: string
+          role: Database["public"]["Enums"]["project_role"]
+          status: string
+        }[]
+      }
       has_project_role: {
         Args: {
           _project_id: string
