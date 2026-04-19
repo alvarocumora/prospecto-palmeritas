@@ -621,14 +621,12 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
               <button type="button" onClick={centerOnAoi} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors">
                 <Crosshair className="w-3.5 h-3.5" /> Centrar en AOI
               </button>
-              <button type="button" onClick={toggleMeasure} className={`w-full inline-flex items-center justify-between gap-2 px-2 py-1.5 rounded border ${measuring ? "border-gold bg-gold/10 text-gold" : "border-border bg-bg-secondary text-foreground hover:bg-accent"} transition-colors`}>
-                <span className="inline-flex items-center gap-2">
-                  <Ruler className="w-3.5 h-3.5" /> {measuring ? "Medir: ON" : "Medir distancia (M)"}
-                </span>
-                {measureDist != null && <span className="text-[10px] text-foreground">{(measureDist / 1000).toFixed(2)} km</span>}
-              </button>
-              {measuring && (
-                <button type="button" onClick={clearMeasure} className="w-full text-[10px] text-muted-foreground hover:text-foreground">Limpiar mediciones</button>
+              {measureDist != null && (
+                <div className="flex items-center justify-between text-[10px] px-2 py-1 rounded bg-bg-secondary border border-border">
+                  <span className="text-muted-foreground">Distancia</span>
+                  <span className="text-foreground font-semibold">{(measureDist / 1000).toFixed(2)} km</span>
+                  <button type="button" onClick={clearMeasure} className="text-muted-foreground hover:text-destructive">✕</button>
+                </div>
               )}
             </div>
             <div className="space-y-1.5 border-t border-border pt-2">

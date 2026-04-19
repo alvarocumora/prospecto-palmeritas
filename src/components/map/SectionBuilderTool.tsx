@@ -100,44 +100,48 @@ export function SectionBuilderTool({ map, L, holes, logsByHole }: Props) {
 
   return (
     <>
-      <div className="absolute top-14 right-3 z-[1100] flex flex-col gap-2 items-end pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-2 bg-bg-secondary/95 border border-border rounded backdrop-blur p-1.5 shadow-lg">
+      {/* Section button slots into the right toolbar column */}
+      <div className="absolute top-3 right-3 z-[500] pointer-events-none" style={{ marginTop: 184 }}>
+        <div className="pointer-events-auto flex flex-col items-end gap-1.5">
           <button
             onClick={() => { setActive((a) => !a); cleanup(); }}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs font-mono font-semibold transition-colors ${
-              active ? "bg-gold text-bg-primary" : "text-foreground hover:bg-accent"
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border backdrop-blur shadow-md transition-colors ${
+              active ? "bg-gold text-bg-primary" : "bg-background/95 text-foreground hover:bg-accent"
             }`}
             aria-pressed={active}
-            title="Dibuja una línea de sección haciendo dos clicks en el mapa"
+            title="Sección 2D — click 2 puntos en el mapa"
           >
-            <Scissors className="w-3.5 h-3.5" />
-            {active ? "Click 2 puntos…" : "Sección"}
+            <Scissors className="w-4 h-4" />
           </button>
-          <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-            ±
-            <input
-              type="number"
-              min={5}
-              max={500}
-              step={5}
-              value={maxOffset}
-              onChange={(e) => setMaxOffset(Math.max(5, Number(e.target.value) || 50))}
-              className="w-12 px-1 py-0.5 bg-background border border-border rounded text-foreground"
-            />
-            m
-          </label>
-          {section && (
-            <>
-              <button onClick={() => setShowView(true)} className="text-[10px] font-mono text-info hover:underline">Ver sección</button>
-              <button onClick={clearAll} className="text-muted-foreground hover:text-destructive p-0.5" aria-label="Limpiar"><X className="w-3.5 h-3.5" /></button>
-            </>
+          {(active || section) && (
+            <div className="flex items-center gap-1.5 bg-background/95 border border-border rounded backdrop-blur px-2 py-1 shadow-md">
+              <label className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                ±
+                <input
+                  type="number"
+                  min={5}
+                  max={500}
+                  step={5}
+                  value={maxOffset}
+                  onChange={(e) => setMaxOffset(Math.max(5, Number(e.target.value) || 50))}
+                  className="w-12 px-1 py-0.5 bg-bg-secondary border border-border rounded text-foreground"
+                />
+                m
+              </label>
+              {section && (
+                <>
+                  <button onClick={() => setShowView(true)} className="text-[10px] font-mono text-info hover:underline">Ver</button>
+                  <button onClick={clearAll} className="text-muted-foreground hover:text-destructive p-0.5" aria-label="Limpiar"><X className="w-3.5 h-3.5" /></button>
+                </>
+              )}
+            </div>
+          )}
+          {active && (
+            <div className="text-[10px] font-mono bg-gold text-bg-primary px-2 py-1 rounded shadow">
+              {startRef.current ? "Click 2 (fin)" : "Click 1 (inicio)"} · ESC cancela
+            </div>
           )}
         </div>
-        {active && (
-          <div className="pointer-events-none text-[10px] font-mono bg-gold text-bg-primary px-2 py-1 rounded shadow">
-            {startRef.current ? "Click 2 (fin)" : "Click 1 (inicio)"} · ESC cancela
-          </div>
-        )}
       </div>
 
       {showView && section && (
