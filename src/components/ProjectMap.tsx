@@ -513,15 +513,15 @@ export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps =
   };
 
   return (
-    <div className="space-y-3">
+    <div className={fillHeight ? "h-full flex flex-col" : "space-y-3"}>
       <div
         ref={wrapperRef}
-        className={`relative ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
+        className={`relative ${fillHeight ? "flex-1 min-h-0" : ""} ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
       >
         <div
           ref={containerRef}
           data-export-map
-          className={`${isFullscreen ? "h-full" : "h-72 md:h-96"} w-full rounded border border-border overflow-hidden bg-bg-secondary`}
+          className={`${fillHeight || isFullscreen ? "h-full" : "h-72 md:h-96"} w-full ${fillHeight ? "" : "rounded border border-border"} overflow-hidden bg-bg-secondary`}
           style={{ zIndex: 0 }}
         />
 
