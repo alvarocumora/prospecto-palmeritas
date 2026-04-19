@@ -54,9 +54,12 @@ function OperationalMap() {
   const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
   const { rasters } = useDroneFlights(active?.id ?? null);
+  const { flights } = useDroneFlights(active?.id ?? null);
   const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const { targets } = useExplorationTargets(active?.id ?? null);
+  const [timeActive, setTimeActive] = useState(false);
+  const [timeCursor, setTimeCursor] = useState<number | null>(null);
 
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
