@@ -137,6 +137,84 @@ export type Database = {
         }
         Relationships: []
       }
+      core_boxes: {
+        Row: {
+          box_code: string
+          box_number: number | null
+          condition: string
+          created_at: string
+          created_by: string
+          depth_from: number | null
+          depth_to: number | null
+          hole_id: string | null
+          id: string
+          notes: string | null
+          photo_urls: string[] | null
+          position: string | null
+          project_id: string
+          rack: string | null
+          shelf: string | null
+          status: string
+          storage_location: string | null
+          updated_at: string
+        }
+        Insert: {
+          box_code: string
+          box_number?: number | null
+          condition?: string
+          created_at?: string
+          created_by: string
+          depth_from?: number | null
+          depth_to?: number | null
+          hole_id?: string | null
+          id?: string
+          notes?: string | null
+          photo_urls?: string[] | null
+          position?: string | null
+          project_id: string
+          rack?: string | null
+          shelf?: string | null
+          status?: string
+          storage_location?: string | null
+          updated_at?: string
+        }
+        Update: {
+          box_code?: string
+          box_number?: number | null
+          condition?: string
+          created_at?: string
+          created_by?: string
+          depth_from?: number | null
+          depth_to?: number | null
+          hole_id?: string | null
+          id?: string
+          notes?: string | null
+          photo_urls?: string[] | null
+          position?: string | null
+          project_id?: string
+          rack?: string | null
+          shelf?: string | null
+          status?: string
+          storage_location?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "core_boxes_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "core_boxes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_core_logs: {
         Row: {
           ag_gpt: number | null
@@ -1537,6 +1615,78 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      sample_custody: {
+        Row: {
+          carrier: string | null
+          created_at: string
+          created_by: string
+          event_at: string
+          event_type: string
+          from_user: string | null
+          id: string
+          location: string | null
+          notes: string | null
+          photo_urls: string[] | null
+          project_id: string
+          sample_code: string
+          sample_id: string | null
+          seal_number: string | null
+          to_user: string | null
+          waybill: string | null
+        }
+        Insert: {
+          carrier?: string | null
+          created_at?: string
+          created_by: string
+          event_at?: string
+          event_type: string
+          from_user?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          photo_urls?: string[] | null
+          project_id: string
+          sample_code: string
+          sample_id?: string | null
+          seal_number?: string | null
+          to_user?: string | null
+          waybill?: string | null
+        }
+        Update: {
+          carrier?: string | null
+          created_at?: string
+          created_by?: string
+          event_at?: string
+          event_type?: string
+          from_user?: string | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          photo_urls?: string[] | null
+          project_id?: string
+          sample_code?: string
+          sample_id?: string | null
+          seal_number?: string | null
+          to_user?: string | null
+          waybill?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sample_custody_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sample_custody_sample_id_fkey"
+            columns: ["sample_id"]
+            isOneToOne: false
+            referencedRelation: "sampling_results"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sampling_results: {
         Row: {
