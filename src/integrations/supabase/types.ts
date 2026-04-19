@@ -1815,6 +1815,97 @@ export type Database = {
         }
         Relationships: []
       }
+      prospectivity_cells: {
+        Row: {
+          cell_lat: number
+          cell_lng: number
+          cell_size_m: number
+          features: Json
+          generated_at: string
+          generated_by: string | null
+          id: string
+          project_id: string
+          run_id: string
+          score: number
+        }
+        Insert: {
+          cell_lat: number
+          cell_lng: number
+          cell_size_m?: number
+          features?: Json
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          project_id: string
+          run_id: string
+          score: number
+        }
+        Update: {
+          cell_lat?: number
+          cell_lng?: number
+          cell_size_m?: number
+          features?: Json
+          generated_at?: string
+          generated_by?: string | null
+          id?: string
+          project_id?: string
+          run_id?: string
+          score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospectivity_cells_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prospectivity_runs: {
+        Row: {
+          bbox_geojson: Json
+          cell_count: number
+          cell_size_m: number
+          generated_at: string
+          generated_by: string
+          id: string
+          notes: string | null
+          project_id: string
+          weights: Json
+        }
+        Insert: {
+          bbox_geojson: Json
+          cell_count?: number
+          cell_size_m: number
+          generated_at?: string
+          generated_by: string
+          id?: string
+          notes?: string | null
+          project_id: string
+          weights?: Json
+        }
+        Update: {
+          bbox_geojson?: Json
+          cell_count?: number
+          cell_size_m?: number
+          generated_at?: string
+          generated_by?: string
+          id?: string
+          notes?: string | null
+          project_id?: string
+          weights?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prospectivity_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       qaqc_results: {
         Row: {
           certificate: string | null
