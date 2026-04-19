@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Maximize2, Minimize2, Wrench, Ruler, Crosshair, Download, Layers, Pencil } from "lucide-react";
 import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
