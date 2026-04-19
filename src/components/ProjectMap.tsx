@@ -19,6 +19,8 @@ import {
   type CatastroOrigen,
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
+import { buildSernageominLayers } from "./map/sernageominLayers";
+import { buildSatelliteLayers } from "./map/satelliteLayers";
 import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
 import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { addProjectFeatures } from "./map/featureLayers";
@@ -75,6 +77,13 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "basemap:carto-dark": { visible: false, opacity: 1 },
   "basemap:opentopo": { visible: false, opacity: 1 },
   "geo:macrostrat": { visible: false, opacity: 0.7 },
+  "geochile:litologia": { visible: true, opacity: 0.65 },
+  "geochile:yacimientos": { visible: true, opacity: 0.95 },
+  "geochile:areas-protegidas": { visible: false, opacity: 0.5 },
+  "sat:s2-truecolor": { visible: false, opacity: 1 },
+  "sat:s2-ndvi": { visible: false, opacity: 0.85 },
+  "sat:worldcover": { visible: false, opacity: 0.55 },
+  "sat:copernicus-dem": { visible: false, opacity: 0.75 },
   "geophys:emag2": { visible: false, opacity: 0.55 },
   "geophys:wgm2012": { visible: false, opacity: 0.55 },
   "geophys:hillshade": { visible: false, opacity: 0.6 },
@@ -251,6 +260,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       const basemaps = buildBasemaps(L);
       const geoOverlays = buildGeologyOverlays(L);
       const geophysicsWms = buildGeophysicsOverlays(L);
+      const sernageomin = buildSernageominLayers(L);
+      const satellite = buildSatelliteLayers(L);
 
       const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
         [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
@@ -275,9 +286,16 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
         { id: "basemap:esri-topo", label: "Esri Topo", group: "Basemap", layer: basemaps["Esri Topo"], exclusive: true },
         { id: "basemap:carto-dark", label: "CARTO Dark", group: "Basemap", layer: basemaps["CARTO Dark"], exclusive: true },
         { id: "basemap:opentopo", label: "OpenTopoMap", group: "Basemap", layer: basemaps["OpenTopoMap"], exclusive: true },
-        { id: "geo:macrostrat", label: "Geología Macrostrat", group: "Geología", layer: geoOverlays["Geología Macrostrat (global)"] },
-        { id: "geophys:emag2", label: "Magnetometría EMAG2", group: "Geofísica", layer: geophysicsWms["Magnetometría EMAG2 (regional)"] },
-        { id: "geophys:wgm2012", label: "Gravimetría WGM2012", group: "Geofísica", layer: geophysicsWms["Gravimetría Bouguer WGM2012 (regional)"] },
+        { id: "geochile:litologia", label: "SERNAGEOMIN Geología 1:1M", group: "Geología Chile", layer: sernageomin.geologia1M },
+        { id: "geochile:yacimientos", label: "Yacimientos & faenas (SERNAGEOMIN)", group: "Geología Chile", layer: sernageomin.yacimientos },
+        { id: "geochile:areas-protegidas", label: "Áreas protegidas SNASPE", group: "Geología Chile", layer: sernageomin.areasProtegidas },
+        { id: "sat:s2-truecolor", label: "Sentinel-2 color verdadero (10 m)", group: "Satelital", layer: satellite.sentinel2TrueColor },
+        { id: "sat:s2-ndvi", label: "Sentinel-2 vegetación / NDVI", group: "Satelital", layer: satellite.sentinel2NDVI },
+        { id: "sat:worldcover", label: "ESA WorldCover 2021 (10 m)", group: "Satelital", layer: satellite.worldCover },
+        { id: "sat:copernicus-dem", label: "Copernicus DEM (relieve)", group: "Satelital", layer: satellite.copernicusDem },
+        { id: "geo:macrostrat", label: "Macrostrat (global, fallback)", group: "Geología", layer: geoOverlays["Geología Macrostrat (global)"] },
+        { id: "geophys:emag2", label: "Magnetometría EMAG2 (regional)", group: "Geofísica", layer: geophysicsWms["Magnetometría EMAG2 (regional)"] },
+        { id: "geophys:wgm2012", label: "Gravimetría WGM2012 (regional)", group: "Geofísica", layer: geophysicsWms["Gravimetría Bouguer WGM2012 (regional)"] },
         { id: "geophys:hillshade", label: "Hillshade SRTM", group: "Geofísica", layer: geophysicsWms["Hillshade SRTM (Esri)"] },
       ];
       setManagedLayers(initial);
