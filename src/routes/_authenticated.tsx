@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
@@ -140,6 +140,7 @@ function AuthenticatedLayout() {
           <NavItem to="/dashboard/sampling" icon={<TestTube2 className="w-3.5 h-3.5" />} label="Muestreo" module="sampling" role={role} />
           <NavItem to="/dashboard/qaqc" icon={<ShieldCheck className="w-3.5 h-3.5" />} label="QA/QC" module="qaqc" role={role} />
           <NavItem to="/dashboard/approvals" icon={<ClipboardCheck className="w-3.5 h-3.5" />} label="Aprobaciones" module="approvals" role={role} />
+          <NavItem to="/dashboard/targets" icon={<Target className="w-3.5 h-3.5" />} label="Targets" module="targets" role={role} />
 
           <div className="pt-3 mt-3 border-t border-border" />
           {canAccess(role, "team") && (

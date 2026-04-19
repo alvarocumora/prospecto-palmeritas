@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
+import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
@@ -68,6 +69,12 @@ const AuthenticatedDashboardTeamRoute =
   AuthenticatedDashboardTeamRouteImport.update({
     id: '/dashboard/team',
     path: '/dashboard/team',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTargetsRoute =
+  AuthenticatedDashboardTargetsRouteImport.update({
+    id: '/dashboard/targets',
+    path: '/dashboard/targets',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSamplingRoute =
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -218,6 +226,7 @@ export interface FileRoutesByTo {
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -245,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/qaqc'
     | '/dashboard/sampling'
+    | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
@@ -297,6 +308,7 @@ export interface FileRouteTypes {
     | '/dashboard/projects'
     | '/dashboard/qaqc'
     | '/dashboard/sampling'
+    | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
@@ -323,6 +335,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/qaqc'
     | '/_authenticated/dashboard/sampling'
+    | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
@@ -386,6 +399,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof AuthenticatedDashboardTeamRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/targets': {
+      id: '/_authenticated/dashboard/targets'
+      path: '/dashboard/targets'
+      fullPath: '/dashboard/targets'
+      preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/sampling': {
@@ -556,6 +576,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
+  AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRoute
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
@@ -578,6 +599,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
+  AuthenticatedDashboardTargetsRoute: AuthenticatedDashboardTargetsRoute,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
