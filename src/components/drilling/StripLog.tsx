@@ -272,7 +272,8 @@ export function StripLog({
                 title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin litología"}`}
                 onMouseEnter={() => onHover?.(l.id)}
                 onMouseLeave={() => onHover?.(null)}
-                className={`absolute left-0 right-0 border-t border-background/40 cursor-help flex items-center justify-center font-mono font-semibold transition-all ${
+                onClick={() => onSelect?.(l.id)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer flex items-center justify-center font-mono font-semibold transition-all ${
                   isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{
