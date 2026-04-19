@@ -1,16 +1,19 @@
-import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity } from "lucide-react";
+import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity, Plane, Image as ImageIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { DrillHole } from "@/hooks/useDrilling";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import type { GeophysicsStation } from "@/hooks/useGeophysicsData";
+import type { DroneFlight, DroneRaster } from "@/hooks/useDroneFlights";
 import { auColor } from "./sampleColors";
 
 export type InspectedFeature =
   | { kind: "sample"; data: SamplingResult }
   | { kind: "drill"; data: DrillHole }
   | { kind: "concession"; data: MiningConcession }
-  | { kind: "station"; data: GeophysicsStation };
+  | { kind: "station"; data: GeophysicsStation }
+  | { kind: "drone_flight"; data: DroneFlight }
+  | { kind: "drone_raster"; data: DroneRaster };
 
 interface Props {
   feature: InspectedFeature | null;
@@ -35,6 +38,8 @@ export function FeatureInspectorPanel({ feature, onClose }: Props) {
         {feature.kind === "drill" && <DrillBody h={feature.data} />}
         {feature.kind === "concession" && <ConcessionBody c={feature.data} />}
         {feature.kind === "station" && <StationBody s={feature.data} />}
+        {feature.kind === "drone_flight" && <FlightBody f={feature.data} />}
+        {feature.kind === "drone_raster" && <RasterBody r={feature.data} />}
       </div>
     </aside>
   );
@@ -44,10 +49,19 @@ function iconFor(k: InspectedFeature["kind"]) {
   if (k === "sample") return <FlaskConical className="w-3 h-3 text-teal" />;
   if (k === "drill") return <Drill className="w-3 h-3 text-copper" />;
   if (k === "concession") return <MapIcon className="w-3 h-3 text-gold" />;
+  if (k === "drone_flight") return <Plane className="w-3 h-3 text-info" />;
+  if (k === "drone_raster") return <ImageIcon className="w-3 h-3 text-gold" />;
   return <Activity className="w-3 h-3 text-info" />;
 }
 function labelFor(k: InspectedFeature["kind"]) {
-  return { sample: "Muestra", drill: "Sondaje", concession: "Concesión", station: "Estación geofísica" }[k];
+  return {
+    sample: "Muestra",
+    drill: "Sondaje",
+    concession: "Concesión",
+    station: "Estación geofísica",
+    drone_flight: "Vuelo dron",
+    drone_raster: "Raster dron",
+  }[k];
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
