@@ -53,8 +53,7 @@ function OperationalMap() {
   const [snapshotting, setSnapshotting] = useState(false);
   const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
-  const { rasters } = useDroneFlights(active?.id ?? null);
-  const { flights } = useDroneFlights(active?.id ?? null);
+  const { rasters, flights } = useDroneFlights(active?.id ?? null);
   const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const { targets } = useExplorationTargets(active?.id ?? null);
