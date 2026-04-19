@@ -60,6 +60,20 @@ function OperationalMap() {
   const [timeActive, setTimeActive] = useState(false);
   const [timeCursor, setTimeCursor] = useState<number | null>(null);
 
+  // Sprint 6.4 — Time-filtered raster visibility (computed early so effects below can depend on it)
+  const visibleRasterSettings = useMemo(() => {
+    if (!timeActive || timeCursor == null) return rasterSettings;
+    const next: RasterSettings = { ...rasterSettings };
+    for (const r of rasters) {
+      if (!r.captured_at) continue;
+      const t = Date.parse(r.captured_at);
+      if (!isNaN(t) && t > timeCursor && next[r.id]?.visible) {
+        next[r.id] = { ...next[r.id], visible: false };
+      }
+    }
+    return next;
+  }, [rasterSettings, rasters, timeActive, timeCursor]);
+
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
     if (!mapInst) return;
