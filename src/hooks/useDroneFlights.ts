@@ -48,3 +48,43 @@ export function useDroneFlights(projectId: string | null) {
 
   return { flights, rasters, loading, refresh };
 }
+
+export type FlightInsert = {
+  project_id: string;
+  campaign_id?: string | null;
+  name: string;
+  sensor: string;
+  pilot?: string | null;
+  flown_at?: string | null;
+  altitude_m?: number | null;
+  area_ha?: number | null;
+  geometry_geojson: unknown;
+  notes?: string | null;
+};
+
+export type RasterInsert = {
+  project_id: string;
+  campaign_id?: string | null;
+  flight_id?: string | null;
+  name: string;
+  raster_type: string;
+  url: string;
+  bounds_geojson: unknown;
+  captured_at?: string | null;
+};
+
+export async function createFlight(payload: FlightInsert, userId: string) {
+  return supabase.from("drone_flights").insert({ ...payload, created_by: userId }).select().single();
+}
+
+export async function deleteFlight(id: string) {
+  return supabase.from("drone_flights").delete().eq("id", id);
+}
+
+export async function createRaster(payload: RasterInsert, userId: string) {
+  return supabase.from("drone_rasters").insert({ ...payload, created_by: userId }).select().single();
+}
+
+export async function deleteRaster(id: string) {
+  return supabase.from("drone_rasters").delete().eq("id", id);
+}
