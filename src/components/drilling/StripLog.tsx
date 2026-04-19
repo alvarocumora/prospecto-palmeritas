@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { DrillCoreLog } from "@/hooks/useDrilling";
+import { computeIntercepts, formatIntercept } from "@/lib/drilling/intercepts";
 
 /** Heat color for Au g/t value (null/0 → muted). */
 function auColor(au: number | null | undefined): string {
