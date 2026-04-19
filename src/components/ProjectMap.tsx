@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Maximize2, Minimize2, Wrench, Ruler, Crosshair, Download, Layers, Pencil } from "lucide-react";
 import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -34,6 +34,8 @@ import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
 import { useDrillHoles } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { computeIntercepts, bestIntercept, interceptScore, scoreToHaloStyle } from "@/lib/drilling/intercepts";
 import { buildConcessionsLayer } from "./map/concessionLayer";
 import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
@@ -102,6 +104,17 @@ export function ProjectMap() {
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
+  const { byHole: logsByHole } = useProjectCoreLogs(active?.id ?? null);
+  const scoresByHole = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const h of drillHoles) {
+      const logs = logsByHole[h.id];
+      if (!logs?.length) continue;
+      const best = bestIntercept(computeIntercepts(logs, 0.5, 2));
+      if (best) out[h.id] = interceptScore(best);
+    }
+    return out;
+  }, [drillHoles, logsByHole]);
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
   const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
@@ -333,7 +346,7 @@ export function ProjectMap() {
       map.removeLayer(drillCollarsLayerRef.current);
       drillCollarsLayerRef.current = null;
     }
-    const layer = buildDrillCollarsLayer(L, drillHoles);
+    const layer = buildDrillCollarsLayer(L, drillHoles, scoresByHole, scoreToHaloStyle);
     drillCollarsLayerRef.current = layer;
     if (drillHoles.length > 0) layer.addTo(map);
     setManagedLayers((prev) => {
@@ -348,7 +361,7 @@ export function ProjectMap() {
         },
       ];
     });
-  }, [drillHoles, active?.id]);
+  }, [drillHoles, scoresByHole, active?.id]);
 
 
   // Fullscreen toggle
@@ -599,6 +612,15 @@ export function ProjectMap() {
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
+        </span>
+        <span className="inline-flex items-center gap-1.5" title="Halo = mejor intercept (Au g/t × m)">
+          <span className="text-muted-foreground/70">Halo GT:</span>
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#86efac" }} title="≤5" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#bef264" }} title="5–20" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} title="20–50" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fb923c" }} title="50–150" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#dc2626" }} title=">150" />
+          <span className="text-muted-foreground/70">g·m/t</span>
         </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica

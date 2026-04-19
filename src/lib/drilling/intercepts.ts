@@ -104,3 +104,32 @@ export function formatIntercept(it: Intercept): string {
   const au = it.au_gpt != null ? it.au_gpt.toFixed(2) : "—";
   return `${it.length.toFixed(2)}m @ ${au} g/t Au`;
 }
+
+/** Au-equivalent metal score: g/t × m (a.k.a. GT). */
+export function interceptScore(it: Intercept): number {
+  return (it.au_gpt ?? 0) * it.length;
+}
+
+export type HaloStyle = { color: string; radius: number; label: string };
+
+/** Map a grade·length score (g·m/t) to a halo color + radius. Returns null if score ≤ 0. */
+export function scoreToHaloStyle(score: number): HaloStyle | null {
+  if (!Number.isFinite(score) || score <= 0) return null;
+  let color = "#86efac";
+  let label = "bajo";
+  if (score > 150) {
+    color = "#dc2626";
+    label = "excepcional";
+  } else if (score > 50) {
+    color = "#fb923c";
+    label = "alto";
+  } else if (score > 20) {
+    color = "#fbbf24";
+    label = "bueno";
+  } else if (score > 5) {
+    color = "#bef264";
+    label = "moderado";
+  }
+  const radius = 12 + Math.min(score / 10, 18);
+  return { color, radius, label };
+}

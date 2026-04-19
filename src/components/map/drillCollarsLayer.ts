@@ -109,15 +109,34 @@ function popupHtml(h: DrillHole): string {
   </div>`;
 }
 
-/** Build a LayerGroup of circleMarker collars colored by status. */
+/** Build a LayerGroup of circleMarker collars colored by status, with optional mineralization halos. */
 export function buildDrillCollarsLayer(
   L: LeafletNS,
-  holes: DrillHole[]
+  holes: DrillHole[],
+  scoresByHole?: Record<string, number>,
+  haloStyleFor?: (score: number) => { color: string; radius: number; label: string } | null
 ): LayerGroup {
   const group = L.layerGroup();
   for (const h of holes) {
     const ll = holeLatLng(h);
     if (!ll) continue;
+
+    // Halo first (so it renders below the collar dot)
+    const score = scoresByHole?.[h.id] ?? 0;
+    const halo = haloStyleFor && score > 0 ? haloStyleFor(score) : null;
+    if (halo) {
+      const haloMarker = L.circleMarker(ll, {
+        radius: halo.radius,
+        color: halo.color,
+        weight: 2.5,
+        opacity: 0.9,
+        fillColor: halo.color,
+        fillOpacity: 0.18,
+        interactive: false,
+      });
+      group.addLayer(haloMarker);
+    }
+
     const color = STATUS_COLORS[h.status] ?? "#64748b";
     const marker = L.circleMarker(ll, {
       radius: 6,
@@ -126,7 +145,14 @@ export function buildDrillCollarsLayer(
       fillColor: color,
       fillOpacity: 0.95,
     });
-    marker.bindPopup(popupHtml(h));
+    let popup = popupHtml(h);
+    if (halo && score > 0) {
+      popup = popup.replace(
+        "</div></div>",
+        `</div><div style="margin-top:6px;border-top:1px solid #3a322c;padding-top:6px;">Mejor intercept: <strong style="color:${halo.color};">${score.toFixed(1)} g·m/t</strong> <span style="color:#A89080;">(${halo.label})</span></div></div>`
+      );
+    }
+    marker.bindPopup(popup);
     marker.bindTooltip(h.hole_id, {
       direction: "top",
       offset: [0, -8],
