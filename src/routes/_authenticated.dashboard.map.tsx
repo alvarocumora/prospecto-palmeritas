@@ -21,6 +21,9 @@ import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivi
 import { useDroneFlights } from "@/hooks/useDroneFlights";
 import { RasterControlPanel, type RasterSettings } from "@/components/drones/RasterControlPanel";
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
+import { Map3DView } from "@/components/map/Map3DView";
+import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -48,6 +51,8 @@ function OperationalMap() {
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
   const { rasters } = useDroneFlights(active?.id ?? null);
   const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
+  const [viewMode, setViewMode] = useState<ViewMode>("2d");
+  const { targets } = useExplorationTargets(active?.id ?? null);
 
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
@@ -142,6 +147,7 @@ function OperationalMap() {
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap justify-end">
+          <ViewModeToggle mode={viewMode} onChange={setViewMode} />
           <CampaignSelector campaigns={campaigns} value={campaignId} onChange={setCampaignId} />
           <label className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground cursor-pointer whitespace-nowrap">
             <input
@@ -156,46 +162,60 @@ function OperationalMap() {
           <span className="text-[11px] font-mono text-muted-foreground hidden lg:inline whitespace-nowrap">
             <FlaskConical className="w-3 h-3 inline mr-1" /> {filteredSamples.length} muestras
           </span>
-          <button
-            type="button"
-            onClick={handleSnapshot}
-            disabled={snapshotting || !mapInst}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-background text-foreground hover:bg-accent disabled:opacity-50 text-[11px] font-mono whitespace-nowrap transition-colors"
-            title="Exportar snapshot PNG con leyenda y escala"
-          >
-            {snapshotting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-gold" />}
-            <span className="hidden sm:inline">Snapshot</span>
-          </button>
+          {viewMode === "2d" && (
+            <button
+              type="button"
+              onClick={handleSnapshot}
+              disabled={snapshotting || !mapInst}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-background text-foreground hover:bg-accent disabled:opacity-50 text-[11px] font-mono whitespace-nowrap transition-colors"
+              title="Exportar snapshot PNG con leyenda y escala"
+            >
+              {snapshotting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-gold" />}
+              <span className="hidden sm:inline">Snapshot</span>
+            </button>
+          )}
         </div>
       </header>
 
       <div className="relative flex-1 min-h-0">
-        <ProjectMap
-          samples={filteredSamples}
-          onInspect={setInspected}
-          fillHeight
-          onMapReady={(map, L) => setMapInst({ map, L })}
-        />
-        <SectionBuilderTool
-          map={mapInst?.map ?? null}
-          L={mapInst?.L ?? null}
-          holes={holes}
-          logsByHole={logsByHole}
-          projectName={active?.name}
-        />
-        <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
-        <GeoIntelBriefButton map={mapInst?.map ?? null} />
-        <ProspectivityButton
-          map={mapInst?.map ?? null}
-          onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
-        />
-        <RasterControlPanel
-          rasters={rasters}
-          settings={rasterSettings}
-          onChange={updateRasterSetting}
-          onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
-        />
-        <CollapsibleAuLegend />
+        {viewMode === "3d" ? (
+          <Map3DView
+            centerLat={active?.center_lat ?? -33.898438}
+            centerLng={active?.center_lng ?? -71.115471}
+            holes={holes}
+            logsByHole={logsByHole}
+            targets={targets}
+          />
+        ) : (
+          <>
+            <ProjectMap
+              samples={filteredSamples}
+              onInspect={setInspected}
+              fillHeight
+              onMapReady={(map, L) => setMapInst({ map, L })}
+            />
+            <SectionBuilderTool
+              map={mapInst?.map ?? null}
+              L={mapInst?.L ?? null}
+              holes={holes}
+              logsByHole={logsByHole}
+              projectName={active?.name}
+            />
+            <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
+            <GeoIntelBriefButton map={mapInst?.map ?? null} />
+            <ProspectivityButton
+              map={mapInst?.map ?? null}
+              onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+            />
+            <RasterControlPanel
+              rasters={rasters}
+              settings={rasterSettings}
+              onChange={updateRasterSetting}
+              onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
+            />
+            <CollapsibleAuLegend />
+          </>
+        )}
       </div>
     </div>
   );
