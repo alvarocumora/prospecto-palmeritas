@@ -138,6 +138,8 @@ export function StripLog({
   lithoWidth = 48,
   altWidth = 48,
   intWidth = 10,
+  hoveredId = null,
+  onHover,
 }: {
   logs: DrillCoreLog[];
   height?: number;
@@ -145,6 +147,8 @@ export function StripLog({
   lithoWidth?: number;
   altWidth?: number;
   intWidth?: number;
+  hoveredId?: string | null;
+  onHover?: (id: string | null) => void;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
@@ -228,11 +232,16 @@ export function StripLog({
           {sorted.map((l) => {
             const top = scale(l.depth_from);
             const h = Math.max(scale(l.depth_to) - scale(l.depth_from), 1);
+            const isHover = hoveredId === l.id;
             return (
               <div
                 key={l.id}
                 title={`${l.depth_from}–${l.depth_to} m · Au ${l.au_gpt ?? "—"} g/t`}
-                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help"
+                onMouseEnter={() => onHover?.(l.id)}
+                onMouseLeave={() => onHover?.(null)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-help transition-all ${
+                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                }`}
                 style={{ top, height: h, background: auColor(l.au_gpt) }}
               />
             );
@@ -253,11 +262,16 @@ export function StripLog({
             const code = l.lithology?.trim() || "";
             const label = code ? abbr(code) : "";
             const showLabel = h >= 14 && label.length > 0;
+            const isHover = hoveredId === l.id;
             return (
               <div
                 key={l.id}
                 title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin litología"}`}
-                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help flex items-center justify-center font-mono font-semibold"
+                onMouseEnter={() => onHover?.(l.id)}
+                onMouseLeave={() => onHover?.(null)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-help flex items-center justify-center font-mono font-semibold transition-all ${
+                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                }`}
                 style={{
                   top,
                   height: h,
@@ -287,11 +301,16 @@ export function StripLog({
             const code = l.alteration?.trim() || "";
             const label = code ? abbr(code) : "";
             const showLabel = h >= 14 && label.length > 0;
+            const isHover = hoveredId === l.id;
             return (
               <div
                 key={l.id}
                 title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin alteración"}`}
-                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help flex items-center justify-center font-mono font-semibold"
+                onMouseEnter={() => onHover?.(l.id)}
+                onMouseLeave={() => onHover?.(null)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-help flex items-center justify-center font-mono font-semibold transition-all ${
+                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                }`}
                 style={{
                   top,
                   height: h,

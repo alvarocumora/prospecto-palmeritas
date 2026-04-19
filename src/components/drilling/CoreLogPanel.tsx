@@ -34,6 +34,7 @@ export function CoreLogPanel({
   const [creating, setCreating] = useState(false);
   const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
   const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const intercepts = useMemo(
     () => computeIntercepts(logs, cutoff, dilution),
@@ -186,7 +187,12 @@ export function CoreLogPanel({
               <div className="text-[10px] uppercase tracking-wider text-text-secondary mb-1 text-center">
                 Strip-log
               </div>
-              <StripLog logs={logs} height={Math.max(400, logs.length * 24)} />
+              <StripLog
+                logs={logs}
+                height={Math.max(400, logs.length * 24)}
+                hoveredId={hoveredId}
+                onHover={setHoveredId}
+              />
             </div>
           )}
 
@@ -223,8 +229,14 @@ export function CoreLogPanel({
                       return (
                         <tr
                           key={l.id}
-                          className={`border-b border-border last:border-0 hover:bg-accent/30 ${
-                            isOverlap ? "bg-amber-500/5" : ""
+                          onMouseEnter={() => setHoveredId(l.id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                          className={`border-b border-border last:border-0 transition-colors ${
+                            hoveredId === l.id
+                              ? "bg-primary/10 outline outline-1 outline-primary"
+                              : isOverlap
+                              ? "bg-amber-500/5 hover:bg-accent/30"
+                              : "hover:bg-accent/30"
                           }`}
                         >
                           <Td>
