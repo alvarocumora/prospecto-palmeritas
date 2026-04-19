@@ -46,7 +46,10 @@ import { CoordinateFooter } from "./map/CoordinateFooter";
 import { DrawingTools } from "./map/DrawingTools";
 import { buildSamplesLayer } from "./map/sampleLayer";
 import { buildDroneLayer } from "./map/droneLayer";
+import { buildTargetsLayer } from "./map/targetsLayer";
+import { wireGeoIntelClickPopup } from "./map/geoIntelInspector";
 import { useDroneFlights } from "@/hooks/useDroneFlights";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { InspectedFeature } from "./map/FeatureInspectorPanel";
 
@@ -98,6 +101,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "samples:project": { visible: true, opacity: 1 },
   "drones:flights": { visible: true, opacity: 0.9 },
   "drones:rasters": { visible: true, opacity: 0.75 },
+  "targets:project": { visible: true, opacity: 1 },
 };
 
 export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
@@ -132,6 +136,10 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
   const { byHole: logsByHole } = useProjectCoreLogs(active?.id ?? null);
   const { flights: droneFlights, rasters: droneRasters } = useDroneFlights(active?.id ?? null);
+  const { targets } = useExplorationTargets(active?.id ?? null);
+  const targetsRef = useRef<typeof targets>(targets);
+  useEffect(() => { targetsRef.current = targets; }, [targets]);
+  const targetsLayerRef = useRef<LayerGroup | null>(null);
   const scoresByHole = useMemo(() => {
     const out: Record<string, number> = {};
     for (const h of drillHoles) {
