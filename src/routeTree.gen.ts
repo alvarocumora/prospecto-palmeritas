@@ -29,6 +29,7 @@ import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
+import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
@@ -147,6 +148,12 @@ const AuthenticatedDashboardAuditRoute =
     path: '/dashboard/audit',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardApprovalsRoute =
+  AuthenticatedDashboardApprovalsRouteImport.update({
+    id: '/dashboard/approvals',
+    path: '/dashboard/approvals',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAdminRoute =
   AuthenticatedDashboardAdminRouteImport.update({
     id: '/dashboard/admin',
@@ -172,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
@@ -196,6 +204,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
@@ -222,6 +231,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
@@ -248,6 +258,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/invitations/$token'
     | '/dashboard/admin'
+    | '/dashboard/approvals'
     | '/dashboard/audit'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/invitations/$token'
     | '/dashboard/admin'
+    | '/dashboard/approvals'
     | '/dashboard/audit'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
@@ -297,6 +309,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/invitations/$token'
     | '/_authenticated/dashboard/admin'
+    | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/campaigns'
     | '/_authenticated/dashboard/catastro'
@@ -466,6 +479,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/approvals': {
+      id: '/_authenticated/dashboard/approvals'
+      path: '/dashboard/approvals'
+      fullPath: '/dashboard/approvals'
+      preLoaderRoute: typeof AuthenticatedDashboardApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/admin': {
       id: '/_authenticated/dashboard/admin'
       path: '/dashboard/admin'
@@ -522,6 +542,7 @@ const AuthenticatedDashboardGeophysicsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
@@ -541,6 +562,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+  AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
