@@ -192,3 +192,25 @@ function RasterBody({ r }: { r: DroneRaster }) {
   );
 }
 
+function TargetBody({ t }: { t: ExplorationTarget }) {
+  return (
+    <>
+      <div className="text-base font-bold text-gold mb-1">{t.code}</div>
+      <div className="text-foreground mb-2">{t.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{t.target_type}{t.commodity ? ` · ${t.commodity}` : ""}</div>
+      <Row label="Etapa" value={t.stage} />
+      <Row label="Prioridad" value={t.priority} />
+      <Row label="Score" value={t.score != null ? `${t.score}` : "—"} />
+      <Row label="Confianza" value={t.confidence_pct != null ? `${t.confidence_pct}%` : "—"} />
+      <Row label="Lat / Lng" value={t.lat != null && t.lng != null ? `${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}` : "—"} />
+      <Row label="Elevación" value={t.elevation_m != null ? `${t.elevation_m} m` : "—"} />
+      <Row label="m planeados" value={t.planned_meters != null ? `${t.planned_meters} m` : "—"} />
+      <Row label="Costo USD" value={t.estimated_cost_usd != null ? `$${Number(t.estimated_cost_usd).toLocaleString()}` : "—"} />
+      {t.rationale && <div className="mt-3 p-2 rounded bg-muted/30 text-foreground/80 italic text-[10.5px]">{t.rationale}</div>}
+      <Link to="/dashboard/targets" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Targets <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
