@@ -1,16 +1,19 @@
-import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity } from "lucide-react";
+import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity, Plane, Image as ImageIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { DrillHole } from "@/hooks/useDrilling";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import type { GeophysicsStation } from "@/hooks/useGeophysicsData";
+import type { DroneFlight, DroneRaster } from "@/hooks/useDroneFlights";
 import { auColor } from "./sampleColors";
 
 export type InspectedFeature =
   | { kind: "sample"; data: SamplingResult }
   | { kind: "drill"; data: DrillHole }
   | { kind: "concession"; data: MiningConcession }
-  | { kind: "station"; data: GeophysicsStation };
+  | { kind: "station"; data: GeophysicsStation }
+  | { kind: "drone_flight"; data: DroneFlight }
+  | { kind: "drone_raster"; data: DroneRaster };
 
 interface Props {
   feature: InspectedFeature | null;
@@ -35,6 +38,8 @@ export function FeatureInspectorPanel({ feature, onClose }: Props) {
         {feature.kind === "drill" && <DrillBody h={feature.data} />}
         {feature.kind === "concession" && <ConcessionBody c={feature.data} />}
         {feature.kind === "station" && <StationBody s={feature.data} />}
+        {feature.kind === "drone_flight" && <FlightBody f={feature.data} />}
+        {feature.kind === "drone_raster" && <RasterBody r={feature.data} />}
       </div>
     </aside>
   );
@@ -44,10 +49,19 @@ function iconFor(k: InspectedFeature["kind"]) {
   if (k === "sample") return <FlaskConical className="w-3 h-3 text-teal" />;
   if (k === "drill") return <Drill className="w-3 h-3 text-copper" />;
   if (k === "concession") return <MapIcon className="w-3 h-3 text-gold" />;
+  if (k === "drone_flight") return <Plane className="w-3 h-3 text-info" />;
+  if (k === "drone_raster") return <ImageIcon className="w-3 h-3 text-gold" />;
   return <Activity className="w-3 h-3 text-info" />;
 }
 function labelFor(k: InspectedFeature["kind"]) {
-  return { sample: "Muestra", drill: "Sondaje", concession: "Concesión", station: "Estación geofísica" }[k];
+  return {
+    sample: "Muestra",
+    drill: "Sondaje",
+    concession: "Concesión",
+    station: "Estación geofísica",
+    drone_flight: "Vuelo dron",
+    drone_raster: "Raster dron",
+  }[k];
 }
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -128,3 +142,42 @@ function StationBody({ s }: { s: GeophysicsStation }) {
     </>
   );
 }
+
+function FlightBody({ f }: { f: DroneFlight }) {
+  return (
+    <>
+      <div className="text-base font-bold text-info mb-2">{f.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{f.sensor} · drone</div>
+      <Row label="Piloto" value={f.pilot ?? "—"} />
+      <Row label="Fecha" value={f.flown_at ?? "—"} />
+      <Row label="Altura" value={f.altitude_m != null ? `${f.altitude_m} m` : "—"} />
+      <Row label="Área" value={f.area_ha != null ? `${f.area_ha} ha` : "—"} />
+      {f.notes && <Row label="Notas" value={f.notes} />}
+      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Drones <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
+function RasterBody({ r }: { r: DroneRaster }) {
+  return (
+    <>
+      <div className="text-base font-bold text-gold mb-2">{r.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{r.raster_type}</div>
+      <Row label="Capturado" value={r.captured_at ?? "—"} />
+      <Row
+        label="URL"
+        value={
+          <a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[140px]">
+            abrir ↗
+          </a>
+        }
+      />
+      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Drones <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
