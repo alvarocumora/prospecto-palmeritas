@@ -14,6 +14,7 @@ import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
 import type { LeafletNS } from "@/components/map/types";
 import { Layers, FlaskConical, Camera, Loader2 } from "lucide-react";
 import { captureMapSnapshot, downloadDataUrl } from "@/lib/map/snapshot";
+import { GeoIntelBriefButton } from "@/components/GeoIntelBriefButton";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -141,6 +142,7 @@ function OperationalMap() {
           logsByHole={logsByHole}
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
+        <GeoIntelBriefButton map={mapInst?.map ?? null} />
         <CollapsibleAuLegend />
       </div>
     </div>
