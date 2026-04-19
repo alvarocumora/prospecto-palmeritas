@@ -106,7 +106,7 @@ export function useExplorationTargets(projectId: string | null) {
 
   const updateStage = useCallback(async (id: string, stage: TargetStage, closedReason?: string) => {
     if (!user) return { error: "no-user" };
-    const patch: Record<string, unknown> = { stage };
+    const patch: { stage: TargetStage; validated_by?: string; validated_at?: string; closed_at?: string; closed_reason?: string | null } = { stage };
     if (stage === "validated") { patch.validated_by = user.id; patch.validated_at = new Date().toISOString(); }
     if (stage === "closed") { patch.closed_at = new Date().toISOString(); patch.closed_reason = closedReason ?? null; }
     const { error } = await supabase.from("exploration_targets").update(patch).eq("id", id);
@@ -114,7 +114,7 @@ export function useExplorationTargets(projectId: string | null) {
     return { error: error?.message ?? null };
   }, [user, refresh]);
 
-  const updateTarget = useCallback(async (id: string, patch: Partial<ExplorationTarget>) => {
+  const updateTarget = useCallback(async (id: string, patch: Partial<Omit<ExplorationTarget, "evidence" | "geometry_geojson">>) => {
     const { error } = await supabase.from("exploration_targets").update(patch).eq("id", id);
     if (!error) await refresh();
     return { error: error?.message ?? null };
