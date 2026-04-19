@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
+import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 
@@ -118,6 +119,12 @@ const AuthenticatedDashboardAuditRoute =
     path: '/dashboard/audit',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAdminRoute =
+  AuthenticatedDashboardAdminRouteImport.update({
+    id: '/dashboard/admin',
+    path: '/dashboard/admin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdRoute =
   AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
     id: '/$surveyId',
@@ -136,6 +143,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -155,6 +163,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -176,6 +185,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/invitations/$token'
+    | '/dashboard/admin'
     | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
@@ -216,6 +227,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/invitations/$token'
+    | '/dashboard/admin'
     | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
@@ -236,6 +248,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/invitations/$token'
+    | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
@@ -373,6 +386,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/admin': {
+      id: '/_authenticated/dashboard/admin'
+      path: '/dashboard/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/geophysics/$surveyId': {
       id: '/_authenticated/dashboard/geophysics/$surveyId'
       path: '/$surveyId'
@@ -421,6 +441,7 @@ const AuthenticatedDashboardGeophysicsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
@@ -435,6 +456,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,

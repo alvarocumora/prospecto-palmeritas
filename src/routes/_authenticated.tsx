@@ -6,12 +6,13 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
+import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
@@ -35,6 +36,7 @@ function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
   const role = useProjectRole();
+  const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
   const navigate = useNavigate();
   const location = useLocation();
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -128,6 +130,17 @@ function AuthenticatedLayout() {
             <NavItem to="/dashboard/marketplace" icon={<LayersIcon className="w-3.5 h-3.5" />} label="Marketplace" module="marketplace" role={role} />
           )}
           <NavItem to="/dashboard/profile" icon={<UserCircle className="w-3.5 h-3.5" />} label="Mi Perfil" module="profile" role={role} />
+
+          {isSuperAdmin && (
+            <Link
+              to="/dashboard/admin"
+              className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs font-mono transition-colors ${
+                location.pathname.startsWith("/dashboard/admin") ? "bg-gold/10 text-gold" : "text-gold hover:bg-accent"
+              }`}
+            >
+              <Crown className="w-3.5 h-3.5" /> Admin Plataforma
+            </Link>
+          )}
 
           {canAccess(role, "palmeras") && (
             <div className="pt-4 mt-4 border-t border-border">
