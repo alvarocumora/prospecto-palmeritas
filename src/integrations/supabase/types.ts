@@ -649,49 +649,79 @@ export type Database = {
       }
       drone_rasters: {
         Row: {
+          band_count: number | null
           bounds_geojson: Json | null
           campaign_id: string | null
           captured_at: string | null
           created_at: string
           created_by: string
+          crs: string | null
+          file_size_bytes: number | null
           flight_id: string | null
+          height_px: number | null
           id: string
+          max_value: number | null
+          min_value: number | null
           name: string
           notes: string | null
+          pixel_size_m: number | null
+          processing: boolean
           project_id: string
           raster_type: string
+          storage_path: string | null
           updated_at: string
           url: string
+          width_px: number | null
         }
         Insert: {
+          band_count?: number | null
           bounds_geojson?: Json | null
           campaign_id?: string | null
           captured_at?: string | null
           created_at?: string
           created_by: string
+          crs?: string | null
+          file_size_bytes?: number | null
           flight_id?: string | null
+          height_px?: number | null
           id?: string
+          max_value?: number | null
+          min_value?: number | null
           name: string
           notes?: string | null
+          pixel_size_m?: number | null
+          processing?: boolean
           project_id: string
           raster_type?: string
+          storage_path?: string | null
           updated_at?: string
           url: string
+          width_px?: number | null
         }
         Update: {
+          band_count?: number | null
           bounds_geojson?: Json | null
           campaign_id?: string | null
           captured_at?: string | null
           created_at?: string
           created_by?: string
+          crs?: string | null
+          file_size_bytes?: number | null
           flight_id?: string | null
+          height_px?: number | null
           id?: string
+          max_value?: number | null
+          min_value?: number | null
           name?: string
           notes?: string | null
+          pixel_size_m?: number | null
+          processing?: boolean
           project_id?: string
           raster_type?: string
+          storage_path?: string | null
           updated_at?: string
           url?: string
+          width_px?: number | null
         }
         Relationships: [
           {
