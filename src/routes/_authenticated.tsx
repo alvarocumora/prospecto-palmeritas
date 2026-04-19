@@ -9,7 +9,7 @@ import {
   Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { supabase } from "@/integrations/supabase/client";
+
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
