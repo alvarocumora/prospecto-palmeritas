@@ -68,12 +68,12 @@ function OperationalMap() {
     return () => { layer.remove(); };
   }, [mapInst, prospCells]);
 
-  // Render drone raster overlays
+  // Render drone raster overlays (uses time-filtered settings)
   useEffect(() => {
     if (!mapInst) return;
     let cancelled = false;
     let layer: L.LayerGroup | null = null;
-    buildRasterOverlayLayer(mapInst.L, rasters, rasterSettings).then((l) => {
+    buildRasterOverlayLayer(mapInst.L, rasters, visibleRasterSettings).then((l) => {
       if (cancelled) return;
       layer = l;
       l.addTo(mapInst.map);
@@ -82,7 +82,7 @@ function OperationalMap() {
       cancelled = true;
       layer?.remove();
     };
-  }, [mapInst, rasters, rasterSettings]);
+  }, [mapInst, rasters, visibleRasterSettings]);
 
   const updateRasterSetting = (id: string, patch: Partial<RasterSettings[string]>) => {
     setRasterSettings((prev) => {
