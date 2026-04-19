@@ -26,6 +26,7 @@ import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
+import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -127,6 +128,12 @@ const AuthenticatedDashboardCatastroRoute =
     path: '/dashboard/catastro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardCampaignsRoute =
+  AuthenticatedDashboardCampaignsRouteImport.update({
+    id: '/dashboard/campaigns',
+    path: '/dashboard/campaigns',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAuditRoute =
   AuthenticatedDashboardAuditRouteImport.update({
     id: '/dashboard/audit',
@@ -159,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
@@ -181,6 +189,7 @@ export interface FileRoutesByTo {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
@@ -205,6 +214,7 @@ export interface FileRoutesById {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/dashboard/admin'
     | '/dashboard/audit'
+    | '/dashboard/campaigns'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/drones'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/dashboard/admin'
     | '/dashboard/audit'
+    | '/dashboard/campaigns'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/drones'
@@ -274,6 +286,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/audit'
+    | '/_authenticated/dashboard/campaigns'
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
@@ -419,6 +432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/campaigns': {
+      id: '/_authenticated/dashboard/campaigns'
+      path: '/dashboard/campaigns'
+      fullPath: '/dashboard/campaigns'
+      preLoaderRoute: typeof AuthenticatedDashboardCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/audit': {
       id: '/_authenticated/dashboard/audit'
       path: '/dashboard/audit'
@@ -483,6 +503,7 @@ const AuthenticatedDashboardGeophysicsRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
+  AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
@@ -500,6 +521,7 @@ interface AuthenticatedRouteChildren {
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
+  AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
@@ -530,3 +552,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
