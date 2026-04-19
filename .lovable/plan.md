@@ -1,24 +1,37 @@
 
-Add mineralized intercept calculation for drill holes.
+Add a "mineralization halo" around drill collar markers in `ProjectMap` based on best intercept's grade·length score (Au g/t × meters).
 
-## Logic
-- `computeIntercepts(logs, cutoff, maxInternalDilution)`: sort by depth_from, walk intervals, group contiguous (gap ≤ maxInternalDilution, default 2m) where `au_gpt >= cutoff`. For each intercept: from, to, length, length-weighted Au/Cu/Ag averages, # intervals.
-- Length-weighted avg: `Σ(grade_i × len_i) / Σ(len_i)` (skip nulls per-element).
+## Approach
+
+Reuse existing `useProjectCoreLogs` + `computeIntercepts` + `bestIntercept` utilities to derive a metal-score per hole. Render an extra halo `circleMarker` (larger radius, low fill opacity, no fill — colored stroke) underneath the existing collar dot.
+
+### Score → color scale
+- score = `au_gpt × length_m` (units: g·m/t — common "GT" metric)
+- Bins (typical for Au exploration):
+  - score = 0 or no intercept → no halo
+  - 0 < s ≤ 5 → light green `#86efac` (low)
+  - 5 < s ≤ 20 → yellow-green `#bef264` (moderate)
+  - 20 < s ≤ 50 → amber `#fbbf24` (good)
+  - 50 < s ≤ 150 → orange `#fb923c` (high)
+  - s > 150 → deep red `#dc2626` (exceptional)
+- Halo radius scales: 12px base + min(score/10, 18) → max ~30px
+- Stroke weight 2.5, fillOpacity 0.18
 
 ## Files
-1. **New** `src/lib/drilling/intercepts.ts` — pure function + types. Default cutoff 0.5 g/t Au, default dilution 2m.
-2. **Edit** `src/components/drilling/CoreLogPanel.tsx`:
-   - Cutoff input (number, default 0.5) + dilution input (default 2m) in header
-   - New "Intercepts mineralizados" section above intervals table: highlighted card-table with from-to, length, Au g/t (bold amber), Cu%, Ag g/t, # intervalos
-   - Empty state if no intercepts
-3. **Edit** `src/routes/_authenticated.dashboard.drilling.tsx`:
-   - For each hole, fetch its logs lazily via batch (single query: `drill_core_logs` filtered by `hole_id IN (...)` for current project)
-   - Compute best intercept per hole (longest, or highest grade·length)
-   - Add new column "Mejor intercept" showing e.g. `12.5m @ 2.34 g/t Au` colored amber, or "—"
-   - Use cutoff 0.5 (fixed at table level; configurable in panel)
 
-## Approach for table column
-- New hook `useProjectCoreLogs(projectId)` returning all logs grouped by hole_id (single query, low overhead for typical project sizes <10k intervals).
-- Compute intercepts per hole in `useMemo`.
+### 1. Edit `src/lib/drilling/intercepts.ts`
+- Add `interceptScore(it)` → `(it.au_gpt ?? 0) * it.length`
+- Add `scoreToHaloColor(score)` returning `{ color, radius } | null`
 
-## No DB changes, no deps.
+### 2. Edit `src/components/map/drillCollarsLayer.ts`
+- Accept optional second arg `scoresByHole?: Record<string, number>` in `buildDrillCollarsLayer`
+- For each hole with score > 0, add halo `circleMarker` BEFORE the collar dot
+- Halo popup also shows the best intercept summary line if score available
+
+### 3. Edit `src/components/ProjectMap.tsx`
+- Already imports `useDrillHoles`. Add `useProjectCoreLogs(activeProjectId)`
+- Compute `scoresByHole` via `useMemo` (best intercept per hole, cutoff 0.5 / dilution 2)
+- Pass to `buildDrillCollarsLayer(L, holes, scoresByHole)`
+- Add a small legend chip for the halo scale next to the existing "X sondajes" chip
+
+## No DB / no deps.
