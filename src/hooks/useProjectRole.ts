@@ -38,6 +38,7 @@ export const MODULE_ROLES: Record<string, ProjectRole[]> = {
   projects: ["owner", "admin", "project_manager"],
   team: ["owner", "admin", "project_manager"],
   audit: ["owner", "admin", "project_manager", "chief_geologist"],
+  approvals: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer"],
   marketplace: ["owner", "admin", "project_manager", "chief_geologist", "geologist"],
   profile: ALL_VIEW,
   settings: ["owner"],
