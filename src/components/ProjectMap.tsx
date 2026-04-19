@@ -613,6 +613,15 @@ export function ProjectMap() {
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
         </span>
+        <span className="inline-flex items-center gap-1.5" title="Halo = mejor intercept (Au g/t × m)">
+          <span className="text-muted-foreground/70">Halo GT:</span>
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#86efac" }} title="≤5" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#bef264" }} title="5–20" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} title="20–50" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fb923c" }} title="50–150" />
+          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#dc2626" }} title=">150" />
+          <span className="text-muted-foreground/70">g·m/t</span>
+        </span>
         <span className="inline-flex items-center gap-1.5">
           <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
         </span>
