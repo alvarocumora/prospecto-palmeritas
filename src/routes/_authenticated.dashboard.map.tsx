@@ -18,6 +18,9 @@ import { GeoIntelBriefButton } from "@/components/GeoIntelBriefButton";
 import { ProspectivityButton } from "@/components/ProspectivityButton";
 import { buildProspectivityLayer } from "@/components/map/prospectivityLayer";
 import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivity";
+import { useDroneFlights } from "@/hooks/useDroneFlights";
+import { RasterControlPanel, type RasterSettings } from "@/components/drones/RasterControlPanel";
+import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -43,6 +46,8 @@ function OperationalMap() {
   const [snapshotting, setSnapshotting] = useState(false);
   const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
+  const { rasters } = useDroneFlights(active?.id ?? null);
+  const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
 
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
@@ -51,6 +56,29 @@ function OperationalMap() {
     layer.addTo(mapInst.map);
     return () => { layer.remove(); };
   }, [mapInst, prospCells]);
+
+  // Render drone raster overlays
+  useEffect(() => {
+    if (!mapInst) return;
+    let cancelled = false;
+    let layer: L.LayerGroup | null = null;
+    buildRasterOverlayLayer(mapInst.L, rasters, rasterSettings).then((l) => {
+      if (cancelled) return;
+      layer = l;
+      l.addTo(mapInst.map);
+    });
+    return () => {
+      cancelled = true;
+      layer?.remove();
+    };
+  }, [mapInst, rasters, rasterSettings]);
+
+  const updateRasterSetting = (id: string, patch: Partial<RasterSettings[string]>) => {
+    setRasterSettings((prev) => ({
+      ...prev,
+      [id]: { visible: false, opacity: 0.75, colormap: "none", ...prev[id], ...patch },
+    }));
+  };
 
   const campaignName = useMemo(
     () => (campaignId ? campaigns.find((c) => c.id === campaignId)?.name ?? null : null),
@@ -160,6 +188,12 @@ function OperationalMap() {
         <ProspectivityButton
           map={mapInst?.map ?? null}
           onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+        />
+        <RasterControlPanel
+          rasters={rasters}
+          settings={rasterSettings}
+          onChange={updateRasterSetting}
+          onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
         />
         <CollapsibleAuLegend />
       </div>
