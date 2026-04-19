@@ -256,6 +256,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       ];
       setManagedLayers(initial);
       setMapReady(true);
+      onMapReady?.(map, L);
 
       await loadCatastroData();
       if (cancelled) return;
