@@ -34,6 +34,8 @@ import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
 import { useDrillHoles } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { computeIntercepts, bestIntercept, interceptScore, scoreToHaloStyle } from "@/lib/drilling/intercepts";
 import { buildConcessionsLayer } from "./map/concessionLayer";
 import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
