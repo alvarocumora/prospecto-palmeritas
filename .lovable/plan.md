@@ -1,101 +1,87 @@
 
-Implementar Fase 2 + Fase 3 simultáneamente. Esto es ambicioso — voy a entregar una base funcional de cada pieza, no todo pulido. Aviso de antemano: serán ~15-20 archivos nuevos.
+The user wants two things:
+1. **Estado actual del proyecto** — diagnóstico de qué está construido vs qué funciona realmente.
+2. **Plan disruptivo funcional** — siguiente fase concreta que convierta esto en una plataforma de exploración minera operativa, no solo un demo.
 
-## FASE 2 — Estructura ampliada de perfiles y equipos
+Voy a estructurarlo como diagnóstico + roadmap accionable. Concise, sin código.
 
-### 2.1 Perfiles ricos (DB migration)
-Añadir a `profiles`:
-- `specialty` (text) — exploración / geotécnico / geofísico / catastro / otro
-- `certifications` (text[]) — QP NI 43-101, JORC, etc.
-- `phone` (text)
-- `language` (text, default 'es')
-- `country` (text)
+## ESTADO ACTUAL — auditoría rápida
 
-### 2.2 Invitaciones por email (nueva tabla + edge function)
-- Tabla `project_invitations` (project_id, email, role, token, status, invited_by, expires_at).
-- RLS: owners/admins crean e ven invitaciones de su proyecto; cualquiera con el token puede leer la suya.
-- Edge function `send-project-invitation` que inserta + envía email vía Lovable Emails (auth scaffold ya posible más tarde — por ahora email opcional, foco en el link).
-- Página `/invitations/$token` para aceptar — inserta en `project_members` con el rol indicado.
+### ✅ Construido y funcional (verificado en DB y código)
+- **Auth + roles**: login, perfiles, roles por proyecto (owner/admin/geologist/viewer), super_admin global. RLS completa en todas las tablas.
+- **Multi-proyecto**: switcher, invitaciones por token, equipo con roles, auditoría con triggers.
+- **Catastro**: integración SERNAGEOMIN dinámica + tabla `mining_concessions` con alertas de vencimiento.
+- **Geofísica**: surveys/lines/stations CRUD, mapa con magnetometría e IP, captura de campo.
+- **Sondajes**: drill_holes + core_logs, strip log visual, cómputo de intercepts mineralizados.
+- **Muestreo**: resultados de laboratorio (Au/Ag/Cu + path-finders).
+- **Geo-AI Assistant**: chat con contexto de proyecto (Gemini Pro).
+- **Marketplace**: capas públicas instalables.
+- **Reporte NI 43-101**: PDF one-click.
+- **Admin platform**: panel /dashboard/admin con usuarios, proyectos, auditoría.
+- **Las Palmeras**: asignado a alvaro.cumora@gmail.com como owner, con datos vinculados.
 
-### 2.3 Auditoría
-- Tabla `audit_log` (id, project_id, user_id, action, entity_type, entity_id, payload jsonb, created_at).
-- Trigger genérico `log_changes()` aplicado a tablas clave (drill_holes, drill_core_logs, sampling_results, mining_concessions).
-- RLS: solo miembros del proyecto leen su audit_log.
+### ⚠️ Construido pero a medias
+- **Pagos**: stubs en admin, sin Stripe real conectado.
+- **Offline**: hook existe pero no enchufado en formularios.
+- **Emails de invitación**: edge function loguea el link, no envía email.
+- **Marketplace**: solo lectura, no permite uploads.
+- **Time machine**: filtro por fecha en audit, sin reconstrucción real de estado.
+- **Reportes**: solo NI 43-101, falta Pitch Investor y Technical Brief.
 
-### 2.4 UI
-- Página `/dashboard/team` (owners/admins): listado de miembros, cambiar roles, invitar, ver invitaciones pendientes.
-- Página `/dashboard/profile`: editar perfil completo.
-- Página `/dashboard/audit` (owners/admins): timeline de cambios del proyecto activo.
+### ❌ Faltante crítico para "exploración minera real"
+- **Geoquímica avanzada**: no hay multielement plots, ratios path-finder, vectoreo a target.
+- **Modelado 3D**: sin visor de wireframes/superficies (Leapfrog-lite).
+- **QA/QC de muestras**: no hay duplicados, blancos, estándares, gráficos shewhart.
+- **Recursos & estimación**: sin bloques, kriging, clasificación measured/indicated/inferred.
+- **Workflows de campo**: no hay app PWA instalable real con cola offline robusta.
+- **Integraciones laboratorio**: sin import directo de ALS/SGS/Bureau Veritas.
+- **DEM/topografía**: sin elevación real, todo plano.
+- **Reportes regulatorios reales**: ENAMI, SERNAGEOMIN annual.
 
-## FASE 3 — Disrupción de plataforma
+---
 
-### 3.1 Dashboard ejecutivo cross-proyecto
-Reemplazar `_authenticated.dashboard.index.tsx` con KPIs agregados:
-- Total m perforados (suma `actual_depth` de drill_holes)
-- Au promedio ponderado (de drill_core_logs y sampling_results)
-- Intercepts del mes (usando `computeIntercepts` por hole)
-- CapEx geofísico (suma `cost_usd` de geophysics_surveys)
-- Cards por proyecto con mini-spark de actividad
+## PLAN DISRUPTIVO — 4 olas funcionales
 
-### 3.2 Asistente IA geológico
-- Edge function `geo-assistant` usando Lovable AI Gateway (`google/gemini-2.5-pro`).
-- Recibe `project_id` + `messages[]`. Construye system prompt inyectando contexto del proyecto: nº holes, m perforados, surveys activos, top intercepts, concesiones.
-- Stream de respuesta SSE.
-- Componente flotante `<GeoAssistant />` (botón redondo abajo-derecha) con drawer de chat, disponible en todas las páginas del dashboard.
+Cada ola es una unidad entregable de ~1-2 sesiones que aporta valor inmediato a un explorador real.
 
-### 3.3 Modo offline-first ampliado
-- Extender `useOfflineQueue` con namespaces (`drilling`, `sampling`, `geophysics`).
-- Hook `useOfflineMutation(table, mode)` que: si online → supabase directo; si offline → cola IndexedDB + flush al reconectar.
-- Indicador de estado online/offline + cola pendiente en topbar.
+### 🌊 Ola 1 — "Datos de campo confiables" (FUNDAMENTOS)
+Lo más urgente para que un geólogo lo use en terreno mañana.
+- **PWA instalable**: manifest + service worker, install prompt en mobile.
+- **Offline-first real**: enchufar `useOfflineQueue` en formularios de drill_core_logs, sampling_results y geophysics_stations. Badge de cola pendiente, sync automático.
+- **Import CSV laboratorio**: parser para resultados ALS/SGS (assay sheets típicos) → sampling_results con QA/QC automático (detección de duplicados/blancos/estándares por código).
+- **DEM + topografía**: integrar Mapbox terrain o SRTM para elevación real de drill collars.
 
-### 3.4 Marketplace de capas (skeleton)
-- Tabla `shared_layers` (name, description, geometry_geojson, owner_id, is_public, tags[], thumbnail_url, downloads_count).
-- Página `/dashboard/marketplace`: grilla de capas públicas + "instalar en mi proyecto" (copia geometry como geological_feature).
-- Por ahora sin uploads — solo seed con 3 ejemplos (geología regional Chile, hidrografía, fallas regionales).
+### 🌊 Ola 2 — "Inteligencia geoquímica" (DIFERENCIADOR)
+Lo que hace que la plataforma sea mejor que Excel + ArcGIS.
+- **Multielement dashboard**: scatter Au-Ag, ratios path-finder (As/Sb/Hg vectoreo epitermal), histogramas log-normal, percentiles automáticos.
+- **Mapas de anomalías interpolados**: IDW/kriging simple sobre sampling_results → heatmap por elemento sobre el mapa.
+- **Vectoreo a target asistido por IA**: el geo-assistant analiza patrones (intercepts + alteración + geofísica) y propone próximos drill targets con justificación.
+- **Cross-section builder**: dibuja una línea sobre el mapa → genera sección con holes proyectados, intercepts, lito, alteración.
 
-### 3.5 Time machine
-- Vista que lee `audit_log` y permite "viajar" a una fecha: filtra entidades creadas/modificadas antes de esa fecha.
-- Implementación mínima: slider de fecha en `/dashboard/audit` que recompone snapshot.
+### 🌊 Ola 3 — "Modelo 3D y recursos" (PRODUCTO ÚNICO)
+Lo que cobra USD 50k+/año en software tradicional.
+- **Visor 3D**: three.js/deck.gl con holes en 3D (azimuth+dip), intercepts coloreados, superficies de alteración.
+- **Wireframe builder simple**: marca polígonos en secciones → triangula superficie 3D.
+- **Bloques + estimación**: malla de bloques sobre AOI, asignación por inverso a la distancia, clasificación measured/indicated/inferred según distancia a holes.
+- **Tonelaje/ley curve**: gráfico interactivo cutoff vs. tonelaje vs. ley promedio.
 
-### 3.6 Reportes one-click
-- Botón "Generar NI 43-101" en dashboard de proyecto — ya existe `export-ni43101-pdf.ts`.
-- Añadir "Pitch Investor" (1 página, hero + KPIs + mapa + ask) y "Technical Brief" (5 páginas).
+### 🌊 Ola 4 — "Comercialización y escala" (NEGOCIO)
+Convertir la plataforma en SaaS real.
+- **Stripe real**: planes (Solo / Equipo / Enterprise) con metering por GB de datos, nº proyectos, nº miembros.
+- **Reportes regulatorios automatizados**: SERNAGEOMIN annual, declaración ENAMI, NI 43-101 técnico completo.
+- **Data room para inversionistas**: link público read-only de un proyecto con KPIs, mapa, intercepts (sin datos crudos), watermark.
+- **API pública**: REST endpoints para integración con ERPs mineros (SAP IS-Mining, Pronet).
+- **Marketplace activo**: uploads de capas con thumbnail auto, sistema de ratings, monetización (créditos por download).
 
-## Fixes adicionales
-- **Hidratación SSR rota**: el `OnboardingWizard` se monta en SSR con `<div className="min-h-screen...">` pero debería ir dentro de `<Suspense>`. Envolver el branch del wizard en `typeof window` check o usar `useEffect` para mostrar.
+---
 
-## Archivos
+## Recomendación de próximo paso
 
-### DB (1 migration)
-- Migration: añadir columnas a `profiles`, crear `project_invitations`, `audit_log`, `shared_layers`, trigger genérico audit, seed de shared_layers.
+Empezar por **Ola 1 → "Import CSV de laboratorio"** porque:
+- Resuelve el dolor #1 real de un geólogo (recibe el assay sheet de ALS y lo mete a mano hoy).
+- Activa todo lo demás: si entran datos reales, los gráficos, secciones e IA tienen sustancia.
+- Bajo esfuerzo (1 sesión), impacto altísimo.
 
-### Edge functions (2)
-- `supabase/functions/send-project-invitation/index.ts`
-- `supabase/functions/geo-assistant/index.ts`
+Después, en paralelo: PWA + offline real (Ola 1) y multielement dashboard (Ola 2).
 
-### Hooks (4)
-- `src/hooks/useTeam.ts` — miembros + invitaciones
-- `src/hooks/useAuditLog.ts`
-- `src/hooks/useExecutiveKpis.ts`
-- `src/hooks/useOfflineMutation.ts` (extiende useOfflineQueue)
-
-### Componentes (4)
-- `src/components/GeoAssistant.tsx` — drawer flotante
-- `src/components/team/InviteMemberDialog.tsx`
-- `src/components/team/MembersTable.tsx`
-- `src/components/OnlineStatusBadge.tsx`
-
-### Rutas (5 nuevas + 2 editadas)
-- `src/routes/_authenticated.dashboard.team.tsx`
-- `src/routes/_authenticated.dashboard.profile.tsx`
-- `src/routes/_authenticated.dashboard.audit.tsx`
-- `src/routes/_authenticated.dashboard.marketplace.tsx`
-- `src/routes/invitations.$token.tsx`
-- editar `src/routes/_authenticated.dashboard.index.tsx` → dashboard ejecutivo
-- editar `src/routes/_authenticated.tsx` → añadir GeoAssistant + OnlineStatusBadge + nuevas entradas nav (Equipo, Perfil, Auditoría, Marketplace) gateadas por rol
-- editar `src/hooks/useProjectRole.ts` → añadir módulos nuevos al MODULE_ROLES
-
-### Fix hidratación
-- editar `src/routes/_authenticated.tsx` → wrapper del onboarding con guard `mounted`
-
-Confirmo: empiezo migración primero (no en paralelo con código), luego todo el resto.
+¿Apruebas que arranque por **Import CSV laboratorio + QA/QC automático**, o prefieres otra ola/feature?
