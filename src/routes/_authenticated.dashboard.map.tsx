@@ -77,6 +77,7 @@ function OperationalMap() {
         <ProjectMap
           samples={filteredSamples}
           onInspect={setInspected}
+          fillHeight
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
         {/* Au legend */}
