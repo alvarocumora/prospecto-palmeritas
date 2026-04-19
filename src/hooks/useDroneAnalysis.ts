@@ -52,8 +52,8 @@ export function useDroneAnalysis(projectId: string | null) {
       supabase.from("dem_diffs").select("*").eq("project_id", projectId).order("created_at", { ascending: false }),
       supabase.from("stockpile_volumes").select("*").eq("project_id", projectId).order("created_at", { ascending: false }),
     ]);
-    setDiffs((d.data ?? []) as DemDiff[]);
-    setStockpiles((s.data ?? []) as StockpileVolume[]);
+    setDiffs((d.data ?? []) as unknown as DemDiff[]);
+    setStockpiles((s.data ?? []) as unknown as StockpileVolume[]);
     setLoading(false);
   }, [projectId]);
 
