@@ -181,22 +181,61 @@ export function wireMacrostratClickPopup(
     unit: Record<string, unknown> | undefined,
     lat: number,
     lng: number
-  ) => string
+  ) => string,
 ) {
   map.on("click", async (e) => {
     const { lat, lng } = e.latlng;
     const popup = L.popup()
       .setLatLng(e.latlng)
       .setContent(
-        `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A89080;">Consultando Macrostrat…</div>`
+        `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A89080;">Consultando geología…</div>`,
       )
       .openOn(map);
+
+    // 1) SERNAGEOMIN GetFeatureInfo (Chile) — siempre primero
+    let chileHtml = "";
+    try {
+      const { wmsGetFeatureInfo } = await import("./sernageominLayers");
+      const size = map.getSize();
+      const point = map.latLngToContainerPoint(e.latlng);
+      const b = map.getBounds();
+      const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
+      const props = await wmsGetFeatureInfo({
+        baseUrl: "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
+        layer: "0",
+        bbox,
+        width: size.x,
+        height: size.y,
+        x: point.x,
+        y: point.y,
+      });
+      if (props && Object.keys(props).length > 0) {
+        const name = (props.NOMBRE_UNIDAD ?? props.UNIDAD ?? props.NAME ?? props.LITOLOGIA ?? "Unidad geológica chilena") as string;
+        const edad = (props.EDAD ?? props.AGE ?? props.PERIODO ?? "—") as string;
+        const lito = (props.LITOLOGIA ?? props.ROCK_TYPE ?? "—") as string;
+        chileHtml = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:280px;">
+          <strong style="color:#F0C96B;">${name}</strong><br/>
+          Edad: ${edad}<br/>
+          Litología: ${lito}
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Carta Geológica 1:1.000.000 · ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+        </div>`;
+      }
+    } catch {
+      /* ignore — caemos a Macrostrat */
+    }
+
+    if (chileHtml) {
+      popup.setContent(chileHtml);
+      return;
+    }
+
+    // 2) Macrostrat fallback (global)
     try {
       const unit = await fetchUnit(lat, lng);
       popup.setContent(popupHtml(unit, lat, lng));
     } catch (err) {
       popup.setContent(
-        `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A89080;">Error consultando Macrostrat: ${(err as Error).message}</div>`
+        `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A89080;">Sin información geológica disponible en este punto<br/>${(err as Error).message}</div>`,
       );
     }
   });
