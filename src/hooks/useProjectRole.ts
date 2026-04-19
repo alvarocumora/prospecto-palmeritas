@@ -17,6 +17,10 @@ export const MODULE_ROLES: Record<string, ProjectRole[]> = {
   sampling: ["owner", "admin", "geologist", "viewer"],
   palmeras: ["owner", "admin", "geologist"],
   projects: ["owner", "admin"],
+  team: ["owner", "admin"],
+  audit: ["owner", "admin"],
+  marketplace: ["owner", "admin", "geologist"],
+  profile: ["owner", "admin", "geologist", "viewer"],
   settings: ["owner"],
 };
 

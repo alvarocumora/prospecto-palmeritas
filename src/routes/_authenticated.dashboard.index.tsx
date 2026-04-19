@@ -1,27 +1,32 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
-import { FolderKanban, Plus, Activity, Drill, TestTube2, Map as MapIcon, ArrowRight } from "lucide-react";
+import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
+import {
+  Plus, Activity, Drill, TestTube2, Map as MapIcon, ArrowRight,
+  Ruler, Coins, TrendingUp, FlaskConical, Layers as LayersIcon, FolderKanban,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
-  head: () => ({ meta: [{ title: "Resumen — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Resumen Ejecutivo — Trackmin GeoIntel" }] }),
   component: DashboardHome,
 });
 
 function DashboardHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
+  const { kpis, loading } = useExecutiveKpis();
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "geólogo";
 
   return (
-    <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
+    <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
       <header className="mb-8">
-        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Bienvenido</div>
+        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Resumen ejecutivo</div>
         <h1 className="text-2xl md:text-3xl font-bold mt-1">Hola, {name}.</h1>
         <p className="text-sm text-muted-foreground mt-1">
           {projects.length === 0
             ? "Comienza creando tu primer proyecto de exploración."
-            : `Tienes ${projects.length} proyecto${projects.length > 1 ? "s" : ""}. Activo: ${active?.name ?? "ninguno"}.`}
+            : `${projects.length} proyecto${projects.length > 1 ? "s" : ""} activo${projects.length > 1 ? "s" : ""}. Activo: ${active?.name ?? "ninguno"}.`}
         </p>
       </header>
 
@@ -36,6 +41,21 @@ function DashboardHome() {
         </Link>
       ) : (
         <>
+          {/* KPIs ejecutivos */}
+          <section className="mb-8">
+            <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">KPIs cross-proyecto</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <Kpi icon={<FolderKanban className="w-4 h-4" />} label="Proyectos" value={loading ? "…" : String(kpis?.totalProjects ?? 0)} color="text-gold" />
+              <Kpi icon={<Ruler className="w-4 h-4" />} label="m perforados" value={loading ? "…" : (kpis?.totalMetersDrilled ?? 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} color="text-copper" />
+              <Kpi icon={<FlaskConical className="w-4 h-4" />} label="Au promedio" value={loading ? "…" : kpis?.auWeightedAvg ? `${kpis.auWeightedAvg.toFixed(2)} g/t` : "—"} color="text-teal" />
+              <Kpi icon={<Coins className="w-4 h-4" />} label="CapEx geofísico" value={loading ? "…" : `USD ${(kpis?.totalGeophysicsCapex ?? 0).toLocaleString()}`} color="text-info" />
+              <Kpi icon={<Drill className="w-4 h-4" />} label="Total holes" value={loading ? "…" : String(kpis?.totalHoles ?? 0)} />
+              <Kpi icon={<TestTube2 className="w-4 h-4" />} label="Muestras" value={loading ? "…" : String(kpis?.totalSamples ?? 0)} />
+              <Kpi icon={<TrendingUp className="w-4 h-4" />} label="Intercepts mes" value={loading ? "…" : String(kpis?.monthInterceptCount ?? 0)} color="text-gold" />
+              <Kpi icon={<LayersIcon className="w-4 h-4" />} label="Capas marketplace" value="3+" />
+            </div>
+          </section>
+
           <section className="mb-8">
             <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-3">Tus proyectos</h2>
             <div className="grid md:grid-cols-2 gap-3">
@@ -70,6 +90,16 @@ function DashboardHome() {
           </section>
         </>
       )}
+    </div>
+  );
+}
+
+function Kpi({ icon, label, value, color = "text-foreground" }: { icon: React.ReactNode; label: string; value: string; color?: string }) {
+  return (
+    <div className="rounded border border-border bg-bg-secondary p-3">
+      <div className={`inline-flex items-center gap-1 ${color}`}>{icon}</div>
+      <div className="text-[10px] font-mono uppercase text-muted-foreground mt-1.5">{label}</div>
+      <div className={`text-lg font-mono font-bold mt-0.5 ${color}`}>{value}</div>
     </div>
   );
 }
