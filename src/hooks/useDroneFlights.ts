@@ -74,7 +74,20 @@ export type RasterInsert = {
 };
 
 export async function createFlight(payload: FlightInsert, userId: string) {
-  return supabase.from("drone_flights").insert({ ...payload, created_by: userId }).select().single();
+  const row = {
+    project_id: payload.project_id,
+    campaign_id: payload.campaign_id ?? null,
+    name: payload.name,
+    sensor: payload.sensor,
+    pilot: payload.pilot ?? null,
+    flown_at: payload.flown_at ?? null,
+    altitude_m: payload.altitude_m ?? null,
+    area_ha: payload.area_ha ?? null,
+    geometry_geojson: payload.geometry_geojson as never,
+    notes: payload.notes ?? null,
+    created_by: userId,
+  };
+  return supabase.from("drone_flights").insert(row).select().single();
 }
 
 export async function deleteFlight(id: string) {
@@ -82,7 +95,18 @@ export async function deleteFlight(id: string) {
 }
 
 export async function createRaster(payload: RasterInsert, userId: string) {
-  return supabase.from("drone_rasters").insert({ ...payload, created_by: userId }).select().single();
+  const row = {
+    project_id: payload.project_id,
+    campaign_id: payload.campaign_id ?? null,
+    flight_id: payload.flight_id ?? null,
+    name: payload.name,
+    raster_type: payload.raster_type,
+    url: payload.url,
+    bounds_geojson: payload.bounds_geojson as never,
+    captured_at: payload.captured_at ?? null,
+    created_by: userId,
+  };
+  return supabase.from("drone_rasters").insert(row).select().single();
 }
 
 export async function deleteRaster(id: string) {
