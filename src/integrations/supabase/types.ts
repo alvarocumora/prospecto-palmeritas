@@ -407,6 +407,104 @@ export type Database = {
           },
         ]
       }
+      dem_diffs: {
+        Row: {
+          bbox_geojson: Json | null
+          campaign_id: string | null
+          cells_analyzed: number | null
+          created_at: string
+          created_by: string
+          cut_volume_m3: number | null
+          diff_max_m: number | null
+          diff_mean_m: number | null
+          diff_min_m: number | null
+          fill_volume_m3: number | null
+          id: string
+          name: string
+          net_volume_m3: number | null
+          notes: string | null
+          pixel_size_m: number | null
+          project_id: string
+          raster_after_id: string
+          raster_before_id: string
+          storage_path: string | null
+          updated_at: string
+        }
+        Insert: {
+          bbox_geojson?: Json | null
+          campaign_id?: string | null
+          cells_analyzed?: number | null
+          created_at?: string
+          created_by: string
+          cut_volume_m3?: number | null
+          diff_max_m?: number | null
+          diff_mean_m?: number | null
+          diff_min_m?: number | null
+          fill_volume_m3?: number | null
+          id?: string
+          name: string
+          net_volume_m3?: number | null
+          notes?: string | null
+          pixel_size_m?: number | null
+          project_id: string
+          raster_after_id: string
+          raster_before_id: string
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bbox_geojson?: Json | null
+          campaign_id?: string | null
+          cells_analyzed?: number | null
+          created_at?: string
+          created_by?: string
+          cut_volume_m3?: number | null
+          diff_max_m?: number | null
+          diff_mean_m?: number | null
+          diff_min_m?: number | null
+          fill_volume_m3?: number | null
+          id?: string
+          name?: string
+          net_volume_m3?: number | null
+          notes?: string | null
+          pixel_size_m?: number | null
+          project_id?: string
+          raster_after_id?: string
+          raster_before_id?: string
+          storage_path?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dem_diffs_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dem_diffs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dem_diffs_raster_after_id_fkey"
+            columns: ["raster_after_id"]
+            isOneToOne: false
+            referencedRelation: "drone_rasters"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dem_diffs_raster_before_id_fkey"
+            columns: ["raster_before_id"]
+            isOneToOne: false
+            referencedRelation: "drone_rasters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_core_logs: {
         Row: {
           ag_gpt: number | null
@@ -2280,6 +2378,94 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      stockpile_volumes: {
+        Row: {
+          area_m2: number | null
+          base_elevation_m: number | null
+          base_method: string
+          campaign_id: string | null
+          cells_analyzed: number | null
+          created_at: string
+          created_by: string
+          id: string
+          material: string | null
+          max_height_m: number | null
+          mean_height_m: number | null
+          name: string
+          notes: string | null
+          pixel_size_m: number | null
+          polygon_geojson: Json
+          project_id: string
+          raster_id: string
+          updated_at: string
+          volume_m3: number | null
+        }
+        Insert: {
+          area_m2?: number | null
+          base_elevation_m?: number | null
+          base_method?: string
+          campaign_id?: string | null
+          cells_analyzed?: number | null
+          created_at?: string
+          created_by: string
+          id?: string
+          material?: string | null
+          max_height_m?: number | null
+          mean_height_m?: number | null
+          name: string
+          notes?: string | null
+          pixel_size_m?: number | null
+          polygon_geojson: Json
+          project_id: string
+          raster_id: string
+          updated_at?: string
+          volume_m3?: number | null
+        }
+        Update: {
+          area_m2?: number | null
+          base_elevation_m?: number | null
+          base_method?: string
+          campaign_id?: string | null
+          cells_analyzed?: number | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          material?: string | null
+          max_height_m?: number | null
+          mean_height_m?: number | null
+          name?: string
+          notes?: string | null
+          pixel_size_m?: number | null
+          polygon_geojson?: Json
+          project_id?: string
+          raster_id?: string
+          updated_at?: string
+          volume_m3?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stockpile_volumes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stockpile_volumes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "stockpile_volumes_raster_id_fkey"
+            columns: ["raster_id"]
+            isOneToOne: false
+            referencedRelation: "drone_rasters"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

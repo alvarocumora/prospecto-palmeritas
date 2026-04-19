@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plane, Image as ImageIcon, Trash2, Upload, Plus, FileImage } from "lucide-react";
+import { Plane, Image as ImageIcon, Trash2, Upload, Plus, FileImage, GitCompareArrows, Boxes } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -13,6 +13,10 @@ import {
 } from "@/hooks/useDroneFlights";
 import { parseGeoFile } from "@/lib/geo/parseKml";
 import { RasterUploader } from "@/components/drones/RasterUploader";
+import { useDroneAnalysis, deleteDemDiff, deleteStockpile } from "@/hooks/useDroneAnalysis";
+import { DemDiffDialog } from "@/components/drones/DemDiffDialog";
+import { StockpileDialog } from "@/components/drones/StockpileDialog";
+import { DiffTable, StockpileTable } from "@/components/drones/AnalysisTables";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drones")({
   head: () => ({
@@ -31,10 +35,13 @@ function DronesPage() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { flights, rasters, loading, refresh } = useDroneFlights(active?.id ?? null);
-  const [tab, setTab] = useState<"flights" | "rasters">("flights");
+  const { diffs, stockpiles, loading: loadingAnalysis, refresh: refreshAnalysis } = useDroneAnalysis(active?.id ?? null);
+  const [tab, setTab] = useState<"flights" | "rasters" | "diffs" | "stockpiles">("flights");
   const [showFlight, setShowFlight] = useState(false);
   const [showRaster, setShowRaster] = useState(false);
   const [showUploader, setShowUploader] = useState(false);
+  const [showDiff, setShowDiff] = useState(false);
+  const [showStockpile, setShowStockpile] = useState(false);
 
   if (!active) {
     return <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto activo.</div>;
@@ -52,6 +59,16 @@ function DronesPage() {
     const { error } = await deleteRaster(id);
     if (error) toast.error(error.message);
     else { toast.success("Raster eliminado"); refresh(); }
+  };
+  const onDeleteDiff = async (id: string, name: string) => {
+    if (!confirm(`¿Eliminar análisis "${name}"?`)) return;
+    const { error } = await deleteDemDiff(id);
+    if (error) toast.error(error.message); else { toast.success("Eliminado"); refreshAnalysis(); }
+  };
+  const onDeleteStockpile = async (id: string, name: string) => {
+    if (!confirm(`¿Eliminar stockpile "${name}"?`)) return;
+    const { error } = await deleteStockpile(id);
+    if (error) toast.error(error.message); else { toast.success("Eliminado"); refreshAnalysis(); }
   };
 
   return (
@@ -71,35 +88,56 @@ function DronesPage() {
               <FileImage className="w-3.5 h-3.5" /> Subir GeoTIFF
             </button>
           )}
-          <button
-            onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
-          >
-            <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster (URL)"}
-          </button>
+          {(tab === "flights" || tab === "rasters") && (
+            <button
+              onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
+            >
+              <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster (URL)"}
+            </button>
+          )}
+          {tab === "diffs" && (
+            <button onClick={() => setShowDiff(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light">
+              <GitCompareArrows className="w-3.5 h-3.5" /> Comparar DSM
+            </button>
+          )}
+          {tab === "stockpiles" && (
+            <button onClick={() => setShowStockpile(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light">
+              <Boxes className="w-3.5 h-3.5" /> Calcular volumen
+            </button>
+          )}
         </div>
       </header>
 
-      <div className="flex gap-1 border-b border-border">
-        {(["flights", "rasters"] as const).map((t) => (
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
+        {(["flights", "rasters", "diffs", "stockpiles"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-3 py-2 text-xs font-mono border-b-2 transition-colors ${
+            className={`px-3 py-2 text-xs font-mono border-b-2 transition-colors whitespace-nowrap ${
               tab === t ? "border-gold text-gold" : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t === "flights" ? `Vuelos (${flights.length})` : `Rasters (${rasters.length})`}
+            {t === "flights" ? `Vuelos (${flights.length})`
+              : t === "rasters" ? `Rasters (${rasters.length})`
+              : t === "diffs" ? `Cut/Fill (${diffs.length})`
+              : `Stockpiles (${stockpiles.length})`}
           </button>
         ))}
       </div>
 
-      {loading ? (
+      {(loading || loadingAnalysis) ? (
         <div className="text-sm font-mono text-muted-foreground p-6 text-center">Cargando…</div>
       ) : tab === "flights" ? (
         <FlightsTable flights={flights} onDelete={onDeleteFlight} />
-      ) : (
+      ) : tab === "rasters" ? (
         <RastersTable rasters={rasters} onDelete={onDeleteRaster} />
+      ) : tab === "diffs" ? (
+        <DiffTable diffs={diffs} rasters={rasters} onDelete={onDeleteDiff} />
+      ) : (
+        <StockpileTable stockpiles={stockpiles} rasters={rasters} onDelete={onDeleteStockpile} />
       )}
 
       {showFlight && (
@@ -126,6 +164,20 @@ function DronesPage() {
           flights={flights}
           onClose={() => setShowUploader(false)}
           onSaved={() => { setShowUploader(false); refresh(); }}
+        />
+      )}
+      {showDiff && (
+        <DemDiffDialog
+          projectId={active.id} userId={user.id} rasters={rasters}
+          onClose={() => setShowDiff(false)}
+          onSaved={() => { setShowDiff(false); refreshAnalysis(); }}
+        />
+      )}
+      {showStockpile && (
+        <StockpileDialog
+          projectId={active.id} userId={user.id} rasters={rasters}
+          onClose={() => setShowStockpile(false)}
+          onSaved={() => { setShowStockpile(false); refreshAnalysis(); }}
         />
       )}
     </div>
