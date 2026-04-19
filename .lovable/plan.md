@@ -1,79 +1,101 @@
 
-El usuario reporta dos cosas:
-1. **Login no funciona** — pero los logs muestran que SÍ se autentica (`alvaro.cumora@gmail.com` entra, perfil carga, llega a `/dashboard/catastro`). El problema real es: **0 proyectos** → la app queda en estado "Sin proyectos" sin guiarlo a crear uno. Además hay error de hidratación SSR del spinner de loading.
-2. Pide **estructura de perfiles + módulos visibles por rol** y un **plan disruptivo** para la plataforma.
+Implementar Fase 2 + Fase 3 simultáneamente. Esto es ambicioso — voy a entregar una base funcional de cada pieza, no todo pulido. Aviso de antemano: serán ~15-20 archivos nuevos.
 
-## Diagnóstico del "login roto"
+## FASE 2 — Estructura ampliada de perfiles y equipos
 
-- Network: `signInWithPassword` ✓, `/profiles` ✓, `/projects` devuelve `[]` ✓.
-- El usuario YA está autenticado pero no tiene proyectos, así que nunca ve contenido real.
-- Hidratación SSR rompe porque `useAuth` arranca con `loading=true` en server pero el cliente hidrata diferente — el spinner full-screen en `_authenticated.tsx` es el culpable.
-- Sidebar/nav muestra TODOS los módulos sin importar rol → confunde.
+### 2.1 Perfiles ricos (DB migration)
+Añadir a `profiles`:
+- `specialty` (text) — exploración / geotécnico / geofísico / catastro / otro
+- `certifications` (text[]) — QP NI 43-101, JORC, etc.
+- `phone` (text)
+- `language` (text, default 'es')
+- `country` (text)
 
-## Plan disruptivo (3 fases)
+### 2.2 Invitaciones por email (nueva tabla + edge function)
+- Tabla `project_invitations` (project_id, email, role, token, status, invited_by, expires_at).
+- RLS: owners/admins crean e ven invitaciones de su proyecto; cualquiera con el token puede leer la suya.
+- Edge function `send-project-invitation` que inserta + envía email vía Lovable Emails (auth scaffold ya posible más tarde — por ahora email opcional, foco en el link).
+- Página `/invitations/$token` para aceptar — inserta en `project_members` con el rol indicado.
 
-### FASE 1 — Fix inmediato de UX (esta entrega)
+### 2.3 Auditoría
+- Tabla `audit_log` (id, project_id, user_id, action, entity_type, entity_id, payload jsonb, created_at).
+- Trigger genérico `log_changes()` aplicado a tablas clave (drill_holes, drill_core_logs, sampling_results, mining_concessions).
+- RLS: solo miembros del proyecto leen su audit_log.
 
-**A. Onboarding obligatorio post-login**
-Si el usuario tiene 0 proyectos, redirigir automáticamente desde `/dashboard/*` → `/dashboard/projects` con un wizard de bienvenida (3 pasos: nombre proyecto, commodity, ubicación en mapa). Nada de pantallas vacías.
+### 2.4 UI
+- Página `/dashboard/team` (owners/admins): listado de miembros, cambiar roles, invitar, ver invitaciones pendientes.
+- Página `/dashboard/profile`: editar perfil completo.
+- Página `/dashboard/audit` (owners/admins): timeline de cambios del proyecto activo.
 
-**B. Arreglar hidratación SSR**
-- En `_authenticated.tsx`: usar `<Suspense>` o renderizar `null` durante `loading` en SSR para evitar mismatch.
-- En `useAuth`: inicializar `loading=false` en server, mantener `true` solo en cliente hasta resolver `getSession()`.
+## FASE 3 — Disrupción de plataforma
 
-**C. Sistema de roles visible por módulo**
-Ya existe `project_role` enum (`owner | admin | geologist | viewer`) y función `has_project_role`. Falta:
-- Crear hook `useProjectRole()` que devuelve el rol del usuario en el proyecto activo.
-- Componente `<RoleGate roles={[...]}>` para envolver navegación y acciones.
-- Filtrar el sidebar y bottom-nav según rol:
+### 3.1 Dashboard ejecutivo cross-proyecto
+Reemplazar `_authenticated.dashboard.index.tsx` con KPIs agregados:
+- Total m perforados (suma `actual_depth` de drill_holes)
+- Au promedio ponderado (de drill_core_logs y sampling_results)
+- Intercepts del mes (usando `computeIntercepts` por hole)
+- CapEx geofísico (suma `cost_usd` de geophysics_surveys)
+- Cards por proyecto con mini-spark de actividad
 
-```text
-                 owner  admin  geologist  viewer
-Resumen            ✓      ✓       ✓         ✓
-Catastro           ✓      ✓       ✓         ✓ (read)
-Geofísica          ✓      ✓       ✓         ✓ (read)
-Sondajes           ✓      ✓       ✓         ✓ (read)
-Muestreo           ✓      ✓       ✓         ✓ (read)
-Palmeras (AI)      ✓      ✓       ✓         —
-Proyectos/Equipo   ✓      ✓       —         —
-Ajustes/Billing    ✓      —       —         —
-```
+### 3.2 Asistente IA geológico
+- Edge function `geo-assistant` usando Lovable AI Gateway (`google/gemini-2.5-pro`).
+- Recibe `project_id` + `messages[]`. Construye system prompt inyectando contexto del proyecto: nº holes, m perforados, surveys activos, top intercepts, concesiones.
+- Stream de respuesta SSE.
+- Componente flotante `<GeoAssistant />` (botón redondo abajo-derecha) con drawer de chat, disponible en todas las páginas del dashboard.
 
-- Badges visuales del rol al lado del nombre del proyecto.
-- Botones de crear/editar/borrar ocultos o deshabilitados con tooltip "Requiere rol X" para `viewer`.
+### 3.3 Modo offline-first ampliado
+- Extender `useOfflineQueue` con namespaces (`drilling`, `sampling`, `geophysics`).
+- Hook `useOfflineMutation(table, mode)` que: si online → supabase directo; si offline → cola IndexedDB + flush al reconectar.
+- Indicador de estado online/offline + cola pendiente en topbar.
 
-**D. Empty states accionables**
-Cada módulo (Catastro, Geofísica, Sondajes, Muestreo) cuando esté vacío muestra un CTA grande: "Importar CSV", "Dibujar primer polígono", "Crear primer sondaje" — no más pantallas en blanco.
+### 3.4 Marketplace de capas (skeleton)
+- Tabla `shared_layers` (name, description, geometry_geojson, owner_id, is_public, tags[], thumbnail_url, downloads_count).
+- Página `/dashboard/marketplace`: grilla de capas públicas + "instalar en mi proyecto" (copia geometry como geological_feature).
+- Por ahora sin uploads — solo seed con 3 ejemplos (geología regional Chile, hidrografía, fallas regionales).
 
-### FASE 2 — Estructura de perfiles ampliada (siguientes iteraciones, NO en esta entrega)
+### 3.5 Time machine
+- Vista que lee `audit_log` y permite "viajar" a una fecha: filtra entidades creadas/modificadas antes de esa fecha.
+- Implementación mínima: slider de fecha en `/dashboard/audit` que recompone snapshot.
 
-- **Perfiles ricos**: especialidad (geólogo de exploración / geotécnico / geofísico / catastro), certificaciones (QP NI 43-101), foto, organización, teléfono, idioma.
-- **Tipos de cuenta**: Solo / Equipo / Empresa con límites distintos.
-- **Invitaciones por email** con link mágico, asignación de rol al aceptar.
-- **Auditoría** (quién cambió qué, cuándo) — tabla `audit_log`.
+### 3.6 Reportes one-click
+- Botón "Generar NI 43-101" en dashboard de proyecto — ya existe `export-ni43101-pdf.ts`.
+- Añadir "Pitch Investor" (1 página, hero + KPIs + mapa + ask) y "Technical Brief" (5 páginas).
 
-### FASE 3 — Disrupción de plataforma (visión, NO en esta entrega)
+## Fixes adicionales
+- **Hidratación SSR rota**: el `OnboardingWizard` se monta en SSR con `<div className="min-h-screen...">` pero debería ir dentro de `<Suspense>`. Envolver el branch del wizard en `typeof window` check o usar `useEffect` para mostrar.
 
-- **Dashboard ejecutivo** con KPIs cross-proyecto (m perforados, leyes promedio, intercepts del mes, CapEx geofísico).
-- **Asistente IA geológico** (Lovable AI + Gemini Pro) con contexto del proyecto: "¿dónde perforar siguiente?", auto-redacción de NI 43-101.
-- **Modo offline-first robusto** para campo (ya hay `useOfflineQueue`, expandirlo a sondajes y muestreo).
-- **Marketplace de capas** (geología regional, satelital, alteración hiperespectral) compartibles entre proyectos.
-- **Time machine** del proyecto: ver el estado del catastro/sondajes en cualquier fecha pasada.
-- **Reportes one-click**: NI 43-101, JORC, technical brief, inversor pitch — todo desde los datos del proyecto.
+## Archivos
 
-## Esta entrega (Fase 1) — Archivos a editar
+### DB (1 migration)
+- Migration: añadir columnas a `profiles`, crear `project_invitations`, `audit_log`, `shared_layers`, trigger genérico audit, seed de shared_layers.
 
-- **edit** `src/hooks/useAuth.tsx`: `loading` inicial `false` en SSR, evitar mismatch.
-- **edit** `src/routes/_authenticated.tsx`:
-  - reemplazar spinner full-screen por `null` durante `loading` (evita hidratación)
-  - en `beforeLoad` o efecto: si `projects.length === 0` y ruta ≠ `/dashboard/projects`, redirigir
-  - filtrar `NavItem` y `MobileBottomNav` por rol del proyecto activo
-  - mostrar badge de rol junto al proyecto activo
-- **new** `src/hooks/useProjectRole.ts`: devuelve rol del usuario en `active.id`.
-- **new** `src/components/RoleGate.tsx`: wrapper `{children}` que oculta/disable según rol.
-- **new** `src/components/OnboardingWizard.tsx`: 3 pasos para crear primer proyecto (nombre, commodity, lat/lng), inserta en `projects` (el trigger ya añade al usuario como `owner`).
-- **edit** `src/routes/_authenticated.dashboard.projects.tsx`: si no hay proyectos, mostrar `<OnboardingWizard />` en vez de lista vacía.
-- **edit** `src/routes/_authenticated.dashboard.index.tsx`: empty states accionables con links directos a importar/crear.
-- **edit** módulos (Catastro, Geofísica, Sondajes, Muestreo): mostrar empty states con CTAs cuando no hay datos.
+### Edge functions (2)
+- `supabase/functions/send-project-invitation/index.ts`
+- `supabase/functions/geo-assistant/index.ts`
 
-Sin cambios en DB — el esquema de roles ya existe y funciona.
+### Hooks (4)
+- `src/hooks/useTeam.ts` — miembros + invitaciones
+- `src/hooks/useAuditLog.ts`
+- `src/hooks/useExecutiveKpis.ts`
+- `src/hooks/useOfflineMutation.ts` (extiende useOfflineQueue)
+
+### Componentes (4)
+- `src/components/GeoAssistant.tsx` — drawer flotante
+- `src/components/team/InviteMemberDialog.tsx`
+- `src/components/team/MembersTable.tsx`
+- `src/components/OnlineStatusBadge.tsx`
+
+### Rutas (5 nuevas + 2 editadas)
+- `src/routes/_authenticated.dashboard.team.tsx`
+- `src/routes/_authenticated.dashboard.profile.tsx`
+- `src/routes/_authenticated.dashboard.audit.tsx`
+- `src/routes/_authenticated.dashboard.marketplace.tsx`
+- `src/routes/invitations.$token.tsx`
+- editar `src/routes/_authenticated.dashboard.index.tsx` → dashboard ejecutivo
+- editar `src/routes/_authenticated.tsx` → añadir GeoAssistant + OnlineStatusBadge + nuevas entradas nav (Equipo, Perfil, Auditoría, Marketplace) gateadas por rol
+- editar `src/hooks/useProjectRole.ts` → añadir módulos nuevos al MODULE_ROLES
+
+### Fix hidratación
+- editar `src/routes/_authenticated.tsx` → wrapper del onboarding con guard `mounted`
+
+Confirmo: empiezo migración primero (no en paralelo con código), luego todo el resto.
