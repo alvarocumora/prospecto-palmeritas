@@ -36,17 +36,23 @@ export function useExecutiveKpis() {
       const ids = (memberships ?? []).map((m) => m.project_id);
       if (ids.length === 0) {
         if (!cancelled) {
-          setKpis({ totalProjects: 0, totalHoles: 0, totalMetersDrilled: 0, totalSamples: 0, auWeightedAvg: null, totalGeophysicsCapex: 0, monthInterceptCount: 0 });
+          setKpis({
+            totalProjects: 0, totalHoles: 0, totalMetersDrilled: 0, totalSamples: 0,
+            auWeightedAvg: null, totalGeophysicsCapex: 0, monthInterceptCount: 0,
+            pendingReview: 0, approvedRecords: 0, draftRecords: 0,
+            qaqcFailRate: null, qaqcTotal: 0,
+          });
           setLoading(false);
         }
         return;
       }
 
-      const [holes, samples, surveys, coreLogs] = await Promise.all([
+      const [holes, samples, surveys, coreLogs, qaqc] = await Promise.all([
         supabase.from("drill_holes").select("id,actual_depth").in("project_id", ids),
-        supabase.from("sampling_results").select("au_gpt").in("project_id", ids),
+        supabase.from("sampling_results").select("au_gpt,record_status").in("project_id", ids),
         supabase.from("geophysics_surveys").select("cost_usd").in("project_id", ids),
-        supabase.from("drill_core_logs").select("au_gpt,depth_from,depth_to,created_at").in("project_id", ids),
+        supabase.from("drill_core_logs").select("au_gpt,depth_from,depth_to,created_at,record_status").in("project_id", ids),
+        supabase.from("qaqc_results").select("status").in("project_id", ids),
       ]);
 
       const totalMetersDrilled = (holes.data ?? []).reduce((s, h: any) => s + (Number(h.actual_depth) || 0), 0);
@@ -60,6 +66,19 @@ export function useExecutiveKpis() {
         return au >= 0.5 && new Date(c.created_at).getTime() >= monthAgo;
       }).length;
 
+      // Workflow counts (logs + samples)
+      const allRecs = [...(coreLogs.data ?? []), ...(samples.data ?? [])] as Array<{ record_status?: string }>;
+      const pendingReview = allRecs.filter((r) => r.record_status === "review").length;
+      const approvedRecords = allRecs.filter((r) => r.record_status === "approved").length;
+      const draftRecords = allRecs.filter((r) => r.record_status === "draft").length;
+
+      // QA/QC
+      const qaRows = (qaqc.data ?? []) as Array<{ status: string }>;
+      const qaqcTotal = qaRows.length;
+      const qaqcFailRate = qaqcTotal > 0
+        ? (qaRows.filter((r) => r.status === "fail").length / qaqcTotal) * 100
+        : null;
+
       if (!cancelled) {
         setKpis({
           totalProjects: ids.length,
@@ -69,6 +88,8 @@ export function useExecutiveKpis() {
           auWeightedAvg,
           totalGeophysicsCapex,
           monthInterceptCount,
+          pendingReview, approvedRecords, draftRecords,
+          qaqcFailRate, qaqcTotal,
         });
         setLoading(false);
       }
