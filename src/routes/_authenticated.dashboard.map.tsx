@@ -21,6 +21,7 @@ import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivi
 import { useDroneFlights } from "@/hooks/useDroneFlights";
 import { RasterControlPanel, type RasterSettings } from "@/components/drones/RasterControlPanel";
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
+import { RasterSwipePanel } from "@/components/drones/RasterSwipePanel";
 import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
 import { MapCommandPalette } from "@/components/map/MapCommandPalette";
@@ -278,6 +279,7 @@ function OperationalMap() {
               active={timeActive}
               onToggle={setTimeActive}
             />
+            <RasterSwipePanel rasters={rasters} mapInst={mapInst} />
             <CollapsibleAuLegend />
           </>
         )}
