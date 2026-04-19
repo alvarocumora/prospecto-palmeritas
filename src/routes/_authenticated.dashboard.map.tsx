@@ -41,6 +41,16 @@ function OperationalMap() {
   const [inspected, setInspected] = useState<InspectedFeature | null>(null);
   const [mapInst, setMapInst] = useState<{ map: LeafletMap; L: LeafletNS } | null>(null);
   const [snapshotting, setSnapshotting] = useState(false);
+  const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
+  const [, setProspRun] = useState<ProspectivityRun | null>(null);
+
+  // Render prospectivity cells as a Leaflet layer that auto-updates
+  useEffect(() => {
+    if (!mapInst) return;
+    const layer = buildProspectivityLayer(mapInst.L, prospCells);
+    layer.addTo(mapInst.map);
+    return () => { layer.remove(); };
+  }, [mapInst, prospCells]);
 
   const campaignName = useMemo(
     () => (campaignId ? campaigns.find((c) => c.id === campaignId)?.name ?? null : null),
