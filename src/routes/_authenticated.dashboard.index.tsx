@@ -5,6 +5,7 @@ import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
 import {
   Plus, Activity, Drill, TestTube2, Map as MapIcon, ArrowRight,
   Ruler, Coins, TrendingUp, FlaskConical, Layers as LayersIcon, FolderKanban,
+  ClipboardCheck, ShieldCheck, AlertTriangle, CheckCircle2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
