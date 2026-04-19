@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { Map as LeafletMap, Polyline, Marker, LayerGroup } from "leaflet";
+import type { Map as LeafletMap, Polyline, CircleMarker, LayerGroup } from "leaflet";
 import type { LeafletNS } from "./types";
 import { Scissors, X } from "lucide-react";
 import { buildSectionLine, projectHolesToSection, type SectionLine, type ProjectedHole } from "@/lib/section/projection";
@@ -21,7 +21,7 @@ export function SectionBuilderTool({ map, L, holes, logsByHole }: Props) {
   const [showView, setShowView] = useState(false);
   const startRef = useRef<[number, number] | null>(null);
   const previewRef = useRef<Polyline | null>(null);
-  const startMarkerRef = useRef<Marker | null>(null);
+  const startMarkerRef = useRef<CircleMarker | null>(null);
   const lineGroupRef = useRef<LayerGroup | null>(null);
 
   const cleanup = () => {
