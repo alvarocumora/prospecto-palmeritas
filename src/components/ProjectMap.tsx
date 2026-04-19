@@ -373,6 +373,33 @@ export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps =
       ];
     });
   }, [drillHoles, scoresByHole, active?.id]);
+  // Build samples layer for the active project
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !samples) return;
+    if (samplesLayerRef.current) {
+      map.removeLayer(samplesLayerRef.current);
+      samplesLayerRef.current = null;
+    }
+    const layer = buildSamplesLayer(L, samples, {
+      onClick: (s) => onInspect?.({ kind: "sample", data: s }),
+    });
+    samplesLayerRef.current = layer;
+    if (samples.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "samples:project");
+      return [
+        ...without,
+        {
+          id: "samples:project",
+          label: `Muestras (${samples.length})`,
+          group: "Proyecto",
+          layer,
+        },
+      ];
+    });
+  }, [samples, onInspect]);
 
 
   // Fullscreen toggle
