@@ -24,6 +24,8 @@ import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/raster
 import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
 import { MapCommandPalette } from "@/components/map/MapCommandPalette";
+import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
+import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { toast } from "sonner";
 
@@ -222,6 +224,22 @@ function OperationalMap() {
               settings={rasterSettings}
               onChange={updateRasterSetting}
               onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
+            />
+            <SavedViewsPanel
+              projectId={active?.id ?? null}
+              map={mapInst?.map ?? null}
+              layerState={{ campaignId, highGradeOnly, rasterSettings, viewMode }}
+              onRestore={(v: MapView) => {
+                if (mapInst && v.center_lat != null && v.center_lng != null && v.zoom != null) {
+                  mapInst.map.setView([v.center_lat, v.center_lng], v.zoom);
+                }
+                const ls = v.layer_state ?? {};
+                if (typeof ls.campaignId !== "undefined") setCampaignId(ls.campaignId ?? null);
+                if (typeof ls.highGradeOnly === "boolean") setHighGradeOnly(ls.highGradeOnly);
+                if (ls.rasterSettings) setRasterSettings(ls.rasterSettings as RasterSettings);
+                if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
+                toast.success(`Vista «${v.name}» restaurada`);
+              }}
             />
             <CollapsibleAuLegend />
           </>
