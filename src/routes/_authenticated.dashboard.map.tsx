@@ -60,7 +60,7 @@ function OperationalMap() {
   const [timeActive, setTimeActive] = useState(false);
   const [timeCursor, setTimeCursor] = useState<number | null>(null);
 
-  // Sprint 6.4 — Time-filtered raster visibility (computed early so effects below can depend on it)
+  // Sprint 6.4 — time-filtered raster visibility
   const visibleRasterSettings = useMemo(() => {
     if (!timeActive || timeCursor == null) return rasterSettings;
     const next: RasterSettings = { ...rasterSettings };
