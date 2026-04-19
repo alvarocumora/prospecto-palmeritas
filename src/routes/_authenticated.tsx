@@ -1,9 +1,11 @@
 import { createFileRoute, Outlet, redirect, Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
+import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectRole";
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
-  TestTube2, FolderKanban, LogOut, ChevronDown, Plus, Loader2,
+  TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { useState } from "react";
@@ -19,21 +21,39 @@ export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
 
+const ROLE_LABELS: Record<ProjectRole, string> = {
+  owner: "Propietario",
+  admin: "Admin",
+  geologist: "Geólogo",
+  viewer: "Lector",
+};
+const ROLE_COLORS: Record<ProjectRole, string> = {
+  owner: "bg-gold/15 text-gold border-gold/30",
+  admin: "bg-info/15 text-info border-info/30",
+  geologist: "bg-teal/15 text-teal border-teal/30",
+  viewer: "bg-muted text-muted-foreground border-border",
+};
+
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
+  const role = useProjectRole();
   const navigate = useNavigate();
+  const location = useLocation();
   const [switcherOpen, setSwitcherOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-6 h-6 animate-spin text-gold" />
-      </div>
-    );
-  }
+  // Onboarding redirect: if logged-in but no projects, force them to /dashboard/projects
+  useEffect(() => {
+    if (loading || projectsLoading) return;
+    if (!user) return;
+    if (projects.length === 0 && location.pathname !== "/dashboard/projects") {
+      navigate({ to: "/dashboard/projects" });
+    }
+  }, [loading, projectsLoading, user, projects.length, location.pathname, navigate]);
 
-  if (!user) return null; // beforeLoad will redirect
+  // During SSR / initial loading, render nothing to avoid hydration mismatch
+  if (loading) return null;
+  if (!user) return null;
 
   return (
     <div className="min-h-screen flex bg-background text-foreground">
@@ -56,6 +76,11 @@ function AuthenticatedLayout() {
             </span>
             <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
           </button>
+          {role && (
+            <div className={`mt-1.5 inline-flex items-center text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded border ${ROLE_COLORS[role]}`}>
+              {ROLE_LABELS[role]}
+            </div>
+          )}
           {switcherOpen && (
             <div className="absolute left-3 right-3 top-full mt-1 z-50 rounded border border-border bg-background shadow-lg max-h-72 overflow-y-auto">
               {projects.length === 0 && (
@@ -88,20 +113,24 @@ function AuthenticatedLayout() {
         </div>
 
         <nav className="flex-1 p-2 space-y-0.5">
-          <NavItem to="/dashboard" icon={<LayoutDashboard className="w-3.5 h-3.5" />} label="Resumen" exact />
-          <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" />
-          <NavItem to="/dashboard/catastro" icon={<MapIcon className="w-3.5 h-3.5" />} label="Catastro" />
-          <NavItem to="/dashboard/geophysics" icon={<Activity className="w-3.5 h-3.5" />} label="Geofísica" />
-          <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" />
-          <NavItem to="/dashboard/sampling" icon={<TestTube2 className="w-3.5 h-3.5" />} label="Muestreo" />
-          <div className="pt-4 mt-4 border-t border-border">
-            <Link
-              to="/dashboard/palmeras"
-              className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-mono text-muted-foreground hover:text-gold hover:bg-accent transition-colors"
-            >
-              <Mountain className="w-3.5 h-3.5" /> Demo · Palmeras
-            </Link>
-          </div>
+          <NavItem to="/dashboard" icon={<LayoutDashboard className="w-3.5 h-3.5" />} label="Resumen" exact module="overview" role={role} />
+          {canAccess(role, "projects") && (
+            <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" module="projects" role={role} />
+          )}
+          <NavItem to="/dashboard/catastro" icon={<MapIcon className="w-3.5 h-3.5" />} label="Catastro" module="catastro" role={role} />
+          <NavItem to="/dashboard/geophysics" icon={<Activity className="w-3.5 h-3.5" />} label="Geofísica" module="geophysics" role={role} />
+          <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" module="drilling" role={role} />
+          <NavItem to="/dashboard/sampling" icon={<TestTube2 className="w-3.5 h-3.5" />} label="Muestreo" module="sampling" role={role} />
+          {canAccess(role, "palmeras") && (
+            <div className="pt-4 mt-4 border-t border-border">
+              <Link
+                to="/dashboard/palmeras"
+                className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-mono text-muted-foreground hover:text-gold hover:bg-accent transition-colors"
+              >
+                <Mountain className="w-3.5 h-3.5" /> Demo · Palmeras
+              </Link>
+            </div>
+          )}
         </nav>
 
         {/* User */}
@@ -141,15 +170,22 @@ function AuthenticatedLayout() {
       {/* Main content */}
       <main className="flex-1 min-w-0 md:ml-0 mt-12 md:mt-0">
         <Outlet />
-        <MobileBottomNav />
+        <MobileBottomNav role={role} />
       </main>
     </div>
   );
 }
 
-function NavItem({ to, icon, label, exact }: { to: string; icon: React.ReactNode; label: string; exact?: boolean }) {
+function NavItem({
+  to, icon, label, exact, module, role,
+}: {
+  to: string; icon: React.ReactNode; label: string; exact?: boolean;
+  module: string; role: ProjectRole | null;
+}) {
   const location = useLocation();
   const active = exact ? location.pathname === to : location.pathname.startsWith(to);
+  const allowed = canAccess(role, module);
+  if (!allowed) return null;
   return (
     <Link
       to={to}
@@ -163,14 +199,14 @@ function NavItem({ to, icon, label, exact }: { to: string; icon: React.ReactNode
   );
 }
 
-function MobileBottomNav() {
+function MobileBottomNav({ role }: { role: ProjectRole | null }) {
   const items = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Inicio" },
-    { to: "/dashboard/projects", icon: FolderKanban, label: "Proyectos" },
-    { to: "/dashboard/geophysics", icon: Activity, label: "Geofísica" },
-    { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro" },
-    { to: "/dashboard/drilling", icon: Drill, label: "Sondajes" },
-  ];
+    { to: "/dashboard", icon: LayoutDashboard, label: "Inicio", module: "overview" },
+    { to: "/dashboard/projects", icon: FolderKanban, label: "Proyectos", module: "projects" },
+    { to: "/dashboard/geophysics", icon: Activity, label: "Geofísica", module: "geophysics" },
+    { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro", module: "catastro" },
+    { to: "/dashboard/drilling", icon: Drill, label: "Sondajes", module: "drilling" },
+  ].filter((it) => canAccess(role, it.module));
   const location = useLocation();
   return (
     <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-14 border-t border-border bg-background/95 backdrop-blur flex items-stretch">
