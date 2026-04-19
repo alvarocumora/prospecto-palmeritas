@@ -232,11 +232,16 @@ export function StripLog({
           {sorted.map((l) => {
             const top = scale(l.depth_from);
             const h = Math.max(scale(l.depth_to) - scale(l.depth_from), 1);
+            const isHover = hoveredId === l.id;
             return (
               <div
                 key={l.id}
                 title={`${l.depth_from}–${l.depth_to} m · Au ${l.au_gpt ?? "—"} g/t`}
-                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help"
+                onMouseEnter={() => onHover?.(l.id)}
+                onMouseLeave={() => onHover?.(null)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-help transition-all ${
+                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                }`}
                 style={{ top, height: h, background: auColor(l.au_gpt) }}
               />
             );
