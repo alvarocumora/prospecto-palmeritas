@@ -241,10 +241,16 @@ export function CoreLogPanel({
                       return (
                         <tr
                           key={l.id}
+                          ref={(el) => {
+                            rowRefs.current[l.id] = el;
+                          }}
+                          data-row-id={l.id}
                           onMouseEnter={() => setHoveredId(l.id)}
                           onMouseLeave={() => setHoveredId(null)}
                           className={`border-b border-border last:border-0 transition-colors ${
-                            hoveredId === l.id
+                            flashId === l.id
+                              ? "bg-primary/20 outline outline-2 outline-primary"
+                              : hoveredId === l.id
                               ? "bg-primary/10 outline outline-1 outline-primary"
                               : isOverlap
                               ? "bg-amber-500/5 hover:bg-accent/30"
