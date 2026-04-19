@@ -42,6 +42,15 @@ import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
 import { DrawingTools } from "./map/DrawingTools";
+import { buildSamplesLayer } from "./map/sampleLayer";
+import type { SamplingResult } from "@/hooks/useSamplingResults";
+import type { InspectedFeature } from "./map/FeatureInspectorPanel";
+
+interface ProjectMapProps {
+  samples?: SamplingResult[];
+  onInspect?: (f: InspectedFeature) => void;
+  fillHeight?: boolean;
+}
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
 
@@ -74,9 +83,11 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "catastro:ESTACAMENTO": { visible: false, opacity: 1 },
   "concessions:project": { visible: true, opacity: 1 },
   "drills:project": { visible: true, opacity: 1 },
+  "samples:project": { visible: true, opacity: 1 },
 };
 
-export function ProjectMap() {
+export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps = {}) {
+  const samplesLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
