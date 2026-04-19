@@ -3,7 +3,7 @@
 // Usa la lib `geotiff` desde esm.sh. NO descarga el archivo completo si supera 30 MB:
 // usa un Range request para leer solo los primeros bytes (la cabecera GeoTIFF cabe en <1 MB típicamente).
 
-import { fromArrayBuffer } from "https://esm.sh/geotiff@2.1.3";
+import { fromArrayBuffer } from "https://esm.sh/geotiff@2.1.3?target=deno&bundle";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 const corsHeaders = {
