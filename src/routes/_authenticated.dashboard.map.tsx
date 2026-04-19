@@ -27,6 +27,7 @@ import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
 import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
+import { TimeSlider } from "@/components/map/TimeSlider";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -52,10 +53,26 @@ function OperationalMap() {
   const [snapshotting, setSnapshotting] = useState(false);
   const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
-  const { rasters } = useDroneFlights(active?.id ?? null);
+  const { rasters, flights } = useDroneFlights(active?.id ?? null);
   const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
   const [viewMode, setViewMode] = useState<ViewMode>("2d");
   const { targets } = useExplorationTargets(active?.id ?? null);
+  const [timeActive, setTimeActive] = useState(false);
+  const [timeCursor, setTimeCursor] = useState<number | null>(null);
+
+  // Sprint 6.4 — Time-filtered raster visibility (computed early so effects below can depend on it)
+  const visibleRasterSettings = useMemo(() => {
+    if (!timeActive || timeCursor == null) return rasterSettings;
+    const next: RasterSettings = { ...rasterSettings };
+    for (const r of rasters) {
+      if (!r.captured_at) continue;
+      const t = Date.parse(r.captured_at);
+      if (!isNaN(t) && t > timeCursor && next[r.id]?.visible) {
+        next[r.id] = { ...next[r.id], visible: false };
+      }
+    }
+    return next;
+  }, [rasterSettings, rasters, timeActive, timeCursor]);
 
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
@@ -65,12 +82,12 @@ function OperationalMap() {
     return () => { layer.remove(); };
   }, [mapInst, prospCells]);
 
-  // Render drone raster overlays
+  // Render drone raster overlays (uses time-filtered settings)
   useEffect(() => {
     if (!mapInst) return;
     let cancelled = false;
     let layer: L.LayerGroup | null = null;
-    buildRasterOverlayLayer(mapInst.L, rasters, rasterSettings).then((l) => {
+    buildRasterOverlayLayer(mapInst.L, rasters, visibleRasterSettings).then((l) => {
       if (cancelled) return;
       layer = l;
       l.addTo(mapInst.map);
@@ -79,7 +96,7 @@ function OperationalMap() {
       cancelled = true;
       layer?.remove();
     };
-  }, [mapInst, rasters, rasterSettings]);
+  }, [mapInst, rasters, visibleRasterSettings]);
 
   const updateRasterSetting = (id: string, patch: Partial<RasterSettings[string]>) => {
     setRasterSettings((prev) => {
@@ -131,6 +148,19 @@ function OperationalMap() {
     if (highGradeOnly) list = list.filter((s) => (s.au_gpt ?? 0) >= 1.0);
     return list;
   }, [samples, campaignId, highGradeOnly]);
+
+  // Sprint 6.4 — Time filter applied to holes & rasters
+  const filteredHoles = useMemo(() => {
+    if (!timeActive || timeCursor == null) return holes;
+    return holes.filter((h) => {
+      if (!h.started_at) return false;
+      const t = Date.parse(h.started_at);
+      return !isNaN(t) && t <= timeCursor;
+    });
+  }, [holes, timeActive, timeCursor]);
+
+  const timeItemsHoles = useMemo(() => holes.map((h) => ({ date: h.started_at })), [holes]);
+  const timeItemsFlights = useMemo(() => flights.map((f) => ({ date: f.flown_at })), [flights]);
 
   useEffect(() => {
     (window as unknown as { __selectMapFeature?: (f: InspectedFeature) => void }).__selectMapFeature = setInspected;
@@ -194,7 +224,7 @@ function OperationalMap() {
           <Map3DView
             centerLat={active?.center_lat ?? -33.898438}
             centerLng={active?.center_lng ?? -71.115471}
-            holes={holes}
+            holes={filteredHoles}
             logsByHole={logsByHole}
             targets={targets}
           />
@@ -209,7 +239,7 @@ function OperationalMap() {
             <SectionBuilderTool
               map={mapInst?.map ?? null}
               L={mapInst?.L ?? null}
-              holes={holes}
+              holes={filteredHoles}
               logsByHole={logsByHole}
               projectName={active?.name}
             />
@@ -221,7 +251,7 @@ function OperationalMap() {
             />
             <RasterControlPanel
               rasters={rasters}
-              settings={rasterSettings}
+              settings={visibleRasterSettings}
               onChange={updateRasterSetting}
               onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
             />
@@ -240,6 +270,13 @@ function OperationalMap() {
                 if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
                 toast.success(`Vista «${v.name}» restaurada`);
               }}
+            />
+            <TimeSlider
+              holes={timeItemsHoles}
+              flights={timeItemsFlights}
+              onChange={setTimeCursor}
+              active={timeActive}
+              onToggle={setTimeActive}
             />
             <CollapsibleAuLegend />
           </>
