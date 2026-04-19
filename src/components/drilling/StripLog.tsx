@@ -193,6 +193,8 @@ export function StripLog({
     return Array.from(seen.values());
   }, [sorted]);
 
+  const intercepts = useMemo(() => computeIntercepts(sorted, 0.5, 2), [sorted]);
+
   if (!sorted.length) return null;
 
   const headerH = 14;
