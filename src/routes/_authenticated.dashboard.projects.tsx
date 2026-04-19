@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
+import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 export const Route = createFileRoute("/_authenticated/dashboard/projects")({
   head: () => ({ meta: [{ title: "Proyectos — Trackmin GeoIntel" }] }),
@@ -55,9 +56,7 @@ function ProjectsPage() {
       {loading ? (
         <Loader2 className="w-5 h-5 animate-spin text-gold" />
       ) : projects.length === 0 ? (
-        <div className="rounded border border-dashed border-border p-12 text-center">
-          <p className="text-sm text-muted-foreground">Aún no tienes proyectos.</p>
-        </div>
+        <OnboardingWizard />
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
           {projects.map((p) => (
