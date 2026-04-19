@@ -269,6 +269,40 @@ export function StripLog({
         </div>
       </div>
 
+      {/* Alteration column */}
+      <div className="flex flex-col" style={{ width: altWidth }}>
+        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+          Alt
+        </div>
+        <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
+          {sorted.map((l) => {
+            const top = scale(l.depth_from);
+            const h = Math.max(scale(l.depth_to) - scale(l.depth_from), 1);
+            const bg = altColor(l.alteration);
+            const code = l.alteration?.trim() || "";
+            const label = code ? abbr(code) : "";
+            const showLabel = h >= 14 && label.length > 0;
+            return (
+              <div
+                key={l.id}
+                title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin alteración"}`}
+                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help flex items-center justify-center font-mono font-semibold"
+                style={{
+                  top,
+                  height: h,
+                  background: bg,
+                  fontSize: 9,
+                  color: textOn(bg),
+                  letterSpacing: "0.03em",
+                }}
+              >
+                {showLabel ? label : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Legends */}
       <div className="flex flex-col text-[9px] font-mono text-text-secondary gap-2 pl-1" style={{ marginTop: headerH }}>
         <div className="flex flex-col gap-0.5">
@@ -288,6 +322,18 @@ export function StripLog({
             {presentLithos.map((c) => (
               <div key={c} className="flex items-center gap-1" title={c}>
                 <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: lithoColor(c) }} />
+                <span className="truncate max-w-[70px]">{c}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {presentAlts.length > 0 && (
+          <div className="flex flex-col gap-0.5">
+            <div className="font-semibold text-foreground">Alt</div>
+            {presentAlts.map((c) => (
+              <div key={c} className="flex items-center gap-1" title={c}>
+                <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: altColor(c) }} />
                 <span className="truncate max-w-[70px]">{c}</span>
               </div>
             ))}
