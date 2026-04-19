@@ -20,6 +20,7 @@ import {
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
 import { buildSernageominLayers } from "./map/sernageominLayers";
+import { buildUsgsEarthquakesLayer, buildOverpassInfraLayer } from "./map/externalFeedLayers";
 import { buildSatelliteLayers } from "./map/satelliteLayers";
 import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
 import { MagnetometryLegend } from "./map/MagnetometryLegend";
@@ -102,6 +103,8 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "drones:flights": { visible: true, opacity: 0.9 },
   "drones:rasters": { visible: true, opacity: 0.75 },
   "targets:project": { visible: true, opacity: 1 },
+  "ext:usgs-quakes": { visible: false, opacity: 0.85 },
+  "ext:osm-infra": { visible: false, opacity: 0.9 },
 };
 
 export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
@@ -270,6 +273,9 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       const geophysicsWms = buildGeophysicsOverlays(L);
       const sernageomin = buildSernageominLayers(L);
       const satellite = buildSatelliteLayers(L);
+      const usgsLayer = await buildUsgsEarthquakesLayer(L);
+      const overpassCtl = buildOverpassInfraLayer(L);
+      overpassCtl.attach(map);
 
       const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
         [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
@@ -305,6 +311,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
         { id: "geophys:emag2", label: "Magnetometría EMAG2 (regional)", group: "Geofísica", layer: geophysicsWms["Magnetometría EMAG2 (regional)"] },
         { id: "geophys:wgm2012", label: "Gravimetría WGM2012 (regional)", group: "Geofísica", layer: geophysicsWms["Gravimetría Bouguer WGM2012 (regional)"] },
         { id: "geophys:hillshade", label: "Hillshade SRTM", group: "Geofísica", layer: geophysicsWms["Hillshade SRTM (Esri)"] },
+        { id: "ext:usgs-quakes", label: "Sismos USGS (último mes, M≥2.5)", group: "Datos externos", layer: usgsLayer },
+        { id: "ext:osm-infra", label: "OSM caminos & edificios (vista actual)", group: "Datos externos", layer: overpassCtl.group },
       ];
       setManagedLayers(initial);
       setMapReady(true);
