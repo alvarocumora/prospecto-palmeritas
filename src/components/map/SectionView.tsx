@@ -96,6 +96,14 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={interpret}
+              disabled={interpreting || holes.length === 0}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {interpreting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+              {interpreting ? "Interpretando…" : "Interpretar IA"}
+            </button>
             <button onClick={exportSvg} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-xs font-mono hover:bg-accent">
               <Download className="w-3.5 h-3.5" /> SVG
             </button>
