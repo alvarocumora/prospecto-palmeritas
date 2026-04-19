@@ -229,8 +229,14 @@ export function CoreLogPanel({
                       return (
                         <tr
                           key={l.id}
-                          className={`border-b border-border last:border-0 hover:bg-accent/30 ${
-                            isOverlap ? "bg-amber-500/5" : ""
+                          onMouseEnter={() => setHoveredId(l.id)}
+                          onMouseLeave={() => setHoveredId(null)}
+                          className={`border-b border-border last:border-0 transition-colors ${
+                            hoveredId === l.id
+                              ? "bg-primary/10 outline outline-1 outline-primary"
+                              : isOverlap
+                              ? "bg-amber-500/5 hover:bg-accent/30"
+                              : "hover:bg-accent/30"
                           }`}
                         >
                           <Td>
