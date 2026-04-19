@@ -216,9 +216,10 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
         center: CENTER,
         zoom: 16,
         scrollWheelZoom: false,
-        zoomControl: true,
+        zoomControl: false,
         attributionControl: true,
       });
+      L.control.zoom({ position: "bottomleft" }).addTo(map);
       mapRef.current = map;
       leafletRef.current = L;
 
@@ -563,8 +564,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
           style={{ zIndex: 0 }}
         />
 
-        {/* Floating control toolbar (top-left) */}
-        <div className="absolute top-2 left-2 z-[1000] flex flex-col gap-1.5">
+        {/* Unified vertical toolbar (top-right) */}
+        <div className="absolute top-3 right-3 z-[500] flex flex-col gap-1.5" data-map-toolbar>
           <button
             type="button"
             onClick={toggleFullscreen}
@@ -573,26 +574,6 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </button>
-          <button
-            type="button"
-            onClick={() => { setToolsOpen((v) => !v); setLayersOpen(false); setDrawOpen(false); }}
-            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
-            title="Herramientas de gestión"
-          >
-            <Wrench className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => { setDrawOpen((v) => !v); setToolsOpen(false); setLayersOpen(false); }}
-            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${drawOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
-            title="Dibujo (D)"
-          >
-            <Pencil className="w-4 h-4" />
-          </button>
-        </div>
-
-        {/* Layers button (top-right) */}
-        <div className="absolute top-2 right-2 z-[1001]">
           {!layersOpen && (
             <button
               type="button"
@@ -603,10 +584,34 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
               <Layers className="w-4 h-4" />
             </button>
           )}
+          <button
+            type="button"
+            onClick={() => { setDrawOpen((v) => !v); setToolsOpen(false); setLayersOpen(false); }}
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${drawOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
+            title="Dibujo (D)"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={toggleMeasure}
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border ${measuring ? "border-gold bg-gold/10 text-gold" : "border-border bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
+            title="Medir distancia (M)"
+          >
+            <Ruler className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => { setToolsOpen((v) => !v); setLayersOpen(false); setDrawOpen(false); }}
+            className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
+            title="Más herramientas"
+          >
+            <Wrench className="w-4 h-4" />
+          </button>
         </div>
 
         {toolsOpen && (
-          <div className="absolute top-2 left-14 z-[1000] w-64 rounded border border-border bg-background/95 backdrop-blur shadow-lg p-3 text-xs font-mono space-y-3">
+          <div className="absolute top-3 right-14 z-[500] w-60 rounded border border-border bg-background/95 backdrop-blur shadow-lg p-3 text-xs font-mono space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-foreground font-semibold uppercase tracking-wide">Gestión</span>
               <button type="button" onClick={() => setToolsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">✕</button>
