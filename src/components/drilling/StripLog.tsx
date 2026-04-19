@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import type { DrillCoreLog } from "@/hooks/useDrilling";
+import { computeIntercepts, formatIntercept } from "@/lib/drilling/intercepts";
 
 /** Heat color for Au g/t value (null/0 → muted). */
 function auColor(au: number | null | undefined): string {
@@ -136,12 +137,14 @@ export function StripLog({
   auWidth = 36,
   lithoWidth = 48,
   altWidth = 48,
+  intWidth = 10,
 }: {
   logs: DrillCoreLog[];
   height?: number;
   auWidth?: number;
   lithoWidth?: number;
   altWidth?: number;
+  intWidth?: number;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
@@ -189,6 +192,8 @@ export function StripLog({
     }
     return Array.from(seen.values());
   }, [sorted]);
+
+  const intercepts = useMemo(() => computeIntercepts(sorted, 0.5, 2), [sorted]);
 
   if (!sorted.length) return null;
 
@@ -298,6 +303,33 @@ export function StripLog({
               >
                 {showLabel ? label : null}
               </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Intercept marker rail */}
+      <div className="flex flex-col" style={{ width: intWidth }}>
+        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+          Int
+        </div>
+        <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
+          {intercepts.map((it, i) => {
+            const top = scale(it.from);
+            const h = Math.max(scale(it.to) - scale(it.from), 2);
+            return (
+              <div
+                key={i}
+                title={formatIntercept(it)}
+                className="absolute left-0 right-0 cursor-help"
+                style={{
+                  top,
+                  height: h,
+                  background: "#fbbf24",
+                  border: "1px solid #b45309",
+                  boxShadow: "0 0 4px rgba(251,191,36,0.6)",
+                }}
+              />
             );
           })}
         </div>
