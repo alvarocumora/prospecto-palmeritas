@@ -224,7 +224,7 @@ function OperationalMap() {
           <Map3DView
             centerLat={active?.center_lat ?? -33.898438}
             centerLng={active?.center_lng ?? -71.115471}
-            holes={holes}
+            holes={filteredHoles}
             logsByHole={logsByHole}
             targets={targets}
           />
