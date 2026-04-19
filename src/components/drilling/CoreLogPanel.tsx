@@ -203,6 +203,7 @@ export function CoreLogPanel({
                 height={Math.max(400, logs.length * 24)}
                 hoveredId={hoveredId}
                 onHover={setHoveredId}
+                onSelect={scrollToRow}
               />
             </div>
           )}
