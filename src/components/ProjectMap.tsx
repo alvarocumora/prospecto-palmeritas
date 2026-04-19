@@ -104,6 +104,17 @@ export function ProjectMap() {
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
+  const { byHole: logsByHole } = useProjectCoreLogs(active?.id ?? null);
+  const scoresByHole = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const h of drillHoles) {
+      const logs = logsByHole[h.id];
+      if (!logs?.length) continue;
+      const best = bestIntercept(computeIntercepts(logs, 0.5, 2));
+      if (best) out[h.id] = interceptScore(best);
+    }
+    return out;
+  }, [drillHoles, logsByHole]);
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
   const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
