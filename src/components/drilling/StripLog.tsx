@@ -178,6 +178,18 @@ export function StripLog({
     return Array.from(seen.values());
   }, [sorted]);
 
+  // Unique alterations present (preserve first-seen order)
+  const presentAlts = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const l of sorted) {
+      const c = (l.alteration ?? "").trim();
+      if (!c) continue;
+      const k = c.toLowerCase();
+      if (!seen.has(k)) seen.set(k, c);
+    }
+    return Array.from(seen.values());
+  }, [sorted]);
+
   if (!sorted.length) return null;
 
   const headerH = 14;
