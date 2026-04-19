@@ -503,6 +503,117 @@ export type Database = {
           },
         ]
       }
+      exploration_targets: {
+        Row: {
+          assigned_to: string | null
+          campaign_id: string | null
+          closed_at: string | null
+          closed_reason: string | null
+          code: string
+          commodity: string | null
+          confidence_pct: number | null
+          created_at: string
+          created_by: string
+          elevation_m: number | null
+          estimated_cost_usd: number | null
+          evidence: Json | null
+          geometry_geojson: Json | null
+          id: string
+          lat: number | null
+          lng: number | null
+          name: string
+          notes: string | null
+          planned_meters: number | null
+          priority: string
+          project_id: string
+          rationale: string | null
+          score: number | null
+          stage: string
+          target_type: string
+          target_zone: string | null
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          campaign_id?: string | null
+          closed_at?: string | null
+          closed_reason?: string | null
+          code: string
+          commodity?: string | null
+          confidence_pct?: number | null
+          created_at?: string
+          created_by: string
+          elevation_m?: number | null
+          estimated_cost_usd?: number | null
+          evidence?: Json | null
+          geometry_geojson?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          notes?: string | null
+          planned_meters?: number | null
+          priority?: string
+          project_id: string
+          rationale?: string | null
+          score?: number | null
+          stage?: string
+          target_type?: string
+          target_zone?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          campaign_id?: string | null
+          closed_at?: string | null
+          closed_reason?: string | null
+          code?: string
+          commodity?: string | null
+          confidence_pct?: number | null
+          created_at?: string
+          created_by?: string
+          elevation_m?: number | null
+          estimated_cost_usd?: number | null
+          evidence?: Json | null
+          geometry_geojson?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          notes?: string | null
+          planned_meters?: number | null
+          priority?: string
+          project_id?: string
+          rationale?: string | null
+          score?: number | null
+          stage?: string
+          target_type?: string
+          target_zone?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exploration_targets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "exploration_targets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       geo_references: {
         Row: {
           authors: string | null
