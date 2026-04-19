@@ -52,6 +52,7 @@ interface ProjectMapProps {
   samples?: SamplingResult[];
   onInspect?: (f: InspectedFeature) => void;
   fillHeight?: boolean;
+  onMapReady?: (map: LeafletMap, L: LeafletNS) => void;
 }
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
@@ -90,7 +91,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "drones:rasters": { visible: true, opacity: 0.75 },
 };
 
-export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps = {}) {
+export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
