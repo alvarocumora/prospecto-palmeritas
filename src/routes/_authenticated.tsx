@@ -6,12 +6,13 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
+import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
