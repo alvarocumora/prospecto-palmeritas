@@ -238,6 +238,21 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
             </div>
           )}
         </div>
+
+        {interpretation && (
+          <div className="px-4 py-4 border-t border-border bg-background">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="w-3.5 h-3.5 text-gold" />
+              <div className="text-xs font-mono font-semibold text-gold uppercase tracking-wide">Interpretación geológica IA</div>
+            </div>
+            <div className="font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap">
+              {interpretation}
+            </div>
+            <div className="mt-3 text-[10px] font-mono text-muted-foreground italic">
+              Generado por IA · Verifica conclusiones contra datos de campo. No reemplaza juicio del QP (NI 43-101).
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
