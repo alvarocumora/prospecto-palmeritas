@@ -26,8 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
-  // Start as false on the server to avoid hydration mismatch with the client spinner.
-  const [loading, setLoading] = useState(typeof window !== "undefined");
+  const [loading, setLoading] = useState(true);
 
   const loadProfile = async (uid: string) => {
     const { data } = await supabase

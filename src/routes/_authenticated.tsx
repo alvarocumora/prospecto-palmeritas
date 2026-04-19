@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect, Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
@@ -9,16 +9,15 @@ import {
   Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
-import { supabase } from "@/integrations/supabase/client";
+
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 
 export const Route = createFileRoute("/_authenticated")({
-  beforeLoad: async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) throw redirect({ to: "/auth" });
-  },
+  // Auth check is client-only — Supabase session lives in localStorage and is not
+  // available during SSR. Running the redirect on the server bounces every refresh
+  // to /auth and breaks hydration. The component-level guard handles it on the client.
   component: AuthenticatedLayout,
 });
 
@@ -43,6 +42,12 @@ function AuthenticatedLayout() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
+
+  // Client-only redirect to /auth when no session
+  useEffect(() => {
+    if (!mounted || loading) return;
+    if (!user) navigate({ to: "/auth" });
+  }, [mounted, loading, user, navigate]);
 
   useEffect(() => {
     if (!mounted) return;
