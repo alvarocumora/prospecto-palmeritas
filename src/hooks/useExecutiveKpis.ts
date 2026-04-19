@@ -10,6 +10,12 @@ export type ExecutiveKpis = {
   auWeightedAvg: number | null;
   totalGeophysicsCapex: number;
   monthInterceptCount: number;
+  // Fase 1 — gobernanza
+  pendingReview: number;       // drill_core_logs + sampling_results en review
+  approvedRecords: number;     // approved en ambos
+  draftRecords: number;        // draft en ambos
+  qaqcFailRate: number | null; // % fail sobre total resultado QA/QC
+  qaqcTotal: number;
 };
 
 export function useExecutiveKpis() {
