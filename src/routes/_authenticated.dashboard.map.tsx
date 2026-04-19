@@ -135,6 +135,32 @@ function OperationalMap() {
     return list;
   }, [samples, campaignId, highGradeOnly]);
 
+  // Sprint 6.4 — Time filter applied to holes & rasters
+  const filteredHoles = useMemo(() => {
+    if (!timeActive || timeCursor == null) return holes;
+    return holes.filter((h) => {
+      if (!h.started_at) return false;
+      const t = Date.parse(h.started_at);
+      return !isNaN(t) && t <= timeCursor;
+    });
+  }, [holes, timeActive, timeCursor]);
+
+  const visibleRasterSettings = useMemo(() => {
+    if (!timeActive || timeCursor == null) return rasterSettings;
+    const next: RasterSettings = { ...rasterSettings };
+    for (const r of rasters) {
+      if (!r.captured_at) continue;
+      const t = Date.parse(r.captured_at);
+      if (!isNaN(t) && t > timeCursor && next[r.id]?.visible) {
+        next[r.id] = { ...next[r.id], visible: false };
+      }
+    }
+    return next;
+  }, [rasterSettings, rasters, timeActive, timeCursor]);
+
+  const timeItemsHoles = useMemo(() => holes.map((h) => ({ date: h.started_at })), [holes]);
+  const timeItemsFlights = useMemo(() => flights.map((f) => ({ date: f.flown_at })), [flights]);
+
   useEffect(() => {
     (window as unknown as { __selectMapFeature?: (f: InspectedFeature) => void }).__selectMapFeature = setInspected;
     return () => {
