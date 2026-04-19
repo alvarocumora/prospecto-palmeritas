@@ -18,6 +18,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
+import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
+import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
@@ -85,6 +87,12 @@ const AuthenticatedDashboardSamplingRoute =
     path: '/dashboard/sampling',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardReportsRoute =
+  AuthenticatedDashboardReportsRouteImport.update({
+    id: '/dashboard/reports',
+    path: '/dashboard/reports',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardQaqcRoute =
   AuthenticatedDashboardQaqcRouteImport.update({
     id: '/dashboard/qaqc',
@@ -125,6 +133,12 @@ const AuthenticatedDashboardInventoryRoute =
   AuthenticatedDashboardInventoryRouteImport.update({
     id: '/dashboard/inventory',
     path: '/dashboard/inventory',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardHseRoute =
+  AuthenticatedDashboardHseRouteImport.update({
+    id: '/dashboard/hse',
+    path: '/dashboard/hse',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardGeophysicsRoute =
@@ -208,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -215,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -236,6 +252,7 @@ export interface FileRoutesByTo {
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -243,6 +260,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -266,6 +284,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -273,6 +292,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -296,6 +316,7 @@ export interface FileRouteTypes {
     | '/dashboard/drones'
     | '/dashboard/finance'
     | '/dashboard/geophysics'
+    | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/map'
     | '/dashboard/marketplace'
@@ -303,6 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
+    | '/dashboard/reports'
     | '/dashboard/sampling'
     | '/dashboard/targets'
     | '/dashboard/team'
@@ -324,6 +346,7 @@ export interface FileRouteTypes {
     | '/dashboard/drones'
     | '/dashboard/finance'
     | '/dashboard/geophysics'
+    | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/map'
     | '/dashboard/marketplace'
@@ -331,6 +354,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
+    | '/dashboard/reports'
     | '/dashboard/sampling'
     | '/dashboard/targets'
     | '/dashboard/team'
@@ -353,6 +377,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/finance'
     | '/_authenticated/dashboard/geophysics'
+    | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
@@ -360,6 +385,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/qaqc'
+    | '/_authenticated/dashboard/reports'
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
@@ -441,6 +467,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSamplingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/reports': {
+      id: '/_authenticated/dashboard/reports'
+      path: '/dashboard/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/qaqc': {
       id: '/_authenticated/dashboard/qaqc'
       path: '/dashboard/qaqc'
@@ -488,6 +521,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/inventory'
       fullPath: '/dashboard/inventory'
       preLoaderRoute: typeof AuthenticatedDashboardInventoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/hse': {
+      id: '/_authenticated/dashboard/hse'
+      path: '/dashboard/hse'
+      fullPath: '/dashboard/hse'
+      preLoaderRoute: typeof AuthenticatedDashboardHseRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/geophysics': {
@@ -610,6 +650,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
@@ -617,6 +658,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
+  AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRoute
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
@@ -634,6 +676,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardFinanceRoute: AuthenticatedDashboardFinanceRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
+  AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
@@ -642,6 +685,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
+  AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
   AuthenticatedDashboardTargetsRoute: AuthenticatedDashboardTargetsRoute,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,

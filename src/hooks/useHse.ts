@@ -119,7 +119,7 @@ export function useHse(projectId: string | null) {
   }, [user, projectId, refresh]);
 
   const updateIncidentStatus = useCallback(async (id: string, status: IncidentStatus) => {
-    const patch: Record<string, unknown> = { status };
+    const patch: { status: IncidentStatus; closed_at?: string } = { status };
     if (status === "closed") patch.closed_at = new Date().toISOString();
     const { error: err } = await supabase.from("hse_incidents").update(patch).eq("id", id);
     await refresh();
