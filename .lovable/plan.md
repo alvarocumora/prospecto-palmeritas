@@ -1,102 +1,83 @@
 
-## Mapa Operacional — Centro de Operaciones Geocapitals
+User reports overlapping controls on /dashboard/map. Viewport 815px (tablet-ish). Let me map what's stacked where.
 
-### Objetivo
-Convertir el mapa en la pantalla principal (`/dashboard/map`) donde un geólogo vea **todo el proyecto a la vez**: catastro, geofísica con drones, secciones de exploración, muestras y resultados de lab. Click en cualquier elemento → panel lateral con detalle y acciones (editar, exportar, ir al módulo).
+**Top-left (Leaflet default):** zoom +/- control (`leaflet-top leaflet-left`)
+**Top-right (Leaflet default):** layer control + custom toolbar buttons in ProjectMap (fullscreen, draw, layers, measure) + SectionBuilderTool at `top-14 right-3`
+**Bottom-left:** Au legend at `bottom-3 left-3` + Leaflet attribution
+**Bottom-right:** CoordinateFooter + scale
+**Right side:** FeatureInspectorPanel (aside, when open) overlaps everything on right
 
-### Arquitectura propuesta
+Conflicts at 815px:
+1. SectionBuilderTool (top-14 right-3) collides with ProjectMap's own top-right toolbar
+2. FeatureInspectorPanel covers right-side controls when open
+3. Au legend bottom-left near attribution
+4. Zoom top-left is fine but no breathing room from header
+5. Multiple z-index layers (1000, 1100) competing
+
+Plan focuses on reorganizing into clear zones with consistent spacing and z-index hierarchy. No new features — pure layout cleanup.
+
+## Plan: Reorganizar controles del Centro de Operaciones
+
+### Problema
+A 815px de ancho los controles se traslapan: la barra de "Sección" choca con el toolbar de ProjectMap (fullscreen/draw/capas/medir), el panel de inspección tapa controles del lado derecho, y la leyenda de Au compite con la atribución de Leaflet.
+
+### Solución: zonas fijas + jerarquía clara
 
 ```text
-/dashboard/map  ← nueva ruta principal (default tras login)
-┌─────────────────────────────────────────────┐
-│ TopBar: proyecto · campaña activa · export  │
-├──┬──────────────────────────────────┬───────┤
-│L │                                  │ R     │
-│a │        MAPA LEAFLET              │ Panel │
-│y │     (single source of truth)     │ ctx   │
-│e │                                  │       │
-│r │  + Drawing/Measure/Section tool  │ feat  │
-│s │                                  │ inspc │
-├──┴──────────────────────────────────┴───────┤
-│ Footer: coords · escala · campaña · QA flags│
-└─────────────────────────────────────────────┘
+┌────────────────────────────────────────────────┐
+│ HEADER (proyecto, campaña, filtros)            │
+├──┬──────────────────────────────────────────┬──┤
+│+ │                                          │TR│ ← Toolbar vertical:
+│− │                                          │TR│   fullscreen, draw,
+│  │             MAPA                         │TR│   capas, medir,
+│  │                                          │TR│   sección
+│  │                                          │  │
+│  │                                          │  │
+│LG│                                          │  │ ← Leyenda Au
+├──┴──────────────────────────────────────────┴──┤
+│ Coordenadas · escala                           │
+└────────────────────────────────────────────────┘
 ```
 
-### Capas maestras (grupos en LayerOpacityPanel)
+### Cambios concretos
 
-1. **Catastro** — ya existe (SERNAGEOMIN dinámico + `mining_concessions`).
-2. **Geofísica** — surveys/lines/stations existentes + **nuevo: drones**:
-   - Tabla nueva `drone_flights` (geometría LineString del path, altura, sensor: mag/lidar/RGB, fecha, piloto).
-   - Tabla nueva `drone_rasters` (URL a tile/COG, bounds, tipo: orto/dem/mag-grid).
-   - En el mapa: paths de vuelo + overlays raster (orto-foto, mag-grid).
-3. **Sección/Campaña de exploración** — nuevo concepto `exploration_campaigns`:
-   - Tabla con fechas, AOI poligono, fase (recon/scoping/PFS), responsable.
-   - Filtro temporal en topbar: "Campaña activa" → mapa solo muestra datos de esa campaña.
-   - Herramienta **Section Builder**: dibujas línea sobre el mapa → genera vista 2D lateral con holes proyectados.
-4. **Muestreo + Lab** — `sampling_results` ya existe:
-   - Cada muestra como circle marker, color por Au g/t (gradiente), tamaño por ley.
-   - Click → popup con todos los elementos + flag QA/QC (blank/std/dup).
-   - Toggle "solo high-grade ≥1 g/t Au".
-5. **Sondajes** — ya existe, mejorar: collar coloreado por mejor intercept, halo por score.
+**1. Toolbar derecho unificado vertical** (`ProjectMap.tsx` + `SectionBuilderTool.tsx`)
+- Mover los botones del toolbar de ProjectMap (fullscreen, dibujo, capas, medir) a una columna vertical en `top-3 right-3`, ancho fijo ~40px, iconos solamente con tooltip.
+- Integrar el botón "Sección" como un botón más en esa misma columna (no flotando aparte).
+- El input "± 50m" y el control "Ver sección / Limpiar" aparecen en un mini-popover sobre el botón de Sección cuando está activo, no permanente.
 
-### Panel contextual derecho (nuevo)
+**2. FeatureInspectorPanel**
+- Fijar ancho 320px y posicionar `top-3 right-16` (después del toolbar) en lugar de pegado al borde, para que no tape el toolbar al abrirse.
+- En viewports <900px: convertir a panel inferior tipo bottom-sheet (max-height 50vh).
 
-Aparece al hacer click en cualquier feature:
-- Concesión: titular, vencimiento, alertas, link a /dashboard/catastro.
-- Estación geofísica: valores mag/IP, gráfico mini, link a survey.
-- Drone flight: ficha de vuelo, sensor, descargar GeoTIFF.
-- Drill collar: depth, mejor intercept, mini strip-log, link a hole.
-- Muestra: assays, QA flags, certificado lab.
+**3. Leyenda Au**
+- Subirla a `bottom-12 left-3` para no chocar con la atribución de Leaflet.
+- Hacerla colapsable con un botón `<` que la reduce a un icono.
 
-### Nuevas funcionalidades clave del mapa
+**4. Zoom de Leaflet**
+- Mover los controles de zoom a `bottom-left` (configurar `zoomControl: false` y añadir `L.control.zoom({ position: 'bottomleft' })`) para liberar el top-left y dejar el flujo natural pulgar-derecha en mobile.
 
-- **Filtro temporal global** (slider de fecha): muestra solo datos hasta fecha X → time-machine visual.
-- **Section builder**: dibuja line → modal con sección 2D (drill holes proyectados ±50m, lito, intercepts).
-- **Capas guardadas (vistas)**: usuario guarda combo "Inspección catastro mensual" con set de capas/opacidades; aparece en dropdown.
-- **Snapshot**: botón → PNG del estado actual del mapa con leyenda y escala (para informes).
-- **Multi-proyecto overlay** (super_admin/owner con varios proyectos): comparar 2 AOIs.
+**5. Z-index hierarchy estandarizada**
+- Mapa Leaflet: default (400)
+- Toolbar/leyenda flotantes: `z-[500]`
+- FeatureInspectorPanel: `z-[600]`
+- SectionView modal: `z-[700]`
+- Tooltips de Sonner/dialogs shadcn: ya son `z-[1000+]`
 
-### Cambios técnicos
+**6. Header**
+- Reducir altura a 44px en md+ y compactar el badge "X muestras" para que no fuerce wrap a 815px.
 
-**DB (1 migración)**
-- `drone_flights` (project_id, campaign_id, flown_at, sensor, pilot, geometry_geojson, altitude_m, area_ha, notes)
-- `drone_rasters` (project_id, campaign_id, flight_id, raster_type, url, bounds_geojson, captured_at)
-- `exploration_campaigns` (project_id, name, phase, started_at, ended_at, aoi_geojson, lead_user_id, status)
-- `map_views` (user_id, project_id, name, layer_state_json, center, zoom)
-- Añadir `campaign_id` (nullable FK conceptual) a `geophysics_surveys`, `sampling_results`, `drill_holes` para filtrado temporal.
-- RLS estándar (member-based, igual que el resto).
+### Archivos a tocar
+- `src/components/ProjectMap.tsx` — toolbar vertical, mover zoom, ajustar inspector
+- `src/components/map/SectionBuilderTool.tsx` — integrarse al toolbar vertical, popover para opciones
+- `src/components/map/FeatureInspectorPanel.tsx` — ancho fijo, bottom-sheet en mobile
+- `src/routes/_authenticated.dashboard.map.tsx` — header compacto, posición leyenda Au
+- `src/styles.css` (si hace falta) — variables z-index
 
-**Frontend**
-- `src/routes/_authenticated.dashboard.map.tsx` — nueva ruta principal full-screen.
-- `src/components/map/MasterMap.tsx` — refactor de `ProjectMap` para soportar panel contextual + capas drone.
-- `src/components/map/FeatureInspectorPanel.tsx` — panel derecho con tabs por tipo.
-- `src/components/map/CampaignSelector.tsx` — dropdown topbar.
-- `src/components/map/SectionBuilder.tsx` — dibujo de línea + render 2D (canvas/svg).
-- `src/components/map/droneLayer.ts` — vuelos + rasters.
-- `src/components/map/sampleLayer.ts` — muestras coloreadas por Au.
-- `src/hooks/useDroneFlights.ts`, `useExplorationCampaigns.ts`, `useMapViews.ts`.
-- Hacer `/dashboard/map` la **ruta default tras login** (cambiar redirect de `/dashboard` → `/dashboard/map`).
-- Fix runtime: error de hidratación SSR en spinner `min-h-screen` (envolver en `<Suspense>` o `mounted` guard).
+### Resultado
+Una sola columna de herramientas a la derecha (sin solapes), zoom abajo-izquierda, leyenda colapsable arriba de la atribución, panel de inspección que no tapa los controles, y header que no rompe a 815px. Sin agregar features nuevas — solo orden visual.
 
-### Entrega en 3 fases (cada una funcional sola)
-
-**Fase A (base operacional)** — lo que arranca el centro de operaciones:
-- Migración DB completa.
-- Ruta `/dashboard/map` con MasterMap (refactor de ProjectMap full-screen).
-- Capa de muestras coloreadas + panel inspector contextual.
-- Selector de campaña + filtro temporal básico.
-
-**Fase B (drones + section builder)** — diferenciador visual:
-- CRUD `drone_flights` (form para subir GeoJSON path o KML).
-- Overlay raster de drones (URL externa + bounds).
-- Section builder con render 2D de holes proyectados.
-
-**Fase C (vistas guardadas + snapshot + multi-proyecto)** — pulido productivo:
-- `map_views` CRUD + dropdown.
-- Snapshot PNG con leyenda.
-- Comparador multi-proyecto.
-
-### Recomendación
-Arrancar por **Fase A**. Es ~6-8 archivos nuevos + 1 migración, entregable en una sesión, y deja el mapa ya como pantalla principal con muestras + panel inspector + campañas. Fases B y C se construyen encima sin tocar lo de A.
-
-¿Apruebas Fase A, o prefieres ver primero un mock de UI o ajustar el alcance?
+### No incluido (próximas iteraciones)
+- Atajos de teclado para herramientas
+- Mini-mapa de overview
+- Modo presentación (oculta toda UI excepto mapa)
