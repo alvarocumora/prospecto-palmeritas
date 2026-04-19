@@ -141,6 +141,8 @@ export type Database = {
         Row: {
           ag_gpt: number | null
           alteration: string | null
+          approved_at: string | null
+          approved_by: string | null
           au_gpt: number | null
           created_at: string
           created_by: string
@@ -153,6 +155,7 @@ export type Database = {
           mineralization: string | null
           notes: string | null
           project_id: string | null
+          record_status: string
           recovery_pct: number | null
           rqd_pct: number | null
           structure: string | null
@@ -163,6 +166,8 @@ export type Database = {
         Insert: {
           ag_gpt?: number | null
           alteration?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           au_gpt?: number | null
           created_at?: string
           created_by: string
@@ -175,6 +180,7 @@ export type Database = {
           mineralization?: string | null
           notes?: string | null
           project_id?: string | null
+          record_status?: string
           recovery_pct?: number | null
           rqd_pct?: number | null
           structure?: string | null
@@ -185,6 +191,8 @@ export type Database = {
         Update: {
           ag_gpt?: number | null
           alteration?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           au_gpt?: number | null
           created_at?: string
           created_by?: string
@@ -197,6 +205,7 @@ export type Database = {
           mineralization?: string | null
           notes?: string | null
           project_id?: string | null
+          record_status?: string
           recovery_pct?: number | null
           rqd_pct?: number | null
           structure?: string | null
@@ -1188,6 +1197,36 @@ export type Database = {
           },
         ]
       }
+      project_member_capabilities: {
+        Row: {
+          capability: string
+          expires_at: string | null
+          granted_at: string
+          granted_by: string | null
+          id: string
+          project_id: string
+          user_id: string
+        }
+        Insert: {
+          capability: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          project_id: string
+          user_id: string
+        }
+        Update: {
+          capability?: string
+          expires_at?: string | null
+          granted_at?: string
+          granted_by?: string | null
+          id?: string
+          project_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       project_members: {
         Row: {
           created_at: string
@@ -1274,9 +1313,125 @@ export type Database = {
         }
         Relationships: []
       }
+      qaqc_results: {
+        Row: {
+          certificate: string | null
+          created_at: string
+          created_by: string
+          element: string
+          id: string
+          lab: string | null
+          measured_at: string | null
+          measured_value: number | null
+          notes: string | null
+          parent_sample_code: string | null
+          project_id: string
+          qc_type: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sample_code: string
+          sample_id: string | null
+          standard_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          certificate?: string | null
+          created_at?: string
+          created_by: string
+          element: string
+          id?: string
+          lab?: string | null
+          measured_at?: string | null
+          measured_value?: number | null
+          notes?: string | null
+          parent_sample_code?: string | null
+          project_id: string
+          qc_type: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_code: string
+          sample_id?: string | null
+          standard_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          certificate?: string | null
+          created_at?: string
+          created_by?: string
+          element?: string
+          id?: string
+          lab?: string | null
+          measured_at?: string | null
+          measured_value?: number | null
+          notes?: string | null
+          parent_sample_code?: string | null
+          project_id?: string
+          qc_type?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sample_code?: string
+          sample_id?: string | null
+          standard_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      qaqc_standards: {
+        Row: {
+          certifying_lab: string | null
+          code: string
+          created_at: string
+          created_by: string
+          element: string
+          expected_value: number
+          id: string
+          name: string
+          notes: string | null
+          project_id: string
+          tolerance_pct: number
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          certifying_lab?: string | null
+          code: string
+          created_at?: string
+          created_by: string
+          element: string
+          expected_value: number
+          id?: string
+          name: string
+          notes?: string | null
+          project_id: string
+          tolerance_pct?: number
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          certifying_lab?: string | null
+          code?: string
+          created_at?: string
+          created_by?: string
+          element?: string
+          expected_value?: number
+          id?: string
+          name?: string
+          notes?: string | null
+          project_id?: string
+          tolerance_pct?: number
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sampling_results: {
         Row: {
           ag_gpt: number | null
+          approved_at: string | null
+          approved_by: string | null
           as_ppm: number | null
           au_gpt: number | null
           campaign_id: string | null
@@ -1296,6 +1451,7 @@ export type Database = {
           notes: string | null
           pb_ppm: number | null
           project_id: string | null
+          record_status: string
           sample_code: string
           sample_type: string
           sampled_at: string | null
@@ -1306,6 +1462,8 @@ export type Database = {
         }
         Insert: {
           ag_gpt?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
           as_ppm?: number | null
           au_gpt?: number | null
           campaign_id?: string | null
@@ -1325,6 +1483,7 @@ export type Database = {
           notes?: string | null
           pb_ppm?: number | null
           project_id?: string | null
+          record_status?: string
           sample_code: string
           sample_type: string
           sampled_at?: string | null
@@ -1335,6 +1494,8 @@ export type Database = {
         }
         Update: {
           ag_gpt?: number | null
+          approved_at?: string | null
+          approved_by?: string | null
           as_ppm?: number | null
           au_gpt?: number | null
           campaign_id?: string | null
@@ -1354,6 +1515,7 @@ export type Database = {
           notes?: string | null
           pb_ppm?: number | null
           project_id?: string | null
+          record_status?: string
           sample_code?: string
           sample_type?: string
           sampled_at?: string | null
