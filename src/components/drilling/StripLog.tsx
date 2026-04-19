@@ -140,6 +140,7 @@ export function StripLog({
   intWidth = 10,
   hoveredId = null,
   onHover,
+  onSelect,
 }: {
   logs: DrillCoreLog[];
   height?: number;
@@ -149,6 +150,7 @@ export function StripLog({
   intWidth?: number;
   hoveredId?: string | null;
   onHover?: (id: string | null) => void;
+  onSelect?: (id: string) => void;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
