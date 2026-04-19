@@ -23,6 +23,7 @@ import { RasterControlPanel, type RasterSettings } from "@/components/drones/Ras
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
 import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
+import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { toast } from "sonner";
 
@@ -147,6 +148,15 @@ function OperationalMap() {
           </div>
         </div>
         <div className="flex items-center gap-3 flex-wrap justify-end">
+          <MapCommandPalette
+            map={mapInst?.map ?? null}
+            holes={holes}
+            targets={targets}
+            rasters={rasters}
+            viewMode={viewMode}
+            onViewModeChange={setViewMode}
+            onSnapshot={handleSnapshot}
+          />
           <ViewModeToggle mode={viewMode} onChange={setViewMode} />
           <CampaignSelector campaigns={campaigns} value={campaignId} onChange={setCampaignId} />
           <label className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground cursor-pointer whitespace-nowrap">
