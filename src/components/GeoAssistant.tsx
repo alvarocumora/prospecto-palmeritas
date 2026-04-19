@@ -47,7 +47,7 @@ export function GeoAssistant() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.access_token ?? ""}`,
         },
-        body: JSON.stringify({ project_id: active?.id ?? null, messages: next }),
+        body: JSON.stringify({ project_id: active?.id ?? null, messages: next, focus: null }),
       });
 
       if (!resp.ok || !resp.body) {
@@ -117,13 +117,27 @@ export function GeoAssistant() {
           <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
             {messages.length === 0 && (
               <div className="text-xs text-muted-foreground font-mono space-y-2">
-                <p>Pregúntame sobre tu proyecto:</p>
-                <ul className="space-y-1 pl-3">
-                  <li>· ¿Dónde perforar siguiente?</li>
-                  <li>· Resume los mejores intercepts</li>
-                  <li>· Redacta sección 7 NI 43-101</li>
-                  <li>· ¿Qué survey geofísico me falta?</li>
-                </ul>
+                <p className="text-gold">GeoCopilot 5.0 · contexto cargado del proyecto activo</p>
+                <p>Sugerencias rápidas:</p>
+                <div className="grid grid-cols-1 gap-1.5 pt-1">
+                  {[
+                    "¿Dónde perforar el próximo sondaje y por qué?",
+                    "Resume los 5 mejores intercepts y agrupa por dominio",
+                    "¿Qué targets tienen mayor score y qué evidencia los respalda?",
+                    "Redacta sección 7 (Geological Setting) NI 43-101",
+                    "¿Qué permisos vencen y qué actividad bloquean?",
+                    "Compara mineralogía vs alteración: ¿es epitermal o pórfido?",
+                  ].map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => setInput(q)}
+                      className="text-left px-2 py-1 rounded border border-border hover:border-gold hover:bg-gold/5 transition-colors"
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {messages.map((m, i) => (

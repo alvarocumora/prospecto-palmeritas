@@ -1,5 +1,5 @@
-// Geo-AI assistant: streams Lovable AI responses with project-specific context.
-// Receives { project_id, messages: [{role, content}] } and streams SSE.
+// Geo-AI Copilot v2 (Sprint 5.1): inyecta contexto geológico denso del proyecto activo.
+// Recibe { project_id, messages: [{role, content}], focus? } y retorna SSE con la respuesta del modelo.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
@@ -12,7 +12,7 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { project_id, messages } = await req.json();
+    const { project_id, messages, focus } = await req.json();
     if (!Array.isArray(messages)) {
       return new Response(JSON.stringify({ error: "messages required" }), {
         status: 400,
@@ -25,53 +25,102 @@ Deno.serve(async (req) => {
     const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // Build project context (best-effort, no fail)
-    let projectContext = "Sin proyecto seleccionado.";
+    let projectContext = "Sin proyecto activo seleccionado.";
     if (project_id) {
       const admin = createClient(SUPABASE_URL, SERVICE_KEY);
-      const [proj, holes, surveys, samples, conc] = await Promise.all([
-        admin.from("projects").select("name,code,commodity,country,region,description").eq("id", project_id).maybeSingle(),
-        admin.from("drill_holes").select("hole_id,actual_depth,planned_depth,status,target_zone").eq("project_id", project_id),
-        admin.from("geophysics_surveys").select("name,method,status,planned_km,cost_usd").eq("project_id", project_id),
-        admin.from("sampling_results").select("au_gpt,cu_pct,ag_gpt").eq("project_id", project_id).limit(500),
-        admin.from("mining_concessions").select("code,name,concession_type,area_ha,status").eq("project_id", project_id),
+      const [
+        proj, holes, surveys, samples, conc,
+        litho, alter, miner, feats,
+        targets, permits, incidents, logs,
+      ] = await Promise.all([
+        admin.from("projects").select("name,code,commodity,country,region,description,center_lat,center_lng").eq("id", project_id).maybeSingle(),
+        admin.from("drill_holes").select("hole_id,actual_depth,planned_depth,status,target_zone,azimuth,dip,easting,northing").eq("project_id", project_id),
+        admin.from("geophysics_surveys").select("name,method,status,planned_km,cost_usd,expected_depth_m").eq("project_id", project_id),
+        admin.from("drill_core_logs").select("hole_id,depth_from,depth_to,au_gpt,cu_pct,ag_gpt,lithology,alteration").eq("project_id", project_id).gte("au_gpt", 0.3).order("au_gpt", { ascending: false }).limit(40),
+        admin.from("mining_concessions").select("code,name,concession_type,area_ha,status,holder,expires_at").eq("project_id", project_id),
+        admin.from("lithology_units").select("unit_code,name,age,rock_type").eq("project_id", project_id),
+        admin.from("alteration_zones").select("zone_code,name,assemblage,intensity").eq("project_id", project_id),
+        admin.from("mineralogy").select("mineral,paragenetic_stage,abundance").eq("project_id", project_id),
+        admin.from("geological_features").select("feature_code,name,feature_type,strike,dip,length_m").eq("project_id", project_id),
+        admin.from("exploration_targets").select("code,name,target_type,priority,stage,score,lat,lng,rationale").eq("project_id", project_id).neq("stage", "closed").order("score", { ascending: false }).limit(15),
+        admin.from("hse_permits").select("title,permit_type,status,expires_at,authority").eq("project_id", project_id),
+        admin.from("hse_incidents").select("category,severity,status,occurred_at").eq("project_id", project_id).neq("status", "closed").limit(10),
+        admin.from("drill_core_logs").select("au_gpt").eq("project_id", project_id),
       ]);
 
       const totalM = (holes.data ?? []).reduce((s: number, h: any) => s + (Number(h.actual_depth) || 0), 0);
-      const samplesArr = samples.data ?? [];
-      const auVals = samplesArr.map((s: any) => Number(s.au_gpt)).filter((v) => !isNaN(v));
-      const auAvg = auVals.length ? (auVals.reduce((a, b) => a + b, 0) / auVals.length).toFixed(2) : "—";
-      const auMax = auVals.length ? Math.max(...auVals).toFixed(2) : "—";
+      const allAu = (logs.data ?? []).map((s: any) => Number(s.au_gpt)).filter((v) => !isNaN(v) && v > 0);
+      const auAvg = allAu.length ? (allAu.reduce((a, b) => a + b, 0) / allAu.length).toFixed(2) : "—";
+      const auMax = allAu.length ? Math.max(...allAu).toFixed(2) : "—";
+      const auP90 = allAu.length ? [...allAu].sort((a, b) => a - b)[Math.floor(allAu.length * 0.9)].toFixed(2) : "—";
       const capEx = (surveys.data ?? []).reduce((s: number, x: any) => s + (Number(x.cost_usd) || 0), 0);
 
+      const today = new Date();
+      const expiringSoon = (permits.data ?? []).filter((p: any) => {
+        if (!p.expires_at) return false;
+        const days = (new Date(p.expires_at).getTime() - today.getTime()) / 86400000;
+        return days >= 0 && days <= 60;
+      });
+
       projectContext = `
-PROYECTO: ${proj.data?.name ?? "?"} (${proj.data?.code ?? "?"})
-Commodity: ${proj.data?.commodity ?? "?"} | Ubicación: ${proj.data?.region ?? ""} ${proj.data?.country ?? ""}
-Descripción: ${proj.data?.description ?? "—"}
+═══ PROYECTO ACTIVO ═══
+${proj.data?.name ?? "?"} [${proj.data?.code ?? "?"}] · ${proj.data?.commodity ?? "?"}
+Ubicación: ${proj.data?.region ?? ""} ${proj.data?.country ?? ""} (${proj.data?.center_lat ?? "?"}, ${proj.data?.center_lng ?? "?"})
+${proj.data?.description ?? ""}
 
-SONDAJES: ${(holes.data ?? []).length} holes, ${totalM.toFixed(0)} m perforados.
-${(holes.data ?? []).slice(0, 6).map((h: any) => `  · ${h.hole_id} (${h.status}) ${h.actual_depth ?? "?"}/${h.planned_depth ?? "?"}m → ${h.target_zone ?? ""}`).join("\n")}
+═══ MARCO GEOLÓGICO ═══
+Litología (${(litho.data ?? []).length} unidades):
+${(litho.data ?? []).slice(0, 8).map((l: any) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`).join("\n")}
 
-GEOFÍSICA: ${(surveys.data ?? []).length} surveys. CapEx: USD ${capEx.toLocaleString()}.
-${(surveys.data ?? []).slice(0, 5).map((s: any) => `  · ${s.name} [${s.method}, ${s.status}] ${s.planned_km ?? "?"} km`).join("\n")}
+Alteración (${(alter.data ?? []).length} zonas):
+${(alter.data ?? []).slice(0, 6).map((a: any) => `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, intensidad ${a.intensity ?? "?"}]`).join("\n")}
 
-MUESTREO: ${samplesArr.length} muestras. Au promedio ${auAvg} g/t, max ${auMax} g/t.
+Mineralogía clave:
+${(miner.data ?? []).slice(0, 8).map((m: any) => `  · ${m.mineral} (${m.paragenetic_stage ?? "?"}, ${m.abundance ?? "?"})`).join("\n")}
 
-CONCESIONES: ${(conc.data ?? []).length} (${(conc.data ?? []).reduce((s: number, c: any) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total).
+Estructuras (${(feats.data ?? []).length}):
+${(feats.data ?? []).slice(0, 6).map((f: any) => `  · ${f.feature_code} ${f.name} ${f.feature_type} ${f.strike ?? ""}/${f.dip ?? ""} ${f.length_m ?? "?"}m`).join("\n")}
+
+═══ SONDAJES (${(holes.data ?? []).length} holes, ${totalM.toFixed(0)} m) ═══
+${(holes.data ?? []).slice(0, 10).map((h: any) => `  · ${h.hole_id} ${h.status} az${h.azimuth ?? "?"}/${h.dip ?? "?"}° ${h.actual_depth ?? "?"}/${h.planned_depth ?? "?"}m → ${h.target_zone ?? ""}`).join("\n")}
+
+═══ INTERCEPTS DESTACADOS (Au ≥ 0.3 g/t, top ${Math.min(40, (logs.data ?? []).length)}) ═══
+Au promedio: ${auAvg} g/t · P90: ${auP90} g/t · Max: ${auMax} g/t
+${(logs.data ?? []).slice(0, 15).map((l: any) => `  · ${l.hole_id} ${l.depth_from}-${l.depth_to}m: Au ${l.au_gpt} g/t${l.cu_pct ? ` Cu ${l.cu_pct}%` : ""} · ${l.lithology ?? "?"} / ${l.alteration ?? "?"}`).join("\n")}
+
+═══ GEOFÍSICA ═══
+${(surveys.data ?? []).length} surveys · CapEx USD ${capEx.toLocaleString()}
+${(surveys.data ?? []).slice(0, 5).map((s: any) => `  · ${s.name} [${s.method}, ${s.status}] ${s.planned_km ?? "?"} km, prof ${s.expected_depth_m ?? "?"}m`).join("\n")}
+
+═══ TARGETS ACTIVOS (${(targets.data ?? []).length}) ═══
+${(targets.data ?? []).slice(0, 10).map((t: any) => `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} (${t.lat?.toFixed(4) ?? "?"}, ${t.lng?.toFixed(4) ?? "?"}) ${t.rationale ?? ""}`).join("\n")}
+
+═══ HSE / PERMISOS ═══
+${expiringSoon.length} permisos vencen en ≤60 días:
+${expiringSoon.slice(0, 5).map((p: any) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`).join("\n") || "  (ninguno crítico)"}
+${(incidents.data ?? []).length} incidentes abiertos.
+
+═══ CATASTRO ═══
+${(conc.data ?? []).length} concesiones, ${(conc.data ?? []).reduce((s: number, c: any) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total.
+${(conc.data ?? []).slice(0, 5).map((c: any) => `  · ${c.code} ${c.name} [${c.concession_type}/${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`).join("\n")}
       `.trim();
     }
 
-    const systemPrompt = `Eres un asistente geológico experto para exploración minera. Hablas español por defecto.
-Tu rol: ayudar al geólogo con interpretación de datos, sugerir próximos targets de perforación, redactar secciones técnicas (NI 43-101 / JORC), explicar resultados de geofísica y muestreo.
+    const focusBlock = focus ? `\n\n═══ FOCO DE LA PREGUNTA ═══\n${focus}` : "";
 
-CONTEXTO DEL PROYECTO ACTIVO:
-${projectContext}
+    const systemPrompt = `Eres GeoCopilot, asistente IA experto en exploración minera senior (NI 43-101 / JORC).
+Hablas español por defecto. Tono: técnico, directo, citando evidencia concreta.
 
-Reglas:
-- Sé conciso y técnico. Usa unidades SI y notación geológica estándar.
-- Si te piden "dónde perforar", razona en base a leyes, geometría de vetas, anomalías geofísicas y huecos en el muestreo.
-- Cita siempre el dato concreto del proyecto que respalda tu recomendación.
-- Si no tienes datos suficientes, dilo y sugiere qué levantar primero.`;
+REGLAS:
+- Cita siempre el dato del proyecto que respalda tu afirmación (sondaje, ley, código de target, coordenada).
+- Para "¿dónde perforar?": razona con (a) targets de mayor score, (b) intercepts adyacentes, (c) anomalías geofísicas, (d) huecos de muestreo, (e) restricciones HSE/catastro.
+- Para interpretación: usa litología/alteración/mineralogía del marco geológico inyectado.
+- Si falta información, di qué levantar primero (survey IP, sondaje step-out, muestreo de canal).
+- Usa unidades SI, notación geológica estándar (Au g/t, Cu %, m, °).
+- Responde en máx 6 párrafos, con bullets cuando ayuden.
+
+CONTEXTO DEL PROYECTO:
+${projectContext}${focusBlock}`;
 
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
