@@ -239,7 +239,7 @@ function OperationalMap() {
             <SectionBuilderTool
               map={mapInst?.map ?? null}
               L={mapInst?.L ?? null}
-              holes={holes}
+              holes={filteredHoles}
               logsByHole={logsByHole}
               projectName={active?.name}
             />
@@ -251,7 +251,7 @@ function OperationalMap() {
             />
             <RasterControlPanel
               rasters={rasters}
-              settings={rasterSettings}
+              settings={visibleRasterSettings}
               onChange={updateRasterSetting}
               onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
             />
@@ -270,6 +270,13 @@ function OperationalMap() {
                 if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
                 toast.success(`Vista «${v.name}» restaurada`);
               }}
+            />
+            <TimeSlider
+              holes={timeItemsHoles}
+              flights={timeItemsFlights}
+              onChange={setTimeCursor}
+              active={timeActive}
+              onToggle={setTimeActive}
             />
             <CollapsibleAuLegend />
           </>
