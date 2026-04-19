@@ -1,87 +1,102 @@
 
-The user wants two things:
-1. **Estado actual del proyecto** — diagnóstico de qué está construido vs qué funciona realmente.
-2. **Plan disruptivo funcional** — siguiente fase concreta que convierta esto en una plataforma de exploración minera operativa, no solo un demo.
+## Mapa Operacional — Centro de Operaciones Geocapitals
 
-Voy a estructurarlo como diagnóstico + roadmap accionable. Concise, sin código.
+### Objetivo
+Convertir el mapa en la pantalla principal (`/dashboard/map`) donde un geólogo vea **todo el proyecto a la vez**: catastro, geofísica con drones, secciones de exploración, muestras y resultados de lab. Click en cualquier elemento → panel lateral con detalle y acciones (editar, exportar, ir al módulo).
 
-## ESTADO ACTUAL — auditoría rápida
+### Arquitectura propuesta
 
-### ✅ Construido y funcional (verificado en DB y código)
-- **Auth + roles**: login, perfiles, roles por proyecto (owner/admin/geologist/viewer), super_admin global. RLS completa en todas las tablas.
-- **Multi-proyecto**: switcher, invitaciones por token, equipo con roles, auditoría con triggers.
-- **Catastro**: integración SERNAGEOMIN dinámica + tabla `mining_concessions` con alertas de vencimiento.
-- **Geofísica**: surveys/lines/stations CRUD, mapa con magnetometría e IP, captura de campo.
-- **Sondajes**: drill_holes + core_logs, strip log visual, cómputo de intercepts mineralizados.
-- **Muestreo**: resultados de laboratorio (Au/Ag/Cu + path-finders).
-- **Geo-AI Assistant**: chat con contexto de proyecto (Gemini Pro).
-- **Marketplace**: capas públicas instalables.
-- **Reporte NI 43-101**: PDF one-click.
-- **Admin platform**: panel /dashboard/admin con usuarios, proyectos, auditoría.
-- **Las Palmeras**: asignado a alvaro.cumora@gmail.com como owner, con datos vinculados.
+```text
+/dashboard/map  ← nueva ruta principal (default tras login)
+┌─────────────────────────────────────────────┐
+│ TopBar: proyecto · campaña activa · export  │
+├──┬──────────────────────────────────┬───────┤
+│L │                                  │ R     │
+│a │        MAPA LEAFLET              │ Panel │
+│y │     (single source of truth)     │ ctx   │
+│e │                                  │       │
+│r │  + Drawing/Measure/Section tool  │ feat  │
+│s │                                  │ inspc │
+├──┴──────────────────────────────────┴───────┤
+│ Footer: coords · escala · campaña · QA flags│
+└─────────────────────────────────────────────┘
+```
 
-### ⚠️ Construido pero a medias
-- **Pagos**: stubs en admin, sin Stripe real conectado.
-- **Offline**: hook existe pero no enchufado en formularios.
-- **Emails de invitación**: edge function loguea el link, no envía email.
-- **Marketplace**: solo lectura, no permite uploads.
-- **Time machine**: filtro por fecha en audit, sin reconstrucción real de estado.
-- **Reportes**: solo NI 43-101, falta Pitch Investor y Technical Brief.
+### Capas maestras (grupos en LayerOpacityPanel)
 
-### ❌ Faltante crítico para "exploración minera real"
-- **Geoquímica avanzada**: no hay multielement plots, ratios path-finder, vectoreo a target.
-- **Modelado 3D**: sin visor de wireframes/superficies (Leapfrog-lite).
-- **QA/QC de muestras**: no hay duplicados, blancos, estándares, gráficos shewhart.
-- **Recursos & estimación**: sin bloques, kriging, clasificación measured/indicated/inferred.
-- **Workflows de campo**: no hay app PWA instalable real con cola offline robusta.
-- **Integraciones laboratorio**: sin import directo de ALS/SGS/Bureau Veritas.
-- **DEM/topografía**: sin elevación real, todo plano.
-- **Reportes regulatorios reales**: ENAMI, SERNAGEOMIN annual.
+1. **Catastro** — ya existe (SERNAGEOMIN dinámico + `mining_concessions`).
+2. **Geofísica** — surveys/lines/stations existentes + **nuevo: drones**:
+   - Tabla nueva `drone_flights` (geometría LineString del path, altura, sensor: mag/lidar/RGB, fecha, piloto).
+   - Tabla nueva `drone_rasters` (URL a tile/COG, bounds, tipo: orto/dem/mag-grid).
+   - En el mapa: paths de vuelo + overlays raster (orto-foto, mag-grid).
+3. **Sección/Campaña de exploración** — nuevo concepto `exploration_campaigns`:
+   - Tabla con fechas, AOI poligono, fase (recon/scoping/PFS), responsable.
+   - Filtro temporal en topbar: "Campaña activa" → mapa solo muestra datos de esa campaña.
+   - Herramienta **Section Builder**: dibujas línea sobre el mapa → genera vista 2D lateral con holes proyectados.
+4. **Muestreo + Lab** — `sampling_results` ya existe:
+   - Cada muestra como circle marker, color por Au g/t (gradiente), tamaño por ley.
+   - Click → popup con todos los elementos + flag QA/QC (blank/std/dup).
+   - Toggle "solo high-grade ≥1 g/t Au".
+5. **Sondajes** — ya existe, mejorar: collar coloreado por mejor intercept, halo por score.
 
----
+### Panel contextual derecho (nuevo)
 
-## PLAN DISRUPTIVO — 4 olas funcionales
+Aparece al hacer click en cualquier feature:
+- Concesión: titular, vencimiento, alertas, link a /dashboard/catastro.
+- Estación geofísica: valores mag/IP, gráfico mini, link a survey.
+- Drone flight: ficha de vuelo, sensor, descargar GeoTIFF.
+- Drill collar: depth, mejor intercept, mini strip-log, link a hole.
+- Muestra: assays, QA flags, certificado lab.
 
-Cada ola es una unidad entregable de ~1-2 sesiones que aporta valor inmediato a un explorador real.
+### Nuevas funcionalidades clave del mapa
 
-### 🌊 Ola 1 — "Datos de campo confiables" (FUNDAMENTOS)
-Lo más urgente para que un geólogo lo use en terreno mañana.
-- **PWA instalable**: manifest + service worker, install prompt en mobile.
-- **Offline-first real**: enchufar `useOfflineQueue` en formularios de drill_core_logs, sampling_results y geophysics_stations. Badge de cola pendiente, sync automático.
-- **Import CSV laboratorio**: parser para resultados ALS/SGS (assay sheets típicos) → sampling_results con QA/QC automático (detección de duplicados/blancos/estándares por código).
-- **DEM + topografía**: integrar Mapbox terrain o SRTM para elevación real de drill collars.
+- **Filtro temporal global** (slider de fecha): muestra solo datos hasta fecha X → time-machine visual.
+- **Section builder**: dibuja line → modal con sección 2D (drill holes proyectados ±50m, lito, intercepts).
+- **Capas guardadas (vistas)**: usuario guarda combo "Inspección catastro mensual" con set de capas/opacidades; aparece en dropdown.
+- **Snapshot**: botón → PNG del estado actual del mapa con leyenda y escala (para informes).
+- **Multi-proyecto overlay** (super_admin/owner con varios proyectos): comparar 2 AOIs.
 
-### 🌊 Ola 2 — "Inteligencia geoquímica" (DIFERENCIADOR)
-Lo que hace que la plataforma sea mejor que Excel + ArcGIS.
-- **Multielement dashboard**: scatter Au-Ag, ratios path-finder (As/Sb/Hg vectoreo epitermal), histogramas log-normal, percentiles automáticos.
-- **Mapas de anomalías interpolados**: IDW/kriging simple sobre sampling_results → heatmap por elemento sobre el mapa.
-- **Vectoreo a target asistido por IA**: el geo-assistant analiza patrones (intercepts + alteración + geofísica) y propone próximos drill targets con justificación.
-- **Cross-section builder**: dibuja una línea sobre el mapa → genera sección con holes proyectados, intercepts, lito, alteración.
+### Cambios técnicos
 
-### 🌊 Ola 3 — "Modelo 3D y recursos" (PRODUCTO ÚNICO)
-Lo que cobra USD 50k+/año en software tradicional.
-- **Visor 3D**: three.js/deck.gl con holes en 3D (azimuth+dip), intercepts coloreados, superficies de alteración.
-- **Wireframe builder simple**: marca polígonos en secciones → triangula superficie 3D.
-- **Bloques + estimación**: malla de bloques sobre AOI, asignación por inverso a la distancia, clasificación measured/indicated/inferred según distancia a holes.
-- **Tonelaje/ley curve**: gráfico interactivo cutoff vs. tonelaje vs. ley promedio.
+**DB (1 migración)**
+- `drone_flights` (project_id, campaign_id, flown_at, sensor, pilot, geometry_geojson, altitude_m, area_ha, notes)
+- `drone_rasters` (project_id, campaign_id, flight_id, raster_type, url, bounds_geojson, captured_at)
+- `exploration_campaigns` (project_id, name, phase, started_at, ended_at, aoi_geojson, lead_user_id, status)
+- `map_views` (user_id, project_id, name, layer_state_json, center, zoom)
+- Añadir `campaign_id` (nullable FK conceptual) a `geophysics_surveys`, `sampling_results`, `drill_holes` para filtrado temporal.
+- RLS estándar (member-based, igual que el resto).
 
-### 🌊 Ola 4 — "Comercialización y escala" (NEGOCIO)
-Convertir la plataforma en SaaS real.
-- **Stripe real**: planes (Solo / Equipo / Enterprise) con metering por GB de datos, nº proyectos, nº miembros.
-- **Reportes regulatorios automatizados**: SERNAGEOMIN annual, declaración ENAMI, NI 43-101 técnico completo.
-- **Data room para inversionistas**: link público read-only de un proyecto con KPIs, mapa, intercepts (sin datos crudos), watermark.
-- **API pública**: REST endpoints para integración con ERPs mineros (SAP IS-Mining, Pronet).
-- **Marketplace activo**: uploads de capas con thumbnail auto, sistema de ratings, monetización (créditos por download).
+**Frontend**
+- `src/routes/_authenticated.dashboard.map.tsx` — nueva ruta principal full-screen.
+- `src/components/map/MasterMap.tsx` — refactor de `ProjectMap` para soportar panel contextual + capas drone.
+- `src/components/map/FeatureInspectorPanel.tsx` — panel derecho con tabs por tipo.
+- `src/components/map/CampaignSelector.tsx` — dropdown topbar.
+- `src/components/map/SectionBuilder.tsx` — dibujo de línea + render 2D (canvas/svg).
+- `src/components/map/droneLayer.ts` — vuelos + rasters.
+- `src/components/map/sampleLayer.ts` — muestras coloreadas por Au.
+- `src/hooks/useDroneFlights.ts`, `useExplorationCampaigns.ts`, `useMapViews.ts`.
+- Hacer `/dashboard/map` la **ruta default tras login** (cambiar redirect de `/dashboard` → `/dashboard/map`).
+- Fix runtime: error de hidratación SSR en spinner `min-h-screen` (envolver en `<Suspense>` o `mounted` guard).
 
----
+### Entrega en 3 fases (cada una funcional sola)
 
-## Recomendación de próximo paso
+**Fase A (base operacional)** — lo que arranca el centro de operaciones:
+- Migración DB completa.
+- Ruta `/dashboard/map` con MasterMap (refactor de ProjectMap full-screen).
+- Capa de muestras coloreadas + panel inspector contextual.
+- Selector de campaña + filtro temporal básico.
 
-Empezar por **Ola 1 → "Import CSV de laboratorio"** porque:
-- Resuelve el dolor #1 real de un geólogo (recibe el assay sheet de ALS y lo mete a mano hoy).
-- Activa todo lo demás: si entran datos reales, los gráficos, secciones e IA tienen sustancia.
-- Bajo esfuerzo (1 sesión), impacto altísimo.
+**Fase B (drones + section builder)** — diferenciador visual:
+- CRUD `drone_flights` (form para subir GeoJSON path o KML).
+- Overlay raster de drones (URL externa + bounds).
+- Section builder con render 2D de holes proyectados.
 
-Después, en paralelo: PWA + offline real (Ola 1) y multielement dashboard (Ola 2).
+**Fase C (vistas guardadas + snapshot + multi-proyecto)** — pulido productivo:
+- `map_views` CRUD + dropdown.
+- Snapshot PNG con leyenda.
+- Comparador multi-proyecto.
 
-¿Apruebas que arranque por **Import CSV laboratorio + QA/QC automático**, o prefieres otra ola/feature?
+### Recomendación
+Arrancar por **Fase A**. Es ~6-8 archivos nuevos + 1 migración, entregable en una sesión, y deja el mapa ya como pantalla principal con muestras + panel inspector + campañas. Fases B y C se construyen encima sin tocar lo de A.
+
+¿Apruebas Fase A, o prefieres ver primero un mock de UI o ajustar el alcance?
