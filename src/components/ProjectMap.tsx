@@ -220,6 +220,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
         attributionControl: true,
       });
       L.control.zoom({ position: "bottomleft" }).addTo(map);
+      L.control.scale({ position: "bottomleft", imperial: false, maxWidth: 140 }).addTo(map);
       mapRef.current = map;
       leafletRef.current = L;
 
