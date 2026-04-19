@@ -225,6 +225,7 @@ export type Database = {
         Row: {
           actual_depth: number | null
           azimuth: number | null
+          campaign_id: string | null
           completed_at: string | null
           created_at: string
           created_by: string
@@ -245,6 +246,7 @@ export type Database = {
         Insert: {
           actual_depth?: number | null
           azimuth?: number | null
+          campaign_id?: string | null
           completed_at?: string | null
           created_at?: string
           created_by: string
@@ -265,6 +267,7 @@ export type Database = {
         Update: {
           actual_depth?: number | null
           azimuth?: number | null
+          campaign_id?: string | null
           completed_at?: string | null
           created_at?: string
           created_by?: string
@@ -284,7 +287,206 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "drill_holes_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "drill_holes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drone_flights: {
+        Row: {
+          altitude_m: number | null
+          area_ha: number | null
+          campaign_id: string | null
+          created_at: string
+          created_by: string
+          flown_at: string | null
+          geometry_geojson: Json | null
+          id: string
+          name: string
+          notes: string | null
+          pilot: string | null
+          project_id: string
+          sensor: string
+          updated_at: string
+        }
+        Insert: {
+          altitude_m?: number | null
+          area_ha?: number | null
+          campaign_id?: string | null
+          created_at?: string
+          created_by: string
+          flown_at?: string | null
+          geometry_geojson?: Json | null
+          id?: string
+          name: string
+          notes?: string | null
+          pilot?: string | null
+          project_id: string
+          sensor?: string
+          updated_at?: string
+        }
+        Update: {
+          altitude_m?: number | null
+          area_ha?: number | null
+          campaign_id?: string | null
+          created_at?: string
+          created_by?: string
+          flown_at?: string | null
+          geometry_geojson?: Json | null
+          id?: string
+          name?: string
+          notes?: string | null
+          pilot?: string | null
+          project_id?: string
+          sensor?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_flights_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_flights_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drone_rasters: {
+        Row: {
+          bounds_geojson: Json | null
+          campaign_id: string | null
+          captured_at: string | null
+          created_at: string
+          created_by: string
+          flight_id: string | null
+          id: string
+          name: string
+          notes: string | null
+          project_id: string
+          raster_type: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          bounds_geojson?: Json | null
+          campaign_id?: string | null
+          captured_at?: string | null
+          created_at?: string
+          created_by: string
+          flight_id?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          project_id: string
+          raster_type?: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          bounds_geojson?: Json | null
+          campaign_id?: string | null
+          captured_at?: string | null
+          created_at?: string
+          created_by?: string
+          flight_id?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          project_id?: string
+          raster_type?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drone_rasters_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_rasters_flight_id_fkey"
+            columns: ["flight_id"]
+            isOneToOne: false
+            referencedRelation: "drone_flights"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "drone_rasters_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      exploration_campaigns: {
+        Row: {
+          aoi_geojson: Json | null
+          created_at: string
+          created_by: string
+          ended_at: string | null
+          id: string
+          lead_user_id: string | null
+          name: string
+          notes: string | null
+          phase: string
+          project_id: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          aoi_geojson?: Json | null
+          created_at?: string
+          created_by: string
+          ended_at?: string | null
+          id?: string
+          lead_user_id?: string | null
+          name: string
+          notes?: string | null
+          phase?: string
+          project_id: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          aoi_geojson?: Json | null
+          created_at?: string
+          created_by?: string
+          ended_at?: string | null
+          id?: string
+          lead_user_id?: string | null
+          name?: string
+          notes?: string | null
+          phase?: string
+          project_id?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exploration_campaigns_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -565,6 +767,7 @@ export type Database = {
       }
       geophysics_surveys: {
         Row: {
+          campaign_id: string | null
           cost_usd: number | null
           created_at: string
           created_by: string | null
@@ -581,6 +784,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          campaign_id?: string | null
           cost_usd?: number | null
           created_at?: string
           created_by?: string | null
@@ -597,6 +801,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          campaign_id?: string | null
           cost_usd?: number | null
           created_at?: string
           created_by?: string | null
@@ -613,6 +818,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "geophysics_surveys_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "geophysics_surveys_project_id_fkey"
             columns: ["project_id"]
@@ -687,6 +899,53 @@ export type Database = {
             columns: ["reference_id"]
             isOneToOne: false
             referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_views: {
+        Row: {
+          center_lat: number | null
+          center_lng: number | null
+          created_at: string
+          id: string
+          layer_state: Json
+          name: string
+          project_id: string
+          updated_at: string
+          user_id: string
+          zoom: number | null
+        }
+        Insert: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          id?: string
+          layer_state?: Json
+          name: string
+          project_id: string
+          updated_at?: string
+          user_id: string
+          zoom?: number | null
+        }
+        Update: {
+          center_lat?: number | null
+          center_lng?: number | null
+          created_at?: string
+          id?: string
+          layer_state?: Json
+          name?: string
+          project_id?: string
+          updated_at?: string
+          user_id?: string
+          zoom?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_views_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1020,6 +1279,7 @@ export type Database = {
           ag_gpt: number | null
           as_ppm: number | null
           au_gpt: number | null
+          campaign_id: string | null
           certificate: string | null
           created_at: string
           created_by: string
@@ -1048,6 +1308,7 @@ export type Database = {
           ag_gpt?: number | null
           as_ppm?: number | null
           au_gpt?: number | null
+          campaign_id?: string | null
           certificate?: string | null
           created_at?: string
           created_by: string
@@ -1076,6 +1337,7 @@ export type Database = {
           ag_gpt?: number | null
           as_ppm?: number | null
           au_gpt?: number | null
+          campaign_id?: string | null
           certificate?: string | null
           created_at?: string
           created_by?: string
@@ -1101,6 +1363,13 @@ export type Database = {
           zone?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sampling_results_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sampling_results_project_id_fkey"
             columns: ["project_id"]

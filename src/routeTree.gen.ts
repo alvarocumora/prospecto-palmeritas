@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
+import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
@@ -95,6 +96,12 @@ const AuthenticatedDashboardMarketplaceRoute =
     path: '/dashboard/marketplace',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardMapRoute =
+  AuthenticatedDashboardMapRouteImport.update({
+    id: '/dashboard/map',
+    path: '/dashboard/map',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardGeophysicsRoute =
   AuthenticatedDashboardGeophysicsRouteImport.update({
     id: '/dashboard/geophysics',
@@ -148,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
@@ -168,6 +176,7 @@ export interface FileRoutesByTo {
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
@@ -190,6 +199,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
@@ -212,6 +222,7 @@ export interface FileRouteTypes {
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/geophysics'
+    | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
@@ -232,6 +243,7 @@ export interface FileRouteTypes {
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/geophysics'
+    | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
@@ -253,6 +265,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/geophysics'
+    | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/profile'
@@ -358,6 +371,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/map': {
+      id: '/_authenticated/dashboard/map'
+      path: '/dashboard/map'
+      fullPath: '/dashboard/map'
+      preLoaderRoute: typeof AuthenticatedDashboardMapRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/geophysics': {
       id: '/_authenticated/dashboard/geophysics'
       path: '/dashboard/geophysics'
@@ -446,6 +466,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
@@ -462,6 +483,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
+  AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,

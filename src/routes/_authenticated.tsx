@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,6 +111,7 @@ function AuthenticatedLayout() {
 
         <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
           <NavItem to="/dashboard" icon={<LayoutDashboard className="w-3.5 h-3.5" />} label="Resumen" exact module="overview" role={role} />
+          <NavItem to="/dashboard/map" icon={<Compass className="w-3.5 h-3.5" />} label="Centro Op." module="overview" role={role} />
           {canAccess(role, "projects") && (
             <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" module="projects" role={role} />
           )}
