@@ -17,6 +17,7 @@ import { Route as InvitationsTokenRouteImport } from './routes/invitations.$toke
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
+import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
@@ -72,6 +73,12 @@ const AuthenticatedDashboardSamplingRoute =
   AuthenticatedDashboardSamplingRouteImport.update({
     id: '/dashboard/sampling',
     path: '/dashboard/sampling',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardQaqcRoute =
+  AuthenticatedDashboardQaqcRouteImport.update({
+    id: '/dashboard/qaqc',
+    path: '/dashboard/qaqc',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardProjectsRoute =
@@ -176,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -199,6 +207,7 @@ export interface FileRoutesByTo {
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -224,6 +233,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/projects'
+    | '/dashboard/qaqc'
     | '/dashboard/sampling'
     | '/dashboard/team'
     | '/dashboard/'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/projects'
+    | '/dashboard/qaqc'
     | '/dashboard/sampling'
     | '/dashboard/team'
     | '/dashboard'
@@ -296,6 +308,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/projects'
+    | '/_authenticated/dashboard/qaqc'
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/'
@@ -367,6 +380,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/sampling'
       fullPath: '/dashboard/sampling'
       preLoaderRoute: typeof AuthenticatedDashboardSamplingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/qaqc': {
+      id: '/_authenticated/dashboard/qaqc'
+      path: '/dashboard/qaqc'
+      fullPath: '/dashboard/qaqc'
+      preLoaderRoute: typeof AuthenticatedDashboardQaqcRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/projects': {
@@ -513,6 +533,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
+  AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -533,6 +554,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
+  AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,

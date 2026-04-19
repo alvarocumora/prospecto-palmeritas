@@ -1,6 +1,18 @@
 import { useProjects } from "./useProjects";
 
-export type ProjectRole = "owner" | "admin" | "geologist" | "viewer";
+export type ProjectRole =
+  | "owner"
+  | "admin"
+  | "project_manager"
+  | "chief_geologist"
+  | "geologist"
+  | "qaqc_officer"
+  | "field_technician"
+  | "drilling_supervisor"
+  | "hse_officer"
+  | "community_relations"
+  | "viewer"
+  | "external_consultant";
 
 /** Returns the current user's role on the active project (or null). */
 export function useProjectRole(): ProjectRole | null {
@@ -8,24 +20,34 @@ export function useProjectRole(): ProjectRole | null {
   return (active?.role as ProjectRole | undefined) ?? null;
 }
 
+const ALL_VIEW: ProjectRole[] = [
+  "owner", "admin", "project_manager", "chief_geologist", "geologist",
+  "qaqc_officer", "field_technician", "drilling_supervisor", "hse_officer",
+  "community_relations", "viewer", "external_consultant",
+];
+
 /** Permission matrix per module. */
 export const MODULE_ROLES: Record<string, ProjectRole[]> = {
-  overview: ["owner", "admin", "geologist", "viewer"],
-  catastro: ["owner", "admin", "geologist", "viewer"],
-  geophysics: ["owner", "admin", "geologist", "viewer"],
-  drilling: ["owner", "admin", "geologist", "viewer"],
-  sampling: ["owner", "admin", "geologist", "viewer"],
-  palmeras: ["owner", "admin", "geologist"],
-  projects: ["owner", "admin"],
-  team: ["owner", "admin"],
-  audit: ["owner", "admin"],
-  marketplace: ["owner", "admin", "geologist"],
-  profile: ["owner", "admin", "geologist", "viewer"],
+  overview: ALL_VIEW,
+  catastro: ALL_VIEW,
+  geophysics: ALL_VIEW,
+  drilling: ALL_VIEW,
+  sampling: ALL_VIEW,
+  qaqc: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer"],
+  palmeras: ["owner", "admin", "project_manager", "chief_geologist", "geologist"],
+  projects: ["owner", "admin", "project_manager"],
+  team: ["owner", "admin", "project_manager"],
+  audit: ["owner", "admin", "project_manager", "chief_geologist"],
+  marketplace: ["owner", "admin", "project_manager", "chief_geologist", "geologist"],
+  profile: ALL_VIEW,
   settings: ["owner"],
 };
 
 /** Roles allowed to write (create/edit/delete) data. */
-export const WRITE_ROLES: ProjectRole[] = ["owner", "admin", "geologist"];
+export const WRITE_ROLES: ProjectRole[] = [
+  "owner", "admin", "project_manager", "chief_geologist", "geologist",
+  "qaqc_officer", "field_technician", "drilling_supervisor",
+];
 
 export function canAccess(role: ProjectRole | null, module: keyof typeof MODULE_ROLES): boolean {
   if (!role) return false;
