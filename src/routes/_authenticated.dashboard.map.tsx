@@ -21,6 +21,9 @@ import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivi
 import { useDroneFlights } from "@/hooks/useDroneFlights";
 import { RasterControlPanel, type RasterSettings } from "@/components/drones/RasterControlPanel";
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
+import { Map3DView } from "@/components/map/Map3DView";
+import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -48,6 +51,8 @@ function OperationalMap() {
   const [, setProspRun] = useState<ProspectivityRun | null>(null);
   const { rasters } = useDroneFlights(active?.id ?? null);
   const [rasterSettings, setRasterSettings] = useState<RasterSettings>({});
+  const [viewMode, setViewMode] = useState<ViewMode>("2d");
+  const { targets } = useExplorationTargets(active?.id ?? null);
 
   // Render prospectivity cells as a Leaflet layer that auto-updates
   useEffect(() => {
