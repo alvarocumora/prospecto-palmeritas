@@ -180,93 +180,104 @@ export function CoreLogPanel({
           </button>
         </div>
 
-        <div className="border border-border rounded overflow-hidden">
-          {loading ? (
-            <div className="p-6 text-center text-text-secondary text-sm">Cargando…</div>
-          ) : logs.length === 0 ? (
-            <div className="p-6 text-center text-text-secondary text-sm">Sin intervalos. Agrega el primero.</div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs">
-                <thead className="bg-bg-secondary border-b border-border">
-                  <tr className="text-left">
-                    <Th>Desde-Hasta (m)</Th>
-                    <Th>Litología</Th>
-                    <Th>Alteración</Th>
-                    <Th>Mineralización</Th>
-                    <Th>Estructura</Th>
-                    <Th>RQD%</Th>
-                    <Th>Rec%</Th>
-                    <Th>Veta%</Th>
-                    <Th>Sulf%</Th>
-                    <Th>Au g/t</Th>
-                    <Th>Cu %</Th>
-                    <Th>Ag g/t</Th>
-                    <Th> </Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.map((l) => {
-                    const auHi = (l.au_gpt ?? 0) > 1;
-                    const cuHi = (l.cu_pct ?? 0) > 0.5;
-                    const isOverlap = overlaps.has(l.id);
-                    return (
-                      <tr
-                        key={l.id}
-                        className={`border-b border-border last:border-0 hover:bg-accent/30 ${
-                          isOverlap ? "bg-amber-500/5" : ""
-                        }`}
-                      >
-                        <Td>
-                          <span className="font-mono">
-                            {l.depth_from}–{l.depth_to}
-                          </span>
-                          <span className="text-text-secondary ml-1">({(l.depth_to - l.depth_from).toFixed(2)})</span>
-                        </Td>
-                        <Td>{l.lithology ?? "—"}</Td>
-                        <Td>{l.alteration ?? "—"}</Td>
-                        <Td>{l.mineralization ?? "—"}</Td>
-                        <Td>{l.structure ?? "—"}</Td>
-                        <Td>{l.rqd_pct ?? "—"}</Td>
-                        <Td>{l.recovery_pct ?? "—"}</Td>
-                        <Td>{l.vein_pct ?? "—"}</Td>
-                        <Td>{l.sulfide_pct ?? "—"}</Td>
-                        <Td>
-                          <span className={auHi ? "text-amber-600 font-semibold" : ""}>
-                            {l.au_gpt ?? "—"}
-                          </span>
-                        </Td>
-                        <Td>
-                          <span className={cuHi ? "text-orange-600 font-semibold" : ""}>
-                            {l.cu_pct ?? "—"}
-                          </span>
-                        </Td>
-                        <Td>{l.ag_gpt ?? "—"}</Td>
-                        <Td>
-                          <div className="flex gap-1 justify-end">
-                            <button
-                              onClick={() => setEditing(l)}
-                              className="p-1 rounded hover:bg-accent"
-                              title="Editar"
-                            >
-                              <Pencil className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => onDelete(l)}
-                              className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                              title="Eliminar"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          </div>
-                        </Td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+        <div className="flex gap-3">
+          {logs.length > 0 && (
+            <div className="shrink-0 hidden md:block">
+              <div className="text-[10px] uppercase tracking-wider text-text-secondary mb-1 text-center">
+                Strip-log
+              </div>
+              <StripLog logs={logs} height={Math.max(400, logs.length * 24)} />
             </div>
           )}
+
+          <div className="flex-1 min-w-0 border border-border rounded overflow-hidden">
+            {loading ? (
+              <div className="p-6 text-center text-text-secondary text-sm">Cargando…</div>
+            ) : logs.length === 0 ? (
+              <div className="p-6 text-center text-text-secondary text-sm">Sin intervalos. Agrega el primero.</div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead className="bg-bg-secondary border-b border-border">
+                    <tr className="text-left">
+                      <Th>Desde-Hasta (m)</Th>
+                      <Th>Litología</Th>
+                      <Th>Alteración</Th>
+                      <Th>Mineralización</Th>
+                      <Th>Estructura</Th>
+                      <Th>RQD%</Th>
+                      <Th>Rec%</Th>
+                      <Th>Veta%</Th>
+                      <Th>Sulf%</Th>
+                      <Th>Au g/t</Th>
+                      <Th>Cu %</Th>
+                      <Th>Ag g/t</Th>
+                      <Th> </Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {logs.map((l) => {
+                      const auHi = (l.au_gpt ?? 0) > 1;
+                      const cuHi = (l.cu_pct ?? 0) > 0.5;
+                      const isOverlap = overlaps.has(l.id);
+                      return (
+                        <tr
+                          key={l.id}
+                          className={`border-b border-border last:border-0 hover:bg-accent/30 ${
+                            isOverlap ? "bg-amber-500/5" : ""
+                          }`}
+                        >
+                          <Td>
+                            <span className="font-mono">
+                              {l.depth_from}–{l.depth_to}
+                            </span>
+                            <span className="text-text-secondary ml-1">({(l.depth_to - l.depth_from).toFixed(2)})</span>
+                          </Td>
+                          <Td>{l.lithology ?? "—"}</Td>
+                          <Td>{l.alteration ?? "—"}</Td>
+                          <Td>{l.mineralization ?? "—"}</Td>
+                          <Td>{l.structure ?? "—"}</Td>
+                          <Td>{l.rqd_pct ?? "—"}</Td>
+                          <Td>{l.recovery_pct ?? "—"}</Td>
+                          <Td>{l.vein_pct ?? "—"}</Td>
+                          <Td>{l.sulfide_pct ?? "—"}</Td>
+                          <Td>
+                            <span className={auHi ? "text-amber-600 font-semibold" : ""}>
+                              {l.au_gpt ?? "—"}
+                            </span>
+                          </Td>
+                          <Td>
+                            <span className={cuHi ? "text-orange-600 font-semibold" : ""}>
+                              {l.cu_pct ?? "—"}
+                            </span>
+                          </Td>
+                          <Td>{l.ag_gpt ?? "—"}</Td>
+                          <Td>
+                            <div className="flex gap-1 justify-end">
+                              <button
+                                onClick={() => setEditing(l)}
+                                className="p-1 rounded hover:bg-accent"
+                                title="Editar"
+                              >
+                                <Pencil className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                onClick={() => onDelete(l)}
+                                className="p-1 rounded hover:bg-destructive/20 text-destructive"
+                                title="Eliminar"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </Td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
 
         {(creating || editing) && (
