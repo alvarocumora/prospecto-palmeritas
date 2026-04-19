@@ -5,3 +5,12 @@ verify_jwt = true
 
 [functions.send-project-invitation]
 verify_jwt = true
+
+[functions.section-interpret]
+verify_jwt = false
+
+[functions.geo-brief]
+verify_jwt = false
+
+[functions.prospectivity-grid]
+verify_jwt = false

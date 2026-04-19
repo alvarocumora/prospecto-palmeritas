@@ -153,6 +153,7 @@ function OperationalMap() {
           L={mapInst?.L ?? null}
           holes={holes}
           logsByHole={logsByHole}
+          projectName={active?.name}
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
         <GeoIntelBriefButton map={mapInst?.map ?? null} />

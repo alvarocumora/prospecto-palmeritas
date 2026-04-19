@@ -11,9 +11,10 @@ interface Props {
   L: LeafletNS | null;
   holes: DrillHole[];
   logsByHole: Record<string, DrillCoreLog[]>;
+  projectName?: string;
 }
 
-export function SectionBuilderTool({ map, L, holes, logsByHole }: Props) {
+export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: Props) {
   const [active, setActive] = useState(false);
   const [maxOffset, setMaxOffset] = useState(50);
   const [section, setSection] = useState<SectionLine | null>(null);
@@ -149,6 +150,7 @@ export function SectionBuilderTool({ map, L, holes, logsByHole }: Props) {
           line={section}
           holes={projected}
           maxOffsetM={maxOffset}
+          projectName={projectName}
           onClose={() => setShowView(false)}
         />
       )}
