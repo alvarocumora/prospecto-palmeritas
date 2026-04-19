@@ -15,6 +15,9 @@ import type { LeafletNS } from "@/components/map/types";
 import { Layers, FlaskConical, Camera, Loader2 } from "lucide-react";
 import { captureMapSnapshot, downloadDataUrl } from "@/lib/map/snapshot";
 import { GeoIntelBriefButton } from "@/components/GeoIntelBriefButton";
+import { ProspectivityButton } from "@/components/ProspectivityButton";
+import { buildProspectivityLayer } from "@/components/map/prospectivityLayer";
+import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivity";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
