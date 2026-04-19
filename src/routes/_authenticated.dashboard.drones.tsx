@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plane, Image as ImageIcon, Trash2, Upload, Plus } from "lucide-react";
+import { Plane, Image as ImageIcon, Trash2, Upload, Plus, FileImage } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -12,6 +12,7 @@ import {
   deleteRaster,
 } from "@/hooks/useDroneFlights";
 import { parseGeoFile } from "@/lib/geo/parseKml";
+import { RasterUploader } from "@/components/drones/RasterUploader";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drones")({
   head: () => ({
@@ -33,6 +34,7 @@ function DronesPage() {
   const [tab, setTab] = useState<"flights" | "rasters">("flights");
   const [showFlight, setShowFlight] = useState(false);
   const [showRaster, setShowRaster] = useState(false);
+  const [showUploader, setShowUploader] = useState(false);
 
   if (!active) {
     return <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto activo.</div>;
@@ -59,12 +61,23 @@ function DronesPage() {
           <div className="text-[10px] font-mono uppercase text-muted-foreground">Geocapitals · {active.name}</div>
           <h1 className="text-xl font-mono font-semibold flex items-center gap-2"><Plane className="w-5 h-5 text-info" /> Drones</h1>
         </div>
-        <button
-          onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster"}
-        </button>
+        <div className="flex items-center gap-2">
+          {tab === "rasters" && (
+            <button
+              onClick={() => setShowUploader(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold text-gold text-xs font-mono font-semibold hover:bg-gold/10"
+              title="Subir GeoTIFF, ortofoto o DSM directamente al proyecto"
+            >
+              <FileImage className="w-3.5 h-3.5" /> Subir GeoTIFF
+            </button>
+          )}
+          <button
+            onClick={() => (tab === "flights" ? setShowFlight(true) : setShowRaster(true))}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
+          >
+            <Plus className="w-3.5 h-3.5" /> Nuevo {tab === "flights" ? "vuelo" : "raster (URL)"}
+          </button>
+        </div>
       </header>
 
       <div className="flex gap-1 border-b border-border">
@@ -104,6 +117,15 @@ function DronesPage() {
           flights={flights}
           onClose={() => setShowRaster(false)}
           onSaved={() => { setShowRaster(false); refresh(); }}
+        />
+      )}
+      {showUploader && (
+        <RasterUploader
+          projectId={active.id}
+          userId={user.id}
+          flights={flights}
+          onClose={() => setShowUploader(false)}
+          onSaved={() => { setShowUploader(false); refresh(); }}
         />
       )}
     </div>
@@ -182,17 +204,33 @@ function RastersTable({
             <th className="text-left px-3 py-2">Nombre</th>
             <th className="text-left px-3 py-2">Tipo</th>
             <th className="text-left px-3 py-2">Capturado</th>
-            <th className="text-left px-3 py-2">URL</th>
+            <th className="text-left px-3 py-2">CRS</th>
+            <th className="text-right px-3 py-2">Tamaño</th>
+            <th className="text-left px-3 py-2">Origen</th>
             <th className="px-3 py-2"></th>
           </tr>
         </thead>
         <tbody>
           {rasters.map((r) => (
             <tr key={r.id} className="border-t border-border hover:bg-accent/30">
-              <td className="px-3 py-2 font-semibold text-foreground inline-flex items-center gap-1.5"><ImageIcon className="w-3 h-3 text-gold" /> {r.name}</td>
+              <td className="px-3 py-2 font-semibold text-foreground">
+                <div className="inline-flex items-center gap-1.5"><ImageIcon className="w-3 h-3 text-gold" /> {r.name}</div>
+                {r.processing && <div className="text-[9px] text-warning">⏳ procesando metadata…</div>}
+                {r.width_px && r.height_px && (
+                  <div className="text-[9px] text-muted-foreground">{r.width_px}×{r.height_px}px {r.pixel_size_m ? `· ${r.pixel_size_m.toFixed(2)} m/px` : ""}</div>
+                )}
+              </td>
               <td className="px-3 py-2 uppercase">{r.raster_type}</td>
               <td className="px-3 py-2 text-muted-foreground">{r.captured_at ?? "—"}</td>
-              <td className="px-3 py-2 text-muted-foreground"><a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[200px]">{r.url}</a></td>
+              <td className="px-3 py-2 text-muted-foreground text-[10px]">{r.crs ?? "—"}</td>
+              <td className="px-3 py-2 text-right text-muted-foreground">{r.file_size_bytes ? `${(r.file_size_bytes / 1024 / 1024).toFixed(1)} MB` : "—"}</td>
+              <td className="px-3 py-2">
+                {r.storage_path ? (
+                  <span className="px-1.5 py-0.5 rounded bg-gold/10 text-gold text-[9px] uppercase">Storage</span>
+                ) : (
+                  <a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[150px] text-[10px]">URL ext ↗</a>
+                )}
+              </td>
               <td className="px-3 py-2 text-right">
                 <button onClick={() => onDelete(r.id, r.name)} className="text-destructive hover:bg-destructive/10 p-1 rounded" aria-label="Eliminar">
                   <Trash2 className="w-3.5 h-3.5" />

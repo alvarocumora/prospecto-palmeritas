@@ -146,4 +146,18 @@
     color: var(--foreground);
   }
   .input:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+
+  /* Sprint 6.3 — Raster overlay colormaps (CSS-only, applied to L.imageOverlay <img>) */
+  .raster-viridis img,
+  .leaflet-image-layer.raster-viridis {
+    filter: hue-rotate(80deg) saturate(1.6) contrast(1.15);
+  }
+  .raster-magma img,
+  .leaflet-image-layer.raster-magma {
+    filter: hue-rotate(-40deg) saturate(1.8) contrast(1.2) brightness(0.95);
+  }
+  .raster-terrain img,
+  .leaflet-image-layer.raster-terrain {
+    filter: sepia(0.5) hue-rotate(20deg) saturate(1.4);
+  }
 }
