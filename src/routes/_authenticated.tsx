@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 
@@ -22,13 +22,25 @@ export const Route = createFileRoute("/_authenticated")({
 });
 
 const ROLE_LABELS: Record<ProjectRole, string> = {
-  owner: "Propietario", admin: "Admin", geologist: "Geólogo", viewer: "Lector",
+  owner: "Propietario", admin: "Admin", project_manager: "PM",
+  chief_geologist: "Geólogo Jefe", geologist: "Geólogo", qaqc_officer: "QA/QC",
+  field_technician: "Técnico", drilling_supervisor: "Sup. Sondaje",
+  hse_officer: "HSE", community_relations: "Comunidad",
+  viewer: "Lector", external_consultant: "Consultor",
 };
 const ROLE_COLORS: Record<ProjectRole, string> = {
   owner: "bg-gold/15 text-gold border-gold/30",
   admin: "bg-info/15 text-info border-info/30",
+  project_manager: "bg-info/15 text-info border-info/30",
+  chief_geologist: "bg-gold/15 text-gold border-gold/30",
   geologist: "bg-teal/15 text-teal border-teal/30",
+  qaqc_officer: "bg-teal/15 text-teal border-teal/30",
+  field_technician: "bg-muted text-muted-foreground border-border",
+  drilling_supervisor: "bg-info/15 text-info border-info/30",
+  hse_officer: "bg-destructive/15 text-destructive border-destructive/30",
+  community_relations: "bg-muted text-muted-foreground border-border",
   viewer: "bg-muted text-muted-foreground border-border",
+  external_consultant: "bg-muted text-muted-foreground border-border",
 };
 
 function AuthenticatedLayout() {
@@ -126,6 +138,7 @@ function AuthenticatedLayout() {
           <NavItem to="/dashboard/drones" icon={<Plane className="w-3.5 h-3.5" />} label="Drones" module="geophysics" role={role} />
           <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" module="drilling" role={role} />
           <NavItem to="/dashboard/sampling" icon={<TestTube2 className="w-3.5 h-3.5" />} label="Muestreo" module="sampling" role={role} />
+          <NavItem to="/dashboard/qaqc" icon={<ShieldCheck className="w-3.5 h-3.5" />} label="QA/QC" module="qaqc" role={role} />
 
           <div className="pt-3 mt-3 border-t border-border" />
           {canAccess(role, "team") && (
