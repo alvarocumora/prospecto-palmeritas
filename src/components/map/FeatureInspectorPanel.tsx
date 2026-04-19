@@ -142,3 +142,42 @@ function StationBody({ s }: { s: GeophysicsStation }) {
     </>
   );
 }
+
+function FlightBody({ f }: { f: DroneFlight }) {
+  return (
+    <>
+      <div className="text-base font-bold text-info mb-2">{f.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{f.sensor} · drone</div>
+      <Row label="Piloto" value={f.pilot ?? "—"} />
+      <Row label="Fecha" value={f.flown_at ?? "—"} />
+      <Row label="Altura" value={f.altitude_m != null ? `${f.altitude_m} m` : "—"} />
+      <Row label="Área" value={f.area_ha != null ? `${f.area_ha} ha` : "—"} />
+      {f.notes && <Row label="Notas" value={f.notes} />}
+      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Drones <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
+function RasterBody({ r }: { r: DroneRaster }) {
+  return (
+    <>
+      <div className="text-base font-bold text-gold mb-2">{r.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{r.raster_type}</div>
+      <Row label="Capturado" value={r.captured_at ?? "—"} />
+      <Row
+        label="URL"
+        value={
+          <a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[140px]">
+            abrir ↗
+          </a>
+        }
+      />
+      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Drones <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
