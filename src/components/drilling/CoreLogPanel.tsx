@@ -187,7 +187,12 @@ export function CoreLogPanel({
               <div className="text-[10px] uppercase tracking-wider text-text-secondary mb-1 text-center">
                 Strip-log
               </div>
-              <StripLog logs={logs} height={Math.max(400, logs.length * 24)} />
+              <StripLog
+                logs={logs}
+                height={Math.max(400, logs.length * 24)}
+                hoveredId={hoveredId}
+                onHover={setHoveredId}
+              />
             </div>
           )}
 
