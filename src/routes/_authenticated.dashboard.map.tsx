@@ -27,6 +27,7 @@ import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
 import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
+import { TimeSlider } from "@/components/map/TimeSlider";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
