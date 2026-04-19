@@ -1,37 +1,44 @@
 
-Add a "mineralization halo" around drill collar markers in `ProjectMap` based on best intercept's grade·length score (Au g/t × meters).
+Add a second column to `StripLog` showing lithology, color-coded by lithology code, side-by-side with the Au heat column for visual grade-vs-rock comparison.
 
 ## Approach
 
-Reuse existing `useProjectCoreLogs` + `computeIntercepts` + `bestIntercept` utilities to derive a metal-score per hole. Render an extra halo `circleMarker` (larger radius, low fill opacity, no fill — colored stroke) underneath the existing collar dot.
+Add a lithology column (same height/scale as Au column) to the right of the Au strip. Color each interval by a deterministic mapping of common lithology codes (granite, andesite, breccia, vein, etc.) with a fallback hash-based color for unknowns. Include short code labels inside bars when tall enough.
 
-### Score → color scale
-- score = `au_gpt × length_m` (units: g·m/t — common "GT" metric)
-- Bins (typical for Au exploration):
-  - score = 0 or no intercept → no halo
-  - 0 < s ≤ 5 → light green `#86efac` (low)
-  - 5 < s ≤ 20 → yellow-green `#bef264` (moderate)
-  - 20 < s ≤ 50 → amber `#fbbf24` (good)
-  - 50 < s ≤ 150 → orange `#fb923c` (high)
-  - s > 150 → deep red `#dc2626` (exceptional)
-- Halo radius scales: 12px base + min(score/10, 18) → max ~30px
-- Stroke weight 2.5, fillOpacity 0.18
+### Lithology color palette (geology-conventional)
+- `granite` / `granito` → `#fcd9b6` (pink-tan)
+- `andesite` / `andesita` → `#7c8a99` (slate)
+- `basalt` / `basalto` → `#3d3d3d` (dark gray)
+- `rhyolite` / `riolita` → `#e8a598` (salmon)
+- `dacite` / `dacita` → `#b89968` (tan)
+- `diorite` / `diorita` → `#5a6b7a` (blue-gray)
+- `breccia` / `brecha` → `#a0522d` (sienna)
+- `vein` / `veta` / `vetilla` → `#fbbf24` (amber — quartz/sulfide)
+- `skarn` → `#84cc16` (lime)
+- `shale` / `lutita` → `#4a5568` (dark slate)
+- `sandstone` / `arenisca` → `#f5d491` (sand)
+- `limestone` / `caliza` → `#e8e0d0` (cream)
+- `tuff` / `toba` → `#d4b8a8` (dusty rose)
+- unknown → hash-derived HSL (stable per string)
+- null/empty → muted gray
+
+### Layout changes (StripLog.tsx)
+```
+[depth axis 28px] [Au col 36px] [Litho col 48px] [legend ~80px]
+```
+- Litho column shows abbreviation (first 3 letters uppercase) centered when bar height ≥ 14px
+- Hover tooltip on litho bar shows full lithology + depth range
+- Header labels above each column ("Au" / "Lito") replacing the inline `Au` legend label
+
+### Legend restructure
+Two compact legend stacks (Au + Lito) side by side, or stacked vertically. Keep current Au legend; add a second small Litho legend listing only the codes actually present in this hole (dynamic) — avoids clutter.
 
 ## Files
+- **edit** `src/components/drilling/StripLog.tsx`:
+  - Add `LITHOLOGY_COLORS` map + `lithoColor(code)` with hash fallback
+  - Add second column rendering (same scale function)
+  - Compute `presentLithos` via useMemo for dynamic legend
+  - Restructure legend into two compact sections
+  - Adjust outer container width
 
-### 1. Edit `src/lib/drilling/intercepts.ts`
-- Add `interceptScore(it)` → `(it.au_gpt ?? 0) * it.length`
-- Add `scoreToHaloColor(score)` returning `{ color, radius } | null`
-
-### 2. Edit `src/components/map/drillCollarsLayer.ts`
-- Accept optional second arg `scoresByHole?: Record<string, number>` in `buildDrillCollarsLayer`
-- For each hole with score > 0, add halo `circleMarker` BEFORE the collar dot
-- Halo popup also shows the best intercept summary line if score available
-
-### 3. Edit `src/components/ProjectMap.tsx`
-- Already imports `useDrillHoles`. Add `useProjectCoreLogs(activeProjectId)`
-- Compute `scoresByHole` via `useMemo` (best intercept per hole, cutoff 0.5 / dilution 2)
-- Pass to `buildDrillCollarsLayer(L, holes, scoresByHole)`
-- Add a small legend chip for the halo scale next to the existing "X sondajes" chip
-
-## No DB / no deps.
+No DB / no deps / no other files touched.
