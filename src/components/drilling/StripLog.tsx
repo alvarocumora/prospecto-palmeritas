@@ -98,6 +98,17 @@ function lithoColor(code: string | null | undefined): string {
   return hashHsl(lc);
 }
 
+function altColor(code: string | null | undefined): string {
+  if (!code || !code.trim()) return "hsl(var(--muted-foreground) / 0.15)";
+  const lc = code.toLowerCase();
+  // longer keys first to prefer "advanced argillic" over "argillic"
+  const keys = Object.keys(ALTERATION_COLORS).sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    if (lc.includes(key)) return ALTERATION_COLORS[key];
+  }
+  return hashHsl("alt:" + lc);
+}
+
 /** Choose readable text color (black/white) over a given hex/hsl bg. Heuristic on luminance. */
 function textOn(bg: string): string {
   // crude: only pick black for known light hex codes
