@@ -13,13 +13,18 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
+import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
+import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
+import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
+import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 
@@ -42,10 +47,21 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
+  id: '/invitations/$token',
+  path: '/invitations/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
     path: '/dashboard/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTeamRoute =
+  AuthenticatedDashboardTeamRouteImport.update({
+    id: '/dashboard/team',
+    path: '/dashboard/team',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSamplingRoute =
@@ -60,10 +76,22 @@ const AuthenticatedDashboardProjectsRoute =
     path: '/dashboard/projects',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardProfileRoute =
+  AuthenticatedDashboardProfileRouteImport.update({
+    id: '/dashboard/profile',
+    path: '/dashboard/profile',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardPalmerasRoute =
   AuthenticatedDashboardPalmerasRouteImport.update({
     id: '/dashboard/palmeras',
     path: '/dashboard/palmeras',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMarketplaceRoute =
+  AuthenticatedDashboardMarketplaceRouteImport.update({
+    id: '/dashboard/marketplace',
+    path: '/dashboard/marketplace',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardGeophysicsRoute =
@@ -84,6 +112,12 @@ const AuthenticatedDashboardCatastroRoute =
     path: '/dashboard/catastro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAuditRoute =
+  AuthenticatedDashboardAuditRouteImport.update({
+    id: '/dashboard/audit',
+    path: '/dashboard/audit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdRoute =
   AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
     id: '/$surveyId',
@@ -101,12 +135,17 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/invitations/$token': typeof InvitationsTokenRoute
+  '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -115,12 +154,17 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/invitations/$token': typeof InvitationsTokenRoute
+  '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -131,12 +175,17 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/invitations/$token': typeof InvitationsTokenRoute
+  '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -147,12 +196,17 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/invitations/$token'
+    | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/geophysics'
+    | '/dashboard/marketplace'
     | '/dashboard/palmeras'
+    | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/sampling'
+    | '/dashboard/team'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/geophysics/$surveyId/field'
@@ -161,12 +215,17 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/invitations/$token'
+    | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
     | '/dashboard/geophysics'
+    | '/dashboard/marketplace'
     | '/dashboard/palmeras'
+    | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/sampling'
+    | '/dashboard/team'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/geophysics/$surveyId/field'
@@ -176,12 +235,17 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/invitations/$token'
+    | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/geophysics'
+    | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/palmeras'
+    | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/sampling'
+    | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
@@ -192,6 +256,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  InvitationsTokenRoute: typeof InvitationsTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,11 +289,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invitations/$token': {
+      id: '/invitations/$token'
+      path: '/invitations/$token'
+      fullPath: '/invitations/$token'
+      preLoaderRoute: typeof InvitationsTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/team': {
+      id: '/_authenticated/dashboard/team'
+      path: '/dashboard/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/sampling': {
@@ -245,11 +324,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProjectsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/profile': {
+      id: '/_authenticated/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/palmeras': {
       id: '/_authenticated/dashboard/palmeras'
       path: '/dashboard/palmeras'
       fullPath: '/dashboard/palmeras'
       preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/marketplace': {
+      id: '/_authenticated/dashboard/marketplace'
+      path: '/dashboard/marketplace'
+      fullPath: '/dashboard/marketplace'
+      preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/geophysics': {
@@ -271,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/catastro'
       fullPath: '/dashboard/catastro'
       preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/audit': {
+      id: '/_authenticated/dashboard/audit'
+      path: '/dashboard/audit'
+      fullPath: '/dashboard/audit'
+      preLoaderRoute: typeof AuthenticatedDashboardAuditRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/geophysics/$surveyId': {
@@ -321,23 +421,32 @@ const AuthenticatedDashboardGeophysicsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
+  AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
+  AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
+  AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
+  AuthenticatedDashboardMarketplaceRoute:
+    AuthenticatedDashboardMarketplaceRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
+  AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
+  AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
 }
 
@@ -350,6 +459,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  InvitationsTokenRoute: InvitationsTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
