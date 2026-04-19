@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Plus, Pencil, Trash2, AlertTriangle, Sparkles } from "lucide-react";
 import { useDrillCoreLogs, type DrillCoreLog, type DrillHole } from "@/hooks/useDrilling";
 import { StripLog } from "./StripLog";
@@ -35,6 +35,17 @@ export function CoreLogPanel({
   const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
   const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [flashId, setFlashId] = useState<string | null>(null);
+  const rowRefs = useRef<Record<string, HTMLTableRowElement | null>>({});
+
+  const scrollToRow = (id: string) => {
+    const row = rowRefs.current[id];
+    if (row) {
+      row.scrollIntoView({ block: "center", behavior: "smooth" });
+      setFlashId(id);
+      setTimeout(() => setFlashId((cur) => (cur === id ? null : cur)), 1200);
+    }
+  };
 
   const intercepts = useMemo(
     () => computeIntercepts(logs, cutoff, dilution),
@@ -192,6 +203,7 @@ export function CoreLogPanel({
                 height={Math.max(400, logs.length * 24)}
                 hoveredId={hoveredId}
                 onHover={setHoveredId}
+                onSelect={scrollToRow}
               />
             </div>
           )}
@@ -229,10 +241,16 @@ export function CoreLogPanel({
                       return (
                         <tr
                           key={l.id}
+                          ref={(el) => {
+                            rowRefs.current[l.id] = el;
+                          }}
+                          data-row-id={l.id}
                           onMouseEnter={() => setHoveredId(l.id)}
                           onMouseLeave={() => setHoveredId(null)}
                           className={`border-b border-border last:border-0 transition-colors ${
-                            hoveredId === l.id
+                            flashId === l.id
+                              ? "bg-primary/20 outline outline-2 outline-primary"
+                              : hoveredId === l.id
                               ? "bg-primary/10 outline outline-1 outline-primary"
                               : isOverlap
                               ? "bg-amber-500/5 hover:bg-accent/30"

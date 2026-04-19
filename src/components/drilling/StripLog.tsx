@@ -140,6 +140,7 @@ export function StripLog({
   intWidth = 10,
   hoveredId = null,
   onHover,
+  onSelect,
 }: {
   logs: DrillCoreLog[];
   height?: number;
@@ -149,6 +150,7 @@ export function StripLog({
   intWidth?: number;
   hoveredId?: string | null;
   onHover?: (id: string | null) => void;
+  onSelect?: (id: string) => void;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
@@ -239,7 +241,8 @@ export function StripLog({
                 title={`${l.depth_from}–${l.depth_to} m · Au ${l.au_gpt ?? "—"} g/t`}
                 onMouseEnter={() => onHover?.(l.id)}
                 onMouseLeave={() => onHover?.(null)}
-                className={`absolute left-0 right-0 border-t border-background/40 cursor-help transition-all ${
+                onClick={() => onSelect?.(l.id)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer transition-all ${
                   isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{ top, height: h, background: auColor(l.au_gpt) }}
@@ -269,7 +272,8 @@ export function StripLog({
                 title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin litología"}`}
                 onMouseEnter={() => onHover?.(l.id)}
                 onMouseLeave={() => onHover?.(null)}
-                className={`absolute left-0 right-0 border-t border-background/40 cursor-help flex items-center justify-center font-mono font-semibold transition-all ${
+                onClick={() => onSelect?.(l.id)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer flex items-center justify-center font-mono font-semibold transition-all ${
                   isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{
@@ -308,7 +312,8 @@ export function StripLog({
                 title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin alteración"}`}
                 onMouseEnter={() => onHover?.(l.id)}
                 onMouseLeave={() => onHover?.(null)}
-                className={`absolute left-0 right-0 border-t border-background/40 cursor-help flex items-center justify-center font-mono font-semibold transition-all ${
+                onClick={() => onSelect?.(l.id)}
+                className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer flex items-center justify-center font-mono font-semibold transition-all ${
                   isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{
