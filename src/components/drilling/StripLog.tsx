@@ -135,11 +135,13 @@ export function StripLog({
   height = 600,
   auWidth = 36,
   lithoWidth = 48,
+  altWidth = 48,
 }: {
   logs: DrillCoreLog[];
   height?: number;
   auWidth?: number;
   lithoWidth?: number;
+  altWidth?: number;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
