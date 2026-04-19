@@ -618,57 +618,61 @@ export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps =
         {mapReady && <CoordinateFooter map={mapRef.current} />}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
-        <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
-        {ORIGEN_ORDER.map(renderChip)}
-        <a
-          href={`https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index?lat=${CENTER[0]}&lng=${CENTER[1]}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
-          title="Abrir el visor oficial de SERNAGEOMIN"
-        >
-          ↗ Visor SERNAGEOMIN
-        </a>
-      </div>
+      {!fillHeight && (
+        <>
+          <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono">
+            <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
+            {ORIGEN_ORDER.map(renderChip)}
+            <a
+              href={`https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index?lat=${CENTER[0]}&lng=${CENTER[1]}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
+              title="Abrir el visor oficial de SERNAGEOMIN"
+            >
+              ↗ Visor SERNAGEOMIN
+            </a>
+          </div>
 
-      <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-4 h-0.5 bg-gold-light" /> Veta Au–Cu
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full border-2 border-teal" /> Cluster palmeras
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 bg-copper inline-block" style={{ transform: "rotate(45deg)" }} /> Labor antigua
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
-        </span>
-        <span className="inline-flex items-center gap-1.5" title="Halo = mejor intercept (Au g/t × m)">
-          <span className="text-muted-foreground/70">Halo GT:</span>
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#86efac" }} title="≤5" />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#bef264" }} title="5–20" />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} title="20–50" />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fb923c" }} title="50–150" />
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#dc2626" }} title=">150" />
-          <span className="text-muted-foreground/70">g·m/t</span>
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
-        </span>
-        <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
-      </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-4 h-0.5 bg-gold-light" /> Veta Au–Cu
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full border-2 border-teal" /> Cluster palmeras
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 bg-copper inline-block" style={{ transform: "rotate(45deg)" }} /> Labor antigua
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
+            </span>
+            <span className="inline-flex items-center gap-1.5" title="Halo = mejor intercept (Au g/t × m)">
+              <span className="text-muted-foreground/70">Halo GT:</span>
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#86efac" }} title="≤5" />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#bef264" }} title="5–20" />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} title="20–50" />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fb923c" }} title="50–150" />
+              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#dc2626" }} title=">150" />
+              <span className="text-muted-foreground/70">g·m/t</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
+            </span>
+            <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
+          </div>
 
-      <div className="flex flex-wrap items-center gap-3">
-        <MagnetometryLegend stats={magStats} />
-      </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <MagnetometryLegend stats={magStats} />
+          </div>
+        </>
+      )}
     </div>
   );
 }
