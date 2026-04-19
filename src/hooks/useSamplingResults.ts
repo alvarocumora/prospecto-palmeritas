@@ -21,6 +21,9 @@ export type SamplingResult = {
   notes: string | null;
   sampled_at: string | null;
   created_at: string;
+  record_status: string;
+  approved_by: string | null;
+  approved_at: string | null;
 };
 
 export function useSamplingResults(projectId: string | null) {

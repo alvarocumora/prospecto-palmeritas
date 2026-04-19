@@ -43,6 +43,9 @@ export type DrillCoreLog = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  record_status: string;
+  approved_by: string | null;
+  approved_at: string | null;
 };
 
 export const HOLE_STATUSES = ["proposed", "in_progress", "completed", "abandoned"] as const;
