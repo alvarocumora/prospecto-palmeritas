@@ -43,6 +43,45 @@ const LITHOLOGY_COLORS: Record<string, string> = {
   toba: "#d4b8a8",
 };
 
+/** Porphyry-system alteration palette (Lowell-Guilbert convention). */
+const ALTERATION_COLORS: Record<string, string> = {
+  // Potásica — rosa/rojo (biotita-K-feldespato)
+  potassic: "#c0392b",
+  potasica: "#c0392b",
+  "k-feldspar": "#c0392b",
+  biotita: "#c0392b",
+  // Sericítica / fílica — verde-amarillo (cuarzo-sericita-pirita)
+  phyllic: "#9acd32",
+  filica: "#9acd32",
+  sericitic: "#9acd32",
+  sericitica: "#9acd32",
+  qsp: "#9acd32",
+  // Argílica — celeste (caolinita/illita)
+  argillic: "#7fb3d5",
+  argilica: "#7fb3d5",
+  // Argílica avanzada — azul más intenso (alunita/pirofilita)
+  "advanced argillic": "#2874a6",
+  "argilica avanzada": "#2874a6",
+  alunita: "#2874a6",
+  // Propilítica — verde oscuro (clorita-epidota-calcita)
+  propylitic: "#2e7d32",
+  propilitica: "#2e7d32",
+  clorita: "#2e7d32",
+  epidota: "#2e7d32",
+  // Silícea / silicificación — gris claro
+  silicic: "#bdc3c7",
+  silica: "#bdc3c7",
+  silicea: "#bdc3c7",
+  silicification: "#bdc3c7",
+  silicificacion: "#bdc3c7",
+  // Skarn / calc-silicato — oliva
+  calcsilicate: "#827717",
+  "calc-silicate": "#827717",
+  // Sin alteración / fresca
+  fresh: "#ecf0f1",
+  fresca: "#ecf0f1",
+};
+
 /** Stable hash → HSL fallback for unknown lithology codes. */
 function hashHsl(s: string): string {
   let h = 0;
@@ -57,6 +96,17 @@ function lithoColor(code: string | null | undefined): string {
     if (lc.includes(key)) return LITHOLOGY_COLORS[key];
   }
   return hashHsl(lc);
+}
+
+function altColor(code: string | null | undefined): string {
+  if (!code || !code.trim()) return "hsl(var(--muted-foreground) / 0.15)";
+  const lc = code.toLowerCase();
+  // longer keys first to prefer "advanced argillic" over "argillic"
+  const keys = Object.keys(ALTERATION_COLORS).sort((a, b) => b.length - a.length);
+  for (const key of keys) {
+    if (lc.includes(key)) return ALTERATION_COLORS[key];
+  }
+  return hashHsl("alt:" + lc);
 }
 
 /** Choose readable text color (black/white) over a given hex/hsl bg. Heuristic on luminance. */
@@ -85,11 +135,13 @@ export function StripLog({
   height = 600,
   auWidth = 36,
   lithoWidth = 48,
+  altWidth = 48,
 }: {
   logs: DrillCoreLog[];
   height?: number;
   auWidth?: number;
   lithoWidth?: number;
+  altWidth?: number;
 }) {
   const sorted = useMemo(
     () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
@@ -119,6 +171,18 @@ export function StripLog({
     const seen = new Map<string, string>(); // key=lower, value=original
     for (const l of sorted) {
       const c = (l.lithology ?? "").trim();
+      if (!c) continue;
+      const k = c.toLowerCase();
+      if (!seen.has(k)) seen.set(k, c);
+    }
+    return Array.from(seen.values());
+  }, [sorted]);
+
+  // Unique alterations present (preserve first-seen order)
+  const presentAlts = useMemo(() => {
+    const seen = new Map<string, string>();
+    for (const l of sorted) {
+      const c = (l.alteration ?? "").trim();
       if (!c) continue;
       const k = c.toLowerCase();
       if (!seen.has(k)) seen.set(k, c);
@@ -205,6 +269,40 @@ export function StripLog({
         </div>
       </div>
 
+      {/* Alteration column */}
+      <div className="flex flex-col" style={{ width: altWidth }}>
+        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+          Alt
+        </div>
+        <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
+          {sorted.map((l) => {
+            const top = scale(l.depth_from);
+            const h = Math.max(scale(l.depth_to) - scale(l.depth_from), 1);
+            const bg = altColor(l.alteration);
+            const code = l.alteration?.trim() || "";
+            const label = code ? abbr(code) : "";
+            const showLabel = h >= 14 && label.length > 0;
+            return (
+              <div
+                key={l.id}
+                title={`${l.depth_from}–${l.depth_to} m${code ? ` · ${code}` : " · sin alteración"}`}
+                className="absolute left-0 right-0 border-t border-background/40 hover:outline hover:outline-1 hover:outline-foreground/60 cursor-help flex items-center justify-center font-mono font-semibold"
+                style={{
+                  top,
+                  height: h,
+                  background: bg,
+                  fontSize: 9,
+                  color: textOn(bg),
+                  letterSpacing: "0.03em",
+                }}
+              >
+                {showLabel ? label : null}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Legends */}
       <div className="flex flex-col text-[9px] font-mono text-text-secondary gap-2 pl-1" style={{ marginTop: headerH }}>
         <div className="flex flex-col gap-0.5">
@@ -224,6 +322,18 @@ export function StripLog({
             {presentLithos.map((c) => (
               <div key={c} className="flex items-center gap-1" title={c}>
                 <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: lithoColor(c) }} />
+                <span className="truncate max-w-[70px]">{c}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {presentAlts.length > 0 && (
+          <div className="flex flex-col gap-0.5">
+            <div className="font-semibold text-foreground">Alt</div>
+            {presentAlts.map((c) => (
+              <div key={c} className="flex items-center gap-1" title={c}>
+                <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: altColor(c) }} />
                 <span className="truncate max-w-[70px]">{c}</span>
               </div>
             ))}
