@@ -407,6 +407,36 @@ export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps =
     });
   }, [samples, onInspect]);
 
+  // Drone flights + rasters layer
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (droneLayerRef.current) {
+      map.removeLayer(droneLayerRef.current);
+      droneLayerRef.current = null;
+    }
+    const layer = buildDroneLayer(L, droneFlights, droneRasters, {
+      onFlightClick: (f) => onInspect?.({ kind: "drone_flight", data: f }),
+      onRasterClick: (r) => onInspect?.({ kind: "drone_raster", data: r }),
+    });
+    droneLayerRef.current = layer;
+    if (droneFlights.length > 0 || droneRasters.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "drones:flights");
+      return [
+        ...without,
+        {
+          id: "drones:flights",
+          label: `Drones (${droneFlights.length} vuelos · ${droneRasters.length} rasters)`,
+          group: "Geofísica",
+          layer,
+        },
+      ];
+    });
+  }, [droneFlights, droneRasters, onInspect]);
+
+
 
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
