@@ -1,11 +1,6 @@
 
-Add a thin "intercept marker" rail to the right of the Alt column in `StripLog`, showing yellow/amber bars spanning each computed mineralized intercept (Au cutoff 0.5, dilution 2m). Tooltip shows `length @ grade Au g/t`.
+Add click-to-scroll: clicking a bar in StripLog scrolls the matching table row into view and briefly highlights it.
 
 ## Files
-- **edit** `src/components/drilling/StripLog.tsx`:
-  - Import `computeIntercepts`, `formatIntercept` from `@/lib/drilling/intercepts`
-  - Compute `intercepts` via `useMemo`
-  - Add new narrow column (10px) after Alt rendering each intercept as an amber rail with darker amber border
-  - Header label "Int"
-
-No deps, no DB, no other files.
+- **edit** `src/components/drilling/StripLog.tsx`: add optional `onSelect?: (id: string) => void` prop; wire `onClick` on Au/Lito/Alt bars
+- **edit** `src/components/drilling/CoreLogPanel.tsx`: add `rowRefs` map, pass `onSelect={scrollToRow}` to StripLog, set `ref` + `data-row-id` on each `<tr>`, scroll into view with `block: "center"` and a brief `bg-primary/20` flash via `flashId` state
