@@ -12,7 +12,9 @@ import { useSamplingResults } from "@/hooks/useSamplingResults";
 import { useDrillHoles } from "@/hooks/useDrilling";
 import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
 import type { LeafletNS } from "@/components/map/types";
-import { Layers, FlaskConical } from "lucide-react";
+import { Layers, FlaskConical, Camera, Loader2 } from "lucide-react";
+import { captureMapSnapshot, downloadDataUrl } from "@/lib/map/snapshot";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
   head: () => ({
