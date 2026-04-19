@@ -1,58 +1,105 @@
 
-The pasted instructions reference a different project ("TrackMin": 1,052 files, `src/cadastre/`, `src/components/trackmin/`, `useSernageominQuery`, `ingemmetDirect`, `BlockModelLayer`, `FaenaDashboard`, `AppRoutes.tsx`, `src/core/`, `src/pages/`).
+User wants a "disruptive Geology 5.0" plan. Current state: project has SERNAGEOMIN WMS layers, Sentinel-2, Copernicus DEM, exploration_targets, geology reference tables (lithology_units, alteration_zones, mineralogy, geological_features, geo_references), drill core logs, sampling results, geophysics surveys. The geology module today is mostly *display* of static reference data + map overlays.
 
-This project is **Geocapitals/Palmeras** — TanStack Start with file-based routing in `src/routes/`, ~150 files. None of those 17 files in Paso 1 exist. None of the 198 files in `trackmin/` exist. None of the 132 hooks listed exist. There is no `AppRoutes.tsx`, no `src/pages/`, no `src/core/`, no `useSernageominQuery`.
+"5.0" should mean: AI-native, predictive, multi-source fusion, 3D, real-time. Let me design something genuinely disruptive vs incremental.
 
-Applying that 10-step plan literally would delete working code and break the project. Instead I propose what the underlying request actually asks for: **"ver estatus del proyecto y verificar que todo funcione"**.
+## Plan: Geología 5.0 — Inteligencia Geológica Predictiva
 
-## Plan: Auditoría real de Geocapitals + verificación
+### Concepto
+Pasar de "ver capas" a **"el sistema entiende el yacimiento"**: fusión multi-fuente + IA generativa + modelo 3D + predicción de targets.
 
-### A. Diagnóstico técnico (read-only)
-1. Compilación TypeScript (`tsc --noEmit`) → 0 errores esperados tras Fases 1–7.
-2. Lint Supabase (`supabase--linter`) → warnings de RLS / índices.
-3. Inventario real de:
-   - Rutas en `src/routes/` (vs sidebar de `_authenticated.tsx`)
-   - Hooks en `src/hooks/`
-   - Componentes en `src/components/`
-   - Tablas DB con RLS (ya tenemos 24+ tablas confirmadas)
-4. Snapshot de errores de runtime + console del preview actual (`/dashboard/catastro`).
+### Cinco pilares
 
-### B. Limpieza segura aplicada SOLO a este codebase
-- Detectar y eliminar imports no usados que hayan quedado tras Fases 5/6/7 (auth.tsx hero, targetsLayer, geoIntelInspector, monthly-report).
-- Verificar que `routeTree.gen.ts` está sincronizado con las rutas reales (no editarlo a mano).
-- Confirmar que `useProjectRole.ts` lista `hse` y `reports` correctamente.
-- Confirmar que las nuevas capas de mapa (`sernageominLayers`, `satelliteLayers`, `targetsLayer`) están enchufadas en `LayerOpacityPanel` y `ProjectMap`.
+**1. GeoAI Copilot (Lovable AI Gateway — gemini-2.5-pro)**
+- Chat geológico contextual: "¿qué litología domina entre 120-180 m en DDH-04?", "compara mineralogía de DDH-02 vs DDH-05", "sugiere próximo collar".
+- Inyecta contexto: core logs + assays + alteración + targets + SERNAGEOMIN del AOI.
+- Responde con citas a filas de DB + coordenadas.
+- Edge function `geo-copilot` (ya existe `geo-assistant` — extender).
 
-### C. Entregable: `STATUS.md` en raíz
-Documento real con:
-1. **Fases implementadas** (1: QA/QC + roles + aprobación + KPIs · 2: Targets · 3: Inventario · 4: Finance · 5: Reports PDF · 6: HSE · 7: Capas geocientíficas reales)
-2. **Inventario rutas** — lista actual de `_authenticated.dashboard.*.tsx`
-3. **DB**: tablas + RLS + funciones SECURITY DEFINER existentes
-4. **Capas de mapa**: SERNAGEOMIN, Sentinel-2, Copernicus DEM, targets, AOI, sondajes, muestras, drones
-5. **Flujos verificados** vs **pendientes de QA manual**
-6. **Próximos pasos sugeridos** (notificaciones email para permisos por vencer, storage bucket para documentos HSE, datalineage)
+**2. Modelo 3D del subsuelo (Three.js + React-Three-Fiber)**
+- Vista 3D del AOI con: topografía Copernicus DEM, sondajes como cilindros coloreados por Au, vetas como superficies, alteración como volúmenes semi-transparentes.
+- Sliders: profundidad, ley cutoff, filtro por dominio.
+- Click en un sondaje 3D → abre StripLog 2D existente.
 
-### Diagrama (estado real)
+**3. Predicción de targets con ML ligero (servidor)**
+- Edge function que cruza: targets validados + sondajes con intercepto + capas SERNAGEOMIN + Sentinel-2 alteración + distancia a yacimientos conocidos.
+- Genera "heatmap de prospectividad" como GeoJSON grid (celdas 50×50 m con score 0-100).
+- Se renderiza como capa nueva `prospectividad:ai` en el mapa.
+- Cada celda explica su score (qué features pesaron más) → trazabilidad.
+
+**4. Fusión multi-fuente automática (Geo-Intel Brief)**
+- Botón "Generar Brief Geológico" en cualquier punto del mapa.
+- En 1 click: SERNAGEOMIN + Macrostrat + elevación + Sentinel-2 alteración + sondajes a <500 m + muestras a <500 m + targets cercanos + permisos vigentes (HSE) + concesión titular (catastro).
+- IA sintetiza un párrafo profesional + tabla de evidencias.
+- Exportable a PDF (reutiliza primitives de Fase 5).
+
+**5. Sección virtual interactiva (cross-section AI)**
+- Trazas dos puntos en el mapa → el sistema proyecta sondajes cercanos sobre el plano.
+- Interpola litología/alteración entre sondajes con kriging simple (lib `@turf/turf` + interpolación lineal por bandas).
+- Muestra vetas inferidas, zonas de alteración, intercepts de Au.
+- Editable: el geólogo puede "pintar" una unidad y guardarla como interpretación.
+
+### Stack técnico
 
 ```text
-src/
-├── routes/                 (~25 archivos, file-based TanStack)
-│   ├── auth.tsx            (rediseñado Fase auth)
-│   ├── _authenticated.tsx  (sidebar + guard)
-│   └── _authenticated.dashboard.*.tsx (módulos)
-├── components/
-│   ├── map/                (capas + inspector — Fase 7)
-│   ├── drilling/, sampling/, geophysics/, team/, drones consolidados
-│   └── ui/                 (shadcn)
-├── hooks/                  (~25 hooks — sin duplicación detectada)
-├── lib/pdf/                (Fase 5: monthly-report + ni43101)
-└── integrations/supabase/  (auto-generado)
+Frontend:
+  three + @react-three/fiber + @react-three/drei (3D model)
+  d3-contour (heatmap rendering)
+  
+Backend (edge functions):
+  geo-copilot (extiende geo-assistant) — chat con contexto DB
+  prospectivity-grid — calcula heatmap, persiste en tabla nueva
+  geo-brief — fusiona fuentes + síntesis IA
+  
+DB nueva:
+  prospectivity_cells (project_id, geom geojson, score, features jsonb, generated_at)
+  geo_interpretations (project_id, type, geom geojson, attributes jsonb, author, version)
+  
+AI: Lovable AI Gateway (gemini-2.5-pro principal, gemini-2.5-flash para chat rápido)
 ```
 
-### Fuera de alcance (NO se hará)
-- Refactor TrackMin de 10 pasos — los archivos no existen aquí.
-- Mover/renombrar carpetas que ya están organizadas (`map/`, `drilling/`, `sampling/`).
-- Borrar nada sin verificar primero importadores.
+### Sprints propuestos
 
-### Después de aprobar
-Ejecuto A → B → C en una sola pasada y entrego `STATUS.md` + lista breve de hallazgos. Si encuentro errores reales (TS, RLS, runtime), los reporto con propuesta de fix (sin aplicar todavía si son destructivos).
+| Sprint | Pilar | Esfuerzo | Valor |
+|---|---|---|---|
+| 5.1 | GeoAI Copilot | Medio | Alto |
+| 5.2 | Geo-Intel Brief + PDF | Bajo | Alto |
+| 5.3 | Prospectividad ML (heatmap) | Alto | Muy alto |
+| 5.4 | Modelo 3D Three.js | Alto | Visualmente disruptivo |
+| 5.5 | Sección virtual con kriging | Medio | Alto |
+
+### Diagrama
+
+```text
+┌───────────── Geología 5.0 ─────────────┐
+│                                         │
+│  ┌──────────┐   ┌──────────────────┐   │
+│  │  Mapa 2D │   │  Vista 3D R3F    │   │
+│  │ + heatmap│←→│  sondajes/vetas  │   │
+│  │   AI     │   │  alteración vol. │   │
+│  └────┬─────┘   └────────┬─────────┘   │
+│       │                  │              │
+│       └────┬─────────────┘              │
+│            ↓                            │
+│   ┌────────────────────┐                │
+│   │  GeoAI Copilot 💬  │ ← gemini-2.5  │
+│   └────────┬───────────┘                │
+│            ↓                            │
+│   contexto: DB + WMS + sondajes         │
+│            ↓                            │
+│   ┌────────────────────┐                │
+│   │ Geo-Intel Brief PDF│                │
+│   └────────────────────┘                │
+└─────────────────────────────────────────┘
+```
+
+### Propuesta de arranque
+Empezar por **Sprint 5.1 (Copilot) + 5.2 (Brief)** en una pasada — máximo valor, mínimo riesgo, sin dependencias 3D. Luego decidir si seguir con 5.3 (ML) o 5.4 (3D) según prioridad.
+
+### Fuera de alcance ahora
+- Inversión geofísica real (requiere cómputo pesado).
+- Integración con software comercial (Leapfrog, Vulcan).
+- Modelo de bloques económico (eso es Fase 8 — Mineral Resource Estimation).
+
+### Pregunta antes de ejecutar
+¿Quieres que arranque con **5.1 + 5.2** (Copilot + Brief, ~1 turno) o prefieres ver primero un mockup del **modelo 3D (5.4)** porque es el pilar más visual?
