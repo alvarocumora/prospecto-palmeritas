@@ -43,6 +43,8 @@ import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
 import { DrawingTools } from "./map/DrawingTools";
 import { buildSamplesLayer } from "./map/sampleLayer";
+import { buildDroneLayer } from "./map/droneLayer";
+import { useDroneFlights } from "@/hooks/useDroneFlights";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { InspectedFeature } from "./map/FeatureInspectorPanel";
 
@@ -84,10 +86,13 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "concessions:project": { visible: true, opacity: 1 },
   "drills:project": { visible: true, opacity: 1 },
   "samples:project": { visible: true, opacity: 1 },
+  "drones:flights": { visible: true, opacity: 0.9 },
+  "drones:rasters": { visible: true, opacity: 0.75 },
 };
 
 export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
+  const droneLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -116,6 +121,7 @@ export function ProjectMap({ samples, onInspect, fillHeight }: ProjectMapProps =
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
   const { byHole: logsByHole } = useProjectCoreLogs(active?.id ?? null);
+  const { flights: droneFlights, rasters: droneRasters } = useDroneFlights(active?.id ?? null);
   const scoresByHole = useMemo(() => {
     const out: Record<string, number> = {};
     for (const h of drillHoles) {
