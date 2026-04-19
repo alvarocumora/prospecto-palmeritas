@@ -1,12 +1,15 @@
-import { useMemo } from "react";
-import { X, Download } from "lucide-react";
+import { useMemo, useState } from "react";
+import { X, Download, Sparkles, Loader2 } from "lucide-react";
 import type { ProjectedHole, SectionLine } from "@/lib/section/projection";
 import { auGradeColor, lithoColor } from "@/lib/section/projection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Props {
   line: SectionLine;
   holes: ProjectedHole[];
   maxOffsetM: number;
+  projectName?: string;
   onClose: () => void;
 }
 
@@ -14,7 +17,48 @@ const MARGIN = { top: 50, right: 30, bottom: 60, left: 60 };
 const W = 980;
 const H = 480;
 
-export function SectionView({ line, holes, maxOffsetM, onClose }: Props) {
+export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: Props) {
+  const [interpretation, setInterpretation] = useState<string | null>(null);
+  const [interpreting, setInterpreting] = useState(false);
+
+  const interpret = async () => {
+    if (interpreting) return;
+    setInterpreting(true);
+    try {
+      const payload = {
+        line: { lengthM: line.lengthM, bearingDeg: line.bearingDeg, start: line.start, end: line.end },
+        maxOffsetM,
+        projectName,
+        holes: holes.map((ph) => ({
+          hole_id: ph.hole.hole_id,
+          alongM: ph.alongM,
+          signedOffsetM: ph.signedOffsetM,
+          azimuth: ph.hole.azimuth,
+          dip: ph.hole.dip,
+          depth: ph.hole.actual_depth ?? ph.hole.planned_depth,
+          intercepts: ph.logs.map((l) => ({
+            from: l.depth_from,
+            to: l.depth_to,
+            au: l.au_gpt,
+            cu: l.cu_pct,
+            lithology: l.lithology,
+            alteration: l.alteration,
+          })),
+        })),
+      };
+      const { data, error } = await supabase.functions.invoke("section-interpret", { body: payload });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setInterpretation(data.interpretation as string);
+      toast.success("Interpretación IA generada");
+    } catch (e) {
+      console.error(e);
+      toast.error(e instanceof Error ? e.message : "Error generando interpretación");
+    } finally {
+      setInterpreting(false);
+    }
+  };
+
   const { maxDepth, scaleX, scaleY } = useMemo(() => {
     const maxD = Math.max(
       120,
