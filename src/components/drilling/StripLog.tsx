@@ -308,6 +308,33 @@ export function StripLog({
         </div>
       </div>
 
+      {/* Intercept marker rail */}
+      <div className="flex flex-col" style={{ width: intWidth }}>
+        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+          Int
+        </div>
+        <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
+          {intercepts.map((it, i) => {
+            const top = scale(it.from);
+            const h = Math.max(scale(it.to) - scale(it.from), 2);
+            return (
+              <div
+                key={i}
+                title={formatIntercept(it)}
+                className="absolute left-0 right-0 cursor-help"
+                style={{
+                  top,
+                  height: h,
+                  background: "#fbbf24",
+                  border: "1px solid #b45309",
+                  boxShadow: "0 0 4px rgba(251,191,36,0.6)",
+                }}
+              />
+            );
+          })}
+        </div>
+      </div>
+
       {/* Legends */}
       <div className="flex flex-col text-[9px] font-mono text-text-secondary gap-2 pl-1" style={{ marginTop: headerH }}>
         <div className="flex flex-col gap-0.5">
