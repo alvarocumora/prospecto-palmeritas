@@ -34,6 +34,7 @@ export function CoreLogPanel({
   const [creating, setCreating] = useState(false);
   const [cutoff, setCutoff] = useState<number>(DEFAULT_AU_CUTOFF);
   const [dilution, setDilution] = useState<number>(DEFAULT_INTERNAL_DILUTION_M);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const intercepts = useMemo(
     () => computeIntercepts(logs, cutoff, dilution),
