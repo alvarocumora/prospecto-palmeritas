@@ -5,7 +5,7 @@
 //   - net_volume_m3 = fill - cut
 // Persiste el resultado en public.dem_diffs.
 
-import { fromArrayBuffer } from "https://esm.sh/geotiff@2.1.3";
+import { fromArrayBuffer } from "https://esm.sh/geotiff@2.1.3?target=deno&bundle";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
 
 const corsHeaders = {
