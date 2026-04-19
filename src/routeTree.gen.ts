@@ -23,6 +23,7 @@ import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
+import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
@@ -108,6 +109,12 @@ const AuthenticatedDashboardGeophysicsRoute =
     path: '/dashboard/geophysics',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardDronesRoute =
+  AuthenticatedDashboardDronesRouteImport.update({
+    id: '/dashboard/drones',
+    path: '/dashboard/drones',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardDrillingRoute =
   AuthenticatedDashboardDrillingRouteImport.update({
     id: '/dashboard/drilling',
@@ -154,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -175,6 +183,7 @@ export interface FileRoutesByTo {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -198,6 +207,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
+  '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
+    | '/dashboard/drones'
     | '/dashboard/geophysics'
     | '/dashboard/map'
     | '/dashboard/marketplace'
@@ -242,6 +253,7 @@ export interface FileRouteTypes {
     | '/dashboard/audit'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
+    | '/dashboard/drones'
     | '/dashboard/geophysics'
     | '/dashboard/map'
     | '/dashboard/marketplace'
@@ -264,6 +276,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
+    | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
@@ -385,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/drones': {
+      id: '/_authenticated/dashboard/drones'
+      path: '/dashboard/drones'
+      fullPath: '/dashboard/drones'
+      preLoaderRoute: typeof AuthenticatedDashboardDronesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/drilling': {
       id: '/_authenticated/dashboard/drilling'
       path: '/dashboard/drilling'
@@ -465,6 +485,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
+  AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
@@ -481,6 +502,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
+  AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
@@ -508,3 +530,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
