@@ -1,10 +1,11 @@
-import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity, Plane, Image as ImageIcon } from "lucide-react";
+import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity, Plane, Image as ImageIcon, Target as TargetIcon } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { DrillHole } from "@/hooks/useDrilling";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import type { GeophysicsStation } from "@/hooks/useGeophysicsData";
 import type { DroneFlight, DroneRaster } from "@/hooks/useDroneFlights";
+import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 import { auColor } from "./sampleColors";
 
 export type InspectedFeature =
@@ -13,7 +14,8 @@ export type InspectedFeature =
   | { kind: "concession"; data: MiningConcession }
   | { kind: "station"; data: GeophysicsStation }
   | { kind: "drone_flight"; data: DroneFlight }
-  | { kind: "drone_raster"; data: DroneRaster };
+  | { kind: "drone_raster"; data: DroneRaster }
+  | { kind: "target"; data: ExplorationTarget };
 
 interface Props {
   feature: InspectedFeature | null;
@@ -46,6 +48,7 @@ export function FeatureInspectorPanel({ feature, onClose }: Props) {
         {feature.kind === "station" && <StationBody s={feature.data} />}
         {feature.kind === "drone_flight" && <FlightBody f={feature.data} />}
         {feature.kind === "drone_raster" && <RasterBody r={feature.data} />}
+        {feature.kind === "target" && <TargetBody t={feature.data} />}
       </div>
     </aside>
   );
@@ -57,6 +60,7 @@ function iconFor(k: InspectedFeature["kind"]) {
   if (k === "concession") return <MapIcon className="w-3 h-3 text-gold" />;
   if (k === "drone_flight") return <Plane className="w-3 h-3 text-info" />;
   if (k === "drone_raster") return <ImageIcon className="w-3 h-3 text-gold" />;
+  if (k === "target") return <TargetIcon className="w-3 h-3 text-gold" />;
   return <Activity className="w-3 h-3 text-info" />;
 }
 function labelFor(k: InspectedFeature["kind"]) {
@@ -67,6 +71,7 @@ function labelFor(k: InspectedFeature["kind"]) {
     station: "Estación geofísica",
     drone_flight: "Vuelo dron",
     drone_raster: "Raster dron",
+    target: "Target exploración",
   }[k];
 }
 
@@ -182,6 +187,28 @@ function RasterBody({ r }: { r: DroneRaster }) {
       />
       <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
         Ir a Drones <ExternalLink className="w-3 h-3" />
+      </Link>
+    </>
+  );
+}
+
+function TargetBody({ t }: { t: ExplorationTarget }) {
+  return (
+    <>
+      <div className="text-base font-bold text-gold mb-1">{t.code}</div>
+      <div className="text-foreground mb-2">{t.name}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">{t.target_type}{t.commodity ? ` · ${t.commodity}` : ""}</div>
+      <Row label="Etapa" value={t.stage} />
+      <Row label="Prioridad" value={t.priority} />
+      <Row label="Score" value={t.score != null ? `${t.score}` : "—"} />
+      <Row label="Confianza" value={t.confidence_pct != null ? `${t.confidence_pct}%` : "—"} />
+      <Row label="Lat / Lng" value={t.lat != null && t.lng != null ? `${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}` : "—"} />
+      <Row label="Elevación" value={t.elevation_m != null ? `${t.elevation_m} m` : "—"} />
+      <Row label="m planeados" value={t.planned_meters != null ? `${t.planned_meters} m` : "—"} />
+      <Row label="Costo USD" value={t.estimated_cost_usd != null ? `$${Number(t.estimated_cost_usd).toLocaleString()}` : "—"} />
+      {t.rationale && <div className="mt-3 p-2 rounded bg-muted/30 text-foreground/80 italic text-[10.5px]">{t.rationale}</div>}
+      <Link to="/dashboard/targets" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+        Ir a Targets <ExternalLink className="w-3 h-3" />
       </Link>
     </>
   );

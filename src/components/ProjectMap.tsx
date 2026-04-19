@@ -46,7 +46,10 @@ import { CoordinateFooter } from "./map/CoordinateFooter";
 import { DrawingTools } from "./map/DrawingTools";
 import { buildSamplesLayer } from "./map/sampleLayer";
 import { buildDroneLayer } from "./map/droneLayer";
+import { buildTargetsLayer } from "./map/targetsLayer";
+import { wireGeoIntelClickPopup } from "./map/geoIntelInspector";
 import { useDroneFlights } from "@/hooks/useDroneFlights";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { InspectedFeature } from "./map/FeatureInspectorPanel";
 
@@ -98,6 +101,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "samples:project": { visible: true, opacity: 1 },
   "drones:flights": { visible: true, opacity: 0.9 },
   "drones:rasters": { visible: true, opacity: 0.75 },
+  "targets:project": { visible: true, opacity: 1 },
 };
 
 export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
@@ -132,6 +136,10 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
   const { byHole: logsByHole } = useProjectCoreLogs(active?.id ?? null);
   const { flights: droneFlights, rasters: droneRasters } = useDroneFlights(active?.id ?? null);
+  const { targets } = useExplorationTargets(active?.id ?? null);
+  const targetsRef = useRef<typeof targets>(targets);
+  useEffect(() => { targetsRef.current = targets; }, [targets]);
+  const targetsLayerRef = useRef<LayerGroup | null>(null);
   const scoresByHole = useMemo(() => {
     const out: Record<string, number> = {};
     for (const h of drillHoles) {
@@ -305,7 +313,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       await loadCatastroData();
       if (cancelled) return;
 
-      wireMacrostratClickPopup(L, map, fetchMacrostratUnit, macrostratPopupHtml);
+      wireGeoIntelClickPopup(L, map, fetchMacrostratUnit, () => targetsRef.current);
 
       cleanup = () => {
         map.remove();
@@ -481,6 +489,34 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       ];
     });
   }, [droneFlights, droneRasters, onInspect]);
+
+  // Exploration targets layer (Fase 2 → mapa)
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (targetsLayerRef.current) {
+      map.removeLayer(targetsLayerRef.current);
+      targetsLayerRef.current = null;
+    }
+    const layer = buildTargetsLayer(L, targets, {
+      onClick: (t) => onInspect?.({ kind: "target", data: t }),
+    });
+    targetsLayerRef.current = layer;
+    if (targets.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "targets:project");
+      return [
+        ...without,
+        {
+          id: "targets:project",
+          label: `Targets exploración (${targets.length})`,
+          group: "Proyecto",
+          layer,
+        },
+      ];
+    });
+  }, [targets, onInspect]);
 
 
 
