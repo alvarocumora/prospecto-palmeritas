@@ -131,6 +131,17 @@ function AuthenticatedLayout() {
           )}
           <NavItem to="/dashboard/profile" icon={<UserCircle className="w-3.5 h-3.5" />} label="Mi Perfil" module="profile" role={role} />
 
+          {isSuperAdmin && (
+            <Link
+              to="/dashboard/admin"
+              className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs font-mono transition-colors ${
+                location.pathname.startsWith("/dashboard/admin") ? "bg-gold/10 text-gold" : "text-gold hover:bg-accent"
+              }`}
+            >
+              <Crown className="w-3.5 h-3.5" /> Admin Plataforma
+            </Link>
+          )}
+
           {canAccess(role, "palmeras") && (
             <div className="pt-4 mt-4 border-t border-border">
               <Link
