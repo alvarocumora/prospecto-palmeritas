@@ -53,26 +53,27 @@ function OperationalMap() {
 
   return (
     <div className="fixed inset-0 md:left-56 top-12 md:top-0 bottom-14 md:bottom-0 flex flex-col bg-background">
-      <header className="flex items-center justify-between gap-3 px-4 h-12 border-b border-border bg-bg-secondary shrink-0">
-        <div className="flex items-center gap-2 min-w-0">
+      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 md:py-0 md:h-12 border-b border-border bg-bg-secondary shrink-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <Layers className="w-4 h-4 text-gold shrink-0" />
           <div className="min-w-0">
-            <div className="text-[10px] font-mono uppercase text-muted-foreground leading-none">Centro de Operaciones</div>
-            <div className="text-sm font-mono font-semibold truncate">{active?.name ?? "Sin proyecto"}</div>
+            <div className="text-[10px] font-mono uppercase text-muted-foreground leading-none hidden sm:block">Centro de Operaciones</div>
+            <div className="text-xs md:text-sm font-mono font-semibold truncate">{active?.name ?? "Sin proyecto"}</div>
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap justify-end">
           <CampaignSelector campaigns={campaigns} value={campaignId} onChange={setCampaignId} />
-          <label className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground cursor-pointer">
+          <label className="flex items-center gap-1.5 text-[11px] font-mono text-muted-foreground cursor-pointer whitespace-nowrap">
             <input
               type="checkbox"
               checked={highGradeOnly}
               onChange={(e) => setHighGradeOnly(e.target.checked)}
               className="accent-gold"
             />
-            High-grade ≥1 g/t Au
+            <span className="hidden sm:inline">High-grade ≥1 g/t Au</span>
+            <span className="sm:hidden">≥1 g/t</span>
           </label>
-          <span className="text-[11px] font-mono text-muted-foreground hidden md:inline">
+          <span className="text-[11px] font-mono text-muted-foreground hidden lg:inline whitespace-nowrap">
             <FlaskConical className="w-3 h-3 inline mr-1" /> {filteredSamples.length} muestras
           </span>
         </div>
