@@ -100,7 +100,7 @@ export function SectionBuilderTool({ map, L, holes, logsByHole }: Props) {
 
   return (
     <>
-      <div className="absolute top-3 right-3 z-[1100] flex flex-col gap-2 items-end pointer-events-none">
+      <div className="absolute top-14 right-3 z-[1100] flex flex-col gap-2 items-end pointer-events-none">
         <div className="pointer-events-auto flex items-center gap-2 bg-bg-secondary/95 border border-border rounded backdrop-blur p-1.5 shadow-lg">
           <button
             onClick={() => { setActive((a) => !a); cleanup(); }}
