@@ -5,6 +5,19 @@ import type { RecordStatus } from "@/components/RecordStatusBadge";
 
 export type ApprovableTable = "drill_core_logs" | "sampling_results";
 
+type ApprovalPatch = {
+  record_status: RecordStatus;
+  approved_by: string | null;
+  approved_at: string | null;
+};
+
+function buildPatch(userId: string, status: RecordStatus): ApprovalPatch {
+  if (status === "approved") {
+    return { record_status: status, approved_by: userId, approved_at: new Date().toISOString() };
+  }
+  return { record_status: status, approved_by: null, approved_at: null };
+}
+
 /**
  * Workflow draft → review → approved → archived for drill_core_logs and sampling_results.
  * RLS already restricts who can update; here we only set the audit fields.
@@ -12,39 +25,21 @@ export type ApprovableTable = "drill_core_logs" | "sampling_results";
 export function useRecordApproval() {
   const { user } = useAuth();
 
-  const setStatus = useCallback(async (
-    table: ApprovableTable,
-    id: string,
-    status: RecordStatus,
-  ) => {
+  const setStatus = useCallback(async (table: ApprovableTable, id: string, status: RecordStatus) => {
     if (!user) return { error: "no-user" };
-    const patch: Record<string, unknown> = { record_status: status };
-    if (status === "approved") {
-      patch.approved_by = user.id;
-      patch.approved_at = new Date().toISOString();
-    } else {
-      patch.approved_by = null;
-      patch.approved_at = null;
-    }
-    const { error } = await supabase.from(table).update(patch).eq("id", id);
+    const patch = buildPatch(user.id, status);
+    const { error } = table === "drill_core_logs"
+      ? await supabase.from("drill_core_logs").update(patch).eq("id", id)
+      : await supabase.from("sampling_results").update(patch).eq("id", id);
     return { error: error?.message ?? null };
   }, [user]);
 
-  const bulkSetStatus = useCallback(async (
-    table: ApprovableTable,
-    ids: string[],
-    status: RecordStatus,
-  ) => {
+  const bulkSetStatus = useCallback(async (table: ApprovableTable, ids: string[], status: RecordStatus) => {
     if (!user || ids.length === 0) return { error: "no-op" };
-    const patch: Record<string, unknown> = { record_status: status };
-    if (status === "approved") {
-      patch.approved_by = user.id;
-      patch.approved_at = new Date().toISOString();
-    } else {
-      patch.approved_by = null;
-      patch.approved_at = null;
-    }
-    const { error } = await supabase.from(table).update(patch).in("id", ids);
+    const patch = buildPatch(user.id, status);
+    const { error } = table === "drill_core_logs"
+      ? await supabase.from("drill_core_logs").update(patch).in("id", ids)
+      : await supabase.from("sampling_results").update(patch).in("id", ids);
     return { error: error?.message ?? null };
   }, [user]);
 
