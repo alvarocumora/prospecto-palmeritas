@@ -74,10 +74,10 @@ function OperationalMap() {
   }, [mapInst, rasters, rasterSettings]);
 
   const updateRasterSetting = (id: string, patch: Partial<RasterSettings[string]>) => {
-    setRasterSettings((prev) => ({
-      ...prev,
-      [id]: { visible: false, opacity: 0.75, colormap: "none", ...prev[id], ...patch },
-    }));
+    setRasterSettings((prev) => {
+      const current = prev[id] ?? { visible: false, opacity: 0.75, colormap: "none" as const };
+      return { ...prev, [id]: { ...current, ...patch } };
+    });
   };
 
   const campaignName = useMemo(
