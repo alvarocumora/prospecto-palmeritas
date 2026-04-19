@@ -15,6 +15,9 @@ import type { LeafletNS } from "@/components/map/types";
 import { Layers, FlaskConical, Camera, Loader2 } from "lucide-react";
 import { captureMapSnapshot, downloadDataUrl } from "@/lib/map/snapshot";
 import { GeoIntelBriefButton } from "@/components/GeoIntelBriefButton";
+import { ProspectivityButton } from "@/components/ProspectivityButton";
+import { buildProspectivityLayer } from "@/components/map/prospectivityLayer";
+import type { ProspectivityCell, ProspectivityRun } from "@/hooks/useProspectivity";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -38,6 +41,16 @@ function OperationalMap() {
   const [inspected, setInspected] = useState<InspectedFeature | null>(null);
   const [mapInst, setMapInst] = useState<{ map: LeafletMap; L: LeafletNS } | null>(null);
   const [snapshotting, setSnapshotting] = useState(false);
+  const [prospCells, setProspCells] = useState<ProspectivityCell[]>([]);
+  const [, setProspRun] = useState<ProspectivityRun | null>(null);
+
+  // Render prospectivity cells as a Leaflet layer that auto-updates
+  useEffect(() => {
+    if (!mapInst) return;
+    const layer = buildProspectivityLayer(mapInst.L, prospCells);
+    layer.addTo(mapInst.map);
+    return () => { layer.remove(); };
+  }, [mapInst, prospCells]);
 
   const campaignName = useMemo(
     () => (campaignId ? campaigns.find((c) => c.id === campaignId)?.name ?? null : null),
@@ -143,6 +156,10 @@ function OperationalMap() {
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
         <GeoIntelBriefButton map={mapInst?.map ?? null} />
+        <ProspectivityButton
+          map={mapInst?.map ?? null}
+          onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+        />
         <CollapsibleAuLegend />
       </div>
     </div>
