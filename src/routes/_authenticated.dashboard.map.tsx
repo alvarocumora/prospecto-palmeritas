@@ -159,19 +159,6 @@ function OperationalMap() {
     });
   }, [holes, timeActive, timeCursor]);
 
-  const visibleRasterSettings = useMemo(() => {
-    if (!timeActive || timeCursor == null) return rasterSettings;
-    const next: RasterSettings = { ...rasterSettings };
-    for (const r of rasters) {
-      if (!r.captured_at) continue;
-      const t = Date.parse(r.captured_at);
-      if (!isNaN(t) && t > timeCursor && next[r.id]?.visible) {
-        next[r.id] = { ...next[r.id], visible: false };
-      }
-    }
-    return next;
-  }, [rasterSettings, rasters, timeActive, timeCursor]);
-
   const timeItemsHoles = useMemo(() => holes.map((h) => ({ date: h.started_at })), [holes]);
   const timeItemsFlights = useMemo(() => flights.map((f) => ({ date: f.flown_at })), [flights]);
 
