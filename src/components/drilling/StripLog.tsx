@@ -43,6 +43,45 @@ const LITHOLOGY_COLORS: Record<string, string> = {
   toba: "#d4b8a8",
 };
 
+/** Porphyry-system alteration palette (Lowell-Guilbert convention). */
+const ALTERATION_COLORS: Record<string, string> = {
+  // Potásica — rosa/rojo (biotita-K-feldespato)
+  potassic: "#c0392b",
+  potasica: "#c0392b",
+  "k-feldspar": "#c0392b",
+  biotita: "#c0392b",
+  // Sericítica / fílica — verde-amarillo (cuarzo-sericita-pirita)
+  phyllic: "#9acd32",
+  filica: "#9acd32",
+  sericitic: "#9acd32",
+  sericitica: "#9acd32",
+  qsp: "#9acd32",
+  // Argílica — celeste (caolinita/illita)
+  argillic: "#7fb3d5",
+  argilica: "#7fb3d5",
+  // Argílica avanzada — azul más intenso (alunita/pirofilita)
+  "advanced argillic": "#2874a6",
+  "argilica avanzada": "#2874a6",
+  alunita: "#2874a6",
+  // Propilítica — verde oscuro (clorita-epidota-calcita)
+  propylitic: "#2e7d32",
+  propilitica: "#2e7d32",
+  clorita: "#2e7d32",
+  epidota: "#2e7d32",
+  // Silícea / silicificación — gris claro
+  silicic: "#bdc3c7",
+  silica: "#bdc3c7",
+  silicea: "#bdc3c7",
+  silicification: "#bdc3c7",
+  silicificacion: "#bdc3c7",
+  // Skarn / calc-silicato — oliva
+  calcsilicate: "#827717",
+  "calc-silicate": "#827717",
+  // Sin alteración / fresca
+  fresh: "#ecf0f1",
+  fresca: "#ecf0f1",
+};
+
 /** Stable hash → HSL fallback for unknown lithology codes. */
 function hashHsl(s: string): string {
   let h = 0;
