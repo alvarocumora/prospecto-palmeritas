@@ -23,7 +23,13 @@ interface Props {
 export function FeatureInspectorPanel({ feature, onClose }: Props) {
   if (!feature) return null;
   return (
-    <aside className="absolute right-0 top-0 bottom-0 w-80 max-w-[90vw] z-[1100] bg-bg-secondary border-l border-border shadow-2xl overflow-y-auto">
+    <aside
+      className="
+        absolute z-[600] bg-bg-secondary border-border shadow-2xl overflow-y-auto
+        max-md:left-0 max-md:right-0 max-md:bottom-0 max-md:max-h-[50vh] max-md:border-t max-md:rounded-t-lg
+        md:top-3 md:right-16 md:bottom-3 md:w-80 md:rounded-lg md:border
+      "
+    >
       <div className="sticky top-0 z-10 px-3 py-2 border-b border-border bg-bg-secondary flex items-center justify-between">
         <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1.5">
           {iconFor(feature.kind)}

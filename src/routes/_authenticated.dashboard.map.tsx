@@ -93,17 +93,38 @@ function OperationalMap() {
           logsByHole={logsByHole}
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
-        <div className="absolute bottom-3 left-3 z-[1000] bg-bg-secondary/95 border border-border rounded p-2 backdrop-blur">
-          <div className="text-[9px] font-mono uppercase text-muted-foreground mb-1.5">Au g/t</div>
-          <div className="flex flex-col gap-1">
-            {AU_LEGEND.map((l) => (
-              <div key={l.label} className="flex items-center gap-1.5 text-[10px] font-mono">
-                <span className="w-3 h-3 rounded-full border border-white/40" style={{ background: l.color }} />
-                <span className="text-foreground">{l.label}</span>
-              </div>
-            ))}
+        <CollapsibleAuLegend />
+      </div>
+    </div>
+  );
+}
+
+function CollapsibleAuLegend() {
+  const [open, setOpen] = useState(true);
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="absolute bottom-12 left-3 z-[500] w-8 h-8 inline-flex items-center justify-center rounded border border-border bg-bg-secondary/95 backdrop-blur text-foreground hover:bg-accent shadow-md"
+        title="Mostrar leyenda Au"
+      >
+        <FlaskConical className="w-3.5 h-3.5 text-gold" />
+      </button>
+    );
+  }
+  return (
+    <div className="absolute bottom-12 left-3 z-[500] bg-bg-secondary/95 border border-border rounded p-2 backdrop-blur shadow-md">
+      <div className="flex items-center justify-between gap-2 mb-1.5">
+        <div className="text-[9px] font-mono uppercase text-muted-foreground">Au g/t</div>
+        <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground text-[10px] leading-none" title="Colapsar">‹</button>
+      </div>
+      <div className="flex flex-col gap-1">
+        {AU_LEGEND.map((l) => (
+          <div key={l.label} className="flex items-center gap-1.5 text-[10px] font-mono">
+            <span className="w-3 h-3 rounded-full border border-white/40" style={{ background: l.color }} />
+            <span className="text-foreground">{l.label}</span>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
