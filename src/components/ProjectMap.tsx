@@ -313,7 +313,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       await loadCatastroData();
       if (cancelled) return;
 
-      wireMacrostratClickPopup(L, map, fetchMacrostratUnit, macrostratPopupHtml);
+      wireGeoIntelClickPopup(L, map, fetchMacrostratUnit, () => targetsRef.current);
 
       cleanup = () => {
         map.remove();
@@ -489,6 +489,34 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
       ];
     });
   }, [droneFlights, droneRasters, onInspect]);
+
+  // Exploration targets layer (Fase 2 → mapa)
+  useEffect(() => {
+    const L = leafletRef.current;
+    const map = mapRef.current;
+    if (!L || !map) return;
+    if (targetsLayerRef.current) {
+      map.removeLayer(targetsLayerRef.current);
+      targetsLayerRef.current = null;
+    }
+    const layer = buildTargetsLayer(L, targets, {
+      onClick: (t) => onInspect?.({ kind: "target", data: t }),
+    });
+    targetsLayerRef.current = layer;
+    if (targets.length > 0) layer.addTo(map);
+    setManagedLayers((prev) => {
+      const without = prev.filter((p) => p.id !== "targets:project");
+      return [
+        ...without,
+        {
+          id: "targets:project",
+          label: `Targets exploración (${targets.length})`,
+          group: "Proyecto",
+          layer,
+        },
+      ];
+    });
+  }, [targets, onInspect]);
 
 
 
