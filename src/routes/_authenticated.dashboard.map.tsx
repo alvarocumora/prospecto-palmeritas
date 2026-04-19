@@ -156,6 +156,10 @@ function OperationalMap() {
         />
         <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
         <GeoIntelBriefButton map={mapInst?.map ?? null} />
+        <ProspectivityButton
+          map={mapInst?.map ?? null}
+          onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+        />
         <CollapsibleAuLegend />
       </div>
     </div>
