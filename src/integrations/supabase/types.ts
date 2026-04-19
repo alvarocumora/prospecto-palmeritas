@@ -273,6 +273,62 @@ export type Database = {
           },
         ]
       }
+      community_events: {
+        Row: {
+          attendees: number | null
+          commitments: string | null
+          community_name: string
+          created_at: string
+          created_by: string
+          event_date: string
+          event_type: string
+          follow_up_date: string | null
+          id: string
+          project_id: string
+          status: string
+          summary: string
+          updated_at: string
+        }
+        Insert: {
+          attendees?: number | null
+          commitments?: string | null
+          community_name: string
+          created_at?: string
+          created_by: string
+          event_date?: string
+          event_type: string
+          follow_up_date?: string | null
+          id?: string
+          project_id: string
+          status?: string
+          summary: string
+          updated_at?: string
+        }
+        Update: {
+          attendees?: number | null
+          commitments?: string | null
+          community_name?: string
+          created_at?: string
+          created_by?: string
+          event_date?: string
+          event_type?: string
+          follow_up_date?: string | null
+          id?: string
+          project_id?: string
+          status?: string
+          summary?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       core_boxes: {
         Row: {
           box_code: string
@@ -1161,6 +1217,127 @@ export type Database = {
           },
           {
             foreignKeyName: "geophysics_surveys_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hse_incidents: {
+        Row: {
+          category: string
+          closed_at: string | null
+          corrective_actions: string | null
+          created_at: string
+          description: string
+          id: string
+          location: string | null
+          notes: string | null
+          occurred_at: string
+          people_affected: number
+          project_id: string
+          reported_by: string
+          severity: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          occurred_at?: string
+          people_affected?: number
+          project_id: string
+          reported_by: string
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          closed_at?: string | null
+          corrective_actions?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          location?: string | null
+          notes?: string | null
+          occurred_at?: string
+          people_affected?: number
+          project_id?: string
+          reported_by?: string
+          severity?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hse_incidents_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hse_permits: {
+        Row: {
+          authority: string | null
+          created_at: string
+          created_by: string
+          document_url: string | null
+          expires_at: string | null
+          id: string
+          issued_at: string | null
+          notes: string | null
+          number: string | null
+          permit_type: string
+          project_id: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          authority?: string | null
+          created_at?: string
+          created_by: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          notes?: string | null
+          number?: string | null
+          permit_type: string
+          project_id: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          authority?: string | null
+          created_at?: string
+          created_by?: string
+          document_url?: string | null
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          notes?: string | null
+          number?: string | null
+          permit_type?: string
+          project_id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hse_permits_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
