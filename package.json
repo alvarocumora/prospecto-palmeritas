@@ -13,6 +13,9 @@
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
+    "@deck.gl/core": "^9",
+    "@deck.gl/layers": "^9",
+    "@deck.gl/mapbox": "^9",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -63,6 +66,7 @@
     "leaflet-draw": "^1.0.4",
     "leaflet-minimap": "^3.6.1",
     "lucide-react": "^0.575.0",
+    "maplibre-gl": "^4",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",
