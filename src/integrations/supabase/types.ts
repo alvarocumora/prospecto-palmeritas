@@ -137,6 +137,142 @@ export type Database = {
         }
         Relationships: []
       }
+      campaign_budgets: {
+        Row: {
+          campaign_id: string
+          category: string
+          created_at: string
+          created_by: string
+          id: string
+          notes: string | null
+          planned_amount_usd: number
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          campaign_id: string
+          category: string
+          created_at?: string
+          created_by: string
+          id?: string
+          notes?: string | null
+          planned_amount_usd?: number
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          campaign_id?: string
+          category?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          notes?: string | null
+          planned_amount_usd?: number
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_budgets_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_budgets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaign_expenses: {
+        Row: {
+          amount_usd: number
+          approved_at: string | null
+          approved_by: string | null
+          campaign_id: string
+          category: string
+          created_at: string
+          created_by: string
+          description: string
+          expense_date: string
+          hole_id: string | null
+          id: string
+          invoice_number: string | null
+          meters_drilled: number | null
+          notes: string | null
+          project_id: string
+          status: string
+          updated_at: string
+          vendor: string | null
+        }
+        Insert: {
+          amount_usd?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_id: string
+          category: string
+          created_at?: string
+          created_by: string
+          description: string
+          expense_date?: string
+          hole_id?: string | null
+          id?: string
+          invoice_number?: string | null
+          meters_drilled?: number | null
+          notes?: string | null
+          project_id: string
+          status?: string
+          updated_at?: string
+          vendor?: string | null
+        }
+        Update: {
+          amount_usd?: number
+          approved_at?: string | null
+          approved_by?: string | null
+          campaign_id?: string
+          category?: string
+          created_at?: string
+          created_by?: string
+          description?: string
+          expense_date?: string
+          hole_id?: string | null
+          id?: string
+          invoice_number?: string | null
+          meters_drilled?: number | null
+          notes?: string | null
+          project_id?: string
+          status?: string
+          updated_at?: string
+          vendor?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_expenses_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_expenses_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "campaign_expenses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       core_boxes: {
         Row: {
           box_code: string
