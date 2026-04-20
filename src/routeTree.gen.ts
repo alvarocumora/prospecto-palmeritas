@@ -35,6 +35,7 @@ import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_auth
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
+import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
@@ -190,6 +191,12 @@ const AuthenticatedDashboardCampaignsRoute =
     path: '/dashboard/campaigns',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardBoletinRoute =
+  AuthenticatedDashboardBoletinRouteImport.update({
+    id: '/dashboard/boletin',
+    path: '/dashboard/boletin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAuditRoute =
   AuthenticatedDashboardAuditRouteImport.update({
     id: '/dashboard/audit',
@@ -230,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -262,6 +270,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -296,6 +305,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
+  '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
@@ -330,6 +340,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
+    | '/dashboard/boletin'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
@@ -362,6 +373,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
+    | '/dashboard/boletin'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
     | '/dashboard/drilling'
@@ -395,6 +407,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
+    | '/_authenticated/dashboard/boletin'
     | '/_authenticated/dashboard/campaigns'
     | '/_authenticated/dashboard/catastro'
     | '/_authenticated/dashboard/drilling'
@@ -612,6 +625,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCampaignsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/boletin': {
+      id: '/_authenticated/dashboard/boletin'
+      path: '/dashboard/boletin'
+      fullPath: '/dashboard/boletin'
+      preLoaderRoute: typeof AuthenticatedDashboardBoletinRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/audit': {
       id: '/_authenticated/dashboard/audit'
       path: '/dashboard/audit'
@@ -684,6 +704,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
+  AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
   AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
@@ -710,6 +731,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
+  AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
   AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
   AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
