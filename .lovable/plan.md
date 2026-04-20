@@ -1,105 +1,45 @@
 
-User wants a "disruptive Geology 5.0" plan. Current state: project has SERNAGEOMIN WMS layers, Sentinel-2, Copernicus DEM, exploration_targets, geology reference tables (lithology_units, alteration_zones, mineralogy, geological_features, geo_references), drill core logs, sampling results, geophysics surveys. The geology module today is mostly *display* of static reference data + map overlays.
 
-"5.0" should mean: AI-native, predictive, multi-source fusion, 3D, real-time. Let me design something genuinely disruptive vs incremental.
+## Problema
 
-## Plan: Geología 5.0 — Inteligencia Geológica Predictiva
+En móvil (≤768px), las vistas **Mapa** (`/dashboard/map`) y **Catastro** (`/dashboard/catastro`) no cargan correctamente.
 
-### Concepto
-Pasar de "ver capas" a **"el sistema entiende el yacimiento"**: fusión multi-fuente + IA generativa + modelo 3D + predicción de targets.
+Causas probables identificadas tras revisar el código:
 
-### Cinco pilares
+1. **`/dashboard/map`** usa `fixed inset-0 md:left-56 top-12 md:top-0 bottom-14 md:bottom-0` — el contenedor depende de un header móvil de 48px y bottom-nav de 56px. Si el layout `_authenticated.tsx` no renderiza esos elementos en móvil, el mapa queda con altura 0 o tapado. Además los paneles flotantes (`SectionBuilderTool`, `RasterControlPanel`, `SavedViewsPanel`, `RasterSwipePanel`, `LiveCollabLayer`, `TimeSlider`, `ProspectivityButton`, `GeoIntelBriefButton`, `CollapsibleAuLegend`) se apilan todos al mismo tiempo en una pantalla de 440px y bloquean el mapa.
+2. El header de la vista mapa tiene **demasiados controles** (`MapCommandPalette`, `ViewModeToggle`, `CampaignSelector`, checkbox high-grade, contador, snapshot) que en 440px hacen wrap a 3-4 filas y empujan el mapa fuera de viewport.
+3. **`/dashboard/catastro`** probablemente usa una tabla ancha sin scroll horizontal contenido y un dialog form que desborda en móvil.
 
-**1. GeoAI Copilot (Lovable AI Gateway — gemini-2.5-pro)**
-- Chat geológico contextual: "¿qué litología domina entre 120-180 m en DDH-04?", "compara mineralogía de DDH-02 vs DDH-05", "sugiere próximo collar".
-- Inyecta contexto: core logs + assays + alteración + targets + SERNAGEOMIN del AOI.
-- Responde con citas a filas de DB + coordenadas.
-- Edge function `geo-copilot` (ya existe `geo-assistant` — extender).
+## Solución
 
-**2. Modelo 3D del subsuelo (Three.js + React-Three-Fiber)**
-- Vista 3D del AOI con: topografía Copernicus DEM, sondajes como cilindros coloreados por Au, vetas como superficies, alteración como volúmenes semi-transparentes.
-- Sliders: profundidad, ley cutoff, filtro por dominio.
-- Click en un sondaje 3D → abre StripLog 2D existente.
+### 1. Vista Mapa móvil (`_authenticated.dashboard.map.tsx`)
 
-**3. Predicción de targets con ML ligero (servidor)**
-- Edge function que cruza: targets validados + sondajes con intercepto + capas SERNAGEOMIN + Sentinel-2 alteración + distancia a yacimientos conocidos.
-- Genera "heatmap de prospectividad" como GeoJSON grid (celdas 50×50 m con score 0-100).
-- Se renderiza como capa nueva `prospectividad:ai` en el mapa.
-- Cada celda explica su score (qué features pesaron más) → trazabilidad.
+- Reemplazar `fixed inset-0 md:left-56 …` por un layout que use `h-[100dvh]` (dynamic viewport, evita problemas con barra de URL en móvil) y respete el shell de `_authenticated.tsx`.
+- **Header móvil compacto**: en `<md` mostrar solo título + un botón "⚙ Controles" que abra un `Sheet` (drawer) con CampaignSelector, ViewModeToggle, high-grade toggle, snapshot y command palette. En `≥md` mantener la barra actual.
+- **Paneles flotantes en móvil**: ocultar por defecto `SectionBuilderTool`, `RasterControlPanel`, `SavedViewsPanel`, `RasterSwipePanel`, `TimeSlider`, `ProspectivityButton`, `GeoIntelBriefButton`, `CollapsibleAuLegend`. Añadir un FAB único "Herramientas" abajo-derecha que abra un `Sheet` con accesos. En desktop sin cambios.
+- Asegurar `ProjectMap` con `fillHeight` use `height: 100%` real (revisar contenedor padre).
 
-**4. Fusión multi-fuente automática (Geo-Intel Brief)**
-- Botón "Generar Brief Geológico" en cualquier punto del mapa.
-- En 1 click: SERNAGEOMIN + Macrostrat + elevación + Sentinel-2 alteración + sondajes a <500 m + muestras a <500 m + targets cercanos + permisos vigentes (HSE) + concesión titular (catastro).
-- IA sintetiza un párrafo profesional + tabla de evidencias.
-- Exportable a PDF (reutiliza primitives de Fase 5).
+### 2. Vista Catastro móvil (`_authenticated.dashboard.catastro.tsx`)
 
-**5. Sección virtual interactiva (cross-section AI)**
-- Trazas dos puntos en el mapa → el sistema proyecta sondajes cercanos sobre el plano.
-- Interpola litología/alteración entre sondajes con kriging simple (lib `@turf/turf` + interpolación lineal por bandas).
-- Muestra vetas inferidas, zonas de alteración, intercepts de Au.
-- Editable: el geólogo puede "pintar" una unidad y guardarla como interpretación.
+- Envolver tabla en `<div class="overflow-x-auto -mx-3 px-3">` para scroll horizontal limpio.
+- En `<md` reemplazar la tabla por **cards** (una por concesión: nombre, tipo, estado expiración, titular, acciones).
+- Stats en grid `grid-cols-2 md:grid-cols-5`.
+- Filtros y búsqueda colapsables en móvil tras un botón "Filtros".
+- Dialog `ConcessionDialog` con `max-h-[90dvh] overflow-y-auto` y campos `grid-cols-1 md:grid-cols-2`.
 
-### Stack técnico
+### 3. Verificación shell autenticado
 
-```text
-Frontend:
-  three + @react-three/fiber + @react-three/drei (3D model)
-  d3-contour (heatmap rendering)
-  
-Backend (edge functions):
-  geo-copilot (extiende geo-assistant) — chat con contexto DB
-  prospectivity-grid — calcula heatmap, persiste en tabla nueva
-  geo-brief — fusiona fuentes + síntesis IA
-  
-DB nueva:
-  prospectivity_cells (project_id, geom geojson, score, features jsonb, generated_at)
-  geo_interpretations (project_id, type, geom geojson, attributes jsonb, author, version)
-  
-AI: Lovable AI Gateway (gemini-2.5-pro principal, gemini-2.5-flash para chat rápido)
-```
+Revisar `_authenticated.tsx` para confirmar que en móvil hay `top-bar` (h-12) y `bottom-nav` (h-14) reales — si no existen, ajustar offsets de la vista mapa a `top-0 bottom-0`.
 
-### Sprints propuestos
+## Archivos a editar
 
-| Sprint | Pilar | Esfuerzo | Valor |
-|---|---|---|---|
-| 5.1 | GeoAI Copilot | Medio | Alto |
-| 5.2 | Geo-Intel Brief + PDF | Bajo | Alto |
-| 5.3 | Prospectividad ML (heatmap) | Alto | Muy alto |
-| 5.4 | Modelo 3D Three.js | Alto | Visualmente disruptivo |
-| 5.5 | Sección virtual con kriging | Medio | Alto |
+- `src/routes/_authenticated.dashboard.map.tsx` — layout responsive + sheet móvil
+- `src/routes/_authenticated.dashboard.catastro.tsx` — cards móvil + dialog responsive
+- `src/routes/_authenticated.tsx` — verificar (solo si offsets no coinciden)
 
-### Diagrama
+## Resultado esperado
 
-```text
-┌───────────── Geología 5.0 ─────────────┐
-│                                         │
-│  ┌──────────┐   ┌──────────────────┐   │
-│  │  Mapa 2D │   │  Vista 3D R3F    │   │
-│  │ + heatmap│←→│  sondajes/vetas  │   │
-│  │   AI     │   │  alteración vol. │   │
-│  └────┬─────┘   └────────┬─────────┘   │
-│       │                  │              │
-│       └────┬─────────────┘              │
-│            ↓                            │
-│   ┌────────────────────┐                │
-│   │  GeoAI Copilot 💬  │ ← gemini-2.5  │
-│   └────────┬───────────┘                │
-│            ↓                            │
-│   contexto: DB + WMS + sondajes         │
-│            ↓                            │
-│   ┌────────────────────┐                │
-│   │ Geo-Intel Brief PDF│                │
-│   └────────────────────┘                │
-└─────────────────────────────────────────┘
-```
+En 440×688px:
+- **Mapa**: header de 1 fila + mapa a pantalla completa + 1 FAB de herramientas + leyenda Au colapsable.
+- **Catastro**: stats 2-col, lista de cards scrolleable, dialog que cabe en pantalla.
 
-### Propuesta de arranque
-Empezar por **Sprint 5.1 (Copilot) + 5.2 (Brief)** en una pasada — máximo valor, mínimo riesgo, sin dependencias 3D. Luego decidir si seguir con 5.3 (ML) o 5.4 (3D) según prioridad.
-
-### Fuera de alcance ahora
-- Inversión geofísica real (requiere cómputo pesado).
-- Integración con software comercial (Leapfrog, Vulcan).
-- Modelo de bloques económico (eso es Fase 8 — Mineral Resource Estimation).
-
-### Pregunta antes de ejecutar
-¿Quieres que arranque con **5.1 + 5.2** (Copilot + Brief, ~1 turno) o prefieres ver primero un mockup del **modelo 3D (5.4)** porque es el pilar más visual?
