@@ -290,6 +290,7 @@ function BoletinModule() {
       {tab === "watch" && active && user && (
         <WatchHoldersPanel
           projectId={active.id}
+          projectName={active.name}
           userId={user.id}
           holders={watchHolders}
           onChange={refreshHolders}
