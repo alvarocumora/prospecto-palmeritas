@@ -40,6 +40,7 @@ import { useDrillHoles } from "@/hooks/useDrilling";
 import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
 import { computeIntercepts, bestIntercept, interceptScore, scoreToHaloStyle } from "@/lib/drilling/intercepts";
 import { buildConcessionsLayer } from "./map/concessionLayer";
+import { buildConcesionesNacionalesLayer, type ConcesionTipo } from "./map/concesionesNacionalesLayer";
 import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
@@ -105,6 +106,10 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "targets:project": { visible: true, opacity: 1 },
   "ext:usgs-quakes": { visible: false, opacity: 0.85 },
   "ext:osm-infra": { visible: false, opacity: 0.9 },
+  "sernageomin:explotacion": { visible: false, opacity: 0.55 },
+  "sernageomin:exploracion": { visible: false, opacity: 0.55 },
+  "sernageomin:mensura": { visible: false, opacity: 0.55 },
+  "sernageomin:manifestacion": { visible: false, opacity: 0.55 },
 };
 
 export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
@@ -320,6 +325,28 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
 
       await loadCatastroData();
       if (cancelled) return;
+
+      // Concesiones nacionales SERNAGEOMIN (lazy: solo se cargan cuando el usuario activa la capa)
+      const tiposNac: ConcesionTipo[] = ["explotacion", "exploracion", "mensura", "manifestacion"];
+      try {
+        const b = map.getBounds();
+        const bbox: [number, number, number, number] = [
+          b.getWest(), b.getSouth(), b.getEast(), b.getNorth(),
+        ];
+        const nacLayers: ManagedLayer[] = [];
+        for (const tipo of tiposNac) {
+          const { layer, count } = await buildConcesionesNacionalesLayer(L, tipo, bbox);
+          nacLayers.push({
+            id: `sernageomin:${tipo}`,
+            label: `SERNAGEOMIN ${tipo} (${count})`,
+            group: "Catastro Chile",
+            layer,
+          });
+        }
+        if (!cancelled) setManagedLayers((prev) => [...prev.filter((p) => !p.id.startsWith("sernageomin:")), ...nacLayers]);
+      } catch (err) {
+        console.warn("[sernageomin] failed:", err);
+      }
 
       wireGeoIntelClickPopup(L, map, fetchMacrostratUnit, () => targetsRef.current);
 

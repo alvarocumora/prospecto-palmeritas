@@ -301,6 +301,32 @@ function BoletinModule() {
   );
 }
 
+function CourtCaseSummary({ c }: { c: CourtCase }) {
+  return (
+    <div>
+      <div className="flex items-center gap-2 flex-wrap text-xs">
+        <span className="px-1.5 py-0.5 rounded text-[10px] font-medium uppercase bg-bg-secondary border border-border">
+          {c.matter ?? "causa minera"}
+        </span>
+        {c.case_number && <span className="font-mono text-text-secondary">{c.case_number}</span>}
+        {c.filed_at && <span className="text-text-secondary">{c.filed_at}</span>}
+        {c.source_url && (
+          <a href={c.source_url} target="_blank" rel="noreferrer" className="ml-auto text-primary hover:underline inline-flex items-center gap-0.5">
+            PJUD <ExternalLink className="w-3 h-3" />
+          </a>
+        )}
+      </div>
+      <div className="mt-1 text-sm font-medium">{c.defendant ?? "Sin demandado"}</div>
+      <div className="text-xs text-text-secondary mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
+        {c.court && <span>⚖️ {c.court}</span>}
+        {c.defendant_rut && <span className="font-mono">RUT {c.defendant_rut}</span>}
+        {c.comuna && <span>📍 {c.comuna}{c.region && `, ${c.region}`}</span>}
+        {c.status && <span>· {c.status}</span>}
+      </div>
+    </div>
+  );
+}
+
 function BulletinSummary({ b }: { b: MiningBulletin }) {
   return (
     <div>
