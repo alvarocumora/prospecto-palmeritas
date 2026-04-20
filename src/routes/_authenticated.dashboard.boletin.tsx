@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel } from "lucide-react";
+import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel, FileDown } from "lucide-react";
+import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
