@@ -13,6 +13,7 @@ import { Logo } from "@/components/Logo";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
+import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 
 export const Route = createFileRoute("/_authenticated")({
   // Auth check is client-only — Supabase session lives in localStorage and is not
@@ -48,6 +49,7 @@ function AuthenticatedLayout() {
   const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
   const role = useProjectRole();
   const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
+  const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const navigate = useNavigate();
   const location = useLocation();
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -134,7 +136,7 @@ function AuthenticatedLayout() {
             <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" module="projects" role={role} />
           )}
           <NavItem to="/dashboard/catastro" icon={<MapIcon className="w-3.5 h-3.5" />} label="Catastro" module="catastro" role={role} />
-          <NavItem to="/dashboard/boletin" icon={<FileText className="w-3.5 h-3.5" />} label="Boletín Minero" module="catastro" role={role} />
+          <NavItem to="/dashboard/boletin" icon={<FileText className="w-3.5 h-3.5" />} label="Boletín Minero" module="catastro" role={role} badge={catastroAlerts} />
           <NavItem to="/dashboard/geophysics" icon={<Activity className="w-3.5 h-3.5" />} label="Geofísica" module="geophysics" role={role} />
           <NavItem to="/dashboard/drones" icon={<Plane className="w-3.5 h-3.5" />} label="Drones" module="geophysics" role={role} />
           <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" module="drilling" role={role} />
@@ -226,10 +228,10 @@ function AuthenticatedLayout() {
 }
 
 function NavItem({
-  to, icon, label, exact, module, role,
+  to, icon, label, exact, module, role, badge,
 }: {
   to: string; icon: React.ReactNode; label: string; exact?: boolean;
-  module: string; role: ProjectRole | null;
+  module: string; role: ProjectRole | null; badge?: number;
 }) {
   const location = useLocation();
   const active = exact ? location.pathname === to : location.pathname.startsWith(to);
@@ -242,7 +244,12 @@ function NavItem({
         active ? "bg-gold/10 text-gold" : "text-foreground hover:bg-accent"
       }`}
     >
-      {icon}<span>{label}</span>
+      {icon}<span className="flex-1">{label}</span>
+      {badge && badge > 0 ? (
+        <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      ) : null}
     </Link>
   );
 }

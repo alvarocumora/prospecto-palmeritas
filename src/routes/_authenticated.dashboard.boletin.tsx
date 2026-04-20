@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel } from "lucide-react";
+import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel, FileDown } from "lucide-react";
+import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -289,6 +290,7 @@ function BoletinModule() {
       {tab === "watch" && active && user && (
         <WatchHoldersPanel
           projectId={active.id}
+          projectName={active.name}
           userId={user.id}
           holders={watchHolders}
           onChange={refreshHolders}
@@ -363,17 +365,37 @@ function BulletinSummary({ b }: { b: MiningBulletin }) {
 
 function WatchHoldersPanel({
   projectId,
+  projectName,
   userId,
   holders,
   onChange,
 }: {
   projectId: string;
+  projectName: string;
   userId: string;
   holders: ReturnType<typeof useWatchHolders>["data"];
   onChange: () => void;
 }) {
   const [form, setForm] = useState({ holder_name: "", holder_rut: "", notes: "" });
   const [adding, setAdding] = useState(false);
+  const [exporting, setExporting] = useState<string | null>(null);
+
+  const onExportPdf = async (h: { id: string; holder_name: string | null; holder_rut: string | null }) => {
+    setExporting(h.id);
+    try {
+      const res = await generateHolderProfilePdf({
+        projectId,
+        projectName,
+        holderName: h.holder_name,
+        holderRut: h.holder_rut,
+      });
+      toast.success(`Perfil generado: ${res.publications} publicaciones, ${res.cases} causas`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error generando PDF");
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const onAdd = async () => {
     if (!form.holder_name.trim() && !form.holder_rut.trim()) {
@@ -460,12 +482,23 @@ function WatchHoldersPanel({
                   <td className="px-2.5 py-1.5 font-mono">{h.holder_rut ?? "—"}</td>
                   <td className="px-2.5 py-1.5 text-text-secondary">{h.notes ?? "—"}</td>
                   <td className="px-2.5 py-1.5 text-right">
-                    <button
-                      onClick={() => onDelete(h.id)}
-                      className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex gap-1 justify-end">
+                      <button
+                        onClick={() => onExportPdf(h)}
+                        disabled={exporting === h.id}
+                        className="p-1 rounded hover:bg-accent text-text-secondary hover:text-foreground disabled:opacity-50"
+                        title="Generar perfil PDF"
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(h.id)}
+                        className="p-1 rounded hover:bg-destructive/20 text-destructive"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
