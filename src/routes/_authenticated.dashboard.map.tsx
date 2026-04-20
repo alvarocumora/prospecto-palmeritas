@@ -63,6 +63,9 @@ function OperationalMap() {
   const { targets } = useExplorationTargets(active?.id ?? null);
   const [timeActive, setTimeActive] = useState(false);
   const [timeCursor, setTimeCursor] = useState<number | null>(null);
+  const isMobile = useIsMobile();
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
+  const [mobileCtrlOpen, setMobileCtrlOpen] = useState(false);
 
   // Sprint 6.4 — time-filtered raster visibility
   const visibleRasterSettings = useMemo(() => {
