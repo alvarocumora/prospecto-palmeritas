@@ -103,14 +103,24 @@ function BoletinModule() {
             {active && <> · Vigilancia activa para <strong>{active.code}</strong></>}
           </p>
         </div>
-        <button
-          onClick={onSync}
-          disabled={syncing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
-        >
-          <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
-          {syncing ? "Sincronizando…" : "Sincronizar ahora"}
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onSyncPjud}
+            disabled={syncingPjud}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50"
+          >
+            <Gavel className={`w-4 h-4 ${syncingPjud ? "animate-pulse" : ""}`} />
+            {syncingPjud ? "PJUD…" : "Sync PJUD"}
+          </button>
+          <button
+            onClick={onSync}
+            disabled={syncing}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Sincronizando…" : "Sync Boletín"}
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -122,9 +132,12 @@ function BoletinModule() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-border">
+      <div className="flex gap-1 border-b border-border overflow-x-auto">
         <TabButton active={tab === "alerts"} onClick={() => setTab("alerts")}>
-          Alertas {unreadAlerts.length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">{unreadAlerts.length}</span>}
+          Alertas Boletín {unreadAlerts.length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">{unreadAlerts.length}</span>}
+        </TabButton>
+        <TabButton active={tab === "pjud"} onClick={() => setTab("pjud")}>
+          PJUD {courtAlerts.filter(a => !a.is_read).length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">{courtAlerts.filter(a => !a.is_read).length}</span>}
         </TabButton>
         <TabButton active={tab === "all"} onClick={() => setTab("all")}>
           Todas las publicaciones
@@ -133,6 +146,56 @@ function BoletinModule() {
           Titulares vigilados
         </TabButton>
       </div>
+
+      {tab === "pjud" && (
+        <div className="space-y-2">
+          <div className="text-xs text-text-secondary">
+            Causas judiciales mineras del Poder Judicial · {courtCases.length} causas en BD · {courtAlerts.length} alertas para este proyecto
+          </div>
+          {!active ? (
+            <div className="p-6 text-center text-text-secondary text-sm">Selecciona un proyecto para ver alertas PJUD.</div>
+          ) : courtAlerts.length === 0 && courtCases.length === 0 ? (
+            <div className="p-6 text-center text-text-secondary text-sm">
+              Sin causas todavía. Pulsa "Sync PJUD" para extraer causas mineras del Poder Judicial.
+            </div>
+          ) : (
+            <>
+              {courtAlerts.map((a) => (
+                <div key={a.id} className={`border rounded p-3 ${a.is_read ? "border-border bg-bg-secondary/30" : "border-amber-500/40 bg-amber-500/10"}`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        {!a.is_read && <Gavel className="w-4 h-4 text-amber-600 shrink-0" />}
+                        <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-bg-secondary border border-border">
+                          {a.match_type === "defendant_rut" ? "RUT demandado" : "Demandado"}
+                        </span>
+                        <span className="text-xs text-text-secondary">{new Date(a.created_at).toLocaleString("es-CL")}</span>
+                      </div>
+                      {a.case && <CourtCaseSummary c={a.case} />}
+                      {a.match_detail && <div className="text-[11px] text-text-secondary mt-1">Coincidencia: {a.match_detail}</div>}
+                    </div>
+                    <button onClick={() => markCourtRead(a.id)} className="p-1.5 rounded hover:bg-accent shrink-0">
+                      {a.is_read ? <EyeOff className="w-4 h-4 text-text-secondary" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              ))}
+              {courtCases.length > 0 && (
+                <div className="mt-4">
+                  <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Todas las causas mineras</div>
+                  <div className="border border-border rounded divide-y divide-border">
+                    {courtCases.slice(0, 30).map((c) => (
+                      <div key={c.id} className="p-3 hover:bg-accent/30">
+                        <CourtCaseSummary c={c} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
 
       {tab === "alerts" && (
         <div className="space-y-2">
