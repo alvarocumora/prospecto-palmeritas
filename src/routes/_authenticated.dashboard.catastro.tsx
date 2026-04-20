@@ -452,12 +452,12 @@ function ConcessionDialog({
           <Field label="Comuna">
             <input className={inp} value={form.commune} onChange={(e) => setForm({ ...form, commune: e.target.value })} />
           </Field>
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <Field label="Notas">
               <textarea rows={2} className={inp} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
             </Field>
           </div>
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <Field label='Geometría GeoJSON (Polygon o MultiPolygon, opcional)'>
               <textarea
                 rows={4}
