@@ -1542,6 +1542,53 @@ export type Database = {
           },
         ]
       }
+      map_annotations: {
+        Row: {
+          color: string
+          created_at: string
+          created_by: string
+          id: string
+          lat: number
+          lng: number
+          project_id: string
+          resolved: boolean
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          created_by: string
+          id?: string
+          lat: number
+          lng: number
+          project_id: string
+          resolved?: boolean
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          lat?: number
+          lng?: number
+          project_id?: string
+          resolved?: boolean
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_annotations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       map_views: {
         Row: {
           center_lat: number | null
