@@ -499,6 +499,57 @@ export type Database = {
           },
         ]
       }
+      court_case_alerts: {
+        Row: {
+          case_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          match_detail: string | null
+          match_type: string
+          project_id: string
+          read_at: string | null
+          read_by: string | null
+        }
+        Insert: {
+          case_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_detail?: string | null
+          match_type: string
+          project_id: string
+          read_at?: string | null
+          read_by?: string | null
+        }
+        Update: {
+          case_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_detail?: string | null
+          match_type?: string
+          project_id?: string
+          read_at?: string | null
+          read_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "court_case_alerts_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "mining_court_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "court_case_alerts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dem_diffs: {
         Row: {
           bbox_geojson: Json | null
@@ -1957,6 +2008,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mining_court_cases: {
+        Row: {
+          case_number: string | null
+          comuna: string | null
+          content_hash: string
+          court: string | null
+          created_at: string
+          defendant: string | null
+          defendant_rut: string | null
+          filed_at: string | null
+          id: string
+          jurisdiction: string | null
+          last_movement_at: string | null
+          matter: string | null
+          plaintiff: string | null
+          raw_payload: Json | null
+          region: string | null
+          scraped_at: string
+          source: string
+          source_url: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          case_number?: string | null
+          comuna?: string | null
+          content_hash: string
+          court?: string | null
+          created_at?: string
+          defendant?: string | null
+          defendant_rut?: string | null
+          filed_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          last_movement_at?: string | null
+          matter?: string | null
+          plaintiff?: string | null
+          raw_payload?: Json | null
+          region?: string | null
+          scraped_at?: string
+          source?: string
+          source_url?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          case_number?: string | null
+          comuna?: string | null
+          content_hash?: string
+          court?: string | null
+          created_at?: string
+          defendant?: string | null
+          defendant_rut?: string | null
+          filed_at?: string | null
+          id?: string
+          jurisdiction?: string | null
+          last_movement_at?: string | null
+          matter?: string | null
+          plaintiff?: string | null
+          raw_payload?: Json | null
+          region?: string | null
+          scraped_at?: string
+          source?: string
+          source_url?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
