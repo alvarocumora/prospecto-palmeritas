@@ -339,7 +339,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
           nacLayers.push({
             id: `sernageomin:${tipo}`,
             label: `SERNAGEOMIN ${tipo} (${count})`,
-            group: "Catastro Chile",
+            group: "Catastro",
             layer,
           });
         }
