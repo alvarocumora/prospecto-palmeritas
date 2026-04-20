@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
+import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
@@ -62,6 +63,11 @@ const IndexRoute = IndexRouteImport.update({
 const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
   id: '/invitations/$token',
   path: '/invitations/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
+  id: '/hooks/sync-boletin-minero',
+  path: '/hooks/sync-boletin-minero',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -250,6 +257,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -283,6 +291,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/hooks/sync-boletin-minero'
     | '/invitations/$token'
     | '/dashboard/admin'
     | '/dashboard/approvals'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/hooks/sync-boletin-minero'
     | '/invitations/$token'
     | '/dashboard/admin'
     | '/dashboard/approvals'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/hooks/sync-boletin-minero'
     | '/invitations/$token'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
@@ -412,6 +424,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
 }
 
@@ -450,6 +463,13 @@ declare module '@tanstack/react-router' {
       path: '/invitations/$token'
       fullPath: '/invitations/$token'
       preLoaderRoute: typeof InvitationsTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hooks/sync-boletin-minero': {
+      id: '/hooks/sync-boletin-minero'
+      path: '/hooks/sync-boletin-minero'
+      fullPath: '/hooks/sync-boletin-minero'
+      preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
@@ -723,6 +743,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
 }
 export const routeTree = rootRouteImport
