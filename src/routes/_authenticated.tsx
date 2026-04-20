@@ -228,10 +228,10 @@ function AuthenticatedLayout() {
 }
 
 function NavItem({
-  to, icon, label, exact, module, role,
+  to, icon, label, exact, module, role, badge,
 }: {
   to: string; icon: React.ReactNode; label: string; exact?: boolean;
-  module: string; role: ProjectRole | null;
+  module: string; role: ProjectRole | null; badge?: number;
 }) {
   const location = useLocation();
   const active = exact ? location.pathname === to : location.pathname.startsWith(to);
@@ -244,7 +244,12 @@ function NavItem({
         active ? "bg-gold/10 text-gold" : "text-foreground hover:bg-accent"
       }`}
     >
-      {icon}<span>{label}</span>
+      {icon}<span className="flex-1">{label}</span>
+      {badge && badge > 0 ? (
+        <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold">
+          {badge > 99 ? "99+" : badge}
+        </span>
+      ) : null}
     </Link>
   );
 }
