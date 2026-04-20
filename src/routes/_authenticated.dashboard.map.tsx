@@ -12,7 +12,9 @@ import { useSamplingResults } from "@/hooks/useSamplingResults";
 import { useDrillHoles } from "@/hooks/useDrilling";
 import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
 import type { LeafletNS } from "@/components/map/types";
-import { Layers, FlaskConical, Camera, Loader2 } from "lucide-react";
+import { Layers, FlaskConical, Camera, Loader2, Settings2, Wrench } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { captureMapSnapshot, downloadDataUrl } from "@/lib/map/snapshot";
 import { GeoIntelBriefButton } from "@/components/GeoIntelBriefButton";
 import { ProspectivityButton } from "@/components/ProspectivityButton";
@@ -61,6 +63,9 @@ function OperationalMap() {
   const { targets } = useExplorationTargets(active?.id ?? null);
   const [timeActive, setTimeActive] = useState(false);
   const [timeCursor, setTimeCursor] = useState<number | null>(null);
+  const isMobile = useIsMobile();
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false);
+  const [mobileCtrlOpen, setMobileCtrlOpen] = useState(false);
 
   // Sprint 6.4 — time-filtered raster visibility
   const visibleRasterSettings = useMemo(() => {
@@ -181,7 +186,9 @@ function OperationalMap() {
             <div className="text-xs md:text-sm font-mono font-semibold truncate">{active?.name ?? "Sin proyecto"}</div>
           </div>
         </div>
-        <div className="flex items-center gap-3 flex-wrap justify-end">
+
+        {/* Desktop controls */}
+        <div className="hidden md:flex items-center gap-3 flex-wrap justify-end">
           <MapCommandPalette
             map={mapInst?.map ?? null}
             holes={holes}
@@ -200,8 +207,7 @@ function OperationalMap() {
               onChange={(e) => setHighGradeOnly(e.target.checked)}
               className="accent-gold"
             />
-            <span className="hidden sm:inline">High-grade ≥1 g/t Au</span>
-            <span className="sm:hidden">≥1 g/t</span>
+            <span>High-grade ≥1 g/t Au</span>
           </label>
           <span className="text-[11px] font-mono text-muted-foreground hidden lg:inline whitespace-nowrap">
             <FlaskConical className="w-3 h-3 inline mr-1" /> {filteredSamples.length} muestras
@@ -215,9 +221,74 @@ function OperationalMap() {
               title="Exportar snapshot PNG con leyenda y escala"
             >
               {snapshotting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-gold" />}
-              <span className="hidden sm:inline">Snapshot</span>
+              Snapshot
             </button>
           )}
+        </div>
+
+        {/* Mobile single button → opens controls sheet */}
+        <div className="md:hidden flex items-center gap-2">
+          <span className="text-[10px] font-mono text-muted-foreground whitespace-nowrap">
+            {filteredSamples.length} m
+          </span>
+          <Sheet open={mobileCtrlOpen} onOpenChange={setMobileCtrlOpen}>
+            <SheetTrigger asChild>
+              <button
+                type="button"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background text-foreground text-[11px] font-mono"
+                title="Controles del mapa"
+              >
+                <Settings2 className="w-3.5 h-3.5 text-gold" />
+                Ctrl
+              </button>
+            </SheetTrigger>
+            <SheetContent side="top" className="max-h-[80dvh] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Controles del mapa</SheetTitle>
+              </SheetHeader>
+              <div className="space-y-4 mt-4">
+                <div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Vista</div>
+                  <ViewModeToggle mode={viewMode} onChange={setViewMode} />
+                </div>
+                <div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Campaña</div>
+                  <CampaignSelector campaigns={campaigns} value={campaignId} onChange={setCampaignId} />
+                </div>
+                <label className="flex items-center gap-2 text-xs font-mono cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={highGradeOnly}
+                    onChange={(e) => setHighGradeOnly(e.target.checked)}
+                    className="accent-gold"
+                  />
+                  <span>High-grade ≥1 g/t Au</span>
+                </label>
+                {viewMode === "2d" && (
+                  <button
+                    type="button"
+                    onClick={() => { setMobileCtrlOpen(false); handleSnapshot(); }}
+                    disabled={snapshotting || !mapInst}
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded border border-border bg-background text-foreground hover:bg-accent disabled:opacity-50 text-xs font-mono"
+                  >
+                    {snapshotting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5 text-gold" />}
+                    Snapshot PNG
+                  </button>
+                )}
+                <div className="pt-2 border-t border-border">
+                  <MapCommandPalette
+                    map={mapInst?.map ?? null}
+                    holes={holes}
+                    targets={targets}
+                    rasters={rasters}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    onSnapshot={handleSnapshot}
+                  />
+                </div>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </header>
 
@@ -238,51 +309,124 @@ function OperationalMap() {
               fillHeight
               onMapReady={(map, L) => setMapInst({ map, L })}
             />
-            <SectionBuilderTool
-              map={mapInst?.map ?? null}
-              L={mapInst?.L ?? null}
-              holes={filteredHoles}
-              logsByHole={logsByHole}
-              projectName={active?.name}
-            />
             <FeatureInspectorPanel feature={inspected} onClose={() => setInspected(null)} />
-            <GeoIntelBriefButton map={mapInst?.map ?? null} />
-            <ProspectivityButton
-              map={mapInst?.map ?? null}
-              onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
-            />
-            <RasterControlPanel
-              rasters={rasters}
-              settings={visibleRasterSettings}
-              onChange={updateRasterSetting}
-              onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
-            />
-            <SavedViewsPanel
-              projectId={active?.id ?? null}
-              map={mapInst?.map ?? null}
-              layerState={{ campaignId, highGradeOnly, rasterSettings, viewMode }}
-              onRestore={(v: MapView) => {
-                if (mapInst && v.center_lat != null && v.center_lng != null && v.zoom != null) {
-                  mapInst.map.setView([v.center_lat, v.center_lng], v.zoom);
-                }
-                const ls = v.layer_state ?? {};
-                if (typeof ls.campaignId !== "undefined") setCampaignId(ls.campaignId ?? null);
-                if (typeof ls.highGradeOnly === "boolean") setHighGradeOnly(ls.highGradeOnly);
-                if (ls.rasterSettings) setRasterSettings(ls.rasterSettings as RasterSettings);
-                if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
-                toast.success(`Vista «${v.name}» restaurada`);
-              }}
-            />
-            <TimeSlider
-              holes={timeItemsHoles}
-              flights={timeItemsFlights}
-              onChange={setTimeCursor}
-              active={timeActive}
-              onToggle={setTimeActive}
-            />
-            <RasterSwipePanel rasters={rasters} mapInst={mapInst} />
+
+            {/* Always-on lightweight overlays */}
             <LiveCollabLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
             <CollapsibleAuLegend />
+
+            {/* Desktop: all panels visible */}
+            {!isMobile && (
+              <>
+                <SectionBuilderTool
+                  map={mapInst?.map ?? null}
+                  L={mapInst?.L ?? null}
+                  holes={filteredHoles}
+                  logsByHole={logsByHole}
+                  projectName={active?.name}
+                />
+                <GeoIntelBriefButton map={mapInst?.map ?? null} />
+                <ProspectivityButton
+                  map={mapInst?.map ?? null}
+                  onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+                />
+                <RasterControlPanel
+                  rasters={rasters}
+                  settings={visibleRasterSettings}
+                  onChange={updateRasterSetting}
+                  onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
+                />
+                <SavedViewsPanel
+                  projectId={active?.id ?? null}
+                  map={mapInst?.map ?? null}
+                  layerState={{ campaignId, highGradeOnly, rasterSettings, viewMode }}
+                  onRestore={(v: MapView) => {
+                    if (mapInst && v.center_lat != null && v.center_lng != null && v.zoom != null) {
+                      mapInst.map.setView([v.center_lat, v.center_lng], v.zoom);
+                    }
+                    const ls = v.layer_state ?? {};
+                    if (typeof ls.campaignId !== "undefined") setCampaignId(ls.campaignId ?? null);
+                    if (typeof ls.highGradeOnly === "boolean") setHighGradeOnly(ls.highGradeOnly);
+                    if (ls.rasterSettings) setRasterSettings(ls.rasterSettings as RasterSettings);
+                    if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
+                    toast.success(`Vista «${v.name}» restaurada`);
+                  }}
+                />
+                <TimeSlider
+                  holes={timeItemsHoles}
+                  flights={timeItemsFlights}
+                  onChange={setTimeCursor}
+                  active={timeActive}
+                  onToggle={setTimeActive}
+                />
+                <RasterSwipePanel rasters={rasters} mapInst={mapInst} />
+              </>
+            )}
+
+            {/* Mobile: single FAB → drawer with all tools */}
+            {isMobile && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setMobileToolsOpen(true)}
+                  className="absolute bottom-3 right-3 z-[600] w-12 h-12 rounded-full bg-gold text-background shadow-lg inline-flex items-center justify-center"
+                  title="Herramientas"
+                >
+                  <Wrench className="w-5 h-5" />
+                </button>
+                <Sheet open={mobileToolsOpen} onOpenChange={setMobileToolsOpen}>
+                  <SheetContent side="bottom" className="max-h-[85dvh] overflow-y-auto">
+                    <SheetHeader>
+                      <SheetTitle>Herramientas del mapa</SheetTitle>
+                    </SheetHeader>
+                    <div className="space-y-3 mt-4 pb-4">
+                      <GeoIntelBriefButton map={mapInst?.map ?? null} />
+                      <ProspectivityButton
+                        map={mapInst?.map ?? null}
+                        onRunChange={(cells, run) => { setProspCells(cells); setProspRun(run); }}
+                      />
+                      <SectionBuilderTool
+                        map={mapInst?.map ?? null}
+                        L={mapInst?.L ?? null}
+                        holes={filteredHoles}
+                        logsByHole={logsByHole}
+                        projectName={active?.name}
+                      />
+                      <RasterControlPanel
+                        rasters={rasters}
+                        settings={visibleRasterSettings}
+                        onChange={updateRasterSetting}
+                        onZoomTo={(r) => mapInst && fitToRaster(mapInst.L, mapInst.map, r)}
+                      />
+                      <SavedViewsPanel
+                        projectId={active?.id ?? null}
+                        map={mapInst?.map ?? null}
+                        layerState={{ campaignId, highGradeOnly, rasterSettings, viewMode }}
+                        onRestore={(v: MapView) => {
+                          if (mapInst && v.center_lat != null && v.center_lng != null && v.zoom != null) {
+                            mapInst.map.setView([v.center_lat, v.center_lng], v.zoom);
+                          }
+                          const ls = v.layer_state ?? {};
+                          if (typeof ls.campaignId !== "undefined") setCampaignId(ls.campaignId ?? null);
+                          if (typeof ls.highGradeOnly === "boolean") setHighGradeOnly(ls.highGradeOnly);
+                          if (ls.rasterSettings) setRasterSettings(ls.rasterSettings as RasterSettings);
+                          if (ls.viewMode === "2d" || ls.viewMode === "3d") setViewMode(ls.viewMode);
+                          toast.success(`Vista «${v.name}» restaurada`);
+                        }}
+                      />
+                      <TimeSlider
+                        holes={timeItemsHoles}
+                        flights={timeItemsFlights}
+                        onChange={setTimeCursor}
+                        active={timeActive}
+                        onToggle={setTimeActive}
+                      />
+                      <RasterSwipePanel rasters={rasters} mapInst={mapInst} />
+                    </div>
+                  </SheetContent>
+                </Sheet>
+              </>
+            )}
           </>
         )}
       </div>
