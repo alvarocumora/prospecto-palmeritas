@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff } from "lucide-react";
+import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -8,7 +8,11 @@ import {
   useBulletinAlerts,
   useWatchHolders,
   triggerBoletinSync,
+  useCourtCases,
+  useCourtCaseAlerts,
+  triggerPjudSync,
   type MiningBulletin,
+  type CourtCase,
 } from "@/hooks/useMiningBulletins";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -31,8 +35,11 @@ function BoletinModule() {
   const { data: bulletins, loading, refresh } = useMiningBulletins(150);
   const { data: alerts, refresh: refreshAlerts, markRead } = useBulletinAlerts(active?.id ?? null);
   const { data: watchHolders, refresh: refreshHolders } = useWatchHolders(active?.id ?? null);
+  const { data: courtCases, refresh: refreshCases } = useCourtCases(150);
+  const { data: courtAlerts, refresh: refreshCourtAlerts, markRead: markCourtRead } = useCourtCaseAlerts(active?.id ?? null);
   const [syncing, setSyncing] = useState(false);
-  const [tab, setTab] = useState<"alerts" | "all" | "watch">("alerts");
+  const [syncingPjud, setSyncingPjud] = useState(false);
+  const [tab, setTab] = useState<"alerts" | "all" | "pjud" | "watch">("alerts");
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
 
@@ -51,6 +58,23 @@ function BoletinModule() {
       toast.error(result.error ?? "Error en la sincronización");
     }
     setSyncing(false);
+  };
+
+  const onSyncPjud = async () => {
+    setSyncingPjud(true);
+    toast.loading("Sincronizando PJUD…", { id: "sync-pjud" });
+    const result = await triggerPjudSync();
+    toast.dismiss("sync-pjud");
+    if (result.success) {
+      toast.success(
+        `PJUD: ${result.inserted ?? 0} nuevas · ${result.alertsCreated ?? 0} alertas`,
+      );
+      refreshCases();
+      refreshCourtAlerts();
+    } else {
+      toast.error(result.error ?? "Error PJUD");
+    }
+    setSyncingPjud(false);
   };
 
   const filtered = useMemo(() => {
