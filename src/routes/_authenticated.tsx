@@ -134,6 +134,7 @@ function AuthenticatedLayout() {
             <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" module="projects" role={role} />
           )}
           <NavItem to="/dashboard/catastro" icon={<MapIcon className="w-3.5 h-3.5" />} label="Catastro" module="catastro" role={role} />
+          <NavItem to="/dashboard/boletin" icon={<FileText className="w-3.5 h-3.5" />} label="Boletín Minero" module="catastro" role={role} />
           <NavItem to="/dashboard/geophysics" icon={<Activity className="w-3.5 h-3.5" />} label="Geofísica" module="geophysics" role={role} />
           <NavItem to="/dashboard/drones" icon={<Plane className="w-3.5 h-3.5" />} label="Drones" module="geophysics" role={role} />
           <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" module="drilling" role={role} />
