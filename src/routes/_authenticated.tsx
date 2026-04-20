@@ -49,6 +49,7 @@ function AuthenticatedLayout() {
   const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
   const role = useProjectRole();
   const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
+  const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const navigate = useNavigate();
   const location = useLocation();
   const [switcherOpen, setSwitcherOpen] = useState(false);
