@@ -482,12 +482,23 @@ function WatchHoldersPanel({
                   <td className="px-2.5 py-1.5 font-mono">{h.holder_rut ?? "—"}</td>
                   <td className="px-2.5 py-1.5 text-text-secondary">{h.notes ?? "—"}</td>
                   <td className="px-2.5 py-1.5 text-right">
-                    <button
-                      onClick={() => onDelete(h.id)}
-                      className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
+                    <div className="flex gap-1 justify-end">
+                      <button
+                        onClick={() => onExportPdf(h)}
+                        disabled={exporting === h.id}
+                        className="p-1 rounded hover:bg-accent text-text-secondary hover:text-foreground disabled:opacity-50"
+                        title="Generar perfil PDF"
+                      >
+                        <FileDown className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => onDelete(h.id)}
+                        className="p-1 rounded hover:bg-destructive/20 text-destructive"
+                        title="Eliminar"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
