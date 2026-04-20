@@ -13,6 +13,7 @@ import { Logo } from "@/components/Logo";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
+import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 
 export const Route = createFileRoute("/_authenticated")({
   // Auth check is client-only — Supabase session lives in localStorage and is not
