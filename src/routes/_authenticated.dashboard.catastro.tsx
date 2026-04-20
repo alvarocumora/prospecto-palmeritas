@@ -413,11 +413,11 @@ function ConcessionDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{initial ? "Editar concesión" : "Nueva concesión"}</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Field label="Código" required>
             <input className={inp} value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} />
           </Field>
