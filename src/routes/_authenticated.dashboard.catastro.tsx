@@ -182,7 +182,7 @@ function CatastroModule() {
         </div>
       </div>
 
-      {/* Table */}
+      {/* List: cards on mobile, table on md+ */}
       <div className="border border-border rounded overflow-hidden">
         {loading ? (
           <div className="p-6 text-center text-text-secondary text-sm">Cargando…</div>
@@ -191,78 +191,122 @@ function CatastroModule() {
             {data.length === 0 ? "Sin concesiones todavía. Crea la primera." : "Sin resultados con esos filtros."}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead className="bg-bg-secondary border-b border-border">
-                <tr className="text-left">
-                  <Th>Código</Th>
-                  <Th>Nombre</Th>
-                  <Th>Titular</Th>
-                  <Th>Tipo</Th>
-                  <Th>Estado</Th>
-                  <Th>Vencimiento</Th>
-                  <Th>Área (ha)</Th>
-                  <Th>AOI</Th>
-                  <Th> </Th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((c) => {
-                  const st = expiryStatus(c.expires_at);
-                  const days = daysUntilExpiry(c.expires_at);
-                  const color = EXPIRY_COLORS[st];
-                  const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
-                  return (
-                    <tr key={c.id} className="border-b border-border last:border-0 hover:bg-accent/30">
-                      <Td><span className="font-mono font-medium">{c.code}</span></Td>
-                      <Td>{c.name}</Td>
-                      <Td>{c.holder ?? "—"}</Td>
-                      <Td>{TYPE_LABELS[c.concession_type] ?? c.concession_type}</Td>
-                      <Td>{STATUS_LABELS[c.status] ?? c.status}</Td>
-                      <Td>
-                        <span style={{ color }} className="font-medium">
-                          {c.expires_at ?? "—"}
-                          {days !== null && (
-                            <span className="ml-1 text-[10px] opacity-80">
-                              ({days < 0 ? `${Math.abs(days)}d vencida` : `${days}d`})
-                            </span>
-                          )}
-                        </span>
-                      </Td>
-                      <Td>{c.area_ha ?? "—"}</Td>
-                      <Td>
-                        {intersects ? (
-                          <span className="inline-flex items-center gap-1 text-amber-600 font-medium">
-                            <MapPin className="w-3 h-3" /> Sí
+          <>
+            {/* Mobile card list */}
+            <div className="md:hidden divide-y divide-border">
+              {filtered.map((c) => {
+                const st = expiryStatus(c.expires_at);
+                const days = daysUntilExpiry(c.expires_at);
+                const color = EXPIRY_COLORS[st];
+                const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
+                return (
+                  <div key={c.id} className="p-3 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <div className="font-mono font-semibold text-sm truncate">{c.code}</div>
+                        <div className="text-xs text-text-secondary truncate">{c.name}</div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <button onClick={() => setEditing(c)} className="p-1.5 rounded hover:bg-accent" title="Editar">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </button>
+                        <button onClick={() => onDelete(c)} className="p-1.5 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px]">
+                      <div><span className="text-text-secondary">Titular:</span> {c.holder ?? "—"}</div>
+                      <div><span className="text-text-secondary">Tipo:</span> {TYPE_LABELS[c.concession_type] ?? c.concession_type}</div>
+                      <div><span className="text-text-secondary">Estado:</span> {STATUS_LABELS[c.status] ?? c.status}</div>
+                      <div><span className="text-text-secondary">Área:</span> {c.area_ha ?? "—"} ha</div>
+                    </div>
+                    <div className="flex items-center justify-between text-[11px] pt-0.5">
+                      <span style={{ color }} className="font-medium">
+                        {c.expires_at ?? "Sin vencimiento"}
+                        {days !== null && (
+                          <span className="ml-1 opacity-80">
+                            ({days < 0 ? `${Math.abs(days)}d vencida` : `${days}d`})
                           </span>
-                        ) : (
-                          <span className="text-text-secondary">—</span>
                         )}
-                      </Td>
-                      <Td>
-                        <div className="flex gap-1 justify-end">
-                          <button
-                            onClick={() => setEditing(c)}
-                            className="p-1 rounded hover:bg-accent"
-                            title="Editar"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => onDelete(c)}
-                            className="p-1 rounded hover:bg-destructive/20 text-destructive"
-                            title="Eliminar"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </Td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </span>
+                      {intersects && (
+                        <span className="inline-flex items-center gap-1 text-amber-600 font-medium">
+                          <MapPin className="w-3 h-3" /> AOI
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-bg-secondary border-b border-border">
+                  <tr className="text-left">
+                    <Th>Código</Th>
+                    <Th>Nombre</Th>
+                    <Th>Titular</Th>
+                    <Th>Tipo</Th>
+                    <Th>Estado</Th>
+                    <Th>Vencimiento</Th>
+                    <Th>Área (ha)</Th>
+                    <Th>AOI</Th>
+                    <Th> </Th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((c) => {
+                    const st = expiryStatus(c.expires_at);
+                    const days = daysUntilExpiry(c.expires_at);
+                    const color = EXPIRY_COLORS[st];
+                    const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
+                    return (
+                      <tr key={c.id} className="border-b border-border last:border-0 hover:bg-accent/30">
+                        <Td><span className="font-mono font-medium">{c.code}</span></Td>
+                        <Td>{c.name}</Td>
+                        <Td>{c.holder ?? "—"}</Td>
+                        <Td>{TYPE_LABELS[c.concession_type] ?? c.concession_type}</Td>
+                        <Td>{STATUS_LABELS[c.status] ?? c.status}</Td>
+                        <Td>
+                          <span style={{ color }} className="font-medium">
+                            {c.expires_at ?? "—"}
+                            {days !== null && (
+                              <span className="ml-1 text-[10px] opacity-80">
+                                ({days < 0 ? `${Math.abs(days)}d vencida` : `${days}d`})
+                              </span>
+                            )}
+                          </span>
+                        </Td>
+                        <Td>{c.area_ha ?? "—"}</Td>
+                        <Td>
+                          {intersects ? (
+                            <span className="inline-flex items-center gap-1 text-amber-600 font-medium">
+                              <MapPin className="w-3 h-3" /> Sí
+                            </span>
+                          ) : (
+                            <span className="text-text-secondary">—</span>
+                          )}
+                        </Td>
+                        <Td>
+                          <div className="flex gap-1 justify-end">
+                            <button onClick={() => setEditing(c)} className="p-1 rounded hover:bg-accent" title="Editar">
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button onClick={() => onDelete(c)} className="p-1 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </Td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
 
