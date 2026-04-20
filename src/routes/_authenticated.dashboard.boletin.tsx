@@ -365,17 +365,37 @@ function BulletinSummary({ b }: { b: MiningBulletin }) {
 
 function WatchHoldersPanel({
   projectId,
+  projectName,
   userId,
   holders,
   onChange,
 }: {
   projectId: string;
+  projectName: string;
   userId: string;
   holders: ReturnType<typeof useWatchHolders>["data"];
   onChange: () => void;
 }) {
   const [form, setForm] = useState({ holder_name: "", holder_rut: "", notes: "" });
   const [adding, setAdding] = useState(false);
+  const [exporting, setExporting] = useState<string | null>(null);
+
+  const onExportPdf = async (h: { id: string; holder_name: string | null; holder_rut: string | null }) => {
+    setExporting(h.id);
+    try {
+      const res = await generateHolderProfilePdf({
+        projectId,
+        projectName,
+        holderName: h.holder_name,
+        holderRut: h.holder_rut,
+      });
+      toast.success(`Perfil generado: ${res.publications} publicaciones, ${res.cases} causas`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error generando PDF");
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const onAdd = async () => {
     if (!form.holder_name.trim() && !form.holder_rut.trim()) {
