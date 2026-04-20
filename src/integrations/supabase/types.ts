@@ -137,6 +137,98 @@ export type Database = {
         }
         Relationships: []
       }
+      bulletin_alerts: {
+        Row: {
+          bulletin_id: string
+          created_at: string
+          id: string
+          is_read: boolean
+          match_detail: string | null
+          match_type: string
+          project_id: string
+          read_at: string | null
+          read_by: string | null
+        }
+        Insert: {
+          bulletin_id: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_detail?: string | null
+          match_type: string
+          project_id: string
+          read_at?: string | null
+          read_by?: string | null
+        }
+        Update: {
+          bulletin_id?: string
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          match_detail?: string | null
+          match_type?: string
+          project_id?: string
+          read_at?: string | null
+          read_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulletin_alerts_bulletin_id_fkey"
+            columns: ["bulletin_id"]
+            isOneToOne: false
+            referencedRelation: "mining_bulletins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bulletin_alerts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bulletin_watch_holders: {
+        Row: {
+          created_at: string
+          created_by: string
+          holder_name: string | null
+          holder_rut: string | null
+          id: string
+          notes: string | null
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          notes?: string | null
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          notes?: string | null
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulletin_watch_holders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_budgets: {
         Row: {
           campaign_id: string
@@ -1705,6 +1797,81 @@ export type Database = {
           },
         ]
       }
+      mining_bulletins: {
+        Row: {
+          area_ha: number | null
+          centroid_lat: number | null
+          centroid_lng: number | null
+          comuna: string | null
+          concession_code: string | null
+          concession_name: string | null
+          content_hash: string
+          created_at: string
+          geometry_geojson: Json | null
+          holder_name: string | null
+          holder_rut: string | null
+          id: string
+          provincia: string | null
+          publication_date: string | null
+          publication_number: string | null
+          publication_type: string
+          raw_payload: Json | null
+          region: string | null
+          scraped_at: string
+          source: string
+          source_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          centroid_lat?: number | null
+          centroid_lng?: number | null
+          comuna?: string | null
+          concession_code?: string | null
+          concession_name?: string | null
+          content_hash: string
+          created_at?: string
+          geometry_geojson?: Json | null
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          provincia?: string | null
+          publication_date?: string | null
+          publication_number?: string | null
+          publication_type?: string
+          raw_payload?: Json | null
+          region?: string | null
+          scraped_at?: string
+          source?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          centroid_lat?: number | null
+          centroid_lng?: number | null
+          comuna?: string | null
+          concession_code?: string | null
+          concession_name?: string | null
+          content_hash?: string
+          created_at?: string
+          geometry_geojson?: Json | null
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          provincia?: string | null
+          publication_date?: string | null
+          publication_number?: string | null
+          publication_type?: string
+          raw_payload?: Json | null
+          region?: string | null
+          scraped_at?: string
+          source?: string
+          source_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mining_concessions: {
         Row: {
           area_ha: number | null
@@ -1713,15 +1880,20 @@ export type Database = {
           concession_type: string
           created_at: string
           created_by: string
+          datum: string | null
           expires_at: string | null
+          external_id: string | null
           geometry_geojson: Json | null
           granted_at: string | null
           holder: string | null
           id: string
+          last_synced_at: string | null
           name: string
           notes: string | null
           project_id: string
+          provincia: string | null
           region: string | null
+          rut_holder: string | null
           source: string | null
           status: string
           updated_at: string
@@ -1733,15 +1905,20 @@ export type Database = {
           concession_type?: string
           created_at?: string
           created_by: string
+          datum?: string | null
           expires_at?: string | null
+          external_id?: string | null
           geometry_geojson?: Json | null
           granted_at?: string | null
           holder?: string | null
           id?: string
+          last_synced_at?: string | null
           name: string
           notes?: string | null
           project_id: string
+          provincia?: string | null
           region?: string | null
+          rut_holder?: string | null
           source?: string | null
           status?: string
           updated_at?: string
@@ -1753,15 +1930,20 @@ export type Database = {
           concession_type?: string
           created_at?: string
           created_by?: string
+          datum?: string | null
           expires_at?: string | null
+          external_id?: string | null
           geometry_geojson?: Json | null
           granted_at?: string | null
           holder?: string | null
           id?: string
+          last_synced_at?: string | null
           name?: string
           notes?: string | null
           project_id?: string
+          provincia?: string | null
           region?: string | null
+          rut_holder?: string | null
           source?: string | null
           status?: string
           updated_at?: string
