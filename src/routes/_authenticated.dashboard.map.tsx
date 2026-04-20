@@ -29,6 +29,7 @@ import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
 import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { TimeSlider } from "@/components/map/TimeSlider";
+import { LiveCollabLayer } from "@/components/map/LiveCollabLayer";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -280,6 +281,7 @@ function OperationalMap() {
               onToggle={setTimeActive}
             />
             <RasterSwipePanel rasters={rasters} mapInst={mapInst} />
+            <LiveCollabLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
             <CollapsibleAuLegend />
           </>
         )}
