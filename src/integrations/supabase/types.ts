@@ -2730,6 +2730,54 @@ export type Database = {
         }
         Relationships: []
       }
+      qualified_persons: {
+        Row: {
+          bio: string | null
+          competency_areas: string[] | null
+          created_at: string
+          cv_url: string | null
+          full_name: string
+          id: string
+          is_verified: boolean
+          license_no: string
+          profession: string
+          registration_body: string
+          signature_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          competency_areas?: string[] | null
+          created_at?: string
+          cv_url?: string | null
+          full_name: string
+          id?: string
+          is_verified?: boolean
+          license_no: string
+          profession: string
+          registration_body: string
+          signature_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          competency_areas?: string[] | null
+          created_at?: string
+          cv_url?: string | null
+          full_name?: string
+          id?: string
+          is_verified?: boolean
+          license_no?: string
+          profession?: string
+          registration_body?: string
+          signature_url?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       sample_custody: {
         Row: {
           carrier: string | null
@@ -3045,6 +3093,202 @@ export type Database = {
             columns: ["raster_id"]
             isOneToOne: false
             referencedRelation: "drone_rasters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_report_sections: {
+        Row: {
+          content_md: string | null
+          created_at: string
+          figures: Json | null
+          id: string
+          project_id: string
+          qp_id: string | null
+          references_ids: string[] | null
+          report_id: string
+          section_no: number
+          signature_hash: string | null
+          signed_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          word_count: number | null
+        }
+        Insert: {
+          content_md?: string | null
+          created_at?: string
+          figures?: Json | null
+          id?: string
+          project_id: string
+          qp_id?: string | null
+          references_ids?: string[] | null
+          report_id: string
+          section_no: number
+          signature_hash?: string | null
+          signed_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          word_count?: number | null
+        }
+        Update: {
+          content_md?: string | null
+          created_at?: string
+          figures?: Json | null
+          id?: string
+          project_id?: string
+          qp_id?: string | null
+          references_ids?: string[] | null
+          report_id?: string
+          section_no?: number
+          signature_hash?: string | null
+          signed_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          word_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_report_sections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_sections_qp_id_fkey"
+            columns: ["qp_id"]
+            isOneToOne: false
+            referencedRelation: "qualified_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_sections_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_report_versions: {
+        Row: {
+          generated_at: string
+          generated_by: string
+          hash_sha256: string
+          id: string
+          pdf_url: string | null
+          project_id: string
+          report_id: string
+          snapshot: Json
+          version_no: number
+          watermark: string | null
+        }
+        Insert: {
+          generated_at?: string
+          generated_by: string
+          hash_sha256: string
+          id?: string
+          pdf_url?: string | null
+          project_id: string
+          report_id: string
+          snapshot: Json
+          version_no: number
+          watermark?: string | null
+        }
+        Update: {
+          generated_at?: string
+          generated_by?: string
+          hash_sha256?: string
+          id?: string
+          pdf_url?: string | null
+          project_id?: string
+          report_id?: string
+          snapshot?: Json
+          version_no?: number
+          watermark?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_report_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_versions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_reports: {
+        Row: {
+          created_at: string
+          created_by: string
+          effective_date: string | null
+          id: string
+          lead_qp_id: string | null
+          project_id: string
+          report_type: string
+          signature_date: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          effective_date?: string | null
+          id?: string
+          lead_qp_id?: string | null
+          project_id: string
+          report_type?: string
+          signature_date?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          effective_date?: string | null
+          id?: string
+          lead_qp_id?: string | null
+          project_id?: string
+          report_type?: string
+          signature_date?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_reports_lead_qp_id_fkey"
+            columns: ["lead_qp_id"]
+            isOneToOne: false
+            referencedRelation: "qualified_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
