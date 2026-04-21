@@ -2012,6 +2012,36 @@ export type Database = {
           },
         ]
       }
+      marketplace_layer_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          layer_key: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          layer_key: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          layer_key?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mineralogy: {
         Row: {
           abundance: string | null
@@ -2524,6 +2554,221 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      property_data_room_files: {
+        Row: {
+          category: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size_bytes: number | null
+          id: string
+          listing_id: string
+          mime_type: string | null
+          requires_nda: boolean
+          uploaded_by: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size_bytes?: number | null
+          id?: string
+          listing_id: string
+          mime_type?: string | null
+          requires_nda?: boolean
+          uploaded_by: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          id?: string
+          listing_id?: string
+          mime_type?: string | null
+          requires_nda?: boolean
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_data_room_files_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_deal_inquiries: {
+        Row: {
+          closed_at: string | null
+          closed_reason: string | null
+          created_at: string
+          id: string
+          inquirer_user_id: string
+          listing_id: string
+          message: string | null
+          nda_ip: string | null
+          nda_signature: string | null
+          nda_signed_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          id?: string
+          inquirer_user_id: string
+          listing_id: string
+          message?: string | null
+          nda_ip?: string | null
+          nda_signature?: string | null
+          nda_signed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          id?: string
+          inquirer_user_id?: string
+          listing_id?: string
+          message?: string | null
+          nda_ip?: string | null
+          nda_signature?: string | null
+          nda_signed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_deal_inquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_deal_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          inquiry_id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          inquiry_id: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          inquiry_id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_deal_messages_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "property_deal_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_listings: {
+        Row: {
+          area_ha: number | null
+          asking_price_usd: number | null
+          code: string | null
+          commodity: string
+          country: string
+          cover_image_url: string | null
+          created_at: string
+          data_available: string[] | null
+          geometry_geojson: Json | null
+          id: string
+          is_published: boolean
+          modality: string
+          owner_user_id: string
+          project_id: string | null
+          region: string | null
+          royalty_pct: number | null
+          stage: string
+          summary: string | null
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          area_ha?: number | null
+          asking_price_usd?: number | null
+          code?: string | null
+          commodity: string
+          country?: string
+          cover_image_url?: string | null
+          created_at?: string
+          data_available?: string[] | null
+          geometry_geojson?: Json | null
+          id?: string
+          is_published?: boolean
+          modality?: string
+          owner_user_id: string
+          project_id?: string | null
+          region?: string | null
+          royalty_pct?: number | null
+          stage?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          area_ha?: number | null
+          asking_price_usd?: number | null
+          code?: string | null
+          commodity?: string
+          country?: string
+          cover_image_url?: string | null
+          created_at?: string
+          data_available?: string[] | null
+          geometry_geojson?: Json | null
+          id?: string
+          is_published?: boolean
+          modality?: string
+          owner_user_id?: string
+          project_id?: string | null
+          region?: string | null
+          royalty_pct?: number | null
+          stage?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_listings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prospectivity_cells: {
         Row: {
