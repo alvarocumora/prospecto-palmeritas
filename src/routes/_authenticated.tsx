@@ -1,63 +1,39 @@
 import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectRole";
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
-  TestTube2, FolderKanban, LogOut, ChevronDown, Plus,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText,
+  TestTube2, FolderKanban, LogOut,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X,
 } from "lucide-react";
-import { Logo } from "@/components/Logo";
-
 import { GeoAssistant } from "@/components/GeoAssistant";
-import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
+import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
+import { TopBar } from "@/components/ops/TopBar";
+import { StatusBar } from "@/components/ops/StatusBar";
+import { Logo } from "@/components/Logo";
+import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
-  // Auth check is client-only — Supabase session lives in localStorage and is not
-  // available during SSR. Running the redirect on the server bounces every refresh
-  // to /auth and breaks hydration. The component-level guard handles it on the client.
   component: AuthenticatedLayout,
 });
 
-const ROLE_LABELS: Record<ProjectRole, string> = {
-  owner: "Propietario", admin: "Admin", project_manager: "PM",
-  chief_geologist: "Geólogo Jefe", geologist: "Geólogo", qaqc_officer: "QA/QC",
-  field_technician: "Técnico", drilling_supervisor: "Sup. Sondaje",
-  hse_officer: "HSE", community_relations: "Comunidad",
-  viewer: "Lector", external_consultant: "Consultor",
-};
-const ROLE_COLORS: Record<ProjectRole, string> = {
-  owner: "bg-gold/15 text-gold border-gold/30",
-  admin: "bg-info/15 text-info border-info/30",
-  project_manager: "bg-info/15 text-info border-info/30",
-  chief_geologist: "bg-gold/15 text-gold border-gold/30",
-  geologist: "bg-teal/15 text-teal border-teal/30",
-  qaqc_officer: "bg-teal/15 text-teal border-teal/30",
-  field_technician: "bg-muted text-muted-foreground border-border",
-  drilling_supervisor: "bg-info/15 text-info border-info/30",
-  hse_officer: "bg-destructive/15 text-destructive border-destructive/30",
-  community_relations: "bg-muted text-muted-foreground border-border",
-  viewer: "bg-muted text-muted-foreground border-border",
-  external_consultant: "bg-muted text-muted-foreground border-border",
-};
-
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
-  const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
+  const { projects, loading: projectsLoading, active } = useProjects();
   const role = useProjectRole();
   const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const navigate = useNavigate();
   const location = useLocation();
-  const [switcherOpen, setSwitcherOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => { setMounted(true); }, []);
 
-  // Client-only redirect to /auth when no session
   useEffect(() => {
     if (!mounted || loading) return;
     if (!user) navigate({ to: "/auth" });
@@ -72,214 +48,168 @@ function AuthenticatedLayout() {
     }
   }, [mounted, loading, projectsLoading, user, projects.length, location.pathname, navigate]);
 
+  // Close drawer on route change
+  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
+
   if (!mounted || loading) return null;
   if (!user) return null;
 
-  return (
-    <div className="min-h-screen flex bg-background text-foreground">
-      <aside className="hidden md:flex flex-col w-56 border-r border-border bg-bg-secondary">
-        <div className="px-4 h-14 flex items-center justify-between border-b border-border">
-          <Link to="/"><Logo size={18} textClassName="text-xs" /></Link>
-          <OnlineStatusBadge />
-        </div>
+  const items: RailItem[] = [
+    { to: "/dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" />, label: "Mission Control", group: "OPERATIONS", exact: true },
+    { to: "/dashboard/map", icon: <Compass className="w-3.5 h-3.5" />, label: "Centro Op.", group: "OPERATIONS" },
+    { to: "/dashboard/campaigns", icon: <Calendar className="w-3.5 h-3.5" />, label: "Campañas", group: "OPERATIONS" },
+    canAccess(role, "projects") && { to: "/dashboard/projects", icon: <FolderKanban className="w-3.5 h-3.5" />, label: "Proyectos", group: "OPERATIONS" },
 
-        <div className="p-3 border-b border-border relative">
-          <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">Proyecto activo</div>
-          <button
-            type="button"
-            onClick={() => setSwitcherOpen((v) => !v)}
-            className="w-full flex items-center justify-between gap-2 px-2 py-1.5 rounded border border-border bg-background hover:bg-accent transition-colors text-left"
-          >
-            <span className="truncate text-xs font-mono">
-              {projectsLoading ? "Cargando…" : active?.name ?? "Sin proyectos"}
-            </span>
-            <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
-          </button>
-          {role && (
-            <div className={`mt-1.5 inline-flex items-center text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded border ${ROLE_COLORS[role]}`}>
-              {ROLE_LABELS[role]}
-            </div>
-          )}
-          {switcherOpen && (
-            <div className="absolute left-3 right-3 top-full mt-1 z-50 rounded border border-border bg-background shadow-lg max-h-72 overflow-y-auto">
-              {projects.length === 0 && (
-                <div className="px-3 py-2 text-[11px] font-mono text-muted-foreground">Aún no tienes proyectos</div>
-              )}
-              {projects.map((p) => (
-                <button
-                  key={p.id} type="button"
-                  onClick={() => { setActiveId(p.id); setSwitcherOpen(false); }}
-                  className={`w-full text-left px-3 py-2 text-xs font-mono hover:bg-accent transition-colors border-b border-border/50 last:border-b-0 ${
-                    p.id === active?.id ? "bg-gold/10 text-gold" : "text-foreground"
-                  }`}
-                >
-                  <div className="font-semibold truncate">{p.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{p.code} · {p.role}</div>
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => { setSwitcherOpen(false); navigate({ to: "/dashboard/projects" }); }}
-                className="w-full text-left px-3 py-2 text-xs font-mono text-gold hover:bg-accent inline-flex items-center gap-1.5 border-t border-border"
-              >
-                <Plus className="w-3 h-3" /> Nuevo proyecto
-              </button>
-            </div>
-          )}
-        </div>
+    canAccess(role, "catastro") && { to: "/dashboard/catastro", icon: <MapIcon className="w-3.5 h-3.5" />, label: "Catastro", group: "CADASTRE" },
+    canAccess(role, "catastro") && { to: "/dashboard/boletin", icon: <FileText className="w-3.5 h-3.5" />, label: "Boletín Minero", group: "CADASTRE", badge: catastroAlerts },
 
-        <nav className="flex-1 p-2 space-y-0.5 overflow-y-auto">
-          <NavItem to="/dashboard" icon={<LayoutDashboard className="w-3.5 h-3.5" />} label="Resumen" exact module="overview" role={role} />
-          <NavItem to="/dashboard/map" icon={<Compass className="w-3.5 h-3.5" />} label="Centro Op." module="overview" role={role} />
-          <NavItem to="/dashboard/campaigns" icon={<Calendar className="w-3.5 h-3.5" />} label="Campañas" module="overview" role={role} />
-          {canAccess(role, "projects") && (
-            <NavItem to="/dashboard/projects" icon={<FolderKanban className="w-3.5 h-3.5" />} label="Proyectos" module="projects" role={role} />
-          )}
-          <NavItem to="/dashboard/catastro" icon={<MapIcon className="w-3.5 h-3.5" />} label="Catastro" module="catastro" role={role} />
-          <NavItem to="/dashboard/boletin" icon={<FileText className="w-3.5 h-3.5" />} label="Boletín Minero" module="catastro" role={role} badge={catastroAlerts} />
-          <NavItem to="/dashboard/geophysics" icon={<Activity className="w-3.5 h-3.5" />} label="Geofísica" module="geophysics" role={role} />
-          <NavItem to="/dashboard/drones" icon={<Plane className="w-3.5 h-3.5" />} label="Drones" module="geophysics" role={role} />
-          <NavItem to="/dashboard/drilling" icon={<Drill className="w-3.5 h-3.5" />} label="Sondajes" module="drilling" role={role} />
-          <NavItem to="/dashboard/sampling" icon={<TestTube2 className="w-3.5 h-3.5" />} label="Muestreo" module="sampling" role={role} />
-          <NavItem to="/dashboard/qaqc" icon={<ShieldCheck className="w-3.5 h-3.5" />} label="QA/QC" module="qaqc" role={role} />
-          <NavItem to="/dashboard/approvals" icon={<ClipboardCheck className="w-3.5 h-3.5" />} label="Aprobaciones" module="approvals" role={role} />
-          <NavItem to="/dashboard/targets" icon={<Target className="w-3.5 h-3.5" />} label="Targets" module="targets" role={role} />
-          <NavItem to="/dashboard/inventory" icon={<Boxes className="w-3.5 h-3.5" />} label="Inventario" module="inventory" role={role} />
-          <NavItem to="/dashboard/finance" icon={<DollarSign className="w-3.5 h-3.5" />} label="Costos" module="finance" role={role} />
-          <NavItem to="/dashboard/hse" icon={<ShieldAlert className="w-3.5 h-3.5" />} label="HSE" module="hse" role={role} />
-          <NavItem to="/dashboard/reports" icon={<FileText className="w-3.5 h-3.5" />} label="Reportes" module="reports" role={role} />
+    canAccess(role, "geophysics") && { to: "/dashboard/geophysics", icon: <Activity className="w-3.5 h-3.5" />, label: "Geofísica", group: "FIELD" },
+    canAccess(role, "geophysics") && { to: "/dashboard/drones", icon: <Plane className="w-3.5 h-3.5" />, label: "Drones", group: "FIELD" },
+    canAccess(role, "drilling") && { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes", group: "FIELD" },
+    canAccess(role, "sampling") && { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo", group: "FIELD" },
 
-          <div className="pt-3 mt-3 border-t border-border" />
-          {canAccess(role, "team") && (
-            <NavItem to="/dashboard/team" icon={<Users className="w-3.5 h-3.5" />} label="Equipo" module="team" role={role} />
-          )}
-          {canAccess(role, "audit") && (
-            <NavItem to="/dashboard/audit" icon={<ClipboardList className="w-3.5 h-3.5" />} label="Auditoría" module="audit" role={role} />
-          )}
-          {canAccess(role, "marketplace") && (
-            <NavItem to="/dashboard/marketplace" icon={<LayersIcon className="w-3.5 h-3.5" />} label="Marketplace" module="marketplace" role={role} />
-          )}
-          <NavItem to="/dashboard/profile" icon={<UserCircle className="w-3.5 h-3.5" />} label="Mi Perfil" module="profile" role={role} />
+    canAccess(role, "qaqc") && { to: "/dashboard/qaqc", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QA/QC", group: "ANALYSIS" },
+    canAccess(role, "targets") && { to: "/dashboard/targets", icon: <Target className="w-3.5 h-3.5" />, label: "Targets", group: "ANALYSIS" },
+    canAccess(role, "inventory") && { to: "/dashboard/inventory", icon: <Boxes className="w-3.5 h-3.5" />, label: "Inventario", group: "ANALYSIS" },
+    canAccess(role, "reports") && { to: "/dashboard/reports", icon: <FileText className="w-3.5 h-3.5" />, label: "Reportes", group: "ANALYSIS" },
 
-          {isSuperAdmin && (
-            <Link
-              to="/dashboard/admin"
-              className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs font-mono transition-colors ${
-                location.pathname.startsWith("/dashboard/admin") ? "bg-gold/10 text-gold" : "text-gold hover:bg-accent"
-              }`}
-            >
-              <Crown className="w-3.5 h-3.5" /> Admin Plataforma
-            </Link>
-          )}
+    canAccess(role, "approvals") && { to: "/dashboard/approvals", icon: <ClipboardCheck className="w-3.5 h-3.5" />, label: "Aprobaciones", group: "GOVERNANCE" },
+    canAccess(role, "finance") && { to: "/dashboard/finance", icon: <DollarSign className="w-3.5 h-3.5" />, label: "Costos", group: "GOVERNANCE" },
+    canAccess(role, "hse") && { to: "/dashboard/hse", icon: <ShieldAlert className="w-3.5 h-3.5" />, label: "HSE", group: "GOVERNANCE" },
+    canAccess(role, "team") && { to: "/dashboard/team", icon: <Users className="w-3.5 h-3.5" />, label: "Equipo", group: "GOVERNANCE" },
+    canAccess(role, "audit") && { to: "/dashboard/audit", icon: <ClipboardList className="w-3.5 h-3.5" />, label: "Auditoría", group: "GOVERNANCE" },
+    canAccess(role, "marketplace") && { to: "/dashboard/marketplace", icon: <LayersIcon className="w-3.5 h-3.5" />, label: "Marketplace", group: "GOVERNANCE" },
 
-          {canAccess(role, "palmeras") && (
-            <div className="pt-4 mt-4 border-t border-border">
-              <Link
-                to="/dashboard/palmeras"
-                className="flex items-center gap-2 px-2 py-1.5 rounded text-[11px] font-mono text-muted-foreground hover:text-gold hover:bg-accent transition-colors"
-              >
-                <Mountain className="w-3.5 h-3.5" /> Demo · Palmeras
-              </Link>
-            </div>
-          )}
-        </nav>
+    { to: "/dashboard/profile", icon: <UserCircle className="w-3.5 h-3.5" />, label: "Mi Perfil", group: "ACCOUNT" },
+    isSuperAdmin && { to: "/dashboard/admin", icon: <Crown className="w-3.5 h-3.5" />, label: "Admin", group: "ACCOUNT" },
+    canAccess(role, "palmeras") && { to: "/dashboard/palmeras", icon: <Mountain className="w-3.5 h-3.5" />, label: "Demo · Palmeras", group: "ACCOUNT" },
+  ].filter(Boolean) as RailItem[];
 
-        <div className="p-3 border-t border-border">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-gold/20 text-gold inline-flex items-center justify-center text-[11px] font-mono font-bold">
-              {(profile?.display_name ?? user.email ?? "?")[0].toUpperCase()}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-mono truncate">{profile?.display_name ?? "Usuario"}</div>
-              <div className="text-[10px] text-muted-foreground truncate">{user.email}</div>
-            </div>
-            <button
-              type="button"
-              onClick={async () => { await signOut(); navigate({ to: "/" }); }}
-              className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
-              title="Cerrar sesión"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        </div>
-      </aside>
-
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 border-b border-border bg-background/95 backdrop-blur flex items-center justify-between px-3">
-        <Link to="/"><Logo size={16} textClassName="text-xs" /></Link>
-        <div className="flex items-center gap-3">
-          <OnlineStatusBadge />
-          <button
-            type="button"
-            onClick={async () => { await signOut(); navigate({ to: "/" }); }}
-            className="text-[10px] font-mono text-muted-foreground"
-          >Salir</button>
-        </div>
+  const railFooter = (
+    <div className="flex items-center gap-2 min-w-0">
+      <div className="w-6 h-6 rounded-[2px] bg-signal-cyan/15 text-signal-cyan inline-flex items-center justify-center text-[10px] font-mono font-bold border border-signal-cyan/30 shrink-0">
+        {(profile?.display_name ?? user.email ?? "?")[0].toUpperCase()}
       </div>
+      <div className="flex-1 min-w-0 hidden group-hover:block">
+        <div className="text-[10px] font-mono truncate">{profile?.display_name ?? "Usuario"}</div>
+        <div className="text-[9px] text-text-dim truncate">{user.email}</div>
+      </div>
+      <button
+        type="button"
+        onClick={async () => { await signOut(); navigate({ to: "/" }); }}
+        className="p-1 text-text-dim hover:text-signal-red transition-colors shrink-0"
+        title="Cerrar sesión"
+      >
+        <LogOut className="w-3 h-3" />
+      </button>
+    </div>
+  );
 
-      <main className="flex-1 min-w-0 md:ml-0 mt-12 md:mt-0 pb-14 md:pb-0 min-h-[calc(100dvh-3rem)] md:min-h-screen">
+  return (
+    <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
+      <TopBar onMenuClick={() => setDrawerOpen(true)} />
+      <CommandRail items={items} brand={null} footer={railFooter} />
+
+      {/* Mobile drawer */}
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        items={items}
+        userName={profile?.display_name ?? user.email ?? ""}
+        onSignOut={async () => { await signOut(); navigate({ to: "/" }); }}
+      />
+
+      <main
+        className={cn(
+          "relative pt-9 pb-6 md:pl-12 min-h-[100dvh]",
+        )}
+      >
         <Outlet />
-        <MobileBottomNav role={role} />
       </main>
 
+      <StatusBar />
       <GeoAssistant />
     </div>
   );
 }
 
-function NavItem({
-  to, icon, label, exact, module, role, badge,
+function MobileDrawer({
+  open,
+  onClose,
+  items,
+  userName,
+  onSignOut,
 }: {
-  to: string; icon: React.ReactNode; label: string; exact?: boolean;
-  module: string; role: ProjectRole | null; badge?: number;
+  open: boolean;
+  onClose: () => void;
+  items: RailItem[];
+  userName: string;
+  onSignOut: () => void;
 }) {
+  const groups = items.reduce<Record<string, RailItem[]>>((acc, it) => {
+    const g = it.group ?? "—";
+    (acc[g] ??= []).push(it);
+    return acc;
+  }, {});
   const location = useLocation();
-  const active = exact ? location.pathname === to : location.pathname.startsWith(to);
-  const allowed = canAccess(role, module);
-  if (!allowed) return null;
+  if (!open) return null;
   return (
-    <Link
-      to={to}
-      className={`flex items-center gap-2 px-2 py-1.5 rounded text-xs font-mono transition-colors ${
-        active ? "bg-gold/10 text-gold" : "text-foreground hover:bg-accent"
-      }`}
-    >
-      {icon}<span className="flex-1">{label}</span>
-      {badge && badge > 0 ? (
-        <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold">
-          {badge > 99 ? "99+" : badge}
-        </span>
-      ) : null}
-    </Link>
-  );
-}
-
-function MobileBottomNav({ role }: { role: ProjectRole | null }) {
-  const items = [
-    { to: "/dashboard", icon: LayoutDashboard, label: "Inicio", module: "overview" },
-    { to: "/dashboard/map", icon: Compass, label: "Mapa", module: "overview" },
-    { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro", module: "catastro" },
-    { to: "/dashboard/drilling", icon: Drill, label: "Sondajes", module: "drilling" },
-    { to: "/dashboard/projects", icon: FolderKanban, label: "Proyectos", module: "projects" },
-  ].filter((it) => canAccess(role, it.module));
-  const location = useLocation();
-  return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-14 border-t border-border bg-background/95 backdrop-blur flex items-stretch">
-      {items.map((it) => {
-        const Icon = it.icon;
-        const active = location.pathname === it.to;
-        return (
-          <Link
-            key={it.to} to={it.to}
-            className={`flex-1 flex flex-col items-center justify-center gap-0.5 text-[9px] font-mono ${
-              active ? "text-gold" : "text-muted-foreground"
-            }`}
-          >
-            <Icon className="w-4 h-4" />
-            <span>{it.label}</span>
-          </Link>
-        );
-      })}
-    </nav>
+    <div className="md:hidden fixed inset-0 z-50 flex">
+      <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={onClose} />
+      <aside className="relative w-72 max-w-[85%] h-full bg-bg-panel border-r border-border flex flex-col animate-fade-up">
+        <div className="h-10 flex items-center justify-between px-3 border-b border-border">
+          <Logo size={14} textClassName="text-[11px]" />
+          <button type="button" onClick={onClose} className="p-1 text-text-dim hover:text-foreground">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+        <nav className="flex-1 overflow-y-auto py-2">
+          {Object.entries(groups).map(([group, list]) => (
+            <div key={group} className="mb-2">
+              {group !== "—" && (
+                <div className="px-3 pt-1 pb-1 text-[9px] font-mono uppercase tracking-[0.12em] text-text-dim">
+                  {group}
+                </div>
+              )}
+              {list.map((it) => {
+                const active = it.exact ? location.pathname === it.to : location.pathname === it.to || location.pathname.startsWith(it.to + "/");
+                return (
+                  <Link
+                    key={it.to}
+                    to={it.to}
+                    onClick={onClose}
+                    className={cn(
+                      "flex items-center gap-2.5 h-9 mx-1 px-3 rounded-[2px] font-mono text-[12px] transition-colors",
+                      active
+                        ? "bg-bg-elevated text-signal-cyan border-l-2 border-signal-cyan"
+                        : "text-text-mono hover:bg-bg-elevated",
+                    )}
+                  >
+                    {it.icon}
+                    <span className="flex-1 truncate">{it.label}</span>
+                    {it.badge && it.badge > 0 ? (
+                      <span className="inline-flex items-center justify-center min-w-[16px] h-4 px-1 rounded-[2px] bg-signal-amber/20 text-signal-amber text-[9px] font-bold tabular-nums border border-signal-amber/40">
+                        {it.badge > 99 ? "99+" : it.badge}
+                      </span>
+                    ) : null}
+                  </Link>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+        <div className="border-t border-border p-3 flex items-center gap-2">
+          <div className="w-7 h-7 rounded-[2px] bg-signal-cyan/15 text-signal-cyan inline-flex items-center justify-center text-[11px] font-mono font-bold border border-signal-cyan/30">
+            {(userName || "?")[0].toUpperCase()}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[11px] font-mono truncate">{userName}</div>
+          </div>
+          <button type="button" onClick={onSignOut} className="text-text-dim hover:text-signal-red">
+            <LogOut className="w-4 h-4" />
+          </button>
+        </div>
+      </aside>
+    </div>
   );
 }

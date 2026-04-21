@@ -5,17 +5,19 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 3px;
+  --radius-xl: 4px;
 
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "IBM Plex Mono", monospace;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-bg-secondary: var(--bg-secondary);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-elevated: var(--bg-elevated);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
   --color-popover: var(--popover);
@@ -32,50 +34,76 @@
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
   --color-border: var(--border);
+  --color-border-hot: var(--border-hot);
   --color-input: var(--input);
   --color-ring: var(--ring);
 
+  /* Legacy mapping (kept so existing code keeps compiling) */
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-copper: var(--copper);
   --color-teal: var(--teal);
   --color-info: var(--info);
   --color-alert: var(--alert);
+
+  /* Operations signal palette */
+  --color-signal-cyan: var(--signal-cyan);
+  --color-signal-amber: var(--signal-amber);
+  --color-signal-red: var(--signal-red);
+  --color-signal-green: var(--signal-green);
+  --color-signal-violet: var(--signal-violet);
+  --color-text-mono: var(--text-mono);
+  --color-text-dim: var(--text-dim);
 }
 
 :root {
-  --radius: 0.5rem;
+  --radius: 2px;
 
-  /* Geocapitals palette — neutral black + warm gold accent */
-  --background: oklch(0.13 0 0);               /* #0A0A0A near-black */
-  --bg-secondary: oklch(0.17 0 0);             /* #121212 */
-  --card: oklch(0.19 0.002 270);               /* #1A1A1B panel */
-  --card-foreground: oklch(0.96 0.003 270);
-  --popover: oklch(0.19 0.002 270);
-  --popover-foreground: oklch(0.96 0.003 270);
-  --foreground: oklch(0.96 0.003 270);         /* #F2F2F3 */
-  --muted: oklch(0.24 0.003 270);
-  --muted-foreground: oklch(0.70 0.005 270);   /* #A8A8AB */
-  --hint: oklch(0.50 0.005 270);               /* #6E6E72 */
-  --secondary: oklch(0.22 0.003 270);
-  --secondary-foreground: oklch(0.96 0.003 270);
-  --accent: oklch(0.26 0.004 270);
-  --accent-foreground: oklch(0.96 0.003 270);
-  --border: oklch(0.28 0.004 270);             /* #2C2C2E */
-  --input: oklch(0.28 0.004 270);
-  --ring: oklch(0.74 0.13 78);
+  /* Operations Console — Palantir-inspired void + signal */
+  --background: oklch(0.13 0.012 240);            /* #06080A void */
+  --bg-secondary: oklch(0.16 0.012 240);          /* #0C1014 panel */
+  --bg-panel: oklch(0.16 0.012 240);
+  --bg-elevated: oklch(0.20 0.013 240);           /* #131820 elevated */
+  --card: oklch(0.16 0.012 240);
+  --card-foreground: oklch(0.93 0.008 240);
+  --popover: oklch(0.18 0.012 240);
+  --popover-foreground: oklch(0.93 0.008 240);
+  --foreground: oklch(0.93 0.008 240);            /* #E4E9F0 */
+  --muted: oklch(0.22 0.013 240);
+  --muted-foreground: oklch(0.74 0.012 240);      /* #A8B5C4 mono text */
+  --hint: oklch(0.50 0.013 240);                  /* #5A6878 dim */
+  --secondary: oklch(0.20 0.013 240);
+  --secondary-foreground: oklch(0.93 0.008 240);
+  --accent: oklch(0.24 0.014 240);
+  --accent-foreground: oklch(0.93 0.008 240);
+  --border: oklch(0.27 0.014 240);                /* #1F2832 line */
+  --border-hot: oklch(0.34 0.018 240);            /* #2A3744 hot */
+  --input: oklch(0.27 0.014 240);
 
-  --primary: oklch(0.74 0.13 78);              /* refined gold #D4A24C */
-  --primary-foreground: oklch(0.13 0 0);
+  /* Signal palette (functional, not branding) */
+  --signal-cyan: oklch(0.82 0.10 210);            /* #4DD0E1 */
+  --signal-amber: oklch(0.82 0.16 80);            /* #FFB300 */
+  --signal-red: oklch(0.68 0.22 25);              /* #FF5252 */
+  --signal-green: oklch(0.74 0.16 145);           /* #66BB6A */
+  --signal-violet: oklch(0.74 0.16 295);          /* #B388FF */
+  --text-mono: oklch(0.74 0.012 240);
+  --text-dim: oklch(0.50 0.013 240);
 
-  --gold: oklch(0.74 0.13 78);                 /* #D4A24C */
-  --gold-light: oklch(0.86 0.11 86);           /* #F2D08A */
-  --copper: oklch(0.62 0.12 45);               /* #B8763A */
-  --teal: oklch(0.66 0.10 180);                /* #2BA89A */
-  --info: oklch(0.62 0.13 240);                /* #3B82C4 */
-  --alert: oklch(0.58 0.19 25);                /* #B83333 */
-  --destructive: oklch(0.58 0.19 25);
-  --destructive-foreground: oklch(0.98 0.003 270);
+  --ring: var(--signal-cyan);
+
+  /* Cyan is the operational primary; gold reserved for brand mark only */
+  --primary: var(--signal-cyan);
+  --primary-foreground: oklch(0.13 0.012 240);
+
+  /* Brand accent — usar SOLO en logo Geocapitals */
+  --gold: oklch(0.78 0.13 78);
+  --gold-light: oklch(0.86 0.11 86);
+  --copper: oklch(0.62 0.12 45);
+  --teal: var(--signal-cyan);
+  --info: oklch(0.74 0.13 230);
+  --alert: var(--signal-red);
+  --destructive: var(--signal-red);
+  --destructive-foreground: oklch(0.98 0.003 240);
 }
 
 @layer base {
@@ -86,6 +114,11 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* Mono is the default for headings/labels in Operations console */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
   }
 }
 
@@ -93,61 +126,163 @@
   .font-mono { font-family: var(--font-mono); }
   .font-sans { font-family: var(--font-sans); }
 
-  .grid-texture {
+  /* Operations grid background */
+  .ops-grid {
+    background-color: var(--background);
     background-image:
-      linear-gradient(to right, color-mix(in oklab, var(--gold) 6%, transparent) 1px, transparent 1px),
-      linear-gradient(to bottom, color-mix(in oklab, var(--gold) 6%, transparent) 1px, transparent 1px);
-    background-size: 40px 40px;
+      linear-gradient(to right, color-mix(in oklab, var(--signal-cyan) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--signal-cyan) 4%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
+  .ops-scanline {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 2px,
+      color-mix(in oklab, var(--signal-cyan) 2%, transparent) 2px,
+      color-mix(in oklab, var(--signal-cyan) 2%, transparent) 3px
+    );
+  }
+  .ops-panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 0 color-mix(in oklab, var(--border-hot) 40%, transparent);
+  }
+  .ops-panel-hot {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-hot);
+  }
+  .ops-bevel {
+    box-shadow: inset 0 1px 0 0 color-mix(in oklab, var(--border-hot) 60%, transparent),
+                inset 0 -1px 0 0 color-mix(in oklab, var(--background) 60%, transparent);
+  }
+  .ops-hud {
+    background-color: color-mix(in oklab, var(--bg-panel) 78%, transparent);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid var(--border);
+    box-shadow: 0 8px 32px -12px oklch(0 0 0 / 0.6),
+                inset 0 1px 0 0 color-mix(in oklab, var(--border-hot) 50%, transparent);
+  }
+
+  /* Legacy textures still referenced by some components — keep but recolor */
+  .grid-texture { @apply ops-grid; }
   .diagonal-texture {
     background-image: repeating-linear-gradient(
       135deg,
       transparent 0,
-      transparent 18px,
-      color-mix(in oklab, var(--gold) 5%, transparent) 18px,
-      color-mix(in oklab, var(--gold) 5%, transparent) 19px
+      transparent 20px,
+      color-mix(in oklab, var(--signal-cyan) 4%, transparent) 20px,
+      color-mix(in oklab, var(--signal-cyan) 4%, transparent) 21px
     );
   }
-  .accent-bar-gold { box-shadow: inset 3px 0 0 0 var(--gold); }
-  .accent-bar-copper { box-shadow: inset 3px 0 0 0 var(--copper); }
-  .accent-bar-muted { box-shadow: inset 3px 0 0 0 var(--hint); }
+  .accent-bar-gold { box-shadow: inset 2px 0 0 0 var(--signal-cyan); }
+  .accent-bar-copper { box-shadow: inset 2px 0 0 0 var(--signal-amber); }
+  .accent-bar-muted { box-shadow: inset 2px 0 0 0 var(--hint); }
+  .accent-bar-cyan { box-shadow: inset 2px 0 0 0 var(--signal-cyan); }
+  .accent-bar-amber { box-shadow: inset 2px 0 0 0 var(--signal-amber); }
+  .accent-bar-red { box-shadow: inset 2px 0 0 0 var(--signal-red); }
+  .accent-bar-green { box-shadow: inset 2px 0 0 0 var(--signal-green); }
 
   .card-hover {
-    transition: border-color 200ms ease, transform 200ms ease;
+    transition: border-color 160ms ease, background-color 160ms ease;
   }
   .card-hover:hover {
-    border-color: var(--gold);
+    border-color: var(--border-hot);
+    background-color: var(--bg-elevated);
   }
 
   @keyframes fade-up {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .animate-fade-up { animation: fade-up 400ms ease-out both; }
+  .animate-fade-up { animation: fade-up 280ms ease-out both; }
 
   @keyframes pulse-dot {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in oklab, var(--gold) 60%, transparent); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 6px color-mix(in oklab, var(--gold) 0%, transparent); }
+    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 color-mix(in oklab, currentColor 60%, transparent); }
+    50% { opacity: 0.6; box-shadow: 0 0 0 5px color-mix(in oklab, currentColor 0%, transparent); }
   }
-  .animate-pulse-dot { animation: pulse-dot 1.8s ease-in-out infinite; }
+  .animate-pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+
+  @keyframes ticker-blink {
+    0%, 60% { opacity: 1; }
+    70%, 100% { opacity: 0.35; }
+  }
+  .animate-ticker { animation: ticker-blink 1.4s steps(2, end) infinite; }
+
+  @keyframes skeleton-mono {
+    0%, 100% { opacity: 0.35; }
+    50% { opacity: 0.7; }
+  }
+  .skeleton-mono {
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    animation: skeleton-mono 1.4s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-pulse-dot, .animate-ticker, .animate-fade-up, .skeleton-mono {
+      animation: none !important;
+    }
+  }
 
   /* Boost geological overlay legibility on top of dark basemaps */
   .macrostrat-overlay { mix-blend-mode: screen; filter: saturate(1.4) brightness(1.1); }
 
-  /* Reusable form input */
+  /* Reusable form input — terminal style */
   .input {
     width: 100%;
     padding: 0.375rem 0.625rem;
     font-size: 0.75rem;
     font-family: var(--font-mono);
-    border-radius: 0.25rem;
+    border-radius: 2px;
     border: 1px solid var(--border);
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-elevated);
     color: var(--foreground);
   }
-  .input:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+  .input:focus {
+    outline: 1px solid var(--signal-cyan);
+    outline-offset: 0;
+    border-color: var(--signal-cyan);
+  }
 
-  /* Sprint 6.3 — Raster overlay colormaps (CSS-only, applied to L.imageOverlay <img>) */
+  /* Data table primitives */
+  .ops-table {
+    width: 100%;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+  .ops-table thead th {
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-dim);
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+    background-color: var(--bg-panel);
+    position: sticky;
+    top: 0;
+  }
+  .ops-table tbody td {
+    padding: 6px 10px;
+    border-bottom: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
+    color: var(--text-mono);
+    height: 28px;
+  }
+  .ops-table tbody tr {
+    border-left: 2px solid transparent;
+    transition: background-color 120ms ease, border-color 120ms ease;
+  }
+  .ops-table tbody tr:hover {
+    background-color: var(--bg-elevated);
+    border-left-color: var(--signal-cyan);
+  }
+
+  /* Sprint 6.3 — Raster overlay colormaps */
   .raster-viridis img,
   .leaflet-image-layer.raster-viridis {
     filter: hue-rotate(80deg) saturate(1.6) contrast(1.15);
