@@ -1,45 +1,174 @@
 
 
-## Problema
+# Plan: Rediseño disruptivo "Command Platform" estilo Palantir
 
-En móvil (≤768px), las vistas **Mapa** (`/dashboard/map`) y **Catastro** (`/dashboard/catastro`) no cargan correctamente.
+Transformar Geocapitals desde un dashboard SaaS estándar (oro cálido sobre negro) a una **plataforma de control operacional** densa, técnica y cinematográfica — referencia: Palantir Foundry / Gotham, Anduril Lattice, Bloomberg Terminal.
 
-Causas probables identificadas tras revisar el código:
+## Filosofía de diseño
 
-1. **`/dashboard/map`** usa `fixed inset-0 md:left-56 top-12 md:top-0 bottom-14 md:bottom-0` — el contenedor depende de un header móvil de 48px y bottom-nav de 56px. Si el layout `_authenticated.tsx` no renderiza esos elementos en móvil, el mapa queda con altura 0 o tapado. Además los paneles flotantes (`SectionBuilderTool`, `RasterControlPanel`, `SavedViewsPanel`, `RasterSwipePanel`, `LiveCollabLayer`, `TimeSlider`, `ProspectivityButton`, `GeoIntelBriefButton`, `CollapsibleAuLegend`) se apilan todos al mismo tiempo en una pantalla de 440px y bloquean el mapa.
-2. El header de la vista mapa tiene **demasiados controles** (`MapCommandPalette`, `ViewModeToggle`, `CampaignSelector`, checkbox high-grade, contador, snapshot) que en 440px hacen wrap a 3-4 filas y empujan el mapa fuera de viewport.
-3. **`/dashboard/catastro`** probablemente usa una tabla ancha sin scroll horizontal contenido y un dialog form que desborda en móvil.
+| Antes (estándar) | Después (Command Platform) |
+|---|---|
+| Dorado cálido decorativo | Cyan/ámbar técnico funcional (estado, no marca) |
+| Cards redondeadas con padding generoso | Paneles densos, bordes 1px, esquinas casi rectas |
+| Tipografía amigable (DM Sans) | Mono-first (JetBrains Mono) + Inter para prosa |
+| Hero marketing | "System status board" con métricas live |
+| Iconos decorativos | Iconos = controles funcionales con tooltips |
+| Espaciado relajado | Information density alta, jerarquía por color/peso |
 
-## Solución
+## 1. Sistema de diseño nuevo (`src/styles.css`)
 
-### 1. Vista Mapa móvil (`_authenticated.dashboard.map.tsx`)
+**Paleta "Operations":**
+```text
+--bg-void:       #06080A   /* casi negro azulado, no warm */
+--bg-panel:      #0C1014   /* paneles primarios */
+--bg-elevated:   #131820   /* hover/active */
+--bg-grid:       #0A0E13   /* fondo con grid sutil */
+--border-line:   #1F2832   /* divisores 1px */
+--border-hot:    #2A3744   /* bordes hover */
+--text-primary:  #E4E9F0
+--text-mono:     #A8B5C4
+--text-dim:      #5A6878
 
-- Reemplazar `fixed inset-0 md:left-56 …` por un layout que use `h-[100dvh]` (dynamic viewport, evita problemas con barra de URL en móvil) y respete el shell de `_authenticated.tsx`.
-- **Header móvil compacto**: en `<md` mostrar solo título + un botón "⚙ Controles" que abra un `Sheet` (drawer) con CampaignSelector, ViewModeToggle, high-grade toggle, snapshot y command palette. En `≥md` mantener la barra actual.
-- **Paneles flotantes en móvil**: ocultar por defecto `SectionBuilderTool`, `RasterControlPanel`, `SavedViewsPanel`, `RasterSwipePanel`, `TimeSlider`, `ProspectivityButton`, `GeoIntelBriefButton`, `CollapsibleAuLegend`. Añadir un FAB único "Herramientas" abajo-derecha que abra un `Sheet` con accesos. En desktop sin cambios.
-- Asegurar `ProjectMap` con `fillHeight` use `height: 100%` real (revisar contenedor padre).
+/* Estados (no marca) */
+--signal-cyan:   #4DD0E1   /* primario: data, links, foco */
+--signal-amber:  #FFB300   /* warning, pendiente */
+--signal-red:    #FF5252   /* crítico, alerta */
+--signal-green:  #66BB6A   /* ok, aprobado */
+--signal-violet: #B388FF   /* IA, predicciones */
+--accent-gold:   reservado solo para logo Geocapitals
+```
 
-### 2. Vista Catastro móvil (`_authenticated.dashboard.catastro.tsx`)
+**Tipografía:**
+- `JetBrains Mono` — todos los datos, labels, IDs, números, navegación
+- `Inter` — prosa larga, headers de marketing
+- Eliminar `DM Sans` y reducir uso de `IBM Plex Mono`
 
-- Envolver tabla en `<div class="overflow-x-auto -mx-3 px-3">` para scroll horizontal limpio.
-- En `<md` reemplazar la tabla por **cards** (una por concesión: nombre, tipo, estado expiración, titular, acciones).
-- Stats en grid `grid-cols-2 md:grid-cols-5`.
-- Filtros y búsqueda colapsables en móvil tras un botón "Filtros".
-- Dialog `ConcessionDialog` con `max-h-[90dvh] overflow-y-auto` y campos `grid-cols-1 md:grid-cols-2`.
+**Tokens:** `--radius` baja a `2px` (casi rectangular). Sombras reemplazadas por `inset 0 1px 0 var(--border-hot)` (efecto bisel sutil).
 
-### 3. Verificación shell autenticado
+## 2. App Shell — "Operations Console" (`_authenticated.tsx`)
 
-Revisar `_authenticated.tsx` para confirmar que en móvil hay `top-bar` (h-12) y `bottom-nav` (h-14) reales — si no existen, ajustar offsets de la vista mapa a `top-0 bottom-0`.
+Reemplazar sidebar tradicional por **Command Rail tri-zona** estilo Palantir:
 
-## Archivos a editar
+```text
+┌──────────────────────────────────────────────────────────────────────┐
+│ [▣ GEOCAPITALS]  PROJECT-ID:PLM-001 ▾  │ Centro Op. › Mapa  │ ⚡ ⌘K │  ← Top bar 36px
+├──┬───────────────────────────────────────────────────────────────────┤
+│▣ │                                                                    │
+│◈ │                                                                    │
+│⊕ │                  WORKSPACE (Outlet)                                │
+│▤ │                                                                    │
+│⚙ │                                                                    │
+├──┴───────────────────────────────────────────────────────────────────┤
+│ ● LIVE  PLM-001  3 alerts  142 samples  CPU 12%  ⌘K              0.2s │  ← Status bar 24px
+└──────────────────────────────────────────────────────────────────────┘
+```
 
-- `src/routes/_authenticated.dashboard.map.tsx` — layout responsive + sheet móvil
-- `src/routes/_authenticated.dashboard.catastro.tsx` — cards móvil + dialog responsive
-- `src/routes/_authenticated.tsx` — verificar (solo si offsets no coinciden)
+- **Rail izquierdo 48px**: solo iconos con tooltip flotante. Hover expande a 220px (overlay, no push). Categorías colapsables: Operations, Cadastre, Field, Analysis, Governance.
+- **Top bar 36px**: logo + project switcher (selector tipo terminal con código/RUT) + breadcrumb activo + ⌘K command palette + indicador online.
+- **Status bar inferior 24px**: tipo IDE — proyecto activo, alertas en vivo (ticker), conteo de records, latencia, atajos. Reemplaza el footer.
+- **Mobile**: rail se vuelve drawer offcanvas; status bar se mantiene.
+
+## 3. Dashboard "Mission Control" (`_authenticated.dashboard.index.tsx`)
+
+Reemplazar grid de KPIs sueltos por un **briefing operacional**:
+
+```text
+┌─ SITUATION REPORT ────────────────────┬─ ACTIVITY FEED ──────────┐
+│ Project: PALMERAS-001                 │ 14:32 ● Sample BX-091    │
+│ Status: ● ACTIVE   Phase: DRILLING    │       approved by JDG    │
+│ Last update: 4m ago by María L.       │ 14:18 ⚠ Concession 2891  │
+│                                       │       expires in 12 days │
+│ ┌──────┬──────┬──────┬──────┐        │ 13:55 ◈ DDH-042 finished │
+│ │ 12   │ 4128 │ 2.3  │ 142  │        │       at 318.4m          │
+│ │ holes│ m    │ g/t  │ smpl │        │ ...                      │
+│ └──────┴──────┴──────┴──────┘        │                          │
+├─ CRITICAL SIGNALS ────────────────────┼─ RUN PRIORITIES ─────────┤
+│ ⚠ 3 concessions expire <30d           │ □ Approve 7 core logs    │
+│ ⚠ QA/QC fail rate 12% (>threshold)    │ □ Review 2 catastro alrt │
+│ ● 7 records pending approval          │ □ Sync PJUD (last 4d)    │
+└───────────────────────────────────────┴──────────────────────────┘
+┌─ PRODUCTION SPARKLINES (last 30d) ────────────────────────────────┐
+│ Meters drilled  ▁▂▃▅▇▆▅▇█▇▆▅▆▇█  +18%                           │
+│ Samples logged  ▂▃▃▄▅▄▅▆▇▇▆▅▆▇▇  +9%                            │
+│ Au best inter.  ▁▁▂▁▃▂▄▃▅▇▆▅█▇▆  2.3 g/t / 12.4m                │
+└────────────────────────────────────────────────────────────────────┘
+```
+
+- Sparklines inline (sin librería: SVG path o caracteres unicode block).
+- Activity feed con timestamps relativos, refresh realtime via Supabase channel.
+- "Critical signals" prioriza por severidad y tiene CTA inline.
+- Sin imágenes, sin gradientes — pura información.
+
+## 4. Centro de Operaciones (Mapa) — full bleed cinematográfico
+
+- Mapa **edge-to-edge** sin header visible. Header colapsa a una **HUD flotante translúcida** arriba-izquierda con backdrop-blur fuerte.
+- Paneles laterales tipo Foundry: **rail derecho colapsable 320px** que aloja Capas/Inspector/Tiempo/Snapshot como tabs verticales (no FABs sueltos).
+- Coordenadas, zoom y CRS en el **status bar global** (no en footer del mapa).
+- Crosshair central opcional + reticle con ticks de escala.
+- Mobile: HUD bottom-sheet con handle, map ocupa todo el viewport menos los 24px del status bar.
+
+## 5. Listas → "Data Tables" densas
+
+Catastro, Sondajes, Muestreo, Aprobaciones, Auditoría:
+- Tablas mono `text-[11px]`, row height 28px, separadores 1px, **zebra sutil** opcional, **hover row con border-left cyan 2px**.
+- Toolbar superior: filtros inline tipo chips, búsqueda con `⌘F`, export rápido.
+- Estados con dot + color, no badges grandes. Ej: `● ACTIVE`, `◐ PENDING`, `✕ ARCHIVED`.
+- Mobile: ya tenemos cards — refinarlas al mismo lenguaje (mono, border-left de estado, sin sombras).
+
+## 6. Landing pública (`index.tsx`)
+
+Reemplazar hero marketing por **"Live Operations Demo"**:
+- Background animado: grid + lat/lon ticks + concesiones SVG animadas.
+- Headline mono: `GEOCAPITALS // EXPLORATION OPERATIONS PLATFORM`
+- Sub: "The control surface for modern mineral exploration."
+- Reemplazar imágenes hero por **screenshots reales** del dashboard (mockup en frame de monitor).
+- Sección "Trusted data feeds" con logos/labels técnicos: SERNAGEOMIN · BOLETÍN MINERO · PJUD · MACROSTRAT · EMAG2 (todos como text-mono con dot verde "● LIVE").
+- CTA: `[ INITIATE SESSION → ]` en lugar de "Empezar gratis".
+- Eliminar gradientes dorados decorativos; usar líneas y cyan funcional.
+
+## 7. Componentes nuevos compartidos (`src/components/ops/`)
+
+- `<StatusDot status="live|warn|crit|ok" />`
+- `<MetricCell label value delta sparkline? />` — celda densa de KPI
+- `<DataTable />` wrapper con estilo ops uniforme
+- `<HudPanel title collapsible>` — panel translúcido para mapa
+- `<ActivityTicker projectId />` — feed realtime
+- `<Sparkline data />` — SVG inline, sin deps
+- `<CommandRail items />` — sidebar nuevo
+- `<StatusBar />` — barra inferior global
+
+## 8. Producción — checklist
+
+- **Performance**: lazy-load Map3DView, RasterControl, PDF libs; preload fuentes; reducir bundle Leaflet.
+- **SEO**: head() único por ruta pública; OG images por sección.
+- **Accesibilidad**: contraste AAA en cyan/ámbar sobre void; focus rings cyan visibles; `prefers-reduced-motion` desactiva ticker.
+- **Errores**: errorComponent + notFoundComponent en cada ruta con loader (ya parcial).
+- **Loading states**: skeletons mono (líneas `▒▒▒` parpadeantes) en lugar de spinners genéricos.
+- **Manifest PWA + favicon** actualizado al lenguaje técnico.
+- **Console limpia**: eliminar warnings, console.logs.
+- **Empty states**: ilustraciones ASCII tipo terminal (`[ NO DATA · INITIATE SYNC ]`).
+
+## Archivos a crear/editar (orden de ejecución)
+
+**Fase A — Sistema base** (1 sesión)
+1. `src/styles.css` — nueva paleta + tipografía + utilidades ops
+2. `src/components/ops/StatusDot.tsx`, `MetricCell.tsx`, `Sparkline.tsx`, `HudPanel.tsx`, `StatusBar.tsx`, `CommandRail.tsx`, `ActivityTicker.tsx`
+3. Cargar JetBrains Mono + Inter en `__root.tsx`
+
+**Fase B — Shell** (1 sesión)
+4. `src/routes/_authenticated.tsx` — nuevo CommandRail + TopBar + StatusBar
+5. Mobile drawer rail
+
+**Fase C — Superficies clave** (2 sesiones)
+6. `_authenticated.dashboard.index.tsx` — Mission Control
+7. `_authenticated.dashboard.map.tsx` — HUD + rail derecho
+8. Tablas: catastro, drilling, sampling, approvals, boletin
+
+**Fase D — Landing + producción** (1 sesión)
+9. `routes/index.tsx` — landing técnica
+10. Auditoría performance, accesibilidad, SEO, empty/error states
 
 ## Resultado esperado
 
-En 440×688px:
-- **Mapa**: header de 1 fila + mapa a pantalla completa + 1 FAB de herramientas + leyenda Au colapsable.
-- **Catastro**: stats 2-col, lista de cards scrolleable, dialog que cabe en pantalla.
+Una plataforma que **se sienta como un sistema operativo de exploración**, no como otra app SaaS — densa, mono, con datos vivos en cada borde, gestos rápidos por teclado, y estética de sala de control que comunica seriedad técnica desde el primer pixel.
 
