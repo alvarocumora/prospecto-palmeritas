@@ -166,7 +166,13 @@
   }
 
   /* Legacy textures still referenced by some components — keep but recolor */
-  .grid-texture { @apply ops-grid; }
+  .grid-texture {
+    background-color: var(--background);
+    background-image:
+      linear-gradient(to right, color-mix(in oklab, var(--signal-cyan) 4%, transparent) 1px, transparent 1px),
+      linear-gradient(to bottom, color-mix(in oklab, var(--signal-cyan) 4%, transparent) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
   .diagonal-texture {
     background-image: repeating-linear-gradient(
       135deg,
