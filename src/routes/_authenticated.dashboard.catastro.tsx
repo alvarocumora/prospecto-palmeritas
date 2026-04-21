@@ -115,7 +115,7 @@ const PROJECT_AOI: [number, number][] = [
   [-71.1225, -33.9036],
 ];
 
-function CatastroModule() {
+function ConcessionsTab() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { data, loading, refresh } = useMiningConcessions(active?.id ?? null);
@@ -154,11 +154,7 @@ function CatastroModule() {
     [data]
   );
 
-  if (!active) {
-    return (
-      <div className="p-6 text-text-secondary">Selecciona un proyecto para ver su catastro minero.</div>
-    );
-  }
+  if (!active) return null;
 
   const onDelete = async (c: MiningConcession) => {
     if (!confirm(`¿Eliminar concesión "${c.code}"?`)) return;
