@@ -1,8 +1,13 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin } from "lucide-react";
+import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
+import { PatentCalendar } from "@/components/ops/PatentCalendar";
+import { OverlapInspector } from "@/components/ops/OverlapInspector";
+import { WatchManager } from "@/components/ops/WatchManager";
+import { SyncLog } from "@/components/ops/SyncLog";
+import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
   daysUntilExpiry,
@@ -24,8 +29,68 @@ import {
 
 export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   head: () => ({ meta: [{ title: "Catastro minero — Geocapitals" }] }),
-  component: CatastroModule,
+  component: CatastroPage,
 });
+
+type Tab = "concessions" | "patents" | "overlaps" | "watches" | "sync";
+
+const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
+  { id: "concessions", label: "Mis concesiones", icon: FileText },
+  { id: "patents", label: "Patentes", icon: Coins },
+  { id: "overlaps", label: "Conflictos", icon: AlertOctagon },
+  { id: "watches", label: "Vigilancia", icon: Eye },
+  { id: "sync", label: "Sync log", icon: RefreshCw },
+];
+
+function CatastroPage() {
+  const { active } = useProjects();
+  const { user } = useAuth();
+  const [tab, setTab] = useState<Tab>("concessions");
+
+  if (!active) {
+    return <div className="p-6 text-text-secondary">Selecciona un proyecto para ver su catastro minero.</div>;
+  }
+
+  return (
+    <div className="p-4 md:p-6 pb-20 md:pb-6 space-y-4">
+      <div>
+        <h1 className="text-xl font-semibold">Catastro minero</h1>
+        <p className="text-xs text-text-secondary mt-0.5">
+          {active.code} · {active.name}
+        </p>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex gap-1 border-b border-border overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+        {TABS.map((t) => {
+          const Icon = t.icon;
+          const isActive = tab === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={cn(
+                "inline-flex items-center gap-1.5 px-3 py-2 text-[11px] font-mono uppercase tracking-wider whitespace-nowrap border-b-2 transition-colors",
+                isActive
+                  ? "border-signal-cyan text-signal-cyan"
+                  : "border-transparent text-text-dim hover:text-foreground hover:border-border"
+              )}
+            >
+              <Icon className="w-3.5 h-3.5" />
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {tab === "concessions" && <ConcessionsTab />}
+      {tab === "patents" && user && <PatentCalendar projectId={active.id} userId={user.id} />}
+      {tab === "overlaps" && <OverlapInspector projectId={active.id} />}
+      {tab === "watches" && user && <WatchManager projectId={active.id} userId={user.id} />}
+      {tab === "sync" && <SyncLog projectId={active.id} />}
+    </div>
+  );
+}
 
 const TYPE_LABELS: Record<string, string> = {
   exploracion: "Exploración",
@@ -50,7 +115,7 @@ const PROJECT_AOI: [number, number][] = [
   [-71.1225, -33.9036],
 ];
 
-function CatastroModule() {
+function ConcessionsTab() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { data, loading, refresh } = useMiningConcessions(active?.id ?? null);
@@ -89,11 +154,7 @@ function CatastroModule() {
     [data]
   );
 
-  if (!active) {
-    return (
-      <div className="p-6 text-text-secondary">Selecciona un proyecto para ver su catastro minero.</div>
-    );
-  }
+  if (!active) return null;
 
   const onDelete = async (c: MiningConcession) => {
     if (!confirm(`¿Eliminar concesión "${c.code}"?`)) return;
