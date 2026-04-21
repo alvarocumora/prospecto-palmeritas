@@ -1,174 +1,187 @@
 
 
-# Plan: Rediseño disruptivo "Command Platform" estilo Palantir
+# Plan: Marketplace, NI 43-101 y gestión avanzada de Catastro
 
-Transformar Geocapitals desde un dashboard SaaS estándar (oro cálido sobre negro) a una **plataforma de control operacional** densa, técnica y cinematográfica — referencia: Palantir Foundry / Gotham, Anduril Lattice, Bloomberg Terminal.
+Tres módulos integrados que convierten a Geocapitals en una plataforma operativa **end-to-end**: descubrir oportunidades (Marketplace), gobernar permisos vigentes (Catastro+) y entregar entregables bancables (NI 43-101).
 
-## Filosofía de diseño
+---
 
-| Antes (estándar) | Después (Command Platform) |
-|---|---|
-| Dorado cálido decorativo | Cyan/ámbar técnico funcional (estado, no marca) |
-| Cards redondeadas con padding generoso | Paneles densos, bordes 1px, esquinas casi rectas |
-| Tipografía amigable (DM Sans) | Mono-first (JetBrains Mono) + Inter para prosa |
-| Hero marketing | "System status board" con métricas live |
-| Iconos decorativos | Iconos = controles funcionales con tooltips |
-| Espaciado relajado | Information density alta, jerarquía por color/peso |
+## 1. Marketplace de Minería y Proyectos (evolución del actual)
 
-## 1. Sistema de diseño nuevo (`src/styles.css`)
+Hoy `dashboard/marketplace` solo instala capas GeoJSON públicas. Lo expandimos a un **doble marketplace**:
 
-**Paleta "Operations":**
-```text
---bg-void:       #06080A   /* casi negro azulado, no warm */
---bg-panel:      #0C1014   /* paneles primarios */
---bg-elevated:   #131820   /* hover/active */
---bg-grid:       #0A0E13   /* fondo con grid sutil */
---border-line:   #1F2832   /* divisores 1px */
---border-hot:    #2A3744   /* bordes hover */
---text-primary:  #E4E9F0
---text-mono:     #A8B5C4
---text-dim:      #5A6878
+### 1.A — Marketplace de Capas (mejorar existente)
+- Categorías técnicas: Geología regional · Fallas · Hidrografía · Geofísica pública · Concesiones · Comunidades indígenas · Áreas protegidas (SNASPE).
+- Ratings (1–5) + comentarios + curador verificado (`● VERIFIED` dot cyan).
+- Preview thumbnail (mini-mapa SVG de la geometría) antes de instalar.
+- Filtros por commodity, país, escala, licencia (CC-BY, dominio público, propietaria).
 
-/* Estados (no marca) */
---signal-cyan:   #4DD0E1   /* primario: data, links, foco */
---signal-amber:  #FFB300   /* warning, pendiente */
---signal-red:    #FF5252   /* crítico, alerta */
---signal-green:  #66BB6A   /* ok, aprobado */
---signal-violet: #B388FF   /* IA, predicciones */
---accent-gold:   reservado solo para logo Geocapitals
-```
+### 1.B — Marketplace de Proyectos / Property Deals (NUEVO)
+Listado de **propiedades/concesiones en venta, joint-venture, opción o farm-in** publicadas por holders.
 
-**Tipografía:**
-- `JetBrains Mono` — todos los datos, labels, IDs, números, navegación
-- `Inter` — prosa larga, headers de marketing
-- Eliminar `DM Sans` y reducir uso de `IBM Plex Mono`
+- Tarjeta de proyecto: código, commodity, etapa (greenfield → reserve), superficie, NSR/regalía pedida, modalidad (venta · JV · opción · earn-in), datos disponibles (assays, sondajes, NI 43-101 previo).
+- Filtros: commodity, país, etapa, presupuesto, modalidad.
+- **Data room virtual** por proyecto: PDFs, sondajes históricos, mapas, reportes 43-101 — acceso solicitado bajo NDA digital (firma click-through registrada en `audit_log`).
+- Mensajería 1-a-1 entre interesado y holder (canal Realtime Supabase, no email).
+- Estados del deal: `LISTED → INQUIRY → NDA_SIGNED → DUE_DILIGENCE → LOI → CLOSED/WITHDRAWN`.
 
-**Tokens:** `--radius` baja a `2px` (casi rectangular). Sombras reemplazadas por `inset 0 1px 0 var(--border-hot)` (efecto bisel sutil).
+### Tablas nuevas
+- `property_listings` (project_id opcional, holder, commodity, area_ha, stage, modality, asking_price_usd, royalty_pct, region, geometry, summary, is_published, views_count)
+- `property_deal_inquiries` (listing_id, inquirer_user_id, status, nda_signed_at, message)
+- `property_data_room_files` (listing_id, file_path, requires_nda, uploaded_by)
+- `marketplace_layer_reviews` (shared_layer_id, user_id, rating 1-5, comment)
 
-## 2. App Shell — "Operations Console" (`_authenticated.tsx`)
+### Rutas
+- `/dashboard/marketplace/layers` (rebranded de la actual)
+- `/dashboard/marketplace/properties` (nuevo)
+- `/dashboard/marketplace/properties/$id` (detalle + data room)
+- `/dashboard/marketplace/my-listings` (gestión holder)
 
-Reemplazar sidebar tradicional por **Command Rail tri-zona** estilo Palantir:
+---
+
+## 2. Certificación NI 43-101 (workflow completo)
+
+Hoy `lib/export-ni43101-pdf.ts` genera un PDF estático. Lo elevamos a **flujo de Technical Report bancable** con QP (Qualified Person), checklist y versionado.
+
+### 2.A — Reporte estructurado por secciones (las 27 oficiales)
+Basado en el formato `Form 43-101F1`. Cada sección como bloque editable:
 
 ```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ [▣ GEOCAPITALS]  PROJECT-ID:PLM-001 ▾  │ Centro Op. › Mapa  │ ⚡ ⌘K │  ← Top bar 36px
-├──┬───────────────────────────────────────────────────────────────────┤
-│▣ │                                                                    │
-│◈ │                                                                    │
-│⊕ │                  WORKSPACE (Outlet)                                │
-│▤ │                                                                    │
-│⚙ │                                                                    │
-├──┴───────────────────────────────────────────────────────────────────┤
-│ ● LIVE  PLM-001  3 alerts  142 samples  CPU 12%  ⌘K              0.2s │  ← Status bar 24px
-└──────────────────────────────────────────────────────────────────────┘
+1.  Summary                  10. Property Description
+2.  Introduction              11. Sample Preparation
+3.  Reliance on Other Experts 12. Data Verification
+4.  Property Description      13. Mineral Processing
+5.  Accessibility             14. Mineral Resource Estimates
+6.  History                   15. Mineral Reserve Estimates
+...                           23. Adjacent Properties
+                              25. Interpretation & Conclusions
+                              26. Recommendations
+                              27. References
 ```
 
-- **Rail izquierdo 48px**: solo iconos con tooltip flotante. Hover expande a 220px (overlay, no push). Categorías colapsables: Operations, Cadastre, Field, Analysis, Governance.
-- **Top bar 36px**: logo + project switcher (selector tipo terminal con código/RUT) + breadcrumb activo + ⌘K command palette + indicador online.
-- **Status bar inferior 24px**: tipo IDE — proyecto activo, alertas en vivo (ticker), conteo de records, latencia, atajos. Reemplaza el footer.
-- **Mobile**: rail se vuelve drawer offcanvas; status bar se mantiene.
+Cada sección: estado (`empty | draft | qp_review | approved`), QP responsable, fecha, contenido markdown + figuras adjuntas, citas a `geo_references`.
 
-## 3. Dashboard "Mission Control" (`_authenticated.dashboard.index.tsx`)
+### 2.B — Qualified Person (QP) Registry
+Tabla `qualified_persons`: nombre, profesión, registro (AusIMM, CIM, SAIMM, etc.), nº licencia, áreas de competencia, CV PDF, firma digital (image storage). Cada sección del reporte se asigna a un QP que firma electrónicamente al aprobar.
 
-Reemplazar grid de KPIs sueltos por un **briefing operacional**:
+### 2.C — Compliance Checklist (auto-validado)
+Panel que verifica en tiempo real ante la base de datos:
+- ✓ ≥1 sondaje con assays QA/QC pass-rate ≥ 90%
+- ✓ ≥1 mapa de propiedad con concesiones vigentes (cruza `mining_concessions.expires_at`)
+- ✓ Cadena de custodia completa para muestras (`sample_custody`)
+- ✓ Métodos analíticos certificados (lab acreditado ISO 17025)
+- ✓ QP asignado a todas las secciones técnicas
+- ✓ Disclaimer + caveat statements
 
-```text
-┌─ SITUATION REPORT ────────────────────┬─ ACTIVITY FEED ──────────┐
-│ Project: PALMERAS-001                 │ 14:32 ● Sample BX-091    │
-│ Status: ● ACTIVE   Phase: DRILLING    │       approved by JDG    │
-│ Last update: 4m ago by María L.       │ 14:18 ⚠ Concession 2891  │
-│                                       │       expires in 12 days │
-│ ┌──────┬──────┬──────┬──────┐        │ 13:55 ◈ DDH-042 finished │
-│ │ 12   │ 4128 │ 2.3  │ 142  │        │       at 318.4m          │
-│ │ holes│ m    │ g/t  │ smpl │        │ ...                      │
-│ └──────┴──────┴──────┴──────┘        │                          │
-├─ CRITICAL SIGNALS ────────────────────┼─ RUN PRIORITIES ─────────┤
-│ ⚠ 3 concessions expire <30d           │ □ Approve 7 core logs    │
-│ ⚠ QA/QC fail rate 12% (>threshold)    │ □ Review 2 catastro alrt │
-│ ● 7 records pending approval          │ □ Sync PJUD (last 4d)    │
-└───────────────────────────────────────┴──────────────────────────┘
-┌─ PRODUCTION SPARKLINES (last 30d) ────────────────────────────────┐
-│ Meters drilled  ▁▂▃▅▇▆▅▇█▇▆▅▆▇█  +18%                           │
-│ Samples logged  ▂▃▃▄▅▄▅▆▇▇▆▅▆▇▇  +9%                            │
-│ Au best inter.  ▁▁▂▁▃▂▄▃▅▇▆▅█▇▆  2.3 g/t / 12.4m                │
-└────────────────────────────────────────────────────────────────────┘
-```
+Cada item: ✓ verde, ⚠ ámbar (parcial), ✕ rojo. Bloquea export final si falta crítico.
 
-- Sparklines inline (sin librería: SVG path o caracteres unicode block).
-- Activity feed con timestamps relativos, refresh realtime via Supabase channel.
-- "Critical signals" prioriza por severidad y tiene CTA inline.
-- Sin imágenes, sin gradientes — pura información.
+### 2.D — Versionado y entrega
+- Snapshots inmutables (`technical_report_versions` con hash SHA-256).
+- Export PDF con marca de agua "DRAFT / FINAL / FILED".
+- Export adicional: paquete ZIP con apéndices (assay certs, drill logs CSV, JORC↔43-101 cross-walk).
 
-## 4. Centro de Operaciones (Mapa) — full bleed cinematográfico
+### Tablas nuevas
+- `technical_reports` (project_id, title, effective_date, status, lead_qp_id, version)
+- `technical_report_sections` (report_id, section_no, title, content_md, status, qp_id, signed_at)
+- `qualified_persons` (user_id, profession, registration_body, license_no, signature_url)
+- `technical_report_versions` (report_id, version_no, snapshot_jsonb, hash, generated_at)
 
-- Mapa **edge-to-edge** sin header visible. Header colapsa a una **HUD flotante translúcida** arriba-izquierda con backdrop-blur fuerte.
-- Paneles laterales tipo Foundry: **rail derecho colapsable 320px** que aloja Capas/Inspector/Tiempo/Snapshot como tabs verticales (no FABs sueltos).
-- Coordenadas, zoom y CRS en el **status bar global** (no en footer del mapa).
-- Crosshair central opcional + reticle con ticks de escala.
-- Mobile: HUD bottom-sheet con handle, map ocupa todo el viewport menos los 24px del status bar.
+### Rutas
+- `/dashboard/reports/ni43101` (listado)
+- `/dashboard/reports/ni43101/$id` (editor por secciones)
+- `/dashboard/reports/ni43101/$id/checklist`
+- `/dashboard/reports/qp` (registro QPs)
 
-## 5. Listas → "Data Tables" densas
+---
 
-Catastro, Sondajes, Muestreo, Aprobaciones, Auditoría:
-- Tablas mono `text-[11px]`, row height 28px, separadores 1px, **zebra sutil** opcional, **hover row con border-left cyan 2px**.
-- Toolbar superior: filtros inline tipo chips, búsqueda con `⌘F`, export rápido.
-- Estados con dot + color, no badges grandes. Ej: `● ACTIVE`, `◐ PENDING`, `✕ ARCHIVED`.
-- Mobile: ya tenemos cards — refinarlas al mismo lenguaje (mono, border-left de estado, sin sombras).
+## 3. Catastro y Concesiones (gestión avanzada)
 
-## 6. Landing pública (`index.tsx`)
+Sobre lo existente (`mining_concessions` + capa SERNAGEOMIN nacional) sumamos **vigilancia activa, pago de patentes y due diligence**.
 
-Reemplazar hero marketing por **"Live Operations Demo"**:
-- Background animado: grid + lat/lon ticks + concesiones SVG animadas.
-- Headline mono: `GEOCAPITALS // EXPLORATION OPERATIONS PLATFORM`
-- Sub: "The control surface for modern mineral exploration."
-- Reemplazar imágenes hero por **screenshots reales** del dashboard (mockup en frame de monitor).
-- Sección "Trusted data feeds" con logos/labels técnicos: SERNAGEOMIN · BOLETÍN MINERO · PJUD · MACROSTRAT · EMAG2 (todos como text-mono con dot verde "● LIVE").
-- CTA: `[ INITIATE SESSION → ]` en lugar de "Empezar gratis".
-- Eliminar gradientes dorados decorativos; usar líneas y cyan funcional.
+### 3.A — Sync automático SERNAGEOMIN
+Edge function `sync-sernageomin` (cron diario) que para cada concesión del proyecto:
+- Consulta endpoint ArcGIS por `external_id`/código.
+- Detecta cambios en titular, vigencia, superficie, estado.
+- Crea alerta tipo `concession_changed` con diff antes/después.
 
-## 7. Componentes nuevos compartidos (`src/components/ops/`)
+### 3.B — Patentes Mineras (pago anual)
+Tabla `concession_patents`: año, monto UTM, estado (`pending | paid | overdue`), fecha pago, comprobante PDF. Calendario visual con UTM convertido a CLP/USD (rate cacheado). Alertas:
+- 60 días antes del vencimiento patente → ⚠
+- Vencida → ✕ rojo en el mapa
 
-- `<StatusDot status="live|warn|crit|ok" />`
-- `<MetricCell label value delta sparkline? />` — celda densa de KPI
-- `<DataTable />` wrapper con estilo ops uniforme
-- `<HudPanel title collapsible>` — panel translúcido para mapa
-- `<ActivityTicker projectId />` — feed realtime
-- `<Sparkline data />` — SVG inline, sin deps
-- `<CommandRail items />` — sidebar nuevo
-- `<StatusBar />` — barra inferior global
+### 3.C — Sobreposición / Conflictos
+Detector automático server-side (PostGIS o cálculo TS) que compara concesiones del proyecto vs. capa nacional SERNAGEOMIN y marca:
+- Sobreposición con concesión de tercero (potencial conflicto).
+- Sobreposición con SNASPE (parque nacional → bloqueo legal).
+- Sobreposición con comunidades indígenas (consulta previa requerida).
 
-## 8. Producción — checklist
+Cada conflicto → ticket en módulo Approvals con responsable y deadline.
 
-- **Performance**: lazy-load Map3DView, RasterControl, PDF libs; preload fuentes; reducir bundle Leaflet.
-- **SEO**: head() único por ruta pública; OG images por sección.
-- **Accesibilidad**: contraste AAA en cyan/ámbar sobre void; focus rings cyan visibles; `prefers-reduced-motion` desactiva ticker.
-- **Errores**: errorComponent + notFoundComponent en cada ruta con loader (ya parcial).
-- **Loading states**: skeletons mono (líneas `▒▒▒` parpadeantes) en lugar de spinners genéricos.
-- **Manifest PWA + favicon** actualizado al lenguaje técnico.
-- **Console limpia**: eliminar warnings, console.logs.
-- **Empty states**: ilustraciones ASCII tipo terminal (`[ NO DATA · INITIATE SYNC ]`).
+### 3.D — Due Diligence Pack (export)
+Botón "Generar DD Pack" para una concesión: PDF con titularidad histórica, patentes pagadas, gravámenes, mapa de sobreposición, fotos del terreno, links a expedientes BCN/CBR. Útil para vender/comprar (alimenta directamente el Marketplace 1.B).
 
-## Archivos a crear/editar (orden de ejecución)
+### 3.E — Vigilancia Boletín Minero + PJUD ampliada
+Ya existe `bulletin_watch_holders`. Agregar:
+- Watch sobre **códigos** de concesión (no solo holders).
+- Watch sobre **comunas/regiones** (alerta si publican nueva concesión que se sobrepone con AOI del proyecto).
+- Watch sobre **causas judiciales** (mining_court_cases) que mencionen RUT/código.
 
-**Fase A — Sistema base** (1 sesión)
-1. `src/styles.css` — nueva paleta + tipografía + utilidades ops
-2. `src/components/ops/StatusDot.tsx`, `MetricCell.tsx`, `Sparkline.tsx`, `HudPanel.tsx`, `StatusBar.tsx`, `CommandRail.tsx`, `ActivityTicker.tsx`
-3. Cargar JetBrains Mono + Inter en `__root.tsx`
+### Tablas nuevas / extensiones
+- `concession_patents` (concession_id, year, amount_utm, status, paid_at, receipt_url)
+- `concession_overlaps` (concession_id, overlap_type, overlap_with_id, area_overlap_ha, severity, resolved_at)
+- `concession_history` (concession_id, snapshot_jsonb, synced_at) — historial sync
+- Extend `bulletin_watch_holders` → renombrar a `bulletin_watches` con tipo (`holder|code|region|court_keyword`)
 
-**Fase B — Shell** (1 sesión)
-4. `src/routes/_authenticated.tsx` — nuevo CommandRail + TopBar + StatusBar
-5. Mobile drawer rail
+### Rutas / mejoras
+- `/dashboard/catastro` — agregar tabs: **Mis concesiones · Patentes · Conflictos · Vigilancia · Sync log**
+- `/dashboard/catastro/$id` — detalle con timeline de cambios + DD pack export
 
-**Fase C — Superficies clave** (2 sesiones)
-6. `_authenticated.dashboard.index.tsx` — Mission Control
-7. `_authenticated.dashboard.map.tsx` — HUD + rail derecho
-8. Tablas: catastro, drilling, sampling, approvals, boletin
+---
 
-**Fase D — Landing + producción** (1 sesión)
-9. `routes/index.tsx` — landing técnica
-10. Auditoría performance, accesibilidad, SEO, empty/error states
+## Componentes UI nuevos (lenguaje Command Platform)
+
+- `<MarketplaceCard kind="layer|property" />`
+- `<DataRoomGate listingId />` — NDA click-through
+- `<ReportSectionEditor sectionNo qpRequired />`
+- `<ComplianceChecklist reportId />` — auto-evalúa
+- `<QPSignatureBlock qpId />` — firma + sello
+- `<PatentCalendar concessionId />`
+- `<OverlapMap concessionId />` — Leaflet con conflictos
+- `<DDPackButton concessionId />`
+
+Todo bajo `src/components/ops/` siguiendo mono + dots + 11px.
+
+---
+
+## Edge Functions
+
+- `sync-sernageomin` (cron diario) — actualiza `mining_concessions` + crea alertas
+- `generate-ni43101-pack` — compila reporte + apéndices a ZIP firmado
+- `compute-overlaps` — corre overlay analysis bajo demanda
+- `nda-sign` — registra firma click-through con IP/timestamp en audit_log
+
+---
+
+## Orden de ejecución sugerido
+
+**Fase 1 — Catastro avanzado** (base para los otros 2)
+1. Migraciones: `concession_patents`, `concession_overlaps`, `concession_history`, extend `bulletin_watches`
+2. Edge: `sync-sernageomin`, `compute-overlaps`
+3. UI: tabs nuevos en `/dashboard/catastro` + detalle
+
+**Fase 2 — NI 43-101 workflow**
+4. Migraciones: `qualified_persons`, `technical_reports`, `technical_report_sections`, `technical_report_versions`
+5. Editor por secciones + checklist + firma QP
+6. Edge `generate-ni43101-pack`
+
+**Fase 3 — Marketplace ampliado**
+7. Migraciones: `property_listings`, `property_deal_inquiries`, `property_data_room_files`, `marketplace_layer_reviews`
+8. Rutas marketplace properties + data room + NDA
+9. Mensajería Realtime
+
+---
 
 ## Resultado esperado
 
-Una plataforma que **se sienta como un sistema operativo de exploración**, no como otra app SaaS — densa, mono, con datos vivos en cada borde, gestos rápidos por teclado, y estética de sala de control que comunica seriedad técnica desde el primer pixel.
+Una plataforma donde un explorador puede: **descubrir** una propiedad en el Marketplace → solicitar **DD pack** generado desde Catastro → firmar **NDA digital** → revisar el **NI 43-101** ya estructurado y firmado por QP → cerrar el deal — todo dentro de Geocapitals, con trazabilidad completa en `audit_log` y datos en vivo de SERNAGEOMIN/Boletín/PJUD.
 
