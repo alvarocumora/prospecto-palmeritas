@@ -229,6 +229,53 @@ export type Database = {
           },
         ]
       }
+      bulletin_watches: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          label: string | null
+          notes: string | null
+          project_id: string
+          updated_at: string
+          value: string
+          watch_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          project_id: string
+          updated_at?: string
+          value: string
+          watch_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          project_id?: string
+          updated_at?: string
+          value?: string
+          watch_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulletin_watches_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_budgets: {
         Row: {
           campaign_id: string
@@ -414,6 +461,192 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "community_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_history: {
+        Row: {
+          concession_id: string
+          diff: Json | null
+          id: string
+          project_id: string
+          snapshot: Json
+          source: string
+          synced_at: string
+        }
+        Insert: {
+          concession_id: string
+          diff?: Json | null
+          id?: string
+          project_id: string
+          snapshot: Json
+          source?: string
+          synced_at?: string
+        }
+        Update: {
+          concession_id?: string
+          diff?: Json | null
+          id?: string
+          project_id?: string
+          snapshot?: Json
+          source?: string
+          synced_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_history_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_history_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_overlaps: {
+        Row: {
+          area_overlap_ha: number | null
+          concession_id: string
+          created_at: string
+          detected_at: string
+          geometry_geojson: Json | null
+          id: string
+          notes: string | null
+          overlap_type: string
+          overlap_with_id: string | null
+          overlap_with_name: string | null
+          pct_overlap: number | null
+          project_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          area_overlap_ha?: number | null
+          concession_id: string
+          created_at?: string
+          detected_at?: string
+          geometry_geojson?: Json | null
+          id?: string
+          notes?: string | null
+          overlap_type: string
+          overlap_with_id?: string | null
+          overlap_with_name?: string | null
+          pct_overlap?: number | null
+          project_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          area_overlap_ha?: number | null
+          concession_id?: string
+          created_at?: string
+          detected_at?: string
+          geometry_geojson?: Json | null
+          id?: string
+          notes?: string | null
+          overlap_type?: string
+          overlap_with_id?: string | null
+          overlap_with_name?: string | null
+          pct_overlap?: number | null
+          project_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_overlaps_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_overlaps_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_patents: {
+        Row: {
+          amount_clp: number | null
+          amount_usd: number | null
+          amount_utm: number
+          concession_id: string
+          created_at: string
+          created_by: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          project_id: string
+          receipt_url: string | null
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          amount_utm?: number
+          concession_id: string
+          created_at?: string
+          created_by: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          project_id: string
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          amount_utm?: number
+          concession_id?: string
+          created_at?: string
+          created_by?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          project_id?: string
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_patents_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_patents_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
