@@ -229,6 +229,53 @@ export type Database = {
           },
         ]
       }
+      bulletin_watches: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          label: string | null
+          notes: string | null
+          project_id: string
+          updated_at: string
+          value: string
+          watch_type: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          project_id: string
+          updated_at?: string
+          value: string
+          watch_type: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          label?: string | null
+          notes?: string | null
+          project_id?: string
+          updated_at?: string
+          value?: string
+          watch_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bulletin_watches_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_budgets: {
         Row: {
           campaign_id: string
@@ -414,6 +461,192 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "community_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_history: {
+        Row: {
+          concession_id: string
+          diff: Json | null
+          id: string
+          project_id: string
+          snapshot: Json
+          source: string
+          synced_at: string
+        }
+        Insert: {
+          concession_id: string
+          diff?: Json | null
+          id?: string
+          project_id: string
+          snapshot: Json
+          source?: string
+          synced_at?: string
+        }
+        Update: {
+          concession_id?: string
+          diff?: Json | null
+          id?: string
+          project_id?: string
+          snapshot?: Json
+          source?: string
+          synced_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_history_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_history_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_overlaps: {
+        Row: {
+          area_overlap_ha: number | null
+          concession_id: string
+          created_at: string
+          detected_at: string
+          geometry_geojson: Json | null
+          id: string
+          notes: string | null
+          overlap_type: string
+          overlap_with_id: string | null
+          overlap_with_name: string | null
+          pct_overlap: number | null
+          project_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          updated_at: string
+        }
+        Insert: {
+          area_overlap_ha?: number | null
+          concession_id: string
+          created_at?: string
+          detected_at?: string
+          geometry_geojson?: Json | null
+          id?: string
+          notes?: string | null
+          overlap_type: string
+          overlap_with_id?: string | null
+          overlap_with_name?: string | null
+          pct_overlap?: number | null
+          project_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Update: {
+          area_overlap_ha?: number | null
+          concession_id?: string
+          created_at?: string
+          detected_at?: string
+          geometry_geojson?: Json | null
+          id?: string
+          notes?: string | null
+          overlap_type?: string
+          overlap_with_id?: string | null
+          overlap_with_name?: string | null
+          pct_overlap?: number | null
+          project_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_overlaps_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_overlaps_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_patents: {
+        Row: {
+          amount_clp: number | null
+          amount_usd: number | null
+          amount_utm: number
+          concession_id: string
+          created_at: string
+          created_by: string
+          due_date: string | null
+          id: string
+          notes: string | null
+          paid_at: string | null
+          project_id: string
+          receipt_url: string | null
+          status: string
+          updated_at: string
+          year: number
+        }
+        Insert: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          amount_utm?: number
+          concession_id: string
+          created_at?: string
+          created_by: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          project_id: string
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+          year: number
+        }
+        Update: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          amount_utm?: number
+          concession_id?: string
+          created_at?: string
+          created_by?: string
+          due_date?: string | null
+          id?: string
+          notes?: string | null
+          paid_at?: string | null
+          project_id?: string
+          receipt_url?: string | null
+          status?: string
+          updated_at?: string
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_patents_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_patents_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
@@ -1779,6 +2012,36 @@ export type Database = {
           },
         ]
       }
+      marketplace_layer_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          layer_key: string
+          rating: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          layer_key: string
+          rating: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          layer_key?: string
+          rating?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       mineralogy: {
         Row: {
           abundance: string | null
@@ -2292,6 +2555,221 @@ export type Database = {
         }
         Relationships: []
       }
+      property_data_room_files: {
+        Row: {
+          category: string | null
+          created_at: string
+          file_name: string
+          file_path: string
+          file_size_bytes: number | null
+          id: string
+          listing_id: string
+          mime_type: string | null
+          requires_nda: boolean
+          uploaded_by: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          file_name: string
+          file_path: string
+          file_size_bytes?: number | null
+          id?: string
+          listing_id: string
+          mime_type?: string | null
+          requires_nda?: boolean
+          uploaded_by: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          file_name?: string
+          file_path?: string
+          file_size_bytes?: number | null
+          id?: string
+          listing_id?: string
+          mime_type?: string | null
+          requires_nda?: boolean
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_data_room_files_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_deal_inquiries: {
+        Row: {
+          closed_at: string | null
+          closed_reason: string | null
+          created_at: string
+          id: string
+          inquirer_user_id: string
+          listing_id: string
+          message: string | null
+          nda_ip: string | null
+          nda_signature: string | null
+          nda_signed_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          closed_at?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          id?: string
+          inquirer_user_id: string
+          listing_id: string
+          message?: string | null
+          nda_ip?: string | null
+          nda_signature?: string | null
+          nda_signed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          closed_at?: string | null
+          closed_reason?: string | null
+          created_at?: string
+          id?: string
+          inquirer_user_id?: string
+          listing_id?: string
+          message?: string | null
+          nda_ip?: string | null
+          nda_signature?: string | null
+          nda_signed_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_deal_inquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_deal_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          inquiry_id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          inquiry_id: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          inquiry_id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_deal_messages_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "property_deal_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      property_listings: {
+        Row: {
+          area_ha: number | null
+          asking_price_usd: number | null
+          code: string | null
+          commodity: string
+          country: string
+          cover_image_url: string | null
+          created_at: string
+          data_available: string[] | null
+          geometry_geojson: Json | null
+          id: string
+          is_published: boolean
+          modality: string
+          owner_user_id: string
+          project_id: string | null
+          region: string | null
+          royalty_pct: number | null
+          stage: string
+          summary: string | null
+          title: string
+          updated_at: string
+          views_count: number
+        }
+        Insert: {
+          area_ha?: number | null
+          asking_price_usd?: number | null
+          code?: string | null
+          commodity: string
+          country?: string
+          cover_image_url?: string | null
+          created_at?: string
+          data_available?: string[] | null
+          geometry_geojson?: Json | null
+          id?: string
+          is_published?: boolean
+          modality?: string
+          owner_user_id: string
+          project_id?: string | null
+          region?: string | null
+          royalty_pct?: number | null
+          stage?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          views_count?: number
+        }
+        Update: {
+          area_ha?: number | null
+          asking_price_usd?: number | null
+          code?: string | null
+          commodity?: string
+          country?: string
+          cover_image_url?: string | null
+          created_at?: string
+          data_available?: string[] | null
+          geometry_geojson?: Json | null
+          id?: string
+          is_published?: boolean
+          modality?: string
+          owner_user_id?: string
+          project_id?: string | null
+          region?: string | null
+          royalty_pct?: number | null
+          stage?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "property_listings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prospectivity_cells: {
         Row: {
           cell_lat: number
@@ -2494,6 +2972,54 @@ export type Database = {
           tolerance_pct?: number
           unit?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      qualified_persons: {
+        Row: {
+          bio: string | null
+          competency_areas: string[] | null
+          created_at: string
+          cv_url: string | null
+          full_name: string
+          id: string
+          is_verified: boolean
+          license_no: string
+          profession: string
+          registration_body: string
+          signature_url: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          bio?: string | null
+          competency_areas?: string[] | null
+          created_at?: string
+          cv_url?: string | null
+          full_name: string
+          id?: string
+          is_verified?: boolean
+          license_no: string
+          profession: string
+          registration_body: string
+          signature_url?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          bio?: string | null
+          competency_areas?: string[] | null
+          created_at?: string
+          cv_url?: string | null
+          full_name?: string
+          id?: string
+          is_verified?: boolean
+          license_no?: string
+          profession?: string
+          registration_body?: string
+          signature_url?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -2812,6 +3338,202 @@ export type Database = {
             columns: ["raster_id"]
             isOneToOne: false
             referencedRelation: "drone_rasters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_report_sections: {
+        Row: {
+          content_md: string | null
+          created_at: string
+          figures: Json | null
+          id: string
+          project_id: string
+          qp_id: string | null
+          references_ids: string[] | null
+          report_id: string
+          section_no: number
+          signature_hash: string | null
+          signed_at: string | null
+          status: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+          word_count: number | null
+        }
+        Insert: {
+          content_md?: string | null
+          created_at?: string
+          figures?: Json | null
+          id?: string
+          project_id: string
+          qp_id?: string | null
+          references_ids?: string[] | null
+          report_id: string
+          section_no: number
+          signature_hash?: string | null
+          signed_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+          word_count?: number | null
+        }
+        Update: {
+          content_md?: string | null
+          created_at?: string
+          figures?: Json | null
+          id?: string
+          project_id?: string
+          qp_id?: string | null
+          references_ids?: string[] | null
+          report_id?: string
+          section_no?: number
+          signature_hash?: string | null
+          signed_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+          word_count?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_report_sections_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_sections_qp_id_fkey"
+            columns: ["qp_id"]
+            isOneToOne: false
+            referencedRelation: "qualified_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_sections_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_report_versions: {
+        Row: {
+          generated_at: string
+          generated_by: string
+          hash_sha256: string
+          id: string
+          pdf_url: string | null
+          project_id: string
+          report_id: string
+          snapshot: Json
+          version_no: number
+          watermark: string | null
+        }
+        Insert: {
+          generated_at?: string
+          generated_by: string
+          hash_sha256: string
+          id?: string
+          pdf_url?: string | null
+          project_id: string
+          report_id: string
+          snapshot: Json
+          version_no: number
+          watermark?: string | null
+        }
+        Update: {
+          generated_at?: string
+          generated_by?: string
+          hash_sha256?: string
+          id?: string
+          pdf_url?: string | null
+          project_id?: string
+          report_id?: string
+          snapshot?: Json
+          version_no?: number
+          watermark?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_report_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_report_versions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      technical_reports: {
+        Row: {
+          created_at: string
+          created_by: string
+          effective_date: string | null
+          id: string
+          lead_qp_id: string | null
+          project_id: string
+          report_type: string
+          signature_date: string | null
+          status: string
+          summary: string | null
+          title: string
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          effective_date?: string | null
+          id?: string
+          lead_qp_id?: string | null
+          project_id: string
+          report_type?: string
+          signature_date?: string | null
+          status?: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          effective_date?: string | null
+          id?: string
+          lead_qp_id?: string | null
+          project_id?: string
+          report_type?: string
+          signature_date?: string | null
+          status?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "technical_reports_lead_qp_id_fkey"
+            columns: ["lead_qp_id"]
+            isOneToOne: false
+            referencedRelation: "qualified_persons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "technical_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
