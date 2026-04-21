@@ -217,7 +217,7 @@ function AuthenticatedLayout() {
         </div>
       </div>
 
-      <main className="flex-1 min-w-0 md:ml-0 mt-12 md:mt-0">
+      <main className="flex-1 min-w-0 md:ml-0 mt-12 md:mt-0 pb-14 md:pb-0 min-h-[calc(100dvh-3rem)] md:min-h-screen">
         <Outlet />
         <MobileBottomNav role={role} />
       </main>
@@ -257,10 +257,10 @@ function NavItem({
 function MobileBottomNav({ role }: { role: ProjectRole | null }) {
   const items = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Inicio", module: "overview" },
-    { to: "/dashboard/projects", icon: FolderKanban, label: "Proyectos", module: "projects" },
-    { to: "/dashboard/geophysics", icon: Activity, label: "Geofísica", module: "geophysics" },
+    { to: "/dashboard/map", icon: Compass, label: "Mapa", module: "overview" },
+    { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro", module: "catastro" },
     { to: "/dashboard/drilling", icon: Drill, label: "Sondajes", module: "drilling" },
-    { to: "/dashboard/team", icon: Users, label: "Equipo", module: "team" },
+    { to: "/dashboard/projects", icon: FolderKanban, label: "Proyectos", module: "projects" },
   ].filter((it) => canAccess(role, it.module));
   const location = useLocation();
   return (

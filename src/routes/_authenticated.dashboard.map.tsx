@@ -177,7 +177,7 @@ function OperationalMap() {
   }, []);
 
   return (
-    <div className="fixed inset-0 md:left-56 top-12 md:top-0 bottom-14 md:bottom-0 flex flex-col bg-background">
+    <div className="flex flex-col bg-background h-[calc(100dvh-3rem-3.5rem)] md:h-[100dvh] w-full overflow-hidden">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 md:py-0 md:h-12 border-b border-border bg-bg-secondary shrink-0">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <Layers className="w-4 h-4 text-gold shrink-0" />
