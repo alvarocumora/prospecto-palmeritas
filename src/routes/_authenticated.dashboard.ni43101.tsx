@@ -329,7 +329,7 @@ function NI43101Module() {
     }
     setBusy(true);
     setError(null);
-    setProgress("Generando PDF…");
+    setProgress({ label: "Generando PDF…", current: 0, total: 0, phase: "setup" });
     try {
       await exportNI43101({
         basemap: includeSatellite ? "satellite" : "topo",
@@ -338,7 +338,7 @@ function NI43101Module() {
         projectId,
         sections: enabledArray,
         setBasemap,
-        onProgress: (s) => setProgress(s),
+        onProgress: handleProgress,
       });
       toast.success("Informe NI 43-101 descargado");
     } catch (err) {
