@@ -367,6 +367,14 @@ function OperationalMap() {
             {/* Mobile: single FAB → drawer with all tools */}
             {isMobile && (
               <>
+                <MobileMapInspector
+                  map={mapInst?.map ?? null}
+                  rasters={rasters}
+                  rasterSettings={visibleRasterSettings}
+                  onRasterChange={updateRasterSetting}
+                  onSnapshot={handleSnapshot}
+                  snapshotting={snapshotting}
+                />
                 <button
                   type="button"
                   onClick={() => setMobileToolsOpen(true)}
