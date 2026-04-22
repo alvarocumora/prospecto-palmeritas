@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw } from "lucide-react";
+import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2 } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { PatentCalendar } from "@/components/ops/PatentCalendar";
 import { OverlapInspector } from "@/components/ops/OverlapInspector";
 import { WatchManager } from "@/components/ops/WatchManager";
 import { SyncLog } from "@/components/ops/SyncLog";
+import { HoldersTab } from "@/components/ops/HoldersTab";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
