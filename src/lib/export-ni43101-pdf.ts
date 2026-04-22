@@ -267,12 +267,24 @@ export async function exportNI43101(opts: {
 
   // Parallel data fetch
   onProgress?.("Cargando catastro y datos geológicos…");
-  const [geo, geophys, catastroRows, internalConcessions] = await Promise.all([
+  const [geo, geophys, catastroRows, internalConcessions, assayCount] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
+    fetchAssayCount(projectId),
   ]);
+
+  // Compute validation context
+  const validations: Ni43101Validations = {
+    assaysStatus: assayCount === 0 ? "pending" : assayCount < 20 ? "partial" : "available",
+    assaysCount: assayCount,
+    catastroAvailable: catastroRows.length > 0,
+    catastroCount: catastroRows.length,
+    satelliteAvailable: !!satelliteFig,
+    mapAvailable: !!mapFig,
+    geologyAvailable: !!(geo && geo.litho.length > 0),
+  };
 
   // Restore original tab
   if (original && setActive) setActive(original);
@@ -295,7 +307,7 @@ export async function exportNI43101(opts: {
   // Sections
   renderSection1_Intro(s);
   renderSection2_Reliance(s);
-  renderSection3_Property(s, mapFig, catastroRows);
+  renderSection3_Property(s, mapFig, catastroRows, validations);
   if (includeZoning) {
     renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length);
   }
@@ -305,14 +317,14 @@ export async function exportNI43101(opts: {
   renderSection7_DepositType(s, geo);
   renderSection8_Exploration(s, geophys);
   renderSection9_Drilling(s);
-  renderSection10_QAQC(s);
-  renderSection11_DataVerification(s);
+  renderSection10_QAQC(s, validations);
+  renderSection11_DataVerification(s, validations);
   renderSection12_Budget(s);
   renderSection13_Conclusions(s);
   renderSection14_References(s, geo?.references ?? []);
 
   // Annexes (catastro SERNAGEOMIN + concesiones internas)
-  renderAnnexA(s, catastroRows, internalConcessions);
+  renderAnnexA(s, catastroRows, internalConcessions, validations);
   renderAnnexB(s, geophys);
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
