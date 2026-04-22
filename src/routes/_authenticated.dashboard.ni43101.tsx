@@ -250,6 +250,7 @@ function NI43101Module() {
         projectId,
         preview: true,
         sections: enabledArray,
+        setBasemap,
         onProgress: (s) => setProgress(s),
       });
       if (result) {
