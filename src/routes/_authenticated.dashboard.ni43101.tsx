@@ -440,6 +440,34 @@ function NI43101Module() {
           </button>
         </div>
 
+        {busy && progress && (
+          <div className="space-y-1.5 p-3 rounded border border-gold/30 bg-gold/5">
+            <div className="flex items-center justify-between gap-3 text-[11px] font-mono">
+              <div className="flex items-center gap-2 min-w-0">
+                <Loader2 className="w-3.5 h-3.5 text-gold animate-spin shrink-0" />
+                <span className="truncate text-foreground">{progress.label}</span>
+              </div>
+              <span className="text-muted-foreground tabular-nums shrink-0">
+                {progress.total > 0 ? `${progress.current}/${progress.total}` : "…"}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-bg-primary overflow-hidden">
+              <div
+                className="h-full bg-gold transition-all duration-300"
+                style={{
+                  width: progress.total > 0
+                    ? `${Math.min(100, Math.round((progress.current / progress.total) * 100))}%`
+                    : "8%",
+                }}
+              />
+            </div>
+            <div className="text-[10px] font-mono text-muted-foreground">
+              {progress.phase === "render" ? "Renderizando secciones del PDF…"
+                : progress.phase === "finalize" ? "Aplicando encabezados, índice y compilación final…"
+                : "Preparando datos y snapshots del mapa…"}
+            </div>
+          </div>
+        )}
         {error && <div className="text-xs text-destructive font-mono">{error}</div>}
         {!projectId && (
           <div className="text-xs text-muted-foreground font-mono">
