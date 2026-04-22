@@ -780,26 +780,118 @@ export function renderSection14_References(s: PdfState, refs: { citation_key: st
   );
 }
 
-export function renderAnnexA(
+export function renderSection3bis_Zoning(
   s: PdfState,
-  rows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string }[],
+  satelliteFig: string | null,
+  geo: GeologyData | null,
+  internalCount: number,
 ) {
-  h1(s, "Anexo A — Listado completo de pertenencias en bbox de consulta");
-  if (rows.length === 0) {
-    p(s, "Sin pertenencias registradas en la consulta del bbox del proyecto.");
-    return;
+  h1(s, "Zonificación geológica y cobertura satelital");
+  p(
+    s,
+    `Esta sección complementa la descripción de la propiedad con un panorama de la cobertura geo-espacial empleada ` +
+      `durante la fase actual: imagen satelital de alta resolución, capas de zonificación geológica oficiales y catastro ` +
+      `minero combinado (SERNAGEOMIN + registros internos del operador).`,
+  );
+
+  if (satelliteFig) {
+    figure(
+      s,
+      satelliteFig,
+      "Vista satelital del AOI con superposición de polígonos catastrales y trazas de vetas conocidas. Basemap: Esri World Imagery.",
+      { height: 95 },
+    );
+  } else {
+    p(s, "No fue posible capturar la vista satelital en esta ejecución (mapa no montado).");
   }
+
+  h2(s, "Capas geo-espaciales utilizadas");
+  tableCaption(s, "Inventario de capas geo-espaciales activas para el informe.");
   autoTable(s.doc, {
     startY: s.cursorY,
-    head: [["Tipo", "ROL", "Nombre", "Titular", "Ha", "Vencimiento"]],
-    body: rows.map((r) => [r.tipo, r.rol, r.nombre, r.titular, r.ha, r.venc]),
-    styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
-    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+    head: [["Capa", "Fuente", "Escala / Resolución", "Uso"]],
+    body: [
+      ["Esri World Imagery", "Esri / Maxar", "≤0.3 m/px", "Basemap satelital"],
+      ["SERNAGEOMIN Geología 1:1M", "SERNAGEOMIN WMS", "1:1.000.000", "Zonificación litológica regional"],
+      ["Macrostrat Lithology", "Macrostrat.org", "Variable", "Geología de contexto"],
+      ["Catastro Minero", "SERNAGEOMIN Geomin", "Vector", "Pertenencias vigentes"],
+      ["AOI Trackmin", "Trackmin GeoIntel", "Vector interno", "Polígono operativo"],
+    ],
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 1.8, textColor: COLORS.text, overflow: "linebreak" },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
     alternateRowStyles: { fillColor: COLORS.panel },
     margin: { left: PAGE.margin, right: PAGE.margin },
   });
   // @ts-expect-error autotable adds lastAutoTable
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  if (geo && geo.litho.length > 0) {
+    h2(s, "Unidades litológicas reconocidas en el AOI");
+    autoTable(s.doc, {
+      startY: s.cursorY,
+      head: [["Código", "Nombre", "Edad", "Descripción"]],
+      body: geo.litho.slice(0, 10).map((u) => [
+        u.unit_code ?? "—",
+        u.name ?? "—",
+        u.age ?? "—",
+        (u.description ?? "—").slice(0, 110),
+      ]),
+      styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+      alternateRowStyles: { fillColor: COLORS.panel },
+      margin: { left: PAGE.margin, right: PAGE.margin },
+    });
+    // @ts-expect-error autotable adds lastAutoTable
+    s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+  }
+
+  if (internalCount > 0) {
+    p(
+      s,
+      `Se incorporan al Anexo A ${internalCount} pertenencias registradas internamente por el operador (no presentes en la ` +
+        `consulta SERNAGEOMIN del bbox), marcadas con la fuente "Interno".`,
+    );
+  }
+}
+
+export function renderAnnexA(
+  s: PdfState,
+  rows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string }[],
+  internal: { code: string; name: string; holder: string; type: string; status: string; area_ha: string; expires: string }[] = [],
+) {
+  h1(s, "Anexo A — Listado completo de pertenencias en bbox de consulta");
+  if (rows.length === 0 && internal.length === 0) {
+    p(s, "Sin pertenencias registradas en la consulta del bbox del proyecto ni en registros internos.");
+    return;
+  }
+  if (rows.length > 0) {
+    h2(s, "Pertenencias SERNAGEOMIN");
+    autoTable(s.doc, {
+      startY: s.cursorY,
+      head: [["Fuente", "Tipo", "ROL", "Nombre", "Titular", "Ha", "Vencimiento"]],
+      body: rows.map((r) => ["SERNAGEOMIN", r.tipo, r.rol, r.nombre, r.titular, r.ha, r.venc]),
+      styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+      alternateRowStyles: { fillColor: COLORS.panel },
+      margin: { left: PAGE.margin, right: PAGE.margin },
+    });
+    // @ts-expect-error autotable adds lastAutoTable
+    s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+  }
+  if (internal.length > 0) {
+    h2(s, "Pertenencias registradas internamente (operador)");
+    autoTable(s.doc, {
+      startY: s.cursorY,
+      head: [["Fuente", "Código", "Nombre", "Titular", "Tipo", "Estado", "Ha", "Vence"]],
+      body: internal.map((r) => ["Interno", r.code, r.name, r.holder, r.type, r.status, r.area_ha, r.expires]),
+      styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      headStyles: { fillColor: COLORS.copper, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+      alternateRowStyles: { fillColor: COLORS.panel },
+      margin: { left: PAGE.margin, right: PAGE.margin },
+    });
+    // @ts-expect-error autotable adds lastAutoTable
+    s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+  }
 }
 
 export function renderAnnexB(s: PdfState, geophys: GeophysicsData | null) {
