@@ -25,6 +25,7 @@ import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authen
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
+import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
@@ -130,6 +131,12 @@ const AuthenticatedDashboardPalmerasRoute =
   AuthenticatedDashboardPalmerasRouteImport.update({
     id: '/dashboard/palmeras',
     path: '/dashboard/palmeras',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardNi43101Route =
+  AuthenticatedDashboardNi43101RouteImport.update({
+    id: '/dashboard/ni43101',
+    path: '/dashboard/ni43101',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardMarketplaceRoute =
@@ -263,6 +270,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
@@ -298,6 +306,7 @@ export interface FileRoutesByTo {
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
@@ -335,6 +344,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/dashboard/inventory'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/ni43101'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/projects'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/dashboard/inventory'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/ni43101'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/projects'
@@ -443,6 +455,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
+    | '/_authenticated/dashboard/ni43101'
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/projects'
@@ -579,6 +592,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/palmeras'
       fullPath: '/dashboard/palmeras'
       preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/ni43101': {
+      id: '/_authenticated/dashboard/ni43101'
+      path: '/dashboard/ni43101'
+      fullPath: '/dashboard/ni43101'
+      preLoaderRoute: typeof AuthenticatedDashboardNi43101RouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/marketplace': {
@@ -771,6 +791,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
+  AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
@@ -801,6 +822,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
+  AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
