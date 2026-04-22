@@ -118,7 +118,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "sernageomin:manifestacion": { visible: false, opacity: 0.55 },
 };
 
-export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
+export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemapOverride }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
