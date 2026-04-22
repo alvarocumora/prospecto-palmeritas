@@ -790,7 +790,7 @@ function TocItem({
       <button
         onClick={onClick}
         aria-current={isExact ? "page" : isActive ? "true" : undefined}
-        className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] font-mono transition border-l-2 ${
+        className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] font-mono transition border-l-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold ${
           isActive
             ? "bg-gold/10 border-gold text-foreground"
             : "border-transparent hover:bg-bg-secondary text-text-secondary hover:text-foreground"
