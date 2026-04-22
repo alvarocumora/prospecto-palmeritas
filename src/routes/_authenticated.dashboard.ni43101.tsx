@@ -763,3 +763,75 @@ function ValidationsPanel({ v }: { v: Ni43101Validations }) {
     </section>
   );
 }
+
+/* ============================================================
+   Active section description (under TOC)
+   ============================================================ */
+
+function findSectionForToc(label: string): SectionMeta | null {
+  // TOC labels start with "<number>. <title>" or "<number>.<sub>  <title>"
+  // SECTIONS[].number is e.g. "RES", "1", "3", "3.bis", "A", "B".
+  const trimmed = label.trim();
+  // Try exact prefix match against any SECTIONS entry's "<number>. " or "<number>  ".
+  for (const s of SECTIONS) {
+    const prefixes = [`${s.number}. `, `${s.number}.  `, `${s.number} `];
+    if (prefixes.some((p) => trimmed.startsWith(p))) return s;
+    // Sub-section like "3.1  ..." should still resolve to section 3.
+  }
+  // Fallback: leading numeric token before "." matches a SECTIONS.number.
+  const m = trimmed.match(/^([A-Z]|\d+(?:\.[a-z]+)?)/);
+  if (m) {
+    const head = m[1];
+    const hit = SECTIONS.find((s) => s.number === head);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function ActiveSectionDescription({
+  toc,
+  activePage,
+}: {
+  toc: Ni43101TocEntry[];
+  activePage: number;
+}) {
+  // Find the deepest TOC entry whose page <= activePage; resolve to its parent section meta.
+  const candidates = toc.filter((e) => e.page <= activePage);
+  const current = candidates.length ? candidates[candidates.length - 1] : toc[0];
+  if (!current) return null;
+  // Walk back from current to find a level-1 (section) entry for context.
+  let sectionEntry = current;
+  for (let i = toc.indexOf(current); i >= 0; i--) {
+    if (toc[i].level === 1 || toc[i].level === 0) {
+      sectionEntry = toc[i];
+      break;
+    }
+  }
+  const meta = findSectionForToc(sectionEntry.label);
+  return (
+    <div className="border-t border-border bg-bg-secondary/60 p-3 space-y-1.5 sticky bottom-0">
+      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <FileText className="w-3 h-3 text-gold" />
+        Sección activa · pág. {activePage}
+      </div>
+      {meta ? (
+        <>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-gold/40 text-gold">
+              §{meta.number}
+            </span>
+            <div className="text-xs font-mono font-semibold truncate">{meta.title}</div>
+          </div>
+          <p className="text-[11px] text-text-secondary leading-relaxed">{meta.desc}</p>
+        </>
+      ) : (
+        <>
+          <div className="text-xs font-mono font-semibold truncate">{sectionEntry.label}</div>
+          <p className="text-[11px] text-text-secondary leading-relaxed">
+            Contenido frontal del informe (portada, índice o resumen).
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
