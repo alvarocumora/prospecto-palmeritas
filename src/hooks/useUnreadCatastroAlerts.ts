@@ -36,8 +36,9 @@ export function useUnreadCatastroAlerts(projectId: string | null) {
     if (!projectId) return;
 
     // Realtime: refresh when alerts change for this project.
+    // Unique suffix avoids reusing a cached subscribed channel in StrictMode/re-mounts.
     const channel = supabase
-      .channel(`catastro-alerts-${projectId}`)
+      .channel(`catastro-alerts-${projectId}-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "bulletin_alerts", filter: `project_id=eq.${projectId}` },
