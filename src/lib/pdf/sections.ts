@@ -885,7 +885,7 @@ export function renderAnnexA(
       head: [["Fuente", "Código", "Nombre", "Titular", "Tipo", "Estado", "Ha", "Vence"]],
       body: internal.map((r) => ["Interno", r.code, r.name, r.holder, r.type, r.status, r.area_ha, r.expires]),
       styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
-      headStyles: { fillColor: COLORS.copper, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+      headStyles: { fillColor: COLORS.goldDark, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
     });
