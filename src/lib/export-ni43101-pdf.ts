@@ -194,6 +194,15 @@ async function fetchInternalConcessions(projectId: string | null | undefined): P
   }
 }
 
+export type Ni43101TocEntry = { label: string; level: number; page: number };
+export type Ni43101Result = {
+  blob: Blob;
+  url: string;
+  toc: Ni43101TocEntry[];
+  totalPages: number;
+  filename: string;
+};
+
 export async function exportNI43101(opts: {
   setActive?: (id: string) => void;
   getCurrent?: () => string;
@@ -203,7 +212,9 @@ export async function exportNI43101(opts: {
   includeZoning?: boolean;
   projectId?: string | null;
   onProgress?: (step: string) => void;
-} = {}) {
+  /** When true, returns blob/url/toc instead of triggering a download. */
+  preview?: boolean;
+} = {}): Promise<Ni43101Result | void> {
   const {
     setActive,
     getCurrent,
@@ -299,7 +310,19 @@ export async function exportNI43101(opts: {
   // Fill TOC entries on the reserved page
   fillToc(s, tocPageNum, totalPages);
 
-  doc.save(
-    `${PROJECT.ref}_Informe_NI43-101_${new Date().toISOString().slice(0, 10)}.pdf`,
-  );
+  const filename = `${PROJECT.ref}_Informe_NI43-101_${new Date().toISOString().slice(0, 10)}.pdf`;
+
+  if (opts.preview) {
+    const blob = doc.output("blob");
+    const url = URL.createObjectURL(blob);
+    return {
+      blob,
+      url,
+      toc: s.toc.map((e) => ({ label: e.label, level: e.level, page: e.page })),
+      totalPages,
+      filename,
+    };
+  }
+
+  doc.save(filename);
 }
