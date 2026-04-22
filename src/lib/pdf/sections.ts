@@ -869,7 +869,12 @@ export function renderSection3bis_Zoning(
       { height: 95 },
     );
   } else {
-    p(s, "No fue posible capturar la vista satelital en esta ejecución (mapa no montado).");
+    warningBox(
+      s,
+      "Vista satelital no disponible",
+      "No fue posible capturar el snapshot satelital en esta ejecución (mapa no montado, basemap no conmutado a satellite, o tiles no cargados a tiempo). " +
+        "La sección continúa sólo con el inventario de capas y litología.",
+    );
   }
 
   h2(s, "Capas geo-espaciales utilizadas");
