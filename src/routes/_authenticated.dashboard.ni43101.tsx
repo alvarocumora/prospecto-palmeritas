@@ -175,6 +175,8 @@ const SECTIONS: SectionMeta[] = [
 
 const DEFAULT_ENABLED = new Set<Ni43101SectionId>(ALL_SECTIONS);
 
+type ProgressInfo = { label: string; current: number; total: number; phase?: string };
+
 function NI43101Module() {
   const { active } = useProjects();
   const projectId = active?.id ?? null;
