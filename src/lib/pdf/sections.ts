@@ -930,10 +930,17 @@ export function renderAnnexA(
   s: PdfState,
   rows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string }[],
   internal: { code: string; name: string; holder: string; type: string; status: string; area_ha: string; expires: string }[] = [],
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Anexo A — Listado completo de pertenencias en bbox de consulta");
   if (rows.length === 0 && internal.length === 0) {
-    p(s, "Sin pertenencias registradas en la consulta del bbox del proyecto ni en registros internos.");
+    warningBox(
+      s,
+      "Anexo vacío",
+      validations.catastroAvailable
+        ? "El bbox consultado no devolvió pertenencias y no hay registros internos. Verifica el centroide AOI y el radio de consulta."
+        : "El servicio SERNAGEOMIN no respondió en esta ejecución y no hay pertenencias internas cargadas. Reintenta cuando el servicio esté disponible.",
+    );
     return;
   }
   if (rows.length > 0) {
