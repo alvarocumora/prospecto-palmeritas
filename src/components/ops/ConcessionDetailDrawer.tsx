@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
 import { X, Pencil, Trash2, MapPin, Calendar, FileText, Search } from "lucide-react";
 import {
   type MiningConcession,
@@ -54,6 +54,14 @@ export function ConcessionDetailDrawer({
   const [dragging, setDragging] = useState(false);
 
   const bodyRef = useRef<HTMLDivElement>(null);
+
+  // Brief skeleton on open / when switching to another concession via Jump-to.
+  const [hydrating, setHydrating] = useState(true);
+  useEffect(() => {
+    setHydrating(true);
+    const t = setTimeout(() => setHydrating(false), 350);
+    return () => clearTimeout(t);
+  }, [c.id]);
 
   const [jumpQuery, setJumpQuery] = useState("");
   const [jumpOpen, setJumpOpen] = useState(false);
@@ -198,39 +206,58 @@ export function ConcessionDetailDrawer({
 
         {/* Body */}
         <div ref={bodyRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4 overscroll-contain">
-          {/* Status row */}
-          <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium"
-              style={{ backgroundColor: `${color}20`, color }}
-            >
-              <Calendar className="w-3 h-3" />
-              {c.expires_at ?? "Sin vencimiento"}
-              {days !== null && (
-                <span className="opacity-80">
-                  ({days < 0 ? `${Math.abs(days)}d vencida` : `${days}d`})
+          {hydrating ? (
+            <>
+              <div className="flex items-center gap-2 flex-wrap" aria-busy="true" aria-label="Cargando detalle">
+                <div className="h-6 w-40 rounded bg-bg-elevated animate-pulse" />
+                <div className="h-6 w-28 rounded bg-bg-elevated/70 animate-pulse" style={{ animationDelay: "80ms" }} />
+              </div>
+              <dl className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <div key={i} className="space-y-1.5 animate-pulse" style={{ animationDelay: `${i * 60}ms` }}>
+                    <div className="h-2 w-12 bg-bg-elevated/70 rounded" />
+                    <div className="h-3.5 bg-bg-elevated rounded" style={{ width: `${85 - (i % 4) * 12}%` }} />
+                  </div>
+                ))}
+              </dl>
+            </>
+          ) : (
+            <>
+              {/* Status row */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <span
+                  className="inline-flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-medium"
+                  style={{ backgroundColor: `${color}20`, color }}
+                >
+                  <Calendar className="w-3 h-3" />
+                  {c.expires_at ?? "Sin vencimiento"}
+                  {days !== null && (
+                    <span className="opacity-80">
+                      ({days < 0 ? `${Math.abs(days)}d vencida` : `${days}d`})
+                    </span>
+                  )}
                 </span>
-              )}
-            </span>
-            {intersectsAoi && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium bg-amber-500/15 text-amber-600">
-                <MapPin className="w-3 h-3" /> Intersecta AOI
-              </span>
-            )}
-          </div>
+                {intersectsAoi && (
+                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-[11px] font-medium bg-amber-500/15 text-amber-600">
+                    <MapPin className="w-3 h-3" /> Intersecta AOI
+                  </span>
+                )}
+              </div>
 
-          {/* Detail grid */}
-          <dl className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
-            <Item label="Titular" value={c.holder ?? "—"} />
-            <Item label="Tipo" value={TYPE_LABELS[c.concession_type] ?? c.concession_type} />
-            <Item label="Estado" value={STATUS_LABELS[c.status] ?? c.status} />
-            <Item label="Área" value={c.area_ha != null ? `${c.area_ha} ha` : "—"} />
-            <Item label="Otorgada" value={c.granted_at ?? "—"} />
-            <Item label="Vence" value={c.expires_at ?? "—"} />
-            <Item label="Región" value={c.region ?? "—"} />
-            <Item label="Comuna" value={c.commune ?? "—"} />
-            <Item label="Origen" value={c.source ?? "manual"} />
-          </dl>
+              {/* Detail grid */}
+              <dl className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
+                <Item label="Titular" value={c.holder ?? "—"} />
+                <Item label="Tipo" value={TYPE_LABELS[c.concession_type] ?? c.concession_type} />
+                <Item label="Estado" value={STATUS_LABELS[c.status] ?? c.status} />
+                <Item label="Área" value={c.area_ha != null ? `${c.area_ha} ha` : "—"} />
+                <Item label="Otorgada" value={c.granted_at ?? "—"} />
+                <Item label="Vence" value={c.expires_at ?? "—"} />
+                <Item label="Región" value={c.region ?? "—"} />
+                <Item label="Comuna" value={c.commune ?? "—"} />
+                <Item label="Origen" value={c.source ?? "manual"} />
+              </dl>
+            </>
+          )}
 
           {c.notes && (
             <div>

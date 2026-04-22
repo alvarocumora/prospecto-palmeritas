@@ -95,7 +95,23 @@ export function ConcessionFilesPanel({
         </div>
       </div>
       {loading ? (
-        <div className="p-4 text-center text-xs text-text-secondary">Cargando…</div>
+        <div className="divide-y divide-border" aria-busy="true" aria-label="Cargando archivos">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="flex items-center gap-2 px-3 py-2 animate-pulse"
+              style={{ animationDelay: `${i * 120}ms` }}
+            >
+              <div className="w-3.5 h-3.5 rounded-sm bg-bg-elevated shrink-0" />
+              <div className="min-w-0 flex-1 space-y-1.5">
+                <div className="h-3 bg-bg-elevated rounded" style={{ width: `${70 - i * 10}%` }} />
+                <div className="h-2 bg-bg-elevated/70 rounded" style={{ width: `${50 - i * 8}%` }} />
+              </div>
+              <div className="w-6 h-6 rounded bg-bg-elevated/70" />
+              <div className="w-6 h-6 rounded bg-bg-elevated/70" />
+            </div>
+          ))}
+        </div>
       ) : data.length === 0 ? (
         <div className="p-4 text-center text-xs text-text-secondary">
           Sin archivos. Sube título, patente, planos o resoluciones (PDF / imagen, máx 25 MB).
