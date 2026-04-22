@@ -14,6 +14,7 @@ import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
 import { TopBar } from "@/components/ops/TopBar";
 import { StatusBar } from "@/components/ops/StatusBar";
+import { MobileBottomNav } from "@/components/ops/MobileBottomNav";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
@@ -121,13 +122,15 @@ function AuthenticatedLayout() {
 
       <main
         className={cn(
-          "relative pt-9 pb-6 md:pl-12 min-h-[100dvh]",
+          "relative pt-9 pb-20 md:pb-6 md:pl-12 min-h-[100dvh]",
         )}
+        style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         <Outlet />
       </main>
 
       <StatusBar />
+      <MobileBottomNav onMoreClick={() => setDrawerOpen(true)} catastroAlerts={catastroAlerts} />
       <GeoAssistant />
     </div>
   );

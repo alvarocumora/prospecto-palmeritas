@@ -41,7 +41,7 @@ export function StatusBar() {
 
   return (
     <footer
-      className="fixed bottom-0 left-0 right-0 z-30 h-6 border-t border-border bg-bg-panel/95 backdrop-blur flex items-center px-2 gap-3 font-mono text-[10px] text-text-mono select-none"
+      className="hidden md:flex fixed bottom-0 left-0 right-0 z-30 h-6 border-t border-border bg-bg-panel/95 backdrop-blur items-center px-2 gap-3 font-mono text-[10px] text-text-mono select-none"
       role="status"
       aria-live="polite"
     >
