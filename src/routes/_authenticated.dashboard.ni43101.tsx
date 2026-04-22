@@ -175,12 +175,26 @@ const SECTIONS: SectionMeta[] = [
 
 const DEFAULT_ENABLED = new Set<Ni43101SectionId>(ALL_SECTIONS);
 
+type ProgressInfo = { label: string; current: number; total: number; phase?: string };
+
 function NI43101Module() {
   const { active } = useProjects();
   const projectId = active?.id ?? null;
 
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [progress, setProgress] = useState<ProgressInfo | null>(null);
+  const handleProgress = useCallback((step: string | ProgressInfo) => {
+    if (typeof step === "string") {
+      setProgress((prev) => ({
+        label: step,
+        current: prev?.current ?? 0,
+        total: prev?.total ?? 0,
+        phase: "setup",
+      }));
+    } else {
+      setProgress(step);
+    }
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [includeSatellite, setIncludeSatellite] = useState(true);
   const [includeInternal, setIncludeInternal] = useState(true);
@@ -277,7 +291,7 @@ function NI43101Module() {
     }
     setBusy(true);
     setError(null);
-    setProgress("Iniciando…");
+    setProgress({ label: "Iniciando…", current: 0, total: 0, phase: "setup" });
     try {
       if (preview?.url) URL.revokeObjectURL(preview.url);
       const result = await exportNI43101({
@@ -288,7 +302,7 @@ function NI43101Module() {
         preview: true,
         sections: enabledArray,
         setBasemap,
-        onProgress: (s) => setProgress(s),
+        onProgress: handleProgress,
       });
       if (result) {
         setPreview(result);
@@ -315,7 +329,7 @@ function NI43101Module() {
     }
     setBusy(true);
     setError(null);
-    setProgress("Generando PDF…");
+    setProgress({ label: "Generando PDF…", current: 0, total: 0, phase: "setup" });
     try {
       await exportNI43101({
         basemap: includeSatellite ? "satellite" : "topo",
@@ -324,7 +338,7 @@ function NI43101Module() {
         projectId,
         sections: enabledArray,
         setBasemap,
-        onProgress: (s) => setProgress(s),
+        onProgress: handleProgress,
       });
       toast.success("Informe NI 43-101 descargado");
     } catch (err) {
@@ -414,7 +428,7 @@ function NI43101Module() {
             className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-gold text-bg-secondary font-mono text-sm hover:bg-gold/90 disabled:opacity-50 active:scale-[0.99] transition"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : preview ? <RefreshCw className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {busy ? progress ?? "Generando…" : preview ? "Regenerar vista previa" : "Generar vista previa"}
+            {busy ? (progress?.label ?? "Generando…") : preview ? "Regenerar vista previa" : "Generar vista previa"}
           </button>
           <button
             onClick={downloadDirect}
@@ -426,6 +440,34 @@ function NI43101Module() {
           </button>
         </div>
 
+        {busy && progress && (
+          <div className="space-y-1.5 p-3 rounded border border-gold/30 bg-gold/5">
+            <div className="flex items-center justify-between gap-3 text-[11px] font-mono">
+              <div className="flex items-center gap-2 min-w-0">
+                <Loader2 className="w-3.5 h-3.5 text-gold animate-spin shrink-0" />
+                <span className="truncate text-foreground">{progress.label}</span>
+              </div>
+              <span className="text-muted-foreground tabular-nums shrink-0">
+                {progress.total > 0 ? `${progress.current}/${progress.total}` : "…"}
+              </span>
+            </div>
+            <div className="h-1.5 rounded-full bg-bg-primary overflow-hidden">
+              <div
+                className="h-full bg-gold transition-all duration-300"
+                style={{
+                  width: progress.total > 0
+                    ? `${Math.min(100, Math.round((progress.current / progress.total) * 100))}%`
+                    : "8%",
+                }}
+              />
+            </div>
+            <div className="text-[10px] font-mono text-muted-foreground">
+              {progress.phase === "render" ? "Renderizando secciones del PDF…"
+                : progress.phase === "finalize" ? "Aplicando encabezados, índice y compilación final…"
+                : "Preparando datos y snapshots del mapa…"}
+            </div>
+          </div>
+        )}
         {error && <div className="text-xs text-destructive font-mono">{error}</div>}
         {!projectId && (
           <div className="text-xs text-muted-foreground font-mono">
