@@ -86,6 +86,7 @@ function CatastroPage() {
       </div>
 
       {tab === "concessions" && <ConcessionsTab />}
+      {tab === "holders" && user && <HoldersTab projectId={active.id} userId={user.id} />}
       {tab === "patents" && user && <PatentCalendar projectId={active.id} userId={user.id} />}
       {tab === "overlaps" && <OverlapInspector projectId={active.id} />}
       {tab === "watches" && user && <WatchManager projectId={active.id} userId={user.id} />}
