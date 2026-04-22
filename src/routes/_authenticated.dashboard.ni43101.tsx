@@ -553,18 +553,61 @@ function NI43101Module() {
       {/* Preview viewer */}
       {preview ? (
         <section className="rounded border border-border bg-bg-secondary overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-bg-primary/60">
+          <div className="flex items-center gap-2 px-3 py-2 border-b border-border bg-bg-primary/60 flex-wrap">
             <Eye className="w-3.5 h-3.5 text-gold" />
             <div className="text-xs font-mono uppercase tracking-wider text-text-secondary">
               Vista previa · {preview.totalPages} páginas
             </div>
-            <div className="ml-auto text-[10px] font-mono text-muted-foreground">
-              Sección actual · pág. {activePage}
+            <div className="ml-auto flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => goToSectionDelta(-1)}
+                aria-label="Sección anterior (K / flecha arriba)"
+                title="Sección anterior · K / ↑"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border text-[10px] font-mono hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-1 focus-visible:ring-offset-bg-secondary"
+              >
+                <ChevronRight className="w-3 h-3 rotate-180" />
+                Anterior
+              </button>
+              <button
+                type="button"
+                onClick={() => goToSectionDelta(1)}
+                aria-label="Sección siguiente (J / flecha abajo)"
+                title="Sección siguiente · J / ↓"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border text-[10px] font-mono hover:border-gold/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-1 focus-visible:ring-offset-bg-secondary"
+              >
+                Siguiente
+                <ChevronRight className="w-3 h-3" />
+              </button>
+              <span className="hidden md:inline text-[10px] font-mono text-muted-foreground ml-1.5">
+                Atajos: <kbd className="px-1 rounded border border-border">J</kbd>/<kbd className="px-1 rounded border border-border">K</kbd> · <kbd className="px-1 rounded border border-border">↑</kbd>/<kbd className="px-1 rounded border border-border">↓</kbd> · pág. {activePage}
+              </span>
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-h-[70vh]">
-            <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto flex flex-col">
-              <ul ref={tocListRef} className="py-1 flex-1">
+            <aside
+              className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto flex flex-col focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold"
+              tabIndex={0}
+              aria-label="Tabla de contenidos del informe"
+            >
+              <ul
+                ref={tocListRef}
+                role="listbox"
+                aria-label="Secciones"
+                className="py-1 flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+                    e.preventDefault();
+                    goToSectionDelta(e.key === "ArrowDown" ? 1 : -1);
+                  } else if (e.key === "Home") {
+                    e.preventDefault();
+                    goToPage(1);
+                  } else if (e.key === "End") {
+                    e.preventDefault();
+                    goToPage(preview.totalPages);
+                  }
+                }}
+              >
                 {preview.toc.map((entry, i) => {
                   const activeIdx = preview.toc.reduce(
                     (acc, e, idx) => (e.page <= activePage ? idx : acc),
@@ -587,7 +630,12 @@ function NI43101Module() {
               </ul>
               <ActiveSectionDescription toc={preview.toc} activePage={activePage} />
             </aside>
-            <div className="bg-black/30 min-h-[60vh] md:min-h-[80vh]">
+            <div
+              tabIndex={0}
+              role="region"
+              aria-label="Visor del PDF — use J/K o flechas para cambiar de sección"
+              className="bg-black/30 min-h-[60vh] md:min-h-[80vh] focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-gold"
+            >
               <iframe
                 ref={iframeRef}
                 title="Vista previa NI 43-101"
