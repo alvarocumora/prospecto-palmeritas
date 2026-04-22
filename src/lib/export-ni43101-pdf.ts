@@ -31,7 +31,25 @@ import {
   renderSection8_Exploration,
   renderSection9_Drilling,
   renderTocPlaceholder,
+  type Ni43101Validations,
 } from "./pdf/sections";
+
+export type { Ni43101Validations };
+
+async function fetchAssayCount(projectId: string | null | undefined): Promise<number> {
+  if (!projectId) return 0;
+  try {
+    const { count, error } = await supabase
+      .from("drill_core_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId)
+      .not("au_gpt", "is", null);
+    if (error) return 0;
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
 
 /* ============================================================
    DATA FETCHERS
@@ -201,6 +219,7 @@ export type Ni43101Result = {
   toc: Ni43101TocEntry[];
   totalPages: number;
   filename: string;
+  validations: Ni43101Validations;
 };
 
 export async function exportNI43101(opts: {
@@ -251,12 +270,24 @@ export async function exportNI43101(opts: {
 
   // Parallel data fetch
   onProgress?.("Cargando catastro y datos geológicos…");
-  const [geo, geophys, catastroRows, internalConcessions] = await Promise.all([
+  const [geo, geophys, catastroRows, internalConcessions, assayCount] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
+    fetchAssayCount(projectId),
   ]);
+
+  // Compute validation context
+  const validations: Ni43101Validations = {
+    assaysStatus: assayCount === 0 ? "pending" : assayCount < 20 ? "partial" : "available",
+    assaysCount: assayCount,
+    catastroAvailable: catastroRows.length > 0,
+    catastroCount: catastroRows.length,
+    satelliteAvailable: !!satelliteFig,
+    mapAvailable: !!mapFig,
+    geologyAvailable: !!(geo && geo.litho.length > 0),
+  };
 
   // Restore original tab
   if (original && setActive) setActive(original);
@@ -279,7 +310,7 @@ export async function exportNI43101(opts: {
   // Sections
   renderSection1_Intro(s);
   renderSection2_Reliance(s);
-  renderSection3_Property(s, mapFig, catastroRows);
+  renderSection3_Property(s, mapFig, catastroRows, validations);
   if (includeZoning) {
     renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length);
   }
@@ -289,14 +320,14 @@ export async function exportNI43101(opts: {
   renderSection7_DepositType(s, geo);
   renderSection8_Exploration(s, geophys);
   renderSection9_Drilling(s);
-  renderSection10_QAQC(s);
-  renderSection11_DataVerification(s);
+  renderSection10_QAQC(s, validations);
+  renderSection11_DataVerification(s, validations);
   renderSection12_Budget(s);
   renderSection13_Conclusions(s);
   renderSection14_References(s, geo?.references ?? []);
 
   // Annexes (catastro SERNAGEOMIN + concesiones internas)
-  renderAnnexA(s, catastroRows, internalConcessions);
+  renderAnnexA(s, catastroRows, internalConcessions, validations);
   renderAnnexB(s, geophys);
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
@@ -321,6 +352,7 @@ export async function exportNI43101(opts: {
       toc: s.toc.map((e) => ({ label: e.label, level: e.level, page: e.page })),
       totalPages,
       filename,
+      validations,
     };
   }
 

@@ -14,10 +14,37 @@ import {
   p,
   setRGB,
   tableCaption,
+  warningBox,
 } from "./primitives";
 import { drawCrossSection, drawGantt, drawPieChart } from "./figures";
 import type { GeologyData } from "@/hooks/useGeologyData";
 import type { GeophysicsData } from "@/hooks/useGeophysicsData";
+
+/* ============================================================
+   VALIDATION CONTEXT
+   Carries data-availability flags so sections can render
+   warning callouts when content is missing/pending.
+   ============================================================ */
+
+export type Ni43101Validations = {
+  assaysStatus: "available" | "pending" | "partial";
+  assaysCount: number;
+  catastroAvailable: boolean;
+  catastroCount: number;
+  satelliteAvailable: boolean;
+  mapAvailable: boolean;
+  geologyAvailable: boolean;
+};
+
+export const DEFAULT_VALIDATIONS: Ni43101Validations = {
+  assaysStatus: "pending",
+  assaysCount: 0,
+  catastroAvailable: false,
+  catastroCount: 0,
+  satelliteAvailable: false,
+  mapAvailable: false,
+  geologyAvailable: false,
+};
 
 /* ============================================================
    PROJECT CONSTANTS (mirror of /routes/index.tsx)
@@ -338,8 +365,16 @@ export function renderSection3_Property(
   s: PdfState,
   locationFig: string | null,
   catastroRows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string; intersects: boolean }[],
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Localización y descripción de la propiedad");
+  if (!validations.mapAvailable && !locationFig) {
+    warningBox(
+      s,
+      "Mapa no disponible",
+      "No se pudo capturar el mapa principal en esta ejecución. La sección continúa con la descripción textual; reintenta con el mapa visible para incluir la figura.",
+    );
+  }
   h2(s, "Ubicación y accesos");
   p(
     s,
@@ -370,6 +405,16 @@ export function renderSection3_Property(
       `Se distinguen cuatro tipos de origen: Concesiones de Explotación 1983 y 1932, Concesiones de Exploración 1983, y Estacamentos. ` +
       `La verificación de la titularidad y los pagos de patentes vigentes es responsabilidad del operador previo al inicio de trabajos invasivos.`,
   );
+
+  if (!validations.catastroAvailable || catastroRows.length === 0) {
+    warningBox(
+      s,
+      "Catastro no disponible",
+      "No se obtuvieron pertenencias del servicio SERNAGEOMIN para el bbox del proyecto en esta ejecución. " +
+        "Posibles causas: servicio temporalmente fuera de línea, bbox sin registros, o problema de red. " +
+        "El listado de derechos mineros queda incompleto y debe verificarse manualmente antes de la firma del QP.",
+    );
+  }
 
   if (catastroRows.length > 0) {
     h2(s, "Pertenencias intersectando el AOI");
@@ -627,8 +672,23 @@ export function renderSection9_Drilling(s: PdfState) {
   );
 }
 
-export function renderSection10_QAQC(s: PdfState) {
+export function renderSection10_QAQC(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
   h1(s, "Preparación, análisis y seguridad de muestras");
+  if (validations.assaysStatus === "pending") {
+    warningBox(
+      s,
+      "Assays pendientes",
+      "El proyecto se encuentra en etapa pre-Fase 1 y no hay análisis (assays) cargados en la base de datos. " +
+        "El programa QA/QC descrito a continuación es prospectivo: los procedimientos se aplicarán durante la ejecución y se actualizarán en revisiones futuras del informe.",
+    );
+  } else if (validations.assaysStatus === "partial") {
+    warningBox(
+      s,
+      "Assays parciales",
+      `Se cargaron ${validations.assaysCount} resultados analíticos, pero el set aún no es estadísticamente representativo. ` +
+        "QA/QC reportado es preliminar.",
+    );
+  }
   p(
     s,
     `Cadena de custodia documentada desde el sitio hasta el laboratorio. Las muestras de chip y canal sampling se etiquetan ` +
@@ -649,8 +709,15 @@ export function renderSection10_QAQC(s: PdfState) {
   );
 }
 
-export function renderSection11_DataVerification(s: PdfState) {
+export function renderSection11_DataVerification(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
   h1(s, "Verificación de datos");
+  if (validations.assaysStatus === "pending") {
+    warningBox(
+      s,
+      "Assays available: PENDING",
+      "No hay datos analíticos primarios disponibles. La verificación independiente queda diferida hasta la recepción de certificados de laboratorio (Fase 2/3 del programa).",
+    );
+  }
   p(
     s,
     `A la fecha de emisión de este informe el proyecto se encuentra en etapa pre-Fase 1, sin datos analíticos primarios ` +
@@ -802,7 +869,12 @@ export function renderSection3bis_Zoning(
       { height: 95 },
     );
   } else {
-    p(s, "No fue posible capturar la vista satelital en esta ejecución (mapa no montado).");
+    warningBox(
+      s,
+      "Vista satelital no disponible",
+      "No fue posible capturar el snapshot satelital en esta ejecución (mapa no montado, basemap no conmutado a satellite, o tiles no cargados a tiempo). " +
+        "La sección continúa sólo con el inventario de capas y litología.",
+    );
   }
 
   h2(s, "Capas geo-espaciales utilizadas");
@@ -858,10 +930,17 @@ export function renderAnnexA(
   s: PdfState,
   rows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string }[],
   internal: { code: string; name: string; holder: string; type: string; status: string; area_ha: string; expires: string }[] = [],
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Anexo A — Listado completo de pertenencias en bbox de consulta");
   if (rows.length === 0 && internal.length === 0) {
-    p(s, "Sin pertenencias registradas en la consulta del bbox del proyecto ni en registros internos.");
+    warningBox(
+      s,
+      "Anexo vacío",
+      validations.catastroAvailable
+        ? "El bbox consultado no devolvió pertenencias y no hay registros internos. Verifica el centroide AOI y el radio de consulta."
+        : "El servicio SERNAGEOMIN no respondió en esta ejecución y no hay pertenencias internas cargadas. Reintenta cuando el servicio esté disponible.",
+    );
     return;
   }
   if (rows.length > 0) {
