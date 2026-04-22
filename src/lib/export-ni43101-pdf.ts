@@ -217,6 +217,7 @@ export type Ni43101Result = {
   toc: Ni43101TocEntry[];
   totalPages: number;
   filename: string;
+  validations: Ni43101Validations;
 };
 
 export async function exportNI43101(opts: {
@@ -349,6 +350,7 @@ export async function exportNI43101(opts: {
       toc: s.toc.map((e) => ({ label: e.label, level: e.level, page: e.page })),
       totalPages,
       filename,
+      validations,
     };
   }
 
