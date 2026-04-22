@@ -428,7 +428,7 @@ function NI43101Module() {
             className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-gold text-bg-secondary font-mono text-sm hover:bg-gold/90 disabled:opacity-50 active:scale-[0.99] transition"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : preview ? <RefreshCw className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {busy ? progress ?? "Generando…" : preview ? "Regenerar vista previa" : "Generar vista previa"}
+            {busy ? (progress?.label ?? "Generando…") : preview ? "Regenerar vista previa" : "Generar vista previa"}
           </button>
           <button
             onClick={downloadDirect}
