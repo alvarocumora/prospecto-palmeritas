@@ -1,7 +1,10 @@
 import { useRef, useState } from "react";
-import { Upload, Trash2, Download, FileText } from "lucide-react";
-import { useHolderFiles, FILE_TYPE_LABELS } from "@/hooks/useHolderFiles";
+import { Upload, Trash2, Download, FileText, Eye } from "lucide-react";
+import { useHolderFiles, FILE_TYPE_LABELS, type HolderFile } from "@/hooks/useHolderFiles";
 import { toast } from "sonner";
+import { FilePreviewModal } from "./FilePreviewModal";
+
+const PREVIEWABLE = /\.(pdf|png|jpe?g|webp|gif|svg)$/i;
 
 function fmtSize(n: number | null): string {
   if (!n) return "—";
