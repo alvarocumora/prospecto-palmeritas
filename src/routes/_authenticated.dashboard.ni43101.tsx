@@ -351,12 +351,56 @@ function NI43101Module() {
     }
   };
 
-  const goToPage = (page: number) => {
+  const goToPage = useCallback((page: number) => {
     setActivePage(page);
     if (preview && iframeRef.current) {
       iframeRef.current.src = `${preview.url}#page=${page}&view=FitH`;
     }
-  };
+  }, [preview]);
+
+  // Section nav: jump to previous/next level-1 (or level-0) TOC entry.
+  const goToSectionDelta = useCallback((delta: 1 | -1) => {
+    if (!preview) return;
+    const sectionEntries = preview.toc
+      .map((e, i) => ({ ...e, i }))
+      .filter((e) => e.level === 1 || e.level === 0);
+    if (sectionEntries.length === 0) return;
+    // Find index of current section (largest section page <= activePage)
+    let curr = 0;
+    for (let i = 0; i < sectionEntries.length; i++) {
+      if (sectionEntries[i].page <= activePage) curr = i;
+    }
+    const next = Math.max(0, Math.min(sectionEntries.length - 1, curr + delta));
+    goToPage(sectionEntries[next].page);
+  }, [preview, activePage, goToPage]);
+
+  // Global keyboard shortcuts when preview is loaded (skip if user is typing).
+  useEffect(() => {
+    if (!preview) return;
+    const handler = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      const tag = t?.tagName;
+      const isEditable =
+        tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || t?.isContentEditable;
+      if (isEditable) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "j" || e.key === "ArrowDown" || e.key === "PageDown") {
+        e.preventDefault();
+        goToSectionDelta(1);
+      } else if (e.key === "k" || e.key === "ArrowUp" || e.key === "PageUp") {
+        e.preventDefault();
+        goToSectionDelta(-1);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        goToPage(1);
+      } else if (e.key === "End" && preview.totalPages) {
+        e.preventDefault();
+        goToPage(preview.totalPages);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [preview, goToSectionDelta, goToPage]);
 
   const groups: { key: SectionMeta["group"]; label: string }[] = [
     { key: "front", label: "Frontal" },
