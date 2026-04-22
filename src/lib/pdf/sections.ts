@@ -365,8 +365,16 @@ export function renderSection3_Property(
   s: PdfState,
   locationFig: string | null,
   catastroRows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string; intersects: boolean }[],
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Localización y descripción de la propiedad");
+  if (!validations.mapAvailable && !locationFig) {
+    warningBox(
+      s,
+      "Mapa no disponible",
+      "No se pudo capturar el mapa principal en esta ejecución. La sección continúa con la descripción textual; reintenta con el mapa visible para incluir la figura.",
+    );
+  }
   h2(s, "Ubicación y accesos");
   p(
     s,
