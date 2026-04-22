@@ -34,6 +34,8 @@ import {
   type Ni43101Validations,
 } from "./pdf/sections";
 
+export type { Ni43101Validations };
+
 async function fetchAssayCount(projectId: string | null | undefined): Promise<number> {
   if (!projectId) return 0;
   try {
