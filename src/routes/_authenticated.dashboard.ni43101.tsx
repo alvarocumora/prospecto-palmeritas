@@ -221,6 +221,9 @@ function NI43101Module() {
         )}
       </section>
 
+      {/* Validations panel */}
+      {preview && <ValidationsPanel v={preview.validations} />}
+
       {/* Preview viewer */}
       {preview ? (
         <section className="rounded border border-border bg-bg-secondary overflow-hidden">
