@@ -477,10 +477,9 @@ function NI43101Module() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-h-[70vh]">
-            <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto">
-              <ul ref={tocListRef} className="py-1">
+            <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto flex flex-col">
+              <ul ref={tocListRef} className="py-1 flex-1">
                 {preview.toc.map((entry, i) => {
-                  // active = largest entry whose page <= activePage
                   const activeIdx = preview.toc.reduce(
                     (acc, e, idx) => (e.page <= activePage ? idx : acc),
                     0,
@@ -500,6 +499,7 @@ function NI43101Module() {
                   );
                 })}
               </ul>
+              <ActiveSectionDescription toc={preview.toc} activePage={activePage} />
             </aside>
             <div className="bg-black/30 min-h-[60vh] md:min-h-[80vh]">
               <iframe
