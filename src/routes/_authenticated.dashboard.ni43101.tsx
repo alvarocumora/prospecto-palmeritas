@@ -494,7 +494,13 @@ function NI43101Module() {
             <Mountain className="w-3 h-3 text-gold" /> Se captura al generar la vista previa
           </span>
         </div>
-        <ProjectMap onMapReady={onMapReady} />
+        <ProjectMap onMapReady={onMapReady} basemapOverride={captureBasemap} />
+        {captureBasemap && (
+          <div className="mt-2 text-[10px] font-mono text-amber-500 flex items-center gap-1.5">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            Basemap conmutado a <span className="uppercase">{captureBasemap}</span> para captura del informe…
+          </div>
+        )}
       </section>
     </div>
   );
