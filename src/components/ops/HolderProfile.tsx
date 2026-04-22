@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { HolderFilesPanel } from "./HolderFilesPanel";
 import { HolderLinksPanel } from "./HolderLinksPanel";
 import { HolderEditDialog } from "./HolderEditDialog";
+import { CollapsibleSection } from "./CollapsibleSection";
 import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
 import { toast } from "sonner";
 
@@ -94,37 +95,44 @@ export function HolderProfile({
               </div>
             </div>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => setEditing(true)} className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded border border-border hover:bg-accent">
-              <Pencil className="w-3 h-3" /> Editar
+          <div className="flex gap-2 shrink-0">
+            <button
+              onClick={() => setEditing(true)}
+              className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded border border-border hover:bg-accent active:scale-95 transition-transform"
+              aria-label="Editar"
+            >
+              <Pencil className="w-3.5 h-3.5" /> <span className="hidden sm:inline">Editar</span>
             </button>
             <button
               onClick={onExport}
               disabled={exporting}
-              className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-primary text-primary-foreground disabled:opacity-50"
+              className="inline-flex items-center gap-1 text-xs px-2.5 py-1.5 rounded bg-primary text-primary-foreground disabled:opacity-50 active:scale-95 transition-transform"
+              aria-label="Exportar PDF"
             >
-              <FileDown className="w-3 h-3" /> {exporting ? "Generando…" : "PDF"}
+              <FileDown className="w-3.5 h-3.5" /> <span className="hidden sm:inline">{exporting ? "Generando…" : "PDF"}</span>
             </button>
           </div>
         </div>
 
-        {/* Identity grid */}
-        <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-xs">
-          {holder.legal_repr_name && (
-            <div><span className="text-text-secondary">Repr. legal:</span> {holder.legal_repr_name} <span className="font-mono text-text-secondary">{holder.legal_repr_rut ?? ""}</span></div>
-          )}
-          {holder.economic_activity && <div><span className="text-text-secondary">Giro:</span> {holder.economic_activity}</div>}
-          {(holder.region || holder.commune) && (
-            <div><span className="text-text-secondary">Domicilio:</span> {[holder.address, holder.commune, holder.region].filter(Boolean).join(", ")}</div>
-          )}
-          {holder.email && <div><span className="text-text-secondary">Email:</span> <a href={`mailto:${holder.email}`} className="hover:underline">{holder.email}</a></div>}
-          {holder.phone && <div><span className="text-text-secondary">Tel:</span> {holder.phone}</div>}
-          {holder.website && <div><span className="text-text-secondary">Web:</span> <a href={holder.website} target="_blank" rel="noreferrer" className="hover:underline">{holder.website}</a></div>}
-        </div>
-        {holder.notes && <div className="mt-2 text-xs text-text-secondary border-l-2 border-border pl-2">{holder.notes}</div>}
+        {/* Identity grid — collapsible on mobile */}
+        <CollapsibleSection title="Más datos" mobileOnly className="mt-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1 text-xs">
+            {holder.legal_repr_name && (
+              <div><span className="text-text-secondary">Repr. legal:</span> {holder.legal_repr_name} <span className="font-mono text-text-secondary">{holder.legal_repr_rut ?? ""}</span></div>
+            )}
+            {holder.economic_activity && <div><span className="text-text-secondary">Giro:</span> {holder.economic_activity}</div>}
+            {(holder.region || holder.commune) && (
+              <div><span className="text-text-secondary">Domicilio:</span> {[holder.address, holder.commune, holder.region].filter(Boolean).join(", ")}</div>
+            )}
+            {holder.email && <div><span className="text-text-secondary">Email:</span> <a href={`mailto:${holder.email}`} className="hover:underline">{holder.email}</a></div>}
+            {holder.phone && <div><span className="text-text-secondary">Tel:</span> {holder.phone}</div>}
+            {holder.website && <div><span className="text-text-secondary">Web:</span> <a href={holder.website} target="_blank" rel="noreferrer" className="hover:underline">{holder.website}</a></div>}
+          </div>
+          {holder.notes && <div className="mt-2 text-xs text-text-secondary border-l-2 border-border pl-2">{holder.notes}</div>}
+        </CollapsibleSection>
 
-        {/* Quick counts */}
-        <div className="mt-3 grid grid-cols-4 gap-2">
+        {/* Quick counts — 2 cols on mobile, 4 on desktop */}
+        <div className="mt-3 grid grid-cols-2 md:grid-cols-4 gap-2">
           <Stat label="Concesiones" value={concessions.length} />
           <Stat label="Boletín" value={links.data.bulletins.length} />
           <Stat label="PJUD" value={links.data.cases.length} />
@@ -178,7 +186,7 @@ function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="border border-border rounded px-2 py-1.5 bg-background">
       <div className="text-[10px] uppercase tracking-wider text-text-secondary">{label}</div>
-      <div className="font-mono text-lg font-semibold">{value}</div>
+      <div className="font-mono text-2xl md:text-lg font-semibold tabular-nums">{value}</div>
     </div>
   );
 }

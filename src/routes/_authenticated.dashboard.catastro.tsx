@@ -8,6 +8,7 @@ import { OverlapInspector } from "@/components/ops/OverlapInspector";
 import { WatchManager } from "@/components/ops/WatchManager";
 import { SyncLog } from "@/components/ops/SyncLog";
 import { HoldersTab } from "@/components/ops/HoldersTab";
+import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -62,8 +63,11 @@ function CatastroPage() {
         </p>
       </div>
 
-      {/* Tab bar */}
-      <div className="flex gap-1 border-b border-border overflow-x-auto -mx-4 md:mx-0 px-4 md:px-0">
+      {/* Tab picker — mobile */}
+      <MobileTabPicker tabs={TABS} value={tab} onChange={setTab} />
+
+      {/* Tab bar — desktop */}
+      <div className="hidden md:flex gap-1 border-b border-border overflow-x-auto">
         {TABS.map((t) => {
           const Icon = t.icon;
           const isActive = tab === t.id;
@@ -186,13 +190,13 @@ function ConcessionsTab() {
         </button>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
-        <Stat label="Total" value={String(stats.total)} />
+      {/* Stats — mobile shows 3 critical, desktop shows all 5 */}
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
         <Stat label="Vigentes" value={String(stats.vigentes)} color="#0d9488" />
-        <Stat label="Vence <90d" value={String(stats.lt90)} color="#f59e0b" />
+        <Stat label="<90d" value={String(stats.lt90)} color="#f59e0b" />
         <Stat label="Vencidas" value={String(stats.vencidas)} color="#dc2626" />
-        <Stat label="Área total (ha)" value={stats.areaTotal.toFixed(1)} />
+        <Stat label="Total" value={String(stats.total)} className="hidden md:block" />
+        <Stat label="Área (ha)" value={stats.areaTotal.toFixed(1)} className="hidden md:block" />
       </div>
 
       {/* Alerts banner */}
@@ -387,9 +391,9 @@ function ConcessionsTab() {
   );
 }
 
-function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
+function Stat({ label, value, color, className }: { label: string; value: string; color?: string; className?: string }) {
   return (
-    <div className="border border-border rounded p-2.5 bg-bg-secondary/30">
+    <div className={cn("border border-border rounded p-2.5 bg-bg-secondary/30", className)}>
       <div className="text-[10px] uppercase tracking-wider text-text-secondary">{label}</div>
       <div className="text-lg font-semibold" style={color ? { color } : undefined}>{value}</div>
     </div>
