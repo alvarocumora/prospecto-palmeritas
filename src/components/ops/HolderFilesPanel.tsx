@@ -26,6 +26,7 @@ export function HolderFilesPanel({
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileType, setFileType] = useState("otros");
   const [busy, setBusy] = useState(false);
+  const [previewing, setPreviewing] = useState<HolderFile | null>(null);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
