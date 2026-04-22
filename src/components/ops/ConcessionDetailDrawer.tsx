@@ -55,6 +55,17 @@ export function ConcessionDetailDrawer({
 
   const bodyRef = useRef<HTMLDivElement>(null);
 
+  const [jumpQuery, setJumpQuery] = useState("");
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const jumpResults = useMemo(() => {
+    const q = jumpQuery.trim().toLowerCase();
+    if (!q || !allConcessions) return [];
+    return allConcessions
+      .filter((x) => x.id !== c.id)
+      .filter((x) => x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [jumpQuery, allConcessions, c.id]);
+
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     // Only respond to primary pointer (touch / mouse main button)
     if (e.pointerType === "mouse" && e.button !== 0) return;
