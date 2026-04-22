@@ -60,6 +60,12 @@ interface ProjectMapProps {
   onInspect?: (f: InspectedFeature) => void;
   fillHeight?: boolean;
   onMapReady?: (map: LeafletMap, L: LeafletNS) => void;
+  /**
+   * Force a specific basemap (used by report capture). When set, switches
+   * to "satellite" → Esri Imagery or "topo" → Esri Topo, hiding other basemaps.
+   * Set to null/undefined to leave user selection alone.
+   */
+  basemapOverride?: "satellite" | "topo" | null;
 }
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
