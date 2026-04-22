@@ -406,6 +406,16 @@ export function renderSection3_Property(
       `La verificación de la titularidad y los pagos de patentes vigentes es responsabilidad del operador previo al inicio de trabajos invasivos.`,
   );
 
+  if (!validations.catastroAvailable || catastroRows.length === 0) {
+    warningBox(
+      s,
+      "Catastro no disponible",
+      "No se obtuvieron pertenencias del servicio SERNAGEOMIN para el bbox del proyecto en esta ejecución. " +
+        "Posibles causas: servicio temporalmente fuera de línea, bbox sin registros, o problema de red. " +
+        "El listado de derechos mineros queda incompleto y debe verificarse manualmente antes de la firma del QP.",
+    );
+  }
+
   if (catastroRows.length > 0) {
     h2(s, "Pertenencias intersectando el AOI");
     const intersecting = catastroRows.filter((r) => r.intersects);
