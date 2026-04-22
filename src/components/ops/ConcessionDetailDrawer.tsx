@@ -55,6 +55,14 @@ export function ConcessionDetailDrawer({
 
   const bodyRef = useRef<HTMLDivElement>(null);
 
+  // Brief skeleton on open / when switching to another concession via Jump-to.
+  const [hydrating, setHydrating] = useState(true);
+  useEffect(() => {
+    setHydrating(true);
+    const t = setTimeout(() => setHydrating(false), 350);
+    return () => clearTimeout(t);
+  }, [c.id]);
+
   const [jumpQuery, setJumpQuery] = useState("");
   const [jumpOpen, setJumpOpen] = useState(false);
   const jumpResults = useMemo(() => {
