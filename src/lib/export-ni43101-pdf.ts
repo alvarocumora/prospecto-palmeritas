@@ -153,19 +153,75 @@ async function fetchCatastro(): Promise<CatastroRow[]> {
    ENTRY POINT
    ============================================================ */
 
+type InternalConcessionRow = {
+  code: string;
+  name: string;
+  holder: string;
+  type: string;
+  status: string;
+  area_ha: string;
+  expires: string;
+};
+
+async function fetchInternalConcessions(projectId: string | null | undefined): Promise<InternalConcessionRow[]> {
+  if (!projectId) return [];
+  try {
+    const { data, error } = await supabase
+      .from("mining_concessions")
+      .select("code,name,holder,concession_type,status,area_ha,expires_at")
+      .eq("project_id", projectId);
+    if (error || !data) return [];
+    return (data as Array<{
+      code: string;
+      name: string;
+      holder: string | null;
+      concession_type: string;
+      status: string;
+      area_ha: number | null;
+      expires_at: string | null;
+    }>).map((r) => ({
+      code: r.code,
+      name: r.name,
+      holder: r.holder ?? "—",
+      type: r.concession_type,
+      status: r.status,
+      area_ha: r.area_ha != null ? Number(r.area_ha).toFixed(1) : "—",
+      expires: r.expires_at ? new Date(r.expires_at).toLocaleDateString("es-CL") : "—",
+    }));
+  } catch (err) {
+    console.warn("[pdf] fetchInternalConcessions failed:", err);
+    return [];
+  }
+}
+
 export async function exportNI43101(opts: {
   setActive?: (id: string) => void;
   getCurrent?: () => string;
   mapSelector?: string;
+  basemap?: "satellite" | "topo";
+  includeInternalConcessions?: boolean;
+  includeZoning?: boolean;
+  projectId?: string | null;
+  onProgress?: (step: string) => void;
 } = {}) {
-  const { setActive, getCurrent, mapSelector = "[data-export-map]" } = opts;
+  const {
+    setActive,
+    getCurrent,
+    mapSelector = "[data-export-map]",
+    basemap = "topo",
+    includeInternalConcessions = true,
+    includeZoning = true,
+    projectId = null,
+    onProgress,
+  } = opts;
   const original = getCurrent?.();
 
   // Switch to overview/geology to ensure map is mounted before capture.
   setActive?.("overview");
   await new Promise((r) => setTimeout(r, 300));
 
-  // Capture map figure (one high-res snapshot) — falls back to null if not mounted.
+  // Primary map snapshot (topo by default).
+  onProgress?.("Capturando mapa principal…");
   let mapFig = await captureElement(mapSelector, { scale: 2 });
   if (!mapFig) {
     setActive?.("geology");
@@ -173,17 +229,29 @@ export async function exportNI43101(opts: {
     mapFig = await captureElement(mapSelector, { scale: 2 });
   }
 
+  // Optional second snapshot for satellite/zoning section.
+  let satelliteFig: string | null = null;
+  if (includeZoning || basemap === "satellite") {
+    onProgress?.("Capturando vista satelital…");
+    // small delay to allow user-facing basemap toggle (handled by caller via setActive callbacks if wired)
+    await new Promise((r) => setTimeout(r, 400));
+    satelliteFig = await captureElement(mapSelector, { scale: 2 });
+  }
+
   // Parallel data fetch
-  const [geo, geophys, catastroRows] = await Promise.all([
+  onProgress?.("Cargando catastro y datos geológicos…");
+  const [geo, geophys, catastroRows, internalConcessions] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
+    includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
   ]);
 
   // Restore original tab
   if (original && setActive) setActive(original);
 
   // Build PDF
+  onProgress?.("Compilando PDF…");
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const s = createState(doc);
 
@@ -201,6 +269,9 @@ export async function exportNI43101(opts: {
   renderSection1_Intro(s);
   renderSection2_Reliance(s);
   renderSection3_Property(s, mapFig, catastroRows);
+  if (includeZoning) {
+    renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length);
+  }
   renderSection4_Climate(s);
   renderSection5_History(s);
   renderSection6_Geology(s, geo);
@@ -213,8 +284,8 @@ export async function exportNI43101(opts: {
   renderSection13_Conclusions(s);
   renderSection14_References(s, geo?.references ?? []);
 
-  // Annexes
-  renderAnnexA(s, catastroRows);
+  // Annexes (catastro SERNAGEOMIN + concesiones internas)
+  renderAnnexA(s, catastroRows, internalConcessions);
   renderAnnexB(s, geophys);
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
