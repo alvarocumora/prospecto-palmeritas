@@ -1,5 +1,5 @@
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { X, Pencil, Trash2, MapPin, Calendar, FileText } from "lucide-react";
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { X, Pencil, Trash2, MapPin, Calendar, FileText, Search } from "lucide-react";
 import {
   type MiningConcession,
   daysUntilExpiry,
