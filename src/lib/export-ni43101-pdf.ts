@@ -261,6 +261,11 @@ export async function exportNI43101(opts: {
   preview?: boolean;
   /** Subset of sections to render. If omitted, all sections are included. */
   sections?: Ni43101SectionId[];
+  /**
+   * Switch the live map's basemap before snapshot capture.
+   * Used to capture both topo and satellite views with active overlays.
+   */
+  setBasemap?: (b: "satellite" | "topo") => void | Promise<void>;
 } = {}): Promise<Ni43101Result | void> {
   const {
     setActive,
@@ -272,6 +277,7 @@ export async function exportNI43101(opts: {
     projectId = null,
     onProgress,
     sections,
+    setBasemap,
   } = opts;
   const enabled = new Set<Ni43101SectionId>(sections ?? ALL_SECTIONS);
   const has = (id: Ni43101SectionId) => enabled.has(id);
@@ -281,8 +287,13 @@ export async function exportNI43101(opts: {
   setActive?.("overview");
   await new Promise((r) => setTimeout(r, 300));
 
-  // Primary map snapshot (topo by default).
-  onProgress?.("Capturando mapa principal…");
+  // ---- Primary map snapshot (topo basemap with active overlays) ----
+  onProgress?.("Capturando mapa principal (topo + capas activas)…");
+  if (setBasemap) {
+    await setBasemap("topo");
+    // Allow tile layer swap + overlay re-render
+    await new Promise((r) => setTimeout(r, 900));
+  }
   let mapFig = await captureElement(mapSelector, { scale: 2 });
   if (!mapFig) {
     setActive?.("geology");
@@ -290,13 +301,24 @@ export async function exportNI43101(opts: {
     mapFig = await captureElement(mapSelector, { scale: 2 });
   }
 
-  // Optional second snapshot for satellite/zoning section.
+  // ---- Satellite snapshot (only if zoning section enabled OR explicit basemap) ----
   let satelliteFig: string | null = null;
-  if (includeZoning || basemap === "satellite") {
-    onProgress?.("Capturando vista satelital…");
-    // small delay to allow user-facing basemap toggle (handled by caller via setActive callbacks if wired)
-    await new Promise((r) => setTimeout(r, 400));
+  const wantSatellite = (includeZoning && has("zoning")) || basemap === "satellite";
+  if (wantSatellite) {
+    onProgress?.("Conmutando basemap a satélite y capturando capas activas…");
+    if (setBasemap) {
+      await setBasemap("satellite");
+      // Wait for satellite tiles + overlays to redraw
+      await new Promise((r) => setTimeout(r, 1200));
+    } else {
+      // No basemap controller wired — fallback small delay
+      await new Promise((r) => setTimeout(r, 500));
+    }
     satelliteFig = await captureElement(mapSelector, { scale: 2 });
+    // Restore topo basemap for the user
+    if (setBasemap) {
+      await setBasemap("topo");
+    }
   }
 
   // Parallel data fetch
