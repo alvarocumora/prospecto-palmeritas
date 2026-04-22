@@ -138,7 +138,7 @@ export function ConcessionDetailDrawer({
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+        <div ref={bodyRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4 overscroll-contain">
           {/* Status row */}
           <div className="flex items-center gap-2 flex-wrap">
             <span
