@@ -31,7 +31,23 @@ import {
   renderSection8_Exploration,
   renderSection9_Drilling,
   renderTocPlaceholder,
+  type Ni43101Validations,
 } from "./pdf/sections";
+
+async function fetchAssayCount(projectId: string | null | undefined): Promise<number> {
+  if (!projectId) return 0;
+  try {
+    const { count, error } = await supabase
+      .from("drill_core_logs")
+      .select("id", { count: "exact", head: true })
+      .eq("project_id", projectId)
+      .not("au_gpt", "is", null);
+    if (error) return 0;
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
 
 /* ============================================================
    DATA FETCHERS
