@@ -336,30 +336,30 @@ export async function exportNI43101(opts: {
   const tocPageNum = s.pageNum;
 
   // Executive summary (page 3+)
-  renderExecSummary(s);
+  if (has("execSummary")) renderExecSummary(s);
 
   // Sections
-  renderSection1_Intro(s);
-  renderSection2_Reliance(s);
-  renderSection3_Property(s, mapFig, catastroRows, validations);
-  if (includeZoning) {
+  if (has("intro")) renderSection1_Intro(s);
+  if (has("reliance")) renderSection2_Reliance(s);
+  if (has("property")) renderSection3_Property(s, mapFig, catastroRows, validations);
+  if (includeZoning && has("zoning")) {
     renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length);
   }
-  renderSection4_Climate(s);
-  renderSection5_History(s);
-  renderSection6_Geology(s, geo);
-  renderSection7_DepositType(s, geo);
-  renderSection8_Exploration(s, geophys);
-  renderSection9_Drilling(s);
-  renderSection10_QAQC(s, validations);
-  renderSection11_DataVerification(s, validations);
-  renderSection12_Budget(s);
-  renderSection13_Conclusions(s);
-  renderSection14_References(s, geo?.references ?? []);
+  if (has("climate")) renderSection4_Climate(s);
+  if (has("history")) renderSection5_History(s);
+  if (has("geology")) renderSection6_Geology(s, geo);
+  if (has("depositType")) renderSection7_DepositType(s, geo);
+  if (has("exploration")) renderSection8_Exploration(s, geophys);
+  if (has("drilling")) renderSection9_Drilling(s);
+  if (has("qaqc")) renderSection10_QAQC(s, validations);
+  if (has("dataVerification")) renderSection11_DataVerification(s, validations);
+  if (has("budget")) renderSection12_Budget(s);
+  if (has("conclusions")) renderSection13_Conclusions(s);
+  if (has("references")) renderSection14_References(s, geo?.references ?? []);
 
-  // Annexes (catastro SERNAGEOMIN + concesiones internas)
-  renderAnnexA(s, catastroRows, internalConcessions, validations);
-  renderAnnexB(s, geophys);
+  // Annexes
+  if (has("annexA")) renderAnnexA(s, catastroRows, internalConcessions, validations);
+  if (has("annexB")) renderAnnexB(s, geophys);
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
   const totalPages = s.doc.getNumberOfPages();
