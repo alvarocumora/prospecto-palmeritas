@@ -168,6 +168,23 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
   const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
 
+  // External basemap override (used by NI 43-101 report capture).
+  // Switches Esri Imagery / Esri Topo while hiding the other basemaps.
+  useEffect(() => {
+    if (!basemapOverride) return;
+    if (basemapOverride === "satellite") {
+      setVisible("basemap:esri-imagery", true);
+      setVisible("basemap:esri-topo", false);
+      setVisible("basemap:carto-dark", false);
+      setVisible("basemap:opentopo", false);
+    } else {
+      setVisible("basemap:esri-topo", true);
+      setVisible("basemap:esri-imagery", false);
+      setVisible("basemap:carto-dark", false);
+      setVisible("basemap:opentopo", false);
+    }
+  }, [basemapOverride, setVisible]);
+
   const loadCatastroData = useCallback(async () => {
     const L = leafletRef.current;
     const map = mapRef.current;
