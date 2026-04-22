@@ -9,6 +9,7 @@ import { WatchManager } from "@/components/ops/WatchManager";
 import { SyncLog } from "@/components/ops/SyncLog";
 import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
+import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -130,6 +131,7 @@ function ConcessionsTab() {
   const [filter, setFilter] = useState<ExpiryStatus | "all">("all");
   const [editing, setEditing] = useState<MiningConcession | null>(null);
   const [creating, setCreating] = useState(false);
+  const [viewing, setViewing] = useState<MiningConcession | null>(null);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
@@ -268,20 +270,18 @@ function ConcessionsTab() {
                 const color = EXPIRY_COLORS[st];
                 const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
                 return (
-                  <div key={c.id} className="p-3 space-y-1.5">
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => setViewing(c)}
+                    className="w-full text-left p-3 space-y-1.5 active:bg-bg-elevated transition-colors"
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0 flex-1">
                         <div className="font-mono font-semibold text-sm truncate">{c.code}</div>
                         <div className="text-xs text-text-secondary truncate">{c.name}</div>
                       </div>
-                      <div className="flex gap-1 shrink-0">
-                        <button onClick={() => setEditing(c)} className="p-1.5 rounded hover:bg-accent" title="Editar">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => onDelete(c)} className="p-1.5 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <span className="shrink-0 text-text-dim text-[10px] font-mono uppercase tracking-wider">Ver →</span>
                     </div>
                     <div className="grid grid-cols-2 gap-x-2 gap-y-0.5 text-[11px]">
                       <div><span className="text-text-secondary">Titular:</span> {c.holder ?? "—"}</div>
@@ -304,7 +304,7 @@ function ConcessionsTab() {
                         </span>
                       )}
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -385,6 +385,16 @@ function ConcessionsTab() {
           initial={editing}
           onClose={() => { setCreating(false); setEditing(null); }}
           onSaved={() => { refresh(); setCreating(false); setEditing(null); }}
+        />
+      )}
+
+      {viewing && (
+        <ConcessionDetailDrawer
+          concession={viewing}
+          intersectsAoi={intersectsAoiBbox(viewing.geometry_geojson, PROJECT_AOI)}
+          onClose={() => setViewing(null)}
+          onEdit={() => { setEditing(viewing); setViewing(null); }}
+          onDelete={async () => { const c = viewing; setViewing(null); await onDelete(c); }}
         />
       )}
     </div>
