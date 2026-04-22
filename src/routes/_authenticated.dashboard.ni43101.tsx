@@ -192,6 +192,43 @@ function NI43101Module() {
   const [preview, setPreview] = useState<Ni43101Result | null>(null);
   const [activePage, setActivePage] = useState<number>(1);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const tocListRef = useRef<HTMLUListElement | null>(null);
+  const tocItemRefs = useRef<Map<number, HTMLLIElement>>(new Map());
+
+  // Poll the iframe hash to detect in-PDF page navigation (browser native viewer)
+  useEffect(() => {
+    if (!preview) return;
+    const id = window.setInterval(() => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      try {
+        const hash = iframe.contentWindow?.location?.hash ?? "";
+        const m = hash.match(/page=(\d+)/);
+        if (m) {
+          const p = Number(m[1]);
+          if (Number.isFinite(p) && p !== activePage) setActivePage(p);
+        }
+      } catch {
+        // cross-origin or not ready — ignore
+      }
+    }, 700);
+    return () => window.clearInterval(id);
+  }, [preview, activePage]);
+
+  // Autoscroll the active TOC entry into view
+  useEffect(() => {
+    if (!preview) return;
+    // Find the toc entry whose page is the largest <= activePage
+    const candidates = preview.toc
+      .map((e, i) => ({ ...e, i }))
+      .filter((e) => e.page <= activePage);
+    const target = candidates.length ? candidates[candidates.length - 1] : preview.toc[0] ? { ...preview.toc[0], i: 0 } : null;
+    if (!target) return;
+    const el = tocItemRefs.current.get(target.i);
+    if (el && tocListRef.current) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [activePage, preview]);
 
   // Basemap conmutado para captura del PDF (null = lo elige el usuario)
   const [captureBasemap, setCaptureBasemap] = useState<"satellite" | "topo" | null>(null);
@@ -441,15 +478,27 @@ function NI43101Module() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-h-[70vh]">
             <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto">
-              <ul className="py-1">
-                {preview.toc.map((entry, i) => (
-                  <TocItem
-                    key={`${entry.page}-${i}`}
-                    entry={entry}
-                    isActive={entry.page === activePage}
-                    onClick={() => goToPage(entry.page)}
-                  />
-                ))}
+              <ul ref={tocListRef} className="py-1">
+                {preview.toc.map((entry, i) => {
+                  // active = largest entry whose page <= activePage
+                  const activeIdx = preview.toc.reduce(
+                    (acc, e, idx) => (e.page <= activePage ? idx : acc),
+                    0,
+                  );
+                  return (
+                    <TocItem
+                      key={`${entry.page}-${i}`}
+                      entry={entry}
+                      isActive={i === activeIdx}
+                      isExact={entry.page === activePage}
+                      onClick={() => goToPage(entry.page)}
+                      registerRef={(el) => {
+                        if (el) tocItemRefs.current.set(i, el);
+                        else tocItemRefs.current.delete(i);
+                      }}
+                    />
+                  );
+                })}
               </ul>
             </aside>
             <div className="bg-black/30 min-h-[60vh] md:min-h-[80vh]">
@@ -586,16 +635,27 @@ function SectionCard({
 function TocItem({
   entry,
   isActive,
+  isExact,
   onClick,
+  registerRef,
 }: {
   entry: Ni43101TocEntry;
   isActive: boolean;
+  isExact: boolean;
   onClick: () => void;
+  registerRef: (el: HTMLLIElement | null) => void;
 }) {
   return (
-    <li>
+    <li ref={registerRef} className="relative">
+      {isActive && (
+        <span
+          aria-hidden
+          className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r bg-gold"
+        />
+      )}
       <button
         onClick={onClick}
+        aria-current={isExact ? "page" : isActive ? "true" : undefined}
         className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] font-mono transition border-l-2 ${
           isActive
             ? "bg-gold/10 border-gold text-foreground"
@@ -607,6 +667,11 @@ function TocItem({
           className={`w-3 h-3 shrink-0 ${isActive ? "text-gold" : "opacity-40"}`}
         />
         <span className="flex-1 truncate">{entry.label}</span>
+        {isExact && (
+          <span className="text-[9px] font-mono px-1 rounded bg-gold/20 text-gold uppercase">
+            ahora
+          </span>
+        )}
         <span className="text-[10px] text-muted-foreground tabular-nums">{entry.page}</span>
       </button>
     </li>
