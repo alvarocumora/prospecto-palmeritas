@@ -23,6 +23,9 @@ export const COLORS = {
   paper: [255, 253, 250] as [number, number, number],
   panel: [248, 244, 238] as [number, number, number],
   accentBg: [250, 240, 220] as [number, number, number],
+  warnBg: [253, 240, 215] as [number, number, number],
+  warn: [184, 110, 20] as [number, number, number],
+  warnDark: [120, 70, 10] as [number, number, number],
 };
 
 export type PdfState = {
@@ -197,6 +200,33 @@ export function calloutBox(s: PdfState, label: string, body: string) {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.text(label.toUpperCase(), PAGE.margin + 4, s.cursorY + 5);
+  setRGB(doc, "text", COLORS.text);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  let y = s.cursorY + 9;
+  for (const ln of lines) {
+    doc.text(ln, PAGE.margin + 4, y);
+    y += 4;
+  }
+  s.cursorY += boxH + 4;
+}
+
+/** Amber warning callout for missing/pending data. */
+export function warningBox(s: PdfState, label: string, body: string) {
+  const { doc } = s;
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  const lines = doc.splitTextToSize(body, PAGE.width - PAGE.margin * 2 - 8) as string[];
+  const boxH = 6 + lines.length * 4 + 3;
+  ensureSpace(s, boxH + 3);
+  setRGB(doc, "fill", COLORS.warnBg);
+  doc.rect(PAGE.margin, s.cursorY, PAGE.width - PAGE.margin * 2, boxH, "F");
+  setRGB(doc, "fill", COLORS.warn);
+  doc.rect(PAGE.margin, s.cursorY, 1.5, boxH, "F");
+  setRGB(doc, "text", COLORS.warnDark);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(8);
+  doc.text(`! ${label.toUpperCase()}`, PAGE.margin + 4, s.cursorY + 5);
   setRGB(doc, "text", COLORS.text);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(9);
