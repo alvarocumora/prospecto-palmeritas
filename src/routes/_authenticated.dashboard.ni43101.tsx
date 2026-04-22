@@ -302,7 +302,7 @@ function NI43101Module() {
         preview: true,
         sections: enabledArray,
         setBasemap,
-        onProgress: (s) => setProgress(s),
+        onProgress: handleProgress,
       });
       if (result) {
         setPreview(result);
