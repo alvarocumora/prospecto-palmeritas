@@ -222,6 +222,32 @@ export type Ni43101Result = {
   validations: Ni43101Validations;
 };
 
+export type Ni43101SectionId =
+  | "execSummary"
+  | "intro"
+  | "reliance"
+  | "property"
+  | "zoning"
+  | "climate"
+  | "history"
+  | "geology"
+  | "depositType"
+  | "exploration"
+  | "drilling"
+  | "qaqc"
+  | "dataVerification"
+  | "budget"
+  | "conclusions"
+  | "references"
+  | "annexA"
+  | "annexB";
+
+export const ALL_SECTIONS: Ni43101SectionId[] = [
+  "execSummary","intro","reliance","property","zoning","climate","history","geology",
+  "depositType","exploration","drilling","qaqc","dataVerification","budget",
+  "conclusions","references","annexA","annexB",
+];
+
 export async function exportNI43101(opts: {
   setActive?: (id: string) => void;
   getCurrent?: () => string;
@@ -233,6 +259,8 @@ export async function exportNI43101(opts: {
   onProgress?: (step: string) => void;
   /** When true, returns blob/url/toc instead of triggering a download. */
   preview?: boolean;
+  /** Subset of sections to render. If omitted, all sections are included. */
+  sections?: Ni43101SectionId[];
 } = {}): Promise<Ni43101Result | void> {
   const {
     setActive,
@@ -243,7 +271,10 @@ export async function exportNI43101(opts: {
     includeZoning = true,
     projectId = null,
     onProgress,
+    sections,
   } = opts;
+  const enabled = new Set<Ni43101SectionId>(sections ?? ALL_SECTIONS);
+  const has = (id: Ni43101SectionId) => enabled.has(id);
   const original = getCurrent?.();
 
   // Switch to overview/geology to ensure map is mounted before capture.
