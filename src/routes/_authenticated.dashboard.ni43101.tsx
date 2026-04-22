@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap } from "leaflet";
 import { ProjectMap } from "@/components/ProjectMap";
 import { useProjects } from "@/hooks/useProjects";
-import { exportNI43101, type Ni43101Result, type Ni43101TocEntry } from "@/lib/export-ni43101-pdf";
+import { exportNI43101, type Ni43101Result, type Ni43101TocEntry, type Ni43101Validations } from "@/lib/export-ni43101-pdf";
 import {
   FileText,
   Download,
@@ -331,5 +331,91 @@ function TocItem({
         <span className="text-[10px] text-muted-foreground tabular-nums">{entry.page}</span>
       </button>
     </li>
+  );
+}
+
+function ValidationsPanel({ v }: { v: Ni43101Validations }) {
+  const items: { label: string; status: "ok" | "warn" | "err"; detail: string }[] = [
+    {
+      label: "Assays",
+      status: v.assaysStatus === "available" ? "ok" : v.assaysStatus === "partial" ? "warn" : "err",
+      detail:
+        v.assaysStatus === "available"
+          ? `${v.assaysCount} resultados`
+          : v.assaysStatus === "partial"
+          ? `Parcial (${v.assaysCount})`
+          : "PENDING — sin datos",
+    },
+    {
+      label: "Catastro SERNAGEOMIN",
+      status: v.catastroAvailable ? "ok" : "err",
+      detail: v.catastroAvailable ? `${v.catastroCount} pertenencias` : "No disponible",
+    },
+    {
+      label: "Vista satelital",
+      status: v.satelliteAvailable ? "ok" : "warn",
+      detail: v.satelliteAvailable ? "Snapshot capturado" : "No capturada",
+    },
+    {
+      label: "Mapa principal",
+      status: v.mapAvailable ? "ok" : "err",
+      detail: v.mapAvailable ? "Snapshot capturado" : "No capturado",
+    },
+    {
+      label: "Geología",
+      status: v.geologyAvailable ? "ok" : "warn",
+      detail: v.geologyAvailable ? "Litología cargada" : "Sin unidades litológicas",
+    },
+  ];
+  const hasIssue = items.some((i) => i.status !== "ok");
+  return (
+    <section
+      className={`rounded border p-3 space-y-2 ${
+        hasIssue ? "border-warn/50 bg-warn/5" : "border-emerald-500/30 bg-emerald-500/5"
+      }`}
+    >
+      <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider">
+        {hasIssue ? (
+          <>
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+            <span className="text-amber-600 dark:text-amber-400">Validaciones con avisos</span>
+          </>
+        ) : (
+          <>
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-emerald-600 dark:text-emerald-400">Todas las validaciones OK</span>
+          </>
+        )}
+        <span className="ml-auto text-[10px] text-muted-foreground normal-case tracking-normal">
+          Los avisos también se incluyen en el PDF
+        </span>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        {items.map((it) => (
+          <div
+            key={it.label}
+            className={`rounded border px-2 py-1.5 text-[10px] font-mono flex items-start gap-1.5 ${
+              it.status === "ok"
+                ? "border-emerald-500/30 bg-emerald-500/5"
+                : it.status === "warn"
+                ? "border-amber-500/40 bg-amber-500/5"
+                : "border-destructive/40 bg-destructive/5"
+            }`}
+          >
+            {it.status === "ok" ? (
+              <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+            ) : it.status === "warn" ? (
+              <AlertTriangle className="w-3 h-3 text-amber-500 shrink-0 mt-0.5" />
+            ) : (
+              <XCircle className="w-3 h-3 text-destructive shrink-0 mt-0.5" />
+            )}
+            <div className="min-w-0">
+              <div className="truncate">{it.label}</div>
+              <div className="text-muted-foreground truncate">{it.detail}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
