@@ -193,9 +193,21 @@ function NI43101Module() {
   const [activePage, setActivePage] = useState<number>(1);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
+  // Basemap conmutado para captura del PDF (null = lo elige el usuario)
+  const [captureBasemap, setCaptureBasemap] = useState<"satellite" | "topo" | null>(null);
+
   const mapRef = useRef<LeafletMap | null>(null);
   const onMapReady = useCallback((map: LeafletMap) => {
     mapRef.current = map;
+  }, []);
+
+  // Callback used by the PDF exporter to flip basemap before snapshot.
+  // Returns a promise that resolves once React has flushed and tiles likely loaded.
+  const setBasemap = useCallback(async (b: "satellite" | "topo") => {
+    setCaptureBasemap(b);
+    // Wait two animation frames + a short delay so Leaflet swaps tiles
+    await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    await new Promise((r) => setTimeout(r, 250));
   }, []);
 
   useEffect(() => {
