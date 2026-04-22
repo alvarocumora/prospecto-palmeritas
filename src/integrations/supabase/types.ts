@@ -468,6 +468,60 @@ export type Database = {
           },
         ]
       }
+      concession_files: {
+        Row: {
+          concession_id: string
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          id: string
+          project_id: string
+          size_bytes: number | null
+          uploaded_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          concession_id: string
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type?: string
+          id?: string
+          project_id: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          concession_id?: string
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          id?: string
+          project_id?: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_files_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concession_history: {
         Row: {
           concession_id: string
