@@ -9,6 +9,7 @@ import { WatchManager } from "@/components/ops/WatchManager";
 import { SyncLog } from "@/components/ops/SyncLog";
 import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
+import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -130,6 +131,7 @@ function ConcessionsTab() {
   const [filter, setFilter] = useState<ExpiryStatus | "all">("all");
   const [editing, setEditing] = useState<MiningConcession | null>(null);
   const [creating, setCreating] = useState(false);
+  const [viewing, setViewing] = useState<MiningConcession | null>(null);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
