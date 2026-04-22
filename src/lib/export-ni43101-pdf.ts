@@ -345,45 +345,55 @@ export async function exportNI43101(opts: {
   // Restore original tab
   if (original && setActive) setActive(original);
 
-  // Build PDF
-  onProgress?.("Compilando PDF…");
+  // Build PDF — granular progress per section, yielding to the event loop
+  // so the UI can paint between renders.
+  const yieldToUi = () => new Promise<void>((r) => setTimeout(r, 0));
+
+  // Build the ordered render plan from the enabled set.
+  type RenderStep = { id: Ni43101SectionId | "cover" | "toc"; label: string; run: () => void };
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
   const s = createState(doc);
 
-  // Cover (page 1)
-  renderCover(s, mapFig);
+  const plan: RenderStep[] = [
+    { id: "cover", label: "Portada", run: () => renderCover(s, mapFig) },
+    { id: "toc", label: "Índice (placeholder)", run: () => renderTocPlaceholder(s) },
+  ];
+  if (has("execSummary")) plan.push({ id: "execSummary", label: "Resumen ejecutivo", run: () => renderExecSummary(s) });
+  if (has("intro")) plan.push({ id: "intro", label: "§1 Introducción", run: () => renderSection1_Intro(s) });
+  if (has("reliance")) plan.push({ id: "reliance", label: "§2 Confianza en otros expertos", run: () => renderSection2_Reliance(s) });
+  if (has("property")) plan.push({ id: "property", label: "§3 Descripción y ubicación (mapa + catastro)", run: () => renderSection3_Property(s, mapFig, catastroRows, validations) });
+  if (includeZoning && has("zoning")) plan.push({ id: "zoning", label: "§3.bis Zonificación geológica (satélite)", run: () => renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length) });
+  if (has("climate")) plan.push({ id: "climate", label: "§4 Clima e infraestructura", run: () => renderSection4_Climate(s) });
+  if (has("history")) plan.push({ id: "history", label: "§5 Historia", run: () => renderSection5_History(s) });
+  if (has("geology")) plan.push({ id: "geology", label: "§6 Geología local y regional", run: () => renderSection6_Geology(s, geo) });
+  if (has("depositType")) plan.push({ id: "depositType", label: "§7 Tipo de depósito", run: () => renderSection7_DepositType(s, geo) });
+  if (has("exploration")) plan.push({ id: "exploration", label: "§8 Exploración (geofísica/geoquímica)", run: () => renderSection8_Exploration(s, geophys) });
+  if (has("drilling")) plan.push({ id: "drilling", label: "§9 Sondajes", run: () => renderSection9_Drilling(s) });
+  if (has("qaqc")) plan.push({ id: "qaqc", label: "§10 QA/QC", run: () => renderSection10_QAQC(s, validations) });
+  if (has("dataVerification")) plan.push({ id: "dataVerification", label: "§11 Verificación de datos", run: () => renderSection11_DataVerification(s, validations) });
+  if (has("budget")) plan.push({ id: "budget", label: "§12 Presupuesto", run: () => renderSection12_Budget(s) });
+  if (has("conclusions")) plan.push({ id: "conclusions", label: "§13 Conclusiones", run: () => renderSection13_Conclusions(s) });
+  if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });
+  if (has("annexA")) plan.push({ id: "annexA", label: "Anexo A · Catastro", run: () => renderAnnexA(s, catastroRows, internalConcessions, validations) });
+  if (has("annexB")) plan.push({ id: "annexB", label: "Anexo B · Geofísica", run: () => renderAnnexB(s, geophys) });
 
-  // TOC placeholder (page 2)
-  renderTocPlaceholder(s);
-  const tocPageNum = s.pageNum;
+  // Add finalization steps to total so bar reflects real work.
+  const finalizationSteps = 2; // header/footer pass + TOC fill
+  const total = plan.length + finalizationSteps;
+  let tocPageNum = 0;
 
-  // Executive summary (page 3+)
-  if (has("execSummary")) renderExecSummary(s);
-
-  // Sections
-  if (has("intro")) renderSection1_Intro(s);
-  if (has("reliance")) renderSection2_Reliance(s);
-  if (has("property")) renderSection3_Property(s, mapFig, catastroRows, validations);
-  if (includeZoning && has("zoning")) {
-    renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length);
+  for (let i = 0; i < plan.length; i++) {
+    const step = plan[i];
+    onProgress?.({ label: `Renderizando ${step.label}…`, current: i + 1, total, phase: "render" });
+    step.run();
+    if (step.id === "toc") tocPageNum = s.pageNum;
+    // Yield every 2 steps to let the UI repaint without slowing things down too much.
+    if (i % 2 === 1) await yieldToUi();
   }
-  if (has("climate")) renderSection4_Climate(s);
-  if (has("history")) renderSection5_History(s);
-  if (has("geology")) renderSection6_Geology(s, geo);
-  if (has("depositType")) renderSection7_DepositType(s, geo);
-  if (has("exploration")) renderSection8_Exploration(s, geophys);
-  if (has("drilling")) renderSection9_Drilling(s);
-  if (has("qaqc")) renderSection10_QAQC(s, validations);
-  if (has("dataVerification")) renderSection11_DataVerification(s, validations);
-  if (has("budget")) renderSection12_Budget(s);
-  if (has("conclusions")) renderSection13_Conclusions(s);
-  if (has("references")) renderSection14_References(s, geo?.references ?? []);
-
-  // Annexes
-  if (has("annexA")) renderAnnexA(s, catastroRows, internalConcessions, validations);
-  if (has("annexB")) renderAnnexB(s, geophys);
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
+  onProgress?.({ label: "Aplicando encabezado y pie de página…", current: plan.length + 1, total, phase: "finalize" });
+  await yieldToUi();
   const totalPages = s.doc.getNumberOfPages();
   for (let pg = 2; pg <= totalPages; pg++) {
     s.doc.setPage(pg);
@@ -392,6 +402,8 @@ export async function exportNI43101(opts: {
   }
 
   // Fill TOC entries on the reserved page
+  onProgress?.({ label: "Generando índice (TOC)…", current: plan.length + 2, total, phase: "finalize" });
+  await yieldToUi();
   fillToc(s, tocPageNum, totalPages);
 
   const filename = `${PROJECT.ref}_Informe_NI43-101_${new Date().toISOString().slice(0, 10)}.pdf`;
