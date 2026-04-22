@@ -387,6 +387,16 @@ function ConcessionsTab() {
           onSaved={() => { refresh(); setCreating(false); setEditing(null); }}
         />
       )}
+
+      {viewing && (
+        <ConcessionDetailDrawer
+          concession={viewing}
+          intersectsAoi={intersectsAoiBbox(viewing.geometry_geojson, PROJECT_AOI)}
+          onClose={() => setViewing(null)}
+          onEdit={() => { setEditing(viewing); setViewing(null); }}
+          onDelete={async () => { const c = viewing; setViewing(null); await onDelete(c); }}
+        />
+      )}
     </div>
   );
 }
