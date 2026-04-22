@@ -23,6 +23,7 @@ import {
   renderSection1_Intro,
   renderSection2_Reliance,
   renderSection3_Property,
+  renderSection3bis_Zoning,
   renderSection4_Climate,
   renderSection5_History,
   renderSection6_Geology,
