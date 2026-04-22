@@ -192,6 +192,43 @@ function NI43101Module() {
   const [preview, setPreview] = useState<Ni43101Result | null>(null);
   const [activePage, setActivePage] = useState<number>(1);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const tocListRef = useRef<HTMLUListElement | null>(null);
+  const tocItemRefs = useRef<Map<number, HTMLLIElement>>(new Map());
+
+  // Poll the iframe hash to detect in-PDF page navigation (browser native viewer)
+  useEffect(() => {
+    if (!preview) return;
+    const id = window.setInterval(() => {
+      const iframe = iframeRef.current;
+      if (!iframe) return;
+      try {
+        const hash = iframe.contentWindow?.location?.hash ?? "";
+        const m = hash.match(/page=(\d+)/);
+        if (m) {
+          const p = Number(m[1]);
+          if (Number.isFinite(p) && p !== activePage) setActivePage(p);
+        }
+      } catch {
+        // cross-origin or not ready — ignore
+      }
+    }, 700);
+    return () => window.clearInterval(id);
+  }, [preview, activePage]);
+
+  // Autoscroll the active TOC entry into view
+  useEffect(() => {
+    if (!preview) return;
+    // Find the toc entry whose page is the largest <= activePage
+    const candidates = preview.toc
+      .map((e, i) => ({ ...e, i }))
+      .filter((e) => e.page <= activePage);
+    const target = candidates.length ? candidates[candidates.length - 1] : preview.toc[0] ? { ...preview.toc[0], i: 0 } : null;
+    if (!target) return;
+    const el = tocItemRefs.current.get(target.i);
+    if (el && tocListRef.current) {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [activePage, preview]);
 
   // Basemap conmutado para captura del PDF (null = lo elige el usuario)
   const [captureBasemap, setCaptureBasemap] = useState<"satellite" | "topo" | null>(null);
