@@ -28,6 +28,7 @@ export function ConcessionFilesPanel({
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileType, setFileType] = useState("titulo");
   const [busy, setBusy] = useState(false);
+  const [previewing, setPreviewing] = useState<ConcessionFile | null>(null);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
