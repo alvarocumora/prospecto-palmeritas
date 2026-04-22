@@ -60,6 +60,12 @@ interface ProjectMapProps {
   onInspect?: (f: InspectedFeature) => void;
   fillHeight?: boolean;
   onMapReady?: (map: LeafletMap, L: LeafletNS) => void;
+  /**
+   * Force a specific basemap (used by report capture). When set, switches
+   * to "satellite" → Esri Imagery or "topo" → Esri Topo, hiding other basemaps.
+   * Set to null/undefined to leave user selection alone.
+   */
+  basemapOverride?: "satellite" | "topo" | null;
 }
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
@@ -112,7 +118,7 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "sernageomin:manifestacion": { visible: false, opacity: 0.55 },
 };
 
-export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: ProjectMapProps = {}) {
+export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemapOverride }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -161,6 +167,23 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady }: Proje
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
   const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
   const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
+
+  // External basemap override (used by NI 43-101 report capture).
+  // Switches Esri Imagery / Esri Topo while hiding the other basemaps.
+  useEffect(() => {
+    if (!basemapOverride) return;
+    if (basemapOverride === "satellite") {
+      setVisible("basemap:esri-imagery", true);
+      setVisible("basemap:esri-topo", false);
+      setVisible("basemap:carto-dark", false);
+      setVisible("basemap:opentopo", false);
+    } else {
+      setVisible("basemap:esri-topo", true);
+      setVisible("basemap:esri-imagery", false);
+      setVisible("basemap:carto-dark", false);
+      setVisible("basemap:opentopo", false);
+    }
+  }, [basemapOverride, setVisible]);
 
   const loadCatastroData = useCallback(async () => {
     const L = leafletRef.current;

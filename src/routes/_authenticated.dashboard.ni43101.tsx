@@ -193,9 +193,21 @@ function NI43101Module() {
   const [activePage, setActivePage] = useState<number>(1);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
 
+  // Basemap conmutado para captura del PDF (null = lo elige el usuario)
+  const [captureBasemap, setCaptureBasemap] = useState<"satellite" | "topo" | null>(null);
+
   const mapRef = useRef<LeafletMap | null>(null);
   const onMapReady = useCallback((map: LeafletMap) => {
     mapRef.current = map;
+  }, []);
+
+  // Callback used by the PDF exporter to flip basemap before snapshot.
+  // Returns a promise that resolves once React has flushed and tiles likely loaded.
+  const setBasemap = useCallback(async (b: "satellite" | "topo") => {
+    setCaptureBasemap(b);
+    // Wait two animation frames + a short delay so Leaflet swaps tiles
+    await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    await new Promise((r) => setTimeout(r, 250));
   }, []);
 
   useEffect(() => {
@@ -238,6 +250,7 @@ function NI43101Module() {
         projectId,
         preview: true,
         sections: enabledArray,
+        setBasemap,
         onProgress: (s) => setProgress(s),
       });
       if (result) {
@@ -273,6 +286,7 @@ function NI43101Module() {
         includeZoning,
         projectId,
         sections: enabledArray,
+        setBasemap,
         onProgress: (s) => setProgress(s),
       });
       toast.success("Informe NI 43-101 descargado");
@@ -480,7 +494,13 @@ function NI43101Module() {
             <Mountain className="w-3 h-3 text-gold" /> Se captura al generar la vista previa
           </span>
         </div>
-        <ProjectMap onMapReady={onMapReady} />
+        <ProjectMap onMapReady={onMapReady} basemapOverride={captureBasemap} />
+        {captureBasemap && (
+          <div className="mt-2 text-[10px] font-mono text-amber-500 flex items-center gap-1.5">
+            <Loader2 className="w-3 h-3 animate-spin" />
+            Basemap conmutado a <span className="uppercase">{captureBasemap}</span> para captura del informe…
+          </div>
+        )}
       </section>
     </div>
   );
