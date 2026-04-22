@@ -87,25 +87,42 @@ export function HolderFilesPanel({
         <div className="p-4 text-center text-xs text-text-secondary">Sin archivos. Sube escrituras, poderes o RUT.</div>
       ) : (
         <div className="divide-y divide-border">
-          {data.map((f) => (
-            <div key={f.id} className="flex items-center gap-2 px-3 py-2 text-xs">
-              <FileText className="w-3.5 h-3.5 text-text-secondary shrink-0" />
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-mono">{f.file_name}</div>
-                <div className="text-[10px] text-text-secondary">
-                  {FILE_TYPE_LABELS[f.file_type] ?? f.file_type} · {fmtSize(f.size_bytes)} · {new Date(f.uploaded_at).toLocaleDateString("es-CL")}
-                </div>
+          {data.map((f) => {
+            const canPreview = PREVIEWABLE.test(f.file_name);
+            return (
+              <div key={f.id} className="flex items-center gap-2 px-3 py-2 text-xs">
+                <button
+                  type="button"
+                  onClick={() => canPreview && setPreviewing(f)}
+                  disabled={!canPreview}
+                  className="flex items-center gap-2 min-w-0 flex-1 text-left disabled:cursor-default group"
+                  title={canPreview ? "Previsualizar" : f.file_name}
+                >
+                  <FileText className="w-3.5 h-3.5 text-text-secondary shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <div className={`truncate font-mono ${canPreview ? "group-hover:text-primary" : ""}`}>{f.file_name}</div>
+                    <div className="text-[10px] text-text-secondary">
+                      {FILE_TYPE_LABELS[f.file_type] ?? f.file_type} · {fmtSize(f.size_bytes)} · {new Date(f.uploaded_at).toLocaleDateString("es-CL")}
+                    </div>
+                  </div>
+                </button>
+                {canPreview && (
+                  <button onClick={() => setPreviewing(f)} className="p-1 rounded hover:bg-accent" title="Previsualizar" aria-label="Previsualizar">
+                    <Eye className="w-3.5 h-3.5" />
+                  </button>
+                )}
+                <button onClick={() => onDownload(f.file_path)} className="p-1 rounded hover:bg-accent" title="Descargar">
+                  <Download className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => onRemove(f.id, f.file_path)} className="p-1 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
               </div>
-              <button onClick={() => onDownload(f.file_path)} className="p-1 rounded hover:bg-accent" title="Descargar">
-                <Download className="w-3.5 h-3.5" />
-              </button>
-              <button onClick={() => onRemove(f.id, f.file_path)} className="p-1 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
+      <FilePreviewModal file={previewing} getDownloadUrl={getDownloadUrl} onClose={() => setPreviewing(null)} />
     </div>
   );
 }
