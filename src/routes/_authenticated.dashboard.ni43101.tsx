@@ -635,16 +635,27 @@ function SectionCard({
 function TocItem({
   entry,
   isActive,
+  isExact,
   onClick,
+  registerRef,
 }: {
   entry: Ni43101TocEntry;
   isActive: boolean;
+  isExact: boolean;
   onClick: () => void;
+  registerRef: (el: HTMLLIElement | null) => void;
 }) {
   return (
-    <li>
+    <li ref={registerRef} className="relative">
+      {isActive && (
+        <span
+          aria-hidden
+          className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r bg-gold"
+        />
+      )}
       <button
         onClick={onClick}
+        aria-current={isExact ? "page" : isActive ? "true" : undefined}
         className={`w-full text-left flex items-center gap-2 px-3 py-2 text-[11px] font-mono transition border-l-2 ${
           isActive
             ? "bg-gold/10 border-gold text-foreground"
@@ -656,6 +667,11 @@ function TocItem({
           className={`w-3 h-3 shrink-0 ${isActive ? "text-gold" : "opacity-40"}`}
         />
         <span className="flex-1 truncate">{entry.label}</span>
+        {isExact && (
+          <span className="text-[9px] font-mono px-1 rounded bg-gold/20 text-gold uppercase">
+            ahora
+          </span>
+        )}
         <span className="text-[10px] text-muted-foreground tabular-nums">{entry.page}</span>
       </button>
     </li>
