@@ -291,7 +291,7 @@ function NI43101Module() {
     }
     setBusy(true);
     setError(null);
-    setProgress("Iniciando…");
+    setProgress({ label: "Iniciando…", current: 0, total: 0, phase: "setup" });
     try {
       if (preview?.url) URL.revokeObjectURL(preview.url);
       const result = await exportNI43101({
