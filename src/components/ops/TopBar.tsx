@@ -91,8 +91,8 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
           aria-haspopup="listbox"
           aria-expanded={open}
         >
-          <span className="text-text-dim text-[9px] uppercase tracking-wider">Project</span>
-          <span className="text-foreground tabular-nums truncate max-w-[140px]">
+          <span className="hidden sm:inline text-text-dim text-[9px] uppercase tracking-wider">Project</span>
+          <span className="text-foreground tabular-nums truncate max-w-[90px] sm:max-w-[140px]">
             {loading ? "…" : active?.code ?? "—"}
           </span>
           <ChevronDown className="w-3 h-3 text-text-dim" />
@@ -143,16 +143,18 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
         <Command className="w-3 h-3" />
         <span>⌘K</span>
       </button>
-      <OnlineStatusBadge />
-      {user && (
-        <button
-          type="button"
-          onClick={async () => { await signOut(); navigate({ to: "/" }); }}
-          className="font-mono text-[10px] text-text-dim hover:text-signal-red uppercase tracking-wider"
-        >
-          Salir
-        </button>
-      )}
+      <div className="hidden md:flex items-center gap-2">
+        <OnlineStatusBadge />
+        {user && (
+          <button
+            type="button"
+            onClick={async () => { await signOut(); navigate({ to: "/" }); }}
+            className="font-mono text-[10px] text-text-dim hover:text-signal-red uppercase tracking-wider"
+          >
+            Salir
+          </button>
+        )}
+      </div>
     </header>
   );
 }
