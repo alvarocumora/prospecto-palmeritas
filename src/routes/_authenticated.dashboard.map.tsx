@@ -32,6 +32,7 @@ import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { TimeSlider } from "@/components/map/TimeSlider";
 import { LiveCollabLayer } from "@/components/map/LiveCollabLayer";
+import { MobileMapInspector } from "@/components/map/MobileMapInspector";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/map")({
@@ -366,6 +367,14 @@ function OperationalMap() {
             {/* Mobile: single FAB → drawer with all tools */}
             {isMobile && (
               <>
+                <MobileMapInspector
+                  map={mapInst?.map ?? null}
+                  rasters={rasters}
+                  rasterSettings={visibleRasterSettings}
+                  onRasterChange={updateRasterSetting}
+                  onSnapshot={handleSnapshot}
+                  snapshotting={snapshotting}
+                />
                 <button
                   type="button"
                   onClick={() => setMobileToolsOpen(true)}
