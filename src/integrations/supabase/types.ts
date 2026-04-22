@@ -513,6 +513,80 @@ export type Database = {
           },
         ]
       }
+      concession_holders: {
+        Row: {
+          address: string | null
+          commune: string | null
+          created_at: string
+          created_by: string
+          economic_activity: string | null
+          email: string | null
+          holder_type: string
+          id: string
+          incorporation_date: string | null
+          legal_repr_name: string | null
+          legal_repr_rut: string | null
+          name: string
+          notes: string | null
+          phone: string | null
+          project_id: string
+          region: string | null
+          rut: string | null
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          commune?: string | null
+          created_at?: string
+          created_by: string
+          economic_activity?: string | null
+          email?: string | null
+          holder_type?: string
+          id?: string
+          incorporation_date?: string | null
+          legal_repr_name?: string | null
+          legal_repr_rut?: string | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          project_id: string
+          region?: string | null
+          rut?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          commune?: string | null
+          created_at?: string
+          created_by?: string
+          economic_activity?: string | null
+          email?: string | null
+          holder_type?: string
+          id?: string
+          incorporation_date?: string | null
+          legal_repr_name?: string | null
+          legal_repr_rut?: string | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          project_id?: string
+          region?: string | null
+          rut?: string | null
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_holders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concession_overlaps: {
         Row: {
           area_overlap_ha: number | null
@@ -1728,6 +1802,134 @@ export type Database = {
           },
         ]
       }
+      holder_files: {
+        Row: {
+          description: string | null
+          file_name: string
+          file_path: string
+          file_type: string
+          holder_id: string
+          id: string
+          project_id: string
+          size_bytes: number | null
+          uploaded_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          description?: string | null
+          file_name: string
+          file_path: string
+          file_type?: string
+          holder_id: string
+          id?: string
+          project_id: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          description?: string | null
+          file_name?: string
+          file_path?: string
+          file_type?: string
+          holder_id?: string
+          id?: string
+          project_id?: string
+          size_bytes?: number | null
+          uploaded_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holder_files_holder_id_fkey"
+            columns: ["holder_id"]
+            isOneToOne: false
+            referencedRelation: "concession_holders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holder_files_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      holder_links: {
+        Row: {
+          auto_matched: boolean
+          bulletin_id: string | null
+          case_id: string | null
+          external_url: string | null
+          holder_id: string
+          id: string
+          label: string | null
+          link_type: string
+          linked_at: string
+          linked_by: string | null
+          notes: string | null
+          project_id: string
+        }
+        Insert: {
+          auto_matched?: boolean
+          bulletin_id?: string | null
+          case_id?: string | null
+          external_url?: string | null
+          holder_id: string
+          id?: string
+          label?: string | null
+          link_type: string
+          linked_at?: string
+          linked_by?: string | null
+          notes?: string | null
+          project_id: string
+        }
+        Update: {
+          auto_matched?: boolean
+          bulletin_id?: string | null
+          case_id?: string | null
+          external_url?: string | null
+          holder_id?: string
+          id?: string
+          label?: string | null
+          link_type?: string
+          linked_at?: string
+          linked_by?: string | null
+          notes?: string | null
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "holder_links_bulletin_id_fkey"
+            columns: ["bulletin_id"]
+            isOneToOne: false
+            referencedRelation: "mining_bulletins"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holder_links_case_id_fkey"
+            columns: ["case_id"]
+            isOneToOne: false
+            referencedRelation: "mining_court_cases"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holder_links_holder_id_fkey"
+            columns: ["holder_id"]
+            isOneToOne: false
+            referencedRelation: "concession_holders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "holder_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       hse_incidents: {
         Row: {
           category: string
@@ -2200,6 +2402,7 @@ export type Database = {
           geometry_geojson: Json | null
           granted_at: string | null
           holder: string | null
+          holder_id: string | null
           id: string
           last_synced_at: string | null
           name: string
@@ -2225,6 +2428,7 @@ export type Database = {
           geometry_geojson?: Json | null
           granted_at?: string | null
           holder?: string | null
+          holder_id?: string | null
           id?: string
           last_synced_at?: string | null
           name: string
@@ -2250,6 +2454,7 @@ export type Database = {
           geometry_geojson?: Json | null
           granted_at?: string | null
           holder?: string | null
+          holder_id?: string | null
           id?: string
           last_synced_at?: string | null
           name?: string
@@ -2263,6 +2468,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "mining_concessions_holder_id_fkey"
+            columns: ["holder_id"]
+            isOneToOne: false
+            referencedRelation: "concession_holders"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "mining_concessions_project_id_fkey"
             columns: ["project_id"]
@@ -3569,6 +3781,11 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      match_holder_publications: {
+        Args: { _holder_id: string }
+        Returns: number
+      }
+      normalize_rut: { Args: { _rut: string }; Returns: string }
     }
     Enums: {
       app_role: "super_admin" | "support"

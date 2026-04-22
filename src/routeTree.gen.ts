@@ -42,6 +42,7 @@ import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
+import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -233,6 +234,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
     path: '/field',
     getParentRoute: () => AuthenticatedDashboardGeophysicsSurveyIdRoute,
   } as any)
+const AuthenticatedDashboardCatastroHoldersIdRoute =
+  AuthenticatedDashboardCatastroHoldersIdRouteImport.update({
+    id: '/holders/$id',
+    path: '/holders/$id',
+    getParentRoute: () => AuthenticatedDashboardCatastroRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -246,7 +253,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
-  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
@@ -266,6 +273,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRoutesByTo {
@@ -280,7 +288,7 @@ export interface FileRoutesByTo {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
-  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
@@ -300,6 +308,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRoutesById {
@@ -316,7 +325,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
-  '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRoute
+  '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
@@ -336,6 +345,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
 export interface FileRouteTypes {
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -406,6 +417,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
   id:
     | '__root__'
@@ -441,6 +453,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
+    | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
   fileRoutesById: FileRoutesById
 }
@@ -687,8 +700,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
     }
+    '/_authenticated/dashboard/catastro/holders/$id': {
+      id: '/_authenticated/dashboard/catastro/holders/$id'
+      path: '/holders/$id'
+      fullPath: '/dashboard/catastro/holders/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardCatastroHoldersIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardCatastroRoute
+    }
   }
 }
+
+interface AuthenticatedDashboardCatastroRouteChildren {
+  AuthenticatedDashboardCatastroHoldersIdRoute: typeof AuthenticatedDashboardCatastroHoldersIdRoute
+}
+
+const AuthenticatedDashboardCatastroRouteChildren: AuthenticatedDashboardCatastroRouteChildren =
+  {
+    AuthenticatedDashboardCatastroHoldersIdRoute:
+      AuthenticatedDashboardCatastroHoldersIdRoute,
+  }
+
+const AuthenticatedDashboardCatastroRouteWithChildren =
+  AuthenticatedDashboardCatastroRoute._addFileChildren(
+    AuthenticatedDashboardCatastroRouteChildren,
+  )
 
 interface AuthenticatedDashboardGeophysicsSurveyIdRouteChildren {
   AuthenticatedDashboardGeophysicsSurveyIdFieldRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -726,7 +761,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
   AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
-  AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRoute
+  AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRouteWithChildren
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRoute
@@ -753,7 +788,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
   AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
-  AuthenticatedDashboardCatastroRoute: AuthenticatedDashboardCatastroRoute,
+  AuthenticatedDashboardCatastroRoute:
+    AuthenticatedDashboardCatastroRouteWithChildren,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardFinanceRoute: AuthenticatedDashboardFinanceRoute,

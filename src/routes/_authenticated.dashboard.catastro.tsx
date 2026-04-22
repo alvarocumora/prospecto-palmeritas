@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw } from "lucide-react";
+import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2 } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { PatentCalendar } from "@/components/ops/PatentCalendar";
 import { OverlapInspector } from "@/components/ops/OverlapInspector";
 import { WatchManager } from "@/components/ops/WatchManager";
 import { SyncLog } from "@/components/ops/SyncLog";
+import { HoldersTab } from "@/components/ops/HoldersTab";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -32,10 +33,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   component: CatastroPage,
 });
 
-type Tab = "concessions" | "patents" | "overlaps" | "watches" | "sync";
+type Tab = "concessions" | "holders" | "patents" | "overlaps" | "watches" | "sync";
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "concessions", label: "Mis concesiones", icon: FileText },
+  { id: "holders", label: "Titulares", icon: Building2 },
   { id: "patents", label: "Patentes", icon: Coins },
   { id: "overlaps", label: "Conflictos", icon: AlertOctagon },
   { id: "watches", label: "Vigilancia", icon: Eye },
@@ -84,6 +86,7 @@ function CatastroPage() {
       </div>
 
       {tab === "concessions" && <ConcessionsTab />}
+      {tab === "holders" && user && <HoldersTab projectId={active.id} userId={user.id} />}
       {tab === "patents" && user && <PatentCalendar projectId={active.id} userId={user.id} />}
       {tab === "overlaps" && <OverlapInspector projectId={active.id} />}
       {tab === "watches" && user && <WatchManager projectId={active.id} userId={user.id} />}
