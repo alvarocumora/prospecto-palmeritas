@@ -478,15 +478,27 @@ function NI43101Module() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-h-[70vh]">
             <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto">
-              <ul className="py-1">
-                {preview.toc.map((entry, i) => (
-                  <TocItem
-                    key={`${entry.page}-${i}`}
-                    entry={entry}
-                    isActive={entry.page === activePage}
-                    onClick={() => goToPage(entry.page)}
-                  />
-                ))}
+              <ul ref={tocListRef} className="py-1">
+                {preview.toc.map((entry, i) => {
+                  // active = largest entry whose page <= activePage
+                  const activeIdx = preview.toc.reduce(
+                    (acc, e, idx) => (e.page <= activePage ? idx : acc),
+                    0,
+                  );
+                  return (
+                    <TocItem
+                      key={`${entry.page}-${i}`}
+                      entry={entry}
+                      isActive={i === activeIdx}
+                      isExact={entry.page === activePage}
+                      onClick={() => goToPage(entry.page)}
+                      registerRef={(el) => {
+                        if (el) tocItemRefs.current.set(i, el);
+                        else tocItemRefs.current.delete(i);
+                      }}
+                    />
+                  );
+                })}
               </ul>
             </aside>
             <div className="bg-black/30 min-h-[60vh] md:min-h-[80vh]">
