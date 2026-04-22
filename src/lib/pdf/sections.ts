@@ -672,8 +672,23 @@ export function renderSection9_Drilling(s: PdfState) {
   );
 }
 
-export function renderSection10_QAQC(s: PdfState) {
+export function renderSection10_QAQC(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
   h1(s, "Preparación, análisis y seguridad de muestras");
+  if (validations.assaysStatus === "pending") {
+    warningBox(
+      s,
+      "Assays pendientes",
+      "El proyecto se encuentra en etapa pre-Fase 1 y no hay análisis (assays) cargados en la base de datos. " +
+        "El programa QA/QC descrito a continuación es prospectivo: los procedimientos se aplicarán durante la ejecución y se actualizarán en revisiones futuras del informe.",
+    );
+  } else if (validations.assaysStatus === "partial") {
+    warningBox(
+      s,
+      "Assays parciales",
+      `Se cargaron ${validations.assaysCount} resultados analíticos, pero el set aún no es estadísticamente representativo. ` +
+        "QA/QC reportado es preliminar.",
+    );
+  }
   p(
     s,
     `Cadena de custodia documentada desde el sitio hasta el laboratorio. Las muestras de chip y canal sampling se etiquetan ` +
@@ -694,8 +709,15 @@ export function renderSection10_QAQC(s: PdfState) {
   );
 }
 
-export function renderSection11_DataVerification(s: PdfState) {
+export function renderSection11_DataVerification(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
   h1(s, "Verificación de datos");
+  if (validations.assaysStatus === "pending") {
+    warningBox(
+      s,
+      "Assays available: PENDING",
+      "No hay datos analíticos primarios disponibles. La verificación independiente queda diferida hasta la recepción de certificados de laboratorio (Fase 2/3 del programa).",
+    );
+  }
   p(
     s,
     `A la fecha de emisión de este informe el proyecto se encuentra en etapa pre-Fase 1, sin datos analíticos primarios ` +
