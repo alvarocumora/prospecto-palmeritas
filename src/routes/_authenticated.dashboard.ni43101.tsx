@@ -286,6 +286,7 @@ function NI43101Module() {
         includeZoning,
         projectId,
         sections: enabledArray,
+        setBasemap,
         onProgress: (s) => setProgress(s),
       });
       toast.success("Informe NI 43-101 descargado");
