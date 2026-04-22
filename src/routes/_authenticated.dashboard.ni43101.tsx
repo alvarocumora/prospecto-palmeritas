@@ -180,7 +180,19 @@ function NI43101Module() {
   const projectId = active?.id ?? null;
 
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState<string | null>(null);
+  const [progress, setProgress] = useState<ProgressInfo | null>(null);
+  const handleProgress = useCallback((step: string | ProgressInfo) => {
+    if (typeof step === "string") {
+      setProgress((prev) => ({
+        label: step,
+        current: prev?.current ?? 0,
+        total: prev?.total ?? 0,
+        phase: "setup",
+      }));
+    } else {
+      setProgress(step);
+    }
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const [includeSatellite, setIncludeSatellite] = useState(true);
   const [includeInternal, setIncludeInternal] = useState(true);
