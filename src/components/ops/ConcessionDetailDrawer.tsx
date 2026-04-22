@@ -6,6 +6,7 @@ import {
   expiryStatus,
   EXPIRY_COLORS,
 } from "@/hooks/useMiningConcessions";
+import { ConcessionFilesPanel } from "./ConcessionFilesPanel";
 
 const SWIPE_CLOSE_THRESHOLD = 120; // px to trigger close
 const SWIPE_VELOCITY_THRESHOLD = 0.5; // px/ms
@@ -182,6 +183,10 @@ export function ConcessionDetailDrawer({
                 {c.notes}
               </div>
             </div>
+          )}
+
+          {c.project_id && (
+            <ConcessionFilesPanel concessionId={c.id} projectId={c.project_id} />
           )}
         </div>
 
