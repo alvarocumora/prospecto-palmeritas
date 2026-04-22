@@ -256,7 +256,7 @@ export async function exportNI43101(opts: {
   includeInternalConcessions?: boolean;
   includeZoning?: boolean;
   projectId?: string | null;
-  onProgress?: (step: string) => void;
+  onProgress?: (step: string | { label: string; current: number; total: number; phase?: string }) => void;
   /** When true, returns blob/url/toc instead of triggering a download. */
   preview?: boolean;
   /** Subset of sections to render. If omitted, all sections are included. */
