@@ -477,10 +477,9 @@ function NI43101Module() {
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-[260px_1fr] min-h-[70vh]">
-            <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto">
-              <ul ref={tocListRef} className="py-1">
+            <aside className="border-b md:border-b-0 md:border-r border-border bg-bg-primary/30 max-h-[40vh] md:max-h-[80vh] overflow-y-auto flex flex-col">
+              <ul ref={tocListRef} className="py-1 flex-1">
                 {preview.toc.map((entry, i) => {
-                  // active = largest entry whose page <= activePage
                   const activeIdx = preview.toc.reduce(
                     (acc, e, idx) => (e.page <= activePage ? idx : acc),
                     0,
@@ -500,6 +499,7 @@ function NI43101Module() {
                   );
                 })}
               </ul>
+              <ActiveSectionDescription toc={preview.toc} activePage={activePage} />
             </aside>
             <div className="bg-black/30 min-h-[60vh] md:min-h-[80vh]">
               <iframe
@@ -761,5 +761,77 @@ function ValidationsPanel({ v }: { v: Ni43101Validations }) {
         ))}
       </div>
     </section>
+  );
+}
+
+/* ============================================================
+   Active section description (under TOC)
+   ============================================================ */
+
+function findSectionForToc(label: string): SectionMeta | null {
+  // TOC labels start with "<number>. <title>" or "<number>.<sub>  <title>"
+  // SECTIONS[].number is e.g. "RES", "1", "3", "3.bis", "A", "B".
+  const trimmed = label.trim();
+  // Try exact prefix match against any SECTIONS entry's "<number>. " or "<number>  ".
+  for (const s of SECTIONS) {
+    const prefixes = [`${s.number}. `, `${s.number}.  `, `${s.number} `];
+    if (prefixes.some((p) => trimmed.startsWith(p))) return s;
+    // Sub-section like "3.1  ..." should still resolve to section 3.
+  }
+  // Fallback: leading numeric token before "." matches a SECTIONS.number.
+  const m = trimmed.match(/^([A-Z]|\d+(?:\.[a-z]+)?)/);
+  if (m) {
+    const head = m[1];
+    const hit = SECTIONS.find((s) => s.number === head);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+function ActiveSectionDescription({
+  toc,
+  activePage,
+}: {
+  toc: Ni43101TocEntry[];
+  activePage: number;
+}) {
+  // Find the deepest TOC entry whose page <= activePage; resolve to its parent section meta.
+  const candidates = toc.filter((e) => e.page <= activePage);
+  const current = candidates.length ? candidates[candidates.length - 1] : toc[0];
+  if (!current) return null;
+  // Walk back from current to find a level-1 (section) entry for context.
+  let sectionEntry = current;
+  for (let i = toc.indexOf(current); i >= 0; i--) {
+    if (toc[i].level === 1 || toc[i].level === 0) {
+      sectionEntry = toc[i];
+      break;
+    }
+  }
+  const meta = findSectionForToc(sectionEntry.label);
+  return (
+    <div className="border-t border-border bg-bg-secondary/60 p-3 space-y-1.5 sticky bottom-0">
+      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <FileText className="w-3 h-3 text-gold" />
+        Sección activa · pág. {activePage}
+      </div>
+      {meta ? (
+        <>
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded border border-gold/40 text-gold">
+              §{meta.number}
+            </span>
+            <div className="text-xs font-mono font-semibold truncate">{meta.title}</div>
+          </div>
+          <p className="text-[11px] text-text-secondary leading-relaxed">{meta.desc}</p>
+        </>
+      ) : (
+        <>
+          <div className="text-xs font-mono font-semibold truncate">{sectionEntry.label}</div>
+          <p className="text-[11px] text-text-secondary leading-relaxed">
+            Contenido frontal del informe (portada, índice o resumen).
+          </p>
+        </>
+      )}
+    </div>
   );
 }
