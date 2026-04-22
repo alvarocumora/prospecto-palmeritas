@@ -14,10 +14,37 @@ import {
   p,
   setRGB,
   tableCaption,
+  warningBox,
 } from "./primitives";
 import { drawCrossSection, drawGantt, drawPieChart } from "./figures";
 import type { GeologyData } from "@/hooks/useGeologyData";
 import type { GeophysicsData } from "@/hooks/useGeophysicsData";
+
+/* ============================================================
+   VALIDATION CONTEXT
+   Carries data-availability flags so sections can render
+   warning callouts when content is missing/pending.
+   ============================================================ */
+
+export type Ni43101Validations = {
+  assaysStatus: "available" | "pending" | "partial";
+  assaysCount: number;
+  catastroAvailable: boolean;
+  catastroCount: number;
+  satelliteAvailable: boolean;
+  mapAvailable: boolean;
+  geologyAvailable: boolean;
+};
+
+export const DEFAULT_VALIDATIONS: Ni43101Validations = {
+  assaysStatus: "pending",
+  assaysCount: 0,
+  catastroAvailable: false,
+  catastroCount: 0,
+  satelliteAvailable: false,
+  mapAvailable: false,
+  geologyAvailable: false,
+};
 
 /* ============================================================
    PROJECT CONSTANTS (mirror of /routes/index.tsx)
