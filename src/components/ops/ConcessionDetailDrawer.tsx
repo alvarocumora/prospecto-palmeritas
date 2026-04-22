@@ -31,12 +31,16 @@ export function ConcessionDetailDrawer({
   onEdit,
   onDelete,
   intersectsAoi,
+  allConcessions,
+  onJumpTo,
 }: {
   concession: MiningConcession;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
   intersectsAoi?: boolean;
+  allConcessions?: MiningConcession[];
+  onJumpTo?: (c: MiningConcession) => void;
 }) {
   const c = concession;
   const st = expiryStatus(c.expires_at);
