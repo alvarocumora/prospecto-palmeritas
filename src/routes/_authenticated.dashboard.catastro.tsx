@@ -392,6 +392,8 @@ function ConcessionsTab() {
         <ConcessionDetailDrawer
           concession={viewing}
           intersectsAoi={intersectsAoiBbox(viewing.geometry_geojson, PROJECT_AOI)}
+          allConcessions={data}
+          onJumpTo={(c) => setViewing(c)}
           onClose={() => setViewing(null)}
           onEdit={() => { setEditing(viewing); setViewing(null); }}
           onDelete={async () => { const c = viewing; setViewing(null); await onDelete(c); }}

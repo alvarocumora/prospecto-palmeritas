@@ -1,5 +1,5 @@
-import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
-import { X, Pencil, Trash2, MapPin, Calendar, FileText } from "lucide-react";
+import { useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import { X, Pencil, Trash2, MapPin, Calendar, FileText, Search } from "lucide-react";
 import {
   type MiningConcession,
   daysUntilExpiry,
@@ -31,12 +31,16 @@ export function ConcessionDetailDrawer({
   onEdit,
   onDelete,
   intersectsAoi,
+  allConcessions,
+  onJumpTo,
 }: {
   concession: MiningConcession;
   onClose: () => void;
   onEdit: () => void;
   onDelete: () => void;
   intersectsAoi?: boolean;
+  allConcessions?: MiningConcession[];
+  onJumpTo?: (c: MiningConcession) => void;
 }) {
   const c = concession;
   const st = expiryStatus(c.expires_at);
@@ -50,6 +54,17 @@ export function ConcessionDetailDrawer({
   const [dragging, setDragging] = useState(false);
 
   const bodyRef = useRef<HTMLDivElement>(null);
+
+  const [jumpQuery, setJumpQuery] = useState("");
+  const [jumpOpen, setJumpOpen] = useState(false);
+  const jumpResults = useMemo(() => {
+    const q = jumpQuery.trim().toLowerCase();
+    if (!q || !allConcessions) return [];
+    return allConcessions
+      .filter((x) => x.id !== c.id)
+      .filter((x) => x.code.toLowerCase().includes(q) || x.name.toLowerCase().includes(q))
+      .slice(0, 8);
+  }, [jumpQuery, allConcessions, c.id]);
 
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     // Only respond to primary pointer (touch / mouse main button)
@@ -137,6 +152,49 @@ export function ConcessionDetailDrawer({
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Jump-to search */}
+        {allConcessions && allConcessions.length > 1 && onJumpTo && (
+          <div className="px-4 pt-2 pb-2 border-b border-border relative">
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-secondary pointer-events-none" />
+              <input
+                type="text"
+                value={jumpQuery}
+                onChange={(e) => { setJumpQuery(e.target.value); setJumpOpen(true); }}
+                onFocus={() => setJumpOpen(true)}
+                onBlur={() => setTimeout(() => setJumpOpen(false), 150)}
+                placeholder="Saltar a otra concesión por código o nombre…"
+                className="w-full h-9 pl-7 pr-2 rounded bg-bg-elevated border border-border text-xs font-mono placeholder:text-text-secondary focus:outline-none focus:border-primary"
+              />
+            </div>
+            {jumpOpen && jumpResults.length > 0 && (
+              <div className="absolute left-4 right-4 top-full mt-1 z-10 bg-bg-panel border border-border rounded shadow-lg max-h-64 overflow-y-auto">
+                {jumpResults.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => {
+                      onJumpTo(r);
+                      setJumpQuery("");
+                      setJumpOpen(false);
+                      bodyRef.current?.scrollTo({ top: 0 });
+                    }}
+                    className="w-full text-left px-3 py-2 text-xs hover:bg-bg-elevated active:bg-bg-elevated border-b border-border last:border-b-0"
+                  >
+                    <div className="font-mono font-semibold truncate">{r.code}</div>
+                    <div className="text-text-secondary truncate">{r.name}</div>
+                  </button>
+                ))}
+              </div>
+            )}
+            {jumpOpen && jumpQuery.trim() && jumpResults.length === 0 && (
+              <div className="absolute left-4 right-4 top-full mt-1 z-10 bg-bg-panel border border-border rounded shadow-lg px-3 py-2 text-xs text-text-secondary">
+                Sin resultados
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Body */}
         <div ref={bodyRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4 overscroll-contain">
