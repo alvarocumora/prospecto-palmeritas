@@ -1,8 +1,11 @@
 import { useRef, useState } from "react";
-import { Upload, Trash2, Download, FileText, Image as ImageIcon } from "lucide-react";
-import { useConcessionFiles, CONCESSION_FILE_TYPE_LABELS } from "@/hooks/useConcessionFiles";
+import { Upload, Trash2, Download, FileText, Image as ImageIcon, Eye } from "lucide-react";
+import { useConcessionFiles, CONCESSION_FILE_TYPE_LABELS, type ConcessionFile } from "@/hooks/useConcessionFiles";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { FilePreviewModal } from "./FilePreviewModal";
+
+const PREVIEWABLE = /\.(pdf|png|jpe?g|webp|gif|svg)$/i;
 
 function fmtSize(n: number | null): string {
   if (!n) return "—";
