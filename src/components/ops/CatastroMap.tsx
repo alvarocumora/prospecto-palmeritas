@@ -22,7 +22,7 @@ type Props = {
  * Exploración 1983, Estacamento) en el bbox visible, más las concesiones
  * registradas del proyecto.
  */
-export function CatastroMap({ concessions, center = [-71.115, -33.898], projectName }: Props) {
+export function CatastroMap({ concessions, center = [-71.115, -33.898], projectName, onFeaturesLoaded }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const catastroLayerRef = useRef<LeafletGeoJSON | null>(null);
