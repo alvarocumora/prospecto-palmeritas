@@ -11,6 +11,7 @@ import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
 import { CatastroMap } from "@/components/ops/CatastroMap";
+import { CatastroOverlapPanel } from "@/components/ops/CatastroOverlapPanel";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
