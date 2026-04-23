@@ -68,7 +68,7 @@ export function TimeSlider({ holes, flights, onChange, active, onToggle }: Props
       <button
         onClick={() => onToggle(true)}
         disabled={totalDays === 0}
-        className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md disabled:opacity-40"
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md disabled:opacity-40"
         title={totalDays === 0 ? "Sin datos temporales" : "Activar línea de tiempo"}
       >
         <Clock className="w-3.5 h-3.5 text-gold" />
@@ -82,7 +82,7 @@ export function TimeSlider({ holes, flights, onChange, active, onToggle }: Props
   const maxDate = maxMs > 0 ? new Date(maxMs).toISOString().slice(0, 10) : "—";
 
   return (
-    <div className="absolute bottom-12 left-1/2 -translate-x-1/2 z-[500] w-[min(560px,calc(100vw-1.5rem))] bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl">
+    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[600] w-[min(560px,calc(100vw-1.5rem))] bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl">
       <div className="flex items-center gap-2 px-3 py-2 border-b border-border">
         <Clock className="w-3.5 h-3.5 text-gold shrink-0" />
         <span className="text-[10px] font-mono uppercase text-muted-foreground">Línea de tiempo</span>

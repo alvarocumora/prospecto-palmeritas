@@ -40,7 +40,7 @@ export function RasterControlPanel({ rasters, settings, onChange, onZoomTo }: Pr
   if (rasters.length === 0) return null;
 
   return (
-    <div className="absolute top-4 right-4 z-[1000] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl max-h-[60vh] flex flex-col">
+    <div className="absolute top-14 right-3 z-[600] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl max-h-[55vh] flex flex-col">
       <div className="px-3 py-2 border-b border-border flex items-center gap-2">
         <Layers className="w-3.5 h-3.5 text-gold" />
         <div className="text-[10px] font-mono uppercase text-muted-foreground">Rasters drone ({rasters.length})</div>
