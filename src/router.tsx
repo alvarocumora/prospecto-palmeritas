@@ -25,7 +25,7 @@ function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => vo
       if (!sessionStorage.getItem(KEY)) {
         sessionStorage.setItem(KEY, "1");
         window.location.reload();
-        return null as unknown as JSX.Element;
+        return null;
       }
     } catch {
       // sessionStorage unavailable — fall through to normal error UI
