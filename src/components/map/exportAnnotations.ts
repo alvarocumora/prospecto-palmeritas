@@ -74,7 +74,7 @@ export function exportAnnotationsCsv(
 
 export function exportAnnotationsPdf(
   annotations: MapAnnotation[],
-  meta: { projectName: string; targetMap?: Map<string, { code: string }>; campaignMap?: Map<string, { name: string }> },
+  meta: ExportMeta,
 ) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -95,35 +95,57 @@ export function exportAnnotationsPdf(
 
   autoTable(doc, {
     startY: 76,
-    head: [["#", "Lat", "Lng", "Color", "Texto", "Resuelta", "Target", "Campaña", "Fase", "Creada"]],
-    body: annotations.map((a, i) => [
-      String(i + 1),
-      Number(a.lat).toFixed(5),
-      Number(a.lng).toFixed(5),
-      colorLabel(a.color),
-      a.text,
-      a.resolved ? "✓" : "",
-      a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "—" : "",
-      a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "").slice(0, 24) : "",
-      a.phase ?? "",
-      new Date(a.created_at).toLocaleDateString("es-CL"),
-    ]),
-    styles: { font: "helvetica", fontSize: 8, cellPadding: 3, overflow: "linebreak" },
-    headStyles: { fillColor: "#C8922A", textColor: 255, fontStyle: "bold" },
+    head: [["#", "Lat", "Lng", "Prio", "Color", "Texto", "Creador", "Resuelta", "Motivo / por", "Target", "Campaña", "Fase"]],
+    body: annotations.map((a, i) => {
+      const resolvedCell = a.resolved
+        ? `${(a.resolved_reason ?? "—")}\n${a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? "—" : "—"}${a.resolved_at ? ` · ${new Date(a.resolved_at).toLocaleDateString("es-CL")}` : ""}`
+        : "";
+      return [
+        String(i + 1),
+        Number(a.lat).toFixed(5),
+        Number(a.lng).toFixed(5),
+        priorityLabel(a.priority),
+        colorLabel(a.color),
+        a.text,
+        meta.userMap?.get(a.created_by) ?? "—",
+        a.resolved ? "✓" : "",
+        resolvedCell,
+        a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "—" : "",
+        a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "").slice(0, 24) : "",
+        a.phase ?? "",
+      ];
+    }),
+    styles: { font: "helvetica", fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
+    headStyles: { fillColor: "#C8922A", textColor: 255, fontStyle: "bold", fontSize: 7.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
-      0: { cellWidth: 24, halign: "right" },
-      1: { cellWidth: 55, halign: "right" },
-      2: { cellWidth: 55, halign: "right" },
-      3: { cellWidth: 70 },
-      4: { cellWidth: 260 },
-      5: { cellWidth: 45, halign: "center" },
-      6: { cellWidth: 60 },
-      7: { cellWidth: 95 },
-      8: { cellWidth: 55 },
-      9: { cellWidth: 60 },
+      0: { cellWidth: 20, halign: "right" },
+      1: { cellWidth: 48, halign: "right" },
+      2: { cellWidth: 48, halign: "right" },
+      3: { cellWidth: 38 },
+      4: { cellWidth: 56 },
+      5: { cellWidth: 170 },
+      6: { cellWidth: 70 },
+      7: { cellWidth: 38, halign: "center" },
+      8: { cellWidth: 110 },
+      9: { cellWidth: 50 },
+      10: { cellWidth: 80 },
+      11: { cellWidth: 45 },
+    },
+    didParseCell: (data) => {
+      if (data.section === "body" && data.column.index === 3) {
+        const v = String(data.cell.raw).toLowerCase();
+        if (v === "alta") data.cell.styles.textColor = [225, 29, 72];
+        else if (v === "media") data.cell.styles.textColor = [200, 146, 42];
+        else if (v === "baja") data.cell.styles.textColor = [100, 116, 139];
+        data.cell.styles.fontStyle = "bold";
+      }
     },
     margin: { left: 40, right: 40 },
+    didDrawPage: () => {
+      const page = doc.getNumberOfPages();
+      doc.setFontSize(8);
+      doc.setTextColor(140);
     didDrawPage: () => {
       const page = doc.getNumberOfPages();
       doc.setFontSize(8);
