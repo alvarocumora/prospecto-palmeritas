@@ -22,62 +22,189 @@ export type Project = {
 
 const ACTIVE_KEY = "trackmin:active-project";
 
-export function useProjects() {
-  const { user } = useAuth();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeId, setActiveIdState] = useState<string | null>(() =>
-    typeof window === "undefined" ? null : localStorage.getItem(ACTIVE_KEY)
-  );
+type ProjectsStore = {
+  activeId: string | null;
+  error: string | null;
+  initializedUserId: string | null;
+  loading: boolean;
+  projects: Project[];
+  userId: string | null;
+};
 
-  const refresh = useCallback(async () => {
-    if (!user) {
-      setProjects([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    const { data, error: err } = await supabase
+const store: ProjectsStore = {
+  activeId: null,
+  error: null,
+  initializedUserId: null,
+  loading: true,
+  projects: [],
+  userId: null,
+};
+
+const listeners = new Set<() => void>();
+let refreshPromise: Promise<void> | null = null;
+
+function emitStoreChange() {
+  listeners.forEach((listener) => listener());
+}
+
+function readStoredActiveId(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem(ACTIVE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredActiveId(id: string | null) {
+  if (typeof window === "undefined") return;
+  try {
+    if (id) localStorage.setItem(ACTIVE_KEY, id);
+    else localStorage.removeItem(ACTIVE_KEY);
+  } catch {
+    // ignore localStorage failures
+  }
+}
+
+function syncActiveProject(projects: Project[]) {
+  let nextActiveId = store.activeId ?? readStoredActiveId();
+
+  if (nextActiveId && !projects.some((project) => project.id === nextActiveId)) {
+    nextActiveId = null;
+  }
+
+  if (!nextActiveId && projects.length > 0) {
+    nextActiveId = projects[0].id;
+  }
+
+  if (nextActiveId !== store.activeId) {
+    store.activeId = nextActiveId;
+    writeStoredActiveId(nextActiveId);
+  }
+}
+
+async function fetchProjects(userId: string | null, force = false) {
+  if (!userId) {
+    store.userId = null;
+    store.initializedUserId = null;
+    store.projects = [];
+    store.error = null;
+    store.loading = false;
+    store.activeId = readStoredActiveId();
+    emitStoreChange();
+    return;
+  }
+
+  if (!force && store.initializedUserId === userId && !store.loading) {
+    syncActiveProject(store.projects);
+    emitStoreChange();
+    return;
+  }
+
+  if (refreshPromise) {
+    await refreshPromise;
+    return;
+  }
+
+  store.userId = userId;
+  store.loading = true;
+  store.error = null;
+  emitStoreChange();
+
+  refreshPromise = (async () => {
+    const { data, error } = await supabase
       .from("projects")
       .select("*, project_members!inner(role,user_id)")
-      .eq("project_members.user_id", user.id)
+      .eq("project_members.user_id", userId)
       .order("updated_at", { ascending: false });
-    if (err) {
-      setError(err.message);
-      setProjects([]);
-    } else {
-      type Row = Project & { project_members: { role: Project["role"] }[] };
-      const rows = (data ?? []) as unknown as Row[];
-      setProjects(
-        rows.map((p) => ({ ...p, role: p.project_members?.[0]?.role }))
-      );
-      setError(null);
+
+    if (error) {
+      store.projects = [];
+      store.error = error.message;
+      store.loading = false;
+      store.initializedUserId = userId;
+      emitStoreChange();
+      return;
     }
-    setLoading(false);
-  }, [user]);
+
+    type Row = Project & { project_members: { role: Project["role"] }[] };
+    const rows = (data ?? []) as unknown as Row[];
+
+    store.projects = rows.map((project) => ({
+      ...project,
+      role: project.project_members?.[0]?.role,
+    }));
+    store.error = null;
+    store.loading = false;
+    store.initializedUserId = userId;
+    syncActiveProject(store.projects);
+    emitStoreChange();
+  })().finally(() => {
+    refreshPromise = null;
+  });
+
+  await refreshPromise;
+}
+
+export function useProjects() {
+  const { user } = useAuth();
+  const [, forceRender] = useState(0);
 
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    const onStoreChange = () => forceRender((count) => count + 1);
+    listeners.add(onStoreChange);
 
-  const setActiveId = useCallback((id: string | null) => {
-    setActiveIdState(id);
+    const syncFromStorage = () => {
+      const storedActiveId = readStoredActiveId();
+      if (storedActiveId !== store.activeId) {
+        store.activeId = storedActiveId;
+        emitStoreChange();
+      }
+    };
+
+    syncFromStorage();
+
     if (typeof window !== "undefined") {
-      if (id) localStorage.setItem(ACTIVE_KEY, id);
-      else localStorage.removeItem(ACTIVE_KEY);
+      const onStorage = (event: StorageEvent) => {
+        if (event.key === ACTIVE_KEY) syncFromStorage();
+      };
+
+      window.addEventListener("storage", onStorage);
+      return () => {
+        listeners.delete(onStoreChange);
+        window.removeEventListener("storage", onStorage);
+      };
     }
+
+    return () => {
+      listeners.delete(onStoreChange);
+    };
   }, []);
 
-  // Auto-select first project when none active
+  const refresh = useCallback(async () => {
+    await fetchProjects(user?.id ?? null, true);
+  }, [user?.id]);
+
   useEffect(() => {
-    if (!activeId && projects.length > 0) setActiveId(projects[0].id);
-    if (activeId && projects.length > 0 && !projects.some((p) => p.id === activeId)) {
-      setActiveId(projects[0].id);
-    }
-  }, [projects, activeId, setActiveId]);
+    void fetchProjects(user?.id ?? null);
+  }, [user?.id]);
 
-  const active = projects.find((p) => p.id === activeId) ?? null;
+  const setActiveId = useCallback((id: string | null) => {
+    if (id === store.activeId) return;
+    store.activeId = id;
+    writeStoredActiveId(id);
+    emitStoreChange();
+  }, []);
 
-  return { projects, active, activeId, setActiveId, loading, error, refresh };
+  const active = store.projects.find((project) => project.id === store.activeId) ?? null;
+
+  return {
+    projects: store.projects,
+    active,
+    activeId: store.activeId,
+    setActiveId,
+    loading: store.loading,
+    error: store.error,
+    refresh,
+  };
 }
