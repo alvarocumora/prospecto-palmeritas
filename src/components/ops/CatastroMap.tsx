@@ -177,7 +177,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   const [visibleFeatures, setVisibleFeatures] = useState<GeoJSON.Feature[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const FILTER_STORAGE_KEY = "catastroMap:filters:v1";
-  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean };
+  type SortMode = "default" | "ha_desc" | "ha_asc";
+  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean; sort?: SortMode };
   const loadStoredFilters = (): StoredFilters => {
     if (typeof window === "undefined") return {};
     try {
@@ -196,6 +197,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   });
   const [searchQuery, setSearchQuery] = useState(() => loadStoredFilters().q ?? "");
   const [expiringOnly, setExpiringOnly] = useState(() => loadStoredFilters().expiringOnly ?? false);
+  const [sortMode, setSortMode] = useState<SortMode>(() => loadStoredFilters().sort ?? "default");
   const expiryThresholdDays = 90;
 
   // Persist filter state across reloads.
@@ -206,10 +208,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         types: Array.from(typeFilter),
         q: searchQuery,
         expiringOnly,
+        sort: sortMode,
       };
       window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload));
     } catch { /* quota / disabled storage */ }
-  }, [typeFilter, searchQuery, expiringOnly]);
+  }, [typeFilter, searchQuery, expiringOnly, sortMode]);
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
@@ -476,10 +479,10 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
   }, [selectedId]);
 
-  // Filtered list (type + free-text + expiring-only) for the side panel.
+  // Filtered + sorted list (type + free-text + expiring-only) for the side panel.
   const filteredFeatures = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return visibleFeatures.filter((f) => {
+    const filtered = visibleFeatures.filter((f) => {
       const p = (f.properties ?? {}) as Record<string, unknown>;
       const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       if (!typeFilter.has(origen)) return false;
@@ -494,7 +497,15 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         .join(" | ");
       return hay.includes(q);
     });
-  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly]);
+    if (sortMode === "default") return filtered;
+    const ha = (f: GeoJSON.Feature): number => {
+      const v = (f.properties as Record<string, unknown> | undefined)?.HECTAREAS;
+      return typeof v === "number" && Number.isFinite(v) ? v : -Infinity;
+    };
+    return [...filtered].sort((a, b) =>
+      sortMode === "ha_desc" ? ha(b) - ha(a) : ha(a) - ha(b),
+    );
+  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly, sortMode]);
 
   // Expiry summary across visible features (independent of filters).
   const expirySummary = useMemo(() => {
@@ -595,9 +606,21 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
               <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
                 Pertenencias en vista
               </span>
-              <span className="font-mono text-[10px] text-signal-cyan">
-                {filteredFeatures.length}/{visibleFeatures.length}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={sortMode}
+                  onChange={(e) => setSortMode(e.target.value as SortMode)}
+                  className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-bg-elevated focus:outline-none focus:ring-1 focus:ring-primary"
+                  title="Ordenar listado"
+                >
+                  <option value="default">Orden: original</option>
+                  <option value="ha_desc">Ha ↓ (mayor)</option>
+                  <option value="ha_asc">Ha ↑ (menor)</option>
+                </select>
+                <span className="font-mono text-[10px] text-signal-cyan">
+                  {filteredFeatures.length}/{visibleFeatures.length}
+                </span>
+              </div>
             </div>
             <div className="relative">
               <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-text-secondary" />
