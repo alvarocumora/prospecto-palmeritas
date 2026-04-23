@@ -113,7 +113,7 @@ function AuthenticatedLayout() {
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
-      <CommandRail items={items} brand={null} footer={railFooter} />
+      <CommandRail items={items} brand={null} />
 
       {/* Mobile drawer */}
       <MobileDrawer
@@ -126,7 +126,7 @@ function AuthenticatedLayout() {
 
       <main
         className={cn(
-          "relative pt-9 pb-20 md:pb-6 md:pl-12 min-h-[100dvh]",
+          "relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]",
         )}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
