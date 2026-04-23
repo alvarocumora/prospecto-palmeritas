@@ -58,6 +58,25 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
   const targetMap = useMemo(() => new Map(targets.map((t) => [t.id, t])), [targets]);
   const campaignMap = useMemo(() => new Map(campaigns.map((c) => [c.id, c])), [campaigns]);
 
+  // Map de user_id → display_name (para creador / quien resolvió en el export)
+  const [userMap, setUserMap] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    const ids = Array.from(new Set(
+      annotations.flatMap((a) => [a.created_by, a.resolved_by]).filter(Boolean) as string[],
+    ));
+    if (ids.length === 0) { setUserMap(new Map()); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, email")
+        .in("user_id", ids);
+      if (cancelled) return;
+      setUserMap(new Map((data ?? []).map((p) => [p.user_id, p.display_name || p.email || "—"])));
+    })();
+    return () => { cancelled = true; };
+  }, [annotations]);
+
   // Apply filters
   const filtered = useMemo(() => {
     let list = showResolved ? annotations : annotations.filter((a) => !a.resolved);
