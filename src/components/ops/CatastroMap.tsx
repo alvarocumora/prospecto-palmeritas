@@ -187,6 +187,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     () => new Set<CatastroOrigen>(["EXPLOTA_1983", "EXPLOTA_1932", "EXPLORA_1983", "ESTACAMENTO"])
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [expiringOnly, setExpiringOnly] = useState(false);
+  const expiryThresholdDays = 90;
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
