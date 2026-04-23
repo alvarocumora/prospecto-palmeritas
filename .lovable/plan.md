@@ -1,96 +1,82 @@
 
 
-# Plan disruptivo de geología — 5 features con impacto real
+# Plan estratégico — Geocapitals como sistema real de geología, catastro y consulta legal
 
-Objetivo: convertir Trackmin GeoIntel en una plataforma de exploración con automatización geocientífica que hoy solo existe en software caro de escritorio (Leapfrog, ioGAS, ENVI, Micromine). Todo se ejecuta dentro de Lovable Cloud reusando lo que ya tienes (assays, drill_core_logs, drone_rasters, exploration_targets).
+## Diagnóstico del estado actual
 
-## Roadmap por olas (ordenado por ratio impacto/esfuerzo)
+El sistema ya tiene una base muy sólida (30 rutas, 26 tablas con RLS, capas SERNAGEOMIN/Sentinel/EMAG2 reales, auth + roles + audit log). Los **3 ejes centrales** que pediste revisar están en estos niveles de madurez:
 
-### Ola 1 — Geochemical Fingerprint (PCA + clustering) ★ quick-win
-Análisis multivariado automático sobre `samples` para detectar la firma del depósito (pórfido vs epitermal vs IOCG vs skarn) y vectorear hacia el centro mineralizado.
+| Eje | Estado | Brecha vs sistema real |
+|---|---|---|
+| **Catastro minero** | 80% — fetch live SERNAGEOMIN ArcGIS, popups con titular/RUT/comuna, expiry alerts, panel filtrable, sync history | Falta: cron sync automático, alertas email, intersección oficial AOI vs catastro, watchlist multi-titular, histórico de cambios visualizado |
+| **Geofísica** | 60% — CRUD de surveys/líneas/estaciones, captura GPS offline, EMAG2/WGM2012 regionales | Falta: visualización de grid magnético interpolado, reducción al polo, filtros (RTP, derivada vertical), perfiles 2D, integración con targets |
+| **Consulta legal** | 30% — `mining_bulletins` y `mining_court_cases` con auto-match a holders, sync stub PJUD/Boletín | Falta: scraping real Boletín Minero PDF, búsqueda federada, alertas legales, expediente consolidado por concesión, due diligence automatizado |
 
-- Edge function `geochem-fingerprint`: corre PCA sobre Au, Ag, Cu, As, Sb, Hg, Pb, Zn, Mo; k-means para clusters de alteración; calcula índices pathfinder (As+Sb+Hg → epitermal, Mo+Bi+Te → pórfido).
-- Tabla nueva `geochem_analyses` (run_id, pca_loadings, clusters, pathfinder_scores).
-- UI `/dashboard/sampling` → tab "Fingerprint": biplot PC1/PC2, mapa con clusters coloreados, badge "Firma detectada: Epitermal Au-Ag low sulfidation (87%)".
-- Acción: "Generar targets desde clusters" → crea `exploration_targets` automáticos en centroides de cluster con score basado en intensidad pathfinder.
+Ya existe un `.lovable/plan.md` enfocado en 5 olas geocientíficas (geochem PCA, lineamientos, 3D implícito, drill recon, NI 43-101 IA). Ese plan es bueno pero **no cubre los ejes legal/catastro** que ahora priorizas.
 
-### Ola 2 — Drone Lineament & Structural Detector
-CV sobre DEM/orthomosaico para detectar lineamientos, fallas y intersecciones estructurales (los "trampas" de mineralización).
+---
 
-- Edge function `dem-lineaments`: hillshade multidireccional → Canny edge detection → Hough transform → líneas estructurales en GeoJSON.
-- Tabla `structural_lineaments` (geometry, azimuth, length_m, confidence).
-- UI `/dashboard/drones`: botón "Detectar estructuras" en cada DEM, capa nueva en mapa con rosa de azimutes.
-- Cruce automático: intersección lineamientos × vetas mapeadas → score de "structural target" sumado al `prospectivity-grid` existente.
+## Plan propuesto — 4 fases ordenadas por ratio impacto/riesgo
 
-### Ola 3 — Implicit 3D Geology (RBF wireframes en `/dashboard/geology3d`)
-Modelado implícito de cuerpos mineralizados usando RBF (Radial Basis Functions) sobre `drill_core_logs` — lo que hace Leapfrog Geo.
+### Fase A · Catastro de grado profesional (semana 1)
+Convertir el módulo catastro de "viewer + CRUD" a **sistema de vigilancia jurídica continua**.
 
-- Librería WASM compatible Worker (o JS puro): RBF interpolator sobre puntos de litología/ley.
-- Edge function `implicit-model`: genera isosuperficies (Au≥0.5, Au≥1.0, Au≥3.0 g/t) en formato GLB/GLTF.
-- Tabla `geology_models` (model_id, isovalue, mesh_url en Storage).
-- UI Three.js extiende `Geology3DViewer.tsx` con toggle "Wireframe litología" y "Shell de ley".
-- Cálculo automático de tonelaje preliminar (volumen × densidad asumida).
+1. **Sync automático SERNAGEOMIN** — cron diario (pg_cron → `/api/public/sync-catastro`) que:
+   - Refresca todas las concesiones del proyecto contra ArcGIS oficial.
+   - Detecta cambios (titular, superficie, vigencia, estado) y los inserta en `concession_history` con diff JSON.
+   - Marca concesiones desaparecidas como `status='vencida'`.
+2. **Watchlist por titular/RUT** — usuario marca un RUT/empresa y recibe alerta cuando aparezca en una concesión nueva, manifestación, o boletín. Tabla `holder_watches` ya existe → activar el flujo end-to-end.
+3. **Alertas email** (Resend vía edge function): vencimiento <90 días, cambio de titular detectado, nueva concesión vecina dentro de buffer 1 km de AOI.
+4. **Intersección AOI ↔ catastro** real con turf.js: porcentaje exacto de overlap, hectáreas en conflicto, exportable a PDF para el QP.
+5. **Vista "Expediente concesión"** — drawer con: ficha SERNAGEOMIN actual + histórico de cambios cronológico + boletines vinculados + casos judiciales del titular + archivos adjuntos + mapa centrado.
 
-### Ola 4 — Drill Reconciliation & Deviation Alerts
-Compara sondaje planificado vs ejecutado (cuando llegan datos MWD/Gyro) y alerta desviaciones críticas en tiempo real.
+### Fase B · Consulta legal real (semana 2)
+Pasar del stub `sync-pjud` a un **buscador legal-minero funcional**.
 
-- Tabla `drill_surveys` (hole_id, depth, azimuth_actual, dip_actual, measured_at).
-- Edge function `drill-deviation`: calcula trayectoria real vs planificada; flag si offset > 5 m del target geológico.
-- UI `/dashboard/drilling`: vista 3D con tubo planificado (azul) vs real (rojo); panel de alertas activas; export reporte daily drilling.
+1. **Scraper Boletín Oficial de Minería** — edge function que descarga el PDF semanal, extrae con `pdf-parse` (Worker-compat) las publicaciones de manifestaciones/mensuras/sentencias, normaliza titular/RUT/comuna, e inserta en `mining_bulletins`. Auto-match con `concession_holders` ya está implementado vía trigger `trg_match_bulletin_holders`.
+2. **Búsqueda PJUD** — integración con la API pública del Poder Judicial para causas mineras (materia 1407, 1408). Tabla `mining_court_cases` y trigger de match ya existen.
+3. **Búsqueda federada** en una sola caja: por RUT, nombre titular, código de concesión, comuna. Devuelve concesiones + boletines + causas + watches en resultados unificados.
+4. **Due diligence report** — botón en perfil de holder: PDF con todas las concesiones, deudas de patentes (cruce con `concession_patents`), litigios activos, publicaciones boletín último año.
+5. **Alertas legales** — notificación cuando aparece una nueva causa contra un titular en watch, o cuando se publica una manifestación dentro del AOI del proyecto.
 
-### Ola 5 — NI 43-101 Auto-draft con IA
-Aprovecha Lovable AI (`google/gemini-2.5-pro`) para pre-llenar secciones técnicas del reporte 43-101 desde los datos del proyecto.
+### Fase C · Geofísica visual y analítica (semana 3)
+Llevar el módulo de "tabla de estaciones" a **mapa interpretable**.
 
-- Edge function `ni43101-draft`: lee `samples`, `drill_holes`, `geochem_analyses`, `geology_models` → genera borrador de secciones 6 (Geological Setting), 7 (Deposit Types), 11 (Sample Preparation), 14 (Mineral Resource Estimates).
-- UI `/dashboard/ni43101`: botón "Auto-draft sección" por QP; el QP edita y firma.
-- Reduce el tiempo de redacción de ~80h a ~10h por reporte.
+1. **Grid interpolado en cliente** — tomar `geophysics_stations` con valor magnético/IP, interpolar con IDW (JS puro) sobre canvas, renderizar como capa raster en Leaflet con paleta cyan-magenta. Toggle de opacidad y rango.
+2. **Reducción al polo y derivada vertical** — edge function `geophysics-process` que aplica RTP y 1ra derivada vertical sobre el grid. Resultados cacheados en `geophysics_processed_grids`.
+3. **Perfiles 2D** — herramienta de dibujo: el usuario traza una línea y se genera un gráfico de perfil con valores interpolados a lo largo, descargable.
+4. **Importación Geosoft GXF / XYZ** — parser para los formatos estándar de la industria, no solo CSV.
+5. **Cruce magnetometría × targets** — los targets de exploración heredan automáticamente el valor magnético del grid en su centroide (alimenta el score de prospectividad existente).
 
-## Arquitectura técnica condensada
+### Fase D · Integración geocientífica (semana 4)
+Conectar las 3 fases anteriores con la **Ola 1 del plan original** (Geochemical Fingerprint PCA).
 
-```text
-                    ┌─────────────────────────┐
-                    │  exploration_targets    │◄── score unificado
-                    └────────▲────────────────┘
-                             │
-        ┌────────────────────┼────────────────────────┐
-        │                    │                        │
-┌───────┴────────┐  ┌────────┴────────┐  ┌────────────┴──────┐
-│ geochem-       │  │ dem-lineaments  │  │ prospectivity-grid│
-│ fingerprint    │  │ (Ola 2)         │  │ (existente)       │
-│ (Ola 1)        │  └─────────────────┘  └───────────────────┘
-└───────┬────────┘           │                      │
-        │                    │                      │
-        ▼                    ▼                      ▼
-┌─────────────────────────────────────────────────────────┐
-│                    samples · drill_core_logs            │
-│                    drone_rasters · veins                │
-└─────────────────────────────────────────────────────────┘
-                             │
-                             ▼
-              ┌──────────────────────────┐
-              │ implicit-model (Ola 3)   │──► geology_models (3D)
-              └──────────────────────────┘
-                             │
-                             ▼
-              ┌──────────────────────────┐
-              │ ni43101-draft (Ola 5)    │──► reportes auto
-              └──────────────────────────┘
-```
+1. **PCA + k-means sobre samples** (Ola 1 del plan existente) — firma del depósito y generación automática de targets desde clusters geoquímicos.
+2. **Score unificado de prospectividad** combinando: anomalía magnética (Fase C), densidad de lineamientos estructurales, firma geoquímica (Ola 1), proximidad a vetas mapeadas, ausencia de conflictos catastrales (Fase A).
+3. **Dashboard ejecutivo enriquecido** — agregar tarjetas "Vigencia catastral" (% concesiones >90 días), "Alertas legales abiertas", "Cobertura geofísica" (% AOI cubierto).
 
-## Detalles técnicos clave
+---
 
-- **Sin dependencias Node-only**: PCA/k-means en JS puro (`ml-pca`, `ml-kmeans`), RBF en WASM, CV con `opencv.js` cargado bajo demanda en cliente para evitar runtime Worker.
-- **RLS**: todas las tablas nuevas con `project_id` + policy basada en `has_project_role`.
-- **Lovable AI Gateway** para Ola 5 (sin API key del usuario).
-- **Storage**: bucket `geology-models` para meshes GLB, `lineaments` para overlays GeoJSON grandes.
-- **Compat móvil**: todos los cómputos pesados en edge functions, frontend solo renderiza resultados.
+## Detalles técnicos
 
-## Entregable de la primera implementación
-Recomiendo arrancar por **Ola 1 (Geochemical Fingerprint)** porque:
-1. Reutiliza datos que ya tienes cargados (`samples`).
-2. Resultado visible en <10 min de uso.
-3. Genera targets automáticos que alimentan el resto del pipeline.
-4. Cero dependencias nativas, 100% compatible Worker.
+- **Edge functions nuevas**: `sync-catastro` (cron público), `scrape-boletin-minero`, `sync-pjud`, `geophysics-process`, `geochem-fingerprint`, `due-diligence-report`, `notify-alerts`.
+- **Tablas nuevas**: `concession_alerts` (tipo, severidad, leído, payload), `geophysics_processed_grids` (survey_id, type=RTP|VD1, raster_url, bbox), `geochem_analyses` (run_id, pca_loadings, clusters JSON, pathfinder_scores).
+- **Cron**: `pg_cron` extension activada → llama a URLs estables `project--{id}.lovable.app/api/public/sync-catastro` y `/api/public/scrape-boletin` con header `x-cron-secret` validado por HMAC.
+- **Storage**: bucket nuevo `geophysics-grids` (privado, RLS por proyecto) para los rasters interpolados PNG, y `legal-docs` para PDFs de boletines.
+- **Email**: Resend connector — templates para "vencimiento concesión", "cambio detectado", "nueva publicación boletín", "causa judicial nueva".
+- **Librerías compatibles Worker**: `turf.js` (intersección), `ml-pca` + `ml-kmeans` (geoquímica), `pdf-parse` (boletín), todas pure-JS sin native bindings.
+- **Seguridad**: RLS estricto en todas las tablas nuevas con `has_project_role`, endpoints `/api/public/*` validan firma HMAC del cron, scraping respeta robots.txt y rate-limit.
+- **No tocar**: `auth.tsx`, `useAuth.tsx`, `client.ts`, `types.ts`, ni el shell del router. Las fases extienden, no rompen.
 
-Al aprobar este plan, implemento Ola 1 completa: migración SQL + edge function + UI tab + integración con `exploration_targets`.
+---
+
+## Recomendación de arranque
+
+Empezar por **Fase A (Catastro profesional)** porque:
+1. El 80% de la infraestructura ya está (tablas `concession_history`, `holder_watches`, `concession_overlaps`, edge function `sync-sernageomin` stub, hook `useUnreadCatastroAlerts`).
+2. Es el módulo más visible para el usuario final (abogado/QP minero).
+3. Desbloquea el flujo de alertas que reutilizará Fase B (legal) y D (dashboard).
+4. Riesgo bajo: solo agrega cron + email + un drawer; no toca esquema crítico.
+
+Al aprobar este plan, implemento Fase A completa: cron + watchlist activa + alertas email + intersección turf + drawer expediente. Las fases B/C/D se ejecutan secuencialmente en mensajes posteriores para mantener cada cambio revisable.
 
