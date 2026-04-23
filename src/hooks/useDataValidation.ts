@@ -11,6 +11,15 @@ export type TableAudit = {
   error?: string;
 };
 
+export type AffectedRecord = {
+  /** Primary key (uuid) of the offending row. */
+  id: string;
+  /** Human-readable label (code/hole_id/name). */
+  label?: string;
+  /** Key/value pairs of the relevant fields for triage. */
+  fields: Record<string, string | number | null | undefined>;
+};
+
 export type Inconsistency = {
   id: string;
   severity: "error" | "warn" | "info";
@@ -20,6 +29,8 @@ export type Inconsistency = {
   count: number;
   /** Optional tag to distinguish broken cross-references from enum/uniqueness checks. */
   category?: "enum" | "unique" | "xref" | "missing";
+  /** Up to ~50 affected rows for in-UI triage (full count is in `count`). */
+  affected?: AffectedRecord[];
 };
 
 export type ValidationReport = {
