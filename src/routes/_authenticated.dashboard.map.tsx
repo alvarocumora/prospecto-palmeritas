@@ -190,7 +190,7 @@ function OperationalMap() {
         </div>
 
         {/* Desktop controls */}
-        <div className="hidden md:flex items-center gap-3 flex-wrap justify-end">
+        <div className="hidden md:flex items-center gap-2 flex-1 justify-end overflow-x-auto">
           <MapCommandPalette
             map={mapInst?.map ?? null}
             holes={holes}
