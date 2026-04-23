@@ -9,14 +9,18 @@ interface Props {
   open: boolean;
   format: "csv" | "pdf";
   annotations: MapAnnotation[];
+  totalAnnotations: number;
   projectName: string;
   targetMap?: Map<string, { code: string }>;
   campaignMap?: Map<string, { name: string }>;
+  filterSummary?: string;
+  showResolved: boolean;
   onClose: () => void;
 }
 
 export function ExportAnnotationsPreview({
-  open, format, annotations, projectName, targetMap, campaignMap, onClose,
+  open, format, annotations, totalAnnotations, projectName, targetMap, campaignMap,
+  filterSummary, showResolved, onClose,
 }: Props) {
   if (!open) return null;
 
