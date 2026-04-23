@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+import { Download, Loader2, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 import type * as LType from "leaflet";
-import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON, TileLayer } from "leaflet";
+import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
 import { catastroQueryUrl, CATASTRO_STYLE, catastroPopupHtml, type CatastroOrigen } from "@/components/map/overlays";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
+import { exportCatastroMapPdf } from "@/lib/pdf/catastro-map";
 
 type Props = {
   concessions: MiningConcession[];
   /** [lng, lat] center fallback */
   center?: [number, number];
+  projectName?: string;
 };
 
 /**
