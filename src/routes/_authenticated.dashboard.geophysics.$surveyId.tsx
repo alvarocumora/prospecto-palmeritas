@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload,
+  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload, AlertTriangle,
 } from "lucide-react";
 import {
   useSurvey,
@@ -9,8 +9,17 @@ import {
   type Station,
   type Line,
 } from "@/hooks/useGeophysicsCRUD";
+import { useGeophysicsAnomalies } from "@/hooks/useGeophysicsAnomalies";
 import { useProjects } from "@/hooks/useProjects";
 import { StationCsvImport } from "@/components/geophysics/StationCsvImport";
+import { AnomaliesTab } from "@/components/geophysics/AnomaliesTab";
+import {
+  WorkflowStepper,
+  PHASE_ORDER,
+  phaseFromStatus,
+  type WorkflowPhase,
+  type PhaseProgress,
+} from "@/components/geophysics/WorkflowStepper";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/geophysics/$surveyId")({
@@ -23,12 +32,16 @@ function SurveyDetail() {
   const navigate = useNavigate();
   const { active } = useProjects();
   const { survey, lines, stations, loading, refresh } = useSurvey(surveyId);
-  const [tab, setTab] = useState<"stations" | "lines">("stations");
+  const { updateSurvey } = useGeophysicsMutations();
+  const { data: anomalies, refresh: refreshAnomalies } = useGeophysicsAnomalies(surveyId);
+  const [tab, setTab] = useState<"stations" | "lines" | "anomalies">("stations");
   const [editingStation, setEditingStation] = useState<Station | null>(null);
   const [creatingStation, setCreatingStation] = useState(false);
   const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [creatingLine, setCreatingLine] = useState(false);
   const [importingCsv, setImportingCsv] = useState(false);
+  const [phaseBusy, setPhaseBusy] = useState(false);
+
 
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>;
