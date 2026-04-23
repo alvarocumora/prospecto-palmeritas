@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Upload, Beaker, AlertTriangle, FlaskConical, ShieldCheck, FileText } from "lucide-react";
+import { Upload, Beaker, AlertTriangle, FlaskConical, ShieldCheck, FileText, Sparkles } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useSamplingResults } from "@/hooks/useSamplingResults";
 import { AssayCsvImport } from "@/components/sampling/AssayCsvImport";
+import { GeochemFingerprintPanel } from "@/components/sampling/GeochemFingerprintPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/sampling")({
   head: () => ({ meta: [{ title: "Muestreo — Trackmin GeoIntel" }] }),
@@ -14,6 +15,7 @@ function SamplingPage() {
   const { active } = useProjects();
   const { data, loading, refresh } = useSamplingResults(active?.id ?? null);
   const [importOpen, setImportOpen] = useState(false);
+  const [tab, setTab] = useState<"results" | "fingerprint">("results");
 
   const stats = {
     total: data.length,
@@ -66,7 +68,25 @@ function SamplingPage() {
         <StatCard icon={<FileText className="w-3 h-3" />} label="Au máx" value={stats.auMax.toFixed(2)} suffix="g/t" highlight />
       </div>
 
-      <div className="rounded border border-border overflow-hidden">
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setTab("results")}
+          className={`px-3 py-2 text-xs font-mono uppercase border-b-2 -mb-px ${tab === "results" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          <Beaker className="w-3 h-3 inline mr-1" /> Resultados
+        </button>
+        <button
+          onClick={() => setTab("fingerprint")}
+          className={`px-3 py-2 text-xs font-mono uppercase border-b-2 -mb-px ${tab === "fingerprint" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          <Sparkles className="w-3 h-3 inline mr-1" /> Fingerprint geoquímico
+        </button>
+      </div>
+
+      {tab === "fingerprint" && <GeochemFingerprintPanel projectId={active.id} />}
+
+      {tab === "results" && (
+        <div className="rounded border border-border overflow-hidden">
         <div className="px-3 py-2 bg-muted text-xs font-mono uppercase text-muted-foreground border-b border-border flex items-center justify-between">
           <span>Resultados recientes</span>
           {loading && <span>cargando…</span>}
@@ -127,6 +147,7 @@ function SamplingPage() {
           </div>
         )}
       </div>
+      )}
 
       {importOpen && (
         <AssayCsvImport

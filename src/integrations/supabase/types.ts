@@ -1572,6 +1572,71 @@ export type Database = {
           },
         ]
       }
+      geochem_analyses: {
+        Row: {
+          cluster_count: number
+          clusters: Json
+          created_at: string
+          created_by: string
+          elements_used: string[]
+          id: string
+          notes: string | null
+          pathfinder_scores: Json
+          pca_loadings: Json
+          pca_scores: Json
+          pca_variance: Json
+          project_id: string
+          sample_count: number
+          signature: string | null
+          signature_confidence: number | null
+          updated_at: string
+        }
+        Insert: {
+          cluster_count?: number
+          clusters?: Json
+          created_at?: string
+          created_by: string
+          elements_used?: string[]
+          id?: string
+          notes?: string | null
+          pathfinder_scores?: Json
+          pca_loadings?: Json
+          pca_scores?: Json
+          pca_variance?: Json
+          project_id: string
+          sample_count?: number
+          signature?: string | null
+          signature_confidence?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cluster_count?: number
+          clusters?: Json
+          created_at?: string
+          created_by?: string
+          elements_used?: string[]
+          id?: string
+          notes?: string | null
+          pathfinder_scores?: Json
+          pca_loadings?: Json
+          pca_scores?: Json
+          pca_variance?: Json
+          project_id?: string
+          sample_count?: number
+          signature?: string | null
+          signature_confidence?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geochem_analyses_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       geological_features: {
         Row: {
           alteration_id: string | null
