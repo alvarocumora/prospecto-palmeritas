@@ -11,6 +11,15 @@ export type TableAudit = {
   error?: string;
 };
 
+export type AffectedRecord = {
+  /** Primary key (uuid) of the offending row. */
+  id: string;
+  /** Human-readable label (code/hole_id/name). */
+  label?: string;
+  /** Key/value pairs of the relevant fields for triage. */
+  fields: Record<string, string | number | null | undefined>;
+};
+
 export type Inconsistency = {
   id: string;
   severity: "error" | "warn" | "info";
@@ -20,6 +29,8 @@ export type Inconsistency = {
   count: number;
   /** Optional tag to distinguish broken cross-references from enum/uniqueness checks. */
   category?: "enum" | "unique" | "xref" | "missing";
+  /** Up to ~50 affected rows for in-UI triage (full count is in `count`). */
+  affected?: AffectedRecord[];
 };
 
 export type ValidationReport = {
@@ -97,86 +108,129 @@ export function useDataValidation(projectId: string | null) {
     const inconsistencies: Inconsistency[] = [];
 
     if (projectId) {
+      const cap = <T,>(arr: T[]): T[] => arr.slice(0, 50);
+
       // 1. Drill holes with invalid status
-      const dh = await supabase.from("drill_holes").select("id,status,depth_to:actual_depth,planned_depth").eq("project_id", projectId);
+      const dh = await supabase
+        .from("drill_holes")
+        .select("id,hole_id,status,actual_depth,planned_depth,campaign_id")
+        .eq("project_id", projectId);
       if (dh.data) {
         const bad = dh.data.filter((r) => r.status && !VALID_DRILL_STATUS.has(String(r.status)));
         if (bad.length) inconsistencies.push({
           id: "dh-status", severity: "error", table: "drill_holes",
           rule: "Status fuera de enum", detail: `Valores no válidos: ${[...new Set(bad.map((b) => b.status))].join(", ")}`, count: bad.length,
+          category: "enum",
+          affected: cap(bad).map((r) => ({ id: r.id, label: r.hole_id, fields: { hole_id: r.hole_id, status: r.status, planned_depth: r.planned_depth, actual_depth: r.actual_depth } })),
         });
       }
 
       // 2. Core logs depth_from >= depth_to
-      const cl = await supabase.from("drill_core_logs").select("id,depth_from,depth_to,record_status").eq("project_id", projectId);
+      const cl = await supabase
+        .from("drill_core_logs")
+        .select("id,depth_from,depth_to,record_status,hole_id,lithology")
+        .eq("project_id", projectId);
       if (cl.data) {
         const inv = cl.data.filter((r) => Number(r.depth_from) >= Number(r.depth_to));
         if (inv.length) inconsistencies.push({
           id: "cl-depth", severity: "error", table: "drill_core_logs",
           rule: "depth_from ≥ depth_to", detail: "Intervalos inválidos detectados", count: inv.length,
+          affected: cap(inv).map((r) => ({ id: r.id, label: `${r.depth_from}–${r.depth_to} m`, fields: { hole_id: r.hole_id, depth_from: r.depth_from, depth_to: r.depth_to, lithology: r.lithology } })),
         });
         const badStatus = cl.data.filter((r) => r.record_status && !VALID_RECORD_STATUS.has(String(r.record_status)));
         if (badStatus.length) inconsistencies.push({
           id: "cl-rs", severity: "warn", table: "drill_core_logs",
           rule: "record_status fuera de enum", detail: [...new Set(badStatus.map((b) => b.record_status))].join(", "), count: badStatus.length,
+          category: "enum",
+          affected: cap(badStatus).map((r) => ({ id: r.id, fields: { hole_id: r.hole_id, depth_from: r.depth_from, depth_to: r.depth_to, record_status: r.record_status } })),
         });
       }
 
-      // 3. Targets enums
-      const tg = await supabase.from("exploration_targets").select("id,code,stage,priority").eq("project_id", projectId);
+      // 3. Targets enums + duplicate codes
+      const tg = await supabase
+        .from("exploration_targets")
+        .select("id,code,name,stage,priority,target_type,campaign_id")
+        .eq("project_id", projectId);
       if (tg.data) {
         const badStage = tg.data.filter((r) => r.stage && !VALID_TARGET_STAGE.has(String(r.stage)));
         if (badStage.length) inconsistencies.push({
           id: "tg-stage", severity: "warn", table: "exploration_targets",
           rule: "stage fuera de enum", detail: [...new Set(badStage.map((b) => b.stage))].join(", "), count: badStage.length,
+          category: "enum",
+          affected: cap(badStage).map((r) => ({ id: r.id, label: r.code, fields: { code: r.code, name: r.name, stage: r.stage } })),
         });
         const badPri = tg.data.filter((r) => r.priority && !VALID_TARGET_PRIORITY.has(String(r.priority)));
         if (badPri.length) inconsistencies.push({
           id: "tg-pri", severity: "warn", table: "exploration_targets",
           rule: "priority fuera de enum", detail: [...new Set(badPri.map((b) => b.priority))].join(", "), count: badPri.length,
+          category: "enum",
+          affected: cap(badPri).map((r) => ({ id: r.id, label: r.code, fields: { code: r.code, name: r.name, priority: r.priority } })),
         });
-        // Duplicate codes
-        const codes = tg.data.map((r) => r.code).filter(Boolean) as string[];
-        const dupes = codes.filter((c, i) => codes.indexOf(c) !== i);
-        if (dupes.length) inconsistencies.push({
+        const codeMap = new Map<string, typeof tg.data>();
+        for (const r of tg.data) {
+          if (!r.code) continue;
+          (codeMap.get(r.code) ?? codeMap.set(r.code, []).get(r.code)!).push(r);
+        }
+        const dupRows = [...codeMap.values()].filter((arr) => arr.length > 1).flat();
+        if (dupRows.length) inconsistencies.push({
           id: "tg-dup", severity: "error", table: "exploration_targets",
-          rule: "code duplicado", detail: `Códigos: ${[...new Set(dupes)].slice(0, 5).join(", ")}`, count: dupes.length,
+          rule: "code duplicado", detail: `Códigos: ${[...new Set(dupRows.map((r) => r.code))].slice(0, 5).join(", ")}`, count: dupRows.length,
+          category: "unique",
+          affected: cap(dupRows).map((r) => ({ id: r.id, label: r.code, fields: { code: r.code, name: r.name, stage: r.stage } })),
         });
       }
 
       // 4. Drill holes duplicate hole_id
       if (dh.data) {
-        const ids = (await supabase.from("drill_holes").select("hole_id").eq("project_id", projectId)).data?.map((r) => r.hole_id) ?? [];
-        const dupes = ids.filter((c, i) => c && ids.indexOf(c) !== i);
-        if (dupes.length) inconsistencies.push({
+        const map = new Map<string, typeof dh.data>();
+        for (const r of dh.data) {
+          if (!r.hole_id) continue;
+          (map.get(r.hole_id) ?? map.set(r.hole_id, []).get(r.hole_id)!).push(r);
+        }
+        const dupRows = [...map.values()].filter((arr) => arr.length > 1).flat();
+        if (dupRows.length) inconsistencies.push({
           id: "dh-dup", severity: "error", table: "drill_holes",
-          rule: "hole_id duplicado", detail: `IDs: ${[...new Set(dupes)].slice(0, 5).join(", ")}`, count: dupes.length,
+          rule: "hole_id duplicado", detail: `IDs: ${[...new Set(dupRows.map((r) => r.hole_id))].slice(0, 5).join(", ")}`, count: dupRows.length,
+          category: "unique",
+          affected: cap(dupRows).map((r) => ({ id: r.id, label: r.hole_id, fields: { hole_id: r.hole_id, status: r.status, planned_depth: r.planned_depth } })),
         });
       }
 
       // 5. Patents enum + paid without paid_at
-      const pt = await supabase.from("concession_patents").select("id,status,paid_at,year").eq("project_id", projectId);
+      const pt = await supabase
+        .from("concession_patents")
+        .select("id,status,paid_at,year,amount_utm,concession_id")
+        .eq("project_id", projectId);
       if (pt.data) {
         const badSt = pt.data.filter((r) => r.status && !VALID_PATENT_STATUS.has(String(r.status)));
         if (badSt.length) inconsistencies.push({
           id: "pt-st", severity: "warn", table: "concession_patents",
           rule: "status fuera de enum", detail: [...new Set(badSt.map((b) => b.status))].join(", "), count: badSt.length,
+          category: "enum",
+          affected: cap(badSt).map((r) => ({ id: r.id, label: `${r.year}`, fields: { year: r.year, status: r.status, amount_utm: r.amount_utm, concession_id: r.concession_id } })),
         });
         const paidNoDate = pt.data.filter((r) => r.status === "paid" && !r.paid_at);
         if (paidNoDate.length) inconsistencies.push({
           id: "pt-pd", severity: "warn", table: "concession_patents",
           rule: "paid sin paid_at", detail: "Patentes marcadas como pagadas sin fecha", count: paidNoDate.length,
+          affected: cap(paidNoDate).map((r) => ({ id: r.id, label: `${r.year}`, fields: { year: r.year, status: r.status, paid_at: r.paid_at, concession_id: r.concession_id } })),
         });
       }
 
-      // 6. Concessions without holder linked
+      // 6. Concessions duplicate code
       const conc = await supabase.from("mining_concessions").select("id,code,name").eq("project_id", projectId);
       if (conc.data) {
-        const codes = conc.data.map((r) => r.code).filter(Boolean) as string[];
-        const dupes = codes.filter((c, i) => codes.indexOf(c) !== i);
-        if (dupes.length) inconsistencies.push({
+        const map = new Map<string, typeof conc.data>();
+        for (const r of conc.data) {
+          if (!r.code) continue;
+          (map.get(r.code) ?? map.set(r.code, []).get(r.code)!).push(r);
+        }
+        const dupRows = [...map.values()].filter((arr) => arr.length > 1).flat();
+        if (dupRows.length) inconsistencies.push({
           id: "mc-dup", severity: "error", table: "mining_concessions",
-          rule: "code duplicado", detail: `Códigos: ${[...new Set(dupes)].slice(0, 5).join(", ")}`, count: dupes.length,
+          rule: "code duplicado", detail: `Códigos: ${[...new Set(dupRows.map((r) => r.code))].slice(0, 5).join(", ")}`, count: dupRows.length,
+          category: "unique",
+          affected: cap(dupRows).map((r) => ({ id: r.id, label: r.code, fields: { code: r.code, name: r.name } })),
         });
       }
 
@@ -187,16 +241,20 @@ export function useDataValidation(projectId: string | null) {
         if (noPhase.length) inconsistencies.push({
           id: "camp-ph", severity: "info", table: "exploration_campaigns",
           rule: "campaña sin phase", detail: "Definir fase (recon, generative, etc.)", count: noPhase.length,
+          category: "missing",
+          affected: cap(noPhase).map((r) => ({ id: r.id, label: r.name, fields: { name: r.name, status: r.status, phase: r.phase } })),
         });
       }
 
       // 8. Geophysics stations without survey
-      const gs = await supabase.from("geophysics_stations").select("id,survey_id").eq("project_id", projectId);
+      const gs = await supabase.from("geophysics_stations").select("id,survey_id,station_id,lat,lng").eq("project_id", projectId);
       if (gs.data) {
         const orphan = gs.data.filter((r) => !r.survey_id);
         if (orphan.length) inconsistencies.push({
           id: "gs-orph", severity: "warn", table: "geophysics_stations",
           rule: "estación sin survey_id", detail: "Estaciones huérfanas sin survey vinculado", count: orphan.length,
+          category: "missing",
+          affected: cap(orphan).map((r) => ({ id: r.id, label: r.station_id, fields: { station_id: r.station_id, lat: r.lat, lng: r.lng, survey_id: r.survey_id } })),
         });
       }
 
@@ -381,6 +439,7 @@ export function useDataValidation(projectId: string | null) {
       }
 
       // Push all xref findings as inconsistencies, tagged as cross-reference.
+      const cap50 = <T,>(arr: T[]): T[] => arr.slice(0, 50);
       for (const c of checks) {
         const sample = c.rows.slice(0, 3).map((r) => r.ref ?? "∅").filter(Boolean);
         inconsistencies.push({
@@ -391,6 +450,11 @@ export function useDataValidation(projectId: string | null) {
           detail: `FK rota en ${c.parentLabel}${sample.length ? ` · refs: ${sample.join(", ")}${c.rows.length > 3 ? "…" : ""}` : ""}`,
           count: c.rows.length,
           category: "xref",
+          affected: cap50(c.rows).map((r) => ({
+            id: r.id,
+            label: r.ref ?? "∅",
+            fields: { [c.parentLabel]: r.ref ?? "(null)" },
+          })),
         });
       }
     }

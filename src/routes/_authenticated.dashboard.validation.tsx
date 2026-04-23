@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight } from "lucide-react";
+import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight, ChevronDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { useDataValidation, type TableAudit, type Inconsistency } from "@/hooks/useDataValidation";
@@ -278,14 +278,26 @@ function formatRelative(iso: string): string {
 }
 
 function IncRow({ iss }: { iss: Inconsistency }) {
+  const [open, setOpen] = useState(false);
   const Icon = iss.severity === "error" ? XCircle : iss.severity === "warn" ? AlertTriangle : FileWarning;
   const tone =
     iss.severity === "error" ? "text-signal-red border-l-signal-red" :
     iss.severity === "warn" ? "text-signal-amber border-l-signal-amber" :
     "text-signal-cyan border-l-signal-cyan";
+  const hasAffected = !!iss.affected && iss.affected.length > 0;
+  const Chevron = open ? ChevronDown : ChevronRight;
+
   return (
-    <div className={cn("px-3 py-2 border-l-2 hover:bg-accent/30", tone)}>
-      <div className="flex items-start gap-2">
+    <div className={cn("border-l-2", tone)}>
+      <button
+        type="button"
+        onClick={() => hasAffected && setOpen((v) => !v)}
+        disabled={!hasAffected}
+        className={cn(
+          "w-full text-left px-3 py-2 flex items-start gap-2 hover:bg-accent/30 transition-colors",
+          hasAffected ? "cursor-pointer" : "cursor-default",
+        )}
+      >
         <Icon className="w-3.5 h-3.5 mt-0.5 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -299,9 +311,89 @@ function IncRow({ iss }: { iss: Inconsistency }) {
             <span className="ml-auto text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-[2px] bg-bg-elevated border border-border">
               {iss.count} {iss.count === 1 ? "fila" : "filas"}
             </span>
+            {hasAffected && <Chevron className="w-3 h-3 text-text-dim shrink-0" />}
           </div>
           <div className="text-[10px] text-text-dim font-mono mt-0.5 truncate">{iss.detail}</div>
         </div>
+      </button>
+      {open && hasAffected && <AffectedTable affected={iss.affected!} totalCount={iss.count} />}
+    </div>
+  );
+}
+
+function AffectedTable({
+  affected,
+  totalCount,
+}: {
+  affected: NonNullable<Inconsistency["affected"]>;
+  totalCount: number;
+}) {
+  const columns = useMemo(() => {
+    const cols: string[] = [];
+    const seen = new Set<string>();
+    for (const r of affected) {
+      for (const k of Object.keys(r.fields)) {
+        if (!seen.has(k)) { seen.add(k); cols.push(k); }
+      }
+    }
+    return cols;
+  }, [affected]);
+  const truncated = totalCount > affected.length;
+
+  return (
+    <div className="bg-bg-elevated/30 border-t border-border/50">
+      <div className="px-3 py-1.5 border-b border-border/40">
+        <span className="text-[9px] font-mono uppercase tracking-wider text-text-dim">
+          Registros afectados · mostrando {affected.length}/{totalCount}
+          {truncated && " (truncado a 50)"}
+        </span>
+      </div>
+      <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
+        <table className="w-full text-[10px] font-mono">
+          <thead className="bg-bg-panel/60 sticky top-0">
+            <tr className="text-left text-text-dim">
+              <th className="px-2 py-1.5 font-normal">label</th>
+              {columns.map((c) => (
+                <th key={c} className="px-2 py-1.5 font-normal whitespace-nowrap">{c}</th>
+              ))}
+              <th className="px-2 py-1.5 font-normal w-6"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {affected.map((r) => (
+              <tr key={r.id} className="border-t border-border/30 hover:bg-accent/20">
+                <td className="px-2 py-1 text-foreground font-bold whitespace-nowrap">
+                  {r.label ?? <span className="text-text-dim">—</span>}
+                </td>
+                {columns.map((c) => {
+                  const v = r.fields[c];
+                  return (
+                    <td
+                      key={c}
+                      className="px-2 py-1 text-text-secondary whitespace-nowrap max-w-[200px] truncate"
+                      title={v == null ? "(null)" : String(v)}
+                    >
+                      {v == null ? <span className="text-text-dim italic">∅</span> : String(v)}
+                    </td>
+                  );
+                })}
+                <td className="px-2 py-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      navigator.clipboard?.writeText(r.id);
+                      toast.success("ID copiado", { description: r.id });
+                    }}
+                    title={`Copiar id: ${r.id}`}
+                    className="p-0.5 text-text-dim hover:text-foreground"
+                  >
+                    <Copy className="w-3 h-3" />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
