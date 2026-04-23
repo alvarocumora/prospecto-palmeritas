@@ -31,7 +31,7 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -40,12 +40,24 @@ function AuthPage() {
           },
         });
         if (error) throw error;
+        // If email confirmation is required, no session is returned.
+        if (!data.session) {
+          toast.success("Cuenta creada. Revisa tu email para confirmar.");
+          setMode("login");
+          return;
+        }
         toast.success("Cuenta creada. Redirigiendo…");
+        // Wait one tick for AuthProvider's onAuthStateChange to propagate `user`.
+        await new Promise((r) => setTimeout(r, 50));
         navigate({ to: "/dashboard" });
       } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
+        if (!data.session) throw new Error("No se pudo iniciar sesión");
         toast.success("Bienvenido");
+        // Wait one tick for AuthProvider's onAuthStateChange to propagate `user`,
+        // otherwise the protected layout sees user=null and bounces back to /auth.
+        await new Promise((r) => setTimeout(r, 50));
         navigate({ to: "/dashboard" });
       }
     } catch (err) {
