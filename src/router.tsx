@@ -1,8 +1,36 @@
 import { createRouter, useRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
 
+function isChunkLoadError(error: Error): boolean {
+  const msg = (error?.message || "").toLowerCase();
+  const name = (error?.name || "").toLowerCase();
+  return (
+    msg.includes("importing a module script failed") ||
+    msg.includes("failed to fetch dynamically imported module") ||
+    msg.includes("error loading dynamically imported module") ||
+    msg.includes("loading chunk") ||
+    msg.includes("loading css chunk") ||
+    name === "chunkloaderror"
+  );
+}
+
 function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
+
+  // Auto-recovery for stale chunk errors after a new deploy.
+  // Reload once (guarded via sessionStorage) to fetch fresh asset manifest.
+  if (typeof window !== "undefined" && isChunkLoadError(error)) {
+    const KEY = "__chunk_reload_attempted__";
+    try {
+      if (!sessionStorage.getItem(KEY)) {
+        sessionStorage.setItem(KEY, "1");
+        window.location.reload();
+        return null as unknown as JSX.Element;
+      }
+    } catch {
+      // sessionStorage unavailable — fall through to normal error UI
+    }
+  }
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
