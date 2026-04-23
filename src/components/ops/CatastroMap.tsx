@@ -318,7 +318,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [center]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Render project concessions
   useEffect(() => {
