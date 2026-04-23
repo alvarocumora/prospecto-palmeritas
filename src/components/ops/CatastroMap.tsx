@@ -115,6 +115,35 @@ function featureIntersectsBbox(f: GeoJSON.Feature, b: BBox): boolean {
   return !(maxLng < b.minLng || minLng > b.maxLng || maxLat < b.minLat || minLat > b.maxLat);
 }
 
+/** Parse SERNAGEOMIN FECHA_VENCIMIENTO (epoch ms or ISO date) and return days until expiry. */
+function daysUntilExpiry(p: Record<string, unknown>): number | null {
+  const raw = p.FECHA_VENCIMIENTO;
+  if (raw == null) return null;
+  let ts: number;
+  if (typeof raw === "number") ts = raw;
+  else {
+    const d = new Date(String(raw));
+    if (isNaN(d.getTime())) return null;
+    ts = d.getTime();
+  }
+  return Math.floor((ts - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
+/** Severity tier from days-to-expiry (null = unknown, expired => "expired"). */
+type ExpirySeverity = "expired" | "critical" | "warn" | "ok" | "unknown";
+function expirySeverity(days: number | null): ExpirySeverity {
+  if (days === null) return "unknown";
+  if (days < 0) return "expired";
+  if (days <= 30) return "critical";
+  if (days <= 90) return "warn";
+  return "ok";
+}
+const EXPIRY_COLOR: Record<Exclude<ExpirySeverity, "ok" | "unknown">, string> = {
+  expired: "#dc2626",
+  critical: "#ef4444",
+  warn: "#f59e0b",
+};
+
 type Props = {
   concessions: MiningConcession[];
   /** [lng, lat] center fallback */
@@ -151,6 +180,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     () => new Set<CatastroOrigen>(["EXPLOTA_1983", "EXPLOTA_1932", "EXPLORA_1983", "ESTACAMENTO"])
   );
   const [searchQuery, setSearchQuery] = useState("");
+  const [expiringOnly, setExpiringOnly] = useState(false);
+  const expiryThresholdDays = 90;
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
@@ -371,23 +402,35 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     loadCatastro({ force: true });
   };
 
-  // Apply visual highlight to the currently selected feature, dim the rest.
+  // Apply visual highlight: selection state + expiry warning ring.
   useEffect(() => {
     if (!LRef) return;
     for (const [id, lyr] of featureLayersRef.current.entries()) {
       const path = lyr as unknown as { setStyle?: (s: Record<string, unknown>) => void };
       if (!path.setStyle) continue;
       const f = visibleFeatures.find((x) => x.id === id);
-      const origen = ((f?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+      const props = (f?.properties as Record<string, unknown> | undefined) ?? {};
+      const origen = (props.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+      const sev = expirySeverity(daysUntilExpiry(props));
       const isSel = selectedId === id;
       const isDimmed = selectedId !== null && !isSel;
+      // Expiring polygons get a red outline + slightly higher fill so they pop.
+      const expiringStroke = sev === "expired" || sev === "critical" || sev === "warn";
+      const ringColor = sev !== "ok" && sev !== "unknown" ? EXPIRY_COLOR[sev] : null;
       path.setStyle({
-        color: isSel ? "#ffffff" : s.color,
-        weight: isSel ? 4 : s.weight,
+        color: isSel ? "#ffffff" : ringColor ?? s.color,
+        weight: isSel ? 4 : expiringStroke ? 3 : s.weight,
         opacity: isDimmed ? 0.35 : s.opacity,
-        fillColor: s.fillColor,
-        fillOpacity: isSel ? Math.min(0.55, s.fillOpacity + 0.25) : isDimmed ? 0.05 : s.fillOpacity,
+        fillColor: ringColor ?? s.fillColor,
+        fillOpacity: isSel
+          ? Math.min(0.55, s.fillOpacity + 0.25)
+          : isDimmed
+          ? 0.05
+          : expiringStroke
+          ? Math.min(0.5, s.fillOpacity + 0.15)
+          : s.fillOpacity,
+        dashArray: sev === "expired" ? "6,4" : undefined,
       });
     }
   }, [selectedId, visibleFeatures, LRef]);
@@ -405,13 +448,17 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
   }, [selectedId]);
 
-  // Filtered list (type + free-text) for the side panel.
+  // Filtered list (type + free-text + expiring-only) for the side panel.
   const filteredFeatures = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return visibleFeatures.filter((f) => {
       const p = (f.properties ?? {}) as Record<string, unknown>;
       const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       if (!typeFilter.has(origen)) return false;
+      if (expiringOnly) {
+        const sev = expirySeverity(daysUntilExpiry(p));
+        if (sev !== "expired" && sev !== "critical" && sev !== "warn") return false;
+      }
       if (!q) return true;
       const hay = [p.NOMBRE, p.NUMERO_ROL, p.TITULAR_DIVISION, p.COMUNA]
         .filter(Boolean)
@@ -419,7 +466,20 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         .join(" | ");
       return hay.includes(q);
     });
-  }, [visibleFeatures, typeFilter, searchQuery]);
+  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly]);
+
+  // Expiry summary across visible features (independent of filters).
+  const expirySummary = useMemo(() => {
+    let expired = 0, critical = 0, warn = 0;
+    for (const f of visibleFeatures) {
+      const sev = expirySeverity(daysUntilExpiry((f.properties ?? {}) as Record<string, unknown>));
+      if (sev === "expired") expired++;
+      else if (sev === "critical") critical++;
+      else if (sev === "warn") warn++;
+    }
+    return { expired, critical, warn };
+  }, [visibleFeatures]);
+
 
   const toggleType = (t: CatastroOrigen) => {
     setTypeFilter((prev) => {
@@ -556,6 +616,34 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                 );
               })}
             </div>
+            {(expirySummary.expired + expirySummary.critical + expirySummary.warn) > 0 && (
+              <div className="flex items-center gap-1 flex-wrap pt-1 border-t border-border/50">
+                <button
+                  onClick={() => setExpiringOnly((v) => !v)}
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${
+                    expiringOnly ? "bg-destructive/15 border-destructive text-destructive" : "border-border text-text-secondary hover:bg-accent"
+                  }`}
+                  title={`Mostrar solo pertenencias que vencen en ≤${expiryThresholdDays} días`}
+                >
+                  ⚠ Solo por vencer
+                </button>
+                {expirySummary.expired > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded animate-pulse" style={{ background: `${EXPIRY_COLOR.expired}22`, color: EXPIRY_COLOR.expired, border: `1px solid ${EXPIRY_COLOR.expired}` }}>
+                    {expirySummary.expired} vencidas
+                  </span>
+                )}
+                {expirySummary.critical > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.critical}22`, color: EXPIRY_COLOR.critical, border: `1px solid ${EXPIRY_COLOR.critical}` }}>
+                    {expirySummary.critical} ≤30 d
+                  </span>
+                )}
+                {expirySummary.warn > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.warn}22`, color: EXPIRY_COLOR.warn, border: `1px solid ${EXPIRY_COLOR.warn}` }}>
+                    {expirySummary.warn} ≤90 d
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
             {filteredFeatures.length === 0 ? (
@@ -570,6 +658,10 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                   const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
                   const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
                   const isSel = selectedId === id;
+                  const days = daysUntilExpiry(p);
+                  const sev = expirySeverity(days);
+                  const showBadge = sev === "expired" || sev === "critical" || sev === "warn";
+                  const badgeColor = showBadge ? EXPIRY_COLOR[sev as "expired" | "critical" | "warn"] : null;
                   return (
                     <li key={id}>
                       <button
@@ -583,9 +675,22 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                             className="inline-block w-2 h-2 rounded-sm shrink-0"
                             style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
                           />
-                          <span className="font-semibold truncate" style={{ color: s.color }}>
+                          <span className="font-semibold truncate flex-1" style={{ color: s.color }}>
                             {(p.NOMBRE as string) ?? "(sin nombre)"}
                           </span>
+                          {showBadge && badgeColor && (
+                            <span
+                              className={`shrink-0 px-1 py-0.5 rounded text-[9px] font-mono ${sev === "expired" ? "animate-pulse" : ""}`}
+                              style={{ background: `${badgeColor}22`, color: badgeColor, border: `1px solid ${badgeColor}` }}
+                              title={
+                                sev === "expired"
+                                  ? `Vencida hace ${Math.abs(days ?? 0)} días`
+                                  : `Vence en ${days} días`
+                              }
+                            >
+                              {sev === "expired" ? "VENCIDA" : `${days}d`}
+                            </span>
+                          )}
                         </div>
                         <div className="text-[10px] text-text-secondary leading-tight">
                           ROL {(p.NUMERO_ROL as string | number) ?? "—"}
