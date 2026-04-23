@@ -84,6 +84,31 @@ function ValidationPage() {
             )}
           </HudPanel>
 
+          {/* Repair actions */}
+          <HudPanel title="Acciones de reparación · vista previa antes de aplicar" accent="violet" className="bg-bg-panel/40">
+            <div className="text-[10px] font-mono text-text-dim mb-3">
+              Cada reparación primero genera un dry-run. Revisa los cambios y luego confirma para aplicarlos a la base.
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {repairs.repairs.map((repair) => (
+                <RepairCard
+                  key={repair.id}
+                  repair={repair}
+                  state={repairs.states[repair.id]}
+                  onPreview={() => repairs.runPreview(repair)}
+                  onApply={async () => {
+                    const n = await repairs.applyRepair(repair);
+                    if (n > 0) {
+                      toast.success(`${repair.title}: ${n} fila${n === 1 ? "" : "s"} corregida${n === 1 ? "" : "s"}`);
+                      refresh();
+                    }
+                  }}
+                  onClear={() => repairs.clear(repair.id)}
+                />
+              ))}
+            </div>
+          </HudPanel>
+
           {/* Tables audit */}
           <HudPanel
             title={`Estado por tabla · ${active.name ?? active.id.slice(0, 8)}`}
