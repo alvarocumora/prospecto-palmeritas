@@ -479,10 +479,10 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
   }, [selectedId]);
 
-  // Filtered list (type + free-text + expiring-only) for the side panel.
+  // Filtered + sorted list (type + free-text + expiring-only) for the side panel.
   const filteredFeatures = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    return visibleFeatures.filter((f) => {
+    const filtered = visibleFeatures.filter((f) => {
       const p = (f.properties ?? {}) as Record<string, unknown>;
       const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       if (!typeFilter.has(origen)) return false;
@@ -497,7 +497,15 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         .join(" | ");
       return hay.includes(q);
     });
-  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly]);
+    if (sortMode === "default") return filtered;
+    const ha = (f: GeoJSON.Feature): number => {
+      const v = (f.properties as Record<string, unknown> | undefined)?.HECTAREAS;
+      return typeof v === "number" && Number.isFinite(v) ? v : -Infinity;
+    };
+    return [...filtered].sort((a, b) =>
+      sortMode === "ha_desc" ? ha(b) - ha(a) : ha(a) - ha(b),
+    );
+  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly, sortMode]);
 
   // Expiry summary across visible features (independent of filters).
   const expirySummary = useMemo(() => {
