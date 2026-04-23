@@ -8,6 +8,7 @@ import {
   useProjectCapabilities,
   type ModuleAction,
 } from "@/hooks/useMemberCapabilities";
+import { MODULE_ROLES, WRITE_ROLES, type ProjectRole } from "@/hooks/useProjectRole";
 import { Eye, Pencil, Ban, RotateCcw, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -190,15 +191,10 @@ function CheckCell({
   );
 }
 
-function DefaultPill({ role, module }: { role: string; module: string }) {
-  // simple lookup against MODULE_ROLES
-  // re-import lazily to avoid extra cost
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const mod = require("@/hooks/useProjectRole");
-  const allowed: string[] = mod.MODULE_ROLES?.[module] ?? [];
-  const canWriteRoles: string[] = mod.WRITE_ROLES ?? [];
+function DefaultPill({ role, module }: { role: ProjectRole; module: string }) {
+  const allowed = (MODULE_ROLES as Record<string, ProjectRole[]>)[module] ?? [];
   const hasAccess = allowed.includes(role);
-  const hasWrite = hasAccess && canWriteRoles.includes(role);
+  const hasWrite = hasAccess && WRITE_ROLES.includes(role);
   return (
     <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${hasWrite ? "border-gold/40 text-gold" : hasAccess ? "border-border text-muted-foreground" : "border-destructive/30 text-destructive/70"}`}>
       {hasWrite ? "edit" : hasAccess ? "view" : "—"}

@@ -5,7 +5,8 @@ import { useTeam } from "@/hooks/useTeam";
 import { useProjectRole } from "@/hooks/useProjectRole";
 import { MembersTable } from "@/components/team/MembersTable";
 import { InviteMemberDialog } from "@/components/team/InviteMemberDialog";
-import { UserPlus, Mail, Trash2, Copy } from "lucide-react";
+import { CapabilitiesMatrix } from "@/components/team/CapabilitiesMatrix";
+import { UserPlus, Mail, Trash2, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/team")({
@@ -52,6 +53,13 @@ function TeamPage() {
             onRemove={removeMember}
           />
         )}
+      </section>
+
+      <section className="mb-8">
+        <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+          <ShieldCheck className="w-3.5 h-3.5" /> Capacidades por miembro
+        </h2>
+        {!loading && <CapabilitiesMatrix members={members} canManage={canManage} />}
       </section>
 
       {canManage && (
