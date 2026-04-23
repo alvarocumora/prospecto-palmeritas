@@ -69,7 +69,7 @@ export function ProspectivityButton({ map, onRunChange }: Props) {
   };
 
   return (
-    <div className="absolute top-3 left-3 z-[500] flex flex-col gap-1.5 max-w-[200px]">
+    <div className="absolute top-14 left-3 z-[500] flex flex-col gap-1.5 max-w-[200px]">
       <button
         type="button"
         onClick={generate}
