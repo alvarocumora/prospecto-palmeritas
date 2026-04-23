@@ -28,6 +28,7 @@ import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
 import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
+import { AnnotationsLayer } from "@/components/map/AnnotationsLayer";
 import type { MapView } from "@/hooks/useMapViews";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { TimeSlider } from "@/components/map/TimeSlider";
@@ -314,6 +315,7 @@ function OperationalMap() {
 
             {/* Always-on lightweight overlays */}
             <LiveCollabLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
+            <AnnotationsLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
             <CollapsibleAuLegend />
 
             {/* Desktop: all panels visible */}
