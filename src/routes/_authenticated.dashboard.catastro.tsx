@@ -73,10 +73,34 @@ function CatastroPage() {
       const changed = result?.changed ?? 0;
       const missing = result?.missing ?? 0;
       const alerts = result?.alertsCreated ?? 0;
+
+      // Chain compute-overlaps so conflicts stay in sync with authoritative data
+      toast.loading("Analizando sobreposiciones…", { id: t });
+      let detected = 0;
+      try {
+        const { data: ov, error: ovErr } = await supabase.functions.invoke("compute-overlaps", {
+          body: { projectId: active.id },
+        });
+        if (ovErr) throw ovErr;
+        detected = ov?.detected ?? 0;
+      } catch (ovErr) {
+        // Don't fail the whole sync — overlaps are best-effort
+        console.error("compute-overlaps failed", ovErr);
+        toast.warning(
+          `Sync OK · ${checked} revisadas · ${changed} cambios · ${alerts} alertas · sobreposiciones no recalculadas`,
+          { id: t, duration: 6000 }
+        );
+        // Notify panels even on partial success
+        window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId: active.id } }));
+        return;
+      }
+
       toast.success(
-        `Sync OK · ${checked} revisadas · ${changed} con cambios · ${missing} no encontradas · ${alerts} alertas`,
-        { id: t, duration: 6000 }
+        `Sync OK · ${checked} revisadas · ${changed} cambios · ${missing} no encontradas · ${alerts} alertas · ${detected} sobreposiciones`,
+        { id: t, duration: 7000 }
       );
+      // Tell panels (overlaps, concessions, alerts) to refresh
+      window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId: active.id } }));
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error en sync", { id: t });
     } finally {
