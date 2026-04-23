@@ -18,6 +18,8 @@ export type Inconsistency = {
   rule: string;
   detail: string;
   count: number;
+  /** Optional tag to distinguish broken cross-references from enum/uniqueness checks. */
+  category?: "enum" | "unique" | "xref" | "missing";
 };
 
 export type ValidationReport = {
