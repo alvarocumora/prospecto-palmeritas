@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
-import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar } from "lucide-react";
+import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download } from "lucide-react";
 import {
   useMapAnnotations,
   ANNOTATION_COLORS,
@@ -14,10 +14,12 @@ import {
 } from "@/hooks/useMapAnnotations";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { useExplorationCampaigns } from "@/hooks/useExplorationCampaigns";
+import { exportAnnotationsCsv, exportAnnotationsPdf } from "./exportAnnotations";
 import type { LeafletNS } from "./types";
 
 interface Props {
   projectId: string | null;
+  projectName?: string | null;
   map: LeafletMap | null;
   L: LeafletNS | null;
 }
@@ -25,7 +27,7 @@ interface Props {
 type DraftPin = { lat: number; lng: number } | null;
 type FilterKind = "all" | "target" | "campaign" | "phase";
 
-export function AnnotationsLayer({ projectId, map, L }: Props) {
+export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
   const { annotations, createAnnotation, updateAnnotation, deleteAnnotation } = useMapAnnotations(projectId);
   const { targets } = useExplorationTargets(projectId);
   const { data: campaigns } = useExplorationCampaigns(projectId);
@@ -205,13 +207,31 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
             Notas ({filtered.length}/{annotations.length})
           </span>
         </div>
-        <button
-          onClick={() => { setOpen(false); cancelDraft(); }}
-          className="text-muted-foreground hover:text-foreground"
-          title="Cerrar"
-        >
-          <X className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => exportAnnotationsCsv(filtered, { projectName: projectName ?? "proyecto", targetMap, campaignMap })}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-gold disabled:opacity-40"
+            title="Exportar CSV"
+          >
+            <Download className="w-3 h-3" /> CSV
+          </button>
+          <button
+            onClick={() => exportAnnotationsPdf(filtered, { projectName: projectName ?? "proyecto", targetMap, campaignMap })}
+            disabled={filtered.length === 0}
+            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-gold disabled:opacity-40"
+            title="Exportar PDF"
+          >
+            <Download className="w-3 h-3" /> PDF
+          </button>
+          <button
+            onClick={() => { setOpen(false); cancelDraft(); }}
+            className="text-muted-foreground hover:text-foreground ml-1"
+            title="Cerrar"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Filter bar */}
