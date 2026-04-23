@@ -523,7 +523,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     if (lyr?.getBounds) {
       try {
         const b = lyr.getBounds();
-        if (b.isValid()) map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: true });
+        if (b.isValid() && !isUnmountingRef.current) {
+          map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: false });
+        }
       } catch { /* noop */ }
     }
   }, [selectedId]);
@@ -768,7 +770,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
               try {
                 if (lyr.getBounds) {
                   const b = lyr.getBounds();
-                  if (b.isValid()) map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: true });
+                  if (b.isValid() && !isUnmountingRef.current) {
+                    map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: false });
+                  }
                 }
                 lyr.openPopup?.();
               } catch { /* noop */ }
@@ -835,7 +839,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                       if (!map || !lyr?.getBounds) return;
                       try {
                         const b = lyr.getBounds();
-                        if (b.isValid()) map.fitBounds(b, { padding: [40, 40], maxZoom: 17, animate: true });
+                        if (b.isValid() && !isUnmountingRef.current) {
+                          map.fitBounds(b, { padding: [40, 40], maxZoom: 17, animate: false });
+                        }
                       } catch { /* noop */ }
                     }}
                     className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-primary/40 bg-primary/10 text-[10px] font-mono text-primary hover:bg-primary/20"
