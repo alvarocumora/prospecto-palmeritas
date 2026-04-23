@@ -101,8 +101,8 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
 
   return (
     <>
-      {/* Section button slots into the right toolbar column */}
-      <div className="absolute top-3 right-3 z-[500] pointer-events-none" style={{ marginTop: 184 }}>
+      {/* Section button slots into the right toolbar column (below raster swipe + control) */}
+      <div className="absolute top-3 right-16 z-[500] pointer-events-none">
         <div className="pointer-events-auto flex flex-col items-end gap-1.5">
           <button
             onClick={() => { setActive((a) => !a); cleanup(); }}

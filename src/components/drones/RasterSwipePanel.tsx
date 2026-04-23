@@ -90,7 +90,7 @@ export function RasterSwipePanel({ rasters, mapInst }: Props) {
   return (
     <>
       {/* Trigger button + selectors */}
-      <div className="absolute top-3 right-3 z-[1000] flex flex-col items-end gap-2">
+      <div className="absolute top-3 right-3 z-[700] flex flex-col items-end gap-2">
         <button
           onClick={() => setOpen((o) => !o)}
           className="flex items-center gap-1.5 rounded-md bg-bg-secondary/95 backdrop-blur px-2.5 py-1.5 text-xs border border-border hover:bg-bg-tertiary"

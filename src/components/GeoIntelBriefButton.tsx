@@ -84,7 +84,7 @@ export function GeoIntelBriefButton({ map }: Props) {
         type="button"
         onClick={generate}
         disabled={loading}
-        className="absolute top-3 right-3 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gold/40 bg-bg-secondary/95 backdrop-blur text-foreground hover:bg-gold/10 hover:border-gold disabled:opacity-50 text-[11px] font-mono shadow-md transition-colors"
+        className="absolute top-3 right-28 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gold/40 bg-bg-secondary/95 backdrop-blur text-foreground hover:bg-gold/10 hover:border-gold disabled:opacity-50 text-[11px] font-mono shadow-md transition-colors"
         title="Generar brief geológico IA del centro del mapa"
       >
         {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" /> : <Sparkles className="w-3.5 h-3.5 text-gold" />}
@@ -92,7 +92,7 @@ export function GeoIntelBriefButton({ map }: Props) {
       </button>
 
       {open && (
-        <div className="absolute top-3 right-3 z-[600] w-[min(94vw,440px)] max-h-[80vh] flex flex-col rounded-lg border border-gold/40 bg-bg-secondary shadow-2xl">
+        <div className="absolute top-14 right-3 z-[800] w-[min(94vw,440px)] max-h-[75vh] flex flex-col rounded-lg border border-gold/40 bg-bg-secondary shadow-2xl">
           <header className="px-3 py-2 border-b border-border flex items-center gap-2 shrink-0">
             <Sparkles className="w-4 h-4 text-gold" />
             <div className="font-mono text-xs font-semibold flex-1">Geo-Intel Brief</div>
