@@ -301,4 +301,19 @@
   .leaflet-image-layer.raster-terrain {
     filter: sepia(0.5) hue-rotate(20deg) saturate(1.4);
   }
+
+  /* Lift Leaflet bottom controls above the global StatusBar (h-6 = 24px) */
+  .leaflet-bottom.leaflet-left {
+    margin-bottom: 32px;
+  }
+  .leaflet-bottom.leaflet-right {
+    margin-bottom: 32px;
+  }
+  /* Compact zoom buttons */
+  .leaflet-control-zoom a {
+    width: 28px !important;
+    height: 28px !important;
+    line-height: 28px !important;
+    font-size: 14px !important;
+  }
 }
