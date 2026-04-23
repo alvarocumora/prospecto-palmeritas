@@ -294,6 +294,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         ro.observe(containerRef.current);
       }
       (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
+      } catch (e) {
+        console.error("[CatastroMap] failed to initialize Leaflet map", e);
+      }
     })();
     return () => {
       cancelled = true;
