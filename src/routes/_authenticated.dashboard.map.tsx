@@ -315,7 +315,7 @@ function OperationalMap() {
 
             {/* Always-on lightweight overlays */}
             <LiveCollabLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
-            <AnnotationsLayer projectId={active?.id ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
+            <AnnotationsLayer projectId={active?.id ?? null} projectName={active?.name ?? null} map={mapInst?.map ?? null} L={mapInst?.L ?? null} />
             <CollapsibleAuLegend />
 
             {/* Desktop: all panels visible */}
