@@ -1,10 +1,23 @@
 // Export map annotations to CSV or PDF.
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ANNOTATION_COLORS, type MapAnnotation } from "@/hooks/useMapAnnotations";
+import { ANNOTATION_COLORS, ANNOTATION_PRIORITIES, type MapAnnotation } from "@/hooks/useMapAnnotations";
 
 function colorLabel(c: string): string {
   return ANNOTATION_COLORS.find((x) => x.value === c)?.label ?? c;
+}
+
+function priorityLabel(p: string | null | undefined): string {
+  return ANNOTATION_PRIORITIES.find((x) => x.value === p)?.label ?? (p ?? "—");
+}
+
+export type UserNameMap = Map<string, string>;
+
+interface ExportMeta {
+  projectName: string;
+  targetMap?: Map<string, { code: string }>;
+  campaignMap?: Map<string, { name: string }>;
+  userMap?: UserNameMap;
 }
 
 function csvEscape(v: unknown): string {
@@ -15,10 +28,14 @@ function csvEscape(v: unknown): string {
 
 export function exportAnnotationsCsv(
   annotations: MapAnnotation[],
-  meta: { projectName: string; targetMap?: Map<string, { code: string }>; campaignMap?: Map<string, { name: string }> },
+  meta: ExportMeta,
 ) {
   const headers = [
-    "id", "lat", "lng", "color", "color_label", "text", "resolved",
+    "id", "lat", "lng",
+    "color", "color_label", "color_original",
+    "priority", "priority_label",
+    "text", "resolved", "resolved_reason", "resolved_by", "resolved_at",
+    "created_by", "created_by_name",
     "target_code", "campaign_name", "phase", "created_at", "updated_at",
   ];
   const rows = annotations.map((a) => [
@@ -27,8 +44,16 @@ export function exportAnnotationsCsv(
     Number(a.lng).toFixed(6),
     a.color,
     colorLabel(a.color),
+    a.color, // color_original (alias explícito para auditoría)
+    a.priority ?? "medium",
+    priorityLabel(a.priority),
     a.text,
     a.resolved ? "true" : "false",
+    a.resolved_reason ?? "",
+    a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? a.resolved_by : "",
+    a.resolved_at ?? "",
+    a.created_by,
+    meta.userMap?.get(a.created_by) ?? "",
     a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "" : "",
     a.campaign_id ? meta.campaignMap?.get(a.campaign_id)?.name ?? "" : "",
     a.phase ?? "",
@@ -49,7 +74,7 @@ export function exportAnnotationsCsv(
 
 export function exportAnnotationsPdf(
   annotations: MapAnnotation[],
-  meta: { projectName: string; targetMap?: Map<string, { code: string }>; campaignMap?: Map<string, { name: string }> },
+  meta: ExportMeta,
 ) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -70,33 +95,51 @@ export function exportAnnotationsPdf(
 
   autoTable(doc, {
     startY: 76,
-    head: [["#", "Lat", "Lng", "Color", "Texto", "Resuelta", "Target", "Campaña", "Fase", "Creada"]],
-    body: annotations.map((a, i) => [
-      String(i + 1),
-      Number(a.lat).toFixed(5),
-      Number(a.lng).toFixed(5),
-      colorLabel(a.color),
-      a.text,
-      a.resolved ? "✓" : "",
-      a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "—" : "",
-      a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "").slice(0, 24) : "",
-      a.phase ?? "",
-      new Date(a.created_at).toLocaleDateString("es-CL"),
-    ]),
-    styles: { font: "helvetica", fontSize: 8, cellPadding: 3, overflow: "linebreak" },
-    headStyles: { fillColor: "#C8922A", textColor: 255, fontStyle: "bold" },
+    head: [["#", "Lat", "Lng", "Prio", "Color", "Texto", "Creador", "Resuelta", "Motivo / por", "Target", "Campaña", "Fase"]],
+    body: annotations.map((a, i) => {
+      const resolvedCell = a.resolved
+        ? `${(a.resolved_reason ?? "—")}\n${a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? "—" : "—"}${a.resolved_at ? ` · ${new Date(a.resolved_at).toLocaleDateString("es-CL")}` : ""}`
+        : "";
+      return [
+        String(i + 1),
+        Number(a.lat).toFixed(5),
+        Number(a.lng).toFixed(5),
+        priorityLabel(a.priority),
+        colorLabel(a.color),
+        a.text,
+        meta.userMap?.get(a.created_by) ?? "—",
+        a.resolved ? "✓" : "",
+        resolvedCell,
+        a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "—" : "",
+        a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "").slice(0, 24) : "",
+        a.phase ?? "",
+      ];
+    }),
+    styles: { font: "helvetica", fontSize: 7.5, cellPadding: 2.5, overflow: "linebreak" },
+    headStyles: { fillColor: "#C8922A", textColor: 255, fontStyle: "bold", fontSize: 7.5 },
     alternateRowStyles: { fillColor: [248, 248, 250] },
     columnStyles: {
-      0: { cellWidth: 24, halign: "right" },
-      1: { cellWidth: 55, halign: "right" },
-      2: { cellWidth: 55, halign: "right" },
-      3: { cellWidth: 70 },
-      4: { cellWidth: 260 },
-      5: { cellWidth: 45, halign: "center" },
-      6: { cellWidth: 60 },
-      7: { cellWidth: 95 },
-      8: { cellWidth: 55 },
-      9: { cellWidth: 60 },
+      0: { cellWidth: 20, halign: "right" },
+      1: { cellWidth: 48, halign: "right" },
+      2: { cellWidth: 48, halign: "right" },
+      3: { cellWidth: 38 },
+      4: { cellWidth: 56 },
+      5: { cellWidth: 170 },
+      6: { cellWidth: 70 },
+      7: { cellWidth: 38, halign: "center" },
+      8: { cellWidth: 110 },
+      9: { cellWidth: 50 },
+      10: { cellWidth: 80 },
+      11: { cellWidth: 45 },
+    },
+    didParseCell: (data) => {
+      if (data.section === "body" && data.column.index === 3) {
+        const v = String(data.cell.raw).toLowerCase();
+        if (v === "alta") data.cell.styles.textColor = [225, 29, 72];
+        else if (v === "media") data.cell.styles.textColor = [200, 146, 42];
+        else if (v === "baja") data.cell.styles.textColor = [100, 116, 139];
+        data.cell.styles.fontStyle = "bold";
+      }
     },
     margin: { left: 40, right: 40 },
     didDrawPage: () => {

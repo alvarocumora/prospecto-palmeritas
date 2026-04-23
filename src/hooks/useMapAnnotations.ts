@@ -14,12 +14,22 @@ export interface MapAnnotation {
   text: string;
   color: string;
   resolved: boolean;
+  priority: "low" | "medium" | "high";
+  resolved_reason: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
   target_id: string | null;
   campaign_id: string | null;
   phase: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export const ANNOTATION_PRIORITIES: { value: "low" | "medium" | "high"; label: string; hex: string }[] = [
+  { value: "low", label: "Baja", hex: "#64748B" },
+  { value: "medium", label: "Media", hex: "#D4A24C" },
+  { value: "high", label: "Alta", hex: "#E11D48" },
+];
 
 export const SAMPLING_PHASES = [
   "recon",
@@ -90,6 +100,7 @@ export function useMapAnnotations(projectId: string | null) {
   const createAnnotation = useCallback(
     async (input: {
       lat: number; lng: number; text: string; color?: string;
+      priority?: "low" | "medium" | "high";
       target_id?: string | null; campaign_id?: string | null; phase?: string | null;
     }) => {
       if (!projectId) return null;
@@ -108,6 +119,7 @@ export function useMapAnnotations(projectId: string | null) {
           lng: input.lng,
           text: input.text.slice(0, 500),
           color: input.color ?? "gold",
+          priority: input.priority ?? "medium",
           target_id: input.target_id ?? null,
           campaign_id: input.campaign_id ?? null,
           phase: input.phase ?? null,
@@ -125,8 +137,28 @@ export function useMapAnnotations(projectId: string | null) {
   );
 
   const updateAnnotation = useCallback(
-    async (id: string, patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase">>) => {
-      const { error } = await supabase.from("map_annotations").update(patch).eq("id", id);
+    async (
+      id: string,
+      patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase" | "priority" | "resolved_reason">>,
+    ) => {
+      const next: {
+        text?: string; color?: string; resolved?: boolean; lat?: number; lng?: number;
+        target_id?: string | null; campaign_id?: string | null; phase?: string | null;
+        priority?: "low" | "medium" | "high"; resolved_reason?: string | null;
+        resolved_by?: string | null; resolved_at?: string | null;
+      } = { ...patch };
+      if (Object.prototype.hasOwnProperty.call(patch, "resolved")) {
+        if (patch.resolved) {
+          const { data: u } = await supabase.auth.getUser();
+          next.resolved_by = u.user?.id ?? null;
+          next.resolved_at = new Date().toISOString();
+        } else {
+          next.resolved_by = null;
+          next.resolved_at = null;
+          next.resolved_reason = null;
+        }
+      }
+      const { error } = await supabase.from("map_annotations").update(next).eq("id", id);
       if (error) {
         toast.error(`No se pudo actualizar: ${error.message}`);
       }

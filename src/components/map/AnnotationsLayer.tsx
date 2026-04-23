@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
 import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download, History } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useAnnotationHistory, summarizeDiff } from "@/hooks/useAnnotationHistory";
 import {
   useMapAnnotations,
@@ -56,6 +57,25 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
 
   const targetMap = useMemo(() => new Map(targets.map((t) => [t.id, t])), [targets]);
   const campaignMap = useMemo(() => new Map(campaigns.map((c) => [c.id, c])), [campaigns]);
+
+  // Map de user_id → display_name (para creador / quien resolvió en el export)
+  const [userMap, setUserMap] = useState<Map<string, string>>(new Map());
+  useEffect(() => {
+    const ids = Array.from(new Set(
+      annotations.flatMap((a) => [a.created_by, a.resolved_by]).filter(Boolean) as string[],
+    ));
+    if (ids.length === 0) { setUserMap(new Map()); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("user_id, display_name, email")
+        .in("user_id", ids);
+      if (cancelled) return;
+      setUserMap(new Map((data ?? []).map((p) => [p.user_id, p.display_name || p.email || "—"])));
+    })();
+    return () => { cancelled = true; };
+  }, [annotations]);
 
   // Apply filters
   const filtered = useMemo(() => {
@@ -432,6 +452,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
       projectName={projectName ?? "proyecto"}
       targetMap={targetMap}
       campaignMap={campaignMap}
+      userMap={userMap}
       filterSummary={filterLabel}
       showResolved={showResolved}
       onClose={() => setPreviewFormat(null)}

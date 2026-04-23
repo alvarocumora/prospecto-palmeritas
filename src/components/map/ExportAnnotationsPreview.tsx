@@ -3,7 +3,7 @@
 import { Download, FileText, FileSpreadsheet, X } from "lucide-react";
 import type { MapAnnotation } from "@/hooks/useMapAnnotations";
 import { ANNOTATION_COLORS } from "@/hooks/useMapAnnotations";
-import { exportAnnotationsCsv, exportAnnotationsPdf } from "./exportAnnotations";
+import { exportAnnotationsCsv, exportAnnotationsPdf, type UserNameMap } from "./exportAnnotations";
 
 interface Props {
   open: boolean;
@@ -13,13 +13,14 @@ interface Props {
   projectName: string;
   targetMap?: Map<string, { code: string }>;
   campaignMap?: Map<string, { name: string }>;
+  userMap?: UserNameMap;
   filterSummary?: string;
   showResolved: boolean;
   onClose: () => void;
 }
 
 export function ExportAnnotationsPreview({
-  open, format, annotations, totalAnnotations, projectName, targetMap, campaignMap,
+  open, format, annotations, totalAnnotations, projectName, targetMap, campaignMap, userMap,
   filterSummary, showResolved, onClose,
 }: Props) {
   if (!open) return null;
@@ -42,9 +43,9 @@ export function ExportAnnotationsPreview({
 
   const handleDownload = () => {
     if (isPdf) {
-      exportAnnotationsPdf(annotations, { projectName, targetMap, campaignMap });
+      exportAnnotationsPdf(annotations, { projectName, targetMap, campaignMap, userMap });
     } else {
-      exportAnnotationsCsv(annotations, { projectName, targetMap, campaignMap });
+      exportAnnotationsCsv(annotations, { projectName, targetMap, campaignMap, userMap });
     }
     onClose();
   };
