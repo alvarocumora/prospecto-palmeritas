@@ -371,6 +371,65 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     loadCatastro({ force: true });
   };
 
+  // Apply visual highlight to the currently selected feature, dim the rest.
+  useEffect(() => {
+    if (!LRef) return;
+    for (const [id, lyr] of featureLayersRef.current.entries()) {
+      const path = lyr as unknown as { setStyle?: (s: Record<string, unknown>) => void };
+      if (!path.setStyle) continue;
+      const f = visibleFeatures.find((x) => x.id === id);
+      const origen = ((f?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+      const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+      const isSel = selectedId === id;
+      const isDimmed = selectedId !== null && !isSel;
+      path.setStyle({
+        color: isSel ? "#ffffff" : s.color,
+        weight: isSel ? 4 : s.weight,
+        opacity: isDimmed ? 0.35 : s.opacity,
+        fillColor: s.fillColor,
+        fillOpacity: isSel ? Math.min(0.55, s.fillOpacity + 0.25) : isDimmed ? 0.05 : s.fillOpacity,
+      });
+    }
+  }, [selectedId, visibleFeatures, LRef]);
+
+  // Pan to selected feature.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !selectedId) return;
+    const lyr = featureLayersRef.current.get(selectedId) as unknown as { getBounds?: () => LType.LatLngBounds };
+    if (lyr?.getBounds) {
+      try {
+        const b = lyr.getBounds();
+        if (b.isValid()) map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: true });
+      } catch { /* noop */ }
+    }
+  }, [selectedId]);
+
+  // Filtered list (type + free-text) for the side panel.
+  const filteredFeatures = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    return visibleFeatures.filter((f) => {
+      const p = (f.properties ?? {}) as Record<string, unknown>;
+      const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+      if (!typeFilter.has(origen)) return false;
+      if (!q) return true;
+      const hay = [p.NOMBRE, p.NUMERO_ROL, p.TITULAR_DIVISION, p.COMUNA]
+        .filter(Boolean)
+        .map((v) => String(v).toLowerCase())
+        .join(" | ");
+      return hay.includes(q);
+    });
+  }, [visibleFeatures, typeFilter, searchQuery]);
+
+  const toggleType = (t: CatastroOrigen) => {
+    setTypeFilter((prev) => {
+      const next = new Set(prev);
+      if (next.has(t)) next.delete(t);
+      else next.add(t);
+      return next;
+    });
+  };
+
   const handleExportPdf = async () => {
     const map = mapRef.current;
     const el = containerRef.current;
