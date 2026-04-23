@@ -26,9 +26,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898] }: Props)
   const catastroLayerRef = useRef<LeafletGeoJSON | null>(null);
   const projectLayerRef = useRef<LeafletGeoJSON | null>(null);
   const [loading, setLoading] = useState(false);
+  const [exporting, setExporting] = useState(false);
   const [count, setCount] = useState<number | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [LRef, setLRef] = useState<typeof LType | null>(null);
+  const featuresRef = useRef<GeoJSON.FeatureCollection | null>(null);
 
   // Init map once
   useEffect(() => {
@@ -156,6 +158,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898] }: Props)
         },
       }).addTo(map);
       catastroLayerRef.current = layer;
+      featuresRef.current = fc;
       setCount(fc.features?.length ?? 0);
     } catch (e) {
       setErr((e as Error).message);
