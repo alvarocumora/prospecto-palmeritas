@@ -11,11 +11,24 @@ export type ExecutiveKpis = {
   totalGeophysicsCapex: number;
   monthInterceptCount: number;
   // Fase 1 — gobernanza
-  pendingReview: number;       // drill_core_logs + sampling_results en review
-  approvedRecords: number;     // approved en ambos
-  draftRecords: number;        // draft en ambos
-  qaqcFailRate: number | null; // % fail sobre total resultado QA/QC
+  pendingReview: number;
+  approvedRecords: number;
+  draftRecords: number;
+  qaqcFailRate: number | null;
   qaqcTotal: number;
+  // Catastro & cumplimiento
+  concessionsTotal: number;
+  concessionsVigentes: number;
+  concessionsCaducadas: number;
+  concessionsConstitucion: number;
+  concessionsExpiring90d: number;
+  patentsDue: number;
+  overlapsOpen: number;
+  alertsUnread: number;
+  bulletinsUnread: number;
+  // Operación
+  activeTargets: number;
+  activeCampaigns: number;
 };
 
 export function useExecutiveKpis() {
