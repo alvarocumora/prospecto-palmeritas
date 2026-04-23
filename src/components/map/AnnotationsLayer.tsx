@@ -428,9 +428,12 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
       open={previewFormat !== null}
       format={previewFormat ?? "csv"}
       annotations={filtered}
+      totalAnnotations={annotations.length}
       projectName={projectName ?? "proyecto"}
       targetMap={targetMap}
       campaignMap={campaignMap}
+      filterSummary={filterLabel}
+      showResolved={showResolved}
       onClose={() => setPreviewFormat(null)}
     />
     </>
