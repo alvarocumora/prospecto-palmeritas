@@ -252,9 +252,26 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
 
       mapRef.current = map;
       setLRef(L);
+
+      // Fix: tiles can render with opacity 0 if container had zero size at mount
+      // (tabs, lazy mount, etc.). Invalidate size after layout settles.
+      const invalidate = () => map.invalidateSize();
+      requestAnimationFrame(invalidate);
+      setTimeout(invalidate, 200);
+      setTimeout(invalidate, 600);
+
+      // Also re-invalidate when the container resizes.
+      let ro: ResizeObserver | null = null;
+      if (typeof ResizeObserver !== "undefined" && containerRef.current) {
+        ro = new ResizeObserver(() => map.invalidateSize());
+        ro.observe(containerRef.current);
+      }
+      (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
     })();
     return () => {
       cancelled = true;
+      const m = mapRef.current as unknown as { __ro?: ResizeObserver | null } | null;
+      m?.__ro?.disconnect();
       mapRef.current?.remove();
       mapRef.current = null;
     };
