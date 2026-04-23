@@ -86,6 +86,7 @@ function SamplingPage() {
       {tab === "fingerprint" && <GeochemFingerprintPanel projectId={active.id} />}
 
       {tab === "results" && (
+        <div className="rounded border border-border overflow-hidden">
         <div className="px-3 py-2 bg-muted text-xs font-mono uppercase text-muted-foreground border-b border-border flex items-center justify-between">
           <span>Resultados recientes</span>
           {loading && <span>cargando…</span>}
