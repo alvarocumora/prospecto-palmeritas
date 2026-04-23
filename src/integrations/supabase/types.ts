@@ -2176,47 +2176,70 @@ export type Database = {
       }
       map_annotations: {
         Row: {
+          campaign_id: string | null
           color: string
           created_at: string
           created_by: string
           id: string
           lat: number
           lng: number
+          phase: string | null
           project_id: string
           resolved: boolean
+          target_id: string | null
           text: string
           updated_at: string
         }
         Insert: {
+          campaign_id?: string | null
           color?: string
           created_at?: string
           created_by: string
           id?: string
           lat: number
           lng: number
+          phase?: string | null
           project_id: string
           resolved?: boolean
+          target_id?: string | null
           text: string
           updated_at?: string
         }
         Update: {
+          campaign_id?: string | null
           color?: string
           created_at?: string
           created_by?: string
           id?: string
           lat?: number
           lng?: number
+          phase?: string | null
           project_id?: string
           resolved?: boolean
+          target_id?: string | null
           text?: string
           updated_at?: string
         }
         Relationships: [
           {
+            foreignKeyName: "map_annotations_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "map_annotations_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_annotations_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
             referencedColumns: ["id"]
           },
         ]
