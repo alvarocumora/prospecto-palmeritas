@@ -606,9 +606,21 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
               <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
                 Pertenencias en vista
               </span>
-              <span className="font-mono text-[10px] text-signal-cyan">
-                {filteredFeatures.length}/{visibleFeatures.length}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <select
+                  value={sortMode}
+                  onChange={(e) => setSortMode(e.target.value as SortMode)}
+                  className="font-mono text-[10px] px-1.5 py-0.5 rounded border border-border bg-bg-elevated focus:outline-none focus:ring-1 focus:ring-primary"
+                  title="Ordenar listado"
+                >
+                  <option value="default">Orden: original</option>
+                  <option value="ha_desc">Ha ↓ (mayor)</option>
+                  <option value="ha_asc">Ha ↑ (menor)</option>
+                </select>
+                <span className="font-mono text-[10px] text-signal-cyan">
+                  {filteredFeatures.length}/{visibleFeatures.length}
+                </span>
+              </div>
             </div>
             <div className="relative">
               <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-text-secondary" />
