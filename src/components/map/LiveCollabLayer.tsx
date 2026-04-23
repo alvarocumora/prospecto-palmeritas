@@ -130,8 +130,8 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
 
   return (
     <>
-      {/* Control panel */}
-      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] flex items-center gap-1.5 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-2 py-1 shadow-md">
+      {/* Control panel — top-left, compact, sits above ProspectivityButton */}
+      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-1 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-1.5 py-1 shadow-md">
         <button
           onClick={() => setSharing(!sharing)}
           className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
