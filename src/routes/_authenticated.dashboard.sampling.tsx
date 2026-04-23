@@ -68,7 +68,24 @@ function SamplingPage() {
         <StatCard icon={<FileText className="w-3 h-3" />} label="Au máx" value={stats.auMax.toFixed(2)} suffix="g/t" highlight />
       </div>
 
-      <div className="rounded border border-border overflow-hidden">
+      <div className="flex gap-1 border-b border-border">
+        <button
+          onClick={() => setTab("results")}
+          className={`px-3 py-2 text-xs font-mono uppercase border-b-2 -mb-px ${tab === "results" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          <Beaker className="w-3 h-3 inline mr-1" /> Resultados
+        </button>
+        <button
+          onClick={() => setTab("fingerprint")}
+          className={`px-3 py-2 text-xs font-mono uppercase border-b-2 -mb-px ${tab === "fingerprint" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+        >
+          <Sparkles className="w-3 h-3 inline mr-1" /> Fingerprint geoquímico
+        </button>
+      </div>
+
+      {tab === "fingerprint" && <GeochemFingerprintPanel projectId={active.id} />}
+
+      {tab === "results" && (
         <div className="px-3 py-2 bg-muted text-xs font-mono uppercase text-muted-foreground border-b border-border flex items-center justify-between">
           <span>Resultados recientes</span>
           {loading && <span>cargando…</span>}
