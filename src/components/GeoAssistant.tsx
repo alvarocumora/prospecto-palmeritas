@@ -98,7 +98,7 @@ export function GeoAssistant() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 w-12 h-12 rounded-full bg-gold text-bg-secondary shadow-lg hover:scale-105 transition-transform inline-flex items-center justify-center"
+        className="fixed bottom-20 md:bottom-10 right-4 md:right-6 z-50 w-11 h-11 rounded-full bg-gold text-bg-secondary shadow-lg hover:scale-105 transition-transform inline-flex items-center justify-center"
         title="Asistente IA geológico"
       >
         {open ? <X className="w-5 h-5" /> : <Sparkles className="w-5 h-5" />}
