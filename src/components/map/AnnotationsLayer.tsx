@@ -447,6 +447,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
         )}
       </div>
     </div>
+    </div>
     <ExportAnnotationsPreview
       open={previewFormat !== null}
       format={previewFormat ?? "csv"}
@@ -461,7 +462,6 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
       onClose={() => setPreviewFormat(null)}
     />
     </>
-    </div>
   );
 }
 
