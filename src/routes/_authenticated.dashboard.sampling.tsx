@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { Upload, Beaker, AlertTriangle, FlaskConical, ShieldCheck, FileText } from "lucide-react";
+import { Upload, Beaker, AlertTriangle, FlaskConical, ShieldCheck, FileText, Sparkles } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useSamplingResults } from "@/hooks/useSamplingResults";
 import { AssayCsvImport } from "@/components/sampling/AssayCsvImport";
+import { GeochemFingerprintPanel } from "@/components/sampling/GeochemFingerprintPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/sampling")({
   head: () => ({ meta: [{ title: "Muestreo — Trackmin GeoIntel" }] }),
