@@ -202,6 +202,9 @@ function ConcessionsTab() {
         <Stat label="Área (ha)" value={stats.areaTotal.toFixed(1)} className="hidden md:block" />
       </div>
 
+      {/* Mapa interactivo del catastro */}
+      <CatastroMap concessions={data} />
+
       {/* Alerts banner */}
       {alerts.length > 0 && (
         <div className="border border-amber-500/40 bg-amber-500/10 rounded p-3">
