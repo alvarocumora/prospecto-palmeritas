@@ -461,6 +461,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
       onClose={() => setPreviewFormat(null)}
     />
     </>
+    </div>
   );
 }
 

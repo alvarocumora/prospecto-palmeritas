@@ -135,5 +135,6 @@ export function TimeSlider({ holes, flights, onChange, active, onToggle }: Props
         <span>{maxDate}</span>
       </div>
     </div>
+    </div>
   );
 }
