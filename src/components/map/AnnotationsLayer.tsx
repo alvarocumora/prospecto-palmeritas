@@ -15,7 +15,7 @@ import {
 } from "@/hooks/useMapAnnotations";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { useExplorationCampaigns } from "@/hooks/useExplorationCampaigns";
-import { exportAnnotationsCsv, exportAnnotationsPdf } from "./exportAnnotations";
+import { ExportAnnotationsPreview } from "./ExportAnnotationsPreview";
 import type { LeafletNS } from "./types";
 
 interface Props {
