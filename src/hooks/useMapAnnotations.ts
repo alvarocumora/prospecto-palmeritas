@@ -141,8 +141,12 @@ export function useMapAnnotations(projectId: string | null) {
       id: string,
       patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase" | "priority" | "resolved_reason">>,
     ) => {
-      const next: Record<string, unknown> = { ...patch };
-      // Si cambia el estado resuelto, completar trazabilidad
+      const next: {
+        text?: string; color?: string; resolved?: boolean; lat?: number; lng?: number;
+        target_id?: string | null; campaign_id?: string | null; phase?: string | null;
+        priority?: "low" | "medium" | "high"; resolved_reason?: string | null;
+        resolved_by?: string | null; resolved_at?: string | null;
+      } = { ...patch };
       if (Object.prototype.hasOwnProperty.call(patch, "resolved")) {
         if (patch.resolved) {
           const { data: u } = await supabase.auth.getUser();
