@@ -10,6 +10,7 @@ import { SyncLog } from "@/components/ops/SyncLog";
 import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
+import { CatastroMap } from "@/components/ops/CatastroMap";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
