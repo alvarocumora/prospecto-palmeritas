@@ -144,7 +144,7 @@ function ValidationPage() {
                 <div key={group}>
                   <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider mb-1.5">{group}</div>
                   <div className="border border-border rounded-[2px] divide-y divide-border">
-                    {list.map((t) => <TableRow key={t.table} audit={t} />)}
+                    {list.map((t) => <TableRow key={t.table} audit={t} sync={report.lastSync[t.table] ?? null} />)}
                   </div>
                 </div>
               ))}
@@ -194,7 +194,10 @@ function StatCard({
   );
 }
 
-function TableRow({ audit }: { audit: TableAudit }) {
+function TableRow({ audit, sync }: {
+  audit: TableAudit;
+  sync: { at: string; prevCount: number; delta: number } | null;
+}) {
   const dotCls =
     audit.status === "ok" ? "bg-signal-green" :
     audit.status === "warn" ? "bg-signal-amber" :
@@ -207,6 +210,14 @@ function TableRow({ audit }: { audit: TableAudit }) {
     audit.status === "ok" ? "text-signal-green" :
     audit.status === "warn" ? "text-signal-amber" :
     audit.status === "error" ? "text-signal-red" : "text-text-dim";
+
+  const deltaCls = !sync ? "text-text-dim" :
+    sync.delta > 0 ? "text-signal-green" :
+    sync.delta < 0 ? "text-signal-red" : "text-text-dim";
+  const deltaLabel = !sync ? "—" :
+    sync.delta === 0 ? "±0" :
+    sync.delta > 0 ? `+${sync.delta.toLocaleString()}` : sync.delta.toLocaleString();
+
   return (
     <div className="px-3 py-2 hover:bg-accent/30 flex items-center gap-3">
       <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", dotCls)} />
@@ -216,12 +227,31 @@ function TableRow({ audit }: { audit: TableAudit }) {
           {audit.table}{audit.expectedMin ? ` · min ${audit.expectedMin}` : ""}{audit.error ? ` · ${audit.error}` : ""}
         </div>
       </div>
-      <div className="text-right">
+      <div className="text-right shrink-0 w-28" title={sync ? `Última sync: ${new Date(sync.at).toLocaleString("es-CL")}` : "Sin snapshots previos"}>
+        <div className={cn("text-[11px] font-mono tabular-nums", deltaCls)}>{deltaLabel}</div>
+        <div className="text-[9px] font-mono text-text-dim truncate">
+          {sync ? formatRelative(sync.at) : "primera corrida"}
+        </div>
+      </div>
+      <div className="text-right shrink-0 w-20">
         <div className="text-[13px] font-mono font-bold tabular-nums">{audit.count.toLocaleString()}</div>
         <div className={cn("text-[9px] font-mono uppercase tracking-wider", statusCls)}>{statusLabel}</div>
       </div>
     </div>
   );
+}
+
+function formatRelative(iso: string): string {
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diffMs / 60_000);
+  if (min < 1) return "ahora";
+  if (min < 60) return `hace ${min} min`;
+  const hr = Math.floor(min / 60);
+  if (hr < 24) return `hace ${hr} h`;
+  const day = Math.floor(hr / 24);
+  if (day < 30) return `hace ${day} d`;
+  const mo = Math.floor(day / 30);
+  return `hace ${mo} mes`;
 }
 
 function IncRow({ iss }: { iss: Inconsistency }) {
