@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight, ChevronDown, Copy } from "lucide-react";
+import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight, ChevronDown, Copy, FileText, FileSpreadsheet } from "lucide-react";
 import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { useDataValidation, type TableAudit, type Inconsistency } from "@/hooks/useDataValidation";
 import { useDataRepairs, type RepairDefinition, type RepairPreviewRow } from "@/hooks/useDataRepairs";
 import { HudPanel } from "@/components/ops/HudPanel";
 import { cn } from "@/lib/utils";
+import { exportValidationCsv, exportValidationPdf } from "@/lib/validation/export";
 
 export const Route = createFileRoute("/_authenticated/dashboard/validation")({
   component: ValidationPage,
@@ -39,14 +40,48 @@ function ValidationPage() {
             Audita el estado del seed por tabla, detecta inconsistencias en enums, claves únicas y referencias.
           </p>
         </div>
-        <button
-          onClick={refresh}
-          disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan text-[11px] font-mono uppercase hover:bg-signal-cyan/20 disabled:opacity-50"
-        >
-          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          Re-ejecutar audit
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => {
+              if (!report || !active) return;
+              try {
+                exportValidationCsv(report, active.name ?? active.id.slice(0, 8));
+                toast.success("CSV exportado");
+              } catch (e) {
+                toast.error("Error exportando CSV", { description: e instanceof Error ? e.message : String(e) });
+              }
+            }}
+            disabled={!report || loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border border-signal-green/40 bg-signal-green/10 text-signal-green text-[11px] font-mono uppercase hover:bg-signal-green/20 disabled:opacity-50"
+          >
+            <FileSpreadsheet className="w-3.5 h-3.5" />
+            CSV
+          </button>
+          <button
+            onClick={() => {
+              if (!report || !active) return;
+              try {
+                exportValidationPdf(report, active.name ?? active.id.slice(0, 8));
+                toast.success("PDF exportado");
+              } catch (e) {
+                toast.error("Error exportando PDF", { description: e instanceof Error ? e.message : String(e) });
+              }
+            }}
+            disabled={!report || loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border border-signal-violet/40 bg-signal-violet/10 text-signal-violet text-[11px] font-mono uppercase hover:bg-signal-violet/20 disabled:opacity-50"
+          >
+            <FileText className="w-3.5 h-3.5" />
+            PDF
+          </button>
+          <button
+            onClick={refresh}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan text-[11px] font-mono uppercase hover:bg-signal-cyan/20 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            Re-ejecutar audit
+          </button>
+        </div>
       </header>
 
       {!active && (
