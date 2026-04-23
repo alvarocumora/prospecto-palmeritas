@@ -143,13 +143,6 @@ const EXPIRY_COLOR: Record<Exclude<ExpirySeverity, "ok" | "unknown">, string> = 
   critical: "#ef4444",
   warn: "#f59e0b",
 };
-const EXPIRY_LABEL: Record<ExpirySeverity, string> = {
-  expired: "Vencida",
-  critical: "≤30 d",
-  warn: "≤90 d",
-  ok: "Vigente",
-  unknown: "—",
-};
 
 type Props = {
   concessions: MiningConcession[];
