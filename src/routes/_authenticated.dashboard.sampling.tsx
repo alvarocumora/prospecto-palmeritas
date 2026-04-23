@@ -146,6 +146,7 @@ function SamplingPage() {
           </div>
         )}
       </div>
+      )}
 
       {importOpen && (
         <AssayCsvImport
