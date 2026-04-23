@@ -623,6 +623,34 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                 );
               })}
             </div>
+            {(expirySummary.expired + expirySummary.critical + expirySummary.warn) > 0 && (
+              <div className="flex items-center gap-1 flex-wrap pt-1 border-t border-border/50">
+                <button
+                  onClick={() => setExpiringOnly((v) => !v)}
+                  className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${
+                    expiringOnly ? "bg-destructive/15 border-destructive text-destructive" : "border-border text-text-secondary hover:bg-accent"
+                  }`}
+                  title={`Mostrar solo pertenencias que vencen en ≤${expiryThresholdDays} días`}
+                >
+                  ⚠ Solo por vencer
+                </button>
+                {expirySummary.expired > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded animate-pulse" style={{ background: `${EXPIRY_COLOR.expired}22`, color: EXPIRY_COLOR.expired, border: `1px solid ${EXPIRY_COLOR.expired}` }}>
+                    {expirySummary.expired} vencidas
+                  </span>
+                )}
+                {expirySummary.critical > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.critical}22`, color: EXPIRY_COLOR.critical, border: `1px solid ${EXPIRY_COLOR.critical}` }}>
+                    {expirySummary.critical} ≤30 d
+                  </span>
+                )}
+                {expirySummary.warn > 0 && (
+                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.warn}22`, color: EXPIRY_COLOR.warn, border: `1px solid ${EXPIRY_COLOR.warn}` }}>
+                    {expirySummary.warn} ≤90 d
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto">
             {filteredFeatures.length === 0 ? (
