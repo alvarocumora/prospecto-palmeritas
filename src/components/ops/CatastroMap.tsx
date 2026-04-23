@@ -237,6 +237,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         center: [center[1], center[0]],
         zoom: 12,
         zoomControl: true,
+        zoomAnimation: false,
+        fadeAnimation: false,
+        markerZoomAnimation: false,
       });
 
       L.tileLayer(
@@ -248,32 +251,52 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       ).addTo(map);
 
       L.tileLayer(
-        "https://stamen-tiles.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}.png",
-        { attribution: "Labels © Stamen", maxZoom: 18, opacity: 0.85 }
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          attribution: "© OpenStreetMap contributors",
+          maxZoom: 19,
+          opacity: 0.45,
+        }
       ).addTo(map);
 
       mapRef.current = map;
       setLRef(L);
 
-      // Fix: tiles can render with opacity 0 if container had zero size at mount
-      // (tabs, lazy mount, etc.). Invalidate size after layout settles.
-      const invalidate = () => map.invalidateSize();
-      requestAnimationFrame(invalidate);
-      setTimeout(invalidate, 200);
-      setTimeout(invalidate, 600);
+      // Fix: if the map mounts inside a dynamic layout, defer safe invalidation.
+      const safeInvalidate = () => {
+        if (isUnmountingRef.current) return;
+        const currentMap = mapRef.current;
+        const el = containerRef.current;
+        if (!currentMap || !el || !el.isConnected) return;
+        try {
+          currentMap.invalidateSize(false);
+        } catch {
+          /* noop */
+        }
+      };
 
-      // Also re-invalidate when the container resizes.
+      requestAnimationFrame(safeInvalidate);
+      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 200));
+      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 600));
+
       let ro: ResizeObserver | null = null;
       if (typeof ResizeObserver !== "undefined" && containerRef.current) {
-        ro = new ResizeObserver(() => map.invalidateSize());
+        ro = new ResizeObserver(() => {
+          safeInvalidate();
+        });
         ro.observe(containerRef.current);
       }
       (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
     })();
     return () => {
       cancelled = true;
+      isUnmountingRef.current = true;
+      invalidateTimersRef.current.forEach((id) => window.clearTimeout(id));
+      invalidateTimersRef.current = [];
       const m = mapRef.current as unknown as { __ro?: ResizeObserver | null } | null;
       m?.__ro?.disconnect();
+      mapRef.current?.off();
+      mapRef.current?.stop();
       mapRef.current?.remove();
       mapRef.current = null;
     };
