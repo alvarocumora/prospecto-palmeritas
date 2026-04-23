@@ -1,16 +1,19 @@
 // Renders persistent map annotations as Leaflet markers + manages a panel
-// for listing, editing, resolving and deleting them.
-// Click "Add note" → next click on the map drops a pin and opens an editor.
+// for listing, editing, resolving, filtering and deleting them.
+// Annotations can be linked to an exploration target, a campaign, or a sampling phase.
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
-import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil } from "lucide-react";
+import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar } from "lucide-react";
 import {
   useMapAnnotations,
   ANNOTATION_COLORS,
+  SAMPLING_PHASES,
   colorHex,
   type MapAnnotation,
 } from "@/hooks/useMapAnnotations";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
+import { useExplorationCampaigns } from "@/hooks/useExplorationCampaigns";
 import type { LeafletNS } from "./types";
 
 interface Props {
@@ -20,29 +23,52 @@ interface Props {
 }
 
 type DraftPin = { lat: number; lng: number } | null;
+type FilterKind = "all" | "target" | "campaign" | "phase";
 
 export function AnnotationsLayer({ projectId, map, L }: Props) {
   const { annotations, createAnnotation, updateAnnotation, deleteAnnotation } = useMapAnnotations(projectId);
+  const { targets } = useExplorationTargets(projectId);
+  const { data: campaigns } = useExplorationCampaigns(projectId);
+
   const [open, setOpen] = useState(false);
   const [showResolved, setShowResolved] = useState(false);
   const [placingMode, setPlacingMode] = useState(false);
   const [draft, setDraft] = useState<DraftPin>(null);
   const [draftText, setDraftText] = useState("");
   const [draftColor, setDraftColor] = useState("gold");
+  const [draftTarget, setDraftTarget] = useState<string>("");
+  const [draftCampaign, setDraftCampaign] = useState<string>("");
+  const [draftPhase, setDraftPhase] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+
+  // Filter state
+  const [filterKind, setFilterKind] = useState<FilterKind>("all");
+  const [filterValue, setFilterValue] = useState<string>("");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   const groupRef = useRef<LayerGroup | null>(null);
   const draftMarkerRef = useRef<Layer | null>(null);
 
-  // Render markers for stored annotations.
+  const targetMap = useMemo(() => new Map(targets.map((t) => [t.id, t])), [targets]);
+  const campaignMap = useMemo(() => new Map(campaigns.map((c) => [c.id, c])), [campaigns]);
+
+  // Apply filters
+  const filtered = useMemo(() => {
+    let list = showResolved ? annotations : annotations.filter((a) => !a.resolved);
+    if (filterKind === "target" && filterValue) list = list.filter((a) => a.target_id === filterValue);
+    else if (filterKind === "campaign" && filterValue) list = list.filter((a) => a.campaign_id === filterValue);
+    else if (filterKind === "phase" && filterValue) list = list.filter((a) => a.phase === filterValue);
+    return list;
+  }, [annotations, showResolved, filterKind, filterValue]);
+
+  // Render markers for filtered annotations.
   useEffect(() => {
     if (!map || !L) return;
     if (!groupRef.current) groupRef.current = L.layerGroup().addTo(map);
     const group = groupRef.current;
     group.clearLayers();
-    const list = showResolved ? annotations : annotations.filter((a) => !a.resolved);
-    for (const a of list) {
+    for (const a of filtered) {
       const icon = L.divIcon({
         className: "",
         html: `<div style="width:18px;height:18px;border-radius:50%;background:${colorHex(a.color)};border:2px solid #0A0A0A;box-shadow:0 0 0 2px ${colorHex(a.color)}55;display:flex;align-items:center;justify-content:center;color:#0A0A0A;font-size:10px;font-weight:700;${a.resolved ? "opacity:0.45;" : ""}">${a.resolved ? "✓" : "•"}</div>`,
@@ -51,12 +77,20 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
       });
       const m = L.marker([Number(a.lat), Number(a.lng)], { icon }).addTo(group);
       const safeText = a.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const t = a.target_id ? targetMap.get(a.target_id) : null;
+      const c = a.campaign_id ? campaignMap.get(a.campaign_id) : null;
+      const linksHtml = [
+        t ? `<span style="background:#3B82F622;color:#3B82F6;padding:1px 4px;border-radius:2px;">▸ ${t.code}</span>` : "",
+        c ? `<span style="background:#A855F722;color:#A855F7;padding:1px 4px;border-radius:2px;">⊙ ${(c.name || "").slice(0, 18)}</span>` : "",
+        a.phase ? `<span style="background:#10B98122;color:#10B981;padding:1px 4px;border-radius:2px;">⌬ ${a.phase}</span>` : "",
+      ].filter(Boolean).join(" ");
       m.bindPopup(
         `<div style="font-family:ui-monospace,monospace;max-width:240px;">
           <div style="color:${colorHex(a.color)};font-size:10px;text-transform:uppercase;margin-bottom:4px;">
             ${ANNOTATION_COLORS.find((c) => c.value === a.color)?.label ?? "Nota"}${a.resolved ? " · resuelta" : ""}
           </div>
           <div style="color:#F5F5F5;font-size:12px;line-height:1.4;white-space:pre-wrap;">${safeText}</div>
+          ${linksHtml ? `<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;font-size:10px;">${linksHtml}</div>` : ""}
           <div style="color:#888;font-size:10px;margin-top:6px;">${new Date(a.created_at).toLocaleString("es-CL")}</div>
         </div>`,
       );
@@ -64,7 +98,7 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
     return () => {
       group.clearLayers();
     };
-  }, [map, L, annotations, showResolved]);
+  }, [map, L, filtered, targetMap, campaignMap]);
 
   // Click-to-place handler when in placing mode.
   useEffect(() => {
@@ -112,23 +146,42 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
   const startPlacing = () => {
     setDraft(null);
     setDraftText("");
+    setDraftTarget("");
+    setDraftCampaign("");
+    setDraftPhase("");
     setPlacingMode(true);
   };
 
   const cancelDraft = () => {
     setDraft(null);
     setDraftText("");
+    setDraftTarget("");
+    setDraftCampaign("");
+    setDraftPhase("");
     setPlacingMode(false);
   };
 
   const saveDraft = async () => {
     if (!draft || !draftText.trim()) return;
-    await createAnnotation({ lat: draft.lat, lng: draft.lng, text: draftText.trim(), color: draftColor });
-    setDraft(null);
-    setDraftText("");
+    await createAnnotation({
+      lat: draft.lat,
+      lng: draft.lng,
+      text: draftText.trim(),
+      color: draftColor,
+      target_id: draftTarget || null,
+      campaign_id: draftCampaign || null,
+      phase: draftPhase || null,
+    });
+    cancelDraft();
   };
 
-  const visible = showResolved ? annotations : annotations.filter((a) => !a.resolved);
+  const filterLabel = filterKind === "all"
+    ? "Todas"
+    : filterKind === "target"
+      ? `Target: ${targetMap.get(filterValue)?.code ?? "—"}`
+      : filterKind === "campaign"
+        ? `Campaña: ${campaignMap.get(filterValue)?.name?.slice(0, 14) ?? "—"}`
+        : `Fase: ${filterValue}`;
 
   if (!open) {
     return (
@@ -138,30 +191,80 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
         title="Notas y anotaciones"
       >
         <StickyNote className="w-3.5 h-3.5 text-gold" />
-        <span>Notas{visible.length > 0 ? ` (${visible.length})` : ""}</span>
+        <span>Notas{filtered.length > 0 ? ` (${filtered.length})` : ""}</span>
       </button>
     );
   }
 
   return (
-    <div className="absolute bottom-24 right-3 z-[500] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[60vh]">
+    <div className="absolute bottom-24 right-3 z-[500] w-80 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[68vh]">
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StickyNote className="w-3.5 h-3.5 text-gold" />
           <span className="text-[10px] font-mono uppercase text-muted-foreground">
-            Notas ({visible.length})
+            Notas ({filtered.length}/{annotations.length})
           </span>
         </div>
         <button
-          onClick={() => {
-            setOpen(false);
-            cancelDraft();
-          }}
+          onClick={() => { setOpen(false); cancelDraft(); }}
           className="text-muted-foreground hover:text-foreground"
           title="Cerrar"
         >
           <X className="w-3.5 h-3.5" />
         </button>
+      </div>
+
+      {/* Filter bar */}
+      <div className="px-2 py-1.5 border-b border-border bg-accent/20">
+        <button
+          onClick={() => setFilterOpen((v) => !v)}
+          className={`w-full inline-flex items-center justify-between gap-1 px-2 py-1 rounded border text-[10px] font-mono ${filterKind !== "all" ? "border-gold/60 text-gold bg-gold/10" : "border-border text-muted-foreground hover:text-foreground"}`}
+        >
+          <span className="inline-flex items-center gap-1">
+            <Filter className="w-3 h-3" /> {filterLabel}
+          </span>
+          {filterKind !== "all" && (
+            <span
+              role="button"
+              tabIndex={0}
+              onClick={(e) => { e.stopPropagation(); setFilterKind("all"); setFilterValue(""); }}
+              className="hover:text-destructive"
+            >
+              <X className="w-3 h-3" />
+            </span>
+          )}
+        </button>
+        {filterOpen && (
+          <div className="mt-1.5 space-y-1.5 p-1.5 rounded border border-border bg-background/80">
+            <select
+              value={`${filterKind}:${filterValue}`}
+              onChange={(e) => {
+                const [k, v] = e.target.value.split(":", 2);
+                setFilterKind(k as FilterKind);
+                setFilterValue(v ?? "");
+                setFilterOpen(false);
+              }}
+              className="w-full px-1.5 py-1 text-[10px] font-mono rounded border border-border bg-background outline-none focus:border-gold"
+            >
+              <option value="all:">Todas las notas</option>
+              <optgroup label="Por target">
+                {targets.map((t) => (
+                  <option key={t.id} value={`target:${t.id}`}>▸ {t.code} — {t.name.slice(0, 30)}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Por campaña">
+                {campaigns.map((c) => (
+                  <option key={c.id} value={`campaign:${c.id}`}>⊙ {c.name.slice(0, 32)}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Por fase">
+                {SAMPLING_PHASES.map((p) => (
+                  <option key={p} value={`phase:${p}`}>⌬ {p}</option>
+                ))}
+              </optgroup>
+            </select>
+          </div>
+        )}
       </div>
 
       {/* Draft editor */}
@@ -190,6 +293,38 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
                 title={c.label}
               />
             ))}
+          </div>
+          <div className="grid grid-cols-1 gap-1">
+            <select
+              value={draftTarget}
+              onChange={(e) => setDraftTarget(e.target.value)}
+              className="w-full px-1.5 py-1 text-[10px] font-mono rounded border border-border bg-background outline-none focus:border-gold"
+            >
+              <option value="">▸ Sin target asociado</option>
+              {targets.map((t) => (
+                <option key={t.id} value={t.id}>{t.code} — {t.name.slice(0, 28)}</option>
+              ))}
+            </select>
+            <select
+              value={draftCampaign}
+              onChange={(e) => setDraftCampaign(e.target.value)}
+              className="w-full px-1.5 py-1 text-[10px] font-mono rounded border border-border bg-background outline-none focus:border-gold"
+            >
+              <option value="">⊙ Sin campaña</option>
+              {campaigns.map((c) => (
+                <option key={c.id} value={c.id}>{c.name.slice(0, 32)}</option>
+              ))}
+            </select>
+            <select
+              value={draftPhase}
+              onChange={(e) => setDraftPhase(e.target.value)}
+              className="w-full px-1.5 py-1 text-[10px] font-mono rounded border border-border bg-background outline-none focus:border-gold"
+            >
+              <option value="">⌬ Sin fase de muestreo</option>
+              {SAMPLING_PHASES.map((p) => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
           </div>
           <div className="flex gap-1">
             <button
@@ -231,15 +366,19 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
       )}
 
       <div className="overflow-y-auto flex-1 p-1">
-        {visible.length === 0 ? (
+        {filtered.length === 0 ? (
           <div className="px-2 py-4 text-center text-[10px] font-mono text-muted-foreground">
-            Sin notas. Crea pines con observaciones estructurales, targets o tareas pendientes.
+            {filterKind !== "all"
+              ? "Sin notas para este filtro."
+              : "Sin notas. Crea pines con observaciones estructurales, targets o tareas pendientes."}
           </div>
         ) : (
-          visible.map((a) => (
+          filtered.map((a) => (
             <AnnotationRow
               key={a.id}
               a={a}
+              targetCode={a.target_id ? targetMap.get(a.target_id)?.code ?? null : null}
+              campaignName={a.campaign_id ? campaignMap.get(a.campaign_id)?.name ?? null : null}
               editing={editingId === a.id}
               editText={editText}
               onStartEdit={() => {
@@ -267,6 +406,8 @@ export function AnnotationsLayer({ projectId, map, L }: Props) {
 
 interface RowProps {
   a: MapAnnotation;
+  targetCode: string | null;
+  campaignName: string | null;
   editing: boolean;
   editText: string;
   onStartEdit: () => void;
@@ -280,6 +421,8 @@ interface RowProps {
 
 function AnnotationRow({
   a,
+  targetCode,
+  campaignName,
   editing,
   editText,
   onStartEdit,
@@ -316,6 +459,25 @@ function AnnotationRow({
               <div className={`text-[11px] font-mono text-foreground line-clamp-3 ${a.resolved ? "line-through" : ""}`}>
                 {a.text}
               </div>
+              {(targetCode || campaignName || a.phase) && (
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {targetCode && (
+                    <span className="inline-flex items-center gap-0.5 px-1 py-0 rounded text-[9px] font-mono bg-blue-500/15 text-blue-400">
+                      <TargetIcon className="w-2.5 h-2.5" /> {targetCode}
+                    </span>
+                  )}
+                  {campaignName && (
+                    <span className="inline-flex items-center gap-0.5 px-1 py-0 rounded text-[9px] font-mono bg-purple-500/15 text-purple-400">
+                      <Calendar className="w-2.5 h-2.5" /> {campaignName.slice(0, 18)}
+                    </span>
+                  )}
+                  {a.phase && (
+                    <span className="px-1 py-0 rounded text-[9px] font-mono bg-emerald-500/15 text-emerald-400">
+                      ⌬ {a.phase}
+                    </span>
+                  )}
+                </div>
+              )}
               <div className="text-[9px] font-mono text-muted-foreground mt-0.5">
                 {Number(a.lat).toFixed(4)},{Number(a.lng).toFixed(4)} ·{" "}
                 {new Date(a.created_at).toLocaleDateString("es-CL")}

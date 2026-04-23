@@ -14,9 +14,23 @@ export interface MapAnnotation {
   text: string;
   color: string;
   resolved: boolean;
+  target_id: string | null;
+  campaign_id: string | null;
+  phase: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export const SAMPLING_PHASES = [
+  "recon",
+  "rock-chip",
+  "channel",
+  "trinchera",
+  "RC",
+  "DDH",
+  "metalúrgico",
+  "verificación",
+] as const;
 
 export const ANNOTATION_COLORS: { value: string; label: string; hex: string }[] = [
   { value: "gold", label: "Estructural", hex: "#D4A24C" },
@@ -74,7 +88,10 @@ export function useMapAnnotations(projectId: string | null) {
   }, [projectId, fetchAnnotations]);
 
   const createAnnotation = useCallback(
-    async (input: { lat: number; lng: number; text: string; color?: string }) => {
+    async (input: {
+      lat: number; lng: number; text: string; color?: string;
+      target_id?: string | null; campaign_id?: string | null; phase?: string | null;
+    }) => {
       if (!projectId) return null;
       const { data: u } = await supabase.auth.getUser();
       const uid = u.user?.id;
@@ -91,6 +108,9 @@ export function useMapAnnotations(projectId: string | null) {
           lng: input.lng,
           text: input.text.slice(0, 500),
           color: input.color ?? "gold",
+          target_id: input.target_id ?? null,
+          campaign_id: input.campaign_id ?? null,
+          phase: input.phase ?? null,
         })
         .select()
         .single();
@@ -105,7 +125,7 @@ export function useMapAnnotations(projectId: string | null) {
   );
 
   const updateAnnotation = useCallback(
-    async (id: string, patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng">>) => {
+    async (id: string, patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase">>) => {
       const { error } = await supabase.from("map_annotations").update(patch).eq("id", id);
       if (error) {
         toast.error(`No se pudo actualizar: ${error.message}`);
