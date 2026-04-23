@@ -85,7 +85,24 @@ export function ExportAnnotationsPreview({
               Anotaciones del mapa — {projectName}
             </div>
             <div className="text-[10px] font-mono text-muted-foreground mt-1">
-              Total: {total} · Resueltas: {resolved} · Generado: {new Date().toLocaleString("es-CL")}
+            </div>
+          </div>
+
+          {/* Filtros aplicados — confirma que el export respeta lo visible en el mapa */}
+          <div className="rounded border border-border bg-accent/20 p-2.5">
+            <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1.5">
+              Filtros aplicados (export = lo visible en el mapa)
+            </div>
+            <div className="flex flex-wrap gap-1.5 text-[10px] font-mono">
+              <span className="px-1.5 py-0.5 rounded bg-background border border-border">
+                {filterSummary && filterSummary !== "Todas" ? filterSummary : "Sin filtro target/campaña/fase"}
+              </span>
+              <span className={`px-1.5 py-0.5 rounded border ${showResolved ? "border-emerald-500/40 text-emerald-500" : "border-amber-500/40 text-amber-500"}`}>
+                {showResolved ? "Incluye resueltas" : "Solo pendientes"}
+              </span>
+              <span className="px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
+                {total} de {totalAnnotations} anotaciones
+              </span>
             </div>
           </div>
 
