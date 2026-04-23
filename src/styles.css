@@ -309,6 +309,13 @@
   .leaflet-bottom.leaflet-right {
     margin-bottom: 36px !important;
   }
+  /* Lift the minimap further so it doesn't collide with the floating AI assistant FAB */
+  .leaflet-control-minimap {
+    margin-right: 64px !important;
+    margin-bottom: 8px !important;
+    border: 1px solid hsl(var(--border)) !important;
+    border-radius: 4px !important;
+  }
   /* Compact zoom buttons */
   .leaflet-control-zoom a {
     width: 28px !important;
