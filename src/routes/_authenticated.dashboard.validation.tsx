@@ -248,3 +248,119 @@ function IncRow({ iss }: { iss: Inconsistency }) {
     </div>
   );
 }
+
+function RepairCard({
+  repair,
+  state,
+  onPreview,
+  onApply,
+  onClear,
+}: {
+  repair: RepairDefinition;
+  state: { preview: RepairPreviewRow[] | null; loading: boolean; applying: boolean; appliedCount: number | null; error: string | null } | undefined;
+  onPreview: () => void;
+  onApply: () => void;
+  onClear: () => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const s = state ?? { preview: null, loading: false, applying: false, appliedCount: null, error: null };
+  const hasPreview = s.preview !== null;
+  const previewCount = s.preview?.length ?? 0;
+  const catCls =
+    repair.category === "enum" ? "border-signal-cyan/40 text-signal-cyan"
+    : repair.category === "orphan" ? "border-signal-amber/40 text-signal-amber"
+    : "border-signal-violet/40 text-signal-violet";
+
+  return (
+    <div className="border border-border rounded-[2px] bg-bg-elevated/40">
+      <div className="px-3 py-2 flex items-start gap-2">
+        <Wrench className="w-3.5 h-3.5 text-signal-violet shrink-0 mt-0.5" />
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[12px] font-mono font-bold text-foreground truncate">{repair.title}</span>
+            <span className={cn("text-[8px] font-mono uppercase px-1 py-0 border rounded-[2px]", catCls)}>{repair.category}</span>
+            <span className="text-[9px] font-mono text-text-dim">{repair.table}</span>
+          </div>
+          <div className="text-[10px] text-text-dim font-mono mt-0.5">{repair.description}</div>
+          {s.error && (
+            <div className="mt-1.5 text-[10px] font-mono text-signal-red border-l-2 border-signal-red pl-1.5">{s.error}</div>
+          )}
+          {s.appliedCount !== null && (
+            <div className="mt-1.5 text-[10px] font-mono text-signal-green flex items-center gap-1">
+              <CheckCircle2 className="w-3 h-3" />
+              {s.appliedCount} fila{s.appliedCount === 1 ? "" : "s"} corregida{s.appliedCount === 1 ? "" : "s"}.
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col gap-1 shrink-0">
+          {!hasPreview ? (
+            <button
+              onClick={onPreview}
+              disabled={s.loading}
+              className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan hover:bg-signal-cyan/20 disabled:opacity-50"
+            >
+              {s.loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Eye className="w-3 h-3" />}
+              Preview
+            </button>
+          ) : previewCount === 0 ? (
+            <span className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-signal-green/40 bg-signal-green/10 text-signal-green">
+              <CheckCircle2 className="w-3 h-3" /> Sin cambios
+            </span>
+          ) : (
+            <>
+              <button
+                onClick={onApply}
+                disabled={s.applying}
+                className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-signal-violet/60 bg-signal-violet/15 text-signal-violet hover:bg-signal-violet/25 disabled:opacity-50"
+              >
+                {s.applying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
+                Aplicar ({previewCount})
+              </button>
+              <button
+                onClick={onClear}
+                className="inline-flex items-center justify-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-border text-text-dim hover:text-foreground"
+              >
+                Cancelar
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      {hasPreview && previewCount > 0 && (
+        <div className="border-t border-border">
+          <button
+            onClick={() => setExpanded((v) => !v)}
+            className="w-full px-3 py-1.5 flex items-center gap-1.5 text-[10px] font-mono uppercase text-text-dim hover:text-foreground hover:bg-accent/30"
+          >
+            <ChevronRight className={cn("w-3 h-3 transition-transform", expanded && "rotate-90")} />
+            Vista previa · {previewCount} fila{previewCount === 1 ? "" : "s"}
+          </button>
+          {expanded && (
+            <div className="max-h-64 overflow-y-auto border-t border-border divide-y divide-border">
+              {s.preview!.slice(0, 50).map((row) => (
+                <div key={row.id} className="px-3 py-1.5 text-[10px] font-mono">
+                  <div className="text-foreground">{row.label}</div>
+                  <div className="flex items-center gap-1 mt-0.5 text-text-dim">
+                    <span className="text-signal-red line-through truncate">
+                      {Object.entries(row.before).map(([k, v]) => `${k}=${String(v ?? "—")}`).join(" · ")}
+                    </span>
+                    <ChevronRight className="w-2.5 h-2.5 shrink-0" />
+                    <span className="text-signal-green truncate">
+                      {Object.entries(row.after).map(([k, v]) => `${k}=${String(v ?? "—")}`).join(" · ")}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {previewCount > 50 && (
+                <div className="px-3 py-1.5 text-[10px] font-mono text-text-dim text-center">
+                  + {previewCount - 50} más…
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
