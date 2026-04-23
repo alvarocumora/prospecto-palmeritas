@@ -665,6 +665,10 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                   const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
                   const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
                   const isSel = selectedId === id;
+                  const days = daysUntilExpiry(p);
+                  const sev = expirySeverity(days);
+                  const showBadge = sev === "expired" || sev === "critical" || sev === "warn";
+                  const badgeColor = showBadge ? EXPIRY_COLOR[sev as "expired" | "critical" | "warn"] : null;
                   return (
                     <li key={id}>
                       <button
@@ -678,9 +682,22 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                             className="inline-block w-2 h-2 rounded-sm shrink-0"
                             style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
                           />
-                          <span className="font-semibold truncate" style={{ color: s.color }}>
+                          <span className="font-semibold truncate flex-1" style={{ color: s.color }}>
                             {(p.NOMBRE as string) ?? "(sin nombre)"}
                           </span>
+                          {showBadge && badgeColor && (
+                            <span
+                              className={`shrink-0 px-1 py-0.5 rounded text-[9px] font-mono ${sev === "expired" ? "animate-pulse" : ""}`}
+                              style={{ background: `${badgeColor}22`, color: badgeColor, border: `1px solid ${badgeColor}` }}
+                              title={
+                                sev === "expired"
+                                  ? `Vencida hace ${Math.abs(days ?? 0)} días`
+                                  : `Vence en ${days} días`
+                              }
+                            >
+                              {sev === "expired" ? "VENCIDA" : `${days}d`}
+                            </span>
+                          )}
                         </div>
                         <div className="text-[10px] text-text-secondary leading-tight">
                           ROL {(p.NUMERO_ROL as string | number) ?? "—"}
