@@ -100,6 +100,7 @@ export function useMapAnnotations(projectId: string | null) {
   const createAnnotation = useCallback(
     async (input: {
       lat: number; lng: number; text: string; color?: string;
+      priority?: "low" | "medium" | "high";
       target_id?: string | null; campaign_id?: string | null; phase?: string | null;
     }) => {
       if (!projectId) return null;
@@ -118,6 +119,7 @@ export function useMapAnnotations(projectId: string | null) {
           lng: input.lng,
           text: input.text.slice(0, 500),
           color: input.color ?? "gold",
+          priority: input.priority ?? "medium",
           target_id: input.target_id ?? null,
           campaign_id: input.campaign_id ?? null,
           phase: input.phase ?? null,
@@ -135,8 +137,24 @@ export function useMapAnnotations(projectId: string | null) {
   );
 
   const updateAnnotation = useCallback(
-    async (id: string, patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase">>) => {
-      const { error } = await supabase.from("map_annotations").update(patch).eq("id", id);
+    async (
+      id: string,
+      patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase" | "priority" | "resolved_reason">>,
+    ) => {
+      const next: Record<string, unknown> = { ...patch };
+      // Si cambia el estado resuelto, completar trazabilidad
+      if (Object.prototype.hasOwnProperty.call(patch, "resolved")) {
+        if (patch.resolved) {
+          const { data: u } = await supabase.auth.getUser();
+          next.resolved_by = u.user?.id ?? null;
+          next.resolved_at = new Date().toISOString();
+        } else {
+          next.resolved_by = null;
+          next.resolved_at = null;
+          next.resolved_reason = null;
+        }
+      }
+      const { error } = await supabase.from("map_annotations").update(next).eq("id", id);
       if (error) {
         toast.error(`No se pudo actualizar: ${error.message}`);
       }
