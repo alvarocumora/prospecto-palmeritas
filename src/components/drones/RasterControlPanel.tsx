@@ -129,5 +129,6 @@ export function RasterControlPanel({ rasters, settings, onChange, onZoomTo }: Pr
         Click en nombre = zoom al raster
       </div>
     </div>
+    </div>
   );
 }
