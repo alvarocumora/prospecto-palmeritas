@@ -25,10 +25,32 @@ export function SyncLog({ projectId }: { projectId: string }) {
       const changed = result?.changed ?? 0;
       const missing = result?.missing ?? 0;
       const alerts = result?.alertsCreated ?? 0;
+
+      toast.loading("Analizando sobreposiciones…", { id: t });
+      let detected = 0;
+      try {
+        const { data: ov, error: ovErr } = await supabase.functions.invoke("compute-overlaps", {
+          body: { projectId },
+        });
+        if (ovErr) throw ovErr;
+        detected = ov?.detected ?? 0;
+      } catch (ovErr) {
+        console.error("compute-overlaps failed", ovErr);
+        toast.warning(
+          `Sync OK · ${checked} revisadas · ${changed} cambios · ${alerts} alertas · sobreposiciones no recalculadas`,
+          { id: t, duration: 6000 }
+        );
+        window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId } }));
+        refresh();
+        refreshConcessions();
+        return;
+      }
+
       toast.success(
-        `Sync OK · ${checked} revisadas · ${changed} con cambios · ${missing} no encontradas · ${alerts} alertas`,
-        { id: t, duration: 6000 }
+        `Sync OK · ${checked} revisadas · ${changed} cambios · ${missing} no encontradas · ${alerts} alertas · ${detected} sobreposiciones`,
+        { id: t, duration: 7000 }
       );
+      window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId } }));
       refresh();
       refreshConcessions();
     } catch (e) {
