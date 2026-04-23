@@ -645,6 +645,97 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
               </div>
             )}
           </div>
+          {selectedId && (() => {
+            const sel = visibleFeatures.find((f) => f.id === selectedId);
+            if (!sel) return null;
+            const p = (sel.properties ?? {}) as Record<string, unknown>;
+            const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+            const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+            const rol = `${(p.NUMERO_ROL as string | number) ?? "—"}${p.DV_ROL ? `-${String(p.DV_ROL)}` : ""}`;
+            const ha = typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(2) : "—";
+            const days = daysUntilExpiry(p);
+            const sev = expirySeverity(days);
+            const venc = p.FECHA_VENCIMIENTO
+              ? new Date(typeof p.FECHA_VENCIMIENTO === "number" ? p.FECHA_VENCIMIENTO : String(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
+              : null;
+            const openPopup = () => {
+              const map = mapRef.current;
+              const lyr = featureLayersRef.current.get(selectedId) as unknown as {
+                openPopup?: () => void;
+                getBounds?: () => LType.LatLngBounds;
+              };
+              if (!map || !lyr) return;
+              try {
+                if (lyr.getBounds) {
+                  const b = lyr.getBounds();
+                  if (b.isValid()) map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: true });
+                }
+                lyr.openPopup?.();
+              } catch { /* noop */ }
+            };
+            const rows: Array<[string, string]> = [
+              ["Origen", s.label],
+              ["ROL", rol],
+              ["Nombre", (p.NOMBRE as string) ?? "—"],
+              ["Titular", (p.TITULAR_DIVISION as string) ?? "—"],
+              ["Comuna", (p.COMUNA as string) ?? "—"],
+              ["Superficie", `${ha} ha`],
+              ["Situación", (p.SITUACION_CONCESION as string) ?? "—"],
+              ...(venc ? [["Vencimiento", venc] as [string, string]] : []),
+            ];
+            return (
+              <div
+                className="border-b border-border bg-bg-elevated/60 px-3 py-2.5 space-y-2"
+                style={{ borderLeft: `3px solid ${s.color}` }}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
+                      Detalle seleccionado
+                    </div>
+                    <div className="font-mono text-xs font-semibold truncate" style={{ color: s.color }}>
+                      {(p.NOMBRE as string) ?? "(sin nombre)"}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setSelectedId(null)}
+                    className="shrink-0 text-text-secondary hover:text-foreground"
+                    aria-label="Cerrar detalle"
+                    title="Cerrar"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+                <dl className="space-y-1">
+                  {rows.map(([k, v]) => (
+                    <div key={k} className="flex gap-2 text-[10px] font-mono leading-tight">
+                      <dt className="text-text-secondary min-w-[68px] shrink-0">{k}</dt>
+                      <dd className="font-medium text-foreground break-words">{v}</dd>
+                    </div>
+                  ))}
+                  {sev !== "ok" && sev !== "unknown" && days !== null && (
+                    <div className="flex gap-2 text-[10px] font-mono leading-tight">
+                      <dt className="text-text-secondary min-w-[68px] shrink-0">Estado</dt>
+                      <dd
+                        className={`font-medium ${sev === "expired" ? "animate-pulse" : ""}`}
+                        style={{ color: EXPIRY_COLOR[sev] }}
+                      >
+                        {sev === "expired" ? `Vencida hace ${Math.abs(days)} d` : `Vence en ${days} d`}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+                <button
+                  onClick={openPopup}
+                  className="w-full inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-secondary text-[10px] font-mono hover:bg-accent"
+                  title="Centrar y abrir popup en el mapa"
+                >
+                  <Search className="w-3 h-3" />
+                  Ver popup en mapa
+                </button>
+              </div>
+            );
+          })()}
           <div className="flex-1 overflow-y-auto">
             {filteredFeatures.length === 0 ? (
               <div className="p-4 text-center text-xs text-text-secondary font-mono">
