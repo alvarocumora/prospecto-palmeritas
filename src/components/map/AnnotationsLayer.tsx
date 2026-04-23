@@ -44,6 +44,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
   const [draftPhase, setDraftPhase] = useState<string>("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [previewFormat, setPreviewFormat] = useState<"csv" | "pdf" | null>(null);
 
   // Filter state
   const [filterKind, setFilterKind] = useState<FilterKind>("all");
@@ -210,18 +211,18 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
         </div>
         <div className="flex items-center gap-1">
           <button
-            onClick={() => exportAnnotationsCsv(filtered, { projectName: projectName ?? "proyecto", targetMap, campaignMap })}
+            onClick={() => setPreviewFormat("csv")}
             disabled={filtered.length === 0}
             className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-gold disabled:opacity-40"
-            title="Exportar CSV"
+            title="Vista previa CSV"
           >
             <Download className="w-3 h-3" /> CSV
           </button>
           <button
-            onClick={() => exportAnnotationsPdf(filtered, { projectName: projectName ?? "proyecto", targetMap, campaignMap })}
+            onClick={() => setPreviewFormat("pdf")}
             disabled={filtered.length === 0}
             className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border text-[10px] font-mono text-muted-foreground hover:text-foreground hover:border-gold disabled:opacity-40"
-            title="Exportar PDF"
+            title="Vista previa PDF"
           >
             <Download className="w-3 h-3" /> PDF
           </button>
