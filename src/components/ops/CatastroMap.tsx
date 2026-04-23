@@ -142,6 +142,24 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   const [LRef, setLRef] = useState<typeof LType | null>(null);
   const featuresRef = useRef<GeoJSON.FeatureCollection | null>(null);
 
+  // Per-feature leaflet layers, keyed by stable feature id, for select-on-click highlight.
+  const featureLayersRef = useRef<Map<string, LType.Layer>>(new Map());
+  // Visible features mirrored to React state so the side panel can render & filter.
+  const [visibleFeatures, setVisibleFeatures] = useState<GeoJSON.Feature[]>([]);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<Set<CatastroOrigen>>(
+    () => new Set<CatastroOrigen>(["EXPLOTA_1983", "EXPLOTA_1932", "EXPLORA_1983", "ESTACAMENTO"])
+  );
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const featureId = (f: GeoJSON.Feature, idx: number): string => {
+    const p = (f.properties ?? {}) as Record<string, unknown>;
+    const rol = p.NUMERO_ROL ?? p.numero_rol;
+    const dv = p.DV_ROL ?? p.dv_rol;
+    if (rol != null) return `${rol}-${dv ?? ""}-${idx}`;
+    return `f-${idx}`;
+  };
+
   // Init map once
   useEffect(() => {
     if (!containerRef.current || mapRef.current) return;
