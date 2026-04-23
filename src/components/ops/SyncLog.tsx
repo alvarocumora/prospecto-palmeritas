@@ -15,16 +15,24 @@ export function SyncLog({ projectId }: { projectId: string }) {
 
   const onSync = async () => {
     setSyncing(true);
+    const t = toast.loading("Sincronizando con SERNAGEOMIN…");
     try {
-      const { data: result, error } = await supabase.functions.invoke("sync-sernageomin", {
+      const { data: result, error } = await supabase.functions.invoke("sync-catastro", {
         body: { projectId },
       });
       if (error) throw error;
-      toast.success(`Sync OK · ${result?.checked ?? 0} concesiones · ${result?.changed ?? 0} cambios`);
+      const checked = result?.checked ?? 0;
+      const changed = result?.changed ?? 0;
+      const missing = result?.missing ?? 0;
+      const alerts = result?.alertsCreated ?? 0;
+      toast.success(
+        `Sync OK · ${checked} revisadas · ${changed} con cambios · ${missing} no encontradas · ${alerts} alertas`,
+        { id: t, duration: 6000 }
+      );
       refresh();
       refreshConcessions();
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Error en sync");
+      toast.error(e instanceof Error ? e.message : "Error en sync", { id: t });
     } finally {
       setSyncing(false);
     }
