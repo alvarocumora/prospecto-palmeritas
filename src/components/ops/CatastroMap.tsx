@@ -176,12 +176,40 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   // Visible features mirrored to React state so the side panel can render & filter.
   const [visibleFeatures, setVisibleFeatures] = useState<GeoJSON.Feature[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [typeFilter, setTypeFilter] = useState<Set<CatastroOrigen>>(
-    () => new Set<CatastroOrigen>(["EXPLOTA_1983", "EXPLOTA_1932", "EXPLORA_1983", "ESTACAMENTO"])
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [expiringOnly, setExpiringOnly] = useState(false);
+  const FILTER_STORAGE_KEY = "catastroMap:filters:v1";
+  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean };
+  const loadStoredFilters = (): StoredFilters => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(FILTER_STORAGE_KEY);
+      return raw ? (JSON.parse(raw) as StoredFilters) : {};
+    } catch {
+      return {};
+    }
+  };
+  const [typeFilter, setTypeFilter] = useState<Set<CatastroOrigen>>(() => {
+    const stored = loadStoredFilters();
+    if (stored.types && Array.isArray(stored.types) && stored.types.length > 0) {
+      return new Set<CatastroOrigen>(stored.types);
+    }
+    return new Set<CatastroOrigen>(["EXPLOTA_1983", "EXPLOTA_1932", "EXPLORA_1983", "ESTACAMENTO"]);
+  });
+  const [searchQuery, setSearchQuery] = useState(() => loadStoredFilters().q ?? "");
+  const [expiringOnly, setExpiringOnly] = useState(() => loadStoredFilters().expiringOnly ?? false);
   const expiryThresholdDays = 90;
+
+  // Persist filter state across reloads.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const payload: StoredFilters = {
+        types: Array.from(typeFilter),
+        q: searchQuery,
+        expiringOnly,
+      };
+      window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload));
+    } catch { /* quota / disabled storage */ }
+  }, [typeFilter, searchQuery, expiringOnly]);
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
