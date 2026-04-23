@@ -177,7 +177,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   const [visibleFeatures, setVisibleFeatures] = useState<GeoJSON.Feature[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const FILTER_STORAGE_KEY = "catastroMap:filters:v1";
-  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean };
+  type SortMode = "default" | "ha_desc" | "ha_asc";
+  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean; sort?: SortMode };
   const loadStoredFilters = (): StoredFilters => {
     if (typeof window === "undefined") return {};
     try {
@@ -196,6 +197,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   });
   const [searchQuery, setSearchQuery] = useState(() => loadStoredFilters().q ?? "");
   const [expiringOnly, setExpiringOnly] = useState(() => loadStoredFilters().expiringOnly ?? false);
+  const [sortMode, setSortMode] = useState<SortMode>(() => loadStoredFilters().sort ?? "default");
   const expiryThresholdDays = 90;
 
   // Persist filter state across reloads.
@@ -206,10 +208,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         types: Array.from(typeFilter),
         q: searchQuery,
         expiringOnly,
+        sort: sortMode,
       };
       window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload));
     } catch { /* quota / disabled storage */ }
-  }, [typeFilter, searchQuery, expiringOnly]);
+  }, [typeFilter, searchQuery, expiringOnly, sortMode]);
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
