@@ -12,6 +12,8 @@ type Props = {
   /** [lng, lat] center fallback */
   center?: [number, number];
   projectName?: string;
+  /** Notified whenever new SERNAGEOMIN features are loaded for the bbox. */
+  onFeaturesLoaded?: (fc: GeoJSON.FeatureCollection) => void;
 };
 
 /**
