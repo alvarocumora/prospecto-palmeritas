@@ -304,10 +304,10 @@
 
   /* Lift Leaflet bottom controls above the global StatusBar (h-6 = 24px) */
   .leaflet-bottom.leaflet-left {
-    margin-bottom: 32px;
+    margin-bottom: 36px !important;
   }
   .leaflet-bottom.leaflet-right {
-    margin-bottom: 32px;
+    margin-bottom: 36px !important;
   }
   /* Compact zoom buttons */
   .leaflet-control-zoom a {
