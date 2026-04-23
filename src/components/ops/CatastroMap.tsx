@@ -226,12 +226,19 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
 
   // Init map once
   useEffect(() => {
+    // Reset unmount flag in case the previous render aborted (React StrictMode
+    // or HMR can leave it stuck at `true` and silently disable invalidateSize).
+    isUnmountingRef.current = false;
     if (!containerRef.current || mapRef.current) return;
     let cancelled = false;
     (async () => {
-      const L = await import("leaflet");
-      await import("leaflet/dist/leaflet.css");
-      if (cancelled || !containerRef.current) return;
+      try {
+        const L = await import("leaflet");
+        await import("leaflet/dist/leaflet.css");
+        if (cancelled || !containerRef.current) {
+          console.warn("[CatastroMap] init aborted", { cancelled, hasContainer: !!containerRef.current });
+          return;
+        }
 
       const map = L.map(containerRef.current, {
         center: [center[1], center[0]],
