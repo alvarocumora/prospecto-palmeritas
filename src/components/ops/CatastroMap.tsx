@@ -1,11 +1,119 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { Database, Download, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type * as LType from "leaflet";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
 import { catastroQueryUrl, CATASTRO_STYLE, catastroPopupHtml, type CatastroOrigen } from "@/components/map/overlays";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import { exportCatastroMapPdf } from "@/lib/pdf/catastro-map";
+
+// ---------- Cache (bbox-keyed, localStorage 24h + in-memory) ----------
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const CACHE_PREFIX = "catastroMap:v1:";
+type CacheEntry = { ts: number; bbox: BBox; fc: GeoJSON.FeatureCollection };
+type BBox = { minLng: number; minLat: number; maxLng: number; maxLat: number };
+
+const memoryCache = new Map<string, CacheEntry>();
+
+function bboxKey(b: BBox) {
+  const r = (n: number) => n.toFixed(3);
+  return `${CACHE_PREFIX}${r(b.minLng)},${r(b.minLat)},${r(b.maxLng)},${r(b.maxLat)}`;
+}
+
+function bboxContains(outer: BBox, inner: BBox) {
+  return (
+    outer.minLng <= inner.minLng + 1e-9 &&
+    outer.minLat <= inner.minLat + 1e-9 &&
+    outer.maxLng + 1e-9 >= inner.maxLng &&
+    outer.maxLat + 1e-9 >= inner.maxLat
+  );
+}
+
+/** Find a cached entry whose bbox fully contains the requested bbox. */
+function findCoveringCache(target: BBox): CacheEntry | null {
+  // 1) memory first
+  for (const e of memoryCache.values()) {
+    if (Date.now() - e.ts < CACHE_TTL_MS && bboxContains(e.bbox, target)) return e;
+  }
+  // 2) localStorage scan
+  if (typeof window === "undefined") return null;
+  try {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (!k || !k.startsWith(CACHE_PREFIX)) continue;
+      const raw = window.localStorage.getItem(k);
+      if (!raw) continue;
+      try {
+        const e = JSON.parse(raw) as CacheEntry;
+        if (Date.now() - e.ts > CACHE_TTL_MS) {
+          window.localStorage.removeItem(k);
+          continue;
+        }
+        if (bboxContains(e.bbox, target)) {
+          memoryCache.set(k, e);
+          return e;
+        }
+      } catch {
+        window.localStorage.removeItem(k);
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function writeCache(bbox: BBox, fc: GeoJSON.FeatureCollection) {
+  const key = bboxKey(bbox);
+  const entry: CacheEntry = { ts: Date.now(), bbox, fc };
+  memoryCache.set(key, entry);
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(entry));
+  } catch {
+    // Quota exceeded — purge oldest map entries and retry once.
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i);
+        if (k && k.startsWith(CACHE_PREFIX)) keys.push(k);
+      }
+      keys.slice(0, Math.max(1, Math.floor(keys.length / 2))).forEach((k) => window.localStorage.removeItem(k));
+      window.localStorage.setItem(key, JSON.stringify(entry));
+    } catch { /* give up */ }
+  }
+}
+
+/** Pad a bbox by a fraction (e.g. 0.25 = +25% on each side) to prefetch surroundings. */
+function padBbox(b: BBox, frac: number): BBox {
+  const dLng = (b.maxLng - b.minLng) * frac;
+  const dLat = (b.maxLat - b.minLat) * frac;
+  return {
+    minLng: b.minLng - dLng,
+    maxLng: b.maxLng + dLng,
+    minLat: b.minLat - dLat,
+    maxLat: b.maxLat + dLat,
+  };
+}
+
+/** Cheap bbox-intersect check on a GeoJSON Feature using its coordinate envelope. */
+function featureIntersectsBbox(f: GeoJSON.Feature, b: BBox): boolean {
+  const g = f.geometry;
+  if (!g) return false;
+  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  const visit = (coords: unknown) => {
+    if (typeof (coords as number[])[0] === "number") {
+      const [x, y] = coords as number[];
+      if (x < minLng) minLng = x;
+      if (x > maxLng) maxLng = x;
+      if (y < minLat) minLat = y;
+      if (y > maxLat) maxLat = y;
+      return;
+    }
+    for (const c of coords as unknown[]) visit(c);
+  };
+  if ("coordinates" in g) visit((g as { coordinates: unknown }).coordinates);
+  else return false;
+  return !(maxLng < b.minLng || minLng > b.maxLng || maxLat < b.minLat || minLat > b.maxLat);
+}
 
 type Props = {
   concessions: MiningConcession[];
@@ -121,48 +229,80 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     } catch { /* noop */ }
   }, [concessions, LRef]);
 
-  // Fetch SERNAGEOMIN catastro for the current bbox
-  const loadCatastro = async () => {
+  const [fromCache, setFromCache] = useState(false);
+
+  // Render features into the leaflet layer (extracted so cache + fetch share it).
+  const renderFeatures = (fc: GeoJSON.FeatureCollection) => {
     const map = mapRef.current;
     const L = LRef;
     if (!map || !L) return;
+    if (catastroLayerRef.current) {
+      catastroLayerRef.current.remove();
+      catastroLayerRef.current = null;
+    }
+    // Clip features to current view to keep tooltips snappy.
+    const b = map.getBounds();
+    const view: BBox = { minLng: b.getWest(), minLat: b.getSouth(), maxLng: b.getEast(), maxLat: b.getNorth() };
+    const visible = (fc.features ?? []).filter((f) => featureIntersectsBbox(f, view));
+    const visibleFc: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: visible };
+    const layer = L.geoJSON(visibleFc, {
+      style: (feature) => {
+        const origen = ((feature?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+        const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+        return {
+          color: s.color,
+          weight: s.weight,
+          opacity: s.opacity,
+          fillColor: s.fillColor,
+          fillOpacity: s.fillOpacity,
+        };
+      },
+      onEachFeature: (f, lyr) => {
+        lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), { maxWidth: 320 });
+      },
+    }).addTo(map);
+    catastroLayerRef.current = layer;
+    featuresRef.current = visibleFc;
+    setCount(visible.length);
+    onFeaturesLoaded?.(visibleFc);
+  };
+
+  // Fetch SERNAGEOMIN catastro for the current bbox (cache-aware).
+  const loadCatastro = async (opts?: { force?: boolean }) => {
+    const map = mapRef.current;
+    const L = LRef;
+    if (!map || !L) return;
+    const b = map.getBounds();
+    const view: BBox = {
+      minLng: b.getWest(),
+      minLat: b.getSouth(),
+      maxLng: b.getEast(),
+      maxLat: b.getNorth(),
+    };
+
+    // 1) Try cache (any cached bbox covering current view)
+    if (!opts?.force) {
+      const hit = findCoveringCache(view);
+      if (hit) {
+        setErr(null);
+        setFromCache(true);
+        renderFeatures(hit.fc);
+        return;
+      }
+    }
+
+    // 2) Fetch — pad bbox to prefetch a buffer so small pans/zooms reuse cache
     setLoading(true);
     setErr(null);
+    setFromCache(false);
     try {
-      const b = map.getBounds();
-      const url = catastroQueryUrl({
-        minLng: b.getWest(),
-        minLat: b.getSouth(),
-        maxLng: b.getEast(),
-        maxLat: b.getNorth(),
-      });
+      const fetchBbox = padBbox(view, 0.25);
+      const url = catastroQueryUrl(fetchBbox);
       const res = await fetch(url);
       if (!res.ok) throw new Error(`SERNAGEOMIN HTTP ${res.status}`);
       const fc = (await res.json()) as GeoJSON.FeatureCollection;
-      if (catastroLayerRef.current) {
-        catastroLayerRef.current.remove();
-        catastroLayerRef.current = null;
-      }
-      const layer = L.geoJSON(fc, {
-        style: (feature) => {
-          const origen = ((feature?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
-          const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
-          return {
-            color: s.color,
-            weight: s.weight,
-            opacity: s.opacity,
-            fillColor: s.fillColor,
-            fillOpacity: s.fillOpacity,
-          };
-        },
-        onEachFeature: (f, lyr) => {
-          lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), { maxWidth: 320 });
-        },
-      }).addTo(map);
-      catastroLayerRef.current = layer;
-      featuresRef.current = fc;
-      setCount(fc.features?.length ?? 0);
-      onFeaturesLoaded?.(fc);
+      writeCache(fetchBbox, fc);
+      renderFeatures(fc);
     } catch (e) {
       setErr((e as Error).message);
       setCount(null);
@@ -171,14 +311,39 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
   };
 
-  // Auto-load on first map ready
+  // Auto-load on map ready + on moveend (debounced, cache-first)
   useEffect(() => {
-    if (LRef && mapRef.current) {
-      const t = setTimeout(() => loadCatastro(), 600);
-      return () => clearTimeout(t);
-    }
+    const map = mapRef.current;
+    if (!LRef || !map) return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const trigger = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => loadCatastro(), 350);
+    };
+    trigger(); // initial
+    map.on("moveend", trigger);
+    return () => {
+      if (timer) clearTimeout(timer);
+      map.off("moveend", trigger);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [LRef]);
+
+  const clearCache = () => {
+    memoryCache.clear();
+    if (typeof window !== "undefined") {
+      try {
+        const keys: string[] = [];
+        for (let i = 0; i < window.localStorage.length; i++) {
+          const k = window.localStorage.key(i);
+          if (k && k.startsWith(CACHE_PREFIX)) keys.push(k);
+        }
+        keys.forEach((k) => window.localStorage.removeItem(k));
+      } catch { /* ignore */ }
+    }
+    toast.success("Caché de catastro limpiado");
+    loadCatastro({ force: true });
+  };
 
   const handleExportPdf = async () => {
     const map = mapRef.current;
@@ -213,9 +378,22 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
           {count !== null && (
             <span className="font-mono text-signal-cyan whitespace-nowrap">{count} en vista</span>
           )}
+          {fromCache && !loading && (
+            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-bg-elevated text-text-secondary border border-border whitespace-nowrap" title="Datos servidos desde caché local (24h)">
+              <Database className="w-3 h-3 inline mr-1" />caché
+            </span>
+          )}
           {err && <span className="text-destructive truncate">· {err}</span>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={clearCache}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-elevated text-xs hover:bg-accent disabled:opacity-50"
+            title="Limpiar caché y refrescar"
+          >
+            Limpiar caché
+          </button>
           <button
             onClick={handleExportPdf}
             disabled={exporting || loading}
@@ -226,12 +404,13 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
             PDF
           </button>
           <button
-            onClick={loadCatastro}
+            onClick={() => loadCatastro({ force: true })}
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-primary-foreground text-xs hover:opacity-90 disabled:opacity-50"
+            title="Forzar recarga desde SERNAGEOMIN"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-            Cargar
+            Recargar
           </button>
         </div>
       </div>
