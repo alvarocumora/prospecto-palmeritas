@@ -330,13 +330,31 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       projectLayerRef.current.remove();
       projectLayerRef.current = null;
     }
+    // Normalize whatever was stored in geometry_geojson into a bare Geometry
+    // (some imports persist a Feature or FeatureCollection — Leaflet rejects
+    // those when set as a Feature.geometry, throwing "Invalid GeoJSON object").
+    const toGeometry = (raw: unknown): GeoJSON.Geometry | null => {
+      if (!raw || typeof raw !== "object") return null;
+      const g = raw as { type?: string; geometry?: unknown; features?: unknown[]; coordinates?: unknown };
+      if (g.type === "Feature" && g.geometry) return toGeometry(g.geometry);
+      if (g.type === "FeatureCollection" && Array.isArray(g.features)) {
+        const first = g.features.find((f) => f && (f as { geometry?: unknown }).geometry);
+        return first ? toGeometry((first as { geometry: unknown }).geometry) : null;
+      }
+      if (g.type && g.coordinates !== undefined) return raw as GeoJSON.Geometry;
+      return null;
+    };
     const features = concessions
-      .filter((c) => c.geometry_geojson)
-      .map((c) => ({
-        type: "Feature" as const,
-        properties: { ...c },
-        geometry: c.geometry_geojson as GeoJSON.Geometry,
-      }));
+      .map((c) => {
+        const geom = toGeometry(c.geometry_geojson);
+        if (!geom) return null;
+        return {
+          type: "Feature" as const,
+          properties: { ...c },
+          geometry: geom,
+        };
+      })
+      .filter((f): f is NonNullable<typeof f> => f !== null);
     if (features.length === 0) return;
     const fc: GeoJSON.FeatureCollection = { type: "FeatureCollection", features };
     const layer = L.geoJSON(fc, {
