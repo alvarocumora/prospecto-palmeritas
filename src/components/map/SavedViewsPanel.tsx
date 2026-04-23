@@ -40,7 +40,7 @@ export function SavedViewsPanel({ projectId, map, layerState, onRestore }: Props
     return (
       <button
         onClick={() => setOpen(true)}
-        className="absolute bottom-12 right-3 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
+        className="absolute bottom-3 right-3 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
         title="Vistas guardadas"
       >
         <Bookmark className="w-3.5 h-3.5 text-gold" />
@@ -50,7 +50,7 @@ export function SavedViewsPanel({ projectId, map, layerState, onRestore }: Props
   }
 
   return (
-    <div className="absolute bottom-12 right-3 z-[500] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[60vh]">
+    <div className="absolute bottom-3 right-3 z-[600] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[60vh]">
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bookmark className="w-3.5 h-3.5 text-gold" />
