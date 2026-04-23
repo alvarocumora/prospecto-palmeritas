@@ -21,11 +21,21 @@ type Mode = "login" | "signup";
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { user, loading: authLoading } = useAuth();
   const [mode, setMode] = useState<Mode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Si ya hay sesión activa, redirigir al dashboard automáticamente.
+  // Esto cubre tanto el caso "usuario ya logueado entra a /auth" como
+  // "acaba de iniciar sesión y onAuthStateChange propagó el user".
+  useEffect(() => {
+    if (!authLoading && user) {
+      navigate({ to: "/dashboard" });
+    }
+  }, [authLoading, user, navigate]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -41,25 +51,19 @@ function AuthPage() {
           },
         });
         if (error) throw error;
-        // If email confirmation is required, no session is returned.
         if (!data.session) {
           toast.success("Cuenta creada. Revisa tu email para confirmar.");
           setMode("login");
           return;
         }
         toast.success("Cuenta creada. Redirigiendo…");
-        // Wait one tick for AuthProvider's onAuthStateChange to propagate `user`.
-        await new Promise((r) => setTimeout(r, 50));
-        navigate({ to: "/dashboard" });
+        // El useEffect de arriba navega cuando user esté disponible.
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (!data.session) throw new Error("No se pudo iniciar sesión");
         toast.success("Bienvenido");
-        // Wait one tick for AuthProvider's onAuthStateChange to propagate `user`,
-        // otherwise the protected layout sees user=null and bounces back to /auth.
-        await new Promise((r) => setTimeout(r, 50));
-        navigate({ to: "/dashboard" });
+        // El useEffect navega cuando AuthProvider propague el user.
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Error de autenticación";
