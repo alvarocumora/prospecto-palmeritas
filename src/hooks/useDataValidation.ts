@@ -25,6 +25,8 @@ export type ValidationReport = {
   inconsistencies: Inconsistency[];
   totals: { ok: number; warn: number; empty: number; error: number; rows: number };
   generatedAt: string;
+  /** Map of table -> previous snapshot info (last sync timestamp + row count delta). */
+  lastSync: Record<string, { at: string; prevCount: number; delta: number } | null>;
 };
 
 const SEED_TABLES: { table: string; label: string; group: string; expectedMin?: number }[] = [
