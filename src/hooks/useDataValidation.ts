@@ -208,7 +208,48 @@ export function useDataValidation(projectId: string | null) {
       { ok: 0, warn: 0, empty: 0, error: 0, rows: 0 },
     );
 
-    setReport({ tables, inconsistencies, totals, generatedAt: new Date().toISOString() });
+    // Fetch the latest previous snapshot per table for delta computation.
+    const lastSync: ValidationReport["lastSync"] = {};
+    if (projectId) {
+      const tableNames = tables.map((t) => t.table);
+      const { data: snapshots } = await supabase
+        .from("validation_snapshots")
+        .select("table_name,row_count,created_at")
+        .eq("project_id", projectId)
+        .in("table_name", tableNames)
+        .order("created_at", { ascending: false })
+        .limit(500);
+      const seen = new Set<string>();
+      for (const s of snapshots ?? []) {
+        if (seen.has(s.table_name)) continue;
+        seen.add(s.table_name);
+        const audit = tables.find((t) => t.table === s.table_name);
+        if (!audit) continue;
+        lastSync[s.table_name] = {
+          at: s.created_at,
+          prevCount: s.row_count,
+          delta: audit.count - s.row_count,
+        };
+      }
+      for (const t of tables) {
+        if (!(t.table in lastSync)) lastSync[t.table] = null;
+      }
+
+      // Persist new snapshot rows for this run (best-effort, ignore errors).
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const payload = tables.map((t) => ({
+          project_id: projectId,
+          table_name: t.table,
+          row_count: t.count,
+          status: t.status,
+          created_by: user.id,
+        }));
+        await supabase.from("validation_snapshots").insert(payload);
+      }
+    }
+
+    setReport({ tables, inconsistencies, totals, generatedAt: new Date().toISOString(), lastSync });
     setLoading(false);
   }, [projectId]);
 
