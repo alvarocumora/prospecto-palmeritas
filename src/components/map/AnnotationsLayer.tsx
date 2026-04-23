@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
-import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar } from "lucide-react";
+import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download } from "lucide-react";
 import {
   useMapAnnotations,
   ANNOTATION_COLORS,
@@ -14,10 +14,12 @@ import {
 } from "@/hooks/useMapAnnotations";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { useExplorationCampaigns } from "@/hooks/useExplorationCampaigns";
+import { exportAnnotationsCsv, exportAnnotationsPdf } from "./exportAnnotations";
 import type { LeafletNS } from "./types";
 
 interface Props {
   projectId: string | null;
+  projectName?: string | null;
   map: LeafletMap | null;
   L: LeafletNS | null;
 }
