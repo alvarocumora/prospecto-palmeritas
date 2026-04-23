@@ -10,6 +10,7 @@ import { SyncLog } from "@/components/ops/SyncLog";
 import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
+import { CatastroMap } from "@/components/ops/CatastroMap";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -200,6 +201,9 @@ function ConcessionsTab() {
         <Stat label="Total" value={String(stats.total)} className="hidden md:block" />
         <Stat label="Área (ha)" value={stats.areaTotal.toFixed(1)} className="hidden md:block" />
       </div>
+
+      {/* Mapa interactivo del catastro */}
+      <CatastroMap concessions={data} />
 
       {/* Alerts banner */}
       {alerts.length > 0 && (
