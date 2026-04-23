@@ -66,20 +66,43 @@ function ValidationPage() {
             <StatCard label="Total filas" value={report.totals.rows} tone="cyan" Icon={Database} />
           </div>
 
-          {/* Inconsistencies */}
-          <HudPanel title="Inconsistencias detectadas" accent="amber" className="bg-bg-panel/40">
+          {/* Inconsistencies grouped by severity */}
+          <HudPanel title="Inconsistencias detectadas · agrupadas por severidad" accent="amber" className="bg-bg-panel/40">
             {report.inconsistencies.length === 0 ? (
               <div className="p-4 text-center">
                 <CheckCircle2 className="w-6 h-6 mx-auto text-signal-green mb-2" />
                 <div className="text-[11px] font-mono text-text-dim">
-                  Sin inconsistencias detectadas. Stages, enums y claves únicas en orden.
+                  Sin inconsistencias detectadas. Stages, enums, claves únicas y referencias cruzadas en orden.
                 </div>
               </div>
             ) : (
-              <div className="border border-border rounded-[2px] divide-y divide-border">
-                {report.inconsistencies.map((iss) => (
-                  <IncRow key={iss.id} iss={iss} />
-                ))}
+              <div className="space-y-3">
+                {(["error", "warn", "info"] as const).map((sev) => {
+                  const items = report.inconsistencies.filter((i) => i.severity === sev);
+                  if (items.length === 0) return null;
+                  const xrefCount = items.filter((i) => i.category === "xref").length;
+                  const sevLabel = sev === "error" ? "Errores críticos" : sev === "warn" ? "Advertencias" : "Informativo";
+                  const sevCls =
+                    sev === "error" ? "text-signal-red border-signal-red/40 bg-signal-red/5" :
+                    sev === "warn" ? "text-signal-amber border-signal-amber/40 bg-signal-amber/5" :
+                    "text-signal-cyan border-signal-cyan/40 bg-signal-cyan/5";
+                  return (
+                    <div key={sev} className={cn("border rounded-[2px]", sevCls)}>
+                      <div className="px-3 py-1.5 flex items-center gap-2 border-b border-current/20">
+                        <span className="text-[10px] font-mono uppercase tracking-wider font-bold">{sevLabel}</span>
+                        <span className="text-[10px] font-mono opacity-60">{items.length} regla{items.length === 1 ? "" : "s"}</span>
+                        {xrefCount > 0 && (
+                          <span className="ml-auto text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] border border-current/40 uppercase">
+                            {xrefCount} FK rota{xrefCount === 1 ? "" : "s"}
+                          </span>
+                        )}
+                      </div>
+                      <div className="divide-y divide-border bg-bg-panel/40">
+                        {items.map((iss) => <IncRow key={iss.id} iss={iss} />)}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </HudPanel>
@@ -268,6 +291,11 @@ function IncRow({ iss }: { iss: Inconsistency }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[11px] font-mono font-bold text-foreground">{iss.rule}</span>
             <span className="text-[9px] font-mono text-text-dim uppercase">{iss.table}</span>
+            {iss.category === "xref" && (
+              <span className="text-[8px] font-mono uppercase px-1 py-0 rounded-[2px] border border-signal-violet/40 text-signal-violet">
+                FK rota
+              </span>
+            )}
             <span className="ml-auto text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-[2px] bg-bg-elevated border border-border">
               {iss.count} {iss.count === 1 ? "fila" : "filas"}
             </span>
