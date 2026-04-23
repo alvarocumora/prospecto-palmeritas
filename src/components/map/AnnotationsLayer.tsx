@@ -209,20 +209,23 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
 
   if (!open) {
     return (
+      <div className="absolute top-3 left-44 z-[500] pointer-events-none">
       <button
         onClick={() => setOpen(true)}
-        className="absolute top-3 left-44 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
+        className="pointer-events-auto inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
         title="Notas y anotaciones persistentes"
       >
         <StickyNote className="w-3.5 h-3.5 text-gold" />
         <span>Notas{filtered.length > 0 ? ` (${filtered.length})` : ""}</span>
       </button>
+      </div>
     );
   }
 
   return (
     <>
-    <div className="absolute top-3 left-44 z-[500] w-80 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[68vh]">
+    <div className="absolute top-3 left-44 z-[500] pointer-events-none">
+    <div className="pointer-events-auto w-80 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[68vh]">
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <StickyNote className="w-3.5 h-3.5 text-gold" />

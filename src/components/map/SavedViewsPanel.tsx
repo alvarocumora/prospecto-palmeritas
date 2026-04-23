@@ -120,5 +120,6 @@ export function SavedViewsPanel({ projectId, map, layerState, onRestore }: Props
         )}
       </div>
     </div>
+    </div>
   );
 }
