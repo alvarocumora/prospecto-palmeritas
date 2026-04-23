@@ -115,6 +115,42 @@ function featureIntersectsBbox(f: GeoJSON.Feature, b: BBox): boolean {
   return !(maxLng < b.minLng || minLng > b.maxLng || maxLat < b.minLat || minLat > b.maxLat);
 }
 
+/** Parse SERNAGEOMIN FECHA_VENCIMIENTO (epoch ms or ISO date) and return days until expiry. */
+function daysUntilExpiry(p: Record<string, unknown>): number | null {
+  const raw = p.FECHA_VENCIMIENTO;
+  if (raw == null) return null;
+  let ts: number;
+  if (typeof raw === "number") ts = raw;
+  else {
+    const d = new Date(String(raw));
+    if (isNaN(d.getTime())) return null;
+    ts = d.getTime();
+  }
+  return Math.floor((ts - Date.now()) / (1000 * 60 * 60 * 24));
+}
+
+/** Severity tier from days-to-expiry (null = unknown, expired => "expired"). */
+type ExpirySeverity = "expired" | "critical" | "warn" | "ok" | "unknown";
+function expirySeverity(days: number | null): ExpirySeverity {
+  if (days === null) return "unknown";
+  if (days < 0) return "expired";
+  if (days <= 30) return "critical";
+  if (days <= 90) return "warn";
+  return "ok";
+}
+const EXPIRY_COLOR: Record<Exclude<ExpirySeverity, "ok" | "unknown">, string> = {
+  expired: "#dc2626",
+  critical: "#ef4444",
+  warn: "#f59e0b",
+};
+const EXPIRY_LABEL: Record<ExpirySeverity, string> = {
+  expired: "Vencida",
+  critical: "≤30 d",
+  warn: "≤90 d",
+  ok: "Vigente",
+  unknown: "—",
+};
+
 type Props = {
   concessions: MiningConcession[];
   /** [lng, lat] center fallback */
