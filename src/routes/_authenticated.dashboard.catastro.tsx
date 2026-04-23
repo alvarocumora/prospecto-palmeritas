@@ -12,6 +12,8 @@ import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
 import { CatastroMap } from "@/components/ops/CatastroMap";
 import { CatastroOverlapPanel } from "@/components/ops/CatastroOverlapPanel";
+import { ConcessionAlertsPanel } from "@/components/ops/ConcessionAlertsPanel";
+import { AoiOverlapPanel } from "@/components/ops/AoiOverlapPanel";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -216,6 +218,20 @@ function ConcessionsTab() {
         catastroFeatures={(catastroFC?.features ?? []) as React.ComponentProps<typeof CatastroOverlapPanel>["catastroFeatures"]}
         projectConcessions={data}
       />
+
+      {/* Vigilancia (alertas) + Intersección AOI ↔ catastro */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <ConcessionAlertsPanel projectId={active.id} />
+        <AoiOverlapPanel
+          aoi={{ type: "Polygon", coordinates: [PROJECT_AOI] }}
+          concessions={data}
+          onSelectConcession={(id) => {
+            const c = data.find((x) => x.id === id);
+            if (c) setViewing(c);
+          }}
+        />
+      </div>
+
 
       {/* Alerts banner */}
       {alerts.length > 0 && (

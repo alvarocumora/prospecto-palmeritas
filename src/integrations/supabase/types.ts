@@ -468,6 +468,82 @@ export type Database = {
           },
         ]
       }
+      concession_alerts: {
+        Row: {
+          acknowledged: boolean
+          alert_type: string
+          concession_id: string | null
+          created_at: string
+          holder_id: string | null
+          id: string
+          is_read: boolean
+          message: string | null
+          payload: Json | null
+          project_id: string
+          read_at: string | null
+          read_by: string | null
+          severity: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged?: boolean
+          alert_type: string
+          concession_id?: string | null
+          created_at?: string
+          holder_id?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          payload?: Json | null
+          project_id: string
+          read_at?: string | null
+          read_by?: string | null
+          severity?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged?: boolean
+          alert_type?: string
+          concession_id?: string | null
+          created_at?: string
+          holder_id?: string | null
+          id?: string
+          is_read?: boolean
+          message?: string | null
+          payload?: Json | null
+          project_id?: string
+          read_at?: string | null
+          read_by?: string | null
+          severity?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_alerts_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_alerts_holder_id_fkey"
+            columns: ["holder_id"]
+            isOneToOne: false
+            referencedRelation: "concession_holders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "concession_alerts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concession_files: {
         Row: {
           concession_id: string

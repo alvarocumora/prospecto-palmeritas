@@ -17,6 +17,7 @@ import { Route as InvitationsTokenRouteImport } from './routes/invitations.$toke
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
+import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
@@ -88,6 +89,11 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
+  id: '/api/public/sync-catastro',
+  path: '/api/public/sync-catastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardValidationRoute =
   AuthenticatedDashboardValidationRouteImport.update({
     id: '/dashboard/validation',
@@ -303,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
@@ -383,6 +391,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
@@ -424,6 +433,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
+    | '/api/public/sync-catastro'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/catastro/holders/$id'
@@ -463,6 +473,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
+    | '/api/public/sync-catastro'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/catastro/holders/$id'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
+    | '/api/public/sync-catastro'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/catastro/holders/$id'
@@ -517,6 +529,7 @@ export interface RootRouteChildren {
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
+  ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -576,6 +589,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/public/sync-catastro': {
+      id: '/api/public/sync-catastro'
+      path: '/api/public/sync-catastro'
+      fullPath: '/api/public/sync-catastro'
+      preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/validation': {
       id: '/_authenticated/dashboard/validation'
@@ -912,16 +932,8 @@ const rootRouteChildren: RootRouteChildren = {
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
+  ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
