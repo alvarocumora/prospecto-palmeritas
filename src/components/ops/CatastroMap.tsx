@@ -230,76 +230,84 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     // or HMR can leave it stuck at `true` and silently disable invalidateSize).
     isUnmountingRef.current = false;
     if (!containerRef.current || mapRef.current) return;
-    let cancelled = false;
+    let aborted = false;
     (async () => {
       try {
         const L = await import("leaflet");
         await import("leaflet/dist/leaflet.css");
-        if (cancelled || !containerRef.current) {
-          console.warn("[CatastroMap] init aborted", { cancelled, hasContainer: !!containerRef.current });
+        // Don't abort just because StrictMode unmounted+remounted us — as long
+        // as the container is still in the DOM we can safely (re)init. If the
+        // container is gone, the cleanup below will tear everything down.
+        if (aborted || !containerRef.current || !containerRef.current.isConnected) {
+          console.warn("[CatastroMap] init skipped (container detached)");
+          return;
+        }
+        if (mapRef.current) {
+          // Another effect run already initialized the map; just publish L.
+          setLRef(L);
           return;
         }
 
-      const map = L.map(containerRef.current, {
-        center: [center[1], center[0]],
-        zoom: 12,
-        zoomControl: true,
-        zoomAnimation: false,
-        fadeAnimation: false,
-        markerZoomAnimation: false,
-      });
-
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: "Imagery © Esri",
-          maxZoom: 19,
-        }
-      ).addTo(map);
-
-      L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution: "© OpenStreetMap contributors",
-          maxZoom: 19,
-          opacity: 0.45,
-        }
-      ).addTo(map);
-
-      mapRef.current = map;
-      setLRef(L);
-
-      // Fix: if the map mounts inside a dynamic layout, defer safe invalidation.
-      const safeInvalidate = () => {
-        if (isUnmountingRef.current) return;
-        const currentMap = mapRef.current;
-        const el = containerRef.current;
-        if (!currentMap || !el || !el.isConnected) return;
-        try {
-          currentMap.invalidateSize(false);
-        } catch {
-          /* noop */
-        }
-      };
-
-      requestAnimationFrame(safeInvalidate);
-      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 200));
-      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 600));
-
-      let ro: ResizeObserver | null = null;
-      if (typeof ResizeObserver !== "undefined" && containerRef.current) {
-        ro = new ResizeObserver(() => {
-          safeInvalidate();
+        const map = L.map(containerRef.current, {
+          center: [center[1], center[0]],
+          zoom: 12,
+          zoomControl: true,
+          zoomAnimation: false,
+          fadeAnimation: false,
+          markerZoomAnimation: false,
         });
-        ro.observe(containerRef.current);
-      }
-      (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
+
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "Imagery © Esri",
+            maxZoom: 19,
+          }
+        ).addTo(map);
+
+        L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            attribution: "© OpenStreetMap contributors",
+            maxZoom: 19,
+            opacity: 0.45,
+          }
+        ).addTo(map);
+
+        mapRef.current = map;
+        setLRef(L);
+
+        // Fix: if the map mounts inside a dynamic layout, defer safe invalidation.
+        const safeInvalidate = () => {
+          if (isUnmountingRef.current) return;
+          const currentMap = mapRef.current;
+          const el = containerRef.current;
+          if (!currentMap || !el || !el.isConnected) return;
+          try {
+            currentMap.invalidateSize(false);
+          } catch {
+            /* noop */
+          }
+        };
+
+        requestAnimationFrame(safeInvalidate);
+        invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 200));
+        invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 600));
+
+        let ro: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== "undefined" && containerRef.current) {
+          ro = new ResizeObserver(() => {
+            safeInvalidate();
+          });
+          ro.observe(containerRef.current);
+        }
+        (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
       } catch (e) {
         console.error("[CatastroMap] failed to initialize Leaflet map", e);
       }
     })();
     return () => {
-      cancelled = true;
+      aborted = true;
       isUnmountingRef.current = true;
       invalidateTimersRef.current.forEach((id) => window.clearTimeout(id));
       invalidateTimersRef.current = [];
