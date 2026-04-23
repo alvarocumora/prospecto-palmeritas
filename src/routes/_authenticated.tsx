@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase,
 } from "lucide-react";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
@@ -80,7 +80,8 @@ function AuthenticatedLayout() {
     canAccess(role, "hse") && { to: "/dashboard/hse", icon: <ShieldAlert className="w-3.5 h-3.5" />, label: "HSE", group: "GOVERNANCE" },
     canAccess(role, "team") && { to: "/dashboard/team", icon: <Users className="w-3.5 h-3.5" />, label: "Equipo", group: "GOVERNANCE" },
     canAccess(role, "audit") && { to: "/dashboard/audit", icon: <ClipboardList className="w-3.5 h-3.5" />, label: "Auditoría", group: "GOVERNANCE" },
-    canAccess(role, "marketplace") && { to: "/dashboard/marketplace", icon: <LayersIcon className="w-3.5 h-3.5" />, label: "Marketplace", group: "GOVERNANCE" },
+    canAccess(role, "marketplace") && { to: "/dashboard/marketplace", icon: <LayersIcon className="w-3.5 h-3.5" />, label: "Marketplace Capas", group: "GOVERNANCE" },
+    { to: "/dashboard/deals", icon: <Briefcase className="w-3.5 h-3.5" />, label: "Marketplace Deals", group: "GOVERNANCE" },
 
     { to: "/dashboard/profile", icon: <UserCircle className="w-3.5 h-3.5" />, label: "Mi Perfil", group: "ACCOUNT" },
     isSuperAdmin && { to: "/dashboard/admin", icon: <Crown className="w-3.5 h-3.5" />, label: "Admin", group: "ACCOUNT" },
