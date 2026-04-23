@@ -134,6 +134,7 @@ function ConcessionsTab() {
   const [editing, setEditing] = useState<MiningConcession | null>(null);
   const [creating, setCreating] = useState(false);
   const [viewing, setViewing] = useState<MiningConcession | null>(null);
+  const [catastroFC, setCatastroFC] = useState<GeoJSON.FeatureCollection | null>(null);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
