@@ -180,12 +180,12 @@ function OperationalMap() {
 
   return (
     <div className="flex flex-col bg-background h-[calc(100dvh-3rem-3.5rem)] md:h-[100dvh] w-full overflow-hidden">
-      <header className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 md:py-0 md:h-12 border-b border-border bg-bg-secondary shrink-0">
-        <div className="flex items-center gap-2 min-w-0 flex-1">
+      <header className="flex items-center gap-x-3 gap-y-1 px-3 h-10 md:h-11 border-b border-border bg-bg-secondary shrink-0">
+        <div className="flex items-center gap-2 min-w-0 shrink-0">
           <Layers className="w-4 h-4 text-gold shrink-0" />
-          <div className="min-w-0">
-            <div className="text-[10px] font-mono uppercase text-muted-foreground leading-none hidden sm:block">Centro de Operaciones</div>
-            <div className="text-xs md:text-sm font-mono font-semibold truncate">{active?.name ?? "Sin proyecto"}</div>
+          <div className="min-w-0 leading-tight">
+            <div className="text-[9px] font-mono uppercase text-muted-foreground hidden lg:block">Centro de Operaciones</div>
+            <div className="text-xs font-mono font-semibold truncate max-w-[180px]">{active?.name ?? "Sin proyecto"}</div>
           </div>
         </div>
 
