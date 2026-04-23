@@ -21,6 +21,7 @@ import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authen
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
+import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
@@ -108,6 +109,12 @@ const AuthenticatedDashboardReportsRoute =
   AuthenticatedDashboardReportsRouteImport.update({
     id: '/dashboard/reports',
     path: '/dashboard/reports',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardQpsRoute =
+  AuthenticatedDashboardQpsRouteImport.update({
+    id: '/dashboard/qps',
+    path: '/dashboard/qps',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardQaqcRoute =
@@ -283,6 +290,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
@@ -320,6 +328,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
@@ -359,6 +368,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
+  '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
@@ -398,6 +408,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
+    | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
     | '/dashboard/targets'
@@ -435,6 +446,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
+    | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
     | '/dashboard/targets'
@@ -473,6 +485,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/qaqc'
+    | '/_authenticated/dashboard/qps'
     | '/_authenticated/dashboard/reports'
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/targets'
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/reports'
       fullPath: '/dashboard/reports'
       preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/qps': {
+      id: '/_authenticated/dashboard/qps'
+      path: '/dashboard/qps'
+      fullPath: '/dashboard/qps'
+      preLoaderRoute: typeof AuthenticatedDashboardQpsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/qaqc': {
@@ -817,6 +837,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
+  AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRoute
@@ -849,6 +870,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
+  AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
   AuthenticatedDashboardTargetsRoute: AuthenticatedDashboardTargetsRoute,

@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck,
 } from "lucide-react";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
@@ -74,6 +74,7 @@ function AuthenticatedLayout() {
     canAccess(role, "inventory") && { to: "/dashboard/inventory", icon: <Boxes className="w-3.5 h-3.5" />, label: "Inventario", group: "ANALYSIS" },
     canAccess(role, "reports") && { to: "/dashboard/reports", icon: <FileText className="w-3.5 h-3.5" />, label: "Reportes", group: "ANALYSIS" },
     canAccess(role, "reports") && { to: "/dashboard/ni43101", icon: <FileText className="w-3.5 h-3.5" />, label: "Informe 43-101", group: "ANALYSIS" },
+    canAccess(role, "reports") && { to: "/dashboard/qps", icon: <BadgeCheck className="w-3.5 h-3.5" />, label: "QPs · Firmas", group: "ANALYSIS" },
 
     canAccess(role, "approvals") && { to: "/dashboard/approvals", icon: <ClipboardCheck className="w-3.5 h-3.5" />, label: "Aprobaciones", group: "GOVERNANCE" },
     canAccess(role, "finance") && { to: "/dashboard/finance", icon: <DollarSign className="w-3.5 h-3.5" />, label: "Costos", group: "GOVERNANCE" },
