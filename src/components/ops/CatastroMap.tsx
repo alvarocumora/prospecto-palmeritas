@@ -499,7 +499,113 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
           </button>
         </div>
       </div>
-      <div ref={containerRef} className="h-[420px] md:h-[520px] w-full" />
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px]">
+        <div ref={containerRef} className="h-[420px] md:h-[520px] w-full" />
+        <aside className="border-t lg:border-t-0 lg:border-l border-border bg-bg-secondary/50 flex flex-col h-[300px] lg:h-[520px]">
+          <div className="px-3 py-2 border-b border-border space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
+                Pertenencias en vista
+              </span>
+              <span className="font-mono text-[10px] text-signal-cyan">
+                {filteredFeatures.length}/{visibleFeatures.length}
+              </span>
+            </div>
+            <div className="relative">
+              <Search className="w-3 h-3 absolute left-2 top-1/2 -translate-y-1/2 text-text-secondary" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ROL, titular, comuna…"
+                className="w-full pl-7 pr-7 py-1 text-xs font-mono rounded border border-border bg-bg-elevated focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 text-text-secondary hover:text-foreground"
+                  aria-label="Limpiar búsqueda"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {(Object.entries(CATASTRO_STYLE) as Array<[CatastroOrigen, typeof CATASTRO_STYLE[CatastroOrigen]]>).map(([k, s]) => {
+                const active = typeFilter.has(k);
+                return (
+                  <button
+                    key={k}
+                    onClick={() => toggleType(k)}
+                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border transition-opacity ${
+                      active ? "opacity-100" : "opacity-40"
+                    }`}
+                    style={{
+                      borderColor: s.color,
+                      background: active ? `${s.fillColor}` : "transparent",
+                      color: active ? s.color : "var(--text-secondary)",
+                    }}
+                    title={`${active ? "Ocultar" : "Mostrar"} ${s.label}`}
+                  >
+                    <span
+                      className="inline-block w-2 h-2 rounded-sm"
+                      style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
+                    />
+                    {s.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto">
+            {filteredFeatures.length === 0 ? (
+              <div className="p-4 text-center text-xs text-text-secondary font-mono">
+                {visibleFeatures.length === 0 ? "Sin pertenencias en vista" : "Ningún resultado con esos filtros"}
+              </div>
+            ) : (
+              <ul className="divide-y divide-border">
+                {filteredFeatures.map((f) => {
+                  const id = f.id as string;
+                  const p = (f.properties ?? {}) as Record<string, unknown>;
+                  const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+                  const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+                  const isSel = selectedId === id;
+                  return (
+                    <li key={id}>
+                      <button
+                        onClick={() => setSelectedId(isSel ? null : id)}
+                        className={`w-full text-left px-3 py-2 text-xs font-mono hover:bg-accent transition-colors ${
+                          isSel ? "bg-accent" : ""
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span
+                            className="inline-block w-2 h-2 rounded-sm shrink-0"
+                            style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
+                          />
+                          <span className="font-semibold truncate" style={{ color: s.color }}>
+                            {(p.NOMBRE as string) ?? "(sin nombre)"}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-text-secondary leading-tight">
+                          ROL {(p.NUMERO_ROL as string) ?? "—"}
+                          {p.DV_ROL ? `-${p.DV_ROL}` : ""} · {(p.HECTAREAS as number)?.toFixed?.(1) ?? "—"} ha
+                          {p.COMUNA ? ` · ${p.COMUNA}` : ""}
+                        </div>
+                        {p.TITULAR_DIVISION && (
+                          <div className="text-[10px] text-text-secondary truncate mt-0.5">
+                            {p.TITULAR_DIVISION as string}
+                          </div>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        </aside>
+      </div>
       <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-border text-[10px] font-mono">
         {(Object.entries(CATASTRO_STYLE) as Array<[CatastroOrigen, typeof CATASTRO_STYLE[CatastroOrigen]]>).map(([k, s]) => (
           <span key={k} className="inline-flex items-center gap-1.5">
