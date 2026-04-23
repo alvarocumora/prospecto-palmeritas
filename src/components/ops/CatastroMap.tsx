@@ -588,9 +588,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                           </span>
                         </div>
                         <div className="text-[10px] text-text-secondary leading-tight">
-                          ROL {(p.NUMERO_ROL as string) ?? "—"}
-                          {p.DV_ROL ? `-${p.DV_ROL}` : ""} · {(p.HECTAREAS as number)?.toFixed?.(1) ?? "—"} ha
-                          {p.COMUNA ? ` · ${p.COMUNA}` : ""}
+                          ROL {(p.NUMERO_ROL as string | number) ?? "—"}
+                          {p.DV_ROL ? `-${String(p.DV_ROL)}` : ""} · {typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(1) : "—"} ha
+                          {p.COMUNA ? ` · ${String(p.COMUNA)}` : ""}
                         </div>
                         {p.TITULAR_DIVISION && (
                           <div className="text-[10px] text-text-secondary truncate mt-0.5">
