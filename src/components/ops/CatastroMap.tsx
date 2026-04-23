@@ -162,6 +162,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       catastroLayerRef.current = layer;
       featuresRef.current = fc;
       setCount(fc.features?.length ?? 0);
+      onFeaturesLoaded?.(fc);
     } catch (e) {
       setErr((e as Error).message);
       setCount(null);
