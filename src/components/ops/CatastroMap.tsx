@@ -378,9 +378,22 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
           {count !== null && (
             <span className="font-mono text-signal-cyan whitespace-nowrap">{count} en vista</span>
           )}
+          {fromCache && !loading && (
+            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-bg-elevated text-text-secondary border border-border whitespace-nowrap" title="Datos servidos desde caché local (24h)">
+              <Database className="w-3 h-3 inline mr-1" />caché
+            </span>
+          )}
           {err && <span className="text-destructive truncate">· {err}</span>}
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={clearCache}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-elevated text-xs hover:bg-accent disabled:opacity-50"
+            title="Limpiar caché y refrescar"
+          >
+            Limpiar caché
+          </button>
           <button
             onClick={handleExportPdf}
             disabled={exporting || loading}
@@ -391,12 +404,13 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
             PDF
           </button>
           <button
-            onClick={loadCatastro}
+            onClick={() => loadCatastro({ force: true })}
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-primary-foreground text-xs hover:opacity-90 disabled:opacity-50"
+            title="Forzar recarga desde SERNAGEOMIN"
           >
             {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-            Cargar
+            Recargar
           </button>
         </div>
       </div>
