@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight } from "lucide-react";
+import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight, ChevronDown, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { useDataValidation, type TableAudit, type Inconsistency } from "@/hooks/useDataValidation";
