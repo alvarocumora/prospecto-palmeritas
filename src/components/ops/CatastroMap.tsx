@@ -177,24 +177,60 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898] }: Props)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [LRef]);
 
+  const handleExportPdf = async () => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el) return;
+    setExporting(true);
+    try {
+      const b = map.getBounds();
+      await exportCatastroMapPdf({
+        mapElement: el,
+        bbox: { minLng: b.getWest(), minLat: b.getSouth(), maxLng: b.getEast(), maxLat: b.getNorth() },
+        zoom: map.getZoom(),
+        catastroFeatures: (featuresRef.current?.features ?? []).map((f) => ({
+          properties: (f.properties ?? {}) as Parameters<typeof exportCatastroMapPdf>[0]["catastroFeatures"][number]["properties"],
+        })),
+        projectConcessions: concessions,
+        projectName,
+      });
+      toast.success("PDF exportado");
+    } catch (e) {
+      toast.error(`No se pudo exportar: ${(e as Error).message}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <div className="border border-border rounded overflow-hidden bg-bg-secondary/30">
-      <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-secondary">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-mono uppercase tracking-wider text-text-secondary">Catastro SERNAGEOMIN</span>
+      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-bg-secondary">
+        <div className="flex items-center gap-2 text-xs min-w-0">
+          <span className="font-mono uppercase tracking-wider text-text-secondary truncate">Catastro SERNAGEOMIN</span>
           {count !== null && (
-            <span className="font-mono text-signal-cyan">{count} pertenencias en vista</span>
+            <span className="font-mono text-signal-cyan whitespace-nowrap">{count} en vista</span>
           )}
-          {err && <span className="text-destructive">· {err}</span>}
+          {err && <span className="text-destructive truncate">· {err}</span>}
         </div>
-        <button
-          onClick={loadCatastro}
-          disabled={loading}
-          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-primary-foreground text-xs hover:opacity-90 disabled:opacity-50"
-        >
-          {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          Cargar en vista
-        </button>
+        <div className="flex items-center gap-1.5 shrink-0">
+          <button
+            onClick={handleExportPdf}
+            disabled={exporting || loading}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-bg-elevated text-xs hover:bg-accent disabled:opacity-50"
+            title="Exportar mapa actual a PDF"
+          >
+            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            PDF
+          </button>
+          <button
+            onClick={loadCatastro}
+            disabled={loading}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-primary-foreground text-xs hover:opacity-90 disabled:opacity-50"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            Cargar
+          </button>
+        </div>
       </div>
       <div ref={containerRef} className="h-[420px] md:h-[520px] w-full" />
       <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-border text-[10px] font-mono">
