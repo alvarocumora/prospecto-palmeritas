@@ -347,7 +347,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     projectLayerRef.current = layer;
     try {
       const b = layer.getBounds();
-      if (b.isValid()) map.fitBounds(b, { padding: [40, 40], maxZoom: 14 });
+      if (b.isValid() && !isUnmountingRef.current) {
+        map.fitBounds(b, { padding: [40, 40], maxZoom: 14, animate: false });
+      }
     } catch { /* noop */ }
   }, [concessions, LRef]);
 
