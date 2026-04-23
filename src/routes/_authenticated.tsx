@@ -15,7 +15,6 @@ import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
 import { TopBar } from "@/components/ops/TopBar";
 import { StatusBar } from "@/components/ops/StatusBar";
 import { MobileBottomNav } from "@/components/ops/MobileBottomNav";
-import { MobileDiagnosticsChecklist } from "@/components/ops/MobileDiagnosticsChecklist";
 import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
@@ -136,7 +135,6 @@ function AuthenticatedLayout() {
 
       <StatusBar />
       <MobileBottomNav onMoreClick={() => setDrawerOpen(true)} catastroAlerts={catastroAlerts} />
-      <MobileDiagnosticsChecklist />
       <GeoAssistant />
     </div>
   );
