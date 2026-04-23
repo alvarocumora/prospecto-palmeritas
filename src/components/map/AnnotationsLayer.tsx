@@ -433,6 +433,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
       projectName={projectName ?? "proyecto"}
       targetMap={targetMap}
       campaignMap={campaignMap}
+      userMap={userMap}
       filterSummary={filterLabel}
       showResolved={showResolved}
       onClose={() => setPreviewFormat(null)}
