@@ -14,12 +14,22 @@ export interface MapAnnotation {
   text: string;
   color: string;
   resolved: boolean;
+  priority: "low" | "medium" | "high";
+  resolved_reason: string | null;
+  resolved_by: string | null;
+  resolved_at: string | null;
   target_id: string | null;
   campaign_id: string | null;
   phase: string | null;
   created_at: string;
   updated_at: string;
 }
+
+export const ANNOTATION_PRIORITIES: { value: "low" | "medium" | "high"; label: string; hex: string }[] = [
+  { value: "low", label: "Baja", hex: "#64748B" },
+  { value: "medium", label: "Media", hex: "#D4A24C" },
+  { value: "high", label: "Alta", hex: "#E11D48" },
+];
 
 export const SAMPLING_PHASES = [
   "recon",
