@@ -94,6 +94,27 @@ function padBbox(b: BBox, frac: number): BBox {
   };
 }
 
+/** Cheap bbox-intersect check on a GeoJSON Feature using its coordinate envelope. */
+function featureIntersectsBbox(f: GeoJSON.Feature, b: BBox): boolean {
+  const g = f.geometry;
+  if (!g) return false;
+  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  const visit = (coords: unknown) => {
+    if (typeof (coords as number[])[0] === "number") {
+      const [x, y] = coords as number[];
+      if (x < minLng) minLng = x;
+      if (x > maxLng) maxLng = x;
+      if (y < minLat) minLat = y;
+      if (y > maxLat) maxLat = y;
+      return;
+    }
+    for (const c of coords as unknown[]) visit(c);
+  };
+  if ("coordinates" in g) visit((g as { coordinates: unknown }).coordinates);
+  else return false;
+  return !(maxLng < b.minLng || minLng > b.maxLng || maxLat < b.minLat || minLat > b.maxLat);
+}
+
 type Props = {
   concessions: MiningConcession[];
   /** [lng, lat] center fallback */
