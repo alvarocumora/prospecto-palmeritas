@@ -203,7 +203,7 @@ function ConcessionsTab() {
       </div>
 
       {/* Mapa interactivo del catastro */}
-      <CatastroMap concessions={data} />
+      <CatastroMap concessions={data} projectName={`${active.code} · ${active.name}`} />
 
       {/* Alerts banner */}
       {alerts.length > 0 && (
