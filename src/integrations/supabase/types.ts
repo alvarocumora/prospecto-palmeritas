@@ -2184,8 +2184,12 @@ export type Database = {
           lat: number
           lng: number
           phase: string | null
+          priority: string
           project_id: string
           resolved: boolean
+          resolved_at: string | null
+          resolved_by: string | null
+          resolved_reason: string | null
           target_id: string | null
           text: string
           updated_at: string
@@ -2199,8 +2203,12 @@ export type Database = {
           lat: number
           lng: number
           phase?: string | null
+          priority?: string
           project_id: string
           resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_reason?: string | null
           target_id?: string | null
           text: string
           updated_at?: string
@@ -2214,8 +2222,12 @@ export type Database = {
           lat?: number
           lng?: number
           phase?: string | null
+          priority?: string
           project_id?: string
           resolved?: boolean
+          resolved_at?: string | null
+          resolved_by?: string | null
+          resolved_reason?: string | null
           target_id?: string | null
           text?: string
           updated_at?: string
