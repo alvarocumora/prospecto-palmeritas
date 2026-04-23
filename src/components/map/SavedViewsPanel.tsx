@@ -38,19 +38,22 @@ export function SavedViewsPanel({ projectId, map, layerState, onRestore }: Props
 
   if (!open) {
     return (
+      <div className="absolute bottom-3 right-[200px] z-[500] pointer-events-none">
       <button
         onClick={() => setOpen(true)}
-        className="absolute bottom-3 right-[200px] z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
+        className="pointer-events-auto inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-bg-secondary/95 backdrop-blur text-[11px] font-mono text-foreground hover:bg-accent shadow-md"
         title="Vistas guardadas"
       >
         <Bookmark className="w-3.5 h-3.5 text-gold" />
         <span>Vistas{views.length > 0 ? ` (${views.length})` : ""}</span>
       </button>
+      </div>
     );
   }
 
   return (
-    <div className="absolute bottom-3 right-[200px] z-[600] w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[60vh]">
+    <div className="absolute bottom-3 right-[200px] z-[600] pointer-events-none">
+    <div className="pointer-events-auto w-72 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[60vh]">
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Bookmark className="w-3.5 h-3.5 text-gold" />
@@ -116,6 +119,7 @@ export function SavedViewsPanel({ projectId, map, layerState, onRestore }: Props
           ))
         )}
       </div>
+    </div>
     </div>
   );
 }

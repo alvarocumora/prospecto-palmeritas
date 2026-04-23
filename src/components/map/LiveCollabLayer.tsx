@@ -131,7 +131,8 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
   return (
     <>
       {/* Control panel — top-left, compact, sits above ProspectivityButton */}
-      <div className="absolute top-3 left-3 z-[1000] flex items-center gap-1 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-1.5 py-1 shadow-md">
+      <div className="absolute top-3 left-3 z-[1000] pointer-events-none">
+      <div className="pointer-events-auto flex items-center gap-1 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-1.5 py-1 shadow-md">
         <button
           onClick={() => setSharing(!sharing)}
           className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
@@ -153,6 +154,7 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
           <MessageSquarePlus className="w-3.5 h-3.5" />
           {adding ? "Click en el mapa…" : `Notas (${annotations.length})`}
         </button>
+      </div>
       </div>
 
       {/* Composer modal */}
