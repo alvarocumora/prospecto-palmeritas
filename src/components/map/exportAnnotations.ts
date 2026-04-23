@@ -1,10 +1,23 @@
 // Export map annotations to CSV or PDF.
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ANNOTATION_COLORS, type MapAnnotation } from "@/hooks/useMapAnnotations";
+import { ANNOTATION_COLORS, ANNOTATION_PRIORITIES, type MapAnnotation } from "@/hooks/useMapAnnotations";
 
 function colorLabel(c: string): string {
   return ANNOTATION_COLORS.find((x) => x.value === c)?.label ?? c;
+}
+
+function priorityLabel(p: string | null | undefined): string {
+  return ANNOTATION_PRIORITIES.find((x) => x.value === p)?.label ?? (p ?? "—");
+}
+
+export type UserNameMap = Map<string, string>;
+
+interface ExportMeta {
+  projectName: string;
+  targetMap?: Map<string, { code: string }>;
+  campaignMap?: Map<string, { name: string }>;
+  userMap?: UserNameMap;
 }
 
 function csvEscape(v: unknown): string {
@@ -15,10 +28,14 @@ function csvEscape(v: unknown): string {
 
 export function exportAnnotationsCsv(
   annotations: MapAnnotation[],
-  meta: { projectName: string; targetMap?: Map<string, { code: string }>; campaignMap?: Map<string, { name: string }> },
+  meta: ExportMeta,
 ) {
   const headers = [
-    "id", "lat", "lng", "color", "color_label", "text", "resolved",
+    "id", "lat", "lng",
+    "color", "color_label", "color_original",
+    "priority", "priority_label",
+    "text", "resolved", "resolved_reason", "resolved_by", "resolved_at",
+    "created_by", "created_by_name",
     "target_code", "campaign_name", "phase", "created_at", "updated_at",
   ];
   const rows = annotations.map((a) => [
@@ -27,8 +44,16 @@ export function exportAnnotationsCsv(
     Number(a.lng).toFixed(6),
     a.color,
     colorLabel(a.color),
+    a.color, // color_original (alias explícito para auditoría)
+    a.priority ?? "medium",
+    priorityLabel(a.priority),
     a.text,
     a.resolved ? "true" : "false",
+    a.resolved_reason ?? "",
+    a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? a.resolved_by : "",
+    a.resolved_at ?? "",
+    a.created_by,
+    meta.userMap?.get(a.created_by) ?? "",
     a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "" : "",
     a.campaign_id ? meta.campaignMap?.get(a.campaign_id)?.name ?? "" : "",
     a.phase ?? "",
