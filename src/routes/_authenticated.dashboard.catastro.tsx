@@ -219,6 +219,20 @@ function ConcessionsTab() {
         projectConcessions={data}
       />
 
+      {/* Vigilancia (alertas) + Intersección AOI ↔ catastro */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <ConcessionAlertsPanel projectId={active.id} />
+        <AoiOverlapPanel
+          aoi={{ type: "Polygon", coordinates: [PROJECT_AOI] }}
+          concessions={data}
+          onSelectConcession={(id) => {
+            const c = data.find((x) => x.id === id);
+            if (c) setViewing(c);
+          }}
+        />
+      </div>
+
+
       {/* Alerts banner */}
       {alerts.length > 0 && (
         <div className="border border-amber-500/40 bg-amber-500/10 rounded p-3">
