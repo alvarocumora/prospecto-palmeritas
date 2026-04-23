@@ -439,6 +439,7 @@ export function useDataValidation(projectId: string | null) {
       }
 
       // Push all xref findings as inconsistencies, tagged as cross-reference.
+      const cap50 = <T,>(arr: T[]): T[] => arr.slice(0, 50);
       for (const c of checks) {
         const sample = c.rows.slice(0, 3).map((r) => r.ref ?? "∅").filter(Boolean);
         inconsistencies.push({
@@ -449,6 +450,11 @@ export function useDataValidation(projectId: string | null) {
           detail: `FK rota en ${c.parentLabel}${sample.length ? ` · refs: ${sample.join(", ")}${c.rows.length > 3 ? "…" : ""}` : ""}`,
           count: c.rows.length,
           category: "xref",
+          affected: cap50(c.rows).map((r) => ({
+            id: r.id,
+            label: r.ref ?? "∅",
+            fields: { [c.parentLabel]: r.ref ?? "(null)" },
+          })),
         });
       }
     }
