@@ -1,11 +1,98 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Loader2, RefreshCw } from "lucide-react";
+import { Database, Download, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import type * as LType from "leaflet";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
 import { catastroQueryUrl, CATASTRO_STYLE, catastroPopupHtml, type CatastroOrigen } from "@/components/map/overlays";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import { exportCatastroMapPdf } from "@/lib/pdf/catastro-map";
+
+// ---------- Cache (bbox-keyed, localStorage 24h + in-memory) ----------
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const CACHE_PREFIX = "catastroMap:v1:";
+type CacheEntry = { ts: number; bbox: BBox; fc: GeoJSON.FeatureCollection };
+type BBox = { minLng: number; minLat: number; maxLng: number; maxLat: number };
+
+const memoryCache = new Map<string, CacheEntry>();
+
+function bboxKey(b: BBox) {
+  const r = (n: number) => n.toFixed(3);
+  return `${CACHE_PREFIX}${r(b.minLng)},${r(b.minLat)},${r(b.maxLng)},${r(b.maxLat)}`;
+}
+
+function bboxContains(outer: BBox, inner: BBox) {
+  return (
+    outer.minLng <= inner.minLng + 1e-9 &&
+    outer.minLat <= inner.minLat + 1e-9 &&
+    outer.maxLng + 1e-9 >= inner.maxLng &&
+    outer.maxLat + 1e-9 >= inner.maxLat
+  );
+}
+
+/** Find a cached entry whose bbox fully contains the requested bbox. */
+function findCoveringCache(target: BBox): CacheEntry | null {
+  // 1) memory first
+  for (const e of memoryCache.values()) {
+    if (Date.now() - e.ts < CACHE_TTL_MS && bboxContains(e.bbox, target)) return e;
+  }
+  // 2) localStorage scan
+  if (typeof window === "undefined") return null;
+  try {
+    for (let i = 0; i < window.localStorage.length; i++) {
+      const k = window.localStorage.key(i);
+      if (!k || !k.startsWith(CACHE_PREFIX)) continue;
+      const raw = window.localStorage.getItem(k);
+      if (!raw) continue;
+      try {
+        const e = JSON.parse(raw) as CacheEntry;
+        if (Date.now() - e.ts > CACHE_TTL_MS) {
+          window.localStorage.removeItem(k);
+          continue;
+        }
+        if (bboxContains(e.bbox, target)) {
+          memoryCache.set(k, e);
+          return e;
+        }
+      } catch {
+        window.localStorage.removeItem(k);
+      }
+    }
+  } catch { /* ignore */ }
+  return null;
+}
+
+function writeCache(bbox: BBox, fc: GeoJSON.FeatureCollection) {
+  const key = bboxKey(bbox);
+  const entry: CacheEntry = { ts: Date.now(), bbox, fc };
+  memoryCache.set(key, entry);
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, JSON.stringify(entry));
+  } catch {
+    // Quota exceeded — purge oldest map entries and retry once.
+    try {
+      const keys: string[] = [];
+      for (let i = 0; i < window.localStorage.length; i++) {
+        const k = window.localStorage.key(i);
+        if (k && k.startsWith(CACHE_PREFIX)) keys.push(k);
+      }
+      keys.slice(0, Math.max(1, Math.floor(keys.length / 2))).forEach((k) => window.localStorage.removeItem(k));
+      window.localStorage.setItem(key, JSON.stringify(entry));
+    } catch { /* give up */ }
+  }
+}
+
+/** Pad a bbox by a fraction (e.g. 0.25 = +25% on each side) to prefetch surroundings. */
+function padBbox(b: BBox, frac: number): BBox {
+  const dLng = (b.maxLng - b.minLng) * frac;
+  const dLat = (b.maxLat - b.minLat) * frac;
+  return {
+    minLng: b.minLng - dLng,
+    maxLng: b.maxLng + dLng,
+    minLat: b.minLat - dLat,
+    maxLat: b.maxLat + dLat,
+  };
+}
 
 type Props = {
   concessions: MiningConcession[];
