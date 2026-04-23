@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Database, Download, Loader2, RefreshCw, Search, X } from "lucide-react";
+import { Crosshair, Database, Download, Loader2, RefreshCw, Search, X } from "lucide-react";
 import { toast } from "sonner";
 import type * as LType from "leaflet";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
@@ -776,14 +776,34 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                     </div>
                   )}
                 </dl>
-                <button
-                  onClick={openPopup}
-                  className="w-full inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-secondary text-[10px] font-mono hover:bg-accent"
-                  title="Centrar y abrir popup en el mapa"
-                >
-                  <Search className="w-3 h-3" />
-                  Ver popup en mapa
-                </button>
+                <div className="flex gap-1.5">
+                  <button
+                    onClick={() => {
+                      const map = mapRef.current;
+                      const lyr = featureLayersRef.current.get(selectedId) as unknown as {
+                        getBounds?: () => LType.LatLngBounds;
+                      };
+                      if (!map || !lyr?.getBounds) return;
+                      try {
+                        const b = lyr.getBounds();
+                        if (b.isValid()) map.fitBounds(b, { padding: [40, 40], maxZoom: 17, animate: true });
+                      } catch { /* noop */ }
+                    }}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-primary/40 bg-primary/10 text-[10px] font-mono text-primary hover:bg-primary/20"
+                    title="Hacer zoom y centrar en la pertenencia seleccionada"
+                  >
+                    <Crosshair className="w-3 h-3" />
+                    Zoom y centrar
+                  </button>
+                  <button
+                    onClick={openPopup}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-secondary text-[10px] font-mono hover:bg-accent"
+                    title="Centrar y abrir popup en el mapa"
+                  >
+                    <Search className="w-3 h-3" />
+                    Ver popup
+                  </button>
+                </div>
               </div>
             );
           })()}
