@@ -344,7 +344,12 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         const id = (f.id as string) ?? "";
         if (id) featureLayersRef.current.set(id, lyr);
         lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), { maxWidth: 320 });
-        lyr.on("click", () => setSelectedId(id || null));
+        lyr.on("dblclick", (ev: LType.LeafletMouseEvent) => {
+          // Prevent the map's default double-click zoom when selecting.
+          L.DomEvent.stopPropagation(ev);
+          if (ev.originalEvent) L.DomEvent.preventDefault(ev.originalEvent);
+          setSelectedId(id || null);
+        });
       },
     }).addTo(map);
     catastroLayerRef.current = layer;
