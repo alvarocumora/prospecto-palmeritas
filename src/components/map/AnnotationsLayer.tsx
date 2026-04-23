@@ -4,7 +4,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
-import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download } from "lucide-react";
+import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download, History } from "lucide-react";
+import { useAnnotationHistory, summarizeDiff } from "@/hooks/useAnnotationHistory";
 import {
   useMapAnnotations,
   ANNOTATION_COLORS,
@@ -453,6 +454,7 @@ function AnnotationRow({
   onDelete,
   onZoom,
 }: RowProps) {
+  const [historyOpen, setHistoryOpen] = useState(false);
   return (
     <div className={`group px-2 py-1.5 rounded hover:bg-accent ${a.resolved ? "opacity-60" : ""}`}>
       <div className="flex items-start gap-1.5">
@@ -523,6 +525,13 @@ function AnnotationRow({
               <button onClick={onStartEdit} className="p-1 text-muted-foreground hover:text-foreground" title="Editar">
                 <Pencil className="w-3 h-3" />
               </button>
+              <button
+                onClick={() => setHistoryOpen((v) => !v)}
+                className={`p-1 hover:text-foreground ${historyOpen ? "text-gold" : "text-muted-foreground"}`}
+                title="Historial de cambios"
+              >
+                <History className="w-3 h-3" />
+              </button>
               <button onClick={onDelete} className="p-1 text-muted-foreground hover:text-destructive" title="Eliminar">
                 <Trash2 className="w-3 h-3" />
               </button>
@@ -530,6 +539,52 @@ function AnnotationRow({
           )}
         </div>
       </div>
+      {historyOpen && <AnnotationHistoryPanel annotationId={a.id} />}
     </div>
   );
 }
+
+function AnnotationHistoryPanel({ annotationId }: { annotationId: string }) {
+  const { entries, loading } = useAnnotationHistory(annotationId);
+  return (
+    <div className="mt-1.5 ml-4 pl-2 border-l border-border space-y-1">
+      {loading ? (
+        <div className="text-[9px] font-mono text-muted-foreground">Cargando historial…</div>
+      ) : entries.length === 0 ? (
+        <div className="text-[9px] font-mono text-muted-foreground">Sin historial.</div>
+      ) : (
+        entries.map((e, i) => {
+          const prev = entries[i + 1]?.payload ?? null;
+          const diffs = e.action === "UPDATE" ? summarizeDiff(e.payload, prev) : [];
+          const actionLabel =
+            e.action === "INSERT" ? "creó" :
+            e.action === "DELETE" ? "eliminó" :
+            (e.payload as { resolved?: boolean } | null)?.resolved !== (prev as { resolved?: boolean } | null)?.resolved
+              ? ((e.payload as { resolved?: boolean } | null)?.resolved ? "marcó resuelta" : "reabrió")
+              : "editó";
+          const tone =
+            e.action === "INSERT" ? "text-emerald-400" :
+            e.action === "DELETE" ? "text-destructive" :
+            "text-blue-400";
+          return (
+            <div key={e.id} className="text-[9px] font-mono leading-tight">
+              <div>
+                <span className={tone}>{actionLabel}</span>{" "}
+                <span className="text-foreground">{e.user_name ?? "—"}</span>
+              </div>
+              <div className="text-muted-foreground">
+                {new Date(e.created_at).toLocaleString("es-CL")}
+              </div>
+              {diffs.length > 0 && (
+                <div className="text-muted-foreground/80 italic">
+                  {diffs.join(" · ")}
+                </div>
+              )}
+            </div>
+          );
+        })
+      )}
+    </div>
+  );
+}
+
