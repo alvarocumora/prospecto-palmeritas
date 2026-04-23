@@ -5,6 +5,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, LayerGroup, LeafletMouseEvent } from "leaflet";
 import { StickyNote, Plus, Trash2, Check, X, MapPin, Pencil, Filter, Target as TargetIcon, Calendar, Download, History } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 import { useAnnotationHistory, summarizeDiff } from "@/hooks/useAnnotationHistory";
 import {
   useMapAnnotations,
