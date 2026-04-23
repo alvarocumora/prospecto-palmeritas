@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
-  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload,
+  ArrowLeft, Loader2, Plus, Pencil, Trash2, MapPin, Activity, Download, Radio, Upload, AlertTriangle,
 } from "lucide-react";
 import {
   useSurvey,
@@ -9,8 +9,17 @@ import {
   type Station,
   type Line,
 } from "@/hooks/useGeophysicsCRUD";
+import { useGeophysicsAnomalies } from "@/hooks/useGeophysicsAnomalies";
 import { useProjects } from "@/hooks/useProjects";
 import { StationCsvImport } from "@/components/geophysics/StationCsvImport";
+import { AnomaliesTab } from "@/components/geophysics/AnomaliesTab";
+import {
+  WorkflowStepper,
+  PHASE_ORDER,
+  phaseFromStatus,
+  type WorkflowPhase,
+  type PhaseProgress,
+} from "@/components/geophysics/WorkflowStepper";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/geophysics/$surveyId")({
@@ -23,12 +32,16 @@ function SurveyDetail() {
   const navigate = useNavigate();
   const { active } = useProjects();
   const { survey, lines, stations, loading, refresh } = useSurvey(surveyId);
-  const [tab, setTab] = useState<"stations" | "lines">("stations");
+  const { updateSurvey } = useGeophysicsMutations();
+  const { data: anomalies, refresh: refreshAnomalies } = useGeophysicsAnomalies(surveyId);
+  const [tab, setTab] = useState<"stations" | "lines" | "anomalies">("stations");
   const [editingStation, setEditingStation] = useState<Station | null>(null);
   const [creatingStation, setCreatingStation] = useState(false);
   const [editingLine, setEditingLine] = useState<Line | null>(null);
   const [creatingLine, setCreatingLine] = useState(false);
   const [importingCsv, setImportingCsv] = useState(false);
+  const [phaseBusy, setPhaseBusy] = useState(false);
+
 
   if (loading) {
     return <div className="flex items-center justify-center py-24"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>;
@@ -64,19 +77,119 @@ function SurveyDetail() {
         {survey.notes && <p className="text-sm text-muted-foreground mt-2">{survey.notes}</p>}
       </header>
 
+      {/* Workflow stepper */}
+      {(() => {
+        const phase = phaseFromStatus(survey.status);
+        const validatedAnoms = anomalies.filter((a) => a.status === "validated").length;
+        const promotedAnoms = anomalies.filter((a) => a.status === "promoted").length;
+        const totalAnoms = anomalies.length;
+        const progress: PhaseProgress =
+          phase === "planned"
+            ? {
+                pct: lines.length > 0 ? 1 : 0,
+                detail: `${lines.length} línea${lines.length === 1 ? "" : "s"} definida${lines.length === 1 ? "" : "s"}`,
+                canAdvance: lines.length > 0,
+              }
+            : phase === "field"
+              ? (() => {
+                  const target = Math.max(
+                    1,
+                    survey.station_spacing_m && survey.planned_km
+                      ? Math.round((survey.planned_km * 1000) / survey.station_spacing_m)
+                      : Math.max(stations.length, 10)
+                  );
+                  const realStations = stations.filter((s) => !s.is_synthetic).length;
+                  return {
+                    pct: Math.min(1, realStations / target),
+                    detail: `${realStations} / ${target} estaciones capturadas`,
+                    canAdvance: realStations >= Math.min(target, 5),
+                  };
+                })()
+              : phase === "processing"
+                ? {
+                    pct: totalAnoms === 0 ? 0 : Math.min(1, validatedAnoms / Math.max(1, totalAnoms)),
+                    detail: `${validatedAnoms} validada${validatedAnoms === 1 ? "" : "s"} de ${totalAnoms} anomalía${totalAnoms === 1 ? "" : "s"}`,
+                    canAdvance: validatedAnoms > 0,
+                  }
+                : {
+                    pct: 1,
+                    detail: `${promotedAnoms} target${promotedAnoms === 1 ? "" : "s"} generado${promotedAnoms === 1 ? "" : "s"}`,
+                    canAdvance: false,
+                  };
+
+        const advance = async () => {
+          const i = PHASE_ORDER.indexOf(phase);
+          const nxt = PHASE_ORDER[i + 1];
+          if (!nxt) return;
+          setPhaseBusy(true);
+          try {
+            await updateSurvey(survey.id, { status: nxt });
+            toast.success(`Fase actualizada a ${nxt}`);
+            refresh();
+            if (nxt === "processing") setTab("anomalies");
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Error");
+          } finally {
+            setPhaseBusy(false);
+          }
+        };
+        const revert = async () => {
+          const i = PHASE_ORDER.indexOf(phase);
+          const prv = PHASE_ORDER[i - 1];
+          if (!prv) return;
+          setPhaseBusy(true);
+          try {
+            await updateSurvey(survey.id, { status: prv });
+            toast.success(`Fase revertida a ${prv}`);
+            refresh();
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Error");
+          } finally {
+            setPhaseBusy(false);
+          }
+        };
+        const jumpTo = async (p: WorkflowPhase) => {
+          if (p === phase) return;
+          setPhaseBusy(true);
+          try {
+            await updateSurvey(survey.id, { status: p });
+            toast.success(`Fase: ${p}`);
+            refresh();
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Error");
+          } finally {
+            setPhaseBusy(false);
+          }
+        };
+
+        return (
+          <div className="mb-6">
+            <WorkflowStepper
+              phase={phase}
+              progress={progress}
+              busy={phaseBusy}
+              onAdvance={advance}
+              onRevert={revert}
+              onJumpTo={jumpTo}
+            />
+          </div>
+        );
+      })()}
+
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
         <Stat label="Estado" value={survey.status} />
-        <Stat label="Km" value={(survey.planned_km ?? 0).toString()} />
         <Stat label="Estaciones" value={stations.length.toString()} />
         <Stat label="Líneas" value={lines.length.toString()} />
-        <Stat label="USD" value={(survey.cost_usd ?? 0).toLocaleString("es-CL")} />
+        <Stat label="Anomalías" value={anomalies.length.toString()} />
+        <Stat label="Promovidas" value={anomalies.filter((a) => a.status === "promoted").length.toString()} />
       </div>
 
       {/* Tabs */}
       <div className="flex border-b border-border mb-4">
         <TabBtn active={tab === "stations"} onClick={() => setTab("stations")} icon={<MapPin className="w-3 h-3" />} label={`Estaciones (${stations.length})`} />
         <TabBtn active={tab === "lines"} onClick={() => setTab("lines")} icon={<Activity className="w-3 h-3" />} label={`Líneas (${lines.length})`} />
+        <TabBtn active={tab === "anomalies"} onClick={() => setTab("anomalies")} icon={<AlertTriangle className="w-3 h-3" />} label={`Anomalías (${anomalies.length})`} />
       </div>
 
       {tab === "stations" && (
@@ -94,6 +207,14 @@ function SurveyDetail() {
           onCreate={() => setCreatingLine(true)}
           onEdit={(l) => setEditingLine(l)}
           onDeleted={refresh}
+        />
+      )}
+      {tab === "anomalies" && active && (
+        <AnomaliesTab
+          projectId={active.id}
+          surveyId={survey.id}
+          stations={stations}
+          onChanged={refreshAnomalies}
         />
       )}
 
