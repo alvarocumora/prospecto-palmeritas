@@ -321,10 +321,10 @@ export function useDataRepairs(projectId: string | null) {
   const [states, setStates] = useState<Record<RepairId, RepairRunState>>({} as Record<RepairId, RepairRunState>);
 
   const update = (id: RepairId, patch: Partial<RepairRunState>) => {
-    setStates((prev) => ({
-      ...prev,
-      [id]: { preview: null, loading: false, applying: false, appliedCount: null, error: null, ...prev[id], ...patch },
-    }));
+    setStates((prev) => {
+      const base: RepairRunState = prev[id] ?? { preview: null, loading: false, applying: false, appliedCount: null, error: null };
+      return { ...prev, [id]: { ...base, ...patch } };
+    });
   };
 
   const runPreview = useCallback(

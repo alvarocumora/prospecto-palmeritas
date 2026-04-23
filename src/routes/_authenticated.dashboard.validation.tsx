@@ -1,8 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, ShieldAlert, FileWarning } from "lucide-react";
+import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight } from "lucide-react";
+import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { useDataValidation, type TableAudit, type Inconsistency } from "@/hooks/useDataValidation";
+import { useDataRepairs, type RepairDefinition, type RepairPreviewRow } from "@/hooks/useDataRepairs";
 import { HudPanel } from "@/components/ops/HudPanel";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/validation")({
 function ValidationPage() {
   const { active } = useProjects();
   const { report, loading, refresh } = useDataValidation(active?.id ?? null);
+  const repairs = useDataRepairs(active?.id ?? null);
   const [filter, setFilter] = useState<"all" | "issues">("all");
 
   const grouped = useMemo(() => {
