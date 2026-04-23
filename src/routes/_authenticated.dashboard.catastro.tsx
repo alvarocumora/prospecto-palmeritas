@@ -11,6 +11,7 @@ import { HoldersTab } from "@/components/ops/HoldersTab";
 import { MobileTabPicker } from "@/components/ops/MobileTabPicker";
 import { ConcessionDetailDrawer } from "@/components/ops/ConcessionDetailDrawer";
 import { CatastroMap } from "@/components/ops/CatastroMap";
+import { CatastroOverlapPanel } from "@/components/ops/CatastroOverlapPanel";
 import { cn } from "@/lib/utils";
 import {
   useMiningConcessions,
@@ -133,6 +134,7 @@ function ConcessionsTab() {
   const [editing, setEditing] = useState<MiningConcession | null>(null);
   const [creating, setCreating] = useState(false);
   const [viewing, setViewing] = useState<MiningConcession | null>(null);
+  const [catastroFC, setCatastroFC] = useState<GeoJSON.FeatureCollection | null>(null);
 
   const filtered = useMemo(() => {
     const s = search.trim().toLowerCase();
@@ -203,7 +205,17 @@ function ConcessionsTab() {
       </div>
 
       {/* Mapa interactivo del catastro */}
-      <CatastroMap concessions={data} projectName={`${active.code} · ${active.name}`} />
+      <CatastroMap
+        concessions={data}
+        projectName={`${active.code} · ${active.name}`}
+        onFeaturesLoaded={setCatastroFC}
+      />
+
+      {/* Análisis de superposición SERNAGEOMIN ↔ proyecto */}
+      <CatastroOverlapPanel
+        catastroFeatures={(catastroFC?.features ?? []) as React.ComponentProps<typeof CatastroOverlapPanel>["catastroFeatures"]}
+        projectConcessions={data}
+      />
 
       {/* Alerts banner */}
       {alerts.length > 0 && (

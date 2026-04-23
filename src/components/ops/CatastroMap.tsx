@@ -12,6 +12,8 @@ type Props = {
   /** [lng, lat] center fallback */
   center?: [number, number];
   projectName?: string;
+  /** Notified whenever new SERNAGEOMIN features are loaded for the bbox. */
+  onFeaturesLoaded?: (fc: GeoJSON.FeatureCollection) => void;
 };
 
 /**
@@ -20,7 +22,7 @@ type Props = {
  * Exploración 1983, Estacamento) en el bbox visible, más las concesiones
  * registradas del proyecto.
  */
-export function CatastroMap({ concessions, center = [-71.115, -33.898], projectName }: Props) {
+export function CatastroMap({ concessions, center = [-71.115, -33.898], projectName, onFeaturesLoaded }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const catastroLayerRef = useRef<LeafletGeoJSON | null>(null);
@@ -160,6 +162,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       catastroLayerRef.current = layer;
       featuresRef.current = fc;
       setCount(fc.features?.length ?? 0);
+      onFeaturesLoaded?.(fc);
     } catch (e) {
       setErr((e as Error).message);
       setCount(null);
