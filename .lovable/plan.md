@@ -1,113 +1,96 @@
 
 
-# Estado de la Plataforma Geocapitals + Plan para Convertirla en Operativa Real
+# Plan disruptivo de geología — 5 features con impacto real
 
-## Diagnóstico actual
+Objetivo: convertir Trackmin GeoIntel en una plataforma de exploración con automatización geocientífica que hoy solo existe en software caro de escritorio (Leapfrog, ioGAS, ENVI, Micromine). Todo se ejecuta dentro de Lovable Cloud reusando lo que ya tienes (assays, drill_core_logs, drone_rasters, exploration_targets).
 
-**Lo bueno (ya implementado y conectado a DB):**
-- 61 tablas en Supabase con RLS activo y políticas por rol de proyecto
-- 30 rutas frontend, todas con componente real (no quedan stubs vacíos)
-- 41 hooks conectando UI ↔ Supabase
-- Edge functions activas: `geo-assistant`, `geo-brief`, `prospectivity-grid`, `compute-overlaps`, `dem-diff`, `extract-raster-metadata`, `section-interpret`, `stockpile-volume`, `sync-sernageomin`, `send-project-invitation`
-- Cron hooks: `sync-boletin-minero`, `sync-pjud`
-- 1 proyecto demo creado (`Prospecto Las Palmeras`)
+## Roadmap por olas (ordenado por ratio impacto/esfuerzo)
 
-**El problema real (no es código, es DATOS):**
-La mayoría de tablas operativas están **vacías**. La plataforma "funciona" pero parece muerta:
+### Ola 1 — Geochemical Fingerprint (PCA + clustering) ★ quick-win
+Análisis multivariado automático sobre `samples` para detectar la firma del depósito (pórfido vs epitermal vs IOCG vs skarn) y vectorear hacia el centro mineralizado.
 
-| Módulo | Filas en DB | Estado |
-|---|---|---|
-| drill_holes / drill_core_logs | 0 / 0 | Vacío |
-| sampling_results / sample_custody | 0 / 0 | Vacío |
-| qaqc_results / qaqc_standards | 0 / 0 | Vacío |
-| exploration_targets / campaigns | 0 / 0 | Vacío |
-| core_boxes (inventario) | 0 | Vacío |
-| campaign_budgets / expenses | 0 / 0 | Vacío |
-| hse_permits / incidents / community | 0 / 0 / 0 | Vacío |
-| mining_concessions / holders / patents | 0 / 0 / 0 | Vacío |
-| mining_bulletins / court_cases | 0 / 0 | Sin sync ejecutado |
-| drone_flights / rasters | 0 / 0 | Vacío |
-| qualified_persons / technical_reports | 0 / 0 | NI 43-101 sin firma |
-| property_listings (marketplace deals) | 0 | Sin escaparate |
-| audit_log | 0 | Triggers no se han disparado |
+- Edge function `geochem-fingerprint`: corre PCA sobre Au, Ag, Cu, As, Sb, Hg, Pb, Zn, Mo; k-means para clusters de alteración; calcula índices pathfinder (As+Sb+Hg → epitermal, Mo+Bi+Te → pórfido).
+- Tabla nueva `geochem_analyses` (run_id, pca_loadings, clusters, pathfinder_scores).
+- UI `/dashboard/sampling` → tab "Fingerprint": biplot PC1/PC2, mapa con clusters coloreados, badge "Firma detectada: Epitermal Au-Ag low sulfidation (87%)".
+- Acción: "Generar targets desde clusters" → crea `exploration_targets` automáticos en centroides de cluster con score basado en intensidad pathfinder.
 
-**Solo tienen datos:** `geophysics_surveys (3)`, `geophysics_stations (40)`, `mineralogy (18)`, `lithology_units (4)`, `alteration_zones (3)`, `geological_features (3)`, `shared_layers (3)`, `profiles (1)`, `project_members (1)`.
+### Ola 2 — Drone Lineament & Structural Detector
+CV sobre DEM/orthomosaico para detectar lineamientos, fallas y intersecciones estructurales (los "trampas" de mineralización).
 
-**Gaps de funcionalidad detectados:**
-1. **Marketplace de capas** existe pero no hay marketplace de **propiedades/deals** UI (las tablas `property_listings`, `property_deal_inquiries`, `property_deal_messages`, `property_data_room_files` existen pero no hay ruta).
-2. **NI 43-101 firmado por QP** — tabla `qualified_persons` existe pero no hay UI para gestionarlos ni asociarlos a `technical_reports` / `technical_report_versions` / `technical_report_sections`.
-3. **Mapa anotaciones** (`map_annotations`) y **vistas guardadas** (`map_views`) tienen tabla pero no se usan visiblemente.
-4. **Capabilities por miembro** (`project_member_capabilities`) sin UI de gestión fina.
-5. Los crons de Boletín/PJUD nunca se han ejecutado (0 filas) — el botón existe pero no se ha gatillado.
+- Edge function `dem-lineaments`: hillshade multidireccional → Canny edge detection → Hough transform → líneas estructurales en GeoJSON.
+- Tabla `structural_lineaments` (geometry, azimuth, length_m, confidence).
+- UI `/dashboard/drones`: botón "Detectar estructuras" en cada DEM, capa nueva en mapa con rosa de azimutes.
+- Cruce automático: intersección lineamientos × vetas mapeadas → score de "structural target" sumado al `prospectivity-grid` existente.
 
----
+### Ola 3 — Implicit 3D Geology (RBF wireframes en `/dashboard/geology3d`)
+Modelado implícito de cuerpos mineralizados usando RBF (Radial Basis Functions) sobre `drill_core_logs` — lo que hace Leapfrog Geo.
 
-## Plan en 4 olas
+- Librería WASM compatible Worker (o JS puro): RBF interpolator sobre puntos de litología/ley.
+- Edge function `implicit-model`: genera isosuperficies (Au≥0.5, Au≥1.0, Au≥3.0 g/t) en formato GLB/GLTF.
+- Tabla `geology_models` (model_id, isovalue, mesh_url en Storage).
+- UI Three.js extiende `Geology3DViewer.tsx` con toggle "Wireframe litología" y "Shell de ley".
+- Cálculo automático de tonelaje preliminar (volumen × densidad asumida).
 
-### Ola 1 — Sembrar el proyecto demo con datos reales y consistentes
-Crear una migración SQL `seed` que poblé `Prospecto Las Palmeras` con un dataset coherente para que **toda la plataforma cobre vida** sin tocar UI:
+### Ola 4 — Drill Reconciliation & Deviation Alerts
+Compara sondaje planificado vs ejecutado (cuando llegan datos MWD/Gyro) y alerta desviaciones críticas en tiempo real.
 
-- **3 campañas de exploración** (recon → scoping → drilling) con AOIs
-- **8 sondajes DDH** con collares geo-referenciados, `actual_depth` 80–280 m
-- **~120 core_logs** distribuidos con litologías, alteraciones y `au_gpt` realistas (incluye intercepts ≥0.5 g/t para activar KPI mensual)
-- **~200 sampling_results** (chip, channel, grab) con cadena de custodia (`sample_custody`)
-- **~30 qaqc_results** con estándares (CRM), blanks y duplicados (mezcla pass/fail para activar la tasa de fallos)
-- **15 exploration_targets** en distintas etapas (generated → drill_ready → drilled)
-- **40 core_boxes** ligados a sondajes
-- **3 budgets** por categoría + **25 expenses** aprobados/pendientes
-- **6 hse_permits** (ambiental, agua, exploración) con vencimientos escalonados (algunos próximos a expirar para activar alertas)
-- **4 hse_incidents** y **8 community_events**
-- **~80 mining_concessions** sintéticas alrededor del AOI con titulares, geometrías y patentes
-- **20 concession_holders** + **40 concession_patents** con vencimientos mixtos
-- **2 qualified_persons** + **1 technical_report** firmado de demo
-- **5 property_listings** públicas para el marketplace de deals
-- **3 drone_flights** + **2 drone_rasters** (referencias a archivos placeholder)
-- **3 prospectivity_runs** ya calculados con `prospectivity_cells`
+- Tabla `drill_surveys` (hole_id, depth, azimuth_actual, dip_actual, measured_at).
+- Edge function `drill-deviation`: calcula trayectoria real vs planificada; flag si offset > 5 m del target geológico.
+- UI `/dashboard/drilling`: vista 3D con tubo planificado (azul) vs real (rojo); panel de alertas activas; export reporte daily drilling.
 
-Resultado: dashboard ejecutivo, mapa, todos los módulos muestran información real. Los triggers de `log_audit_change` poblarán `audit_log` automáticamente.
+### Ola 5 — NI 43-101 Auto-draft con IA
+Aprovecha Lovable AI (`google/gemini-2.5-pro`) para pre-llenar secciones técnicas del reporte 43-101 desde los datos del proyecto.
 
-### Ola 2 — Cerrar gaps de UI faltantes
-1. **Ruta `/dashboard/deals`**: Marketplace de propiedades mineras (listings públicos, data room por propiedad, mensajería entre comprador/vendedor) usando las tablas `property_*` ya existentes. Reemplaza el "Marketplace" actual o queda como subsección.
-2. **Gestión de Qualified Persons** dentro de `/dashboard/ni43101`: agregar/editar QPs, firmar reporte, versionar (`technical_report_versions`), bloquear secciones (`technical_report_sections`).
-3. **Saved Views & Annotations** en `/dashboard/map`: panel para guardar la vista actual (extent + capas activas + filtros) y dibujar anotaciones persistentes en la AOI.
-4. **Capabilities granulares** en `/dashboard/team`: matriz de permisos por miembro (`project_member_capabilities`) más allá del rol base.
+- Edge function `ni43101-draft`: lee `samples`, `drill_holes`, `geochem_analyses`, `geology_models` → genera borrador de secciones 6 (Geological Setting), 7 (Deposit Types), 11 (Sample Preparation), 14 (Mineral Resource Estimates).
+- UI `/dashboard/ni43101`: botón "Auto-draft sección" por QP; el QP edita y firma.
+- Reduce el tiempo de redacción de ~80h a ~10h por reporte.
 
-### Ola 3 — Activar las integraciones externas en producción
-1. **Disparar `sync-sernageomin`** con la AOI del proyecto para poblar concesiones reales (sustituye/complementa las sintéticas).
-2. **Disparar `sync-boletin-minero`** y `sync-pjud` una vez para alimentar `mining_bulletins` y `mining_court_cases`.
-3. **Configurar pg_cron** (vía migración) para que ambos hooks corran diariamente sin intervención.
-4. **Verificar `FIRECRAWL_API_KEY`** (ya está como secret) y registrar la primera corrida en `concession_history`.
+## Arquitectura técnica condensada
 
-### Ola 4 — Pulido de gobernanza y observabilidad
-1. **Activar `password_hibp_enabled`** en auth (chequeo de contraseñas filtradas).
-2. **RLS audit pass** con `supabase--linter` para confirmar 0 hallazgos tras el seed.
-3. **Botón "Reset demo"** (solo super_admin) que vacía y reseed-ea el proyecto Palmeras para demos.
-4. **Notificación visible en sidebar** cuando hay permisos HSE por vencer en <30 días (badge similar al de catastro).
+```text
+                    ┌─────────────────────────┐
+                    │  exploration_targets    │◄── score unificado
+                    └────────▲────────────────┘
+                             │
+        ┌────────────────────┼────────────────────────┐
+        │                    │                        │
+┌───────┴────────┐  ┌────────┴────────┐  ┌────────────┴──────┐
+│ geochem-       │  │ dem-lineaments  │  │ prospectivity-grid│
+│ fingerprint    │  │ (Ola 2)         │  │ (existente)       │
+│ (Ola 1)        │  └─────────────────┘  └───────────────────┘
+└───────┬────────┘           │                      │
+        │                    │                      │
+        ▼                    ▼                      ▼
+┌─────────────────────────────────────────────────────────┐
+│                    samples · drill_core_logs            │
+│                    drone_rasters · veins                │
+└─────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+              ┌──────────────────────────┐
+              │ implicit-model (Ola 3)   │──► geology_models (3D)
+              └──────────────────────────┘
+                             │
+                             ▼
+              ┌──────────────────────────┐
+              │ ni43101-draft (Ola 5)    │──► reportes auto
+              └──────────────────────────┘
+```
 
----
+## Detalles técnicos clave
 
-## Detalles técnicos
+- **Sin dependencias Node-only**: PCA/k-means en JS puro (`ml-pca`, `ml-kmeans`), RBF en WASM, CV con `opencv.js` cargado bajo demanda en cliente para evitar runtime Worker.
+- **RLS**: todas las tablas nuevas con `project_id` + policy basada en `has_project_role`.
+- **Lovable AI Gateway** para Ola 5 (sin API key del usuario).
+- **Storage**: bucket `geology-models` para meshes GLB, `lineaments` para overlays GeoJSON grandes.
+- **Compat móvil**: todos los cómputos pesados en edge functions, frontend solo renderiza resultados.
 
-- **Seed**: una sola migración `*_seed_palmeras_demo.sql` idempotente (usa `ON CONFLICT DO NOTHING` por código/identificador natural). Vincula todo a `project_id = '8dc8e288-...-bb7fb85d1745'` y `created_by` = el único `user_id` existente en `profiles`.
-- Coordenadas reales centradas en Alhué (-33.898, -71.115). Geometrías GeoJSON simples (puntos para collares/muestras, polígonos pequeños para concesiones, líneas para vetas).
-- **Realismo geológico**: distribución log-normal de Au, oxidación somera (0–50 m), sulfuros profundos, intercepts ricos en zonas predefinidas (correlacionables con targets).
-- **Sin secrets nuevos**: todo lo necesario ya está configurado.
-- **Sin breaking changes** en hooks o componentes existentes.
+## Entregable de la primera implementación
+Recomiendo arrancar por **Ola 1 (Geochemical Fingerprint)** porque:
+1. Reutiliza datos que ya tienes cargados (`samples`).
+2. Resultado visible en <10 min de uso.
+3. Genera targets automáticos que alimentan el resto del pipeline.
+4. Cero dependencias nativas, 100% compatible Worker.
 
----
-
-## Entregable de cada ola
-
-| Ola | Cambios | Visible para el usuario |
-|---|---|---|
-| 1 | 1 migración SQL grande | Cada módulo deja de estar vacío; KPIs muestran números |
-| 2 | 1 ruta nueva (`deals`) + 3 paneles nuevos | Marketplace de propiedades funciona; NI 43-101 firmable; mapa con vistas guardadas |
-| 3 | Llamada a edge functions + 1 migración pg_cron | Datos oficiales de SERNAGEOMIN/Boletín entran solos |
-| 4 | 1 migración (auth setting) + 1 componente badge HSE + botón reset | Plataforma lista para demo a inversores |
-
----
-
-## ¿Cómo procedemos?
-
-Recomendación: empezar por **Ola 1 (seed)** porque es lo que más impacto visual genera con menos riesgo. Después podemos iterar por olas o saltar a la que prefieras.
+Al aprobar este plan, implemento Ola 1 completa: migración SQL + edge function + UI tab + integración con `exploration_targets`.
 
