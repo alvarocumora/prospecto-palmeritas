@@ -1805,6 +1805,128 @@ export type Database = {
           },
         ]
       }
+      geophysics_anomalies: {
+        Row: {
+          anomaly_type: string
+          code: string
+          confidence_pct: number | null
+          created_at: string
+          created_by: string
+          dismissed_reason: string | null
+          estimated_area_m2: number | null
+          estimated_depth_m: number | null
+          evidence: Json | null
+          id: string
+          lat: number | null
+          lng: number | null
+          notes: string | null
+          peak_unit: string | null
+          peak_value: number | null
+          project_id: string
+          promoted_at: string | null
+          rationale: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          severity: string
+          station_id: string | null
+          status: string
+          survey_id: string
+          target_id: string | null
+          updated_at: string
+          validated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          anomaly_type?: string
+          code: string
+          confidence_pct?: number | null
+          created_at?: string
+          created_by: string
+          dismissed_reason?: string | null
+          estimated_area_m2?: number | null
+          estimated_depth_m?: number | null
+          evidence?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          peak_unit?: string | null
+          peak_value?: number | null
+          project_id: string
+          promoted_at?: string | null
+          rationale?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          station_id?: string | null
+          status?: string
+          survey_id: string
+          target_id?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          anomaly_type?: string
+          code?: string
+          confidence_pct?: number | null
+          created_at?: string
+          created_by?: string
+          dismissed_reason?: string | null
+          estimated_area_m2?: number | null
+          estimated_depth_m?: number | null
+          evidence?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          notes?: string | null
+          peak_unit?: string | null
+          peak_value?: number | null
+          project_id?: string
+          promoted_at?: string | null
+          rationale?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          severity?: string
+          station_id?: string | null
+          status?: string
+          survey_id?: string
+          target_id?: string | null
+          updated_at?: string
+          validated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geophysics_anomalies_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geophysics_anomalies_station_id_fkey"
+            columns: ["station_id"]
+            isOneToOne: false
+            referencedRelation: "geophysics_stations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geophysics_anomalies_survey_id_fkey"
+            columns: ["survey_id"]
+            isOneToOne: false
+            referencedRelation: "geophysics_surveys"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "geophysics_anomalies_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       geophysics_lines: {
         Row: {
           created_at: string
