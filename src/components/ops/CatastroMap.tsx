@@ -455,13 +455,17 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
   }, [selectedId]);
 
-  // Filtered list (type + free-text) for the side panel.
+  // Filtered list (type + free-text + expiring-only) for the side panel.
   const filteredFeatures = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return visibleFeatures.filter((f) => {
       const p = (f.properties ?? {}) as Record<string, unknown>;
       const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       if (!typeFilter.has(origen)) return false;
+      if (expiringOnly) {
+        const sev = expirySeverity(daysUntilExpiry(p));
+        if (sev !== "expired" && sev !== "critical" && sev !== "warn") return false;
+      }
       if (!q) return true;
       const hay = [p.NOMBRE, p.NUMERO_ROL, p.TITULAR_DIVISION, p.COMUNA]
         .filter(Boolean)
@@ -469,7 +473,20 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         .join(" | ");
       return hay.includes(q);
     });
-  }, [visibleFeatures, typeFilter, searchQuery]);
+  }, [visibleFeatures, typeFilter, searchQuery, expiringOnly]);
+
+  // Expiry summary across visible features (independent of filters).
+  const expirySummary = useMemo(() => {
+    let expired = 0, critical = 0, warn = 0;
+    for (const f of visibleFeatures) {
+      const sev = expirySeverity(daysUntilExpiry((f.properties ?? {}) as Record<string, unknown>));
+      if (sev === "expired") expired++;
+      else if (sev === "critical") critical++;
+      else if (sev === "warn") warn++;
+    }
+    return { expired, critical, warn };
+  }, [visibleFeatures]);
+
 
   const toggleType = (t: CatastroOrigen) => {
     setTypeFilter((prev) => {
