@@ -226,70 +226,88 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
 
   // Init map once
   useEffect(() => {
+    // Reset unmount flag in case the previous render aborted (React StrictMode
+    // or HMR can leave it stuck at `true` and silently disable invalidateSize).
+    isUnmountingRef.current = false;
     if (!containerRef.current || mapRef.current) return;
-    let cancelled = false;
+    let aborted = false;
     (async () => {
-      const L = await import("leaflet");
-      await import("leaflet/dist/leaflet.css");
-      if (cancelled || !containerRef.current) return;
-
-      const map = L.map(containerRef.current, {
-        center: [center[1], center[0]],
-        zoom: 12,
-        zoomControl: true,
-        zoomAnimation: false,
-        fadeAnimation: false,
-        markerZoomAnimation: false,
-      });
-
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: "Imagery © Esri",
-          maxZoom: 19,
+      try {
+        const L = await import("leaflet");
+        await import("leaflet/dist/leaflet.css");
+        // Don't abort just because StrictMode unmounted+remounted us — as long
+        // as the container is still in the DOM we can safely (re)init. If the
+        // container is gone, the cleanup below will tear everything down.
+        if (aborted || !containerRef.current || !containerRef.current.isConnected) {
+          console.warn("[CatastroMap] init skipped (container detached)");
+          return;
         }
-      ).addTo(map);
-
-      L.tileLayer(
-        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-        {
-          attribution: "© OpenStreetMap contributors",
-          maxZoom: 19,
-          opacity: 0.45,
+        if (mapRef.current) {
+          // Another effect run already initialized the map; just publish L.
+          setLRef(L);
+          return;
         }
-      ).addTo(map);
 
-      mapRef.current = map;
-      setLRef(L);
-
-      // Fix: if the map mounts inside a dynamic layout, defer safe invalidation.
-      const safeInvalidate = () => {
-        if (isUnmountingRef.current) return;
-        const currentMap = mapRef.current;
-        const el = containerRef.current;
-        if (!currentMap || !el || !el.isConnected) return;
-        try {
-          currentMap.invalidateSize(false);
-        } catch {
-          /* noop */
-        }
-      };
-
-      requestAnimationFrame(safeInvalidate);
-      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 200));
-      invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 600));
-
-      let ro: ResizeObserver | null = null;
-      if (typeof ResizeObserver !== "undefined" && containerRef.current) {
-        ro = new ResizeObserver(() => {
-          safeInvalidate();
+        const map = L.map(containerRef.current, {
+          center: [center[1], center[0]],
+          zoom: 12,
+          zoomControl: true,
+          zoomAnimation: false,
+          fadeAnimation: false,
+          markerZoomAnimation: false,
         });
-        ro.observe(containerRef.current);
+
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "Imagery © Esri",
+            maxZoom: 19,
+          }
+        ).addTo(map);
+
+        L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            attribution: "© OpenStreetMap contributors",
+            maxZoom: 19,
+            opacity: 0.45,
+          }
+        ).addTo(map);
+
+        mapRef.current = map;
+        setLRef(L);
+
+        // Fix: if the map mounts inside a dynamic layout, defer safe invalidation.
+        const safeInvalidate = () => {
+          if (isUnmountingRef.current) return;
+          const currentMap = mapRef.current;
+          const el = containerRef.current;
+          if (!currentMap || !el || !el.isConnected) return;
+          try {
+            currentMap.invalidateSize(false);
+          } catch {
+            /* noop */
+          }
+        };
+
+        requestAnimationFrame(safeInvalidate);
+        invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 200));
+        invalidateTimersRef.current.push(window.setTimeout(safeInvalidate, 600));
+
+        let ro: ResizeObserver | null = null;
+        if (typeof ResizeObserver !== "undefined" && containerRef.current) {
+          ro = new ResizeObserver(() => {
+            safeInvalidate();
+          });
+          ro.observe(containerRef.current);
+        }
+        (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
+      } catch (e) {
+        console.error("[CatastroMap] failed to initialize Leaflet map", e);
       }
-      (map as unknown as { __ro?: ResizeObserver | null }).__ro = ro;
     })();
     return () => {
-      cancelled = true;
+      aborted = true;
       isUnmountingRef.current = true;
       invalidateTimersRef.current.forEach((id) => window.clearTimeout(id));
       invalidateTimersRef.current = [];
@@ -300,7 +318,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       mapRef.current?.remove();
       mapRef.current = null;
     };
-  }, [center]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Render project concessions
   useEffect(() => {
@@ -311,13 +330,31 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       projectLayerRef.current.remove();
       projectLayerRef.current = null;
     }
+    // Normalize whatever was stored in geometry_geojson into a bare Geometry
+    // (some imports persist a Feature or FeatureCollection — Leaflet rejects
+    // those when set as a Feature.geometry, throwing "Invalid GeoJSON object").
+    const toGeometry = (raw: unknown): GeoJSON.Geometry | null => {
+      if (!raw || typeof raw !== "object") return null;
+      const g = raw as { type?: string; geometry?: unknown; features?: unknown[]; coordinates?: unknown };
+      if (g.type === "Feature" && g.geometry) return toGeometry(g.geometry);
+      if (g.type === "FeatureCollection" && Array.isArray(g.features)) {
+        const first = g.features.find((f) => f && (f as { geometry?: unknown }).geometry);
+        return first ? toGeometry((first as { geometry: unknown }).geometry) : null;
+      }
+      if (g.type && g.coordinates !== undefined) return raw as GeoJSON.Geometry;
+      return null;
+    };
     const features = concessions
-      .filter((c) => c.geometry_geojson)
-      .map((c) => ({
-        type: "Feature" as const,
-        properties: { ...c },
-        geometry: c.geometry_geojson as GeoJSON.Geometry,
-      }));
+      .map((c) => {
+        const geom = toGeometry(c.geometry_geojson);
+        if (!geom) return null;
+        return {
+          type: "Feature" as const,
+          properties: { ...c },
+          geometry: geom,
+        };
+      })
+      .filter((f): f is NonNullable<typeof f> => f !== null);
     if (features.length === 0) return;
     const fc: GeoJSON.FeatureCollection = { type: "FeatureCollection", features };
     const layer = L.geoJSON(fc, {
