@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectRole";
@@ -90,30 +90,10 @@ function AuthenticatedLayout() {
     canAccess(role, "palmeras") && { to: "/dashboard/palmeras", icon: <Mountain className="w-3.5 h-3.5" />, label: "Demo · Palmeras", group: "ACCOUNT" },
   ].filter(Boolean) as RailItem[];
 
-  const railFooter = (
-    <div className="flex items-center gap-2 min-w-0">
-      <div className="w-6 h-6 rounded-[2px] bg-signal-cyan/15 text-signal-cyan inline-flex items-center justify-center text-[10px] font-mono font-bold border border-signal-cyan/30 shrink-0">
-        {(profile?.display_name ?? user.email ?? "?")[0].toUpperCase()}
-      </div>
-      <div className="flex-1 min-w-0 hidden group-hover:block">
-        <div className="text-[10px] font-mono truncate">{profile?.display_name ?? "Usuario"}</div>
-        <div className="text-[9px] text-text-dim truncate">{user.email}</div>
-      </div>
-      <button
-        type="button"
-        onClick={async () => { await signOut(); navigate({ to: "/" }); }}
-        className="p-1 text-text-dim hover:text-signal-red transition-colors shrink-0"
-        title="Cerrar sesión"
-      >
-        <LogOut className="w-3 h-3" />
-      </button>
-    </div>
-  );
-
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
-      <CommandRail items={items} brand={null} footer={railFooter} />
+      <CommandRail items={items} brand={null} />
 
       {/* Mobile drawer */}
       <MobileDrawer
@@ -126,7 +106,7 @@ function AuthenticatedLayout() {
 
       <main
         className={cn(
-          "relative pt-9 pb-20 md:pb-6 md:pl-12 min-h-[100dvh]",
+          "relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]",
         )}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
