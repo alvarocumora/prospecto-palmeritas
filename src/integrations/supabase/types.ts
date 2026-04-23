@@ -3827,6 +3827,44 @@ export type Database = {
           },
         ]
       }
+      validation_snapshots: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          project_id: string
+          row_count: number
+          status: string
+          table_name: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          project_id: string
+          row_count?: number
+          status: string
+          table_name: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          project_id?: string
+          row_count?: number
+          status?: string
+          table_name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "validation_snapshots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
