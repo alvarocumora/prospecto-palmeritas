@@ -205,7 +205,17 @@ function ConcessionsTab() {
       </div>
 
       {/* Mapa interactivo del catastro */}
-      <CatastroMap concessions={data} projectName={`${active.code} · ${active.name}`} />
+      <CatastroMap
+        concessions={data}
+        projectName={`${active.code} · ${active.name}`}
+        onFeaturesLoaded={setCatastroFC}
+      />
+
+      {/* Análisis de superposición SERNAGEOMIN ↔ proyecto */}
+      <CatastroOverlapPanel
+        catastroFeatures={(catastroFC?.features ?? []) as React.ComponentProps<typeof CatastroOverlapPanel>["catastroFeatures"]}
+        projectConcessions={data}
+      />
 
       {/* Alerts banner */}
       {alerts.length > 0 && (
