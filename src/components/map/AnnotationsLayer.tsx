@@ -201,6 +201,7 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
   }
 
   return (
+    <>
     <div className="absolute bottom-24 right-3 z-[500] w-80 bg-background/95 backdrop-blur-sm border border-border rounded-lg shadow-xl flex flex-col max-h-[68vh]">
       <div className="px-3 py-2 border-b border-border flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -423,6 +424,16 @@ export function AnnotationsLayer({ projectId, projectName, map, L }: Props) {
         )}
       </div>
     </div>
+    <ExportAnnotationsPreview
+      open={previewFormat !== null}
+      format={previewFormat ?? "csv"}
+      annotations={filtered}
+      projectName={projectName ?? "proyecto"}
+      targetMap={targetMap}
+      campaignMap={campaignMap}
+      onClose={() => setPreviewFormat(null)}
+    />
+    </>
   );
 }
 
