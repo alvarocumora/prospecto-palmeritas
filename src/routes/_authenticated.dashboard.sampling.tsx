@@ -15,6 +15,7 @@ function SamplingPage() {
   const { active } = useProjects();
   const { data, loading, refresh } = useSamplingResults(active?.id ?? null);
   const [importOpen, setImportOpen] = useState(false);
+  const [tab, setTab] = useState<"results" | "fingerprint">("results");
 
   const stats = {
     total: data.length,
