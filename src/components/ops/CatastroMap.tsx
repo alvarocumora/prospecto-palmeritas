@@ -409,23 +409,35 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     loadCatastro({ force: true });
   };
 
-  // Apply visual highlight to the currently selected feature, dim the rest.
+  // Apply visual highlight: selection state + expiry warning ring.
   useEffect(() => {
     if (!LRef) return;
     for (const [id, lyr] of featureLayersRef.current.entries()) {
       const path = lyr as unknown as { setStyle?: (s: Record<string, unknown>) => void };
       if (!path.setStyle) continue;
       const f = visibleFeatures.find((x) => x.id === id);
-      const origen = ((f?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+      const props = (f?.properties as Record<string, unknown> | undefined) ?? {};
+      const origen = (props.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
       const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+      const sev = expirySeverity(daysUntilExpiry(props));
       const isSel = selectedId === id;
       const isDimmed = selectedId !== null && !isSel;
+      // Expiring polygons get a red outline + slightly higher fill so they pop.
+      const expiringStroke = sev === "expired" || sev === "critical" || sev === "warn";
+      const ringColor = sev !== "ok" && sev !== "unknown" ? EXPIRY_COLOR[sev] : null;
       path.setStyle({
-        color: isSel ? "#ffffff" : s.color,
-        weight: isSel ? 4 : s.weight,
+        color: isSel ? "#ffffff" : ringColor ?? s.color,
+        weight: isSel ? 4 : expiringStroke ? 3 : s.weight,
         opacity: isDimmed ? 0.35 : s.opacity,
-        fillColor: s.fillColor,
-        fillOpacity: isSel ? Math.min(0.55, s.fillOpacity + 0.25) : isDimmed ? 0.05 : s.fillOpacity,
+        fillColor: ringColor ?? s.fillColor,
+        fillOpacity: isSel
+          ? Math.min(0.55, s.fillOpacity + 0.25)
+          : isDimmed
+          ? 0.05
+          : expiringStroke
+          ? Math.min(0.5, s.fillOpacity + 0.15)
+          : s.fillOpacity,
+        dashArray: sev === "expired" ? "6,4" : undefined,
       });
     }
   }, [selectedId, visibleFeatures, LRef]);
