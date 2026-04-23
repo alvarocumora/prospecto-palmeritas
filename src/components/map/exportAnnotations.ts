@@ -146,10 +146,6 @@ export function exportAnnotationsPdf(
       const page = doc.getNumberOfPages();
       doc.setFontSize(8);
       doc.setTextColor(140);
-    didDrawPage: () => {
-      const page = doc.getNumberOfPages();
-      doc.setFontSize(8);
-      doc.setTextColor(140);
       doc.text(`Anotaciones · ${meta.projectName} · pág. ${page}`, pageW - 40, pageH - 16, { align: "right" });
     },
   });
