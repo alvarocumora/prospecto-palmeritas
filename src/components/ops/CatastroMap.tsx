@@ -258,10 +258,13 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       catastroLayerRef.current.remove();
       catastroLayerRef.current = null;
     }
-    // Clip features to current view to keep tooltips snappy.
+    featureLayersRef.current.clear();
+    // Clip features to current view to keep tooltips snappy and assign stable ids.
     const b = map.getBounds();
     const view: BBox = { minLng: b.getWest(), minLat: b.getSouth(), maxLng: b.getEast(), maxLat: b.getNorth() };
-    const visible = (fc.features ?? []).filter((f) => featureIntersectsBbox(f, view));
+    const visible = (fc.features ?? [])
+      .filter((f) => featureIntersectsBbox(f, view))
+      .map((f, idx) => ({ ...f, id: featureId(f, idx) } as GeoJSON.Feature));
     const visibleFc: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: visible };
     const layer = L.geoJSON(visibleFc, {
       style: (feature) => {
@@ -276,12 +279,17 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         };
       },
       onEachFeature: (f, lyr) => {
+        const id = (f.id as string) ?? "";
+        if (id) featureLayersRef.current.set(id, lyr);
         lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), { maxWidth: 320 });
+        lyr.on("click", () => setSelectedId(id || null));
       },
     }).addTo(map);
     catastroLayerRef.current = layer;
     featuresRef.current = visibleFc;
+    setVisibleFeatures(visible);
     setCount(visible.length);
+    setSelectedId(null);
     onFeaturesLoaded?.(visibleFc);
   };
 
