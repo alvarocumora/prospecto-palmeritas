@@ -38,6 +38,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    let initialResolved = false;
+
     // Set up listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
@@ -48,9 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setProfile(null);
       }
+      // Only flip loading off after the initial getSession() has resolved.
+      // This prevents a transient "no user" state during first render that
+      // would cause protected routes to bounce to /auth.
+      if (initialResolved) setLoading(false);
     });
 
     supabase.auth.getSession().then(({ data: { session: s } }) => {
+      initialResolved = true;
       setSession(s);
       setUser(s?.user ?? null);
       if (s?.user) loadProfile(s.user.id);
