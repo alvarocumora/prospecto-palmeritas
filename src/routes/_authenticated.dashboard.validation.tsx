@@ -291,6 +291,11 @@ function IncRow({ iss }: { iss: Inconsistency }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[11px] font-mono font-bold text-foreground">{iss.rule}</span>
             <span className="text-[9px] font-mono text-text-dim uppercase">{iss.table}</span>
+            {iss.category === "xref" && (
+              <span className="text-[8px] font-mono uppercase px-1 py-0 rounded-[2px] border border-signal-violet/40 text-signal-violet">
+                FK rota
+              </span>
+            )}
             <span className="ml-auto text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded-[2px] bg-bg-elevated border border-border">
               {iss.count} {iss.count === 1 ? "fila" : "filas"}
             </span>
