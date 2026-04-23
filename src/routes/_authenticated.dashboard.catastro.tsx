@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2 } from "lucide-react";
+import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2, Download } from "lucide-react";
+import { ImportConcessionsDialog } from "@/components/ops/ImportConcessionsDialog";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { PatentCalendar } from "@/components/ops/PatentCalendar";
@@ -136,6 +137,7 @@ function ConcessionsTab() {
   const [editing, setEditing] = useState<MiningConcession | null>(null);
   const [creating, setCreating] = useState(false);
   const [viewing, setViewing] = useState<MiningConcession | null>(null);
+  const [importing, setImporting] = useState(false);
   const [catastroFC, setCatastroFC] = useState<GeoJSON.FeatureCollection | null>(null);
 
   const filtered = useMemo(() => {
@@ -189,13 +191,31 @@ function ConcessionsTab() {
             Concesiones del proyecto · {active.code} · {active.name}
           </p>
         </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
-        >
-          <Plus className="w-4 h-4" /> Nueva concesión
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setImporting(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan text-sm hover:bg-signal-cyan/20"
+            title="Importa concesiones reales desde el catastro oficial SERNAGEOMIN"
+          >
+            <Download className="w-4 h-4" /> Importar SERNAGEOMIN
+          </button>
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
+          >
+            <Plus className="w-4 h-4" /> Nueva concesión
+          </button>
+        </div>
       </div>
+
+      {importing && active && (
+        <ImportConcessionsDialog
+          open={importing}
+          onClose={() => setImporting(false)}
+          projectId={active.id}
+          onImported={refresh}
+        />
+      )}
 
       {/* Stats — mobile shows 3 critical, desktop shows all 5 */}
       <div className="grid grid-cols-3 md:grid-cols-5 gap-2">
