@@ -178,6 +178,23 @@ export function useQualifiedPersons() {
   };
 
   const signSection = async (sectionId: string) => {
+    // Gate: bloquea firma si compliance < umbral configurado
+    const sec = sections.find((s) => s.id === sectionId);
+    if (sec) {
+      const { data: rep } = await supabase
+        .from("technical_reports")
+        .select("compliance_score_cached, compliance_threshold")
+        .eq("id", sec.report_id)
+        .maybeSingle();
+      if (rep) {
+        const score = rep.compliance_score_cached ?? 0;
+        const thr = rep.compliance_threshold ?? 95;
+        if (score < thr) {
+          toast.error(`Firma bloqueada: compliance ${score}% < umbral ${thr}%`);
+          throw new Error("compliance_below_threshold");
+        }
+      }
+    }
     const hash = `sig_${crypto.randomUUID().slice(0, 12)}_${Date.now().toString(36)}`;
     const { error } = await supabase
       .from("technical_report_sections")
