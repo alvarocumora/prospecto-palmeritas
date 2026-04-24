@@ -91,9 +91,24 @@ function EstimationPage() {
               running={running === m.id}
               onRun={() => estimate(m.id)}
               onDelete={() => { if (confirm(`Eliminar modelo "${m.name}"?`)) remove(m.id); }}
+              onView={() => setViewerId(m.id)}
             />
           ))}
         </div>
+      )}
+
+      {viewerModel && (
+        <Dialog open={!!viewerModel} onOpenChange={(o) => !o && setViewerId(null)}>
+          <DialogContent className="max-w-5xl p-0 overflow-hidden">
+            <DialogHeader className="px-4 py-3 border-b border-border">
+              <DialogTitle className="font-mono text-sm flex items-center gap-2">
+                <BoxIcon className="w-4 h-4 text-signal-cyan" />
+                Visor 3D — {viewerModel.name}
+              </DialogTitle>
+            </DialogHeader>
+            <BlockModel3DViewer model={viewerModel} className="h-[70vh] border-0 rounded-none" />
+          </DialogContent>
+        </Dialog>
       )}
 
       <CreateDialog
