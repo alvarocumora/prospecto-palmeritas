@@ -13,6 +13,7 @@ import {
   fillToc,
   renderAnnexA,
   renderAnnexB,
+  renderAnnexC_Compliance,
   renderCover,
   renderExecSummary,
   renderSection10_QAQC,
@@ -31,6 +32,7 @@ import {
   renderSection8_Exploration,
   renderSection9_Drilling,
   renderTocPlaceholder,
+  type ComplianceAnnexData,
   type Ni43101Validations,
 } from "./pdf/sections";
 
@@ -240,13 +242,85 @@ export type Ni43101SectionId =
   | "conclusions"
   | "references"
   | "annexA"
-  | "annexB";
+  | "annexB"
+  | "annexC";
 
 export const ALL_SECTIONS: Ni43101SectionId[] = [
   "execSummary","intro","reliance","property","zoning","climate","history","geology",
   "depositType","exploration","drilling","qaqc","dataVerification","budget",
-  "conclusions","references","annexA","annexB",
+  "conclusions","references","annexA","annexB","annexC",
 ];
+
+async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
+  if (!reportId) return null;
+  try {
+    const { data: report } = await supabase
+      .from("technical_reports")
+      .select("id, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at")
+      .eq("id", reportId)
+      .maybeSingle();
+    if (!report) return null;
+    const stds = (report.active_standards as string[] | null) ?? ["ni43101"];
+    const [{ data: rules }, { data: evals }, { data: links }] = await Promise.all([
+      supabase.from("compliance_rules").select("id, standard, rule_code, title, severity").in("standard", stds as any).order("display_order"),
+      supabase.from("compliance_evaluations").select("rule_id, status, auto_evaluated").eq("report_id", reportId),
+      supabase.from("report_evidence_links").select("rule_id").eq("report_id", reportId),
+    ]);
+    const evCount = new Map<string, number>();
+    for (const l of links ?? []) {
+      if (!l.rule_id) continue;
+      evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
+    }
+    const evalMap = new Map((evals ?? []).map((e: any) => [e.rule_id, e]));
+    const byStd: ComplianceAnnexData["byStandard"] = {};
+    const threshold = report.compliance_threshold ?? 95;
+    const detailRules: ComplianceAnnexData["rules"] = [];
+    for (const std of stds) {
+      const stdRules = (rules ?? []).filter((r: any) => r.standard === std);
+      let weighted = 0, weight = 0, mPass = 0, mTotal = 0;
+      for (const r of stdRules as any[]) {
+        const w = r.severity === "mandatory" ? 1.0 : r.severity === "recommended" ? 0.3 : 0.1;
+        weight += w;
+        const ev: any = evalMap.get(r.id);
+        if (ev?.status === "pass") weighted += w;
+        else if (ev?.status === "warn") weighted += w * 0.5;
+        if (r.severity === "mandatory") {
+          mTotal += 1;
+          if (ev?.status === "pass") mPass += 1;
+        }
+        detailRules.push({
+          rule_code: r.rule_code,
+          standard: r.standard,
+          title: r.title,
+          severity: r.severity,
+          status: (ev?.status ?? "pending"),
+          auto: !!ev?.auto_evaluated,
+          evidence_count: evCount.get(r.id) ?? 0,
+        });
+      }
+      const score = weight > 0 ? Math.round((weighted / weight) * 100) : 0;
+      byStd[std] = {
+        score,
+        status: score >= threshold ? "compliant" : score >= 70 ? "partial" : "non_compliant",
+        mandatory_pass: mPass,
+        mandatory_total: mTotal,
+        rules_total: stdRules.length,
+      };
+    }
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return {
+      reportId,
+      globalScore: report.compliance_score_cached ?? 0,
+      threshold,
+      evaluatedAt: report.compliance_evaluated_at,
+      byStandard: byStd,
+      rules: detailRules,
+      verifyUrl: `${origin}/api/public/verify-compliance/${reportId}`,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function exportNI43101(opts: {
   setActive?: (id: string) => void;
@@ -256,6 +330,8 @@ export async function exportNI43101(opts: {
   includeInternalConcessions?: boolean;
   includeZoning?: boolean;
   projectId?: string | null;
+  /** Optional report id to include Annex C compliance certificate. */
+  reportId?: string | null;
   onProgress?: (step: string | { label: string; current: number; total: number; phase?: string }) => void;
   /** When true, returns blob/url/toc instead of triggering a download. */
   preview?: boolean;
@@ -275,6 +351,7 @@ export async function exportNI43101(opts: {
     includeInternalConcessions = true,
     includeZoning = true,
     projectId = null,
+    reportId = null,
     onProgress,
     sections,
     setBasemap,
@@ -322,13 +399,14 @@ export async function exportNI43101(opts: {
   }
 
   // Parallel data fetch
-  onProgress?.("Cargando catastro y datos geológicos…");
-  const [geo, geophys, catastroRows, internalConcessions, assayCount] = await Promise.all([
+  onProgress?.("Cargando catastro, datos geológicos y compliance…");
+  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
     fetchAssayCount(projectId),
+    fetchComplianceAnnex(reportId),
   ]);
 
   // Compute validation context
@@ -376,6 +454,7 @@ export async function exportNI43101(opts: {
   if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });
   if (has("annexA")) plan.push({ id: "annexA", label: "Anexo A · Catastro", run: () => renderAnnexA(s, catastroRows, internalConcessions, validations) });
   if (has("annexB")) plan.push({ id: "annexB", label: "Anexo B · Geofísica", run: () => renderAnnexB(s, geophys) });
+  if (has("annexC") && complianceData) plan.push({ id: "annexC", label: "Anexo C · Compliance", run: () => renderAnnexC_Compliance(s, complianceData) });
 
   // Add finalization steps to total so bar reflects real work.
   const finalizationSteps = 2; // header/footer pass + TOC fill

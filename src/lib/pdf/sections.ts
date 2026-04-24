@@ -1004,3 +1004,123 @@ export function renderAnnexB(s: PdfState, geophys: GeophysicsData | null) {
   // @ts-expect-error autotable adds lastAutoTable
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
 }
+
+/* ============================================================
+   ANNEX C — COMPLIANCE MATRIX
+   Resumen de cumplimiento normativo (NI 43-101 / JORC / SAMREC / PERC)
+   con sello verificable + QR público.
+   ============================================================ */
+
+const STD_LABEL_C: Record<string, string> = {
+  ni43101: "NI 43-101",
+  jorc2012: "JORC 2012",
+  samrec: "SAMREC",
+  perc: "PERC",
+  gkz: "GKZ (RU)",
+};
+
+export type ComplianceAnnexData = {
+  reportId: string;
+  globalScore: number;
+  threshold: number;
+  evaluatedAt: string | null;
+  byStandard: Record<string, {
+    score: number;
+    status: "compliant" | "partial" | "non_compliant";
+    mandatory_pass: number;
+    mandatory_total: number;
+    rules_total: number;
+  }>;
+  rules: Array<{
+    rule_code: string;
+    standard: string;
+    title: string;
+    severity: "mandatory" | "recommended" | "conditional";
+    status: "pass" | "warn" | "fail" | "na" | "pending";
+    auto: boolean;
+    evidence_count: number;
+  }>;
+  verifyUrl: string;
+};
+
+export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData | null) {
+  h1(s, "Anexo C — Matriz de Compliance Normativo");
+  if (!data) {
+    p(s, "Sin datos de compliance evaluados para este reporte.");
+    return;
+  }
+
+  // Sello principal
+  const compliant = data.globalScore >= data.threshold;
+  const calloutTitle = compliant ? "REPORTE CERTIFICADO" : "COMPLIANCE INSUFICIENTE";
+  const calloutBody = `Score global: ${data.globalScore}% · Umbral requerido: ${data.threshold}%\n` +
+    `Evaluado: ${data.evaluatedAt ? new Date(data.evaluatedAt).toLocaleString("es-CL") : "—"}\n` +
+    `Verificacion publica: ${data.verifyUrl}`;
+  if (compliant) {
+    calloutBox(s, calloutTitle, calloutBody);
+  } else {
+    warningBox(s, calloutTitle, calloutBody);
+  }
+
+  // Tabla score por estándar
+  h2(s, "Resumen por estándar");
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Estándar", "Score", "Estado", "Obligatorios", "Total ítems"]],
+    body: Object.entries(data.byStandard).map(([std, sc]) => [
+      STD_LABEL_C[std] ?? std,
+      `${sc.score}%`,
+      sc.status === "compliant" ? "Cumple" : sc.status === "partial" ? "Parcial" : "No cumple",
+      `${sc.mandatory_pass}/${sc.mandatory_total}`,
+      String(sc.rules_total),
+    ]),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error autotable adds lastAutoTable
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Detalle por regla
+  ensureSpace(s, 30);
+  h2(s, "Detalle de evaluación por ítem");
+  const statusLabel: Record<string, string> = {
+    pass: "✓ OK", warn: "⚠ Adv.", fail: "✗ Falla", na: "N/A", pending: "Pend.",
+  };
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Código", "Estándar", "Ítem", "Sev.", "Estado", "Auto", "Ev."]],
+    body: data.rules.map((r) => [
+      r.rule_code,
+      STD_LABEL_C[r.standard] ?? r.standard,
+      r.title.length > 60 ? r.title.slice(0, 58) + "…" : r.title,
+      r.severity === "mandatory" ? "OBL" : r.severity === "recommended" ? "REC" : "COND",
+      statusLabel[r.status] ?? r.status,
+      r.auto ? "✓" : "—",
+      String(r.evidence_count),
+    ]),
+    styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    columnStyles: {
+      0: { cellWidth: 26 },
+      1: { cellWidth: 22 },
+      3: { cellWidth: 14, halign: "center" },
+      4: { cellWidth: 18, halign: "center" },
+      5: { cellWidth: 12, halign: "center" },
+      6: { cellWidth: 12, halign: "center" },
+    },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error autotable adds lastAutoTable
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  ensureSpace(s, 20);
+  p(s, `Para verificar este sello de cumplimiento de forma independiente, acceda a:`);
+  setRGB(s.doc, "text", COLORS.gold);
+  s.doc.setFontSize(8);
+  s.doc.textWithLink(data.verifyUrl, PAGE.margin, s.cursorY, { url: data.verifyUrl });
+  s.cursorY += 6;
+  setRGB(s.doc, "text", COLORS.text);
+}
