@@ -330,6 +330,8 @@ export async function exportNI43101(opts: {
   includeInternalConcessions?: boolean;
   includeZoning?: boolean;
   projectId?: string | null;
+  /** Optional report id to include Annex C compliance certificate. */
+  reportId?: string | null;
   onProgress?: (step: string | { label: string; current: number; total: number; phase?: string }) => void;
   /** When true, returns blob/url/toc instead of triggering a download. */
   preview?: boolean;
@@ -349,6 +351,7 @@ export async function exportNI43101(opts: {
     includeInternalConcessions = true,
     includeZoning = true,
     projectId = null,
+    reportId = null,
     onProgress,
     sections,
     setBasemap,
