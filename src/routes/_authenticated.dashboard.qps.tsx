@@ -15,6 +15,7 @@ import {
   UserCheck, Plus, FileText, ShieldCheck, Pencil, Trash2,
   CheckCircle2, Clock, FileSignature, BadgeCheck, Loader2, RotateCcw,
 } from "lucide-react";
+import { ComplianceMatrix } from "@/components/qps/ComplianceMatrix";
 
 export const Route = createFileRoute("/_authenticated/dashboard/qps")({
   head: () => ({
