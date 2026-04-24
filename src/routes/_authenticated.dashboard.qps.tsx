@@ -199,6 +199,41 @@ function QpsPage() {
             </div>
           )}
         </TabsContent>
+
+        {/* COMPLIANCE TAB */}
+        <TabsContent value="compliance" className="mt-4">
+          {reports.length === 0 ? (
+            <div className="border border-border rounded p-8 text-center text-text-dim font-mono text-xs">
+              Crea un reporte técnico primero para evaluar compliance.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-[260px_1fr]">
+              <div className="space-y-1">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground px-1 mb-1">Reporte a evaluar</div>
+                {reports.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setActiveReportId(r.id)}
+                    className={`w-full text-left border rounded p-2 font-mono text-xs ${activeReportId === r.id ? "border-signal-cyan bg-signal-cyan/5" : "border-border hover:border-signal-cyan/40"}`}
+                  >
+                    <div className="truncate">{r.title}</div>
+                    <div className="text-[9px] text-text-dim flex items-center gap-2 mt-0.5">
+                      <span className="uppercase">{r.report_type}</span>
+                      <span>v{r.version}</span>
+                      {r.compliance_score_cached != null && (
+                        <span className={r.compliance_score_cached >= 95 ? "text-emerald-500" : r.compliance_score_cached >= 70 ? "text-amber-500" : "text-rose-500"}>
+                          {r.compliance_score_cached}%
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {activeReportId && <ComplianceMatrix reportId={activeReportId} />}
+            </div>
+          )}
+        </TabsContent>
       </Tabs>
 
       <QpDialog
