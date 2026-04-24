@@ -34,6 +34,10 @@ export type TechnicalReport = {
   created_by: string;
   created_at: string;
   updated_at: string;
+  active_standards?: string[] | null;
+  compliance_threshold?: number | null;
+  compliance_score_cached?: number | null;
+  compliance_evaluated_at?: string | null;
 };
 
 export type ReportSection = {
