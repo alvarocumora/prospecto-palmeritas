@@ -181,6 +181,9 @@ type ProgressInfo = { label: string; current: number; total: number; phase?: str
 function NI43101Module() {
   const { active } = useProjects();
   const projectId = active?.id ?? null;
+  const { reports } = useQualifiedPersons();
+  const [reportId, setReportId] = useState<string | null>(null);
+  if (!reportId && reports.length > 0) setReportId(reports[0].id);
 
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<ProgressInfo | null>(null);
