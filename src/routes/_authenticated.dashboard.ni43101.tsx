@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap } from "leaflet";
 import { ProjectMap } from "@/components/ProjectMap";
 import { useProjects } from "@/hooks/useProjects";
+import { useQualifiedPersons } from "@/hooks/useQualifiedPersons";
 import {
   ALL_SECTIONS,
   exportNI43101,
@@ -180,6 +181,9 @@ type ProgressInfo = { label: string; current: number; total: number; phase?: str
 function NI43101Module() {
   const { active } = useProjects();
   const projectId = active?.id ?? null;
+  const { reports } = useQualifiedPersons();
+  const [reportId, setReportId] = useState<string | null>(null);
+  if (!reportId && reports.length > 0) setReportId(reports[0].id);
 
   const [busy, setBusy] = useState(false);
   const [progress, setProgress] = useState<ProgressInfo | null>(null);
@@ -299,6 +303,7 @@ function NI43101Module() {
         includeInternalConcessions: includeInternal,
         includeZoning,
         projectId,
+        reportId,
         preview: true,
         sections: enabledArray,
         setBasemap,
@@ -336,6 +341,7 @@ function NI43101Module() {
         includeInternalConcessions: includeInternal,
         includeZoning,
         projectId,
+        reportId,
         sections: enabledArray,
         setBasemap,
         onProgress: handleProgress,

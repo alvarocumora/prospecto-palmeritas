@@ -3763,6 +3763,274 @@ export type Database = {
           },
         ]
       }
+      resource_blocks: {
+        Row: {
+          classification: string | null
+          created_at: string
+          grade: number | null
+          id: string
+          ix: number
+          iy: number
+          iz: number
+          model_id: string
+          n_samples: number
+          nearest_dist: number | null
+          project_id: string
+          variance: number | null
+          x: number
+          y: number
+          z: number
+        }
+        Insert: {
+          classification?: string | null
+          created_at?: string
+          grade?: number | null
+          id?: string
+          ix: number
+          iy: number
+          iz: number
+          model_id: string
+          n_samples?: number
+          nearest_dist?: number | null
+          project_id: string
+          variance?: number | null
+          x: number
+          y: number
+          z: number
+        }
+        Update: {
+          classification?: string | null
+          created_at?: string
+          grade?: number | null
+          id?: string
+          ix?: number
+          iy?: number
+          iz?: number
+          model_id?: string
+          n_samples?: number
+          nearest_dist?: number | null
+          project_id?: string
+          variance?: number | null
+          x?: number
+          y?: number
+          z?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_blocks_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "resource_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_blocks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_composites: {
+        Row: {
+          created_at: string
+          depth_from: number
+          depth_to: number
+          grade: number
+          hole_code: string | null
+          hole_id: string | null
+          id: string
+          length_m: number
+          model_id: string
+          project_id: string
+          x: number
+          y: number
+          z: number
+        }
+        Insert: {
+          created_at?: string
+          depth_from: number
+          depth_to: number
+          grade: number
+          hole_code?: string | null
+          hole_id?: string | null
+          id?: string
+          length_m: number
+          model_id: string
+          project_id: string
+          x: number
+          y: number
+          z: number
+        }
+        Update: {
+          created_at?: string
+          depth_from?: number
+          depth_to?: number
+          grade?: number
+          hole_code?: string | null
+          hole_id?: string | null
+          id?: string
+          length_m?: number
+          model_id?: string
+          project_id?: string
+          x?: number
+          y?: number
+          z?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_composites_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_composites_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "resource_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_composites_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_models: {
+        Row: {
+          bbox_max_x: number | null
+          bbox_max_y: number | null
+          bbox_max_z: number | null
+          bbox_min_x: number | null
+          bbox_min_y: number | null
+          bbox_min_z: number | null
+          block_size_x: number
+          block_size_y: number
+          block_size_z: number
+          blocks_estimated: number | null
+          blocks_total: number | null
+          campaign_id: string | null
+          commodity: string
+          composite_length: number
+          composites_count: number | null
+          created_at: string
+          created_by: string
+          cutoff_grade: number | null
+          density_t_m3: number
+          estimated_at: string | null
+          id: string
+          max_samples: number
+          mean_grade: number | null
+          metal_content: number | null
+          method: string
+          min_samples: number
+          name: string
+          notes: string | null
+          power: number
+          project_id: string
+          search_radius: number
+          status: string
+          tonnage_above_cutoff: number | null
+          tonnage_total: number | null
+          updated_at: string
+        }
+        Insert: {
+          bbox_max_x?: number | null
+          bbox_max_y?: number | null
+          bbox_max_z?: number | null
+          bbox_min_x?: number | null
+          bbox_min_y?: number | null
+          bbox_min_z?: number | null
+          block_size_x?: number
+          block_size_y?: number
+          block_size_z?: number
+          blocks_estimated?: number | null
+          blocks_total?: number | null
+          campaign_id?: string | null
+          commodity?: string
+          composite_length?: number
+          composites_count?: number | null
+          created_at?: string
+          created_by: string
+          cutoff_grade?: number | null
+          density_t_m3?: number
+          estimated_at?: string | null
+          id?: string
+          max_samples?: number
+          mean_grade?: number | null
+          metal_content?: number | null
+          method?: string
+          min_samples?: number
+          name: string
+          notes?: string | null
+          power?: number
+          project_id: string
+          search_radius?: number
+          status?: string
+          tonnage_above_cutoff?: number | null
+          tonnage_total?: number | null
+          updated_at?: string
+        }
+        Update: {
+          bbox_max_x?: number | null
+          bbox_max_y?: number | null
+          bbox_max_z?: number | null
+          bbox_min_x?: number | null
+          bbox_min_y?: number | null
+          bbox_min_z?: number | null
+          block_size_x?: number
+          block_size_y?: number
+          block_size_z?: number
+          blocks_estimated?: number | null
+          blocks_total?: number | null
+          campaign_id?: string | null
+          commodity?: string
+          composite_length?: number
+          composites_count?: number | null
+          created_at?: string
+          created_by?: string
+          cutoff_grade?: number | null
+          density_t_m3?: number
+          estimated_at?: string | null
+          id?: string
+          max_samples?: number
+          mean_grade?: number | null
+          metal_content?: number | null
+          method?: string
+          min_samples?: number
+          name?: string
+          notes?: string | null
+          power?: number
+          project_id?: string
+          search_radius?: number
+          status?: string
+          tonnage_above_cutoff?: number | null
+          tonnage_total?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_models_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_models_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sample_custody: {
         Row: {
           carrier: string | null
