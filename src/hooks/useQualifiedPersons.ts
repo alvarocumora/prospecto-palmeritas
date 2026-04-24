@@ -144,7 +144,10 @@ export function useQualifiedPersons() {
   };
 
   const updateReport = async (id: string, patch: Partial<TechnicalReport>) => {
-    const { error } = await supabase.from("technical_reports").update(patch).eq("id", id);
+    const { error } = await supabase
+      .from("technical_reports")
+      .update(patch as never)
+      .eq("id", id);
     if (error) { toast.error(error.message); throw error; }
     await fetchAll();
   };
