@@ -153,13 +153,19 @@ export function useCompliance(reportId: string | null) {
 
   const attachEvidence = useCallback(async (ruleId: string, evidenceType: string, evidenceId?: string, url?: string, caption?: string) => {
     if (!reportId) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { toast.error("No autenticado"); return; }
+    const { data: rep } = await supabase.from("technical_reports").select("project_id").eq("id", reportId).single();
+    if (!rep) throw new Error("Reporte no encontrado");
     const { error } = await supabase.from("report_evidence_links").insert({
       report_id: reportId,
+      project_id: rep.project_id,
       rule_id: ruleId,
       evidence_type: evidenceType,
       evidence_id: evidenceId ?? null,
       url: url ?? null,
       caption: caption ?? null,
+      created_by: user.id,
     });
     if (error) { toast.error(error.message); throw error; }
     toast.success("Evidencia adjuntada");
