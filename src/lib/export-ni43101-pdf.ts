@@ -242,13 +242,82 @@ export type Ni43101SectionId =
   | "conclusions"
   | "references"
   | "annexA"
-  | "annexB";
+  | "annexB"
+  | "annexC";
 
 export const ALL_SECTIONS: Ni43101SectionId[] = [
   "execSummary","intro","reliance","property","zoning","climate","history","geology",
   "depositType","exploration","drilling","qaqc","dataVerification","budget",
-  "conclusions","references","annexA","annexB",
+  "conclusions","references","annexA","annexB","annexC",
 ];
+
+async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
+  if (!reportId) return null;
+  try {
+    const { data: report } = await supabase
+      .from("technical_reports")
+      .select("id, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at")
+      .eq("id", reportId)
+      .maybeSingle();
+    if (!report) return null;
+    const stds = (report.active_standards as string[] | null) ?? ["ni43101"];
+    const [{ data: rules }, { data: evals }, { data: links }] = await Promise.all([
+      supabase.from("compliance_rules").select("id, standard, rule_code, title, severity").in("standard", stds as any).order("display_order"),
+      supabase.from("compliance_evaluations").select("rule_id, status, auto_evaluated").eq("report_id", reportId),
+      supabase.from("report_evidence_links").select("rule_id").eq("report_id", reportId),
+    ]);
+    const evCount = new Map<string, number>();
+    for (const l of links ?? []) evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
+    const evalMap = new Map((evals ?? []).map((e: any) => [e.rule_id, e]));
+    const byStd: ComplianceAnnexData["byStandard"] = {};
+    const threshold = report.compliance_threshold ?? 95;
+    const detailRules: ComplianceAnnexData["rules"] = [];
+    for (const std of stds) {
+      const stdRules = (rules ?? []).filter((r: any) => r.standard === std);
+      let weighted = 0, weight = 0, mPass = 0, mTotal = 0;
+      for (const r of stdRules as any[]) {
+        const w = r.severity === "mandatory" ? 1.0 : r.severity === "recommended" ? 0.3 : 0.1;
+        weight += w;
+        const ev: any = evalMap.get(r.id);
+        if (ev?.status === "pass") weighted += w;
+        else if (ev?.status === "warn") weighted += w * 0.5;
+        if (r.severity === "mandatory") {
+          mTotal += 1;
+          if (ev?.status === "pass") mPass += 1;
+        }
+        detailRules.push({
+          rule_code: r.rule_code,
+          standard: r.standard,
+          title: r.title,
+          severity: r.severity,
+          status: (ev?.status ?? "pending"),
+          auto: !!ev?.auto_evaluated,
+          evidence_count: evCount.get(r.id) ?? 0,
+        });
+      }
+      const score = weight > 0 ? Math.round((weighted / weight) * 100) : 0;
+      byStd[std] = {
+        score,
+        status: score >= threshold ? "compliant" : score >= 70 ? "partial" : "non_compliant",
+        mandatory_pass: mPass,
+        mandatory_total: mTotal,
+        rules_total: stdRules.length,
+      };
+    }
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return {
+      reportId,
+      globalScore: report.compliance_score_cached ?? 0,
+      threshold,
+      evaluatedAt: report.compliance_evaluated_at,
+      byStandard: byStd,
+      rules: detailRules,
+      verifyUrl: `${origin}/api/public/verify-compliance/${reportId}`,
+    };
+  } catch {
+    return null;
+  }
+}
 
 export async function exportNI43101(opts: {
   setActive?: (id: string) => void;
