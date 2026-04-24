@@ -123,12 +123,13 @@ function EstimationPage() {
   );
 }
 
-function ModelCard({ model, writable, running, onRun, onDelete }: {
+function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
   model: ReturnType<typeof useResourceModels>["models"][number];
   writable: boolean;
   running: boolean;
   onRun: () => void;
   onDelete: () => void;
+  onView: () => void;
 }) {
   const unit = COMMODITIES.find((c) => c.v === model.commodity)?.unit ?? "";
   const statusColor = {
