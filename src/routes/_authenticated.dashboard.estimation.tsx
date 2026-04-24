@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity } from "lucide-react";
+import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity, Box as BoxIcon } from "lucide-react";
+import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
@@ -44,6 +45,8 @@ function EstimationPage() {
   const writable = canWrite(role);
   const { models, loading, running, create, remove, estimate } = useResourceModels();
   const [dialog, setDialog] = useState(false);
+  const [viewerId, setViewerId] = useState<string | null>(null);
+  const viewerModel = useMemo(() => models.find((m) => m.id === viewerId) ?? null, [models, viewerId]);
 
   if (!active) {
     return <div className="p-8 text-text-dim font-mono text-xs">Selecciona un proyecto activo.</div>;
@@ -88,9 +91,24 @@ function EstimationPage() {
               running={running === m.id}
               onRun={() => estimate(m.id)}
               onDelete={() => { if (confirm(`Eliminar modelo "${m.name}"?`)) remove(m.id); }}
+              onView={() => setViewerId(m.id)}
             />
           ))}
         </div>
+      )}
+
+      {viewerModel && (
+        <Dialog open={!!viewerModel} onOpenChange={(o) => !o && setViewerId(null)}>
+          <DialogContent className="max-w-5xl p-0 overflow-hidden">
+            <DialogHeader className="px-4 py-3 border-b border-border">
+              <DialogTitle className="font-mono text-sm flex items-center gap-2">
+                <BoxIcon className="w-4 h-4 text-signal-cyan" />
+                Visor 3D — {viewerModel.name}
+              </DialogTitle>
+            </DialogHeader>
+            <BlockModel3DViewer model={viewerModel} className="h-[70vh] border-0 rounded-none" />
+          </DialogContent>
+        </Dialog>
       )}
 
       <CreateDialog
@@ -105,12 +123,13 @@ function EstimationPage() {
   );
 }
 
-function ModelCard({ model, writable, running, onRun, onDelete }: {
+function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
   model: ReturnType<typeof useResourceModels>["models"][number];
   writable: boolean;
   running: boolean;
   onRun: () => void;
   onDelete: () => void;
+  onView: () => void;
 }) {
   const unit = COMMODITIES.find((c) => c.v === model.commodity)?.unit ?? "";
   const statusColor = {
@@ -155,6 +174,11 @@ function ModelCard({ model, writable, running, onRun, onDelete }: {
       )}
 
       <div className="flex items-center gap-2 pt-2 border-t border-border">
+        {model.status === "complete" && (
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={onView}>
+            <BoxIcon className="w-3 h-3 mr-1" /> Ver 3D
+          </Button>
+        )}
         {writable && (
           <>
             <Button

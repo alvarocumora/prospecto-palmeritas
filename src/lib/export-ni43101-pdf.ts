@@ -21,6 +21,7 @@ import {
   renderSection12_Budget,
   renderSection13_Conclusions,
   renderSection14_References,
+  renderSection14bis_ResourceEstimates,
   renderSection1_Intro,
   renderSection2_Reliance,
   renderSection3_Property,
@@ -34,6 +35,7 @@ import {
   renderTocPlaceholder,
   type ComplianceAnnexData,
   type Ni43101Validations,
+  type ResourceEstimateData,
 } from "./pdf/sections";
 
 export type { Ni43101Validations };
@@ -238,6 +240,7 @@ export type Ni43101SectionId =
   | "drilling"
   | "qaqc"
   | "dataVerification"
+  | "resourceEstimates"
   | "budget"
   | "conclusions"
   | "references"
@@ -247,9 +250,25 @@ export type Ni43101SectionId =
 
 export const ALL_SECTIONS: Ni43101SectionId[] = [
   "execSummary","intro","reliance","property","zoning","climate","history","geology",
-  "depositType","exploration","drilling","qaqc","dataVerification","budget",
-  "conclusions","references","annexA","annexB","annexC",
+  "depositType","exploration","drilling","qaqc","dataVerification","resourceEstimates",
+  "budget","conclusions","references","annexA","annexB","annexC",
 ];
+
+async function fetchResourceEstimates(projectId: string | null | undefined): Promise<ResourceEstimateData | null> {
+  if (!projectId) return null;
+  try {
+    const { data, error } = await supabase
+      .from("resource_models")
+      .select("name, commodity, method, block_size_x, block_size_y, block_size_z, search_radius, composite_length, cutoff_grade, density_t_m3, blocks_estimated, blocks_total, composites_count, tonnage_total, tonnage_above_cutoff, mean_grade, metal_content, estimated_at, status")
+      .eq("project_id", projectId)
+      .eq("status", "complete")
+      .order("estimated_at", { ascending: false });
+    if (error || !data || data.length === 0) return null;
+    return { models: data as ResourceEstimateData["models"] };
+  } catch {
+    return null;
+  }
+}
 
 async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
   if (!reportId) return null;
@@ -400,13 +419,14 @@ export async function exportNI43101(opts: {
 
   // Parallel data fetch
   onProgress?.("Cargando catastro, datos geológicos y compliance…");
-  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData] = await Promise.all([
+  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData, resourceData] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
     fetchAssayCount(projectId),
     fetchComplianceAnnex(reportId),
+    fetchResourceEstimates(projectId),
   ]);
 
   // Compute validation context
@@ -449,6 +469,7 @@ export async function exportNI43101(opts: {
   if (has("drilling")) plan.push({ id: "drilling", label: "§9 Sondajes", run: () => renderSection9_Drilling(s) });
   if (has("qaqc")) plan.push({ id: "qaqc", label: "§10 QA/QC", run: () => renderSection10_QAQC(s, validations) });
   if (has("dataVerification")) plan.push({ id: "dataVerification", label: "§11 Verificación de datos", run: () => renderSection11_DataVerification(s, validations) });
+  if (has("resourceEstimates")) plan.push({ id: "resourceEstimates", label: "§14 Estimación de recursos", run: () => renderSection14bis_ResourceEstimates(s, resourceData) });
   if (has("budget")) plan.push({ id: "budget", label: "§12 Presupuesto", run: () => renderSection12_Budget(s) });
   if (has("conclusions")) plan.push({ id: "conclusions", label: "§13 Conclusiones", run: () => renderSection13_Conclusions(s) });
   if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });

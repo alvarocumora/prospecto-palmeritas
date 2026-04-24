@@ -45,6 +45,7 @@ export const MODULE_ROLES: Record<string, ProjectRole[]> = {
   marketplace: ["owner", "admin", "project_manager", "chief_geologist", "geologist"],
   hse: ["owner", "admin", "project_manager", "chief_geologist", "hse_officer", "community_relations", "field_technician", "drilling_supervisor", "geologist"],
   reports: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer", "hse_officer", "external_consultant"],
+  estimation: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "external_consultant"],
   profile: ALL_VIEW,
   settings: ["owner"],
 };

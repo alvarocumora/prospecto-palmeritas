@@ -157,7 +157,12 @@ const SECTIONS: SectionMeta[] = [
     icon: ListChecks, group: "body",
   },
   {
-    id: "references", number: "14", title: "Referencias bibliográficas",
+    id: "resourceEstimates", number: "14", title: "Estimación de recursos",
+    desc: "Modelos de bloques IDW/NN, tonelaje, ley media y metal contenido.",
+    icon: Mountain, group: "body",
+  },
+  {
+    id: "references", number: "14b", title: "Referencias bibliográficas",
     desc: "Citas geológicas y fuentes consultadas.",
     icon: Library, group: "body",
   },

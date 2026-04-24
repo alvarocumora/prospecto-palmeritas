@@ -1124,3 +1124,136 @@ export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData |
   s.cursorY += 6;
   setRGB(s.doc, "text", COLORS.text);
 }
+
+/* ============================================================
+   §14bis — Resource Estimates (NI 43-101 Item 14, JORC clause 49)
+   ============================================================ */
+
+export type ResourceEstimateData = {
+  models: Array<{
+    name: string;
+    commodity: string;
+    method: string;
+    block_size_x: number;
+    block_size_y: number;
+    block_size_z: number;
+    search_radius: number;
+    composite_length: number;
+    cutoff_grade: number | null;
+    density_t_m3: number;
+    blocks_estimated: number;
+    blocks_total: number;
+    composites_count: number;
+    tonnage_total: number | null;
+    tonnage_above_cutoff: number | null;
+    mean_grade: number | null;
+    metal_content: number | null;
+    estimated_at: string | null;
+    classification?: { measured: number; indicated: number; inferred: number };
+  }>;
+};
+
+const METHOD_LABEL: Record<string, string> = {
+  idw: "Inverse Distance Weighting (IDW²)",
+  ok: "Ordinary Kriging",
+  nn: "Nearest Neighbour",
+};
+
+function fmtTonnage(t: number | null): string {
+  if (t == null || !Number.isFinite(t)) return "—";
+  if (t >= 1e6) return `${(t / 1e6).toFixed(2)} Mt`;
+  if (t >= 1e3) return `${(t / 1e3).toFixed(0)} kt`;
+  return `${t.toFixed(0)} t`;
+}
+
+export function renderSection14bis_ResourceEstimates(s: PdfState, data: ResourceEstimateData | null) {
+  h1(s, "Estimación de recursos minerales");
+  p(
+    s,
+    "Esta sección presenta los modelos de recursos generados por el motor geoestadístico interno " +
+      "de la plataforma. La estimación se realiza sobre compósitos de longitud fija obtenidos a partir " +
+      "de los registros de testigo de sondajes, proyectados al espacio 3D usando la geometría del pozo " +
+      "(azimut, dip, profundidad). Las leyes se asignan a un modelo de bloques regular según el método " +
+      "seleccionado (IDW, NN o OK), aplicando un radio de búsqueda y un mínimo/máximo de muestras.",
+  );
+
+  if (!data || data.models.length === 0) {
+    warningBox(
+      s,
+      "Sin modelos de recursos disponibles",
+      "No se encontraron modelos en estado 'complete' para este proyecto. Los recursos cuantitativos " +
+        "(tonelaje · ley · metal contenido) no se reportan en esta versión del informe. " +
+        "Esta sección debe ser actualizada cuando el QP firme un modelo definitivo.",
+    );
+    return;
+  }
+
+  // Tabla resumen — un row por modelo
+  h2(s, "Resumen de modelos de bloques");
+  tableCaption(s, "Modelos de recursos estimados — parámetros y resultados clave.");
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Modelo", "Commodity", "Método", "Bloque (m)", "Compósitos", "Bloques estim."]],
+    body: data.models.map((m) => [
+      m.name,
+      m.commodity.toUpperCase(),
+      METHOD_LABEL[m.method] ?? m.method,
+      `${m.block_size_x}×${m.block_size_y}×${m.block_size_z}`,
+      String(m.composites_count),
+      `${m.blocks_estimated}/${m.blocks_total}`,
+    ]),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error autotable adds lastAutoTable
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Tabla de recursos cuantitativos
+  ensureSpace(s, 30);
+  h2(s, "Recursos cuantitativos por modelo");
+  tableCaption(
+    s,
+    "Tonelaje y ley media reportados a cutoff. Sin clasificación NI 43-101 oficial — requiere validación de QP.",
+  );
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Modelo", "Cutoff", "Densidad (t/m³)", "Tonelaje > cutoff", "Ley media", "Metal contenido"]],
+    body: data.models.map((m) => {
+      const unit = m.commodity === "au" || m.commodity === "ag" ? "g/t" : "%";
+      const grade = m.mean_grade != null ? `${m.mean_grade.toFixed(unit === "g/t" ? 2 : 3)} ${unit}` : "—";
+      const cutoff = m.cutoff_grade != null ? `${m.cutoff_grade} ${unit}` : "—";
+      const metal = m.metal_content != null
+        ? unit === "g/t"
+          ? `${(m.metal_content / 31.1035).toFixed(0)} oz`
+          : `${m.metal_content.toFixed(0)} t`
+        : "—";
+      return [
+        m.name,
+        cutoff,
+        m.density_t_m3.toFixed(2),
+        fmtTonnage(m.tonnage_above_cutoff ?? m.tonnage_total),
+        grade,
+        metal,
+      ];
+    }),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error autotable adds lastAutoTable
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Notas técnicas
+  ensureSpace(s, 30);
+  h2(s, "Notas técnicas y limitaciones");
+  bullet(s, [
+    "Los valores reportados corresponden a estimaciones internas no auditadas. Una clasificación formal de recursos (Measured / Indicated / Inferred) bajo NI 43-101 requiere la firma de una Persona Calificada (QP).",
+    "El método IDW asume isotropía espacial (potencia 2). En presencia de fuerte direccionalidad estructural, se recomienda Ordinary Kriging con variograma fitteado.",
+    "El cutoff aplicado es operacional, no económico. Un análisis NSR/NPV es requerido para cutoff económico.",
+    "Densidad usada es uniforme; estimaciones más finas requieren densidad por dominio litológico.",
+    "Compósitos de longitud fija pueden suavizar leyes en intercepts cortos de alta ley — revisar registro original para vetas estrechas.",
+  ]);
+}
