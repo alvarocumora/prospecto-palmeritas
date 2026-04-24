@@ -267,7 +267,10 @@ async function fetchComplianceAnnex(reportId: string | null | undefined): Promis
       supabase.from("report_evidence_links").select("rule_id").eq("report_id", reportId),
     ]);
     const evCount = new Map<string, number>();
-    for (const l of links ?? []) evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
+    for (const l of links ?? []) {
+      if (!l.rule_id) continue;
+      evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
+    }
     const evalMap = new Map((evals ?? []).map((e: any) => [e.rule_id, e]));
     const byStd: ComplianceAnnexData["byStandard"] = {};
     const threshold = report.compliance_threshold ?? 95;
