@@ -53,14 +53,14 @@ export function EvidenceDrawer({ reportId, ruleId, ruleCode, ruleTitle, evidence
         supabase.from("drill_holes").select("id, hole_id, status").eq("project_id", active.id).limit(100),
         supabase.from("sampling_results").select("id, sample_code, au_gpt").eq("project_id", active.id).limit(100),
         supabase.from("exploration_targets").select("id, code, name, stage").eq("project_id", active.id).limit(100),
-        supabase.from("geophysics_anomalies").select("id, anomaly_id, severity").eq("project_id", active.id).limit(100),
+        supabase.from("geophysics_anomalies").select("id, code, severity").eq("project_id", active.id).limit(100),
       ]);
       const out: Source[] = [];
       for (const s of (sec.data ?? [])) out.push({ id: s.id, type: "section", label: `§${s.section_no} ${s.title}` });
       for (const h of (holes.data ?? [])) out.push({ id: h.id, type: "drill_hole", label: h.hole_id, meta: h.status });
       for (const s of (samples.data ?? [])) out.push({ id: s.id, type: "sample", label: s.sample_code, meta: s.au_gpt ? `Au ${s.au_gpt} g/t` : undefined });
       for (const t of (targets.data ?? [])) out.push({ id: t.id, type: "target", label: `${t.code} · ${t.name}`, meta: t.stage });
-      for (const a of (anomalies.data ?? [])) out.push({ id: a.id, type: "anomaly", label: a.anomaly_id, meta: a.severity });
+      for (const a of (anomalies.data ?? [])) out.push({ id: a.id, type: "anomaly", label: a.code, meta: a.severity });
       setSources(out);
       setLoading(false);
     };
