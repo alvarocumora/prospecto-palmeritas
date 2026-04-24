@@ -174,6 +174,11 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
       )}
 
       <div className="flex items-center gap-2 pt-2 border-t border-border">
+        {model.status === "complete" && (
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={onView}>
+            <BoxIcon className="w-3 h-3 mr-1" /> Ver 3D
+          </Button>
+        )}
         {writable && (
           <>
             <Button
