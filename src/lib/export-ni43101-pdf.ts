@@ -13,6 +13,7 @@ import {
   fillToc,
   renderAnnexA,
   renderAnnexB,
+  renderAnnexC_Compliance,
   renderCover,
   renderExecSummary,
   renderSection10_QAQC,
@@ -31,6 +32,7 @@ import {
   renderSection8_Exploration,
   renderSection9_Drilling,
   renderTocPlaceholder,
+  type ComplianceAnnexData,
   type Ni43101Validations,
 } from "./pdf/sections";
 
