@@ -454,6 +454,7 @@ export async function exportNI43101(opts: {
   if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });
   if (has("annexA")) plan.push({ id: "annexA", label: "Anexo A · Catastro", run: () => renderAnnexA(s, catastroRows, internalConcessions, validations) });
   if (has("annexB")) plan.push({ id: "annexB", label: "Anexo B · Geofísica", run: () => renderAnnexB(s, geophys) });
+  if (has("annexC") && complianceData) plan.push({ id: "annexC", label: "Anexo C · Compliance", run: () => renderAnnexC_Compliance(s, complianceData) });
 
   // Add finalization steps to total so bar reflects real work.
   const finalizationSteps = 2; // header/footer pass + TOC fill
