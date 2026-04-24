@@ -399,13 +399,14 @@ export async function exportNI43101(opts: {
   }
 
   // Parallel data fetch
-  onProgress?.("Cargando catastro y datos geológicos…");
-  const [geo, geophys, catastroRows, internalConcessions, assayCount] = await Promise.all([
+  onProgress?.("Cargando catastro, datos geológicos y compliance…");
+  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
     fetchAssayCount(projectId),
+    fetchComplianceAnnex(reportId),
   ]);
 
   // Compute validation context
