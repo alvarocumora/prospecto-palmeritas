@@ -240,6 +240,7 @@ export type Ni43101SectionId =
   | "drilling"
   | "qaqc"
   | "dataVerification"
+  | "resourceEstimates"
   | "budget"
   | "conclusions"
   | "references"
@@ -249,9 +250,25 @@ export type Ni43101SectionId =
 
 export const ALL_SECTIONS: Ni43101SectionId[] = [
   "execSummary","intro","reliance","property","zoning","climate","history","geology",
-  "depositType","exploration","drilling","qaqc","dataVerification","budget",
-  "conclusions","references","annexA","annexB","annexC",
+  "depositType","exploration","drilling","qaqc","dataVerification","resourceEstimates",
+  "budget","conclusions","references","annexA","annexB","annexC",
 ];
+
+async function fetchResourceEstimates(projectId: string | null | undefined): Promise<ResourceEstimateData | null> {
+  if (!projectId) return null;
+  try {
+    const { data, error } = await supabase
+      .from("resource_models")
+      .select("name, commodity, method, block_size_x, block_size_y, block_size_z, search_radius, composite_length, cutoff_grade, density_t_m3, blocks_estimated, blocks_total, composites_count, tonnage_total, tonnage_above_cutoff, mean_grade, metal_content, estimated_at, status")
+      .eq("project_id", projectId)
+      .eq("status", "complete")
+      .order("estimated_at", { ascending: false });
+    if (error || !data || data.length === 0) return null;
+    return { models: data as ResourceEstimateData["models"] };
+  } catch {
+    return null;
+  }
+}
 
 async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
   if (!reportId) return null;
