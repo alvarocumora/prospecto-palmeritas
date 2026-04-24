@@ -1118,9 +1118,9 @@ export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData |
 
   ensureSpace(s, 20);
   p(s, `Para verificar este sello de cumplimiento de forma independiente, acceda a:`);
-  setRGB(s.doc, COLORS.gold);
+  setRGB(s.doc, "text", COLORS.gold);
   s.doc.setFontSize(8);
   s.doc.textWithLink(data.verifyUrl, PAGE.margin, s.cursorY, { url: data.verifyUrl });
   s.cursorY += 6;
-  setRGB(s.doc, COLORS.text);
+  setRGB(s.doc, "text", COLORS.text);
 }
