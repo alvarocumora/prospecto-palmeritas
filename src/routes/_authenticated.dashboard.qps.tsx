@@ -95,10 +95,11 @@ function QpsPage() {
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports")}>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance")}>
         <TabsList>
           <TabsTrigger value="qps"><UserCheck className="w-3 h-3 mr-1" /> Personas Calificadas ({qps.length})</TabsTrigger>
           <TabsTrigger value="reports"><FileText className="w-3 h-3 mr-1" /> Reportes ({reports.length})</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="w-3 h-3 mr-1" /> Compliance</TabsTrigger>
         </TabsList>
 
         {/* QPs TAB */}
