@@ -54,7 +54,7 @@ function QpsPage() {
     upsertSection, assignQpToSection, signSection, revokeSignature,
   } = useQualifiedPersons();
 
-  const [tab, setTab] = useState<"qps" | "reports">("qps");
+  const [tab, setTab] = useState<"qps" | "reports" | "compliance">("qps");
   const [qpDialog, setQpDialog] = useState<{ open: boolean; editing: QualifiedPerson | null }>({ open: false, editing: null });
   const [reportDialog, setReportDialog] = useState(false);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
