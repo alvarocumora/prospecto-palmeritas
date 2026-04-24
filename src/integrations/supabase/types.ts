@@ -468,6 +468,121 @@ export type Database = {
           },
         ]
       }
+      compliance_evaluations: {
+        Row: {
+          auto_evaluated: boolean
+          created_at: string
+          evaluated_at: string | null
+          evaluated_by: string | null
+          evaluator_notes: string | null
+          id: string
+          project_id: string
+          report_id: string
+          rule_id: string
+          score: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          auto_evaluated?: boolean
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          evaluator_notes?: string | null
+          id?: string
+          project_id: string
+          report_id: string
+          rule_id: string
+          score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          auto_evaluated?: boolean
+          created_at?: string
+          evaluated_at?: string | null
+          evaluated_by?: string | null
+          evaluator_notes?: string | null
+          id?: string
+          project_id?: string
+          report_id?: string
+          rule_id?: string
+          score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_evaluations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_evaluations_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "compliance_evaluations_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      compliance_rules: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          evaluator_config: Json | null
+          evaluator_type: string
+          id: string
+          reference_url: string | null
+          rule_code: string
+          section_no: number | null
+          severity: string
+          standard: Database["public"]["Enums"]["compliance_standard"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number
+          evaluator_config?: Json | null
+          evaluator_type?: string
+          id?: string
+          reference_url?: string | null
+          rule_code: string
+          section_no?: number | null
+          severity?: string
+          standard: Database["public"]["Enums"]["compliance_standard"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          evaluator_config?: Json | null
+          evaluator_type?: string
+          id?: string
+          reference_url?: string | null
+          rule_code?: string
+          section_no?: number | null
+          severity?: string
+          standard?: Database["public"]["Enums"]["compliance_standard"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       concession_alerts: {
         Row: {
           acknowledged: boolean
@@ -3587,6 +3702,67 @@ export type Database = {
         }
         Relationships: []
       }
+      report_evidence_links: {
+        Row: {
+          caption: string | null
+          created_at: string
+          created_by: string
+          evidence_id: string | null
+          evidence_type: string
+          id: string
+          project_id: string
+          report_id: string
+          rule_id: string | null
+          url: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          created_by: string
+          evidence_id?: string | null
+          evidence_type: string
+          id?: string
+          project_id: string
+          report_id: string
+          rule_id?: string | null
+          url?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          created_by?: string
+          evidence_id?: string | null
+          evidence_type?: string
+          id?: string
+          project_id?: string
+          report_id?: string
+          rule_id?: string | null
+          url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_evidence_links_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_evidence_links_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "technical_reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_evidence_links_rule_id_fkey"
+            columns: ["rule_id"]
+            isOneToOne: false
+            referencedRelation: "compliance_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sample_custody: {
         Row: {
           carrier: string | null
@@ -4041,6 +4217,10 @@ export type Database = {
       }
       technical_reports: {
         Row: {
+          active_standards: Database["public"]["Enums"]["compliance_standard"][]
+          compliance_evaluated_at: string | null
+          compliance_score_cached: number | null
+          compliance_threshold: number
           created_at: string
           created_by: string
           effective_date: string | null
@@ -4056,6 +4236,10 @@ export type Database = {
           version: number
         }
         Insert: {
+          active_standards?: Database["public"]["Enums"]["compliance_standard"][]
+          compliance_evaluated_at?: string | null
+          compliance_score_cached?: number | null
+          compliance_threshold?: number
           created_at?: string
           created_by: string
           effective_date?: string | null
@@ -4071,6 +4255,10 @@ export type Database = {
           version?: number
         }
         Update: {
+          active_standards?: Database["public"]["Enums"]["compliance_standard"][]
+          compliance_evaluated_at?: string | null
+          compliance_score_cached?: number | null
+          compliance_threshold?: number
           created_at?: string
           created_by?: string
           effective_date?: string | null
@@ -4179,6 +4367,7 @@ export type Database = {
     }
     Enums: {
       app_role: "super_admin" | "support"
+      compliance_standard: "ni43101" | "jorc2012" | "samrec" | "perc" | "gkz"
       project_role:
         | "owner"
         | "admin"
@@ -4320,6 +4509,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["super_admin", "support"],
+      compliance_standard: ["ni43101", "jorc2012", "samrec", "perc", "gkz"],
       project_role: [
         "owner",
         "admin",
