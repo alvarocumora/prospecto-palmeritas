@@ -21,6 +21,7 @@ import {
   renderSection12_Budget,
   renderSection13_Conclusions,
   renderSection14_References,
+  renderSection14bis_ResourceEstimates,
   renderSection1_Intro,
   renderSection2_Reliance,
   renderSection3_Property,
@@ -34,6 +35,7 @@ import {
   renderTocPlaceholder,
   type ComplianceAnnexData,
   type Ni43101Validations,
+  type ResourceEstimateData,
 } from "./pdf/sections";
 
 export type { Ni43101Validations };
