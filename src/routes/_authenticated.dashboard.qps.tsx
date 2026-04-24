@@ -15,6 +15,7 @@ import {
   UserCheck, Plus, FileText, ShieldCheck, Pencil, Trash2,
   CheckCircle2, Clock, FileSignature, BadgeCheck, Loader2, RotateCcw,
 } from "lucide-react";
+import { ComplianceMatrix } from "@/components/qps/ComplianceMatrix";
 
 export const Route = createFileRoute("/_authenticated/dashboard/qps")({
   head: () => ({
@@ -54,7 +55,7 @@ function QpsPage() {
     upsertSection, assignQpToSection, signSection, revokeSignature,
   } = useQualifiedPersons();
 
-  const [tab, setTab] = useState<"qps" | "reports">("qps");
+  const [tab, setTab] = useState<"qps" | "reports" | "compliance">("qps");
   const [qpDialog, setQpDialog] = useState<{ open: boolean; editing: QualifiedPerson | null }>({ open: false, editing: null });
   const [reportDialog, setReportDialog] = useState(false);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
@@ -95,10 +96,11 @@ function QpsPage() {
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports")}>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance")}>
         <TabsList>
           <TabsTrigger value="qps"><UserCheck className="w-3 h-3 mr-1" /> Personas Calificadas ({qps.length})</TabsTrigger>
           <TabsTrigger value="reports"><FileText className="w-3 h-3 mr-1" /> Reportes ({reports.length})</TabsTrigger>
+          <TabsTrigger value="compliance"><ShieldCheck className="w-3 h-3 mr-1" /> Compliance</TabsTrigger>
         </TabsList>
 
         {/* QPs TAB */}
@@ -195,6 +197,41 @@ function QpsPage() {
                   onDeleteReport={() => { if (confirm("Eliminar reporte completo?")) { deleteReport(activeReportId); setActiveReportId(null); } }}
                 />
               )}
+            </div>
+          )}
+        </TabsContent>
+
+        {/* COMPLIANCE TAB */}
+        <TabsContent value="compliance" className="mt-4">
+          {reports.length === 0 ? (
+            <div className="border border-border rounded p-8 text-center text-text-dim font-mono text-xs">
+              Crea un reporte técnico primero para evaluar compliance.
+            </div>
+          ) : (
+            <div className="grid gap-4 md:grid-cols-[260px_1fr]">
+              <div className="space-y-1">
+                <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground px-1 mb-1">Reporte a evaluar</div>
+                {reports.map((r) => (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setActiveReportId(r.id)}
+                    className={`w-full text-left border rounded p-2 font-mono text-xs ${activeReportId === r.id ? "border-signal-cyan bg-signal-cyan/5" : "border-border hover:border-signal-cyan/40"}`}
+                  >
+                    <div className="truncate">{r.title}</div>
+                    <div className="text-[9px] text-text-dim flex items-center gap-2 mt-0.5">
+                      <span className="uppercase">{r.report_type}</span>
+                      <span>v{r.version}</span>
+                      {r.compliance_score_cached != null && (
+                        <span className={r.compliance_score_cached >= 95 ? "text-emerald-500" : r.compliance_score_cached >= 70 ? "text-amber-500" : "text-rose-500"}>
+                          {r.compliance_score_cached}%
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+              {activeReportId && <ComplianceMatrix reportId={activeReportId} />}
             </div>
           )}
         </TabsContent>
