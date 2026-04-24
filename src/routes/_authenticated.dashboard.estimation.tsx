@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity } from "lucide-react";
+import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity, Box as BoxIcon } from "lucide-react";
+import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
@@ -44,6 +45,8 @@ function EstimationPage() {
   const writable = canWrite(role);
   const { models, loading, running, create, remove, estimate } = useResourceModels();
   const [dialog, setDialog] = useState(false);
+  const [viewerId, setViewerId] = useState<string | null>(null);
+  const viewerModel = useMemo(() => models.find((m) => m.id === viewerId) ?? null, [models, viewerId]);
 
   if (!active) {
     return <div className="p-8 text-text-dim font-mono text-xs">Selecciona un proyecto activo.</div>;
