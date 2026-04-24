@@ -419,13 +419,14 @@ export async function exportNI43101(opts: {
 
   // Parallel data fetch
   onProgress?.("Cargando catastro, datos geológicos y compliance…");
-  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData] = await Promise.all([
+  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData, resourceData] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
     includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
     fetchAssayCount(projectId),
     fetchComplianceAnnex(reportId),
+    fetchResourceEstimates(projectId),
   ]);
 
   // Compute validation context
@@ -468,6 +469,7 @@ export async function exportNI43101(opts: {
   if (has("drilling")) plan.push({ id: "drilling", label: "§9 Sondajes", run: () => renderSection9_Drilling(s) });
   if (has("qaqc")) plan.push({ id: "qaqc", label: "§10 QA/QC", run: () => renderSection10_QAQC(s, validations) });
   if (has("dataVerification")) plan.push({ id: "dataVerification", label: "§11 Verificación de datos", run: () => renderSection11_DataVerification(s, validations) });
+  if (has("resourceEstimates")) plan.push({ id: "resourceEstimates", label: "§14 Estimación de recursos", run: () => renderSection14bis_ResourceEstimates(s, resourceData) });
   if (has("budget")) plan.push({ id: "budget", label: "§12 Presupuesto", run: () => renderSection12_Budget(s) });
   if (has("conclusions")) plan.push({ id: "conclusions", label: "§13 Conclusiones", run: () => renderSection13_Conclusions(s) });
   if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });
