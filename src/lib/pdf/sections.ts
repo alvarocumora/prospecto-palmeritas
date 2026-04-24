@@ -1052,13 +1052,15 @@ export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData |
 
   // Sello principal
   const compliant = data.globalScore >= data.threshold;
-  calloutBox(s, {
-    title: compliant ? "✓ REPORTE CERTIFICADO" : "⚠ COMPLIANCE INSUFICIENTE",
-    body: `Score global: ${data.globalScore}% · Umbral requerido: ${data.threshold}%\n` +
-      `Evaluado: ${data.evaluatedAt ? new Date(data.evaluatedAt).toLocaleString("es-CL") : "—"}\n` +
-      `Verificación pública: ${data.verifyUrl}`,
-    tone: compliant ? "info" : "warning",
-  });
+  const calloutTitle = compliant ? "REPORTE CERTIFICADO" : "COMPLIANCE INSUFICIENTE";
+  const calloutBody = `Score global: ${data.globalScore}% · Umbral requerido: ${data.threshold}%\n` +
+    `Evaluado: ${data.evaluatedAt ? new Date(data.evaluatedAt).toLocaleString("es-CL") : "—"}\n` +
+    `Verificacion publica: ${data.verifyUrl}`;
+  if (compliant) {
+    calloutBox(s, calloutTitle, calloutBody);
+  } else {
+    warningBox(s, calloutTitle, calloutBody);
+  }
 
   // Tabla score por estándar
   h2(s, "Resumen por estándar");
