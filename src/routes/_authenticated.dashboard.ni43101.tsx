@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap } from "leaflet";
 import { ProjectMap } from "@/components/ProjectMap";
 import { useProjects } from "@/hooks/useProjects";
+import { useQualifiedPersons } from "@/hooks/useQualifiedPersons";
 import {
   ALL_SECTIONS,
   exportNI43101,
