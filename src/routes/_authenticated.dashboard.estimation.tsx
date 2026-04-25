@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity, Box as BoxIcon } from "lucide-react";
 import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
+import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
@@ -200,6 +201,17 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
           <span className="text-[9px] text-signal-amber font-mono ml-auto">OK requiere variograma — pendiente</span>
         )}
       </div>
+
+      {model.status === "complete" && (
+        <div className="pt-2 border-t border-border">
+          <EconomicScenariosPanel
+            modelId={model.id}
+            modelName={model.name}
+            commodity={model.commodity}
+            writable={writable}
+          />
+        </div>
+      )}
     </div>
   );
 }
