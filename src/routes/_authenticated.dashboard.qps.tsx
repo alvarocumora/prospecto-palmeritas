@@ -16,6 +16,7 @@ import {
   CheckCircle2, Clock, FileSignature, BadgeCheck, Loader2, RotateCcw,
 } from "lucide-react";
 import { ComplianceMatrix } from "@/components/qps/ComplianceMatrix";
+import { SignatureEnvelopesPanel } from "@/components/qps/SignatureEnvelopesPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/qps")({
   head: () => ({
@@ -55,7 +56,7 @@ function QpsPage() {
     upsertSection, assignQpToSection, signSection, revokeSignature,
   } = useQualifiedPersons();
 
-  const [tab, setTab] = useState<"qps" | "reports" | "compliance">("qps");
+  const [tab, setTab] = useState<"qps" | "reports" | "compliance" | "signatures">("qps");
   const [qpDialog, setQpDialog] = useState<{ open: boolean; editing: QualifiedPerson | null }>({ open: false, editing: null });
   const [reportDialog, setReportDialog] = useState(false);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
@@ -96,11 +97,12 @@ function QpsPage() {
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance")}>
+      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance" | "signatures")}>
         <TabsList>
           <TabsTrigger value="qps"><UserCheck className="w-3 h-3 mr-1" /> Personas Calificadas ({qps.length})</TabsTrigger>
           <TabsTrigger value="reports"><FileText className="w-3 h-3 mr-1" /> Reportes ({reports.length})</TabsTrigger>
           <TabsTrigger value="compliance"><ShieldCheck className="w-3 h-3 mr-1" /> Compliance</TabsTrigger>
+          <TabsTrigger value="signatures"><FileSignature className="w-3 h-3 mr-1" /> Firmas</TabsTrigger>
         </TabsList>
 
         {/* QPs TAB */}
@@ -234,6 +236,11 @@ function QpsPage() {
               {activeReportId && <ComplianceMatrix reportId={activeReportId} />}
             </div>
           )}
+        </TabsContent>
+
+        {/* SIGNATURES TAB */}
+        <TabsContent value="signatures" className="mt-4">
+          <SignatureEnvelopesPanel />
         </TabsContent>
       </Tabs>
 
