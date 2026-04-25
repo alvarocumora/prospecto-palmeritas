@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity, Box as BoxIcon } from "lucide-react";
 import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
+import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
