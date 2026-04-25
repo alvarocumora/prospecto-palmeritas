@@ -1200,6 +1200,78 @@ export type Database = {
           },
         ]
       }
+      document_signatures: {
+        Row: {
+          created_at: string
+          envelope_id: string
+          id: string
+          ip_address: string | null
+          project_id: string
+          rejection_reason: string | null
+          signature_hmac: string | null
+          signed_at: string | null
+          signed_document_hash: string | null
+          signer_email: string | null
+          signer_name: string
+          signer_role: string
+          signer_user_id: string
+          signing_order: number
+          status: string
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          envelope_id: string
+          id?: string
+          ip_address?: string | null
+          project_id: string
+          rejection_reason?: string | null
+          signature_hmac?: string | null
+          signed_at?: string | null
+          signed_document_hash?: string | null
+          signer_email?: string | null
+          signer_name: string
+          signer_role: string
+          signer_user_id: string
+          signing_order?: number
+          status?: string
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          envelope_id?: string
+          id?: string
+          ip_address?: string | null
+          project_id?: string
+          rejection_reason?: string | null
+          signature_hmac?: string | null
+          signed_at?: string | null
+          signed_document_hash?: string | null
+          signer_email?: string | null
+          signer_name?: string
+          signer_role?: string
+          signer_user_id?: string
+          signing_order?: number
+          status?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_signatures_envelope_id_fkey"
+            columns: ["envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_signatures_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_core_logs: {
         Row: {
           ag_gpt: number | null
@@ -4547,6 +4619,122 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      signature_audit_trail: {
+        Row: {
+          action: string
+          actor_name: string | null
+          actor_user_id: string | null
+          created_at: string
+          envelope_id: string
+          hash_chain: string | null
+          id: string
+          payload: Json | null
+          project_id: string
+        }
+        Insert: {
+          action: string
+          actor_name?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          envelope_id: string
+          hash_chain?: string | null
+          id?: string
+          payload?: Json | null
+          project_id: string
+        }
+        Update: {
+          action?: string
+          actor_name?: string | null
+          actor_user_id?: string | null
+          created_at?: string
+          envelope_id?: string
+          hash_chain?: string | null
+          id?: string
+          payload?: Json | null
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_audit_trail_envelope_id_fkey"
+            columns: ["envelope_id"]
+            isOneToOne: false
+            referencedRelation: "signature_envelopes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_audit_trail_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      signature_envelopes: {
+        Row: {
+          completed_at: string | null
+          completed_signers: number
+          created_at: string
+          created_by: string
+          document_hash: string
+          document_ref_id: string | null
+          document_storage_path: string | null
+          document_title: string
+          document_type: string
+          expires_at: string | null
+          id: string
+          metadata: Json | null
+          project_id: string
+          required_signers: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_signers?: number
+          created_at?: string
+          created_by: string
+          document_hash: string
+          document_ref_id?: string | null
+          document_storage_path?: string | null
+          document_title: string
+          document_type: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id: string
+          required_signers?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          completed_signers?: number
+          created_at?: string
+          created_by?: string
+          document_hash?: string
+          document_ref_id?: string | null
+          document_storage_path?: string | null
+          document_title?: string
+          document_type?: string
+          expires_at?: string | null
+          id?: string
+          metadata?: Json | null
+          project_id?: string
+          required_signers?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_envelopes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stockpile_volumes: {
         Row: {
