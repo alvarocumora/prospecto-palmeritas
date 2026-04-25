@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { useSignatureEnvelopes, type SignatureEnvelope } from "@/hooks/useSignatureEnvelopes";
 import { useTeam } from "@/hooks/useTeam";
+import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
