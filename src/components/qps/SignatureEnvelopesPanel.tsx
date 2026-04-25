@@ -27,7 +27,8 @@ const SIGNER_ROLES = [
 export function SignatureEnvelopesPanel() {
   const { user } = useAuth();
   const { envelopes, signatures, loading, createEnvelope, signEnvelope, rejectEnvelope } = useSignatureEnvelopes();
-  const { members } = useTeam();
+  const { active } = useProjects();
+  const { members } = useTeam(active?.id ?? null);
   const [createOpen, setCreateOpen] = useState(false);
 
   const sigsByEnv = useMemo(() => {
