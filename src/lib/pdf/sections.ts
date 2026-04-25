@@ -1257,3 +1257,201 @@ export function renderSection14bis_ResourceEstimates(s: PdfState, data: Resource
     "Compósitos de longitud fija pueden suavizar leyes en intercepts cortos de alta ley — revisar registro original para vetas estrechas.",
   ]);
 }
+
+/* ============================================================
+   §19 ECONOMIC ANALYSIS (NSR/NPV/IRR)
+   ============================================================ */
+
+export type EconomicAnalysisData = {
+  scenarios: Array<{
+    name: string;
+    model_name: string;
+    commodity: string;
+    commodity_price_usd: number;
+    price_unit: string;
+    recovery_pct: number;
+    royalty_pct: number;
+    discount_rate_pct: number;
+    annual_throughput_t: number;
+    capex_usd: number;
+    mining_cost_usd_t: number;
+    processing_cost_usd_t: number;
+    ga_cost_usd_t: number;
+    nsr_cutoff_usd_t: number | null;
+    ore_tonnes: number | null;
+    waste_tonnes: number | null;
+    strip_ratio: number | null;
+    mean_grade: number | null;
+    metal_payable: number | null;
+    gross_revenue_usd: number | null;
+    total_opex_usd: number | null;
+    ebitda_usd: number | null;
+    npv_usd: number | null;
+    irr_pct: number | null;
+    payback_years: number | null;
+    mine_life_years: number | null;
+    computed_at: string | null;
+  }>;
+  schedule?: Array<{
+    scenario_name: string;
+    year: number;
+    ore_tonnes: number;
+    waste_tonnes: number;
+    revenue_usd: number;
+    opex_usd: number;
+    cashflow_usd: number;
+    cumulative_cashflow_usd: number;
+  }>;
+};
+
+function fmtUsdShort(v: number | null | undefined): string {
+  if (v == null || !Number.isFinite(v)) return "—";
+  if (Math.abs(v) >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
+  if (Math.abs(v) >= 1e6) return `$${(v / 1e6).toFixed(1)}M`;
+  if (Math.abs(v) >= 1e3) return `$${(v / 1e3).toFixed(0)}k`;
+  return `$${v.toFixed(0)}`;
+}
+
+export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnalysisData | null) {
+  h1(s, "Análisis económico (NSR · NPV · IRR)");
+  p(
+    s,
+    "Esta sección presenta los resultados del motor económico interno de la plataforma, que aplica un modelo " +
+      "Net Smelter Return (NSR) sobre el modelo de bloques estimado, una heurística de pit-shell por cono flotante, " +
+      "y descuento de flujos de caja anuales (DCF) para producir métricas NPV, IRR y Payback. " +
+      "Los resultados son indicativos para fines de evaluación temprana (PEA-equivalent); para PEA/PFS/FS formal " +
+      "se requiere validación con software dedicado y firma de QP.",
+  );
+
+  if (!data || data.scenarios.length === 0) {
+    warningBox(
+      s,
+      "Sin escenarios económicos calculados",
+      "No se encontraron escenarios económicos en estado 'complete' para los modelos de este proyecto. " +
+        "Sin análisis económico, no se reportan métricas financieras en este informe.",
+    );
+    return;
+  }
+
+  // Resumen de parámetros
+  h2(s, "Parámetros de los escenarios evaluados");
+  tableCaption(s, "Configuración técnico-económica utilizada por escenario.");
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Escenario", "Modelo", "Precio", "Rec. %", "Royalty %", "Discount %", "Capex"]],
+    body: data.scenarios.map((sc) => [
+      sc.name,
+      sc.model_name,
+      `$${sc.commodity_price_usd} ${sc.price_unit.replace("usd_per_", "/")}`,
+      sc.recovery_pct.toFixed(1),
+      sc.royalty_pct.toFixed(1),
+      sc.discount_rate_pct.toFixed(1),
+      fmtUsdShort(sc.capex_usd),
+    ]),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error autotable adds lastAutoTable
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Costos operativos
+  ensureSpace(s, 30);
+  h2(s, "Costos operativos unitarios (USD/t)");
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Escenario", "Mining", "Process", "G&A", "OPEX total/t mineral"]],
+    body: data.scenarios.map((sc) => {
+      const opexT = sc.mining_cost_usd_t + sc.processing_cost_usd_t + sc.ga_cost_usd_t;
+      return [
+        sc.name,
+        `$${sc.mining_cost_usd_t.toFixed(2)}`,
+        `$${sc.processing_cost_usd_t.toFixed(2)}`,
+        `$${sc.ga_cost_usd_t.toFixed(2)}`,
+        `$${opexT.toFixed(2)}`,
+      ];
+    }),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Resultados clave
+  ensureSpace(s, 35);
+  h2(s, "Resultados financieros");
+  tableCaption(s, "Métricas DCF descontadas y vida de mina por escenario. NPV/IRR sensibles al precio de commodity.");
+  autoTable(s.doc, {
+    startY: s.cursorY,
+    head: [["Escenario", "Mineral (t)", "Strip", "NPV", "IRR %", "Payback (a)", "Vida (a)", "EBITDA"]],
+    body: data.scenarios.map((sc) => [
+      sc.name,
+      fmtTonnage(sc.ore_tonnes),
+      sc.strip_ratio != null ? sc.strip_ratio.toFixed(2) : "—",
+      fmtUsdShort(sc.npv_usd),
+      sc.irr_pct != null ? `${sc.irr_pct.toFixed(1)}%` : "—",
+      sc.payback_years != null ? String(sc.payback_years) : "—",
+      sc.mine_life_years != null ? String(sc.mine_life_years) : "—",
+      fmtUsdShort(sc.ebitda_usd),
+    ]),
+    styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text },
+    headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+    alternateRowStyles: { fillColor: COLORS.panel },
+    margin: { left: PAGE.margin, right: PAGE.margin },
+  });
+  // @ts-expect-error
+  s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+
+  // Schedule anual del primer escenario completo (si existe)
+  const baseScenario = data.scenarios[0];
+  const baseSchedule = data.schedule?.filter((r) => r.scenario_name === baseScenario.name) ?? [];
+  if (baseSchedule.length > 0) {
+    ensureSpace(s, 50);
+    h2(s, `Schedule anual de producción — ${baseScenario.name}`);
+    tableCaption(s, "Flujo de caja anual no descontado. Año 0 = inversión inicial (Capex).");
+    autoTable(s.doc, {
+      startY: s.cursorY,
+      head: [["Año", "Mineral (t)", "Estéril (t)", "Ingresos", "OPEX", "Cashflow", "Acumulado"]],
+      body: baseSchedule.slice(0, 25).map((r) => [
+        `Y${r.year}`,
+        fmtTonnage(r.ore_tonnes),
+        fmtTonnage(r.waste_tonnes),
+        fmtUsdShort(r.revenue_usd),
+        `-${fmtUsdShort(r.opex_usd)}`,
+        fmtUsdShort(r.cashflow_usd),
+        fmtUsdShort(r.cumulative_cashflow_usd),
+      ]),
+      styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.5, textColor: COLORS.text },
+      headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
+      alternateRowStyles: { fillColor: COLORS.panel },
+      margin: { left: PAGE.margin, right: PAGE.margin },
+    });
+    // @ts-expect-error
+    s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
+  }
+
+  // Limitaciones técnicas
+  ensureSpace(s, 35);
+  h2(s, "Limitaciones del modelo económico");
+  bullet(s, [
+    "Pit-shell heurístico (cono flotante con ángulo único): no sustituye un pit-optimizer Lerchs-Grossmann (Whittle/MineSight). Las cifras de tonelaje en pit pueden variar ±20%.",
+    "El precio de commodity se asume constante a lo largo de la vida de mina; no se modelan curvas forward ni hedging.",
+    "Capex se gasta íntegramente en el Año 0; un cronograma realista de inversión escalonada modificaría el NPV.",
+    "Recuperación metalúrgica única — no se modelan recuperaciones por dominio mineralógico ni penalizaciones por impurezas distintas a refining cost.",
+    "El cálculo de IRR usa Newton-Raphson sobre el flujo descontado; en flujos no monotónicos pueden existir múltiples raíces.",
+    "Royalty modelado como porcentaje plano sobre revenue; la legislación chilena (Ley 21.591 de royalty minero) requiere modelado escalonado por margen operacional.",
+    "Análisis de sensibilidad (precio ±20%, OPEX ±15%, recuperación ±5%) NO está incluido en esta versión del informe — debe agregarse antes de PEA formal.",
+  ]);
+
+  // Disclaimer firma QP
+  calloutBox(
+    s,
+    "Validación requerida",
+    "Estos resultados constituyen un análisis económico interno preliminar (scoping-level). " +
+      "Su uso para decisiones de inversión, divulgación pública o reportes regulatorios requiere validación independiente, " +
+      "auditoría de los costos, y firma formal de una Persona Calificada (QP) bajo NI 43-101 §19.",
+  );
+}
