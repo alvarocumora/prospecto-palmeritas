@@ -1540,6 +1540,225 @@ export type Database = {
           },
         ]
       }
+      economic_scenarios: {
+        Row: {
+          annual_throughput_t: number
+          capex_usd: number
+          commodity_price_usd: number
+          computed_at: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          discount_rate_pct: number
+          ebitda_usd: number | null
+          ga_cost_usd_t: number
+          gross_revenue_usd: number | null
+          id: string
+          irr_pct: number | null
+          mean_grade: number | null
+          metal_payable: number | null
+          mine_life_years: number | null
+          mining_cost_usd_t: number
+          model_id: string
+          name: string
+          notes: string | null
+          npv_usd: number | null
+          nsr_cutoff_usd_t: number | null
+          ore_tonnes: number | null
+          payable_pct: number
+          payback_years: number | null
+          price_unit: string
+          processing_cost_usd_t: number
+          project_id: string
+          ramp_up_years: number
+          recovery_pct: number
+          refining_cost_usd_oz: number
+          royalty_pct: number
+          slope_angle_deg: number
+          status: string
+          strip_ratio: number | null
+          sustaining_capex_usd_t: number
+          total_capex_usd: number | null
+          total_opex_usd: number | null
+          transport_cost_usd_t: number
+          updated_at: string
+          waste_cost_usd_t: number
+          waste_tonnes: number | null
+        }
+        Insert: {
+          annual_throughput_t?: number
+          capex_usd?: number
+          commodity_price_usd?: number
+          computed_at?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          discount_rate_pct?: number
+          ebitda_usd?: number | null
+          ga_cost_usd_t?: number
+          gross_revenue_usd?: number | null
+          id?: string
+          irr_pct?: number | null
+          mean_grade?: number | null
+          metal_payable?: number | null
+          mine_life_years?: number | null
+          mining_cost_usd_t?: number
+          model_id: string
+          name: string
+          notes?: string | null
+          npv_usd?: number | null
+          nsr_cutoff_usd_t?: number | null
+          ore_tonnes?: number | null
+          payable_pct?: number
+          payback_years?: number | null
+          price_unit?: string
+          processing_cost_usd_t?: number
+          project_id: string
+          ramp_up_years?: number
+          recovery_pct?: number
+          refining_cost_usd_oz?: number
+          royalty_pct?: number
+          slope_angle_deg?: number
+          status?: string
+          strip_ratio?: number | null
+          sustaining_capex_usd_t?: number
+          total_capex_usd?: number | null
+          total_opex_usd?: number | null
+          transport_cost_usd_t?: number
+          updated_at?: string
+          waste_cost_usd_t?: number
+          waste_tonnes?: number | null
+        }
+        Update: {
+          annual_throughput_t?: number
+          capex_usd?: number
+          commodity_price_usd?: number
+          computed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          discount_rate_pct?: number
+          ebitda_usd?: number | null
+          ga_cost_usd_t?: number
+          gross_revenue_usd?: number | null
+          id?: string
+          irr_pct?: number | null
+          mean_grade?: number | null
+          metal_payable?: number | null
+          mine_life_years?: number | null
+          mining_cost_usd_t?: number
+          model_id?: string
+          name?: string
+          notes?: string | null
+          npv_usd?: number | null
+          nsr_cutoff_usd_t?: number | null
+          ore_tonnes?: number | null
+          payable_pct?: number
+          payback_years?: number | null
+          price_unit?: string
+          processing_cost_usd_t?: number
+          project_id?: string
+          ramp_up_years?: number
+          recovery_pct?: number
+          refining_cost_usd_oz?: number
+          royalty_pct?: number
+          slope_angle_deg?: number
+          status?: string
+          strip_ratio?: number | null
+          sustaining_capex_usd_t?: number
+          total_capex_usd?: number | null
+          total_opex_usd?: number | null
+          transport_cost_usd_t?: number
+          updated_at?: string
+          waste_cost_usd_t?: number
+          waste_tonnes?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "economic_scenarios_model_id_fkey"
+            columns: ["model_id"]
+            isOneToOne: false
+            referencedRelation: "resource_models"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "economic_scenarios_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      economic_schedule: {
+        Row: {
+          capex_usd: number
+          cashflow_usd: number
+          created_at: string
+          cumulative_cashflow_usd: number
+          discounted_cashflow_usd: number
+          id: string
+          mean_grade: number | null
+          metal_payable: number
+          opex_usd: number
+          ore_tonnes: number
+          project_id: string
+          revenue_usd: number
+          scenario_id: string
+          waste_tonnes: number
+          year: number
+        }
+        Insert: {
+          capex_usd?: number
+          cashflow_usd?: number
+          created_at?: string
+          cumulative_cashflow_usd?: number
+          discounted_cashflow_usd?: number
+          id?: string
+          mean_grade?: number | null
+          metal_payable?: number
+          opex_usd?: number
+          ore_tonnes?: number
+          project_id: string
+          revenue_usd?: number
+          scenario_id: string
+          waste_tonnes?: number
+          year: number
+        }
+        Update: {
+          capex_usd?: number
+          cashflow_usd?: number
+          created_at?: string
+          cumulative_cashflow_usd?: number
+          discounted_cashflow_usd?: number
+          id?: string
+          mean_grade?: number | null
+          metal_payable?: number
+          opex_usd?: number
+          ore_tonnes?: number
+          project_id?: string
+          revenue_usd?: number
+          scenario_id?: string
+          waste_tonnes?: number
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "economic_schedule_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "economic_schedule_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "economic_scenarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       exploration_campaigns: {
         Row: {
           aoi_geojson: Json | null
@@ -3759,6 +3978,73 @@ export type Database = {
             columns: ["rule_id"]
             isOneToOne: false
             referencedRelation: "compliance_rules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      resource_block_economics: {
+        Row: {
+          block_id: string
+          created_at: string
+          extraction_year: number | null
+          id: string
+          in_pit: boolean
+          insitu_value_usd: number | null
+          is_ore: boolean
+          margin_usd_t: number | null
+          nsr_usd_t: number | null
+          project_id: string
+          scenario_id: string
+          total_cost_usd_t: number | null
+        }
+        Insert: {
+          block_id: string
+          created_at?: string
+          extraction_year?: number | null
+          id?: string
+          in_pit?: boolean
+          insitu_value_usd?: number | null
+          is_ore?: boolean
+          margin_usd_t?: number | null
+          nsr_usd_t?: number | null
+          project_id: string
+          scenario_id: string
+          total_cost_usd_t?: number | null
+        }
+        Update: {
+          block_id?: string
+          created_at?: string
+          extraction_year?: number | null
+          id?: string
+          in_pit?: boolean
+          insitu_value_usd?: number | null
+          is_ore?: boolean
+          margin_usd_t?: number | null
+          nsr_usd_t?: number | null
+          project_id?: string
+          scenario_id?: string
+          total_cost_usd_t?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resource_block_economics_block_id_fkey"
+            columns: ["block_id"]
+            isOneToOne: false
+            referencedRelation: "resource_blocks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_block_economics_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "resource_block_economics_scenario_id_fkey"
+            columns: ["scenario_id"]
+            isOneToOne: false
+            referencedRelation: "economic_scenarios"
             referencedColumns: ["id"]
           },
         ]
