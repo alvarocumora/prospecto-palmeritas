@@ -22,6 +22,7 @@ import {
   renderSection13_Conclusions,
   renderSection14_References,
   renderSection14bis_ResourceEstimates,
+  renderSection19_EconomicAnalysis,
   renderSection1_Intro,
   renderSection2_Reliance,
   renderSection3_Property,
