@@ -201,6 +201,17 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
           <span className="text-[9px] text-signal-amber font-mono ml-auto">OK requiere variograma — pendiente</span>
         )}
       </div>
+
+      {model.status === "complete" && (
+        <div className="pt-2 border-t border-border">
+          <EconomicScenariosPanel
+            modelId={model.id}
+            modelName={model.name}
+            commodity={model.commodity}
+            writable={writable}
+          />
+        </div>
+      )}
     </div>
   );
 }
