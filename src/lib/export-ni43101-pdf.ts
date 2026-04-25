@@ -273,6 +273,71 @@ async function fetchResourceEstimates(projectId: string | null | undefined): Pro
   }
 }
 
+async function fetchEconomicAnalysis(projectId: string | null | undefined): Promise<EconomicAnalysisData | null> {
+  if (!projectId) return null;
+  try {
+    const { data: scs, error } = await supabase
+      .from("economic_scenarios")
+      .select("id, name, model_id, commodity_price_usd, price_unit, recovery_pct, royalty_pct, discount_rate_pct, annual_throughput_t, capex_usd, mining_cost_usd_t, processing_cost_usd_t, ga_cost_usd_t, nsr_cutoff_usd_t, ore_tonnes, waste_tonnes, strip_ratio, mean_grade, metal_payable, gross_revenue_usd, total_opex_usd, ebitda_usd, npv_usd, irr_pct, payback_years, mine_life_years, computed_at, resource_models(name, commodity)")
+      .eq("project_id", projectId)
+      .eq("status", "complete")
+      .order("computed_at", { ascending: false });
+    if (error || !scs || scs.length === 0) return null;
+
+    const scenarios = (scs as any[]).map((sc) => ({
+      name: sc.name,
+      model_name: sc.resource_models?.name ?? "—",
+      commodity: sc.resource_models?.commodity ?? "—",
+      commodity_price_usd: sc.commodity_price_usd,
+      price_unit: sc.price_unit,
+      recovery_pct: sc.recovery_pct,
+      royalty_pct: sc.royalty_pct,
+      discount_rate_pct: sc.discount_rate_pct,
+      annual_throughput_t: sc.annual_throughput_t,
+      capex_usd: sc.capex_usd,
+      mining_cost_usd_t: sc.mining_cost_usd_t,
+      processing_cost_usd_t: sc.processing_cost_usd_t,
+      ga_cost_usd_t: sc.ga_cost_usd_t,
+      nsr_cutoff_usd_t: sc.nsr_cutoff_usd_t,
+      ore_tonnes: sc.ore_tonnes,
+      waste_tonnes: sc.waste_tonnes,
+      strip_ratio: sc.strip_ratio,
+      mean_grade: sc.mean_grade,
+      metal_payable: sc.metal_payable,
+      gross_revenue_usd: sc.gross_revenue_usd,
+      total_opex_usd: sc.total_opex_usd,
+      ebitda_usd: sc.ebitda_usd,
+      npv_usd: sc.npv_usd,
+      irr_pct: sc.irr_pct,
+      payback_years: sc.payback_years,
+      mine_life_years: sc.mine_life_years,
+      computed_at: sc.computed_at,
+    }));
+
+    // Schedule del primer escenario
+    const baseId = (scs as any[])[0].id;
+    const { data: schRows } = await supabase
+      .from("economic_schedule")
+      .select("year, ore_tonnes, waste_tonnes, revenue_usd, opex_usd, cashflow_usd, cumulative_cashflow_usd")
+      .eq("scenario_id", baseId)
+      .order("year");
+    const schedule = (schRows ?? []).map((r: any) => ({
+      scenario_name: scenarios[0].name,
+      year: r.year,
+      ore_tonnes: r.ore_tonnes,
+      waste_tonnes: r.waste_tonnes,
+      revenue_usd: r.revenue_usd,
+      opex_usd: r.opex_usd,
+      cashflow_usd: r.cashflow_usd,
+      cumulative_cashflow_usd: r.cumulative_cashflow_usd,
+    }));
+
+    return { scenarios, schedule };
+  } catch {
+    return null;
+  }
+}
+
 async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
   if (!reportId) return null;
   try {
