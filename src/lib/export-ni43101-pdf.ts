@@ -35,6 +35,7 @@ import {
   renderSection9_Drilling,
   renderTocPlaceholder,
   type ComplianceAnnexData,
+  type EconomicAnalysisData,
   type Ni43101Validations,
   type ResourceEstimateData,
 } from "./pdf/sections";
