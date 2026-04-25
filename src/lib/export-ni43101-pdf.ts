@@ -243,6 +243,7 @@ export type Ni43101SectionId =
   | "qaqc"
   | "dataVerification"
   | "resourceEstimates"
+  | "economicAnalysis"
   | "budget"
   | "conclusions"
   | "references"
@@ -253,7 +254,7 @@ export type Ni43101SectionId =
 export const ALL_SECTIONS: Ni43101SectionId[] = [
   "execSummary","intro","reliance","property","zoning","climate","history","geology",
   "depositType","exploration","drilling","qaqc","dataVerification","resourceEstimates",
-  "budget","conclusions","references","annexA","annexB","annexC",
+  "economicAnalysis","budget","conclusions","references","annexA","annexB","annexC",
 ];
 
 async function fetchResourceEstimates(projectId: string | null | undefined): Promise<ResourceEstimateData | null> {
