@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { fetchGeologyData } from "@/services/geology.service";
 
 export type LithologyUnit = {
@@ -69,29 +69,21 @@ export type GeologyData = {
   references: GeoReference[];
 };
 
+function getErrorMessage(error: unknown) {
+  if (!error) return null;
+  return error instanceof Error ? error.message : "Error loading geology data";
+}
+
 export function useGeologyData() {
-  const [data, setData] = useState<GeologyData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const query = useQuery({
+    queryKey: ["geology-data"],
+    queryFn: fetchGeologyData,
+    staleTime: 1000 * 60 * 10,
+  });
 
-  useEffect(() => {
-    let cancelled = false;
-
-    fetchGeologyData()
-      .then((geologyData) => {
-        if (!cancelled) setData(geologyData);
-      })
-      .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : "Error loading geology data");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return { data, loading, error };
+  return {
+    data: query.data ?? null,
+    loading: query.isLoading,
+    error: getErrorMessage(query.error),
+  };
 }
