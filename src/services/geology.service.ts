@@ -6,7 +6,7 @@ import type {
   GeoReference,
   LithologyUnit,
   Mineral,
-} from "@/hooks/useGeologyData";
+} from "@/types/geology";
 
 export async function fetchGeologyData(): Promise<GeologyData> {
   const [litho, alteration, minerals, features, references] = await Promise.all([
