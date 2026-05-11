@@ -7,4 +7,5 @@ export type * from "./geophysics";
 export type * from "./jobs";
 export type * from "./miningConcessions";
 export type * from "./requestContext";
+export type * from "./targetContext";
 export type * from "./usage";
