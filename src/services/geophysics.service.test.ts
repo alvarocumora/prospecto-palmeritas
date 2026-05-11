@@ -15,16 +15,19 @@ type QueryResult = {
 };
 
 function queryResult(result: QueryResult) {
+  const promise = Promise.resolve(result);
   const query = {
     select: vi.fn(),
     order: vi.fn(),
     or: vi.fn(),
+    then: promise.then.bind(promise),
+    catch: promise.catch.bind(promise),
+    finally: promise.finally.bind(promise),
   };
 
   query.select.mockReturnValue(query);
   query.order.mockReturnValue(query);
   query.or.mockReturnValue(query);
-  Object.assign(query, Promise.resolve(result));
 
   return query;
 }
