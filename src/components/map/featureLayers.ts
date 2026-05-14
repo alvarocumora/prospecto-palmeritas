@@ -1,11 +1,18 @@
 import type { Map as LeafletMap } from "leaflet";
 import { CENTER, type AnyFC, type LeafletNS, sourceLine } from "./types";
 
-/** Adds AOI/veins/palms/workings/drills to the map and fits bounds. */
+const RING_COLORS: Record<number, string> = {
+  1: "#F0C96B", // gold — Discovery
+  2: "#CD7F32", // copper — Step-out
+  3: "#5DA3DD", // blue — Reserve
+};
+const RING_LABELS: Record<number, string> = { 1: "R1", 2: "R2", 3: "R3" };
+
+/** Adds AOI/veins/palms/workings/drills (+ optional anomalies) and fits bounds. */
 export function addProjectFeatures(
   L: LeafletNS,
   map: LeafletMap,
-  data: { aoi: AnyFC; veins: AnyFC; palms: AnyFC; workings: AnyFC; drills: AnyFC }
+  data: { aoi: AnyFC; veins: AnyFC; palms: AnyFC; workings: AnyFC; drills: AnyFC; anomalies?: AnyFC }
 ) {
   // AOI centroid
   const centroidIcon = L.divIcon({
