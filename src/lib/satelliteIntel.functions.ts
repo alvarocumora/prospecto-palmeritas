@@ -36,8 +36,9 @@ export type StacItem = {
   cloudCover: number | null;
   thumbnailUrl: string | null;
   stacHref: string | null;
-  assets: JsonMap;
-  properties: JsonMap;
+  // Pre-serializado a JSON string para cruzar el RPC sin problemas de tipos.
+  assetsJson: string;
+  propertiesJson: string;
 };
 
 async function postSearch(stacUrl: string, body: Record<string, unknown>): Promise<unknown> {
@@ -54,7 +55,7 @@ async function postSearch(stacUrl: string, body: Record<string, unknown>): Promi
 
 function normalizeFeature(f: any, collection: string): StacItem {
   const props = (f?.properties ?? {}) as Record<string, unknown>;
-  const assets = (f?.assets ?? {}) as Record<string, { href: string; type?: string; title?: string }>;
+  const assets = (f?.assets ?? {}) as Record<string, { href?: string; type?: string; title?: string }>;
   const bbox = Array.isArray(f?.bbox) && f.bbox.length >= 4
     ? ([f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]] as [number, number, number, number])
     : ([0, 0, 0, 0] as [number, number, number, number]);
@@ -72,8 +73,8 @@ function normalizeFeature(f: any, collection: string): StacItem {
     cloudCover: cloud,
     thumbnailUrl: thumb,
     stacHref: self,
-    assets,
-    properties: props,
+    assetsJson: JSON.stringify(assets),
+    propertiesJson: JSON.stringify(props),
   };
 }
 
