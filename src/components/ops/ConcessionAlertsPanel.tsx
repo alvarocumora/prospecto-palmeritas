@@ -34,6 +34,7 @@ export function ConcessionAlertsPanel({ projectId }: { projectId: string | null 
     useConcessionAlerts(projectId);
   const [syncing, setSyncing] = useState(false);
   const [filter, setFilter] = useState<"all" | "unread" | "critical">("unread");
+  const [showSettings, setShowSettings] = useState(false);
 
   const visible = useMemo(() => {
     if (filter === "unread") return alerts.filter((a) => !a.is_read);
