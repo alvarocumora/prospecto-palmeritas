@@ -1,15 +1,18 @@
 import { useState } from "react";
-import { Download, Loader2, FileJson, FileSpreadsheet } from "lucide-react";
+import { Download, Loader2, FileJson, FileSpreadsheet, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import {
+  buildExportMetadata,
   buildFeatureCollection,
   downloadBlob,
+  metadataToCsv,
   rowsToCsv,
   satelliteAnomaliesToFeatures,
   geophysicsAnomaliesToFeatures,
   geologicalFeaturesToFeatures,
   prospectivityCellsToFeatures,
+  type DatasetKey,
 } from "@/lib/geoExport";
 
 interface Props {
