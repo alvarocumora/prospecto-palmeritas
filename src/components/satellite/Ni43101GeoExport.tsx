@@ -180,6 +180,15 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
                   : <FileSpreadsheet className="w-3 h-3" />}
                 CSV
               </button>
+              <button
+                onClick={() => downloadMetadataOnly(d.key)}
+                disabled={busy !== null}
+                className="text-[10px] font-mono px-2 py-1 rounded border border-border hover:border-gold/40 disabled:opacity-40 inline-flex items-center gap-1"
+                title="Descargar diccionario de campos / metadatos"
+              >
+                <FileText className="w-3 h-3" />
+                Meta
+              </button>
             </div>
           </div>
         ))}
