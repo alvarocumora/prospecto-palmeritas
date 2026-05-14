@@ -161,6 +161,7 @@ function CatastroPage() {
       {tab === "patents" && user && <PatentCalendar projectId={active.id} userId={user.id} />}
       {tab === "overlaps" && <OverlapInspector projectId={active.id} />}
       {tab === "watches" && user && <WatchManager projectId={active.id} userId={user.id} />}
+      {tab === "history" && <ConcessionChangeHistoryPanel projectId={active.id} />}
       {tab === "sync" && <SyncLog projectId={active.id} />}
     </div>
   );
