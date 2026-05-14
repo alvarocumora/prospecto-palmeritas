@@ -5639,6 +5639,80 @@ export type Database = {
           },
         ]
       }
+      insar_alert_actions: {
+        Row: {
+          action_type: string
+          created_at: string
+          created_by: string
+          follow_up_task_id: string | null
+          id: string
+          insar_id: string
+          metadata: Json
+          notes: string | null
+          project_id: string
+          recommendation: string | null
+          severity_at_time: string | null
+          velocity_mm_year: number | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          created_by: string
+          follow_up_task_id?: string | null
+          id?: string
+          insar_id: string
+          metadata?: Json
+          notes?: string | null
+          project_id: string
+          recommendation?: string | null
+          severity_at_time?: string | null
+          velocity_mm_year?: number | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          created_by?: string
+          follow_up_task_id?: string | null
+          id?: string
+          insar_id?: string
+          metadata?: Json
+          notes?: string | null
+          project_id?: string
+          recommendation?: string | null
+          severity_at_time?: string | null
+          velocity_mm_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insar_alert_actions_follow_up_task_id_fkey"
+            columns: ["follow_up_task_id"]
+            isOneToOne: false
+            referencedRelation: "follow_up_tasks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insar_alert_actions_insar_id_fkey"
+            columns: ["insar_id"]
+            isOneToOne: false
+            referencedRelation: "insar_displacement"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "insar_alert_actions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "insar_alert_actions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       insar_displacement: {
         Row: {
           alert_severity: string | null
