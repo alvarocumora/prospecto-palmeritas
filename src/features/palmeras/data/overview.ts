@@ -8,9 +8,9 @@ export const PALMERAS_OVERVIEW_METRICS = [
 
 export const PALMERAS_PROJECT_PHASES = [
   { n: 1, range: "Meses 1–2", title: "Muestreo superficial", desc: "chip + canal + grab", active: true },
-  { n: 2, range: "Meses 3–4", title: "Geofísica IP", desc: "lineamientos + targets drill" },
-  { n: 3, range: "Meses 5–8", title: "Sondajes DDH", desc: "4 perforaciones 1,030 m" },
-  { n: 4, range: "Meses 9–12", title: "Análisis + reporte", desc: "estimación recursos 43-101" },
+  { n: 2, range: "Meses 3–4", title: "Geofísica IP", desc: "lineamientos + targets drill", active: false },
+  { n: 3, range: "Meses 5–8", title: "Sondajes DDH", desc: "4 perforaciones 1,030 m", active: false },
+  { n: 4, range: "Meses 9–12", title: "Análisis + reporte", desc: "estimación recursos 43-101", active: false },
 ] as const;
 
 export const PALMERAS_OPERATIONAL_ALERTS = [
