@@ -820,3 +820,183 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
 
     return { summaries, generatedAt: new Date().toISOString() };
   });
+
+// ============================================================================
+// InSAR Alert Workflow — Tasks + Recommendations + History
+// ============================================================================
+
+const RunWorkflowInput = z.object({
+  projectId: z.string().uuid(),
+  dryRun: z.boolean().optional(),
+});
+
+function priorityFor(velocity: number, severity: string | null): "low" | "medium" | "high" | "critical" {
+  const a = Math.abs(velocity);
+  if (severity === "critical" || a >= 30) return "critical";
+  if (a >= 20) return "high";
+  if (a >= 15) return "medium";
+  return "low";
+}
+
+function recommendationFor(asset: string | null, vel: number): string {
+  const dir = vel < 0 ? "subsidencia" : "alzamiento";
+  const a = Math.abs(vel);
+  const base = `Detectada ${dir} de ${a.toFixed(1)} mm/año vía InSAR. `;
+  switch (asset) {
+    case "tailings_dam":
+      return base + "Inspección topográfica del talud aguas abajo, revisión piezómetros, validar borde libre y condición filtros. Considerar campaña LiDAR mensual y revisión QA del FoS según D.S. 248.";
+    case "open_pit":
+      return base + "Inspección visual del banco/berma involucrada, lectura de prismas y radar de talud, evaluar reperfilamiento o desaguado. Revisar cuñas/planos críticos en modelo geomecánico.";
+    case "waste_dump":
+      return base + "Verificar geometría del botadero, drenaje basal y posibles fugas. Reducir ritmo de descarga si la velocidad supera umbral operacional.";
+    case "plant":
+      return base + "Coordinar con mantención estructural: nivelación de equipos, juntas y pernos de anclaje. Programar inspección geotécnica de fundaciones.";
+    default:
+      return base + "Programar inspección de campo, instalar/leer prismas y considerar batimetría/LiDAR para validar la magnitud reportada por satélite.";
+  }
+}
+
+export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => RunWorkflowInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: warnings, error: wErr } = await (supabase.from("insar_displacement") as any)
+      .select("id, asset_name, asset_type, velocity_mm_year, alert_severity, end_date")
+      .eq("project_id", data.projectId)
+      .in("alert_severity", ["warning", "critical"]);
+
+    if (wErr) return { ok: false, error: wErr.message, created: 0, skipped: 0, total: 0 };
+
+    const sites = (warnings ?? []) as any[];
+    if (data.dryRun) return { ok: true, error: null, created: 0, skipped: 0, total: sites.length };
+
+    // Avoid duplicates: skip sites already with an open task linked
+    const insarIds = sites.map((s) => s.id);
+    const { data: existing } = await (supabase.from("insar_alert_actions") as any)
+      .select("insar_id, action_type, follow_up_task_id")
+      .in("insar_id", insarIds.length ? insarIds : ["00000000-0000-0000-0000-000000000000"])
+      .eq("action_type", "task_created");
+    const taskedSet = new Set((existing ?? []).map((r: any) => r.insar_id));
+
+    let created = 0;
+    let skipped = 0;
+    const due = new Date();
+    due.setDate(due.getDate() + 14);
+
+    for (const s of sites) {
+      if (taskedSet.has(s.id)) { skipped++; continue; }
+      const vel = Number(s.velocity_mm_year);
+      const prio = priorityFor(vel, s.alert_severity);
+      const rec = recommendationFor(s.asset_type, vel);
+      const title = `[InSAR ${prio.toUpperCase()}] ${s.asset_name ?? "Sitio"} — ${vel.toFixed(1)} mm/año`;
+
+      // 1. Create follow-up task
+      const { data: task, error: tErr } = await (supabase.from("follow_up_tasks") as any)
+        .insert({
+          project_id: data.projectId,
+          title,
+          description: rec,
+          category: "satellite",
+          priority: prio,
+          status: "open",
+          source: "insar_alert",
+          source_ref: s.id,
+          due_date: due.toISOString().slice(0, 10),
+          created_by: userId,
+        })
+        .select("id")
+        .single();
+
+      if (tErr || !task) { console.error("task insert failed", tErr); continue; }
+
+      // 2. Log action in history
+      await (supabase.from("insar_alert_actions") as any).insert({
+        project_id: data.projectId,
+        insar_id: s.id,
+        follow_up_task_id: task.id,
+        action_type: "task_created",
+        severity_at_time: s.alert_severity,
+        velocity_mm_year: vel,
+        recommendation: rec,
+        notes: `Tarea ${prio} generada automáticamente por workflow InSAR.`,
+        metadata: { asset_type: s.asset_type, end_date: s.end_date },
+        created_by: userId,
+      });
+
+      created++;
+    }
+
+    return { ok: true, error: null, created, skipped, total: sites.length };
+  });
+
+const AddRecInput = z.object({
+  projectId: z.string().uuid(),
+  insarId: z.string().uuid(),
+  actionType: z.enum(["recommendation","status_change","dismissed","escalated","field_inspection","closed"]),
+  recommendation: z.string().min(3).max(2000).optional(),
+  notes: z.string().max(2000).optional(),
+});
+
+export const addInsarAlertAction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => AddRecInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: insar } = await (supabase.from("insar_displacement") as any)
+      .select("alert_severity, velocity_mm_year, asset_type")
+      .eq("id", data.insarId)
+      .maybeSingle();
+
+    const { data: row, error } = await (supabase.from("insar_alert_actions") as any)
+      .insert({
+        project_id: data.projectId,
+        insar_id: data.insarId,
+        action_type: data.actionType,
+        severity_at_time: insar?.alert_severity ?? null,
+        velocity_mm_year: insar?.velocity_mm_year ?? null,
+        recommendation: data.recommendation ?? null,
+        notes: data.notes ?? null,
+        metadata: { asset_type: insar?.asset_type ?? null },
+        created_by: userId,
+      })
+      .select("id")
+      .single();
+
+    if (error) return { ok: false, error: error.message, id: null as string | null };
+    return { ok: true, error: null, id: row?.id ?? null };
+  });
+
+const HistoryInput = z.object({ projectId: z.string().uuid() });
+
+export const getInsarAlertHistory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => HistoryInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+
+    const { data: warnings } = await (supabase.from("insar_displacement") as any)
+      .select("id, asset_name, asset_type, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity, end_date, point_geojson")
+      .eq("project_id", data.projectId)
+      .in("alert_severity", ["warning", "critical"])
+      .order("velocity_mm_year", { ascending: false });
+
+    const { data: actions } = await (supabase.from("insar_alert_actions") as any)
+      .select("id, insar_id, follow_up_task_id, action_type, severity_at_time, velocity_mm_year, recommendation, notes, created_at, created_by")
+      .eq("project_id", data.projectId)
+      .order("created_at", { ascending: false })
+      .limit(500);
+
+    const { data: tasks } = await (supabase.from("follow_up_tasks") as any)
+      .select("id, title, status, priority, due_date, source_ref")
+      .eq("project_id", data.projectId)
+      .eq("source", "insar_alert");
+
+    return {
+      sites: (warnings ?? []) as any[],
+      actions: (actions ?? []) as any[],
+      tasks: (tasks ?? []) as any[],
+    };
+  });
