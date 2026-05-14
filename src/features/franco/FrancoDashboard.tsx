@@ -4,6 +4,7 @@ import type { PalmerasTabId } from "@/features/palmeras/types";
 import { FrancoTopNav } from "./components/FrancoTopNav";
 import { FrancoTabPlaceholder } from "./components/FrancoTabPlaceholder";
 import { FrancoHero } from "./components/FrancoHero";
+import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
 
 export function FrancoDashboard() {
   const [active, setActive] = useState<PalmerasTabId>("overview");
@@ -22,8 +23,14 @@ export function FrancoDashboard() {
     <div className="min-h-screen bg-background text-foreground">
       <FrancoTopNav active={active} setActive={setActive} onExport={handleExport} exporting={exporting} />
       <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
-        {active === "overview" ? <FrancoHero /> : null}
-        <FrancoTabPlaceholder tab={active} />
+        {active === "overview" ? (
+          <>
+            <FrancoHero />
+            <FrancoPertenenciasPanel />
+          </>
+        ) : (
+          <FrancoTabPlaceholder tab={active} />
+        )}
       </main>
     </div>
   );

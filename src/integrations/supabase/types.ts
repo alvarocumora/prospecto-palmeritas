@@ -12506,6 +12506,24 @@ export type Database = {
         }
         Returns: string
       }
+      franco_match_pertenencia: {
+        Args: { p_geom: Json; p_name: string }
+        Returns: {
+          area_ha: number
+          code: string
+          commune: string
+          concession_id: string
+          concession_type: string
+          holder: string
+          match_kind: string
+          name: string
+          overlap_ha: number
+          pct_of_concession: number
+          pct_of_kml: number
+          region: string
+          status: string
+        }[]
+      }
       geojson_to_geom: { Args: { _geo: Json }; Returns: unknown }
       get_concession_change_history: {
         Args: { _concession_id: string; _limit?: number }
