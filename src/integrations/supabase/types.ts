@@ -5534,6 +5534,201 @@ export type Database = {
           },
         ]
       }
+      hyperspectral_products: {
+        Row: {
+          acquisition_date: string
+          algorithm: string
+          area_ha: number | null
+          assemblage:
+            | Database["public"]["Enums"]["alteration_assemblage"]
+            | null
+          bbox_geojson: Json
+          cells_above_threshold: number | null
+          cloud_pct: number | null
+          cog_url: string | null
+          created_at: string
+          created_by: string
+          id: string
+          max_score: number | null
+          mean_score: number | null
+          metadata: Json
+          mineral: Database["public"]["Enums"]["hyperspectral_mineral"]
+          notes: string | null
+          pixel_size_m: number | null
+          project_id: string
+          scene_id: string | null
+          source: string
+          spectral_library: string | null
+          stac_href: string | null
+          threshold: number | null
+          thumbnail_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          acquisition_date: string
+          algorithm?: string
+          area_ha?: number | null
+          assemblage?:
+            | Database["public"]["Enums"]["alteration_assemblage"]
+            | null
+          bbox_geojson: Json
+          cells_above_threshold?: number | null
+          cloud_pct?: number | null
+          cog_url?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          max_score?: number | null
+          mean_score?: number | null
+          metadata?: Json
+          mineral: Database["public"]["Enums"]["hyperspectral_mineral"]
+          notes?: string | null
+          pixel_size_m?: number | null
+          project_id: string
+          scene_id?: string | null
+          source: string
+          spectral_library?: string | null
+          stac_href?: string | null
+          threshold?: number | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          acquisition_date?: string
+          algorithm?: string
+          area_ha?: number | null
+          assemblage?:
+            | Database["public"]["Enums"]["alteration_assemblage"]
+            | null
+          bbox_geojson?: Json
+          cells_above_threshold?: number | null
+          cloud_pct?: number | null
+          cog_url?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          max_score?: number | null
+          mean_score?: number | null
+          metadata?: Json
+          mineral?: Database["public"]["Enums"]["hyperspectral_mineral"]
+          notes?: string | null
+          pixel_size_m?: number | null
+          project_id?: string
+          scene_id?: string | null
+          source?: string
+          spectral_library?: string | null
+          stac_href?: string | null
+          threshold?: number | null
+          thumbnail_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "hyperspectral_products_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "hyperspectral_products_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      insar_displacement: {
+        Row: {
+          alert_severity: string | null
+          ascending: boolean | null
+          asset_name: string | null
+          asset_type: string | null
+          bbox_geojson: Json
+          cog_url: string | null
+          coherence: number | null
+          created_at: string
+          created_by: string
+          cumulative_displacement_mm: number | null
+          end_date: string
+          id: string
+          los_vector: Json | null
+          metadata: Json
+          notes: string | null
+          point_geojson: Json
+          project_id: string
+          reference_date: string
+          source: string
+          time_series: Json | null
+          updated_at: string
+          velocity_mm_year: number
+        }
+        Insert: {
+          alert_severity?: string | null
+          ascending?: boolean | null
+          asset_name?: string | null
+          asset_type?: string | null
+          bbox_geojson: Json
+          cog_url?: string | null
+          coherence?: number | null
+          created_at?: string
+          created_by: string
+          cumulative_displacement_mm?: number | null
+          end_date: string
+          id?: string
+          los_vector?: Json | null
+          metadata?: Json
+          notes?: string | null
+          point_geojson: Json
+          project_id: string
+          reference_date: string
+          source?: string
+          time_series?: Json | null
+          updated_at?: string
+          velocity_mm_year: number
+        }
+        Update: {
+          alert_severity?: string | null
+          ascending?: boolean | null
+          asset_name?: string | null
+          asset_type?: string | null
+          bbox_geojson?: Json
+          cog_url?: string | null
+          coherence?: number | null
+          created_at?: string
+          created_by?: string
+          cumulative_displacement_mm?: number | null
+          end_date?: string
+          id?: string
+          los_vector?: Json | null
+          metadata?: Json
+          notes?: string | null
+          point_geojson?: Json
+          project_id?: string
+          reference_date?: string
+          source?: string
+          time_series?: Json | null
+          updated_at?: string
+          velocity_mm_year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "insar_displacement_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "insar_displacement_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investor_contacts: {
         Row: {
           created_at: string
@@ -10914,6 +11109,66 @@ export type Database = {
           },
         ]
       }
+      stac_acquisitions: {
+        Row: {
+          acquisition_date: string
+          assets: Json
+          bbox_geojson: Json
+          cached_at: string
+          cloud_pct: number | null
+          collection: string
+          id: string
+          project_id: string
+          properties: Json
+          scene_id: string
+          stac_href: string | null
+          thumbnail_url: string | null
+        }
+        Insert: {
+          acquisition_date: string
+          assets?: Json
+          bbox_geojson: Json
+          cached_at?: string
+          cloud_pct?: number | null
+          collection: string
+          id?: string
+          project_id: string
+          properties?: Json
+          scene_id: string
+          stac_href?: string | null
+          thumbnail_url?: string | null
+        }
+        Update: {
+          acquisition_date?: string
+          assets?: Json
+          bbox_geojson?: Json
+          cached_at?: string
+          cloud_pct?: number | null
+          collection?: string
+          id?: string
+          project_id?: string
+          properties?: Json
+          scene_id?: string
+          stac_href?: string | null
+          thumbnail_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stac_acquisitions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "stac_acquisitions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stockpile_volumes: {
         Row: {
           area_m2: number | null
@@ -12150,6 +12405,15 @@ export type Database = {
     }
     Enums: {
       account_type: "mining_owner" | "investor" | "geocapitals_team"
+      alteration_assemblage:
+        | "argillic"
+        | "advanced_argillic"
+        | "phyllic"
+        | "propylitic"
+        | "potassic"
+        | "iron_oxide_gossan"
+        | "silicic_cap"
+        | "unclassified"
       app_role: "super_admin" | "support"
       compliance_standard:
         | "ni43101"
@@ -12168,6 +12432,24 @@ export type Database = {
         | "general"
       follow_up_priority: "low" | "medium" | "high" | "critical"
       follow_up_status: "open" | "in_progress" | "done" | "dismissed"
+      hyperspectral_mineral:
+        | "kaolinite"
+        | "alunite"
+        | "illite"
+        | "sericite"
+        | "muscovite"
+        | "montmorillonite"
+        | "chlorite"
+        | "epidote"
+        | "calcite"
+        | "dolomite"
+        | "hematite"
+        | "goethite"
+        | "jarosite"
+        | "pyrite_oxidized"
+        | "gypsum"
+        | "silica"
+        | "other"
       onboarding_state: "not_started" | "in_progress" | "completed"
       org_role: "owner" | "admin" | "member" | "viewer"
       project_role:
@@ -12319,6 +12601,16 @@ export const Constants = {
   public: {
     Enums: {
       account_type: ["mining_owner", "investor", "geocapitals_team"],
+      alteration_assemblage: [
+        "argillic",
+        "advanced_argillic",
+        "phyllic",
+        "propylitic",
+        "potassic",
+        "iron_oxide_gossan",
+        "silicic_cap",
+        "unclassified",
+      ],
       app_role: ["super_admin", "support"],
       compliance_standard: [
         "ni43101",
@@ -12339,6 +12631,25 @@ export const Constants = {
       ],
       follow_up_priority: ["low", "medium", "high", "critical"],
       follow_up_status: ["open", "in_progress", "done", "dismissed"],
+      hyperspectral_mineral: [
+        "kaolinite",
+        "alunite",
+        "illite",
+        "sericite",
+        "muscovite",
+        "montmorillonite",
+        "chlorite",
+        "epidote",
+        "calcite",
+        "dolomite",
+        "hematite",
+        "goethite",
+        "jarosite",
+        "pyrite_oxidized",
+        "gypsum",
+        "silica",
+        "other",
+      ],
       onboarding_state: ["not_started", "in_progress", "completed"],
       org_role: ["owner", "admin", "member", "viewer"],
       project_role: [
