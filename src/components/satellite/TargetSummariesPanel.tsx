@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Activity, AlertTriangle, CheckCircle2, ChevronDown, Layers, Loader2, MapPin, Mountain, Radar, Search, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
 import { useTargetSatelliteSummaries, type TargetSatelliteSummary } from "@/hooks/useTargetSatelliteSummaries";
 import { cn } from "@/lib/utils";
@@ -19,7 +19,7 @@ const STATUS_LABEL: Record<TargetSatelliteSummary["overallStatus"], string> = {
   alert: "Alerta",
 };
 
-const TREND_ICON: Record<NonNullable<TargetSatelliteSummary["insar"]["trend"]>, JSX.Element> = {
+const TREND_ICON: Record<NonNullable<TargetSatelliteSummary["insar"]["trend"]>, React.ReactNode> = {
   stable: <Activity className="w-3 h-3" />,
   subsiding: <TrendingDown className="w-3 h-3 text-signal-amber" />,
   uplifting: <TrendingUp className="w-3 h-3 text-signal-cyan" />,
