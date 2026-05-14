@@ -20,23 +20,6 @@ interface Props {
   projectName?: string;
 }
 
-  function downloadMetadataOnly(key: DatasetKey) {
-    const meta = buildExportMetadata({
-      dataset: key,
-      format: "geojson",
-      filename: `${slug}_${key}_${stamp}.geojson`,
-      project: { id: pid, name: projectName },
-      recordCount: 0,
-      notes: "Diccionario de campos sin datos (solo schema)",
-    });
-    downloadBlob(
-      JSON.stringify(meta, null, 2),
-      `${slug}_${key}_${stamp}.metadata.json`,
-      "application/json",
-    );
-  }
-
-
 const DATASETS: Array<{ key: DatasetKey; label: string }> = [
   { key: "satellite_anomalies", label: "Anomalías satelitales" },
   { key: "geophysics_anomalies", label: "Anomalías geofísicas" },
