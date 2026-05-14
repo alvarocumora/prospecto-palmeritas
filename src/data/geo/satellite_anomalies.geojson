@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "name": "satellite_anomalies",
+  "metadata": {
+    "project": "Prospecto Palmeras (TRK-ALH-001)",
+    "description": "Anomalías multiespectrales y lineamientos estructurales derivados del Informe Pre-NI 43-101 v3. Sentinel-2 + ASTER · ratios SWIR/NIR/Red.",
+    "source": "Trackmin GeoIntel · Pre-NI 43-101 v3"
+  },
+  "features": [
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "A-4", "name": "Anomalía hidrotermal A-4", "alteration": "Hidrotermal · sericita-cuarzo", "score": 91, "color": "#E85D3A", "radius_m": 90, "source": "Sentinel-2 · banda SWIR/NIR · ASTER ratios" }, "geometry": { "type": "Point", "coordinates": [-71.115471, -33.898438] } },
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "C-4", "name": "Halo de óxidos C-4", "alteration": "Óxidos de Fe · gossan", "score": 84, "color": "#F0B040", "radius_m": 70, "source": "Sentinel-2 · banda 4/2 (Fe-oxide ratio)" }, "geometry": { "type": "Point", "coordinates": [-71.116344, -33.899160] } },
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "A-5", "name": "Anomalía argílica A-5", "alteration": "Arcillas · alteración argílica avanzada", "score": 82, "color": "#9B72CF", "radius_m": 80, "source": "Sentinel-2 · SWIR clay index" }, "geometry": { "type": "Point", "coordinates": [-71.117035, -33.897716] } },
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "A-3", "name": "Anomalía hidrotermal A-3", "alteration": "Hidrotermal · score moderado", "score": 78, "color": "#E85D3A", "radius_m": 60, "source": "Sentinel-2 multiespectral" }, "geometry": { "type": "Point", "coordinates": [-71.116162, -33.896994] } },
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "A-1", "name": "Anomalía A-1 (top norte)", "alteration": "Mixto · óxidos + sericita", "score": 74, "color": "#F0B040", "radius_m": 55, "source": "Sentinel-2 multiespectral" }, "geometry": { "type": "Point", "coordinates": [-71.115289, -33.896272] } },
+    { "type": "Feature", "properties": { "kind": "anomaly", "code": "B-1", "name": "Anomalía B-1 (flanco NE)", "alteration": "Hidrotermal débil", "score": 70, "color": "#E85D3A", "radius_m": 50, "source": "Sentinel-2 multiespectral" }, "geometry": { "type": "Point", "coordinates": [-71.113725, -33.897355] } },
+
+    { "type": "Feature", "properties": { "kind": "lineament", "code": "L-NW1", "name": "Lineamiento estructural NW-SE", "strike": "N130°E", "source": "Hillshade SRTM + Copernicus DEM · interpretación Trackmin" }, "geometry": { "type": "LineString", "coordinates": [[-71.118800, -33.896000], [-71.115471, -33.898438], [-71.112400, -33.900700]] } },
+    { "type": "Feature", "properties": { "kind": "lineament", "code": "L-NS1", "name": "Lineamiento N-S secundario", "strike": "N005°E", "source": "Sentinel-2 + DEM · interpretación Trackmin" }, "geometry": { "type": "LineString", "coordinates": [[-71.115907, -33.896000], [-71.115907, -33.900800]] } }
+  ]
+}
