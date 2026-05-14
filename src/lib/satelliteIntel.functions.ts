@@ -33,7 +33,8 @@ export type StacItem = {
   cloudCover: number | null;
   thumbnailUrl: string | null;
   stacHref: string | null;
-  assets: Record<string, { href: string; type?: string; title?: string }>;
+  // Use unknown for serialization safety; clients cast as needed.
+  assets: Record<string, unknown>;
   properties: Record<string, unknown>;
 };
 
