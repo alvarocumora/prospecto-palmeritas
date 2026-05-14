@@ -197,6 +197,8 @@ export function Ni43101DraftPanel({ projectId }: Props) {
         </div>
       </header>
 
+      <Ni43101GeoExport projectId={projectId} projectName={draft.project.name} />
+
       {/* KPI strip */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-px bg-border">
         <KPI label="Targets" value={s.totalTargets} />
