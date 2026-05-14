@@ -23,9 +23,20 @@ function ProjectsPage() {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
+    const { data: orgRow, error: orgErr } = await supabase
+      .from("organization_members")
+      .select("organization_id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+    if (orgErr || !orgRow) {
+      setSaving(false);
+      toast.error(orgErr?.message ?? "No tienes una organización asignada.");
+      return;
+    }
     const { data, error } = await supabase
       .from("projects")
-      .insert({ ...form, created_by: user.id })
+      .insert({ ...form, created_by: user.id, organization_id: orgRow.organization_id })
       .select()
       .single();
     setSaving(false);
