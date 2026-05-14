@@ -187,7 +187,7 @@ Orden **fijo y no negociable** para informes completos. Variantes en §12 indica
 | 11  | **Malla diamantina propuesta**                   | 1       | Tabla DDH (Hoyo · Anillo · Lat · Lon · …)  |
 | 12  | **Pipeline F1 · F2 · F3 + CAPEX**                | 1       | `commercial_table` + total destacado       |
 | 13  | **Conclusiones y próximos hitos**                | 1       | `HBand(color=ACCENT)` + bullets ▸          |
-| 14  | **Anexo A · Mapas geofísicos y bandas**          | 4       | 5 figuras (TMI-RTP, sigan, SWIR, sílice, OH)|
+| 14  | **Anexo A · Mapas satelitales ESRI (anomalías)** | 3–5     | Overview ESRI + 1 figura ESRI por anomalía + zonas (ver §4.6) |
 | 15  | **Anexo B · Concesión legal + plan minero**      | 1–2     | Ficha legal + tabla plan híbrido + KPIs eco|
 | 16  | **Página de validación** *(obligatoria)*         | 1       | Logo + QR + clave pública (ver §8)         |
 
