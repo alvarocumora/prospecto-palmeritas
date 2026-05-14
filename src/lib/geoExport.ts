@@ -129,35 +129,57 @@ export function geologicalFeaturesToFeatures(rows: Array<Record<string, any>>): 
   }));
 }
 
+// Constante consistente con supabase/functions/prospectivity-grid (WGS84).
+const METERS_PER_DEG_LAT = 111_320;
+
+function round7(n: number): number {
+  // ~1.1 cm de precisión, suficiente para QGIS/ArcGIS sin ruido flotante.
+  return Math.round(n * 1e7) / 1e7;
+}
+
 export function prospectivityCellsToFeatures(rows: Array<Record<string, any>>): GeoFeature[] {
-  return rows.map((r) => {
-    const lat = Number(r.cell_lat);
-    const lng = Number(r.cell_lng);
-    const sizeM = Number(r.cell_size_m ?? 100);
-    const dLat = sizeM / 2 / 111000;
-    const dLng = sizeM / 2 / (111000 * Math.cos((lat * Math.PI) / 180));
-    return {
-      type: "Feature" as const,
-      geometry: {
-        type: "Polygon",
-        coordinates: [[
-          [lng - dLng, lat - dLat],
-          [lng + dLng, lat - dLat],
-          [lng + dLng, lat + dLat],
-          [lng - dLng, lat + dLat],
-          [lng - dLng, lat - dLat],
-        ]],
-      },
-      properties: {
-        id: r.id,
-        run_id: r.run_id,
-        score: r.score,
-        cell_lat: lat,
-        cell_lng: lng,
-        cell_size_m: sizeM,
-        features: r.features,
-        generated_at: r.generated_at,
-      },
-    };
-  });
+  return rows
+    .filter((r) => Number.isFinite(Number(r.cell_lat)) && Number.isFinite(Number(r.cell_lng)))
+    .map((r) => {
+      const lat = Number(r.cell_lat);
+      const lng = Number(r.cell_lng);
+      const rawSize = Number(r.cell_size_m);
+      const sizeM = Number.isFinite(rawSize) && rawSize > 0 ? rawSize : 100;
+
+      const cosLat = Math.cos((lat * Math.PI) / 180);
+      const dLat = sizeM / 2 / METERS_PER_DEG_LAT;
+      const dLng = sizeM / 2 / (METERS_PER_DEG_LAT * Math.max(cosLat, 1e-6));
+
+      // Esquinas redondeadas para que el cierre del anillo sea idéntico al primer vértice.
+      const w = round7(lng - dLng);
+      const e = round7(lng + dLng);
+      const s = round7(lat - dLat);
+      const n = round7(lat + dLat);
+
+      return {
+        type: "Feature" as const,
+        geometry: {
+          type: "Polygon",
+          // Anillo exterior en sentido horario inverso (CCW) según RFC 7946,
+          // primer y último vértice idénticos para cierre válido.
+          coordinates: [[
+            [w, s],
+            [e, s],
+            [e, n],
+            [w, n],
+            [w, s],
+          ]],
+        },
+        properties: {
+          id: r.id,
+          run_id: r.run_id,
+          score: r.score,
+          cell_lat: lat,
+          cell_lng: lng,
+          cell_size_m: sizeM,
+          features: r.features,
+          generated_at: r.generated_at,
+        },
+      };
+    });
 }
