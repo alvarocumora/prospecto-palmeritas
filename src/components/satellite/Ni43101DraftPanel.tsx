@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { Loader2, FileText, Download, Printer, AlertTriangle, CheckCircle2, ChevronDown, ChevronRight } from "lucide-react";
 import { useNi43101Draft } from "@/hooks/useNi43101Draft";
 import type { Ni43101Draft } from "@/lib/ni43101Draft.functions";
+import { Ni43101GeoExport } from "./Ni43101GeoExport";
 
 interface Props { projectId: string | null }
 
