@@ -8,6 +8,7 @@ import veinsData from "@/data/geo/veins.geojson?url";
 import palmsData from "@/data/geo/palm_clusters.geojson?url";
 import workingsData from "@/data/geo/workings.geojson?url";
 import drillsData from "@/data/geo/drill_collars.geojson?url";
+import anomaliesData from "@/data/geo/satellite_anomalies.geojson?url";
 
 import { CENTER, type AnyFC, type LeafletNS } from "./map/types";
 import { buildBasemaps } from "./map/basemaps";
@@ -305,8 +306,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
       const overpassCtl = buildOverpassInfraLayer(L);
       overpassCtl.attach(map);
 
-      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
-        [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
+      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
+        [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
           fetch(u).then((r) => r.json())
         )
       )) as AnyFC[];
@@ -318,6 +319,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
         palms: palmsFC,
         workings: workingsFC,
         drills: drillsFC,
+        anomalies: anomaliesFC,
       });
 
       aoiRef.current = (await loadAoiPolygon()) ?? null;

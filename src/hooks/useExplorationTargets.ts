@@ -76,7 +76,15 @@ export function useExplorationTargets(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+    if (!projectId) return;
+    const ch = supabase
+      .channel(`exploration_targets:${projectId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "exploration_targets", filter: `project_id=eq.${projectId}` }, () => { refresh(); })
+      .subscribe();
+    return () => { supabase.removeChannel(ch); };
+  }, [refresh, projectId]);
 
   const addTarget = useCallback(async (t: Partial<ExplorationTarget> & { code: string; name: string }) => {
     if (!projectId || !user) return { error: "no-context" };
