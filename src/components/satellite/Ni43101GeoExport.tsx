@@ -30,6 +30,7 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
   const [busy, setBusy] = useState<string | null>(null);
 
   if (!projectId) return null;
+  const pid: string = projectId;
 
   const slug = (projectName ?? "proyecto").replace(/\s+/g, "_");
   const stamp = new Date().toISOString().slice(0, 10);
