@@ -1,54 +1,28 @@
 {
   "type": "FeatureCollection",
   "name": "drill_collars",
+  "metadata": {
+    "project": "Prospecto Palmeras (TRK-ALH-001)",
+    "design": "Malla 3 anillos · 14 hoyos diamantinos · 3.020 m totales",
+    "source": "Informe Pre-NI 43-101 v3 · Trackmin GeoIntel 2026",
+    "datum": "WGS84"
+  },
   "features": [
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "ALH-DDH-001",
-        "azimuth": "090°",
-        "inclination": "-60°",
-        "depth": "250 m",
-        "target": "Veta aflorante → sulfuros",
-        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
-      },
-      "geometry": { "type": "Point", "coordinates": [-71.11540, -33.89845] }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "ALH-DDH-002",
-        "azimuth": "270°",
-        "inclination": "-55°",
-        "depth": "300 m",
-        "target": "Extensión lateral NW",
-        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
-      },
-      "geometry": { "type": "Point", "coordinates": [-71.11635, -33.89760] }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "ALH-DDH-003",
-        "azimuth": "045°",
-        "inclination": "-70°",
-        "depth": "200 m",
-        "target": "Intersección fallas",
-        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
-      },
-      "geometry": { "type": "Point", "coordinates": [-71.11590, -33.89915] }
-    },
-    {
-      "type": "Feature",
-      "properties": {
-        "id": "ALH-DDH-004",
-        "azimuth": "135°",
-        "inclination": "-65°",
-        "depth": "280 m",
-        "target": "Mesotermal profunda",
-        "source": "Plan de sondajes Trackmin 2025 (propuesto)"
-      },
-      "geometry": { "type": "Point", "coordinates": [-71.11460, -33.89880] }
-    }
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R1-001", "ring": 1, "ring_label": "R1 · Discovery", "priority": "crítica", "azimuth": "070°", "inclination": "-60°", "depth": "250 m", "target": "A-4 · veta aflorante → sulfuros primarios", "justification": "Anomalía hidrotermal multiespectral coincidente con veta de Au-Ag aflorante. Score 91.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Discovery" }, "geometry": { "type": "Point", "coordinates": [-71.115471, -33.898438] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R1-002", "ring": 1, "ring_label": "R1 · Discovery", "priority": "crítica", "azimuth": "070°", "inclination": "-60°", "depth": "250 m", "target": "A-4 step-NE", "justification": "Réplica step-out 80 m NE sobre lineamiento NW-SE.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Discovery" }, "geometry": { "type": "Point", "coordinates": [-71.114598, -33.897716] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R1-003", "ring": 1, "ring_label": "R1 · Discovery", "priority": "crítica", "azimuth": "070°", "inclination": "-60°", "depth": "250 m", "target": "C-4 · óxidos de Fe", "justification": "Halo de óxidos visible en Sentinel-2 (banda 4/2). Confirma extensión SE.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Discovery" }, "geometry": { "type": "Point", "coordinates": [-71.116344, -33.899160] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R1-004", "ring": 1, "ring_label": "R1 · Discovery", "priority": "crítica", "azimuth": "070°", "inclination": "-60°", "depth": "250 m", "target": "A-4/C-4 intersección", "justification": "Intersección de dos lineamientos estructurales NW-SE / N-S. Corazón del sistema.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Discovery" }, "geometry": { "type": "Point", "coordinates": [-71.115907, -33.898799] } },
+
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-005", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "A-5 · arcillas argílicas", "justification": "Anomalía de arcillas (alteración argílica) detectada en banda SWIR. Posible top de columna mineralizada.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.117035, -33.897716] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-006", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "A-3", "justification": "Step-out N 100 m sobre traza estructural inferida.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.116162, -33.896994] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-007", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "A-1", "justification": "Step-out N 200 m sobre veta inferida. Verifica continuidad lateral.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.115289, -33.896272] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-008", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "B-1", "justification": "Step-out NE 200 m. Evalúa límite NE de la zona prospectiva.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.113725, -33.897355] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-009", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "Step S", "justification": "Step-out S 200 m sobre extensión inferida del sistema.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.116780, -33.900244] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R2-010", "ring": 2, "ring_label": "R2 · Step-out", "priority": "alta", "azimuth": "070°", "inclination": "-60°", "depth": "200 m", "target": "Step SW", "justification": "Step-out SW 200 m. Cierre lateral de la malla.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Step-out" }, "geometry": { "type": "Point", "coordinates": [-71.117944, -33.899522] } },
+
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R3-011", "ring": 3, "ring_label": "R3 · Reserve", "priority": "media", "azimuth": "070°", "inclination": "-60°", "depth": "180 m", "target": "Fill B-1 / A-1", "justification": "Hoyo de relleno sólo si R1+R2 confirman ley > 3 g/t Au eq.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Reserve" }, "geometry": { "type": "Point", "coordinates": [-71.114507, -33.896814] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R3-012", "ring": 3, "ring_label": "R3 · Reserve", "priority": "media", "azimuth": "070°", "inclination": "-60°", "depth": "180 m", "target": "Fill A-1 / A-3", "justification": "Hoyo de relleno condicional. Mejora confianza categoría inferida.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Reserve" }, "geometry": { "type": "Point", "coordinates": [-71.115725, -33.896633] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R3-013", "ring": 3, "ring_label": "R3 · Reserve", "priority": "media", "azimuth": "070°", "inclination": "-60°", "depth": "180 m", "target": "Fill A-3 / A-5", "justification": "Hoyo de relleno condicional. Cierra grilla 100×100 m.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Reserve" }, "geometry": { "type": "Point", "coordinates": [-71.116598, -33.897355] } },
+    { "type": "Feature", "properties": { "id": "ALH-DDH-R3-014", "ring": 3, "ring_label": "R3 · Reserve", "priority": "media", "azimuth": "070°", "inclination": "-60°", "depth": "180 m", "target": "Fill C-4 / South", "justification": "Hoyo de relleno SE para amarrar bloque modelado.", "source": "Trackmin · Pre-NI 43-101 v3 · Anillo Reserve" }, "geometry": { "type": "Point", "coordinates": [-71.116780, -33.899702] } }
   ]
 }
