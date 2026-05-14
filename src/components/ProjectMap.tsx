@@ -306,8 +306,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
       const overpassCtl = buildOverpassInfraLayer(L);
       overpassCtl.attach(map);
 
-      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC] = (await Promise.all(
-        [aoiData, veinsData, palmsData, workingsData, drillsData].map((u) =>
+      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
+        [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
           fetch(u).then((r) => r.json())
         )
       )) as AnyFC[];
@@ -319,6 +319,7 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
         palms: palmsFC,
         workings: workingsFC,
         drills: drillsFC,
+        anomalies: anomaliesFC,
       });
 
       aoiRef.current = (await loadAoiPolygon()) ?? null;
