@@ -1700,6 +1700,63 @@ export type Database = {
         }
         Relationships: []
       }
+      concession_alert_settings: {
+        Row: {
+          area_change_enabled: boolean
+          area_change_threshold_pct: number
+          created_at: string
+          email_notify: boolean
+          email_recipients: string[]
+          holder_change_enabled: boolean
+          project_id: string
+          status_change_enabled: boolean
+          updated_at: string
+          updated_by: string | null
+          webhook_url: string | null
+        }
+        Insert: {
+          area_change_enabled?: boolean
+          area_change_threshold_pct?: number
+          created_at?: string
+          email_notify?: boolean
+          email_recipients?: string[]
+          holder_change_enabled?: boolean
+          project_id: string
+          status_change_enabled?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          webhook_url?: string | null
+        }
+        Update: {
+          area_change_enabled?: boolean
+          area_change_threshold_pct?: number
+          created_at?: string
+          email_notify?: boolean
+          email_recipients?: string[]
+          holder_change_enabled?: boolean
+          project_id?: string
+          status_change_enabled?: boolean
+          updated_at?: string
+          updated_by?: string | null
+          webhook_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_alert_settings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "concession_alert_settings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       concession_alerts: {
         Row: {
           acknowledged: boolean
