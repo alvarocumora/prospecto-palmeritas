@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2, Download, Loader2 } from "lucide-react";
+import { AlertTriangle, Plus, Search, Trash2, Pencil, MapPin, FileText, Coins, AlertOctagon, Eye, RefreshCw, Building2, Download, Loader2, History } from "lucide-react";
+import { ConcessionChangeHistoryPanel } from "@/components/catastro/ConcessionChangeHistoryPanel";
 import { ImportConcessionsDialog } from "@/components/ops/ImportConcessionsDialog";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -40,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   component: CatastroPage,
 });
 
-type Tab = "concessions" | "holders" | "patents" | "overlaps" | "watches" | "sync";
+type Tab = "concessions" | "holders" | "patents" | "overlaps" | "watches" | "history" | "sync";
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "concessions", label: "Mis concesiones", icon: FileText },
@@ -48,6 +49,7 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "patents", label: "Patentes", icon: Coins },
   { id: "overlaps", label: "Conflictos", icon: AlertOctagon },
   { id: "watches", label: "Vigilancia", icon: Eye },
+  { id: "history", label: "Historial", icon: History },
   { id: "sync", label: "Sync log", icon: RefreshCw },
 ];
 
@@ -159,6 +161,7 @@ function CatastroPage() {
       {tab === "patents" && user && <PatentCalendar projectId={active.id} userId={user.id} />}
       {tab === "overlaps" && <OverlapInspector projectId={active.id} />}
       {tab === "watches" && user && <WatchManager projectId={active.id} userId={user.id} />}
+      {tab === "history" && <ConcessionChangeHistoryPanel projectId={active.id} />}
       {tab === "sync" && <SyncLog projectId={active.id} />}
     </div>
   );

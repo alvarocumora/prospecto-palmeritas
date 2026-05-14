@@ -1757,6 +1757,13 @@ export type Database = {
             foreignKeyName: "concession_alerts_concession_id_fkey"
             columns: ["concession_id"]
             isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
+          {
+            foreignKeyName: "concession_alerts_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
             referencedRelation: "mining_concessions"
             referencedColumns: ["id"]
           },
@@ -1813,6 +1820,13 @@ export type Database = {
             foreignKeyName: "concession_favorites_concession_id_fkey"
             columns: ["concession_id"]
             isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
+          {
+            foreignKeyName: "concession_favorites_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
             referencedRelation: "mining_concessions"
             referencedColumns: ["id"]
           },
@@ -1828,6 +1842,57 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      concession_field_changes: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          concession_id: string
+          field: string
+          id: string
+          new_value: string | null
+          old_value: string | null
+          project_id: string
+          source: string
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          concession_id: string
+          field: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          project_id: string
+          source?: string
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          concession_id?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          old_value?: string | null
+          project_id?: string
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "concession_field_changes_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
+          {
+            foreignKeyName: "concession_field_changes_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "mining_concessions"
             referencedColumns: ["id"]
           },
         ]
@@ -1870,6 +1935,13 @@ export type Database = {
           uploaded_by?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "concession_files_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
           {
             foreignKeyName: "concession_files_concession_id_fkey"
             columns: ["concession_id"]
@@ -1922,6 +1994,13 @@ export type Database = {
           synced_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "concession_history_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
           {
             foreignKeyName: "concession_history_concession_id_fkey"
             columns: ["concession_id"]
@@ -2086,6 +2165,13 @@ export type Database = {
             foreignKeyName: "concession_overlaps_concession_id_fkey"
             columns: ["concession_id"]
             isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
+          {
+            foreignKeyName: "concession_overlaps_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
             referencedRelation: "mining_concessions"
             referencedColumns: ["id"]
           },
@@ -2158,6 +2244,13 @@ export type Database = {
           year?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "concession_patents_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
           {
             foreignKeyName: "concession_patents_concession_id_fkey"
             columns: ["concession_id"]
@@ -4426,6 +4519,13 @@ export type Database = {
           title?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "express_reports_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: false
+            referencedRelation: "concession_change_summary"
+            referencedColumns: ["concession_id"]
+          },
           {
             foreignKeyName: "express_reports_concession_id_fkey"
             columns: ["concession_id"]
@@ -11641,6 +11741,36 @@ export type Database = {
       }
     }
     Views: {
+      concession_change_summary: {
+        Row: {
+          area_changes: number | null
+          code: string | null
+          concession_id: string | null
+          holder_changes: number | null
+          last_changed_at: string | null
+          last_synced_at: string | null
+          name: string | null
+          project_id: string | null
+          status_changes: number | null
+          total_changes: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mining_concessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mining_concessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       npv_por_proyecto: {
         Row: {
           ag_usd_oz: number | null
@@ -11734,6 +11864,18 @@ export type Database = {
         Returns: string
       }
       geojson_to_geom: { Args: { _geo: Json }; Returns: unknown }
+      get_concession_change_history: {
+        Args: { _concession_id: string; _limit?: number }
+        Returns: {
+          changed_at: string
+          changed_by: string
+          field: string
+          id: string
+          new_value: string
+          old_value: string
+          source: string
+        }[]
+      }
       get_invitation_preview: {
         Args: { _token: string }
         Returns: {
