@@ -33,6 +33,17 @@ export function OnboardingWizard() {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
+    const { data: orgRow, error: orgErr } = await supabase
+      .from("organization_members")
+      .select("organization_id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .maybeSingle();
+    if (orgErr || !orgRow) {
+      setSaving(false);
+      toast.error(orgErr?.message ?? "No tienes una organización asignada.");
+      return;
+    }
     const payload = {
       code: form.code.trim(),
       name: form.name.trim(),
@@ -43,6 +54,7 @@ export function OnboardingWizard() {
       center_lng: form.center_lng ? Number(form.center_lng) : null,
       description: form.description || null,
       created_by: user.id,
+      organization_id: orgRow.organization_id,
     };
     const { data, error } = await supabase.from("projects").insert(payload).select().single();
     setSaving(false);
