@@ -181,8 +181,7 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
       created_by: userId,
       metadata: { seeded: true, note: "Productos derivados sintéticos pendientes de validación con worker Python real" },
     }));
-    const { data: inserted, error } = await supabase
-      .from("hyperspectral_products")
+    const { data: inserted, error } = await (supabase.from("hyperspectral_products") as any)
       .insert(rows)
       .select("*");
     if (error) return { ok: false, error: error.message, products: [] };
