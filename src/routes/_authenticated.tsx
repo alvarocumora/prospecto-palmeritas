@@ -71,6 +71,7 @@ function AuthenticatedLayout() {
 
     canAccess(role, "qaqc") && { to: "/dashboard/qaqc", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QA/QC", group: "ANALYSIS" },
     canAccess(role, "targets") && { to: "/dashboard/targets", icon: <Target className="w-3.5 h-3.5" />, label: "Targets", group: "ANALYSIS" },
+    canAccess(role, "targets") && { to: "/dashboard/satellite-intel", icon: <Satellite className="w-3.5 h-3.5" />, label: "Inteligencia Sat.", group: "ANALYSIS" },
     canAccess(role, "estimation") && { to: "/dashboard/estimation", icon: <BarChart3 className="w-3.5 h-3.5" />, label: "Estimación Recursos", group: "ANALYSIS" },
     canAccess(role, "inventory") && { to: "/dashboard/inventory", icon: <Boxes className="w-3.5 h-3.5" />, label: "Inventario", group: "ANALYSIS" },
     canAccess(role, "reports") && { to: "/dashboard/reports", icon: <FileText className="w-3.5 h-3.5" />, label: "Reportes", group: "ANALYSIS" },

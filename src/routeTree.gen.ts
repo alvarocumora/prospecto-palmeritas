@@ -22,6 +22,7 @@ import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.s
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
+import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
 import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
@@ -118,6 +119,12 @@ const AuthenticatedDashboardTargetsRoute =
   AuthenticatedDashboardTargetsRouteImport.update({
     id: '/dashboard/targets',
     path: '/dashboard/targets',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSatelliteIntelRoute =
+  AuthenticatedDashboardSatelliteIntelRouteImport.update({
+    id: '/dashboard/satellite-intel',
+    path: '/dashboard/satellite-intel',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSamplingRoute =
@@ -328,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -371,6 +379,7 @@ export interface FileRoutesByTo {
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -416,6 +425,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/_authenticated/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
+    | '/dashboard/satellite-intel'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
@@ -504,6 +515,7 @@ export interface FileRouteTypes {
     | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
+    | '/dashboard/satellite-intel'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
@@ -548,6 +560,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/qps'
     | '/_authenticated/dashboard/reports'
     | '/_authenticated/dashboard/sampling'
+    | '/_authenticated/dashboard/satellite-intel'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
@@ -663,6 +676,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/targets'
       fullPath: '/dashboard/targets'
       preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/satellite-intel': {
+      id: '/_authenticated/dashboard/satellite-intel'
+      path: '/dashboard/satellite-intel'
+      fullPath: '/dashboard/satellite-intel'
+      preLoaderRoute: typeof AuthenticatedDashboardSatelliteIntelRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/sampling': {
@@ -942,6 +962,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
+  AuthenticatedDashboardSatelliteIntelRoute: typeof AuthenticatedDashboardSatelliteIntelRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRoute
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
@@ -977,6 +998,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
+  AuthenticatedDashboardSatelliteIntelRoute:
+    AuthenticatedDashboardSatelliteIntelRoute,
   AuthenticatedDashboardTargetsRoute: AuthenticatedDashboardTargetsRoute,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
