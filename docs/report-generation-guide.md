@@ -120,7 +120,21 @@ Parámetros exactos:
 - Banda header 14 mm + ribbon dorado 0.8 mm bajo banda.
 - Tabla meta: 5 filas, label en `ACCENT`, value en `white`, regla inferior `#1F4A40`.
 
+
+#### 3.1.1 Sello circular (esquina superior derecha)
+
+Sello dorado (`ACCENT`, radio 13 mm) centrado en `(W − 25 mm, H − 38 mm)` con tres líneas de texto en `PRIMARY_DK`:
+
+| Línea | Y offset | Fuente            | Texto             |
+|-------|----------|-------------------|-------------------|
+| 1     | H − 35mm | Helvetica-Bold 7.5| `PRE-NI 43-101`   |
+| 2     | H − 39mm | Helvetica-Bold 9  | `v{VERSION}`      |
+| 3     | H − 43mm | Helvetica 6.2     | `INFORME TÉCNICO` |
+
+> **PROHIBIDO** usar etiquetas marketing/sticker tipo `EDICIÓN ÉPICA`, `PREMIUM`, `PRO`, `ÉPICO`, emoji o íconos en el sello. La portada Geocapitals es **formal e institucional** — solo metadatos regulatorios (estándar, versión, naturaleza del documento). Regla introducida en v11.1 tras revisión editorial.
+
 ---
+
 
 ## 4. Catálogo de componentes reutilizables
 
