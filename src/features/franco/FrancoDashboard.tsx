@@ -5,6 +5,8 @@ import { FrancoTopNav } from "./components/FrancoTopNav";
 import { FrancoTabPlaceholder } from "./components/FrancoTabPlaceholder";
 import { FrancoHero } from "./components/FrancoHero";
 import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
+import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
+import { FrancoNI43101DraftPanel } from "./components/FrancoNI43101DraftPanel";
 
 export function FrancoDashboard() {
   const [active, setActive] = useState<PalmerasTabId>("overview");
@@ -26,7 +28,9 @@ export function FrancoDashboard() {
         {active === "overview" ? (
           <>
             <FrancoHero />
+            <FrancoPertenenciasMap />
             <FrancoPertenenciasPanel />
+            <FrancoNI43101DraftPanel />
           </>
         ) : (
           <FrancoTabPlaceholder tab={active} />
