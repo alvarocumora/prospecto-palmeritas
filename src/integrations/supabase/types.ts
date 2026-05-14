@@ -10042,6 +10042,7 @@ export type Database = {
           aoi_geometry: Json | null
           bbox: number[] | null
           completed_at: string | null
+          content_hash: string | null
           created_at: string
           created_by: string
           date_from: string | null
@@ -10051,21 +10052,28 @@ export type Database = {
           external_scene_id: string | null
           id: string
           index_code: string
+          last_modified_by: string | null
           max_cloud_cover_pct: number | null
           output_raster_url: string | null
+          parameters: Json
+          parent_run_id: string | null
+          pipeline_version: string | null
           project_id: string
           provider: string
           sensor: string
+          source_metadata: Json
           started_at: string | null
           stats: Json | null
           status: string
           storage_path: string | null
           updated_at: string
+          version: number | null
         }
         Insert: {
           aoi_geometry?: Json | null
           bbox?: number[] | null
           completed_at?: string | null
+          content_hash?: string | null
           created_at?: string
           created_by: string
           date_from?: string | null
@@ -10075,21 +10083,28 @@ export type Database = {
           external_scene_id?: string | null
           id?: string
           index_code: string
+          last_modified_by?: string | null
           max_cloud_cover_pct?: number | null
           output_raster_url?: string | null
+          parameters?: Json
+          parent_run_id?: string | null
+          pipeline_version?: string | null
           project_id: string
           provider: string
           sensor: string
+          source_metadata?: Json
           started_at?: string | null
           stats?: Json | null
           status?: string
           storage_path?: string | null
           updated_at?: string
+          version?: number | null
         }
         Update: {
           aoi_geometry?: Json | null
           bbox?: number[] | null
           completed_at?: string | null
+          content_hash?: string | null
           created_at?: string
           created_by?: string
           date_from?: string | null
@@ -10099,18 +10114,38 @@ export type Database = {
           external_scene_id?: string | null
           id?: string
           index_code?: string
+          last_modified_by?: string | null
           max_cloud_cover_pct?: number | null
           output_raster_url?: string | null
+          parameters?: Json
+          parent_run_id?: string | null
+          pipeline_version?: string | null
           project_id?: string
           provider?: string
           sensor?: string
+          source_metadata?: Json
           started_at?: string | null
           stats?: Json | null
           status?: string
           storage_path?: string | null
           updated_at?: string
+          version?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "satellite_analysis_runs_parent_run_id_fkey"
+            columns: ["parent_run_id"]
+            isOneToOne: false
+            referencedRelation: "satellite_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_analysis_runs_parent_run_id_fkey"
+            columns: ["parent_run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
+          },
           {
             foreignKeyName: "satellite_analysis_runs_project_id_fkey"
             columns: ["project_id"]
@@ -10197,6 +10232,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "satellite_analysis_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_anomalies_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
           },
         ]
       }
@@ -10311,6 +10353,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "satellite_analysis_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_evidence_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
           },
           {
             foreignKeyName: "satellite_evidence_target_id_fkey"
@@ -10534,6 +10583,13 @@ export type Database = {
             referencedRelation: "satellite_analysis_runs"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "satellite_jobs_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
+          },
         ]
       }
       satellite_layer_cache: {
@@ -10675,6 +10731,81 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "satellite_analysis_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_layers_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
+          },
+        ]
+      }
+      satellite_run_status_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          duration_ms: number | null
+          from_status: string | null
+          id: string
+          message: string | null
+          metadata: Json
+          project_id: string
+          run_id: string
+          to_status: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          from_status?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json
+          project_id: string
+          run_id: string
+          to_status: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          duration_ms?: number | null
+          from_status?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json
+          project_id?: string
+          run_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "satellite_run_status_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "satellite_run_status_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_run_status_events_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "satellite_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_run_status_events_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
           },
         ]
       }
@@ -10887,6 +11018,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "satellite_analysis_runs"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_timeseries_points_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
           },
         ]
       }
@@ -12172,6 +12310,125 @@ export type Database = {
           project_name: string | null
         }
         Relationships: []
+      }
+      v_satellite_run_traceability: {
+        Row: {
+          audit_log_count: number | null
+          completed_at: string | null
+          content_hash: string | null
+          created_at: string | null
+          created_by: string | null
+          date_from: string | null
+          date_to: string | null
+          evalscript_version: string | null
+          index_code: string | null
+          last_modified_by: string | null
+          max_cloud_cover_pct: number | null
+          output_raster_url: string | null
+          parameters: Json | null
+          parent_run_id: string | null
+          pipeline_version: string | null
+          project_id: string | null
+          provider: string | null
+          run_id: string | null
+          sensor: string | null
+          source_metadata: Json | null
+          started_at: string | null
+          status: string | null
+          status_event_count: number | null
+          status_timeline: Json | null
+          storage_path: string | null
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          audit_log_count?: never
+          completed_at?: string | null
+          content_hash?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date_from?: string | null
+          date_to?: string | null
+          evalscript_version?: string | null
+          index_code?: string | null
+          last_modified_by?: string | null
+          max_cloud_cover_pct?: number | null
+          output_raster_url?: string | null
+          parameters?: Json | null
+          parent_run_id?: string | null
+          pipeline_version?: string | null
+          project_id?: string | null
+          provider?: string | null
+          run_id?: string | null
+          sensor?: string | null
+          source_metadata?: Json | null
+          started_at?: string | null
+          status?: string | null
+          status_event_count?: never
+          status_timeline?: never
+          storage_path?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          audit_log_count?: never
+          completed_at?: string | null
+          content_hash?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          date_from?: string | null
+          date_to?: string | null
+          evalscript_version?: string | null
+          index_code?: string | null
+          last_modified_by?: string | null
+          max_cloud_cover_pct?: number | null
+          output_raster_url?: string | null
+          parameters?: Json | null
+          parent_run_id?: string | null
+          pipeline_version?: string | null
+          project_id?: string | null
+          provider?: string | null
+          run_id?: string | null
+          sensor?: string | null
+          source_metadata?: Json | null
+          started_at?: string | null
+          status?: string | null
+          status_event_count?: never
+          status_timeline?: never
+          storage_path?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "satellite_analysis_runs_parent_run_id_fkey"
+            columns: ["parent_run_id"]
+            isOneToOne: false
+            referencedRelation: "satellite_analysis_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_analysis_runs_parent_run_id_fkey"
+            columns: ["parent_run_id"]
+            isOneToOne: false
+            referencedRelation: "v_satellite_run_traceability"
+            referencedColumns: ["run_id"]
+          },
+          {
+            foreignKeyName: "satellite_analysis_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "satellite_analysis_runs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Functions: {
