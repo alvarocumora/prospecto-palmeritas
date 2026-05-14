@@ -598,3 +598,225 @@ NO uses backticks ni markdown.`;
       return { ok: false, error: (err as Error).message, explanation: "", actions: [] };
     }
   });
+
+// ============================================================================
+// Target Summaries — Hyperspectral × InSAR × DEM-diff aggregated per target
+// ============================================================================
+
+const TargetSummariesInput = z.object({
+  projectId: z.string().uuid(),
+});
+
+export type TargetSatelliteSummary = {
+  targetId: string;
+  code: string;
+  name: string;
+  targetType: string;
+  commodity: string | null;
+  priority: string;
+  score: number | null;
+  lat: number | null;
+  lng: number | null;
+  hyperspectral: {
+    productCount: number;
+    minerals: string[];
+    assemblages: string[];
+    meanScore: number | null;
+    maxScore: number | null;
+    cellsAboveThreshold: number;
+    areaHa: number;
+    coverageOk: boolean;
+    latestDate: string | null;
+  };
+  insar: {
+    available: boolean;
+    velocityMmYear: number | null;
+    cumulativeMm: number | null;
+    coherence: number | null;
+    severity: "info" | "warning" | "critical" | null;
+    trend: "stable" | "subsiding" | "uplifting" | "warning" | null;
+    assetType: string | null;
+    distanceM: number | null;
+    endDate: string | null;
+  };
+  demDiff: {
+    available: boolean;
+    stockpileName: string | null;
+    material: string | null;
+    volumeM3: number | null;
+    areaM2: number | null;
+    meanHeightM: number | null;
+    distanceM: number | null;
+  };
+  overallStatus: "ok" | "monitor" | "alert";
+};
+
+function bboxContains(bbox: any, lat: number, lng: number): boolean {
+  try {
+    const coords = bbox?.coordinates?.[0];
+    if (!Array.isArray(coords) || coords.length < 4) return false;
+    const xs = coords.map((c: number[]) => c[0]);
+    const ys = coords.map((c: number[]) => c[1]);
+    return lng >= Math.min(...xs) && lng <= Math.max(...xs) && lat >= Math.min(...ys) && lat <= Math.max(...ys);
+  } catch {
+    return false;
+  }
+}
+
+function pointFromGeom(g: any): [number, number] | null {
+  try {
+    if (g?.type === "Point" && Array.isArray(g.coordinates)) return [g.coordinates[0], g.coordinates[1]];
+    if (g?.type === "Polygon" && Array.isArray(g.coordinates?.[0])) {
+      const ring = g.coordinates[0];
+      let x = 0, y = 0;
+      for (const p of ring) { x += p[0]; y += p[1]; }
+      return [x / ring.length, y / ring.length];
+    }
+  } catch { /* noop */ }
+  return null;
+}
+
+function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371000;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+
+export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => TargetSummariesInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const pid = data.projectId;
+
+    const [tRes, hRes, iRes, sRes] = await Promise.all([
+      (supabase.from("exploration_targets") as any)
+        .select("id,code,name,target_type,commodity,priority,score,lat,lng")
+        .eq("project_id", pid),
+      (supabase.from("hyperspectral_products") as any)
+        .select("id,acquisition_date,bbox_geojson,mineral,assemblage,mean_score,max_score,cells_above_threshold,area_ha")
+        .eq("project_id", pid),
+      (supabase.from("insar_displacement") as any)
+        .select("id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date")
+        .eq("project_id", pid),
+      (supabase.from("stockpile_volumes") as any)
+        .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
+        .eq("project_id", pid),
+    ]);
+
+    const targets = (tRes.data ?? []) as any[];
+    const hyper = (hRes.data ?? []) as any[];
+    const insar = (iRes.data ?? []) as any[];
+    const stocks = (sRes.data ?? []) as any[];
+
+    const summaries: TargetSatelliteSummary[] = targets.map((t) => {
+      const lat = t.lat != null ? Number(t.lat) : null;
+      const lng = t.lng != null ? Number(t.lng) : null;
+
+      // Hyperspectral coverage
+      const matchingH = lat != null && lng != null
+        ? hyper.filter((h) => bboxContains(h.bbox_geojson, lat, lng))
+        : hyper; // fallback: project-wide
+      const minerals = Array.from(new Set(matchingH.map((h) => String(h.mineral)).filter(Boolean)));
+      const assemblages = Array.from(new Set(matchingH.map((h) => String(h.assemblage)).filter(Boolean)));
+      const scores = matchingH.map((h) => Number(h.mean_score)).filter((n) => Number.isFinite(n));
+      const maxScores = matchingH.map((h) => Number(h.max_score)).filter((n) => Number.isFinite(n));
+      const cellsAbove = matchingH.reduce((acc, h) => acc + (Number(h.cells_above_threshold) || 0), 0);
+      const areaHa = matchingH.reduce((acc, h) => acc + (Number(h.area_ha) || 0), 0);
+      const latestH = matchingH.reduce<string | null>((acc, h) => {
+        const d = h.acquisition_date ?? null;
+        if (!d) return acc;
+        if (!acc || d > acc) return d;
+        return acc;
+      }, null);
+
+      // InSAR — closest point
+      let insarRec: any = null;
+      let insarDist = Infinity;
+      if (lat != null && lng != null) {
+        for (const r of insar) {
+          const p = pointFromGeom(r.point_geojson);
+          if (!p) continue;
+          const d = haversineM(lat, lng, p[1], p[0]);
+          if (d < insarDist) { insarDist = d; insarRec = r; }
+        }
+      }
+      const vel = insarRec ? Number(insarRec.velocity_mm_year) : null;
+      let trend: "stable" | "subsiding" | "uplifting" | "warning" | null = null;
+      if (vel != null) {
+        if (Math.abs(vel) >= 15) trend = "warning";
+        else if (vel <= -5) trend = "subsiding";
+        else if (vel >= 5) trend = "uplifting";
+        else trend = "stable";
+      }
+
+      // Stockpile — closest polygon
+      let stockRec: any = null;
+      let stockDist = Infinity;
+      if (lat != null && lng != null) {
+        for (const s of stocks) {
+          const p = pointFromGeom(s.polygon_geojson);
+          if (!p) continue;
+          const d = haversineM(lat, lng, p[1], p[0]);
+          if (d < stockDist) { stockDist = d; stockRec = s; }
+        }
+      }
+      // Only attach a stockpile if reasonably close (≤5 km), else "no stockpile"
+      const stockClose = stockRec && stockDist <= 5000;
+
+      // Overall status
+      const sev = insarRec?.alert_severity ?? null;
+      let status: "ok" | "monitor" | "alert" = "ok";
+      if (sev === "critical") status = "alert";
+      else if (sev === "warning" || trend === "warning") status = "alert";
+      else if (matchingH.length > 0 && (Math.max(...maxScores, 0) >= 0.7)) status = "monitor";
+      else if (sev === "info" && vel != null && Math.abs(vel) >= 8) status = "monitor";
+
+      return {
+        targetId: t.id,
+        code: t.code,
+        name: t.name,
+        targetType: t.target_type,
+        commodity: t.commodity ?? null,
+        priority: t.priority,
+        score: t.score != null ? Number(t.score) : null,
+        lat, lng,
+        hyperspectral: {
+          productCount: matchingH.length,
+          minerals,
+          assemblages,
+          meanScore: scores.length ? scores.reduce((a, b) => a + b, 0) / scores.length : null,
+          maxScore: maxScores.length ? Math.max(...maxScores) : null,
+          cellsAboveThreshold: cellsAbove,
+          areaHa,
+          coverageOk: matchingH.length > 0,
+          latestDate: latestH,
+        },
+        insar: {
+          available: !!insarRec,
+          velocityMmYear: vel,
+          cumulativeMm: insarRec?.cumulative_displacement_mm != null ? Number(insarRec.cumulative_displacement_mm) : null,
+          coherence: insarRec?.coherence != null ? Number(insarRec.coherence) : null,
+          severity: (sev as any) ?? null,
+          trend,
+          assetType: insarRec?.asset_type ?? null,
+          distanceM: insarRec ? Math.round(insarDist) : null,
+          endDate: insarRec?.end_date ?? null,
+        },
+        demDiff: {
+          available: !!stockClose,
+          stockpileName: stockClose ? stockRec.name : null,
+          material: stockClose ? stockRec.material : null,
+          volumeM3: stockClose && stockRec.volume_m3 != null ? Number(stockRec.volume_m3) : null,
+          areaM2: stockClose && stockRec.area_m2 != null ? Number(stockRec.area_m2) : null,
+          meanHeightM: stockClose && stockRec.mean_height_m != null ? Number(stockRec.mean_height_m) : null,
+          distanceM: stockClose ? Math.round(stockDist) : null,
+        },
+        overallStatus: status,
+      };
+    });
+
+    return { summaries, generatedAt: new Date().toISOString() };
+  });
