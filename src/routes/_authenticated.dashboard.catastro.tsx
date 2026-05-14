@@ -41,7 +41,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   component: CatastroPage,
 });
 
-type Tab = "concessions" | "holders" | "patents" | "overlaps" | "watches" | "sync";
+type Tab = "concessions" | "holders" | "patents" | "overlaps" | "watches" | "history" | "sync";
 
 const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "concessions", label: "Mis concesiones", icon: FileText },
@@ -49,6 +49,7 @@ const TABS: Array<{ id: Tab; label: string; icon: typeof FileText }> = [
   { id: "patents", label: "Patentes", icon: Coins },
   { id: "overlaps", label: "Conflictos", icon: AlertOctagon },
   { id: "watches", label: "Vigilancia", icon: Eye },
+  { id: "history", label: "Historial", icon: History },
   { id: "sync", label: "Sync log", icon: RefreshCw },
 ];
 
