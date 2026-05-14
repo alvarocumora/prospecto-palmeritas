@@ -40,6 +40,10 @@ function SatelliteIntelPage() {
       </header>
 
       <section>
+        <TargetSummariesPanel projectId={active.id} />
+      </section>
+
+      <section>
         <HyperspectralPanel projectId={active.id} defaultBbox={bbox} />
       </section>
 
