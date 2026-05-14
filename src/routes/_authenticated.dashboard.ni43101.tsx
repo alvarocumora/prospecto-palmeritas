@@ -45,6 +45,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Ni43101DraftPanel } from "@/components/satellite/Ni43101DraftPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/ni43101")({
   head: () => ({
@@ -435,6 +436,9 @@ function NI43101Module() {
           PDF · NI 43-101
         </span>
       </header>
+
+      {/* Borrador automático a partir de los productos satelitales/geológicos cargados */}
+      <Ni43101DraftPanel projectId={projectId} />
 
       {/* Global options + actions */}
       <section className="rounded border border-border bg-bg-secondary p-4 md:p-5 space-y-4">
