@@ -119,11 +119,10 @@ export const searchStac = createServerFn({ method: "POST" })
         ]] },
         cloud_pct: it.cloudCover,
         thumbnail_url: it.thumbnailUrl,
-        assets: it.assets,
-        properties: it.properties,
+        assets: JSON.parse(it.assetsJson),
+        properties: JSON.parse(it.propertiesJson),
       }));
-      const { error } = await supabase
-        .from("stac_acquisitions")
+      const { error } = await (supabase.from("stac_acquisitions") as any)
         .upsert(rows, { onConflict: "project_id,collection,scene_id", ignoreDuplicates: true });
       if (error) console.warn("stac_acquisitions cache failed:", error.message);
     }
