@@ -30,6 +30,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard/profile": "Perfil",
   "/dashboard/admin": "Admin",
   "/dashboard/campaigns": "Campañas",
+  "/dashboard/satellite-intel": "Inteligencia Satelital",
 };
 
 function breadcrumb(path: string): string {

@@ -187,3 +187,92 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
     if (error) return { ok: false, error: error.message, products: [] };
     return { ok: true, error: null, products: inserted ?? [] };
   });
+
+// =====================================================================
+// Sprint 2 — Análisis hiperespectral con IA (Lovable AI Gateway)
+// =====================================================================
+
+const ExplainInput = z.object({
+  projectId: z.string().uuid(),
+  productIds: z.array(z.string().uuid()).min(1).max(20),
+  context: z.string().max(800).optional(),
+});
+
+type ProductRow = {
+  mineral: string;
+  assemblage: string | null;
+  source: string;
+  acquisition_date: string;
+  mean_score: number | null;
+  max_score: number | null;
+  area_ha: number | null;
+  pixel_size_m: number | null;
+  algorithm: string;
+};
+
+export const explainHyperspectralProducts = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ExplainInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await (supabase.from("hyperspectral_products") as any)
+      .select("mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm")
+      .eq("project_id", data.projectId)
+      .in("id", data.productIds);
+    if (error) return { ok: false, error: error.message, explanation: "", targets: [] as string[] };
+    const products = (rows ?? []) as ProductRow[];
+    if (products.length === 0) {
+      return { ok: false, error: "No products found", explanation: "", targets: [] };
+    }
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) {
+      return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", targets: [] };
+    }
+
+    const summary = products.map((p) =>
+      `- ${p.mineral} (${p.assemblage ?? "n/a"}) · ${p.source} ${p.acquisition_date.slice(0,10)} · mean=${p.mean_score?.toFixed(2) ?? "?"} max=${p.max_score?.toFixed(2) ?? "?"} area=${p.area_ha?.toFixed(1) ?? "?"} ha · res=${p.pixel_size_m ?? "?"} m · ${p.algorithm}`
+    ).join("\n");
+
+    const systemPrompt = `Eres un geólogo de exploración experto en mapeo hiperespectral (EMIT, EnMAP, ASTER) y modelos de alteración hidrotermal en pórfidos Cu-Au-Mo y epitermales chilenos. Tu trabajo es interpretar productos minerales derivados de sensores remotos para identificar zonas prospectivas. Sé conciso, técnico y orientado a decisión.`;
+
+    const userPrompt = `Productos hiperespectrales detectados en el proyecto:
+${summary}
+
+${data.context ? `Contexto adicional: ${data.context}\n\n` : ""}Devuelve JSON estricto con el formato:
+{
+  "explanation": "máx 220 palabras explicando ensambles de alteración (argílico/fílico/propilítico/iron-oxide-gossan), zonación lateral y vertical implícita, vector hacia núcleo del sistema",
+  "targets": ["target 1: descripción + acción recomendada", "target 2: ..."]
+}
+NO uses backticks ni markdown, solo JSON válido.`;
+
+    let explanation = "";
+    let targets: string[] = [];
+    try {
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-pro",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.4,
+        }),
+      });
+      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", targets: [] };
+      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", targets: [] };
+      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", targets: [] };
+      const json = await aiRes.json();
+      const text: string = json?.choices?.[0]?.message?.content ?? "";
+      const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
+      const parsed = JSON.parse(cleaned);
+      explanation = String(parsed.explanation ?? "");
+      targets = Array.isArray(parsed.targets) ? parsed.targets.map(String) : [];
+    } catch (err) {
+      return { ok: false, error: (err as Error).message, explanation: "", targets: [] };
+    }
+
+    return { ok: true, error: null, explanation, targets };
+  });
