@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useProjects } from "@/hooks/useProjects";
 import { HyperspectralPanel } from "@/components/satellite/HyperspectralPanel";
 import { InsarMonitoringPanel } from "@/components/satellite/InsarMonitoringPanel";
+import { StockpileVolumesPanel } from "@/components/satellite/StockpileVolumesPanel";
 import { Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/satellite-intel")({
