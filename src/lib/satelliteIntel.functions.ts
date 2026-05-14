@@ -25,6 +25,9 @@ const SearchInput = z.object({
   limit: z.number().int().min(1).max(50).default(20),
 });
 
+// JSON-safe alias for serializable maps over the RPC boundary.
+type JsonMap = { [k: string]: unknown };
+
 export type StacItem = {
   id: string;
   collection: string;
@@ -33,9 +36,8 @@ export type StacItem = {
   cloudCover: number | null;
   thumbnailUrl: string | null;
   stacHref: string | null;
-  // Use unknown for serialization safety; clients cast as needed.
-  assets: Record<string, unknown>;
-  properties: Record<string, unknown>;
+  assets: JsonMap;
+  properties: JsonMap;
 };
 
 async function postSearch(stacUrl: string, body: Record<string, unknown>): Promise<unknown> {
