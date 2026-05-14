@@ -147,6 +147,25 @@ Sidebar de fondo `#FBF7EC` con barra lateral 1.6 mm. Para disclaimers usar `colo
 - `Image` ancho `CONTENT_W`, alto proporcional (60 % para mapas grandes, 32 % para bandas satelitales en grid 2×).
 - Caption inmediatamente debajo: `Figura N.` en bold + texto en `S_SMALL`.
 
+### 4.6 Mapas satelitales ESRI (Anexo A — anomalías)
+A partir de **v10**, todos los mapas de anomalías del Anexo A se renderizan sobre **ESRI World Imagery** real (no sintético). Implementación canónica:
+
+- **Librería:** `contextily` (`pip install contextily`) + `matplotlib`.
+- **Proveedor:** `cx.providers.Esri.WorldImagery` (atribución obligatoria en caption).
+- **Proyección:** convertir lon/lat WGS84 → Web Mercator (EPSG:3857) con helper `lonlat_to_merc(lon, lat)` antes de plotear. Nunca pasar grados directos.
+- **Capas obligatorias por figura:**
+  1. Basemap ESRI World Imagery (zoom 15–17 según extensión).
+  2. Polígono AOI legal (`mining_concessions.geom`) con stroke `ACCENT` 1.2 pt, fill `none`.
+  3. Marker de anomalía: círculo proporcional al `radius_m`, color por `mineral_code`, label `{code} · score {n}`.
+  4. Norte + escala gráfica + atribución `Esri, Maxar, Earthstar Geographics`.
+- **Salida:** PNG 300 dpi, ratio 4:3, guardado en `/tmp/v{n}_assets/anom_{code}_esri.png`.
+- **Naming:** `anom_overview_esri.png` (todas las anomalías) + `anom_{A-XX}_esri.png` (detalle individual).
+- **Estructura Anexo A v10+:**
+  - **Figura A.1** — Overview ESRI con todas las anomalías + AOI + leyenda mineral.
+  - **Figuras A.2 … A.(1+N)** — Detalle individual por anomalía (zoom, sensor, score, radio).
+  - **Figura final** — Mapa de zonas Z1–Zn de campo sobre ESRI.
+- **Descripción del Anexo A** (texto canónico bajo `HBand`): `Mapas satelitales ESRI · anomalías sobre AOI`.
+
 ---
 
 ## 5. Estructura canónica del informe
