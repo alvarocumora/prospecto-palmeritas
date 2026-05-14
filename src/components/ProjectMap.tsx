@@ -784,6 +784,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           </div>
         )}
 
+        <CatastroSearch map={mapRef.current} L={leafletRef.current} />
+
         <DrawingTools open={drawOpen} onClose={() => setDrawOpen(false)} map={mapRef.current} L={leafletRef.current} />
 
         <LayerOpacityPanel
