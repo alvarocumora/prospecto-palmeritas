@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useProjects } from "@/hooks/useProjects";
 import { HyperspectralPanel } from "@/components/satellite/HyperspectralPanel";
+import { InsarMonitoringPanel } from "@/components/satellite/InsarMonitoringPanel";
 import { Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/satellite-intel")({
@@ -38,6 +39,13 @@ function SatelliteIntelPage() {
 
       <section>
         <HyperspectralPanel projectId={active.id} defaultBbox={bbox} />
+      </section>
+
+      <section>
+        <InsarMonitoringPanel
+          projectId={active.id}
+          defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
+        />
       </section>
     </div>
   );
