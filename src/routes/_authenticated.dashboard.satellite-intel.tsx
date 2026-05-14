@@ -4,6 +4,7 @@ import { HyperspectralPanel } from "@/components/satellite/HyperspectralPanel";
 import { InsarMonitoringPanel } from "@/components/satellite/InsarMonitoringPanel";
 import { StockpileVolumesPanel } from "@/components/satellite/StockpileVolumesPanel";
 import { TargetSummariesPanel } from "@/components/satellite/TargetSummariesPanel";
+import { SatelliteMapViewer } from "@/components/satellite/SatelliteMapViewer";
 import { Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/satellite-intel")({
@@ -38,6 +39,13 @@ function SatelliteIntelPage() {
           </p>
         </div>
       </header>
+
+      <section>
+        <SatelliteMapViewer
+          projectId={active.id}
+          center={active.center_lat != null && active.center_lng != null ? [Number(active.center_lat), Number(active.center_lng)] : null}
+        />
+      </section>
 
       <section>
         <TargetSummariesPanel projectId={active.id} />
