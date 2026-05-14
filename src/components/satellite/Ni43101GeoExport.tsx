@@ -40,7 +40,7 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
       const { data, error } = await supabase
         .from("satellite_anomalies")
         .select("id, project_id, run_id, index_code, geometry, bbox, severity, score, area_ha, notes, detected_at")
-        .eq("project_id", projectId);
+        .eq("project_id", pid);
       if (error) throw error;
       return data ?? [];
     }
@@ -48,7 +48,7 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
       const { data, error } = await supabase
         .from("geophysics_anomalies")
         .select("id, code, anomaly_type, severity, status, confidence_pct, lat, lng, peak_value, peak_unit, estimated_depth_m, estimated_area_m2, rationale")
-        .eq("project_id", projectId);
+        .eq("project_id", pid);
       if (error) throw error;
       return data ?? [];
     }
@@ -56,14 +56,14 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
       const { data, error } = await supabase
         .from("geological_features")
         .select("id, feature_code, name, feature_type, strike, dip, length_m, width_m, description, geometry_geojson, source")
-        .eq("project_id", projectId);
+        .eq("project_id", pid);
       if (error) throw error;
       return data ?? [];
     }
     const { data, error } = await supabase
       .from("prospectivity_cells")
       .select("id, run_id, cell_lat, cell_lng, cell_size_m, score, features, generated_at")
-      .eq("project_id", projectId);
+      .eq("project_id", pid);
     if (error) throw error;
     return data ?? [];
   }
