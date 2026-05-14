@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
@@ -68,6 +69,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivePalmerasRoute = LivePalmerasRouteImport.update({
+  id: '/live/palmeras',
+  path: '/live/palmeras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
@@ -296,6 +302,7 @@ export interface FileRoutesByFullPath {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/palmeras': typeof LivePalmerasRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -338,6 +345,7 @@ export interface FileRoutesByTo {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/palmeras': typeof LivePalmerasRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/palmeras': typeof LivePalmerasRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/palmeras'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/palmeras'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -511,6 +522,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/palmeras'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
@@ -555,6 +567,7 @@ export interface RootRouteChildren {
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
+  LivePalmerasRoute: typeof LivePalmerasRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
 }
@@ -587,6 +600,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/palmeras': {
+      id: '/live/palmeras'
+      path: '/live/palmeras'
+      fullPath: '/live/palmeras'
+      preLoaderRoute: typeof LivePalmerasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invitations/$token': {
@@ -975,6 +995,7 @@ const rootRouteChildren: RootRouteChildren = {
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
+  LivePalmerasRoute: LivePalmerasRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
