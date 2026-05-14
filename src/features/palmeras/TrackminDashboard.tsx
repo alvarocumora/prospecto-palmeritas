@@ -1216,7 +1216,7 @@ function Budget() {
    ROOT
    ============================================================ */
 
-function TrackminGeoIntel() {
+export function TrackminGeoIntel() {
   const [active, setActive] = useState<TabId>("overview");
   const [exporting, setExporting] = useState(false);
 
