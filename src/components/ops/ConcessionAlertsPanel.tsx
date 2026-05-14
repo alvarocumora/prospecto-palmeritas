@@ -9,8 +9,10 @@ import {
   CheckCheck,
   Clock,
   RefreshCw,
+  Settings,
   XCircle,
 } from "lucide-react";
+import { ConcessionAlertSettings } from "@/components/ops/ConcessionAlertSettings";
 import {
   useConcessionAlerts,
   ALERT_TYPE_LABEL,
@@ -32,6 +34,7 @@ export function ConcessionAlertsPanel({ projectId }: { projectId: string | null 
     useConcessionAlerts(projectId);
   const [syncing, setSyncing] = useState(false);
   const [filter, setFilter] = useState<"all" | "unread" | "critical">("unread");
+  const [showSettings, setShowSettings] = useState(false);
 
   const visible = useMemo(() => {
     if (filter === "unread") return alerts.filter((a) => !a.is_read);
@@ -80,6 +83,12 @@ export function ConcessionAlertsPanel({ projectId }: { projectId: string | null 
             <RefreshCw className={`h-3.5 w-3.5 mr-1 ${syncing ? "animate-spin" : ""}`} />
             Sincronizar
           </Button>
+          {projectId && (
+            <Button size="sm" variant="ghost" onClick={() => setShowSettings((v) => !v)}>
+              <Settings className="h-3.5 w-3.5 mr-1" />
+              Reglas
+            </Button>
+          )}
           {unreadCount > 0 && (
             <Button size="sm" variant="ghost" onClick={markAllRead}>
               <CheckCheck className="h-3.5 w-3.5 mr-1" />
@@ -88,6 +97,8 @@ export function ConcessionAlertsPanel({ projectId }: { projectId: string | null 
           )}
         </div>
       </div>
+
+      {showSettings && projectId && <ConcessionAlertSettings projectId={projectId} />}
 
       <div className="flex gap-1 text-xs">
         {(["unread", "critical", "all"] as const).map((f) => (
