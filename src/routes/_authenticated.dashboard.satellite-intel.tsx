@@ -49,6 +49,10 @@ function SatelliteIntelPage() {
       </section>
 
       <section>
+        <InsarAlertWorkflowPanel projectId={active.id} />
+      </section>
+
+      <section>
         <TargetSummariesPanel projectId={active.id} />
       </section>
 

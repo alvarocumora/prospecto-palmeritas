@@ -235,7 +235,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                   <div className="mt-3 p-3 rounded border border-violet-500/30 bg-violet-500/5 space-y-2">
                     <textarea
                       value={composer.text}
-                      onChange={(e) => setComposer({ ...composer, text: e.target.value })}
+                      onChange={(e) => setComposer({ insarId: s.id, text: e.target.value })}
                       placeholder="Recomendación geotécnica de seguimiento (instrumentación, frecuencia de inspección, criterios de gatillo, responsable, etc.)…"
                       className="w-full bg-surface-2/60 border border-border/40 rounded p-2 text-xs font-mono text-foreground placeholder:text-text-dim outline-none focus:border-violet-500/60 min-h-[80px]"
                     />
