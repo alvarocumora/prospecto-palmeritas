@@ -48,6 +48,13 @@ function SatelliteIntelPage() {
           defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
         />
       </section>
+
+      <section>
+        <StockpileVolumesPanel
+          projectId={active.id}
+          defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
+        />
+      </section>
     </div>
   );
 }
