@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
+import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
@@ -37,6 +38,7 @@ import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardGeology3dRouteImport } from './routes/_authenticated.dashboard.geology3d'
+import { Route as AuthenticatedDashboardFrancoRouteImport } from './routes/_authenticated.dashboard.franco'
 import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
 import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
@@ -75,6 +77,11 @@ const IndexRoute = IndexRouteImport.update({
 const LivePalmerasRoute = LivePalmerasRouteImport.update({
   id: '/live/palmeras',
   path: '/live/palmeras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveFrancoRoute = LiveFrancoRouteImport.update({
+  id: '/live/franco',
+  path: '/live/franco',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
@@ -211,6 +218,12 @@ const AuthenticatedDashboardGeology3dRoute =
     path: '/dashboard/geology3d',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardFrancoRoute =
+  AuthenticatedDashboardFrancoRouteImport.update({
+    id: '/dashboard/franco',
+    path: '/dashboard/franco',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardFinanceRoute =
   AuthenticatedDashboardFinanceRouteImport.update({
     id: '/dashboard/finance',
@@ -309,6 +322,7 @@ export interface FileRoutesByFullPath {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -321,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
@@ -353,6 +368,7 @@ export interface FileRoutesByTo {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -365,6 +381,7 @@ export interface FileRoutesByTo {
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
@@ -399,6 +416,7 @@ export interface FileRoutesById {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -411,6 +429,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
+  '/_authenticated/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/_authenticated/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
@@ -445,6 +464,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/franco'
     | '/live/palmeras'
     | '/dashboard/admin'
     | '/dashboard/approvals'
@@ -457,6 +477,7 @@ export interface FileRouteTypes {
     | '/dashboard/drones'
     | '/dashboard/estimation'
     | '/dashboard/finance'
+    | '/dashboard/franco'
     | '/dashboard/geology3d'
     | '/dashboard/geophysics'
     | '/dashboard/hse'
@@ -489,6 +510,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/franco'
     | '/live/palmeras'
     | '/dashboard/admin'
     | '/dashboard/approvals'
@@ -501,6 +523,7 @@ export interface FileRouteTypes {
     | '/dashboard/drones'
     | '/dashboard/estimation'
     | '/dashboard/finance'
+    | '/dashboard/franco'
     | '/dashboard/geology3d'
     | '/dashboard/geophysics'
     | '/dashboard/hse'
@@ -534,6 +557,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/live/franco'
     | '/live/palmeras'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
@@ -546,6 +570,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/estimation'
     | '/_authenticated/dashboard/finance'
+    | '/_authenticated/dashboard/franco'
     | '/_authenticated/dashboard/geology3d'
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/hse'
@@ -580,6 +605,7 @@ export interface RootRouteChildren {
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
+  LiveFrancoRoute: typeof LiveFrancoRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
@@ -620,6 +646,13 @@ declare module '@tanstack/react-router' {
       path: '/live/palmeras'
       fullPath: '/live/palmeras'
       preLoaderRoute: typeof LivePalmerasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/franco': {
+      id: '/live/franco'
+      path: '/live/franco'
+      fullPath: '/live/franco'
+      preLoaderRoute: typeof LiveFrancoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invitations/$token': {
@@ -781,6 +814,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/geology3d'
       fullPath: '/dashboard/geology3d'
       preLoaderRoute: typeof AuthenticatedDashboardGeology3dRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/franco': {
+      id: '/_authenticated/dashboard/franco'
+      path: '/dashboard/franco'
+      fullPath: '/dashboard/franco'
+      preLoaderRoute: typeof AuthenticatedDashboardFrancoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/finance': {
@@ -948,6 +988,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRoute
+  AuthenticatedDashboardFrancoRoute: typeof AuthenticatedDashboardFrancoRoute
   AuthenticatedDashboardGeology3dRoute: typeof AuthenticatedDashboardGeology3dRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
@@ -982,6 +1023,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
   AuthenticatedDashboardFinanceRoute: AuthenticatedDashboardFinanceRoute,
+  AuthenticatedDashboardFrancoRoute: AuthenticatedDashboardFrancoRoute,
   AuthenticatedDashboardGeology3dRoute: AuthenticatedDashboardGeology3dRoute,
   AuthenticatedDashboardGeophysicsRoute:
     AuthenticatedDashboardGeophysicsRouteWithChildren,
@@ -1018,6 +1060,7 @@ const rootRouteChildren: RootRouteChildren = {
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
+  LiveFrancoRoute: LiveFrancoRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   ApiPublicVerifyComplianceReportIdRoute:
@@ -1026,12 +1069,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
