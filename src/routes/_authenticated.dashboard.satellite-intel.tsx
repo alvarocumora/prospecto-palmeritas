@@ -40,6 +40,13 @@ function SatelliteIntelPage() {
       <section>
         <HyperspectralPanel projectId={active.id} defaultBbox={bbox} />
       </section>
+
+      <section>
+        <InsarMonitoringPanel
+          projectId={active.id}
+          defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
+        />
+      </section>
     </div>
   );
 }
