@@ -125,6 +125,23 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
     }
   }
 
+  function downloadMetadataOnly(key: DatasetKey) {
+    const meta = buildExportMetadata({
+      dataset: key,
+      format: "geojson",
+      filename: `${slug}_${key}_${stamp}.geojson`,
+      project: { id: pid, name: projectName },
+      recordCount: 0,
+      notes: "Diccionario de campos sin datos (solo schema)",
+    });
+    downloadBlob(
+      JSON.stringify(meta, null, 2),
+      `${slug}_${key}_${stamp}.metadata.json`,
+      "application/json",
+    );
+    toast.success("Metadatos descargados");
+  }
+
   return (
     <div className="border-t border-border bg-bg-tertiary/40 px-5 py-3">
       <div className="flex items-center gap-2 mb-2">
