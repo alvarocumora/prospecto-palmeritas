@@ -81,6 +81,9 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
         return;
       }
       const filenameBase = `${slug}_${key}_${stamp}`;
+      const dataFilename =
+        format === "csv" ? `${filenameBase}.csv` : `${filenameBase}.geojson`;
+
       if (format === "csv") {
         const flat = rows.map((r: any) => {
           const out: Record<string, unknown> = {};
@@ -89,7 +92,7 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
           }
           return out;
         });
-        downloadBlob(rowsToCsv(flat), `${filenameBase}.csv`, "text/csv");
+        downloadBlob(rowsToCsv(flat), dataFilename, "text/csv");
       } else {
         let features;
         if (key === "satellite_anomalies") features = satelliteAnomaliesToFeatures(rows);
@@ -97,9 +100,25 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
         else if (key === "geological_features") features = geologicalFeaturesToFeatures(rows);
         else features = prospectivityCellsToFeatures(rows);
         const fc = buildFeatureCollection(key, features);
-        downloadBlob(JSON.stringify(fc, null, 2), `${filenameBase}.geojson`, "application/geo+json");
+        downloadBlob(JSON.stringify(fc, null, 2), dataFilename, "application/geo+json");
       }
-      toast.success(`Exportado ${rows.length} registros`);
+
+      // Sidecar de metadatos (JSON + CSV) para trazabilidad NI 43-101
+      const meta = buildExportMetadata({
+        dataset: key,
+        format,
+        filename: dataFilename,
+        project: { id: pid, name: projectName },
+        recordCount: rows.length,
+      });
+      downloadBlob(
+        JSON.stringify(meta, null, 2),
+        `${filenameBase}.metadata.json`,
+        "application/json",
+      );
+      downloadBlob(metadataToCsv(meta), `${filenameBase}.metadata.csv`, "text/csv");
+
+      toast.success(`Exportado ${rows.length} registros + metadatos`);
     } catch (e) {
       console.error(e);
       toast.error(`Error: ${(e as Error).message}`);
