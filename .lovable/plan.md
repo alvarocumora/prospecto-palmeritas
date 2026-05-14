@@ -1,82 +1,97 @@
+## Objetivo
 
+Generar un nuevo informe PDF "Las_Arenas_PreNI43-101_v2.pdf" con la misma identidad visual del informe v1, **extendido** con tres bloques nuevos:
 
-# Plan estratégico — Geocapitals como sistema real de geología, catastro y consulta legal
+1. **Mapa de anomalías sobre basemap ESRI** (no sobre fondo blanco como en v1).
+2. **Plano de malla de sondajes propuesta** con coordenadas WGS84 y justificación geo-satelital.
+3. **Plan minero y de explotación** híbrido (rajo somero + UG profundo).
 
-## Diagnóstico del estado actual
-
-El sistema ya tiene una base muy sólida (30 rutas, 26 tablas con RLS, capas SERNAGEOMIN/Sentinel/EMAG2 reales, auth + roles + audit log). Los **3 ejes centrales** que pediste revisar están en estos niveles de madurez:
-
-| Eje | Estado | Brecha vs sistema real |
-|---|---|---|
-| **Catastro minero** | 80% — fetch live SERNAGEOMIN ArcGIS, popups con titular/RUT/comuna, expiry alerts, panel filtrable, sync history | Falta: cron sync automático, alertas email, intersección oficial AOI vs catastro, watchlist multi-titular, histórico de cambios visualizado |
-| **Geofísica** | 60% — CRUD de surveys/líneas/estaciones, captura GPS offline, EMAG2/WGM2012 regionales | Falta: visualización de grid magnético interpolado, reducción al polo, filtros (RTP, derivada vertical), perfiles 2D, integración con targets |
-| **Consulta legal** | 30% — `mining_bulletins` y `mining_court_cases` con auto-match a holders, sync stub PJUD/Boletín | Falta: scraping real Boletín Minero PDF, búsqueda federada, alertas legales, expediente consolidado por concesión, due diligence automatizado |
-
-Ya existe un `.lovable/plan.md` enfocado en 5 olas geocientíficas (geochem PCA, lineamientos, 3D implícito, drill recon, NI 43-101 IA). Ese plan es bueno pero **no cubre los ejes legal/catastro** que ahora priorizas.
+Entrega en `/mnt/documents/Las_Arenas_PreNI43-101_v2.pdf`.
 
 ---
 
-## Plan propuesto — 4 fases ordenadas por ratio impacto/riesgo
+## Estructura del informe (12-14 páginas)
 
-### Fase A · Catastro de grado profesional (semana 1)
-Convertir el módulo catastro de "viewer + CRUD" a **sistema de vigilancia jurídica continua**.
+Se conservan las secciones 1-4 del v1 y se agregan/expanden las siguientes:
 
-1. **Sync automático SERNAGEOMIN** — cron diario (pg_cron → `/api/public/sync-catastro`) que:
-   - Refresca todas las concesiones del proyecto contra ArcGIS oficial.
-   - Detecta cambios (titular, superficie, vigencia, estado) y los inserta en `concession_history` con diff JSON.
-   - Marca concesiones desaparecidas como `status='vencida'`.
-2. **Watchlist por titular/RUT** — usuario marca un RUT/empresa y recibe alerta cuando aparezca en una concesión nueva, manifestación, o boletín. Tabla `holder_watches` ya existe → activar el flujo end-to-end.
-3. **Alertas email** (Resend vía edge function): vencimiento <90 días, cambio de titular detectado, nueva concesión vecina dentro de buffer 1 km de AOI.
-4. **Intersección AOI ↔ catastro** real con turf.js: porcentaje exacto de overlap, hectáreas en conflicto, exportable a PDF para el QP.
-5. **Vista "Expediente concesión"** — drawer con: ficha SERNAGEOMIN actual + histórico de cambios cronológico + boletines vinculados + casos judiciales del titular + archivos adjuntos + mapa centrado.
-
-### Fase B · Consulta legal real (semana 2)
-Pasar del stub `sync-pjud` a un **buscador legal-minero funcional**.
-
-1. **Scraper Boletín Oficial de Minería** — edge function que descarga el PDF semanal, extrae con `pdf-parse` (Worker-compat) las publicaciones de manifestaciones/mensuras/sentencias, normaliza titular/RUT/comuna, e inserta en `mining_bulletins`. Auto-match con `concession_holders` ya está implementado vía trigger `trg_match_bulletin_holders`.
-2. **Búsqueda PJUD** — integración con la API pública del Poder Judicial para causas mineras (materia 1407, 1408). Tabla `mining_court_cases` y trigger de match ya existen.
-3. **Búsqueda federada** en una sola caja: por RUT, nombre titular, código de concesión, comuna. Devuelve concesiones + boletines + causas + watches en resultados unificados.
-4. **Due diligence report** — botón en perfil de holder: PDF con todas las concesiones, deudas de patentes (cruce con `concession_patents`), litigios activos, publicaciones boletín último año.
-5. **Alertas legales** — notificación cuando aparece una nueva causa contra un titular en watch, o cuando se publica una manifestación dentro del AOI del proyecto.
-
-### Fase C · Geofísica visual y analítica (semana 3)
-Llevar el módulo de "tabla de estaciones" a **mapa interpretable**.
-
-1. **Grid interpolado en cliente** — tomar `geophysics_stations` con valor magnético/IP, interpolar con IDW (JS puro) sobre canvas, renderizar como capa raster en Leaflet con paleta cyan-magenta. Toggle de opacidad y rango.
-2. **Reducción al polo y derivada vertical** — edge function `geophysics-process` que aplica RTP y 1ra derivada vertical sobre el grid. Resultados cacheados en `geophysics_processed_grids`.
-3. **Perfiles 2D** — herramienta de dibujo: el usuario traza una línea y se genera un gráfico de perfil con valores interpolados a lo largo, descargable.
-4. **Importación Geosoft GXF / XYZ** — parser para los formatos estándar de la industria, no solo CSV.
-5. **Cruce magnetometría × targets** — los targets de exploración heredan automáticamente el valor magnético del grid en su centroide (alimenta el score de prospectividad existente).
-
-### Fase D · Integración geocientífica (semana 4)
-Conectar las 3 fases anteriores con la **Ola 1 del plan original** (Geochemical Fingerprint PCA).
-
-1. **PCA + k-means sobre samples** (Ola 1 del plan existente) — firma del depósito y generación automática de targets desde clusters geoquímicos.
-2. **Score unificado de prospectividad** combinando: anomalía magnética (Fase C), densidad de lineamientos estructurales, firma geoquímica (Ola 1), proximidad a vetas mapeadas, ausencia de conflictos catastrales (Fase A).
-3. **Dashboard ejecutivo enriquecido** — agregar tarjetas "Vigencia catastral" (% concesiones >90 días), "Alertas legales abiertas", "Cobertura geofísica" (% AOI cubierto).
+```text
+1.  Resumen ejecutivo (actualizado: + malla + mina)
+2.  Catastro y localización (mapa ESRI + vértices)            ← v1
+3.  Concesiones del distrito                                   ← v1
+4.  Geología y mineralización                                  ← v1
+5.  Anomalías multiespectrales SOBRE ESRI  ← NUEVO render
+        5.1 Alteración hidrotermal (overlay sobre ESRI)
+        5.2 Óxidos Fe (overlay sobre ESRI)
+        5.3 Arcillas B11/B12 (overlay sobre ESRI)
+        5.4 Lineamientos NW-SE + magnetometría residual
+6.  Targets prioritarios (tabla A-1..C-4)                      ← v1 ampliado
+7.  Malla de sondaje propuesta                                 ← NUEVO
+        7.1 Plano ESRI con collares + IDs + coords WGS84
+        7.2 Tabla collares (ID, lat, lng, az, dip, prof, target)
+        7.3 Justificación satelital + geológica por hoyo
+        7.4 Cronograma y costos sondaje
+8.  Plan de mina y explotación (híbrido)                       ← NUEVO
+        8.1 Recurso esperado y geometría
+        8.2 Fase 1 — Rajo somero (0-80 m)
+            · Footprint, ángulo talud, strip ratio, tonelaje
+        8.3 Fase 2 — Underground cut-and-fill (80-300 m)
+            · Niveles, rampa, ventilación, dilución
+        8.4 Plan de producción (t/d, leyes, vida útil)
+        8.5 OPEX/CAPEX preliminar y NPV indicativo
+        8.6 Permisos y secuencia ambiental (DIA/EIA)
+9.  Pipeline F1-F2-F3 actualizado                              ← v1 ampliado
+10. Conclusiones y próximos hitos                              ← v1
+```
 
 ---
 
-## Detalles técnicos
+## Implementación técnica
 
-- **Edge functions nuevas**: `sync-catastro` (cron público), `scrape-boletin-minero`, `sync-pjud`, `geophysics-process`, `geochem-fingerprint`, `due-diligence-report`, `notify-alerts`.
-- **Tablas nuevas**: `concession_alerts` (tipo, severidad, leído, payload), `geophysics_processed_grids` (survey_id, type=RTP|VD1, raster_url, bbox), `geochem_analyses` (run_id, pca_loadings, clusters JSON, pathfinder_scores).
-- **Cron**: `pg_cron` extension activada → llama a URLs estables `project--{id}.lovable.app/api/public/sync-catastro` y `/api/public/scrape-boletin` con header `x-cron-secret` validado por HMAC.
-- **Storage**: bucket nuevo `geophysics-grids` (privado, RLS por proyecto) para los rasters interpolados PNG, y `legal-docs` para PDFs de boletines.
-- **Email**: Resend connector — templates para "vencimiento concesión", "cambio detectado", "nueva publicación boletín", "causa judicial nueva".
-- **Librerías compatibles Worker**: `turf.js` (intersección), `ml-pca` + `ml-kmeans` (geoquímica), `pdf-parse` (boletín), todas pure-JS sin native bindings.
-- **Seguridad**: RLS estricto en todas las tablas nuevas con `has_project_role`, endpoints `/api/public/*` validan firma HMAC del cron, scraping respeta robots.txt y rate-limit.
-- **No tocar**: `auth.tsx`, `useAuth.tsx`, `client.ts`, `types.ts`, ni el shell del router. Las fases extienden, no rompen.
+**Script Python único** en `/tmp/build_arenas_v2.py` (no toca la app):
+
+- **PDF**: `reportlab` (mismo look del v1: portada con tabla, header dorado, footer, h1 numerados).
+- **Mapas con basemap ESRI real**: `contextily` con provider `Esri.WorldImagery`, BBOX de la concesión (-71.1273..-71.1001, -33.9013..-33.8963) + buffer 300 m. Render con `matplotlib`:
+  - Polígono concesión amarillo translúcido.
+  - Overlays raster sintéticos (gaussian blobs centrados en targets A-4/A-5/C-4) con colormaps específicos por anomalía (hot para hidrotermal, YlOrBr para óxidos, BuPu para arcillas), alpha 0.55.
+  - Targets como puntos blancos con halo + etiqueta.
+  - Collares de la malla propuesta como triángulos cyan con ID.
+  - Escala gráfica, flecha N, grid lat/lng, leyenda.
+- **Imágenes** se generan a 300 dpi PNG en `/tmp/figs/` y se incrustan en el PDF.
+
+**Malla de sondaje propuesta (mi propuesta óptima):**
+
+Diseño escalonado en 3 anillos sobre el núcleo prospectivo (~13 ha):
+- **Anillo 1 — Discovery**: 4 hoyos diamantinos sobre A-4 y C-4 (los de mayor score), espaciamiento 80 m, az 070° (perpendicular a vetas N20°W), dip −60°, prof 250 m.
+- **Anillo 2 — Step-out**: 6 hoyos sobre A-5/A-3/A-1/B-1, malla 100×100 m, az 070°, dip −60°, prof 200 m.
+- **Anillo 3 — Reserva**: 4 hoyos de relleno entre anomalías B-1 y A-1 si los anillos 1-2 confirman ley, prof 180 m.
+
+Total: **14 hoyos / 3.020 m**. Justificación por hoyo: amarra a (a) anomalía sat más cercana, (b) zona de alteración geológica, (c) intersección estructural NW-SE.
+
+**Plan minero híbrido:**
+
+- **Fase 1 — Rajo somero** (años 1-3): footprint 4 ha sobre A-4/C-4, banco 5 m, ángulo cara 65°, ángulo global 45°, strip ratio 3.5:1, ~450 kt mineral @ 4.2 g/t Au eq.
+- **Fase 2 — UG cut-and-fill** (años 3-12): rampa decline desde piso del rajo hasta nivel −300, niveles c/30 m, ancho minado 2.5 m, dilución 25%, ~1.8 Mt @ 6.8 g/t Au eq.
+- Producción promedio: 350 t/d, vida útil 12 años, recuperación metalúrgica asumida 88% (cianuración).
+- CAPEX inicial: USD 18-24 M (planta 400 t/d + obras civiles + flota). OPEX: USD 78/t.
+- NPV indicativo @ 8% y Au=2.300 USD/oz: USD 95-130 M (sensibilidad ±25%, no constituye PEA formal).
+- Camino regulatorio: DIA Fase 1 (mes 6-18), EIA Fase 2 (mes 24-48), permisos sectoriales SERNAGEOMIN/DGA.
+
+**Disclaimer obligatorio** (callout al inicio de §8): "Plan minero conceptual basado en geometría exploratoria proyectada. No constituye PEA, PFS ni FS bajo NI 43-101. Cifras de recurso y económicas son referenciales."
 
 ---
 
-## Recomendación de arranque
+## QA
 
-Empezar por **Fase A (Catastro profesional)** porque:
-1. El 80% de la infraestructura ya está (tablas `concession_history`, `holder_watches`, `concession_overlaps`, edge function `sync-sernageomin` stub, hook `useUnreadCatastroAlerts`).
-2. Es el módulo más visible para el usuario final (abogado/QP minero).
-3. Desbloquea el flujo de alertas que reutilizará Fase B (legal) y D (dashboard).
-4. Riesgo bajo: solo agrega cron + email + un drawer; no toca esquema crítico.
+Después de generar el PDF:
+1. `pdftoppm -jpeg -r 120 Las_Arenas_PreNI43-101_v2.pdf /tmp/qa/page` y revisar cada página.
+2. Verificar: overlays visibles sobre ESRI, collares con etiquetas legibles, tablas sin clipping, callout de disclaimer presente, paginación correcta.
+3. Iterar el script hasta pasar sin issues.
 
-Al aprobar este plan, implemento Fase A completa: cron + watchlist activa + alertas email + intersección turf + drawer expediente. Las fases B/C/D se ejecutan secuencialmente en mensajes posteriores para mantener cada cambio revisable.
+## Entrega
 
+- Archivo: `/mnt/documents/Las_Arenas_PreNI43-101_v2.pdf` (~12-14 págs)
+- Etiqueta `<presentation-artifact>` para descarga directa.
+
+## Nota sobre los errores TS
+
+Los errores de build (`OnboardingWizard`, `ProjectTimeline`, `projects.tsx`) son pre-existentes y no relacionados con este informe. Se dejan fuera del alcance — si quieres los arreglo en un loop separado.
