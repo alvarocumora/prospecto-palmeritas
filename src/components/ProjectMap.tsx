@@ -46,6 +46,7 @@ import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
 import { CoordinateFooter } from "./map/CoordinateFooter";
+import { CatastroSearch } from "./map/CatastroSearch";
 import { DrawingTools } from "./map/DrawingTools";
 import { buildSamplesLayer } from "./map/sampleLayer";
 import { buildDroneLayer } from "./map/droneLayer";
