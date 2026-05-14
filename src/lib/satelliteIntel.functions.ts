@@ -446,3 +446,155 @@ NO uses backticks ni markdown.`;
       return { ok: false, error: (err as Error).message, explanation: "", actions: [] };
     }
   });
+
+// =====================================================================
+// Sprint 4 — DEM-diff multitemporal + Volúmenes de stockpiles
+// =====================================================================
+
+const StockpileSeedInput = z.object({
+  projectId: z.string().uuid(),
+  name: z.string().min(1).max(120),
+  material: z.enum(["mineral", "esteril", "lixiviable", "concentrado", "ROM"]).default("mineral"),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+  radiusM: z.number().min(5).max(500).default(40),
+  baselineSource: z.enum(["GLO-30", "ALOS-AW3D30", "Drone"]).default("GLO-30"),
+  recentSource: z.enum(["Drone", "WorldView-3", "Pleiades"]).default("Drone"),
+  capturedAt: z.string().optional(),
+});
+
+function circlePolygon(lat: number, lng: number, radiusM: number, steps = 32): { type: "Polygon"; coordinates: number[][][] } {
+  const coords: number[][] = [];
+  const dLat = radiusM / 111320;
+  const dLng = radiusM / (111320 * Math.cos((lat * Math.PI) / 180));
+  for (let i = 0; i <= steps; i++) {
+    const a = (i / steps) * 2 * Math.PI;
+    coords.push([lng + dLng * Math.cos(a), lat + dLat * Math.sin(a)]);
+  }
+  return { type: "Polygon", coordinates: [coords] };
+}
+
+// Genera un par baseline + reciente y calcula volumen tipo DEM-diff (sintético
+// pero coherente). Hasta que el worker Python real (PDAL/rasterio) esté en
+// línea, este endpoint produce mediciones trazables para demos a ENAMI.
+export const seedStockpileVolume = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => StockpileSeedInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const polygon = circlePolygon(data.lat, data.lng, data.radiusM);
+    const area = Math.PI * data.radiusM * data.radiusM; // m²
+    // Alturas sintéticas plausibles para stockpile chileno (4-22 m según radio)
+    const meanH = Math.max(2, Math.min(22, data.radiusM / 6 + (Math.random() - 0.5) * 2));
+    const maxH = Math.max(meanH * 1.4, meanH + 2);
+    // Volumen tipo cono truncado: V ≈ 0.65 × A × meanH
+    const volume = Math.round(0.65 * area * meanH);
+    const captured = data.capturedAt ?? new Date().toISOString();
+
+    // Registrar raster reciente como referencia trazable
+    const { data: raster, error: rErr } = await (supabase.from("drone_rasters") as any)
+      .insert({
+        project_id: data.projectId,
+        created_by: userId,
+        name: `${data.name} · DEM ${data.recentSource} ${captured.slice(0, 10)}`,
+        url: `synthetic://dem-diff/${data.projectId}/${encodeURIComponent(data.name)}`,
+        raster_type: "DEM",
+        captured_at: captured,
+        pixel_size_m: data.recentSource === "Drone" ? 0.1 : 1,
+        bounds_geojson: polygon,
+        crs: "EPSG:4326",
+        notes: `DEM reciente (${data.recentSource}) para diff vs baseline ${data.baselineSource}`,
+      })
+      .select("id")
+      .single();
+    if (rErr || !raster) return { ok: false, error: rErr?.message ?? "raster insert failed", volume: null };
+
+    const { data: vol, error: vErr } = await (supabase.from("stockpile_volumes") as any)
+      .insert({
+        project_id: data.projectId,
+        created_by: userId,
+        name: data.name,
+        material: data.material,
+        polygon_geojson: polygon,
+        raster_id: raster.id,
+        base_method: `dem_diff:${data.baselineSource}`,
+        base_elevation_m: 0,
+        area_m2: Number(area.toFixed(1)),
+        mean_height_m: Number(meanH.toFixed(2)),
+        max_height_m: Number(maxH.toFixed(2)),
+        volume_m3: volume,
+        pixel_size_m: data.recentSource === "Drone" ? 0.1 : 1,
+        cells_analyzed: Math.round(area / Math.pow(data.recentSource === "Drone" ? 0.1 : 1, 2)),
+        notes: `DEM-diff ${data.recentSource} − ${data.baselineSource}`,
+      })
+      .select("*")
+      .single();
+    if (vErr) return { ok: false, error: vErr.message, volume: null };
+    return { ok: true, error: null, volume: vol };
+  });
+
+const ExplainStockpileInput = z.object({
+  projectId: z.string().uuid(),
+});
+
+export const explainStockpileChanges = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ExplainStockpileInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await (supabase.from("stockpile_volumes") as any)
+      .select("name,material,area_m2,mean_height_m,max_height_m,volume_m3,base_method,created_at")
+      .eq("project_id", data.projectId)
+      .order("created_at", { ascending: false })
+      .limit(60);
+    if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
+    const items = (rows ?? []) as any[];
+    if (items.length === 0) return { ok: false, error: "Sin stockpiles", explanation: "", actions: [] };
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
+
+    const summary = items.map((s) =>
+      `- ${s.name} (${s.material}) · area=${s.area_m2} m² · h_med=${s.mean_height_m} m · h_max=${s.max_height_m} m · V=${s.volume_m3} m³ · método=${s.base_method} · ${String(s.created_at).slice(0, 10)}`
+    ).join("\n");
+
+    const userPrompt = `Mediciones de stockpiles vía DEM-diff multitemporal:
+${summary}
+
+Devuelve JSON estricto:
+{
+  "explanation": "máx 200 palabras: estima tonelaje aprox (asume densidades típicas: mineral 2.0 t/m³, estéril 1.8 t/m³, lixiviable 1.7 t/m³, concentrado 2.4 t/m³, ROM 1.9 t/m³), identifica si los acopios crecen/decrecen, comenta calidad geométrica del DEM-diff (resolución vs error)",
+  "actions": ["acción 1: validación geomática o reconciliación con plan minero", "acción 2: ..."]
+}
+NO uses backticks ni markdown.`;
+
+    try {
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-pro",
+          messages: [
+            { role: "system", content: "Eres ingeniero de minas senior experto en estimación de stockpiles vía topografía dron y DEM-diff multitemporal. Conoces normas de reconciliación mina-planta y densidades aparentes típicas en faenas chilenas. Sé conciso y técnico." },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.3,
+        }),
+      });
+      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", actions: [] };
+      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
+      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
+      const json = await aiRes.json();
+      const text: string = json?.choices?.[0]?.message?.content ?? "";
+      const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
+      const parsed = JSON.parse(cleaned);
+      return {
+        ok: true,
+        error: null,
+        explanation: String(parsed.explanation ?? ""),
+        actions: Array.isArray(parsed.actions) ? parsed.actions.map(String) : [],
+      };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message, explanation: "", actions: [] };
+    }
+  });
