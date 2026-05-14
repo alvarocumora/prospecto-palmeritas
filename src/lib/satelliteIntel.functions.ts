@@ -276,3 +276,173 @@ NO uses backticks ni markdown, solo JSON válido.`;
 
     return { ok: true, error: null, explanation, targets };
   });
+
+// =====================================================================
+// Sprint 3 — Monitoreo InSAR (Sentinel-1 / OPERA DISP-S1) para relaves
+// =====================================================================
+
+const TailingsAssetInput = z.object({
+  name: z.string().min(1).max(120),
+  type: z.enum(["tailings_dam", "open_pit", "waste_dump", "leach_pad", "infrastructure"]),
+  lat: z.number().min(-90).max(90),
+  lng: z.number().min(-180).max(180),
+});
+
+const RunInsarInput = z.object({
+  projectId: z.string().uuid(),
+  assets: z.array(TailingsAssetInput).min(1).max(20),
+  monthsBack: z.number().int().min(3).max(36).default(12),
+});
+
+function classifySeverity(velocity: number): "info" | "watch" | "warning" | "critical" {
+  const abs = Math.abs(velocity);
+  if (abs < 5) return "info";
+  if (abs < 15) return "watch";
+  if (abs < 40) return "warning";
+  return "critical";
+}
+
+// Genera puntos InSAR sintéticos pero realistas (basados en patrones típicos de
+// relaves chilenos: subsidencia diferencial 2-30 mm/yr en la cresta del muro y
+// estabilidad <5 mm/yr en el cuerpo). Mientras el worker Python real no esté en
+// producción, esto entrega una demo trazable y produce alertas accionables.
+export const seedInsarMonitoring = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => RunInsarInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const today = new Date();
+    const refDate = new Date(today.getTime() - data.monthsBack * 30 * 24 * 3600 * 1000);
+    const refIso = refDate.toISOString().slice(0, 10);
+    const endIso = today.toISOString().slice(0, 10);
+
+    const rows: any[] = [];
+    for (const asset of data.assets) {
+      // 6 puntos por activo: corona, talud, pie, cuerpo central x2, perímetro
+      const offsets: Array<{ dx: number; dy: number; vMean: number; vJitter: number; label: string }> = [
+        { dx: 0.0006, dy: 0.0006, vMean: -22, vJitter: 6, label: "cresta_norte" },
+        { dx: 0.0006, dy: -0.0006, vMean: -18, vJitter: 5, label: "cresta_sur" },
+        { dx: -0.0006, dy: 0.0006, vMean: -8, vJitter: 4, label: "talud_oeste" },
+        { dx: -0.0006, dy: -0.0006, vMean: -3, vJitter: 2, label: "pie_oeste" },
+        { dx: 0, dy: 0, vMean: -1.5, vJitter: 1.5, label: "cuerpo_centro" },
+        { dx: 0.001, dy: 0, vMean: -1, vJitter: 1.2, label: "perimetro_este" },
+      ];
+      for (const o of offsets) {
+        const lng = asset.lng + o.dx;
+        const lat = asset.lat + o.dy;
+        const velocity = Number((o.vMean + (Math.random() - 0.5) * 2 * o.vJitter).toFixed(2));
+        const cumulative = Number((velocity * (data.monthsBack / 12)).toFixed(2));
+        const ts: Array<[string, number]> = [];
+        const steps = 10;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const ms = refDate.getTime() + t * (today.getTime() - refDate.getTime());
+          const noisy = velocity * (data.monthsBack / 12) * t + (Math.random() - 0.5) * 1.5;
+          ts.push([new Date(ms).toISOString().slice(0, 10), Number(noisy.toFixed(2))]);
+        }
+        rows.push({
+          project_id: data.projectId,
+          source: "OPERA_DISP_S1",
+          reference_date: refIso,
+          end_date: endIso,
+          asset_name: asset.name,
+          asset_type: asset.type,
+          point_geojson: { type: "Point", coordinates: [lng, lat] },
+          bbox_geojson: {
+            type: "Polygon",
+            coordinates: [[
+              [asset.lng - 0.002, asset.lat - 0.002],
+              [asset.lng + 0.002, asset.lat - 0.002],
+              [asset.lng + 0.002, asset.lat + 0.002],
+              [asset.lng - 0.002, asset.lat + 0.002],
+              [asset.lng - 0.002, asset.lat - 0.002],
+            ]],
+          },
+          velocity_mm_year: velocity,
+          cumulative_displacement_mm: cumulative,
+          coherence: Number((0.55 + Math.random() * 0.4).toFixed(2)),
+          ascending: Math.random() > 0.5,
+          los_vector: { east: 0.62, north: -0.11, up: 0.78 },
+          alert_severity: classifySeverity(velocity),
+          time_series: ts,
+          created_by: userId,
+          metadata: { sample_label: o.label, seeded: true, months_back: data.monthsBack },
+        });
+      }
+    }
+
+    const { data: inserted, error } = await (supabase.from("insar_displacement") as any)
+      .insert(rows)
+      .select("*");
+    if (error) return { ok: false, error: error.message, points: [] };
+    return { ok: true, error: null, points: inserted ?? [] };
+  });
+
+const ExplainInsarInput = z.object({
+  projectId: z.string().uuid(),
+  assetName: z.string().optional(),
+});
+
+export const explainInsarPattern = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => ExplainInsarInput.parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    let q = (supabase.from("insar_displacement") as any)
+      .select("asset_name,asset_type,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,reference_date,end_date,metadata")
+      .eq("project_id", data.projectId)
+      .order("velocity_mm_year", { ascending: true })
+      .limit(60);
+    if (data.assetName) q = q.eq("asset_name", data.assetName);
+    const { data: rows, error } = await q;
+    if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
+    const points = (rows ?? []) as any[];
+    if (points.length === 0) return { ok: false, error: "Sin puntos InSAR", explanation: "", actions: [] };
+
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
+
+    const summary = points.map((p) =>
+      `- ${p.asset_name} (${p.asset_type}) [${p.metadata?.sample_label ?? "n/a"}] v=${p.velocity_mm_year} mm/yr · cum=${p.cumulative_displacement_mm ?? "?"} mm · coh=${p.coherence ?? "?"} · ${p.alert_severity}`
+    ).join("\n");
+
+    const userPrompt = `Puntos InSAR (Sentinel-1 / OPERA DISP-S1) entre ${points[0].reference_date} y ${points[0].end_date}:
+${summary}
+
+Devuelve JSON estricto:
+{
+  "explanation": "máx 220 palabras: identifica patrón de subsidencia (cresta vs cuerpo vs pie), estima riesgo geotécnico para depósito de relaves chileno bajo norma DS 248/2007 SERNAGEOMIN, indica si la deformación es lineal/acelerada/estacional",
+  "actions": ["acción 1: monitoreo o intervención recomendada con plazo", "acción 2: ..."]
+}
+NO uses backticks ni markdown.`;
+
+    try {
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-pro",
+          messages: [
+            { role: "system", content: "Eres ingeniero geotécnico senior especialista en seguridad de depósitos de relaves chilenos (DS 248/2007 SERNAGEOMIN, GISTM) y monitoreo satelital InSAR. Sé técnico, conciso y orientado a decisión." },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.3,
+        }),
+      });
+      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", actions: [] };
+      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
+      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
+      const json = await aiRes.json();
+      const text: string = json?.choices?.[0]?.message?.content ?? "";
+      const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
+      const parsed = JSON.parse(cleaned);
+      return {
+        ok: true,
+        error: null,
+        explanation: String(parsed.explanation ?? ""),
+        actions: Array.isArray(parsed.actions) ? parsed.actions.map(String) : [],
+      };
+    } catch (err) {
+      return { ok: false, error: (err as Error).message, explanation: "", actions: [] };
+    }
+  });
