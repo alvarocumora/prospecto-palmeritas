@@ -5,6 +5,7 @@ import { InsarMonitoringPanel } from "@/components/satellite/InsarMonitoringPane
 import { StockpileVolumesPanel } from "@/components/satellite/StockpileVolumesPanel";
 import { TargetSummariesPanel } from "@/components/satellite/TargetSummariesPanel";
 import { SatelliteMapViewer } from "@/components/satellite/SatelliteMapViewer";
+import { InsarAlertWorkflowPanel } from "@/components/satellite/InsarAlertWorkflowPanel";
 import { Satellite } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/satellite-intel")({
