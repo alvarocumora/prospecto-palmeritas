@@ -231,7 +231,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                   </div>
                 </div>
 
-                {composer?.insarId === s.id && (
+                {composer && composer.insarId === s.id && (
                   <div className="mt-3 p-3 rounded border border-violet-500/30 bg-violet-500/5 space-y-2">
                     <textarea
                       value={composer.text}
