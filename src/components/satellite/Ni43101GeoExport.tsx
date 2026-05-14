@@ -20,7 +20,7 @@ interface Props {
   projectName?: string;
 }
 
-type DatasetKey = "satellite_anomalies" | "geophysics_anomalies" | "geological_features" | "prospectivity_cells";
+
 
 const DATASETS: Array<{ key: DatasetKey; label: string }> = [
   { key: "satellite_anomalies", label: "Anomalías satelitales" },
