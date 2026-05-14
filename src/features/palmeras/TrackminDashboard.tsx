@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ProjectMap } from "@/components/ProjectMap";
 import { GeophysicsModule } from "@/components/Geophysics";
