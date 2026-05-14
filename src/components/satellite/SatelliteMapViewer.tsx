@@ -1,0 +1,354 @@
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Layers, Loader2, Map as MapIcon, Mountain, Radar, Sparkles, Target as TargetIcon } from "lucide-react";
+import { useTargetSatelliteSummaries, type TargetSatelliteSummary } from "@/hooks/useTargetSatelliteSummaries";
+import { supabase } from "@/integrations/supabase/client";
+import { cn } from "@/lib/utils";
+
+type Props = {
+  projectId: string;
+  center: [number, number] | null; // [lat, lng]
+};
+
+type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets";
+
+const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" }> = {
+  aoi: { label: "AOI proyecto", color: "#22d3ee", icon: MapIcon, group: "context" },
+  hyper_emit: { label: "EMIT (60 m)", color: "#a78bfa", icon: Sparkles, group: "hyper" },
+  hyper_aster: { label: "ASTER (30 m)", color: "#f472b6", icon: Sparkles, group: "hyper" },
+  insar: { label: "InSAR velocity (mm/a)", color: "#22d3ee", icon: Radar, group: "insar" },
+  demdiff: { label: "DEM-diff stockpiles", color: "#34d399", icon: Mountain, group: "dem" },
+  targets: { label: "Targets exploración", color: "#f59e0b", icon: TargetIcon, group: "targets" },
+};
+
+// Industrial color ramp for InSAR velocity (mm/year)
+function velocityColor(v: number | null): string {
+  if (v == null) return "#64748b";
+  const a = Math.abs(v);
+  if (a >= 25) return "#dc2626"; // red
+  if (a >= 15) return "#f59e0b"; // amber
+  if (a >= 8) return "#fbbf24";  // yellow
+  if (a >= 3) return "#22d3ee";  // cyan
+  return "#34d399";              // green
+}
+
+function statusColor(s: TargetSatelliteSummary["overallStatus"]): string {
+  return s === "alert" ? "#ef4444" : s === "monitor" ? "#f59e0b" : "#34d399";
+}
+
+export function SatelliteMapViewer({ projectId, center }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<any>(null);
+  const layerRefs = useRef<Record<LayerKey, any>>({} as any);
+  const [ready, setReady] = useState(false);
+  const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
+    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true,
+  });
+  const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
+  const [hyperData, setHyperData] = useState<any[]>([]);
+  const [insarData, setInsarData] = useState<any[]>([]);
+  const [stockData, setStockData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
+  const summaries = summariesRes?.summaries ?? [];
+
+  // Init Leaflet map (client only)
+  useEffect(() => {
+    let cancelled = false;
+    if (typeof window === "undefined" || !containerRef.current) return;
+
+    (async () => {
+      const L = (await import("leaflet")).default;
+      await import("leaflet/dist/leaflet.css");
+      if (cancelled || !containerRef.current) return;
+
+      const c = center ?? [-33.84, -71.15];
+      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false }).setView(c, 12);
+
+      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+        maxZoom: 19,
+      }).addTo(map);
+      L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/terrain-labels/{z}/{x}/{y}.png", {
+        maxZoom: 18, opacity: 0.6,
+      }).addTo(map);
+
+      mapRef.current = map;
+
+      // Initialize layer groups
+      (Object.keys(LAYER_META) as LayerKey[]).forEach((k) => {
+        layerRefs.current[k] = L.layerGroup().addTo(map);
+      });
+
+      setReady(true);
+    })();
+
+    return () => {
+      cancelled = true;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
+  // Load satellite data
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      const [h, i, s] = await Promise.all([
+        (supabase.from("hyperspectral_products") as any)
+          .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
+          .eq("project_id", projectId),
+        (supabase.from("insar_displacement") as any)
+          .select("id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date")
+          .eq("project_id", projectId),
+        (supabase.from("stockpile_volumes") as any)
+          .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
+          .eq("project_id", projectId),
+      ]);
+      if (cancelled) return;
+      setHyperData(h.data ?? []);
+      setInsarData(i.data ?? []);
+      setStockData(s.data ?? []);
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [projectId]);
+
+  // Render layers
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    let cancelled = false;
+    (async () => {
+      const L = (await import("leaflet")).default;
+      if (cancelled) return;
+      const map = mapRef.current;
+      const groups = layerRefs.current;
+      Object.values(groups).forEach((g: any) => g.clearLayers());
+
+      // AOI — derive from union of hyperspectral bboxes (largest)
+      if (enabled.aoi && hyperData.length > 0) {
+        const biggest = hyperData
+          .map((p) => p.bbox_geojson)
+          .filter(Boolean)
+          .sort((a: any, b: any) => bboxArea(b) - bboxArea(a))[0];
+        if (biggest) {
+          L.geoJSON(biggest, {
+            style: { color: LAYER_META.aoi.color, weight: 2, dashArray: "6 4", fillOpacity: 0.05, fillColor: LAYER_META.aoi.color },
+          }).bindTooltip("AOI proyecto", { sticky: true }).addTo(groups.aoi);
+        }
+      }
+
+      // Hyperspectral footprints — separate EMIT vs ASTER
+      hyperData.forEach((p) => {
+        const isEmit = p.source === "EMIT";
+        const key: LayerKey = isEmit ? "hyper_emit" : "hyper_aster";
+        if (!enabled[key]) return;
+        if (!p.bbox_geojson) return;
+        L.geoJSON(p.bbox_geojson, {
+          style: {
+            color: LAYER_META[key].color,
+            weight: 1,
+            opacity: 0.85,
+            fillColor: LAYER_META[key].color,
+            fillOpacity: 0.08 + Math.min(0.2, Number(p.mean_score ?? 0) * 0.25),
+          },
+        }).bindPopup(
+          `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.source}</b> · ${p.mineral}<br/>Ensamble: ${p.assemblage ?? "—"}<br/>Score med: ${Number(p.mean_score ?? 0).toFixed(2)} · max: ${Number(p.max_score ?? 0).toFixed(2)}<br/>${String(p.acquisition_date ?? "").slice(0, 10)}</div>`,
+        ).addTo(groups[key]);
+      });
+
+      // InSAR points — colored by velocity
+      if (enabled.insar) {
+        insarData.forEach((p) => {
+          const g = p.point_geojson;
+          if (g?.type !== "Point") return;
+          const [lng, lat] = g.coordinates;
+          const v = Number(p.velocity_mm_year);
+          const radius = 4 + Math.min(10, Math.abs(v) / 3);
+          const color = velocityColor(v);
+          L.circleMarker([lat, lng], {
+            radius,
+            color: "#0b1220",
+            weight: 1,
+            fillColor: color,
+            fillOpacity: 0.85,
+          }).bindPopup(
+            `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.asset_name ?? "InSAR"}</b><br/>v = ${v.toFixed(1)} mm/año<br/>Σ = ${Number(p.cumulative_displacement_mm ?? 0).toFixed(0)} mm<br/>coh = ${Number(p.coherence ?? 0).toFixed(2)}<br/>severidad: <b>${p.alert_severity ?? "—"}</b><br/>${p.end_date ?? ""}</div>`,
+          ).addTo(groups.insar);
+        });
+      }
+
+      // DEM-diff stockpiles
+      if (enabled.demdiff) {
+        stockData.forEach((s) => {
+          if (!s.polygon_geojson) return;
+          L.geoJSON(s.polygon_geojson, {
+            style: { color: LAYER_META.demdiff.color, weight: 2, fillColor: LAYER_META.demdiff.color, fillOpacity: 0.35 },
+          }).bindPopup(
+            `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${s.name}</b> · ${s.material ?? "—"}<br/>V = ${Number(s.volume_m3 ?? 0).toLocaleString()} m³<br/>A = ${Number(s.area_m2 ?? 0).toLocaleString()} m²<br/>h̄ = ${Number(s.mean_height_m ?? 0).toFixed(1)} m</div>`,
+          ).addTo(groups.demdiff);
+        });
+      }
+
+      // Targets
+      if (enabled.targets) {
+        summaries
+          .filter((t) => statusFilter === "all" || t.overallStatus === statusFilter)
+          .forEach((t) => {
+            if (t.lat == null || t.lng == null) return;
+            const color = statusColor(t.overallStatus);
+            L.circleMarker([t.lat, t.lng], {
+              radius: 6,
+              color: "#0b1220",
+              weight: 1.5,
+              fillColor: color,
+              fillOpacity: 0.95,
+            }).bindPopup(
+              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
+            ).addTo(groups.targets);
+          });
+      }
+
+      // Fit bounds on first paint with data
+      if (hyperData.length > 0 || summaries.length > 0) {
+        try {
+          const bounds = L.latLngBounds([]);
+          hyperData.forEach((p) => {
+            const c = p.bbox_geojson?.coordinates?.[0];
+            if (Array.isArray(c)) c.forEach((pt: number[]) => bounds.extend([pt[1], pt[0]]));
+          });
+          summaries.forEach((t) => {
+            if (t.lat != null && t.lng != null) bounds.extend([t.lat, t.lng]);
+          });
+          if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        } catch { /* noop */ }
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [ready, enabled, statusFilter, hyperData, insarData, stockData, summaries]);
+
+  function toggle(k: LayerKey) {
+    setEnabled((prev) => ({ ...prev, [k]: !prev[k] }));
+  }
+
+  return (
+    <div className="border border-border/50 rounded-md bg-surface-1/40 backdrop-blur overflow-hidden">
+      <header className="flex items-center justify-between gap-3 flex-wrap p-4 border-b border-border/30">
+        <div className="flex items-center gap-2">
+          <MapIcon className="w-4 h-4 text-signal-cyan" />
+          <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">Visor Geoespacial</h2>
+          <span className="text-xs text-text-dim font-mono">
+            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets)
+          </span>
+        </div>
+        {loading && <Loader2 className="w-4 h-4 animate-spin text-text-dim" />}
+      </header>
+
+      <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr]">
+        {/* Layer panel */}
+        <aside className="border-r border-border/30 bg-surface-2/30 p-3 space-y-3 max-h-[640px] overflow-y-auto">
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2 flex items-center gap-1">
+              <Layers className="w-3 h-3" /> Capas
+            </div>
+            <div className="space-y-1">
+              {(Object.keys(LAYER_META) as LayerKey[]).map((k) => {
+                const m = LAYER_META[k];
+                const Icon = m.icon;
+                return (
+                  <label key={k} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-1/60 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={enabled[k]}
+                      onChange={() => toggle(k)}
+                      className="w-3 h-3 accent-signal-cyan"
+                    />
+                    <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: m.color }} />
+                    <Icon className="w-3 h-3 text-text-dim" />
+                    <span className="text-[11px] font-mono text-text-secondary flex-1">{m.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Filtro targets</div>
+            <div className="grid grid-cols-2 gap-1">
+              {(["all", "alert", "monitor", "ok"] as const).map((k) => (
+                <button
+                  key={k}
+                  onClick={() => setStatusFilter(k)}
+                  className={cn(
+                    "text-[10px] font-mono uppercase px-2 py-1 rounded border transition-colors",
+                    statusFilter === k ? "border-signal-cyan/60 bg-signal-cyan/10 text-signal-cyan" : "border-border/40 text-text-secondary hover:border-border",
+                  )}
+                >
+                  {k === "all" ? "Todos" : k === "alert" ? "Alerta" : k === "monitor" ? "Monitor" : "OK"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Legend — InSAR velocity ramp */}
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Velocidad InSAR</div>
+            <div className="space-y-1 text-[10px] font-mono">
+              {[
+                { c: "#34d399", l: "< 3 mm/año · estable" },
+                { c: "#22d3ee", l: "3–8 mm/año" },
+                { c: "#fbbf24", l: "8–15 mm/año" },
+                { c: "#f59e0b", l: "15–25 mm/año · warning" },
+                { c: "#dc2626", l: "≥ 25 mm/año · crítico" },
+              ].map((e) => (
+                <div key={e.c} className="flex items-center gap-2 text-text-secondary">
+                  <span className="w-3 h-3 rounded-full border border-border/50" style={{ background: e.c }} />
+                  {e.l}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Legend — Targets */}
+          <div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Estado target</div>
+            <div className="space-y-1 text-[10px] font-mono">
+              {[
+                { c: "#34d399", l: "Estable" },
+                { c: "#f59e0b", l: "Monitorear" },
+                { c: "#ef4444", l: "Alerta" },
+              ].map((e) => (
+                <div key={e.c} className="flex items-center gap-2 text-text-secondary">
+                  <span className="w-3 h-3 rounded-full border border-border/50" style={{ background: e.c }} />
+                  {e.l}
+                </div>
+              ))}
+            </div>
+          </div>
+        </aside>
+
+        {/* Map */}
+        <div className="relative">
+          <div ref={containerRef} className="w-full h-[640px] bg-surface-2" />
+          {!ready && (
+            <div className="absolute inset-0 flex items-center justify-center text-xs font-mono text-text-dim bg-surface-1/40">
+              <Loader2 className="w-4 h-4 animate-spin mr-2" /> Cargando mapa…
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function bboxArea(g: any): number {
+  try {
+    const c = g?.coordinates?.[0];
+    if (!Array.isArray(c)) return 0;
+    const xs = c.map((p: number[]) => p[0]);
+    const ys = c.map((p: number[]) => p[1]);
+    return (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
+  } catch { return 0; }
+}
