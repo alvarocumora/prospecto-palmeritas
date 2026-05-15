@@ -282,7 +282,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           <MapIcon className="w-4 h-4 text-signal-cyan" />
           <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">Visor Geoespacial</h2>
           <span className="text-xs text-text-dim font-mono">
-            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets)
+            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets · <span className="text-signal-red">{hotspots.length} hotspots HIGH</span>)
           </span>
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-text-dim" />}
