@@ -44,12 +44,14 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   const layerRefs = useRef<Record<LayerKey, any>>({} as any);
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
-    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true,
+    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true, hotspots_high: true,
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
+  const [criticalOnly, setCriticalOnly] = useState(false);
   const [hyperData, setHyperData] = useState<any[]>([]);
   const [insarData, setInsarData] = useState<any[]>([]);
   const [stockData, setStockData] = useState<any[]>([]);
+  const [hotspots, setHotspots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
