@@ -9,16 +9,19 @@ type Props = {
   center: [number, number] | null; // [lat, lng]
 };
 
-type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets";
+type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets" | "hotspots_high";
 
-const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" }> = {
+const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots" }> = {
   aoi: { label: "AOI proyecto", color: "#22d3ee", icon: MapIcon, group: "context" },
+  hotspots_high: { label: "Hotspots HIGH (sat)", color: "#ef4444", icon: Sparkles, group: "hotspots" },
   hyper_emit: { label: "EMIT (60 m)", color: "#a78bfa", icon: Sparkles, group: "hyper" },
   hyper_aster: { label: "ASTER (30 m)", color: "#f472b6", icon: Sparkles, group: "hyper" },
   insar: { label: "InSAR velocity (mm/a)", color: "#22d3ee", icon: Radar, group: "insar" },
   demdiff: { label: "DEM-diff stockpiles", color: "#34d399", icon: Mountain, group: "dem" },
   targets: { label: "Targets exploración", color: "#f59e0b", icon: TargetIcon, group: "targets" },
 };
+
+const CRITICAL_PRIORITIES = new Set(["critical", "Critical", "CRITICAL", "high", "High", "HIGH"]);
 
 // Industrial color ramp for InSAR velocity (mm/year)
 function velocityColor(v: number | null): string {
@@ -41,12 +44,14 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   const layerRefs = useRef<Record<LayerKey, any>>({} as any);
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
-    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true,
+    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true, hotspots_high: true,
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
+  const [criticalOnly, setCriticalOnly] = useState(false);
   const [hyperData, setHyperData] = useState<any[]>([]);
   const [insarData, setInsarData] = useState<any[]>([]);
   const [stockData, setStockData] = useState<any[]>([]);
+  const [hotspots, setHotspots] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
@@ -96,7 +101,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
     let cancelled = false;
     setLoading(true);
     (async () => {
-      const [h, i, s] = await Promise.all([
+      const [h, i, s, hs] = await Promise.all([
         (supabase.from("hyperspectral_products") as any)
           .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
           .eq("project_id", projectId),
@@ -106,11 +111,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         (supabase.from("stockpile_volumes") as any)
           .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
           .eq("project_id", projectId),
+        (supabase.from("satellite_anomalies") as any)
+          .select("id,index_code,geometry,severity,score,area_ha,detected_at,notes")
+          .eq("project_id", projectId)
+          .in("severity", ["high", "HIGH", "High", "critical", "Critical", "CRITICAL"]),
       ]);
       if (cancelled) return;
       setHyperData(h.data ?? []);
       setInsarData(i.data ?? []);
       setStockData(s.data ?? []);
+      setHotspots(hs.data ?? []);
       setLoading(false);
     })();
     return () => { cancelled = true; };
@@ -192,27 +202,55 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         });
       }
 
+      // Hotspots HIGH (satellite_anomalies)
+      if (enabled.hotspots_high) {
+        hotspots.forEach((a) => {
+          const g = a.geometry;
+          if (!g) return;
+          const sev = String(a.severity ?? "").toLowerCase();
+          const color = sev === "critical" ? "#dc2626" : "#ef4444";
+          const popup = `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>Hotspot ${String(a.severity ?? "").toUpperCase()}</b> · ${a.index_code ?? ""}<br/>Score: ${Number(a.score ?? 0).toFixed(2)} · ${Number(a.area_ha ?? 0).toFixed(1)} ha<br/>${a.notes ?? ""}<br/>${String(a.detected_at ?? "").slice(0, 10)}</div>`;
+          if (g.type === "Point") {
+            const [lng, lat] = g.coordinates;
+            L.circleMarker([lat, lng], {
+              radius: 8 + Math.min(8, Number(a.score ?? 0) * 6),
+              color: "#0b1220",
+              weight: 1.2,
+              fillColor: color,
+              fillOpacity: 0.85,
+            }).bindPopup(popup).addTo(groups.hotspots_high);
+          } else {
+            L.geoJSON(g, {
+              style: { color, weight: 1.5, fillColor: color, fillOpacity: 0.4, dashArray: "4 3" },
+              pointToLayer: (_f, ll) => L.circleMarker(ll, { radius: 8, color: "#0b1220", weight: 1.2, fillColor: color, fillOpacity: 0.85 }),
+            }).bindPopup(popup).addTo(groups.hotspots_high);
+          }
+        });
+      }
+
       // Targets
       if (enabled.targets) {
         summaries
           .filter((t) => statusFilter === "all" || t.overallStatus === statusFilter)
+          .filter((t) => !criticalOnly || CRITICAL_PRIORITIES.has(String(t.priority ?? "")))
           .forEach((t) => {
             if (t.lat == null || t.lng == null) return;
+            const isCritical = CRITICAL_PRIORITIES.has(String(t.priority ?? ""));
             const color = statusColor(t.overallStatus);
             L.circleMarker([t.lat, t.lng], {
-              radius: 6,
-              color: "#0b1220",
-              weight: 1.5,
+              radius: isCritical ? 9 : 6,
+              color: isCritical ? "#fde68a" : "#0b1220",
+              weight: isCritical ? 2.5 : 1.5,
               fillColor: color,
               fillOpacity: 0.95,
             }).bindPopup(
-              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
+              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Prioridad: <b>${t.priority ?? "—"}</b> · Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
             ).addTo(groups.targets);
           });
       }
 
       // Fit bounds on first paint with data
-      if (hyperData.length > 0 || summaries.length > 0) {
+      if (hyperData.length > 0 || summaries.length > 0 || hotspots.length > 0) {
         try {
           const bounds = L.latLngBounds([]);
           hyperData.forEach((p) => {
@@ -222,12 +260,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           summaries.forEach((t) => {
             if (t.lat != null && t.lng != null) bounds.extend([t.lat, t.lng]);
           });
+          hotspots.forEach((a) => {
+            const g = a.geometry;
+            if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
+          });
           if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         } catch { /* noop */ }
       }
     })();
     return () => { cancelled = true; };
-  }, [ready, enabled, statusFilter, hyperData, insarData, stockData, summaries]);
+  }, [ready, enabled, statusFilter, criticalOnly, hyperData, insarData, stockData, hotspots, summaries]);
 
   function toggle(k: LayerKey) {
     setEnabled((prev) => ({ ...prev, [k]: !prev[k] }));
@@ -240,7 +282,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           <MapIcon className="w-4 h-4 text-signal-cyan" />
           <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">Visor Geoespacial</h2>
           <span className="text-xs text-text-dim font-mono">
-            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets)
+            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets · <span className="text-signal-red">{hotspots.length} hotspots HIGH</span>)
           </span>
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-text-dim" />}
@@ -275,7 +317,19 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           </div>
 
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Filtro targets</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Filtro targets</div>
+              <button
+                onClick={() => setCriticalOnly((v) => !v)}
+                className={cn(
+                  "text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border transition-colors",
+                  criticalOnly ? "border-signal-red/60 bg-signal-red/10 text-signal-red" : "border-border/40 text-text-secondary hover:border-border",
+                )}
+                title="Solo targets críticos / high priority"
+              >
+                ★ Críticos
+              </button>
+            </div>
             <div className="grid grid-cols-2 gap-1">
               {(["all", "alert", "monitor", "ok"] as const).map((k) => (
                 <button
