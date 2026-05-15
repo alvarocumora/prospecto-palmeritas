@@ -202,27 +202,55 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         });
       }
 
+      // Hotspots HIGH (satellite_anomalies)
+      if (enabled.hotspots_high) {
+        hotspots.forEach((a) => {
+          const g = a.geometry;
+          if (!g) return;
+          const sev = String(a.severity ?? "").toLowerCase();
+          const color = sev === "critical" ? "#dc2626" : "#ef4444";
+          const popup = `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>Hotspot ${String(a.severity ?? "").toUpperCase()}</b> · ${a.index_code ?? ""}<br/>Score: ${Number(a.score ?? 0).toFixed(2)} · ${Number(a.area_ha ?? 0).toFixed(1)} ha<br/>${a.notes ?? ""}<br/>${String(a.detected_at ?? "").slice(0, 10)}</div>`;
+          if (g.type === "Point") {
+            const [lng, lat] = g.coordinates;
+            L.circleMarker([lat, lng], {
+              radius: 8 + Math.min(8, Number(a.score ?? 0) * 6),
+              color: "#0b1220",
+              weight: 1.2,
+              fillColor: color,
+              fillOpacity: 0.85,
+            }).bindPopup(popup).addTo(groups.hotspots_high);
+          } else {
+            L.geoJSON(g, {
+              style: { color, weight: 1.5, fillColor: color, fillOpacity: 0.4, dashArray: "4 3" },
+              pointToLayer: (_f, ll) => L.circleMarker(ll, { radius: 8, color: "#0b1220", weight: 1.2, fillColor: color, fillOpacity: 0.85 }),
+            }).bindPopup(popup).addTo(groups.hotspots_high);
+          }
+        });
+      }
+
       // Targets
       if (enabled.targets) {
         summaries
           .filter((t) => statusFilter === "all" || t.overallStatus === statusFilter)
+          .filter((t) => !criticalOnly || CRITICAL_PRIORITIES.has(String(t.priority ?? "")))
           .forEach((t) => {
             if (t.lat == null || t.lng == null) return;
+            const isCritical = CRITICAL_PRIORITIES.has(String(t.priority ?? ""));
             const color = statusColor(t.overallStatus);
             L.circleMarker([t.lat, t.lng], {
-              radius: 6,
-              color: "#0b1220",
-              weight: 1.5,
+              radius: isCritical ? 9 : 6,
+              color: isCritical ? "#fde68a" : "#0b1220",
+              weight: isCritical ? 2.5 : 1.5,
               fillColor: color,
               fillOpacity: 0.95,
             }).bindPopup(
-              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
+              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Prioridad: <b>${t.priority ?? "—"}</b> · Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
             ).addTo(groups.targets);
           });
       }
 
       // Fit bounds on first paint with data
-      if (hyperData.length > 0 || summaries.length > 0) {
+      if (hyperData.length > 0 || summaries.length > 0 || hotspots.length > 0) {
         try {
           const bounds = L.latLngBounds([]);
           hyperData.forEach((p) => {
@@ -232,12 +260,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           summaries.forEach((t) => {
             if (t.lat != null && t.lng != null) bounds.extend([t.lat, t.lng]);
           });
+          hotspots.forEach((a) => {
+            const g = a.geometry;
+            if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
+          });
           if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         } catch { /* noop */ }
       }
     })();
     return () => { cancelled = true; };
-  }, [ready, enabled, statusFilter, hyperData, insarData, stockData, summaries]);
+  }, [ready, enabled, statusFilter, criticalOnly, hyperData, insarData, stockData, hotspots, summaries]);
 
   function toggle(k: LayerKey) {
     setEnabled((prev) => ({ ...prev, [k]: !prev[k] }));
