@@ -317,7 +317,19 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           </div>
 
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Filtro targets</div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Filtro targets</div>
+              <button
+                onClick={() => setCriticalOnly((v) => !v)}
+                className={cn(
+                  "text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border transition-colors",
+                  criticalOnly ? "border-signal-red/60 bg-signal-red/10 text-signal-red" : "border-border/40 text-text-secondary hover:border-border",
+                )}
+                title="Solo targets críticos / high priority"
+              >
+                ★ Críticos
+              </button>
+            </div>
             <div className="grid grid-cols-2 gap-1">
               {(["all", "alert", "monitor", "ok"] as const).map((k) => (
                 <button
