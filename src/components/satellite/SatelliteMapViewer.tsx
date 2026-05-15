@@ -101,7 +101,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
     let cancelled = false;
     setLoading(true);
     (async () => {
-      const [h, i, s] = await Promise.all([
+      const [h, i, s, hs] = await Promise.all([
         (supabase.from("hyperspectral_products") as any)
           .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
           .eq("project_id", projectId),
@@ -111,11 +111,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         (supabase.from("stockpile_volumes") as any)
           .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
           .eq("project_id", projectId),
+        (supabase.from("satellite_anomalies") as any)
+          .select("id,index_code,geometry,severity,score,area_ha,detected_at,notes")
+          .eq("project_id", projectId)
+          .in("severity", ["high", "HIGH", "High", "critical", "Critical", "CRITICAL"]),
       ]);
       if (cancelled) return;
       setHyperData(h.data ?? []);
       setInsarData(i.data ?? []);
       setStockData(s.data ?? []);
+      setHotspots(hs.data ?? []);
       setLoading(false);
     })();
     return () => { cancelled = true; };
