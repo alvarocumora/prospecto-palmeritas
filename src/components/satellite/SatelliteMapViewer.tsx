@@ -9,16 +9,19 @@ type Props = {
   center: [number, number] | null; // [lat, lng]
 };
 
-type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets";
+type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets" | "hotspots_high";
 
-const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" }> = {
+const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots" }> = {
   aoi: { label: "AOI proyecto", color: "#22d3ee", icon: MapIcon, group: "context" },
+  hotspots_high: { label: "Hotspots HIGH (sat)", color: "#ef4444", icon: Sparkles, group: "hotspots" },
   hyper_emit: { label: "EMIT (60 m)", color: "#a78bfa", icon: Sparkles, group: "hyper" },
   hyper_aster: { label: "ASTER (30 m)", color: "#f472b6", icon: Sparkles, group: "hyper" },
   insar: { label: "InSAR velocity (mm/a)", color: "#22d3ee", icon: Radar, group: "insar" },
   demdiff: { label: "DEM-diff stockpiles", color: "#34d399", icon: Mountain, group: "dem" },
   targets: { label: "Targets exploración", color: "#f59e0b", icon: TargetIcon, group: "targets" },
 };
+
+const CRITICAL_PRIORITIES = new Set(["critical", "Critical", "CRITICAL", "high", "High", "HIGH"]);
 
 // Industrial color ramp for InSAR velocity (mm/year)
 function velocityColor(v: number | null): string {
