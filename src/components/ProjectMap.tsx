@@ -34,11 +34,7 @@ import { buildSatelliteLayers } from "./map/satelliteLayers";
 import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
 import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { addProjectFeatures } from "./map/featureLayers";
-import {
-  bboxAround,
-  clearCatastroCache,
-  loadCatastro,
-} from "./map/catastroLayer";
+import { bboxAround, clearCatastroCache, loadCatastro } from "./map/catastroLayer";
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
