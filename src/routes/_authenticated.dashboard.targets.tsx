@@ -216,6 +216,20 @@ function TargetsPage() {
           <InstallPWAButton />
           <button
             type="button"
+            onClick={handleRunSatellite}
+            disabled={runSat.isPending || targets.length === 0}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-signal-cyan/40 text-signal-cyan bg-signal-cyan/5 hover:bg-signal-cyan/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Corre análisis Sentinel-2 multi-índice sobre los 10 targets de mayor score"
+          >
+            {runSat.isPending ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Satellite className="w-3 h-3" />
+            )}
+            {runSat.isPending ? "Analizando…" : "Correr análisis satelital"}
+          </button>
+          <button
+            type="button"
             onClick={handleExportPDF}
             disabled={exporting || targets.length === 0}
             className="px-3 py-1.5 text-xs font-mono rounded border border-emerald-500/40 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
