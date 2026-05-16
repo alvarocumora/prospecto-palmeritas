@@ -174,10 +174,10 @@ Deno.serve(async (req) => {
           cfg.ref === "report" ? report.id : cfg.ref === "project" ? report.project_id : null;
         const refField = cfg.ref === "report" ? "id" : "id";
         let ok = false;
-        let val = null;
+        let val: unknown = null;
         if (table && field && refId) {
           const { data } = await admin.from(table).select(field).eq(refField, refId).maybeSingle();
-          val = (data as any)?.[field];
+          val = (data as Record<string, unknown> | null)?.[field];
           ok = val !== null && val !== undefined && val !== "";
         }
         result = {
