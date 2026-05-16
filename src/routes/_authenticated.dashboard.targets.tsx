@@ -63,6 +63,15 @@ function TargetsPage() {
   const { data: concessions } = useProjectMiningConcessions(active?.id ?? null);
   const { data: anomaliesByIndex } = useProjectSatelliteAnomalies(active?.id ?? null);
   const runSat = useRunSatelliteAnalysisOnTargets();
+  const [runStartedAt, setRunStartedAt] = useState<Date | null>(null);
+  const [expectedAnomalies, setExpectedAnomalies] = useState(0);
+  const satProgress = useSatelliteAnalysisProgress({
+    projectId: active?.id ?? null,
+    enabled: runSat.isPending,
+    startedAt: runStartedAt,
+    expectedRuns: SAT_INDEX_CODES.length,
+    expectedAnomalies,
+  });
 
   async function handleRunSatellite() {
     if (!active || targets.length === 0) return;
@@ -74,6 +83,8 @@ function TargetsPage() {
       toast.error("No hay targets con coordenadas");
       return;
     }
+    setRunStartedAt(new Date());
+    setExpectedAnomalies(top10.length * SAT_INDEX_CODES.length);
     try {
       const res = await runSat.mutateAsync({
         projectId: active.id,
