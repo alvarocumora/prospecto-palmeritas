@@ -67,6 +67,7 @@ function AuthenticatedLayout() {
     canAccess(role, "geophysics") && { to: "/dashboard/geophysics", icon: <Activity className="w-3.5 h-3.5" />, label: "Geofísica", group: "FIELD" },
     canAccess(role, "geophysics") && { to: "/dashboard/drones", icon: <Plane className="w-3.5 h-3.5" />, label: "Drones", group: "FIELD" },
     canAccess(role, "drilling") && { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes", group: "FIELD" },
+    { to: "/dashboard/field-map", icon: <MapPin className="w-3.5 h-3.5" />, label: "Mapa de campo", group: "FIELD" },
     canAccess(role, "sampling") && { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo", group: "FIELD" },
 
     canAccess(role, "qaqc") && { to: "/dashboard/qaqc", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QA/QC", group: "ANALYSIS" },
