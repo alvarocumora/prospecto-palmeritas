@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass } from "lucide-react";
-import { useGeolocation, haversineMeters } from "@/hooks/useGeolocation";
+import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero } from "lucide-react";
+import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
 function fmtDistance(m: number): string {
@@ -11,6 +11,19 @@ function fmtDistance(m: number): string {
   if (m < 10000) return `${(m / 1000).toFixed(2)} km`;
   return `${(m / 1000).toFixed(1)} km`;
 }
+
+type AccuracyTier = { label: string; color: string; bg: string; border: string; Icon: typeof Signal };
+
+function accuracyTier(acc: number | null): AccuracyTier {
+  if (acc == null) return { label: "sin señal", color: "text-muted-foreground", bg: "bg-muted/20", border: "border-border", Icon: SignalZero };
+  if (acc <= 15) return { label: "excelente", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/40", Icon: Signal };
+  if (acc <= 50) return { label: "buena", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/40", Icon: Signal };
+  if (acc <= 150) return { label: "regular", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/40", Icon: SignalLow };
+  return { label: "pobre", color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/40", Icon: SignalZero };
+}
+
+const ACCURACY_THRESHOLDS = [20, 50, 100, 250, 1000] as const;
+const DEFAULT_ACCURACY_THRESHOLD = 100;
 
 type Metrics = { cu_ppm: number; mo_ppm: number; au_ppb: number; ag_ppm: number };
 
@@ -42,8 +55,33 @@ function fmt(n: number, suffix: string, decimals = 0): string {
 
 export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[] }) {
   const [gpsOn, setGpsOn] = useState(false);
-  const { position, status } = useGeolocation(gpsOn);
+  const [accuracyThreshold, setAccuracyThreshold] = useState<number>(DEFAULT_ACCURACY_THRESHOLD);
+  const { position: rawPosition, status } = useGeolocation(gpsOn);
+
+  // Only accept positions whose accuracy is within the threshold.
+  // We keep the last "trusted" position so the ranking doesn't jump around
+  // every time the device returns a noisy fix.
+  const trustedRef = useRef<GeoPosition | null>(null);
+  const [trustedPos, setTrustedPos] = useState<GeoPosition | null>(null);
+
+  useEffect(() => {
+    if (!gpsOn) {
+      trustedRef.current = null;
+      setTrustedPos(null);
+      return;
+    }
+    if (!rawPosition) return;
+    if (rawPosition.accuracy <= accuracyThreshold) {
+      trustedRef.current = rawPosition;
+      setTrustedPos(rawPosition);
+    }
+  }, [gpsOn, rawPosition, accuracyThreshold]);
+
+  const position = trustedPos;
+  const currentAccuracy = rawPosition?.accuracy ?? null;
+  const trustedAccuracy = trustedPos?.accuracy ?? null;
   const sortByDistance = gpsOn && !!position;
+  const accuracyOk = currentAccuracy != null && currentAccuracy <= accuracyThreshold;
 
   const enriched = useMemo(
     () => targets.map((t) => {
@@ -122,40 +160,81 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
 
   if (targets.length === 0) return null;
 
-  const gpsLabel =
+  const tier = accuracyTier(currentAccuracy);
+  const TierIcon = tier.Icon;
+  const gpsStateLabel =
     status === "denied" ? "GPS denegado" :
     status === "unavailable" ? "GPS no soportado" :
     status === "error" ? "GPS error" :
-    position ? `GPS ±${position.accuracy.toFixed(0)} m` :
-    gpsOn ? "Buscando señal…" : "GPS apagado";
+    !gpsOn ? "GPS apagado" :
+    !rawPosition ? "Buscando señal…" :
+    accuracyOk ? "Señal confiable" : `Señal débil — descartando fixes >${accuracyThreshold} m`;
 
   return (
     <div className="space-y-4">
       {/* GPS / sort toggle */}
-      <div className="flex items-center justify-between gap-3 flex-wrap rounded border border-border bg-bg-secondary px-3 py-2">
-        <div className="inline-flex items-center gap-2 text-[10px] font-mono">
-          <Compass className="w-3.5 h-3.5 text-sky-400" />
-          <span className="text-muted-foreground">Orden:</span>
-          <span className="text-foreground">
-            {sortByDistance ? "Distancia desde mi ubicación" : "Score / ley Cu"}
-          </span>
-          <span className={`ml-2 ${status === "denied" || status === "error" ? "text-destructive" : position ? "text-sky-400" : "text-muted-foreground"}`}>
-            · {gpsLabel}
-          </span>
+      <div className="rounded border border-border bg-bg-secondary px-3 py-2 space-y-2">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="inline-flex items-center gap-2 text-[10px] font-mono flex-wrap">
+            <Compass className="w-3.5 h-3.5 text-sky-400" />
+            <span className="text-muted-foreground">Orden:</span>
+            <span className="text-foreground">
+              {sortByDistance ? "Distancia desde mi ubicación" : "Score / ley Cu"}
+            </span>
+
+            {gpsOn && (
+              <span
+                className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border ${tier.border} ${tier.bg} ${tier.color}`}
+                title={`Precisión actual del GPS · ${tier.label}`}
+              >
+                <TierIcon className="w-3 h-3" />
+                {currentAccuracy != null ? `±${currentAccuracy.toFixed(0)} m` : "—"}
+                <span className="opacity-70">· {tier.label}</span>
+              </span>
+            )}
+
+            <span className={`${status === "denied" || status === "error" ? "text-destructive" : accuracyOk ? "text-emerald-400" : "text-muted-foreground"}`}>
+              · {gpsStateLabel}
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={toggleGps}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
+              gpsOn
+                ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+                : "border-border text-muted-foreground hover:bg-accent"
+            }`}
+            title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
+          >
+            {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
+            {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={toggleGps}
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
-            gpsOn
-              ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
-              : "border-border text-muted-foreground hover:bg-accent"
-          }`}
-          title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
-        >
-          {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
-          {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
-        </button>
+
+        {gpsOn && (
+          <div className="flex items-center justify-between gap-3 flex-wrap text-[10px] font-mono pt-1 border-t border-border/60">
+            <label className="inline-flex items-center gap-1.5 text-muted-foreground">
+              Umbral de precisión:
+              <select
+                value={accuracyThreshold}
+                onChange={(e) => setAccuracyThreshold(Number(e.target.value))}
+                className="px-1.5 py-0.5 rounded border border-border bg-background text-foreground text-[10px] font-mono"
+              >
+                {ACCURACY_THRESHOLDS.map((v) => (
+                  <option key={v} value={v}>±{v} m</option>
+                ))}
+              </select>
+              <span className="opacity-70">solo se actualiza el ranking con fixes mejores que esto</span>
+            </label>
+            {trustedAccuracy != null && (
+              <span className="text-muted-foreground">
+                Última posición usada: <span className="text-foreground">±{trustedAccuracy.toFixed(0)} m</span>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Aggregate KPIs */}
