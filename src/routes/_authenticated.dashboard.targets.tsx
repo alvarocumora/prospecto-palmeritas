@@ -6,9 +6,10 @@ import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
+import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
@@ -20,7 +21,7 @@ function TargetsPage() {
   const role = useProjectRole();
   const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
   const [showForm, setShowForm] = useState(false);
-  const [view, setView] = useState<"kanban" | "map">("kanban");
+  const [view, setView] = useState<"kanban" | "map" | "ranking">("kanban");
   const writable = canWrite(role);
 
   const grouped = useMemo(() => {
@@ -92,6 +93,13 @@ function TargetsPage() {
             >
               <MapIcon className="w-3 h-3" /> Mapa
             </button>
+            <button
+              type="button"
+              onClick={() => setView("ranking")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 border-l border-border ${view === "ranking" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <Trophy className="w-3 h-3" /> Ranking
+            </button>
           </div>
           <Link
             to="/dashboard/targets/ai-brief"
@@ -128,6 +136,8 @@ function TargetsPage() {
         </div>
       ) : view === "map" ? (
         <TargetsMap targets={targets} />
+      ) : view === "ranking" ? (
+        <TargetsExecutivePanel targets={targets} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (
