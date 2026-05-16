@@ -4606,6 +4606,79 @@ export type Database = {
           },
         ]
       }
+      field_pois: {
+        Row: {
+          accuracy_m: number | null
+          created_at: string
+          created_by: string
+          elevation_m: number | null
+          id: string
+          lat: number
+          lng: number
+          note: string | null
+          organization_id: string
+          photo_path: string | null
+          poi_type: string
+          project_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          accuracy_m?: number | null
+          created_at?: string
+          created_by: string
+          elevation_m?: number | null
+          id?: string
+          lat: number
+          lng: number
+          note?: string | null
+          organization_id: string
+          photo_path?: string | null
+          poi_type?: string
+          project_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          accuracy_m?: number | null
+          created_at?: string
+          created_by?: string
+          elevation_m?: number | null
+          id?: string
+          lat?: number
+          lng?: number
+          note?: string | null
+          organization_id?: string
+          photo_path?: string | null
+          poi_type?: string
+          project_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "field_pois_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "field_pois_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "field_pois_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       follow_up_tasks: {
         Row: {
           assigned_to: string | null
