@@ -1,7 +1,16 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { Trophy, TrendingUp, Crown, Star, Medal } from "lucide-react";
+import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass } from "lucide-react";
+import { useGeolocation, haversineMeters } from "@/hooks/useGeolocation";
+import { toast } from "sonner";
+
+function fmtDistance(m: number): string {
+  if (!Number.isFinite(m)) return "—";
+  if (m < 1000) return `${m.toFixed(0)} m`;
+  if (m < 10000) return `${(m / 1000).toFixed(2)} km`;
+  return `${(m / 1000).toFixed(1)} km`;
+}
 
 type Metrics = { cu_ppm: number; mo_ppm: number; au_ppb: number; ag_ppm: number };
 
