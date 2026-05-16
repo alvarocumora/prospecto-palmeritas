@@ -29,7 +29,7 @@ interface Rule {
   title: string;
   severity: string; // mandatory | recommended | conditional
   evaluator_type: string;
-  evaluator_config: Record<string, any> | null;
+  evaluator_config: Record<string, unknown> | null;
 }
 
 interface Report {
