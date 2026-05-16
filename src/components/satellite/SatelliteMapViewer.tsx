@@ -235,7 +235,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       if (cancelled) return;
       const map = mapRef.current;
       const groups = layerRefs.current;
-      Object.values(groups).forEach((g: any) => g.clearLayers());
+      Object.values(groups).forEach((g) => g.clearLayers());
 
       // AOI — derive from union of hyperspectral bboxes (largest)
       if (enabled.aoi && hyperData.length > 0) {
