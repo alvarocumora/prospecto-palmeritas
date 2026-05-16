@@ -283,7 +283,11 @@ function TargetsPage() {
         </div>
       ) : view === "map" ? (
         <div ref={mapWrapRef}>
-          <TargetsMap targets={targets} />
+          <TargetsMap
+            targets={targets}
+            concessions={concessions}
+            anomaliesByIndex={anomaliesByIndex}
+          />
         </div>
       ) : view === "ranking" ? (
         <div ref={rankingWrapRef}>
