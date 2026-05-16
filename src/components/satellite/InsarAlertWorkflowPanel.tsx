@@ -67,8 +67,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   const tasks = data?.tasks ?? [];
 
   const tasksByInsar = useMemo(() => {
-    const m = new Map<string, any[]>();
-    tasks.forEach((t: any) => {
+    const m = new Map<string, (typeof tasks)[number][]>();
+    tasks.forEach((t) => {
       if (!t.source_ref) return;
       const list = m.get(t.source_ref) ?? [];
       list.push(t);
@@ -78,8 +78,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   }, [tasks]);
 
   const actionsByInsar = useMemo(() => {
-    const m = new Map<string, any[]>();
-    actions.forEach((a: any) => {
+    const m = new Map<string, (typeof actions)[number][]>();
+    actions.forEach((a) => {
       const list = m.get(a.insar_id) ?? [];
       list.push(a);
       m.set(a.insar_id, list);
@@ -89,13 +89,13 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
 
   const stats = useMemo(() => {
     const taskedSet = new Set(
-      actions.filter((a: any) => a.action_type === "task_created").map((a: any) => a.insar_id),
+      actions.filter((a) => a.action_type === "task_created").map((a) => a.insar_id),
     );
     return {
       total: sites.length,
       tasked: taskedSet.size,
       pending: sites.length - taskedSet.size,
-      tasksOpen: tasks.filter((t: any) => t.status === "open" || t.status === "in_progress").length,
+      tasksOpen: tasks.filter((t) => t.status === "open" || t.status === "in_progress").length,
     };
   }, [sites, actions, tasks]);
 
