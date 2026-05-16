@@ -909,7 +909,7 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
       }
 
       // Stockpile — closest polygon
-      let stockRec: any = null;
+      let stockRec: StockSel | null = null;
       let stockDist = Infinity;
       if (lat != null && lng != null) {
         for (const s of stocks) {
