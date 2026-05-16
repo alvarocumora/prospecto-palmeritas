@@ -121,25 +121,27 @@ export function useExecutiveKpis() {
       ]);
 
       const totalMetersDrilled = (holes.data ?? []).reduce(
-        (s, h: any) => s + (Number(h.actual_depth) || 0),
+        (s, h: { actual_depth?: number | string | null }) => s + (Number(h.actual_depth) || 0),
         0,
       );
       const auVals = (samples.data ?? [])
-        .map((s: any) => Number(s.au_gpt))
+        .map((s: { au_gpt?: number | string | null }) => Number(s.au_gpt))
         .filter((v) => !isNaN(v) && v > 0);
       const auWeightedAvg = auVals.length
         ? auVals.reduce((a, b) => a + b, 0) / auVals.length
         : null;
       const totalGeophysicsCapex = (surveys.data ?? []).reduce(
-        (s, x: any) => s + (Number(x.cost_usd) || 0),
+        (s, x: { cost_usd?: number | string | null }) => s + (Number(x.cost_usd) || 0),
         0,
       );
 
       const monthAgo = Date.now() - 30 * 24 * 3600 * 1000;
-      const monthInterceptCount = (coreLogs.data ?? []).filter((c: any) => {
-        const au = Number(c.au_gpt);
-        return au >= 0.5 && new Date(c.created_at).getTime() >= monthAgo;
-      }).length;
+      const monthInterceptCount = (coreLogs.data ?? []).filter(
+        (c: { au_gpt?: number | string | null; created_at: string }) => {
+          const au = Number(c.au_gpt);
+          return au >= 0.5 && new Date(c.created_at).getTime() >= monthAgo;
+        },
+      ).length;
 
       const allRecs = [...(coreLogs.data ?? []), ...(samples.data ?? [])] as Array<{
         record_status?: string;

@@ -14,7 +14,7 @@ export interface ComplianceRule {
   description: string;
   severity: "mandatory" | "recommended" | "conditional";
   evaluator_type: "manual" | "auto_count" | "auto_field" | "auto_evidence";
-  evaluator_config: Record<string, any> | null;
+  evaluator_config: Record<string, unknown> | null;
   reference_url: string | null;
   display_order: number;
 }

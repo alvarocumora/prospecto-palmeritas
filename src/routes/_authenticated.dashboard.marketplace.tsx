@@ -16,7 +16,7 @@ type Layer = {
   name: string;
   description: string | null;
   category: string | null;
-  geometry_geojson: any;
+  geometry_geojson: import("@/integrations/supabase/types").Json;
   tags: string[] | null;
   downloads_count: number;
 };

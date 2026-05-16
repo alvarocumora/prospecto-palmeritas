@@ -185,7 +185,7 @@ export function StockpileVolumesPanel({ projectId, defaultCenter }: Props) {
           />
           <select
             value={material}
-            onChange={(e) => setMaterial(e.target.value as any)}
+            onChange={(e) => setMaterial(e.target.value as keyof typeof MATERIAL_LABEL)}
             className="col-span-2 text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono"
           >
             {Object.entries(MATERIAL_LABEL).map(([k, v]) => (
@@ -223,7 +223,9 @@ export function StockpileVolumesPanel({ projectId, defaultCenter }: Props) {
         <div className="flex items-center gap-2 flex-wrap">
           <select
             value={recentSource}
-            onChange={(e) => setRecentSource(e.target.value as any)}
+            onChange={(e) =>
+              setRecentSource(e.target.value as "Drone" | "WorldView-3" | "Pleiades")
+            }
             className="text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono"
           >
             <option value="Drone">DEM Drone · 0.1 m</option>

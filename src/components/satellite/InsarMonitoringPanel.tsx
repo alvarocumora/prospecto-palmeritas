@@ -396,7 +396,7 @@ function PointRow({ p }: { p: InsarPoint }) {
   const max = Math.max(...vals, 0);
   const range = max - min || 1;
   const sev = (p.alert_severity ?? "info") as string;
-  const label = (p.metadata as any)?.sample_label ?? "punto";
+  const label = (p.metadata as { sample_label?: string } | null)?.sample_label ?? "punto";
   return (
     <div className="rounded border border-border bg-bg-panel/40 px-2.5 py-2 text-xs">
       <div className="flex items-center justify-between gap-2">

@@ -367,7 +367,9 @@ function StationsTab({
       "ip_resistivity_ohmm",
       "notes",
     ];
-    const rows = stations.map((s) => headers.map((h) => (s as any)[h] ?? "").join(","));
+    const rows = stations.map((s) =>
+      headers.map((h) => (s as unknown as Record<string, unknown>)[h] ?? "").join(","),
+    );
     const csv = [headers.join(","), ...rows].join("\n");
     const blob = new Blob([csv], { type: "text/csv" });
     const url = URL.createObjectURL(blob);

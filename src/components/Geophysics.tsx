@@ -1,4 +1,4 @@
-import { Radio } from "lucide-react";
+import { Radio, type LucideIcon } from "lucide-react";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 
 const METHOD_SIGNATURES = [
@@ -68,7 +68,11 @@ export function GeophysicsModule({
     accent?: "gold" | "copper" | "muted";
     delay?: number;
   }>;
-  SectionTitle: React.ComponentType<{ icon?: any; children: React.ReactNode; sub?: string }>;
+  SectionTitle: React.ComponentType<{
+    icon?: LucideIcon;
+    children: React.ReactNode;
+    sub?: string;
+  }>;
   Badge: React.ComponentType<{
     children: React.ReactNode;
     tone?: "gold" | "copper" | "teal" | "info" | "alert" | "muted";

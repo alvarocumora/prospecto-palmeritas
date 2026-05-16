@@ -127,35 +127,37 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     if (projectRes.error || !projectRes.data) return null;
     const p = projectRes.data;
 
-    const targets: DraftTargetRow[] = (targetsRes.data ?? []).map((t: any) => ({
-      code: t.code,
-      name: t.name,
-      targetType: t.target_type,
-      commodity: t.commodity,
-      priority: t.priority,
+    const targets: DraftTargetRow[] = (targetsRes.data ?? []).map((t: Record<string, unknown>) => ({
+      code: t.code as string,
+      name: t.name as string,
+      targetType: t.target_type as DraftTargetRow["targetType"],
+      commodity: t.commodity as string | null,
+      priority: t.priority as DraftTargetRow["priority"],
       score: t.score == null ? null : Number(t.score),
       lat: t.lat == null ? null : Number(t.lat),
       lng: t.lng == null ? null : Number(t.lng),
-      stage: t.stage,
+      stage: t.stage as DraftTargetRow["stage"],
     }));
 
-    const hyperspectral: DraftHyperRow[] = (hyperRes.data ?? []).map((h: any) => ({
-      source: h.source,
-      mineral: h.mineral,
-      assemblage: h.assemblage,
-      meanScore: h.mean_score == null ? null : Number(h.mean_score),
-      maxScore: h.max_score == null ? null : Number(h.max_score),
-      areaHa: h.area_ha == null ? null : Number(h.area_ha),
-      cellsAboveThreshold: h.cells_above_threshold ?? null,
-      acquisitionDate: String(h.acquisition_date).slice(0, 10),
-    }));
+    const hyperspectral: DraftHyperRow[] = (hyperRes.data ?? []).map(
+      (h: Record<string, unknown>) => ({
+        source: h.source as string,
+        mineral: h.mineral as string,
+        assemblage: h.assemblage as string | null,
+        meanScore: h.mean_score == null ? null : Number(h.mean_score),
+        maxScore: h.max_score == null ? null : Number(h.max_score),
+        areaHa: h.area_ha == null ? null : Number(h.area_ha),
+        cellsAboveThreshold: (h.cells_above_threshold as number | null) ?? null,
+        acquisitionDate: String(h.acquisition_date).slice(0, 10),
+      }),
+    );
 
     const insar: DraftInsarRow[] = (insarRes.data ?? [])
-      .map((i: any) => ({
-        assetName: i.asset_name ?? "(sin nombre)",
-        assetType: i.asset_type,
-        source: i.source,
-        alertSeverity: i.alert_severity,
+      .map((i: Record<string, unknown>) => ({
+        assetName: (i.asset_name as string | null) ?? "(sin nombre)",
+        assetType: i.asset_type as string,
+        source: i.source as string,
+        alertSeverity: i.alert_severity as DraftInsarRow["alertSeverity"],
         velocityMmYear: Number(i.velocity_mm_year),
         cumulativeMm:
           i.cumulative_displacement_mm == null ? null : Number(i.cumulative_displacement_mm),
@@ -171,13 +173,15 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     const vels = insar.map((i) => i.velocityMmYear).filter((v) => Number.isFinite(v));
     const cohs = insar.map((i) => i.coherence ?? 0).filter((c) => c > 0);
 
-    const stockpiles: DraftStockpileRow[] = (stockRes.data ?? []).map((s: any) => ({
-      name: s.name,
-      material: s.material,
-      volumeM3: s.volume_m3 == null ? null : Number(s.volume_m3),
-      areaM2: s.area_m2 == null ? null : Number(s.area_m2),
-      meanHeightM: s.mean_height_m == null ? null : Number(s.mean_height_m),
-    }));
+    const stockpiles: DraftStockpileRow[] = (stockRes.data ?? []).map(
+      (s: Record<string, unknown>) => ({
+        name: s.name as string,
+        material: s.material as string,
+        volumeM3: s.volume_m3 == null ? null : Number(s.volume_m3),
+        areaM2: s.area_m2 == null ? null : Number(s.area_m2),
+        meanHeightM: s.mean_height_m == null ? null : Number(s.mean_height_m),
+      }),
+    );
 
     const minerals = Array.from(new Set(hyperspectral.map((h) => h.mineral))).sort();
     const assemblages = Array.from(
