@@ -47,7 +47,6 @@ const SearchInput = z.object({
 });
 
 // JSON-safe alias for serializable maps over the RPC boundary.
-type JsonMap = { [k: string]: unknown };
 
 export type StacItem = {
   id: string;
