@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import type {
-  Map as LeafletMap,
-  LayerGroup as LeafletLayerGroup,
-  GeoJSON as LeafletGeoJSON,
-} from "leaflet";
-import type { Feature, Geometry, GeoJsonObject } from "geojson";
+import type { Map as LeafletMap, LayerGroup } from "leaflet";
+import type { Geometry } from "geojson";
 import {
   Layers,
   Loader2,
