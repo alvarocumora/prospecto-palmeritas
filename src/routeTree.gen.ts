@@ -51,6 +51,7 @@ import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
+import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
@@ -296,6 +297,12 @@ const ApiPublicVerifyComplianceReportIdRoute =
     path: '/api/public/verify-compliance/$reportId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedDashboardTargetsAiBriefRoute =
+  AuthenticatedDashboardTargetsAiBriefRouteImport.update({
+    id: '/ai-brief',
+    path: '/ai-brief',
+    getParentRoute: () => AuthenticatedDashboardTargetsRoute,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdRoute =
   AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
     id: '/$surveyId',
@@ -351,12 +358,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
-  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
+  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -397,12 +405,13 @@ export interface FileRoutesByTo {
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
-  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
+  '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -445,12 +454,13 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
-  '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRoute
+  '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
+  '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -499,6 +509,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/targets/ai-brief'
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
@@ -545,6 +556,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
+    | '/dashboard/targets/ai-brief'
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
@@ -592,6 +604,7 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
+    | '/_authenticated/dashboard/targets/ai-brief'
     | '/api/public/verify-compliance/$reportId'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
@@ -907,6 +920,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/targets/ai-brief': {
+      id: '/_authenticated/dashboard/targets/ai-brief'
+      path: '/ai-brief'
+      fullPath: '/dashboard/targets/ai-brief'
+      preLoaderRoute: typeof AuthenticatedDashboardTargetsAiBriefRouteImport
+      parentRoute: typeof AuthenticatedDashboardTargetsRoute
+    }
     '/_authenticated/dashboard/geophysics/$surveyId': {
       id: '/_authenticated/dashboard/geophysics/$surveyId'
       path: '/$surveyId'
@@ -976,6 +996,21 @@ const AuthenticatedDashboardGeophysicsRouteWithChildren =
     AuthenticatedDashboardGeophysicsRouteChildren,
   )
 
+interface AuthenticatedDashboardTargetsRouteChildren {
+  AuthenticatedDashboardTargetsAiBriefRoute: typeof AuthenticatedDashboardTargetsAiBriefRoute
+}
+
+const AuthenticatedDashboardTargetsRouteChildren: AuthenticatedDashboardTargetsRouteChildren =
+  {
+    AuthenticatedDashboardTargetsAiBriefRoute:
+      AuthenticatedDashboardTargetsAiBriefRoute,
+  }
+
+const AuthenticatedDashboardTargetsRouteWithChildren =
+  AuthenticatedDashboardTargetsRoute._addFileChildren(
+    AuthenticatedDashboardTargetsRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
@@ -1004,7 +1039,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardSatelliteIntelRoute: typeof AuthenticatedDashboardSatelliteIntelRoute
-  AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRoute
+  AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRouteWithChildren
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -1042,7 +1077,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
   AuthenticatedDashboardSatelliteIntelRoute:
     AuthenticatedDashboardSatelliteIntelRoute,
-  AuthenticatedDashboardTargetsRoute: AuthenticatedDashboardTargetsRoute,
+  AuthenticatedDashboardTargetsRoute:
+    AuthenticatedDashboardTargetsRouteWithChildren,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
