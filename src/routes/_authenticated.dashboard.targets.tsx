@@ -33,31 +33,26 @@ function TargetsPage() {
     setExporting(true);
     const prevView = view;
     try {
-      toast.info("Generando PDF…");
-      // Render map view, wait for tiles
-      setView("map");
-      await new Promise((r) => setTimeout(r, 2200));
-      const mapEl = mapWrapRef.current;
-      // Render ranking view
-      setView("ranking");
-      await new Promise((r) => setTimeout(r, 600));
-      const rankingEl = rankingWrapRef.current;
+      toast.info("Generando PDF, espera unos segundos…");
 
-      // Re-render map briefly to ensure ref captured (already done above)
-      // We need both els captured at the right moment; switch back to map and capture, then ranking
+      // Capture map
       setView("map");
-      await new Promise((r) => setTimeout(r, 1800));
-      await exportTargetsPDF({
-        mapEl: mapWrapRef.current,
-        rankingEl: null,
+      await new Promise((r) => setTimeout(r, 2500));
+      const mapCanvas = mapWrapRef.current ? await snapshotElement(mapWrapRef.current) : null;
+
+      // Capture ranking
+      setView("ranking");
+      await new Promise((r) => setTimeout(r, 700));
+      const rankingCanvas = rankingWrapRef.current ? await snapshotElement(rankingWrapRef.current) : null;
+
+      buildTargetsPDF({
+        mapCanvas,
+        rankingCanvas,
         projectName: active.name ?? active.code,
         projectCode: active.code,
         targetsCount: targets.length,
-      }).catch(() => null);
-      // Now ranking
-      setView("ranking");
-      await new Promise((r) => setTimeout(r, 600));
-      // Combined export — do both at once instead
+      });
+      toast.success("PDF descargado");
     } catch (e) {
       toast.error("No se pudo generar PDF");
       console.error(e);
