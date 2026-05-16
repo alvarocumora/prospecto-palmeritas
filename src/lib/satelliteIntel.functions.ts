@@ -74,15 +74,21 @@ async function postSearch(stacUrl: string, body: Record<string, unknown>): Promi
   return res.json();
 }
 
-function normalizeFeature(f: any, collection: string): StacItem {
-  const props = (f?.properties ?? {}) as Record<string, unknown>;
-  const assets = (f?.assets ?? {}) as Record<
+function normalizeFeature(f: unknown, collection: string): StacItem {
+  const feat = (f ?? {}) as StacFeature;
+  const props = (feat.properties ?? {}) as Record<string, unknown>;
+  const assets = (feat.assets ?? {}) as Record<
     string,
     { href?: string; type?: string; title?: string }
   >;
   const bbox =
-    Array.isArray(f?.bbox) && f.bbox.length >= 4
-      ? ([f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]] as [number, number, number, number])
+    Array.isArray(feat.bbox) && feat.bbox.length >= 4
+      ? ([feat.bbox[0], feat.bbox[1], feat.bbox[2], feat.bbox[3]] as [
+          number,
+          number,
+          number,
+          number,
+        ])
       : ([0, 0, 0, 0] as [number, number, number, number]);
   const dt =
     (props["datetime"] as string) ??
@@ -96,9 +102,9 @@ function normalizeFeature(f: any, collection: string): StacItem {
         : null;
   const thumb =
     assets["thumbnail"]?.href ?? assets["rendered_preview"]?.href ?? assets["browse"]?.href ?? null;
-  const self = (f?.links ?? []).find((l: any) => l?.rel === "self")?.href ?? null;
+  const self = (feat.links ?? []).find((l) => l?.rel === "self")?.href ?? null;
   return {
-    id: String(f?.id ?? ""),
+    id: String(feat.id ?? ""),
     collection,
     acquisitionDate: dt,
     bbox,
