@@ -849,10 +849,14 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         .eq("project_id", pid),
     ]);
 
-    const targets = (tRes.data ?? []) as any[];
-    const hyper = (hRes.data ?? []) as any[];
-    const insar = (iRes.data ?? []) as any[];
-    const stocks = (sRes.data ?? []) as any[];
+    type TargetSel = Pick<TargetRow, "id" | "code" | "name" | "target_type" | "commodity" | "priority" | "score" | "lat" | "lng">;
+    type HyperSel = Pick<HyperRow, "id" | "acquisition_date" | "bbox_geojson" | "mineral" | "assemblage" | "mean_score" | "max_score" | "cells_above_threshold" | "area_ha">;
+    type InsarSel = Pick<InsarRow, "id" | "asset_name" | "asset_type" | "point_geojson" | "velocity_mm_year" | "cumulative_displacement_mm" | "coherence" | "alert_severity" | "end_date">;
+    type StockSel = Pick<StockRow, "id" | "name" | "material" | "polygon_geojson" | "volume_m3" | "area_m2" | "mean_height_m">;
+    const targets = (tRes.data ?? []) as TargetSel[];
+    const hyper = (hRes.data ?? []) as HyperSel[];
+    const insar = (iRes.data ?? []) as InsarSel[];
+    const stocks = (sRes.data ?? []) as StockSel[];
 
     const summaries: TargetSatelliteSummary[] = targets.map((t) => {
       const lat = t.lat != null ? Number(t.lat) : null;
