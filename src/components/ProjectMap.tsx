@@ -1149,6 +1149,7 @@ export function ProjectMap({
 
           <div className="flex flex-wrap items-center gap-3">
             <MagnetometryLegend stats={magStats} />
+            <GeologyLegend hostRock={lithoLegend} alteration={altLegend} />
           </div>
         </>
       )}
