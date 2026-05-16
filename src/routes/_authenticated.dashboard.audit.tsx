@@ -79,11 +79,12 @@ function AuditPage() {
                   ? "text-info"
                   : "text-destructive";
             const label = ENTITY_LABELS[e.entity_type] ?? e.entity_type;
+            const payload = e.payload as Record<string, unknown> | null;
             const name =
-              (e.payload as any)?.name ??
-              (e.payload as any)?.hole_id ??
-              (e.payload as any)?.sample_code ??
-              (e.payload as any)?.code ??
+              (payload?.name as string | undefined) ??
+              (payload?.hole_id as string | undefined) ??
+              (payload?.sample_code as string | undefined) ??
+              (payload?.code as string | undefined) ??
               "";
             return (
               <div key={e.id} className="px-3 py-2 flex items-start gap-3 text-xs">

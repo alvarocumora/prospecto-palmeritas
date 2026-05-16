@@ -421,7 +421,7 @@ export function metadataToCsv(meta: ExportMetadata): string {
 
 // Convertidores específicos -------------------------------------------------
 
-export function satelliteAnomaliesToFeatures(rows: Array<Record<string, any>>): GeoFeature[] {
+export function satelliteAnomaliesToFeatures(rows: Array<Record<string, unknown>>): GeoFeature[] {
   return rows
     .map((r) => ({
       type: "Feature" as const,
@@ -442,7 +442,7 @@ export function satelliteAnomaliesToFeatures(rows: Array<Record<string, any>>): 
     .filter((f) => f.geometry !== null);
 }
 
-export function geophysicsAnomaliesToFeatures(rows: Array<Record<string, any>>): GeoFeature[] {
+export function geophysicsAnomaliesToFeatures(rows: Array<Record<string, unknown>>): GeoFeature[] {
   return rows
     .filter((r) => r.lat != null && r.lng != null)
     .map((r) => ({
@@ -464,7 +464,7 @@ export function geophysicsAnomaliesToFeatures(rows: Array<Record<string, any>>):
     }));
 }
 
-export function geologicalFeaturesToFeatures(rows: Array<Record<string, any>>): GeoFeature[] {
+export function geologicalFeaturesToFeatures(rows: Array<Record<string, unknown>>): GeoFeature[] {
   return rows.map((r) => ({
     type: "Feature" as const,
     geometry: (r.geometry_geojson as GeoJsonGeometry) ?? null,
@@ -491,7 +491,7 @@ function round7(n: number): number {
   return Math.round(n * 1e7) / 1e7;
 }
 
-export function prospectivityCellsToFeatures(rows: Array<Record<string, any>>): GeoFeature[] {
+export function prospectivityCellsToFeatures(rows: Array<Record<string, unknown>>): GeoFeature[] {
   return rows
     .filter((r) => Number.isFinite(Number(r.cell_lat)) && Number.isFinite(Number(r.cell_lng)))
     .map((r) => {

@@ -43,13 +43,14 @@ function InvitationPage() {
   const accept = async () => {
     setAccepting(true);
     const { data, error } = await supabase.rpc("accept_project_invitation", { _token: token });
+    const result = data as { ok?: boolean; error?: string } | null;
     if (error) {
       setResult({ ok: false, msg: error.message });
-    } else if ((data as any)?.ok) {
+    } else if (result?.ok) {
       setResult({ ok: true, msg: "¡Bienvenido al proyecto!" });
       setTimeout(() => navigate({ to: "/dashboard" }), 1500);
     } else {
-      setResult({ ok: false, msg: (data as any)?.error ?? "Error" });
+      setResult({ ok: false, msg: result?.error ?? "Error" });
     }
     setAccepting(false);
   };
