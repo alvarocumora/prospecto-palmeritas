@@ -578,9 +578,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   );
 }
 
-function bboxArea(g: any): number {
+function bboxArea(g: Geometry | null | undefined): number {
   try {
-    const c = g?.coordinates?.[0];
+    const c = g && "coordinates" in g ? (g.coordinates as unknown[])[0] : undefined;
     if (!Array.isArray(c)) return 0;
     const xs = c.map((p: number[]) => p[0]);
     const ys = c.map((p: number[]) => p[1]);
