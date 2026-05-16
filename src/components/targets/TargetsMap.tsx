@@ -508,22 +508,24 @@ export function TargetsMap({
               <LayersControl.Overlay checked name="Catastro (concesiones)">
                 <GeoJSON
                   key={`conc-${concessions.length}`}
-                  data={{
-                    type: "FeatureCollection",
-                    features: concessions
-                      .filter((c) => c.geometry_geojson)
-                      .map((c) => ({
-                        type: "Feature" as const,
-                        geometry: c.geometry_geojson as GeoJSON.Geometry,
-                        properties: {
-                          code: c.code,
-                          name: c.name,
-                          holder: c.holder,
-                          area_ha: c.area_ha,
-                          concession_type: c.concession_type,
-                        },
-                      })),
-                  }}
+                  data={
+                    {
+                      type: "FeatureCollection",
+                      features: concessions
+                        .filter((c) => c.geometry_geojson)
+                        .map((c) => ({
+                          type: "Feature" as const,
+                          geometry: c.geometry_geojson as GeoJSON.Geometry,
+                          properties: {
+                            code: c.code,
+                            name: c.name,
+                            holder: c.holder,
+                            area_ha: c.area_ha,
+                            concession_type: c.concession_type,
+                          },
+                        })),
+                    } as GeoJSON.FeatureCollection
+                  }
                   style={(feat): PathOptions => {
                     const type = feat?.properties?.concession_type ?? "explotacion";
                     const cssVar =
@@ -562,21 +564,23 @@ export function TargetsMap({
                   <LayersControl.Overlay checked key={idx} name={`Sat · ${meta.label}`}>
                     <GeoJSON
                       key={`${idx}-${arr.length}`}
-                      data={{
-                        type: "FeatureCollection",
-                        features: arr.map((a: AnomalyRow) => ({
-                          type: "Feature" as const,
-                          geometry: a.geometry,
-                          properties: {
-                            id: a.id,
-                            index_code: a.index_code,
-                            severity: a.severity,
-                            score: a.score,
-                            area_ha: a.area_ha,
-                            notes: a.notes,
-                          },
-                        })),
-                      }}
+                      data={
+                        {
+                          type: "FeatureCollection",
+                          features: arr.map((a: AnomalyRow) => ({
+                            type: "Feature" as const,
+                            geometry: a.geometry,
+                            properties: {
+                              id: a.id,
+                              index_code: a.index_code,
+                              severity: a.severity,
+                              score: a.score,
+                              area_ha: a.area_ha,
+                              notes: a.notes,
+                            },
+                          })),
+                        } as GeoJSON.FeatureCollection
+                      }
                       style={(feat): PathOptions => {
                         const score = Number(feat?.properties?.score ?? 0.5);
                         return {
@@ -662,6 +666,8 @@ export function TargetsMap({
             );
           })}
         </MapContainer>
+
+        <TargetsMapLegend anomaliesByIndex={anomaliesByIndex} concessions={concessions} />
 
         {/* Nearest target overlay */}
         {position && (
