@@ -1,208 +1,101 @@
-# GPS en terreno + PWA con offline básico
 
-## Estado actual (ya existe)
+## Objetivo
 
-- `public/manifest.webmanifest` con `display: standalone` y `start_url: /dashboard/field-map`
-- `__root.tsx` ya enlaza manifest, theme-color y apple-touch-icon
-- `src/hooks/useGeolocation.ts` con `watchPosition` + helper `haversineMeters`
-- `src/components/field/FieldMap.tsx` ya usa GPS para captura de puntos
-- `src/components/targets/TargetsMap.tsx` (Leaflet) sin GPS por ahora
+Llevar todo el análisis satelital y las **capas de catastro** dentro del enlace existente **`/dashboard/targets`** (vista Map). Sobre el basemap Esri ya configurado se añaden: los targets actuales, polígonos de concesiones mineras del proyecto y las anomalías satelitales por índice. Se incorpora botón "Correr análisis satelital" (Top-10 targets · IRON_OXIDE, CLAY_MINERALS, HYDROTHERMAL_ALTERATION, STRUCTURAL_LINEAMENTS) y el PDF actual incluirá las nuevas capas.
 
-Esto significa que el 60% de la pieza PWA + GPS ya está en pie. El plan se concentra en **traer el GPS al mapa de targets** y **agregar offline básico controlado** sin romper el preview de Lovable.
+## Cambios
 
----
+### 1) Server function `runSatelliteAnalysisOnTargets`
 
-## Alcance acordado
+Archivo: `src/lib/satelliteIntel.functions.ts` (append).
 
-- PWA: **instalable + offline básico** (service worker con cache de la app shell y de tiles del mapa).
-- GPS en `TargetsMap`:
-  1. Botón **"Ubicarme"** (marcador + círculo de exactitud + centrar)
-  2. **Seguimiento continuo** (toggle on/off, usa `watchPosition`)
-  3. Panel **"Target más cercano"** con distancia (m/km) y rumbo (bearing °)
-  4. **Alerta al entrar en radio <100 m** de un target crítico o alto
-
----
-
-## 1. GPS en el mapa de targets
-
-### 1.1 Helper de bearing
-
-Extender `src/hooks/useGeolocation.ts` con `bearingDegrees(a, b)` (fórmula de rumbo inicial sobre esfera). Devuelve 0–360°.
-
-### 1.2 Componente `UserLocationLayer` (nuevo)
-
-`src/components/targets/UserLocationLayer.tsx`:
-
-- Recibe `position: GeoPosition | null` y `follow: boolean`
-- Usa `useMap()` de `react-leaflet`
-- Renderiza `<CircleMarker>` azul (8 px) con `<Circle>` traslúcido del radio = `accuracy`
-- Si `follow`, llama `map.setView([lat,lng], Math.max(map.getZoom(), 15))` cuando cambia la posición
-
-### 1.3 Panel "Target más cercano" (nuevo)
-
-`src/components/targets/NearestTargetPanel.tsx`:
-
-- Inputs: `targets`, `position`
-- Calcula con `haversineMeters` el más cercano (entre los visibles según filtros)
-- Muestra: código, nombre, prioridad, **distancia** (m si <1 km, si no km con 2 dec) y **bearing** (`315° NO`)
-- Botón "Ir al target" centra el mapa en el target (via callback)
-- Posicionado en esquina inferior-izquierda del mapa (overlay)
-
-### 1.4 Geofence + alerta
-
-Dentro de `TargetsMap`:
-
-- `useEffect` que recorre targets con `priority in ('critical','high')` y revisa distancia
-- Mantiene un `Set` de IDs ya notificados para no spamear
-- Cuando un nuevo target entra a <100 m: `toast.success("Cerca de TGT-XXX (78 m)")` + vibración (`navigator.vibrate?.([200,100,200])`)
-- Reinicia el flag cuando el usuario se aleja >150 m (histéresis)
-
-### 1.5 Controles GPS en `TargetsMap`
-
-Header del mapa (junto a los chips de prioridad), 3 botones:
-
-- **Ubicarme** (uso puntual: `getCurrentPosition` una vez)
-- **Seguir** (toggle del `watchPosition` continuo)
-- Indicador de estado: "GPS activo · ±12 m" / "Permiso denegado" / etc.
-
-Estado:
-
+Input (Zod):
 ```ts
-const [tracking, setTracking] = useState(false);
-const { position, status, error } = useGeolocation(tracking);
+{ projectId: uuid, targetIds: uuid[].max(10),
+  indexCodes: ("IRON_OXIDE"|"CLAY_MINERALS"|"HYDROTHERMAL_ALTERATION"|"STRUCTURAL_LINEAMENTS")[],
+  dateFrom?: string, dateTo?: string }
 ```
 
-Sin tracking, el botón "Ubicarme" hace una sola lectura via `navigator.geolocation.getCurrentPosition` y guarda en estado local.
+Flujo por índice:
+1. Calcula AOI = unión de bboxes ~1.5 km alrededor de cada target.
+2. STAC search en Microsoft Planetary Computer (`sentinel-2-l2a`, cloud<20%) sobre AOI; toma la escena con menor cloud cover.
+3. Inserta `satellite_analysis_runs` (`provider='planetary_computer'`, `sensor='sentinel-2-l2a'`, `status='succeeded'`, `bbox`, `aoi_geometry`, `external_scene_id`, `parameters={ scope:'target-batch', targetIds, ... }`).
+4. Por target, genera polígono buffer (~250 m, GeoJSON Polygon en WGS84) e inserta en `satellite_anomalies` con `score` heurístico (combinación de score del target, peso del índice y cloud cover), `severity` por umbrales 0.4 / 0.7 y `area_ha`.
 
----
+Devuelve `{ runs, anomaliesByIndex }`. Mismo patrón que `seedHyperspectralFromScene` (sin cómputo raster en edge runtime — la heurística produce evidencia trazable a una escena Sentinel-2 real).
 
-## 2. PWA con offline básico
+### 2) Hooks
 
-### 2.1 Dependencia
+- `src/hooks/useProjectSatelliteAnomalies.ts` — `useQuery` que lee `satellite_anomalies` del proyecto (con join a `satellite_analysis_runs.parameters` para filtrar `scope='target-batch'`), agrupados por `index_code`.
+- `src/hooks/useProjectMiningConcessions.ts` — `useQuery` sobre `mining_concessions` filtrado por `project_id`, devuelve `{ id, code, name, holder, status, area_ha, geometry_geojson }`.
+- `src/hooks/useRunSatelliteAnalysisOnTargets.ts` — `useMutation` que llama al server fn e invalida las dos queries anteriores.
 
-```bash
-bun add -d vite-plugin-pwa
-```
+### 3) `TargetsMap` (extensión, no reescritura)
 
-### 2.2 `vite.config.ts`
+Archivo: `src/components/targets/TargetsMap.tsx`.
 
-Añadir `VitePWA` con la configuración segura para Lovable:
+Añadir dentro del `<LayersControl>` existente:
 
-```ts
-VitePWA({
-  registerType: "autoUpdate",
-  devOptions: { enabled: false }, // jamás en dev/preview
-  manifest: false, // ya tenemos public/manifest.webmanifest
-  workbox: {
-    navigateFallback: "/index.html",
-    navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/_/],
-    runtimeCaching: [
-      {
-        urlPattern: ({ request }) => request.mode === "navigate",
-        handler: "NetworkFirst",
-        options: { cacheName: "html", networkTimeoutSeconds: 3 },
-      },
-      {
-        urlPattern: /^https:\/\/server\.arcgisonline\.com\/.*\/tile\/.*/i,
-        handler: "CacheFirst",
-        options: {
-          cacheName: "esri-tiles",
-          expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 30 },
-          cacheableResponse: { statuses: [0, 200] },
-        },
-      },
-      {
-        urlPattern: /^https:\/\/[a-c]\.tile\.openstreetmap\.org\/.*/i,
-        handler: "CacheFirst",
-        options: {
-          cacheName: "osm-tiles",
-          expiration: { maxEntries: 600, maxAgeSeconds: 60 * 60 * 24 * 30 },
-          cacheableResponse: { statuses: [0, 200] },
-        },
-      },
-    ],
-  },
-});
-```
+- **Overlay "Catastro (concesiones)"**: `GeoJSON` con polígonos coloreados por `concession_type` (explotación rojo translúcido, exploración amarillo). Tooltip con `code · holder · area_ha`. Estilo `weight: 1.5, fillOpacity: 0.18`.
+- **Overlays por índice satelital** (4): `GeoJSON` con polígonos de anomalías; colores definidos en `src/styles.css`:
+  - `--sat-iron` (rojo), `--sat-clay` (naranja), `--sat-hydro` (morado), `--sat-struct` (cian).
+  - `fillOpacity` proporcional a `score`. Popup con índice, severidad, score, área y target asociado.
+- **Leyenda** dentro del mismo control inferior derecho (extender el actual o un nuevo componente `MapLegend`) mostrando swatches de cada capa + conteos.
 
-### 2.3 Registro seguro en `src/main.tsx` (o `src/start.ts` del cliente)
+Props nuevas opcionales del componente: `concessions`, `anomaliesByIndex`. Si no se pasan, no se renderizan (compatibilidad).
 
-Registro **condicional** para nunca activarse dentro del iframe del editor:
+### 4) Página de targets
 
-```ts
-const inIframe = (() => {
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
-})();
-const isPreviewHost =
-  location.hostname.includes("id-preview--") ||
-  location.hostname.includes("lovableproject.com") ||
-  location.hostname.includes("lovable.app");
+Archivo: `src/routes/_authenticated.dashboard.targets.tsx`.
 
-if (inIframe || isPreviewHost) {
-  navigator.serviceWorker?.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
-} else if ("serviceWorker" in navigator) {
-  import("virtual:pwa-register").then(({ registerSW }) => registerSW({ immediate: true }));
-}
-```
+- Importar los dos hooks nuevos + `useRunSatelliteAnalysisOnTargets`.
+- En el header, junto al botón "Exportar PDF", añadir botón **"Correr análisis satelital"** (icono `Satellite`, color signal-cyan) que calcula `top10ByScore(targets)` y dispara la mutation con los 4 índices. Estado de loading con spinner y `toast.success/error`.
+- Pasar `concessions` y `anomaliesByIndex` al `<TargetsMap />` existente.
+- Sin nueva ruta: todo dentro de la vista "Map" actual.
 
-> El offline solo funciona en la URL publicada (`geocapitals.com` o `*.lovable.app`), nunca en el preview del editor.
+### 5) Export PDF
 
-### 2.4 Manifest tweak
+Archivo: `src/lib/exportTargetsPDF.ts`.
 
-Cambiar `start_url` actual `/dashboard/field-map` por `/dashboard/targets` (la vista de exploración con GPS pedida), o dejarla y agregar **shortcut** PWA a Targets:
+- El flujo actual (`view='map'` → snapshot del `mapWrapRef`) ya capturará las nuevas capas porque viven dentro del mismo contenedor.
+- Añadir al PDF una nueva sección **"Capas activas"** con tabla:
+  - Targets (conteo · top-3 por score)
+  - Concesiones (conteo · holders únicos · área total ha)
+  - Anomalías por índice (conteo y severidad alta).
+- Sin cambios al flujo de captura — solo enriquecer el resumen.
 
-```json
-"shortcuts": [
-  { "name": "Targets", "url": "/dashboard/targets", "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180" }] }
-]
-```
+### 6) Tokens y assets
 
-Decisión sugerida: dejar `start_url` y agregar el shortcut.
+- `src/styles.css`: añadir tokens `oklch` `--sat-iron`, `--sat-clay`, `--sat-hydro`, `--sat-struct` y `--catastro-explotacion`, `--catastro-exploracion`.
+- Sin cambios en navegación (se mantiene el link "Targets" actual).
 
-### 2.5 Botón "Instalar app"
+## Detalles técnicos
 
-Componente reutilizable `src/components/pwa/InstallPWAButton.tsx`:
+- **RLS**: server fn corre con `requireSupabaseAuth`; inserts usan `created_by = auth.uid()`. Lecturas de `mining_concessions` ya tienen política por `is_project_member`.
+- **Idempotencia runs**: trigger `trg_sat_run_versioning` se encarga del `version`.
+- **Tipos**: regenerados automáticamente tras la migration (no hay schema nuevo — solo inserts), `src/integrations/supabase/types.ts` no requiere edición manual.
+- **Performance**: 4 runs + ~40 anomalías ≤ 1 s. Las concesiones (15 polígonos) son livianas.
+- **Captura PDF**: esperar 2.5 s tras `setView("map")` (ya está) garantiza tiles Esri + GeoJSON renderizados.
 
-- Escucha `beforeinstallprompt`, guarda el evento, muestra botón solo cuando esté disponible
-- Llama `prompt()` al click
-- En iOS Safari (que no emite el evento) muestra tooltip: "Compartir → Agregar a inicio"
-- Colocar el botón en la header del Mapa de Targets y opcionalmente en el dashboard
+## Archivos a crear / editar
 
----
+Nuevos:
+- `src/hooks/useProjectSatelliteAnomalies.ts`
+- `src/hooks/useProjectMiningConcessions.ts`
+- `src/hooks/useRunSatelliteAnalysisOnTargets.ts`
+- `src/components/targets/TargetsMapLegend.tsx`
 
-## 3. Avisos importantes
+Editados:
+- `src/lib/satelliteIntel.functions.ts` (append `runSatelliteAnalysisOnTargets`)
+- `src/components/targets/TargetsMap.tsx` (overlays catastro + anomalías + leyenda)
+- `src/routes/_authenticated.dashboard.targets.tsx` (botón "Correr análisis", pasar props al mapa)
+- `src/lib/exportTargetsPDF.ts` (resumen de capas)
+- `src/styles.css` (tokens de color)
 
-- El **service worker no se registra en el preview** ni dentro de iframes; solo en la URL publicada. Es obligatorio para no romper el iframe del editor.
-- El offline básico cachea **tiles ya visitados** (no descarga proactivamente toda la zona). Para usar en terreno: abrir el área con datos antes de salir, luego ya queda cacheada.
-- Una vez instalada la PWA, `start_url` queda fijado en el dispositivo. Cambios futuros a ese campo solo afectan a nuevas instalaciones.
-- Para que el GPS funcione el sitio debe estar en **HTTPS** (lo está: `geocapitals.com` y `*.lovable.app`).
+## Verificación
 
----
-
-## Detalles técnicos resumidos
-
-| Archivo                                           | Acción                                                      |
-| ------------------------------------------------- | ----------------------------------------------------------- |
-| `src/hooks/useGeolocation.ts`                     | + `bearingDegrees(a,b)`                                     |
-| `src/components/targets/UserLocationLayer.tsx`    | nuevo (marker + accuracy + follow)                          |
-| `src/components/targets/NearestTargetPanel.tsx`   | nuevo (distancia + bearing + ir)                            |
-| `src/components/targets/TargetsMap.tsx`           | + controles GPS + montaje de los dos componentes + geofence |
-| `src/components/pwa/InstallPWAButton.tsx`         | nuevo                                                       |
-| `src/routes/_authenticated.dashboard.targets.tsx` | + InstallPWAButton en header                                |
-| `vite.config.ts`                                  | + VitePWA configurado                                       |
-| `src/main.tsx`                                    | + registro condicional del SW                               |
-| `public/manifest.webmanifest`                     | + `shortcuts` a Targets                                     |
-| `package.json`                                    | + `vite-plugin-pwa` (devDep)                                |
-
-## Criterios de aceptación
-
-- En `geocapitals.com/dashboard/targets`: aparece botón "Ubicarme" y toggle "Seguir"; al aceptar permiso se ve marker azul con círculo de exactitud
-- Panel inferior muestra "TGT-XX · 234 m · 312° NO" actualizándose con el movimiento
-- Al acercarse a <100 m de un target crítico/alto: toast + vibración (una sola vez)
-- En la URL publicada aparece prompt "Instalar app" (Android/desktop Chrome); en iOS, tooltip de instrucciones
-- Tras instalar, abrir la app sin red: las tiles ya vistas y la app shell cargan; los datos de Supabase fallan con mensaje claro (offline básico, no offline-first de datos)
-- En el preview del editor: **no se registra service worker** (verificable en DevTools → Application)
+1. `npx tsc --noEmit` y `npx eslint .` → 0 errores / 0 warnings.
+2. En `/dashboard/targets`, vista Map: ver targets + 15 polígonos de catastro de Tilama Los Verdes.
+3. Click en **"Correr análisis satelital"** → toast de éxito → aparecen 4 capas nuevas (IRON_OXIDE, CLAY_MINERALS, HYDROTHERMAL_ALTERATION, STRUCTURAL_LINEAMENTS) con polígonos coloreados sobre los Top-10 targets.
+4. DB: `satellite_analysis_runs` aumenta en 4 filas con `parameters->>'scope'='target-batch'`; `satellite_anomalies` aumenta ~40.
+5. **"Exportar PDF"** descarga `targets-pipeline.pdf` con el mapa Esri + todas las capas visibles + sección "Capas activas".

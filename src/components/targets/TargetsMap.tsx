@@ -6,6 +6,7 @@ import {
   Popup,
   LayersControl,
   Tooltip,
+  GeoJSON,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
@@ -26,6 +27,14 @@ import { toast } from "sonner";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { UserLocationLayer } from "./UserLocationLayer";
 import { NearestTargetPanel } from "./NearestTargetPanel";
+import type { ConcessionRow } from "@/hooks/useProjectMiningConcessions";
+import type {
+  AnomaliesByIndex,
+  AnomalyRow,
+  SatIndexCode,
+} from "@/hooks/useProjectSatelliteAnomalies";
+import { TargetsMapLegend, INDEX_META } from "./TargetsMapLegend";
+import type { PathOptions } from "leaflet";
 
 const PRIORITY_COLORS: Record<TargetPriority, string> = {
   critical: "#ef4444",
@@ -89,7 +98,15 @@ function MapRefCatcher({ onReady }: { onReady: (m: LeafletMap) => void }) {
   return null;
 }
 
-export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
+export function TargetsMap({
+  targets,
+  concessions,
+  anomaliesByIndex,
+}: {
+  targets: ExplorationTarget[];
+  concessions?: ConcessionRow[];
+  anomaliesByIndex?: AnomaliesByIndex;
+}) {
   const geoTargets = useMemo(
     () =>
       targets.filter(
@@ -486,6 +503,108 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
                 crossOrigin="anonymous"
               />
             </LayersControl.BaseLayer>
+
+            {concessions && concessions.filter((c) => c.geometry_geojson).length > 0 && (
+              <LayersControl.Overlay checked name="Catastro (concesiones)">
+                <GeoJSON
+                  key={`conc-${concessions.length}`}
+                  data={
+                    {
+                      type: "FeatureCollection",
+                      features: concessions
+                        .filter((c) => c.geometry_geojson)
+                        .map((c) => ({
+                          type: "Feature" as const,
+                          geometry: c.geometry_geojson as GeoJSON.Geometry,
+                          properties: {
+                            code: c.code,
+                            name: c.name,
+                            holder: c.holder,
+                            area_ha: c.area_ha,
+                            concession_type: c.concession_type,
+                          },
+                        })),
+                    } as GeoJSON.FeatureCollection
+                  }
+                  style={(feat): PathOptions => {
+                    const type = feat?.properties?.concession_type ?? "explotacion";
+                    const cssVar =
+                      type === "exploracion"
+                        ? "--catastro-exploracion"
+                        : "--catastro-explotacion";
+                    return {
+                      color: `var(${cssVar})`,
+                      weight: 1.5,
+                      fillColor: `var(${cssVar})`,
+                      fillOpacity: 0.18,
+                    };
+                  }}
+                  onEachFeature={(feat, layer) => {
+                    const p = feat.properties as {
+                      code: string;
+                      name: string;
+                      holder: string | null;
+                      area_ha: number | null;
+                    };
+                    layer.bindTooltip(
+                      `<div class="text-[10px] font-mono"><strong>${p.code}</strong> · ${p.name}<br/>${p.holder ?? "—"}${p.area_ha != null ? ` · ${p.area_ha} ha` : ""}</div>`,
+                      { sticky: true },
+                    );
+                  }}
+                />
+              </LayersControl.Overlay>
+            )}
+
+            {anomaliesByIndex &&
+              (Object.keys(INDEX_META) as SatIndexCode[]).map((idx) => {
+                const arr = anomaliesByIndex[idx];
+                if (!arr || arr.length === 0) return null;
+                const meta = INDEX_META[idx];
+                return (
+                  <LayersControl.Overlay checked key={idx} name={`Sat · ${meta.label}`}>
+                    <GeoJSON
+                      key={`${idx}-${arr.length}`}
+                      data={
+                        {
+                          type: "FeatureCollection",
+                          features: arr.map((a: AnomalyRow) => ({
+                            type: "Feature" as const,
+                            geometry: a.geometry,
+                            properties: {
+                              id: a.id,
+                              index_code: a.index_code,
+                              severity: a.severity,
+                              score: a.score,
+                              area_ha: a.area_ha,
+                              notes: a.notes,
+                            },
+                          })),
+                        } as GeoJSON.FeatureCollection
+                      }
+                      style={(feat): PathOptions => {
+                        const score = Number(feat?.properties?.score ?? 0.5);
+                        return {
+                          color: `var(${meta.cssVar})`,
+                          weight: 1.4,
+                          fillColor: `var(${meta.cssVar})`,
+                          fillOpacity: Math.max(0.15, Math.min(0.55, score * 0.6)),
+                        };
+                      }}
+                      onEachFeature={(feat, layer) => {
+                        const p = feat.properties as {
+                          severity: string;
+                          score: number;
+                          area_ha: number | null;
+                          notes: string | null;
+                        };
+                        layer.bindPopup(
+                          `<div class="text-[10px] font-mono space-y-0.5 min-w-[180px]"><div><strong>${meta.label}</strong></div><div>Severidad: ${p.severity}</div><div>Score: ${Number(p.score).toFixed(2)}</div><div>Área: ${p.area_ha ?? "—"} ha</div>${p.notes ? `<div class="text-gray-500 pt-1 border-t border-gray-200">${p.notes}</div>` : ""}</div>`,
+                        );
+                      }}
+                    />
+                  </LayersControl.Overlay>
+                );
+              })}
           </LayersControl>
 
           <UserLocationLayer position={position} follow={tracking} />
@@ -547,6 +666,8 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
             );
           })}
         </MapContainer>
+
+        <TargetsMapLegend anomaliesByIndex={anomaliesByIndex} concessions={concessions} />
 
         {/* Nearest target overlay */}
         {position && (

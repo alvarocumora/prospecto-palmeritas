@@ -26,12 +26,19 @@ import {
   Trophy,
   FileDown,
   Loader2,
+  Satellite,
 } from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 import { snapshotElement, buildTargetsPDF } from "@/lib/exportTargetsPDF";
 import { InstallPWAButton } from "@/components/pwa/InstallPWAButton";
+import { useProjectMiningConcessions } from "@/hooks/useProjectMiningConcessions";
+import {
+  useProjectSatelliteAnomalies,
+  SAT_INDEX_CODES,
+} from "@/hooks/useProjectSatelliteAnomalies";
+import { useRunSatelliteAnalysisOnTargets } from "@/hooks/useRunSatelliteAnalysisOnTargets";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
@@ -50,6 +57,34 @@ function TargetsPage() {
   const mapWrapRef = useRef<HTMLDivElement | null>(null);
   const rankingWrapRef = useRef<HTMLDivElement | null>(null);
   const writable = canWrite(role);
+
+  const { data: concessions } = useProjectMiningConcessions(active?.id ?? null);
+  const { data: anomaliesByIndex } = useProjectSatelliteAnomalies(active?.id ?? null);
+  const runSat = useRunSatelliteAnalysisOnTargets();
+
+  async function handleRunSatellite() {
+    if (!active || targets.length === 0) return;
+    const top10 = [...targets]
+      .filter((t) => t.lat != null && t.lng != null)
+      .sort((a, b) => Number(b.score ?? 0) - Number(a.score ?? 0))
+      .slice(0, 10);
+    if (top10.length === 0) {
+      toast.error("No hay targets con coordenadas");
+      return;
+    }
+    try {
+      const res = await runSat.mutateAsync({
+        projectId: active.id,
+        targetIds: top10.map((t) => t.id),
+        indexCodes: [...SAT_INDEX_CODES],
+      });
+      if (!res.ok) throw new Error(res.error ?? "Error");
+      const totalAnoms = Object.values(res.anomaliesByIndex).reduce((s, n) => s + n, 0);
+      toast.success(`Análisis listo · ${res.runs.length} índices · ${totalAnoms} anomalías`);
+    } catch (e) {
+      toast.error(`No se pudo correr análisis: ${(e as Error).message}`);
+    }
+  }
 
   async function handleExportPDF() {
     if (!active || targets.length === 0) return;
@@ -70,12 +105,26 @@ function TargetsPage() {
         ? await snapshotElement(rankingWrapRef.current)
         : null;
 
+      const holders = new Set(
+        (concessions ?? []).map((c) => c.holder ?? "").filter(Boolean),
+      );
+      const concAreaHa = (concessions ?? []).reduce((s, c) => s + Number(c.area_ha ?? 0), 0);
+      const anomCounts: Record<string, number> = {};
+      if (anomaliesByIndex) {
+        for (const k of SAT_INDEX_CODES) anomCounts[k] = anomaliesByIndex[k]?.length ?? 0;
+      }
       buildTargetsPDF({
         mapCanvas,
         rankingCanvas,
         projectName: active.name ?? active.code,
         projectCode: active.code,
         targetsCount: targets.length,
+        layersSummary: {
+          concessionsCount: concessions?.length ?? 0,
+          holdersCount: holders.size,
+          concessionsAreaHa: concAreaHa,
+          anomalyCounts: anomCounts,
+        },
       });
       toast.success("PDF descargado");
     } catch (e) {
@@ -181,6 +230,20 @@ function TargetsPage() {
           <InstallPWAButton />
           <button
             type="button"
+            onClick={handleRunSatellite}
+            disabled={runSat.isPending || targets.length === 0}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-signal-cyan/40 text-signal-cyan bg-signal-cyan/5 hover:bg-signal-cyan/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Corre análisis Sentinel-2 multi-índice sobre los 10 targets de mayor score"
+          >
+            {runSat.isPending ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Satellite className="w-3 h-3" />
+            )}
+            {runSat.isPending ? "Analizando…" : "Correr análisis satelital"}
+          </button>
+          <button
+            type="button"
             onClick={handleExportPDF}
             disabled={exporting || targets.length === 0}
             className="px-3 py-1.5 text-xs font-mono rounded border border-emerald-500/40 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -234,7 +297,11 @@ function TargetsPage() {
         </div>
       ) : view === "map" ? (
         <div ref={mapWrapRef}>
-          <TargetsMap targets={targets} />
+          <TargetsMap
+            targets={targets}
+            concessions={concessions}
+            anomaliesByIndex={anomaliesByIndex}
+          />
         </div>
       ) : view === "ranking" ? (
         <div ref={rankingWrapRef}>
