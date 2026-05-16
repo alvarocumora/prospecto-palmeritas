@@ -1,4 +1,4 @@
-import { Radio } from "lucide-react";
+import { Radio, type LucideIcon } from "lucide-react";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
 
 const METHOD_SIGNATURES = [
