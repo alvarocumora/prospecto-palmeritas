@@ -382,7 +382,7 @@ export const seedInsarMonitoring = createServerFn({ method: "POST" })
     const refIso = refDate.toISOString().slice(0, 10);
     const endIso = today.toISOString().slice(0, 10);
 
-    const rows: any[] = [];
+    const rows: TablesInsert<"insar_displacement">[] = [];
     for (const asset of data.assets) {
       // 6 puntos por activo: corona, talud, pie, cuerpo central x2, perímetro
       const offsets: Array<{
