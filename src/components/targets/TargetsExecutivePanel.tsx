@@ -41,19 +41,53 @@ function fmt(n: number, suffix: string, decimals = 0): string {
 }
 
 export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[] }) {
+  const [gpsOn, setGpsOn] = useState(false);
+  const { position, status } = useGeolocation(gpsOn);
+  const sortByDistance = gpsOn && !!position;
+
   const enriched = useMemo(
-    () => targets.map((t) => ({ t, m: extractMetrics(t) })),
-    [targets],
+    () => targets.map((t) => {
+      const lat = t.lat != null ? Number(t.lat) : null;
+      const lng = t.lng != null ? Number(t.lng) : null;
+      const hasCoord = lat != null && lng != null && Number.isFinite(lat) && Number.isFinite(lng);
+      const distance = position && hasCoord
+        ? haversineMeters(position, { lat: lat as number, lng: lng as number })
+        : null;
+      return { t, m: extractMetrics(t), distance };
+    }),
+    [targets, position],
   );
 
   const grouped = useMemo(() => {
     const g: Record<TargetPriority, typeof enriched> = { critical: [], high: [], medium: [], low: [] };
     enriched.forEach((row) => g[row.t.priority].push(row));
     (Object.keys(g) as TargetPriority[]).forEach((k) => {
-      g[k].sort((a, b) => (b.t.score ?? 0) - (a.t.score ?? 0) || b.m.cu_ppm - a.m.cu_ppm);
+      if (sortByDistance) {
+        g[k].sort((a, b) => {
+          const da = a.distance ?? Number.POSITIVE_INFINITY;
+          const db = b.distance ?? Number.POSITIVE_INFINITY;
+          if (da !== db) return da - db;
+          return (b.t.score ?? 0) - (a.t.score ?? 0);
+        });
+      } else {
+        g[k].sort((a, b) => (b.t.score ?? 0) - (a.t.score ?? 0) || b.m.cu_ppm - a.m.cu_ppm);
+      }
     });
     return g;
-  }, [enriched]);
+  }, [enriched, sortByDistance]);
+
+  function toggleGps() {
+    if (gpsOn) {
+      setGpsOn(false);
+      return;
+    }
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocalización no soportada en este dispositivo");
+      return;
+    }
+    setGpsOn(true);
+    toast.info("Solicitando GPS… el ranking se ordenará por distancia");
+  }
 
   const aggregate = useMemo(() => {
     const all = enriched.map((r) => r.m);
