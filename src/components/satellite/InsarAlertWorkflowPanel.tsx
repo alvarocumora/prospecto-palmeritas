@@ -308,7 +308,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         Sin eventos registrados todavía.
                       </div>
                     ) : (
-                      siteActions.map((a: any) => (
+                      siteActions.map((a) => (
                         <div key={a.id} className="flex items-start gap-2 text-[11px] font-mono">
                           <span
                             className={cn(
