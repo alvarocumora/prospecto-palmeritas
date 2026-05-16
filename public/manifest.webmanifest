@@ -1,7 +1,7 @@
 {
   "name": "Geocapitals Field",
   "short_name": "Geocapitals",
-  "description": "Mapa de exploración en terreno: pertenencias mineras y captura de puntos de interés geolocalizados.",
+  "description": "Exploración minera en terreno: targets, catastro y captura geolocalizada.",
   "start_url": "/dashboard/field-map",
   "scope": "/",
   "display": "standalone",
@@ -21,6 +21,22 @@
       "sizes": "180x180",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Targets",
+      "short_name": "Targets",
+      "description": "Mapa de targets de exploración con GPS",
+      "url": "/dashboard/targets",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180" }]
+    },
+    {
+      "name": "Mapa de campo",
+      "short_name": "Campo",
+      "description": "Captura geolocalizada en terreno",
+      "url": "/dashboard/field-map",
+      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180" }]
     }
   ]
 }
