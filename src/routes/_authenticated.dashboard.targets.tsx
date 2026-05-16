@@ -183,9 +183,9 @@ function TargetsPage() {
           <p className="text-xs text-muted-foreground mt-1">Crea tu primer target con la evidencia geológica/geofísica que lo respalde.</p>
         </div>
       ) : view === "map" ? (
-        <TargetsMap targets={targets} />
+        <div ref={mapWrapRef}><TargetsMap targets={targets} /></div>
       ) : view === "ranking" ? (
-        <TargetsExecutivePanel targets={targets} />
+        <div ref={rankingWrapRef}><TargetsExecutivePanel targets={targets} /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (
