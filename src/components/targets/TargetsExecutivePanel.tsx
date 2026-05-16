@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero } from "lucide-react";
+import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero, RefreshCw } from "lucide-react";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
