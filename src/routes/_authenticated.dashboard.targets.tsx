@@ -6,8 +6,9 @@ import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon } from "lucide-react";
 import { toast } from "sonner";
+import { TargetsMap } from "@/components/targets/TargetsMap";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
@@ -19,6 +20,7 @@ function TargetsPage() {
   const role = useProjectRole();
   const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
   const [showForm, setShowForm] = useState(false);
+  const [view, setView] = useState<"kanban" | "map">("kanban");
   const writable = canWrite(role);
 
   const grouped = useMemo(() => {
@@ -75,6 +77,22 @@ function TargetsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <div className="inline-flex rounded border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setView("kanban")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 ${view === "kanban" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <LayoutGrid className="w-3 h-3" /> Kanban
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("map")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 border-l border-border ${view === "map" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <MapIcon className="w-3 h-3" /> Mapa
+            </button>
+          </div>
           <Link
             to="/dashboard/targets/ai-brief"
             className="px-3 py-1.5 text-xs font-mono rounded border border-info/40 text-info bg-info/5 hover:bg-info/10 inline-flex items-center gap-1.5"
@@ -108,6 +126,8 @@ function TargetsPage() {
           <div className="font-mono text-sm">Sin targets aún</div>
           <p className="text-xs text-muted-foreground mt-1">Crea tu primer target con la evidencia geológica/geofísica que lo respalde.</p>
         </div>
+      ) : view === "map" ? (
+        <TargetsMap targets={targets} />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (
