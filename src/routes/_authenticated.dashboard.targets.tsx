@@ -105,12 +105,26 @@ function TargetsPage() {
         ? await snapshotElement(rankingWrapRef.current)
         : null;
 
+      const holders = new Set(
+        (concessions ?? []).map((c) => c.holder ?? "").filter(Boolean),
+      );
+      const concAreaHa = (concessions ?? []).reduce((s, c) => s + Number(c.area_ha ?? 0), 0);
+      const anomCounts: Record<string, number> = {};
+      if (anomaliesByIndex) {
+        for (const k of SAT_INDEX_CODES) anomCounts[k] = anomaliesByIndex[k]?.length ?? 0;
+      }
       buildTargetsPDF({
         mapCanvas,
         rankingCanvas,
         projectName: active.name ?? active.code,
         projectCode: active.code,
         targetsCount: targets.length,
+        layersSummary: {
+          concessionsCount: concessions?.length ?? 0,
+          holdersCount: holders.size,
+          concessionsAreaHa: concAreaHa,
+          anomalyCounts: anomCounts,
+        },
       });
       toast.success("PDF descargado");
     } catch (e) {
