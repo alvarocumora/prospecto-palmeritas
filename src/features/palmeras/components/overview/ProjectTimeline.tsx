@@ -22,7 +22,9 @@ export function ProjectTimeline({ className = "" }: ProjectTimelineProps) {
             />
             <div className="flex items-baseline justify-between gap-3">
               <div className="font-mono text-sm">
-                <span className={phase.active ? "text-gold" : "text-foreground"}>FASE {phase.n}</span>
+                <span className={phase.active ? "text-gold" : "text-foreground"}>
+                  FASE {phase.n}
+                </span>
                 <span className="text-hint mx-2">·</span>
                 <span className="text-muted-foreground">{phase.range}</span>
               </div>

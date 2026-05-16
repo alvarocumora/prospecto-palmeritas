@@ -30,7 +30,9 @@ function TeamPage() {
     <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
       <header className="mb-6 flex items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Proyecto · {active.code}</div>
+          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+            Proyecto · {active.code}
+          </div>
           <h1 className="text-xl md:text-2xl font-bold mt-1">Equipo de {active.name}</h1>
         </div>
         {canManage && (
@@ -44,8 +46,12 @@ function TeamPage() {
       </header>
 
       <section className="mb-8">
-        <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Miembros</h2>
-        {loading ? <div className="text-xs text-muted-foreground">Cargando…</div> : (
+        <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
+          Miembros
+        </h2>
+        {loading ? (
+          <div className="text-xs text-muted-foreground">Cargando…</div>
+        ) : (
           <MembersTable
             members={members}
             canManage={canManage}
@@ -64,10 +70,14 @@ function TeamPage() {
 
       {canManage && (
         <section>
-          <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">Invitaciones</h2>
+          <h2 className="text-xs font-mono uppercase tracking-wider text-muted-foreground mb-2">
+            Invitaciones
+          </h2>
           <div className="rounded border border-border bg-bg-secondary divide-y divide-border">
             {invitations.length === 0 && (
-              <div className="px-3 py-4 text-xs text-muted-foreground font-mono text-center">Sin invitaciones pendientes.</div>
+              <div className="px-3 py-4 text-xs text-muted-foreground font-mono text-center">
+                Sin invitaciones pendientes.
+              </div>
             )}
             {invitations.map((inv) => (
               <div key={inv.id} className="px-3 py-2 flex items-center gap-3 text-xs">
@@ -75,7 +85,8 @@ function TeamPage() {
                 <div className="flex-1 min-w-0">
                   <div className="font-mono truncate">{inv.email}</div>
                   <div className="text-[10px] font-mono text-muted-foreground">
-                    {inv.role} · {inv.status} · expira {new Date(inv.expires_at).toLocaleDateString()}
+                    {inv.role} · {inv.status} · expira{" "}
+                    {new Date(inv.expires_at).toLocaleDateString()}
                   </div>
                 </div>
                 <button

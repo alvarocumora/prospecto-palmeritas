@@ -17,30 +17,42 @@ function utmToLatLng(easting: number, northing: number, zone = 19, south = true)
   const m = y / k0;
   const mu = m / (a * (1 - (e * e) / 4 - (3 * e ** 4) / 64 - (5 * e ** 6) / 256));
   const e1 = (1 - Math.sqrt(1 - e * e)) / (1 + Math.sqrt(1 - e * e));
-  const phi1 = mu + (3 * e1 / 2 - 27 * e1 ** 3 / 32) * Math.sin(2 * mu)
-    + (21 * e1 ** 2 / 16 - 55 * e1 ** 4 / 32) * Math.sin(4 * mu)
-    + (151 * e1 ** 3 / 96) * Math.sin(6 * mu);
+  const phi1 =
+    mu +
+    ((3 * e1) / 2 - (27 * e1 ** 3) / 32) * Math.sin(2 * mu) +
+    ((21 * e1 ** 2) / 16 - (55 * e1 ** 4) / 32) * Math.sin(4 * mu) +
+    ((151 * e1 ** 3) / 96) * Math.sin(6 * mu);
   const n1 = a / Math.sqrt(1 - (e * Math.sin(phi1)) ** 2);
   const t1 = Math.tan(phi1) ** 2;
   const c1 = e1sq * Math.cos(phi1) ** 2;
   const r1 = (a * (1 - e * e)) / Math.pow(1 - (e * Math.sin(phi1)) ** 2, 1.5);
   const d = x / (n1 * k0);
-  const lat = phi1 - (n1 * Math.tan(phi1) / r1) *
-    (d ** 2 / 2 - (5 + 3 * t1 + 10 * c1 - 4 * c1 ** 2 - 9 * e1sq) * d ** 4 / 24);
-  const lng = ((zone - 1) * 6 - 180 + 3) * Math.PI / 180
-    + (d - (1 + 2 * t1 + c1) * d ** 3 / 6) / Math.cos(phi1);
-  return [lat * 180 / Math.PI, lng * 180 / Math.PI];
+  const lat =
+    phi1 -
+    ((n1 * Math.tan(phi1)) / r1) *
+      (d ** 2 / 2 - ((5 + 3 * t1 + 10 * c1 - 4 * c1 ** 2 - 9 * e1sq) * d ** 4) / 24);
+  const lng =
+    (((zone - 1) * 6 - 180 + 3) * Math.PI) / 180 +
+    (d - ((1 + 2 * t1 + c1) * d ** 3) / 6) / Math.cos(phi1);
+  return [(lat * 180) / Math.PI, (lng * 180) / Math.PI];
 }
 
 function sampleLatLng(s: SamplingResult): [number, number] | null {
   const e = (s as unknown as { easting?: number | null }).easting ?? null;
   const n = (s as unknown as { northing?: number | null }).northing ?? null;
   if (e == null || n == null) return null;
-  try { return utmToLatLng(Number(e), Number(n)); } catch { return null; }
+  try {
+    return utmToLatLng(Number(e), Number(n));
+  } catch {
+    return null;
+  }
 }
 
 function escape(s: string): string {
-  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
+  return s.replace(
+    /[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string,
+  );
 }
 
 function popupHtml(s: SamplingResult): string {
@@ -63,7 +75,7 @@ function popupHtml(s: SamplingResult): string {
 export function buildSamplesLayer(
   L: LeafletNS,
   samples: SamplingResult[],
-  opts: { onClick?: (s: SamplingResult) => void; minAu?: number } = {}
+  opts: { onClick?: (s: SamplingResult) => void; minAu?: number } = {},
 ): LayerGroup {
   const group = L.layerGroup();
   const min = opts.minAu ?? null;

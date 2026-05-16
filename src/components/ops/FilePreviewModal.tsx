@@ -93,7 +93,10 @@ export function FilePreviewModal({
     >
       <div
         className="relative bg-bg-primary w-full md:w-[min(1100px,95vw)] md:h-[90vh] h-full md:rounded-lg overflow-hidden flex flex-col shadow-2xl"
-        style={{ transform: dragY ? `translateY(${dragY}px)` : undefined, transition: dragY ? "none" : "transform 200ms" }}
+        style={{
+          transform: dragY ? `translateY(${dragY}px)` : undefined,
+          transition: dragY ? "none" : "transform 200ms",
+        }}
       >
         {/* Header (drag handle on mobile) */}
         <div
@@ -140,17 +143,9 @@ export function FilePreviewModal({
           ) : error ? (
             <div className="text-center p-6 text-xs text-destructive">{error}</div>
           ) : !url ? null : kind === "pdf" ? (
-            <iframe
-              src={url}
-              title={file.file_name}
-              className="w-full h-full border-0 bg-white"
-            />
+            <iframe src={url} title={file.file_name} className="w-full h-full border-0 bg-white" />
           ) : kind === "image" ? (
-            <img
-              src={url}
-              alt={file.file_name}
-              className="max-w-full max-h-full object-contain"
-            />
+            <img src={url} alt={file.file_name} className="max-w-full max-h-full object-contain" />
           ) : (
             <div className="text-center p-6 space-y-3">
               <div className="text-xs text-text-secondary">

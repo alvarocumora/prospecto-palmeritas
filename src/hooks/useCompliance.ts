@@ -74,7 +74,10 @@ export function useCompliance(reportId: string | null) {
 
   const fetchAll = useCallback(async () => {
     if (!reportId) {
-      setRules([]); setEvaluations([]); setEvidence([]); setLoading(false);
+      setRules([]);
+      setEvaluations([]);
+      setEvidence([]);
+      setLoading(false);
       return;
     }
     setLoading(true);
@@ -105,7 +108,9 @@ export function useCompliance(reportId: string | null) {
     }
   }, [reportId]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const evaluate = useCallback(async (): Promise<EvaluationResult | null> => {
     if (!reportId) return null;
@@ -127,82 +132,137 @@ export function useCompliance(reportId: string | null) {
     }
   }, [reportId, activeStandards, fetchAll]);
 
-  const markManual = useCallback(async (ruleId: string, status: EvalStatus, notes?: string) => {
-    if (!reportId) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data: rep } = await supabase.from("technical_reports").select("project_id").eq("id", reportId).single();
-    if (!rep) throw new Error("Reporte no encontrado");
-    const score = status === "pass" ? 100 : status === "warn" ? 50 : status === "na" ? 100 : 0;
-    const { error } = await supabase
-      .from("compliance_evaluations")
-      .upsert({
+  const markManual = useCallback(
+    async (ruleId: string, status: EvalStatus, notes?: string) => {
+      if (!reportId) return;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const { data: rep } = await supabase
+        .from("technical_reports")
+        .select("project_id")
+        .eq("id", reportId)
+        .single();
+      if (!rep) throw new Error("Reporte no encontrado");
+      const score = status === "pass" ? 100 : status === "warn" ? 50 : status === "na" ? 100 : 0;
+      const { error } = await supabase.from("compliance_evaluations").upsert(
+        {
+          report_id: reportId,
+          project_id: rep.project_id,
+          rule_id: ruleId,
+          status,
+          score,
+          auto_evaluated: false,
+          evaluator_notes: notes ?? null,
+          evaluated_at: new Date().toISOString(),
+          evaluated_by: user?.id ?? null,
+        },
+        { onConflict: "report_id,rule_id" },
+      );
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      toast.success("Evaluación actualizada");
+      await fetchAll();
+    },
+    [reportId, fetchAll],
+  );
+
+  const attachEvidence = useCallback(
+    async (
+      ruleId: string,
+      evidenceType: string,
+      evidenceId?: string,
+      url?: string,
+      caption?: string,
+    ) => {
+      if (!reportId) return;
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        toast.error("No autenticado");
+        return;
+      }
+      const { data: rep } = await supabase
+        .from("technical_reports")
+        .select("project_id")
+        .eq("id", reportId)
+        .single();
+      if (!rep) throw new Error("Reporte no encontrado");
+      const { error } = await supabase.from("report_evidence_links").insert({
         report_id: reportId,
         project_id: rep.project_id,
         rule_id: ruleId,
-        status,
-        score,
-        auto_evaluated: false,
-        evaluator_notes: notes ?? null,
-        evaluated_at: new Date().toISOString(),
-        evaluated_by: user?.id ?? null,
-      }, { onConflict: "report_id,rule_id" });
-    if (error) { toast.error(error.message); throw error; }
-    toast.success("Evaluación actualizada");
-    await fetchAll();
-  }, [reportId, fetchAll]);
+        evidence_type: evidenceType,
+        evidence_id: evidenceId ?? null,
+        url: url ?? null,
+        caption: caption ?? null,
+        created_by: user.id,
+      });
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      toast.success("Evidencia adjuntada");
+      await fetchAll();
+    },
+    [reportId, fetchAll],
+  );
 
-  const attachEvidence = useCallback(async (ruleId: string, evidenceType: string, evidenceId?: string, url?: string, caption?: string) => {
-    if (!reportId) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { toast.error("No autenticado"); return; }
-    const { data: rep } = await supabase.from("technical_reports").select("project_id").eq("id", reportId).single();
-    if (!rep) throw new Error("Reporte no encontrado");
-    const { error } = await supabase.from("report_evidence_links").insert({
-      report_id: reportId,
-      project_id: rep.project_id,
-      rule_id: ruleId,
-      evidence_type: evidenceType,
-      evidence_id: evidenceId ?? null,
-      url: url ?? null,
-      caption: caption ?? null,
-      created_by: user.id,
-    });
-    if (error) { toast.error(error.message); throw error; }
-    toast.success("Evidencia adjuntada");
-    await fetchAll();
-  }, [reportId, fetchAll]);
+  const removeEvidence = useCallback(
+    async (linkId: string) => {
+      const { error } = await supabase.from("report_evidence_links").delete().eq("id", linkId);
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      await fetchAll();
+    },
+    [fetchAll],
+  );
 
-  const removeEvidence = useCallback(async (linkId: string) => {
-    const { error } = await supabase.from("report_evidence_links").delete().eq("id", linkId);
-    if (error) { toast.error(error.message); throw error; }
-    await fetchAll();
-  }, [fetchAll]);
+  const toggleStandard = useCallback(
+    async (std: ComplianceStandard) => {
+      if (!reportId) return;
+      const next = activeStandards.includes(std)
+        ? activeStandards.filter((s) => s !== std)
+        : [...activeStandards, std];
+      if (next.length === 0) {
+        toast.error("Debe haber al menos un estándar activo");
+        return;
+      }
+      const { error } = await supabase
+        .from("technical_reports")
+        .update({ active_standards: next })
+        .eq("id", reportId);
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      setActiveStandards(next);
+      await fetchAll();
+    },
+    [reportId, activeStandards, fetchAll],
+  );
 
-  const toggleStandard = useCallback(async (std: ComplianceStandard) => {
-    if (!reportId) return;
-    const next = activeStandards.includes(std)
-      ? activeStandards.filter((s) => s !== std)
-      : [...activeStandards, std];
-    if (next.length === 0) { toast.error("Debe haber al menos un estándar activo"); return; }
-    const { error } = await supabase
-      .from("technical_reports")
-      .update({ active_standards: next })
-      .eq("id", reportId);
-    if (error) { toast.error(error.message); throw error; }
-    setActiveStandards(next);
-    await fetchAll();
-  }, [reportId, activeStandards, fetchAll]);
-
-  const updateThreshold = useCallback(async (n: number) => {
-    if (!reportId) return;
-    const clamped = Math.max(0, Math.min(100, Math.round(n)));
-    const { error } = await supabase
-      .from("technical_reports")
-      .update({ compliance_threshold: clamped })
-      .eq("id", reportId);
-    if (error) { toast.error(error.message); throw error; }
-    setThreshold(clamped);
-  }, [reportId]);
+  const updateThreshold = useCallback(
+    async (n: number) => {
+      if (!reportId) return;
+      const clamped = Math.max(0, Math.min(100, Math.round(n)));
+      const { error } = await supabase
+        .from("technical_reports")
+        .update({ compliance_threshold: clamped })
+        .eq("id", reportId);
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      setThreshold(clamped);
+    },
+    [reportId],
+  );
 
   // Derivados: scores por estándar usando evaluaciones cargadas
   const scoreByStandard = useMemo(() => {
@@ -251,13 +311,24 @@ export function useCompliance(reportId: string | null) {
   }, [rules, evaluations, globalScore, threshold]);
 
   return {
-    rules, evaluations, evidence,
-    activeStandards, threshold, cachedScore,
-    loading, evaluating, error,
-    scoreByStandard, globalScore, isBlocking,
+    rules,
+    evaluations,
+    evidence,
+    activeStandards,
+    threshold,
+    cachedScore,
+    loading,
+    evaluating,
+    error,
+    scoreByStandard,
+    globalScore,
+    isBlocking,
     refresh: fetchAll,
-    evaluate, markManual,
-    attachEvidence, removeEvidence,
-    toggleStandard, updateThreshold,
+    evaluate,
+    markManual,
+    attachEvidence,
+    removeEvidence,
+    toggleStandard,
+    updateThreshold,
   };
 }

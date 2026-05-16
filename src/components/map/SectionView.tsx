@@ -26,7 +26,12 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
     setInterpreting(true);
     try {
       const payload = {
-        line: { lengthM: line.lengthM, bearingDeg: line.bearingDeg, start: line.start, end: line.end },
+        line: {
+          lengthM: line.lengthM,
+          bearingDeg: line.bearingDeg,
+          start: line.start,
+          end: line.end,
+        },
         maxOffsetM,
         projectName,
         holes: holes.map((ph) => ({
@@ -46,7 +51,9 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
           })),
         })),
       };
-      const { data, error } = await supabase.functions.invoke("section-interpret", { body: payload });
+      const { data, error } = await supabase.functions.invoke("section-interpret", {
+        body: payload,
+      });
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
       setInterpretation(data.interpretation as string);
@@ -62,7 +69,7 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
   const { maxDepth, scaleX, scaleY } = useMemo(() => {
     const maxD = Math.max(
       120,
-      ...holes.map((h) => (h.hole.actual_depth ?? h.hole.planned_depth ?? 0)),
+      ...holes.map((h) => h.hole.actual_depth ?? h.hole.planned_depth ?? 0),
     );
     const padTop = 30; // surface buffer
     const innerW = W - MARGIN.left - MARGIN.right;
@@ -86,13 +93,20 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
   };
 
   return (
-    <div className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-background border border-border rounded-lg max-w-[1040px] w-full max-h-[92vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background border border-border rounded-lg max-w-[1040px] w-full max-h-[92vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-4 py-3 border-b border-border flex items-center justify-between gap-3">
           <div>
             <div className="text-[10px] font-mono uppercase text-muted-foreground">Sección 2D</div>
             <div className="text-sm font-mono font-semibold">
-              {line.lengthM.toFixed(0)} m · azimut {line.bearingDeg.toFixed(0)}° · {holes.length} sondajes proyectados (±{maxOffsetM} m)
+              {line.lengthM.toFixed(0)} m · azimut {line.bearingDeg.toFixed(0)}° · {holes.length}{" "}
+              sondajes proyectados (±{maxOffsetM} m)
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -101,18 +115,33 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
               disabled={interpreting || holes.length === 0}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {interpreting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+              {interpreting ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Sparkles className="w-3.5 h-3.5" />
+              )}
               {interpreting ? "Interpretando…" : "Interpretar IA"}
             </button>
-            <button onClick={exportSvg} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-xs font-mono hover:bg-accent">
+            <button
+              onClick={exportSvg}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-xs font-mono hover:bg-accent"
+            >
               <Download className="w-3.5 h-3.5" /> SVG
             </button>
-            <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1.5"><X className="w-4 h-4" /></button>
+            <button onClick={onClose} className="text-muted-foreground hover:text-foreground p-1.5">
+              <X className="w-4 h-4" />
+            </button>
           </div>
         </div>
 
         <div className="p-4 overflow-x-auto bg-bg-secondary">
-          <svg id="section-svg" viewBox={`0 0 ${W} ${H}`} width="100%" style={{ background: "#FAF7F2", maxWidth: 1000 }} xmlns="http://www.w3.org/2000/svg">
+          <svg
+            id="section-svg"
+            viewBox={`0 0 ${W} ${H}`}
+            width="100%"
+            style={{ background: "#FAF7F2", maxWidth: 1000 }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
             {/* Sky / surface */}
             <defs>
               <linearGradient id="sky" x1="0" x2="0" y1="0" y2="1">
@@ -120,13 +149,50 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
                 <stop offset="100%" stopColor="#fef3c7" />
               </linearGradient>
             </defs>
-            <rect x={MARGIN.left} y={MARGIN.top} width={W - MARGIN.left - MARGIN.right} height={surfaceY - MARGIN.top} fill="url(#sky)" />
-            <line x1={MARGIN.left} y1={surfaceY} x2={W - MARGIN.right} y2={surfaceY} stroke="#92400e" strokeWidth={2} />
-            <rect x={MARGIN.left} y={surfaceY} width={W - MARGIN.left - MARGIN.right} height={H - MARGIN.bottom - surfaceY} fill="#fef3c7" opacity={0.3} />
+            <rect
+              x={MARGIN.left}
+              y={MARGIN.top}
+              width={W - MARGIN.left - MARGIN.right}
+              height={surfaceY - MARGIN.top}
+              fill="url(#sky)"
+            />
+            <line
+              x1={MARGIN.left}
+              y1={surfaceY}
+              x2={W - MARGIN.right}
+              y2={surfaceY}
+              stroke="#92400e"
+              strokeWidth={2}
+            />
+            <rect
+              x={MARGIN.left}
+              y={surfaceY}
+              width={W - MARGIN.left - MARGIN.right}
+              height={H - MARGIN.bottom - surfaceY}
+              fill="#fef3c7"
+              opacity={0.3}
+            />
 
             {/* End labels */}
-            <text x={MARGIN.left} y={MARGIN.top - 12} fontSize={11} fontFamily="monospace" fill="#52525b">A · {line.start[0].toFixed(4)}, {line.start[1].toFixed(4)}</text>
-            <text x={W - MARGIN.right} y={MARGIN.top - 12} fontSize={11} fontFamily="monospace" fill="#52525b" textAnchor="end">A' · {line.end[0].toFixed(4)}, {line.end[1].toFixed(4)}</text>
+            <text
+              x={MARGIN.left}
+              y={MARGIN.top - 12}
+              fontSize={11}
+              fontFamily="monospace"
+              fill="#52525b"
+            >
+              A · {line.start[0].toFixed(4)}, {line.start[1].toFixed(4)}
+            </text>
+            <text
+              x={W - MARGIN.right}
+              y={MARGIN.top - 12}
+              fontSize={11}
+              fontFamily="monospace"
+              fill="#52525b"
+              textAnchor="end"
+            >
+              A' · {line.end[0].toFixed(4)}, {line.end[1].toFixed(4)}
+            </text>
 
             {/* Depth grid + axis */}
             {[0, 0.25, 0.5, 0.75, 1].map((f) => {
@@ -134,8 +200,24 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
               const y = scaleY(d);
               return (
                 <g key={f}>
-                  <line x1={MARGIN.left} y1={y} x2={W - MARGIN.right} y2={y} stroke="#e7e5e4" strokeDasharray="3,3" />
-                  <text x={MARGIN.left - 6} y={y + 3} fontSize={9} fontFamily="monospace" fill="#78716c" textAnchor="end">{d.toFixed(0)} m</text>
+                  <line
+                    x1={MARGIN.left}
+                    y1={y}
+                    x2={W - MARGIN.right}
+                    y2={y}
+                    stroke="#e7e5e4"
+                    strokeDasharray="3,3"
+                  />
+                  <text
+                    x={MARGIN.left - 6}
+                    y={y + 3}
+                    fontSize={9}
+                    fontFamily="monospace"
+                    fill="#78716c"
+                    textAnchor="end"
+                  >
+                    {d.toFixed(0)} m
+                  </text>
                 </g>
               );
             })}
@@ -146,8 +228,23 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
               const x = scaleX(m);
               return (
                 <g key={`x${f}`}>
-                  <line x1={x} y1={H - MARGIN.bottom} x2={x} y2={H - MARGIN.bottom + 4} stroke="#78716c" />
-                  <text x={x} y={H - MARGIN.bottom + 16} fontSize={9} fontFamily="monospace" fill="#78716c" textAnchor="middle">{m.toFixed(0)} m</text>
+                  <line
+                    x1={x}
+                    y1={H - MARGIN.bottom}
+                    x2={x}
+                    y2={H - MARGIN.bottom + 4}
+                    stroke="#78716c"
+                  />
+                  <text
+                    x={x}
+                    y={H - MARGIN.bottom + 16}
+                    fontSize={9}
+                    fontFamily="monospace"
+                    fill="#78716c"
+                    textAnchor="middle"
+                  >
+                    {m.toFixed(0)} m
+                  </text>
                 </g>
               );
             })}
@@ -161,7 +258,10 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
               // Direction in section: + or − along x depending on azimuth vs section bearing
               const az = ph.hole.azimuth ?? 0;
               const sign = Math.cos(((az - line.bearingDeg) * Math.PI) / 180) >= 0 ? 1 : -1;
-              const horizPerM = Math.sin(dipRad) === 0 ? 0 : Math.cos(dipRad) / Math.sin(dipRad === 0 ? 1e-6 : dipRad);
+              const horizPerM =
+                Math.sin(dipRad) === 0
+                  ? 0
+                  : Math.cos(dipRad) / Math.sin(dipRad === 0 ? 1e-6 : dipRad);
               const dxPerDepth = sign * horizPerM;
 
               return (
@@ -171,10 +271,21 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
                     ? ph.logs.map((log, i) => {
                         const yFrom = scaleY(log.depth_from);
                         const yTo = scaleY(log.depth_to);
-                        const xFrom = x0 + (log.depth_from) * (dxPerDepth) * ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
-                        const xTo = x0 + (log.depth_to) * (dxPerDepth) * ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
+                        const xFrom =
+                          x0 +
+                          log.depth_from *
+                            dxPerDepth *
+                            ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
+                        const xTo =
+                          x0 +
+                          log.depth_to *
+                            dxPerDepth *
+                            ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
                         const grade = log.au_gpt;
-                        const col = grade != null && grade >= 0.3 ? auGradeColor(grade) : lithoColor(log.lithology);
+                        const col =
+                          grade != null && grade >= 0.3
+                            ? auGradeColor(grade)
+                            : lithoColor(log.lithology);
                         return (
                           <line
                             key={i}
@@ -192,31 +303,85 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
                       })
                     : (() => {
                         const yEnd = scaleY(totalDepth);
-                        const xEnd = x0 + totalDepth * dxPerDepth * ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
-                        return <line x1={x0} y1={surfaceY} x2={xEnd} y2={yEnd} stroke="#a8a29e" strokeWidth={2} strokeDasharray="3,2" />;
+                        const xEnd =
+                          x0 +
+                          totalDepth *
+                            dxPerDepth *
+                            ((scaleX(line.lengthM) - scaleX(0)) / line.lengthM);
+                        return (
+                          <line
+                            x1={x0}
+                            y1={surfaceY}
+                            x2={xEnd}
+                            y2={yEnd}
+                            stroke="#a8a29e"
+                            strokeWidth={2}
+                            strokeDasharray="3,2"
+                          />
+                        );
                       })()}
 
                   {/* Collar marker */}
-                  <circle cx={x0} cy={surfaceY} r={5} fill="#0b0d10" stroke="#fff" strokeWidth={1.5} />
-                  <text x={x0} y={surfaceY - 10} fontSize={9} fontFamily="monospace" fill="#0b0d10" textAnchor="middle" fontWeight={700}>
+                  <circle
+                    cx={x0}
+                    cy={surfaceY}
+                    r={5}
+                    fill="#0b0d10"
+                    stroke="#fff"
+                    strokeWidth={1.5}
+                  />
+                  <text
+                    x={x0}
+                    y={surfaceY - 10}
+                    fontSize={9}
+                    fontFamily="monospace"
+                    fill="#0b0d10"
+                    textAnchor="middle"
+                    fontWeight={700}
+                  >
                     {ph.hole.hole_id}
                   </text>
-                  <text x={x0} y={surfaceY - 22} fontSize={8} fontFamily="monospace" fill="#78716c" textAnchor="middle">
-                    {ph.signedOffsetM >= 0 ? "+" : ""}{ph.signedOffsetM.toFixed(0)}m
+                  <text
+                    x={x0}
+                    y={surfaceY - 22}
+                    fontSize={8}
+                    fontFamily="monospace"
+                    fill="#78716c"
+                    textAnchor="middle"
+                  >
+                    {ph.signedOffsetM >= 0 ? "+" : ""}
+                    {ph.signedOffsetM.toFixed(0)}m
                   </text>
                 </g>
               );
             })}
 
             {/* Title */}
-            <text x={W / 2} y={H - 18} fontSize={11} fontFamily="monospace" fill="#0b0d10" textAnchor="middle" fontWeight={600}>
-              SECCIÓN A — A'  ·  proyección ±{maxOffsetM} m
+            <text
+              x={W / 2}
+              y={H - 18}
+              fontSize={11}
+              fontFamily="monospace"
+              fill="#0b0d10"
+              textAnchor="middle"
+              fontWeight={600}
+            >
+              SECCIÓN A — A' · proyección ±{maxOffsetM} m
             </text>
 
             {/* Legend */}
             <g transform={`translate(${W - MARGIN.right - 200}, ${MARGIN.top + 8})`}>
               <rect x={0} y={0} width={195} height={88} fill="#fff" stroke="#e7e5e4" rx={4} />
-              <text x={8} y={14} fontSize={9} fontFamily="monospace" fontWeight={700} fill="#0b0d10">Au g/t</text>
+              <text
+                x={8}
+                y={14}
+                fontSize={9}
+                fontFamily="monospace"
+                fontWeight={700}
+                fill="#0b0d10"
+              >
+                Au g/t
+              </text>
               {[
                 { c: "#dc2626", l: "≥5" },
                 { c: "#f97316", l: "1–5" },
@@ -226,7 +391,9 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
               ].map((row, i) => (
                 <g key={i} transform={`translate(8, ${24 + i * 12})`}>
                   <rect width={14} height={6} fill={row.c} />
-                  <text x={20} y={6} fontSize={9} fontFamily="monospace" fill="#0b0d10">{row.l}</text>
+                  <text x={20} y={6} fontSize={9} fontFamily="monospace" fill="#0b0d10">
+                    {row.l}
+                  </text>
                 </g>
               ))}
             </g>
@@ -234,7 +401,8 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
 
           {holes.length === 0 && (
             <div className="mt-4 text-center text-xs font-mono text-muted-foreground">
-              Ningún sondaje cae dentro de ±{maxOffsetM} m de la línea. Dibuja otra sección o sube los datos de coordenadas (easting/northing) de los holes.
+              Ningún sondaje cae dentro de ±{maxOffsetM} m de la línea. Dibuja otra sección o sube
+              los datos de coordenadas (easting/northing) de los holes.
             </div>
           )}
         </div>
@@ -243,13 +411,16 @@ export function SectionView({ line, holes, maxOffsetM, projectName, onClose }: P
           <div className="px-4 py-4 border-t border-border bg-background">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-3.5 h-3.5 text-gold" />
-              <div className="text-xs font-mono font-semibold text-gold uppercase tracking-wide">Interpretación geológica IA</div>
+              <div className="text-xs font-mono font-semibold text-gold uppercase tracking-wide">
+                Interpretación geológica IA
+              </div>
             </div>
             <div className="font-mono text-xs leading-relaxed text-foreground whitespace-pre-wrap">
               {interpretation}
             </div>
             <div className="mt-3 text-[10px] font-mono text-muted-foreground italic">
-              Generado por IA · Verifica conclusiones contra datos de campo. No reemplaza juicio del QP (NI 43-101).
+              Generado por IA · Verifica conclusiones contra datos de campo. No reemplaza juicio del
+              QP (NI 43-101).
             </div>
           </div>
         )}

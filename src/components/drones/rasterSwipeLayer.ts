@@ -48,7 +48,10 @@ export async function buildRasterSwipeLayer(
   // Right raster (B) — bottom layer, fully visible.
   const overlayB = L.imageOverlay(
     urlB,
-    [[boundsB[1], boundsB[0]], [boundsB[3], boundsB[2]]],
+    [
+      [boundsB[1], boundsB[0]],
+      [boundsB[3], boundsB[2]],
+    ],
     { opacity: 1, interactive: false, className: "raster-swipe-b" },
   );
   overlayB.addTo(group);
@@ -56,7 +59,10 @@ export async function buildRasterSwipeLayer(
   // Left raster (A) — clipped on top.
   const overlayA = L.imageOverlay(
     urlA,
-    [[boundsA[1], boundsA[0]], [boundsA[3], boundsA[2]]],
+    [
+      [boundsA[1], boundsA[0]],
+      [boundsA[3], boundsA[2]],
+    ],
     { opacity: 1, interactive: false, className: "raster-swipe-a" },
   );
   overlayA.addTo(group);
@@ -81,7 +87,10 @@ export async function buildRasterSwipeLayer(
       return;
     }
     const splitWithinImage = px - imgLeft;
-    const rightInsetPct = Math.max(0, Math.min(100, ((imgWidth - splitWithinImage) / imgWidth) * 100));
+    const rightInsetPct = Math.max(
+      0,
+      Math.min(100, ((imgWidth - splitWithinImage) / imgWidth) * 100),
+    );
     imgA.style.clipPath = `inset(0 ${rightInsetPct}% 0 0)`;
     void ratio;
   };

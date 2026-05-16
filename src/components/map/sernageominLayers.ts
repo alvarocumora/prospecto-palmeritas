@@ -34,26 +34,21 @@ function yacimientos(L: LeafletNS) {
       transparent: true,
       version: "1.3.0",
       opacity: 0.95,
-      attribution:
-        'Yacimientos &copy; <a href="https://www.sernageomin.cl">SERNAGEOMIN</a>',
+      attribution: 'Yacimientos &copy; <a href="https://www.sernageomin.cl">SERNAGEOMIN</a>',
     },
   );
 }
 
 /** Áreas protegidas SNASPE / CONAF — relevante para módulo HSE & permisos. */
 function areasProtegidas(L: LeafletNS) {
-  return L.tileLayer.wms(
-    "https://ide.mma.gob.cl/geoserver/wms",
-    {
-      layers: "areas_protegidas:snaspe",
-      format: "image/png",
-      transparent: true,
-      version: "1.1.1",
-      opacity: 0.5,
-      attribution:
-        'Áreas Protegidas &copy; <a href="https://ide.mma.gob.cl">MMA / CONAF</a>',
-    },
-  );
+  return L.tileLayer.wms("https://ide.mma.gob.cl/geoserver/wms", {
+    layers: "areas_protegidas:snaspe",
+    format: "image/png",
+    transparent: true,
+    version: "1.1.1",
+    opacity: 0.5,
+    attribution: 'Áreas Protegidas &copy; <a href="https://ide.mma.gob.cl">MMA / CONAF</a>',
+  });
 }
 
 export function buildSernageominLayers(L: LeafletNS) {
@@ -98,7 +93,9 @@ export async function wmsGetFeatureInfo(opts: {
   try {
     const res = await fetch(`${opts.baseUrl}?${params.toString()}`);
     if (!res.ok) return null;
-    const json = (await res.json()) as { features?: Array<{ properties?: Record<string, unknown> }> };
+    const json = (await res.json()) as {
+      features?: Array<{ properties?: Record<string, unknown> }>;
+    };
     return json.features?.[0]?.properties ?? null;
   } catch {
     return null;

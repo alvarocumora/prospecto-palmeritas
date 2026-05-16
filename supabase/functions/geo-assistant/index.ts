@@ -4,8 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
@@ -29,31 +28,100 @@ Deno.serve(async (req) => {
     if (project_id) {
       const admin = createClient(SUPABASE_URL, SERVICE_KEY);
       const [
-        proj, holes, surveys, samples, conc,
-        litho, alter, miner, feats,
-        targets, permits, incidents, logs,
+        proj,
+        holes,
+        surveys,
+        samples,
+        conc,
+        litho,
+        alter,
+        miner,
+        feats,
+        targets,
+        permits,
+        incidents,
+        logs,
       ] = await Promise.all([
-        admin.from("projects").select("name,code,commodity,country,region,description,center_lat,center_lng").eq("id", project_id).maybeSingle(),
-        admin.from("drill_holes").select("hole_id,actual_depth,planned_depth,status,target_zone,azimuth,dip,easting,northing").eq("project_id", project_id),
-        admin.from("geophysics_surveys").select("name,method,status,planned_km,cost_usd,expected_depth_m").eq("project_id", project_id),
-        admin.from("drill_core_logs").select("hole_id,depth_from,depth_to,au_gpt,cu_pct,ag_gpt,lithology,alteration").eq("project_id", project_id).gte("au_gpt", 0.3).order("au_gpt", { ascending: false }).limit(40),
-        admin.from("mining_concessions").select("code,name,concession_type,area_ha,status,holder,expires_at").eq("project_id", project_id),
-        admin.from("lithology_units").select("unit_code,name,age,rock_type").eq("project_id", project_id),
-        admin.from("alteration_zones").select("zone_code,name,assemblage,intensity").eq("project_id", project_id),
-        admin.from("mineralogy").select("mineral,paragenetic_stage,abundance").eq("project_id", project_id),
-        admin.from("geological_features").select("feature_code,name,feature_type,strike,dip,length_m").eq("project_id", project_id),
-        admin.from("exploration_targets").select("code,name,target_type,priority,stage,score,lat,lng,rationale").eq("project_id", project_id).neq("stage", "closed").order("score", { ascending: false }).limit(15),
-        admin.from("hse_permits").select("title,permit_type,status,expires_at,authority").eq("project_id", project_id),
-        admin.from("hse_incidents").select("category,severity,status,occurred_at").eq("project_id", project_id).neq("status", "closed").limit(10),
+        admin
+          .from("projects")
+          .select("name,code,commodity,country,region,description,center_lat,center_lng")
+          .eq("id", project_id)
+          .maybeSingle(),
+        admin
+          .from("drill_holes")
+          .select(
+            "hole_id,actual_depth,planned_depth,status,target_zone,azimuth,dip,easting,northing",
+          )
+          .eq("project_id", project_id),
+        admin
+          .from("geophysics_surveys")
+          .select("name,method,status,planned_km,cost_usd,expected_depth_m")
+          .eq("project_id", project_id),
+        admin
+          .from("drill_core_logs")
+          .select("hole_id,depth_from,depth_to,au_gpt,cu_pct,ag_gpt,lithology,alteration")
+          .eq("project_id", project_id)
+          .gte("au_gpt", 0.3)
+          .order("au_gpt", { ascending: false })
+          .limit(40),
+        admin
+          .from("mining_concessions")
+          .select("code,name,concession_type,area_ha,status,holder,expires_at")
+          .eq("project_id", project_id),
+        admin
+          .from("lithology_units")
+          .select("unit_code,name,age,rock_type")
+          .eq("project_id", project_id),
+        admin
+          .from("alteration_zones")
+          .select("zone_code,name,assemblage,intensity")
+          .eq("project_id", project_id),
+        admin
+          .from("mineralogy")
+          .select("mineral,paragenetic_stage,abundance")
+          .eq("project_id", project_id),
+        admin
+          .from("geological_features")
+          .select("feature_code,name,feature_type,strike,dip,length_m")
+          .eq("project_id", project_id),
+        admin
+          .from("exploration_targets")
+          .select("code,name,target_type,priority,stage,score,lat,lng,rationale")
+          .eq("project_id", project_id)
+          .neq("stage", "closed")
+          .order("score", { ascending: false })
+          .limit(15),
+        admin
+          .from("hse_permits")
+          .select("title,permit_type,status,expires_at,authority")
+          .eq("project_id", project_id),
+        admin
+          .from("hse_incidents")
+          .select("category,severity,status,occurred_at")
+          .eq("project_id", project_id)
+          .neq("status", "closed")
+          .limit(10),
         admin.from("drill_core_logs").select("au_gpt").eq("project_id", project_id),
       ]);
 
-      const totalM = (holes.data ?? []).reduce((s: number, h: any) => s + (Number(h.actual_depth) || 0), 0);
-      const allAu = (logs.data ?? []).map((s: any) => Number(s.au_gpt)).filter((v) => !isNaN(v) && v > 0);
-      const auAvg = allAu.length ? (allAu.reduce((a, b) => a + b, 0) / allAu.length).toFixed(2) : "—";
+      const totalM = (holes.data ?? []).reduce(
+        (s: number, h: any) => s + (Number(h.actual_depth) || 0),
+        0,
+      );
+      const allAu = (logs.data ?? [])
+        .map((s: any) => Number(s.au_gpt))
+        .filter((v) => !isNaN(v) && v > 0);
+      const auAvg = allAu.length
+        ? (allAu.reduce((a, b) => a + b, 0) / allAu.length).toFixed(2)
+        : "—";
       const auMax = allAu.length ? Math.max(...allAu).toFixed(2) : "—";
-      const auP90 = allAu.length ? [...allAu].sort((a, b) => a - b)[Math.floor(allAu.length * 0.9)].toFixed(2) : "—";
-      const capEx = (surveys.data ?? []).reduce((s: number, x: any) => s + (Number(x.cost_usd) || 0), 0);
+      const auP90 = allAu.length
+        ? [...allAu].sort((a, b) => a - b)[Math.floor(allAu.length * 0.9)].toFixed(2)
+        : "—";
+      const capEx = (surveys.data ?? []).reduce(
+        (s: number, x: any) => s + (Number(x.cost_usd) || 0),
+        0,
+      );
 
       const today = new Date();
       const expiringSoon = (permits.data ?? []).filter((p: any) => {
@@ -70,39 +138,92 @@ ${proj.data?.description ?? ""}
 
 ═══ MARCO GEOLÓGICO ═══
 Litología (${(litho.data ?? []).length} unidades):
-${(litho.data ?? []).slice(0, 8).map((l: any) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`).join("\n")}
+${(litho.data ?? [])
+  .slice(0, 8)
+  .map((l: any) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`)
+  .join("\n")}
 
 Alteración (${(alter.data ?? []).length} zonas):
-${(alter.data ?? []).slice(0, 6).map((a: any) => `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, intensidad ${a.intensity ?? "?"}]`).join("\n")}
+${(alter.data ?? [])
+  .slice(0, 6)
+  .map(
+    (a: any) =>
+      `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, intensidad ${a.intensity ?? "?"}]`,
+  )
+  .join("\n")}
 
 Mineralogía clave:
-${(miner.data ?? []).slice(0, 8).map((m: any) => `  · ${m.mineral} (${m.paragenetic_stage ?? "?"}, ${m.abundance ?? "?"})`).join("\n")}
+${(miner.data ?? [])
+  .slice(0, 8)
+  .map((m: any) => `  · ${m.mineral} (${m.paragenetic_stage ?? "?"}, ${m.abundance ?? "?"})`)
+  .join("\n")}
 
 Estructuras (${(feats.data ?? []).length}):
-${(feats.data ?? []).slice(0, 6).map((f: any) => `  · ${f.feature_code} ${f.name} ${f.feature_type} ${f.strike ?? ""}/${f.dip ?? ""} ${f.length_m ?? "?"}m`).join("\n")}
+${(feats.data ?? [])
+  .slice(0, 6)
+  .map(
+    (f: any) =>
+      `  · ${f.feature_code} ${f.name} ${f.feature_type} ${f.strike ?? ""}/${f.dip ?? ""} ${f.length_m ?? "?"}m`,
+  )
+  .join("\n")}
 
 ═══ SONDAJES (${(holes.data ?? []).length} holes, ${totalM.toFixed(0)} m) ═══
-${(holes.data ?? []).slice(0, 10).map((h: any) => `  · ${h.hole_id} ${h.status} az${h.azimuth ?? "?"}/${h.dip ?? "?"}° ${h.actual_depth ?? "?"}/${h.planned_depth ?? "?"}m → ${h.target_zone ?? ""}`).join("\n")}
+${(holes.data ?? [])
+  .slice(0, 10)
+  .map(
+    (h: any) =>
+      `  · ${h.hole_id} ${h.status} az${h.azimuth ?? "?"}/${h.dip ?? "?"}° ${h.actual_depth ?? "?"}/${h.planned_depth ?? "?"}m → ${h.target_zone ?? ""}`,
+  )
+  .join("\n")}
 
 ═══ INTERCEPTS DESTACADOS (Au ≥ 0.3 g/t, top ${Math.min(40, (logs.data ?? []).length)}) ═══
 Au promedio: ${auAvg} g/t · P90: ${auP90} g/t · Max: ${auMax} g/t
-${(logs.data ?? []).slice(0, 15).map((l: any) => `  · ${l.hole_id} ${l.depth_from}-${l.depth_to}m: Au ${l.au_gpt} g/t${l.cu_pct ? ` Cu ${l.cu_pct}%` : ""} · ${l.lithology ?? "?"} / ${l.alteration ?? "?"}`).join("\n")}
+${(logs.data ?? [])
+  .slice(0, 15)
+  .map(
+    (l: any) =>
+      `  · ${l.hole_id} ${l.depth_from}-${l.depth_to}m: Au ${l.au_gpt} g/t${l.cu_pct ? ` Cu ${l.cu_pct}%` : ""} · ${l.lithology ?? "?"} / ${l.alteration ?? "?"}`,
+  )
+  .join("\n")}
 
 ═══ GEOFÍSICA ═══
 ${(surveys.data ?? []).length} surveys · CapEx USD ${capEx.toLocaleString()}
-${(surveys.data ?? []).slice(0, 5).map((s: any) => `  · ${s.name} [${s.method}, ${s.status}] ${s.planned_km ?? "?"} km, prof ${s.expected_depth_m ?? "?"}m`).join("\n")}
+${(surveys.data ?? [])
+  .slice(0, 5)
+  .map(
+    (s: any) =>
+      `  · ${s.name} [${s.method}, ${s.status}] ${s.planned_km ?? "?"} km, prof ${s.expected_depth_m ?? "?"}m`,
+  )
+  .join("\n")}
 
 ═══ TARGETS ACTIVOS (${(targets.data ?? []).length}) ═══
-${(targets.data ?? []).slice(0, 10).map((t: any) => `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} (${t.lat?.toFixed(4) ?? "?"}, ${t.lng?.toFixed(4) ?? "?"}) ${t.rationale ?? ""}`).join("\n")}
+${(targets.data ?? [])
+  .slice(0, 10)
+  .map(
+    (t: any) =>
+      `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} (${t.lat?.toFixed(4) ?? "?"}, ${t.lng?.toFixed(4) ?? "?"}) ${t.rationale ?? ""}`,
+  )
+  .join("\n")}
 
 ═══ HSE / PERMISOS ═══
 ${expiringSoon.length} permisos vencen en ≤60 días:
-${expiringSoon.slice(0, 5).map((p: any) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`).join("\n") || "  (ninguno crítico)"}
+${
+  expiringSoon
+    .slice(0, 5)
+    .map((p: any) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`)
+    .join("\n") || "  (ninguno crítico)"
+}
 ${(incidents.data ?? []).length} incidentes abiertos.
 
 ═══ CATASTRO ═══
 ${(conc.data ?? []).length} concesiones, ${(conc.data ?? []).reduce((s: number, c: any) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total.
-${(conc.data ?? []).slice(0, 5).map((c: any) => `  · ${c.code} ${c.name} [${c.concession_type}/${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`).join("\n")}
+${(conc.data ?? [])
+  .slice(0, 5)
+  .map(
+    (c: any) =>
+      `  · ${c.code} ${c.name} [${c.concession_type}/${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`,
+  )
+  .join("\n")}
       `.trim();
     }
 
@@ -138,18 +259,24 @@ ${projectContext}${focusBlock}`;
     if (!aiResp.ok) {
       if (aiResp.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit, intenta en unos segundos." }), {
-          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (aiResp.status === 402) {
-        return new Response(JSON.stringify({ error: "Sin créditos de IA. Recarga en Settings → Workspace → Usage." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Sin créditos de IA. Recarga en Settings → Workspace → Usage." }),
+          {
+            status: 402,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          },
+        );
       }
       const t = await aiResp.text();
       console.error("AI gateway error", aiResp.status, t);
       return new Response(JSON.stringify({ error: "AI gateway error" }), {
-        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -159,7 +286,8 @@ ${projectContext}${focusBlock}`;
   } catch (e) {
     console.error("geo-assistant error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

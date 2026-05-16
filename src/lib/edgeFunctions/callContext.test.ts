@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { RequestContext } from "@/types/requestContext";
-import { createEdgeFunctionHeaders, createEdgeFunctionLogLabel, createEdgeFunctionPayload } from "./callContext";
+import {
+  createEdgeFunctionHeaders,
+  createEdgeFunctionLogLabel,
+  createEdgeFunctionPayload,
+} from "./callContext";
 
 const context: RequestContext = {
   requestId: "geo:abc-1234",
@@ -21,7 +25,7 @@ describe("edge function call context helpers", () => {
         functionName: "sync-catastro",
         body: { force: true },
         context,
-      })
+      }),
     ).toEqual({ "x-request-id": "geo:abc-1234" });
   });
 
@@ -31,7 +35,7 @@ describe("edge function call context helpers", () => {
         functionName: "sync-catastro",
         body: { force: true },
         context,
-      })
+      }),
     ).toEqual({
       body: { force: true },
       context: {
@@ -52,7 +56,7 @@ describe("edge function call context helpers", () => {
         functionName: "sync-catastro",
         body: { force: true },
         context,
-      })
+      }),
     ).toBe("edge:sync-catastro request:geo:abc-1234 org:org-1 project:project-1 user:user-1");
   });
 });

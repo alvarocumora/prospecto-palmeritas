@@ -24,13 +24,20 @@ export function MobileBottomNav({
     { to: "/dashboard", icon: LayoutDashboard, label: "Home" },
     { to: "/dashboard/map", icon: Compass, label: "Mapa", matchPrefix: true },
     { to: "/dashboard/field-map", icon: MapPin, label: "Campo", matchPrefix: true },
-    { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro", matchPrefix: true, badge: catastroAlerts },
+    {
+      to: "/dashboard/catastro",
+      icon: MapIcon,
+      label: "Catastro",
+      matchPrefix: true,
+      badge: catastroAlerts,
+    },
     { icon: Menu, label: "Más", onClick: onMoreClick },
   ];
 
   const isActive = (s: Slot) => {
     if (!s.to) return false;
-    if (s.matchPrefix) return location.pathname === s.to || location.pathname.startsWith(s.to + "/");
+    if (s.matchPrefix)
+      return location.pathname === s.to || location.pathname.startsWith(s.to + "/");
     return location.pathname === s.to;
   };
 
@@ -52,7 +59,12 @@ export function MobileBottomNav({
                 active ? "bg-signal-cyan opacity-100" : "opacity-0",
               )}
             />
-            <Icon className={cn("w-5 h-5 transition-colors", active ? "text-signal-cyan" : "text-text-dim")} />
+            <Icon
+              className={cn(
+                "w-5 h-5 transition-colors",
+                active ? "text-signal-cyan" : "text-text-dim",
+              )}
+            />
             <span
               className={cn(
                 "text-[10px] font-mono mt-0.5 transition-colors",
@@ -68,7 +80,8 @@ export function MobileBottomNav({
             ) : null}
           </>
         );
-        const className = "relative flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform";
+        const className =
+          "relative flex-1 flex flex-col items-center justify-center active:scale-95 transition-transform";
         if (s.to) {
           return (
             <Link key={i} to={s.to} className={className}>
@@ -77,7 +90,13 @@ export function MobileBottomNav({
           );
         }
         return (
-          <button key={i} type="button" onClick={s.onClick} className={className} aria-label={s.label}>
+          <button
+            key={i}
+            type="button"
+            onClick={s.onClick}
+            className={className}
+            aria-label={s.label}
+          >
             {inner}
           </button>
         );

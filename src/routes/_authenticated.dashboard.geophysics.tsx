@@ -32,8 +32,13 @@ function GeophysicsModule() {
         <h1 className="text-2xl font-bold mb-2">Geofísica</h1>
         <div className="rounded border border-dashed border-border p-12 text-center mt-6">
           <Activity className="w-8 h-8 text-gold mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground">Selecciona o crea un proyecto para gestionar campañas geofísicas.</p>
-          <Link to="/dashboard/projects" className="inline-block mt-4 text-xs font-mono text-gold hover:underline">
+          <p className="text-sm text-muted-foreground">
+            Selecciona o crea un proyecto para gestionar campañas geofísicas.
+          </p>
+          <Link
+            to="/dashboard/projects"
+            className="inline-block mt-4 text-xs font-mono text-gold hover:underline"
+          >
             Ir a proyectos →
           </Link>
         </div>
@@ -45,7 +50,9 @@ function GeophysicsModule() {
     <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
       <header className="flex flex-wrap items-end justify-between gap-3 mb-6">
         <div>
-          <div className="text-[10px] uppercase font-mono text-muted-foreground">{active.code} · {active.name}</div>
+          <div className="text-[10px] uppercase font-mono text-muted-foreground">
+            {active.code} · {active.name}
+          </div>
           <h1 className="text-2xl font-bold flex items-center gap-2 mt-1">
             <Activity className="w-5 h-5 text-gold" /> Campañas geofísicas
           </h1>
@@ -67,13 +74,22 @@ function GeophysicsModule() {
         <Stat label="Campañas" value={surveys.length.toString()} />
         <Stat label="Km planeados" value={totalKm.toLocaleString("es-CL")} />
         <Stat label="Costo USD" value={totalCost.toLocaleString("es-CL")} />
-        <Stat label="Activas" value={surveys.filter((s) => s.status === "in_progress").length.toString()} />
+        <Stat
+          label="Activas"
+          value={surveys.filter((s) => s.status === "in_progress").length.toString()}
+        />
       </div>
 
-      {error && <div className="p-3 mb-4 rounded border border-destructive/40 bg-destructive/10 text-xs font-mono text-destructive">Error: {error}</div>}
+      {error && (
+        <div className="p-3 mb-4 rounded border border-destructive/40 bg-destructive/10 text-xs font-mono text-destructive">
+          Error: {error}
+        </div>
+      )}
 
       {loading ? (
-        <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>
+        <div className="flex items-center justify-center py-16">
+          <Loader2 className="w-6 h-6 animate-spin text-gold" />
+        </div>
       ) : surveys.length === 0 ? (
         <button
           type="button"
@@ -82,7 +98,9 @@ function GeophysicsModule() {
         >
           <Radio className="w-8 h-8 text-gold mx-auto mb-3" />
           <div className="font-mono font-semibold">Crear primera campaña</div>
-          <div className="text-xs text-muted-foreground mt-1">Magnetometría, IP, CSAMT, gravimetría...</div>
+          <div className="text-xs text-muted-foreground mt-1">
+            Magnetometría, IP, CSAMT, gravimetría...
+          </div>
         </button>
       ) : (
         <div className="rounded border border-border overflow-hidden">
@@ -103,7 +121,11 @@ function GeophysicsModule() {
               {surveys.map((s) => (
                 <tr key={s.id} className="border-b border-border/40 hover:bg-accent/30">
                   <td className="py-2.5 px-3 text-foreground font-semibold">
-                    <Link to="/dashboard/geophysics/$surveyId" params={{ surveyId: s.id }} className="hover:text-gold">
+                    <Link
+                      to="/dashboard/geophysics/$surveyId"
+                      params={{ surveyId: s.id }}
+                      className="hover:text-gold"
+                    >
                       {s.name}
                     </Link>
                   </td>
@@ -111,8 +133,12 @@ function GeophysicsModule() {
                   <td className="py-2.5 px-3 text-right">{s.planned_km ?? "—"}</td>
                   <td className="py-2.5 px-3 text-right">{s.station_spacing_m ?? "—"}</td>
                   <td className="py-2.5 px-3 text-right">{s.expected_depth_m ?? "—"}</td>
-                  <td className="py-2.5 px-3 text-right">{s.cost_usd?.toLocaleString("es-CL") ?? "—"}</td>
-                  <td className="py-2.5 px-3"><StatusBadge status={s.status} /></td>
+                  <td className="py-2.5 px-3 text-right">
+                    {s.cost_usd?.toLocaleString("es-CL") ?? "—"}
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <StatusBadge status={s.status} />
+                  </td>
                   <td className="py-2.5 px-3 text-right">
                     <div className="inline-flex items-center gap-1">
                       <Link
@@ -134,7 +160,12 @@ function GeophysicsModule() {
                       <button
                         type="button"
                         onClick={async () => {
-                          if (!confirm(`¿Eliminar "${s.name}"? Se borrarán también líneas y estaciones asociadas.`)) return;
+                          if (
+                            !confirm(
+                              `¿Eliminar "${s.name}"? Se borrarán también líneas y estaciones asociadas.`,
+                            )
+                          )
+                            return;
                           try {
                             await deleteSurvey(s.id);
                             toast.success("Campaña eliminada");
@@ -195,7 +226,9 @@ function StatusBadge({ status }: { status: string }) {
           ? "bg-destructive/10 text-destructive border-destructive/30"
           : "bg-muted text-muted-foreground border-border";
   return (
-    <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${tone}`}>{status}</span>
+    <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${tone}`}>
+      {status}
+    </span>
   );
 }
 
@@ -253,13 +286,18 @@ function SurveyDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4"
+      onClick={onClose}
+    >
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-lg border border-border bg-background p-5 space-y-3 max-h-[90vh] overflow-y-auto"
       >
-        <h2 className="text-base font-mono font-semibold">{initial ? "Editar campaña" : "Nueva campaña"}</h2>
+        <h2 className="text-base font-mono font-semibold">
+          {initial ? "Editar campaña" : "Nueva campaña"}
+        </h2>
 
         <Field label="Nombre" required>
           <input
@@ -279,7 +317,9 @@ function SurveyDialog({
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
             >
               {SURVEY_METHODS.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
           </Field>
@@ -290,7 +330,9 @@ function SurveyDialog({
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
             >
               {SURVEY_STATUS.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </Field>
@@ -299,7 +341,8 @@ function SurveyDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Km planeados">
             <input
-              type="number" step="0.1"
+              type="number"
+              step="0.1"
               value={form.planned_km}
               onChange={(e) => setForm((f) => ({ ...f, planned_km: e.target.value }))}
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
@@ -307,7 +350,8 @@ function SurveyDialog({
           </Field>
           <Field label="Costo USD">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.cost_usd}
               onChange={(e) => setForm((f) => ({ ...f, cost_usd: e.target.value }))}
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
@@ -318,7 +362,8 @@ function SurveyDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Espaciamiento (m)">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.station_spacing_m}
               onChange={(e) => setForm((f) => ({ ...f, station_spacing_m: e.target.value }))}
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
@@ -326,7 +371,8 @@ function SurveyDialog({
           </Field>
           <Field label="Profundidad esp. (m)">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.expected_depth_m}
               onChange={(e) => setForm((f) => ({ ...f, expected_depth_m: e.target.value }))}
               className="w-full px-2.5 py-1.5 text-xs font-mono rounded border border-border bg-bg-secondary"
@@ -344,7 +390,11 @@ function SurveyDialog({
         </Field>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent"
+          >
             Cancelar
           </button>
           <button
@@ -361,11 +411,20 @@ function SurveyDialog({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </div>
       {children}
     </label>

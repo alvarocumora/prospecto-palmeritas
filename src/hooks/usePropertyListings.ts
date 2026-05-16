@@ -72,7 +72,9 @@ export function usePropertyListings(projectId?: string | null) {
     setListings((data ?? []) as PropertyListing[]);
   }, [projectId]);
 
-  useEffect(() => { fetch(); }, [fetch]);
+  useEffect(() => {
+    fetch();
+  }, [fetch]);
 
   return { listings, loading, refresh: fetch };
 }
@@ -96,7 +98,11 @@ export function usePropertyListing(id: string | null) {
     const uid = u.user?.id ?? null;
     const [{ data: l }, { data: f }, { data: i }] = await Promise.all([
       supabase.from("property_listings").select("*").eq("id", id).maybeSingle(),
-      supabase.from("property_data_room_files").select("*").eq("listing_id", id).order("created_at", { ascending: false }),
+      supabase
+        .from("property_data_room_files")
+        .select("*")
+        .eq("listing_id", id)
+        .order("created_at", { ascending: false }),
       uid
         ? supabase
             .from("property_deal_inquiries")
@@ -112,7 +118,9 @@ export function usePropertyListing(id: string | null) {
     setLoading(false);
   }, [id]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   return { listing, files, inquiry, loading, refresh: fetchAll };
 }

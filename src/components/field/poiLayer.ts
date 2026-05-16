@@ -33,7 +33,11 @@ export function buildFieldPoisLayer(
       opacity: 1,
     });
     const date = new Date(p.created_at).toLocaleString("es-CL", {
-      day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
     const html = `
       <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
@@ -53,7 +57,9 @@ export function buildFieldPoisLayer(
     marker.bindPopup(html);
     if (opts?.onDelete) {
       marker.on("popupopen", (ev) => {
-        const popupNode = (ev as { popup: { getElement: () => HTMLElement | null } }).popup.getElement();
+        const popupNode = (
+          ev as { popup: { getElement: () => HTMLElement | null } }
+        ).popup.getElement();
         const btn = popupNode?.querySelector<HTMLButtonElement>(`[data-poi-del="${p.id}"]`);
         if (btn) {
           btn.addEventListener("click", () => opts.onDelete?.(p.id), { once: true });

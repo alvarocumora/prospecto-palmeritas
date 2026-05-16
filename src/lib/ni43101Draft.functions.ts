@@ -95,7 +95,9 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     const [projectRes, targetsRes, hyperRes, insarRes, stockRes] = await Promise.all([
       supabase
         .from("projects")
-        .select("id, code, name, commodity, country, region, center_lat, center_lng, description, crs_epsg")
+        .select(
+          "id, code, name, commodity, country, region, center_lat, center_lng, description, crs_epsg",
+        )
         .eq("id", projectId)
         .maybeSingle(),
       supabase
@@ -105,12 +107,16 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
         .order("code"),
       supabase
         .from("hyperspectral_products")
-        .select("source, mineral, assemblage, mean_score, max_score, area_ha, cells_above_threshold, acquisition_date")
+        .select(
+          "source, mineral, assemblage, mean_score, max_score, area_ha, cells_above_threshold, acquisition_date",
+        )
         .eq("project_id", projectId)
         .order("mean_score", { ascending: false, nullsFirst: false }),
       supabase
         .from("insar_displacement")
-        .select("asset_name, asset_type, source, alert_severity, velocity_mm_year, cumulative_displacement_mm, coherence, reference_date, end_date")
+        .select(
+          "asset_name, asset_type, source, alert_severity, velocity_mm_year, cumulative_displacement_mm, coherence, reference_date, end_date",
+        )
         .eq("project_id", projectId),
       supabase
         .from("stockpile_volumes")
@@ -122,14 +128,21 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     const p = projectRes.data;
 
     const targets: DraftTargetRow[] = (targetsRes.data ?? []).map((t: any) => ({
-      code: t.code, name: t.name, targetType: t.target_type, commodity: t.commodity,
-      priority: t.priority, score: t.score == null ? null : Number(t.score),
-      lat: t.lat == null ? null : Number(t.lat), lng: t.lng == null ? null : Number(t.lng),
+      code: t.code,
+      name: t.name,
+      targetType: t.target_type,
+      commodity: t.commodity,
+      priority: t.priority,
+      score: t.score == null ? null : Number(t.score),
+      lat: t.lat == null ? null : Number(t.lat),
+      lng: t.lng == null ? null : Number(t.lng),
       stage: t.stage,
     }));
 
     const hyperspectral: DraftHyperRow[] = (hyperRes.data ?? []).map((h: any) => ({
-      source: h.source, mineral: h.mineral, assemblage: h.assemblage,
+      source: h.source,
+      mineral: h.mineral,
+      assemblage: h.assemblage,
       meanScore: h.mean_score == null ? null : Number(h.mean_score),
       maxScore: h.max_score == null ? null : Number(h.max_score),
       areaHa: h.area_ha == null ? null : Number(h.area_ha),
@@ -144,7 +157,8 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
         source: i.source,
         alertSeverity: i.alert_severity,
         velocityMmYear: Number(i.velocity_mm_year),
-        cumulativeMm: i.cumulative_displacement_mm == null ? null : Number(i.cumulative_displacement_mm),
+        cumulativeMm:
+          i.cumulative_displacement_mm == null ? null : Number(i.cumulative_displacement_mm),
         coherence: i.coherence == null ? null : Number(i.coherence),
         referenceDate: String(i.reference_date).slice(0, 10),
         endDate: String(i.end_date).slice(0, 10),
@@ -158,7 +172,8 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     const cohs = insar.map((i) => i.coherence ?? 0).filter((c) => c > 0);
 
     const stockpiles: DraftStockpileRow[] = (stockRes.data ?? []).map((s: any) => ({
-      name: s.name, material: s.material,
+      name: s.name,
+      material: s.material,
       volumeM3: s.volume_m3 == null ? null : Number(s.volume_m3),
       areaM2: s.area_m2 == null ? null : Number(s.area_m2),
       meanHeightM: s.mean_height_m == null ? null : Number(s.mean_height_m),
@@ -172,11 +187,16 @@ export const getNi43101DraftReport = createServerFn({ method: "POST" })
     return {
       generatedAt: new Date().toISOString(),
       project: {
-        id: p.id, code: p.code, name: p.name,
-        commodity: p.commodity, country: p.country, region: p.region,
+        id: p.id,
+        code: p.code,
+        name: p.name,
+        commodity: p.commodity,
+        country: p.country,
+        region: p.region,
         centerLat: p.center_lat == null ? null : Number(p.center_lat),
         centerLng: p.center_lng == null ? null : Number(p.center_lng),
-        description: p.description, crsEpsg: p.crs_epsg,
+        description: p.description,
+        crsEpsg: p.crs_epsg,
       },
       stats: {
         totalTargets: targets.length,

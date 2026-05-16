@@ -29,7 +29,7 @@ describe("useFullscreenMap", () => {
     Object.defineProperty(wrapper, "requestFullscreen", { value: requestFullscreen });
 
     const { result } = renderHook(() =>
-      useFullscreenMap({ wrapperRef: { current: wrapper }, mapRef: { current: null } })
+      useFullscreenMap({ wrapperRef: { current: wrapper }, mapRef: { current: null } }),
     );
 
     await act(async () => {

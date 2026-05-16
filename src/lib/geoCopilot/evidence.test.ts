@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import type { GeoCopilotEvidenceRef } from "@/types/geoCopilot";
-import { createEvidenceLabel, filterEvidenceByConfidence, groupEvidenceByCategory, summarizeEvidence } from "./evidence";
+import {
+  createEvidenceLabel,
+  filterEvidenceByConfidence,
+  groupEvidenceByCategory,
+  summarizeEvidence,
+} from "./evidence";
 
 const evidence: GeoCopilotEvidenceRef[] = [
   {

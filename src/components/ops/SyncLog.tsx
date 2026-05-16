@@ -38,7 +38,7 @@ export function SyncLog({ projectId }: { projectId: string }) {
         console.error("compute-overlaps failed", ovErr);
         toast.warning(
           `Sync OK · ${checked} revisadas · ${changed} cambios · ${alerts} alertas · sobreposiciones no recalculadas`,
-          { id: t, duration: 6000 }
+          { id: t, duration: 6000 },
         );
         window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId } }));
         refresh();
@@ -48,7 +48,7 @@ export function SyncLog({ projectId }: { projectId: string }) {
 
       toast.success(
         `Sync OK · ${checked} revisadas · ${changed} cambios · ${missing} no encontradas · ${alerts} alertas · ${detected} sobreposiciones`,
-        { id: t, duration: 7000 }
+        { id: t, duration: 7000 },
       );
       window.dispatchEvent(new CustomEvent("catastro:synced", { detail: { projectId } }));
       refresh();
@@ -61,11 +61,7 @@ export function SyncLog({ projectId }: { projectId: string }) {
   };
 
   return (
-    <HudPanel
-      title="SERNAGEOMIN · Sync log"
-      accent="cyan"
-      className="bg-bg-panel/40"
-    >
+    <HudPanel title="SERNAGEOMIN · Sync log" accent="cyan" className="bg-bg-panel/40">
       <div className="flex items-center justify-between mb-3">
         <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider">
           {data.length} eventos registrados
@@ -75,7 +71,11 @@ export function SyncLog({ projectId }: { projectId: string }) {
           disabled={syncing}
           className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan text-[10px] font-mono uppercase hover:bg-signal-cyan/20 disabled:opacity-50"
         >
-          {syncing ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+          {syncing ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <RefreshCw className="w-3 h-3" />
+          )}
           Sincronizar ahora
         </button>
       </div>
@@ -95,20 +95,27 @@ export function SyncLog({ projectId }: { projectId: string }) {
             return (
               <div key={h.id} className="px-2.5 py-1.5 hover:bg-accent/30">
                 <div className="flex items-center gap-2">
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasDiff ? "bg-signal-amber" : "bg-signal-green"}`} />
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full shrink-0 ${hasDiff ? "bg-signal-amber" : "bg-signal-green"}`}
+                  />
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] font-mono truncate">
                       {concessionMap.get(h.concession_id) ?? h.concession_id.slice(0, 8)}
                     </div>
                     <div className="text-[10px] text-text-dim">
                       {new Date(h.synced_at).toLocaleString("es-CL")} · {h.source}
-                      {hasDiff && ` · ${Object.keys(h.diff!).length} campo${Object.keys(h.diff!).length === 1 ? "" : "s"} cambiados`}
+                      {hasDiff &&
+                        ` · ${Object.keys(h.diff!).length} campo${Object.keys(h.diff!).length === 1 ? "" : "s"} cambiados`}
                     </div>
                     {hasDiff && (
                       <div className="text-[10px] mt-1 font-mono text-signal-amber">
-                        {Object.entries(h.diff!).slice(0, 3).map(([k, v]) => (
-                          <span key={k} className="mr-2">{k}: {String(v)}</span>
-                        ))}
+                        {Object.entries(h.diff!)
+                          .slice(0, 3)
+                          .map(([k, v]) => (
+                            <span key={k} className="mr-2">
+                              {k}: {String(v)}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </div>

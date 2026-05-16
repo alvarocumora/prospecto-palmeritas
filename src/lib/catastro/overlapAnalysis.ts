@@ -66,7 +66,9 @@ export function computeOverlaps(
     if (!cFeat) continue;
     let intersection: AnyPolyFeature | null = null;
     try {
-      intersection = turf.intersect(turf.featureCollection([aoiFeat, cFeat])) as AnyPolyFeature | null;
+      intersection = turf.intersect(
+        turf.featureCollection([aoiFeat, cFeat]),
+      ) as AnyPolyFeature | null;
     } catch {
       intersection = null;
     }

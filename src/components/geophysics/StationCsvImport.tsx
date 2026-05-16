@@ -26,7 +26,10 @@ function detectDelimiter(line: string): string {
   let bestCount = 0;
   for (const c of candidates) {
     const n = line.split(c).length;
-    if (n > bestCount) { bestCount = n; best = c; }
+    if (n > bestCount) {
+      bestCount = n;
+      best = c;
+    }
   }
   return best;
 }
@@ -38,13 +41,22 @@ function parseCsvLine(line: string, delim: string): string[] {
   for (let i = 0; i < line.length; i++) {
     const ch = line[i];
     if (inQuotes) {
-      if (ch === '"' && line[i + 1] === '"') { cur += '"'; i++; }
-      else if (ch === '"') { inQuotes = false; }
-      else { cur += ch; }
+      if (ch === '"' && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else if (ch === '"') {
+        inQuotes = false;
+      } else {
+        cur += ch;
+      }
     } else {
       if (ch === '"') inQuotes = true;
-      else if (ch === delim) { out.push(cur); cur = ""; }
-      else { cur += ch; }
+      else if (ch === delim) {
+        out.push(cur);
+        cur = "";
+      } else {
+        cur += ch;
+      }
     }
   }
   out.push(cur);
@@ -56,7 +68,7 @@ function toNum(s: string): number | null {
   // accept comma decimal
   const norm = s.replace(",", ".");
   const n = Number(norm);
-  return Number.isFinite(n) ? n : NaN as unknown as number;
+  return Number.isFinite(n) ? n : (NaN as unknown as number);
 }
 
 function parseCsv(text: string): { rows: ParsedRow[]; headerError: string | null } {
@@ -69,7 +81,9 @@ function parseCsv(text: string): { rows: ParsedRow[]; headerError: string | null
     return { rows: [], headerError: `Faltan columnas obligatorias: ${missing.join(", ")}` };
   }
   const idx: Record<string, number> = {};
-  ALL_FIELDS.forEach((f) => { idx[f] = headers.indexOf(f); });
+  ALL_FIELDS.forEach((f) => {
+    idx[f] = headers.indexOf(f);
+  });
 
   const seen = new Set<string>();
   const rows: ParsedRow[] = [];
@@ -91,12 +105,15 @@ function parseCsv(text: string): { rows: ParsedRow[]; headerError: string | null
     if (lng === null || Number.isNaN(lng)) errors.push("lng inválida");
     else if (lng < -180 || lng > 180) errors.push("lng fuera de rango");
 
-    const optNum = (key: typeof OPTIONAL[number]) => {
+    const optNum = (key: (typeof OPTIONAL)[number]) => {
       if (idx[key] < 0) return null;
       const raw = cells[idx[key]] ?? "";
       if (raw === "") return null;
       const n = toNum(raw);
-      if (n === null || Number.isNaN(n)) { errors.push(`${key} inválida`); return null; }
+      if (n === null || Number.isNaN(n)) {
+        errors.push(`${key} inválida`);
+        return null;
+      }
       return n;
     };
     const mag_nt = optNum("mag_nt");
@@ -152,13 +169,21 @@ export function StationCsvImport({
     const blob = new Blob([TEMPLATE], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "estaciones_plantilla.csv"; a.click();
+    a.href = url;
+    a.download = "estaciones_plantilla.csv";
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   const handleImport = async () => {
-    if (!user) { toast.error("Sin sesión"); return; }
-    if (validRows.length === 0) { toast.error("No hay filas válidas para importar"); return; }
+    if (!user) {
+      toast.error("Sin sesión");
+      return;
+    }
+    if (validRows.length === 0) {
+      toast.error("No hay filas válidas para importar");
+      return;
+    }
     setImporting(true);
     try {
       const payload = validRows.map((r) => ({
@@ -209,19 +234,29 @@ export function StationCsvImport({
           {/* Source */}
           <div className="grid md:grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Archivo CSV</label>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+                Archivo CSV
+              </label>
               <input
                 type="file"
                 accept=".csv,text/csv"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleFile(f);
+                }}
                 className="block w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-gold file:text-bg-primary file:font-mono file:cursor-pointer"
               />
-              <button onClick={downloadTemplate} className="mt-2 inline-flex items-center gap-1 text-[11px] font-mono text-info hover:underline">
+              <button
+                onClick={downloadTemplate}
+                className="mt-2 inline-flex items-center gap-1 text-[11px] font-mono text-info hover:underline"
+              >
                 <FileText className="w-3 h-3" /> Descargar plantilla
               </button>
             </div>
             <div>
-              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">o pegar contenido</label>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+                o pegar contenido
+              </label>
               <textarea
                 value={text}
                 onChange={(e) => setText(e.target.value)}
@@ -234,8 +269,8 @@ export function StationCsvImport({
 
           <div className="text-[11px] font-mono text-muted-foreground">
             <strong className="text-foreground">Columnas requeridas:</strong> station_id, lat, lng ·
-            <strong className="text-foreground"> opcionales:</strong> mag_nt, ip_chargeability_mvv, ip_resistivity_ohmm, notes ·
-            separadores: <code>, ; \t</code>
+            <strong className="text-foreground"> opcionales:</strong> mag_nt, ip_chargeability_mvv,
+            ip_resistivity_ohmm, notes · separadores: <code>, ; \t</code>
           </div>
 
           {/* Status */}
@@ -274,9 +309,14 @@ export function StationCsvImport({
                 </thead>
                 <tbody>
                   {preview.map((r) => (
-                    <tr key={r.rowNum} className={`border-b border-border/40 ${r.errors.length ? "bg-destructive/5" : ""}`}>
+                    <tr
+                      key={r.rowNum}
+                      className={`border-b border-border/40 ${r.errors.length ? "bg-destructive/5" : ""}`}
+                    >
                       <td className="py-1 px-2 text-muted-foreground">{r.rowNum}</td>
-                      <td className="py-1 px-2">{r.station_id || <span className="text-destructive">∅</span>}</td>
+                      <td className="py-1 px-2">
+                        {r.station_id || <span className="text-destructive">∅</span>}
+                      </td>
                       <td className="py-1 px-2 text-right">{r.lat ?? "—"}</td>
                       <td className="py-1 px-2 text-right">{r.lng ?? "—"}</td>
                       <td className="py-1 px-2 text-right">{r.mag_nt ?? "—"}</td>
@@ -287,7 +327,8 @@ export function StationCsvImport({
                           <span className="text-teal">OK</span>
                         ) : (
                           <span className="text-destructive" title={r.errors.join("; ")}>
-                            {r.errors[0]}{r.errors.length > 1 ? ` +${r.errors.length - 1}` : ""}
+                            {r.errors[0]}
+                            {r.errors.length > 1 ? ` +${r.errors.length - 1}` : ""}
                           </span>
                         )}
                       </td>
@@ -305,7 +346,10 @@ export function StationCsvImport({
         </div>
 
         <div className="flex items-center justify-between p-4 border-t border-border bg-bg-secondary/50">
-          <button onClick={onClose} className="text-xs font-mono text-muted-foreground hover:text-foreground">
+          <button
+            onClick={onClose}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground"
+          >
             Cancelar
           </button>
           <button
@@ -313,7 +357,11 @@ export function StationCsvImport({
             disabled={importing || validRows.length === 0}
             className="inline-flex items-center gap-2 px-4 py-2 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {importing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+            {importing ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Upload className="w-3 h-3" />
+            )}
             Importar {validRows.length} estaciones
           </button>
         </div>

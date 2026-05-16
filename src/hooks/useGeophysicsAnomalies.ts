@@ -87,7 +87,10 @@ export const ANOMALY_STATUS_META: Record<AnomalyStatus, { label: string; color: 
   reviewed: { label: "Revisada", color: "text-info border-info/30 bg-info/10" },
   validated: { label: "Validada", color: "text-gold border-gold/40 bg-gold/10" },
   promoted: { label: "Promovida", color: "text-teal border-teal/30 bg-teal/10" },
-  dismissed: { label: "Descartada", color: "text-muted-foreground border-border bg-muted/20 line-through" },
+  dismissed: {
+    label: "Descartada",
+    color: "text-muted-foreground border-border bg-muted/20 line-through",
+  },
 };
 
 // Cast helper — supabase types regenerate after migration
@@ -135,7 +138,7 @@ export function useGeophysicsAnomalyMutations() {
     async (
       projectId: string,
       surveyId: string,
-      payload: Partial<GeophysicsAnomaly>
+      payload: Partial<GeophysicsAnomaly>,
     ): Promise<GeophysicsAnomaly> => {
       if (!user) throw new Error("Sin sesión");
       const { data, error } = await sb
@@ -165,7 +168,7 @@ export function useGeophysicsAnomalyMutations() {
       if (error) throw error;
       return data as GeophysicsAnomaly;
     },
-    [user]
+    [user],
   );
 
   const updateAnomaly = useCallback(
@@ -179,7 +182,7 @@ export function useGeophysicsAnomalyMutations() {
       if (error) throw error;
       return data as GeophysicsAnomaly;
     },
-    []
+    [],
   );
 
   const deleteAnomaly = useCallback(async (id: string) => {
@@ -204,7 +207,7 @@ export function useGeophysicsAnomalyMutations() {
       }
       return updateAnomaly(id, patch);
     },
-    [user, updateAnomaly]
+    [user, updateAnomaly],
   );
 
   /**
@@ -225,7 +228,7 @@ export function useGeophysicsAnomalyMutations() {
         planned_meters?: number | null;
         estimated_cost_usd?: number | null;
         campaign_id?: string | null;
-      }
+      },
     ): Promise<{ targetId: string }> => {
       if (!user) throw new Error("Sin sesión");
 
@@ -279,7 +282,7 @@ export function useGeophysicsAnomalyMutations() {
 
       return { targetId };
     },
-    [user, updateAnomaly]
+    [user, updateAnomaly],
   );
 
   return { createAnomaly, updateAnomaly, deleteAnomaly, setStatus, promoteToTarget };

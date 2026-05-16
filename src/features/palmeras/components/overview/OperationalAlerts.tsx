@@ -20,10 +20,15 @@ export function OperationalAlerts({ className = "" }: OperationalAlertsProps) {
       </SectionTitle>
       <ul className="space-y-2 mt-2">
         {PALMERAS_OPERATIONAL_ALERTS.map((alert, index) => (
-          <li key={`${alert.level}-${index}`} className="flex items-start gap-3 p-3 rounded border border-border bg-bg-secondary card-hover">
+          <li
+            key={`${alert.level}-${index}`}
+            className="flex items-start gap-3 p-3 rounded border border-border bg-bg-secondary card-hover"
+          >
             <SignalDot tone={alertToneToSignal(alert.tone)} />
             <div className="flex-1">
-              <div className="font-mono text-[10px] uppercase tracking-widest text-hint">{alert.level}</div>
+              <div className="font-mono text-[10px] uppercase tracking-widest text-hint">
+                {alert.level}
+              </div>
               <div className="text-sm text-foreground">{alert.text}</div>
             </div>
           </li>

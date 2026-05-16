@@ -16,8 +16,12 @@ const corsHeaders = {
 
 interface Block {
   id: string;
-  ix: number; iy: number; iz: number;
-  x: number; y: number; z: number;
+  ix: number;
+  iy: number;
+  iz: number;
+  x: number;
+  y: number;
+  z: number;
   grade: number | null;
   classification: string | null;
 }
@@ -70,20 +74,28 @@ function nsrPerTonne(grade: number, s: Scenario, m: Model): number {
     revenue = lbPerT * recovery * payable * s.commodity_price_usd;
   } else {
     // usd_per_t metal
-    const tPerT = (m.commodity === "cu" || m.commodity === "fe" || m.commodity === "zn" || m.commodity === "pb")
-      ? grade / 100 : grade / 1_000_000;
+    const tPerT =
+      m.commodity === "cu" || m.commodity === "fe" || m.commodity === "zn" || m.commodity === "pb"
+        ? grade / 100
+        : grade / 1_000_000;
     revenue = tPerT * recovery * payable * s.commodity_price_usd;
   }
   // Royalty on revenue
-  revenue *= (1 - s.royalty_pct / 100);
+  revenue *= 1 - s.royalty_pct / 100;
   return revenue;
 }
 
 /** Floating-cone pit: a block is in-pit if every block in the cone above (slope-expanded) is also stripped. */
-function buildPit(blocks: Block[], oreFlag: Map<string, boolean>, m: Model, slopeDeg: number): Set<string> {
+function buildPit(
+  blocks: Block[],
+  oreFlag: Map<string, boolean>,
+  m: Model,
+  slopeDeg: number,
+): Set<string> {
   // index by (ix, iy, iz)
   const idx = new Map<string, Block>();
-  let maxZ = -Infinity, minZ = Infinity;
+  let maxZ = -Infinity,
+    minZ = Infinity;
   for (const b of blocks) {
     idx.set(`${b.ix}_${b.iy}_${b.iz}`, b);
     if (b.iz > maxZ) maxZ = b.iz;
@@ -91,7 +103,8 @@ function buildPit(blocks: Block[], oreFlag: Map<string, boolean>, m: Model, slop
   }
   // Slope tan determines lateral expansion per vertical block step
   const slopeTan = Math.tan((slopeDeg * Math.PI) / 180);
-  const lateralPerStep = (m.block_size_z / Math.max(slopeTan, 0.01)) / Math.max(m.block_size_x, m.block_size_y);
+  const lateralPerStep =
+    m.block_size_z / Math.max(slopeTan, 0.01) / Math.max(m.block_size_x, m.block_size_y);
   const inPit = new Set<string>();
   // Start from top and propagate downward: any ore block included pulls in cone above
   // For simplicity here: mark every block whose grade is ore AND which has a feasible cone of mostly economic mass above.
@@ -100,7 +113,8 @@ function buildPit(blocks: Block[], oreFlag: Map<string, boolean>, m: Model, slop
     if (!oreFlag.get(b.id)) continue;
     const depthSteps = maxZ - b.iz;
     const radius = Math.ceil(depthSteps * lateralPerStep);
-    let coneValuePos = 0, coneCount = 0;
+    let coneValuePos = 0,
+      coneCount = 0;
     for (let dz = 0; dz <= depthSteps; dz++) {
       const r = Math.ceil(dz * lateralPerStep);
       for (let dx = -r; dx <= r; dx++) {
@@ -136,12 +150,14 @@ function computeIRR(cashflows: number[]): number | null {
   const npv = (rate: number) =>
     cashflows.reduce((acc, cf, t) => acc + cf / Math.pow(1 + rate, t), 0);
   if (npv(0) <= 0) return null;
-  let lo = 0, hi = 5; // 0%..500%
+  let lo = 0,
+    hi = 5; // 0%..500%
   for (let i = 0; i < 80; i++) {
     const mid = (lo + hi) / 2;
     const v = npv(mid);
     if (Math.abs(v) < 1) return mid * 100;
-    if (v > 0) lo = mid; else hi = mid;
+    if (v > 0) lo = mid;
+    else hi = mid;
   }
   return ((lo + hi) / 2) * 100;
 }
@@ -159,19 +175,26 @@ Deno.serve(async (req) => {
     if (!scenario_id) throw new Error("scenario_id required");
 
     const { data: scenario, error: sErr } = await supabase
-      .from("economic_scenarios").select("*").eq("id", scenario_id).single();
+      .from("economic_scenarios")
+      .select("*")
+      .eq("id", scenario_id)
+      .single();
     if (sErr || !scenario) throw new Error("Scenario not found");
 
     await supabase.from("economic_scenarios").update({ status: "running" }).eq("id", scenario_id);
 
     const { data: model, error: mErr } = await supabase
-      .from("resource_models").select("*").eq("id", scenario.model_id).single();
+      .from("resource_models")
+      .select("*")
+      .eq("id", scenario.model_id)
+      .single();
     if (mErr || !model) throw new Error("Model not found");
     if (model.status !== "complete") throw new Error("Resource model is not complete");
 
     // Fetch all blocks for the model
     const { data: blocks, error: bErr } = await supabase
-      .from("resource_blocks").select("id, ix, iy, iz, x, y, z, grade, classification")
+      .from("resource_blocks")
+      .select("id, ix, iy, iz, x, y, z, grade, classification")
       .eq("model_id", scenario.model_id);
     if (bErr) throw bErr;
     if (!blocks || blocks.length === 0) throw new Error("Model has no blocks");
@@ -183,28 +206,41 @@ Deno.serve(async (req) => {
     const blockTonnage = blockVolume * Number(model.density_t_m3);
 
     // 1) Compute NSR per block, ore vs waste
-    const totalProcessing = s.mining_cost_usd_t + s.processing_cost_usd_t + s.ga_cost_usd_t + s.transport_cost_usd_t;
+    const totalProcessing =
+      s.mining_cost_usd_t + s.processing_cost_usd_t + s.ga_cost_usd_t + s.transport_cost_usd_t;
     // NSR cutoff = grade where revenue == processing costs
     // Solve: nsr_per_t(g_cut) == totalProcessing → linear-ish in grade for each unit
     // Use bisection to invert nsrPerTonne
-    let lo = 0, hi = 100;
+    let lo = 0,
+      hi = 100;
     for (let i = 0; i < 40; i++) {
       const mid = (lo + hi) / 2;
       const r = nsrPerTonne(mid, s, m);
-      if (r > totalProcessing) hi = mid; else lo = mid;
+      if (r > totalProcessing) hi = mid;
+      else lo = mid;
     }
     const nsrCutoffGrade = (lo + hi) / 2;
     const nsrCutoffUsdT = totalProcessing;
 
     const blockEcon: Array<{
-      block_id: string; nsr_usd_t: number | null; insitu_value_usd: number | null;
-      total_cost_usd_t: number; margin_usd_t: number | null; is_ore: boolean;
+      block_id: string;
+      nsr_usd_t: number | null;
+      insitu_value_usd: number | null;
+      total_cost_usd_t: number;
+      margin_usd_t: number | null;
+      is_ore: boolean;
     }> = [];
     const oreFlag = new Map<string, boolean>();
     for (const b of blocks as Block[]) {
       if (b.grade == null || b.grade <= 0) {
-        blockEcon.push({ block_id: b.id, nsr_usd_t: null, insitu_value_usd: null,
-          total_cost_usd_t: totalProcessing, margin_usd_t: null, is_ore: false });
+        blockEcon.push({
+          block_id: b.id,
+          nsr_usd_t: null,
+          insitu_value_usd: null,
+          total_cost_usd_t: totalProcessing,
+          margin_usd_t: null,
+          is_ore: false,
+        });
         oreFlag.set(b.id, false);
         continue;
       }
@@ -236,14 +272,25 @@ Deno.serve(async (req) => {
     const yearsLife = Math.max(1, Math.ceil(totalOreT / s.annual_throughput_t));
 
     // Build annual schedule
-    type Yr = { year: number; ore: number; waste: number; metal: number; revenue: number; opex: number; capex: number };
+    type Yr = {
+      year: number;
+      ore: number;
+      waste: number;
+      metal: number;
+      revenue: number;
+      opex: number;
+      capex: number;
+    };
     const yearly: Yr[] = [];
     let oreCursor = 0;
     let wasteCursor = 0;
     const wastePerYear = totalWasteT / yearsLife;
-    let cumGrade = 0, cumGradeT = 0;
+    let cumGrade = 0,
+      cumGradeT = 0;
     for (let y = 1; y <= yearsLife; y++) {
-      let yearOreT = 0, yearMetal = 0, yearRevenue = 0;
+      let yearOreT = 0,
+        yearMetal = 0,
+        yearRevenue = 0;
       const yearTarget = s.annual_throughput_t * Math.min(1, y / Math.max(1, s.ramp_up_years));
       while (yearOreT < yearTarget && oreCursor < oreBlocks.length) {
         const be = oreBlocks[oreCursor++];
@@ -258,18 +305,38 @@ Deno.serve(async (req) => {
       const yearWasteT = Math.min(wastePerYear, totalWasteT - wasteCursor);
       wasteCursor += yearWasteT;
       const yearOpex =
-        yearOreT * (s.mining_cost_usd_t + s.processing_cost_usd_t + s.ga_cost_usd_t + s.transport_cost_usd_t + s.sustaining_capex_usd_t)
-        + yearWasteT * (s.mining_cost_usd_t + s.waste_cost_usd_t);
+        yearOreT *
+          (s.mining_cost_usd_t +
+            s.processing_cost_usd_t +
+            s.ga_cost_usd_t +
+            s.transport_cost_usd_t +
+            s.sustaining_capex_usd_t) +
+        yearWasteT * (s.mining_cost_usd_t + s.waste_cost_usd_t);
       const yearCapex = y === 1 ? s.capex_usd : 0;
-      yearly.push({ year: y, ore: yearOreT, waste: yearWasteT, metal: yearMetal, revenue: yearRevenue, opex: yearOpex, capex: yearCapex });
+      yearly.push({
+        year: y,
+        ore: yearOreT,
+        waste: yearWasteT,
+        metal: yearMetal,
+        revenue: yearRevenue,
+        opex: yearOpex,
+        capex: yearCapex,
+      });
       cumGradeT += yearOreT;
-      cumGrade += (yearMetal); // approx
+      cumGrade += yearMetal; // approx
     }
 
-    const cashflows = [-s.capex_usd, ...yearly.map((y) => y.revenue - y.opex - (y.year === 1 ? 0 : 0))];
-    const npv = cashflows.reduce((acc, cf, t) => acc + cf / Math.pow(1 + s.discount_rate_pct / 100, t), 0);
+    const cashflows = [
+      -s.capex_usd,
+      ...yearly.map((y) => y.revenue - y.opex - (y.year === 1 ? 0 : 0)),
+    ];
+    const npv = cashflows.reduce(
+      (acc, cf, t) => acc + cf / Math.pow(1 + s.discount_rate_pct / 100, t),
+      0,
+    );
     const irr = computeIRR(cashflows);
-    let cum = 0; let payback = null as number | null;
+    let cum = 0;
+    let payback = null as number | null;
     for (let i = 0; i < cashflows.length; i++) {
       cum += cashflows[i];
       if (cum >= 0 && payback === null) payback = i;
@@ -280,7 +347,8 @@ Deno.serve(async (req) => {
     await supabase.from("economic_schedule").delete().eq("scenario_id", scenario_id);
 
     const beRows = blockEcon.map((be) => ({
-      scenario_id, project_id: s.project_id,
+      scenario_id,
+      project_id: s.project_id,
       block_id: be.block_id,
       nsr_usd_t: be.nsr_usd_t,
       insitu_value_usd: be.insitu_value_usd,
@@ -291,7 +359,9 @@ Deno.serve(async (req) => {
     }));
     const chunkSize = 500;
     for (let i = 0; i < beRows.length; i += chunkSize) {
-      const { error } = await supabase.from("resource_block_economics").insert(beRows.slice(i, i + chunkSize));
+      const { error } = await supabase
+        .from("resource_block_economics")
+        .insert(beRows.slice(i, i + chunkSize));
       if (error) throw error;
     }
 
@@ -301,10 +371,12 @@ Deno.serve(async (req) => {
       cumCash += cashflow;
       const disc = cashflow / Math.pow(1 + s.discount_rate_pct / 100, y.year);
       return {
-        scenario_id, project_id: s.project_id,
+        scenario_id,
+        project_id: s.project_id,
         year: y.year,
-        ore_tonnes: y.ore, waste_tonnes: y.waste,
-        mean_grade: y.ore > 0 ? (y.metal / y.ore) : null,
+        ore_tonnes: y.ore,
+        waste_tonnes: y.waste,
+        mean_grade: y.ore > 0 ? y.metal / y.ore : null,
         metal_payable: y.metal,
         revenue_usd: y.revenue,
         opex_usd: y.opex,
@@ -322,39 +394,46 @@ Deno.serve(async (req) => {
     const totalRevenue = yearly.reduce((a, b) => a + b.revenue, 0);
     const totalOpex = yearly.reduce((a, b) => a + b.opex, 0);
 
-    await supabase.from("economic_scenarios").update({
-      status: "complete",
-      nsr_cutoff_usd_t: nsrCutoffUsdT,
-      ore_tonnes: totalOreT,
-      waste_tonnes: totalWasteT,
-      strip_ratio: stripRatio,
-      mean_grade: cumGradeT > 0 ? cumGrade / cumGradeT : null,
-      metal_payable: cumGrade,
-      gross_revenue_usd: totalRevenue,
-      total_opex_usd: totalOpex,
-      total_capex_usd: s.capex_usd,
-      ebitda_usd: totalRevenue - totalOpex,
-      npv_usd: npv,
-      irr_pct: irr,
-      payback_years: payback,
-      mine_life_years: yearsLife,
-      computed_at: new Date().toISOString(),
-    }).eq("id", scenario_id);
+    await supabase
+      .from("economic_scenarios")
+      .update({
+        status: "complete",
+        nsr_cutoff_usd_t: nsrCutoffUsdT,
+        ore_tonnes: totalOreT,
+        waste_tonnes: totalWasteT,
+        strip_ratio: stripRatio,
+        mean_grade: cumGradeT > 0 ? cumGrade / cumGradeT : null,
+        metal_payable: cumGrade,
+        gross_revenue_usd: totalRevenue,
+        total_opex_usd: totalOpex,
+        total_capex_usd: s.capex_usd,
+        ebitda_usd: totalRevenue - totalOpex,
+        npv_usd: npv,
+        irr_pct: irr,
+        payback_years: payback,
+        mine_life_years: yearsLife,
+        computed_at: new Date().toISOString(),
+      })
+      .eq("id", scenario_id);
 
-    return new Response(JSON.stringify({
-      ok: true,
-      nsr_cutoff_grade: nsrCutoffGrade,
-      ore_tonnes: totalOreT,
-      strip_ratio: stripRatio,
-      npv_usd: npv,
-      irr_pct: irr,
-      mine_life_years: yearsLife,
-      payback_years: payback,
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        nsr_cutoff_grade: nsrCutoffGrade,
+        ore_tonnes: totalOreT,
+        strip_ratio: stripRatio,
+        npv_usd: npv,
+        irr_pct: irr,
+        mine_life_years: yearsLife,
+        payback_years: payback,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return new Response(JSON.stringify({ ok: false, error: msg }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

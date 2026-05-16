@@ -3,8 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 Deno.serve(async (req) => {
@@ -14,14 +13,16 @@ Deno.serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
       return new Response(JSON.stringify({ error: "missing auth" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const { project_id, email, role } = await req.json();
     if (!project_id || !email || !role) {
       return new Response(JSON.stringify({ error: "project_id, email, role required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -33,10 +34,14 @@ Deno.serve(async (req) => {
       global: { headers: { Authorization: authHeader } },
     });
 
-    const { data: { user }, error: userErr } = await userClient.auth.getUser();
+    const {
+      data: { user },
+      error: userErr,
+    } = await userClient.auth.getUser();
     if (userErr || !user) {
       return new Response(JSON.stringify({ error: "invalid user" }), {
-        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -54,7 +59,8 @@ Deno.serve(async (req) => {
     if (error) {
       console.error("invite insert error", error);
       return new Response(JSON.stringify({ error: error.message }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -66,12 +72,14 @@ Deno.serve(async (req) => {
     console.log(`[invite] ${email} → ${link} (expires ${data.expires_at})`);
 
     return new Response(JSON.stringify({ ok: true, link, invitation_id: data.id }), {
-      status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 200,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("send-project-invitation error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

@@ -20,8 +20,17 @@ interface Props {
 }
 
 export function ExportAnnotationsPreview({
-  open, format, annotations, totalAnnotations, projectName, targetMap, campaignMap, userMap,
-  filterSummary, showResolved, onClose,
+  open,
+  format,
+  annotations,
+  totalAnnotations,
+  projectName,
+  targetMap,
+  campaignMap,
+  userMap,
+  filterSummary,
+  showResolved,
+  onClose,
 }: Props) {
   if (!open) return null;
 
@@ -81,12 +90,13 @@ export function ExportAnnotationsPreview({
         <div className="p-4 space-y-3 overflow-y-auto max-h-[60vh]">
           {/* Document header preview */}
           <div className="rounded border border-gold/30 bg-gold/5 p-3">
-            <div className="text-[10px] font-mono uppercase text-gold mb-1">Encabezado del reporte</div>
+            <div className="text-[10px] font-mono uppercase text-gold mb-1">
+              Encabezado del reporte
+            </div>
             <div className="text-sm font-bold text-foreground">
               Anotaciones del mapa — {projectName}
             </div>
-            <div className="text-[10px] font-mono text-muted-foreground mt-1">
-            </div>
+            <div className="text-[10px] font-mono text-muted-foreground mt-1"></div>
           </div>
 
           {/* Filtros aplicados — confirma que el export respeta lo visible en el mapa */}
@@ -96,9 +106,13 @@ export function ExportAnnotationsPreview({
             </div>
             <div className="flex flex-wrap gap-1.5 text-[10px] font-mono">
               <span className="px-1.5 py-0.5 rounded bg-background border border-border">
-                {filterSummary && filterSummary !== "Todas" ? filterSummary : "Sin filtro target/campaña/fase"}
+                {filterSummary && filterSummary !== "Todas"
+                  ? filterSummary
+                  : "Sin filtro target/campaña/fase"}
               </span>
-              <span className={`px-1.5 py-0.5 rounded border ${showResolved ? "border-emerald-500/40 text-emerald-500" : "border-amber-500/40 text-amber-500"}`}>
+              <span
+                className={`px-1.5 py-0.5 rounded border ${showResolved ? "border-emerald-500/40 text-emerald-500" : "border-amber-500/40 text-amber-500"}`}
+              >
                 {showResolved ? "Incluye resueltas" : "Solo pendientes"}
               </span>
               <span className="px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
@@ -139,10 +153,7 @@ export function ExportAnnotationsPreview({
                     className="flex items-center justify-between px-2 py-1 rounded border border-border bg-accent/20 text-[11px] font-mono"
                   >
                     <span className="inline-flex items-center gap-2">
-                      <span
-                        className="w-2.5 h-2.5 rounded-full"
-                        style={{ background: c.hex }}
-                      />
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ background: c.hex }} />
                       <span className="text-foreground">{c.label}</span>
                     </span>
                     <span className="text-muted-foreground">{byColor.get(c.value)}</span>
@@ -182,8 +193,16 @@ export function ExportAnnotationsPreview({
 }
 
 function Stat({
-  label, value, accent, small,
-}: { label: string; value: number; accent: "gold" | "amber" | "green" | "blue" | "purple"; small?: boolean }) {
+  label,
+  value,
+  accent,
+  small,
+}: {
+  label: string;
+  value: number;
+  accent: "gold" | "amber" | "green" | "blue" | "purple";
+  small?: boolean;
+}) {
   const colors: Record<string, string> = {
     gold: "border-gold/30 text-gold",
     amber: "border-amber-500/30 text-amber-500",

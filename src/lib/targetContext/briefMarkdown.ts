@@ -10,9 +10,10 @@ export function buildTargetBriefMarkdown(context: ExplorationTargetContext): str
   const title = createTargetBriefTitle(context);
   const drivers = list(context.fusionScore.drivers);
   const evidenceLabels = list(context.evidenceSummary.labels);
-  const categories = context.evidenceSummary.categories.length > 0
-    ? context.evidenceSummary.categories.join(", ")
-    : "Sin categorías";
+  const categories =
+    context.evidenceSummary.categories.length > 0
+      ? context.evidenceSummary.categories.join(", ")
+      : "Sin categorías";
 
   return [
     `# ${title}`,

@@ -3,7 +3,12 @@ import { Crosshair, Database, Download, Loader2, RefreshCw, Search, X } from "lu
 import { toast } from "sonner";
 import type * as LType from "leaflet";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
-import { catastroQueryUrl, CATASTRO_STYLE, catastroPopupHtml, type CatastroOrigen } from "@/components/map/overlays";
+import {
+  catastroQueryUrl,
+  CATASTRO_STYLE,
+  catastroPopupHtml,
+  type CatastroOrigen,
+} from "@/components/map/overlays";
 import type { MiningConcession } from "@/hooks/useMiningConcessions";
 import { exportCatastroMapPdf } from "@/lib/pdf/catastro-map";
 
@@ -57,7 +62,9 @@ function findCoveringCache(target: BBox): CacheEntry | null {
         window.localStorage.removeItem(k);
       }
     }
-  } catch { /* ignore */ }
+  } catch {
+    /* ignore */
+  }
   return null;
 }
 
@@ -76,9 +83,13 @@ function writeCache(bbox: BBox, fc: GeoJSON.FeatureCollection) {
         const k = window.localStorage.key(i);
         if (k && k.startsWith(CACHE_PREFIX)) keys.push(k);
       }
-      keys.slice(0, Math.max(1, Math.floor(keys.length / 2))).forEach((k) => window.localStorage.removeItem(k));
+      keys
+        .slice(0, Math.max(1, Math.floor(keys.length / 2)))
+        .forEach((k) => window.localStorage.removeItem(k));
       window.localStorage.setItem(key, JSON.stringify(entry));
-    } catch { /* give up */ }
+    } catch {
+      /* give up */
+    }
   }
 }
 
@@ -98,7 +109,10 @@ function padBbox(b: BBox, frac: number): BBox {
 function featureIntersectsBbox(f: GeoJSON.Feature, b: BBox): boolean {
   const g = f.geometry;
   if (!g) return false;
-  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  let minLng = Infinity,
+    minLat = Infinity,
+    maxLng = -Infinity,
+    maxLat = -Infinity;
   const visit = (coords: unknown) => {
     if (typeof (coords as number[])[0] === "number") {
       const [x, y] = coords as number[];
@@ -159,7 +173,12 @@ type Props = {
  * Exploración 1983, Estacamento) en el bbox visible, más las concesiones
  * registradas del proyecto.
  */
-export function CatastroMap({ concessions, center = [-71.115, -33.898], projectName, onFeaturesLoaded }: Props) {
+export function CatastroMap({
+  concessions,
+  center = [-71.115, -33.898],
+  projectName,
+  onFeaturesLoaded,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const catastroLayerRef = useRef<LeafletGeoJSON | null>(null);
@@ -180,7 +199,12 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const FILTER_STORAGE_KEY = "catastroMap:filters:v1";
   type SortMode = "default" | "ha_desc" | "ha_asc";
-  type StoredFilters = { types?: CatastroOrigen[]; q?: string; expiringOnly?: boolean; sort?: SortMode };
+  type StoredFilters = {
+    types?: CatastroOrigen[];
+    q?: string;
+    expiringOnly?: boolean;
+    sort?: SortMode;
+  };
   const loadStoredFilters = (): StoredFilters => {
     if (typeof window === "undefined") return {};
     try {
@@ -213,7 +237,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         sort: sortMode,
       };
       window.localStorage.setItem(FILTER_STORAGE_KEY, JSON.stringify(payload));
-    } catch { /* quota / disabled storage */ }
+    } catch {
+      /* quota / disabled storage */
+    }
   }, [typeFilter, searchQuery, expiringOnly, sortMode]);
 
   const featureId = (f: GeoJSON.Feature, idx: number): string => {
@@ -262,17 +288,14 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
           {
             attribution: "Imagery © Esri",
             maxZoom: 19,
-          }
+          },
         ).addTo(map);
 
-        L.tileLayer(
-          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-          {
-            attribution: "© OpenStreetMap contributors",
-            maxZoom: 19,
-            opacity: 0.45,
-          }
-        ).addTo(map);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+          maxZoom: 19,
+          opacity: 0.45,
+        }).addTo(map);
 
         mapRef.current = map;
         setLRef(L);
@@ -335,7 +358,12 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     // those when set as a Feature.geometry, throwing "Invalid GeoJSON object").
     const toGeometry = (raw: unknown): GeoJSON.Geometry | null => {
       if (!raw || typeof raw !== "object") return null;
-      const g = raw as { type?: string; geometry?: unknown; features?: unknown[]; coordinates?: unknown };
+      const g = raw as {
+        type?: string;
+        geometry?: unknown;
+        features?: unknown[];
+        coordinates?: unknown;
+      };
       if (g.type === "Feature" && g.geometry) return toGeometry(g.geometry);
       if (g.type === "FeatureCollection" && Array.isArray(g.features)) {
         const first = g.features.find((f) => f && (f as { geometry?: unknown }).geometry);
@@ -377,7 +405,7 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
             Área: ${p.area_ha ?? "—"} ha<br/>
             Vence: ${p.expires_at ?? "—"}
             <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 Concesión registrada del proyecto</div>
-          </div>`
+          </div>`,
         );
       },
     }).addTo(map);
@@ -387,7 +415,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       if (b.isValid() && !isUnmountingRef.current) {
         map.fitBounds(b, { padding: [40, 40], maxZoom: 14, animate: false });
       }
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, [concessions, LRef]);
 
   const [fromCache, setFromCache] = useState(false);
@@ -404,14 +434,21 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     featureLayersRef.current.clear();
     // Clip features to current view to keep tooltips snappy and assign stable ids.
     const b = map.getBounds();
-    const view: BBox = { minLng: b.getWest(), minLat: b.getSouth(), maxLng: b.getEast(), maxLat: b.getNorth() };
+    const view: BBox = {
+      minLng: b.getWest(),
+      minLat: b.getSouth(),
+      maxLng: b.getEast(),
+      maxLat: b.getNorth(),
+    };
     const visible = (fc.features ?? [])
       .filter((f) => featureIntersectsBbox(f, view))
-      .map((f, idx) => ({ ...f, id: featureId(f, idx) } as GeoJSON.Feature));
+      .map((f, idx) => ({ ...f, id: featureId(f, idx) }) as GeoJSON.Feature);
     const visibleFc: GeoJSON.FeatureCollection = { type: "FeatureCollection", features: visible };
     const layer = L.geoJSON(visibleFc, {
       style: (feature) => {
-        const origen = ((feature?.properties as Record<string, unknown> | undefined)?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+        const origen =
+          ((feature?.properties as Record<string, unknown> | undefined)
+            ?.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
         const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
         return {
           color: s.color,
@@ -424,7 +461,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       onEachFeature: (f, lyr) => {
         const id = (f.id as string) ?? "";
         if (id) featureLayersRef.current.set(id, lyr);
-        lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), { maxWidth: 320 });
+        lyr.bindPopup(catastroPopupHtml((f.properties ?? {}) as Record<string, unknown>), {
+          maxWidth: 320,
+        });
         lyr.on("dblclick", (ev: LType.LeafletMouseEvent) => {
           // Prevent the map's default double-click zoom when selecting.
           L.DomEvent.stopPropagation(ev);
@@ -513,7 +552,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
           if (k && k.startsWith(CACHE_PREFIX)) keys.push(k);
         }
         keys.forEach((k) => window.localStorage.removeItem(k));
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
     toast.success("Caché de catastro limpiado");
     loadCatastro({ force: true });
@@ -536,17 +577,17 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       const expiringStroke = sev === "expired" || sev === "critical" || sev === "warn";
       const ringColor = sev !== "ok" && sev !== "unknown" ? EXPIRY_COLOR[sev] : null;
       path.setStyle({
-        color: isSel ? "#ffffff" : ringColor ?? s.color,
+        color: isSel ? "#ffffff" : (ringColor ?? s.color),
         weight: isSel ? 4 : expiringStroke ? 3 : s.weight,
         opacity: isDimmed ? 0.35 : s.opacity,
         fillColor: ringColor ?? s.fillColor,
         fillOpacity: isSel
           ? Math.min(0.55, s.fillOpacity + 0.25)
           : isDimmed
-          ? 0.05
-          : expiringStroke
-          ? Math.min(0.5, s.fillOpacity + 0.15)
-          : s.fillOpacity,
+            ? 0.05
+            : expiringStroke
+              ? Math.min(0.5, s.fillOpacity + 0.15)
+              : s.fillOpacity,
         dashArray: sev === "expired" ? "6,4" : undefined,
       });
     }
@@ -556,14 +597,18 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !selectedId) return;
-    const lyr = featureLayersRef.current.get(selectedId) as unknown as { getBounds?: () => LType.LatLngBounds };
+    const lyr = featureLayersRef.current.get(selectedId) as unknown as {
+      getBounds?: () => LType.LatLngBounds;
+    };
     if (lyr?.getBounds) {
       try {
         const b = lyr.getBounds();
         if (b.isValid() && !isUnmountingRef.current) {
           map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: false });
         }
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
     }
   }, [selectedId]);
 
@@ -590,14 +635,14 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       const v = (f.properties as Record<string, unknown> | undefined)?.HECTAREAS;
       return typeof v === "number" && Number.isFinite(v) ? v : -Infinity;
     };
-    return [...filtered].sort((a, b) =>
-      sortMode === "ha_desc" ? ha(b) - ha(a) : ha(a) - ha(b),
-    );
+    return [...filtered].sort((a, b) => (sortMode === "ha_desc" ? ha(b) - ha(a) : ha(a) - ha(b)));
   }, [visibleFeatures, typeFilter, searchQuery, expiringOnly, sortMode]);
 
   // Expiry summary across visible features (independent of filters).
   const expirySummary = useMemo(() => {
-    let expired = 0, critical = 0, warn = 0;
+    let expired = 0,
+      critical = 0,
+      warn = 0;
     for (const f of visibleFeatures) {
       const sev = expirySeverity(daysUntilExpiry((f.properties ?? {}) as Record<string, unknown>));
       if (sev === "expired") expired++;
@@ -606,7 +651,6 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     }
     return { expired, critical, warn };
   }, [visibleFeatures]);
-
 
   const toggleType = (t: CatastroOrigen) => {
     setTypeFilter((prev) => {
@@ -626,10 +670,17 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
       const b = map.getBounds();
       await exportCatastroMapPdf({
         mapElement: el,
-        bbox: { minLng: b.getWest(), minLat: b.getSouth(), maxLng: b.getEast(), maxLat: b.getNorth() },
+        bbox: {
+          minLng: b.getWest(),
+          minLat: b.getSouth(),
+          maxLng: b.getEast(),
+          maxLat: b.getNorth(),
+        },
         zoom: map.getZoom(),
         catastroFeatures: (featuresRef.current?.features ?? []).map((f) => ({
-          properties: (f.properties ?? {}) as Parameters<typeof exportCatastroMapPdf>[0]["catastroFeatures"][number]["properties"],
+          properties: (f.properties ?? {}) as Parameters<
+            typeof exportCatastroMapPdf
+          >[0]["catastroFeatures"][number]["properties"],
         })),
         projectConcessions: concessions,
         projectName,
@@ -646,13 +697,19 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
     <div className="border border-border rounded overflow-hidden bg-bg-secondary/30">
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-bg-secondary">
         <div className="flex items-center gap-2 text-xs min-w-0">
-          <span className="font-mono uppercase tracking-wider text-text-secondary truncate">Catastro SERNAGEOMIN</span>
+          <span className="font-mono uppercase tracking-wider text-text-secondary truncate">
+            Catastro SERNAGEOMIN
+          </span>
           {count !== null && (
             <span className="font-mono text-signal-cyan whitespace-nowrap">{count} en vista</span>
           )}
           {fromCache && !loading && (
-            <span className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-bg-elevated text-text-secondary border border-border whitespace-nowrap" title="Datos servidos desde caché local (24h)">
-              <Database className="w-3 h-3 inline mr-1" />caché
+            <span
+              className="font-mono text-[10px] px-1.5 py-0.5 rounded bg-bg-elevated text-text-secondary border border-border whitespace-nowrap"
+              title="Datos servidos desde caché local (24h)"
+            >
+              <Database className="w-3 h-3 inline mr-1" />
+              caché
             </span>
           )}
           {err && <span className="text-destructive truncate">· {err}</span>}
@@ -672,7 +729,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-border bg-bg-elevated text-xs hover:bg-accent disabled:opacity-50"
             title="Exportar mapa actual a PDF"
           >
-            {exporting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Download className="w-3.5 h-3.5" />}
+            {exporting ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Download className="w-3.5 h-3.5" />
+            )}
             PDF
           </button>
           <button
@@ -681,7 +742,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-primary text-primary-foreground text-xs hover:opacity-90 disabled:opacity-50"
             title="Forzar recarga desde SERNAGEOMIN"
           >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            {loading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5" />
+            )}
             Recargar
           </button>
         </div>
@@ -730,7 +795,11 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
               )}
             </div>
             <div className="flex flex-wrap gap-1">
-              {(Object.entries(CATASTRO_STYLE) as Array<[CatastroOrigen, typeof CATASTRO_STYLE[CatastroOrigen]]>).map(([k, s]) => {
+              {(
+                Object.entries(CATASTRO_STYLE) as Array<
+                  [CatastroOrigen, (typeof CATASTRO_STYLE)[CatastroOrigen]]
+                >
+              ).map(([k, s]) => {
                 const active = typeFilter.has(k);
                 return (
                   <button
@@ -755,154 +824,193 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                 );
               })}
             </div>
-            {(expirySummary.expired + expirySummary.critical + expirySummary.warn) > 0 && (
+            {expirySummary.expired + expirySummary.critical + expirySummary.warn > 0 && (
               <div className="flex items-center gap-1 flex-wrap pt-1 border-t border-border/50">
                 <button
                   onClick={() => setExpiringOnly((v) => !v)}
                   className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border ${
-                    expiringOnly ? "bg-destructive/15 border-destructive text-destructive" : "border-border text-text-secondary hover:bg-accent"
+                    expiringOnly
+                      ? "bg-destructive/15 border-destructive text-destructive"
+                      : "border-border text-text-secondary hover:bg-accent"
                   }`}
                   title={`Mostrar solo pertenencias que vencen en ≤${expiryThresholdDays} días`}
                 >
                   ⚠ Solo por vencer
                 </button>
                 {expirySummary.expired > 0 && (
-                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded animate-pulse" style={{ background: `${EXPIRY_COLOR.expired}22`, color: EXPIRY_COLOR.expired, border: `1px solid ${EXPIRY_COLOR.expired}` }}>
+                  <span
+                    className="font-mono text-[10px] px-1.5 py-0.5 rounded animate-pulse"
+                    style={{
+                      background: `${EXPIRY_COLOR.expired}22`,
+                      color: EXPIRY_COLOR.expired,
+                      border: `1px solid ${EXPIRY_COLOR.expired}`,
+                    }}
+                  >
                     {expirySummary.expired} vencidas
                   </span>
                 )}
                 {expirySummary.critical > 0 && (
-                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.critical}22`, color: EXPIRY_COLOR.critical, border: `1px solid ${EXPIRY_COLOR.critical}` }}>
+                  <span
+                    className="font-mono text-[10px] px-1.5 py-0.5 rounded"
+                    style={{
+                      background: `${EXPIRY_COLOR.critical}22`,
+                      color: EXPIRY_COLOR.critical,
+                      border: `1px solid ${EXPIRY_COLOR.critical}`,
+                    }}
+                  >
                     {expirySummary.critical} ≤30 d
                   </span>
                 )}
                 {expirySummary.warn > 0 && (
-                  <span className="font-mono text-[10px] px-1.5 py-0.5 rounded" style={{ background: `${EXPIRY_COLOR.warn}22`, color: EXPIRY_COLOR.warn, border: `1px solid ${EXPIRY_COLOR.warn}` }}>
+                  <span
+                    className="font-mono text-[10px] px-1.5 py-0.5 rounded"
+                    style={{
+                      background: `${EXPIRY_COLOR.warn}22`,
+                      color: EXPIRY_COLOR.warn,
+                      border: `1px solid ${EXPIRY_COLOR.warn}`,
+                    }}
+                  >
                     {expirySummary.warn} ≤90 d
                   </span>
                 )}
               </div>
             )}
           </div>
-          {selectedId && (() => {
-            const sel = visibleFeatures.find((f) => f.id === selectedId);
-            if (!sel) return null;
-            const p = (sel.properties ?? {}) as Record<string, unknown>;
-            const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
-            const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
-            const rol = `${(p.NUMERO_ROL as string | number) ?? "—"}${p.DV_ROL ? `-${String(p.DV_ROL)}` : ""}`;
-            const ha = typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(2) : "—";
-            const days = daysUntilExpiry(p);
-            const sev = expirySeverity(days);
-            const venc = p.FECHA_VENCIMIENTO
-              ? new Date(typeof p.FECHA_VENCIMIENTO === "number" ? p.FECHA_VENCIMIENTO : String(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
-              : null;
-            const openPopup = () => {
-              const map = mapRef.current;
-              const lyr = featureLayersRef.current.get(selectedId) as unknown as {
-                openPopup?: () => void;
-                getBounds?: () => LType.LatLngBounds;
-              };
-              if (!map || !lyr) return;
-              try {
-                if (lyr.getBounds) {
-                  const b = lyr.getBounds();
-                  if (b.isValid() && !isUnmountingRef.current) {
-                    map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: false });
+          {selectedId &&
+            (() => {
+              const sel = visibleFeatures.find((f) => f.id === selectedId);
+              if (!sel) return null;
+              const p = (sel.properties ?? {}) as Record<string, unknown>;
+              const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
+              const s = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
+              const rol = `${(p.NUMERO_ROL as string | number) ?? "—"}${p.DV_ROL ? `-${String(p.DV_ROL)}` : ""}`;
+              const ha = typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(2) : "—";
+              const days = daysUntilExpiry(p);
+              const sev = expirySeverity(days);
+              const venc = p.FECHA_VENCIMIENTO
+                ? new Date(
+                    typeof p.FECHA_VENCIMIENTO === "number"
+                      ? p.FECHA_VENCIMIENTO
+                      : String(p.FECHA_VENCIMIENTO),
+                  ).toLocaleDateString("es-CL")
+                : null;
+              const openPopup = () => {
+                const map = mapRef.current;
+                const lyr = featureLayersRef.current.get(selectedId) as unknown as {
+                  openPopup?: () => void;
+                  getBounds?: () => LType.LatLngBounds;
+                };
+                if (!map || !lyr) return;
+                try {
+                  if (lyr.getBounds) {
+                    const b = lyr.getBounds();
+                    if (b.isValid() && !isUnmountingRef.current) {
+                      map.fitBounds(b, { padding: [60, 60], maxZoom: 16, animate: false });
+                    }
                   }
+                  lyr.openPopup?.();
+                } catch {
+                  /* noop */
                 }
-                lyr.openPopup?.();
-              } catch { /* noop */ }
-            };
-            const rows: Array<[string, string]> = [
-              ["Origen", s.label],
-              ["ROL", rol],
-              ["Nombre", (p.NOMBRE as string) ?? "—"],
-              ["Titular", (p.TITULAR_DIVISION as string) ?? "—"],
-              ["Comuna", (p.COMUNA as string) ?? "—"],
-              ["Superficie", `${ha} ha`],
-              ["Situación", (p.SITUACION_CONCESION as string) ?? "—"],
-              ...(venc ? [["Vencimiento", venc] as [string, string]] : []),
-            ];
-            return (
-              <div
-                className="border-b border-border bg-bg-elevated/60 px-3 py-2.5 space-y-2"
-                style={{ borderLeft: `3px solid ${s.color}` }}
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
-                      Detalle seleccionado
-                    </div>
-                    <div className="font-mono text-xs font-semibold truncate" style={{ color: s.color }}>
-                      {(p.NOMBRE as string) ?? "(sin nombre)"}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => setSelectedId(null)}
-                    className="shrink-0 text-text-secondary hover:text-foreground"
-                    aria-label="Cerrar detalle"
-                    title="Cerrar"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <dl className="space-y-1">
-                  {rows.map(([k, v]) => (
-                    <div key={k} className="flex gap-2 text-[10px] font-mono leading-tight">
-                      <dt className="text-text-secondary min-w-[68px] shrink-0">{k}</dt>
-                      <dd className="font-medium text-foreground break-words">{v}</dd>
-                    </div>
-                  ))}
-                  {sev !== "ok" && sev !== "unknown" && days !== null && (
-                    <div className="flex gap-2 text-[10px] font-mono leading-tight">
-                      <dt className="text-text-secondary min-w-[68px] shrink-0">Estado</dt>
-                      <dd
-                        className={`font-medium ${sev === "expired" ? "animate-pulse" : ""}`}
-                        style={{ color: EXPIRY_COLOR[sev] }}
+              };
+              const rows: Array<[string, string]> = [
+                ["Origen", s.label],
+                ["ROL", rol],
+                ["Nombre", (p.NOMBRE as string) ?? "—"],
+                ["Titular", (p.TITULAR_DIVISION as string) ?? "—"],
+                ["Comuna", (p.COMUNA as string) ?? "—"],
+                ["Superficie", `${ha} ha`],
+                ["Situación", (p.SITUACION_CONCESION as string) ?? "—"],
+                ...(venc ? [["Vencimiento", venc] as [string, string]] : []),
+              ];
+              return (
+                <div
+                  className="border-b border-border bg-bg-elevated/60 px-3 py-2.5 space-y-2"
+                  style={{ borderLeft: `3px solid ${s.color}` }}
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="font-mono text-[10px] uppercase tracking-wider text-text-secondary">
+                        Detalle seleccionado
+                      </div>
+                      <div
+                        className="font-mono text-xs font-semibold truncate"
+                        style={{ color: s.color }}
                       >
-                        {sev === "expired" ? `Vencida hace ${Math.abs(days)} d` : `Vence en ${days} d`}
-                      </dd>
+                        {(p.NOMBRE as string) ?? "(sin nombre)"}
+                      </div>
                     </div>
-                  )}
-                </dl>
-                <div className="flex gap-1.5">
-                  <button
-                    onClick={() => {
-                      const map = mapRef.current;
-                      const lyr = featureLayersRef.current.get(selectedId) as unknown as {
-                        getBounds?: () => LType.LatLngBounds;
-                      };
-                      if (!map || !lyr?.getBounds) return;
-                      try {
-                        const b = lyr.getBounds();
-                        if (b.isValid() && !isUnmountingRef.current) {
-                          map.fitBounds(b, { padding: [40, 40], maxZoom: 17, animate: false });
+                    <button
+                      onClick={() => setSelectedId(null)}
+                      className="shrink-0 text-text-secondary hover:text-foreground"
+                      aria-label="Cerrar detalle"
+                      title="Cerrar"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                  <dl className="space-y-1">
+                    {rows.map(([k, v]) => (
+                      <div key={k} className="flex gap-2 text-[10px] font-mono leading-tight">
+                        <dt className="text-text-secondary min-w-[68px] shrink-0">{k}</dt>
+                        <dd className="font-medium text-foreground break-words">{v}</dd>
+                      </div>
+                    ))}
+                    {sev !== "ok" && sev !== "unknown" && days !== null && (
+                      <div className="flex gap-2 text-[10px] font-mono leading-tight">
+                        <dt className="text-text-secondary min-w-[68px] shrink-0">Estado</dt>
+                        <dd
+                          className={`font-medium ${sev === "expired" ? "animate-pulse" : ""}`}
+                          style={{ color: EXPIRY_COLOR[sev] }}
+                        >
+                          {sev === "expired"
+                            ? `Vencida hace ${Math.abs(days)} d`
+                            : `Vence en ${days} d`}
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                  <div className="flex gap-1.5">
+                    <button
+                      onClick={() => {
+                        const map = mapRef.current;
+                        const lyr = featureLayersRef.current.get(selectedId) as unknown as {
+                          getBounds?: () => LType.LatLngBounds;
+                        };
+                        if (!map || !lyr?.getBounds) return;
+                        try {
+                          const b = lyr.getBounds();
+                          if (b.isValid() && !isUnmountingRef.current) {
+                            map.fitBounds(b, { padding: [40, 40], maxZoom: 17, animate: false });
+                          }
+                        } catch {
+                          /* noop */
                         }
-                      } catch { /* noop */ }
-                    }}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-primary/40 bg-primary/10 text-[10px] font-mono text-primary hover:bg-primary/20"
-                    title="Hacer zoom y centrar en la pertenencia seleccionada"
-                  >
-                    <Crosshair className="w-3 h-3" />
-                    Zoom y centrar
-                  </button>
-                  <button
-                    onClick={openPopup}
-                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-secondary text-[10px] font-mono hover:bg-accent"
-                    title="Centrar y abrir popup en el mapa"
-                  >
-                    <Search className="w-3 h-3" />
-                    Ver popup
-                  </button>
+                      }}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-primary/40 bg-primary/10 text-[10px] font-mono text-primary hover:bg-primary/20"
+                      title="Hacer zoom y centrar en la pertenencia seleccionada"
+                    >
+                      <Crosshair className="w-3 h-3" />
+                      Zoom y centrar
+                    </button>
+                    <button
+                      onClick={openPopup}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1 rounded border border-border bg-bg-secondary text-[10px] font-mono hover:bg-accent"
+                      title="Centrar y abrir popup en el mapa"
+                    >
+                      <Search className="w-3 h-3" />
+                      Ver popup
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })()}
+              );
+            })()}
           <div className="flex-1 overflow-y-auto">
             {filteredFeatures.length === 0 ? (
               <div className="p-4 text-center text-xs text-text-secondary font-mono">
-                {visibleFeatures.length === 0 ? "Sin pertenencias en vista" : "Ningún resultado con esos filtros"}
+                {visibleFeatures.length === 0
+                  ? "Sin pertenencias en vista"
+                  : "Ningún resultado con esos filtros"}
               </div>
             ) : (
               <ul className="divide-y divide-border">
@@ -915,7 +1023,9 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                   const days = daysUntilExpiry(p);
                   const sev = expirySeverity(days);
                   const showBadge = sev === "expired" || sev === "critical" || sev === "warn";
-                  const badgeColor = showBadge ? EXPIRY_COLOR[sev as "expired" | "critical" | "warn"] : null;
+                  const badgeColor = showBadge
+                    ? EXPIRY_COLOR[sev as "expired" | "critical" | "warn"]
+                    : null;
                   return (
                     <li key={id}>
                       <button
@@ -929,13 +1039,20 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                             className="inline-block w-2 h-2 rounded-sm shrink-0"
                             style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
                           />
-                          <span className="font-semibold truncate flex-1" style={{ color: s.color }}>
+                          <span
+                            className="font-semibold truncate flex-1"
+                            style={{ color: s.color }}
+                          >
                             {(p.NOMBRE as string) ?? "(sin nombre)"}
                           </span>
                           {showBadge && badgeColor && (
                             <span
                               className={`shrink-0 px-1 py-0.5 rounded text-[9px] font-mono ${sev === "expired" ? "animate-pulse" : ""}`}
-                              style={{ background: `${badgeColor}22`, color: badgeColor, border: `1px solid ${badgeColor}` }}
+                              style={{
+                                background: `${badgeColor}22`,
+                                color: badgeColor,
+                                border: `1px solid ${badgeColor}`,
+                              }}
                               title={
                                 sev === "expired"
                                   ? `Vencida hace ${Math.abs(days ?? 0)} días`
@@ -948,7 +1065,8 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
                         </div>
                         <div className="text-[10px] text-text-secondary leading-tight">
                           ROL {(p.NUMERO_ROL as string | number) ?? "—"}
-                          {p.DV_ROL ? `-${String(p.DV_ROL)}` : ""} · {typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(1) : "—"} ha
+                          {p.DV_ROL ? `-${String(p.DV_ROL)}` : ""} ·{" "}
+                          {typeof p.HECTAREAS === "number" ? p.HECTAREAS.toFixed(1) : "—"} ha
                           {p.COMUNA ? ` · ${String(p.COMUNA)}` : ""}
                         </div>
                         {typeof p.TITULAR_DIVISION === "string" && p.TITULAR_DIVISION && (
@@ -966,14 +1084,24 @@ export function CatastroMap({ concessions, center = [-71.115, -33.898], projectN
         </aside>
       </div>
       <div className="flex flex-wrap gap-3 px-3 py-2 border-t border-border text-[10px] font-mono">
-        {(Object.entries(CATASTRO_STYLE) as Array<[CatastroOrigen, typeof CATASTRO_STYLE[CatastroOrigen]]>).map(([k, s]) => (
+        {(
+          Object.entries(CATASTRO_STYLE) as Array<
+            [CatastroOrigen, (typeof CATASTRO_STYLE)[CatastroOrigen]]
+          >
+        ).map(([k, s]) => (
           <span key={k} className="inline-flex items-center gap-1.5">
-            <span className="inline-block w-3 h-3 rounded-sm" style={{ background: s.fillColor, border: `1px solid ${s.color}` }} />
+            <span
+              className="inline-block w-3 h-3 rounded-sm"
+              style={{ background: s.fillColor, border: `1px solid ${s.color}` }}
+            />
             <span className="text-text-secondary">{s.label}</span>
           </span>
         ))}
         <span className="inline-flex items-center gap-1.5">
-          <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#FFD24A33", border: "1.5px dashed #FFD24A" }} />
+          <span
+            className="inline-block w-3 h-3 rounded-sm"
+            style={{ background: "#FFD24A33", border: "1.5px dashed #FFD24A" }}
+          />
           <span className="text-text-secondary">Mis concesiones</span>
         </span>
       </div>

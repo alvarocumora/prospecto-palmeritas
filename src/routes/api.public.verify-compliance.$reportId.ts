@@ -9,24 +9,26 @@ export const Route = createFileRoute("/api/public/verify-compliance/$reportId")(
         const url = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
         if (!url || !key) {
-          return new Response(
-            JSON.stringify({ ok: false, error: "server_misconfigured" }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: "server_misconfigured" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         const sb = createClient(url, key, { auth: { persistSession: false } });
 
         const { data: report, error } = await sb
           .from("technical_reports")
-          .select("id, project_id, title, version, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at, status")
+          .select(
+            "id, project_id, title, version, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at, status",
+          )
           .eq("id", reportId)
           .maybeSingle();
 
         if (error || !report) {
-          return new Response(
-            JSON.stringify({ ok: false, error: "report_not_found" }),
-            { status: 404, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: "report_not_found" }), {
+            status: 404,
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         const { data: project } = await sb
@@ -46,10 +48,29 @@ export const Route = createFileRoute("/api/public/verify-compliance/$reportId")(
           .eq("report_id", reportId);
 
         const evalMap = new Map((evals ?? []).map((e) => [e.rule_id, e]));
-        const byStandard: Record<string, { total: number; pass: number; warn: number; fail: number; pending: number; mandatory_pass: number; mandatory_total: number }> = {};
+        const byStandard: Record<
+          string,
+          {
+            total: number;
+            pass: number;
+            warn: number;
+            fail: number;
+            pending: number;
+            mandatory_pass: number;
+            mandatory_total: number;
+          }
+        > = {};
         for (const r of rules ?? []) {
           const std = r.standard;
-          byStandard[std] ??= { total: 0, pass: 0, warn: 0, fail: 0, pending: 0, mandatory_pass: 0, mandatory_total: 0 };
+          byStandard[std] ??= {
+            total: 0,
+            pass: 0,
+            warn: 0,
+            fail: 0,
+            pending: 0,
+            mandatory_pass: 0,
+            mandatory_total: 0,
+          };
           const ev = evalMap.get(r.id);
           byStandard[std].total += 1;
           const st = ev?.status ?? "pending";

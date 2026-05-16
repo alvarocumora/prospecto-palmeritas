@@ -12,13 +12,15 @@ describe("intersectsAoiBbox", () => {
   it("returns true when a polygon bbox overlaps the AOI bbox", () => {
     const polygon = {
       type: "Polygon",
-      coordinates: [[
-        [-71.15, -33.9],
-        [-71.05, -33.9],
-        [-71.05, -33.88],
-        [-71.15, -33.88],
-        [-71.15, -33.9],
-      ]],
+      coordinates: [
+        [
+          [-71.15, -33.9],
+          [-71.05, -33.9],
+          [-71.05, -33.88],
+          [-71.15, -33.88],
+          [-71.15, -33.9],
+        ],
+      ],
     };
 
     expect(intersectsAoiBbox(polygon, aoi)).toBe(true);
@@ -27,13 +29,15 @@ describe("intersectsAoiBbox", () => {
   it("returns false when a polygon bbox does not overlap the AOI bbox", () => {
     const polygon = {
       type: "Polygon",
-      coordinates: [[
-        [-72.15, -34.9],
-        [-72.05, -34.9],
-        [-72.05, -34.88],
-        [-72.15, -34.88],
-        [-72.15, -34.9],
-      ]],
+      coordinates: [
+        [
+          [-72.15, -34.9],
+          [-72.05, -34.9],
+          [-72.05, -34.88],
+          [-72.15, -34.88],
+          [-72.15, -34.9],
+        ],
+      ],
     };
 
     expect(intersectsAoiBbox(polygon, aoi)).toBe(false);

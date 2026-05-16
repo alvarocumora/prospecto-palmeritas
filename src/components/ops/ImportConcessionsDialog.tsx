@@ -61,7 +61,9 @@ export function ImportConcessionsDialog({
       const r = data as ImportResponse;
       setResult(r);
       if (r.imported > 0) {
-        toast.success(`${r.imported} concesión${r.imported === 1 ? "" : "es"} importada${r.imported === 1 ? "" : "s"} desde SERNAGEOMIN`);
+        toast.success(
+          `${r.imported} concesión${r.imported === 1 ? "" : "es"} importada${r.imported === 1 ? "" : "s"} desde SERNAGEOMIN`,
+        );
         onImported();
       } else if (r.notFound === codes.length) {
         toast.error("Ninguno de los códigos fue encontrado en SERNAGEOMIN");
@@ -130,7 +132,11 @@ export function ImportConcessionsDialog({
               disabled={running || codes.length === 0}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
             >
-              {running ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+              {running ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
               Importar {codes.length > 0 && `(${codes.length})`}
             </button>
           </div>
@@ -170,8 +176,10 @@ function SummaryCell({ n, label, color }: { n: number; label: string; color: str
 }
 
 function ResultIcon({ status }: { status: ImportResult["status"] }) {
-  if (status === "imported") return <CheckCircle2 className="w-3.5 h-3.5 text-signal-green shrink-0" />;
+  if (status === "imported")
+    return <CheckCircle2 className="w-3.5 h-3.5 text-signal-green shrink-0" />;
   if (status === "skipped") return <SkipForward className="w-3.5 h-3.5 text-text-dim shrink-0" />;
-  if (status === "not_found") return <AlertCircle className="w-3.5 h-3.5 text-signal-amber shrink-0" />;
+  if (status === "not_found")
+    return <AlertCircle className="w-3.5 h-3.5 text-signal-amber shrink-0" />;
   return <XCircle className="w-3.5 h-3.5 text-destructive shrink-0" />;
 }

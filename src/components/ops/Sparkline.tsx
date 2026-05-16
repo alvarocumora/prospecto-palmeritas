@@ -27,7 +27,9 @@ export function Sparkline({
     const y = height - ((v - min) / span) * (height - 2) - 1;
     return [x, y] as const;
   });
-  const path = pts.map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+  const path = pts
+    .map(([x, y], i) => `${i === 0 ? "M" : "L"}${x.toFixed(1)},${y.toFixed(1)}`)
+    .join(" ");
   const area = fill
     ? `${path} L${(pts[pts.length - 1]?.[0] ?? 0).toFixed(1)},${height} L0,${height} Z`
     : "";
@@ -53,5 +55,7 @@ export function blockSpark(values: number[]): string {
   const min = Math.min(...values);
   const max = Math.max(...values);
   const span = max - min || 1;
-  return values.map((v) => blocks[Math.min(7, Math.max(0, Math.floor(((v - min) / span) * 7)))]).join("");
+  return values
+    .map((v) => blocks[Math.min(7, Math.max(0, Math.floor(((v - min) / span) * 7)))])
+    .join("");
 }

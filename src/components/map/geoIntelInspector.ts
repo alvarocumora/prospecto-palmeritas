@@ -47,7 +47,8 @@ async function fetchSernageominLitho(map: LeafletMap, lat: number, lng: number) 
   const b = map.getBounds();
   const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
   return wmsGetFeatureInfo({
-    baseUrl: "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
+    baseUrl:
+      "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
     layer: "0",
     bbox,
     width: size.x,
@@ -63,7 +64,8 @@ async function fetchSernageominYacimientos(map: LeafletMap, lat: number, lng: nu
   const b = map.getBounds();
   const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
   return wmsGetFeatureInfo({
-    baseUrl: "https://catastro.sernageomin.cl/arcgis/services/Mineria/Yacimientos/MapServer/WMSServer",
+    baseUrl:
+      "https://catastro.sernageomin.cl/arcgis/services/Mineria/Yacimientos/MapServer/WMSServer",
     layer: "0",
     bbox,
     width: size.x,
@@ -118,7 +120,11 @@ export function wireGeoIntelClickPopup(
 
     // Lithology
     if (litho && Object.keys(litho).length > 0) {
-      const name = (litho.NOMBRE_UNIDAD ?? litho.UNIDAD ?? litho.NAME ?? litho.LITOLOGIA ?? "Unidad geológica") as string;
+      const name = (litho.NOMBRE_UNIDAD ??
+        litho.UNIDAD ??
+        litho.NAME ??
+        litho.LITOLOGIA ??
+        "Unidad geológica") as string;
       const edad = (litho.EDAD ?? litho.AGE ?? litho.PERIODO ?? "—") as string;
       const lit = (litho.LITOLOGIA ?? litho.ROCK_TYPE ?? "—") as string;
       sections.push(

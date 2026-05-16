@@ -23,7 +23,12 @@ export function FrancoDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <FrancoTopNav active={active} setActive={setActive} onExport={handleExport} exporting={exporting} />
+      <FrancoTopNav
+        active={active}
+        setActive={setActive}
+        onExport={handleExport}
+        exporting={exporting}
+      />
       <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
         {active === "overview" ? (
           <>

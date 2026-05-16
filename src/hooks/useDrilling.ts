@@ -103,9 +103,22 @@ export function useDrillHoles(projectId: string | null) {
     if (!projectId) return;
     const ch = supabase
       .channel(`drill_holes:${projectId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "drill_holes", filter: `project_id=eq.${projectId}` }, () => { refresh(); })
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "drill_holes",
+          filter: `project_id=eq.${projectId}`,
+        },
+        () => {
+          refresh();
+        },
+      )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [refresh, projectId]);
 
   return { data, loading, error, refresh };

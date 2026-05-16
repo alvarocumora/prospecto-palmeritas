@@ -36,13 +36,17 @@ describe("request id utilities", () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000002");
 
     expect(getOrCreateRequestId("geo:existing-1234")).toBe("geo:existing-1234");
-    expect(getOrCreateRequestId("bad value", "jobs")).toBe("jobs:00000000-0000-4000-8000-000000000002");
+    expect(getOrCreateRequestId("bad value", "jobs")).toBe(
+      "jobs:00000000-0000-4000-8000-000000000002",
+    );
 
     vi.restoreAllMocks();
   });
 
   it("creates request id headers", () => {
-    expect(createRequestIdHeaders("geo:abc-1234")).toEqual({ [requestIdHeaderName]: "geo:abc-1234" });
+    expect(createRequestIdHeaders("geo:abc-1234")).toEqual({
+      [requestIdHeaderName]: "geo:abc-1234",
+    });
     expect(() => createRequestIdHeaders("bad value")).toThrow("Invalid request id");
   });
 });

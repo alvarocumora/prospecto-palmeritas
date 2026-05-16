@@ -9,7 +9,7 @@
         "type": "Pique manual",
         "source": "Reconocimiento de labores antiguas Trackmin 2025"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11580, -33.89800] }
+      "geometry": { "type": "Point", "coordinates": [-71.1158, -33.898] }
     },
     {
       "type": "Feature",
@@ -18,7 +18,7 @@
         "type": "Socavón ~25m",
         "source": "Reconocimiento de labores antiguas Trackmin 2025"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11505, -33.89880] }
+      "geometry": { "type": "Point", "coordinates": [-71.11505, -33.8988] }
     },
     {
       "type": "Feature",
@@ -27,7 +27,7 @@
         "type": "Pique 8m",
         "source": "Reconocimiento de labores antiguas Trackmin 2025"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11470, -33.89930] }
+      "geometry": { "type": "Point", "coordinates": [-71.1147, -33.8993] }
     }
   ]
 }

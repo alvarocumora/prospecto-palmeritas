@@ -4,7 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import { useRecordApproval, type ApprovableTable } from "@/hooks/useRecordApproval";
-import { RecordStatusBadge, RECORD_STATUSES, type RecordStatus } from "@/components/RecordStatusBadge";
+import {
+  RecordStatusBadge,
+  RECORD_STATUSES,
+  type RecordStatus,
+} from "@/components/RecordStatusBadge";
 import { ClipboardCheck, CheckCircle2, Eye, Archive, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 
@@ -45,42 +49,62 @@ function ApprovalsPage() {
       if (tab === "drill_core_logs") {
         const { data } = await supabase
           .from("drill_core_logs")
-          .select("id, record_status, created_by, created_at, approved_by, approved_at, depth_from, depth_to, lithology, au_gpt, hole_id")
+          .select(
+            "id, record_status, created_by, created_at, approved_by, approved_at, depth_from, depth_to, lithology, au_gpt, hole_id",
+          )
           .eq("project_id", active.id)
           .eq("record_status", filter)
           .order("created_at", { ascending: false })
           .limit(500);
-        setRows((data ?? []).map((r) => ({
-          id: r.id, record_status: r.record_status, created_by: r.created_by, created_at: r.created_at,
-          approved_by: r.approved_by, approved_at: r.approved_at,
-          label: `${r.depth_from}–${r.depth_to} m`,
-          detail: `${r.lithology ?? "—"} · Au ${r.au_gpt ?? "—"} g/t`,
-        })));
+        setRows(
+          (data ?? []).map((r) => ({
+            id: r.id,
+            record_status: r.record_status,
+            created_by: r.created_by,
+            created_at: r.created_at,
+            approved_by: r.approved_by,
+            approved_at: r.approved_at,
+            label: `${r.depth_from}–${r.depth_to} m`,
+            detail: `${r.lithology ?? "—"} · Au ${r.au_gpt ?? "—"} g/t`,
+          })),
+        );
       } else {
         const { data } = await supabase
           .from("sampling_results")
-          .select("id, record_status, created_by, created_at, approved_by, approved_at, sample_code, sample_type, au_gpt, ag_gpt, cu_pct")
+          .select(
+            "id, record_status, created_by, created_at, approved_by, approved_at, sample_code, sample_type, au_gpt, ag_gpt, cu_pct",
+          )
           .eq("project_id", active.id)
           .eq("record_status", filter)
           .order("created_at", { ascending: false })
           .limit(500);
-        setRows((data ?? []).map((r) => ({
-          id: r.id, record_status: r.record_status, created_by: r.created_by, created_at: r.created_at,
-          approved_by: r.approved_by, approved_at: r.approved_at,
-          label: r.sample_code,
-          detail: `${r.sample_type} · Au ${r.au_gpt ?? "—"} · Ag ${r.ag_gpt ?? "—"} · Cu ${r.cu_pct ?? "—"}%`,
-        })));
+        setRows(
+          (data ?? []).map((r) => ({
+            id: r.id,
+            record_status: r.record_status,
+            created_by: r.created_by,
+            created_at: r.created_at,
+            approved_by: r.approved_by,
+            approved_at: r.approved_at,
+            label: r.sample_code,
+            detail: `${r.sample_type} · Au ${r.au_gpt ?? "—"} · Ag ${r.ag_gpt ?? "—"} · Cu ${r.cu_pct ?? "—"}%`,
+          })),
+        );
       }
       setLoading(false);
     })();
   }, [active, tab, filter]);
 
-  const stats = useMemo(() => ({
-    total: rows.length,
-    selected: selected.size,
-  }), [rows, selected]);
+  const stats = useMemo(
+    () => ({
+      total: rows.length,
+      selected: selected.size,
+    }),
+    [rows, selected],
+  );
 
-  if (!active) return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
+  if (!active)
+    return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
 
   async function reload() {
     setFilter((f) => f); // trigger effect
@@ -94,7 +118,10 @@ function ApprovalsPage() {
   async function changeStatus(id: string, next: RecordStatus) {
     const { error } = await setStatus(tab, id, next);
     if (error) toast.error(error);
-    else { toast.success(`Estado → ${next}`); setRows((rs) => rs.filter((r) => r.id !== id)); }
+    else {
+      toast.success(`Estado → ${next}`);
+      setRows((rs) => rs.filter((r) => r.id !== id));
+    }
   }
 
   async function bulkChange(next: RecordStatus) {
@@ -112,23 +139,27 @@ function ApprovalsPage() {
   function toggle(id: string) {
     setSelected((s) => {
       const n = new Set(s);
-      if (n.has(id)) n.delete(id); else n.add(id);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
       return n;
     });
   }
   function toggleAll() {
-    setSelected((s) => s.size === rows.length ? new Set() : new Set(rows.map((r) => r.id)));
+    setSelected((s) => (s.size === rows.length ? new Set() : new Set(rows.map((r) => r.id))));
   }
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
       <header className="mb-6">
-        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Proyecto · {active.code}</div>
+        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+          Proyecto · {active.code}
+        </div>
         <h1 className="text-xl md:text-2xl font-bold mt-1 inline-flex items-center gap-2">
           <ClipboardCheck className="w-5 h-5 text-gold" /> Aprobaciones
         </h1>
         <p className="text-xs text-muted-foreground mt-1">
-          Workflow <span className="font-mono">draft → review → approved → archived</span>. Solo registros aprobados aparecen en reportes oficiales y mapa público.
+          Workflow <span className="font-mono">draft → review → approved → archived</span>. Solo
+          registros aprobados aparecen en reportes oficiales y mapa público.
         </p>
         {!canApprove && (
           <div className="mt-2 text-[11px] font-mono text-gold border border-gold/30 bg-gold/5 rounded px-2 py-1 inline-block">
@@ -139,8 +170,16 @@ function ApprovalsPage() {
 
       {/* Tabs entidad */}
       <div className="flex gap-1 border-b border-border mb-3">
-        <TabBtn active={tab === "drill_core_logs"} onClick={() => setTab("drill_core_logs")} label="Logs de sondaje" />
-        <TabBtn active={tab === "sampling_results"} onClick={() => setTab("sampling_results")} label="Resultados de muestreo" />
+        <TabBtn
+          active={tab === "drill_core_logs"}
+          onClick={() => setTab("drill_core_logs")}
+          label="Logs de sondaje"
+        />
+        <TabBtn
+          active={tab === "sampling_results"}
+          onClick={() => setTab("sampling_results")}
+          label="Resultados de muestreo"
+        />
       </div>
 
       {/* Filtro estado */}
@@ -151,7 +190,9 @@ function ApprovalsPage() {
             type="button"
             onClick={() => setFilter(s)}
             className={`px-2 py-1 text-[10px] font-mono uppercase rounded border transition-colors ${
-              filter === s ? "bg-gold/15 text-gold border-gold/40" : "border-border text-muted-foreground hover:bg-accent"
+              filter === s
+                ? "bg-gold/15 text-gold border-gold/40"
+                : "border-border text-muted-foreground hover:bg-accent"
             }`}
           >
             {s}
@@ -165,8 +206,18 @@ function ApprovalsPage() {
       {/* Bulk actions */}
       {canApprove && selected.size > 0 && (
         <div className="mb-3 flex flex-wrap gap-2">
-          <BulkBtn onClick={() => bulkChange("review")} Icon={Eye} label="Marcar Revisión" tone="gold" />
-          <BulkBtn onClick={() => bulkChange("approved")} Icon={CheckCircle2} label="Aprobar" tone="teal" />
+          <BulkBtn
+            onClick={() => bulkChange("review")}
+            Icon={Eye}
+            label="Marcar Revisión"
+            tone="gold"
+          />
+          <BulkBtn
+            onClick={() => bulkChange("approved")}
+            Icon={CheckCircle2}
+            label="Aprobar"
+            tone="teal"
+          />
           <BulkBtn onClick={() => bulkChange("draft")} Icon={RotateCcw} label="Volver a borrador" />
           <BulkBtn onClick={() => bulkChange("archived")} Icon={Archive} label="Archivar" />
         </div>
@@ -185,7 +236,11 @@ function ApprovalsPage() {
               <tr>
                 {canApprove && (
                   <th className="px-3 py-2 w-8">
-                    <input type="checkbox" checked={selected.size === rows.length && rows.length > 0} onChange={toggleAll} />
+                    <input
+                      type="checkbox"
+                      checked={selected.size === rows.length && rows.length > 0}
+                      onChange={toggleAll}
+                    />
                   </th>
                 )}
                 <th className="text-left px-3 py-2">Estado</th>
@@ -200,27 +255,52 @@ function ApprovalsPage() {
                 <tr key={r.id} className="border-t border-border hover:bg-accent/30">
                   {canApprove && (
                     <td className="px-3 py-2">
-                      <input type="checkbox" checked={selected.has(r.id)} onChange={() => toggle(r.id)} />
+                      <input
+                        type="checkbox"
+                        checked={selected.has(r.id)}
+                        onChange={() => toggle(r.id)}
+                      />
                     </td>
                   )}
-                  <td className="px-3 py-2"><RecordStatusBadge status={r.record_status} /></td>
+                  <td className="px-3 py-2">
+                    <RecordStatusBadge status={r.record_status} />
+                  </td>
                   <td className="px-3 py-2">{r.label}</td>
                   <td className="px-3 py-2 text-muted-foreground">{r.detail}</td>
-                  <td className="px-3 py-2 text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</td>
+                  <td className="px-3 py-2 text-muted-foreground">
+                    {new Date(r.created_at).toLocaleDateString()}
+                  </td>
                   <td className="px-3 py-2 text-right">
                     {canApprove ? (
                       <div className="inline-flex gap-1">
                         {r.record_status !== "review" && (
-                          <RowBtn onClick={() => changeStatus(r.id, "review")} title="Marcar para revisión" Icon={Eye} />
+                          <RowBtn
+                            onClick={() => changeStatus(r.id, "review")}
+                            title="Marcar para revisión"
+                            Icon={Eye}
+                          />
                         )}
                         {r.record_status !== "approved" && (
-                          <RowBtn onClick={() => changeStatus(r.id, "approved")} title="Aprobar" Icon={CheckCircle2} tone="teal" />
+                          <RowBtn
+                            onClick={() => changeStatus(r.id, "approved")}
+                            title="Aprobar"
+                            Icon={CheckCircle2}
+                            tone="teal"
+                          />
                         )}
                         {r.record_status !== "draft" && (
-                          <RowBtn onClick={() => changeStatus(r.id, "draft")} title="Volver a borrador" Icon={RotateCcw} />
+                          <RowBtn
+                            onClick={() => changeStatus(r.id, "draft")}
+                            title="Volver a borrador"
+                            Icon={RotateCcw}
+                          />
                         )}
                         {r.record_status !== "archived" && (
-                          <RowBtn onClick={() => changeStatus(r.id, "archived")} title="Archivar" Icon={Archive} />
+                          <RowBtn
+                            onClick={() => changeStatus(r.id, "archived")}
+                            title="Archivar"
+                            Icon={Archive}
+                          />
                         )}
                       </div>
                     ) : (
@@ -237,13 +317,23 @@ function ApprovalsPage() {
   );
 }
 
-function TabBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function TabBtn({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
-        active ? "border-gold text-gold" : "border-transparent text-muted-foreground hover:text-foreground"
+        active
+          ? "border-gold text-gold"
+          : "border-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
       {label}
@@ -251,22 +341,56 @@ function TabBtn({ active, onClick, label }: { active: boolean; onClick: () => vo
   );
 }
 
-function BulkBtn({ onClick, Icon, label, tone }: { onClick: () => void; Icon: typeof Eye; label: string; tone?: "teal" | "gold" }) {
-  const toneCls = tone === "teal" ? "border-teal/40 text-teal hover:bg-teal/10"
-    : tone === "gold" ? "border-gold/40 text-gold hover:bg-gold/10"
-    : "border-border text-muted-foreground hover:bg-accent";
+function BulkBtn({
+  onClick,
+  Icon,
+  label,
+  tone,
+}: {
+  onClick: () => void;
+  Icon: typeof Eye;
+  label: string;
+  tone?: "teal" | "gold";
+}) {
+  const toneCls =
+    tone === "teal"
+      ? "border-teal/40 text-teal hover:bg-teal/10"
+      : tone === "gold"
+        ? "border-gold/40 text-gold hover:bg-gold/10"
+        : "border-border text-muted-foreground hover:bg-accent";
   return (
-    <button type="button" onClick={onClick} className={`px-2.5 py-1 text-[11px] font-mono rounded border inline-flex items-center gap-1.5 ${toneCls}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      className={`px-2.5 py-1 text-[11px] font-mono rounded border inline-flex items-center gap-1.5 ${toneCls}`}
+    >
       <Icon className="w-3 h-3" /> {label}
     </button>
   );
 }
 
-function RowBtn({ onClick, Icon, title, tone }: { onClick: () => void; Icon: typeof Eye; title: string; tone?: "teal" }) {
-  const toneCls = tone === "teal" ? "border-teal/40 text-teal hover:bg-teal/10"
-    : "border-border text-muted-foreground hover:bg-accent hover:text-foreground";
+function RowBtn({
+  onClick,
+  Icon,
+  title,
+  tone,
+}: {
+  onClick: () => void;
+  Icon: typeof Eye;
+  title: string;
+  tone?: "teal";
+}) {
+  const toneCls =
+    tone === "teal"
+      ? "border-teal/40 text-teal hover:bg-teal/10"
+      : "border-border text-muted-foreground hover:bg-accent hover:text-foreground";
   return (
-    <button type="button" onClick={onClick} title={title} className={`p-1 rounded border ${toneCls}`}>
+    <button
+      type="button"
+      onClick={onClick}
+      title={title}
+      className={`p-1 rounded border ${toneCls}`}
+    >
       <Icon className="w-3 h-3" />
     </button>
   );

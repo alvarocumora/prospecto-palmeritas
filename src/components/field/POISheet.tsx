@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { Loader2, MapPin, Camera } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FIELD_POI_TYPES, type FieldPoiType, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { toast } from "sonner";
 
@@ -204,7 +210,11 @@ export function POISheet({
               disabled={saving || !coords}
               className="flex-1 h-12 rounded-md bg-gold text-background text-sm font-mono font-semibold disabled:opacity-50 active:scale-95 transition inline-flex items-center justify-center gap-2"
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+              {saving ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <MapPin className="w-4 h-4" />
+              )}
               Guardar
             </button>
           </div>

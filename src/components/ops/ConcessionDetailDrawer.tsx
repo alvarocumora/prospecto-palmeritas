@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { X, Pencil, Trash2, MapPin, Calendar, FileText, Search } from "lucide-react";
 import {
   type MiningConcession,
@@ -106,7 +112,11 @@ export function ConcessionDetailDrawer({
     const velocity = dy / dt;
     dragStart.current = null;
     setDragging(false);
-    try { (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId); } catch { /* ignore */ }
+    try {
+      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
+    } catch {
+      /* ignore */
+    }
     if (dy > SWIPE_CLOSE_THRESHOLD || velocity > SWIPE_VELOCITY_THRESHOLD) {
       onClose();
     } else {
@@ -169,7 +179,10 @@ export function ConcessionDetailDrawer({
               <input
                 type="text"
                 value={jumpQuery}
-                onChange={(e) => { setJumpQuery(e.target.value); setJumpOpen(true); }}
+                onChange={(e) => {
+                  setJumpQuery(e.target.value);
+                  setJumpOpen(true);
+                }}
                 onFocus={() => setJumpOpen(true)}
                 onBlur={() => setTimeout(() => setJumpOpen(false), 150)}
                 placeholder="Saltar a otra concesión por código o nombre…"
@@ -205,18 +218,35 @@ export function ConcessionDetailDrawer({
         )}
 
         {/* Body */}
-        <div ref={bodyRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-4 overscroll-contain">
+        <div
+          ref={bodyRef}
+          className="flex-1 overflow-y-auto px-4 py-3 space-y-4 overscroll-contain"
+        >
           {hydrating ? (
             <>
-              <div className="flex items-center gap-2 flex-wrap" aria-busy="true" aria-label="Cargando detalle">
+              <div
+                className="flex items-center gap-2 flex-wrap"
+                aria-busy="true"
+                aria-label="Cargando detalle"
+              >
                 <div className="h-6 w-40 rounded bg-bg-elevated animate-pulse" />
-                <div className="h-6 w-28 rounded bg-bg-elevated/70 animate-pulse" style={{ animationDelay: "80ms" }} />
+                <div
+                  className="h-6 w-28 rounded bg-bg-elevated/70 animate-pulse"
+                  style={{ animationDelay: "80ms" }}
+                />
               </div>
               <dl className="grid grid-cols-2 gap-x-3 gap-y-3 text-sm">
                 {Array.from({ length: 9 }).map((_, i) => (
-                  <div key={i} className="space-y-1.5 animate-pulse" style={{ animationDelay: `${i * 60}ms` }}>
+                  <div
+                    key={i}
+                    className="space-y-1.5 animate-pulse"
+                    style={{ animationDelay: `${i * 60}ms` }}
+                  >
                     <div className="h-2 w-12 bg-bg-elevated/70 rounded" />
-                    <div className="h-3.5 bg-bg-elevated rounded" style={{ width: `${85 - (i % 4) * 12}%` }} />
+                    <div
+                      className="h-3.5 bg-bg-elevated rounded"
+                      style={{ width: `${85 - (i % 4) * 12}%` }}
+                    />
                   </div>
                 ))}
               </dl>
@@ -270,9 +300,7 @@ export function ConcessionDetailDrawer({
             </div>
           )}
 
-          {c.project_id && (
-            <ConcessionFilesPanel concessionId={c.id} projectId={c.project_id} />
-          )}
+          {c.project_id && <ConcessionFilesPanel concessionId={c.id} projectId={c.project_id} />}
         </div>
 
         {/* Sticky footer actions */}

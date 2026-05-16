@@ -34,9 +34,9 @@ export function holeDirection(azimuthDeg: number, dipDeg: number): [number, numb
   const az = (azimuthDeg * Math.PI) / 180;
   const dip = (dipDeg * Math.PI) / 180;
   const horiz = Math.cos(dip);
-  const dx = horiz * Math.sin(az);   // East component
-  const dy = -Math.sin(dip);          // Up axis: dip positivo va hacia abajo
-  const dz = -horiz * Math.cos(az);   // -North → +z apunta al sur
+  const dx = horiz * Math.sin(az); // East component
+  const dy = -Math.sin(dip); // Up axis: dip positivo va hacia abajo
+  const dz = -horiz * Math.cos(az); // -North → +z apunta al sur
   return [dx, dy, dz];
 }
 
@@ -67,7 +67,12 @@ export type SceneHole = {
   collar: [number, number, number];
   direction: [number, number, number];
   totalDepth: number;
-  intercepts: Array<{ log: DrillCoreLog; from: [number, number, number]; to: [number, number, number]; color: string }>;
+  intercepts: Array<{
+    log: DrillCoreLog;
+    from: [number, number, number];
+    to: [number, number, number];
+    color: string;
+  }>;
 };
 
 export function buildSceneHoles(

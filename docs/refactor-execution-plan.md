@@ -196,7 +196,8 @@ export async function fetchGeologyData() {
     supabase.from("geo_references").select("*").order("year", { ascending: false }),
   ]);
 
-  const firstError = litho.error || alteration.error || minerals.error || features.error || references.error;
+  const firstError =
+    litho.error || alteration.error || minerals.error || features.error || references.error;
   if (firstError) throw firstError;
 
   return {

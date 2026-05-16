@@ -51,10 +51,13 @@ function parseCsvLine(line: string, delim: string): string[] {
   for (let i = 0; i < line.length; i++) {
     const c = line[i];
     if (c === '"') {
-      if (inQ && line[i + 1] === '"') { cur += '"'; i++; }
-      else inQ = !inQ;
+      if (inQ && line[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else inQ = !inQ;
     } else if (c === delim && !inQ) {
-      out.push(cur); cur = "";
+      out.push(cur);
+      cur = "";
     } else cur += c;
   }
   out.push(cur);
@@ -102,14 +105,15 @@ function normalizeCuPct(value: number | null, unit: string): number | null {
 function classifyHeader(h: string): { logical: string; unit: string } | null {
   const norm = h.toLowerCase().replace(/[\s_\-/.]/g, "");
   // Sample code
-  if (/^(sample|sampleid|sampleno|samplenumber|sampleidentifier|muestra|id|codigo|code)$/.test(norm))
+  if (
+    /^(sample|sampleid|sampleno|samplenumber|sampleidentifier|muestra|id|codigo|code)$/.test(norm)
+  )
     return { logical: "sample_code", unit: "" };
   // Certificate / job
   if (/^(certificate|cert|certno|jobno|job|wo|workorder|labjob)$/.test(norm))
     return { logical: "certificate", unit: "" };
   // Lab
-  if (/^(lab|laboratory|laboratorio)$/.test(norm))
-    return { logical: "lab", unit: "" };
+  if (/^(lab|laboratory|laboratorio)$/.test(norm)) return { logical: "lab", unit: "" };
 
   // Element_unit pattern: au_ppm, augpt, agppm, cupct, cu_, asppm
   // Try to match "<elem><unit>" where elem is 1-2 letters and unit is gpt/ppm/ppb/pct/%
@@ -118,7 +122,15 @@ function classifyHeader(h: string): { logical: string; unit: string } | null {
     const elem = m[1];
     const unit = m[2] === "%" ? "pct" : m[2];
     const map: Record<string, string> = {
-      au: "au", ag: "ag", cu: "cu", as: "as", sb: "sb", hg: "hg", pb: "pb", zn: "zn", mo: "mo",
+      au: "au",
+      ag: "ag",
+      cu: "cu",
+      as: "as",
+      sb: "sb",
+      hg: "hg",
+      pb: "pb",
+      zn: "zn",
+      mo: "mo",
     };
     if (elem in map) return { logical: map[elem], unit };
   }
@@ -127,7 +139,15 @@ function classifyHeader(h: string): { logical: string; unit: string } | null {
   if (bare) {
     const elem = bare[1];
     const defaults: Record<string, string> = {
-      au: "ppm", ag: "ppm", cu: "pct", as: "ppm", sb: "ppm", hg: "ppm", pb: "ppm", zn: "ppm", mo: "ppm",
+      au: "ppm",
+      ag: "ppm",
+      cu: "pct",
+      as: "ppm",
+      sb: "ppm",
+      hg: "ppm",
+      pb: "ppm",
+      zn: "ppm",
+      mo: "ppm",
     };
     if (elem in defaults) return { logical: elem, unit: defaults[elem] };
   }
@@ -137,8 +157,14 @@ function classifyHeader(h: string): { logical: string; unit: string } | null {
 /** Detect QC type by sample code conventions. */
 export function detectQcType(code: string): { type: QcType; parent: string | null } {
   const c = code.toUpperCase().trim();
-  if (/^(BLK|BLANK)[\-_]?\d*$/.test(c) || c.includes("BLANK")) return { type: "blank", parent: null };
-  if (/^(STD|CRM|STANDARD|REF)[\-_]?\w*$/.test(c) || c.startsWith("OREAS") || c.startsWith("CDN") || c.startsWith("GBM")) {
+  if (/^(BLK|BLANK)[\-_]?\d*$/.test(c) || c.includes("BLANK"))
+    return { type: "blank", parent: null };
+  if (
+    /^(STD|CRM|STANDARD|REF)[\-_]?\w*$/.test(c) ||
+    c.startsWith("OREAS") ||
+    c.startsWith("CDN") ||
+    c.startsWith("GBM")
+  ) {
     return { type: "standard", parent: null };
   }
   // Duplicates: SAMPLE-D, SAMPLE_DUP, SAMPLE.DUPL, DUP-001
@@ -149,9 +175,17 @@ export function detectQcType(code: string): { type: QcType; parent: string | nul
 }
 
 export function parseAssayCsv(text: string): AssayParseResult {
-  const lines = text.replace(/\r\n/g, "\n").split("\n").filter((l) => l.trim().length > 0);
+  const lines = text
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .filter((l) => l.trim().length > 0);
   if (lines.length < 2) {
-    return { rows: [], headerError: "El archivo debe tener al menos cabecera + 1 fila", detectedColumns: {}, qcStats: { samples: 0, blanks: 0, standards: 0, duplicates: 0 } };
+    return {
+      rows: [],
+      headerError: "El archivo debe tener al menos cabecera + 1 fila",
+      detectedColumns: {},
+      qcStats: { samples: 0, blanks: 0, standards: 0, duplicates: 0 },
+    };
   }
   const delim = detectDelimiter(lines[0]);
   const headers = parseCsvLine(lines[0], delim);
@@ -187,8 +221,10 @@ export function parseAssayCsv(text: string): AssayParseResult {
     const getNum = (k: string): { v: number | null; warn: string | null } => {
       if (!(k in colMap)) return { v: null, warn: null };
       const r = toNum(cells[colMap[k].idx] ?? "");
-      if (r.flag === "invalid") return { v: null, warn: `${k.toUpperCase()}: valor no numérico "${cells[colMap[k].idx]}"` };
-      if (r.flag === "bdl") return { v: r.value, warn: `${k.toUpperCase()}: bajo límite de detección` };
+      if (r.flag === "invalid")
+        return { v: null, warn: `${k.toUpperCase()}: valor no numérico "${cells[colMap[k].idx]}"` };
+      if (r.flag === "bdl")
+        return { v: r.value, warn: `${k.toUpperCase()}: bajo límite de detección` };
       if (r.flag === "above") return { v: r.value, warn: `${k.toUpperCase()}: sobre rango` };
       return { v: r.value, warn: null };
     };
@@ -201,7 +237,15 @@ export function parseAssayCsv(text: string): AssayParseResult {
     if (code) seenCodes.add(code);
 
     const qc = code ? detectQcType(code) : { type: "sample" as QcType, parent: null };
-    stats[qc.type === "sample" ? "samples" : qc.type === "blank" ? "blanks" : qc.type === "standard" ? "standards" : "duplicates"]++;
+    stats[
+      qc.type === "sample"
+        ? "samples"
+        : qc.type === "blank"
+          ? "blanks"
+          : qc.type === "standard"
+            ? "standards"
+            : "duplicates"
+    ]++;
 
     const auRaw = getNum("au");
     const agRaw = getNum("ag");
@@ -262,7 +306,8 @@ export function runQaQc(rows: ParsedAssay[]): QcAlert[] {
     if (r.qc_type === "blank") {
       if ((r.au_gpt ?? 0) > BLANK_AU_THRESHOLD) {
         alerts.push({
-          rowNum: r.rowNum, sample_code: r.sample_code,
+          rowNum: r.rowNum,
+          sample_code: r.sample_code,
           type: "blank_contamination",
           message: `Au=${r.au_gpt?.toFixed(3)} g/t en blanco (umbral ${BLANK_AU_THRESHOLD})`,
           severity: "critical",
@@ -273,16 +318,22 @@ export function runQaQc(rows: ParsedAssay[]): QcAlert[] {
       const parent = byCode.get(r.parent_code);
       if (!parent) {
         alerts.push({
-          rowNum: r.rowNum, sample_code: r.sample_code,
+          rowNum: r.rowNum,
+          sample_code: r.sample_code,
           type: "duplicate_mismatch",
           message: `Muestra original ${r.parent_code} no encontrada`,
           severity: "warning",
         });
-      } else if (parent.au_gpt != null && r.au_gpt != null && Math.max(parent.au_gpt, r.au_gpt) > 0.1) {
+      } else if (
+        parent.au_gpt != null &&
+        r.au_gpt != null &&
+        Math.max(parent.au_gpt, r.au_gpt) > 0.1
+      ) {
         const hrd = (Math.abs(parent.au_gpt - r.au_gpt) / ((parent.au_gpt + r.au_gpt) / 2)) * 100;
         if (hrd > DUPLICATE_REL_DIFF_PCT) {
           alerts.push({
-            rowNum: r.rowNum, sample_code: r.sample_code,
+            rowNum: r.rowNum,
+            sample_code: r.sample_code,
             type: "duplicate_mismatch",
             message: `HRD=${hrd.toFixed(1)}% Au vs ${r.parent_code} (${parent.au_gpt} vs ${r.au_gpt})`,
             severity: "warning",

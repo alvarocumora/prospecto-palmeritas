@@ -1,6 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getTargetSatelliteSummaries, type TargetSatelliteSummary } from "@/lib/satelliteIntel.functions";
+import {
+  getTargetSatelliteSummaries,
+  type TargetSatelliteSummary,
+} from "@/lib/satelliteIntel.functions";
 
 export type { TargetSatelliteSummary };
 
@@ -9,7 +12,8 @@ export function useTargetSatelliteSummaries(projectId: string | null | undefined
   return useQuery({
     queryKey: ["target-sat-summaries", projectId],
     queryFn: async () => {
-      if (!projectId) return { summaries: [] as TargetSatelliteSummary[], generatedAt: new Date().toISOString() };
+      if (!projectId)
+        return { summaries: [] as TargetSatelliteSummary[], generatedAt: new Date().toISOString() };
       return fn({ data: { projectId } });
     },
     enabled: !!projectId,

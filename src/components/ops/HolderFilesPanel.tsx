@@ -72,19 +72,29 @@ export function HolderFilesPanel({
             className="text-[11px] bg-bg-secondary border border-border rounded px-2 py-1"
           >
             {Object.entries(FILE_TYPE_LABELS).map(([k, v]) => (
-              <option key={k} value={k}>{v}</option>
+              <option key={k} value={k}>
+                {v}
+              </option>
             ))}
           </select>
           <label className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded bg-primary text-primary-foreground cursor-pointer hover:opacity-90">
             <Upload className="w-3 h-3" /> {busy ? "Subiendo…" : "Subir"}
-            <input ref={inputRef} type="file" className="hidden" onChange={onFile} disabled={busy} />
+            <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              onChange={onFile}
+              disabled={busy}
+            />
           </label>
         </div>
       </div>
       {loading ? (
         <div className="p-4 text-center text-xs text-text-secondary">Cargando…</div>
       ) : data.length === 0 ? (
-        <div className="p-4 text-center text-xs text-text-secondary">Sin archivos. Sube escrituras, poderes o RUT.</div>
+        <div className="p-4 text-center text-xs text-text-secondary">
+          Sin archivos. Sube escrituras, poderes o RUT.
+        </div>
       ) : (
         <div className="divide-y divide-border">
           {data.map((f) => {
@@ -100,21 +110,39 @@ export function HolderFilesPanel({
                 >
                   <FileText className="w-3.5 h-3.5 text-text-secondary shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <div className={`truncate font-mono ${canPreview ? "group-hover:text-primary" : ""}`}>{f.file_name}</div>
+                    <div
+                      className={`truncate font-mono ${canPreview ? "group-hover:text-primary" : ""}`}
+                    >
+                      {f.file_name}
+                    </div>
                     <div className="text-[10px] text-text-secondary">
-                      {FILE_TYPE_LABELS[f.file_type] ?? f.file_type} · {fmtSize(f.size_bytes)} · {new Date(f.uploaded_at).toLocaleDateString("es-CL")}
+                      {FILE_TYPE_LABELS[f.file_type] ?? f.file_type} · {fmtSize(f.size_bytes)} ·{" "}
+                      {new Date(f.uploaded_at).toLocaleDateString("es-CL")}
                     </div>
                   </div>
                 </button>
                 {canPreview && (
-                  <button onClick={() => setPreviewing(f)} className="p-1 rounded hover:bg-accent" title="Previsualizar" aria-label="Previsualizar">
+                  <button
+                    onClick={() => setPreviewing(f)}
+                    className="p-1 rounded hover:bg-accent"
+                    title="Previsualizar"
+                    aria-label="Previsualizar"
+                  >
                     <Eye className="w-3.5 h-3.5" />
                   </button>
                 )}
-                <button onClick={() => onDownload(f.file_path)} className="p-1 rounded hover:bg-accent" title="Descargar">
+                <button
+                  onClick={() => onDownload(f.file_path)}
+                  className="p-1 rounded hover:bg-accent"
+                  title="Descargar"
+                >
                   <Download className="w-3.5 h-3.5" />
                 </button>
-                <button onClick={() => onRemove(f.id, f.file_path)} className="p-1 rounded hover:bg-destructive/20 text-destructive" title="Eliminar">
+                <button
+                  onClick={() => onRemove(f.id, f.file_path)}
+                  className="p-1 rounded hover:bg-destructive/20 text-destructive"
+                  title="Eliminar"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -122,7 +150,11 @@ export function HolderFilesPanel({
           })}
         </div>
       )}
-      <FilePreviewModal file={previewing} getDownloadUrl={getDownloadUrl} onClose={() => setPreviewing(null)} />
+      <FilePreviewModal
+        file={previewing}
+        getDownloadUrl={getDownloadUrl}
+        onClose={() => setPreviewing(null)}
+      />
     </div>
   );
 }

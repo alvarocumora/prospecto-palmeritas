@@ -37,7 +37,10 @@ export async function buildRasterOverlayLayer(
     try {
       const overlay = L.imageOverlay(
         url,
-        [[minLat, minLng], [maxLat, maxLng]],
+        [
+          [minLat, minLng],
+          [maxLat, maxLng],
+        ],
         { opacity: s.opacity, interactive: false, className: `raster-${s.colormap}` },
       );
       overlay.addTo(group);

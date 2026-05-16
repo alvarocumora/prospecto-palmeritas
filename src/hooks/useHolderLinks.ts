@@ -70,10 +70,18 @@ export function useHolderLinks(holderId: string | null) {
 
     const [bRes, cRes] = await Promise.all([
       bulletinIds.length
-        ? supabase.from("mining_bulletins").select("id,publication_date,publication_number,publication_type,concession_name,comuna,source_url").in("id", bulletinIds)
+        ? supabase
+            .from("mining_bulletins")
+            .select(
+              "id,publication_date,publication_number,publication_type,concession_name,comuna,source_url",
+            )
+            .in("id", bulletinIds)
         : Promise.resolve({ data: [] as EnrichedBulletin[] }),
       caseIds.length
-        ? supabase.from("mining_court_cases").select("id,case_number,court,matter,plaintiff,filed_at,status,source_url").in("id", caseIds)
+        ? supabase
+            .from("mining_court_cases")
+            .select("id,case_number,court,matter,plaintiff,filed_at,status,source_url")
+            .in("id", caseIds)
         : Promise.resolve({ data: [] as EnrichedCase[] }),
     ]);
 
@@ -98,7 +106,13 @@ export function useHolderLinks(holderId: string | null) {
   }, [refresh]);
 
   const addExternal = useCallback(
-    async (input: { holderId: string; projectId: string; userId: string; url: string; label?: string }) => {
+    async (input: {
+      holderId: string;
+      projectId: string;
+      userId: string;
+      url: string;
+      label?: string;
+    }) => {
       const { error: err } = await supabase.from("holder_links").insert({
         holder_id: input.holderId,
         project_id: input.projectId,
@@ -123,14 +137,21 @@ export function useHolderLinks(holderId: string | null) {
     [refresh],
   );
 
-  const rescan = useCallback(async (holderId: string) => {
-    // Re-trigger matching by touching the holder row (updates name/rut trigger fires)
-    const { data: h } = await supabase.from("concession_holders").select("name").eq("id", holderId).maybeSingle();
-    if (h) {
-      await supabase.from("concession_holders").update({ name: h.name }).eq("id", holderId);
-    }
-    await refresh();
-  }, [refresh]);
+  const rescan = useCallback(
+    async (holderId: string) => {
+      // Re-trigger matching by touching the holder row (updates name/rut trigger fires)
+      const { data: h } = await supabase
+        .from("concession_holders")
+        .select("name")
+        .eq("id", holderId)
+        .maybeSingle();
+      if (h) {
+        await supabase.from("concession_holders").update({ name: h.name }).eq("id", holderId);
+      }
+      await refresh();
+    },
+    [refresh],
+  );
 
   return { data, loading, error, refresh, addExternal, remove, rescan };
 }

@@ -11,7 +11,8 @@ function Geology3DPage() {
       <div className="mb-3">
         <h1 className="text-xl font-mono text-gold">Geología 3D</h1>
         <p className="text-xs font-mono text-muted-foreground">
-          Sondajes, intercepts (Au ≥ 0.1 g/t) y targets del proyecto activo. Arrastra para rotar, rueda para zoom.
+          Sondajes, intercepts (Au ≥ 0.1 g/t) y targets del proyecto activo. Arrastra para rotar,
+          rueda para zoom.
         </p>
       </div>
       <div className="h-[calc(100%-3.5rem)] rounded-lg border border-gold/30 overflow-hidden">

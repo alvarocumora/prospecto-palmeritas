@@ -78,105 +78,164 @@ type SectionMeta = {
 
 const SECTIONS: SectionMeta[] = [
   {
-    id: "execSummary", number: "RES", title: "Resumen ejecutivo",
+    id: "execSummary",
+    number: "RES",
+    title: "Resumen ejecutivo",
     desc: "Síntesis del proyecto, hallazgos clave y recomendaciones.",
-    icon: ScrollText, group: "front",
+    icon: ScrollText,
+    group: "front",
   },
   {
-    id: "intro", number: "1", title: "Introducción",
+    id: "intro",
+    number: "1",
+    title: "Introducción",
     desc: "Alcance, propósito del informe y términos de referencia.",
-    icon: BookOpen, group: "body",
+    icon: BookOpen,
+    group: "body",
   },
   {
-    id: "reliance", number: "2", title: "Confianza en otros expertos",
+    id: "reliance",
+    number: "2",
+    title: "Confianza en otros expertos",
     desc: "Declaración de fuentes legales, fiscales y de titulación.",
-    icon: ClipboardCheck, group: "body",
+    icon: ClipboardCheck,
+    group: "body",
   },
   {
-    id: "property", number: "3", title: "Descripción y ubicación",
+    id: "property",
+    number: "3",
+    title: "Descripción y ubicación",
     desc: "Mapa del AOI, coordenadas, accesos y catastro SERNAGEOMIN.",
-    icon: MapIcon, group: "body",
-    requires: (v) => v.mapAvailable && v.catastroAvailable ? "ok" : v.mapAvailable ? "warn" : "err",
+    icon: MapIcon,
+    group: "body",
+    requires: (v) =>
+      v.mapAvailable && v.catastroAvailable ? "ok" : v.mapAvailable ? "warn" : "err",
   },
   {
-    id: "zoning", number: "3.bis", title: "Zonificación geológica",
+    id: "zoning",
+    number: "3.bis",
+    title: "Zonificación geológica",
     desc: "Capas activas, vista satelital y litología del AOI.",
-    icon: Satellite, group: "body",
-    requires: (v) => v.satelliteAvailable ? (v.geologyAvailable ? "ok" : "warn") : "warn",
+    icon: Satellite,
+    group: "body",
+    requires: (v) => (v.satelliteAvailable ? (v.geologyAvailable ? "ok" : "warn") : "warn"),
   },
   {
-    id: "climate", number: "4", title: "Clima, fisiografía e infraestructura",
+    id: "climate",
+    number: "4",
+    title: "Clima, fisiografía e infraestructura",
     desc: "Condiciones operativas, accesos viales y servicios.",
-    icon: Cloud, group: "body",
+    icon: Cloud,
+    group: "body",
   },
   {
-    id: "history", number: "5", title: "Historia",
+    id: "history",
+    number: "5",
+    title: "Historia",
     desc: "Trabajos previos, propietarios anteriores y producción histórica.",
-    icon: History, group: "body",
+    icon: History,
+    group: "body",
   },
   {
-    id: "geology", number: "6", title: "Geología local y regional",
+    id: "geology",
+    number: "6",
+    title: "Geología local y regional",
     desc: "Litología, alteración, mineralogía y rasgos estructurales.",
-    icon: Mountain, group: "body",
-    requires: (v) => v.geologyAvailable ? "ok" : "warn",
+    icon: Mountain,
+    group: "body",
+    requires: (v) => (v.geologyAvailable ? "ok" : "warn"),
   },
   {
-    id: "depositType", number: "7", title: "Tipo de depósito",
+    id: "depositType",
+    number: "7",
+    title: "Tipo de depósito",
     desc: "Modelo conceptual epitermal–mesotermal Au–Cu.",
-    icon: Compass, group: "body",
+    icon: Compass,
+    group: "body",
   },
   {
-    id: "exploration", number: "8", title: "Exploración",
+    id: "exploration",
+    number: "8",
+    title: "Exploración",
     desc: "Geofísica IP/Mag, geoquímica y muestreo superficial.",
-    icon: FlaskConical, group: "body",
+    icon: FlaskConical,
+    group: "body",
   },
   {
-    id: "drilling", number: "9", title: "Sondajes",
+    id: "drilling",
+    number: "9",
+    title: "Sondajes",
     desc: "Programa DDH propuesto: 4 perforaciones, 1.030 m.",
-    icon: Pickaxe, group: "body",
+    icon: Pickaxe,
+    group: "body",
   },
   {
-    id: "qaqc", number: "10", title: "Preparación, análisis y QA/QC",
+    id: "qaqc",
+    number: "10",
+    title: "Preparación, análisis y QA/QC",
     desc: "Protocolos de muestreo, blanks, duplicados y estándares.",
-    icon: Microscope, group: "body",
-    requires: (v) => v.assaysStatus === "available" ? "ok" : v.assaysStatus === "partial" ? "warn" : "err",
+    icon: Microscope,
+    group: "body",
+    requires: (v) =>
+      v.assaysStatus === "available" ? "ok" : v.assaysStatus === "partial" ? "warn" : "err",
   },
   {
-    id: "dataVerification", number: "11", title: "Verificación de datos",
+    id: "dataVerification",
+    number: "11",
+    title: "Verificación de datos",
     desc: "Auditoría QP de assays y consistencia de la base de datos.",
-    icon: ClipboardCheck, group: "body",
-    requires: (v) => v.assaysStatus === "available" ? "ok" : "err",
+    icon: ClipboardCheck,
+    group: "body",
+    requires: (v) => (v.assaysStatus === "available" ? "ok" : "err"),
   },
   {
-    id: "budget", number: "12", title: "Presupuesto recomendado",
+    id: "budget",
+    number: "12",
+    title: "Presupuesto recomendado",
     desc: "Programa 12 meses · USD 211.310 · 4 fases.",
-    icon: Wallet, group: "body",
+    icon: Wallet,
+    group: "body",
   },
   {
-    id: "conclusions", number: "13", title: "Conclusiones y recomendaciones",
+    id: "conclusions",
+    number: "13",
+    title: "Conclusiones y recomendaciones",
     desc: "Síntesis técnica y próximos pasos para el QP.",
-    icon: ListChecks, group: "body",
+    icon: ListChecks,
+    group: "body",
   },
   {
-    id: "resourceEstimates", number: "14", title: "Estimación de recursos",
+    id: "resourceEstimates",
+    number: "14",
+    title: "Estimación de recursos",
     desc: "Modelos de bloques IDW/NN, tonelaje, ley media y metal contenido.",
-    icon: Mountain, group: "body",
+    icon: Mountain,
+    group: "body",
   },
   {
-    id: "references", number: "14b", title: "Referencias bibliográficas",
+    id: "references",
+    number: "14b",
+    title: "Referencias bibliográficas",
     desc: "Citas geológicas y fuentes consultadas.",
-    icon: Library, group: "body",
+    icon: Library,
+    group: "body",
   },
   {
-    id: "annexA", number: "A", title: "Anexo A · Catastro",
+    id: "annexA",
+    number: "A",
+    title: "Anexo A · Catastro",
     desc: "Tablas SERNAGEOMIN y pertenencias internas del proyecto.",
-    icon: Files, group: "annex",
-    requires: (v) => v.catastroAvailable ? "ok" : "err",
+    icon: Files,
+    group: "annex",
+    requires: (v) => (v.catastroAvailable ? "ok" : "err"),
   },
   {
-    id: "annexB", number: "B", title: "Anexo B · Geofísica",
+    id: "annexB",
+    number: "B",
+    title: "Anexo B · Geofísica",
     desc: "Encuestas, líneas y estaciones IP/Mag.",
-    icon: Layers, group: "annex",
+    icon: Layers,
+    group: "annex",
   },
 ];
 
@@ -243,10 +302,12 @@ function NI43101Module() {
   useEffect(() => {
     if (!preview) return;
     // Find the toc entry whose page is the largest <= activePage
-    const candidates = preview.toc
-      .map((e, i) => ({ ...e, i }))
-      .filter((e) => e.page <= activePage);
-    const target = candidates.length ? candidates[candidates.length - 1] : preview.toc[0] ? { ...preview.toc[0], i: 0 } : null;
+    const candidates = preview.toc.map((e, i) => ({ ...e, i })).filter((e) => e.page <= activePage);
+    const target = candidates.length
+      ? candidates[candidates.length - 1]
+      : preview.toc[0]
+        ? { ...preview.toc[0], i: 0 }
+        : null;
     if (!target) return;
     const el = tocItemRefs.current.get(target.i);
     if (el && tocListRef.current) {
@@ -289,10 +350,20 @@ function NI43101Module() {
   const enableAll = () => setEnabled(new Set(ALL_SECTIONS));
   const enableNone = () => setEnabled(new Set());
   const enableEssentials = () =>
-    setEnabled(new Set<Ni43101SectionId>([
-      "execSummary","property","geology","exploration","drilling",
-      "qaqc","dataVerification","budget","conclusions","annexA",
-    ]));
+    setEnabled(
+      new Set<Ni43101SectionId>([
+        "execSummary",
+        "property",
+        "geology",
+        "exploration",
+        "drilling",
+        "qaqc",
+        "dataVerification",
+        "budget",
+        "conclusions",
+        "annexA",
+      ]),
+    );
 
   const buildPreview = async () => {
     if (enabled.size === 0) {
@@ -363,28 +434,34 @@ function NI43101Module() {
     }
   };
 
-  const goToPage = useCallback((page: number) => {
-    setActivePage(page);
-    if (preview && iframeRef.current) {
-      iframeRef.current.src = `${preview.url}#page=${page}&view=FitH`;
-    }
-  }, [preview]);
+  const goToPage = useCallback(
+    (page: number) => {
+      setActivePage(page);
+      if (preview && iframeRef.current) {
+        iframeRef.current.src = `${preview.url}#page=${page}&view=FitH`;
+      }
+    },
+    [preview],
+  );
 
   // Section nav: jump to previous/next level-1 (or level-0) TOC entry.
-  const goToSectionDelta = useCallback((delta: 1 | -1) => {
-    if (!preview) return;
-    const sectionEntries = preview.toc
-      .map((e, i) => ({ ...e, i }))
-      .filter((e) => e.level === 1 || e.level === 0);
-    if (sectionEntries.length === 0) return;
-    // Find index of current section (largest section page <= activePage)
-    let curr = 0;
-    for (let i = 0; i < sectionEntries.length; i++) {
-      if (sectionEntries[i].page <= activePage) curr = i;
-    }
-    const next = Math.max(0, Math.min(sectionEntries.length - 1, curr + delta));
-    goToPage(sectionEntries[next].page);
-  }, [preview, activePage, goToPage]);
+  const goToSectionDelta = useCallback(
+    (delta: 1 | -1) => {
+      if (!preview) return;
+      const sectionEntries = preview.toc
+        .map((e, i) => ({ ...e, i }))
+        .filter((e) => e.level === 1 || e.level === 0);
+      if (sectionEntries.length === 0) return;
+      // Find index of current section (largest section page <= activePage)
+      let curr = 0;
+      for (let i = 0; i < sectionEntries.length; i++) {
+        if (sectionEntries[i].page <= activePage) curr = i;
+      }
+      const next = Math.max(0, Math.min(sectionEntries.length - 1, curr + delta));
+      goToPage(sectionEntries[next].page);
+    },
+    [preview, activePage, goToPage],
+  );
 
   // Global keyboard shortcuts when preview is loaded (skip if user is typing).
   useEffect(() => {
@@ -429,7 +506,8 @@ function NI43101Module() {
             <FileText className="w-5 h-5 text-gold" /> Hub Informe NI 43-101
           </h1>
           <p className="text-xs text-muted-foreground font-mono mt-1">
-            {active?.name ?? "Prospecto Palmeras"} · {enabled.size}/{ALL_SECTIONS.length} secciones activas
+            {active?.name ?? "Prospecto Palmeras"} · {enabled.size}/{ALL_SECTIONS.length} secciones
+            activas
           </p>
         </div>
         <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-gold/40 text-gold font-mono text-[11px] uppercase tracking-wider">
@@ -455,7 +533,9 @@ function NI43101Module() {
             />
             <div>
               <div className="text-xs font-mono">Basemap satelital</div>
-              <div className="text-[10px] text-text-secondary">Usar Esri World Imagery en el snapshot principal</div>
+              <div className="text-[10px] text-text-secondary">
+                Usar Esri World Imagery en el snapshot principal
+              </div>
             </div>
           </label>
           <label className="flex items-start gap-2 p-3 rounded border border-border bg-bg-primary cursor-pointer hover:border-gold/40">
@@ -467,17 +547,36 @@ function NI43101Module() {
             />
             <div>
               <div className="text-xs font-mono">Pertenencias internas</div>
-              <div className="text-[10px] text-text-secondary">Combinar con catastro SERNAGEOMIN en el Anexo A</div>
+              <div className="text-[10px] text-text-secondary">
+                Combinar con catastro SERNAGEOMIN en el Anexo A
+              </div>
             </div>
           </label>
         </div>
 
         {/* Quick presets */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mr-1">Presets:</span>
-          <button onClick={enableAll} className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-gold/40">Todas</button>
-          <button onClick={enableEssentials} className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-gold/40">Esenciales</button>
-          <button onClick={enableNone} className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-destructive/40 hover:text-destructive">Ninguna</button>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mr-1">
+            Presets:
+          </span>
+          <button
+            onClick={enableAll}
+            className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-gold/40"
+          >
+            Todas
+          </button>
+          <button
+            onClick={enableEssentials}
+            className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-gold/40"
+          >
+            Esenciales
+          </button>
+          <button
+            onClick={enableNone}
+            className="text-[11px] font-mono px-2 py-1 rounded border border-border hover:border-destructive/40 hover:text-destructive"
+          >
+            Ninguna
+          </button>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -486,8 +585,18 @@ function NI43101Module() {
             disabled={busy || enabled.size === 0}
             className="inline-flex items-center justify-center gap-2 px-4 py-3 rounded bg-gold text-bg-secondary font-mono text-sm hover:bg-gold/90 disabled:opacity-50 active:scale-[0.99] transition"
           >
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : preview ? <RefreshCw className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            {busy ? (progress?.label ?? "Generando…") : preview ? "Regenerar vista previa" : "Generar vista previa"}
+            {busy ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : preview ? (
+              <RefreshCw className="w-4 h-4" />
+            ) : (
+              <Eye className="w-4 h-4" />
+            )}
+            {busy
+              ? (progress?.label ?? "Generando…")
+              : preview
+                ? "Regenerar vista previa"
+                : "Generar vista previa"}
           </button>
           <button
             onClick={downloadDirect}
@@ -514,23 +623,27 @@ function NI43101Module() {
               <div
                 className="h-full bg-gold transition-all duration-300"
                 style={{
-                  width: progress.total > 0
-                    ? `${Math.min(100, Math.round((progress.current / progress.total) * 100))}%`
-                    : "8%",
+                  width:
+                    progress.total > 0
+                      ? `${Math.min(100, Math.round((progress.current / progress.total) * 100))}%`
+                      : "8%",
                 }}
               />
             </div>
             <div className="text-[10px] font-mono text-muted-foreground">
-              {progress.phase === "render" ? "Renderizando secciones del PDF…"
-                : progress.phase === "finalize" ? "Aplicando encabezados, índice y compilación final…"
-                : "Preparando datos y snapshots del mapa…"}
+              {progress.phase === "render"
+                ? "Renderizando secciones del PDF…"
+                : progress.phase === "finalize"
+                  ? "Aplicando encabezados, índice y compilación final…"
+                  : "Preparando datos y snapshots del mapa…"}
             </div>
           </div>
         )}
         {error && <div className="text-xs text-destructive font-mono">{error}</div>}
         {!projectId && (
           <div className="text-xs text-muted-foreground font-mono">
-            Sin proyecto activo: el informe usa los datos del Prospecto Palmeras y omite las pertenencias internas.
+            Sin proyecto activo: el informe usa los datos del Prospecto Palmeras y omite las
+            pertenencias internas.
           </div>
         )}
       </section>
@@ -545,7 +658,9 @@ function NI43101Module() {
           if (items.length === 0) return null;
           return (
             <div key={g.key} className="space-y-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{g.label}</div>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                {g.label}
+              </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                 {items.map((meta) => (
                   <SectionCard
@@ -595,7 +710,10 @@ function NI43101Module() {
                 <ChevronRight className="w-3 h-3" />
               </button>
               <span className="hidden md:inline text-[10px] font-mono text-muted-foreground ml-1.5">
-                Atajos: <kbd className="px-1 rounded border border-border">J</kbd>/<kbd className="px-1 rounded border border-border">K</kbd> · <kbd className="px-1 rounded border border-border">↑</kbd>/<kbd className="px-1 rounded border border-border">↓</kbd> · pág. {activePage}
+                Atajos: <kbd className="px-1 rounded border border-border">J</kbd>/
+                <kbd className="px-1 rounded border border-border">K</kbd> ·{" "}
+                <kbd className="px-1 rounded border border-border">↑</kbd>/
+                <kbd className="px-1 rounded border border-border">↓</kbd> · pág. {activePage}
               </span>
             </div>
           </div>
@@ -665,7 +783,8 @@ function NI43101Module() {
           <Eye className="w-8 h-8 text-gold/60 mx-auto mb-2" />
           <div className="text-sm font-mono">Aún no hay vista previa</div>
           <div className="text-[11px] text-text-secondary mt-1">
-            Configura las secciones que quieras incluir y genera la vista previa para revisar el informe antes de descargar.
+            Configura las secciones que quieras incluir y genera la vista previa para revisar el
+            informe antes de descargar.
           </div>
         </section>
       )}
@@ -677,9 +796,19 @@ function NI43101Module() {
         </div>
         <ul className="text-[11px] text-text-secondary font-mono space-y-1">
           <li>• Catastro Minero SERNAGEOMIN (Geomin WMS) — bbox 16 km en torno al centroide AOI</li>
-          <li>• Tabla <code className="text-foreground">mining_concessions</code> del proyecto activo</li>
-          <li>• Geología: <code className="text-foreground">lithology_units</code>, <code className="text-foreground">alteration_zones</code>, <code className="text-foreground">mineralogy</code>, <code className="text-foreground">geological_features</code></li>
-          <li>• Geofísica: <code className="text-foreground">geophysics_surveys / lines / stations</code></li>
+          <li>
+            • Tabla <code className="text-foreground">mining_concessions</code> del proyecto activo
+          </li>
+          <li>
+            • Geología: <code className="text-foreground">lithology_units</code>,{" "}
+            <code className="text-foreground">alteration_zones</code>,{" "}
+            <code className="text-foreground">mineralogy</code>,{" "}
+            <code className="text-foreground">geological_features</code>
+          </li>
+          <li>
+            • Geofísica:{" "}
+            <code className="text-foreground">geophysics_surveys / lines / stations</code>
+          </li>
           <li>• Capas de mapa: Macrostrat, SERNAGEOMIN 1:1M, Esri World Imagery</li>
         </ul>
       </section>
@@ -696,7 +825,8 @@ function NI43101Module() {
         {captureBasemap && (
           <div className="mt-2 text-[10px] font-mono text-amber-500 flex items-center gap-1.5">
             <Loader2 className="w-3 h-3 animate-spin" />
-            Basemap conmutado a <span className="uppercase">{captureBasemap}</span> para captura del informe…
+            Basemap conmutado a <span className="uppercase">{captureBasemap}</span> para captura del
+            informe…
           </div>
         )}
       </section>
@@ -734,42 +864,58 @@ function SectionCard({
       }`}
     >
       <div className="flex items-start gap-2">
-        <div className={`shrink-0 w-8 h-8 rounded flex items-center justify-center border ${
-          active ? "border-gold/50 text-gold bg-gold/10" : "border-border text-muted-foreground"
-        }`}>
+        <div
+          className={`shrink-0 w-8 h-8 rounded flex items-center justify-center border ${
+            active ? "border-gold/50 text-gold bg-gold/10" : "border-border text-muted-foreground"
+          }`}
+        >
           <Icon className="w-4 h-4" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-1.5">
-            <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
-              active ? "border-gold/40 text-gold" : "border-border text-muted-foreground"
-            }`}>
+            <span
+              className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
+                active ? "border-gold/40 text-gold" : "border-border text-muted-foreground"
+              }`}
+            >
               §{meta.number}
             </span>
             <div className="text-xs font-mono font-semibold truncate">{meta.title}</div>
           </div>
           <div className="text-[10px] text-text-secondary mt-1 line-clamp-2">{meta.desc}</div>
         </div>
-        <div className={`shrink-0 w-4 h-4 rounded border flex items-center justify-center transition ${
-          active ? "bg-gold border-gold" : "border-border"
-        }`}>
+        <div
+          className={`shrink-0 w-4 h-4 rounded border flex items-center justify-center transition ${
+            active ? "bg-gold border-gold" : "border-border"
+          }`}
+        >
           {active && <CheckCircle2 className="w-3 h-3 text-bg-secondary" />}
         </div>
       </div>
 
       {valState && (
-        <div className={`flex items-center gap-1.5 text-[10px] font-mono pt-1 border-t ${
-          valState === "ok" ? "border-emerald-500/20 text-emerald-500"
-          : valState === "warn" ? "border-amber-500/30 text-amber-500"
-          : "border-destructive/30 text-destructive"
-        }`}>
-          {valState === "ok" ? <CheckCircle2 className="w-3 h-3" />
-            : valState === "warn" ? <AlertTriangle className="w-3 h-3" />
-            : <XCircle className="w-3 h-3" />}
+        <div
+          className={`flex items-center gap-1.5 text-[10px] font-mono pt-1 border-t ${
+            valState === "ok"
+              ? "border-emerald-500/20 text-emerald-500"
+              : valState === "warn"
+                ? "border-amber-500/30 text-amber-500"
+                : "border-destructive/30 text-destructive"
+          }`}
+        >
+          {valState === "ok" ? (
+            <CheckCircle2 className="w-3 h-3" />
+          ) : valState === "warn" ? (
+            <AlertTriangle className="w-3 h-3" />
+          ) : (
+            <XCircle className="w-3 h-3" />
+          )}
           <span>
-            {valState === "ok" ? "Datos disponibles"
-              : valState === "warn" ? "Datos parciales"
-              : "Datos faltantes — revisar"}
+            {valState === "ok"
+              ? "Datos disponibles"
+              : valState === "warn"
+                ? "Datos parciales"
+                : "Datos faltantes — revisar"}
           </span>
         </div>
       )}
@@ -797,10 +943,7 @@ function TocItem({
   return (
     <li ref={registerRef} className="relative">
       {isActive && (
-        <span
-          aria-hidden
-          className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r bg-gold"
-        />
+        <span aria-hidden className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r bg-gold" />
       )}
       <button
         onClick={onClick}
@@ -812,9 +955,7 @@ function TocItem({
         } ${entry.level === 2 ? "pl-6" : ""}`}
         style={{ paddingLeft: entry.level === 2 ? 24 : undefined }}
       >
-        <ChevronRight
-          className={`w-3 h-3 shrink-0 ${isActive ? "text-gold" : "opacity-40"}`}
-        />
+        <ChevronRight className={`w-3 h-3 shrink-0 ${isActive ? "text-gold" : "opacity-40"}`} />
         <span className="flex-1 truncate">{entry.label}</span>
         {isExact && (
           <span className="text-[9px] font-mono px-1 rounded bg-gold/20 text-gold uppercase">
@@ -836,8 +977,8 @@ function ValidationsPanel({ v }: { v: Ni43101Validations }) {
         v.assaysStatus === "available"
           ? `${v.assaysCount} resultados`
           : v.assaysStatus === "partial"
-          ? `Parcial (${v.assaysCount})`
-          : "PENDING — sin datos",
+            ? `Parcial (${v.assaysCount})`
+            : "PENDING — sin datos",
     },
     {
       label: "Catastro SERNAGEOMIN",
@@ -876,7 +1017,9 @@ function ValidationsPanel({ v }: { v: Ni43101Validations }) {
         ) : (
           <>
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-            <span className="text-emerald-600 dark:text-emerald-400">Todas las validaciones OK</span>
+            <span className="text-emerald-600 dark:text-emerald-400">
+              Todas las validaciones OK
+            </span>
           </>
         )}
         <span className="ml-auto text-[10px] text-muted-foreground normal-case tracking-normal">
@@ -891,8 +1034,8 @@ function ValidationsPanel({ v }: { v: Ni43101Validations }) {
               it.status === "ok"
                 ? "border-emerald-500/30 bg-emerald-500/5"
                 : it.status === "warn"
-                ? "border-amber-500/40 bg-amber-500/5"
-                : "border-destructive/40 bg-destructive/5"
+                  ? "border-amber-500/40 bg-amber-500/5"
+                  : "border-destructive/40 bg-destructive/5"
             }`}
           >
             {it.status === "ok" ? (

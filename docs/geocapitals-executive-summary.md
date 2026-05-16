@@ -19,13 +19,13 @@ El producto está construido sobre Lovable Cloud con arquitectura multi-tenant b
 
 ## 2. Stack y backend
 
-| Capa | Stack / capacidad |
-|---|---|
-| Frontend | TanStack Start v1, React 19, Tailwind v4, Vite 7, TanStack Query |
-| Backend | Lovable Cloud / Supabase, 135 tablas, 35 edge functions, PostGIS 3.3.7, pg_cron + pg_net |
-| IA | Lovable AI Gateway: Gemini 2.5 Pro/Flash, GPT-5 para GeoCopilot, target generator y AI explainer |
-| Geoespacial | Sentinel MPC, DEM Copernicus, ArcGIS REST de Sernageomin, drape 3D real |
-| Seguridad | RLS por proyecto, `has_role()` SECURITY DEFINER, `app_roles`, audit log |
+| Capa        | Stack / capacidad                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------------ |
+| Frontend    | TanStack Start v1, React 19, Tailwind v4, Vite 7, TanStack Query                                 |
+| Backend     | Lovable Cloud / Supabase, 135 tablas, 35 edge functions, PostGIS 3.3.7, pg_cron + pg_net         |
+| IA          | Lovable AI Gateway: Gemini 2.5 Pro/Flash, GPT-5 para GeoCopilot, target generator y AI explainer |
+| Geoespacial | Sentinel MPC, DEM Copernicus, ArcGIS REST de Sernageomin, drape 3D real                          |
+| Seguridad   | RLS por proyecto, `has_role()` SECURITY DEFINER, `app_roles`, audit log                          |
 
 ---
 
@@ -33,26 +33,26 @@ El producto está construido sobre Lovable Cloud con arquitectura multi-tenant b
 
 Estado verificado contra el código en producción, no aspiracional.
 
-| Módulo | Capacidad real | Estado | Madurez |
-|---|---|---:|---:|
-| Catastro Minero | Concesiones Sernageomin, holders, alertas patentes, overlaps con AOI, calendario, sync ArcGIS automático | Producción | 95% |
-| Prospectos Mineros | 30 prospectos curados desde Sernageomin REST con geometría WGS84 y commodity | Producción | 90% |
-| Instalaciones Mineras | ~29.000 instalaciones con filtros región/tipo/recurso, ingest async vía edge function | Beta | 80% |
-| Boletín Minero | Watches, alertas, ingest PJUD/Boletín automatizado vía pg_cron | Producción | 85% |
-| Geofísica | Surveys magnéticos/gravimétricos, captura de campo, anomalías, promoción a targets | Producción | 90% |
-| Geología 3D | Geology3DViewer real con DEM Copernicus + drape Sentinel MPC + anomalías WGS84 | Producción | 85% |
-| Drilling | Sondajes, core logging, strip logs, intercepts, QA/QC | Producción | 85% |
-| Sampling & Geoquímica | Imports CSV de assays, fingerprint geoquímico, validación | Producción | 80% |
-| Drones & Rasters | Upload ortomosaicos, DEM diff, swipe overlay, cálculo de stockpiles | Producción | 85% |
-| Estimación de Recursos | Block model 3D, escenarios económicos, NI 43-101 export | Beta | 70% |
-| Targets de Exploración | Generación, scoring, prospectividad grid, AI explainer | Beta | 75% |
-| NI 43-101 / QPs | Compliance matrix, evidence drawer, signature envelopes, qualified persons | Beta | 70% |
-| Deals & Marketplace | Listings de propiedades mineras, inquiries, due diligence | Beta | 65% |
-| Investor CRM | Pipeline de inversionistas, campañas, finance tracking | Alpha | 55% |
-| Data Room | Storage seguro de archivos por concesión/holder/proyecto | Producción | 80% |
-| Team & Roles | Multi-tenant por organization + project, RLS con `has_role()`, capabilities matrix | Producción | 95% |
-| GeoCopilot AI | Geo-Intel Brief con Lovable AI Gateway, Gemini/GPT, evidencia geológica | Beta | 70% |
-| HSE & Compliance | Auditoría, validación de datos, repairs, approvals | Producción | 80% |
+| Módulo                 | Capacidad real                                                                                           |     Estado | Madurez |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- | ---------: | ------: |
+| Catastro Minero        | Concesiones Sernageomin, holders, alertas patentes, overlaps con AOI, calendario, sync ArcGIS automático | Producción |     95% |
+| Prospectos Mineros     | 30 prospectos curados desde Sernageomin REST con geometría WGS84 y commodity                             | Producción |     90% |
+| Instalaciones Mineras  | ~29.000 instalaciones con filtros región/tipo/recurso, ingest async vía edge function                    |       Beta |     80% |
+| Boletín Minero         | Watches, alertas, ingest PJUD/Boletín automatizado vía pg_cron                                           | Producción |     85% |
+| Geofísica              | Surveys magnéticos/gravimétricos, captura de campo, anomalías, promoción a targets                       | Producción |     90% |
+| Geología 3D            | Geology3DViewer real con DEM Copernicus + drape Sentinel MPC + anomalías WGS84                           | Producción |     85% |
+| Drilling               | Sondajes, core logging, strip logs, intercepts, QA/QC                                                    | Producción |     85% |
+| Sampling & Geoquímica  | Imports CSV de assays, fingerprint geoquímico, validación                                                | Producción |     80% |
+| Drones & Rasters       | Upload ortomosaicos, DEM diff, swipe overlay, cálculo de stockpiles                                      | Producción |     85% |
+| Estimación de Recursos | Block model 3D, escenarios económicos, NI 43-101 export                                                  |       Beta |     70% |
+| Targets de Exploración | Generación, scoring, prospectividad grid, AI explainer                                                   |       Beta |     75% |
+| NI 43-101 / QPs        | Compliance matrix, evidence drawer, signature envelopes, qualified persons                               |       Beta |     70% |
+| Deals & Marketplace    | Listings de propiedades mineras, inquiries, due diligence                                                |       Beta |     65% |
+| Investor CRM           | Pipeline de inversionistas, campañas, finance tracking                                                   |      Alpha |     55% |
+| Data Room              | Storage seguro de archivos por concesión/holder/proyecto                                                 | Producción |     80% |
+| Team & Roles           | Multi-tenant por organization + project, RLS con `has_role()`, capabilities matrix                       | Producción |     95% |
+| GeoCopilot AI          | Geo-Intel Brief con Lovable AI Gateway, Gemini/GPT, evidencia geológica                                  |       Beta |     70% |
+| HSE & Compliance       | Auditoría, validación de datos, repairs, approvals                                                       | Producción |     80% |
 
 ---
 
@@ -82,13 +82,13 @@ RLS estricto por proyecto y rol, listo para operación SaaS.
 
 ## 5. Brechas críticas
 
-| Brecha | Impacto | Nota |
-|---|---|---|
-| Jobs pesados | Alto | Algunos syncs aún sufren timeouts. Mitigado con `EdgeRuntime.waitUntil`, pero falta job runner formal. |
-| Modularización frontend | Alto | `ProjectMap` y dashboards monolíticos frenan velocidad de equipo. |
-| Observabilidad | Alto | Falta request-id end-to-end y dashboards por tenant. |
-| Investor CRM | Medio/alto | Aún en alpha; requiere pipeline visual y métricas de embudo. |
-| SaaS comercial | Alto | Falta tenant management central, feature flags por plan y límites de consumo. |
+| Brecha                  | Impacto    | Nota                                                                                                   |
+| ----------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| Jobs pesados            | Alto       | Algunos syncs aún sufren timeouts. Mitigado con `EdgeRuntime.waitUntil`, pero falta job runner formal. |
+| Modularización frontend | Alto       | `ProjectMap` y dashboards monolíticos frenan velocidad de equipo.                                      |
+| Observabilidad          | Alto       | Falta request-id end-to-end y dashboards por tenant.                                                   |
+| Investor CRM            | Medio/alto | Aún en alpha; requiere pipeline visual y métricas de embudo.                                           |
+| SaaS comercial          | Alto       | Falta tenant management central, feature flags por plan y límites de consumo.                          |
 
 ---
 
@@ -96,15 +96,15 @@ RLS estricto por proyecto y rol, listo para operación SaaS.
 
 Hoja de ruta priorizada por impacto y dependencia técnica.
 
-| Fase | Foco | Plazo | Prioridad |
-|---|---|---:|---:|
-| F1 — Endurecer seguridad | Auditar SECURITY DEFINER, rotar secretos, RLS por dominio | 2 sem | P0 |
-| F2 — Job runner robusto | Mover syncs pesados —catastro, instalaciones, PJUD— a workers async con retry/idempotencia | 3 sem | P0 |
-| F3 — Modularización frontend | Extraer ProjectMap en submódulos: layers, tools, inspectors; separar dominios deals/certification | 4 sem | P1 |
-| F4 — Fusion Score 3D + IA | Sprint disruptivo: cross-section, AI target generator, geofísica a profundidad | 4 sem | P1 |
-| F5 — SaaS multi-tenant | Tenant management central, feature flags por plan, límites de consumo | 3 sem | P1 |
-| F6 — Observabilidad | Request-id end-to-end, dashboards por tenant, SLOs y runbooks | 2 sem | P2 |
-| F7 — Go-to-market | Onboarding reproducible, demos verticales para junior miners y exploración avanzada | Continuo | P2 |
+| Fase                         | Foco                                                                                              |    Plazo | Prioridad |
+| ---------------------------- | ------------------------------------------------------------------------------------------------- | -------: | --------: |
+| F1 — Endurecer seguridad     | Auditar SECURITY DEFINER, rotar secretos, RLS por dominio                                         |    2 sem |        P0 |
+| F2 — Job runner robusto      | Mover syncs pesados —catastro, instalaciones, PJUD— a workers async con retry/idempotencia        |    3 sem |        P0 |
+| F3 — Modularización frontend | Extraer ProjectMap en submódulos: layers, tools, inspectors; separar dominios deals/certification |    4 sem |        P1 |
+| F4 — Fusion Score 3D + IA    | Sprint disruptivo: cross-section, AI target generator, geofísica a profundidad                    |    4 sem |        P1 |
+| F5 — SaaS multi-tenant       | Tenant management central, feature flags por plan, límites de consumo                             |    3 sem |        P1 |
+| F6 — Observabilidad          | Request-id end-to-end, dashboards por tenant, SLOs y runbooks                                     |    2 sem |        P2 |
+| F7 — Go-to-market            | Onboarding reproducible, demos verticales para junior miners y exploración avanzada               | Continuo |        P2 |
 
 ---
 
@@ -134,13 +134,13 @@ Chat con memoria de proyecto, citando evidencia y exportando briefs PDF.
 
 ## 8. KPIs de éxito a 6 meses
 
-| Categoría | KPI objetivo |
-|---|---|
-| Confiabilidad | Job success rate > 99%; p95 endpoints críticos < 800 ms |
-| Cobertura datos | 100% de concesiones activas Chile sincronizadas diariamente |
-| Adopción | ≥ 10 tenants activos con > 5 proyectos cada uno |
-| Producto | ≥ 3 reportes NI 43-101 emitidos íntegramente desde la plataforma |
-| IA | ≥ 70% de targets aceptados por geólogos competentes vs. generados por GeoCopilot |
+| Categoría       | KPI objetivo                                                                     |
+| --------------- | -------------------------------------------------------------------------------- |
+| Confiabilidad   | Job success rate > 99%; p95 endpoints críticos < 800 ms                          |
+| Cobertura datos | 100% de concesiones activas Chile sincronizadas diariamente                      |
+| Adopción        | ≥ 10 tenants activos con > 5 proyectos cada uno                                  |
+| Producto        | ≥ 3 reportes NI 43-101 emitidos íntegramente desde la plataforma                 |
+| IA              | ≥ 70% de targets aceptados por geólogos competentes vs. generados por GeoCopilot |
 
 ---
 

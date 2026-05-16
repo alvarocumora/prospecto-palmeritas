@@ -23,7 +23,13 @@ export function StatusDot({
   label?: string;
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 font-mono text-[10px]", COLORS[status], className)}>
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 font-mono text-[10px]",
+        COLORS[status],
+        className,
+      )}
+    >
       <span
         className={cn(
           "inline-block w-1.5 h-1.5 rounded-full bg-current",

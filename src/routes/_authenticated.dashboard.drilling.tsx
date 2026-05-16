@@ -17,12 +17,7 @@ import { computeIntercepts, bestIntercept, formatIntercept } from "@/lib/drillin
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drilling")({
   head: () => ({ meta: [{ title: "Sondajes — Geocapitals" }] }),
@@ -50,12 +45,18 @@ function DrillingModule() {
 
   const filtered = useMemo(
     () => (filter === "all" ? data : data.filter((h) => h.status === filter)),
-    [data, filter]
+    [data, filter],
   );
 
   const stats = useMemo(() => {
-    let plannedM = 0, drilledM = 0;
-    const byStatus: Record<string, number> = { proposed: 0, in_progress: 0, completed: 0, abandoned: 0 };
+    let plannedM = 0,
+      drilledM = 0;
+    const byStatus: Record<string, number> = {
+      proposed: 0,
+      in_progress: 0,
+      completed: 0,
+      abandoned: 0,
+    };
     for (const h of data) {
       plannedM += Number(h.planned_depth ?? 0);
       drilledM += Number(h.actual_depth ?? 0);
@@ -66,7 +67,9 @@ function DrillingModule() {
   }, [data]);
 
   if (!active) {
-    return <div className="p-6 text-text-secondary">Selecciona un proyecto para ver sus sondajes.</div>;
+    return (
+      <div className="p-6 text-text-secondary">Selecciona un proyecto para ver sus sondajes.</div>
+    );
   }
 
   const onDelete = async (h: DrillHole) => {
@@ -101,10 +104,25 @@ function DrillingModule() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-6 gap-2">
         <Stat label="Total" value={String(stats.total)} />
-        <Stat label="Propuestos" value={String(stats.byStatus.proposed)} color={STATUS_COLORS.proposed} />
-        <Stat label="En curso" value={String(stats.byStatus.in_progress)} color={STATUS_COLORS.in_progress} />
-        <Stat label="Completados" value={String(stats.byStatus.completed)} color={STATUS_COLORS.completed} />
-        <Stat label="Avance" value={`${stats.drilledM.toFixed(0)}/${stats.plannedM.toFixed(0)} m`} />
+        <Stat
+          label="Propuestos"
+          value={String(stats.byStatus.proposed)}
+          color={STATUS_COLORS.proposed}
+        />
+        <Stat
+          label="En curso"
+          value={String(stats.byStatus.in_progress)}
+          color={STATUS_COLORS.in_progress}
+        />
+        <Stat
+          label="Completados"
+          value={String(stats.byStatus.completed)}
+          color={STATUS_COLORS.completed}
+        />
+        <Stat
+          label="Avance"
+          value={`${stats.drilledM.toFixed(0)}/${stats.plannedM.toFixed(0)} m`}
+        />
         <Stat label="% global" value={`${stats.pct}%`} color="#0d9488" />
       </div>
 
@@ -131,7 +149,9 @@ function DrillingModule() {
           <div className="p-6 text-center text-text-secondary text-sm">Cargando…</div>
         ) : filtered.length === 0 ? (
           <div className="p-6 text-center text-text-secondary text-sm">
-            {data.length === 0 ? "Sin sondajes todavía. Crea el primero." : "Sin resultados con ese filtro."}
+            {data.length === 0
+              ? "Sin sondajes todavía. Crea el primero."
+              : "Sin resultados con ese filtro."}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -155,7 +175,10 @@ function DrillingModule() {
                   const pct = progressPct(h);
                   const color = STATUS_COLORS[h.status] ?? "#64748b";
                   return (
-                    <tr key={h.id} className="border-b border-border last:border-0 hover:bg-accent/30">
+                    <tr
+                      key={h.id}
+                      className="border-b border-border last:border-0 hover:bg-accent/30"
+                    >
                       <Td>
                         <span className="font-mono font-medium">{h.hole_id}</span>
                       </Td>
@@ -186,7 +209,9 @@ function DrillingModule() {
                               style={{ width: `${pct}%`, background: color }}
                             />
                           </div>
-                          <span className="text-[10px] text-text-secondary w-8 text-right">{pct}%</span>
+                          <span className="text-[10px] text-text-secondary w-8 text-right">
+                            {pct}%
+                          </span>
                         </div>
                       </Td>
                       <Td>
@@ -239,8 +264,15 @@ function DrillingModule() {
           projectId={active.id}
           userId={user.id}
           initial={editing}
-          onClose={() => { setCreating(false); setEditing(null); }}
-          onSaved={() => { refresh(); setCreating(false); setEditing(null); }}
+          onClose={() => {
+            setCreating(false);
+            setEditing(null);
+          }}
+          onSaved={() => {
+            refresh();
+            setCreating(false);
+            setEditing(null);
+          }}
         />
       )}
 
@@ -249,7 +281,10 @@ function DrillingModule() {
           hole={logHole}
           projectId={active.id}
           userId={user.id}
-          onClose={() => { setLogHole(null); refreshLogs(); }}
+          onClose={() => {
+            setLogHole(null);
+            refreshLogs();
+          }}
         />
       )}
     </div>
@@ -260,13 +295,19 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="border border-border rounded p-2.5 bg-bg-secondary/30">
       <div className="text-[10px] uppercase tracking-wider text-text-secondary">{label}</div>
-      <div className="text-lg font-semibold" style={color ? { color } : undefined}>{value}</div>
+      <div className="text-lg font-semibold" style={color ? { color } : undefined}>
+        {value}
+      </div>
     </div>
   );
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px] whitespace-nowrap">{children}</th>;
+  return (
+    <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px] whitespace-nowrap">
+      {children}
+    </th>
+  );
 }
 function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-2.5 py-1.5 whitespace-nowrap">{children}</td>;
@@ -344,54 +385,137 @@ function HoleDialog({
         </DialogHeader>
         <div className="grid grid-cols-2 gap-3">
           <Field label="ID Sondaje" required>
-            <input className={inp} placeholder="ALH-DDH-001" value={form.hole_id} onChange={(e) => setForm({ ...form, hole_id: e.target.value })} />
+            <input
+              className={inp}
+              placeholder="ALH-DDH-001"
+              value={form.hole_id}
+              onChange={(e) => setForm({ ...form, hole_id: e.target.value })}
+            />
           </Field>
           <Field label="Zona objetivo">
-            <input className={inp} value={form.target_zone} onChange={(e) => setForm({ ...form, target_zone: e.target.value })} />
+            <input
+              className={inp}
+              value={form.target_zone}
+              onChange={(e) => setForm({ ...form, target_zone: e.target.value })}
+            />
           </Field>
           <Field label="Estado">
-            <select className={inp} value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
-              {HOLE_STATUSES.map((s) => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
+            <select
+              className={inp}
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+            >
+              {HOLE_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {STATUS_LABELS[s]}
+                </option>
+              ))}
             </select>
           </Field>
           <div />
           <Field label="Easting">
-            <input type="number" step="0.01" className={inp} value={form.easting} onChange={(e) => setForm({ ...form, easting: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.easting}
+              onChange={(e) => setForm({ ...form, easting: e.target.value })}
+            />
           </Field>
           <Field label="Northing">
-            <input type="number" step="0.01" className={inp} value={form.northing} onChange={(e) => setForm({ ...form, northing: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.northing}
+              onChange={(e) => setForm({ ...form, northing: e.target.value })}
+            />
           </Field>
           <Field label="Elevación (m)">
-            <input type="number" step="0.01" className={inp} value={form.elevation} onChange={(e) => setForm({ ...form, elevation: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.elevation}
+              onChange={(e) => setForm({ ...form, elevation: e.target.value })}
+            />
           </Field>
           <Field label="Azimut (°)">
-            <input type="number" step="0.1" className={inp} value={form.azimuth} onChange={(e) => setForm({ ...form, azimuth: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.azimuth}
+              onChange={(e) => setForm({ ...form, azimuth: e.target.value })}
+            />
           </Field>
           <Field label="Dip (°)">
-            <input type="number" step="0.1" className={inp} value={form.dip} onChange={(e) => setForm({ ...form, dip: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.dip}
+              onChange={(e) => setForm({ ...form, dip: e.target.value })}
+            />
           </Field>
           <div />
           <Field label="Profundidad planificada (m)">
-            <input type="number" step="0.01" className={inp} value={form.planned_depth} onChange={(e) => setForm({ ...form, planned_depth: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.planned_depth}
+              onChange={(e) => setForm({ ...form, planned_depth: e.target.value })}
+            />
           </Field>
           <Field label="Profundidad real (m)">
-            <input type="number" step="0.01" className={inp} value={form.actual_depth} onChange={(e) => setForm({ ...form, actual_depth: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.actual_depth}
+              onChange={(e) => setForm({ ...form, actual_depth: e.target.value })}
+            />
           </Field>
           <Field label="Fecha inicio">
-            <input type="date" className={inp} value={form.started_at} onChange={(e) => setForm({ ...form, started_at: e.target.value })} />
+            <input
+              type="date"
+              className={inp}
+              value={form.started_at}
+              onChange={(e) => setForm({ ...form, started_at: e.target.value })}
+            />
           </Field>
           <Field label="Fecha fin">
-            <input type="date" className={inp} value={form.completed_at} onChange={(e) => setForm({ ...form, completed_at: e.target.value })} />
+            <input
+              type="date"
+              className={inp}
+              value={form.completed_at}
+              onChange={(e) => setForm({ ...form, completed_at: e.target.value })}
+            />
           </Field>
           <div className="col-span-2">
             <Field label="Notas">
-              <textarea rows={2} className={inp} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              <textarea
+                rows={2}
+                className={inp}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
             </Field>
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm rounded border border-border hover:bg-accent">Cancelar</button>
-          <button onClick={onSave} disabled={saving} className="px-3 py-1.5 text-sm rounded bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 text-sm rounded border border-border hover:bg-accent"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="px-3 py-1.5 text-sm rounded bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
             {saving ? "Guardando…" : "Guardar"}
           </button>
         </div>
@@ -400,13 +524,23 @@ function HoleDialog({
   );
 }
 
-const inp = "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
+const inp =
+  "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <label className="block text-[10px] uppercase tracking-wider text-text-secondary mb-1">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       {children}
     </div>

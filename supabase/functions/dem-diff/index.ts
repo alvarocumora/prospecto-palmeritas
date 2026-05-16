@@ -32,7 +32,9 @@ async function loadDsm(sb: ReturnType<typeof createClient>, rasterId: string) {
   if (error || !row) throw new Error(`raster ${rasterId} not found`);
   if (!row.storage_path) throw new Error(`raster ${row.name} has no storage file`);
 
-  const { data: signed } = await sb.storage.from("drone-rasters").createSignedUrl(row.storage_path, 60);
+  const { data: signed } = await sb.storage
+    .from("drone-rasters")
+    .createSignedUrl(row.storage_path, 60);
   if (!signed) throw new Error("signed-url failed");
 
   const res = await fetch(signed.signedUrl);
@@ -47,7 +49,13 @@ async function loadDsm(sb: ReturnType<typeof createClient>, rasterId: string) {
   return { width, height, bbox, raster: data[0] as Float32Array | number[], row };
 }
 
-function sample(raster: Float32Array | number[], width: number, height: number, fx: number, fy: number): number | null {
+function sample(
+  raster: Float32Array | number[],
+  width: number,
+  height: number,
+  fx: number,
+  fy: number,
+): number | null {
   // fx,fy in [0,1] — nearest neighbour
   const px = Math.min(width - 1, Math.max(0, Math.floor(fx * width)));
   const py = Math.min(height - 1, Math.max(0, Math.floor(fy * height)));
@@ -73,7 +81,10 @@ Deno.serve(async (req) => {
     const { projectId, name, rasterBeforeId, rasterAfterId, notes } = (await req.json()) as Payload;
     if (!projectId || !rasterBeforeId || !rasterAfterId || !name) throw new Error("Missing fields");
 
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const sb = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new Error("Missing x-user-id header");
@@ -127,7 +138,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (cells === 0) throw new Error("No overlapping valid cells (rasters may be in different CRS)");
+    if (cells === 0)
+      throw new Error("No overlapping valid cells (rasters may be in different CRS)");
 
     const result = {
       project_id: projectId,
@@ -147,7 +159,11 @@ Deno.serve(async (req) => {
       created_by: userId,
     };
 
-    const { data: row, error: insErr } = await sb.from("dem_diffs").insert(result).select().single();
+    const { data: row, error: insErr } = await sb
+      .from("dem_diffs")
+      .insert(result)
+      .select()
+      .single();
     if (insErr) throw new Error(`insert: ${insErr.message}`);
 
     return new Response(JSON.stringify({ ok: true, diff: row }), {

@@ -57,8 +57,10 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
-      if (openProj && projRef.current && !projRef.current.contains(e.target as Node)) setOpenProj(false);
-      if (openUser && userRef.current && !userRef.current.contains(e.target as Node)) setOpenUser(false);
+      if (openProj && projRef.current && !projRef.current.contains(e.target as Node))
+        setOpenProj(false);
+      if (openUser && userRef.current && !userRef.current.contains(e.target as Node))
+        setOpenUser(false);
     };
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
@@ -96,40 +98,57 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             onClick={() => setOpenProj((v) => !v)}
             className={cn(
               "flex items-center gap-1.5 h-7 px-2 rounded-[2px] border bg-bg-elevated transition-colors font-mono text-[11px]",
-              openProj ? "border-signal-cyan text-signal-cyan" : "border-border hover:border-border-hot",
+              openProj
+                ? "border-signal-cyan text-signal-cyan"
+                : "border-border hover:border-border-hot",
             )}
             aria-haspopup="listbox"
             aria-expanded={openProj}
           >
-            <span className="hidden sm:inline text-text-dim text-[9px] uppercase tracking-wider">Project</span>
-            <span className="text-foreground tabular-nums truncate max-w-[90px] sm:max-w-[140px]">
-              {loading ? "…" : active?.code ?? "—"}
+            <span className="hidden sm:inline text-text-dim text-[9px] uppercase tracking-wider">
+              Project
             </span>
-            <ChevronDown className={cn("w-3 h-3 text-text-dim transition-transform", openProj && "rotate-180")} />
+            <span className="text-foreground tabular-nums truncate max-w-[90px] sm:max-w-[140px]">
+              {loading ? "…" : (active?.code ?? "—")}
+            </span>
+            <ChevronDown
+              className={cn("w-3 h-3 text-text-dim transition-transform", openProj && "rotate-180")}
+            />
           </button>
           {openProj && (
             <div className="absolute left-0 top-full mt-1 w-72 ops-panel-hot rounded-[3px] shadow-2xl max-h-80 overflow-y-auto z-50">
               {projects.length === 0 && (
-                <div className="px-3 py-2 text-[11px] font-mono text-text-dim">[ NO PROJECTS · CREATE ONE ]</div>
+                <div className="px-3 py-2 text-[11px] font-mono text-text-dim">
+                  [ NO PROJECTS · CREATE ONE ]
+                </div>
               )}
               {projects.map((p) => (
                 <button
                   key={p.id}
                   type="button"
-                  onClick={() => { setActiveId(p.id); setOpenProj(false); }}
+                  onClick={() => {
+                    setActiveId(p.id);
+                    setOpenProj(false);
+                  }}
                   className={cn(
                     "w-full text-left px-3 py-1.5 font-mono text-[11px] border-b border-border/40 last:border-b-0 hover:bg-bg-elevated transition-colors flex items-baseline gap-2",
-                    p.id === active?.id && "bg-bg-elevated text-signal-cyan border-l-2 border-l-signal-cyan",
+                    p.id === active?.id &&
+                      "bg-bg-elevated text-signal-cyan border-l-2 border-l-signal-cyan",
                   )}
                 >
-                  <span className="text-text-dim text-[9px] uppercase w-12 shrink-0 tabular-nums">{p.code}</span>
+                  <span className="text-text-dim text-[9px] uppercase w-12 shrink-0 tabular-nums">
+                    {p.code}
+                  </span>
                   <span className="truncate flex-1">{p.name}</span>
                   <span className="text-[9px] text-text-dim uppercase">{p.role}</span>
                 </button>
               ))}
               <button
                 type="button"
-                onClick={() => { setOpenProj(false); navigate({ to: "/dashboard/projects" }); }}
+                onClick={() => {
+                  setOpenProj(false);
+                  navigate({ to: "/dashboard/projects" });
+                }}
                 className="w-full text-left px-3 py-1.5 font-mono text-[11px] text-signal-cyan hover:bg-bg-elevated inline-flex items-center gap-1.5 border-t border-border"
               >
                 <Plus className="w-3 h-3" /> NEW PROJECT
@@ -140,7 +159,9 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
         <div className="hidden sm:flex items-center gap-1.5 font-mono text-[10px] min-w-0">
           <span className="text-text-dim/50">/</span>
-          <span className="text-text-mono uppercase tracking-wider truncate">{breadcrumb(location.pathname)}</span>
+          <span className="text-text-mono uppercase tracking-wider truncate">
+            {breadcrumb(location.pathname)}
+          </span>
         </div>
       </div>
 
@@ -175,7 +196,12 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
               <span className="w-5 h-5 rounded-[2px] bg-signal-cyan/15 text-signal-cyan inline-flex items-center justify-center text-[10px] font-bold border border-signal-cyan/30">
                 {initial}
               </span>
-              <ChevronDown className={cn("w-3 h-3 text-text-dim transition-transform", openUser && "rotate-180")} />
+              <ChevronDown
+                className={cn(
+                  "w-3 h-3 text-text-dim transition-transform",
+                  openUser && "rotate-180",
+                )}
+              />
             </button>
             {openUser && (
               <div className="absolute right-0 top-full mt-1 w-56 ops-panel-hot rounded-[3px] shadow-2xl z-50 overflow-hidden">
@@ -187,14 +213,21 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                 </div>
                 <button
                   type="button"
-                  onClick={() => { setOpenUser(false); navigate({ to: "/dashboard/profile" }); }}
+                  onClick={() => {
+                    setOpenUser(false);
+                    navigate({ to: "/dashboard/profile" });
+                  }}
                   className="w-full text-left px-3 py-1.5 text-[11px] font-mono text-text-mono hover:bg-bg-elevated inline-flex items-center gap-2"
                 >
                   <UserCircle className="w-3.5 h-3.5" /> Mi perfil
                 </button>
                 <button
                   type="button"
-                  onClick={async () => { setOpenUser(false); await signOut(); navigate({ to: "/" }); }}
+                  onClick={async () => {
+                    setOpenUser(false);
+                    await signOut();
+                    navigate({ to: "/" });
+                  }}
                   className="w-full text-left px-3 py-1.5 text-[11px] font-mono text-signal-red/90 hover:bg-bg-elevated inline-flex items-center gap-2 border-t border-border"
                 >
                   <LogOut className="w-3.5 h-3.5" /> Cerrar sesión

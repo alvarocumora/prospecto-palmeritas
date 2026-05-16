@@ -4,19 +4,15 @@ import { useDrillCoreLogs, type DrillCoreLog, type DrillHole } from "@/hooks/use
 import { StripLog } from "./StripLog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   computeIntercepts,
   DEFAULT_AU_CUTOFF,
   DEFAULT_INTERNAL_DILUTION_M,
 } from "@/lib/drilling/intercepts";
 
-const inp = "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
+const inp =
+  "w-full px-2 py-1.5 text-sm bg-bg-secondary border border-border rounded focus:outline-none focus:ring-1 focus:ring-primary";
 
 export function CoreLogPanel({
   hole,
@@ -49,7 +45,7 @@ export function CoreLogPanel({
 
   const intercepts = useMemo(
     () => computeIntercepts(logs, cutoff, dilution),
-    [logs, cutoff, dilution]
+    [logs, cutoff, dilution],
   );
 
   const overlaps = useMemo(() => {
@@ -66,7 +62,7 @@ export function CoreLogPanel({
 
   const totalLogged = useMemo(
     () => logs.reduce((acc, l) => acc + (l.depth_to - l.depth_from), 0),
-    [logs]
+    [logs],
   );
 
   const onDelete = async (l: DrillCoreLog) => {
@@ -91,10 +87,25 @@ export function CoreLogPanel({
         </DialogHeader>
 
         <div className="flex flex-wrap gap-3 text-xs text-text-secondary border-b border-border pb-2">
-          <span>Zona: <strong className="text-foreground">{hole.target_zone ?? "—"}</strong></span>
-          <span>Profundidad: <strong className="text-foreground">{hole.actual_depth ?? "—"}/{hole.planned_depth ?? "—"} m</strong></span>
-          <span>Az/Dip: <strong className="text-foreground">{hole.azimuth ?? "—"}°/{hole.dip ?? "—"}°</strong></span>
-          <span>Logueado: <strong className="text-foreground">{totalLogged.toFixed(2)} m</strong> en {logs.length} intervalos</span>
+          <span>
+            Zona: <strong className="text-foreground">{hole.target_zone ?? "—"}</strong>
+          </span>
+          <span>
+            Profundidad:{" "}
+            <strong className="text-foreground">
+              {hole.actual_depth ?? "—"}/{hole.planned_depth ?? "—"} m
+            </strong>
+          </span>
+          <span>
+            Az/Dip:{" "}
+            <strong className="text-foreground">
+              {hole.azimuth ?? "—"}°/{hole.dip ?? "—"}°
+            </strong>
+          </span>
+          <span>
+            Logueado: <strong className="text-foreground">{totalLogged.toFixed(2)} m</strong> en{" "}
+            {logs.length} intervalos
+          </span>
         </div>
 
         {/* Intercepts mineralizados */}
@@ -103,9 +114,7 @@ export function CoreLogPanel({
             <div className="flex items-center gap-2 text-sm font-semibold">
               <Sparkles className="w-4 h-4 text-amber-500" />
               Intercepts mineralizados
-              <span className="text-xs font-normal text-text-secondary">
-                ({intercepts.length})
-              </span>
+              <span className="text-xs font-normal text-text-secondary">({intercepts.length})</span>
             </div>
             <div className="flex items-center gap-2 text-[11px]">
               <label className="flex items-center gap-1">
@@ -155,9 +164,7 @@ export function CoreLogPanel({
                       <td className="px-2 py-1 font-mono">
                         {it.from.toFixed(2)}–{it.to.toFixed(2)}
                       </td>
-                      <td className="px-2 py-1 font-mono font-semibold">
-                        {it.length.toFixed(2)}
-                      </td>
+                      <td className="px-2 py-1 font-mono font-semibold">{it.length.toFixed(2)}</td>
                       <td className="px-2 py-1 font-mono font-bold text-amber-600">
                         {it.au_gpt != null ? it.au_gpt.toFixed(3) : "—"}
                       </td>
@@ -212,7 +219,9 @@ export function CoreLogPanel({
             {loading ? (
               <div className="p-6 text-center text-text-secondary text-sm">Cargando…</div>
             ) : logs.length === 0 ? (
-              <div className="p-6 text-center text-text-secondary text-sm">Sin intervalos. Agrega el primero.</div>
+              <div className="p-6 text-center text-text-secondary text-sm">
+                Sin intervalos. Agrega el primero.
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
@@ -251,17 +260,19 @@ export function CoreLogPanel({
                             flashId === l.id
                               ? "bg-primary/20 outline outline-2 outline-primary"
                               : hoveredId === l.id
-                              ? "bg-primary/10 outline outline-1 outline-primary"
-                              : isOverlap
-                              ? "bg-amber-500/5 hover:bg-accent/30"
-                              : "hover:bg-accent/30"
+                                ? "bg-primary/10 outline outline-1 outline-primary"
+                                : isOverlap
+                                  ? "bg-amber-500/5 hover:bg-accent/30"
+                                  : "hover:bg-accent/30"
                           }`}
                         >
                           <Td>
                             <span className="font-mono">
                               {l.depth_from}–{l.depth_to}
                             </span>
-                            <span className="text-text-secondary ml-1">({(l.depth_to - l.depth_from).toFixed(2)})</span>
+                            <span className="text-text-secondary ml-1">
+                              ({(l.depth_to - l.depth_from).toFixed(2)})
+                            </span>
                           </Td>
                           <Td>{l.lithology ?? "—"}</Td>
                           <Td>{l.alteration ?? "—"}</Td>
@@ -333,7 +344,11 @@ export function CoreLogPanel({
 }
 
 function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-2 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px] whitespace-nowrap">{children}</th>;
+  return (
+    <th className="px-2 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px] whitespace-nowrap">
+      {children}
+    </th>
+  );
 }
 function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-2 py-1.5 whitespace-nowrap">{children}</td>;
@@ -422,53 +437,137 @@ function CoreLogDialog({
         </DialogHeader>
         <div className="grid grid-cols-3 gap-3">
           <Field label="Desde (m)" required>
-            <input type="number" step="0.01" className={inp} value={form.depth_from} onChange={(e) => setForm({ ...form, depth_from: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.depth_from}
+              onChange={(e) => setForm({ ...form, depth_from: e.target.value })}
+            />
           </Field>
           <Field label="Hasta (m)" required>
-            <input type="number" step="0.01" className={inp} value={form.depth_to} onChange={(e) => setForm({ ...form, depth_to: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.depth_to}
+              onChange={(e) => setForm({ ...form, depth_to: e.target.value })}
+            />
           </Field>
           <Field label="Litología">
-            <input className={inp} value={form.lithology} onChange={(e) => setForm({ ...form, lithology: e.target.value })} />
+            <input
+              className={inp}
+              value={form.lithology}
+              onChange={(e) => setForm({ ...form, lithology: e.target.value })}
+            />
           </Field>
           <Field label="Alteración">
-            <input className={inp} value={form.alteration} onChange={(e) => setForm({ ...form, alteration: e.target.value })} />
+            <input
+              className={inp}
+              value={form.alteration}
+              onChange={(e) => setForm({ ...form, alteration: e.target.value })}
+            />
           </Field>
           <Field label="Mineralización">
-            <input className={inp} value={form.mineralization} onChange={(e) => setForm({ ...form, mineralization: e.target.value })} />
+            <input
+              className={inp}
+              value={form.mineralization}
+              onChange={(e) => setForm({ ...form, mineralization: e.target.value })}
+            />
           </Field>
           <Field label="Estructura">
-            <input className={inp} value={form.structure} onChange={(e) => setForm({ ...form, structure: e.target.value })} />
+            <input
+              className={inp}
+              value={form.structure}
+              onChange={(e) => setForm({ ...form, structure: e.target.value })}
+            />
           </Field>
           <Field label="RQD %">
-            <input type="number" step="0.1" className={inp} value={form.rqd_pct} onChange={(e) => setForm({ ...form, rqd_pct: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.rqd_pct}
+              onChange={(e) => setForm({ ...form, rqd_pct: e.target.value })}
+            />
           </Field>
           <Field label="Recovery %">
-            <input type="number" step="0.1" className={inp} value={form.recovery_pct} onChange={(e) => setForm({ ...form, recovery_pct: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.recovery_pct}
+              onChange={(e) => setForm({ ...form, recovery_pct: e.target.value })}
+            />
           </Field>
           <Field label="Veta %">
-            <input type="number" step="0.1" className={inp} value={form.vein_pct} onChange={(e) => setForm({ ...form, vein_pct: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.vein_pct}
+              onChange={(e) => setForm({ ...form, vein_pct: e.target.value })}
+            />
           </Field>
           <Field label="Sulfuros %">
-            <input type="number" step="0.1" className={inp} value={form.sulfide_pct} onChange={(e) => setForm({ ...form, sulfide_pct: e.target.value })} />
+            <input
+              type="number"
+              step="0.1"
+              className={inp}
+              value={form.sulfide_pct}
+              onChange={(e) => setForm({ ...form, sulfide_pct: e.target.value })}
+            />
           </Field>
           <Field label="Au (g/t)">
-            <input type="number" step="0.001" className={inp} value={form.au_gpt} onChange={(e) => setForm({ ...form, au_gpt: e.target.value })} />
+            <input
+              type="number"
+              step="0.001"
+              className={inp}
+              value={form.au_gpt}
+              onChange={(e) => setForm({ ...form, au_gpt: e.target.value })}
+            />
           </Field>
           <Field label="Cu (%)">
-            <input type="number" step="0.001" className={inp} value={form.cu_pct} onChange={(e) => setForm({ ...form, cu_pct: e.target.value })} />
+            <input
+              type="number"
+              step="0.001"
+              className={inp}
+              value={form.cu_pct}
+              onChange={(e) => setForm({ ...form, cu_pct: e.target.value })}
+            />
           </Field>
           <Field label="Ag (g/t)">
-            <input type="number" step="0.01" className={inp} value={form.ag_gpt} onChange={(e) => setForm({ ...form, ag_gpt: e.target.value })} />
+            <input
+              type="number"
+              step="0.01"
+              className={inp}
+              value={form.ag_gpt}
+              onChange={(e) => setForm({ ...form, ag_gpt: e.target.value })}
+            />
           </Field>
           <div className="col-span-3">
             <Field label="Notas">
-              <textarea rows={2} className={inp} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+              <textarea
+                rows={2}
+                className={inp}
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              />
             </Field>
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-3 py-1.5 text-sm rounded border border-border hover:bg-accent">Cancelar</button>
-          <button onClick={onSave} disabled={saving} className="px-3 py-1.5 text-sm rounded bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50">
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 text-sm rounded border border-border hover:bg-accent"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="px-3 py-1.5 text-sm rounded bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
+          >
             {saving ? "Guardando…" : "Guardar"}
           </button>
         </div>
@@ -477,11 +576,20 @@ function CoreLogDialog({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <label className="block text-[10px] uppercase tracking-wider text-text-secondary mb-1">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       {children}
     </div>

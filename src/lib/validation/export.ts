@@ -39,15 +39,17 @@ export function exportValidationCsv(report: ValidationReport, projectName: strin
   sections.push("");
 
   sections.push("## Resumen");
-  sections.push(toCsv([
-    ["metric", "value"],
-    ["tablas_ok", report.totals.ok],
-    ["tablas_vacias", report.totals.empty],
-    ["warnings", report.totals.warn],
-    ["errores", report.totals.error],
-    ["filas_totales", report.totals.rows],
-    ["inconsistencias", report.inconsistencies.length],
-  ]));
+  sections.push(
+    toCsv([
+      ["metric", "value"],
+      ["tablas_ok", report.totals.ok],
+      ["tablas_vacias", report.totals.empty],
+      ["warnings", report.totals.warn],
+      ["errores", report.totals.error],
+      ["filas_totales", report.totals.rows],
+      ["inconsistencias", report.inconsistencies.length],
+    ]),
+  );
   sections.push("");
 
   sections.push("## Tablas");
@@ -76,14 +78,7 @@ export function exportValidationCsv(report: ValidationReport, projectName: strin
     ["severidad", "categoria", "tabla", "regla", "filas_afectadas", "detalle"],
   ];
   for (const i of report.inconsistencies) {
-    incRows.push([
-      i.severity,
-      i.category ?? "",
-      i.table,
-      i.rule,
-      i.count,
-      i.detail,
-    ]);
+    incRows.push([i.severity, i.category ?? "", i.table, i.rule, i.count, i.detail]);
   }
   sections.push(toCsv(incRows));
 
@@ -112,7 +107,11 @@ export function exportValidationPdf(report: ValidationReport, projectName: strin
     { label: "Vacías", value: totals.empty, color: [148, 163, 184] as [number, number, number] },
     { label: "Warnings", value: totals.warn, color: [245, 158, 11] as [number, number, number] },
     { label: "Errores", value: totals.error, color: [239, 68, 68] as [number, number, number] },
-    { label: "Filas totales", value: totals.rows.toLocaleString(), color: [6, 182, 212] as [number, number, number] },
+    {
+      label: "Filas totales",
+      value: totals.rows.toLocaleString(),
+      color: [6, 182, 212] as [number, number, number],
+    },
   ];
 
   const boxW = (pageWidth - 80 - 4 * 8) / 5;
@@ -187,7 +186,10 @@ export function exportValidationPdf(report: ValidationReport, projectName: strin
   }
 
   // Tables grouped
-  if (cursorY > 700) { doc.addPage(); cursorY = 50; }
+  if (cursorY > 700) {
+    doc.addPage();
+    cursorY = 50;
+  }
   doc.setFontSize(12);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(0);
@@ -196,7 +198,11 @@ export function exportValidationPdf(report: ValidationReport, projectName: strin
   const tableBody = report.tables.map((t) => {
     const sync = report.lastSync[t.table];
     const delta = sync
-      ? sync.delta === 0 ? "±0" : sync.delta > 0 ? `+${sync.delta}` : String(sync.delta)
+      ? sync.delta === 0
+        ? "±0"
+        : sync.delta > 0
+          ? `+${sync.delta}`
+          : String(sync.delta)
       : "—";
     return [
       t.group,

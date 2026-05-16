@@ -97,7 +97,11 @@ Sé específico con números (metros, leyes, ángulos). Si la sección no tiene 
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: "Eres un geólogo de exploración senior, especialista en sistemas epitermales y orogénicos de Au-Cu. Escribes interpretaciones técnicas claras, accionables y honestas sobre incertidumbres." },
+          {
+            role: "system",
+            content:
+              "Eres un geólogo de exploración senior, especialista en sistemas epitermales y orogénicos de Au-Cu. Escribes interpretaciones técnicas claras, accionables y honestas sobre incertidumbres.",
+          },
           { role: "user", content: prompt },
         ],
       }),
@@ -105,17 +109,24 @@ Sé específico con números (metros, leyes, ángulos). Si la sección no tiene 
 
     if (!aiRes.ok) {
       if (aiRes.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limit excedido. Intenta en unos segundos." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(
+          JSON.stringify({ error: "Rate limit excedido. Intenta en unos segundos." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
       }
       if (aiRes.status === 402) {
-        return new Response(JSON.stringify({ error: "Sin créditos en Lovable AI workspace." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Sin créditos en Lovable AI workspace." }), {
+          status: 402,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
       const txt = await aiRes.text();
       throw new Error(`AI gateway ${aiRes.status}: ${txt}`);
     }
 
     const data = await aiRes.json();
-    const interpretation: string = data.choices?.[0]?.message?.content ?? "Sin respuesta del modelo.";
+    const interpretation: string =
+      data.choices?.[0]?.message?.content ?? "Sin respuesta del modelo.";
 
     return new Response(
       JSON.stringify({

@@ -3,7 +3,20 @@ import { useCompliance, type ComplianceStandard, type EvalStatus } from "@/hooks
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { ChevronDown, ChevronRight, RefreshCw, CheckCircle2, AlertTriangle, XCircle, Circle, Minus, Paperclip, Lock, ShieldCheck, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronRight,
+  RefreshCw,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Circle,
+  Minus,
+  Paperclip,
+  Lock,
+  ShieldCheck,
+  ExternalLink,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EvidenceDrawer } from "./EvidenceDrawer";
 
@@ -29,15 +42,21 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
   const c = useCompliance(reportId);
   const [filter, setFilter] = useState<"all" | "fails" | "mandatory">("all");
   const [openSections, setOpenSections] = useState<Set<number>>(new Set());
-  const [evidenceTarget, setEvidenceTarget] = useState<{ ruleId: string; ruleCode: string; title: string } | null>(null);
+  const [evidenceTarget, setEvidenceTarget] = useState<{
+    ruleId: string;
+    ruleCode: string;
+    title: string;
+  } | null>(null);
 
   const toggleSection = (n: number) => {
     const next = new Set(openSections);
-    if (next.has(n)) next.delete(n); else next.add(n);
+    if (next.has(n)) next.delete(n);
+    else next.add(n);
     setOpenSections(next);
   };
 
-  if (c.loading) return <div className="p-6 text-sm text-muted-foreground">Cargando matriz de compliance…</div>;
+  if (c.loading)
+    return <div className="p-6 text-sm text-muted-foreground">Cargando matriz de compliance…</div>;
 
   // Agrupa por (standard, section_no)
   const filtered = c.rules.filter((r) => {
@@ -109,16 +128,25 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
         {c.activeStandards.map((std) => {
           const s = c.scoreByStandard[std];
           if (!s) return null;
-          const color = s.score >= c.threshold ? "text-emerald-500" : s.score >= 70 ? "text-amber-500" : "text-rose-500";
+          const color =
+            s.score >= c.threshold
+              ? "text-emerald-500"
+              : s.score >= 70
+                ? "text-amber-500"
+                : "text-rose-500";
           return (
             <div key={std} className="rounded-lg border border-border bg-card p-3">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono text-muted-foreground">{STANDARD_LABELS[std]}</span>
+                <span className="text-xs font-mono text-muted-foreground">
+                  {STANDARD_LABELS[std]}
+                </span>
                 <span className={cn("text-2xl font-bold tabular-nums", color)}>{s.score}%</span>
               </div>
               <Progress value={s.score} className="h-1.5" />
               <div className="mt-2 text-[10px] font-mono text-muted-foreground flex justify-between">
-                <span>Obligatorios {s.mandatory_pass}/{s.mandatory_total}</span>
+                <span>
+                  Obligatorios {s.mandatory_pass}/{s.mandatory_total}
+                </span>
                 <span>{s.rules_total} ítems</span>
               </div>
             </div>
@@ -133,14 +161,17 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
           <div className="flex-1 text-xs">
             <div className="font-semibold text-rose-400">Firma bloqueada</div>
             <div className="text-muted-foreground mt-0.5">
-              Compliance global {c.globalScore}% &lt; umbral {c.threshold}%. Cierra los ítems obligatorios pendientes para habilitar la firma.
+              Compliance global {c.globalScore}% &lt; umbral {c.threshold}%. Cierra los ítems
+              obligatorios pendientes para habilitar la firma.
             </div>
           </div>
         </div>
       ) : (
         <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/10 p-3 flex items-center gap-3">
           <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-          <div className="text-xs font-semibold text-emerald-400">Compliance OK · {c.globalScore}% — Firma habilitada</div>
+          <div className="text-xs font-semibold text-emerald-400">
+            Compliance OK · {c.globalScore}% — Firma habilitada
+          </div>
         </div>
       )}
 
@@ -152,7 +183,9 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
             onClick={() => setFilter(f)}
             className={cn(
               "px-2.5 py-1 rounded-md font-mono",
-              filter === f ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80",
+              filter === f
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80",
             )}
           >
             {f === "all" ? "Todos" : f === "mandatory" ? "Solo obligatorios" : "Solo fallas"}
@@ -177,12 +210,20 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
                 onClick={() => toggleSection(sectionNo)}
                 className="w-full px-3 py-2 flex items-center gap-2 hover:bg-muted/30 text-left"
               >
-                {expanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                <Badge variant="outline" className="font-mono text-[10px]">{STANDARD_LABELS[std as ComplianceStandard]}</Badge>
+                {expanded ? (
+                  <ChevronDown className="w-3.5 h-3.5" />
+                ) : (
+                  <ChevronRight className="w-3.5 h-3.5" />
+                )}
+                <Badge variant="outline" className="font-mono text-[10px]">
+                  {STANDARD_LABELS[std as ComplianceStandard]}
+                </Badge>
                 <span className="text-xs font-mono">§{sectionNo}</span>
                 <span className="text-xs text-muted-foreground">· {rls.length} ítems</span>
                 {failures > 0 && (
-                  <Badge variant="destructive" className="ml-auto text-[10px]">{failures} pendientes</Badge>
+                  <Badge variant="destructive" className="ml-auto text-[10px]">
+                    {failures} pendientes
+                  </Badge>
                 )}
               </button>
               {expanded && (
@@ -198,18 +239,31 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
                           <meta.Icon className={cn("w-4 h-4 shrink-0 mt-0.5", meta.color)} />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[10px] font-mono text-muted-foreground">{rule.rule_code}</span>
+                              <span className="text-[10px] font-mono text-muted-foreground">
+                                {rule.rule_code}
+                              </span>
                               {rule.severity === "mandatory" && (
-                                <Badge variant="outline" className="text-[9px] h-4 border-rose-500/40 text-rose-400">obligatorio</Badge>
+                                <Badge
+                                  variant="outline"
+                                  className="text-[9px] h-4 border-rose-500/40 text-rose-400"
+                                >
+                                  obligatorio
+                                </Badge>
                               )}
                               {rule.severity === "recommended" && (
-                                <Badge variant="outline" className="text-[9px] h-4">recomendado</Badge>
+                                <Badge variant="outline" className="text-[9px] h-4">
+                                  recomendado
+                                </Badge>
                               )}
-                              <Badge variant="secondary" className="text-[9px] h-4">{rule.evaluator_type}</Badge>
+                              <Badge variant="secondary" className="text-[9px] h-4">
+                                {rule.evaluator_type}
+                              </Badge>
                             </div>
                             <div className="text-sm font-medium mt-0.5">{rule.title}</div>
                             {rule.description && (
-                              <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{rule.description}</div>
+                              <div className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                                {rule.description}
+                              </div>
                             )}
                             {ev?.evaluator_notes && (
                               <div className="text-[11px] font-mono text-muted-foreground/80 mt-1 italic">
@@ -218,7 +272,13 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
                             )}
                             <div className="flex items-center gap-2 mt-2">
                               <button
-                                onClick={() => setEvidenceTarget({ ruleId: rule.id, ruleCode: rule.rule_code, title: rule.title })}
+                                onClick={() =>
+                                  setEvidenceTarget({
+                                    ruleId: rule.id,
+                                    ruleCode: rule.rule_code,
+                                    title: rule.title,
+                                  })
+                                }
                                 className="text-[11px] font-mono inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border hover:bg-muted"
                               >
                                 <Paperclip className="w-3 h-3" /> Evidencia ({evCount})
@@ -228,23 +288,36 @@ export function ComplianceMatrix({ reportId }: { reportId: string }) {
                                   <button
                                     onClick={() => c.markManual(rule.id, "pass")}
                                     className="text-[11px] font-mono px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
-                                  >Pass</button>
+                                  >
+                                    Pass
+                                  </button>
                                   <button
                                     onClick={() => c.markManual(rule.id, "warn")}
                                     className="text-[11px] font-mono px-2 py-0.5 rounded border border-amber-500/30 text-amber-400 hover:bg-amber-500/10"
-                                  >Warn</button>
+                                  >
+                                    Warn
+                                  </button>
                                   <button
                                     onClick={() => c.markManual(rule.id, "fail")}
                                     className="text-[11px] font-mono px-2 py-0.5 rounded border border-rose-500/30 text-rose-400 hover:bg-rose-500/10"
-                                  >Fail</button>
+                                  >
+                                    Fail
+                                  </button>
                                   <button
                                     onClick={() => c.markManual(rule.id, "na")}
                                     className="text-[11px] font-mono px-2 py-0.5 rounded border border-border text-muted-foreground hover:bg-muted"
-                                  >N/A</button>
+                                  >
+                                    N/A
+                                  </button>
                                 </>
                               )}
                               {rule.reference_url && (
-                                <a href={rule.reference_url} target="_blank" rel="noreferrer" className="text-[11px] font-mono inline-flex items-center gap-1 ml-auto text-sky-400 hover:underline">
+                                <a
+                                  href={rule.reference_url}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                  className="text-[11px] font-mono inline-flex items-center gap-1 ml-auto text-sky-400 hover:underline"
+                                >
                                   Ref <ExternalLink className="w-3 h-3" />
                                 </a>
                               )}

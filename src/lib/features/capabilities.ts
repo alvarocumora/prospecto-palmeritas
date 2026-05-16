@@ -1,6 +1,11 @@
 import { evaluateFeatureFlag, listEnabledFeatures } from "./featureFlags";
 import { evaluateAllUsageLimits } from "@/lib/usage/limits";
-import type { FeatureFlagContext, FeatureFlagDecision, FeatureFlagKey, PlanId } from "@/types/featureFlags";
+import type {
+  FeatureFlagContext,
+  FeatureFlagDecision,
+  FeatureFlagKey,
+  PlanId,
+} from "@/types/featureFlags";
 import type { UsageLimitContext, UsageLimitDecision, UsageSnapshot } from "@/types/usage";
 
 export type SaaSCapabilityContext = {
@@ -36,7 +41,10 @@ export function buildCapabilitySnapshot(context: SaaSCapabilityContext): SaaSCap
     plan: context.plan,
     enabledFeatures: listEnabledFeatures(featureContext),
     featureDecisions: Object.fromEntries(
-      CORE_GEOCAPITAL_FEATURES.map((feature) => [feature, evaluateFeatureFlag(feature, featureContext)])
+      CORE_GEOCAPITAL_FEATURES.map((feature) => [
+        feature,
+        evaluateFeatureFlag(feature, featureContext),
+      ]),
     ) as Record<FeatureFlagKey, FeatureFlagDecision>,
     usageDecisions: evaluateAllUsageLimits({
       plan: context.plan,

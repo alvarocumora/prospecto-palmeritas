@@ -55,11 +55,9 @@ type EnrichedRow = {
 function enrichRows(
   featuresByOrigen: Record<CatastroOrigen, AnyFC["features"]>,
   aoi: AoiPolygon | null,
-  centerLngLat: [number, number]
+  centerLngLat: [number, number],
 ): EnrichedRow[] {
-  const aoiCentroidPt = aoi
-    ? centroid(aoi)
-    : point([centerLngLat[0], centerLngLat[1]]);
+  const aoiCentroidPt = aoi ? centroid(aoi) : point([centerLngLat[0], centerLngLat[1]]);
 
   const rows: EnrichedRow[] = [];
   for (const origen of ORIGEN_ORDER) {
@@ -96,7 +94,7 @@ function enrichRows(
 
 export function exportCatastroPdf(
   featuresByOrigen: Record<CatastroOrigen, AnyFC["features"]>,
-  meta: { center: [number, number]; halfKm: number; aoi: AoiPolygon | null }
+  meta: { center: [number, number]; halfKm: number; aoi: AoiPolygon | null },
 ) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -116,12 +114,12 @@ export function exportCatastroPdf(
   doc.text(
     `Centroide AOI: ${meta.center[0].toFixed(5)}, ${meta.center[1].toFixed(5)} · Radio bbox: ${meta.halfKm} km · Generado: ${now}`,
     40,
-    56
+    56,
   );
   doc.text(
     "Fuente: SERNAGEOMIN Catastro Minero (FeatureServer WGS84_Concesion, ID_SITUACION_CONCESION in 1,3). Distancias y intersección AOI calculadas con turf.js.",
     40,
-    70
+    70,
   );
 
   let cursorY = 90;
@@ -175,9 +173,7 @@ export function exportCatastroPdf(
     doc.text(`${style.label} (${feats.length})`, 56, cursorY);
     cursorY += 6;
 
-    const rows = allRows
-      .filter((r) => r.origen === origen)
-      .sort((a, b) => a.distKm - b.distKm);
+    const rows = allRows.filter((r) => r.origen === origen).sort((a, b) => a.distKm - b.distKm);
 
     autoTable(doc, {
       startY: cursorY,
@@ -210,12 +206,9 @@ export function exportCatastroPdf(
         const page = doc.getNumberOfPages();
         doc.setFontSize(8);
         doc.setTextColor(140);
-        doc.text(
-          `Prospecto Palmeras · pertenencias · pág. ${page}`,
-          pageW - 40,
-          pageH - 16,
-          { align: "right" }
-        );
+        doc.text(`Prospecto Palmeras · pertenencias · pág. ${page}`, pageW - 40, pageH - 16, {
+          align: "right",
+        });
       },
     });
 
@@ -234,7 +227,7 @@ export function exportCatastroPdf(
 /** Returns set of feature IDs (keyed by NUMERO_ROL-DV) that intersect AOI, used to highlight on the map. */
 export function computeAoiIntersections(
   featuresByOrigen: Record<CatastroOrigen, AnyFC["features"]>,
-  aoi: AoiPolygon | null
+  aoi: AoiPolygon | null,
 ): Set<string> {
   if (!aoi) return new Set();
   const out = new Set<string>();

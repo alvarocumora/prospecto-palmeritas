@@ -11,7 +11,11 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Iniciar sesión — Geocapitals" },
-      { name: "description", content: "Plataforma para exploración minera moderna. Catastro, geofísica, sondajes y muestreo." },
+      {
+        name: "description",
+        content:
+          "Plataforma para exploración minera moderna. Catastro, geofísica, sondajes y muestreo.",
+      },
     ],
   }),
   component: AuthPage,
@@ -139,12 +143,11 @@ function AuthPage() {
               Plataforma de exploración minera
             </p>
             <h1 className="text-4xl font-bold leading-tight text-foreground max-w-md">
-              Del afloramiento al{" "}
-              <span className="text-gold">target perforable</span>.
+              Del afloramiento al <span className="text-gold">target perforable</span>.
             </h1>
             <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Catastro SERNAGEOMIN, geofísica, sondajes, muestreo y QA/QC en una
-              sola plataforma diseñada por geólogos.
+              Catastro SERNAGEOMIN, geofísica, sondajes, muestreo y QA/QC en una sola plataforma
+              diseñada por geólogos.
             </p>
           </div>
 

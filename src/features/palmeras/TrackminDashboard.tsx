@@ -102,7 +102,15 @@ function Card({
   );
 }
 
-function SectionTitle({ icon: Icon, children, sub }: { icon?: typeof Activity; children: React.ReactNode; sub?: string }) {
+function SectionTitle({
+  icon: Icon,
+  children,
+  sub,
+}: {
+  icon?: typeof Activity;
+  children: React.ReactNode;
+  sub?: string;
+}) {
   return (
     <div className="flex items-end justify-between mb-4">
       <div className="flex items-center gap-3">
@@ -163,7 +171,9 @@ function TopNav({
       <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-8">
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-xl font-bold text-gold tracking-tight">TRACKMIN</span>
-          <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">GeoIntel</span>
+          <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+            GeoIntel
+          </span>
         </div>
 
         <nav className="flex items-center gap-1 flex-1 overflow-x-auto">
@@ -222,19 +232,37 @@ function Overview() {
   ];
 
   const phases = [
-    { n: 1, range: "Meses 1–2", title: "Muestreo superficial", desc: "chip + canal + grab", active: true },
+    {
+      n: 1,
+      range: "Meses 1–2",
+      title: "Muestreo superficial",
+      desc: "chip + canal + grab",
+      active: true,
+    },
     { n: 2, range: "Meses 3–4", title: "Geofísica IP", desc: "lineamientos + targets drill" },
     { n: 3, range: "Meses 5–8", title: "Sondajes DDH", desc: "4 perforaciones 1,030 m" },
     { n: 4, range: "Meses 9–12", title: "Análisis + reporte", desc: "estimación recursos 43-101" },
   ];
 
   const alerts = [
-    { tone: "alert", level: "INMEDIATA", text: "Chip sampling veta aflorante — sin costo análisis aún" },
-    { tone: "alert", level: "INMEDIATA", text: "Canal sampling labores antiguas — geometría pendiente" },
+    {
+      tone: "alert",
+      level: "INMEDIATA",
+      text: "Chip sampling veta aflorante — sin costo análisis aún",
+    },
+    {
+      tone: "alert",
+      level: "INMEDIATA",
+      text: "Canal sampling labores antiguas — geometría pendiente",
+    },
     { tone: "gold", level: "ALTA", text: "Verificar concesiones SERNAGEOMIN — Portal Geomin" },
     { tone: "gold", level: "ALTA", text: "Notificar CMN — labores prehispánicas en predio" },
     { tone: "teal", level: "MEDIA", text: "Contratar geólogo QP para supervisión DDH" },
-    { tone: "teal", level: "MEDIA", text: "Cotizar laboratorio certificado ISO 17025 (ALS / Bureau Veritas)" },
+    {
+      tone: "teal",
+      level: "MEDIA",
+      text: "Cotizar laboratorio certificado ISO 17025 (ALS / Bureau Veritas)",
+    },
   ] as const;
 
   return (
@@ -252,8 +280,8 @@ function Overview() {
           </h1>
           <p className="mt-3 font-mono text-sm text-gold-light">{PROJECT.coords} · WGS84</p>
           <p className="mt-4 text-sm text-muted-foreground max-w-3xl">
-            {PROJECT.location} · Operador: <span className="text-foreground">{PROJECT.operator}</span> · Inicio:{" "}
-            {PROJECT.created}
+            {PROJECT.location} · Operador:{" "}
+            <span className="text-foreground">{PROJECT.operator}</span> · Inicio: {PROJECT.created}
           </p>
         </div>
       </div>
@@ -262,7 +290,9 @@ function Overview() {
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {metrics.map((m, i) => (
           <Card key={m.label} delay={i * 100} className="p-4" accent="gold">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-2">{m.label}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-2">
+              {m.label}
+            </div>
             <div className="font-mono text-2xl text-foreground font-semibold">{m.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{m.sub}</div>
           </Card>
@@ -308,9 +338,13 @@ function Overview() {
                 key={i}
                 className="flex items-start gap-3 p-3 rounded border border-border bg-bg-secondary card-hover"
               >
-                <StatusDot tone={a.tone === "alert" ? "alert" : a.tone === "gold" ? "gold" : "teal"} />
+                <StatusDot
+                  tone={a.tone === "alert" ? "alert" : a.tone === "gold" ? "gold" : "teal"}
+                />
                 <div className="flex-1">
-                  <div className="font-mono text-[10px] uppercase tracking-widest text-hint">{a.level}</div>
+                  <div className="font-mono text-[10px] uppercase tracking-widest text-hint">
+                    {a.level}
+                  </div>
                   <div className="text-sm text-foreground">{a.text}</div>
                 </div>
               </li>
@@ -352,7 +386,14 @@ function CrossSection() {
         {[0, 75, 150, 225, 300].map((d, i) => (
           <g key={d}>
             <line x1="36" y1={30 + i * 60} x2="40" y2={30 + i * 60} stroke="var(--hint)" />
-            <text x="32" y={34 + i * 60} fontSize="9" fill="var(--muted-foreground)" textAnchor="end" fontFamily="monospace">
+            <text
+              x="32"
+              y={34 + i * 60}
+              fontSize="9"
+              fill="var(--muted-foreground)"
+              textAnchor="end"
+              fontFamily="monospace"
+            >
               {d}m
             </text>
           </g>
@@ -361,11 +402,25 @@ function CrossSection() {
         {/* layers */}
         {layers.map((l) => (
           <g key={l.label}>
-            <rect x="50" y={l.y} width="220" height={l.h} fill={l.color} fillOpacity="0.25" stroke={l.color} />
+            <rect
+              x="50"
+              y={l.y}
+              width="220"
+              height={l.h}
+              fill={l.color}
+              fillOpacity="0.25"
+              stroke={l.color}
+            />
             <text x="60" y={l.y + 16} fontSize="10" fill="var(--foreground)" fontFamily="monospace">
               {l.label}
             </text>
-            <text x="60" y={l.y + 28} fontSize="9" fill="var(--muted-foreground)" fontFamily="monospace">
+            <text
+              x="60"
+              y={l.y + 28}
+              fontSize="9"
+              fill="var(--muted-foreground)"
+              fontFamily="monospace"
+            >
               {l.depth}
             </text>
           </g>
@@ -378,7 +433,15 @@ function CrossSection() {
         </text>
 
         {/* drill hole */}
-        <line x1="290" y1="30" x2="340" y2="240" stroke="var(--alert)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <line
+          x1="290"
+          y1="30"
+          x2="340"
+          y2="240"
+          stroke="var(--alert)"
+          strokeWidth="1.5"
+          strokeDasharray="3 3"
+        />
         <text x="300" y="25" fontSize="9" fill="var(--alert)" fontFamily="monospace">
           DDH-001
         </text>
@@ -417,17 +480,20 @@ function Geology() {
   if (error || !data) {
     return (
       <div className="space-y-6">
-      <Card className="p-6" accent="copper">
-        <SectionTitle icon={Mountain}>Error al cargar geología</SectionTitle>
-        <p className="text-sm text-muted-foreground">{error ?? "No se pudieron obtener los datos."}</p>
-      </Card>
+        <Card className="p-6" accent="copper">
+          <SectionTitle icon={Mountain}>Error al cargar geología</SectionTitle>
+          <p className="text-sm text-muted-foreground">
+            {error ?? "No se pudieron obtener los datos."}
+          </p>
+        </Card>
       </div>
     );
   }
 
   const stagePrimary = (m: { paragenetic_stage: string | null; category: string | null }) =>
     m.category === "ore" && (m.paragenetic_stage === "main" || m.paragenetic_stage === "early");
-  const stageSupergene = (m: { paragenetic_stage: string | null }) => m.paragenetic_stage === "supergene";
+  const stageSupergene = (m: { paragenetic_stage: string | null }) =>
+    m.paragenetic_stage === "supergene";
 
   const groupedMinerals: Record<string, typeof data.minerals> = {
     PRIMARIOS: data.minerals.filter(stagePrimary),
@@ -446,10 +512,11 @@ function Geology() {
           Geología Regional
         </SectionTitle>
         <p className="text-sm text-foreground/90 leading-relaxed max-w-4xl">
-          La <span className="text-gold">Formación Lo Valle</span> (Cretácico Superior, ~90–75 Ma) constituye un
-          metalotecto reconocido a lo largo de la Cordillera de la Costa entre los 32–36°S, hospedando sistemas
-          epitermales–mesotermales de Au–Cu de baja a intermedia sulfidación. La intersección con intrusivos
-          granodioríticos del Cretácico tardío–Paleoceno define los principales distritos productivos.
+          La <span className="text-gold">Formación Lo Valle</span> (Cretácico Superior, ~90–75 Ma)
+          constituye un metalotecto reconocido a lo largo de la Cordillera de la Costa entre los
+          32–36°S, hospedando sistemas epitermales–mesotermales de Au–Cu de baja a intermedia
+          sulfidación. La intersección con intrusivos granodioríticos del Cretácico tardío–Paleoceno
+          define los principales distritos productivos.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="font-mono text-[10px] uppercase tracking-widest text-hint mr-2 self-center">
@@ -479,7 +546,10 @@ function Geology() {
             <thead>
               <tr className="text-left border-b border-border">
                 {["Unidad", "Edad", "Litología", "Descripción"].map((h) => (
-                  <th key={h} className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint">
+                  <th
+                    key={h}
+                    className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint"
+                  >
                     {h}
                   </th>
                 ))}
@@ -556,8 +626,8 @@ function Geology() {
             ))}
           </ul>
           <div className="mt-4 p-3 rounded border border-border bg-bg-secondary text-xs text-muted-foreground">
-            <span className="font-mono text-hint uppercase tracking-wider">Diagnóstico:</span> fluidos
-            150–300°C, origen magmático-meteórico.
+            <span className="font-mono text-hint uppercase tracking-wider">Diagnóstico:</span>{" "}
+            fluidos 150–300°C, origen magmático-meteórico.
           </div>
         </Card>
       </div>
@@ -797,11 +867,16 @@ function Sampling() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-border">
-                {["Tipo", "Zona objetivo", "Espaciado", "Analítica", "Prioridad", "Status"].map((h) => (
-                  <th key={h} className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint">
-                    {h}
-                  </th>
-                ))}
+                {["Tipo", "Zona objetivo", "Espaciado", "Analítica", "Prioridad", "Status"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody>
@@ -811,7 +886,9 @@ function Sampling() {
                   <td className="py-3 px-3 text-muted-foreground">{row[1]}</td>
                   <td className="py-3 px-3 font-mono text-gold-light">{row[2]}</td>
                   <td className="py-3 px-3 text-foreground/90">{row[3]}</td>
-                  <td className="py-3 px-3"><Badge tone={tone(row[4])}>{row[4]}</Badge></td>
+                  <td className="py-3 px-3">
+                    <Badge tone={tone(row[4])}>{row[4]}</Badge>
+                  </td>
                   <td className="py-3 px-3">
                     <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground font-mono">
                       <span className="w-3 h-3 border border-hint inline-block" /> Pendiente
@@ -829,17 +906,25 @@ function Sampling() {
         <SectionTitle icon={CheckCircle2}>QA / QC</SectionTitle>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="rounded border border-border bg-bg-secondary p-4">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">Protocolo</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">
+              Protocolo
+            </div>
             <div className="text-sm text-foreground">
               1 blanco + 1 estándar certificado + 1 duplicado / cada 20 muestras
             </div>
           </div>
           <div className="rounded border border-border bg-bg-secondary p-4">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">Laboratorio</div>
-            <div className="text-sm text-foreground">ALS Geochemistry (Santiago) · Bureau Veritas Chile</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">
+              Laboratorio
+            </div>
+            <div className="text-sm text-foreground">
+              ALS Geochemistry (Santiago) · Bureau Veritas Chile
+            </div>
           </div>
           <div className="rounded border border-border bg-bg-secondary p-4">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">Certificación</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-1">
+              Certificación
+            </div>
             <div className="text-sm text-foreground">ISO/IEC 17025</div>
           </div>
         </div>
@@ -854,18 +939,54 @@ function Sampling() {
           </button>
         </div>
         <p className="text-sm text-muted-foreground mb-4">
-          Sin resultados disponibles. Los ensayes se cargarán aquí una vez completado el muestreo superficial.
+          Sin resultados disponibles. Los ensayes se cargarán aquí una vez completado el muestreo
+          superficial.
         </p>
         <div className="h-64 rounded border border-dashed border-border bg-bg-secondary p-4">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={[
-              { n: 1, au: 0 }, { n: 2, au: 0 }, { n: 3, au: 0 }, { n: 4, au: 0 },
-              { n: 5, au: 0 }, { n: 6, au: 0 }, { n: 7, au: 0 }, { n: 8, au: 0 },
-            ]}>
+            <LineChart
+              data={[
+                { n: 1, au: 0 },
+                { n: 2, au: 0 },
+                { n: 3, au: 0 },
+                { n: 4, au: 0 },
+                { n: 5, au: 0 },
+                { n: 6, au: 0 },
+                { n: 7, au: 0 },
+                { n: 8, au: 0 },
+              ]}
+            >
               <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-              <XAxis dataKey="n" stroke="var(--hint)" fontSize={10} label={{ value: "Sample #", position: "insideBottom", offset: -2, fill: "var(--hint)", fontSize: 10 }} />
-              <YAxis stroke="var(--hint)" fontSize={10} label={{ value: "Au g/t", angle: -90, position: "insideLeft", fill: "var(--hint)", fontSize: 10 }} />
-              <Line type="monotone" dataKey="au" stroke="var(--gold)" strokeDasharray="4 4" dot={false} />
+              <XAxis
+                dataKey="n"
+                stroke="var(--hint)"
+                fontSize={10}
+                label={{
+                  value: "Sample #",
+                  position: "insideBottom",
+                  offset: -2,
+                  fill: "var(--hint)",
+                  fontSize: 10,
+                }}
+              />
+              <YAxis
+                stroke="var(--hint)"
+                fontSize={10}
+                label={{
+                  value: "Au g/t",
+                  angle: -90,
+                  position: "insideLeft",
+                  fill: "var(--hint)",
+                  fontSize: 10,
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey="au"
+                stroke="var(--gold)"
+                strokeDasharray="4 4"
+                dot={false}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -904,7 +1025,9 @@ function DrillProgram() {
           { label: "Estado del programa", value: "Conceptual", sub: "Pendiente Fase 3" },
         ].map((m, i) => (
           <Card key={m.label} delay={i * 100} className="p-4" accent="gold">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint">{m.label}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint">
+              {m.label}
+            </div>
             <div className="font-mono text-2xl text-foreground mt-1">{m.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{m.sub}</div>
           </Card>
@@ -920,8 +1043,19 @@ function DrillProgram() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-border">
-                {["Sondaje", "Azimut", "Inclinación", "Prof. Total", "Zona Objetivo", "Estado", "Log"].map((h) => (
-                  <th key={h} className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint">
+                {[
+                  "Sondaje",
+                  "Azimut",
+                  "Inclinación",
+                  "Prof. Total",
+                  "Zona Objetivo",
+                  "Estado",
+                  "Log",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint"
+                  >
                     {h}
                   </th>
                 ))}
@@ -935,7 +1069,9 @@ function DrillProgram() {
                   <td className="py-3 px-3 font-mono text-foreground">{r[2]}</td>
                   <td className="py-3 px-3 font-mono text-gold-light">{r[3]}</td>
                   <td className="py-3 px-3 text-muted-foreground">{r[4]}</td>
-                  <td className="py-3 px-3"><Badge tone="muted">Propuesto</Badge></td>
+                  <td className="py-3 px-3">
+                    <Badge tone="muted">Propuesto</Badge>
+                  </td>
                   <td className="py-3 px-3 text-hint">—</td>
                 </tr>
               ))}
@@ -958,19 +1094,43 @@ function DrillProgram() {
         <Card delay={300} className="p-6" accent="gold">
           <SectionTitle icon={Info}>Especificaciones — Recuperación</SectionTitle>
           <ul className="space-y-2 text-sm text-foreground/90">
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Diámetro:</span> NQ mínimo / HQ recomendado</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Recuperación:</span> &gt;85% por tramo 3m</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Orientación:</span> Reflex ACT III</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Preservación:</span> Foto + descripción antes de corte</li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Diámetro:</span> NQ
+              mínimo / HQ recomendado
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Recuperación:</span>{" "}
+              &gt;85% por tramo 3m
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Orientación:</span>{" "}
+              Reflex ACT III
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Preservación:</span> Foto
+              + descripción antes de corte
+            </li>
           </ul>
         </Card>
         <Card delay={400} className="p-6" accent="copper">
           <SectionTitle icon={Info}>Especificaciones — Análisis</SectionTitle>
           <ul className="space-y-2 text-sm text-foreground/90">
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Corte:</span> Sierra diamante, mitad análisis / mitad archivo</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Muestreo:</span> Tramos geológicos o 1m máx</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">QP supervisor:</span> Pendiente contratación</li>
-            <li><span className="text-hint font-mono text-xs uppercase mr-2">Análisis:</span> Fire Assay + ICP-OES 33E</li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Corte:</span> Sierra
+              diamante, mitad análisis / mitad archivo
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Muestreo:</span> Tramos
+              geológicos o 1m máx
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">QP supervisor:</span>{" "}
+              Pendiente contratación
+            </li>
+            <li>
+              <span className="text-hint font-mono text-xs uppercase mr-2">Análisis:</span> Fire
+              Assay + ICP-OES 33E
+            </li>
           </ul>
         </Card>
       </div>
@@ -995,8 +1155,14 @@ function DrillProgram() {
           {/* legend */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 self-start">
             {lithoLog.map((l) => (
-              <div key={l.name} className="flex items-center gap-3 p-2 rounded border border-border bg-bg-secondary">
-                <span className="w-4 h-4 rounded" style={{ backgroundColor: l.color, opacity: 0.7 }} />
+              <div
+                key={l.name}
+                className="flex items-center gap-3 p-2 rounded border border-border bg-bg-secondary"
+              >
+                <span
+                  className="w-4 h-4 rounded"
+                  style={{ backgroundColor: l.color, opacity: 0.7 }}
+                />
                 <span className="text-sm text-foreground">{l.name}</span>
               </div>
             ))}
@@ -1013,11 +1179,41 @@ function DrillProgram() {
 
 function Budget() {
   const items = [
-    { label: "Sondaje DDH", detail: "1,030 m × $120/m", amount: 123600, pct: 58, color: "var(--gold)" },
-    { label: "Geólogo terreno", detail: "60 días × $350/día", amount: 21000, pct: 10, color: "var(--copper)" },
-    { label: "Muestreo + análisis", detail: "~400 muestras × $65", amount: 26000, pct: 12, color: "var(--teal)" },
-    { label: "Geofísica IP", detail: "15 km × $1,200/km", amount: 18000, pct: 9, color: "var(--info)" },
-    { label: "Cartografía UAV", detail: "1 vuelo", amount: 3500, pct: 2, color: "var(--muted-foreground)" },
+    {
+      label: "Sondaje DDH",
+      detail: "1,030 m × $120/m",
+      amount: 123600,
+      pct: 58,
+      color: "var(--gold)",
+    },
+    {
+      label: "Geólogo terreno",
+      detail: "60 días × $350/día",
+      amount: 21000,
+      pct: 10,
+      color: "var(--copper)",
+    },
+    {
+      label: "Muestreo + análisis",
+      detail: "~400 muestras × $65",
+      amount: 26000,
+      pct: 12,
+      color: "var(--teal)",
+    },
+    {
+      label: "Geofísica IP",
+      detail: "15 km × $1,200/km",
+      amount: 18000,
+      pct: 9,
+      color: "var(--info)",
+    },
+    {
+      label: "Cartografía UAV",
+      detail: "1 vuelo",
+      amount: 3500,
+      pct: 2,
+      color: "var(--muted-foreground)",
+    },
     { label: "Imprevistos 10%", detail: "Buffer", amount: 19210, pct: 9, color: "var(--hint)" },
   ];
   const total = 211310;
@@ -1032,10 +1228,38 @@ function Budget() {
   ];
 
   const timeline = [
-    { phase: "Fase 1", range: "Meses 1–2", title: "Muestreo superficial", start: 0, span: 2, color: "var(--gold)" },
-    { phase: "Fase 2", range: "Meses 3–4", title: "Geofísica IP", start: 2, span: 2, color: "var(--info)" },
-    { phase: "Fase 3", range: "Meses 5–8", title: "Sondajes DDH", start: 4, span: 4, color: "var(--copper)" },
-    { phase: "Fase 4", range: "Meses 9–12", title: "Análisis + reporte", start: 8, span: 4, color: "var(--teal)" },
+    {
+      phase: "Fase 1",
+      range: "Meses 1–2",
+      title: "Muestreo superficial",
+      start: 0,
+      span: 2,
+      color: "var(--gold)",
+    },
+    {
+      phase: "Fase 2",
+      range: "Meses 3–4",
+      title: "Geofísica IP",
+      start: 2,
+      span: 2,
+      color: "var(--info)",
+    },
+    {
+      phase: "Fase 3",
+      range: "Meses 5–8",
+      title: "Sondajes DDH",
+      start: 4,
+      span: 4,
+      color: "var(--copper)",
+    },
+    {
+      phase: "Fase 4",
+      range: "Meses 9–12",
+      title: "Análisis + reporte",
+      start: 8,
+      span: 4,
+      color: "var(--teal)",
+    },
   ];
 
   const regulatory = [
@@ -1059,7 +1283,10 @@ function Budget() {
             <thead>
               <tr className="text-left border-b border-border">
                 {["Ítem", "Detalle", "Monto", "%"].map((h) => (
-                  <th key={h} className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint">
+                  <th
+                    key={h}
+                    className="py-2 px-3 font-mono text-[11px] uppercase tracking-wider text-hint"
+                  >
                     {h}
                   </th>
                 ))}
@@ -1070,19 +1297,26 @@ function Budget() {
                 <tr key={it.label} className="border-b border-border/50 hover:bg-bg-secondary">
                   <td className="py-3 px-3">
                     <div className="flex items-center gap-2">
-                      <span className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: it.color }} />
+                      <span
+                        className="w-2.5 h-2.5 rounded-sm"
+                        style={{ backgroundColor: it.color }}
+                      />
                       <span className="text-foreground">{it.label}</span>
                     </div>
                   </td>
                   <td className="py-3 px-3 text-muted-foreground">{it.detail}</td>
-                  <td className="py-3 px-3 font-mono text-gold-light">${it.amount.toLocaleString()}</td>
+                  <td className="py-3 px-3 font-mono text-gold-light">
+                    ${it.amount.toLocaleString()}
+                  </td>
                   <td className="py-3 px-3 font-mono text-foreground">{it.pct}%</td>
                 </tr>
               ))}
               <tr className="bg-bg-secondary border-t-2 border-gold/30">
                 <td className="py-3 px-3 font-mono text-foreground font-bold">TOTAL</td>
                 <td className="py-3 px-3 text-hint">—</td>
-                <td className="py-3 px-3 font-mono text-gold font-bold">${total.toLocaleString()}</td>
+                <td className="py-3 px-3 font-mono text-gold font-bold">
+                  ${total.toLocaleString()}
+                </td>
                 <td className="py-3 px-3 font-mono text-foreground font-bold">100%</td>
               </tr>
             </tbody>
@@ -1150,7 +1384,9 @@ function Budget() {
           {/* month axis */}
           <div className="grid grid-cols-12 gap-1 font-mono text-[10px] text-hint pl-40">
             {Array.from({ length: 12 }, (_, i) => (
-              <div key={i} className="text-center">M{i + 1}</div>
+              <div key={i} className="text-center">
+                M{i + 1}
+              </div>
             ))}
           </div>
           {timeline.map((t) => (

@@ -25,7 +25,11 @@ export interface MapAnnotation {
   updated_at: string;
 }
 
-export const ANNOTATION_PRIORITIES: { value: "low" | "medium" | "high"; label: string; hex: string }[] = [
+export const ANNOTATION_PRIORITIES: {
+  value: "low" | "medium" | "high";
+  label: string;
+  hex: string;
+}[] = [
   { value: "low", label: "Baja", hex: "#64748B" },
   { value: "medium", label: "Media", hex: "#D4A24C" },
   { value: "high", label: "Alta", hex: "#E11D48" },
@@ -88,7 +92,12 @@ export function useMapAnnotations(projectId: string | null) {
       .channel(`map-annotations-${projectId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "map_annotations", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "map_annotations",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => fetchAnnotations(),
       )
       .subscribe();
@@ -99,9 +108,14 @@ export function useMapAnnotations(projectId: string | null) {
 
   const createAnnotation = useCallback(
     async (input: {
-      lat: number; lng: number; text: string; color?: string;
+      lat: number;
+      lng: number;
+      text: string;
+      color?: string;
       priority?: "low" | "medium" | "high";
-      target_id?: string | null; campaign_id?: string | null; phase?: string | null;
+      target_id?: string | null;
+      campaign_id?: string | null;
+      phase?: string | null;
     }) => {
       if (!projectId) return null;
       const { data: u } = await supabase.auth.getUser();
@@ -139,13 +153,35 @@ export function useMapAnnotations(projectId: string | null) {
   const updateAnnotation = useCallback(
     async (
       id: string,
-      patch: Partial<Pick<MapAnnotation, "text" | "color" | "resolved" | "lat" | "lng" | "target_id" | "campaign_id" | "phase" | "priority" | "resolved_reason">>,
+      patch: Partial<
+        Pick<
+          MapAnnotation,
+          | "text"
+          | "color"
+          | "resolved"
+          | "lat"
+          | "lng"
+          | "target_id"
+          | "campaign_id"
+          | "phase"
+          | "priority"
+          | "resolved_reason"
+        >
+      >,
     ) => {
       const next: {
-        text?: string; color?: string; resolved?: boolean; lat?: number; lng?: number;
-        target_id?: string | null; campaign_id?: string | null; phase?: string | null;
-        priority?: "low" | "medium" | "high"; resolved_reason?: string | null;
-        resolved_by?: string | null; resolved_at?: string | null;
+        text?: string;
+        color?: string;
+        resolved?: boolean;
+        lat?: number;
+        lng?: number;
+        target_id?: string | null;
+        campaign_id?: string | null;
+        phase?: string | null;
+        priority?: "low" | "medium" | "high";
+        resolved_reason?: string | null;
+        resolved_by?: string | null;
+        resolved_at?: string | null;
       } = { ...patch };
       if (Object.prototype.hasOwnProperty.call(patch, "resolved")) {
         if (patch.resolved) {
@@ -175,5 +211,12 @@ export function useMapAnnotations(projectId: string | null) {
     toast.success("Nota eliminada");
   }, []);
 
-  return { annotations, loading, createAnnotation, updateAnnotation, deleteAnnotation, refresh: fetchAnnotations };
+  return {
+    annotations,
+    loading,
+    createAnnotation,
+    updateAnnotation,
+    deleteAnnotation,
+    refresh: fetchAnnotations,
+  };
 }

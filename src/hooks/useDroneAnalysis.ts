@@ -46,18 +46,33 @@ export function useDroneAnalysis(projectId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setDiffs([]); setStockpiles([]); setLoading(false); return; }
+    if (!projectId) {
+      setDiffs([]);
+      setStockpiles([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const [d, s] = await Promise.all([
-      supabase.from("dem_diffs").select("*").eq("project_id", projectId).order("created_at", { ascending: false }),
-      supabase.from("stockpile_volumes").select("*").eq("project_id", projectId).order("created_at", { ascending: false }),
+      supabase
+        .from("dem_diffs")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("stockpile_volumes")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("created_at", { ascending: false }),
     ]);
     setDiffs((d.data ?? []) as unknown as DemDiff[]);
     setStockpiles((s.data ?? []) as unknown as StockpileVolume[]);
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { diffs, stockpiles, loading, refresh };
 }
@@ -81,7 +96,8 @@ export async function runDemDiff(opts: {
     headers: { "x-user-id": opts.userId },
   });
   if (error) return { data: null, error: error.message };
-  if ((data as { error?: string })?.error) return { data: null, error: (data as { error: string }).error };
+  if ((data as { error?: string })?.error)
+    return { data: null, error: (data as { error: string }).error };
   return { data: (data as { diff: DemDiff }).diff, error: null };
 }
 
@@ -110,7 +126,8 @@ export async function runStockpileVolume(opts: {
     headers: { "x-user-id": opts.userId },
   });
   if (error) return { data: null, error: error.message };
-  if ((data as { error?: string })?.error) return { data: null, error: (data as { error: string }).error };
+  if ((data as { error?: string })?.error)
+    return { data: null, error: (data as { error: string }).error };
   return { data: (data as { stockpile: StockpileVolume }).stockpile, error: null };
 }
 

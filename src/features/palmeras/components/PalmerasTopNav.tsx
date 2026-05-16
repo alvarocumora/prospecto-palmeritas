@@ -17,7 +17,9 @@ export function PalmerasTopNav({ active, setActive, onExport, exporting }: Palme
       <div className="max-w-[1400px] mx-auto px-6 py-3 flex items-center gap-8">
         <div className="flex items-baseline gap-2">
           <span className="font-mono text-xl font-bold text-gold tracking-tight">TRACKMIN</span>
-          <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">GeoIntel</span>
+          <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+            GeoIntel
+          </span>
         </div>
 
         <nav className="flex items-center gap-1 flex-1 overflow-x-auto">

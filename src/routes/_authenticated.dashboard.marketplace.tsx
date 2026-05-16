@@ -58,7 +58,10 @@ function MarketplacePage() {
     });
     if (error) toast.error(error.message);
     else {
-      await supabase.from("shared_layers").update({ downloads_count: layer.downloads_count + 1 }).eq("id", layer.id);
+      await supabase
+        .from("shared_layers")
+        .update({ downloads_count: layer.downloads_count + 1 })
+        .eq("id", layer.id);
       toast.success(`"${layer.name}" instalada en ${active.name}`);
     }
     setInstalling(null);
@@ -67,7 +70,9 @@ function MarketplacePage() {
   return (
     <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
       <header className="mb-6">
-        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Datos compartidos</div>
+        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+          Datos compartidos
+        </div>
         <h1 className="text-xl md:text-2xl font-bold mt-1">Marketplace de Capas</h1>
         <p className="text-xs text-muted-foreground mt-1">
           Instala capas públicas (geología regional, fallas, hidrografía) en tu proyecto activo.
@@ -84,32 +89,49 @@ function MarketplacePage() {
                 <Layers className="w-5 h-5 text-gold shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="font-mono font-semibold text-sm">{l.name}</div>
-                  <div className="text-[10px] font-mono uppercase text-muted-foreground mt-0.5">{l.category ?? "—"}</div>
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground mt-0.5">
+                    {l.category ?? "—"}
+                  </div>
                 </div>
               </div>
-              {l.description && <p className="mt-2 text-xs text-muted-foreground">{l.description}</p>}
+              {l.description && (
+                <p className="mt-2 text-xs text-muted-foreground">{l.description}</p>
+              )}
               {l.tags && l.tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {l.tags.map((t) => (
-                    <span key={t} className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-background border border-border">{t}</span>
+                    <span
+                      key={t}
+                      className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-background border border-border"
+                    >
+                      {t}
+                    </span>
                   ))}
                 </div>
               )}
               <div className="mt-3 flex items-center justify-between">
-                <span className="text-[10px] font-mono text-muted-foreground">{l.downloads_count} instalaciones</span>
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {l.downloads_count} instalaciones
+                </span>
                 <button
                   onClick={() => install(l)}
                   disabled={!active || installing === l.id}
                   className="px-2.5 py-1 rounded bg-gold text-bg-secondary text-xs font-mono font-semibold disabled:opacity-50 inline-flex items-center gap-1"
                 >
-                  {installing === l.id ? <Loader2 className="w-3 h-3 animate-spin" /> : <Download className="w-3 h-3" />}
+                  {installing === l.id ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <Download className="w-3 h-3" />
+                  )}
                   Instalar
                 </button>
               </div>
             </div>
           ))}
           {layers.length === 0 && (
-            <div className="md:col-span-2 text-center text-xs text-muted-foreground py-8 font-mono">No hay capas disponibles aún.</div>
+            <div className="md:col-span-2 text-center text-xs text-muted-foreground py-8 font-mono">
+              No hay capas disponibles aún.
+            </div>
           )}
         </div>
       )}

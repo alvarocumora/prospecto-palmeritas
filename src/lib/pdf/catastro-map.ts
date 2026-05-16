@@ -93,7 +93,11 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
   doc.setFontSize(8);
   let lx = margin;
   const legendY = cursorY;
-  (Object.entries(CATASTRO_STYLE) as Array<[CatastroOrigen, typeof CATASTRO_STYLE[CatastroOrigen]]>).forEach(([, s]) => {
+  (
+    Object.entries(CATASTRO_STYLE) as Array<
+      [CatastroOrigen, (typeof CATASTRO_STYLE)[CatastroOrigen]]
+    >
+  ).forEach(([, s]) => {
     const hex = s.fillColor.replace("#", "");
     const r = parseInt(hex.slice(0, 2), 16);
     const g = parseInt(hex.slice(2, 4), 16);
@@ -157,7 +161,7 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
       const venc = p.FECHA_VENCIMIENTO
         ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
         : "—";
-      const tipo = p.ORIGEN ? CATASTRO_STYLE[p.ORIGEN]?.label ?? p.ORIGEN : "—";
+      const tipo = p.ORIGEN ? (CATASTRO_STYLE[p.ORIGEN]?.label ?? p.ORIGEN) : "—";
       return [
         p.NOMBRE ?? "—",
         rol,
@@ -184,7 +188,11 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
       doc.setFont("helvetica", "italic");
       doc.setFontSize(7);
       doc.setTextColor(140, 130, 120);
-      doc.text(`Mostrando 200 de ${catastroFeatures.length}. Refina la vista del mapa para reducir el universo.`, margin, y);
+      doc.text(
+        `Mostrando 200 de ${catastroFeatures.length}. Refina la vista del mapa para reducir el universo.`,
+        margin,
+        y,
+      );
     }
   }
 
@@ -195,7 +203,11 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
     doc.setFont("helvetica", "normal");
     doc.setFontSize(7);
     doc.setTextColor(150, 138, 128);
-    doc.text("Fuente: SERNAGEOMIN — Catastro Minero (ArcGIS REST · WGS84_Concesion)", margin, pageH - 5);
+    doc.text(
+      "Fuente: SERNAGEOMIN — Catastro Minero (ArcGIS REST · WGS84_Concesion)",
+      margin,
+      pageH - 5,
+    );
     doc.text(`${i} / ${pageCount}`, pageW - margin, pageH - 5, { align: "right" });
   }
 

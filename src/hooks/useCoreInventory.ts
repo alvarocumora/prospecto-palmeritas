@@ -27,8 +27,14 @@ export type CoreBox = {
 };
 
 export type CustodyEvent =
-  | "collected" | "packaged" | "shipped" | "received_lab"
-  | "analyzed" | "returned" | "archived" | "rejected";
+  | "collected"
+  | "packaged"
+  | "shipped"
+  | "received_lab"
+  | "analyzed"
+  | "returned"
+  | "archived"
+  | "rejected";
 
 export type SampleCustody = {
   id: string;
@@ -50,28 +56,28 @@ export type SampleCustody = {
 };
 
 export const BOX_STATUS_META: Record<CoreBoxStatus, { label: string; color: string }> = {
-  stored:     { label: "Almacenado",  color: "text-info border-info/30 bg-info/10" },
+  stored: { label: "Almacenado", color: "text-info border-info/30 bg-info/10" },
   in_transit: { label: "En tránsito", color: "text-copper border-copper/40 bg-copper/10" },
-  sampled:    { label: "Muestreado",  color: "text-gold border-gold/40 bg-gold/10" },
-  archived:   { label: "Archivado",   color: "text-muted-foreground border-border bg-muted/20" },
-  lost:       { label: "Perdido",     color: "text-destructive border-destructive/40 bg-destructive/10" },
+  sampled: { label: "Muestreado", color: "text-gold border-gold/40 bg-gold/10" },
+  archived: { label: "Archivado", color: "text-muted-foreground border-border bg-muted/20" },
+  lost: { label: "Perdido", color: "text-destructive border-destructive/40 bg-destructive/10" },
 };
 
 export const CONDITION_META: Record<CoreBoxCondition, { label: string; color: string }> = {
-  good:    { label: "Buena",   color: "text-teal border-teal/30" },
-  damaged: { label: "Dañada",  color: "text-destructive border-destructive/40" },
+  good: { label: "Buena", color: "text-teal border-teal/30" },
+  damaged: { label: "Dañada", color: "text-destructive border-destructive/40" },
   partial: { label: "Parcial", color: "text-copper border-copper/40" },
 };
 
 export const CUSTODY_EVENT_META: Record<CustodyEvent, { label: string; color: string }> = {
-  collected:    { label: "Recolectada",      color: "text-info" },
-  packaged:     { label: "Empaquetada",      color: "text-info" },
-  shipped:      { label: "Enviada",          color: "text-copper" },
-  received_lab: { label: "Recibida en lab",  color: "text-teal" },
-  analyzed:     { label: "Analizada",        color: "text-gold" },
-  returned:     { label: "Devuelta",         color: "text-muted-foreground" },
-  archived:     { label: "Archivada",        color: "text-muted-foreground" },
-  rejected:     { label: "Rechazada",        color: "text-destructive" },
+  collected: { label: "Recolectada", color: "text-info" },
+  packaged: { label: "Empaquetada", color: "text-info" },
+  shipped: { label: "Enviada", color: "text-copper" },
+  received_lab: { label: "Recibida en lab", color: "text-teal" },
+  analyzed: { label: "Analizada", color: "text-gold" },
+  returned: { label: "Devuelta", color: "text-muted-foreground" },
+  archived: { label: "Archivada", color: "text-muted-foreground" },
+  rejected: { label: "Rechazada", color: "text-destructive" },
 };
 
 export function useCoreInventory(projectId: string | null) {
@@ -82,11 +88,25 @@ export function useCoreInventory(projectId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setBoxes([]); setCustody([]); setLoading(false); return; }
+    if (!projectId) {
+      setBoxes([]);
+      setCustody([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const [boxesRes, custodyRes] = await Promise.all([
-      supabase.from("core_boxes").select("*").eq("project_id", projectId).order("box_code", { ascending: true }),
-      supabase.from("sample_custody").select("*").eq("project_id", projectId).order("event_at", { ascending: false }).limit(500),
+      supabase
+        .from("core_boxes")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("box_code", { ascending: true }),
+      supabase
+        .from("sample_custody")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("event_at", { ascending: false })
+        .limit(500),
     ]);
     if (boxesRes.error) setError(boxesRes.error.message);
     else setBoxes((boxesRes.data ?? []) as CoreBox[]);
@@ -95,61 +115,75 @@ export function useCoreInventory(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const addBox = useCallback(async (b: Partial<CoreBox> & { box_code: string }) => {
-    if (!projectId || !user) return { error: "no-context" };
-    const { error } = await supabase.from("core_boxes").insert({
-      project_id: projectId,
-      created_by: user.id,
-      box_code: b.box_code,
-      hole_id: b.hole_id ?? null,
-      box_number: b.box_number ?? null,
-      depth_from: b.depth_from ?? null,
-      depth_to: b.depth_to ?? null,
-      storage_location: b.storage_location ?? null,
-      rack: b.rack ?? null,
-      shelf: b.shelf ?? null,
-      position: b.position ?? null,
-      status: b.status ?? "stored",
-      condition: b.condition ?? "good",
-      notes: b.notes ?? null,
-    });
-    if (!error) await refresh();
-    return { error: error?.message ?? null };
-  }, [projectId, user, refresh]);
-
-  const updateBox = useCallback(async (id: string, patch: Partial<CoreBox>) => {
-    const { error } = await supabase.from("core_boxes").update(patch).eq("id", id);
-    if (!error) await refresh();
-    return { error: error?.message ?? null };
+  useEffect(() => {
+    refresh();
   }, [refresh]);
 
-  const deleteBox = useCallback(async (id: string) => {
-    const { error } = await supabase.from("core_boxes").delete().eq("id", id);
-    if (!error) await refresh();
-    return { error: error?.message ?? null };
-  }, [refresh]);
+  const addBox = useCallback(
+    async (b: Partial<CoreBox> & { box_code: string }) => {
+      if (!projectId || !user) return { error: "no-context" };
+      const { error } = await supabase.from("core_boxes").insert({
+        project_id: projectId,
+        created_by: user.id,
+        box_code: b.box_code,
+        hole_id: b.hole_id ?? null,
+        box_number: b.box_number ?? null,
+        depth_from: b.depth_from ?? null,
+        depth_to: b.depth_to ?? null,
+        storage_location: b.storage_location ?? null,
+        rack: b.rack ?? null,
+        shelf: b.shelf ?? null,
+        position: b.position ?? null,
+        status: b.status ?? "stored",
+        condition: b.condition ?? "good",
+        notes: b.notes ?? null,
+      });
+      if (!error) await refresh();
+      return { error: error?.message ?? null };
+    },
+    [projectId, user, refresh],
+  );
 
-  const addCustodyEvent = useCallback(async (e: Partial<SampleCustody> & { sample_code: string; event_type: CustodyEvent }) => {
-    if (!projectId || !user) return { error: "no-context" };
-    const { error } = await supabase.from("sample_custody").insert({
-      project_id: projectId,
-      created_by: user.id,
-      sample_code: e.sample_code,
-      event_type: e.event_type,
-      event_at: e.event_at ?? new Date().toISOString(),
-      location: e.location ?? null,
-      from_user: e.from_user ?? null,
-      to_user: e.to_user ?? null,
-      carrier: e.carrier ?? null,
-      waybill: e.waybill ?? null,
-      seal_number: e.seal_number ?? null,
-      notes: e.notes ?? null,
-    });
-    if (!error) await refresh();
-    return { error: error?.message ?? null };
-  }, [projectId, user, refresh]);
+  const updateBox = useCallback(
+    async (id: string, patch: Partial<CoreBox>) => {
+      const { error } = await supabase.from("core_boxes").update(patch).eq("id", id);
+      if (!error) await refresh();
+      return { error: error?.message ?? null };
+    },
+    [refresh],
+  );
+
+  const deleteBox = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("core_boxes").delete().eq("id", id);
+      if (!error) await refresh();
+      return { error: error?.message ?? null };
+    },
+    [refresh],
+  );
+
+  const addCustodyEvent = useCallback(
+    async (e: Partial<SampleCustody> & { sample_code: string; event_type: CustodyEvent }) => {
+      if (!projectId || !user) return { error: "no-context" };
+      const { error } = await supabase.from("sample_custody").insert({
+        project_id: projectId,
+        created_by: user.id,
+        sample_code: e.sample_code,
+        event_type: e.event_type,
+        event_at: e.event_at ?? new Date().toISOString(),
+        location: e.location ?? null,
+        from_user: e.from_user ?? null,
+        to_user: e.to_user ?? null,
+        carrier: e.carrier ?? null,
+        waybill: e.waybill ?? null,
+        seal_number: e.seal_number ?? null,
+        notes: e.notes ?? null,
+      });
+      if (!error) await refresh();
+      return { error: error?.message ?? null };
+    },
+    [projectId, user, refresh],
+  );
 
   return { boxes, custody, loading, error, refresh, addBox, updateBox, deleteBox, addCustodyEvent };
 }

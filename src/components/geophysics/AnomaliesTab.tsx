@@ -63,8 +63,7 @@ export function AnomaliesTab({
   const onAdvance = async (a: GeophysicsAnomaly) => {
     try {
       const next: AnomalyStatus | null =
-        a.status === "detected" ? "reviewed" :
-        a.status === "reviewed" ? "validated" : null;
+        a.status === "detected" ? "reviewed" : a.status === "reviewed" ? "validated" : null;
       if (!next) return;
       await setStatus(a.id, next);
       toast.success(next === "validated" ? "Anomalía validada" : "Anomalía revisada");
@@ -167,7 +166,9 @@ export function AnomaliesTab({
                     <td className="py-2 px-3 text-foreground font-semibold">{a.code}</td>
                     <td className="py-2 px-3 text-gold">{ANOMALY_TYPE_LABELS[a.anomaly_type]}</td>
                     <td className="py-2 px-3">
-                      <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${sev.color}`}>
+                      <span
+                        className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${sev.color}`}
+                      >
                         {sev.label}
                       </span>
                     </td>
@@ -177,7 +178,9 @@ export function AnomaliesTab({
                     </td>
                     <td className="py-2 px-3 text-right">{a.estimated_depth_m ?? "—"}</td>
                     <td className="py-2 px-3">
-                      <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${st.color}`}>
+                      <span
+                        className={`inline-block px-1.5 py-0.5 rounded border text-[10px] uppercase ${st.color}`}
+                      >
                         {st.label}
                       </span>
                     </td>
@@ -322,12 +325,18 @@ function AnomalyDialog({
       lng: s ? s.lng.toString() : f.lng,
       peak_value: s
         ? (s.mag_nt?.toString() ??
-            s.ip_chargeability_mvv?.toString() ??
-            s.ip_resistivity_ohmm?.toString() ??
-            f.peak_value)
+          s.ip_chargeability_mvv?.toString() ??
+          s.ip_resistivity_ohmm?.toString() ??
+          f.peak_value)
         : f.peak_value,
       peak_unit: s
-        ? (s.mag_nt != null ? "nT" : s.ip_chargeability_mvv != null ? "mV/V" : s.ip_resistivity_ohmm != null ? "Ω·m" : f.peak_unit)
+        ? s.mag_nt != null
+          ? "nT"
+          : s.ip_chargeability_mvv != null
+            ? "mV/V"
+            : s.ip_resistivity_ohmm != null
+              ? "Ω·m"
+              : f.peak_unit
         : f.peak_unit,
     }));
   };
@@ -337,7 +346,8 @@ function AnomalyDialog({
     setSaving(true);
     try {
       const conf = form.confidence_pct ? Number(form.confidence_pct) : null;
-      if (conf != null && (conf < 0 || conf > 100)) throw new Error("Confianza debe estar entre 0 y 100");
+      if (conf != null && (conf < 0 || conf > 100))
+        throw new Error("Confianza debe estar entre 0 y 100");
       const payload = {
         code: form.code.trim(),
         anomaly_type: form.anomaly_type,
@@ -369,13 +379,18 @@ function AnomalyDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4"
+      onClick={onClose}
+    >
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
         className="w-full max-w-lg rounded-lg border border-border bg-background p-5 space-y-3 max-h-[90vh] overflow-y-auto"
       >
-        <h2 className="text-base font-mono font-semibold">{initial ? "Editar anomalía" : "Nueva anomalía"}</h2>
+        <h2 className="text-base font-mono font-semibold">
+          {initial ? "Editar anomalía" : "Nueva anomalía"}
+        </h2>
 
         <Field label="Código" required>
           <input
@@ -391,7 +406,9 @@ function AnomalyDialog({
           <Field label="Tipo">
             <select
               value={form.anomaly_type}
-              onChange={(e) => setForm((f) => ({ ...f, anomaly_type: e.target.value as AnomalyType }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, anomaly_type: e.target.value as AnomalyType }))
+              }
               className="input"
             >
               {ANOMALY_TYPES.map((t) => (
@@ -404,7 +421,9 @@ function AnomalyDialog({
           <Field label="Severidad">
             <select
               value={form.severity}
-              onChange={(e) => setForm((f) => ({ ...f, severity: e.target.value as AnomalySeverity }))}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, severity: e.target.value as AnomalySeverity }))
+              }
               className="input"
             >
               {(["low", "medium", "high", "critical"] as AnomalySeverity[]).map((s) => (
@@ -434,7 +453,8 @@ function AnomalyDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Latitud">
             <input
-              type="number" step="any"
+              type="number"
+              step="any"
               value={form.lat}
               onChange={(e) => setForm((f) => ({ ...f, lat: e.target.value }))}
               className="input"
@@ -442,7 +462,8 @@ function AnomalyDialog({
           </Field>
           <Field label="Longitud">
             <input
-              type="number" step="any"
+              type="number"
+              step="any"
               value={form.lng}
               onChange={(e) => setForm((f) => ({ ...f, lng: e.target.value }))}
               className="input"
@@ -453,7 +474,8 @@ function AnomalyDialog({
         <div className="grid grid-cols-3 gap-3">
           <Field label="Pico">
             <input
-              type="number" step="any"
+              type="number"
+              step="any"
               value={form.peak_value}
               onChange={(e) => setForm((f) => ({ ...f, peak_value: e.target.value }))}
               className="input"
@@ -469,7 +491,10 @@ function AnomalyDialog({
           </Field>
           <Field label="Confianza %">
             <input
-              type="number" step="1" min="0" max="100"
+              type="number"
+              step="1"
+              min="0"
+              max="100"
               value={form.confidence_pct}
               onChange={(e) => setForm((f) => ({ ...f, confidence_pct: e.target.value }))}
               className="input"
@@ -480,7 +505,8 @@ function AnomalyDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Prof. estimada (m)">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.estimated_depth_m}
               onChange={(e) => setForm((f) => ({ ...f, estimated_depth_m: e.target.value }))}
               className="input"
@@ -488,7 +514,8 @@ function AnomalyDialog({
           </Field>
           <Field label="Área estimada (m²)">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.estimated_area_m2}
               onChange={(e) => setForm((f) => ({ ...f, estimated_area_m2: e.target.value }))}
               className="input"
@@ -516,7 +543,11 @@ function AnomalyDialog({
         </Field>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent"
+          >
             Cancelar
           </button>
           <button
@@ -533,7 +564,15 @@ function AnomalyDialog({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">
@@ -545,7 +584,15 @@ function Field({ label, required, children }: { label: string; required?: boolea
   );
 }
 
-function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function Chip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       type="button"

@@ -61,10 +61,7 @@ function getCommodityColumn(c: string): keyof CoreLog {
 }
 
 /** Project a depth along a hole given collar coords + azimuth/dip. */
-function projectDepth(
-  hole: Hole,
-  depth: number,
-): { x: number; y: number; z: number } | null {
+function projectDepth(hole: Hole, depth: number): { x: number; y: number; z: number } | null {
   if (hole.easting == null || hole.northing == null || hole.elevation == null) return null;
   const az = ((hole.azimuth ?? 0) * Math.PI) / 180;
   const dipDown = ((hole.dip ?? -90) * Math.PI) / 180; // dip negative = downward
@@ -78,7 +75,12 @@ function projectDepth(
 }
 
 /** Composite core logs to fixed-length intervals (length-weighted average). */
-function compositeIntervals(logs: CoreLog[], holes: Map<string, Hole>, commodityCol: keyof CoreLog, length: number): Composite[] {
+function compositeIntervals(
+  logs: CoreLog[],
+  holes: Map<string, Hole>,
+  commodityCol: keyof CoreLog,
+  length: number,
+): Composite[] {
   // Group by hole, sort by depth_from
   const byHole = new Map<string, CoreLog[]>();
   for (const l of logs) {
@@ -142,8 +144,12 @@ interface ModelParams {
 }
 
 interface BlockOut {
-  ix: number; iy: number; iz: number;
-  x: number; y: number; z: number;
+  ix: number;
+  iy: number;
+  iz: number;
+  x: number;
+  y: number;
+  z: number;
   grade: number | null;
   variance: number | null;
   n_samples: number;
@@ -151,7 +157,10 @@ interface BlockOut {
   classification: string | null;
 }
 
-function estimateBlocks(composites: Composite[], params: ModelParams): {
+function estimateBlocks(
+  composites: Composite[],
+  params: ModelParams,
+): {
   blocks: BlockOut[];
   bbox: { minX: number; maxX: number; minY: number; maxY: number; minZ: number; maxZ: number };
 } {
@@ -173,7 +182,9 @@ function estimateBlocks(composites: Composite[], params: ModelParams): {
   const nz = Math.max(1, Math.ceil((bbox.maxZ - bbox.minZ) / params.block_size_z));
   const totalBlocks = nx * ny * nz;
   if (totalBlocks > 250_000) {
-    throw new Error(`Block count ${totalBlocks} exceeds 250,000 — increase block size or shrink AOI.`);
+    throw new Error(
+      `Block count ${totalBlocks} exceeds 250,000 — increase block size or shrink AOI.`,
+    );
   }
   const blocks: BlockOut[] = [];
   for (let ix = 0; ix < nx; ix++) {
@@ -185,8 +196,10 @@ function estimateBlocks(composites: Composite[], params: ModelParams): {
         // Find composites within search radius
         const neighbours: Array<{ d: number; g: number }> = [];
         for (const c of composites) {
-          const dx = c.x - cx, dy = c.y - cy, dz = c.z - cz;
-          const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          const dx = c.x - cx,
+            dy = c.y - cy,
+            dz = c.z - cz;
+          const d = Math.sqrt(dx * dx + dy * dy + dz * dz);
           if (d <= params.search_radius) neighbours.push({ d, g: c.grade });
         }
         neighbours.sort((a, b) => a.d - b.d);
@@ -194,9 +207,17 @@ function estimateBlocks(composites: Composite[], params: ModelParams): {
         const nearest = used[0]?.d ?? null;
         if (used.length < params.min_samples) {
           blocks.push({
-            ix, iy, iz, x: cx, y: cy, z: cz,
-            grade: null, variance: null,
-            n_samples: used.length, nearest_dist: nearest, classification: null,
+            ix,
+            iy,
+            iz,
+            x: cx,
+            y: cy,
+            z: cz,
+            grade: null,
+            variance: null,
+            n_samples: used.length,
+            nearest_dist: nearest,
+            classification: null,
           });
           continue;
         }
@@ -205,7 +226,8 @@ function estimateBlocks(composites: Composite[], params: ModelParams): {
           grade = used[0].g;
         } else {
           // IDW
-          let num = 0, den = 0;
+          let num = 0,
+            den = 0;
           for (const u of used) {
             const w = 1 / Math.pow(Math.max(u.d, 0.01), params.power);
             num += w * u.g;
@@ -219,13 +241,23 @@ function estimateBlocks(composites: Composite[], params: ModelParams): {
         // Classification: measured if nearest <= 1/3 radius and n>=4 ; indicated if nearest <= 2/3 and n>=2; else inferred
         const nd = nearest ?? params.search_radius;
         const cls =
-          nd <= params.search_radius / 3 && used.length >= 4 ? "measured" :
-          nd <= (params.search_radius * 2) / 3 && used.length >= 2 ? "indicated" :
-          "inferred";
+          nd <= params.search_radius / 3 && used.length >= 4
+            ? "measured"
+            : nd <= (params.search_radius * 2) / 3 && used.length >= 2
+              ? "indicated"
+              : "inferred";
         blocks.push({
-          ix, iy, iz, x: cx, y: cy, z: cz,
-          grade, variance,
-          n_samples: used.length, nearest_dist: nearest, classification: cls,
+          ix,
+          iy,
+          iz,
+          x: cx,
+          y: cy,
+          z: cz,
+          grade,
+          variance,
+          n_samples: used.length,
+          nearest_dist: nearest,
+          classification: cls,
         });
       }
     }
@@ -247,13 +279,19 @@ Deno.serve(async (req) => {
 
     // 1) Fetch model
     const { data: model, error: mErr } = await supabase
-      .from("resource_models").select("*").eq("id", model_id).single();
+      .from("resource_models")
+      .select("*")
+      .eq("id", model_id)
+      .single();
     if (mErr || !model) throw new Error("Model not found");
 
     await supabase.from("resource_models").update({ status: "running" }).eq("id", model_id);
 
     // 2) Fetch holes for project (optionally filtered by campaign)
-    const holesQuery = supabase.from("drill_holes").select("id, hole_id, easting, northing, elevation, azimuth, dip").eq("project_id", model.project_id);
+    const holesQuery = supabase
+      .from("drill_holes")
+      .select("id, hole_id, easting, northing, elevation, azimuth, dip")
+      .eq("project_id", model.project_id);
     if (model.campaign_id) holesQuery.eq("campaign_id", model.campaign_id);
     const { data: holesData, error: hErr } = await holesQuery;
     if (hErr) throw hErr;
@@ -276,7 +314,10 @@ Deno.serve(async (req) => {
       Number(model.composite_length),
     );
     if (composites.length === 0) {
-      await supabase.from("resource_models").update({ status: "failed", notes: "No valid composites" }).eq("id", model_id);
+      await supabase
+        .from("resource_models")
+        .update({ status: "failed", notes: "No valid composites" })
+        .eq("id", model_id);
       throw new Error(`No valid composites for commodity ${model.commodity}`);
     }
 
@@ -303,18 +344,26 @@ Deno.serve(async (req) => {
     const chunkSize = 500;
     for (let i = 0; i < composites.length; i += chunkSize) {
       const chunk = composites.slice(i, i + chunkSize).map((c) => ({
-        model_id, project_id: model.project_id,
-        hole_id: c.hole_id, hole_code: c.hole_code,
-        depth_from: c.depth_from, depth_to: c.depth_to,
-        length_m: c.length_m, grade: c.grade,
-        x: c.x, y: c.y, z: c.z,
+        model_id,
+        project_id: model.project_id,
+        hole_id: c.hole_id,
+        hole_code: c.hole_code,
+        depth_from: c.depth_from,
+        depth_to: c.depth_to,
+        length_m: c.length_m,
+        grade: c.grade,
+        x: c.x,
+        y: c.y,
+        z: c.z,
       }));
       const { error } = await supabase.from("resource_composites").insert(chunk);
       if (error) throw error;
     }
     for (let i = 0; i < blocks.length; i += chunkSize) {
       const chunk = blocks.slice(i, i + chunkSize).map((b) => ({
-        ...b, model_id, project_id: model.project_id,
+        ...b,
+        model_id,
+        project_id: model.project_id,
       }));
       const { error } = await supabase.from("resource_blocks").insert(chunk);
       if (error) throw error;
@@ -334,31 +383,40 @@ Deno.serve(async (req) => {
     // Metal content unit depends on commodity; for au/ag it's grams (g/t * t / 1e6 * 1e6 = g) — keep as commodity-native
     const metalContent = tonnageAboveCutoff * meanGrade;
 
-    await supabase.from("resource_models").update({
-      status: "complete",
-      bbox_min_x: bbox.minX, bbox_max_x: bbox.maxX,
-      bbox_min_y: bbox.minY, bbox_max_y: bbox.maxY,
-      bbox_min_z: bbox.minZ, bbox_max_z: bbox.maxZ,
-      blocks_total: blocks.length,
-      blocks_estimated: estimated.length,
-      composites_count: composites.length,
-      tonnage_total: tonnageTotal,
-      tonnage_above_cutoff: tonnageAboveCutoff,
-      mean_grade: meanGrade,
-      metal_content: metalContent,
-      estimated_at: new Date().toISOString(),
-    }).eq("id", model_id);
+    await supabase
+      .from("resource_models")
+      .update({
+        status: "complete",
+        bbox_min_x: bbox.minX,
+        bbox_max_x: bbox.maxX,
+        bbox_min_y: bbox.minY,
+        bbox_max_y: bbox.maxY,
+        bbox_min_z: bbox.minZ,
+        bbox_max_z: bbox.maxZ,
+        blocks_total: blocks.length,
+        blocks_estimated: estimated.length,
+        composites_count: composites.length,
+        tonnage_total: tonnageTotal,
+        tonnage_above_cutoff: tonnageAboveCutoff,
+        mean_grade: meanGrade,
+        metal_content: metalContent,
+        estimated_at: new Date().toISOString(),
+      })
+      .eq("id", model_id);
 
-    return new Response(JSON.stringify({
-      ok: true,
-      composites: composites.length,
-      blocks_total: blocks.length,
-      blocks_estimated: estimated.length,
-      tonnage_total: tonnageTotal,
-      tonnage_above_cutoff: tonnageAboveCutoff,
-      mean_grade: meanGrade,
-      metal_content: metalContent,
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        composites: composites.length,
+        blocks_total: blocks.length,
+        blocks_estimated: estimated.length,
+        tonnage_total: tonnageTotal,
+        tonnage_above_cutoff: tonnageAboveCutoff,
+        mean_grade: meanGrade,
+        metal_content: metalContent,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return new Response(JSON.stringify({ ok: false, error: msg }), {

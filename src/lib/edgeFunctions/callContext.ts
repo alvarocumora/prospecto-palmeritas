@@ -1,12 +1,18 @@
 import { createRequestContextHeaders } from "@/lib/observability/requestContext";
-import type { EdgeFunctionCallOptions, EdgeFunctionCallPayload, EdgeFunctionHeaders } from "@/types/edgeFunctions";
+import type {
+  EdgeFunctionCallOptions,
+  EdgeFunctionCallPayload,
+  EdgeFunctionHeaders,
+} from "@/types/edgeFunctions";
 
-export function createEdgeFunctionHeaders<TBody>(options: EdgeFunctionCallOptions<TBody>): EdgeFunctionHeaders {
+export function createEdgeFunctionHeaders<TBody>(
+  options: EdgeFunctionCallOptions<TBody>,
+): EdgeFunctionHeaders {
   return createRequestContextHeaders(options.context);
 }
 
 export function createEdgeFunctionPayload<TBody>(
-  options: EdgeFunctionCallOptions<TBody>
+  options: EdgeFunctionCallOptions<TBody>,
 ): EdgeFunctionCallPayload<TBody> {
   return {
     body: options.body,

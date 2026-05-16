@@ -2,8 +2,11 @@ import type { DrillHole, DrillCoreLog } from "@/hooks/useDrilling";
 
 /** UTM 19S → lat/lng (mirror of drillCollarsLayer). */
 function utmToLatLng(easting: number, northing: number, zone = 19, south = true): [number, number] {
-  const a = 6378137.0, f = 1 / 298.257223563, k0 = 0.9996;
-  const e2 = f * (2 - f), ep2 = e2 / (1 - e2);
+  const a = 6378137.0,
+    f = 1 / 298.257223563,
+    k0 = 0.9996;
+  const e2 = f * (2 - f),
+    ep2 = e2 / (1 - e2);
   const x = easting - 500000.0;
   const y = south ? northing - 10000000.0 : northing;
   const M = y / k0;
@@ -13,8 +16,15 @@ function utmToLatLng(easting: number, northing: number, zone = 19, south = true)
   const J2 = (21 * e1 ** 2) / 16 - (55 * e1 ** 4) / 32;
   const J3 = (151 * e1 ** 3) / 96;
   const J4 = (1097 * e1 ** 4) / 512;
-  const fp = mu + J1 * Math.sin(2 * mu) + J2 * Math.sin(4 * mu) + J3 * Math.sin(6 * mu) + J4 * Math.sin(8 * mu);
-  const sinFp = Math.sin(fp), cosFp = Math.cos(fp), tanFp = Math.tan(fp);
+  const fp =
+    mu +
+    J1 * Math.sin(2 * mu) +
+    J2 * Math.sin(4 * mu) +
+    J3 * Math.sin(6 * mu) +
+    J4 * Math.sin(8 * mu);
+  const sinFp = Math.sin(fp),
+    cosFp = Math.cos(fp),
+    tanFp = Math.tan(fp);
   const C1 = ep2 * cosFp * cosFp;
   const T1 = tanFp * tanFp;
   const R1 = (a * (1 - e2)) / Math.pow(1 - e2 * sinFp * sinFp, 1.5);
@@ -23,7 +33,8 @@ function utmToLatLng(easting: number, northing: number, zone = 19, south = true)
   const Q1 = (N1 * tanFp) / R1;
   const Q2 = (D * D) / 2;
   const Q3 = ((5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ep2) * Math.pow(D, 4)) / 24;
-  const Q4 = ((61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ep2 - 3 * C1 * C1) * Math.pow(D, 6)) / 720;
+  const Q4 =
+    ((61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ep2 - 3 * C1 * C1) * Math.pow(D, 6)) / 720;
   const lat = fp - Q1 * (Q2 - Q3 + Q4);
   const Q5 = D;
   const Q6 = ((1 + 2 * T1 + C1) * Math.pow(D, 3)) / 6;
@@ -35,7 +46,8 @@ function utmToLatLng(easting: number, northing: number, zone = 19, south = true)
 
 export function holeLatLng(h: DrillHole): [number, number] | null {
   if (h.easting == null || h.northing == null) return null;
-  const e = Number(h.easting), n = Number(h.northing);
+  const e = Number(h.easting),
+    n = Number(h.northing);
   if (!Number.isFinite(e) || !Number.isFinite(n)) return null;
   if (Math.abs(e) <= 180 && Math.abs(n) <= 90) return [n, e];
   return utmToLatLng(e, n, 19, true);

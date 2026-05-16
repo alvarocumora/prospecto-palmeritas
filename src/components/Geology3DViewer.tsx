@@ -27,7 +27,10 @@ export function Geology3DViewer({ className }: Props) {
 
   // Cargar core logs del proyecto
   useEffect(() => {
-    if (!active?.id) { setLogs([]); return; }
+    if (!active?.id) {
+      setLogs([]);
+      return;
+    }
     setLogsLoading(true);
     supabase
       .from("drill_core_logs")
@@ -159,20 +162,30 @@ export function Geology3DViewer({ className }: Props) {
           const lng0 = active?.center_lng ?? -71.1;
           const dxM = (t.lng - lng0) * 111_320 * Math.cos((lat0 * Math.PI) / 180);
           const dyM = (t.lat - lat0) * 111_320;
-          const elev = (t.elevation_m ?? 0);
+          const elev = t.elevation_m ?? 0;
           const sphere = new THREE.Mesh(
             new THREE.SphereGeometry(15, 16, 16),
             new THREE.MeshStandardMaterial({
-              color: t.priority === "critical" ? 0xdc2626 :
-                     t.priority === "high" ? 0xf59e0b :
-                     t.priority === "medium" ? 0x3b82f6 : 0x64748b,
-              transparent: true, opacity: 0.7,
+              color:
+                t.priority === "critical"
+                  ? 0xdc2626
+                  : t.priority === "high"
+                    ? 0xf59e0b
+                    : t.priority === "medium"
+                      ? 0x3b82f6
+                      : 0x64748b,
+              transparent: true,
+              opacity: 0.7,
             }),
           );
           sphere.position.set(dxM, elev, -dyM);
           sphere.userData = {
-            kind: "target", code: t.code, name: t.name, priority: t.priority,
-            stage: t.stage, score: t.score,
+            kind: "target",
+            code: t.code,
+            name: t.name,
+            priority: t.priority,
+            stage: t.stage,
+            score: t.score,
           };
           tgGroup.add(sphere);
         }
@@ -203,7 +216,9 @@ export function Geology3DViewer({ className }: Props) {
       if (hit) {
         const u = hit.object.userData;
         if (u.kind === "intercept") {
-          setHoverInfo(`${u.hole} · ${u.from}-${u.to}m · Au ${u.au ?? "—"} g/t${u.cu ? ` · Cu ${u.cu}%` : ""}${u.lith ? ` · ${u.lith}` : ""}`);
+          setHoverInfo(
+            `${u.hole} · ${u.from}-${u.to}m · Au ${u.au ?? "—"} g/t${u.cu ? ` · Cu ${u.cu}%` : ""}${u.lith ? ` · ${u.lith}` : ""}`,
+          );
         } else if (u.kind === "hole") {
           setHoverInfo(`Sondaje ${u.id} · ${u.depth}m`);
         } else if (u.kind === "target") {
@@ -247,7 +262,16 @@ export function Geology3DViewer({ className }: Props) {
         else if (mat) (mat as THREE.Material).dispose();
       });
     };
-  }, [holes, logs, targets, showHoles, showIntercepts, showTargets, active?.center_lat, active?.center_lng]);
+  }, [
+    holes,
+    logs,
+    targets,
+    showHoles,
+    showIntercepts,
+    showTargets,
+    active?.center_lat,
+    active?.center_lng,
+  ]);
 
   const loading = holesLoading || logsLoading;
 
@@ -258,15 +282,25 @@ export function Geology3DViewer({ className }: Props) {
       {/* Toolbar */}
       <div className="absolute top-3 left-3 flex flex-col gap-1 bg-bg-secondary/95 border border-gold/30 rounded p-2 text-xs font-mono backdrop-blur">
         <div className="flex items-center gap-1.5 text-gold font-semibold mb-1">
-          <Box className="w-3.5 h-3.5" /> 3D · {holes.length}H · {logs.length}log · {targets.length}T
+          <Box className="w-3.5 h-3.5" /> 3D · {holes.length}H · {logs.length}log · {targets.length}
+          T
         </div>
-        <button onClick={() => setShowHoles((v) => !v)} className="flex items-center gap-1.5 hover:text-gold">
+        <button
+          onClick={() => setShowHoles((v) => !v)}
+          className="flex items-center gap-1.5 hover:text-gold"
+        >
           {showHoles ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />} Sondajes
         </button>
-        <button onClick={() => setShowIntercepts((v) => !v)} className="flex items-center gap-1.5 hover:text-gold">
+        <button
+          onClick={() => setShowIntercepts((v) => !v)}
+          className="flex items-center gap-1.5 hover:text-gold"
+        >
           {showIntercepts ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />} Intercepts
         </button>
-        <button onClick={() => setShowTargets((v) => !v)} className="flex items-center gap-1.5 hover:text-gold">
+        <button
+          onClick={() => setShowTargets((v) => !v)}
+          className="flex items-center gap-1.5 hover:text-gold"
+        >
           {showTargets ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />} Targets
         </button>
       </div>
@@ -274,10 +308,22 @@ export function Geology3DViewer({ className }: Props) {
       {/* Leyenda Au */}
       <div className="absolute bottom-3 left-3 bg-bg-secondary/95 border border-border rounded p-2 text-[10px] font-mono backdrop-blur">
         <div className="text-muted-foreground mb-1">Au g/t</div>
-        <div className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: auColor(0.2) }} />0.1–0.3</div>
-        <div className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: auColor(0.5) }} />0.3–1</div>
-        <div className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: auColor(2) }} />1–3</div>
-        <div className="flex items-center gap-1"><span className="w-3 h-3 rounded" style={{ background: auColor(5) }} />≥3</div>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded" style={{ background: auColor(0.2) }} />
+          0.1–0.3
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded" style={{ background: auColor(0.5) }} />
+          0.3–1
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded" style={{ background: auColor(2) }} />
+          1–3
+        </div>
+        <div className="flex items-center gap-1">
+          <span className="w-3 h-3 rounded" style={{ background: auColor(5) }} />
+          ≥3
+        </div>
       </div>
 
       {hoverInfo && (

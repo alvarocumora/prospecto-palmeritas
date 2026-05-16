@@ -75,7 +75,9 @@ function SharePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-sm font-mono text-muted-foreground animate-pulse">Cargando targets…</div>
+        <div className="text-sm font-mono text-muted-foreground animate-pulse">
+          Cargando targets…
+        </div>
       </div>
     );
   }

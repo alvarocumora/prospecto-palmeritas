@@ -1,4 +1,14 @@
-import { X, ExternalLink, FlaskConical, Drill, Map as MapIcon, Activity, Plane, Image as ImageIcon, Target as TargetIcon } from "lucide-react";
+import {
+  X,
+  ExternalLink,
+  FlaskConical,
+  Drill,
+  Map as MapIcon,
+  Activity,
+  Plane,
+  Image as ImageIcon,
+  Target as TargetIcon,
+} from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { DrillHole } from "@/hooks/useDrilling";
@@ -37,7 +47,11 @@ export function FeatureInspectorPanel({ feature, onClose }: Props) {
           {iconFor(feature.kind)}
           <span>{labelFor(feature.kind)}</span>
         </div>
-        <button onClick={onClose} className="p-1 rounded hover:bg-accent text-muted-foreground" aria-label="Cerrar">
+        <button
+          onClick={onClose}
+          className="p-1 rounded hover:bg-accent text-muted-foreground"
+          aria-label="Cerrar"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
@@ -89,7 +103,14 @@ function SampleBody({ s }: { s: SamplingResult }) {
     <>
       <div className="text-base font-bold text-gold mb-2">{s.sample_code}</div>
       <div className="text-[10px] uppercase text-muted-foreground mb-3">{s.sample_type}</div>
-      <Row label="Au" value={<span style={{ color: auColor(s.au_gpt) }}>{s.au_gpt != null ? `${Number(s.au_gpt).toFixed(3)} g/t` : "—"}</span>} />
+      <Row
+        label="Au"
+        value={
+          <span style={{ color: auColor(s.au_gpt) }}>
+            {s.au_gpt != null ? `${Number(s.au_gpt).toFixed(3)} g/t` : "—"}
+          </span>
+        }
+      />
       <Row label="Ag" value={s.ag_gpt != null ? `${Number(s.ag_gpt).toFixed(2)} g/t` : "—"} />
       <Row label="Cu" value={s.cu_pct != null ? `${Number(s.cu_pct).toFixed(3)} %` : "—"} />
       <Row label="As" value={s.as_ppm != null ? `${s.as_ppm} ppm` : "—"} />
@@ -98,7 +119,10 @@ function SampleBody({ s }: { s: SamplingResult }) {
       <Row label="Lab" value={s.lab ?? "—"} />
       <Row label="Certificado" value={s.certificate ?? "—"} />
       <Row label="Fecha" value={s.sampled_at ?? "—"} />
-      <Link to="/dashboard/sampling" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Link
+        to="/dashboard/sampling"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Muestreo <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -114,7 +138,10 @@ function DrillBody({ h }: { h: DrillHole }) {
       <Row label="Az / Dip" value={`${h.azimuth ?? "—"}° / ${h.dip ?? "—"}°`} />
       <Row label="Plan" value={h.planned_depth != null ? `${h.planned_depth} m` : "—"} />
       <Row label="Real" value={h.actual_depth != null ? `${h.actual_depth} m` : "—"} />
-      <Link to="/dashboard/drilling" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Link
+        to="/dashboard/drilling"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Sondajes <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -132,7 +159,10 @@ function ConcessionBody({ c }: { c: MiningConcession }) {
       <Row label="Comuna" value={c.commune ?? "—"} />
       <Row label="Hectáreas" value={c.area_ha != null ? `${c.area_ha} ha` : "—"} />
       <Row label="Vence" value={c.expires_at ?? "—"} />
-      <Link to="/dashboard/catastro" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Link
+        to="/dashboard/catastro"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Catastro <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -145,9 +175,18 @@ function StationBody({ s }: { s: GeophysicsStation }) {
       <div className="text-base font-bold text-info mb-2">{s.station_id}</div>
       <Row label="Lat / Lng" value={`${Number(s.lat).toFixed(5)}, ${Number(s.lng).toFixed(5)}`} />
       <Row label="MAG" value={s.mag_nt != null ? `${Number(s.mag_nt).toFixed(1)} nT` : "—"} />
-      <Row label="IP charg." value={s.ip_chargeability_mvv != null ? `${s.ip_chargeability_mvv} mV/V` : "—"} />
-      <Row label="Resistividad" value={s.ip_resistivity_ohmm != null ? `${s.ip_resistivity_ohmm} Ω·m` : "—"} />
-      <Link to="/dashboard/geophysics" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Row
+        label="IP charg."
+        value={s.ip_chargeability_mvv != null ? `${s.ip_chargeability_mvv} mV/V` : "—"}
+      />
+      <Row
+        label="Resistividad"
+        value={s.ip_resistivity_ohmm != null ? `${s.ip_resistivity_ohmm} Ω·m` : "—"}
+      />
+      <Link
+        to="/dashboard/geophysics"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Geofísica <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -164,7 +203,10 @@ function FlightBody({ f }: { f: DroneFlight }) {
       <Row label="Altura" value={f.altitude_m != null ? `${f.altitude_m} m` : "—"} />
       <Row label="Área" value={f.area_ha != null ? `${f.area_ha} ha` : "—"} />
       {f.notes && <Row label="Notas" value={f.notes} />}
-      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Link
+        to="/dashboard/drones"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Drones <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -180,12 +222,20 @@ function RasterBody({ r }: { r: DroneRaster }) {
       <Row
         label="URL"
         value={
-          <a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[140px]">
+          <a
+            href={r.url}
+            target="_blank"
+            rel="noopener"
+            className="text-gold hover:underline truncate inline-block max-w-[140px]"
+          >
             abrir ↗
           </a>
         }
       />
-      <Link to="/dashboard/drones" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Link
+        to="/dashboard/drones"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Drones <ExternalLink className="w-3 h-3" />
       </Link>
     </>
@@ -197,20 +247,41 @@ function TargetBody({ t }: { t: ExplorationTarget }) {
     <>
       <div className="text-base font-bold text-gold mb-1">{t.code}</div>
       <div className="text-foreground mb-2">{t.name}</div>
-      <div className="text-[10px] uppercase text-muted-foreground mb-3">{t.target_type}{t.commodity ? ` · ${t.commodity}` : ""}</div>
+      <div className="text-[10px] uppercase text-muted-foreground mb-3">
+        {t.target_type}
+        {t.commodity ? ` · ${t.commodity}` : ""}
+      </div>
       <Row label="Etapa" value={t.stage} />
       <Row label="Prioridad" value={t.priority} />
       <Row label="Score" value={t.score != null ? `${t.score}` : "—"} />
       <Row label="Confianza" value={t.confidence_pct != null ? `${t.confidence_pct}%` : "—"} />
-      <Row label="Lat / Lng" value={t.lat != null && t.lng != null ? `${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}` : "—"} />
+      <Row
+        label="Lat / Lng"
+        value={
+          t.lat != null && t.lng != null
+            ? `${Number(t.lat).toFixed(5)}, ${Number(t.lng).toFixed(5)}`
+            : "—"
+        }
+      />
       <Row label="Elevación" value={t.elevation_m != null ? `${t.elevation_m} m` : "—"} />
       <Row label="m planeados" value={t.planned_meters != null ? `${t.planned_meters} m` : "—"} />
-      <Row label="Costo USD" value={t.estimated_cost_usd != null ? `$${Number(t.estimated_cost_usd).toLocaleString()}` : "—"} />
-      {t.rationale && <div className="mt-3 p-2 rounded bg-muted/30 text-foreground/80 italic text-[10.5px]">{t.rationale}</div>}
-      <Link to="/dashboard/targets" className="mt-3 inline-flex items-center gap-1 text-gold hover:underline">
+      <Row
+        label="Costo USD"
+        value={
+          t.estimated_cost_usd != null ? `$${Number(t.estimated_cost_usd).toLocaleString()}` : "—"
+        }
+      />
+      {t.rationale && (
+        <div className="mt-3 p-2 rounded bg-muted/30 text-foreground/80 italic text-[10.5px]">
+          {t.rationale}
+        </div>
+      )}
+      <Link
+        to="/dashboard/targets"
+        className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
+      >
         Ir a Targets <ExternalLink className="w-3 h-3" />
       </Link>
     </>
   );
 }
-

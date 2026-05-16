@@ -2,7 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Polyline, CircleMarker, LayerGroup } from "leaflet";
 import type { LeafletNS } from "./types";
 import { Scissors, X } from "lucide-react";
-import { buildSectionLine, projectHolesToSection, type SectionLine, type ProjectedHole } from "@/lib/section/projection";
+import {
+  buildSectionLine,
+  projectHolesToSection,
+  type SectionLine,
+  type ProjectedHole,
+} from "@/lib/section/projection";
 import type { DrillHole, DrillCoreLog } from "@/hooks/useDrilling";
 import { SectionView } from "./SectionView";
 
@@ -27,8 +32,14 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
 
   const cleanup = () => {
     if (!map) return;
-    if (previewRef.current) { map.removeLayer(previewRef.current); previewRef.current = null; }
-    if (startMarkerRef.current) { map.removeLayer(startMarkerRef.current); startMarkerRef.current = null; }
+    if (previewRef.current) {
+      map.removeLayer(previewRef.current);
+      previewRef.current = null;
+    }
+    if (startMarkerRef.current) {
+      map.removeLayer(startMarkerRef.current);
+      startMarkerRef.current = null;
+    }
     startRef.current = null;
   };
 
@@ -51,16 +62,43 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
       const ll: [number, number] = [e.latlng.lat, e.latlng.lng];
       if (!startRef.current) {
         startRef.current = ll;
-        startMarkerRef.current = L.circleMarker(ll, { radius: 6, color: "#C8922A", weight: 2, fillColor: "#C8922A", fillOpacity: 0.9 }).addTo(map);
+        startMarkerRef.current = L.circleMarker(ll, {
+          radius: 6,
+          color: "#C8922A",
+          weight: 2,
+          fillColor: "#C8922A",
+          fillOpacity: 0.9,
+        }).addTo(map);
         return;
       }
       // Second click → finalize section
       const line = buildSectionLine(startRef.current, ll);
       if (lineGroupRef.current) map.removeLayer(lineGroupRef.current);
       const group = L.layerGroup();
-      L.polyline([line.start, line.end], { color: "#C8922A", weight: 3, dashArray: "8,4", opacity: 0.95 }).addTo(group);
-      L.circleMarker(line.start, { radius: 6, color: "#fff", weight: 2, fillColor: "#C8922A", fillOpacity: 1 }).bindTooltip("A", { permanent: true, direction: "top", offset: [0, -8] }).addTo(group);
-      L.circleMarker(line.end, { radius: 6, color: "#fff", weight: 2, fillColor: "#C8922A", fillOpacity: 1 }).bindTooltip("A'", { permanent: true, direction: "top", offset: [0, -8] }).addTo(group);
+      L.polyline([line.start, line.end], {
+        color: "#C8922A",
+        weight: 3,
+        dashArray: "8,4",
+        opacity: 0.95,
+      }).addTo(group);
+      L.circleMarker(line.start, {
+        radius: 6,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#C8922A",
+        fillOpacity: 1,
+      })
+        .bindTooltip("A", { permanent: true, direction: "top", offset: [0, -8] })
+        .addTo(group);
+      L.circleMarker(line.end, {
+        radius: 6,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#C8922A",
+        fillOpacity: 1,
+      })
+        .bindTooltip("A'", { permanent: true, direction: "top", offset: [0, -8] })
+        .addTo(group);
       group.addTo(map);
       lineGroupRef.current = group;
 
@@ -78,12 +116,20 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
       if (previewRef.current) {
         previewRef.current.setLatLngs(pts);
       } else {
-        previewRef.current = L.polyline(pts, { color: "#C8922A", weight: 2, dashArray: "4,4", opacity: 0.7 }).addTo(map);
+        previewRef.current = L.polyline(pts, {
+          color: "#C8922A",
+          weight: 2,
+          dashArray: "4,4",
+          opacity: 0.7,
+        }).addTo(map);
       }
     };
 
     const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") { setActive(false); cleanup(); }
+      if (e.key === "Escape") {
+        setActive(false);
+        cleanup();
+      }
     };
 
     map.on("click", onClick);
@@ -105,9 +151,14 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
       <div className="absolute top-3 right-16 z-[500] pointer-events-none">
         <div className="pointer-events-auto flex flex-col items-end gap-1.5">
           <button
-            onClick={() => { setActive((a) => !a); cleanup(); }}
+            onClick={() => {
+              setActive((a) => !a);
+              cleanup();
+            }}
             className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border backdrop-blur shadow-md transition-colors ${
-              active ? "bg-gold text-bg-primary" : "bg-background/95 text-foreground hover:bg-accent"
+              active
+                ? "bg-gold text-bg-primary"
+                : "bg-background/95 text-foreground hover:bg-accent"
             }`}
             aria-pressed={active}
             title="Sección 2D — click 2 puntos en el mapa"
@@ -131,8 +182,19 @@ export function SectionBuilderTool({ map, L, holes, logsByHole, projectName }: P
               </label>
               {section && (
                 <>
-                  <button onClick={() => setShowView(true)} className="text-[10px] font-mono text-info hover:underline">Ver</button>
-                  <button onClick={clearAll} className="text-muted-foreground hover:text-destructive p-0.5" aria-label="Limpiar"><X className="w-3.5 h-3.5" /></button>
+                  <button
+                    onClick={() => setShowView(true)}
+                    className="text-[10px] font-mono text-info hover:underline"
+                  >
+                    Ver
+                  </button>
+                  <button
+                    onClick={clearAll}
+                    className="text-muted-foreground hover:text-destructive p-0.5"
+                    aria-label="Limpiar"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
                 </>
               )}
             </div>

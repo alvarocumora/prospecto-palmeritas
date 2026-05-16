@@ -14,21 +14,22 @@ self.addEventListener("install", (e) => {
 });
 
 self.addEventListener("activate", (e) => {
-  e.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(
-      keys
-        .filter((k) => k.startsWith("geocap-") && !k.endsWith(VERSION))
-        .map((k) => caches.delete(k)),
-    );
-    await self.clients.claim();
-  })());
+  e.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => k.startsWith("geocap-") && !k.endsWith(VERSION))
+          .map((k) => caches.delete(k)),
+      );
+      await self.clients.claim();
+    })(),
+  );
 });
 
 function isTileUrl(url) {
   return (
-    url.hostname === "server.arcgisonline.com" ||
-    /\.tile\.openstreetmap\.org$/.test(url.hostname)
+    url.hostname === "server.arcgisonline.com" || /\.tile\.openstreetmap\.org$/.test(url.hostname)
   );
 }
 
@@ -65,7 +66,10 @@ async function cacheFirstTile(request) {
   try {
     const network = await fetch(request, { mode: "cors", credentials: "omit" });
     if (network && (network.status === 200 || network.status === 0)) {
-      cache.put(request, network.clone()).then(() => trimCache(TILE_CACHE, MAX_TILES)).catch(() => {});
+      cache
+        .put(request, network.clone())
+        .then(() => trimCache(TILE_CACHE, MAX_TILES))
+        .catch(() => {});
     }
     return network;
   } catch (e) {
@@ -79,7 +83,11 @@ self.addEventListener("fetch", (event) => {
   if (req.method !== "GET") return;
 
   let url;
-  try { url = new URL(req.url); } catch { return; }
+  try {
+    url = new URL(req.url);
+  } catch {
+    return;
+  }
 
   // Never intercept these
   if (
@@ -90,7 +98,8 @@ self.addEventListener("fetch", (event) => {
     url.pathname === "/service-worker.js" ||
     url.pathname === "/version.json" ||
     url.pathname === "/manifest.webmanifest"
-  ) return;
+  )
+    return;
 
   // Map tiles: cache-first
   if (isTileUrl(url)) {

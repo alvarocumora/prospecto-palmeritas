@@ -1,7 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
-import { Plane, Image as ImageIcon, Trash2, Upload, Plus, FileImage, GitCompareArrows, Boxes } from "lucide-react";
+import {
+  Plane,
+  Image as ImageIcon,
+  Trash2,
+  Upload,
+  Plus,
+  FileImage,
+  GitCompareArrows,
+  Boxes,
+} from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -22,7 +31,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/drones")({
   head: () => ({
     meta: [
       { title: "Drones — Geocapitals" },
-      { name: "description", content: "CRUD de vuelos de dron y rasters (orto, DEM, mag-grid) sobre el proyecto." },
+      {
+        name: "description",
+        content: "CRUD de vuelos de dron y rasters (orto, DEM, mag-grid) sobre el proyecto.",
+      },
     ],
   }),
   component: DronesPage,
@@ -35,7 +47,12 @@ function DronesPage() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { flights, rasters, loading, refresh } = useDroneFlights(active?.id ?? null);
-  const { diffs, stockpiles, loading: loadingAnalysis, refresh: refreshAnalysis } = useDroneAnalysis(active?.id ?? null);
+  const {
+    diffs,
+    stockpiles,
+    loading: loadingAnalysis,
+    refresh: refreshAnalysis,
+  } = useDroneAnalysis(active?.id ?? null);
   const [tab, setTab] = useState<"flights" | "rasters" | "diffs" | "stockpiles">("flights");
   const [showFlight, setShowFlight] = useState(false);
   const [showRaster, setShowRaster] = useState(false);
@@ -44,7 +61,11 @@ function DronesPage() {
   const [showStockpile, setShowStockpile] = useState(false);
 
   if (!active) {
-    return <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto activo.</div>;
+    return (
+      <div className="p-6 text-sm font-mono text-muted-foreground">
+        Selecciona un proyecto activo.
+      </div>
+    );
   }
   if (!user) return null;
 
@@ -52,31 +73,49 @@ function DronesPage() {
     if (!confirm(`¿Eliminar vuelo "${name}"?`)) return;
     const { error } = await deleteFlight(id);
     if (error) toast.error(error.message);
-    else { toast.success("Vuelo eliminado"); refresh(); }
+    else {
+      toast.success("Vuelo eliminado");
+      refresh();
+    }
   };
   const onDeleteRaster = async (id: string, name: string) => {
     if (!confirm(`¿Eliminar raster "${name}"?`)) return;
     const { error } = await deleteRaster(id);
     if (error) toast.error(error.message);
-    else { toast.success("Raster eliminado"); refresh(); }
+    else {
+      toast.success("Raster eliminado");
+      refresh();
+    }
   };
   const onDeleteDiff = async (id: string, name: string) => {
     if (!confirm(`¿Eliminar análisis "${name}"?`)) return;
     const { error } = await deleteDemDiff(id);
-    if (error) toast.error(error.message); else { toast.success("Eliminado"); refreshAnalysis(); }
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Eliminado");
+      refreshAnalysis();
+    }
   };
   const onDeleteStockpile = async (id: string, name: string) => {
     if (!confirm(`¿Eliminar stockpile "${name}"?`)) return;
     const { error } = await deleteStockpile(id);
-    if (error) toast.error(error.message); else { toast.success("Eliminado"); refreshAnalysis(); }
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Eliminado");
+      refreshAnalysis();
+    }
   };
 
   return (
     <div className="p-4 md:p-6 max-w-6xl mx-auto space-y-4">
       <header className="flex items-center justify-between gap-3">
         <div>
-          <div className="text-[10px] font-mono uppercase text-muted-foreground">Geocapitals · {active.name}</div>
-          <h1 className="text-xl font-mono font-semibold flex items-center gap-2"><Plane className="w-5 h-5 text-info" /> Drones</h1>
+          <div className="text-[10px] font-mono uppercase text-muted-foreground">
+            Geocapitals · {active.name}
+          </div>
+          <h1 className="text-xl font-mono font-semibold flex items-center gap-2">
+            <Plane className="w-5 h-5 text-info" /> Drones
+          </h1>
         </div>
         <div className="flex items-center gap-2">
           {tab === "rasters" && (
@@ -97,14 +136,18 @@ function DronesPage() {
             </button>
           )}
           {tab === "diffs" && (
-            <button onClick={() => setShowDiff(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light">
+            <button
+              onClick={() => setShowDiff(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
+            >
               <GitCompareArrows className="w-3.5 h-3.5" /> Comparar DSM
             </button>
           )}
           {tab === "stockpiles" && (
-            <button onClick={() => setShowStockpile(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light">
+            <button
+              onClick={() => setShowStockpile(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold hover:bg-gold-light"
+            >
               <Boxes className="w-3.5 h-3.5" /> Calcular volumen
             </button>
           )}
@@ -117,18 +160,23 @@ function DronesPage() {
             key={t}
             onClick={() => setTab(t)}
             className={`px-3 py-2 text-xs font-mono border-b-2 transition-colors whitespace-nowrap ${
-              tab === t ? "border-gold text-gold" : "border-transparent text-muted-foreground hover:text-foreground"
+              tab === t
+                ? "border-gold text-gold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {t === "flights" ? `Vuelos (${flights.length})`
-              : t === "rasters" ? `Rasters (${rasters.length})`
-              : t === "diffs" ? `Cut/Fill (${diffs.length})`
-              : `Stockpiles (${stockpiles.length})`}
+            {t === "flights"
+              ? `Vuelos (${flights.length})`
+              : t === "rasters"
+                ? `Rasters (${rasters.length})`
+                : t === "diffs"
+                  ? `Cut/Fill (${diffs.length})`
+                  : `Stockpiles (${stockpiles.length})`}
           </button>
         ))}
       </div>
 
-      {(loading || loadingAnalysis) ? (
+      {loading || loadingAnalysis ? (
         <div className="text-sm font-mono text-muted-foreground p-6 text-center">Cargando…</div>
       ) : tab === "flights" ? (
         <FlightsTable flights={flights} onDelete={onDeleteFlight} />
@@ -145,7 +193,10 @@ function DronesPage() {
           projectId={active.id}
           userId={user.id}
           onClose={() => setShowFlight(false)}
-          onSaved={() => { setShowFlight(false); refresh(); }}
+          onSaved={() => {
+            setShowFlight(false);
+            refresh();
+          }}
         />
       )}
       {showRaster && (
@@ -154,7 +205,10 @@ function DronesPage() {
           userId={user.id}
           flights={flights}
           onClose={() => setShowRaster(false)}
-          onSaved={() => { setShowRaster(false); refresh(); }}
+          onSaved={() => {
+            setShowRaster(false);
+            refresh();
+          }}
         />
       )}
       {showUploader && (
@@ -163,21 +217,34 @@ function DronesPage() {
           userId={user.id}
           flights={flights}
           onClose={() => setShowUploader(false)}
-          onSaved={() => { setShowUploader(false); refresh(); }}
+          onSaved={() => {
+            setShowUploader(false);
+            refresh();
+          }}
         />
       )}
       {showDiff && (
         <DemDiffDialog
-          projectId={active.id} userId={user.id} rasters={rasters}
+          projectId={active.id}
+          userId={user.id}
+          rasters={rasters}
           onClose={() => setShowDiff(false)}
-          onSaved={() => { setShowDiff(false); refreshAnalysis(); }}
+          onSaved={() => {
+            setShowDiff(false);
+            refreshAnalysis();
+          }}
         />
       )}
       {showStockpile && (
         <StockpileDialog
-          projectId={active.id} userId={user.id} rasters={rasters}
+          projectId={active.id}
+          userId={user.id}
+          rasters={rasters}
           onClose={() => setShowStockpile(false)}
-          onSaved={() => { setShowStockpile(false); refreshAnalysis(); }}
+          onSaved={() => {
+            setShowStockpile(false);
+            refreshAnalysis();
+          }}
         />
       )}
     </div>
@@ -222,7 +289,11 @@ function FlightsTable({
               <td className="px-3 py-2 text-right">{f.altitude_m ?? "—"}</td>
               <td className="px-3 py-2 text-right">{f.area_ha ?? "—"}</td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => onDelete(f.id, f.name)} className="text-destructive hover:bg-destructive/10 p-1 rounded" aria-label="Eliminar">
+                <button
+                  onClick={() => onDelete(f.id, f.name)}
+                  className="text-destructive hover:bg-destructive/10 p-1 rounded"
+                  aria-label="Eliminar"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </td>
@@ -266,25 +337,47 @@ function RastersTable({
           {rasters.map((r) => (
             <tr key={r.id} className="border-t border-border hover:bg-accent/30">
               <td className="px-3 py-2 font-semibold text-foreground">
-                <div className="inline-flex items-center gap-1.5"><ImageIcon className="w-3 h-3 text-gold" /> {r.name}</div>
-                {r.processing && <div className="text-[9px] text-warning">⏳ procesando metadata…</div>}
+                <div className="inline-flex items-center gap-1.5">
+                  <ImageIcon className="w-3 h-3 text-gold" /> {r.name}
+                </div>
+                {r.processing && (
+                  <div className="text-[9px] text-warning">⏳ procesando metadata…</div>
+                )}
                 {r.width_px && r.height_px && (
-                  <div className="text-[9px] text-muted-foreground">{r.width_px}×{r.height_px}px {r.pixel_size_m ? `· ${r.pixel_size_m.toFixed(2)} m/px` : ""}</div>
+                  <div className="text-[9px] text-muted-foreground">
+                    {r.width_px}×{r.height_px}px{" "}
+                    {r.pixel_size_m ? `· ${r.pixel_size_m.toFixed(2)} m/px` : ""}
+                  </div>
                 )}
               </td>
               <td className="px-3 py-2 uppercase">{r.raster_type}</td>
               <td className="px-3 py-2 text-muted-foreground">{r.captured_at ?? "—"}</td>
               <td className="px-3 py-2 text-muted-foreground text-[10px]">{r.crs ?? "—"}</td>
-              <td className="px-3 py-2 text-right text-muted-foreground">{r.file_size_bytes ? `${(r.file_size_bytes / 1024 / 1024).toFixed(1)} MB` : "—"}</td>
+              <td className="px-3 py-2 text-right text-muted-foreground">
+                {r.file_size_bytes ? `${(r.file_size_bytes / 1024 / 1024).toFixed(1)} MB` : "—"}
+              </td>
               <td className="px-3 py-2">
                 {r.storage_path ? (
-                  <span className="px-1.5 py-0.5 rounded bg-gold/10 text-gold text-[9px] uppercase">Storage</span>
+                  <span className="px-1.5 py-0.5 rounded bg-gold/10 text-gold text-[9px] uppercase">
+                    Storage
+                  </span>
                 ) : (
-                  <a href={r.url} target="_blank" rel="noopener" className="text-gold hover:underline truncate inline-block max-w-[150px] text-[10px]">URL ext ↗</a>
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener"
+                    className="text-gold hover:underline truncate inline-block max-w-[150px] text-[10px]"
+                  >
+                    URL ext ↗
+                  </a>
                 )}
               </td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => onDelete(r.id, r.name)} className="text-destructive hover:bg-destructive/10 p-1 rounded" aria-label="Eliminar">
+                <button
+                  onClick={() => onDelete(r.id, r.name)}
+                  className="text-destructive hover:bg-destructive/10 p-1 rounded"
+                  aria-label="Eliminar"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </td>
@@ -365,24 +458,49 @@ function FlightDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Sensor">
             <select value={sensor} onChange={(e) => setSensor(e.target.value)} className="input">
-              {SENSORS.map((s) => <option key={s} value={s}>{s.toUpperCase()}</option>)}
+              {SENSORS.map((s) => (
+                <option key={s} value={s}>
+                  {s.toUpperCase()}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Fecha de vuelo">
-            <input type="date" value={flownAt} onChange={(e) => setFlownAt(e.target.value)} className="input" />
+            <input
+              type="date"
+              value={flownAt}
+              onChange={(e) => setFlownAt(e.target.value)}
+              className="input"
+            />
           </Field>
           <Field label="Piloto">
             <input value={pilot} onChange={(e) => setPilot(e.target.value)} className="input" />
           </Field>
           <Field label="Altura (m)">
-            <input type="number" value={altitude} onChange={(e) => setAltitude(e.target.value)} className="input" />
+            <input
+              type="number"
+              value={altitude}
+              onChange={(e) => setAltitude(e.target.value)}
+              className="input"
+            />
           </Field>
           <Field label="Área (ha)">
-            <input type="number" step="0.1" value={area} onChange={(e) => setArea(e.target.value)} className="input" />
+            <input
+              type="number"
+              step="0.1"
+              value={area}
+              onChange={(e) => setArea(e.target.value)}
+              className="input"
+            />
           </Field>
         </div>
         <Field label="Notas">
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} className="input" />
+          <textarea
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            rows={2}
+            className="input"
+          />
         </Field>
         <Field label="Path / AOI (GeoJSON o KML)" required>
           <div className="space-y-1.5">
@@ -398,7 +516,10 @@ function FlightDialog({
               type="file"
               accept=".geojson,.json,.kml,application/json,application/vnd.google-earth.kml+xml,text/xml"
               className="hidden"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                if (f) handleFile(f);
+              }}
             />
             {geometry && (
               <div className="text-[10px] text-teal">✓ Geometría {geometry.type} cargada</div>
@@ -406,8 +527,18 @@ function FlightDialog({
           </div>
         </Field>
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-3 py-1.5 rounded border border-border text-muted-foreground hover:bg-accent">Cancelar</button>
-          <button type="submit" disabled={saving} className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold hover:bg-gold-light disabled:opacity-50">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded border border-border text-muted-foreground hover:bg-accent"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold hover:bg-gold-light disabled:opacity-50"
+          >
             {saving ? "Guardando…" : "Crear vuelo"}
           </button>
         </div>
@@ -474,34 +605,82 @@ function RasterDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Tipo">
             <select value={type} onChange={(e) => setType(e.target.value)} className="input">
-              {RASTER_TYPES.map((t) => <option key={t} value={t}>{t.toUpperCase()}</option>)}
+              {RASTER_TYPES.map((t) => (
+                <option key={t} value={t}>
+                  {t.toUpperCase()}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Capturado">
-            <input type="date" value={capturedAt} onChange={(e) => setCapturedAt(e.target.value)} className="input" />
+            <input
+              type="date"
+              value={capturedAt}
+              onChange={(e) => setCapturedAt(e.target.value)}
+              className="input"
+            />
           </Field>
         </div>
         <Field label="URL pública (PNG/JPG georef o tile)" required>
-          <input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…/ortho.png" className="input" />
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://…/ortho.png"
+            className="input"
+          />
         </Field>
         <Field label="Vuelo asociado (opcional)">
           <select value={flightId} onChange={(e) => setFlightId(e.target.value)} className="input">
             <option value="">— Ninguno —</option>
-            {flights.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
+            {flights.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
           </select>
         </Field>
         <div>
           <div className="text-[10px] uppercase text-muted-foreground mb-1.5">Bounds (lng/lat)</div>
           <div className="grid grid-cols-2 gap-2">
-            <input value={minLng} onChange={(e) => setMinLng(e.target.value)} placeholder="minLng" className="input" />
-            <input value={minLat} onChange={(e) => setMinLat(e.target.value)} placeholder="minLat" className="input" />
-            <input value={maxLng} onChange={(e) => setMaxLng(e.target.value)} placeholder="maxLng" className="input" />
-            <input value={maxLat} onChange={(e) => setMaxLat(e.target.value)} placeholder="maxLat" className="input" />
+            <input
+              value={minLng}
+              onChange={(e) => setMinLng(e.target.value)}
+              placeholder="minLng"
+              className="input"
+            />
+            <input
+              value={minLat}
+              onChange={(e) => setMinLat(e.target.value)}
+              placeholder="minLat"
+              className="input"
+            />
+            <input
+              value={maxLng}
+              onChange={(e) => setMaxLng(e.target.value)}
+              placeholder="maxLng"
+              className="input"
+            />
+            <input
+              value={maxLat}
+              onChange={(e) => setMaxLat(e.target.value)}
+              placeholder="maxLat"
+              className="input"
+            />
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-3 py-1.5 rounded border border-border text-muted-foreground hover:bg-accent">Cancelar</button>
-          <button type="submit" disabled={saving} className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold hover:bg-gold-light disabled:opacity-50">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 rounded border border-border text-muted-foreground hover:bg-accent"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold hover:bg-gold-light disabled:opacity-50"
+          >
             {saving ? "Guardando…" : "Crear raster"}
           </button>
         </div>
@@ -510,13 +689,29 @@ function RasterDialog({
   );
 }
 
-function Modal({ title, children, onClose }: { title: string; children: React.ReactNode; onClose: () => void }) {
+function Modal({
+  title,
+  children,
+  onClose,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onClose: () => void;
+}) {
   return (
-    <div className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-background border border-border rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-background border border-border rounded-lg max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <h3 className="text-sm font-mono font-semibold">{title}</h3>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
+            ✕
+          </button>
         </div>
         <div className="p-4">{children}</div>
       </div>
@@ -524,11 +719,20 @@ function Modal({ title, children, onClose }: { title: string; children: React.Re
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="text-[10px] uppercase text-muted-foreground mb-1 inline-block">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </span>
       {children}
       <style>{`.input{width:100%;padding:6px 8px;border:1px solid hsl(var(--border));background:hsl(var(--background));border-radius:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:hsl(var(--foreground))}`}</style>

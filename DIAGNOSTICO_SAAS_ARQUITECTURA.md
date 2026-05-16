@@ -5,11 +5,13 @@ Fecha de análisis: 2026-04-25.
 ## 1) Arquitectura actual
 
 ### Frontend
-- SPA/SSR híbrida con **TanStack Start + React 19 + Vite 7**, desplegable en Cloudflare Workers vía `wrangler`. El router es file-based (`src/routes/*`) y existe un layout autenticado monolítico que concentra navegación, permisos y shell de aplicación.  
+
+- SPA/SSR híbrida con **TanStack Start + React 19 + Vite 7**, desplegable en Cloudflare Workers vía `wrangler`. El router es file-based (`src/routes/*`) y existe un layout autenticado monolítico que concentra navegación, permisos y shell de aplicación.
 - La experiencia principal es **mapa operativo** (`/dashboard/map`) con una composición muy grande de capas, herramientas de dibujo, medición, snapshot, paneles y modo 3D.
 - Estado de datos en cliente con hooks custom (sin una capa de dominio separada): muchos hooks consultan Supabase directamente desde UI/hooks.
 
 ### Backend / BFF
+
 - No hay backend tradicional (Node/Go/etc.) separado.
 - Se combinan dos estilos de backend:
   1. **Server handlers** en rutas TanStack (`src/routes/api.public.*`) para endpoints HTTP públicos/internos.
@@ -17,6 +19,7 @@ Fecha de análisis: 2026-04-25.
 - El patrón dominante es “frontend + Supabase”, con lógica de negocio repartida entre cliente, SQL (RLS/triggers) y edge functions.
 
 ### Base de datos
+
 - Base de datos PostgreSQL en Supabase con fuerte uso de **RLS + funciones SQL SECURITY DEFINER + triggers**.
 - El tipado generado (`src/integrations/supabase/types.ts`) evidencia un dominio amplio (exploración, QA/QC, drones, catastro, economía, compliance, firmas, marketplace).
 - Hay alto volumen de migraciones en poco tiempo (37 archivos), lo que sugiere evolución rápida y potencial deuda de esquema/versionado.
@@ -53,6 +56,7 @@ Fecha de análisis: 2026-04-25.
    - Riesgo: latencia alta, timeouts, costos y baja elasticidad bajo crecimiento multi-tenant.
 
 ### Archivos críticos (hotspots)
+
 - **Arquitectura app/routing**: `src/routes/_authenticated.tsx`, `src/routes/_authenticated.dashboard.map.tsx`, `src/components/ProjectMap.tsx`.
 - **Datos/autenticación**: `src/hooks/useAuth.tsx`, `src/hooks/useProjects.ts`, `src/integrations/supabase/client.server.ts`, `src/integrations/supabase/auth-middleware.ts`.
 - **Dominio/seguridad DB**: migraciones de multi-tenancy, RLS y funciones helper (`20260418220643_...sql`) + migraciones de cron/sync (`20260420132729_...sql`).
@@ -62,14 +66,17 @@ Fecha de análisis: 2026-04-25.
 ## 3) ¿Puede escalar como plataforma SaaS?
 
 ### Respuesta corta
+
 **Sí, pero no de forma sana a gran escala sin refactor estructural.**
 
 ### Lo que ya está bien para SaaS
+
 - Multi-tenant real con membresía por proyecto y RLS madura.
 - Superficie funcional amplia (operación minera end-to-end) con diferenciadores de producto (mapa operacional + IA + compliance + firmas).
 - Arquitectura cloud-native (Supabase + edge) favorable para iteración rápida.
 
 ### Lo que limita el escalamiento
+
 - Acoplamiento alto en frontend core y reparto difuso de reglas.
 - Falta de capa de servicios de dominio versionada y testeable.
 - Procesos batch/sync de diseño más “MVP” que “plataforma robusta”.
@@ -78,10 +85,13 @@ Fecha de análisis: 2026-04-25.
 ## 4) Propuesta de nueva arquitectura modular
 
 ## Objetivo
+
 Pasar de “feature monolith” a una **arquitectura modular por dominios**, manteniendo Supabase como pilar de datos/autenticación, pero con contratos claros entre capas.
 
 ### 4.1 Módulos de dominio (bounded contexts)
+
 Separar en módulos explícitos (código + ownership + métricas):
+
 1. **Identity & Access** (auth, perfiles, membresía, RBAC/RLS)
 2. **Cadastre & Legal** (concesiones, boletín, PJUD, alertas)
 3. **Field Operations** (geofísica, drones, drilling, sampling)
@@ -90,6 +100,7 @@ Separar en módulos explícitos (código + ownership + métricas):
 6. **Collaboration** (team, invitations, annotations, realtime)
 
 ### 4.2 Estructura de código recomendada
+
 - `src/modules/<dominio>/`
   - `ui/` (componentes de presentación)
   - `application/` (casos de uso)
@@ -98,12 +109,14 @@ Separar en módulos explícitos (código + ownership + métricas):
 - `src/shared/` para cross-cutting (design system, logging, feature flags, observabilidad, errores).
 
 ### 4.3 Backend/BFF modular
+
 - Mantener TanStack server handlers y edge functions, pero introducir convención:
   - `/api/<dominio>/<use-case>` (versionado semántico cuando aplique)
   - Edge functions por dominio con contratos de entrada/salida formales (Zod/JSON Schema).
 - Jobs pesados asíncronos con cola/eventos (en vez de loops síncronos de larga duración).
 
 ### 4.4 Datos y gobernanza
+
 - Mantener RLS, pero:
   - estandarizar políticas por dominio,
   - auditar y limitar `SECURITY DEFINER`,
@@ -112,6 +125,7 @@ Separar en módulos explícitos (código + ownership + métricas):
 - Añadir migraciones “squash” por release mayor para reducir fricción histórica.
 
 ### 4.5 Observabilidad y SRE mínimo SaaS
+
 - Trazabilidad de request-id en frontend → api handler → edge function → DB.
 - Dashboards de latencia/errores por dominio.
 - Alertas de jobs (sync-catastro, sync-pjud, IA, firmas) con SLOs.
@@ -119,6 +133,7 @@ Separar en módulos explícitos (código + ownership + métricas):
 ## 5) Roadmap por etapas (MVP → Escalabilidad → IA)
 
 ### Etapa A — MVP robusto (0-8 semanas)
+
 **Meta:** estabilizar base técnica y seguridad sin frenar negocio.
 
 - A1. Seguridad operativa inmediata
@@ -133,11 +148,13 @@ Separar en módulos explícitos (código + ownership + métricas):
   - Pipeline CI mínimo: lint + typecheck + smoke tests API.
 
 **KPI de salida Etapa A:**
+
 - 0 secretos hardcodeados.
 - 80% de endpoints críticos con contrato validado.
 - Reducción de tamaño/complexidad de archivos hotspot (>30%).
 
 ### Etapa B — Escalabilidad SaaS (2-4 meses)
+
 **Meta:** soportar crecimiento multi-proyecto/multi-equipo sin degradación.
 
 - B1. Bounded contexts reales
@@ -150,11 +167,13 @@ Separar en módulos explícitos (código + ownership + métricas):
   - Revisión de índices por consulta real, pruebas de carga y tuning RLS.
 
 **KPI de salida Etapa B:**
+
 - p95 de operaciones críticas dentro de objetivo definido.
 - Job success rate > 99%.
 - MTTR de incidentes operativos < objetivo.
 
 ### Etapa C — Capa IA de plataforma (4-8 meses)
+
 **Meta:** pasar de features IA aisladas a plataforma IA gobernada.
 
 - C1. AI Gateway interno
@@ -167,6 +186,7 @@ Separar en módulos explícitos (código + ownership + métricas):
   - Versionado de prompts/modelos, evaluación offline, guardrails y auditoría.
 
 **KPI de salida Etapa C:**
+
 - % de respuestas IA con evidencia trazable.
 - Reducción medible de tiempo de análisis por geólogo.
 - Control de costo IA por proyecto/usuario.
@@ -174,4 +194,5 @@ Separar en módulos explícitos (código + ownership + métricas):
 ---
 
 ## Conclusión ejecutiva
+
 El repositorio ya tiene una base funcional potente y diferencial para minería, pero hoy opera como un monolito de features aceleradas. La prioridad estratégica no es “agregar más módulos”, sino **modularizar y endurecer seguridad/operación** para convertirlo en SaaS escalable de verdad.

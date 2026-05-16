@@ -29,7 +29,9 @@ export function useHyperspectralProducts(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -37,11 +39,18 @@ export function useHyperspectralProducts(projectId: string | null) {
       .channel(`hyperspectral-${projectId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "hyperspectral_products", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "hyperspectral_products",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [projectId, refresh]);
 
   return { products, loading, error, refresh };

@@ -35,9 +35,12 @@ export function FieldMap() {
   const [mapReady, setMapReady] = useState(false);
   const [follow, setFollow] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [pendingCoords, setPendingCoords] = useState<
-    { lat: number; lng: number; accuracy: number | null; elevation: number | null } | null
-  >(null);
+  const [pendingCoords, setPendingCoords] = useState<{
+    lat: number;
+    lng: number;
+    accuracy: number | null;
+    elevation: number | null;
+  } | null>(null);
 
   const { data: concessions } = useMiningConcessions(projectId);
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
@@ -76,7 +79,9 @@ export function FieldMap() {
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
         { maxZoom: 19, attribution: "Tiles &copy; Esri" },
       );
-      L.control.layers({ Satélite: sat, Topográfico: topo }, {}, { position: "topright" }).addTo(map);
+      L.control
+        .layers({ Satélite: sat, Topográfico: topo }, {}, { position: "topright" })
+        .addTo(map);
 
       mapRef.current = map;
       setMapReady(true);
@@ -90,7 +95,8 @@ export function FieldMap() {
 
   // Concessions layer
   useEffect(() => {
-    const L = LRef.current; const map = mapRef.current;
+    const L = LRef.current;
+    const map = mapRef.current;
     if (!L || !map || !mapReady) return;
     if (concessionLayerRef.current) {
       map.removeLayer(concessionLayerRef.current);
@@ -107,7 +113,11 @@ export function FieldMap() {
       try {
         const layer = L.geoJSON(c.geometry_geojson as never, {
           style: () => ({
-            color, weight: 2, opacity: 0.9, fillColor: color, fillOpacity: 0.15,
+            color,
+            weight: 2,
+            opacity: 0.9,
+            fillColor: color,
+            fillOpacity: 0.15,
             dashArray: isPending ? "6 4" : undefined,
           }),
         });
@@ -122,7 +132,9 @@ export function FieldMap() {
         group.addLayer(layer);
         const b = layer.getBounds();
         bounds = bounds ? bounds.extend(b) : b;
-      } catch {/* skip */}
+      } catch {
+        /* skip */
+      }
     }
     group.addTo(map);
     concessionLayerRef.current = group;
@@ -131,7 +143,8 @@ export function FieldMap() {
 
   // POIs layer
   useEffect(() => {
-    const L = LRef.current; const map = mapRef.current;
+    const L = LRef.current;
+    const map = mapRef.current;
     if (!L || !map || !mapReady) return;
     if (poiLayerRef.current) {
       map.removeLayer(poiLayerRef.current);
@@ -155,7 +168,8 @@ export function FieldMap() {
 
   // Targets layer (read-only en terreno)
   useEffect(() => {
-    const L = LRef.current; const map = mapRef.current;
+    const L = LRef.current;
+    const map = mapRef.current;
     if (!L || !map || !mapReady) return;
     if (targetsLayerRef.current) {
       map.removeLayer(targetsLayerRef.current);
@@ -169,19 +183,30 @@ export function FieldMap() {
 
   // GPS marker
   useEffect(() => {
-    const L = LRef.current; const map = mapRef.current;
+    const L = LRef.current;
+    const map = mapRef.current;
     if (!L || !map || !mapReady || !position) return;
     const latlng: [number, number] = [position.lat, position.lng];
     if (!meMarkerRef.current) {
       meMarkerRef.current = L.circleMarker(latlng, {
-        radius: 6, color: "#fff", weight: 2, fillColor: "#3b82f6", fillOpacity: 1,
+        radius: 6,
+        color: "#fff",
+        weight: 2,
+        fillColor: "#3b82f6",
+        fillOpacity: 1,
       }).addTo(map) as unknown as Marker;
     } else {
-      (meMarkerRef.current as unknown as { setLatLng: (ll: [number, number]) => void }).setLatLng(latlng);
+      (meMarkerRef.current as unknown as { setLatLng: (ll: [number, number]) => void }).setLatLng(
+        latlng,
+      );
     }
     if (meCircleRef.current) map.removeLayer(meCircleRef.current);
     meCircleRef.current = L.circle(latlng, {
-      radius: position.accuracy, color: "#3b82f6", weight: 1, fillColor: "#3b82f6", fillOpacity: 0.1,
+      radius: position.accuracy,
+      color: "#3b82f6",
+      weight: 1,
+      fillColor: "#3b82f6",
+      fillOpacity: 0.1,
     }).addTo(map);
     if (follow) map.setView(latlng, Math.max(map.getZoom(), 16), { animate: true });
   }, [position, mapReady, follow]);
@@ -251,7 +276,9 @@ export function FieldMap() {
       >
         <div className="min-w-0">
           <div className="text-[10px] font-mono uppercase text-muted-foreground">Mapa de campo</div>
-          <div className="text-sm font-mono font-semibold truncate text-foreground">{active?.name}</div>
+          <div className="text-sm font-mono font-semibold truncate text-foreground">
+            {active?.name}
+          </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {targets.length > 0 && (
@@ -288,9 +315,18 @@ export function FieldMap() {
       >
         <div className="text-muted-foreground mb-1">Pertenencias</div>
         <div className="flex flex-col gap-0.5">
-          <span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.ok }} /> Vigente</span>
-          <span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.warning }} /> Por vencer</span>
-          <span className="flex items-center gap-1.5"><i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.expired }} /> Vencida</span>
+          <span className="flex items-center gap-1.5">
+            <i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.ok }} />{" "}
+            Vigente
+          </span>
+          <span className="flex items-center gap-1.5">
+            <i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.warning }} />{" "}
+            Por vencer
+          </span>
+          <span className="flex items-center gap-1.5">
+            <i className="w-2.5 h-2.5 rounded-sm" style={{ background: EXPIRY_COLORS.expired }} />{" "}
+            Vencida
+          </span>
         </div>
         {poisLoading && (
           <div className="mt-1 inline-flex items-center gap-1 text-muted-foreground">
@@ -329,7 +365,9 @@ export function FieldMap() {
         online={online}
         projectId={projectId}
         organizationId={orgId}
-        onSave={async (p: NewFieldPoi) => { await create(p); }}
+        onSave={async (p: NewFieldPoi) => {
+          await create(p);
+        }}
         onQueue={(p) => enqueue(p)}
       />
     </div>

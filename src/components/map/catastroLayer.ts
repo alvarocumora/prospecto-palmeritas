@@ -10,12 +10,7 @@ import type { AnyFC, LeafletNS } from "./types";
 const TTL_MS = 24 * 60 * 60 * 1000; // 24h
 const CACHE_VERSION = "v2"; // bumped: schema change (single layer, ORIGEN-discriminated)
 
-function cacheKey(bbox: {
-  minLng: number;
-  minLat: number;
-  maxLng: number;
-  maxLat: number;
-}) {
+function cacheKey(bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number }) {
   const r = (n: number) => n.toFixed(4);
   return `catastro:${CACHE_VERSION}:all:${r(bbox.minLng)},${r(bbox.minLat)},${r(bbox.maxLng)},${r(bbox.maxLat)}`;
 }
@@ -91,7 +86,7 @@ const ALL_ORIGENS: CatastroOrigen[] = [
  */
 export async function loadCatastro(
   L: LeafletNS,
-  bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number }
+  bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number },
 ): Promise<CatastroLoadResult> {
   const key = cacheKey(bbox);
   const cached = readCache(key);
@@ -146,7 +141,7 @@ export async function loadCatastro(
         onEachFeature: (f, l) => {
           l.bindPopup(catastroPopupHtml(f.properties ?? {}));
         },
-      }
+      },
     );
   }
 
@@ -177,11 +172,7 @@ export function wireMacrostratClickPopup(
   L: LeafletNS,
   map: LeafletMap,
   fetchUnit: (lat: number, lng: number) => Promise<Record<string, unknown> | undefined>,
-  popupHtml: (
-    unit: Record<string, unknown> | undefined,
-    lat: number,
-    lng: number
-  ) => string,
+  popupHtml: (unit: Record<string, unknown> | undefined, lat: number, lng: number) => string,
 ) {
   map.on("click", async (e) => {
     const { lat, lng } = e.latlng;
@@ -201,7 +192,8 @@ export function wireMacrostratClickPopup(
       const b = map.getBounds();
       const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
       const props = await wmsGetFeatureInfo({
-        baseUrl: "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
+        baseUrl:
+          "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
         layer: "0",
         bbox,
         width: size.x,
@@ -210,7 +202,11 @@ export function wireMacrostratClickPopup(
         y: point.y,
       });
       if (props && Object.keys(props).length > 0) {
-        const name = (props.NOMBRE_UNIDAD ?? props.UNIDAD ?? props.NAME ?? props.LITOLOGIA ?? "Unidad geológica chilena") as string;
+        const name = (props.NOMBRE_UNIDAD ??
+          props.UNIDAD ??
+          props.NAME ??
+          props.LITOLOGIA ??
+          "Unidad geológica chilena") as string;
         const edad = (props.EDAD ?? props.AGE ?? props.PERIODO ?? "—") as string;
         const lito = (props.LITOLOGIA ?? props.ROCK_TYPE ?? "—") as string;
         chileHtml = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:280px;">

@@ -100,7 +100,10 @@ export function parseGeoFile(text: string): GeoJSON.Geometry | null {
 
 /** Computes bbox [minLng, minLat, maxLng, maxLat] from a geometry. */
 export function geometryBbox(geom: GeoJSON.Geometry): [number, number, number, number] | null {
-  let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+  let minLng = Infinity,
+    minLat = Infinity,
+    maxLng = -Infinity,
+    maxLat = -Infinity;
   const visit = (coords: unknown): void => {
     if (Array.isArray(coords) && typeof coords[0] === "number") {
       const [lng, lat] = coords as number[];

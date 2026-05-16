@@ -32,7 +32,9 @@ export function GeoIntelBriefButton({ map }: Props) {
     setBrief("");
     setEvidence(null);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/geo-brief`;
       const resp = await fetch(url, {
         method: "POST",
@@ -87,7 +89,11 @@ export function GeoIntelBriefButton({ map }: Props) {
         className="absolute top-3 right-28 z-[500] inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gold/40 bg-bg-secondary/95 backdrop-blur text-foreground hover:bg-gold/10 hover:border-gold disabled:opacity-50 text-[11px] font-mono shadow-md transition-colors"
         title="Generar brief geológico IA del centro del mapa"
       >
-        {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" /> : <Sparkles className="w-3.5 h-3.5 text-gold" />}
+        {loading ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" />
+        ) : (
+          <Sparkles className="w-3.5 h-3.5 text-gold" />
+        )}
         <span className="hidden sm:inline">Geo-Intel Brief</span>
       </button>
 
@@ -98,10 +104,16 @@ export function GeoIntelBriefButton({ map }: Props) {
             <div className="font-mono text-xs font-semibold flex-1">Geo-Intel Brief</div>
             {evidence && (
               <span className="text-[10px] font-mono text-muted-foreground inline-flex items-center gap-1">
-                <MapPin className="w-3 h-3" /> {evidence.point.lat.toFixed(4)}, {evidence.point.lng.toFixed(4)}
+                <MapPin className="w-3 h-3" /> {evidence.point.lat.toFixed(4)},{" "}
+                {evidence.point.lng.toFixed(4)}
               </span>
             )}
-            <button onClick={() => setOpen(false)} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+            <button
+              onClick={() => setOpen(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </header>
 
           <div className="flex-1 overflow-y-auto p-3 text-xs font-mono whitespace-pre-wrap text-foreground">

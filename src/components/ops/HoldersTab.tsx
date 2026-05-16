@@ -38,7 +38,9 @@ export function HoldersTab({ projectId, userId }: { projectId: string; userId: s
       </div>
 
       {loading ? (
-        <div className="p-6 text-center text-sm text-text-secondary border border-border rounded">Cargando…</div>
+        <div className="p-6 text-center text-sm text-text-secondary border border-border rounded">
+          Cargando…
+        </div>
       ) : filtered.length === 0 ? (
         <div className="p-6 text-center text-sm text-text-secondary border border-border rounded">
           {data.length === 0 ? "Sin titulares todavía. Crea el primero." : "Sin resultados."}
@@ -57,7 +59,10 @@ export function HoldersTab({ projectId, userId }: { projectId: string; userId: s
           projectId={projectId}
           userId={userId}
           onClose={() => setCreating(false)}
-          onSaved={() => { setCreating(false); refresh(); }}
+          onSaved={() => {
+            setCreating(false);
+            refresh();
+          }}
         />
       )}
     </div>

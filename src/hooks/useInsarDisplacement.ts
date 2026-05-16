@@ -9,7 +9,10 @@ export function useInsarDisplacement(projectId: string | null) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setPoints([]); return; }
+    if (!projectId) {
+      setPoints([]);
+      return;
+    }
     setLoading(true);
     const { data } = await supabase
       .from("insar_displacement")
@@ -21,7 +24,9 @@ export function useInsarDisplacement(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -29,11 +34,18 @@ export function useInsarDisplacement(projectId: string | null) {
       .channel(`insar-${projectId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "insar_displacement", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "insar_displacement",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [projectId, refresh]);
 
   return { points, loading, refresh };

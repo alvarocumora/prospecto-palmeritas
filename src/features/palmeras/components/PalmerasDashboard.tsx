@@ -24,7 +24,12 @@ export function PalmerasDashboard() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <PalmerasTopNav active={active} setActive={setActive} onExport={handleExport} exporting={exporting} />
+      <PalmerasTopNav
+        active={active}
+        setActive={setActive}
+        onExport={handleExport}
+        exporting={exporting}
+      />
       <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6">
         {active === "overview" ? <OverviewTab /> : <PalmerasTabPlaceholder tab={active} />}
       </main>

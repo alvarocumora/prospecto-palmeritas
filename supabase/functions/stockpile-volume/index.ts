@@ -44,12 +44,18 @@ function latLngToUtm(lat: number, lng: number): [number, number, number, boolean
   const M =
     a *
     ((1 - Math.pow(e, 2) / 4 - (3 * Math.pow(e, 4)) / 64 - (5 * Math.pow(e, 6)) / 256) * latRad -
-      ((3 * Math.pow(e, 2)) / 8 + (3 * Math.pow(e, 4)) / 32 + (45 * Math.pow(e, 6)) / 1024) * Math.sin(2 * latRad) +
+      ((3 * Math.pow(e, 2)) / 8 + (3 * Math.pow(e, 4)) / 32 + (45 * Math.pow(e, 6)) / 1024) *
+        Math.sin(2 * latRad) +
       ((15 * Math.pow(e, 4)) / 256 + (45 * Math.pow(e, 6)) / 1024) * Math.sin(4 * latRad) -
       ((35 * Math.pow(e, 6)) / 3072) * Math.sin(6 * latRad));
   const easting =
-    k0 * N * (A + ((1 - T + C) * Math.pow(A, 3)) / 6 +
-      ((5 - 18 * T + Math.pow(T, 2) + 72 * C - 58 * (e * e) / (1 - e * e)) * Math.pow(A, 5)) / 120) + 500000;
+    k0 *
+      N *
+      (A +
+        ((1 - T + C) * Math.pow(A, 3)) / 6 +
+        ((5 - 18 * T + Math.pow(T, 2) + 72 * C - (58 * (e * e)) / (1 - e * e)) * Math.pow(A, 5)) /
+          120) +
+    500000;
   let northing =
     k0 *
     (M +
@@ -57,7 +63,9 @@ function latLngToUtm(lat: number, lng: number): [number, number, number, boolean
         Math.tan(latRad) *
         (Math.pow(A, 2) / 2 +
           ((5 - T + 9 * C + 4 * C * C) * Math.pow(A, 4)) / 24 +
-          ((61 - 58 * T + Math.pow(T, 2) + 600 * C - 330 * (e * e) / (1 - e * e)) * Math.pow(A, 6)) / 720));
+          ((61 - 58 * T + Math.pow(T, 2) + 600 * C - (330 * (e * e)) / (1 - e * e)) *
+            Math.pow(A, 6)) /
+            720));
   const southern = lat < 0;
   if (southern) northing += 10000000;
   return [easting, northing, zone, southern];
@@ -66,15 +74,23 @@ function latLngToUtm(lat: number, lng: number): [number, number, number, boolean
 function pointInPolygon(x: number, y: number, ring: number[][]): boolean {
   let inside = false;
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const xi = ring[i][0], yi = ring[i][1];
-    const xj = ring[j][0], yj = ring[j][1];
+    const xi = ring[i][0],
+      yi = ring[i][1];
+    const xj = ring[j][0],
+      yj = ring[j][1];
     const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
     if (intersect) inside = !inside;
   }
   return inside;
 }
 
-function sample(raster: Float32Array | number[], width: number, height: number, fx: number, fy: number): number | null {
+function sample(
+  raster: Float32Array | number[],
+  width: number,
+  height: number,
+  fx: number,
+  fy: number,
+): number | null {
   const px = Math.min(width - 1, Math.max(0, Math.floor(fx * width)));
   const py = Math.min(height - 1, Math.max(0, Math.floor(fy * height)));
   const v = raster[py * width + px];
@@ -92,7 +108,10 @@ Deno.serve(async (req) => {
     const userId = req.headers.get("x-user-id");
     if (!userId) throw new Error("Missing x-user-id header");
 
-    const sb = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
+    const sb = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+    );
 
     const { data: row, error } = await sb
       .from("drone_rasters")
@@ -102,7 +121,9 @@ Deno.serve(async (req) => {
     if (error || !row) throw new Error("raster not found");
     if (!row.storage_path) throw new Error("raster has no storage file");
 
-    const { data: signed } = await sb.storage.from("drone-rasters").createSignedUrl(row.storage_path, 60);
+    const { data: signed } = await sb.storage
+      .from("drone-rasters")
+      .createSignedUrl(row.storage_path, 60);
     if (!signed) throw new Error("signed-url failed");
     const res = await fetch(signed.signedUrl);
     if (!res.ok) throw new Error(`download HTTP ${res.status}`);
@@ -112,7 +133,10 @@ Deno.serve(async (req) => {
     const width = image.getWidth();
     const height = image.getHeight();
     const bbox = image.getBoundingBox(); // raster CRS
-    const data = (await image.readRasters({ samples: [0] })) as unknown as (Float32Array | number[])[];
+    const data = (await image.readRasters({ samples: [0] })) as unknown as (
+      | Float32Array
+      | number[]
+    )[];
     const raster = data[0];
 
     // Convert polygon (lng,lat) → raster CRS (assume UTM)
@@ -122,7 +146,10 @@ Deno.serve(async (req) => {
       return [e, n];
     });
     // Polygon bounds in raster CRS
-    let pMinX = Infinity, pMinY = Infinity, pMaxX = -Infinity, pMaxY = -Infinity;
+    let pMinX = Infinity,
+      pMinY = Infinity,
+      pMaxX = -Infinity,
+      pMaxY = -Infinity;
     for (const [x, y] of ringRC) {
       if (x < pMinX) pMinX = x;
       if (x > pMaxX) pMaxX = x;
@@ -161,7 +188,10 @@ Deno.serve(async (req) => {
         inside.push({ x: cx, y: cy, v });
         // Edge detection: cell adjacent to outside or to polygon boundary
         const onEdge =
-          i === 0 || j === 0 || i === wCells - 1 || j === hCells - 1 ||
+          i === 0 ||
+          j === 0 ||
+          i === wCells - 1 ||
+          j === hCells - 1 ||
           !pointInPolygon(cx + cellW, cy, ringRC) ||
           !pointInPolygon(cx - cellW, cy, ringRC) ||
           !pointInPolygon(cx, cy + cellH, ringRC) ||
@@ -174,7 +204,8 @@ Deno.serve(async (req) => {
 
     let baseZ: number;
     if (baseMethod === "fixed") {
-      if (body.baseElevationM === null || body.baseElevationM === undefined) throw new Error("base_elevation_m required for fixed method");
+      if (body.baseElevationM === null || body.baseElevationM === undefined)
+        throw new Error("base_elevation_m required for fixed method");
       baseZ = body.baseElevationM;
     } else if (baseMethod === "min") {
       baseZ = Math.min(...inside.map((c) => c.v));

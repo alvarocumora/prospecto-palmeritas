@@ -47,9 +47,14 @@ function ResetPasswordPage() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <div className="w-full max-w-sm space-y-6">
-        <h1 className="text-xl font-mono font-bold text-foreground text-center">Nueva contraseña</h1>
+        <h1 className="text-xl font-mono font-bold text-foreground text-center">
+          Nueva contraseña
+        </h1>
         {ready ? (
-          <form onSubmit={handleSubmit} className="space-y-4 rounded border border-border bg-bg-secondary p-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-4 rounded border border-border bg-bg-secondary p-6"
+          >
             <input
               type="password"
               value={password}

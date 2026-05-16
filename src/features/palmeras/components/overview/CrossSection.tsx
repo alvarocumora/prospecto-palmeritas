@@ -13,7 +13,14 @@ export function CrossSection() {
         {[0, 75, 150, 225, 300].map((depth, index) => (
           <g key={depth}>
             <line x1="36" y1={30 + index * 60} x2="40" y2={30 + index * 60} stroke="var(--hint)" />
-            <text x="32" y={34 + index * 60} fontSize="9" fill="var(--muted-foreground)" textAnchor="end" fontFamily="monospace">
+            <text
+              x="32"
+              y={34 + index * 60}
+              fontSize="9"
+              fill="var(--muted-foreground)"
+              textAnchor="end"
+              fontFamily="monospace"
+            >
               {depth}m
             </text>
           </g>
@@ -21,11 +28,31 @@ export function CrossSection() {
 
         {CROSS_SECTION_LAYERS.map((layer) => (
           <g key={layer.label}>
-            <rect x="50" y={layer.y} width="220" height={layer.h} fill={layer.color} fillOpacity="0.25" stroke={layer.color} />
-            <text x="60" y={layer.y + 16} fontSize="10" fill="var(--foreground)" fontFamily="monospace">
+            <rect
+              x="50"
+              y={layer.y}
+              width="220"
+              height={layer.h}
+              fill={layer.color}
+              fillOpacity="0.25"
+              stroke={layer.color}
+            />
+            <text
+              x="60"
+              y={layer.y + 16}
+              fontSize="10"
+              fill="var(--foreground)"
+              fontFamily="monospace"
+            >
               {layer.label}
             </text>
-            <text x="60" y={layer.y + 28} fontSize="9" fill="var(--muted-foreground)" fontFamily="monospace">
+            <text
+              x="60"
+              y={layer.y + 28}
+              fontSize="9"
+              fill="var(--muted-foreground)"
+              fontFamily="monospace"
+            >
               {layer.depth}
             </text>
           </g>
@@ -36,7 +63,15 @@ export function CrossSection() {
           Veta Au–Cu
         </text>
 
-        <line x1="290" y1="30" x2="340" y2="240" stroke="var(--alert)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <line
+          x1="290"
+          y1="30"
+          x2="340"
+          y2="240"
+          stroke="var(--alert)"
+          strokeWidth="1.5"
+          strokeDasharray="3 3"
+        />
         <text x="300" y="25" fontSize="9" fill="var(--alert)" fontFamily="monospace">
           DDH-001
         </text>

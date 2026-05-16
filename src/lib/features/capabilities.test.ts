@@ -15,7 +15,10 @@ describe("SaaS capability helpers", () => {
     expect(snapshot.enabledFeatures).toContain("geocapital.ai_copilot");
     expect(snapshot.enabledFeatures).toContain("geocapital.advanced_3d");
     expect(snapshot.enabledFeatures).not.toContain("geocapital.investor_crm");
-    expect(snapshot.featureDecisions["geocapital.ai_copilot"]).toMatchObject({ enabled: true, source: "plan" });
+    expect(snapshot.featureDecisions["geocapital.ai_copilot"]).toMatchObject({
+      enabled: true,
+      source: "plan",
+    });
     expect(snapshot.usageDecisions).toHaveLength(5);
   });
 
@@ -34,7 +37,9 @@ describe("SaaS capability helpers", () => {
       source: "override",
       reason: "pilot",
     });
-    expect(snapshot.usageDecisions.find((decision) => decision.key === "ai_briefs_per_month")).toMatchObject({
+    expect(
+      snapshot.usageDecisions.find((decision) => decision.key === "ai_briefs_per_month"),
+    ).toMatchObject({
       used: 10,
       limit: 50,
       remaining: 40,

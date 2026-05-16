@@ -5,7 +5,10 @@ export type WorkflowPhase = "planned" | "field" | "processing" | "completed";
 
 export const PHASE_ORDER: WorkflowPhase[] = ["planned", "field", "processing", "completed"];
 
-export const PHASE_META: Record<WorkflowPhase, { label: string; icon: ReactNode; description: string }> = {
+export const PHASE_META: Record<
+  WorkflowPhase,
+  { label: string; icon: ReactNode; description: string }
+> = {
   planned: {
     label: "Planificada",
     icon: <Activity className="w-3.5 h-3.5" />,
@@ -123,7 +126,13 @@ export function WorkflowStepper({
                         : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {isPast ? <Check className="w-3 h-3" /> : isFuture ? <Lock className="w-2.5 h-2.5" /> : i + 1}
+                  {isPast ? (
+                    <Check className="w-3 h-3" />
+                  ) : isFuture ? (
+                    <Lock className="w-2.5 h-2.5" />
+                  ) : (
+                    i + 1
+                  )}
                 </span>
                 <span
                   className={`text-[10px] font-mono uppercase tracking-wider ${
@@ -155,7 +164,9 @@ export function WorkflowStepper({
               style={{ width: `${Math.max(2, Math.min(100, Math.round(progress.pct * 100)))}%` }}
             />
           </div>
-          <p className="text-[10px] text-muted-foreground mt-1.5">{PHASE_META[phase].description}</p>
+          <p className="text-[10px] text-muted-foreground mt-1.5">
+            {PHASE_META[phase].description}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">

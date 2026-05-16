@@ -1,5 +1,16 @@
 import { useMemo, useState } from "react";
-import { AlertTriangle, CheckCircle2, ChevronDown, ClipboardList, Eye, Loader2, MessageSquarePlus, Radar, Sparkles, X } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  ClipboardList,
+  Eye,
+  Loader2,
+  MessageSquarePlus,
+  Radar,
+  Sparkles,
+  X,
+} from "lucide-react";
 import {
   useInsarAlertHistory,
   useRunInsarWorkflow,
@@ -77,7 +88,9 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   }, [actions]);
 
   const stats = useMemo(() => {
-    const taskedSet = new Set(actions.filter((a: any) => a.action_type === "task_created").map((a: any) => a.insar_id));
+    const taskedSet = new Set(
+      actions.filter((a: any) => a.action_type === "task_created").map((a: any) => a.insar_id),
+    );
     return {
       total: sites.length,
       tasked: taskedSet.size,
@@ -89,7 +102,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   function toggle(id: string) {
     setExpanded((p) => {
       const n = new Set(p);
-      if (n.has(id)) n.delete(id); else n.add(id);
+      if (n.has(id)) n.delete(id);
+      else n.add(id);
       return n;
     });
   }
@@ -105,7 +119,10 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
     setComposer(null);
   }
 
-  async function quickAction(insarId: string, actionType: "field_inspection" | "escalated" | "dismissed" | "closed") {
+  async function quickAction(
+    insarId: string,
+    actionType: "field_inspection" | "escalated" | "dismissed" | "closed",
+  ) {
     await addMut.mutateAsync({ projectId, insarId, actionType });
   }
 
@@ -118,7 +135,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
             Workflow Alertas InSAR
           </h2>
           <span className="text-xs text-text-dim font-mono">
-            {stats.total} sitios · {stats.tasked} c/tarea · {stats.pending} pendientes · {stats.tasksOpen} tareas abiertas
+            {stats.total} sitios · {stats.tasked} c/tarea · {stats.pending} pendientes ·{" "}
+            {stats.tasksOpen} tareas abiertas
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -134,7 +152,11 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
             disabled={runMut.isPending || stats.pending === 0}
             className="text-xs px-3 py-1.5 rounded border border-signal-cyan/40 text-signal-cyan hover:bg-signal-cyan/10 disabled:opacity-50 font-mono uppercase tracking-wide flex items-center gap-1.5"
           >
-            {runMut.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {runMut.isPending ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Sparkles className="w-3 h-3" />
+            )}
             Generar tareas ({stats.pending})
           </button>
         </div>
@@ -142,7 +164,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
 
       {runMut.data && (
         <div className="px-4 py-2 border-b border-border/20 text-xs font-mono text-emerald-400 bg-emerald-500/5">
-          Workflow ejecutado: {runMut.data.created} tareas creadas, {runMut.data.skipped} omitidas (ya tenían tarea), {runMut.data.total} totales.
+          Workflow ejecutado: {runMut.data.created} tareas creadas, {runMut.data.skipped} omitidas
+          (ya tenían tarea), {runMut.data.total} totales.
         </div>
       )}
 
@@ -168,17 +191,29 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                 <div className="flex items-start justify-between gap-3 flex-wrap">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className={cn("text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border", PRIO_COLOR[prio])}>
+                      <span
+                        className={cn(
+                          "text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border",
+                          PRIO_COLOR[prio],
+                        )}
+                      >
                         {prio}
                       </span>
                       <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border bg-signal-amber/10 text-signal-amber border-signal-amber/40">
                         {s.alert_severity}
                       </span>
-                      <span className="text-sm font-medium text-foreground">{s.asset_name ?? "Sitio"}</span>
-                      <span className="text-[11px] text-text-dim font-mono">· {s.asset_type ?? "—"}</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {s.asset_name ?? "Sitio"}
+                      </span>
+                      <span className="text-[11px] text-text-dim font-mono">
+                        · {s.asset_type ?? "—"}
+                      </span>
                     </div>
                     <div className="text-[11px] text-text-secondary font-mono mt-1 flex flex-wrap gap-3">
-                      <span><Radar className="w-2.5 h-2.5 inline mr-1" /> v = <b className="text-foreground">{vel.toFixed(1)} mm/año</b></span>
+                      <span>
+                        <Radar className="w-2.5 h-2.5 inline mr-1" /> v ={" "}
+                        <b className="text-foreground">{vel.toFixed(1)} mm/año</b>
+                      </span>
                       <span>Σ = {Number(s.cumulative_displacement_mm ?? 0).toFixed(0)} mm</span>
                       <span>coh = {Number(s.coherence ?? 0).toFixed(2)}</span>
                       <span>cierre {String(s.end_date ?? "").slice(0, 10)}</span>
@@ -189,7 +224,9 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         </span>
                       )}
                       {siteActions.length > 0 && (
-                        <span className="text-violet-300">{siteActions.length} eventos en historial</span>
+                        <span className="text-violet-300">
+                          {siteActions.length} eventos en historial
+                        </span>
                       )}
                     </div>
                   </div>
@@ -225,7 +262,9 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                       onClick={() => toggle(s.id)}
                       className="text-[10px] px-2 py-1 rounded border border-border/40 text-text-secondary hover:border-border font-mono uppercase flex items-center gap-1"
                     >
-                      <ChevronDown className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")} />
+                      <ChevronDown
+                        className={cn("w-3 h-3 transition-transform", isOpen && "rotate-180")}
+                      />
                       Historial ({siteActions.length})
                     </button>
                   </div>
@@ -251,7 +290,11 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         disabled={!composer.text.trim() || addMut.isPending}
                         className="text-[10px] px-2 py-1 rounded border border-violet-500/40 bg-violet-500/10 text-violet-300 font-mono uppercase disabled:opacity-50 flex items-center gap-1"
                       >
-                        {addMut.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <CheckCircle2 className="w-3 h-3" />}
+                        {addMut.isPending ? (
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="w-3 h-3" />
+                        )}
                         Registrar
                       </button>
                     </div>
@@ -261,21 +304,31 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                 {isOpen && (
                   <div className="mt-3 ml-2 pl-3 border-l-2 border-border/30 space-y-2">
                     {siteActions.length === 0 ? (
-                      <div className="text-[11px] text-text-dim font-mono">Sin eventos registrados todavía.</div>
+                      <div className="text-[11px] text-text-dim font-mono">
+                        Sin eventos registrados todavía.
+                      </div>
                     ) : (
                       siteActions.map((a: any) => (
                         <div key={a.id} className="flex items-start gap-2 text-[11px] font-mono">
-                          <span className={cn("inline-block px-1.5 py-0.5 rounded border text-[9px] uppercase whitespace-nowrap", ACTION_COLOR[a.action_type] ?? "")}>
+                          <span
+                            className={cn(
+                              "inline-block px-1.5 py-0.5 rounded border text-[9px] uppercase whitespace-nowrap",
+                              ACTION_COLOR[a.action_type] ?? "",
+                            )}
+                          >
                             {ACTION_LABEL[a.action_type] ?? a.action_type}
                           </span>
                           <div className="min-w-0 flex-1">
                             <div className="text-text-dim text-[10px]">
                               {new Date(a.created_at).toLocaleString("es-CL")}
                               {a.severity_at_time && ` · sev ${a.severity_at_time}`}
-                              {a.velocity_mm_year != null && ` · ${Number(a.velocity_mm_year).toFixed(1)} mm/a`}
+                              {a.velocity_mm_year != null &&
+                                ` · ${Number(a.velocity_mm_year).toFixed(1)} mm/a`}
                             </div>
                             {a.recommendation && (
-                              <div className="text-text-secondary mt-0.5 whitespace-pre-wrap">{a.recommendation}</div>
+                              <div className="text-text-secondary mt-0.5 whitespace-pre-wrap">
+                                {a.recommendation}
+                              </div>
                             )}
                             {a.notes && !a.recommendation && (
                               <div className="text-text-dim mt-0.5">{a.notes}</div>
@@ -286,12 +339,24 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                     )}
                     {siteTasks.length > 0 && (
                       <div className="pt-2 border-t border-border/20">
-                        <div className="text-[10px] text-text-dim font-mono uppercase mb-1">Tareas vinculadas</div>
+                        <div className="text-[10px] text-text-dim font-mono uppercase mb-1">
+                          Tareas vinculadas
+                        </div>
                         {siteTasks.map((t: any) => (
-                          <div key={t.id} className="text-[11px] font-mono text-text-secondary flex items-center gap-2">
+                          <div
+                            key={t.id}
+                            className="text-[11px] font-mono text-text-secondary flex items-center gap-2"
+                          >
                             <ClipboardList className="w-3 h-3 text-signal-cyan" />
                             <span className="truncate flex-1">{t.title}</span>
-                            <span className={cn("text-[9px] uppercase px-1.5 py-0.5 rounded border", PRIO_COLOR[t.priority] ?? "")}>{t.priority}</span>
+                            <span
+                              className={cn(
+                                "text-[9px] uppercase px-1.5 py-0.5 rounded border",
+                                PRIO_COLOR[t.priority] ?? "",
+                              )}
+                            >
+                              {t.priority}
+                            </span>
                             <span className="text-[10px] text-text-dim">{t.status}</span>
                           </div>
                         ))}

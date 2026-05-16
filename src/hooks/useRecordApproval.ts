@@ -25,23 +25,31 @@ function buildPatch(userId: string, status: RecordStatus): ApprovalPatch {
 export function useRecordApproval() {
   const { user } = useAuth();
 
-  const setStatus = useCallback(async (table: ApprovableTable, id: string, status: RecordStatus) => {
-    if (!user) return { error: "no-user" };
-    const patch = buildPatch(user.id, status);
-    const { error } = table === "drill_core_logs"
-      ? await supabase.from("drill_core_logs").update(patch).eq("id", id)
-      : await supabase.from("sampling_results").update(patch).eq("id", id);
-    return { error: error?.message ?? null };
-  }, [user]);
+  const setStatus = useCallback(
+    async (table: ApprovableTable, id: string, status: RecordStatus) => {
+      if (!user) return { error: "no-user" };
+      const patch = buildPatch(user.id, status);
+      const { error } =
+        table === "drill_core_logs"
+          ? await supabase.from("drill_core_logs").update(patch).eq("id", id)
+          : await supabase.from("sampling_results").update(patch).eq("id", id);
+      return { error: error?.message ?? null };
+    },
+    [user],
+  );
 
-  const bulkSetStatus = useCallback(async (table: ApprovableTable, ids: string[], status: RecordStatus) => {
-    if (!user || ids.length === 0) return { error: "no-op" };
-    const patch = buildPatch(user.id, status);
-    const { error } = table === "drill_core_logs"
-      ? await supabase.from("drill_core_logs").update(patch).in("id", ids)
-      : await supabase.from("sampling_results").update(patch).in("id", ids);
-    return { error: error?.message ?? null };
-  }, [user]);
+  const bulkSetStatus = useCallback(
+    async (table: ApprovableTable, ids: string[], status: RecordStatus) => {
+      if (!user || ids.length === 0) return { error: "no-op" };
+      const patch = buildPatch(user.id, status);
+      const { error } =
+        table === "drill_core_logs"
+          ? await supabase.from("drill_core_logs").update(patch).in("id", ids)
+          : await supabase.from("sampling_results").update(patch).in("id", ids);
+      return { error: error?.message ?? null };
+    },
+    [user],
+  );
 
   return { setStatus, bulkSetStatus };
 }

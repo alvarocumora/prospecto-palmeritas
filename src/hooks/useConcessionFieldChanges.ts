@@ -32,7 +32,11 @@ export function useConcessionChangeSummary(projectId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setData([]); setLoading(false); return; }
+    if (!projectId) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: rows } = await supabase
       .from("concession_change_summary" as never)
@@ -43,7 +47,9 @@ export function useConcessionChangeSummary(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   // Realtime: refrescar cuando llegue un cambio en este proyecto
   useEffect(() => {
@@ -52,11 +58,18 @@ export function useConcessionChangeSummary(projectId: string | null) {
       .channel(`ccf-summary-${projectId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "concession_field_changes", filter: `project_id=eq.${projectId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "concession_field_changes",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [projectId, refresh]);
 
   return { data, loading, refresh };
@@ -68,18 +81,30 @@ export function useConcessionChangeHistory(concessionId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!concessionId) { setData([]); setLoading(false); return; }
+    if (!concessionId) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: rows, error } = await supabase.rpc("get_concession_change_history", {
       _concession_id: concessionId,
       _limit: 200,
     });
     if (error) console.error("[useConcessionChangeHistory]", error);
-    setData(((rows ?? []) as ConcessionFieldChange[]).map((r) => ({ ...r, concession_id: concessionId, project_id: "" })));
+    setData(
+      ((rows ?? []) as ConcessionFieldChange[]).map((r) => ({
+        ...r,
+        concession_id: concessionId,
+        project_id: "",
+      })),
+    );
     setLoading(false);
   }, [concessionId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!concessionId) return;
@@ -87,11 +112,18 @@ export function useConcessionChangeHistory(concessionId: string | null) {
       .channel(`ccf-${concessionId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "concession_field_changes", filter: `concession_id=eq.${concessionId}` },
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "concession_field_changes",
+          filter: `concession_id=eq.${concessionId}`,
+        },
         () => refresh(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [concessionId, refresh]);
 
   return { data, loading, refresh };

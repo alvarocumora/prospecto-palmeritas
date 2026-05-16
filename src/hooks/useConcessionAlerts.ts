@@ -52,7 +52,9 @@ export function useConcessionAlerts(projectId: string | null) {
   }, [projectId]);
 
   const markRead = useCallback(async (id: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     await supabase
       .from("concession_alerts")
       .update({ is_read: true, read_at: new Date().toISOString(), read_by: user?.id })
@@ -62,7 +64,9 @@ export function useConcessionAlerts(projectId: string | null) {
 
   const markAllRead = useCallback(async () => {
     if (!projectId) return;
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     await supabase
       .from("concession_alerts")
       .update({ is_read: true, read_at: new Date().toISOString(), read_by: user?.id })
@@ -105,5 +109,14 @@ export function useConcessionAlerts(projectId: string | null) {
   const unreadCount = alerts.filter((a) => !a.is_read).length;
   const criticalCount = alerts.filter((a) => !a.is_read && a.severity === "critical").length;
 
-  return { alerts, loading, unreadCount, criticalCount, refresh, markRead, markAllRead, triggerSync };
+  return {
+    alerts,
+    loading,
+    unreadCount,
+    criticalCount,
+    refresh,
+    markRead,
+    markAllRead,
+    triggerSync,
+  };
 }

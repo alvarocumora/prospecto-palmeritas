@@ -1,6 +1,16 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { RefreshCw, AlertTriangle, ExternalLink, Plus, Trash2, Eye, EyeOff, Gavel, FileDown } from "lucide-react";
+import {
+  RefreshCw,
+  AlertTriangle,
+  ExternalLink,
+  Plus,
+  Trash2,
+  Eye,
+  EyeOff,
+  Gavel,
+  FileDown,
+} from "lucide-react";
 import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -37,7 +47,11 @@ function BoletinModule() {
   const { data: alerts, refresh: refreshAlerts, markRead } = useBulletinAlerts(active?.id ?? null);
   const { data: watchHolders, refresh: refreshHolders } = useWatchHolders(active?.id ?? null);
   const { data: courtCases, refresh: refreshCases } = useCourtCases(150);
-  const { data: courtAlerts, refresh: refreshCourtAlerts, markRead: markCourtRead } = useCourtCaseAlerts(active?.id ?? null);
+  const {
+    data: courtAlerts,
+    refresh: refreshCourtAlerts,
+    markRead: markCourtRead,
+  } = useCourtCaseAlerts(active?.id ?? null);
   const [syncing, setSyncing] = useState(false);
   const [syncingPjud, setSyncingPjud] = useState(false);
   const [tab, setTab] = useState<"alerts" | "all" | "pjud" | "watch">("alerts");
@@ -67,9 +81,7 @@ function BoletinModule() {
     const result = await triggerPjudSync();
     toast.dismiss("sync-pjud");
     if (result.success) {
-      toast.success(
-        `PJUD: ${result.inserted ?? 0} nuevas · ${result.alertsCreated ?? 0} alertas`,
-      );
+      toast.success(`PJUD: ${result.inserted ?? 0} nuevas · ${result.alertsCreated ?? 0} alertas`);
       refreshCases();
       refreshCourtAlerts();
     } else {
@@ -101,7 +113,12 @@ function BoletinModule() {
           <h1 className="text-xl font-semibold">Boletín Oficial de Minería</h1>
           <p className="text-xs text-text-secondary mt-0.5">
             Pedimentos, mensuras y manifestaciones publicadas en boletinminero.cl
-            {active && <> · Vigilancia activa para <strong>{active.code}</strong></>}
+            {active && (
+              <>
+                {" "}
+                · Vigilancia activa para <strong>{active.code}</strong>
+              </>
+            )}
           </p>
         </div>
         <div className="flex gap-2">
@@ -127,18 +144,39 @@ function BoletinModule() {
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
         <Stat label="Publicaciones totales" value={String(bulletins.length)} />
-        <Stat label="Alertas no leídas" value={String(unreadAlerts.length)} color={unreadAlerts.length > 0 ? "#dc2626" : undefined} />
+        <Stat
+          label="Alertas no leídas"
+          value={String(unreadAlerts.length)}
+          color={unreadAlerts.length > 0 ? "#dc2626" : undefined}
+        />
         <Stat label="Titulares vigilados" value={String(watchHolders.length)} />
-        <Stat label="Última sync" value={bulletins[0]?.scraped_at ? new Date(bulletins[0].scraped_at).toLocaleDateString("es-CL") : "—"} />
+        <Stat
+          label="Última sync"
+          value={
+            bulletins[0]?.scraped_at
+              ? new Date(bulletins[0].scraped_at).toLocaleDateString("es-CL")
+              : "—"
+          }
+        />
       </div>
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border overflow-x-auto">
         <TabButton active={tab === "alerts"} onClick={() => setTab("alerts")}>
-          Alertas Boletín {unreadAlerts.length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">{unreadAlerts.length}</span>}
+          Alertas Boletín{" "}
+          {unreadAlerts.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">
+              {unreadAlerts.length}
+            </span>
+          )}
         </TabButton>
         <TabButton active={tab === "pjud"} onClick={() => setTab("pjud")}>
-          PJUD {courtAlerts.filter(a => !a.is_read).length > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">{courtAlerts.filter(a => !a.is_read).length}</span>}
+          PJUD{" "}
+          {courtAlerts.filter((a) => !a.is_read).length > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">
+              {courtAlerts.filter((a) => !a.is_read).length}
+            </span>
+          )}
         </TabButton>
         <TabButton active={tab === "all"} onClick={() => setTab("all")}>
           Todas las publicaciones
@@ -151,10 +189,13 @@ function BoletinModule() {
       {tab === "pjud" && (
         <div className="space-y-2">
           <div className="text-xs text-text-secondary">
-            Causas judiciales mineras del Poder Judicial · {courtCases.length} causas en BD · {courtAlerts.length} alertas para este proyecto
+            Causas judiciales mineras del Poder Judicial · {courtCases.length} causas en BD ·{" "}
+            {courtAlerts.length} alertas para este proyecto
           </div>
           {!active ? (
-            <div className="p-6 text-center text-text-secondary text-sm">Selecciona un proyecto para ver alertas PJUD.</div>
+            <div className="p-6 text-center text-text-secondary text-sm">
+              Selecciona un proyecto para ver alertas PJUD.
+            </div>
           ) : courtAlerts.length === 0 && courtCases.length === 0 ? (
             <div className="p-6 text-center text-text-secondary text-sm">
               Sin causas todavía. Pulsa "Sync PJUD" para extraer causas mineras del Poder Judicial.
@@ -162,7 +203,10 @@ function BoletinModule() {
           ) : (
             <>
               {courtAlerts.map((a) => (
-                <div key={a.id} className={`border rounded p-3 ${a.is_read ? "border-border bg-bg-secondary/30" : "border-amber-500/40 bg-amber-500/10"}`}>
+                <div
+                  key={a.id}
+                  className={`border rounded p-3 ${a.is_read ? "border-border bg-bg-secondary/30" : "border-amber-500/40 bg-amber-500/10"}`}
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
@@ -170,20 +214,35 @@ function BoletinModule() {
                         <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-bg-secondary border border-border">
                           {a.match_type === "defendant_rut" ? "RUT demandado" : "Demandado"}
                         </span>
-                        <span className="text-xs text-text-secondary">{new Date(a.created_at).toLocaleString("es-CL")}</span>
+                        <span className="text-xs text-text-secondary">
+                          {new Date(a.created_at).toLocaleString("es-CL")}
+                        </span>
                       </div>
                       {a.case && <CourtCaseSummary c={a.case} />}
-                      {a.match_detail && <div className="text-[11px] text-text-secondary mt-1">Coincidencia: {a.match_detail}</div>}
+                      {a.match_detail && (
+                        <div className="text-[11px] text-text-secondary mt-1">
+                          Coincidencia: {a.match_detail}
+                        </div>
+                      )}
                     </div>
-                    <button onClick={() => markCourtRead(a.id)} className="p-1.5 rounded hover:bg-accent shrink-0">
-                      {a.is_read ? <EyeOff className="w-4 h-4 text-text-secondary" /> : <Eye className="w-4 h-4" />}
+                    <button
+                      onClick={() => markCourtRead(a.id)}
+                      className="p-1.5 rounded hover:bg-accent shrink-0"
+                    >
+                      {a.is_read ? (
+                        <EyeOff className="w-4 h-4 text-text-secondary" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                 </div>
               ))}
               {courtCases.length > 0 && (
                 <div className="mt-4">
-                  <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">Todas las causas mineras</div>
+                  <div className="text-xs font-medium text-text-secondary uppercase tracking-wider mb-2">
+                    Todas las causas mineras
+                  </div>
                   <div className="border border-border rounded divide-y divide-border">
                     {courtCases.slice(0, 30).map((c) => (
                       <div key={c.id} className="p-3 hover:bg-accent/30">
@@ -201,10 +260,13 @@ function BoletinModule() {
       {tab === "alerts" && (
         <div className="space-y-2">
           {!active ? (
-            <div className="p-6 text-center text-text-secondary text-sm">Selecciona un proyecto para ver alertas.</div>
+            <div className="p-6 text-center text-text-secondary text-sm">
+              Selecciona un proyecto para ver alertas.
+            </div>
           ) : alerts.length === 0 ? (
             <div className="p-6 text-center text-text-secondary text-sm">
-              Sin alertas todavía. Agrega titulares vigilados o asegúrate de tener un AOI definido en una campaña.
+              Sin alertas todavía. Agrega titulares vigilados o asegúrate de tener un AOI definido
+              en una campaña.
             </div>
           ) : (
             alerts.map((a) => (
@@ -217,13 +279,21 @@ function BoletinModule() {
                     <div className="flex items-center gap-2 mb-1">
                       {!a.is_read && <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />}
                       <span className="text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-bg-secondary border border-border">
-                        {a.match_type === "aoi" ? "AOI" : a.match_type === "holder_rut" ? "RUT" : "Titular"}
+                        {a.match_type === "aoi"
+                          ? "AOI"
+                          : a.match_type === "holder_rut"
+                            ? "RUT"
+                            : "Titular"}
                       </span>
-                      <span className="text-xs text-text-secondary">{new Date(a.created_at).toLocaleString("es-CL")}</span>
+                      <span className="text-xs text-text-secondary">
+                        {new Date(a.created_at).toLocaleString("es-CL")}
+                      </span>
                     </div>
                     {a.bulletin && <BulletinSummary b={a.bulletin} />}
                     {a.match_detail && (
-                      <div className="text-[11px] text-text-secondary mt-1">Coincidencia: {a.match_detail}</div>
+                      <div className="text-[11px] text-text-secondary mt-1">
+                        Coincidencia: {a.match_detail}
+                      </div>
                     )}
                   </div>
                   <button
@@ -231,7 +301,11 @@ function BoletinModule() {
                     className="p-1.5 rounded hover:bg-accent shrink-0"
                     title={a.is_read ? "Leída" : "Marcar leída"}
                   >
-                    {a.is_read ? <EyeOff className="w-4 h-4 text-text-secondary" /> : <Eye className="w-4 h-4" />}
+                    {a.is_read ? (
+                      <EyeOff className="w-4 h-4 text-text-secondary" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -313,7 +387,12 @@ function CourtCaseSummary({ c }: { c: CourtCase }) {
         {c.case_number && <span className="font-mono text-text-secondary">{c.case_number}</span>}
         {c.filed_at && <span className="text-text-secondary">{c.filed_at}</span>}
         {c.source_url && (
-          <a href={c.source_url} target="_blank" rel="noreferrer" className="ml-auto text-primary hover:underline inline-flex items-center gap-0.5">
+          <a
+            href={c.source_url}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-auto text-primary hover:underline inline-flex items-center gap-0.5"
+          >
             PJUD <ExternalLink className="w-3 h-3" />
           </a>
         )}
@@ -322,7 +401,12 @@ function CourtCaseSummary({ c }: { c: CourtCase }) {
       <div className="text-xs text-text-secondary mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
         {c.court && <span>⚖️ {c.court}</span>}
         {c.defendant_rut && <span className="font-mono">RUT {c.defendant_rut}</span>}
-        {c.comuna && <span>📍 {c.comuna}{c.region && `, ${c.region}`}</span>}
+        {c.comuna && (
+          <span>
+            📍 {c.comuna}
+            {c.region && `, ${c.region}`}
+          </span>
+        )}
         {c.status && <span>· {c.status}</span>}
       </div>
     </div>
@@ -342,21 +426,42 @@ function BulletinSummary({ b }: { b: MiningBulletin }) {
         >
           {b.publication_type}
         </span>
-        {b.publication_number && <span className="font-mono text-text-secondary">#{b.publication_number}</span>}
+        {b.publication_number && (
+          <span className="font-mono text-text-secondary">#{b.publication_number}</span>
+        )}
         {b.publication_date && <span className="text-text-secondary">{b.publication_date}</span>}
         {b.source_url && (
-          <a href={b.source_url} target="_blank" rel="noreferrer" className="ml-auto text-primary hover:underline inline-flex items-center gap-0.5">
+          <a
+            href={b.source_url}
+            target="_blank"
+            rel="noreferrer"
+            className="ml-auto text-primary hover:underline inline-flex items-center gap-0.5"
+          >
             Fuente <ExternalLink className="w-3 h-3" />
           </a>
         )}
       </div>
       <div className="mt-1 text-sm font-medium">
         {b.concession_name ?? "Concesión sin nombre"}
-        {b.concession_code && <span className="text-text-secondary ml-1.5 font-mono text-xs">({b.concession_code})</span>}
+        {b.concession_code && (
+          <span className="text-text-secondary ml-1.5 font-mono text-xs">
+            ({b.concession_code})
+          </span>
+        )}
       </div>
       <div className="text-xs text-text-secondary mt-0.5 flex flex-wrap gap-x-3 gap-y-0.5">
-        {b.holder_name && <span>👤 {b.holder_name}{b.holder_rut && <span className="ml-1 font-mono">· {b.holder_rut}</span>}</span>}
-        {b.comuna && <span>📍 {b.comuna}{b.region && <span>, {b.region}</span>}</span>}
+        {b.holder_name && (
+          <span>
+            👤 {b.holder_name}
+            {b.holder_rut && <span className="ml-1 font-mono">· {b.holder_rut}</span>}
+          </span>
+        )}
+        {b.comuna && (
+          <span>
+            📍 {b.comuna}
+            {b.region && <span>, {b.region}</span>}
+          </span>
+        )}
         {b.area_ha && <span>{b.area_ha} ha</span>}
       </div>
     </div>
@@ -380,7 +485,11 @@ function WatchHoldersPanel({
   const [adding, setAdding] = useState(false);
   const [exporting, setExporting] = useState<string | null>(null);
 
-  const onExportPdf = async (h: { id: string; holder_name: string | null; holder_rut: string | null }) => {
+  const onExportPdf = async (h: {
+    id: string;
+    holder_name: string | null;
+    holder_rut: string | null;
+  }) => {
     setExporting(h.id);
     try {
       const res = await generateHolderProfilePdf({
@@ -464,14 +573,22 @@ function WatchHoldersPanel({
 
       <div className="border border-border rounded overflow-hidden">
         {holders.length === 0 ? (
-          <div className="p-6 text-center text-text-secondary text-sm">Sin titulares vigilados todavía.</div>
+          <div className="p-6 text-center text-text-secondary text-sm">
+            Sin titulares vigilados todavía.
+          </div>
         ) : (
           <table className="w-full text-xs">
             <thead className="bg-bg-secondary border-b border-border text-left">
               <tr>
-                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">Nombre</th>
-                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">RUT</th>
-                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">Notas</th>
+                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">
+                  Nombre
+                </th>
+                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">
+                  RUT
+                </th>
+                <th className="px-2.5 py-1.5 font-medium text-text-secondary uppercase tracking-wider text-[10px]">
+                  Notas
+                </th>
                 <th className="px-2.5 py-1.5"></th>
               </tr>
             </thead>
@@ -514,17 +631,29 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="border border-border rounded p-2.5 bg-bg-secondary/30">
       <div className="text-[10px] uppercase tracking-wider text-text-secondary">{label}</div>
-      <div className="text-lg font-semibold" style={color ? { color } : undefined}>{value}</div>
+      <div className="text-lg font-semibold" style={color ? { color } : undefined}>
+        {value}
+      </div>
     </div>
   );
 }
 
-function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
   return (
     <button
       onClick={onClick}
       className={`px-3 py-1.5 text-sm border-b-2 transition-colors ${
-        active ? "border-primary text-foreground font-medium" : "border-transparent text-text-secondary hover:text-foreground"
+        active
+          ? "border-primary text-foreground font-medium"
+          : "border-transparent text-text-secondary hover:text-foreground"
       }`}
     >
       {children}

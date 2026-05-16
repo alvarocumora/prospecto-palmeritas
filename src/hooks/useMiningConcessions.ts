@@ -1,7 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchMiningConcessions } from "@/services/miningConcessions.service";
 export type { ExpiryStatus, MiningConcession } from "@/types/miningConcessions";
-export { EXPIRY_COLORS, EXPIRY_LABELS, daysUntilExpiry, expiryStatus } from "@/lib/miningConcessions/expiry";
+export {
+  EXPIRY_COLORS,
+  EXPIRY_LABELS,
+  daysUntilExpiry,
+  expiryStatus,
+} from "@/lib/miningConcessions/expiry";
 export { intersectsAoiBbox } from "@/lib/miningConcessions/geometry";
 
 function toErrorMessage(error: unknown) {

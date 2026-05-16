@@ -4,7 +4,8 @@ import { useGeochemFingerprint, type GeochemAnalysis } from "@/hooks/useGeochemF
 import { toast } from "sonner";
 
 export function GeochemFingerprintPanel({ projectId }: { projectId: string }) {
-  const { latest, loading, running, error, run, generateTargets } = useGeochemFingerprint(projectId);
+  const { latest, loading, running, error, run, generateTargets } =
+    useGeochemFingerprint(projectId);
   const [generating, setGenerating] = useState(false);
 
   const onRun = async () => {
@@ -30,7 +31,9 @@ export function GeochemFingerprintPanel({ projectId }: { projectId: string }) {
             <Sparkles className="w-4 h-4 text-primary" /> Geochemical Fingerprint
           </h2>
           <p className="text-xs text-muted-foreground mt-1 max-w-xl">
-            Análisis multivariado (PCA + clustering) sobre todas las muestras del proyecto. Detecta la firma del depósito (pórfido, epitermal, IOCG, skarn, VMS) y agrupa muestras químicamente similares para vectorear hacia el centro mineralizado.
+            Análisis multivariado (PCA + clustering) sobre todas las muestras del proyecto. Detecta
+            la firma del depósito (pórfido, epitermal, IOCG, skarn, VMS) y agrupa muestras
+            químicamente similares para vectorear hacia el centro mineralizado.
           </p>
         </div>
         <button
@@ -51,21 +54,38 @@ export function GeochemFingerprintPanel({ projectId }: { projectId: string }) {
       )}
 
       {loading && !latest && (
-        <div className="text-sm text-muted-foreground p-6 text-center">Cargando análisis previo…</div>
+        <div className="text-sm text-muted-foreground p-6 text-center">
+          Cargando análisis previo…
+        </div>
       )}
 
       {!loading && !latest && !error && (
         <div className="rounded border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-          Aún no hay análisis para este proyecto. Carga al menos 5 muestras y haz clic en <strong className="text-foreground">Generar fingerprint</strong>.
+          Aún no hay análisis para este proyecto. Carga al menos 5 muestras y haz clic en{" "}
+          <strong className="text-foreground">Generar fingerprint</strong>.
         </div>
       )}
 
-      {latest && <FingerprintResults analysis={latest} onGenerateTargets={onGenerateTargets} generating={generating} />}
+      {latest && (
+        <FingerprintResults
+          analysis={latest}
+          onGenerateTargets={onGenerateTargets}
+          generating={generating}
+        />
+      )}
     </div>
   );
 }
 
-function FingerprintResults({ analysis, onGenerateTargets, generating }: { analysis: GeochemAnalysis; onGenerateTargets: () => void; generating: boolean }) {
+function FingerprintResults({
+  analysis,
+  onGenerateTargets,
+  generating,
+}: {
+  analysis: GeochemAnalysis;
+  onGenerateTargets: () => void;
+  generating: boolean;
+}) {
   const conf = Math.round((analysis.signature_confidence ?? 0) * 100);
   const pf = Object.entries(analysis.pathfinder_scores).sort((a, b) => b[1] - a[1]);
   const maxPf = Math.max(...pf.map(([, v]) => v), 1);
@@ -77,7 +97,9 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
         <div className="text-[10px] uppercase font-mono text-muted-foreground">Firma detectada</div>
         <div className="text-xl font-bold text-primary mt-0.5">{analysis.signature ?? "—"}</div>
         <div className="text-xs text-muted-foreground mt-1">
-          Confianza: <span className="font-semibold text-foreground">{conf}%</span> · {analysis.sample_count} muestras · {analysis.elements_used.length} elementos · {analysis.cluster_count} clusters
+          Confianza: <span className="font-semibold text-foreground">{conf}%</span> ·{" "}
+          {analysis.sample_count} muestras · {analysis.elements_used.length} elementos ·{" "}
+          {analysis.cluster_count} clusters
         </div>
         <div className="text-[10px] text-muted-foreground mt-1">
           Generado: {new Date(analysis.created_at).toLocaleString()}
@@ -88,14 +110,17 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
         {/* PCA Biplot */}
         <div className="rounded border border-border p-3">
           <div className="text-xs font-mono uppercase text-muted-foreground mb-2">
-            Biplot PC1 ({(analysis.pca_variance.pc1 * 100).toFixed(1)}%) vs PC2 ({(analysis.pca_variance.pc2 * 100).toFixed(1)}%)
+            Biplot PC1 ({(analysis.pca_variance.pc1 * 100).toFixed(1)}%) vs PC2 (
+            {(analysis.pca_variance.pc2 * 100).toFixed(1)}%)
           </div>
           <PcaBiplot analysis={analysis} />
         </div>
 
         {/* Pathfinder bar chart */}
         <div className="rounded border border-border p-3">
-          <div className="text-xs font-mono uppercase text-muted-foreground mb-2">Índices pathfinder</div>
+          <div className="text-xs font-mono uppercase text-muted-foreground mb-2">
+            Índices pathfinder
+          </div>
           <div className="space-y-2">
             {pf.map(([key, value]) => {
               const pct = (value / maxPf) * 100;
@@ -103,11 +128,18 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
               return (
                 <div key={key}>
                   <div className="flex justify-between text-xs mb-0.5">
-                    <span className={isTop ? "font-semibold text-foreground" : "text-muted-foreground"}>{labelFor(key)}</span>
+                    <span
+                      className={isTop ? "font-semibold text-foreground" : "text-muted-foreground"}
+                    >
+                      {labelFor(key)}
+                    </span>
                     <span className="font-mono text-muted-foreground">{value.toFixed(2)}</span>
                   </div>
                   <div className="h-2 bg-muted rounded overflow-hidden">
-                    <div className={isTop ? "h-full bg-primary" : "h-full bg-muted-foreground/40"} style={{ width: `${pct}%` }} />
+                    <div
+                      className={isTop ? "h-full bg-primary" : "h-full bg-muted-foreground/40"}
+                      style={{ width: `${pct}%` }}
+                    />
                   </div>
                 </div>
               );
@@ -125,7 +157,11 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
             disabled={generating}
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 disabled:opacity-50"
           >
-            {generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <TargetIcon className="w-3 h-3" />}
+            {generating ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <TargetIcon className="w-3 h-3" />
+            )}
             Generar targets desde clusters
           </button>
         </div>
@@ -144,14 +180,25 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
               <tr key={c.cluster} className="border-b border-border/40">
                 <td className="py-1.5 px-3">
                   <span className="inline-flex items-center gap-1.5">
-                    <span className="w-3 h-3 rounded" style={{ background: clusterColor(c.cluster) }} />
+                    <span
+                      className="w-3 h-3 rounded"
+                      style={{ background: clusterColor(c.cluster) }}
+                    />
                     #{c.cluster + 1}
                   </span>
                 </td>
                 <td className="py-1.5 px-3 text-right">{c.sample_count}</td>
-                <td className={`py-1.5 px-3 text-right ${c.au_mean_gpt >= 1 ? "font-bold text-primary" : ""}`}>{c.au_mean_gpt.toFixed(3)}</td>
-                <td className="py-1.5 px-3 text-right text-muted-foreground">{c.centroid_pc1.toFixed(2)}</td>
-                <td className="py-1.5 px-3 text-right text-muted-foreground">{c.centroid_pc2.toFixed(2)}</td>
+                <td
+                  className={`py-1.5 px-3 text-right ${c.au_mean_gpt >= 1 ? "font-bold text-primary" : ""}`}
+                >
+                  {c.au_mean_gpt.toFixed(3)}
+                </td>
+                <td className="py-1.5 px-3 text-right text-muted-foreground">
+                  {c.centroid_pc1.toFixed(2)}
+                </td>
+                <td className="py-1.5 px-3 text-right text-muted-foreground">
+                  {c.centroid_pc2.toFixed(2)}
+                </td>
               </tr>
             ))}
           </tbody>
@@ -162,13 +209,17 @@ function FingerprintResults({ analysis, onGenerateTargets, generating }: { analy
 }
 
 function PcaBiplot({ analysis }: { analysis: GeochemAnalysis }) {
-  const W = 360, H = 280, M = 30;
+  const W = 360,
+    H = 280,
+    M = 30;
   const pts = analysis.pca_scores;
   if (pts.length === 0) return <div className="text-xs text-muted-foreground">Sin datos</div>;
   const xs = pts.map((p) => p.pc1);
   const ys = pts.map((p) => p.pc2);
-  const xMin = Math.min(...xs), xMax = Math.max(...xs);
-  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const xMin = Math.min(...xs),
+    xMax = Math.max(...xs);
+  const yMin = Math.min(...ys),
+    yMax = Math.max(...ys);
   const sx = (x: number) => M + ((x - xMin) / (xMax - xMin || 1)) * (W - 2 * M);
   const sy = (y: number) => H - M - ((y - yMin) / (yMax - yMin || 1)) * (H - 2 * M);
 
@@ -179,11 +230,32 @@ function PcaBiplot({ analysis }: { analysis: GeochemAnalysis }) {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-auto">
       {/* axes */}
-      <line x1={M} y1={H / 2} x2={W - M} y2={H / 2} stroke="hsl(var(--border))" strokeDasharray="2 2" />
-      <line x1={W / 2} y1={M} x2={W / 2} y2={H - M} stroke="hsl(var(--border))" strokeDasharray="2 2" />
+      <line
+        x1={M}
+        y1={H / 2}
+        x2={W - M}
+        y2={H / 2}
+        stroke="hsl(var(--border))"
+        strokeDasharray="2 2"
+      />
+      <line
+        x1={W / 2}
+        y1={M}
+        x2={W / 2}
+        y2={H - M}
+        stroke="hsl(var(--border))"
+        strokeDasharray="2 2"
+      />
       {/* sample dots */}
       {pts.map((p) => (
-        <circle key={p.sample_id} cx={sx(p.pc1)} cy={sy(p.pc2)} r={3} fill={clusterColor(p.cluster)} fillOpacity={0.7} />
+        <circle
+          key={p.sample_id}
+          cx={sx(p.pc1)}
+          cy={sy(p.pc2)}
+          r={3}
+          fill={clusterColor(p.cluster)}
+          fillOpacity={0.7}
+        />
       ))}
       {/* loading vectors */}
       {loadings.map(([elem, v]) => {
@@ -191,8 +263,25 @@ function PcaBiplot({ analysis }: { analysis: GeochemAnalysis }) {
         const y2 = H / 2 - (v.pc2 / loadMax) * loadScale;
         return (
           <g key={elem}>
-            <line x1={W / 2} y1={H / 2} x2={x2} y2={y2} stroke="hsl(var(--primary))" strokeWidth={1.2} />
-            <text x={x2} y={y2} dx={4} dy={-2} fontSize="9" fill="hsl(var(--primary))" fontFamily="monospace">{elem.replace("_gpt", "").replace("_pct", "%").replace("_ppm", "").toUpperCase()}</text>
+            <line
+              x1={W / 2}
+              y1={H / 2}
+              x2={x2}
+              y2={y2}
+              stroke="hsl(var(--primary))"
+              strokeWidth={1.2}
+            />
+            <text
+              x={x2}
+              y={y2}
+              dx={4}
+              dy={-2}
+              fontSize="9"
+              fill="hsl(var(--primary))"
+              fontFamily="monospace"
+            >
+              {elem.replace("_gpt", "").replace("_pct", "%").replace("_ppm", "").toUpperCase()}
+            </text>
           </g>
         );
       })}

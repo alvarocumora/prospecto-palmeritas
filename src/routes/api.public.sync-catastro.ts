@@ -60,7 +60,11 @@ export const Route = createFileRoute("/api/public/sync-catastro")({
             const json = await res.json();
             results.push({ projectId, ok: res.ok, ...(res.ok ? {} : { error: json.error }) });
           } catch (e) {
-            results.push({ projectId, ok: false, error: e instanceof Error ? e.message : String(e) });
+            results.push({
+              projectId,
+              ok: false,
+              error: e instanceof Error ? e.message : String(e),
+            });
           }
         }
 

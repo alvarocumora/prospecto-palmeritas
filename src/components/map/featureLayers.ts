@@ -12,7 +12,14 @@ const RING_LABELS: Record<number, string> = { 1: "R1", 2: "R2", 3: "R3" };
 export function addProjectFeatures(
   L: LeafletNS,
   map: LeafletMap,
-  data: { aoi: AnyFC; veins: AnyFC; palms: AnyFC; workings: AnyFC; drills: AnyFC; anomalies?: AnyFC }
+  data: {
+    aoi: AnyFC;
+    veins: AnyFC;
+    palms: AnyFC;
+    workings: AnyFC;
+    drills: AnyFC;
+    anomalies?: AnyFC;
+  },
 ) {
   // AOI centroid
   const centroidIcon = L.divIcon({
@@ -42,7 +49,7 @@ export function addProjectFeatures(
           ${p.code ?? ""}<br/>
           ${CENTER[0].toFixed(6)}, ${CENTER[1].toFixed(6)}
           ${sourceLine(p.source)}
-        </div>`
+        </div>`,
       );
     },
   }).addTo(map);
@@ -57,7 +64,7 @@ export function addProjectFeatures(
           <strong style="color:#C8922A;">${p.name}</strong><br/>
           Rumbo: ${p.strike} · ${p.dip ?? ""}
           ${sourceLine(p.source)}
-        </div>`
+        </div>`,
       );
     },
   }).addTo(map);
@@ -82,7 +89,7 @@ export function addProjectFeatures(
           ${p.count}× ${p.species ?? "Jubaea chilensis"}<br/>
           <em style="color:#A89080;">Proxy estructural</em>
           ${sourceLine(p.source)}
-        </div>`
+        </div>`,
       );
     },
   }).addTo(map);
@@ -105,7 +112,7 @@ export function addProjectFeatures(
           <strong style="color:#CD7F32;">${p.name}</strong><br/>
           ${p.type}
           ${sourceLine(p.source)}
-        </div>`
+        </div>`,
       );
     },
   }).addTo(map);
@@ -144,7 +151,7 @@ export function addProjectFeatures(
           <div style="color:#cfc8b8;">Target: ${p.target ?? p.target_zone ?? "—"}</div>
           ${justification}
           ${sourceLine(p.source)}
-        </div>`
+        </div>`,
       );
     },
   }).addTo(map);
@@ -179,7 +186,7 @@ export function addProjectFeatures(
               <strong style="color:#9B72CF;">${p.name}</strong><br/>
               Rumbo: ${p.strike ?? "—"}
               ${sourceLine(p.source)}
-            </div>`
+            </div>`,
           );
         } else {
           const color = p.color ?? "#E85D3A";
@@ -189,7 +196,7 @@ export function addProjectFeatures(
               Alteración: ${p.alteration ?? "—"}<br/>
               Score: <strong>${p.score ?? "—"}</strong>
               ${sourceLine(p.source)}
-            </div>`
+            </div>`,
           );
         }
       },
@@ -207,7 +214,7 @@ export function addProjectFeatures(
         collect.push([lat, lng]);
       } else if (f.geometry.type === "LineString") {
         (f.geometry.coordinates as [number, number][]).forEach(([lng, lat]) =>
-          collect.push([lat, lng])
+          collect.push([lat, lng]),
         );
       }
     });

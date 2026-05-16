@@ -8,7 +8,17 @@ import {
   type GeophysicsAnomaly,
 } from "@/hooks/useGeophysicsAnomalies";
 
-const TARGET_TYPES = ["vein", "disseminated", "skarn", "porphyry", "epithermal", "iocg", "vms", "placer", "other"] as const;
+const TARGET_TYPES = [
+  "vein",
+  "disseminated",
+  "skarn",
+  "porphyry",
+  "epithermal",
+  "iocg",
+  "vms",
+  "placer",
+  "other",
+] as const;
 const PRIORITIES = ["low", "medium", "high", "critical"] as const;
 
 /** Suggest a likely deposit type from the anomaly type — user can override. */
@@ -58,7 +68,9 @@ export function PromoteAnomalyDialog({
     priority: suggestPriority(anomaly),
     commodity: "",
     target_zone: "",
-    rationale: anomaly.rationale ?? `Anomalía ${ANOMALY_TYPE_LABELS[anomaly.anomaly_type]} validada en survey geofísico.`,
+    rationale:
+      anomaly.rationale ??
+      `Anomalía ${ANOMALY_TYPE_LABELS[anomaly.anomaly_type]} validada en survey geofísico.`,
     planned_meters: "",
     estimated_cost_usd: "",
   });
@@ -95,7 +107,10 @@ export function PromoteAnomalyDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 bg-bg-primary/80 backdrop-blur flex items-center justify-center p-4"
+      onClick={onClose}
+    >
       <form
         onSubmit={submit}
         onClick={(e) => e.stopPropagation()}
@@ -106,8 +121,8 @@ export function PromoteAnomalyDialog({
           <h2 className="text-base font-mono font-semibold">Promover a Exploration Target</h2>
         </div>
         <p className="text-[11px] text-muted-foreground">
-          Crea un target en estado <span className="text-gold">validated</span> con la evidencia geofísica
-          (anomalía <span className="text-foreground font-semibold">{anomaly.code}</span>,{" "}
+          Crea un target en estado <span className="text-gold">validated</span> con la evidencia
+          geofísica (anomalía <span className="text-foreground font-semibold">{anomaly.code}</span>,{" "}
           {ANOMALY_TYPE_LABELS[anomaly.anomaly_type]}, conf. {anomaly.confidence_pct ?? "—"}%).
         </p>
 
@@ -127,7 +142,9 @@ export function PromoteAnomalyDialog({
               className="input"
             >
               {PRIORITIES.map((p) => (
-                <option key={p} value={p}>{p}</option>
+                <option key={p} value={p}>
+                  {p}
+                </option>
               ))}
             </select>
           </Field>
@@ -150,7 +167,9 @@ export function PromoteAnomalyDialog({
               className="input"
             >
               {TARGET_TYPES.map((t) => (
-                <option key={t} value={t}>{t}</option>
+                <option key={t} value={t}>
+                  {t}
+                </option>
               ))}
             </select>
           </Field>
@@ -184,7 +203,8 @@ export function PromoteAnomalyDialog({
         <div className="grid grid-cols-2 gap-3">
           <Field label="Metros planeados">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.planned_meters}
               onChange={(e) => setForm((f) => ({ ...f, planned_meters: e.target.value }))}
               className="input"
@@ -192,7 +212,8 @@ export function PromoteAnomalyDialog({
           </Field>
           <Field label="Costo estimado USD">
             <input
-              type="number" step="1"
+              type="number"
+              step="1"
               value={form.estimated_cost_usd}
               onChange={(e) => setForm((f) => ({ ...f, estimated_cost_usd: e.target.value }))}
               className="input"
@@ -201,12 +222,16 @@ export function PromoteAnomalyDialog({
         </div>
 
         <div className="rounded border border-border bg-bg-secondary p-2 text-[10px] font-mono text-muted-foreground">
-          Coordenadas heredadas: {anomaly.lat?.toFixed(5) ?? "—"}, {anomaly.lng?.toFixed(5) ?? "—"} ·
-          {" "}Conf. {anomaly.confidence_pct ?? "—"}% · Severidad {anomaly.severity}
+          Coordenadas heredadas: {anomaly.lat?.toFixed(5) ?? "—"}, {anomaly.lng?.toFixed(5) ?? "—"}{" "}
+          · Conf. {anomaly.confidence_pct ?? "—"}% · Severidad {anomaly.severity}
         </div>
 
         <div className="flex justify-end gap-2 pt-2">
-          <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent">
+          <button
+            type="button"
+            onClick={onClose}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent"
+          >
             Cancelar
           </button>
           <button
@@ -214,7 +239,11 @@ export function PromoteAnomalyDialog({
             disabled={saving || !form.code.trim() || !form.name.trim()}
             className="px-3 py-1.5 text-xs font-mono rounded bg-gold text-bg-primary font-semibold hover:bg-gold/90 disabled:opacity-50 inline-flex items-center gap-1.5"
           >
-            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <TargetIcon className="w-3 h-3" />}
+            {saving ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <TargetIcon className="w-3 h-3" />
+            )}
             Promover a Target
           </button>
         </div>
@@ -223,7 +252,15 @@ export function PromoteAnomalyDialog({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">

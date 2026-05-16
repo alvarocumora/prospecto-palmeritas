@@ -30,7 +30,10 @@ export function useTeam(projectId: string | null) {
 
   const refresh = useCallback(async () => {
     if (!projectId) {
-      setMembers([]); setInvitations([]); setLoading(false); return;
+      setMembers([]);
+      setInvitations([]);
+      setLoading(false);
+      return;
     }
     setLoading(true);
     const [m, inv] = await Promise.all([
@@ -57,7 +60,14 @@ export function useTeam(projectId: string | null) {
           .from("profiles")
           .select("user_id,display_name,email,avatar_url")
           .in("user_id", userIds)
-      : { data: [] as { user_id: string; display_name: string | null; email: string | null; avatar_url: string | null }[] };
+      : {
+          data: [] as {
+            user_id: string;
+            display_name: string | null;
+            email: string | null;
+            avatar_url: string | null;
+          }[],
+        };
     const byUser = new Map((profiles ?? []).map((p) => [p.user_id, p]));
     setMembers(
       memberRows.map((mm) => ({
@@ -68,32 +78,52 @@ export function useTeam(projectId: string | null) {
         display_name: byUser.get(mm.user_id)?.display_name ?? null,
         email: byUser.get(mm.user_id)?.email ?? null,
         avatar_url: byUser.get(mm.user_id)?.avatar_url ?? null,
-      }))
+      })),
     );
-    setInvitations(((inv.data ?? []) as Invitation[]));
+    setInvitations((inv.data ?? []) as Invitation[]);
     setError(null);
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const updateRole = useCallback(async (memberId: string, role: ProjectRole) => {
-    const { error } = await supabase.from("project_members").update({ role }).eq("id", memberId);
-    if (!error) await refresh();
-    return error;
+  useEffect(() => {
+    refresh();
   }, [refresh]);
 
-  const removeMember = useCallback(async (memberId: string) => {
-    const { error } = await supabase.from("project_members").delete().eq("id", memberId);
-    if (!error) await refresh();
-    return error;
-  }, [refresh]);
+  const updateRole = useCallback(
+    async (memberId: string, role: ProjectRole) => {
+      const { error } = await supabase.from("project_members").update({ role }).eq("id", memberId);
+      if (!error) await refresh();
+      return error;
+    },
+    [refresh],
+  );
 
-  const revokeInvitation = useCallback(async (invId: string) => {
-    const { error } = await supabase.from("project_invitations").delete().eq("id", invId);
-    if (!error) await refresh();
-    return error;
-  }, [refresh]);
+  const removeMember = useCallback(
+    async (memberId: string) => {
+      const { error } = await supabase.from("project_members").delete().eq("id", memberId);
+      if (!error) await refresh();
+      return error;
+    },
+    [refresh],
+  );
 
-  return { members, invitations, loading, error, refresh, updateRole, removeMember, revokeInvitation };
+  const revokeInvitation = useCallback(
+    async (invId: string) => {
+      const { error } = await supabase.from("project_invitations").delete().eq("id", invId);
+      if (!error) await refresh();
+      return error;
+    },
+    [refresh],
+  );
+
+  return {
+    members,
+    invitations,
+    loading,
+    error,
+    refresh,
+    updateRole,
+    removeMember,
+    revokeInvitation,
+  };
 }

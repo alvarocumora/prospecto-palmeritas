@@ -1,10 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { RefreshCw, Loader2, CheckCircle2, AlertTriangle, XCircle, Database, FileWarning, Wrench, Eye, Play, ChevronRight, ChevronDown, Copy, FileText, FileSpreadsheet } from "lucide-react";
+import {
+  RefreshCw,
+  Loader2,
+  CheckCircle2,
+  AlertTriangle,
+  XCircle,
+  Database,
+  FileWarning,
+  Wrench,
+  Eye,
+  Play,
+  ChevronRight,
+  ChevronDown,
+  Copy,
+  FileText,
+  FileSpreadsheet,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useProjects } from "@/hooks/useProjects";
 import { useDataValidation, type TableAudit, type Inconsistency } from "@/hooks/useDataValidation";
-import { useDataRepairs, type RepairDefinition, type RepairPreviewRow } from "@/hooks/useDataRepairs";
+import {
+  useDataRepairs,
+  type RepairDefinition,
+  type RepairPreviewRow,
+} from "@/hooks/useDataRepairs";
 import { HudPanel } from "@/components/ops/HudPanel";
 import { cn } from "@/lib/utils";
 import { exportValidationCsv, exportValidationPdf } from "@/lib/validation/export";
@@ -21,9 +41,8 @@ function ValidationPage() {
 
   const grouped = useMemo(() => {
     if (!report) return {} as Record<string, TableAudit[]>;
-    const list = filter === "issues"
-      ? report.tables.filter((t) => t.status !== "ok")
-      : report.tables;
+    const list =
+      filter === "issues" ? report.tables.filter((t) => t.status !== "ok") : report.tables;
     return list.reduce<Record<string, TableAudit[]>>((acc, t) => {
       (acc[t.group] ??= []).push(t);
       return acc;
@@ -34,10 +53,13 @@ function ValidationPage() {
     <div className="px-3 md:px-6 py-4 max-w-[1400px] mx-auto space-y-4">
       <header className="flex items-start justify-between gap-3 flex-wrap">
         <div>
-          <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider">QA · Data Integrity</div>
+          <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider">
+            QA · Data Integrity
+          </div>
           <h1 className="text-xl font-mono font-bold text-foreground">Validación & Sync Status</h1>
           <p className="text-[11px] text-text-dim mt-1">
-            Audita el estado del seed por tabla, detecta inconsistencias en enums, claves únicas y referencias.
+            Audita el estado del seed por tabla, detecta inconsistencias en enums, claves únicas y
+            referencias.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -48,7 +70,9 @@ function ValidationPage() {
                 exportValidationCsv(report, active.name ?? active.id.slice(0, 8));
                 toast.success("CSV exportado");
               } catch (e) {
-                toast.error("Error exportando CSV", { description: e instanceof Error ? e.message : String(e) });
+                toast.error("Error exportando CSV", {
+                  description: e instanceof Error ? e.message : String(e),
+                });
               }
             }}
             disabled={!report || loading}
@@ -64,7 +88,9 @@ function ValidationPage() {
                 exportValidationPdf(report, active.name ?? active.id.slice(0, 8));
                 toast.success("PDF exportado");
               } catch (e) {
-                toast.error("Error exportando PDF", { description: e instanceof Error ? e.message : String(e) });
+                toast.error("Error exportando PDF", {
+                  description: e instanceof Error ? e.message : String(e),
+                });
               }
             }}
             disabled={!report || loading}
@@ -78,7 +104,11 @@ function ValidationPage() {
             disabled={loading}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan text-[11px] font-mono uppercase hover:bg-signal-cyan/20 disabled:opacity-50"
           >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+            {loading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <RefreshCw className="w-3.5 h-3.5" />
+            )}
             Re-ejecutar audit
           </button>
         </div>
@@ -96,18 +126,28 @@ function ValidationPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
             <StatCard label="Tablas OK" value={report.totals.ok} tone="ok" Icon={CheckCircle2} />
             <StatCard label="Vacías" value={report.totals.empty} tone="dim" Icon={Database} />
-            <StatCard label="Warnings" value={report.totals.warn} tone="warn" Icon={AlertTriangle} />
+            <StatCard
+              label="Warnings"
+              value={report.totals.warn}
+              tone="warn"
+              Icon={AlertTriangle}
+            />
             <StatCard label="Errores" value={report.totals.error} tone="crit" Icon={XCircle} />
             <StatCard label="Total filas" value={report.totals.rows} tone="cyan" Icon={Database} />
           </div>
 
           {/* Inconsistencies grouped by severity */}
-          <HudPanel title="Inconsistencias detectadas · agrupadas por severidad" accent="amber" className="bg-bg-panel/40">
+          <HudPanel
+            title="Inconsistencias detectadas · agrupadas por severidad"
+            accent="amber"
+            className="bg-bg-panel/40"
+          >
             {report.inconsistencies.length === 0 ? (
               <div className="p-4 text-center">
                 <CheckCircle2 className="w-6 h-6 mx-auto text-signal-green mb-2" />
                 <div className="text-[11px] font-mono text-text-dim">
-                  Sin inconsistencias detectadas. Stages, enums, claves únicas y referencias cruzadas en orden.
+                  Sin inconsistencias detectadas. Stages, enums, claves únicas y referencias
+                  cruzadas en orden.
                 </div>
               </div>
             ) : (
@@ -116,16 +156,27 @@ function ValidationPage() {
                   const items = report.inconsistencies.filter((i) => i.severity === sev);
                   if (items.length === 0) return null;
                   const xrefCount = items.filter((i) => i.category === "xref").length;
-                  const sevLabel = sev === "error" ? "Errores críticos" : sev === "warn" ? "Advertencias" : "Informativo";
+                  const sevLabel =
+                    sev === "error"
+                      ? "Errores críticos"
+                      : sev === "warn"
+                        ? "Advertencias"
+                        : "Informativo";
                   const sevCls =
-                    sev === "error" ? "text-signal-red border-signal-red/40 bg-signal-red/5" :
-                    sev === "warn" ? "text-signal-amber border-signal-amber/40 bg-signal-amber/5" :
-                    "text-signal-cyan border-signal-cyan/40 bg-signal-cyan/5";
+                    sev === "error"
+                      ? "text-signal-red border-signal-red/40 bg-signal-red/5"
+                      : sev === "warn"
+                        ? "text-signal-amber border-signal-amber/40 bg-signal-amber/5"
+                        : "text-signal-cyan border-signal-cyan/40 bg-signal-cyan/5";
                   return (
                     <div key={sev} className={cn("border rounded-[2px]", sevCls)}>
                       <div className="px-3 py-1.5 flex items-center gap-2 border-b border-current/20">
-                        <span className="text-[10px] font-mono uppercase tracking-wider font-bold">{sevLabel}</span>
-                        <span className="text-[10px] font-mono opacity-60">{items.length} regla{items.length === 1 ? "" : "s"}</span>
+                        <span className="text-[10px] font-mono uppercase tracking-wider font-bold">
+                          {sevLabel}
+                        </span>
+                        <span className="text-[10px] font-mono opacity-60">
+                          {items.length} regla{items.length === 1 ? "" : "s"}
+                        </span>
                         {xrefCount > 0 && (
                           <span className="ml-auto text-[9px] font-mono px-1.5 py-0.5 rounded-[2px] border border-current/40 uppercase">
                             {xrefCount} FK rota{xrefCount === 1 ? "" : "s"}
@@ -133,7 +184,9 @@ function ValidationPage() {
                         )}
                       </div>
                       <div className="divide-y divide-border bg-bg-panel/40">
-                        {items.map((iss) => <IncRow key={iss.id} iss={iss} />)}
+                        {items.map((iss) => (
+                          <IncRow key={iss.id} iss={iss} />
+                        ))}
                       </div>
                     </div>
                   );
@@ -143,9 +196,14 @@ function ValidationPage() {
           </HudPanel>
 
           {/* Repair actions */}
-          <HudPanel title="Acciones de reparación · vista previa antes de aplicar" accent="violet" className="bg-bg-panel/40">
+          <HudPanel
+            title="Acciones de reparación · vista previa antes de aplicar"
+            accent="violet"
+            className="bg-bg-panel/40"
+          >
             <div className="text-[10px] font-mono text-text-dim mb-3">
-              Cada reparación primero genera un dry-run. Revisa los cambios y luego confirma para aplicarlos a la base.
+              Cada reparación primero genera un dry-run. Revisa los cambios y luego confirma para
+              aplicarlos a la base.
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {repairs.repairs.map((repair) => (
@@ -157,7 +215,9 @@ function ValidationPage() {
                   onApply={async () => {
                     const n = await repairs.applyRepair(repair);
                     if (n > 0) {
-                      toast.success(`${repair.title}: ${n} fila${n === 1 ? "" : "s"} corregida${n === 1 ? "" : "s"}`);
+                      toast.success(
+                        `${repair.title}: ${n} fila${n === 1 ? "" : "s"} corregida${n === 1 ? "" : "s"}`,
+                      );
                       refresh();
                     }
                   }}
@@ -178,7 +238,9 @@ function ValidationPage() {
                 onClick={() => setFilter("all")}
                 className={cn(
                   "px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border",
-                  filter === "all" ? "border-signal-cyan/60 bg-signal-cyan/15 text-signal-cyan" : "border-border text-text-dim",
+                  filter === "all"
+                    ? "border-signal-cyan/60 bg-signal-cyan/15 text-signal-cyan"
+                    : "border-border text-text-dim",
                 )}
               >
                 Todas ({report.tables.length})
@@ -187,7 +249,9 @@ function ValidationPage() {
                 onClick={() => setFilter("issues")}
                 className={cn(
                   "px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border",
-                  filter === "issues" ? "border-signal-amber/60 bg-signal-amber/15 text-signal-amber" : "border-border text-text-dim",
+                  filter === "issues"
+                    ? "border-signal-amber/60 bg-signal-amber/15 text-signal-amber"
+                    : "border-border text-text-dim",
                 )}
               >
                 Solo issues ({report.totals.warn + report.totals.empty + report.totals.error})
@@ -200,9 +264,13 @@ function ValidationPage() {
             <div className="space-y-3">
               {Object.entries(grouped).map(([group, list]) => (
                 <div key={group}>
-                  <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider mb-1.5">{group}</div>
+                  <div className="text-[10px] font-mono text-text-dim uppercase tracking-wider mb-1.5">
+                    {group}
+                  </div>
                   <div className="border border-border rounded-[2px] divide-y divide-border">
-                    {list.map((t) => <TableRow key={t.table} audit={t} sync={report.lastSync[t.table] ?? null} />)}
+                    {list.map((t) => (
+                      <TableRow key={t.table} audit={t} sync={report.lastSync[t.table] ?? null} />
+                    ))}
                   </div>
                 </div>
               ))}
@@ -227,7 +295,10 @@ function ValidationPage() {
 }
 
 function StatCard({
-  label, value, tone, Icon,
+  label,
+  value,
+  tone,
+  Icon,
 }: {
   label: string;
   value: number;
@@ -252,29 +323,52 @@ function StatCard({
   );
 }
 
-function TableRow({ audit, sync }: {
+function TableRow({
+  audit,
+  sync,
+}: {
   audit: TableAudit;
   sync: { at: string; prevCount: number; delta: number } | null;
 }) {
   const dotCls =
-    audit.status === "ok" ? "bg-signal-green" :
-    audit.status === "warn" ? "bg-signal-amber" :
-    audit.status === "error" ? "bg-signal-red" : "bg-text-dim/50";
+    audit.status === "ok"
+      ? "bg-signal-green"
+      : audit.status === "warn"
+        ? "bg-signal-amber"
+        : audit.status === "error"
+          ? "bg-signal-red"
+          : "bg-text-dim/50";
   const statusLabel =
-    audit.status === "ok" ? "OK" :
-    audit.status === "empty" ? "VACÍA" :
-    audit.status === "warn" ? "BAJO MIN" : "ERROR";
+    audit.status === "ok"
+      ? "OK"
+      : audit.status === "empty"
+        ? "VACÍA"
+        : audit.status === "warn"
+          ? "BAJO MIN"
+          : "ERROR";
   const statusCls =
-    audit.status === "ok" ? "text-signal-green" :
-    audit.status === "warn" ? "text-signal-amber" :
-    audit.status === "error" ? "text-signal-red" : "text-text-dim";
+    audit.status === "ok"
+      ? "text-signal-green"
+      : audit.status === "warn"
+        ? "text-signal-amber"
+        : audit.status === "error"
+          ? "text-signal-red"
+          : "text-text-dim";
 
-  const deltaCls = !sync ? "text-text-dim" :
-    sync.delta > 0 ? "text-signal-green" :
-    sync.delta < 0 ? "text-signal-red" : "text-text-dim";
-  const deltaLabel = !sync ? "—" :
-    sync.delta === 0 ? "±0" :
-    sync.delta > 0 ? `+${sync.delta.toLocaleString()}` : sync.delta.toLocaleString();
+  const deltaCls = !sync
+    ? "text-text-dim"
+    : sync.delta > 0
+      ? "text-signal-green"
+      : sync.delta < 0
+        ? "text-signal-red"
+        : "text-text-dim";
+  const deltaLabel = !sync
+    ? "—"
+    : sync.delta === 0
+      ? "±0"
+      : sync.delta > 0
+        ? `+${sync.delta.toLocaleString()}`
+        : sync.delta.toLocaleString();
 
   return (
     <div className="px-3 py-2 hover:bg-accent/30 flex items-center gap-3">
@@ -282,18 +376,31 @@ function TableRow({ audit, sync }: {
       <div className="flex-1 min-w-0">
         <div className="text-[12px] font-mono text-foreground truncate">{audit.label}</div>
         <div className="text-[10px] text-text-dim font-mono truncate">
-          {audit.table}{audit.expectedMin ? ` · min ${audit.expectedMin}` : ""}{audit.error ? ` · ${audit.error}` : ""}
+          {audit.table}
+          {audit.expectedMin ? ` · min ${audit.expectedMin}` : ""}
+          {audit.error ? ` · ${audit.error}` : ""}
         </div>
       </div>
-      <div className="text-right shrink-0 w-28" title={sync ? `Última sync: ${new Date(sync.at).toLocaleString("es-CL")}` : "Sin snapshots previos"}>
+      <div
+        className="text-right shrink-0 w-28"
+        title={
+          sync
+            ? `Última sync: ${new Date(sync.at).toLocaleString("es-CL")}`
+            : "Sin snapshots previos"
+        }
+      >
         <div className={cn("text-[11px] font-mono tabular-nums", deltaCls)}>{deltaLabel}</div>
         <div className="text-[9px] font-mono text-text-dim truncate">
           {sync ? formatRelative(sync.at) : "primera corrida"}
         </div>
       </div>
       <div className="text-right shrink-0 w-20">
-        <div className="text-[13px] font-mono font-bold tabular-nums">{audit.count.toLocaleString()}</div>
-        <div className={cn("text-[9px] font-mono uppercase tracking-wider", statusCls)}>{statusLabel}</div>
+        <div className="text-[13px] font-mono font-bold tabular-nums">
+          {audit.count.toLocaleString()}
+        </div>
+        <div className={cn("text-[9px] font-mono uppercase tracking-wider", statusCls)}>
+          {statusLabel}
+        </div>
       </div>
     </div>
   );
@@ -314,11 +421,14 @@ function formatRelative(iso: string): string {
 
 function IncRow({ iss }: { iss: Inconsistency }) {
   const [open, setOpen] = useState(false);
-  const Icon = iss.severity === "error" ? XCircle : iss.severity === "warn" ? AlertTriangle : FileWarning;
+  const Icon =
+    iss.severity === "error" ? XCircle : iss.severity === "warn" ? AlertTriangle : FileWarning;
   const tone =
-    iss.severity === "error" ? "text-signal-red border-l-signal-red" :
-    iss.severity === "warn" ? "text-signal-amber border-l-signal-amber" :
-    "text-signal-cyan border-l-signal-cyan";
+    iss.severity === "error"
+      ? "text-signal-red border-l-signal-red"
+      : iss.severity === "warn"
+        ? "text-signal-amber border-l-signal-amber"
+        : "text-signal-cyan border-l-signal-cyan";
   const hasAffected = !!iss.affected && iss.affected.length > 0;
   const Chevron = open ? ChevronDown : ChevronRight;
 
@@ -368,7 +478,10 @@ function AffectedTable({
     const seen = new Set<string>();
     for (const r of affected) {
       for (const k of Object.keys(r.fields)) {
-        if (!seen.has(k)) { seen.add(k); cols.push(k); }
+        if (!seen.has(k)) {
+          seen.add(k);
+          cols.push(k);
+        }
       }
     }
     return cols;
@@ -389,7 +502,9 @@ function AffectedTable({
             <tr className="text-left text-text-dim">
               <th className="px-2 py-1.5 font-normal">label</th>
               {columns.map((c) => (
-                <th key={c} className="px-2 py-1.5 font-normal whitespace-nowrap">{c}</th>
+                <th key={c} className="px-2 py-1.5 font-normal whitespace-nowrap">
+                  {c}
+                </th>
               ))}
               <th className="px-2 py-1.5 font-normal w-6"></th>
             </tr>
@@ -442,19 +557,35 @@ function RepairCard({
   onClear,
 }: {
   repair: RepairDefinition;
-  state: { preview: RepairPreviewRow[] | null; loading: boolean; applying: boolean; appliedCount: number | null; error: string | null } | undefined;
+  state:
+    | {
+        preview: RepairPreviewRow[] | null;
+        loading: boolean;
+        applying: boolean;
+        appliedCount: number | null;
+        error: string | null;
+      }
+    | undefined;
   onPreview: () => void;
   onApply: () => void;
   onClear: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const s = state ?? { preview: null, loading: false, applying: false, appliedCount: null, error: null };
+  const s = state ?? {
+    preview: null,
+    loading: false,
+    applying: false,
+    appliedCount: null,
+    error: null,
+  };
   const hasPreview = s.preview !== null;
   const previewCount = s.preview?.length ?? 0;
   const catCls =
-    repair.category === "enum" ? "border-signal-cyan/40 text-signal-cyan"
-    : repair.category === "orphan" ? "border-signal-amber/40 text-signal-amber"
-    : "border-signal-violet/40 text-signal-violet";
+    repair.category === "enum"
+      ? "border-signal-cyan/40 text-signal-cyan"
+      : repair.category === "orphan"
+        ? "border-signal-amber/40 text-signal-amber"
+        : "border-signal-violet/40 text-signal-violet";
 
   return (
     <div className="border border-border rounded-[2px] bg-bg-elevated/40">
@@ -462,18 +593,30 @@ function RepairCard({
         <Wrench className="w-3.5 h-3.5 text-signal-violet shrink-0 mt-0.5" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[12px] font-mono font-bold text-foreground truncate">{repair.title}</span>
-            <span className={cn("text-[8px] font-mono uppercase px-1 py-0 border rounded-[2px]", catCls)}>{repair.category}</span>
+            <span className="text-[12px] font-mono font-bold text-foreground truncate">
+              {repair.title}
+            </span>
+            <span
+              className={cn(
+                "text-[8px] font-mono uppercase px-1 py-0 border rounded-[2px]",
+                catCls,
+              )}
+            >
+              {repair.category}
+            </span>
             <span className="text-[9px] font-mono text-text-dim">{repair.table}</span>
           </div>
           <div className="text-[10px] text-text-dim font-mono mt-0.5">{repair.description}</div>
           {s.error && (
-            <div className="mt-1.5 text-[10px] font-mono text-signal-red border-l-2 border-signal-red pl-1.5">{s.error}</div>
+            <div className="mt-1.5 text-[10px] font-mono text-signal-red border-l-2 border-signal-red pl-1.5">
+              {s.error}
+            </div>
           )}
           {s.appliedCount !== null && (
             <div className="mt-1.5 text-[10px] font-mono text-signal-green flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              {s.appliedCount} fila{s.appliedCount === 1 ? "" : "s"} corregida{s.appliedCount === 1 ? "" : "s"}.
+              {s.appliedCount} fila{s.appliedCount === 1 ? "" : "s"} corregida
+              {s.appliedCount === 1 ? "" : "s"}.
             </div>
           )}
         </div>
@@ -484,7 +627,11 @@ function RepairCard({
               disabled={s.loading}
               className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-signal-cyan/40 bg-signal-cyan/10 text-signal-cyan hover:bg-signal-cyan/20 disabled:opacity-50"
             >
-              {s.loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Eye className="w-3 h-3" />}
+              {s.loading ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <Eye className="w-3 h-3" />
+              )}
               Preview
             </button>
           ) : previewCount === 0 ? (
@@ -498,7 +645,11 @@ function RepairCard({
                 disabled={s.applying}
                 className="inline-flex items-center gap-1 px-2 py-1 text-[10px] font-mono uppercase rounded-[2px] border border-signal-violet/60 bg-signal-violet/15 text-signal-violet hover:bg-signal-violet/25 disabled:opacity-50"
               >
-                {s.applying ? <Loader2 className="w-3 h-3 animate-spin" /> : <Play className="w-3 h-3" />}
+                {s.applying ? (
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                ) : (
+                  <Play className="w-3 h-3" />
+                )}
                 Aplicar ({previewCount})
               </button>
               <button
@@ -528,11 +679,15 @@ function RepairCard({
                   <div className="text-foreground">{row.label}</div>
                   <div className="flex items-center gap-1 mt-0.5 text-text-dim">
                     <span className="text-signal-red line-through truncate">
-                      {Object.entries(row.before).map(([k, v]) => `${k}=${String(v ?? "—")}`).join(" · ")}
+                      {Object.entries(row.before)
+                        .map(([k, v]) => `${k}=${String(v ?? "—")}`)
+                        .join(" · ")}
                     </span>
                     <ChevronRight className="w-2.5 h-2.5 shrink-0" />
                     <span className="text-signal-green truncate">
-                      {Object.entries(row.after).map(([k, v]) => `${k}=${String(v ?? "—")}`).join(" · ")}
+                      {Object.entries(row.after)
+                        .map(([k, v]) => `${k}=${String(v ?? "—")}`)
+                        .join(" · ")}
                     </span>
                   </div>
                 </div>

@@ -6,12 +6,12 @@ import type { ProspectivityCell } from "@/hooks/useProspectivity";
 function scoreColor(s: number): string {
   // s in 0..100
   const t = Math.max(0, Math.min(1, s / 100));
-  if (t < 0.25) return "#1e3a8a";       // deep blue
-  if (t < 0.45) return "#0891b2";       // cyan
-  if (t < 0.6)  return "#65a30d";       // green
-  if (t < 0.75) return "#eab308";       // yellow
-  if (t < 0.88) return "#ea580c";       // orange
-  return "#dc2626";                     // red
+  if (t < 0.25) return "#1e3a8a"; // deep blue
+  if (t < 0.45) return "#0891b2"; // cyan
+  if (t < 0.6) return "#65a30d"; // green
+  if (t < 0.75) return "#eab308"; // yellow
+  if (t < 0.88) return "#ea580c"; // orange
+  return "#dc2626"; // red
 }
 
 export function buildProspectivityLayer(L: LeafletNS, cells: ProspectivityCell[]): LayerGroup {
@@ -35,7 +35,11 @@ export function buildProspectivityLayer(L: LeafletNS, cells: ProspectivityCell[]
       interactive: true,
     });
     const f = c.features as Record<string, unknown>;
-    const nearest = (f.nearest_target ?? null) as { dist: number; score: number; priority: string } | null;
+    const nearest = (f.nearest_target ?? null) as {
+      dist: number;
+      score: number;
+      priority: string;
+    } | null;
     rect.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
         <div style="color:#F0C96B;font-weight:600;margin-bottom:4px;">Prospectividad</div>
@@ -63,6 +67,6 @@ export function prospectivityLegendHtml(): string {
   ];
   return `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.5;">
     <div style="font-weight:600;color:#F0C96B;margin-bottom:4px;">Prospectividad IA</div>
-    ${stops.map(s => `<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:14px;height:10px;background:${s.c};"></span>${s.v}+ ${s.l}</div>`).join("")}
+    ${stops.map((s) => `<div style="display:flex;align-items:center;gap:6px;"><span style="display:inline-block;width:14px;height:10px;background:${s.c};"></span>${s.v}+ ${s.l}</div>`).join("")}
   </div>`;
 }

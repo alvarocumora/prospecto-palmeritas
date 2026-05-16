@@ -7,7 +7,7 @@ describe("FeatureGate", () => {
     render(
       <FeatureGate feature="geocapital.ai_copilot" context={{ plan: "pro" }}>
         <div>Enabled content</div>
-      </FeatureGate>
+      </FeatureGate>,
     );
 
     expect(screen.getByText("Enabled content")).toBeInTheDocument();
@@ -15,9 +15,13 @@ describe("FeatureGate", () => {
 
   it("renders fallback when a feature is unavailable", () => {
     render(
-      <FeatureGate feature="geocapital.ai_copilot" context={{ plan: "starter" }} fallback={<div>Fallback content</div>}>
+      <FeatureGate
+        feature="geocapital.ai_copilot"
+        context={{ plan: "starter" }}
+        fallback={<div>Fallback content</div>}
+      >
         <div>Enabled content</div>
-      </FeatureGate>
+      </FeatureGate>,
     );
 
     expect(screen.queryByText("Enabled content")).not.toBeInTheDocument();
@@ -36,7 +40,7 @@ describe("FeatureGate", () => {
         }}
       >
         <div>Override content</div>
-      </FeatureGate>
+      </FeatureGate>,
     );
 
     expect(screen.getByText("Override content")).toBeInTheDocument();

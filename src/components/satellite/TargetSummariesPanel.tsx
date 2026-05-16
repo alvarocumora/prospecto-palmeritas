@@ -1,6 +1,23 @@
 import React, { useMemo, useState } from "react";
-import { Activity, AlertTriangle, CheckCircle2, ChevronDown, Layers, Loader2, MapPin, Mountain, Radar, Search, Sparkles, TrendingDown, TrendingUp } from "lucide-react";
-import { useTargetSatelliteSummaries, type TargetSatelliteSummary } from "@/hooks/useTargetSatelliteSummaries";
+import {
+  Activity,
+  AlertTriangle,
+  CheckCircle2,
+  ChevronDown,
+  Layers,
+  Loader2,
+  MapPin,
+  Mountain,
+  Radar,
+  Search,
+  Sparkles,
+  TrendingDown,
+  TrendingUp,
+} from "lucide-react";
+import {
+  useTargetSatelliteSummaries,
+  type TargetSatelliteSummary,
+} from "@/hooks/useTargetSatelliteSummaries";
 import { cn } from "@/lib/utils";
 
 type Props = { projectId: string };
@@ -43,11 +60,12 @@ export function TargetSummariesPanel({ projectId }: Props) {
     const q = search.trim().toLowerCase();
     return summaries
       .filter((s) => filter === "all" || s.overallStatus === filter)
-      .filter((s) =>
-        !q ||
-        s.code.toLowerCase().includes(q) ||
-        s.name.toLowerCase().includes(q) ||
-        (s.commodity ?? "").toLowerCase().includes(q),
+      .filter(
+        (s) =>
+          !q ||
+          s.code.toLowerCase().includes(q) ||
+          s.name.toLowerCase().includes(q) ||
+          (s.commodity ?? "").toLowerCase().includes(q),
       )
       .sort((a, b) => {
         const order = { alert: 0, monitor: 1, ok: 2 };
@@ -57,17 +75,21 @@ export function TargetSummariesPanel({ projectId }: Props) {
       });
   }, [summaries, filter, search]);
 
-  const counts = useMemo(() => ({
-    all: summaries.length,
-    alert: summaries.filter((s) => s.overallStatus === "alert").length,
-    monitor: summaries.filter((s) => s.overallStatus === "monitor").length,
-    ok: summaries.filter((s) => s.overallStatus === "ok").length,
-  }), [summaries]);
+  const counts = useMemo(
+    () => ({
+      all: summaries.length,
+      alert: summaries.filter((s) => s.overallStatus === "alert").length,
+      monitor: summaries.filter((s) => s.overallStatus === "monitor").length,
+      ok: summaries.filter((s) => s.overallStatus === "ok").length,
+    }),
+    [summaries],
+  );
 
   function toggle(id: string) {
     setExpanded((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -89,7 +111,11 @@ export function TargetSummariesPanel({ projectId }: Props) {
           disabled={isFetching}
           className="text-xs px-3 py-1.5 rounded border border-signal-cyan/40 text-signal-cyan hover:bg-signal-cyan/10 disabled:opacity-50 font-mono uppercase tracking-wide flex items-center gap-1.5"
         >
-          {isFetching ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+          {isFetching ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Sparkles className="w-3 h-3" />
+          )}
           Recalcular
         </button>
       </header>
@@ -106,7 +132,8 @@ export function TargetSummariesPanel({ projectId }: Props) {
                 : "border-border/40 text-text-secondary hover:border-border",
             )}
           >
-            {k === "all" ? "Todos" : STATUS_LABEL[k as TargetSatelliteSummary["overallStatus"]]} · {counts[k]}
+            {k === "all" ? "Todos" : STATUS_LABEL[k as TargetSatelliteSummary["overallStatus"]]} ·{" "}
+            {counts[k]}
           </button>
         ))}
         <div className="ml-auto flex items-center gap-1.5 border border-border/40 rounded px-2 py-1 bg-surface-2/40">
@@ -125,13 +152,22 @@ export function TargetSummariesPanel({ projectId }: Props) {
           <Loader2 className="w-4 h-4 animate-spin" /> Calculando resúmenes…
         </div>
       ) : isError ? (
-        <div className="p-8 text-sm text-red-400 text-center font-mono">Error al calcular resúmenes.</div>
+        <div className="p-8 text-sm text-red-400 text-center font-mono">
+          Error al calcular resúmenes.
+        </div>
       ) : filtered.length === 0 ? (
-        <div className="p-8 text-sm text-text-dim text-center font-mono">Sin targets para los filtros activos.</div>
+        <div className="p-8 text-sm text-text-dim text-center font-mono">
+          Sin targets para los filtros activos.
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 p-4">
           {filtered.map((s) => (
-            <TargetCard key={s.targetId} s={s} expanded={expanded.has(s.targetId)} onToggle={() => toggle(s.targetId)} />
+            <TargetCard
+              key={s.targetId}
+              s={s}
+              expanded={expanded.has(s.targetId)}
+              onToggle={() => toggle(s.targetId)}
+            />
           ))}
         </div>
       )}
@@ -139,8 +175,21 @@ export function TargetSummariesPanel({ projectId }: Props) {
   );
 }
 
-function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expanded: boolean; onToggle: () => void }) {
-  const StatusIcon = s.overallStatus === "alert" ? AlertTriangle : s.overallStatus === "monitor" ? Activity : CheckCircle2;
+function TargetCard({
+  s,
+  expanded,
+  onToggle,
+}: {
+  s: TargetSatelliteSummary;
+  expanded: boolean;
+  onToggle: () => void;
+}) {
+  const StatusIcon =
+    s.overallStatus === "alert"
+      ? AlertTriangle
+      : s.overallStatus === "monitor"
+        ? Activity
+        : CheckCircle2;
   return (
     <div className="border border-border/50 rounded bg-surface-2/40 hover:border-border transition-colors overflow-hidden">
       {/* Header */}
@@ -148,7 +197,12 @@ function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expa
         <div className="min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="font-mono text-xs text-signal-cyan">{s.code}</span>
-            <span className={cn("text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border flex items-center gap-1", STATUS_STYLES[s.overallStatus])}>
+            <span
+              className={cn(
+                "text-[10px] font-mono uppercase px-1.5 py-0.5 rounded border flex items-center gap-1",
+                STATUS_STYLES[s.overallStatus],
+              )}
+            >
               <StatusIcon className="w-2.5 h-2.5" />
               {STATUS_LABEL[s.overallStatus]}
             </span>
@@ -180,8 +234,14 @@ function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expa
           <div className="text-[10px] text-text-secondary font-mono">
             scorē {fmtNum(s.hyperspectral.meanScore, 2)} / max {fmtNum(s.hyperspectral.maxScore, 2)}
           </div>
-          <div className="text-[10px] text-text-dim truncate" title={s.hyperspectral.minerals.join(", ")}>
-            {s.hyperspectral.minerals.length > 0 ? s.hyperspectral.minerals.slice(0, 2).join(", ") + (s.hyperspectral.minerals.length > 2 ? "…" : "") : "—"}
+          <div
+            className="text-[10px] text-text-dim truncate"
+            title={s.hyperspectral.minerals.join(", ")}
+          >
+            {s.hyperspectral.minerals.length > 0
+              ? s.hyperspectral.minerals.slice(0, 2).join(", ") +
+                (s.hyperspectral.minerals.length > 2 ? "…" : "")
+              : "—"}
           </div>
         </div>
 
@@ -197,10 +257,14 @@ function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expa
           <div className="text-[10px] text-text-secondary font-mono">
             coh {fmtNum(s.insar.coherence, 2)} · Σ {fmtNum(s.insar.cumulativeMm, 0)} mm
           </div>
-          <div className={cn(
-            "text-[10px] font-mono",
-            s.insar.severity === "warning" || s.insar.severity === "critical" ? "text-signal-amber" : "text-text-dim",
-          )}>
+          <div
+            className={cn(
+              "text-[10px] font-mono",
+              s.insar.severity === "warning" || s.insar.severity === "critical"
+                ? "text-signal-amber"
+                : "text-text-dim",
+            )}
+          >
             {s.insar.severity ? s.insar.severity : "—"}
           </div>
         </div>
@@ -218,7 +282,10 @@ function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expa
               <div className="text-[10px] text-text-secondary font-mono">
                 h̄ {fmtNum(s.demDiff.meanHeightM, 1)} m · {fmtNum(s.demDiff.areaM2, 0)} m²
               </div>
-              <div className="text-[10px] text-text-dim truncate" title={s.demDiff.stockpileName ?? ""}>
+              <div
+                className="text-[10px] text-text-dim truncate"
+                title={s.demDiff.stockpileName ?? ""}
+              >
                 {s.demDiff.material ?? "—"}
               </div>
             </>
@@ -250,7 +317,8 @@ function TargetCard({ s, expanded, onToggle }: { s: TargetSatelliteSummary; expa
           </div>
           {s.hyperspectral.assemblages.length > 0 && (
             <div>
-              <span className="text-text-dim">Ensambles:</span> {s.hyperspectral.assemblages.join(", ")}
+              <span className="text-text-dim">Ensambles:</span>{" "}
+              {s.hyperspectral.assemblages.join(", ")}
             </div>
           )}
           <div>

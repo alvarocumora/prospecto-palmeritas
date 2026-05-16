@@ -54,7 +54,11 @@ export function useProjectCapabilities() {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!active?.id) { setCaps([]); setLoading(false); return; }
+    if (!active?.id) {
+      setCaps([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from("project_member_capabilities")
@@ -65,19 +69,32 @@ export function useProjectCapabilities() {
     setLoading(false);
   }, [active?.id]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
-  const setCapability = async (userId: string, module: string, action: ModuleAction, enabled: boolean) => {
+  const setCapability = async (
+    userId: string,
+    module: string,
+    action: ModuleAction,
+    enabled: boolean,
+  ) => {
     if (!active?.id || !user) return;
     const cap = buildCapKey(module, action);
     if (enabled) {
-      const { error } = await supabase.from("project_member_capabilities").upsert({
-        project_id: active.id,
-        user_id: userId,
-        capability: cap,
-        granted_by: user.id,
-      }, { onConflict: "project_id,user_id,capability" });
-      if (error) { toast.error(error.message); return; }
+      const { error } = await supabase.from("project_member_capabilities").upsert(
+        {
+          project_id: active.id,
+          user_id: userId,
+          capability: cap,
+          granted_by: user.id,
+        },
+        { onConflict: "project_id,user_id,capability" },
+      );
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
     } else {
       const { error } = await supabase
         .from("project_member_capabilities")
@@ -85,7 +102,10 @@ export function useProjectCapabilities() {
         .eq("project_id", active.id)
         .eq("user_id", userId)
         .eq("capability", cap);
-      if (error) { toast.error(error.message); return; }
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
     }
     await refresh();
   };
@@ -97,7 +117,10 @@ export function useProjectCapabilities() {
       .delete()
       .eq("project_id", active.id)
       .eq("user_id", userId);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Permisos restablecidos al rol por defecto");
     await refresh();
   };
@@ -113,7 +136,10 @@ export function useMyCapabilities() {
   const [overrides, setOverrides] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!active?.id || !user) { setOverrides(new Set()); return; }
+    if (!active?.id || !user) {
+      setOverrides(new Set());
+      return;
+    }
     let cancelled = false;
     supabase
       .from("project_member_capabilities")
@@ -130,15 +156,15 @@ export function useMyCapabilities() {
         }
         setOverrides(set);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [active?.id, user?.id]);
 
   return {
     role,
-    canView: (module: keyof typeof MODULE_ROLES) =>
-      effectiveCanView(role, module, overrides),
-    canEdit: (module: keyof typeof MODULE_ROLES) =>
-      effectiveCanEdit(role, module, overrides),
+    canView: (module: keyof typeof MODULE_ROLES) => effectiveCanView(role, module, overrides),
+    canEdit: (module: keyof typeof MODULE_ROLES) => effectiveCanEdit(role, module, overrides),
   };
 }
 

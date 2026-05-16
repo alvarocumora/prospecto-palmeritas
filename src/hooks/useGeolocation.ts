@@ -51,7 +51,7 @@ export function useGeolocation(enabled = true) {
           setError(err.message);
         }
       },
-      { enableHighAccuracy: true, maximumAge: 1000, timeout: 30000 }
+      { enableHighAccuracy: true, maximumAge: 1000, timeout: 30000 },
     );
     watchIdRef.current = id;
     return () => {
@@ -68,7 +68,7 @@ export function useGeolocation(enabled = true) {
 // Haversine distance in meters
 export function haversineMeters(
   a: { lat: number; lng: number },
-  b: { lat: number; lng: number }
+  b: { lat: number; lng: number },
 ): number {
   const R = 6371000;
   const toRad = (d: number) => (d * Math.PI) / 180;
@@ -76,15 +76,14 @@ export function haversineMeters(
   const dLng = toRad(b.lng - a.lng);
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
 // Initial bearing from a → b in degrees (0..360, 0 = North)
 export function bearingDegrees(
   a: { lat: number; lng: number },
-  b: { lat: number; lng: number }
+  b: { lat: number; lng: number },
 ): number {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const toDeg = (r: number) => (r * 180) / Math.PI;
@@ -100,4 +99,3 @@ export function compassPoint(bearing: number): string {
   const dirs = ["N", "NE", "E", "SE", "S", "SO", "O", "NO"];
   return dirs[Math.round(bearing / 45) % 8];
 }
-

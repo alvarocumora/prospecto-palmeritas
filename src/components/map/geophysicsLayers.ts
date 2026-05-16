@@ -1,6 +1,10 @@
 import type { LayerGroup, Map as LeafletMap } from "leaflet";
 import type { LeafletNS } from "./types";
-import type { GeophysicsLine, GeophysicsStation, GeophysicsSurvey } from "@/hooks/useGeophysicsData";
+import type {
+  GeophysicsLine,
+  GeophysicsStation,
+  GeophysicsSurvey,
+} from "@/hooks/useGeophysicsData";
 
 const METHOD_COLOR: Record<string, string> = {
   Magnetometry: "#E11D48",
@@ -65,12 +69,14 @@ export function buildGeophysicsLayer(
   surveys: GeophysicsSurvey[],
   lines: GeophysicsLine[],
   stations: GeophysicsStation[],
-  opts: BuildOptions = {}
+  opts: BuildOptions = {},
 ): LayerGroup {
   const group = L.layerGroup();
   const surveyById = new Map(surveys.map((s) => [s.id, s]));
   const stats = computeMagStats(stations);
-  const span = stats ? Math.max(Math.abs(stats.max - stats.baseline), Math.abs(stats.min - stats.baseline), 1) : 1;
+  const span = stats
+    ? Math.max(Math.abs(stats.max - stats.baseline), Math.abs(stats.min - stats.baseline), 1)
+    : 1;
 
   for (const ln of lines) {
     const s = ln.survey_id ? surveyById.get(ln.survey_id) : undefined;
@@ -85,18 +91,19 @@ export function buildGeophysicsLayer(
       opacity: 0.9,
       dashArray: isSyn ? "6 4" : undefined,
     });
-    const badge = isSyn && !opts.realData
-      ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
-      : !isSyn
-      ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
-      : "";
+    const badge =
+      isSyn && !opts.realData
+        ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
+        : !isSyn
+          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
+          : "";
     polyline.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
         <strong style="color:${color};">${ln.line_id}</strong>${badge}<br/>
         ${s?.name ?? "—"}<br/>
         Método: ${s?.method ?? "—"}${ln.length_m != null ? ` · ${ln.length_m.toFixed(0)} m` : ""}
         ${ln.notes ? `<div style="margin-top:4px;color:#A89080;font-size:10px;">${ln.notes}</div>` : ""}
-      </div>`
+      </div>`,
     );
     group.addLayer(polyline);
   }
@@ -107,7 +114,9 @@ export function buildGeophysicsLayer(
     const surveyColor = colorFor(s);
     const hasMag = st.mag_nt != null;
     const anomaly = hasMag && stats ? (st.mag_nt as number) - stats.baseline : 0;
-    const radius = hasMag ? Math.min(10, Math.max(4, 4 + Math.abs(anomaly) / Math.max(span / 6, 1))) : 4;
+    const radius = hasMag
+      ? Math.min(10, Math.max(4, 4 + Math.abs(anomaly) / Math.max(span / 6, 1)))
+      : 4;
     const fill = hasMag ? magColor(anomaly, span) : "#9ca3af";
     const isSyn = st.is_synthetic;
     const marker = L.circleMarker([st.lat, st.lng], {
@@ -117,15 +126,22 @@ export function buildGeophysicsLayer(
       fillColor: fill,
       fillOpacity: 0.85,
     });
-    const badge = isSyn && !opts.realData
-      ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
-      : !isSyn
-      ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
-      : "";
+    const badge =
+      isSyn && !opts.realData
+        ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
+        : !isSyn
+          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
+          : "";
     const ip = [
-      st.ip_chargeability_mvv != null ? `IP carg: <strong>${st.ip_chargeability_mvv} mV/V</strong>` : null,
-      st.ip_resistivity_ohmm != null ? `IP resist: <strong>${st.ip_resistivity_ohmm} Ω·m</strong>` : null,
-    ].filter(Boolean).join("<br/>");
+      st.ip_chargeability_mvv != null
+        ? `IP carg: <strong>${st.ip_chargeability_mvv} mV/V</strong>`
+        : null,
+      st.ip_resistivity_ohmm != null
+        ? `IP resist: <strong>${st.ip_resistivity_ohmm} Ω·m</strong>`
+        : null,
+    ]
+      .filter(Boolean)
+      .join("<br/>");
     marker.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;min-width:200px;">
         <strong style="color:${surveyColor};">${st.station_id}</strong>${badge}<br/>
@@ -134,7 +150,7 @@ export function buildGeophysicsLayer(
         ${ip ? `${ip}<br/>` : ""}
         <span style="color:#A89080;font-size:10px;">${st.lat.toFixed(5)}, ${st.lng.toFixed(5)}</span>
         ${st.notes ? `<div style="margin-top:4px;color:#A89080;font-size:10px;border-top:1px solid #3a322c;padding-top:4px;">${st.notes}</div>` : ""}
-      </div>`
+      </div>`,
     );
     group.addLayer(marker);
   }
@@ -146,7 +162,7 @@ export function fitToGeophysics(
   L: LeafletNS,
   map: LeafletMap,
   lines: GeophysicsLine[],
-  stations: GeophysicsStation[]
+  stations: GeophysicsStation[],
 ) {
   const pts: [number, number][] = [];
   for (const ln of lines) {

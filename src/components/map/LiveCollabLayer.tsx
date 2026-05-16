@@ -19,8 +19,14 @@ type Props = {
 
 export function LiveCollabLayer({ projectId, map, L }: Props) {
   const {
-    cursors, annotations, sharing, setSharing,
-    broadcastCursor, addAnnotation, toggleResolved, deleteAnnotation,
+    cursors,
+    annotations,
+    sharing,
+    setSharing,
+    broadcastCursor,
+    addAnnotation,
+    toggleResolved,
+    deleteAnnotation,
     currentUserId,
   } = useLiveCollab(projectId);
   const [adding, setAdding] = useState(false);
@@ -36,7 +42,9 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
       broadcastCursor(e.latlng.lat, e.latlng.lng);
     };
     map.on("mousemove", handler);
-    return () => { map.off("mousemove", handler); };
+    return () => {
+      map.off("mousemove", handler);
+    };
   }, [map, sharing, broadcastCursor]);
 
   // Click → add annotation when in adding mode
@@ -67,7 +75,12 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
     for (const c of cursors) {
       seen.add(c.user_id);
       const html = buildCursorHtml(c);
-      const icon = L.divIcon({ html, className: "live-cursor-icon", iconSize: [0, 0], iconAnchor: [0, 0] });
+      const icon = L.divIcon({
+        html,
+        className: "live-cursor-icon",
+        iconSize: [0, 0],
+        iconAnchor: [0, 0],
+      });
       const existing = cursorMarkersRef.current.get(c.user_id);
       if (existing) {
         existing.setLatLng([c.lat, c.lng]);
@@ -106,24 +119,37 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
 
     for (const a of annotations) {
       const html = `<div class="annot-pin ${a.resolved ? "resolved" : ""}" style="background:${a.resolved ? "#22c55e" : "#f0c96b"}">📍</div>`;
-      const icon = L.divIcon({ html, className: "annot-pin-icon", iconSize: [24, 24], iconAnchor: [12, 24] });
+      const icon = L.divIcon({
+        html,
+        className: "annot-pin-icon",
+        iconSize: [24, 24],
+        iconAnchor: [12, 24],
+      });
       const m = L.marker([a.lat, a.lng], { icon });
       const popup = buildAnnotPopup(a, currentUserId);
       m.bindPopup(popup, { closeButton: true });
       m.on("popupopen", (ev: { popup: { getElement(): HTMLElement | null } }) => {
         const el = ev.popup.getElement();
         if (!el) return;
-        el.querySelector<HTMLButtonElement>("[data-act='resolve']")?.addEventListener("click", () => {
-          void toggleResolved(a.id, !a.resolved).then(() => map.closePopup());
-        });
-        el.querySelector<HTMLButtonElement>("[data-act='delete']")?.addEventListener("click", () => {
-          if (!confirm("¿Eliminar esta nota?")) return;
-          void deleteAnnotation(a.id).then(() => map.closePopup());
-        });
+        el.querySelector<HTMLButtonElement>("[data-act='resolve']")?.addEventListener(
+          "click",
+          () => {
+            void toggleResolved(a.id, !a.resolved).then(() => map.closePopup());
+          },
+        );
+        el.querySelector<HTMLButtonElement>("[data-act='delete']")?.addEventListener(
+          "click",
+          () => {
+            if (!confirm("¿Eliminar esta nota?")) return;
+            void deleteAnnotation(a.id).then(() => map.closePopup());
+          },
+        );
       });
       m.addTo(layer);
     }
-    return () => { layer.remove(); };
+    return () => {
+      layer.remove();
+    };
   }, [annotations, map, L, currentUserId, toggleResolved, deleteAnnotation]);
 
   if (!projectId) return null;
@@ -132,41 +158,47 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
     <>
       {/* Control panel — top-left, compact, sits above ProspectivityButton */}
       <div className="absolute top-3 left-3 z-[1000] pointer-events-none">
-      <div className="pointer-events-auto flex items-center gap-1 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-1.5 py-1 shadow-md">
-        <button
-          onClick={() => setSharing(!sharing)}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
-            sharing ? "bg-gold text-bg-primary" : "text-foreground hover:bg-accent"
-          }`}
-          title={sharing ? "Detener compartir cursor" : "Compartir mi cursor con el equipo"}
-        >
-          <Users className="w-3.5 h-3.5" />
-          {sharing ? `En vivo · ${cursors.length + 1}` : "Compartir cursor"}
-        </button>
-        <div className="w-px h-4 bg-border" />
-        <button
-          onClick={() => setAdding((v) => !v)}
-          className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
-            adding ? "bg-gold text-bg-primary" : "text-foreground hover:bg-accent"
-          }`}
-          title="Soltar una nota en el mapa"
-        >
-          <MessageSquarePlus className="w-3.5 h-3.5" />
-          {adding ? "Click en el mapa…" : `Notas (${annotations.length})`}
-        </button>
-      </div>
+        <div className="pointer-events-auto flex items-center gap-1 rounded-md bg-bg-secondary/95 backdrop-blur border border-border px-1.5 py-1 shadow-md">
+          <button
+            onClick={() => setSharing(!sharing)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
+              sharing ? "bg-gold text-bg-primary" : "text-foreground hover:bg-accent"
+            }`}
+            title={sharing ? "Detener compartir cursor" : "Compartir mi cursor con el equipo"}
+          >
+            <Users className="w-3.5 h-3.5" />
+            {sharing ? `En vivo · ${cursors.length + 1}` : "Compartir cursor"}
+          </button>
+          <div className="w-px h-4 bg-border" />
+          <button
+            onClick={() => setAdding((v) => !v)}
+            className={`flex items-center gap-1.5 px-2 py-1 rounded text-[11px] font-mono transition-colors ${
+              adding ? "bg-gold text-bg-primary" : "text-foreground hover:bg-accent"
+            }`}
+            title="Soltar una nota en el mapa"
+          >
+            <MessageSquarePlus className="w-3.5 h-3.5" />
+            {adding ? "Click en el mapa…" : `Notas (${annotations.length})`}
+          </button>
+        </div>
       </div>
 
       {/* Composer modal */}
       {composer && (
-        <div className="absolute inset-0 z-[1001] flex items-center justify-center bg-black/40" onClick={() => setComposer(null)}>
+        <div
+          className="absolute inset-0 z-[1001] flex items-center justify-center bg-black/40"
+          onClick={() => setComposer(null)}
+        >
           <div
             className="bg-bg-secondary border border-border rounded-lg p-4 w-80 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-2">
               <div className="text-xs font-mono uppercase text-muted-foreground">Nueva nota</div>
-              <button onClick={() => setComposer(null)} className="text-muted-foreground hover:text-foreground">
+              <button
+                onClick={() => setComposer(null)}
+                className="text-muted-foreground hover:text-foreground"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -193,7 +225,10 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
                   const text = composer.text.trim();
                   if (!text) return;
                   void addAnnotation(composer.lat, composer.lng, text)
-                    .then(() => { setComposer(null); toast.success("Nota publicada"); })
+                    .then(() => {
+                      setComposer(null);
+                      toast.success("Nota publicada");
+                    })
                     .catch((e: Error) => toast.error(e.message ?? "Error al publicar"));
                 }}
                 disabled={!composer.text.trim()}
@@ -269,5 +304,8 @@ function buildAnnotPopup(a: MapAnnotation, currentUserId: string | null): string
 }
 
 function escapeHtml(s: string): string {
-  return s.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]!));
+  return s.replace(
+    /[&<>"']/g,
+    (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!,
+  );
 }

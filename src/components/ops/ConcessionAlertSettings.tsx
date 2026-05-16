@@ -53,7 +53,9 @@ export function ConcessionAlertSettings({ projectId }: { projectId: string }) {
       }
       setLoading(false);
     })();
-    return () => { cancel = true; };
+    return () => {
+      cancel = true;
+    };
   }, [projectId]);
 
   const save = async () => {
@@ -62,7 +64,9 @@ export function ConcessionAlertSettings({ projectId }: { projectId: string }) {
       .split(/[,\s;]+/)
       .map((e) => e.trim())
       .filter((e) => /.+@.+\..+/.test(e));
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const payload = {
       project_id: projectId,
       ...s,
@@ -95,38 +99,63 @@ export function ConcessionAlertSettings({ projectId }: { projectId: string }) {
 
       <div className="space-y-3 text-sm">
         <label className="flex items-center justify-between gap-3">
-          <span>Alertar cambio de <strong>estado</strong></span>
-          <input type="checkbox" checked={s.status_change_enabled}
-            onChange={(e) => setS({ ...s, status_change_enabled: e.target.checked })} />
+          <span>
+            Alertar cambio de <strong>estado</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={s.status_change_enabled}
+            onChange={(e) => setS({ ...s, status_change_enabled: e.target.checked })}
+          />
         </label>
 
         <label className="flex items-center justify-between gap-3">
-          <span>Alertar cambio de <strong>titular</strong></span>
-          <input type="checkbox" checked={s.holder_change_enabled}
-            onChange={(e) => setS({ ...s, holder_change_enabled: e.target.checked })} />
+          <span>
+            Alertar cambio de <strong>titular</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={s.holder_change_enabled}
+            onChange={(e) => setS({ ...s, holder_change_enabled: e.target.checked })}
+          />
         </label>
 
         <label className="flex items-center justify-between gap-3">
-          <span>Alertar variación de <strong>área (ha)</strong></span>
-          <input type="checkbox" checked={s.area_change_enabled}
-            onChange={(e) => setS({ ...s, area_change_enabled: e.target.checked })} />
+          <span>
+            Alertar variación de <strong>área (ha)</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={s.area_change_enabled}
+            onChange={(e) => setS({ ...s, area_change_enabled: e.target.checked })}
+          />
         </label>
 
         <div className="flex items-center justify-between gap-3 pl-4">
           <span className="text-text-secondary">Umbral mínimo (%)</span>
-          <input type="number" min={0} max={100} step={0.5}
+          <input
+            type="number"
+            min={0}
+            max={100}
+            step={0.5}
             disabled={!s.area_change_enabled}
             value={s.area_change_threshold_pct}
             onChange={(e) => setS({ ...s, area_change_threshold_pct: Number(e.target.value) || 0 })}
-            className="w-24 rounded border border-border bg-background px-2 py-1 text-right" />
+            className="w-24 rounded border border-border bg-background px-2 py-1 text-right"
+          />
         </div>
       </div>
 
       <div className="border-t border-border pt-4 space-y-3 text-sm">
         <label className="flex items-center justify-between gap-3">
-          <span>Notificar por <strong>email</strong></span>
-          <input type="checkbox" checked={s.email_notify}
-            onChange={(e) => setS({ ...s, email_notify: e.target.checked })} />
+          <span>
+            Notificar por <strong>email</strong>
+          </span>
+          <input
+            type="checkbox"
+            checked={s.email_notify}
+            onChange={(e) => setS({ ...s, email_notify: e.target.checked })}
+          />
         </label>
         <input
           type="text"

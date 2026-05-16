@@ -7,7 +7,12 @@ type LogoProps = {
   className?: string;
 };
 
-export function Logo({ size = 24, showText = true, textClassName = "", className = "" }: LogoProps) {
+export function Logo({
+  size = 24,
+  showText = true,
+  textClassName = "",
+  className = "",
+}: LogoProps) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
       <img
@@ -19,9 +24,7 @@ export function Logo({ size = 24, showText = true, textClassName = "", className
         style={{ width: size, height: size }}
       />
       {showText && (
-        <span className={`font-mono font-bold tracking-tight ${textClassName}`}>
-          GEOCAPITALS
-        </span>
+        <span className={`font-mono font-bold tracking-tight ${textClassName}`}>GEOCAPITALS</span>
       )}
     </span>
   );

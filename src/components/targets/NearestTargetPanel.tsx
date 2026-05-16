@@ -1,7 +1,12 @@
 import { useMemo } from "react";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { bearingDegrees, compassPoint, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
+import {
+  bearingDegrees,
+  compassPoint,
+  haversineMeters,
+  type GeoPosition,
+} from "@/hooks/useGeolocation";
 import { Navigation } from "lucide-react";
 
 function formatDistance(m: number): string {
@@ -41,11 +46,7 @@ export function NearestTargetPanel({
   }
 
   if (!nearest) {
-    return (
-      <div className="text-[10px] font-mono text-muted-foreground">
-        Sin targets visibles
-      </div>
-    );
+    return <div className="text-[10px] font-mono text-muted-foreground">Sin targets visibles</div>;
   }
 
   const { t, dist, bearing } = nearest;
@@ -60,13 +61,17 @@ export function NearestTargetPanel({
       <div className="min-w-0">
         <div className="flex items-center gap-1.5">
           <span className="font-semibold truncate">{t.code}</span>
-          <span className={`text-[9px] uppercase px-1 py-0.5 rounded border ${pri.color}`}>{pri.label}</span>
+          <span className={`text-[9px] uppercase px-1 py-0.5 rounded border ${pri.color}`}>
+            {pri.label}
+          </span>
         </div>
         <div className="text-muted-foreground text-[10px] truncate">{t.name}</div>
       </div>
       <div className="ml-auto text-right shrink-0">
         <div className="text-sky-300 font-semibold">{formatDistance(dist)}</div>
-        <div className="text-[10px] text-muted-foreground">{bearing.toFixed(0)}° {compassPoint(bearing)}</div>
+        <div className="text-[10px] text-muted-foreground">
+          {bearing.toFixed(0)}° {compassPoint(bearing)}
+        </div>
       </div>
       {onGoTo && (
         <button

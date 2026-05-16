@@ -10,7 +10,7 @@
         "species": "Jubaea chilensis",
         "source": "Inventario botánico Trackmin 2025 · validación campo"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11680, -33.89720] }
+      "geometry": { "type": "Point", "coordinates": [-71.1168, -33.8972] }
     },
     {
       "type": "Feature",
@@ -20,7 +20,7 @@
         "species": "Jubaea chilensis",
         "source": "Inventario botánico Trackmin 2025 · validación campo"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11540, -33.89820] }
+      "geometry": { "type": "Point", "coordinates": [-71.1154, -33.8982] }
     },
     {
       "type": "Feature",
@@ -30,7 +30,7 @@
         "species": "Jubaea chilensis",
         "source": "Inventario botánico Trackmin 2025 · validación campo"
       },
-      "geometry": { "type": "Point", "coordinates": [-71.11430, -33.89970] }
+      "geometry": { "type": "Point", "coordinates": [-71.1143, -33.8997] }
     }
   ]
 }

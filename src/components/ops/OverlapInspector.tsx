@@ -55,9 +55,15 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
   }, [concessions]);
 
   const stats = useMemo(() => {
-    let blocking = 0, warning = 0, info = 0, resolved = 0;
+    let blocking = 0,
+      warning = 0,
+      info = 0,
+      resolved = 0;
     for (const o of data) {
-      if (o.resolved_at) { resolved++; continue; }
+      if (o.resolved_at) {
+        resolved++;
+        continue;
+      }
       if (o.severity === "blocking") blocking++;
       else if (o.severity === "warning") warning++;
       else info++;
@@ -102,7 +108,7 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
       if (error) throw error;
       toast.success(
         `Análisis completo · ${result?.scanned ?? 0} concesiones · ${result?.detected ?? 0} sobreposiciones detectadas`,
-        { id: t }
+        { id: t },
       );
       refresh();
     } catch (e) {
@@ -119,7 +125,10 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
       .update({ resolved_at: new Date().toISOString(), resolved_by: u.user?.id })
       .eq("id", o.id);
     if (error) toast.error(error.message);
-    else { toast.success("Sobreposición marcada como resuelta"); refresh(); }
+    else {
+      toast.success("Sobreposición marcada como resuelta");
+      refresh();
+    }
   };
 
   const onReopen = async (o: ConcessionOverlap) => {
@@ -128,7 +137,10 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
       .update({ resolved_at: null, resolved_by: null })
       .eq("id", o.id);
     if (error) toast.error(error.message);
-    else { toast.success("Sobreposición reabierta"); refresh(); }
+    else {
+      toast.success("Sobreposición reabierta");
+      refresh();
+    }
   };
 
   return (
@@ -138,8 +150,16 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
       className="bg-bg-panel/40"
     >
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-        <Stat label="Bloqueantes" value={String(stats.blocking)} color={stats.blocking > 0 ? "var(--signal-red)" : undefined} />
-        <Stat label="Advertencias" value={String(stats.warning)} color={stats.warning > 0 ? "var(--signal-amber)" : undefined} />
+        <Stat
+          label="Bloqueantes"
+          value={String(stats.blocking)}
+          color={stats.blocking > 0 ? "var(--signal-red)" : undefined}
+        />
+        <Stat
+          label="Advertencias"
+          value={String(stats.warning)}
+          color={stats.warning > 0 ? "var(--signal-amber)" : undefined}
+        />
         <Stat label="Informativos" value={String(stats.info)} />
         <Stat label="Resueltos" value={String(stats.resolved)} color="var(--signal-green)" />
       </div>
@@ -203,7 +223,10 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
             const color = OVERLAP_SEVERITY_COLORS[o.severity];
             const isResolved = !!o.resolved_at;
             return (
-              <div key={o.id} className={`px-2.5 py-2 hover:bg-accent/30 ${isResolved ? "opacity-60" : ""}`}>
+              <div
+                key={o.id}
+                className={`px-2.5 py-2 hover:bg-accent/30 ${isResolved ? "opacity-60" : ""}`}
+              >
                 <div className="flex items-start gap-2">
                   <AlertTriangle className="w-3.5 h-3.5 shrink-0 mt-0.5" style={{ color }} />
                   <div className="flex-1 min-w-0">
@@ -235,7 +258,9 @@ export function OverlapInspector({ projectId }: { projectId: string }) {
                       {` · detectada ${timeAgo(o.detected_at)}`}
                       {isResolved && o.resolved_at && ` · resuelta ${timeAgo(o.resolved_at)}`}
                     </div>
-                    {o.notes && <div className="text-[10px] text-text-secondary mt-1">{o.notes}</div>}
+                    {o.notes && (
+                      <div className="text-[10px] text-text-secondary mt-1">{o.notes}</div>
+                    )}
                   </div>
                   {isResolved ? (
                     <button
@@ -268,7 +293,9 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="border border-border rounded-[2px] p-2 bg-bg-panel/50">
       <div className="text-[9px] font-mono uppercase tracking-wider text-text-dim">{label}</div>
-      <div className="text-sm font-mono font-semibold" style={color ? { color } : undefined}>{value}</div>
+      <div className="text-sm font-mono font-semibold" style={color ? { color } : undefined}>
+        {value}
+      </div>
     </div>
   );
 }

@@ -3,8 +3,15 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import {
-  Users, FolderKanban, CreditCard, Activity, ShieldAlert,
-  Loader2, Search, Crown, UserMinus,
+  Users,
+  FolderKanban,
+  CreditCard,
+  Activity,
+  ShieldAlert,
+  Loader2,
+  Search,
+  Crown,
+  UserMinus,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -41,7 +48,11 @@ function AdminPage() {
   const [tab, setTab] = useState<Tab>("overview");
 
   if (roleLoading) {
-    return <div className="p-8"><Loader2 className="w-5 h-5 animate-spin text-gold" /></div>;
+    return (
+      <div className="p-8">
+        <Loader2 className="w-5 h-5 animate-spin text-gold" />
+      </div>
+    );
   }
 
   if (!isAdmin) {
@@ -61,22 +72,28 @@ function AdminPage() {
           <Crown className="w-3 h-3" /> Super-admin
         </div>
         <h1 className="text-xl md:text-2xl font-bold mt-1">Panel de Administración</h1>
-        <p className="text-xs text-muted-foreground mt-1">Gestión global de usuarios, proyectos, pagos y operación.</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          Gestión global de usuarios, proyectos, pagos y operación.
+        </p>
       </header>
 
       <nav className="flex gap-1 mb-6 border-b border-border overflow-x-auto">
-        {([
-          ["overview", "Resumen", Activity],
-          ["users", "Usuarios", Users],
-          ["projects", "Proyectos", FolderKanban],
-          ["billing", "Pagos", CreditCard],
-          ["operations", "Operación", ShieldAlert],
-        ] as const).map(([id, label, Icon]) => (
+        {(
+          [
+            ["overview", "Resumen", Activity],
+            ["users", "Usuarios", Users],
+            ["projects", "Proyectos", FolderKanban],
+            ["billing", "Pagos", CreditCard],
+            ["operations", "Operación", ShieldAlert],
+          ] as const
+        ).map(([id, label, Icon]) => (
           <button
             key={id}
             onClick={() => setTab(id)}
             className={`px-3 py-2 text-xs font-mono inline-flex items-center gap-1.5 border-b-2 transition-colors whitespace-nowrap ${
-              tab === id ? "border-gold text-gold" : "border-transparent text-muted-foreground hover:text-foreground"
+              tab === id
+                ? "border-gold text-gold"
+                : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
             <Icon className="w-3.5 h-3.5" /> {label}
@@ -94,7 +111,13 @@ function AdminPage() {
 }
 
 function Overview() {
-  const [stats, setStats] = useState<{ users: number; projects: number; holes: number; samples: number; surveys: number } | null>(null);
+  const [stats, setStats] = useState<{
+    users: number;
+    projects: number;
+    holes: number;
+    samples: number;
+    surveys: number;
+  } | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -143,7 +166,10 @@ function UsersTab() {
   const refresh = async () => {
     setLoading(true);
     const [{ data: profiles }, { data: admins }] = await Promise.all([
-      supabase.from("profiles").select("user_id,email,display_name,organization,country,created_at").order("created_at", { ascending: false }),
+      supabase
+        .from("profiles")
+        .select("user_id,email,display_name,organization,country,created_at")
+        .order("created_at", { ascending: false }),
       supabase.from("app_roles").select("user_id").eq("role", "super_admin"),
     ]);
     const adminSet = new Set((admins ?? []).map((a) => a.user_id));
@@ -151,20 +177,39 @@ function UsersTab() {
     setLoading(false);
   };
 
-  useEffect(() => { refresh(); }, []);
+  useEffect(() => {
+    refresh();
+  }, []);
 
   const toggleAdmin = async (userId: string, currentlyAdmin: boolean) => {
     if (currentlyAdmin) {
-      const { error } = await supabase.from("app_roles").delete().eq("user_id", userId).eq("role", "super_admin");
-      if (error) toast.error(error.message); else { toast.success("Admin removido"); refresh(); }
+      const { error } = await supabase
+        .from("app_roles")
+        .delete()
+        .eq("user_id", userId)
+        .eq("role", "super_admin");
+      if (error) toast.error(error.message);
+      else {
+        toast.success("Admin removido");
+        refresh();
+      }
     } else {
-      const { error } = await supabase.from("app_roles").insert({ user_id: userId, role: "super_admin" });
-      if (error) toast.error(error.message); else { toast.success("Promovido a super-admin"); refresh(); }
+      const { error } = await supabase
+        .from("app_roles")
+        .insert({ user_id: userId, role: "super_admin" });
+      if (error) toast.error(error.message);
+      else {
+        toast.success("Promovido a super-admin");
+        refresh();
+      }
     }
   };
 
-  const filtered = users.filter((u) =>
-    !q || (u.email?.toLowerCase().includes(q.toLowerCase()) || u.display_name?.toLowerCase().includes(q.toLowerCase()))
+  const filtered = users.filter(
+    (u) =>
+      !q ||
+      u.email?.toLowerCase().includes(q.toLowerCase()) ||
+      u.display_name?.toLowerCase().includes(q.toLowerCase()),
   );
 
   return (
@@ -179,16 +224,28 @@ function UsersTab() {
         />
       </div>
 
-      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
+      {loading ? (
+        <Loader2 className="w-4 h-4 animate-spin" />
+      ) : (
         <div className="rounded border border-border bg-bg-secondary overflow-hidden">
           <table className="w-full text-xs">
             <thead className="bg-background">
               <tr>
-                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Usuario</th>
-                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Email</th>
-                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Org</th>
-                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Registro</th>
-                <th className="text-right px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Rol global</th>
+                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Usuario
+                </th>
+                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Email
+                </th>
+                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Org
+                </th>
+                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Registro
+                </th>
+                <th className="text-right px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Rol global
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -196,23 +253,44 @@ function UsersTab() {
                 <tr key={u.user_id} className="border-t border-border">
                   <td className="px-3 py-2 font-mono">{u.display_name ?? "—"}</td>
                   <td className="px-3 py-2 font-mono text-muted-foreground">{u.email ?? "—"}</td>
-                  <td className="px-3 py-2 font-mono text-muted-foreground">{u.organization ?? "—"}</td>
-                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">{new Date(u.created_at).toLocaleDateString()}</td>
+                  <td className="px-3 py-2 font-mono text-muted-foreground">
+                    {u.organization ?? "—"}
+                  </td>
+                  <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
+                    {new Date(u.created_at).toLocaleDateString()}
+                  </td>
                   <td className="px-3 py-2 text-right">
                     <button
                       onClick={() => toggleAdmin(u.user_id, !!u.is_super_admin)}
                       className={`text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded border inline-flex items-center gap-1 ${
-                        u.is_super_admin ? "bg-gold/15 text-gold border-gold/30 hover:bg-gold/25" : "bg-background text-muted-foreground border-border hover:text-foreground"
+                        u.is_super_admin
+                          ? "bg-gold/15 text-gold border-gold/30 hover:bg-gold/25"
+                          : "bg-background text-muted-foreground border-border hover:text-foreground"
                       }`}
                       title={u.is_super_admin ? "Quitar super-admin" : "Hacer super-admin"}
                     >
-                      {u.is_super_admin ? <><Crown className="w-3 h-3" /> super-admin</> : <><UserMinus className="w-3 h-3" /> usuario</>}
+                      {u.is_super_admin ? (
+                        <>
+                          <Crown className="w-3 h-3" /> super-admin
+                        </>
+                      ) : (
+                        <>
+                          <UserMinus className="w-3 h-3" /> usuario
+                        </>
+                      )}
                     </button>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={5} className="px-3 py-6 text-center text-xs font-mono text-muted-foreground">Sin resultados.</td></tr>
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-3 py-6 text-center text-xs font-mono text-muted-foreground"
+                  >
+                    Sin resultados.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -250,12 +328,24 @@ function ProjectsTab() {
       <table className="w-full text-xs">
         <thead className="bg-background">
           <tr>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Código</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Nombre</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Commodity</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">País</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Estado</th>
-            <th className="text-right px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Miembros</th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Código
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Nombre
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Commodity
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              País
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Estado
+            </th>
+            <th className="text-right px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Miembros
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -265,12 +355,23 @@ function ProjectsTab() {
               <td className="px-3 py-2 font-mono">{p.name}</td>
               <td className="px-3 py-2 font-mono text-muted-foreground">{p.commodity ?? "—"}</td>
               <td className="px-3 py-2 font-mono text-muted-foreground">{p.country ?? "—"}</td>
-              <td className="px-3 py-2 font-mono"><span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-teal/10 text-teal border border-teal/20">{p.status}</span></td>
+              <td className="px-3 py-2 font-mono">
+                <span className="text-[10px] uppercase px-1.5 py-0.5 rounded bg-teal/10 text-teal border border-teal/20">
+                  {p.status}
+                </span>
+              </td>
               <td className="px-3 py-2 font-mono text-right">{p.member_count}</td>
             </tr>
           ))}
           {rows.length === 0 && (
-            <tr><td colSpan={6} className="px-3 py-6 text-center text-xs font-mono text-muted-foreground">Sin proyectos.</td></tr>
+            <tr>
+              <td
+                colSpan={6}
+                className="px-3 py-6 text-center text-xs font-mono text-muted-foreground"
+              >
+                Sin proyectos.
+              </td>
+            </tr>
           )}
         </tbody>
       </table>
@@ -284,7 +385,8 @@ function BillingTab() {
       <CreditCard className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
       <div className="font-mono text-sm">Pagos & suscripciones</div>
       <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
-        Conecta Stripe o Paddle desde <span className="font-mono text-gold">Connectors → Payments</span> para gestionar planes,
+        Conecta Stripe o Paddle desde{" "}
+        <span className="font-mono text-gold">Connectors → Payments</span> para gestionar planes,
         cobros recurrentes, facturas e historial de pagos directamente desde aquí.
       </p>
       <div className="mt-4 grid grid-cols-3 gap-2 max-w-md mx-auto">
@@ -296,9 +398,21 @@ function BillingTab() {
   );
 }
 
-function PlanStub({ name, price, features, highlight }: { name: string; price: string; features: string; highlight?: boolean }) {
+function PlanStub({
+  name,
+  price,
+  features,
+  highlight,
+}: {
+  name: string;
+  price: string;
+  features: string;
+  highlight?: boolean;
+}) {
   return (
-    <div className={`rounded border p-3 text-left ${highlight ? "border-gold bg-gold/5" : "border-border bg-background"}`}>
+    <div
+      className={`rounded border p-3 text-left ${highlight ? "border-gold bg-gold/5" : "border-border bg-background"}`}
+    >
       <div className="font-mono font-semibold text-sm">{name}</div>
       <div className={`font-mono text-lg mt-1 ${highlight ? "text-gold" : ""}`}>{price}</div>
       <div className="text-[10px] font-mono text-muted-foreground mt-1">{features}</div>
@@ -307,7 +421,15 @@ function PlanStub({ name, price, features, highlight }: { name: string; price: s
 }
 
 function OperationsTab() {
-  const [recent, setRecent] = useState<{ id: string; action: string; entity_type: string; created_at: string; project_id: string | null }[]>([]);
+  const [recent, setRecent] = useState<
+    {
+      id: string;
+      action: string;
+      entity_type: string;
+      created_at: string;
+      project_id: string | null;
+    }[]
+  >([]);
 
   useEffect(() => {
     (async () => {
@@ -332,20 +454,34 @@ function OperationsTab() {
       </div>
 
       <div className="rounded border border-border bg-bg-secondary overflow-hidden">
-        <div className="px-3 py-2 border-b border-border font-mono text-xs font-semibold">Actividad reciente (audit log global)</div>
+        <div className="px-3 py-2 border-b border-border font-mono text-xs font-semibold">
+          Actividad reciente (audit log global)
+        </div>
         <div className="divide-y divide-border max-h-96 overflow-y-auto">
           {recent.map((r) => (
             <div key={r.id} className="px-3 py-1.5 flex items-center gap-3 text-xs font-mono">
-              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${
-                r.action === "INSERT" ? "bg-teal/10 text-teal border-teal/20" :
-                r.action === "UPDATE" ? "bg-info/10 text-info border-info/20" :
-                "bg-destructive/10 text-destructive border-destructive/20"
-              }`}>{r.action}</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                  r.action === "INSERT"
+                    ? "bg-teal/10 text-teal border-teal/20"
+                    : r.action === "UPDATE"
+                      ? "bg-info/10 text-info border-info/20"
+                      : "bg-destructive/10 text-destructive border-destructive/20"
+                }`}
+              >
+                {r.action}
+              </span>
               <span>{r.entity_type}</span>
-              <span className="ml-auto text-[10px] text-muted-foreground">{new Date(r.created_at).toLocaleString()}</span>
+              <span className="ml-auto text-[10px] text-muted-foreground">
+                {new Date(r.created_at).toLocaleString()}
+              </span>
             </div>
           ))}
-          {recent.length === 0 && <div className="px-3 py-4 text-center text-xs font-mono text-muted-foreground">Sin actividad.</div>}
+          {recent.length === 0 && (
+            <div className="px-3 py-4 text-center text-xs font-mono text-muted-foreground">
+              Sin actividad.
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -353,10 +489,13 @@ function OperationsTab() {
 }
 
 function Health({ label, status }: { label: string; status: "ok" | "warn" | "down" }) {
-  const color = status === "ok" ? "text-teal" : status === "warn" ? "text-gold" : "text-destructive";
+  const color =
+    status === "ok" ? "text-teal" : status === "warn" ? "text-gold" : "text-destructive";
   return (
     <div className="flex items-center gap-2">
-      <span className={`w-2 h-2 rounded-full ${status === "ok" ? "bg-teal" : status === "warn" ? "bg-gold" : "bg-destructive"} animate-pulse`} />
+      <span
+        className={`w-2 h-2 rounded-full ${status === "ok" ? "bg-teal" : status === "warn" ? "bg-gold" : "bg-destructive"} animate-pulse`}
+      />
       <span>{label}</span>
       <span className={`ml-auto uppercase text-[10px] ${color}`}>{status}</span>
     </div>

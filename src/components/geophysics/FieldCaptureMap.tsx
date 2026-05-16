@@ -10,7 +10,14 @@ type Props = {
   lines: Line[];
 };
 
-export function FieldCaptureMap({ userLat, userLng, accuracy, projectCenter, stations, lines }: Props) {
+export function FieldCaptureMap({
+  userLat,
+  userLng,
+  accuracy,
+  projectCenter,
+  stations,
+  lines,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<unknown>(null);
   const userMarkerRef = useRef<unknown>(null);
@@ -31,8 +38,8 @@ export function FieldCaptureMap({ userLat, userLng, accuracy, projectCenter, sta
         userLat != null && userLng != null
           ? [userLat, userLng]
           : projectCenter
-          ? [projectCenter.lat, projectCenter.lng]
-          : [-33.45, -70.66];
+            ? [projectCenter.lat, projectCenter.lng]
+            : [-33.45, -70.66];
       const map = L.map(containerRef.current, {
         center,
         zoom: 16,
@@ -41,7 +48,7 @@ export function FieldCaptureMap({ userLat, userLng, accuracy, projectCenter, sta
       });
       L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 20 }
+        { maxZoom: 20 },
       ).addTo(map);
       stationsLayerRef.current = L.layerGroup().addTo(map);
       linesLayerRef.current = L.layerGroup().addTo(map);
@@ -55,7 +62,11 @@ export function FieldCaptureMap({ userLat, userLng, accuracy, projectCenter, sta
   // update user marker + accuracy
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const map = mapRef.current as { setView: (c: [number, number], z?: number) => void; removeLayer: (l: unknown) => void; getZoom: () => number } | null;
+    const map = mapRef.current as {
+      setView: (c: [number, number], z?: number) => void;
+      removeLayer: (l: unknown) => void;
+      getZoom: () => number;
+    } | null;
     if (!map || userLat == null || userLng == null) return;
     (async () => {
       const L = await import("leaflet");

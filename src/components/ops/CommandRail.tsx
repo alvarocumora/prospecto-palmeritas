@@ -54,7 +54,10 @@ export function CommandRail({
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
-      window.localStorage.setItem(COLLAPSED_GROUPS_KEY, JSON.stringify(Array.from(collapsedGroups)));
+      window.localStorage.setItem(
+        COLLAPSED_GROUPS_KEY,
+        JSON.stringify(Array.from(collapsedGroups)),
+      );
     } catch {
       /* ignore */
     }
@@ -94,7 +97,12 @@ export function CommandRail({
       aria-label="Command rail"
     >
       {brand && (
-        <div className={cn("h-10 flex items-center border-b border-border shrink-0", expanded ? "px-3" : "justify-center")}>
+        <div
+          className={cn(
+            "h-10 flex items-center border-b border-border shrink-0",
+            expanded ? "px-3" : "justify-center",
+          )}
+        >
           {brand}
         </div>
       )}
@@ -105,7 +113,9 @@ export function CommandRail({
           const hasGroupLabel = group !== "—";
           const isCollapsed = collapsedGroups.has(group);
           const groupHasActive = list.some((it) =>
-            it.exact ? location.pathname === it.to : location.pathname === it.to || location.pathname.startsWith(it.to + "/"),
+            it.exact
+              ? location.pathname === it.to
+              : location.pathname === it.to || location.pathname.startsWith(it.to + "/"),
           );
           const showItems = !hasGroupLabel || !expanded || !isCollapsed || groupHasActive;
 
@@ -119,7 +129,14 @@ export function CommandRail({
                   aria-expanded={!isCollapsed}
                 >
                   <span>{group}</span>
-                  <span className={cn("transition-transform text-[8px]", isCollapsed ? "" : "rotate-90")}>›</span>
+                  <span
+                    className={cn(
+                      "transition-transform text-[8px]",
+                      isCollapsed ? "" : "rotate-90",
+                    )}
+                  >
+                    ›
+                  </span>
                 </button>
               )}
               {showItems &&
@@ -147,7 +164,9 @@ export function CommandRail({
                           active ? "opacity-100" : "opacity-0",
                         )}
                       />
-                      <span className="shrink-0 w-4 h-4 inline-flex items-center justify-center">{it.icon}</span>
+                      <span className="shrink-0 w-4 h-4 inline-flex items-center justify-center">
+                        {it.icon}
+                      </span>
                       {expanded && (
                         <>
                           <span className="truncate">{it.label}</span>
@@ -170,7 +189,12 @@ export function CommandRail({
       </nav>
 
       {/* Pin / unpin */}
-      <div className={cn("border-t border-border shrink-0 flex", expanded ? "px-2 py-1.5 justify-end" : "p-1.5 justify-center")}>
+      <div
+        className={cn(
+          "border-t border-border shrink-0 flex",
+          expanded ? "px-2 py-1.5 justify-end" : "p-1.5 justify-center",
+        )}
+      >
         <button
           type="button"
           onClick={() => setPinned((v) => !v)}
@@ -178,7 +202,11 @@ export function CommandRail({
           title={pinned ? "Soltar barra (auto-collapse)" : "Fijar barra abierta"}
           aria-label={pinned ? "Soltar barra" : "Fijar barra"}
         >
-          {pinned ? <ChevronsLeft className="w-3.5 h-3.5" /> : <ChevronsRight className="w-3.5 h-3.5" />}
+          {pinned ? (
+            <ChevronsLeft className="w-3.5 h-3.5" />
+          ) : (
+            <ChevronsRight className="w-3.5 h-3.5" />
+          )}
         </button>
       </div>
 

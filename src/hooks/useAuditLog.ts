@@ -19,7 +19,9 @@ export function useAuditLog(projectId: string | null, limit = 200) {
 
   const refresh = useCallback(async () => {
     if (!projectId) {
-      setEntries([]); setLoading(false); return;
+      setEntries([]);
+      setLoading(false);
+      return;
     }
     setLoading(true);
     const { data, error: err } = await supabase
@@ -29,11 +31,16 @@ export function useAuditLog(projectId: string | null, limit = 200) {
       .order("created_at", { ascending: false })
       .limit(limit);
     if (err) setError(err.message);
-    else { setEntries((data ?? []) as AuditEntry[]); setError(null); }
+    else {
+      setEntries((data ?? []) as AuditEntry[]);
+      setError(null);
+    }
     setLoading(false);
   }, [projectId, limit]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { entries, loading, error, refresh };
 }

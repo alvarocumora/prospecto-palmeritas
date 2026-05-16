@@ -8,7 +8,11 @@ export function useIsSuperAdmin() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) { setIsAdmin(false); setLoading(false); return; }
+    if (!user) {
+      setIsAdmin(false);
+      setLoading(false);
+      return;
+    }
     (async () => {
       const { data } = await supabase
         .from("app_roles")

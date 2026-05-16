@@ -22,9 +22,15 @@ export function MembersTable({
       <table className="w-full text-xs">
         <thead className="bg-background">
           <tr>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Usuario</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Email</th>
-            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Rol</th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Usuario
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Email
+            </th>
+            <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+              Rol
+            </th>
             {canManage && <th className="px-3 py-2 w-10" />}
           </tr>
         </thead>
@@ -79,7 +85,14 @@ export function MembersTable({
             </tr>
           ))}
           {members.length === 0 && (
-            <tr><td colSpan={canManage ? 4 : 3} className="px-3 py-4 text-center text-xs text-muted-foreground font-mono">Sin miembros aún.</td></tr>
+            <tr>
+              <td
+                colSpan={canManage ? 4 : 3}
+                className="px-3 py-4 text-center text-xs text-muted-foreground font-mono"
+              >
+                Sin miembros aún.
+              </td>
+            </tr>
           )}
         </tbody>
       </table>

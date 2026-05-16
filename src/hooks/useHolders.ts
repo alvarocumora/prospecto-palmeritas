@@ -85,7 +85,8 @@ export function useHolders(projectId: string | null) {
     const caseMap = new Map<string, number>();
     (links.data ?? []).forEach((r) => {
       if (r.link_type === "bulletin") bMap.set(r.holder_id, (bMap.get(r.holder_id) ?? 0) + 1);
-      else if (r.link_type === "court_case") caseMap.set(r.holder_id, (caseMap.get(r.holder_id) ?? 0) + 1);
+      else if (r.link_type === "court_case")
+        caseMap.set(r.holder_id, (caseMap.get(r.holder_id) ?? 0) + 1);
     });
     const fMap = new Map<string, number>();
     (files.data ?? []).forEach((r) => fMap.set(r.holder_id, (fMap.get(r.holder_id) ?? 0) + 1));
@@ -97,7 +98,7 @@ export function useHolders(projectId: string | null) {
         bulletins_count: bMap.get(h.id) ?? 0,
         cases_count: caseMap.get(h.id) ?? 0,
         files_count: fMap.get(h.id) ?? 0,
-      }))
+      })),
     );
     setError(null);
     setLoading(false);

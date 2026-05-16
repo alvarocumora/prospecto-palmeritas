@@ -38,13 +38,19 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
   const matchPub = (p: { holder_rut: string | null; holder_name: string | null }) => {
     const pRut = normalizeRut(p.holder_rut);
     if (rutNorm && pRut && pRut === rutNorm) return true;
-    if (holderName && p.holder_name && p.holder_name.toLowerCase().includes(holderName.toLowerCase())) return true;
+    if (
+      holderName &&
+      p.holder_name &&
+      p.holder_name.toLowerCase().includes(holderName.toLowerCase())
+    )
+      return true;
     return false;
   };
   const matchCase = (c: { defendant_rut: string | null; defendant: string | null }) => {
     const cRut = normalizeRut(c.defendant_rut);
     if (rutNorm && cRut && cRut === rutNorm) return true;
-    if (holderName && c.defendant && c.defendant.toLowerCase().includes(holderName.toLowerCase())) return true;
+    if (holderName && c.defendant && c.defendant.toLowerCase().includes(holderName.toLowerCase()))
+      return true;
     return false;
   };
 
@@ -94,14 +100,16 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
     autoTable(doc, {
       startY: y + 12,
       head: [["Fecha", "N°", "Tipo", "Concesión", "Comuna", "Área (ha)"]],
-      body: pubs.slice(0, 50).map((p) => [
-        p.publication_date ?? "—",
-        p.publication_number ?? "—",
-        p.publication_type ?? "—",
-        p.concession_name ?? "—",
-        p.comuna ?? "—",
-        p.area_ha != null ? String(p.area_ha) : "—",
-      ]),
+      body: pubs
+        .slice(0, 50)
+        .map((p) => [
+          p.publication_date ?? "—",
+          p.publication_number ?? "—",
+          p.publication_type ?? "—",
+          p.concession_name ?? "—",
+          p.comuna ?? "—",
+          p.area_ha != null ? String(p.area_ha) : "—",
+        ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [30, 41, 59], textColor: 255 },
       margin: { left: 40, right: 40 },
@@ -117,14 +125,16 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
     autoTable(doc, {
       startY: y + 14,
       head: [["Fecha", "Rol", "Tribunal", "Materia", "Demandante", "Estado"]],
-      body: cases.slice(0, 50).map((c) => [
-        c.filed_at ?? "—",
-        c.case_number ?? "—",
-        c.court ?? "—",
-        c.matter ?? "—",
-        c.plaintiff ?? "—",
-        c.status ?? "—",
-      ]),
+      body: cases
+        .slice(0, 50)
+        .map((c) => [
+          c.filed_at ?? "—",
+          c.case_number ?? "—",
+          c.court ?? "—",
+          c.matter ?? "—",
+          c.plaintiff ?? "—",
+          c.status ?? "—",
+        ]),
       styles: { fontSize: 8 },
       headStyles: { fillColor: [127, 29, 29], textColor: 255 },
       margin: { left: 40, right: 40 },

@@ -4,7 +4,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
-import { useResourceModels, type ResourceBlock, type ResourceModel } from "@/hooks/useResourceModels";
+import {
+  useResourceModels,
+  type ResourceBlock,
+  type ResourceModel,
+} from "@/hooks/useResourceModels";
 import { Loader2, Box, Eye, EyeOff, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -57,7 +61,9 @@ export function BlockModel3DViewer({ model, className }: Props) {
       setBlocks(rows);
       setLoading(false);
     });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [model.id, fetchBlocks]);
 
   const stats = useMemo(() => {
@@ -118,7 +124,11 @@ export function BlockModel3DViewer({ model, className }: Props) {
       );
       scene.add(sprite);
     } else {
-      const geom = new THREE.BoxGeometry(model.block_size_x, model.block_size_z, model.block_size_y);
+      const geom = new THREE.BoxGeometry(
+        model.block_size_x,
+        model.block_size_z,
+        model.block_size_y,
+      );
       const mat = new THREE.MeshLambertMaterial({ vertexColors: true });
       const mesh = new THREE.InstancedMesh(geom, mat, visible.length);
       const dummy = new THREE.Object3D();
@@ -181,18 +191,32 @@ export function BlockModel3DViewer({ model, className }: Props) {
       renderer.dispose();
       container.innerHTML = "";
     };
-  }, [blocks, loading, showAll, cutoff, model.block_size_x, model.block_size_y, model.block_size_z, stats.min, stats.max]);
+  }, [
+    blocks,
+    loading,
+    showAll,
+    cutoff,
+    model.block_size_x,
+    model.block_size_y,
+    model.block_size_z,
+    stats.min,
+    stats.max,
+  ]);
 
   const unit = model.commodity === "au" || model.commodity === "ag" ? "g/t" : "%";
 
   return (
-    <div className={`relative border border-border rounded bg-card flex flex-col ${className ?? ""}`}>
+    <div
+      className={`relative border border-border rounded bg-card flex flex-col ${className ?? ""}`}
+    >
       <div className="flex items-center justify-between px-3 py-2 border-b border-border text-[10px] font-mono">
         <div className="flex items-center gap-2 text-text-dim">
           <Box className="w-3 h-3 text-signal-cyan" />
           <span className="uppercase">{model.name}</span>
           <span>·</span>
-          <span>{stats.count} bloques · {model.commodity.toUpperCase()} {unit}</span>
+          <span>
+            {stats.count} bloques · {model.commodity.toUpperCase()} {unit}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -242,7 +266,12 @@ export function BlockModel3DViewer({ model, className }: Props) {
       {stats.count > 0 && (
         <div className="absolute bottom-3 right-3 bg-background/85 border border-border rounded px-2 py-1.5 text-[9px] font-mono">
           <div className="text-text-dim mb-1">Ley ({unit})</div>
-          <div className="h-2 w-32 rounded" style={{ background: "linear-gradient(to right, #4500a8, #3b5188, #1f928c, #7dd357, #fce824)" }} />
+          <div
+            className="h-2 w-32 rounded"
+            style={{
+              background: "linear-gradient(to right, #4500a8, #3b5188, #1f928c, #7dd357, #fce824)",
+            }}
+          />
           <div className="flex justify-between text-text-dim mt-0.5">
             <span>{stats.min.toFixed(2)}</span>
             <span>{stats.max.toFixed(2)}</span>

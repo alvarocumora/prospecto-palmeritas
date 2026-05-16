@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchGeophysicsData } from "@/services/geophysics.service";
-export type { GeophysicsData, GeophysicsLine, GeophysicsStation, GeophysicsSurvey } from "@/types/geophysics";
+export type {
+  GeophysicsData,
+  GeophysicsLine,
+  GeophysicsStation,
+  GeophysicsSurvey,
+} from "@/types/geophysics";
 
 function toErrorMessage(error: unknown) {
   if (!error) return null;

@@ -250,12 +250,9 @@ export function drawPieChart(
     setRGB(doc, "text", COLORS.text);
     doc.text(d.label, legX + 5, legY);
     setRGB(doc, "text", COLORS.muted);
-    doc.text(
-      `${d.amount.toLocaleString("en-US")} USD   (${pct}%)`,
-      x0 + w - 4,
-      legY,
-      { align: "right" },
-    );
+    doc.text(`${d.amount.toLocaleString("en-US")} USD   (${pct}%)`, x0 + w - 4, legY, {
+      align: "right",
+    });
     legY += 6;
   }
 
@@ -268,7 +265,13 @@ export function drawPieChart(
    ---------------------------------------------------------- */
 export function drawGantt(
   s: PdfState,
-  phases: { phase: string; title: string; start: number; span: number; color: [number, number, number] }[],
+  phases: {
+    phase: string;
+    title: string;
+    start: number;
+    span: number;
+    color: [number, number, number];
+  }[],
   totalMonths: number,
   caption: string,
 ) {
