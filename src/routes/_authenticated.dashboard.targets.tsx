@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
 import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
+import { snapshotElement, buildTargetsPDF } from "@/lib/exportTargetsPDF";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
@@ -22,7 +23,44 @@ function TargetsPage() {
   const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState<"kanban" | "map" | "ranking">("kanban");
+  const [exporting, setExporting] = useState(false);
+  const mapWrapRef = useRef<HTMLDivElement | null>(null);
+  const rankingWrapRef = useRef<HTMLDivElement | null>(null);
   const writable = canWrite(role);
+
+  async function handleExportPDF() {
+    if (!active || targets.length === 0) return;
+    setExporting(true);
+    const prevView = view;
+    try {
+      toast.info("Generando PDF, espera unos segundos…");
+
+      // Capture map
+      setView("map");
+      await new Promise((r) => setTimeout(r, 2500));
+      const mapCanvas = mapWrapRef.current ? await snapshotElement(mapWrapRef.current) : null;
+
+      // Capture ranking
+      setView("ranking");
+      await new Promise((r) => setTimeout(r, 700));
+      const rankingCanvas = rankingWrapRef.current ? await snapshotElement(rankingWrapRef.current) : null;
+
+      buildTargetsPDF({
+        mapCanvas,
+        rankingCanvas,
+        projectName: active.name ?? active.code,
+        projectCode: active.code,
+        targetsCount: targets.length,
+      });
+      toast.success("PDF descargado");
+    } catch (e) {
+      toast.error("No se pudo generar PDF");
+      console.error(e);
+    } finally {
+      setView(prevView);
+      setExporting(false);
+    }
+  }
 
   const grouped = useMemo(() => {
     const m: Record<TargetStage, ExplorationTarget[]> = {
@@ -101,6 +139,16 @@ function TargetsPage() {
               <Trophy className="w-3 h-3" /> Ranking
             </button>
           </div>
+          <button
+            type="button"
+            onClick={handleExportPDF}
+            disabled={exporting || targets.length === 0}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-emerald-500/40 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Exporta mapa + ranking a PDF para enviar por correo o WhatsApp"
+          >
+            {exporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileDown className="w-3 h-3" />}
+            {exporting ? "Generando…" : "Exportar PDF"}
+          </button>
           <Link
             to="/dashboard/targets/ai-brief"
             className="px-3 py-1.5 text-xs font-mono rounded border border-info/40 text-info bg-info/5 hover:bg-info/10 inline-flex items-center gap-1.5"
@@ -135,9 +183,9 @@ function TargetsPage() {
           <p className="text-xs text-muted-foreground mt-1">Crea tu primer target con la evidencia geológica/geofísica que lo respalde.</p>
         </div>
       ) : view === "map" ? (
-        <TargetsMap targets={targets} />
+        <div ref={mapWrapRef}><TargetsMap targets={targets} /></div>
       ) : view === "ranking" ? (
-        <TargetsExecutivePanel targets={targets} />
+        <div ref={rankingWrapRef}><TargetsExecutivePanel targets={targets} /></div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (

@@ -135,6 +135,7 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 attribution="Esri, Maxar, Earthstar Geographics"
                 maxZoom={19}
+                crossOrigin="anonymous"
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="Topográfico">
@@ -142,12 +143,14 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
                 url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
                 attribution="Esri"
                 maxZoom={19}
+                crossOrigin="anonymous"
               />
             </LayersControl.BaseLayer>
             <LayersControl.BaseLayer name="OpenStreetMap">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
                 attribution="&copy; OpenStreetMap"
+                crossOrigin="anonymous"
               />
             </LayersControl.BaseLayer>
           </LayersControl>
