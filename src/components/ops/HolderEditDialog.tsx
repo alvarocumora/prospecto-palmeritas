@@ -77,7 +77,11 @@ export function HolderEditDialog({
           <DialogTitle>{holder ? "Editar titular" : "Nuevo titular"}</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-          <Field label="Nombre / Razón social *" value={form.name} onChange={(v) => setForm({ ...form, name: v })} />
+          <Field
+            label="Nombre / Razón social *"
+            value={form.name}
+            onChange={(v) => setForm({ ...form, name: v })}
+          />
           <Field label="RUT" value={form.rut} onChange={(v) => setForm({ ...form, rut: v })} mono />
           <div>
             <label className="text-[11px] text-text-secondary uppercase tracking-wider">Tipo</label>
@@ -91,18 +95,66 @@ export function HolderEditDialog({
               <option value="comunidad">Comunidad</option>
             </select>
           </div>
-          <Field label="Fecha constitución" value={form.incorporation_date} onChange={(v) => setForm({ ...form, incorporation_date: v })} type="date" />
-          <Field label="Repr. legal" value={form.legal_repr_name} onChange={(v) => setForm({ ...form, legal_repr_name: v })} />
-          <Field label="RUT repr. legal" value={form.legal_repr_rut} onChange={(v) => setForm({ ...form, legal_repr_rut: v })} mono />
-          <Field label="Giro / Actividad" value={form.economic_activity} onChange={(v) => setForm({ ...form, economic_activity: v })} className="md:col-span-2" />
-          <Field label="Dirección" value={form.address} onChange={(v) => setForm({ ...form, address: v })} className="md:col-span-2" />
-          <Field label="Comuna" value={form.commune} onChange={(v) => setForm({ ...form, commune: v })} />
-          <Field label="Región" value={form.region} onChange={(v) => setForm({ ...form, region: v })} />
-          <Field label="Email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} type="email" />
-          <Field label="Teléfono" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-          <Field label="Sitio web" value={form.website} onChange={(v) => setForm({ ...form, website: v })} className="md:col-span-2" />
+          <Field
+            label="Fecha constitución"
+            value={form.incorporation_date}
+            onChange={(v) => setForm({ ...form, incorporation_date: v })}
+            type="date"
+          />
+          <Field
+            label="Repr. legal"
+            value={form.legal_repr_name}
+            onChange={(v) => setForm({ ...form, legal_repr_name: v })}
+          />
+          <Field
+            label="RUT repr. legal"
+            value={form.legal_repr_rut}
+            onChange={(v) => setForm({ ...form, legal_repr_rut: v })}
+            mono
+          />
+          <Field
+            label="Giro / Actividad"
+            value={form.economic_activity}
+            onChange={(v) => setForm({ ...form, economic_activity: v })}
+            className="md:col-span-2"
+          />
+          <Field
+            label="Dirección"
+            value={form.address}
+            onChange={(v) => setForm({ ...form, address: v })}
+            className="md:col-span-2"
+          />
+          <Field
+            label="Comuna"
+            value={form.commune}
+            onChange={(v) => setForm({ ...form, commune: v })}
+          />
+          <Field
+            label="Región"
+            value={form.region}
+            onChange={(v) => setForm({ ...form, region: v })}
+          />
+          <Field
+            label="Email"
+            value={form.email}
+            onChange={(v) => setForm({ ...form, email: v })}
+            type="email"
+          />
+          <Field
+            label="Teléfono"
+            value={form.phone}
+            onChange={(v) => setForm({ ...form, phone: v })}
+          />
+          <Field
+            label="Sitio web"
+            value={form.website}
+            onChange={(v) => setForm({ ...form, website: v })}
+            className="md:col-span-2"
+          />
           <div className="md:col-span-2">
-            <label className="text-[11px] text-text-secondary uppercase tracking-wider">Notas</label>
+            <label className="text-[11px] text-text-secondary uppercase tracking-wider">
+              Notas
+            </label>
             <textarea
               value={form.notes}
               onChange={(e) => setForm({ ...form, notes: e.target.value })}
@@ -112,7 +164,12 @@ export function HolderEditDialog({
           </div>
         </div>
         <div className="flex justify-end gap-2 pt-2">
-          <button onClick={onClose} className="px-3 py-1.5 rounded border border-border text-sm hover:bg-accent">Cancelar</button>
+          <button
+            onClick={onClose}
+            className="px-3 py-1.5 rounded border border-border text-sm hover:bg-accent"
+          >
+            Cancelar
+          </button>
           <button
             onClick={onSave}
             disabled={saving}

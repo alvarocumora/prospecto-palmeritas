@@ -6,7 +6,15 @@ import type { LayerStateMap } from "@/hooks/useLayerState";
 export type ManagedLayer = {
   id: string;
   label: string;
-  group: "Basemap" | "Geología Chile" | "Satelital" | "Geología" | "Geofísica" | "Catastro" | "Proyecto" | "Datos externos";
+  group:
+    | "Basemap"
+    | "Geología Chile"
+    | "Satelital"
+    | "Geología"
+    | "Geofísica"
+    | "Catastro"
+    | "Proyecto"
+    | "Datos externos";
   layer: Layer;
   /** If true, only one layer in this group can be visible (radio behavior). */
   exclusive?: boolean;
@@ -70,7 +78,16 @@ export function LayerOpacityPanel({
 
   if (!open) return null;
 
-  const groups = ["Basemap", "Geología Chile", "Satelital", "Geología", "Geofísica", "Catastro", "Proyecto", "Datos externos"] as const;
+  const groups = [
+    "Basemap",
+    "Geología Chile",
+    "Satelital",
+    "Geología",
+    "Geofísica",
+    "Catastro",
+    "Proyecto",
+    "Datos externos",
+  ] as const;
 
   const handleToggle = (ml: ManagedLayer) => {
     const currentlyVisible = state[ml.id]?.visible ?? false;

@@ -57,12 +57,20 @@ export function useConcessionFiles(concessionId: string | null) {
   const upload = useCallback(
     async (
       file: File,
-      opts: { concessionId: string; projectId: string; userId: string; fileType: string; description?: string },
+      opts: {
+        concessionId: string;
+        projectId: string;
+        userId: string;
+        fileType: string;
+        description?: string;
+      },
     ) => {
       const id = crypto.randomUUID();
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${opts.projectId}/${opts.concessionId}/${id}-${safe}`;
-      const up = await supabase.storage.from("concession-files").upload(path, file, { upsert: false });
+      const up = await supabase.storage
+        .from("concession-files")
+        .upload(path, file, { upsert: false });
       if (up.error) throw up.error;
       const { error: insErr } = await supabase.from("concession_files").insert({
         concession_id: opts.concessionId,
@@ -91,7 +99,9 @@ export function useConcessionFiles(concessionId: string | null) {
   );
 
   const getDownloadUrl = useCallback(async (path: string) => {
-    const { data: signed } = await supabase.storage.from("concession-files").createSignedUrl(path, 60 * 10);
+    const { data: signed } = await supabase.storage
+      .from("concession-files")
+      .createSignedUrl(path, 60 * 10);
     return signed?.signedUrl ?? null;
   }, []);
 

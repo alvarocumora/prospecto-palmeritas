@@ -1,5 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { GeophysicsData, GeophysicsLine, GeophysicsStation, GeophysicsSurvey } from "@/types/geophysics";
+import type {
+  GeophysicsData,
+  GeophysicsLine,
+  GeophysicsStation,
+  GeophysicsSurvey,
+} from "@/types/geophysics";
 
 export async function fetchGeophysicsData(projectId?: string | null): Promise<GeophysicsData> {
   const sQuery = supabase.from("geophysics_surveys").select("*").order("display_order");

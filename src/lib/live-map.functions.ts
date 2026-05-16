@@ -12,9 +12,7 @@ function constantTimeEqual(a: string, b: string): boolean {
 
 function buildVerifier(envVar: string) {
   return createServerFn({ method: "POST" })
-    .inputValidator((input) =>
-      z.object({ password: z.string().min(1).max(200) }).parse(input),
-    )
+    .inputValidator((input) => z.object({ password: z.string().min(1).max(200) }).parse(input))
     .handler(async ({ data }) => {
       const expected = process.env[envVar];
       if (!expected) {

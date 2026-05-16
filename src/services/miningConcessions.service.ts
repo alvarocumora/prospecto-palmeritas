@@ -1,7 +1,9 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { MiningConcession } from "@/types/miningConcessions";
 
-export async function fetchMiningConcessions(projectId: string | null): Promise<MiningConcession[]> {
+export async function fetchMiningConcessions(
+  projectId: string | null,
+): Promise<MiningConcession[]> {
   if (!projectId) return [];
 
   const { data, error } = await supabase

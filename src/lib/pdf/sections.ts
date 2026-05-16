@@ -364,7 +364,15 @@ export function renderSection2_Reliance(s: PdfState) {
 export function renderSection3_Property(
   s: PdfState,
   locationFig: string | null,
-  catastroRows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string; intersects: boolean }[],
+  catastroRows: {
+    tipo: string;
+    rol: string;
+    nombre: string;
+    titular: string;
+    ha: string;
+    venc: string;
+    intersects: boolean;
+  }[],
   validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Localización y descripción de la propiedad");
@@ -385,9 +393,14 @@ export function renderSection3_Property(
   );
 
   if (locationFig) {
-    figure(s, locationFig, "Mapa de ubicación del Prospecto Palmeras y AOI sobre Macrostrat (geología regional). Fuente: Trackmin GeoIntel.", {
-      height: 100,
-    });
+    figure(
+      s,
+      locationFig,
+      "Mapa de ubicación del Prospecto Palmeras y AOI sobre Macrostrat (geología regional). Fuente: Trackmin GeoIntel.",
+      {
+        height: 100,
+      },
+    );
   }
 
   h2(s, "Descripción de la propiedad");
@@ -420,7 +433,10 @@ export function renderSection3_Property(
     h2(s, "Pertenencias intersectando el AOI");
     const intersecting = catastroRows.filter((r) => r.intersects);
     if (intersecting.length === 0) {
-      p(s, "No se identificaron pertenencias mineras vigentes intersectando el polígono AOI en la consulta más reciente al servicio SERNAGEOMIN.");
+      p(
+        s,
+        "No se identificaron pertenencias mineras vigentes intersectando el polígono AOI en la consulta más reciente al servicio SERNAGEOMIN.",
+      );
     } else {
       p(
         s,
@@ -431,8 +447,16 @@ export function renderSection3_Property(
       autoTable(s.doc, {
         startY: s.cursorY,
         head: [["Tipo", "ROL", "Nombre", "Titular", "Ha", "Vencimiento"]],
-        body: intersecting.slice(0, 20).map((r) => [r.tipo, r.rol, r.nombre, r.titular, r.ha, r.venc]),
-        styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.8, textColor: COLORS.text, overflow: "linebreak" },
+        body: intersecting
+          .slice(0, 20)
+          .map((r) => [r.tipo, r.rol, r.nombre, r.titular, r.ha, r.venc]),
+        styles: {
+          font: "helvetica",
+          fontSize: 7.5,
+          cellPadding: 1.8,
+          textColor: COLORS.text,
+          overflow: "linebreak",
+        },
         headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
         alternateRowStyles: { fillColor: COLORS.panel },
         margin: { left: PAGE.margin, right: PAGE.margin },
@@ -504,8 +528,20 @@ export function renderSection6_Geology(s: PdfState, geo: GeologyData | null) {
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Código", "Unidad", "Edad", "Formación", "Tipo de roca"]],
-      body: geo.litho.map((u) => [u.unit_code, u.name, u.age ?? "—", u.formation ?? "—", u.rock_type ?? "—"]),
-      styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text, overflow: "linebreak" },
+      body: geo.litho.map((u) => [
+        u.unit_code,
+        u.name,
+        u.age ?? "—",
+        u.formation ?? "—",
+        u.rock_type ?? "—",
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -519,8 +555,19 @@ export function renderSection6_Geology(s: PdfState, geo: GeologyData | null) {
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Código", "Zona", "Asociación mineral", "Intensidad"]],
-      body: geo.alteration.map((a) => [a.zone_code, a.name, a.assemblage ?? "—", a.intensity ?? "—"]),
-      styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text, overflow: "linebreak" },
+      body: geo.alteration.map((a) => [
+        a.zone_code,
+        a.name,
+        a.assemblage ?? "—",
+        a.intensity ?? "—",
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -553,8 +600,20 @@ export function renderSection7_DepositType(s: PdfState, geo: GeologyData | null)
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Mineral", "Fórmula", "Categoría", "Estadio", "Abundancia"]],
-      body: geo.minerals.map((m) => [m.mineral, m.formula ?? "—", m.category ?? "—", m.paragenetic_stage ?? "—", m.abundance ?? "—"]),
-      styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text, overflow: "linebreak" },
+      body: geo.minerals.map((m) => [
+        m.mineral,
+        m.formula ?? "—",
+        m.category ?? "—",
+        m.paragenetic_stage ?? "—",
+        m.abundance ?? "—",
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -607,7 +666,17 @@ export function renderSection8_Exploration(s: PdfState, geophys: GeophysicsData 
     tableCaption(s, "Campañas geofísicas planificadas.");
     autoTable(s.doc, {
       startY: s.cursorY,
-      head: [["Nombre", "Método", "km plan.", "Espaciado (m)", "Profundidad (m)", "Costo (USD)", "Estado"]],
+      head: [
+        [
+          "Nombre",
+          "Método",
+          "km plan.",
+          "Espaciado (m)",
+          "Profundidad (m)",
+          "Costo (USD)",
+          "Estado",
+        ],
+      ],
       body: geophys.surveys.map((c) => [
         c.name,
         c.method,
@@ -617,7 +686,13 @@ export function renderSection8_Exploration(s: PdfState, geophys: GeophysicsData 
         c.cost_usd != null ? c.cost_usd.toLocaleString("en-US") : "—",
         c.status,
       ]),
-      styles: { font: "helvetica", fontSize: 8, cellPadding: 2, textColor: COLORS.text, overflow: "linebreak" },
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 2,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -672,7 +747,10 @@ export function renderSection9_Drilling(s: PdfState) {
   );
 }
 
-export function renderSection10_QAQC(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
+export function renderSection10_QAQC(
+  s: PdfState,
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
+) {
   h1(s, "Preparación, análisis y seguridad de muestras");
   if (validations.assaysStatus === "pending") {
     warningBox(
@@ -709,7 +787,10 @@ export function renderSection10_QAQC(s: PdfState, validations: Ni43101Validation
   );
 }
 
-export function renderSection11_DataVerification(s: PdfState, validations: Ni43101Validations = DEFAULT_VALIDATIONS) {
+export function renderSection11_DataVerification(
+  s: PdfState,
+  validations: Ni43101Validations = DEFAULT_VALIDATIONS,
+) {
   h1(s, "Verificación de datos");
   if (validations.assaysStatus === "pending") {
     warningBox(
@@ -742,7 +823,11 @@ export function renderSection12_Budget(s: PdfState) {
     head: [["Ítem", "Detalle", "Monto (USD)"]],
     body: [
       ...BUDGET.map((b) => [b.item, b.detail, b.amount.toLocaleString("en-US")]),
-      [{ content: "TOTAL", styles: { fontStyle: "bold" } }, "", { content: BUDGET_TOTAL.toLocaleString("en-US"), styles: { fontStyle: "bold" } }],
+      [
+        { content: "TOTAL", styles: { fontStyle: "bold" } },
+        "",
+        { content: BUDGET_TOTAL.toLocaleString("en-US"), styles: { fontStyle: "bold" } },
+      ],
     ],
     styles: { font: "helvetica", fontSize: 9, cellPadding: 2.5, textColor: COLORS.text },
     headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold" },
@@ -759,14 +844,16 @@ export function renderSection12_Budget(s: PdfState) {
     BUDGET.map((b, i) => ({
       label: b.item,
       amount: b.amount,
-      color: ([
-        [200, 146, 42],   // gold
-        [180, 110, 60],   // copper
-        [60, 140, 130],   // teal
-        [70, 110, 180],   // info blue
-        [150, 138, 128],  // muted
-        [110, 100, 92],   // hint
-      ] as [number, number, number][])[i % 6],
+      color: (
+        [
+          [200, 146, 42], // gold
+          [180, 110, 60], // copper
+          [60, 140, 130], // teal
+          [70, 110, 180], // info blue
+          [150, 138, 128], // muted
+          [110, 100, 92], // hint
+        ] as [number, number, number][]
+      )[i % 6],
     })),
     `USD ${BUDGET_TOTAL.toLocaleString("en-US")}`,
     "Distribución del presupuesto por ítem (donut chart). Sondaje DDH concentra el 58 % del programa.",
@@ -826,7 +913,16 @@ export function renderSection13_Conclusions(s: PdfState) {
   ]);
 }
 
-export function renderSection14_References(s: PdfState, refs: { citation_key: string; title: string; authors: string | null; year: number | null; publisher: string | null }[]) {
+export function renderSection14_References(
+  s: PdfState,
+  refs: {
+    citation_key: string;
+    title: string;
+    authors: string | null;
+    year: number | null;
+    publisher: string | null;
+  }[],
+) {
   h1(s, "Referencias bibliográficas");
   if (refs.length === 0) {
     bullet(s, [
@@ -884,12 +980,23 @@ export function renderSection3bis_Zoning(
     head: [["Capa", "Fuente", "Escala / Resolución", "Uso"]],
     body: [
       ["Esri World Imagery", "Esri / Maxar", "≤0.3 m/px", "Basemap satelital"],
-      ["SERNAGEOMIN Geología 1:1M", "SERNAGEOMIN WMS", "1:1.000.000", "Zonificación litológica regional"],
+      [
+        "SERNAGEOMIN Geología 1:1M",
+        "SERNAGEOMIN WMS",
+        "1:1.000.000",
+        "Zonificación litológica regional",
+      ],
       ["Macrostrat Lithology", "Macrostrat.org", "Variable", "Geología de contexto"],
       ["Catastro Minero", "SERNAGEOMIN Geomin", "Vector", "Pertenencias vigentes"],
       ["AOI Trackmin", "Trackmin GeoIntel", "Vector interno", "Polígono operativo"],
     ],
-    styles: { font: "helvetica", fontSize: 8, cellPadding: 1.8, textColor: COLORS.text, overflow: "linebreak" },
+    styles: {
+      font: "helvetica",
+      fontSize: 8,
+      cellPadding: 1.8,
+      textColor: COLORS.text,
+      overflow: "linebreak",
+    },
     headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
     alternateRowStyles: { fillColor: COLORS.panel },
     margin: { left: PAGE.margin, right: PAGE.margin },
@@ -902,13 +1009,21 @@ export function renderSection3bis_Zoning(
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Código", "Nombre", "Edad", "Descripción"]],
-      body: geo.litho.slice(0, 10).map((u) => [
-        u.unit_code ?? "—",
-        u.name ?? "—",
-        u.age ?? "—",
-        (u.description ?? "—").slice(0, 110),
-      ]),
-      styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      body: geo.litho
+        .slice(0, 10)
+        .map((u) => [
+          u.unit_code ?? "—",
+          u.name ?? "—",
+          u.age ?? "—",
+          (u.description ?? "—").slice(0, 110),
+        ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 7.5,
+        cellPadding: 1.5,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -929,7 +1044,15 @@ export function renderSection3bis_Zoning(
 export function renderAnnexA(
   s: PdfState,
   rows: { tipo: string; rol: string; nombre: string; titular: string; ha: string; venc: string }[],
-  internal: { code: string; name: string; holder: string; type: string; status: string; area_ha: string; expires: string }[] = [],
+  internal: {
+    code: string;
+    name: string;
+    holder: string;
+    type: string;
+    status: string;
+    area_ha: string;
+    expires: string;
+  }[] = [],
   validations: Ni43101Validations = DEFAULT_VALIDATIONS,
 ) {
   h1(s, "Anexo A — Listado completo de pertenencias en bbox de consulta");
@@ -949,7 +1072,13 @@ export function renderAnnexA(
       startY: s.cursorY,
       head: [["Fuente", "Tipo", "ROL", "Nombre", "Titular", "Ha", "Vencimiento"]],
       body: rows.map((r) => ["SERNAGEOMIN", r.tipo, r.rol, r.nombre, r.titular, r.ha, r.venc]),
-      styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        cellPadding: 1.5,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -962,8 +1091,23 @@ export function renderAnnexA(
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Fuente", "Código", "Nombre", "Titular", "Tipo", "Estado", "Ha", "Vence"]],
-      body: internal.map((r) => ["Interno", r.code, r.name, r.holder, r.type, r.status, r.area_ha, r.expires]),
-      styles: { font: "helvetica", fontSize: 7, cellPadding: 1.5, textColor: COLORS.text, overflow: "linebreak" },
+      body: internal.map((r) => [
+        "Interno",
+        r.code,
+        r.name,
+        r.holder,
+        r.type,
+        r.status,
+        r.area_ha,
+        r.expires,
+      ]),
+      styles: {
+        font: "helvetica",
+        fontSize: 7,
+        cellPadding: 1.5,
+        textColor: COLORS.text,
+        overflow: "linebreak",
+      },
       headStyles: { fillColor: COLORS.goldDark, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
@@ -988,14 +1132,16 @@ export function renderAnnexB(s: PdfState, geophys: GeophysicsData | null) {
   autoTable(s.doc, {
     startY: s.cursorY,
     head: [["Estación", "Lat", "Lng", "Mag (nT)", "IP charg. (mV/V)", "IP res. (Ω·m)"]],
-    body: geophys.stations.slice(0, 60).map((st) => [
-      st.station_id,
-      st.lat.toFixed(5),
-      st.lng.toFixed(5),
-      st.mag_nt != null ? st.mag_nt.toFixed(0) : "—",
-      st.ip_chargeability_mvv != null ? st.ip_chargeability_mvv.toFixed(1) : "—",
-      st.ip_resistivity_ohmm != null ? st.ip_resistivity_ohmm.toFixed(0) : "—",
-    ]),
+    body: geophys.stations
+      .slice(0, 60)
+      .map((st) => [
+        st.station_id,
+        st.lat.toFixed(5),
+        st.lng.toFixed(5),
+        st.mag_nt != null ? st.mag_nt.toFixed(0) : "—",
+        st.ip_chargeability_mvv != null ? st.ip_chargeability_mvv.toFixed(1) : "—",
+        st.ip_resistivity_ohmm != null ? st.ip_resistivity_ohmm.toFixed(0) : "—",
+      ]),
     styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.5, textColor: COLORS.text },
     headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 7.5 },
     alternateRowStyles: { fillColor: COLORS.panel },
@@ -1024,13 +1170,16 @@ export type ComplianceAnnexData = {
   globalScore: number;
   threshold: number;
   evaluatedAt: string | null;
-  byStandard: Record<string, {
-    score: number;
-    status: "compliant" | "partial" | "non_compliant";
-    mandatory_pass: number;
-    mandatory_total: number;
-    rules_total: number;
-  }>;
+  byStandard: Record<
+    string,
+    {
+      score: number;
+      status: "compliant" | "partial" | "non_compliant";
+      mandatory_pass: number;
+      mandatory_total: number;
+      rules_total: number;
+    }
+  >;
   rules: Array<{
     rule_code: string;
     standard: string;
@@ -1053,7 +1202,8 @@ export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData |
   // Sello principal
   const compliant = data.globalScore >= data.threshold;
   const calloutTitle = compliant ? "REPORTE CERTIFICADO" : "COMPLIANCE INSUFICIENTE";
-  const calloutBody = `Score global: ${data.globalScore}% · Umbral requerido: ${data.threshold}%\n` +
+  const calloutBody =
+    `Score global: ${data.globalScore}% · Umbral requerido: ${data.threshold}%\n` +
     `Evaluado: ${data.evaluatedAt ? new Date(data.evaluatedAt).toLocaleString("es-CL") : "—"}\n` +
     `Verificacion publica: ${data.verifyUrl}`;
   if (compliant) {
@@ -1086,7 +1236,11 @@ export function renderAnnexC_Compliance(s: PdfState, data: ComplianceAnnexData |
   ensureSpace(s, 30);
   h2(s, "Detalle de evaluación por ítem");
   const statusLabel: Record<string, string> = {
-    pass: "✓ OK", warn: "⚠ Adv.", fail: "✗ Falla", na: "N/A", pending: "Pend.",
+    pass: "✓ OK",
+    warn: "⚠ Adv.",
+    fail: "✗ Falla",
+    na: "N/A",
+    pending: "Pend.",
   };
   autoTable(s.doc, {
     startY: s.cursorY,
@@ -1166,7 +1320,10 @@ function fmtTonnage(t: number | null): string {
   return `${t.toFixed(0)} t`;
 }
 
-export function renderSection14bis_ResourceEstimates(s: PdfState, data: ResourceEstimateData | null) {
+export function renderSection14bis_ResourceEstimates(
+  s: PdfState,
+  data: ResourceEstimateData | null,
+) {
   h1(s, "Estimación de recursos minerales");
   p(
     s,
@@ -1219,16 +1376,20 @@ export function renderSection14bis_ResourceEstimates(s: PdfState, data: Resource
   );
   autoTable(s.doc, {
     startY: s.cursorY,
-    head: [["Modelo", "Cutoff", "Densidad (t/m³)", "Tonelaje > cutoff", "Ley media", "Metal contenido"]],
+    head: [
+      ["Modelo", "Cutoff", "Densidad (t/m³)", "Tonelaje > cutoff", "Ley media", "Metal contenido"],
+    ],
     body: data.models.map((m) => {
       const unit = m.commodity === "au" || m.commodity === "ag" ? "g/t" : "%";
-      const grade = m.mean_grade != null ? `${m.mean_grade.toFixed(unit === "g/t" ? 2 : 3)} ${unit}` : "—";
+      const grade =
+        m.mean_grade != null ? `${m.mean_grade.toFixed(unit === "g/t" ? 2 : 3)} ${unit}` : "—";
       const cutoff = m.cutoff_grade != null ? `${m.cutoff_grade} ${unit}` : "—";
-      const metal = m.metal_content != null
-        ? unit === "g/t"
-          ? `${(m.metal_content / 31.1035).toFixed(0)} oz`
-          : `${m.metal_content.toFixed(0)} t`
-        : "—";
+      const metal =
+        m.metal_content != null
+          ? unit === "g/t"
+            ? `${(m.metal_content / 31.1035).toFixed(0)} oz`
+            : `${m.metal_content.toFixed(0)} t`
+          : "—";
       return [
         m.name,
         cutoff,
@@ -1383,10 +1544,15 @@ export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnal
   // Resultados clave
   ensureSpace(s, 35);
   h2(s, "Resultados financieros");
-  tableCaption(s, "Métricas DCF descontadas y vida de mina por escenario. NPV/IRR sensibles al precio de commodity.");
+  tableCaption(
+    s,
+    "Métricas DCF descontadas y vida de mina por escenario. NPV/IRR sensibles al precio de commodity.",
+  );
   autoTable(s.doc, {
     startY: s.cursorY,
-    head: [["Escenario", "Mineral (t)", "Strip", "NPV", "IRR %", "Payback (a)", "Vida (a)", "EBITDA"]],
+    head: [
+      ["Escenario", "Mineral (t)", "Strip", "NPV", "IRR %", "Payback (a)", "Vida (a)", "EBITDA"],
+    ],
     body: data.scenarios.map((sc) => [
       sc.name,
       fmtTonnage(sc.ore_tonnes),
@@ -1415,15 +1581,17 @@ export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnal
     autoTable(s.doc, {
       startY: s.cursorY,
       head: [["Año", "Mineral (t)", "Estéril (t)", "Ingresos", "OPEX", "Cashflow", "Acumulado"]],
-      body: baseSchedule.slice(0, 25).map((r) => [
-        `Y${r.year}`,
-        fmtTonnage(r.ore_tonnes),
-        fmtTonnage(r.waste_tonnes),
-        fmtUsdShort(r.revenue_usd),
-        `-${fmtUsdShort(r.opex_usd)}`,
-        fmtUsdShort(r.cashflow_usd),
-        fmtUsdShort(r.cumulative_cashflow_usd),
-      ]),
+      body: baseSchedule
+        .slice(0, 25)
+        .map((r) => [
+          `Y${r.year}`,
+          fmtTonnage(r.ore_tonnes),
+          fmtTonnage(r.waste_tonnes),
+          fmtUsdShort(r.revenue_usd),
+          `-${fmtUsdShort(r.opex_usd)}`,
+          fmtUsdShort(r.cashflow_usd),
+          fmtUsdShort(r.cumulative_cashflow_usd),
+        ]),
       styles: { font: "helvetica", fontSize: 7.5, cellPadding: 1.5, textColor: COLORS.text },
       headStyles: { fillColor: COLORS.gold, textColor: 255, fontStyle: "bold", fontSize: 8 },
       alternateRowStyles: { fillColor: COLORS.panel },

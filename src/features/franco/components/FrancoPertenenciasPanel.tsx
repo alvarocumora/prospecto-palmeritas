@@ -4,27 +4,45 @@ import { Download, Loader2, MapPin } from "lucide-react";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { Badge } from "@/features/palmeras/components/primitives/Badge";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
-import { getFrancoCadastreCross, type FrancoPertenenciaMatch } from "@/lib/franco-cadastre.functions";
+import {
+  getFrancoCadastreCross,
+  type FrancoPertenenciaMatch,
+} from "@/lib/franco-cadastre.functions";
 
 function downloadJson(name: string, data: unknown) {
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = name; a.click();
+  a.href = url;
+  a.download = name;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
 function downloadCsv(name: string, rows: FrancoPertenenciaMatch[]) {
   const keys: (keyof FrancoPertenenciaMatch)[] = [
-    "kmlName","concessionCode","concessionName","holder","type","status",
-    "areaHaDb","commune","region","overlapHa","pctOfKml","pctOfConcession","matchKind",
+    "kmlName",
+    "concessionCode",
+    "concessionName",
+    "holder",
+    "type",
+    "status",
+    "areaHaDb",
+    "commune",
+    "region",
+    "overlapHa",
+    "pctOfKml",
+    "pctOfConcession",
+    "matchKind",
   ];
-  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g,'""')}"`;
-  const csv = [keys.join(","), ...rows.map(r => keys.map(k => esc(r[k])).join(","))].join("\n");
+  const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+  const csv = [keys.join(","), ...rows.map((r) => keys.map((k) => esc(r[k])).join(","))].join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
-  a.href = url; a.download = name; a.click();
+  a.href = url;
+  a.download = name;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -50,26 +68,46 @@ export function FrancoPertenenciasPanel() {
     return (
       <Card className="p-6" accent="copper">
         <SectionTitle icon={MapPin}>Error en cruce KMZ × catastro</SectionTitle>
-        <p className="text-sm text-muted-foreground">{error instanceof Error ? error.message : "Sin datos"}</p>
+        <p className="text-sm text-muted-foreground">
+          {error instanceof Error ? error.message : "Sin datos"}
+        </p>
       </Card>
     );
   }
 
-  const exact = data.rows.filter(r => r.matchKind === "EXACT");
-  const overlaps = data.rows.filter(r => r.matchKind === "GEOM" && r.overlapHa > 0.5);
-  const noMatch = data.rows.filter(r => r.matchKind === "NONE");
+  const exact = data.rows.filter((r) => r.matchKind === "EXACT");
+  const overlaps = data.rows.filter((r) => r.matchKind === "GEOM" && r.overlapHa > 0.5);
+  const noMatch = data.rows.filter((r) => r.matchKind === "NONE");
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Pertenencias KMZ", value: String(data.totalKmlPolygons), sub: "polígonos importados" },
-          { label: "Match en catastro", value: `${data.matchedKmlPolygons}/${data.totalKmlPolygons}`, sub: "con concesión real" },
-          { label: "Concesiones únicas", value: String(data.uniqueConcessions), sub: "GF-CONC-* en DB" },
-          { label: "Superficie total", value: `${data.totalAreaHa.toLocaleString("es-CL")} ha`, sub: "matches exactos" },
+          {
+            label: "Pertenencias KMZ",
+            value: String(data.totalKmlPolygons),
+            sub: "polígonos importados",
+          },
+          {
+            label: "Match en catastro",
+            value: `${data.matchedKmlPolygons}/${data.totalKmlPolygons}`,
+            sub: "con concesión real",
+          },
+          {
+            label: "Concesiones únicas",
+            value: String(data.uniqueConcessions),
+            sub: "GF-CONC-* en DB",
+          },
+          {
+            label: "Superficie total",
+            value: `${data.totalAreaHa.toLocaleString("es-CL")} ha`,
+            sub: "matches exactos",
+          },
         ].map((m, i) => (
           <Card key={m.label} delay={i * 80} className="p-4" accent="gold">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-2">{m.label}</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-hint mb-2">
+              {m.label}
+            </div>
             <div className="font-mono text-2xl text-foreground font-semibold">{m.value}</div>
             <div className="text-xs text-muted-foreground mt-1">{m.sub}</div>
           </Card>
@@ -79,7 +117,10 @@ export function FrancoPertenenciasPanel() {
       <Card className="p-6">
         <div className="flex items-end justify-between mb-4 flex-wrap gap-3">
           <div>
-            <SectionTitle icon={MapPin} sub={`Proyecto: ${data.projectName ?? "—"} · ${new Date(data.generatedAt).toLocaleString("es-CL")}`}>
+            <SectionTitle
+              icon={MapPin}
+              sub={`Proyecto: ${data.projectName ?? "—"} · ${new Date(data.generatedAt).toLocaleString("es-CL")}`}
+            >
               Pertenencias KMZ × Catastro real
             </SectionTitle>
           </div>
@@ -120,12 +161,30 @@ export function FrancoPertenenciasPanel() {
                   <td className="py-1.5 pr-3 text-foreground">{r.kmlName}</td>
                   <td className="py-1.5 pr-3 text-foreground">{r.concessionName ?? "—"}</td>
                   <td className="py-1.5 pr-3 text-muted-foreground">{r.concessionCode ?? "—"}</td>
-                  <td className="py-1.5 pr-3 text-muted-foreground truncate max-w-[180px]">{r.holder ?? "—"}</td>
-                  <td className="py-1.5 pr-3 text-right text-muted-foreground">{r.areaHaDb?.toFixed(2) ?? "—"}</td>
-                  <td className="py-1.5 pr-3 text-right text-foreground">{r.overlapHa.toFixed(2)}</td>
-                  <td className="py-1.5 pr-3 text-right text-muted-foreground">{r.pctOfKml.toFixed(1)}%</td>
+                  <td className="py-1.5 pr-3 text-muted-foreground truncate max-w-[180px]">
+                    {r.holder ?? "—"}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right text-muted-foreground">
+                    {r.areaHaDb?.toFixed(2) ?? "—"}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right text-foreground">
+                    {r.overlapHa.toFixed(2)}
+                  </td>
+                  <td className="py-1.5 pr-3 text-right text-muted-foreground">
+                    {r.pctOfKml.toFixed(1)}%
+                  </td>
                   <td className="py-1.5 pr-3">
-                    <Badge tone={r.matchKind === "EXACT" ? "teal" : r.matchKind === "GEOM" ? "gold" : r.matchKind === "NAME~" ? "muted" : "alert"}>
+                    <Badge
+                      tone={
+                        r.matchKind === "EXACT"
+                          ? "teal"
+                          : r.matchKind === "GEOM"
+                            ? "gold"
+                            : r.matchKind === "NAME~"
+                              ? "muted"
+                              : "alert"
+                      }
+                    >
                       {r.matchKind}
                     </Badge>
                   </td>
@@ -138,24 +197,31 @@ export function FrancoPertenenciasPanel() {
 
         {overlaps.length > 0 && (
           <div className="mt-4 p-3 rounded border border-gold/30 bg-gold/5">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-gold mb-1">⚠ Superposiciones internas</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-gold mb-1">
+              ⚠ Superposiciones internas
+            </div>
             <div className="text-xs text-muted-foreground">
-              {overlaps.length} cruces espaciales secundarios &gt;0.5 ha entre pertenencias contiguas (revisar en QGIS).
+              {overlaps.length} cruces espaciales secundarios &gt;0.5 ha entre pertenencias
+              contiguas (revisar en QGIS).
             </div>
           </div>
         )}
         {noMatch.length > 0 && (
           <div className="mt-2 p-3 rounded border border-alert/30 bg-alert/5">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-alert mb-1">Sin match</div>
+            <div className="font-mono text-[10px] uppercase tracking-widest text-alert mb-1">
+              Sin match
+            </div>
             <div className="text-xs text-muted-foreground">
-              {noMatch.length} polígonos del KMZ sin contraparte en catastro DB (probables geometrías auxiliares).
+              {noMatch.length} polígonos del KMZ sin contraparte en catastro DB (probables
+              geometrías auxiliares).
             </div>
           </div>
         )}
 
         <div className="mt-4 text-[11px] font-mono uppercase tracking-wider text-hint">
-          Resumen para informe pre NI 43-101 · Sec. 3 (Property Description) y Anexo A (Catastro) ·
-          {" "}{exact.length} pertenencias confirmadas · {data.totalAreaHa.toLocaleString("es-CL")} ha totales.
+          Resumen para informe pre NI 43-101 · Sec. 3 (Property Description) y Anexo A (Catastro) ·{" "}
+          {exact.length} pertenencias confirmadas · {data.totalAreaHa.toLocaleString("es-CL")} ha
+          totales.
         </div>
       </Card>
     </div>

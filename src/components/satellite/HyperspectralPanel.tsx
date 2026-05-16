@@ -1,8 +1,15 @@
 import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Loader2, Satellite, Sparkles, Telescope, Trash2 } from "lucide-react";
-import { useHyperspectralProducts, type HyperspectralProduct } from "@/hooks/useHyperspectralProducts";
-import { searchStac, seedHyperspectralFromScene, explainHyperspectralProducts } from "@/lib/satelliteIntel.functions";
+import {
+  useHyperspectralProducts,
+  type HyperspectralProduct,
+} from "@/hooks/useHyperspectralProducts";
+import {
+  searchStac,
+  seedHyperspectralFromScene,
+  explainHyperspectralProducts,
+} from "@/lib/satelliteIntel.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -56,7 +63,9 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
       const bbox = defaultBbox ?? [-71.2, -34.0, -71.0, -33.8];
       const today = new Date();
       const dateTo = today.toISOString().slice(0, 10);
-      const dateFrom = new Date(today.getTime() - 365 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      const dateFrom = new Date(today.getTime() - 365 * 24 * 3600 * 1000)
+        .toISOString()
+        .slice(0, 10);
 
       const collection = source === "ASTER" ? "aster" : "emit";
       const { items, error: searchErr } = await searchFn({
@@ -95,11 +104,12 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
       if (ids.length === 0) throw new Error("Sin productos para interpretar");
       const res = await explainFn({ data: { projectId, productIds: ids } });
       if (!res.ok) {
-        const msg = res.error === "rate_limit"
-          ? "Límite de IA alcanzado, reintenta en unos minutos."
-          : res.error === "credits_exhausted"
-          ? "Créditos de Lovable AI agotados. Añade créditos en Settings → Workspace."
-          : `IA: ${res.error}`;
+        const msg =
+          res.error === "rate_limit"
+            ? "Límite de IA alcanzado, reintenta en unos minutos."
+            : res.error === "credits_exhausted"
+              ? "Créditos de Lovable AI agotados. Añade créditos en Settings → Workspace."
+              : `IA: ${res.error}`;
         throw new Error(msg);
       }
       setExplanation(res.explanation);
@@ -140,7 +150,11 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
             disabled={running}
             className="inline-flex items-center gap-1.5 text-xs font-mono uppercase px-3 py-1.5 rounded bg-signal-cyan text-background hover:opacity-90 disabled:opacity-50"
           >
-            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Telescope className="w-3.5 h-3.5" />}
+            {running ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Telescope className="w-3.5 h-3.5" />
+            )}
             Ejecutar análisis
           </button>
           <button
@@ -148,7 +162,11 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
             disabled={explainerLoading || products.length === 0}
             className="inline-flex items-center gap-1.5 text-xs font-mono uppercase px-3 py-1.5 rounded border border-signal-cyan text-signal-cyan hover:bg-signal-cyan/10 disabled:opacity-50"
           >
-            {explainerLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            {explainerLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5" />
+            )}
             Interpretar con IA
           </button>
           {products.length > 0 && (
@@ -174,13 +192,22 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
           <div className="text-[11px] font-mono uppercase tracking-wider text-signal-cyan flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" /> Interpretación IA · Geólogo de exploración
           </div>
-          {explanation && <p className="text-xs leading-relaxed text-foreground whitespace-pre-line">{explanation}</p>}
+          {explanation && (
+            <p className="text-xs leading-relaxed text-foreground whitespace-pre-line">
+              {explanation}
+            </p>
+          )}
           {targets.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase text-text-secondary mb-1">Targets sugeridos</div>
+              <div className="text-[10px] font-mono uppercase text-text-secondary mb-1">
+                Targets sugeridos
+              </div>
               <ul className="space-y-1">
                 {targets.map((t, i) => (
-                  <li key={i} className="text-xs text-foreground border-l-2 border-signal-cyan pl-2">
+                  <li
+                    key={i}
+                    className="text-xs text-foreground border-l-2 border-signal-cyan pl-2"
+                  >
                     {t}
                   </li>
                 ))}
@@ -210,7 +237,10 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {items.map((p) => (
-                    <div key={p.id} className="rounded border border-border bg-bg-panel/40 px-2.5 py-2 text-xs">
+                    <div
+                      key={p.id}
+                      className="rounded border border-border bg-bg-panel/40 px-2.5 py-2 text-xs"
+                    >
                       <div className="flex items-center justify-between gap-2">
                         <span className="font-mono uppercase text-foreground">{p.mineral}</span>
                         <span className="text-[10px] font-mono text-text-dim">

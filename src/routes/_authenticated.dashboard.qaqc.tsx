@@ -10,11 +10,22 @@ export const Route = createFileRoute("/_authenticated/dashboard/qaqc")({
   component: QaQcPage,
 });
 
-const STATUS_STYLE: Record<QaQcResult["status"], { color: string; Icon: typeof CheckCircle2; label: string }> = {
-  pending: { color: "text-muted-foreground border-border bg-muted/30", Icon: Clock, label: "Pendiente" },
+const STATUS_STYLE: Record<
+  QaQcResult["status"],
+  { color: string; Icon: typeof CheckCircle2; label: string }
+> = {
+  pending: {
+    color: "text-muted-foreground border-border bg-muted/30",
+    Icon: Clock,
+    label: "Pendiente",
+  },
   pass: { color: "text-teal border-teal/30 bg-teal/10", Icon: CheckCircle2, label: "Pass" },
   warn: { color: "text-gold border-gold/30 bg-gold/10", Icon: AlertTriangle, label: "Warn" },
-  fail: { color: "text-destructive border-destructive/30 bg-destructive/10", Icon: XCircle, label: "Fail" },
+  fail: {
+    color: "text-destructive border-destructive/30 bg-destructive/10",
+    Icon: XCircle,
+    label: "Fail",
+  },
 };
 
 function QaQcPage() {
@@ -33,17 +44,22 @@ function QaQcPage() {
     return { total, pass, warn, fail, pending };
   }, [results]);
 
-  if (!active) return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
+  if (!active)
+    return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
       <header className="mb-6 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Proyecto · {active.code}</div>
+          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+            Proyecto · {active.code}
+          </div>
           <h1 className="text-xl md:text-2xl font-bold mt-1 inline-flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-gold" /> QA/QC · Control de calidad
           </h1>
-          <p className="text-xs text-muted-foreground mt-1">Blanks, estándares y duplicados con semáforo automático.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Blanks, estándares y duplicados con semáforo automático.
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -77,7 +93,11 @@ function QaQcPage() {
           onClose={() => setShowStdForm(false)}
           onSubmit={async (s) => {
             const { error } = await addStandard(s);
-            if (error) toast.error(error); else { toast.success("Estándar agregado"); setShowStdForm(false); }
+            if (error) toast.error(error);
+            else {
+              toast.success("Estándar agregado");
+              setShowStdForm(false);
+            }
           }}
         />
       )}
@@ -88,15 +108,27 @@ function QaQcPage() {
           onClose={() => setShowResForm(false)}
           onSubmit={async (r) => {
             const { error } = await addResult(r);
-            if (error) toast.error(error); else { toast.success("Resultado QC registrado"); setShowResForm(false); }
+            if (error) toast.error(error);
+            else {
+              toast.success("Resultado QC registrado");
+              setShowResForm(false);
+            }
           }}
         />
       )}
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border mb-4">
-        <TabBtn active={tab === "results"} onClick={() => setTab("results")} label={`Resultados (${results.length})`} />
-        <TabBtn active={tab === "standards"} onClick={() => setTab("standards")} label={`Estándares (${standards.length})`} />
+        <TabBtn
+          active={tab === "results"}
+          onClick={() => setTab("results")}
+          label={`Resultados (${results.length})`}
+        />
+        <TabBtn
+          active={tab === "standards"}
+          onClick={() => setTab("standards")}
+          label={`Estándares (${standards.length})`}
+        />
       </div>
 
       {loading ? (
@@ -110,7 +142,15 @@ function QaQcPage() {
   );
 }
 
-function KpiCard({ label, value, tone }: { label: string; value: number; tone?: "teal" | "gold" | "destructive" }) {
+function KpiCard({
+  label,
+  value,
+  tone,
+}: {
+  label: string;
+  value: number;
+  tone?: "teal" | "gold" | "destructive";
+}) {
   const colorMap = {
     teal: "text-teal",
     gold: "text-gold",
@@ -118,19 +158,33 @@ function KpiCard({ label, value, tone }: { label: string; value: number; tone?: 
   };
   return (
     <div className="rounded border border-border bg-bg-secondary p-3">
-      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
-      <div className={`text-2xl font-bold mt-1 ${tone ? colorMap[tone] : "text-foreground"}`}>{value}</div>
+      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        {label}
+      </div>
+      <div className={`text-2xl font-bold mt-1 ${tone ? colorMap[tone] : "text-foreground"}`}>
+        {value}
+      </div>
     </div>
   );
 }
 
-function TabBtn({ active, onClick, label }: { active: boolean; onClick: () => void; label: string }) {
+function TabBtn({
+  active,
+  onClick,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  label: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
-        active ? "border-gold text-gold" : "border-transparent text-muted-foreground hover:text-foreground"
+        active
+          ? "border-gold text-gold"
+          : "border-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
       {label}
@@ -138,9 +192,19 @@ function TabBtn({ active, onClick, label }: { active: boolean; onClick: () => vo
   );
 }
 
-function ResultsTable({ results, standards }: { results: QaQcResult[]; standards: { id: string; code: string; expected_value: number; unit: string }[] }) {
+function ResultsTable({
+  results,
+  standards,
+}: {
+  results: QaQcResult[];
+  standards: { id: string; code: string; expected_value: number; unit: string }[];
+}) {
   if (results.length === 0) {
-    return <div className="rounded border border-border bg-bg-secondary p-8 text-center text-xs font-mono text-muted-foreground">Sin resultados QC todavía.</div>;
+    return (
+      <div className="rounded border border-border bg-bg-secondary p-8 text-center text-xs font-mono text-muted-foreground">
+        Sin resultados QC todavía.
+      </div>
+    );
   }
   const stdMap = new Map(standards.map((s) => [s.id, s]));
   return (
@@ -165,7 +229,9 @@ function ResultsTable({ results, standards }: { results: QaQcResult[]; standards
             return (
               <tr key={r.id} className="border-t border-border">
                 <td className="px-3 py-2">
-                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] uppercase ${st.color}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded border text-[10px] uppercase ${st.color}`}
+                  >
                     <st.Icon className="w-3 h-3" /> {st.label}
                   </span>
                 </td>
@@ -173,9 +239,19 @@ function ResultsTable({ results, standards }: { results: QaQcResult[]; standards
                 <td className="px-3 py-2">{r.sample_code}</td>
                 <td className="px-3 py-2">{r.element}</td>
                 <td className="px-3 py-2 text-right">{r.measured_value ?? "—"}</td>
-                <td className="px-3 py-2 text-right text-muted-foreground">{std ? `${std.expected_value} ${std.unit}` : (r.qc_type === "blank" ? "≤0.01" : (r.parent_sample_code ?? "—"))}</td>
-                <td className="px-3 py-2 text-muted-foreground">{std?.code ?? r.parent_sample_code ?? "—"}</td>
-                <td className="px-3 py-2 text-muted-foreground">{r.measured_at ?? new Date(r.created_at).toLocaleDateString()}</td>
+                <td className="px-3 py-2 text-right text-muted-foreground">
+                  {std
+                    ? `${std.expected_value} ${std.unit}`
+                    : r.qc_type === "blank"
+                      ? "≤0.01"
+                      : (r.parent_sample_code ?? "—")}
+                </td>
+                <td className="px-3 py-2 text-muted-foreground">
+                  {std?.code ?? r.parent_sample_code ?? "—"}
+                </td>
+                <td className="px-3 py-2 text-muted-foreground">
+                  {r.measured_at ?? new Date(r.created_at).toLocaleDateString()}
+                </td>
               </tr>
             );
           })}
@@ -185,9 +261,26 @@ function ResultsTable({ results, standards }: { results: QaQcResult[]; standards
   );
 }
 
-function StandardsTable({ standards }: { standards: { id: string; code: string; name: string; element: string; expected_value: number; tolerance_pct: number; unit: string; certifying_lab: string | null }[] }) {
+function StandardsTable({
+  standards,
+}: {
+  standards: {
+    id: string;
+    code: string;
+    name: string;
+    element: string;
+    expected_value: number;
+    tolerance_pct: number;
+    unit: string;
+    certifying_lab: string | null;
+  }[];
+}) {
   if (standards.length === 0) {
-    return <div className="rounded border border-border bg-bg-secondary p-8 text-center text-xs font-mono text-muted-foreground">Aún no hay estándares en este proyecto.</div>;
+    return (
+      <div className="rounded border border-border bg-bg-secondary p-8 text-center text-xs font-mono text-muted-foreground">
+        Aún no hay estándares en este proyecto.
+      </div>
+    );
   }
   return (
     <div className="rounded border border-border bg-bg-secondary overflow-x-auto">
@@ -208,7 +301,9 @@ function StandardsTable({ standards }: { standards: { id: string; code: string; 
               <td className="px-3 py-2 text-gold">{s.code}</td>
               <td className="px-3 py-2">{s.name}</td>
               <td className="px-3 py-2">{s.element}</td>
-              <td className="px-3 py-2 text-right">{s.expected_value} {s.unit}</td>
+              <td className="px-3 py-2 text-right">
+                {s.expected_value} {s.unit}
+              </td>
               <td className="px-3 py-2 text-right">{s.tolerance_pct}%</td>
               <td className="px-3 py-2 text-muted-foreground">{s.certifying_lab ?? "—"}</td>
             </tr>
@@ -219,56 +314,123 @@ function StandardsTable({ standards }: { standards: { id: string; code: string; 
   );
 }
 
-function StandardForm({ onSubmit, onClose }: {
-  onSubmit: (s: { code: string; name: string; element: string; expected_value: number; tolerance_pct: number; unit: string; certifying_lab: string | null; notes: string | null }) => void;
+function StandardForm({
+  onSubmit,
+  onClose,
+}: {
+  onSubmit: (s: {
+    code: string;
+    name: string;
+    element: string;
+    expected_value: number;
+    tolerance_pct: number;
+    unit: string;
+    certifying_lab: string | null;
+    notes: string | null;
+  }) => void;
   onClose: () => void;
 }) {
-  const [code, setCode] = useState(""); const [name, setName] = useState(""); const [element, setElement] = useState("Au");
-  const [expected, setExpected] = useState(""); const [tol, setTol] = useState("10"); const [unit, setUnit] = useState("g/t"); const [lab, setLab] = useState("");
+  const [code, setCode] = useState("");
+  const [name, setName] = useState("");
+  const [element, setElement] = useState("Au");
+  const [expected, setExpected] = useState("");
+  const [tol, setTol] = useState("10");
+  const [unit, setUnit] = useState("g/t");
+  const [lab, setLab] = useState("");
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); onSubmit({ code, name, element, expected_value: parseFloat(expected), tolerance_pct: parseFloat(tol), unit, certifying_lab: lab || null, notes: null }); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit({
+          code,
+          name,
+          element,
+          expected_value: parseFloat(expected),
+          tolerance_pct: parseFloat(tol),
+          unit,
+          certifying_lab: lab || null,
+          notes: null,
+        });
+      }}
       className="mb-6 rounded border border-border bg-bg-secondary p-4 grid grid-cols-1 md:grid-cols-4 gap-3"
     >
       <Field label="Código" value={code} onChange={setCode} required />
       <Field label="Nombre" value={name} onChange={setName} required />
       <Field label="Elemento" value={element} onChange={setElement} required />
-      <Field label="Valor esperado" value={expected} onChange={setExpected} type="number" required />
+      <Field
+        label="Valor esperado"
+        value={expected}
+        onChange={setExpected}
+        type="number"
+        required
+      />
       <Field label="Tolerancia ±%" value={tol} onChange={setTol} type="number" required />
       <Field label="Unidad" value={unit} onChange={setUnit} required />
       <Field label="Lab certificador" value={lab} onChange={setLab} />
       <div className="md:col-span-4 flex gap-2 justify-end">
-        <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono border border-border rounded">Cancelar</button>
-        <button type="submit" className="px-3 py-1.5 text-xs font-mono bg-gold text-bg-primary rounded">Guardar</button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-3 py-1.5 text-xs font-mono border border-border rounded"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="px-3 py-1.5 text-xs font-mono bg-gold text-bg-primary rounded"
+        >
+          Guardar
+        </button>
       </div>
     </form>
   );
 }
 
-function ResultForm({ standards, onSubmit, onClose }: {
+function ResultForm({
+  standards,
+  onSubmit,
+  onClose,
+}: {
   standards: { id: string; code: string; element: string }[];
   onSubmit: (r: {
-    sample_code: string; qc_type: "blank" | "standard" | "duplicate"; element: string;
-    measured_value: number | null; standard_id: string | null; parent_sample_code: string | null;
-    certificate: string | null; lab: string | null; measured_at: string | null; notes: string | null;
+    sample_code: string;
+    qc_type: "blank" | "standard" | "duplicate";
+    element: string;
+    measured_value: number | null;
+    standard_id: string | null;
+    parent_sample_code: string | null;
+    certificate: string | null;
+    lab: string | null;
+    measured_at: string | null;
+    notes: string | null;
   }) => void;
   onClose: () => void;
 }) {
-  const [code, setCode] = useState(""); const [type, setType] = useState<"blank" | "standard" | "duplicate">("blank");
-  const [element, setElement] = useState("Au"); const [measured, setMeasured] = useState(""); const [stdId, setStdId] = useState("");
-  const [parent, setParent] = useState(""); const [cert, setCert] = useState(""); const [lab, setLab] = useState(""); const [date, setDate] = useState("");
+  const [code, setCode] = useState("");
+  const [type, setType] = useState<"blank" | "standard" | "duplicate">("blank");
+  const [element, setElement] = useState("Au");
+  const [measured, setMeasured] = useState("");
+  const [stdId, setStdId] = useState("");
+  const [parent, setParent] = useState("");
+  const [cert, setCert] = useState("");
+  const [lab, setLab] = useState("");
+  const [date, setDate] = useState("");
 
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault();
         onSubmit({
-          sample_code: code, qc_type: type, element,
+          sample_code: code,
+          qc_type: type,
+          element,
           measured_value: measured ? parseFloat(measured) : null,
-          standard_id: type === "standard" ? (stdId || null) : null,
-          parent_sample_code: type === "duplicate" ? (parent || null) : null,
-          certificate: cert || null, lab: lab || null,
-          measured_at: date || null, notes: null,
+          standard_id: type === "standard" ? stdId || null : null,
+          parent_sample_code: type === "duplicate" ? parent || null : null,
+          certificate: cert || null,
+          lab: lab || null,
+          measured_at: date || null,
+          notes: null,
         });
       }}
       className="mb-6 rounded border border-border bg-bg-secondary p-4 grid grid-cols-1 md:grid-cols-4 gap-3"
@@ -276,7 +438,11 @@ function ResultForm({ standards, onSubmit, onClose }: {
       <Field label="Código muestra QC" value={code} onChange={setCode} required />
       <div>
         <label className="text-[10px] font-mono uppercase text-muted-foreground">Tipo</label>
-        <select value={type} onChange={(e) => setType(e.target.value as "blank" | "standard" | "duplicate")} className="w-full mt-1 px-2 py-1.5 text-xs rounded border border-border bg-background font-mono">
+        <select
+          value={type}
+          onChange={(e) => setType(e.target.value as "blank" | "standard" | "duplicate")}
+          className="w-full mt-1 px-2 py-1.5 text-xs rounded border border-border bg-background font-mono"
+        >
           <option value="blank">Blank</option>
           <option value="standard">Standard</option>
           <option value="duplicate">Duplicate</option>
@@ -286,12 +452,22 @@ function ResultForm({ standards, onSubmit, onClose }: {
       <Field label="Valor medido" value={measured} onChange={setMeasured} type="number" />
       {type === "standard" && (
         <div className="md:col-span-2">
-          <label className="text-[10px] font-mono uppercase text-muted-foreground">Estándar de referencia</label>
-          <select value={stdId} onChange={(e) => setStdId(e.target.value)} className="w-full mt-1 px-2 py-1.5 text-xs rounded border border-border bg-background font-mono">
+          <label className="text-[10px] font-mono uppercase text-muted-foreground">
+            Estándar de referencia
+          </label>
+          <select
+            value={stdId}
+            onChange={(e) => setStdId(e.target.value)}
+            className="w-full mt-1 px-2 py-1.5 text-xs rounded border border-border bg-background font-mono"
+          >
             <option value="">— seleccionar —</option>
-            {standards.filter((s) => s.element === element).map((s) => (
-              <option key={s.id} value={s.id}>{s.code}</option>
-            ))}
+            {standards
+              .filter((s) => s.element === element)
+              .map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.code}
+                </option>
+              ))}
           </select>
         </div>
       )}
@@ -300,19 +476,48 @@ function ResultForm({ standards, onSubmit, onClose }: {
       <Field label="Lab" value={lab} onChange={setLab} />
       <Field label="Fecha medición" value={date} onChange={setDate} type="date" />
       <div className="md:col-span-4 flex gap-2 justify-end">
-        <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono border border-border rounded">Cancelar</button>
-        <button type="submit" className="px-3 py-1.5 text-xs font-mono bg-gold text-bg-primary rounded">Registrar</button>
+        <button
+          type="button"
+          onClick={onClose}
+          className="px-3 py-1.5 text-xs font-mono border border-border rounded"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          className="px-3 py-1.5 text-xs font-mono bg-gold text-bg-primary rounded"
+        >
+          Registrar
+        </button>
       </div>
     </form>
   );
 }
 
-function Field({ label, value, onChange, type = "text", required }: { label: string; value: string; onChange: (v: string) => void; type?: string; required?: boolean }) {
+function Field({
+  label,
+  value,
+  onChange,
+  type = "text",
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+}) {
   return (
     <div>
-      <label className="text-[10px] font-mono uppercase text-muted-foreground">{label}{required && " *"}</label>
+      <label className="text-[10px] font-mono uppercase text-muted-foreground">
+        {label}
+        {required && " *"}
+      </label>
       <input
-        type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required}
+        type={type}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        required={required}
         step={type === "number" ? "any" : undefined}
         className="w-full mt-1 px-2 py-1.5 text-xs rounded border border-border bg-background font-mono"
       />

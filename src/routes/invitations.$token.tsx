@@ -55,7 +55,11 @@ function InvitationPage() {
   };
 
   if (loading || loadingPreview) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-gold" /></div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-6 h-6 animate-spin text-gold" />
+      </div>
+    );
   }
 
   if (!preview) {
@@ -65,7 +69,9 @@ function InvitationPage() {
           <AlertTriangle className="w-8 h-8 text-destructive mx-auto mb-2" />
           <div className="font-mono font-semibold">Invitación inválida</div>
           <p className="text-xs text-muted-foreground mt-1">El enlace no existe o expiró.</p>
-          <Link to="/" className="mt-4 inline-block text-xs font-mono text-gold underline">Volver al inicio</Link>
+          <Link to="/" className="mt-4 inline-block text-xs font-mono text-gold underline">
+            Volver al inicio
+          </Link>
         </div>
       </div>
     );
@@ -78,7 +84,9 @@ function InvitationPage() {
       <div className="max-w-sm w-full rounded border border-border bg-bg-secondary p-6">
         <Mail className="w-8 h-8 text-gold mx-auto mb-3" />
         <div className="text-center">
-          <div className="text-[10px] uppercase font-mono text-muted-foreground">Invitación al proyecto</div>
+          <div className="text-[10px] uppercase font-mono text-muted-foreground">
+            Invitación al proyecto
+          </div>
           <h1 className="text-xl font-bold mt-1">{preview.project_name}</h1>
           <p className="text-xs text-muted-foreground mt-2">
             Te han invitado como <span className="text-gold font-mono">{preview.role}</span>
@@ -87,7 +95,9 @@ function InvitationPage() {
         </div>
 
         {result ? (
-          <div className={`mt-4 p-3 rounded text-center text-xs font-mono ${result.ok ? "bg-teal/10 text-teal" : "bg-destructive/10 text-destructive"}`}>
+          <div
+            className={`mt-4 p-3 rounded text-center text-xs font-mono ${result.ok ? "bg-teal/10 text-teal" : "bg-destructive/10 text-destructive"}`}
+          >
             {result.ok && <CheckCircle2 className="w-4 h-4 inline mr-1" />}
             {result.msg}
           </div>
@@ -97,7 +107,9 @@ function InvitationPage() {
           </div>
         ) : !user ? (
           <div className="mt-4 space-y-2">
-            <p className="text-xs text-center text-muted-foreground">Inicia sesión o regístrate para aceptar.</p>
+            <p className="text-xs text-center text-muted-foreground">
+              Inicia sesión o regístrate para aceptar.
+            </p>
             <Link
               to="/auth"
               className="block text-center px-3 py-2 rounded bg-gold text-bg-secondary text-xs font-mono font-semibold"

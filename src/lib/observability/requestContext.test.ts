@@ -12,7 +12,7 @@ describe("request context helpers", () => {
       createRequestContext({
         requestId: "geo:existing-1234",
         actor: { organizationId: "org-1", projectId: "project-1", userId: "user-1" },
-      })
+      }),
     ).toEqual({
       requestId: "geo:existing-1234",
       actor: { organizationId: "org-1", projectId: "project-1", userId: "user-1" },
@@ -25,7 +25,9 @@ describe("request context helpers", () => {
   it("creates a new request id when none is provided", () => {
     vi.spyOn(crypto, "randomUUID").mockReturnValue("00000000-0000-4000-8000-000000000003");
 
-    expect(createRequestContext().requestId).toBe("geocapitals:00000000-0000-4000-8000-000000000003");
+    expect(createRequestContext().requestId).toBe(
+      "geocapitals:00000000-0000-4000-8000-000000000003",
+    );
 
     vi.restoreAllMocks();
   });
@@ -40,8 +42,8 @@ describe("request context helpers", () => {
     expect(
       withRequestContextMetadata(
         createRequestContext({ requestId: "geo:abc-1234", metadata: { source: "map" } }),
-        { action: "sync" }
-      ).metadata
+        { action: "sync" },
+      ).metadata,
     ).toEqual({ source: "map", action: "sync" });
   });
 
@@ -51,12 +53,12 @@ describe("request context helpers", () => {
         createRequestContext({
           requestId: "geo:abc-1234",
           actor: { organizationId: "org-1", projectId: "project-1", userId: "user-1" },
-        })
-      )
+        }),
+      ),
     ).toBe("org-1/project-1/user-1");
 
     expect(getRequestContextActorKey(createRequestContext({ requestId: "geo:abc-1234" }))).toBe(
-      "org:none/project:none/user:none"
+      "org:none/project:none/user:none",
     );
   });
 });

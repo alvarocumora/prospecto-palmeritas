@@ -14,7 +14,13 @@ const target: ExplorationTargetContextInput = {
     drilling: 60,
   },
   evidence: [
-    { id: "e1", category: "target", label: "Target Norte", confidence: "high", source: "Fusion Score" },
+    {
+      id: "e1",
+      category: "target",
+      label: "Target Norte",
+      confidence: "high",
+      source: "Fusion Score",
+    },
     { id: "e2", category: "intercept", label: "DDH-001 24m @ 1.2 g/t Au", confidence: "medium" },
   ],
 };
@@ -49,7 +55,7 @@ describe("AITargetBriefPreview", () => {
         }}
         target={target}
         language="en"
-      />
+      />,
     );
 
     expect(screen.getByText("Prompt Preview")).toBeInTheDocument();

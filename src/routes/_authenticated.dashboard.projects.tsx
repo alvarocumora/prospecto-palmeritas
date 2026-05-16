@@ -17,7 +17,13 @@ function ProjectsPage() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [form, setForm] = useState({ code: "", name: "", commodity: "Au-Cu", region: "", description: "" });
+  const [form, setForm] = useState({
+    code: "",
+    name: "",
+    commodity: "Au-Cu",
+    region: "",
+    description: "",
+  });
 
   const create = async (e: FormEvent) => {
     e.preventDefault();
@@ -40,7 +46,10 @@ function ProjectsPage() {
       .select()
       .single();
     setSaving(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Proyecto creado");
     setOpen(false);
     setForm({ code: "", name: "", commodity: "Au-Cu", region: "", description: "" });
@@ -77,10 +86,16 @@ function ProjectsPage() {
                   <div className="font-mono font-semibold">{p.name}</div>
                   <div className="text-[10px] font-mono text-muted-foreground">{p.code}</div>
                 </div>
-                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/20">{p.role}</span>
+                <span className="text-[10px] font-mono uppercase px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/20">
+                  {p.role}
+                </span>
               </div>
-              {p.description && <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>}
-              <div className="mt-3 text-[10px] font-mono text-muted-foreground">{p.commodity ?? "—"} · {p.region ?? p.country ?? ""}</div>
+              {p.description && (
+                <p className="mt-2 text-xs text-muted-foreground">{p.description}</p>
+              )}
+              <div className="mt-3 text-[10px] font-mono text-muted-foreground">
+                {p.commodity ?? "—"} · {p.region ?? p.country ?? ""}
+              </div>
               <button
                 type="button"
                 onClick={() => setActiveId(p.id)}
@@ -95,14 +110,21 @@ function ProjectsPage() {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur flex items-center justify-center p-4">
-          <form onSubmit={create} className="w-full max-w-md rounded border border-border bg-bg-secondary p-5 space-y-3">
+          <form
+            onSubmit={create}
+            className="w-full max-w-md rounded border border-border bg-bg-secondary p-5 space-y-3"
+          >
             <div className="flex items-center justify-between">
               <h2 className="font-mono font-semibold">Nuevo proyecto</h2>
-              <button type="button" onClick={() => setOpen(false)}><X className="w-4 h-4 text-muted-foreground" /></button>
+              <button type="button" onClick={() => setOpen(false)}>
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
             </div>
-            {(["code","name","commodity","region"] as const).map((f) => (
+            {(["code", "name", "commodity", "region"] as const).map((f) => (
               <div key={f}>
-                <label className="text-[10px] uppercase font-mono text-muted-foreground">{f === "code" ? "Código (único)" : f}</label>
+                <label className="text-[10px] uppercase font-mono text-muted-foreground">
+                  {f === "code" ? "Código (único)" : f}
+                </label>
                 <input
                   type="text"
                   required={f === "code" || f === "name"}
@@ -114,7 +136,9 @@ function ProjectsPage() {
               </div>
             ))}
             <div>
-              <label className="text-[10px] uppercase font-mono text-muted-foreground">Descripción</label>
+              <label className="text-[10px] uppercase font-mono text-muted-foreground">
+                Descripción
+              </label>
               <textarea
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}

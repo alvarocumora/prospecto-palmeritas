@@ -6,10 +6,33 @@ import { useProjects } from "@/hooks/useProjects";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { BarChart3, Plus, Play, Trash2, Loader2, Layers, Mountain, Gauge, Activity, Box as BoxIcon } from "lucide-react";
+import {
+  BarChart3,
+  Plus,
+  Play,
+  Trash2,
+  Loader2,
+  Layers,
+  Mountain,
+  Gauge,
+  Activity,
+  Box as BoxIcon,
+} from "lucide-react";
 import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
 
@@ -17,7 +40,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
     meta: [
       { title: "Estimación de Recursos | Geocapitals" },
-      { name: "description", content: "Motor geoestadístico (IDW + NN) para estimación de recursos minerales conforme NI 43-101 / JORC." },
+      {
+        name: "description",
+        content:
+          "Motor geoestadístico (IDW + NN) para estimación de recursos minerales conforme NI 43-101 / JORC.",
+      },
     ],
   }),
   component: EstimationPage,
@@ -47,10 +74,15 @@ function EstimationPage() {
   const { models, loading, running, create, remove, estimate } = useResourceModels();
   const [dialog, setDialog] = useState(false);
   const [viewerId, setViewerId] = useState<string | null>(null);
-  const viewerModel = useMemo(() => models.find((m) => m.id === viewerId) ?? null, [models, viewerId]);
+  const viewerModel = useMemo(
+    () => models.find((m) => m.id === viewerId) ?? null,
+    [models, viewerId],
+  );
 
   if (!active) {
-    return <div className="p-8 text-text-dim font-mono text-xs">Selecciona un proyecto activo.</div>;
+    return (
+      <div className="p-8 text-text-dim font-mono text-xs">Selecciona un proyecto activo.</div>
+    );
   }
 
   return (
@@ -80,7 +112,11 @@ function EstimationPage() {
         <div className="border border-border rounded p-8 text-center text-text-dim font-mono text-xs space-y-2">
           <Mountain className="w-8 h-8 mx-auto text-text-dim/50" />
           <div>No hay modelos de recursos.</div>
-          {writable && <div className="text-[10px]">Crea uno con "Nuevo modelo" para iniciar la estimación.</div>}
+          {writable && (
+            <div className="text-[10px]">
+              Crea uno con "Nuevo modelo" para iniciar la estimación.
+            </div>
+          )}
         </div>
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
@@ -91,7 +127,9 @@ function EstimationPage() {
               writable={writable}
               running={running === m.id}
               onRun={() => estimate(m.id)}
-              onDelete={() => { if (confirm(`Eliminar modelo "${m.name}"?`)) remove(m.id); }}
+              onDelete={() => {
+                if (confirm(`Eliminar modelo "${m.name}"?`)) remove(m.id);
+              }}
               onView={() => setViewerId(m.id)}
             />
           ))}
@@ -124,7 +162,14 @@ function EstimationPage() {
   );
 }
 
-function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
+function ModelCard({
+  model,
+  writable,
+  running,
+  onRun,
+  onDelete,
+  onView,
+}: {
   model: ReturnType<typeof useResourceModels>["models"][number];
   writable: boolean;
   running: boolean;
@@ -142,7 +187,8 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
   }[model.status];
 
   const tonnage = model.tonnage_above_cutoff ?? model.tonnage_total ?? 0;
-  const tonnageK = tonnage > 1e6 ? `${(tonnage / 1e6).toFixed(2)} Mt` : `${(tonnage / 1e3).toFixed(0)} kt`;
+  const tonnageK =
+    tonnage > 1e6 ? `${(tonnage / 1e6).toFixed(2)} Mt` : `${(tonnage / 1e3).toFixed(0)} kt`;
 
   return (
     <div className="border border-border rounded p-3 bg-card space-y-2">
@@ -154,18 +200,34 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
             <span>·</span>
             <span className="uppercase">{model.method}</span>
             <span>·</span>
-            <span>bloque {model.block_size_x}×{model.block_size_y}×{model.block_size_z} m</span>
+            <span>
+              bloque {model.block_size_x}×{model.block_size_y}×{model.block_size_z} m
+            </span>
           </div>
         </div>
-        <Badge variant="outline" className={`text-[9px] ${statusColor}`}>{model.status}</Badge>
+        <Badge variant="outline" className={`text-[9px] ${statusColor}`}>
+          {model.status}
+        </Badge>
       </div>
 
       {model.status === "complete" && (
         <div className="grid grid-cols-2 gap-2 text-[10px] font-mono pt-2 border-t border-border">
-          <Stat icon={<Layers className="w-3 h-3" />} label="Bloques estim." value={`${model.blocks_estimated}/${model.blocks_total}`} />
-          <Stat icon={<Activity className="w-3 h-3" />} label="Compósitos" value={String(model.composites_count)} />
+          <Stat
+            icon={<Layers className="w-3 h-3" />}
+            label="Bloques estim."
+            value={`${model.blocks_estimated}/${model.blocks_total}`}
+          />
+          <Stat
+            icon={<Activity className="w-3 h-3" />}
+            label="Compósitos"
+            value={String(model.composites_count)}
+          />
           <Stat icon={<Mountain className="w-3 h-3" />} label="Tonelaje" value={tonnageK} />
-          <Stat icon={<Gauge className="w-3 h-3" />} label="Ley media" value={`${(model.mean_grade ?? 0).toFixed(model.commodity === "au" || model.commodity === "ag" ? 2 : 3)} ${unit}`} />
+          <Stat
+            icon={<Gauge className="w-3 h-3" />}
+            label="Ley media"
+            value={`${(model.mean_grade ?? 0).toFixed(model.commodity === "au" || model.commodity === "ag" ? 2 : 3)} ${unit}`}
+          />
           {model.cutoff_grade != null && (
             <div className="col-span-2 text-[9px] text-text-dim">
               Cutoff: {model.cutoff_grade} {unit} · Densidad: {model.density_t_m3} t/m³
@@ -189,16 +251,27 @@ function ModelCard({ model, writable, running, onRun, onDelete, onView }: {
               disabled={running || model.status === "running" || model.method === "ok"}
               onClick={onRun}
             >
-              {running ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Play className="w-3 h-3 mr-1" />}
+              {running ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Play className="w-3 h-3 mr-1" />
+              )}
               {model.status === "complete" ? "Re-estimar" : "Estimar"}
             </Button>
-            <Button size="sm" variant="ghost" className="h-7 text-xs text-signal-red ml-auto" onClick={onDelete}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-7 text-xs text-signal-red ml-auto"
+              onClick={onDelete}
+            >
               <Trash2 className="w-3 h-3" />
             </Button>
           </>
         )}
         {model.method === "ok" && (
-          <span className="text-[9px] text-signal-amber font-mono ml-auto">OK requiere variograma — pendiente</span>
+          <span className="text-[9px] text-signal-amber font-mono ml-auto">
+            OK requiere variograma — pendiente
+          </span>
         )}
       </div>
 
@@ -226,7 +299,11 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
   );
 }
 
-function CreateDialog({ open, onClose, onSave }: {
+function CreateDialog({
+  open,
+  onClose,
+  onSave,
+}: {
   open: boolean;
   onClose: () => void;
   onSave: (data: Parameters<ReturnType<typeof useResourceModels>["create"]>[0]) => Promise<void>;
@@ -243,9 +320,15 @@ function CreateDialog({ open, onClose, onSave }: {
   const [saving, setSaving] = useState(false);
 
   const reset = () => {
-    setName(""); setCommodity("au"); setMethod("idw");
-    setSearchRadius(50); setBlockSize(10); setBlockZ(5);
-    setCompositeLength(2); setCutoff(""); setDensity(2.7);
+    setName("");
+    setCommodity("au");
+    setMethod("idw");
+    setSearchRadius(50);
+    setBlockSize(10);
+    setBlockZ(5);
+    setCompositeLength(2);
+    setCutoff("");
+    setDensity(2.7);
   };
 
   const handleSave = async () => {
@@ -281,22 +364,34 @@ function CreateDialog({ open, onClose, onSave }: {
         <div className="grid gap-3">
           <div>
             <Label className="text-xs font-mono">Nombre</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ej: Veta Norte · Au IDW v1" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Ej: Veta Norte · Au IDW v1"
+            />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
               <Label className="text-xs font-mono">Commodity</Label>
               <Select value={commodity} onValueChange={(v) => setCommodity(v as Commodity)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {COMMODITIES.map((c) => <SelectItem key={c.v} value={c.v}>{c.l}</SelectItem>)}
+                  {COMMODITIES.map((c) => (
+                    <SelectItem key={c.v} value={c.v}>
+                      {c.l}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs font-mono">Método</Label>
               <Select value={method} onValueChange={(v) => setMethod(v as ResourceMethod)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   {METHODS.map((m) => (
                     <SelectItem key={m.v} value={m.v} disabled={m.v === "ok"}>
@@ -305,40 +400,77 @@ function CreateDialog({ open, onClose, onSave }: {
                   ))}
                 </SelectContent>
               </Select>
-              <div className="text-[9px] text-text-dim mt-1">{METHODS.find((m) => m.v === method)?.desc}</div>
+              <div className="text-[9px] text-text-dim mt-1">
+                {METHODS.find((m) => m.v === method)?.desc}
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label className="text-xs font-mono">Bloque XY (m)</Label>
-              <Input type="number" min={1} value={blockSize} onChange={(e) => setBlockSize(Number(e.target.value))} />
+              <Input
+                type="number"
+                min={1}
+                value={blockSize}
+                onChange={(e) => setBlockSize(Number(e.target.value))}
+              />
             </div>
             <div>
               <Label className="text-xs font-mono">Bloque Z (m)</Label>
-              <Input type="number" min={1} value={blockZ} onChange={(e) => setBlockZ(Number(e.target.value))} />
+              <Input
+                type="number"
+                min={1}
+                value={blockZ}
+                onChange={(e) => setBlockZ(Number(e.target.value))}
+              />
             </div>
             <div>
               <Label className="text-xs font-mono">Compósito (m)</Label>
-              <Input type="number" min={0.5} step={0.5} value={compositeLength} onChange={(e) => setCompositeLength(Number(e.target.value))} />
+              <Input
+                type="number"
+                min={0.5}
+                step={0.5}
+                value={compositeLength}
+                onChange={(e) => setCompositeLength(Number(e.target.value))}
+              />
             </div>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <Label className="text-xs font-mono">Radio búsq. (m)</Label>
-              <Input type="number" min={1} value={searchRadius} onChange={(e) => setSearchRadius(Number(e.target.value))} />
+              <Input
+                type="number"
+                min={1}
+                value={searchRadius}
+                onChange={(e) => setSearchRadius(Number(e.target.value))}
+              />
             </div>
             <div>
               <Label className="text-xs font-mono">Cutoff ({unit})</Label>
-              <Input type="number" step={0.01} value={cutoff} onChange={(e) => setCutoff(e.target.value)} placeholder="ej: 0.3" />
+              <Input
+                type="number"
+                step={0.01}
+                value={cutoff}
+                onChange={(e) => setCutoff(e.target.value)}
+                placeholder="ej: 0.3"
+              />
             </div>
             <div>
               <Label className="text-xs font-mono">Densidad (t/m³)</Label>
-              <Input type="number" step={0.1} min={0.1} value={density} onChange={(e) => setDensity(Number(e.target.value))} />
+              <Input
+                type="number"
+                step={0.1}
+                min={0.1}
+                value={density}
+                onChange={(e) => setDensity(Number(e.target.value))}
+              />
             </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button onClick={handleSave} disabled={!name.trim() || saving}>
             {saving && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
             Crear modelo

@@ -4,9 +4,36 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectRole";
 import {
-  Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
-  TestTube2, FolderKanban, LogOut,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck, Database, BarChart3, Satellite, MapPin,
+  Mountain,
+  LayoutDashboard,
+  Map as MapIcon,
+  Activity,
+  Drill,
+  TestTube2,
+  FolderKanban,
+  LogOut,
+  Users,
+  ClipboardList,
+  Layers as LayersIcon,
+  UserCircle,
+  Crown,
+  Compass,
+  Plane,
+  Calendar,
+  ShieldCheck,
+  ClipboardCheck,
+  Target,
+  Boxes,
+  DollarSign,
+  ShieldAlert,
+  FileText,
+  X,
+  Briefcase,
+  BadgeCheck,
+  Database,
+  BarChart3,
+  Satellite,
+  MapPin,
 } from "lucide-react";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
@@ -33,7 +60,9 @@ function AuthenticatedLayout() {
   const [mounted, setMounted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!mounted || loading) return;
@@ -50,47 +79,201 @@ function AuthenticatedLayout() {
   }, [mounted, loading, projectsLoading, user, projects.length, location.pathname, navigate]);
 
   // Close drawer on route change
-  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname]);
 
   if (!mounted || loading) return null;
   if (!user) return null;
 
   const items: RailItem[] = [
-    { to: "/dashboard", icon: <LayoutDashboard className="w-3.5 h-3.5" />, label: "Mission Control", group: "OPERATIONS", exact: true },
-    { to: "/dashboard/map", icon: <Compass className="w-3.5 h-3.5" />, label: "Centro Op.", group: "OPERATIONS" },
-    { to: "/dashboard/campaigns", icon: <Calendar className="w-3.5 h-3.5" />, label: "Campañas", group: "OPERATIONS" },
-    canAccess(role, "projects") && { to: "/dashboard/projects", icon: <FolderKanban className="w-3.5 h-3.5" />, label: "Proyectos", group: "OPERATIONS" },
+    {
+      to: "/dashboard",
+      icon: <LayoutDashboard className="w-3.5 h-3.5" />,
+      label: "Mission Control",
+      group: "OPERATIONS",
+      exact: true,
+    },
+    {
+      to: "/dashboard/map",
+      icon: <Compass className="w-3.5 h-3.5" />,
+      label: "Centro Op.",
+      group: "OPERATIONS",
+    },
+    {
+      to: "/dashboard/campaigns",
+      icon: <Calendar className="w-3.5 h-3.5" />,
+      label: "Campañas",
+      group: "OPERATIONS",
+    },
+    canAccess(role, "projects") && {
+      to: "/dashboard/projects",
+      icon: <FolderKanban className="w-3.5 h-3.5" />,
+      label: "Proyectos",
+      group: "OPERATIONS",
+    },
 
-    canAccess(role, "catastro") && { to: "/dashboard/catastro", icon: <MapIcon className="w-3.5 h-3.5" />, label: "Catastro", group: "CADASTRE" },
-    canAccess(role, "catastro") && { to: "/dashboard/boletin", icon: <FileText className="w-3.5 h-3.5" />, label: "Boletín Minero", group: "CADASTRE", badge: catastroAlerts },
+    canAccess(role, "catastro") && {
+      to: "/dashboard/catastro",
+      icon: <MapIcon className="w-3.5 h-3.5" />,
+      label: "Catastro",
+      group: "CADASTRE",
+    },
+    canAccess(role, "catastro") && {
+      to: "/dashboard/boletin",
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: "Boletín Minero",
+      group: "CADASTRE",
+      badge: catastroAlerts,
+    },
 
-    canAccess(role, "geophysics") && { to: "/dashboard/geophysics", icon: <Activity className="w-3.5 h-3.5" />, label: "Geofísica", group: "FIELD" },
-    canAccess(role, "geophysics") && { to: "/dashboard/drones", icon: <Plane className="w-3.5 h-3.5" />, label: "Drones", group: "FIELD" },
-    canAccess(role, "drilling") && { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes", group: "FIELD" },
-    { to: "/dashboard/field-map", icon: <MapPin className="w-3.5 h-3.5" />, label: "Mapa de campo", group: "FIELD" },
-    canAccess(role, "sampling") && { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo", group: "FIELD" },
+    canAccess(role, "geophysics") && {
+      to: "/dashboard/geophysics",
+      icon: <Activity className="w-3.5 h-3.5" />,
+      label: "Geofísica",
+      group: "FIELD",
+    },
+    canAccess(role, "geophysics") && {
+      to: "/dashboard/drones",
+      icon: <Plane className="w-3.5 h-3.5" />,
+      label: "Drones",
+      group: "FIELD",
+    },
+    canAccess(role, "drilling") && {
+      to: "/dashboard/drilling",
+      icon: <Drill className="w-3.5 h-3.5" />,
+      label: "Sondajes",
+      group: "FIELD",
+    },
+    {
+      to: "/dashboard/field-map",
+      icon: <MapPin className="w-3.5 h-3.5" />,
+      label: "Mapa de campo",
+      group: "FIELD",
+    },
+    canAccess(role, "sampling") && {
+      to: "/dashboard/sampling",
+      icon: <TestTube2 className="w-3.5 h-3.5" />,
+      label: "Muestreo",
+      group: "FIELD",
+    },
 
-    canAccess(role, "qaqc") && { to: "/dashboard/qaqc", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QA/QC", group: "ANALYSIS" },
-    canAccess(role, "targets") && { to: "/dashboard/targets", icon: <Target className="w-3.5 h-3.5" />, label: "Targets", group: "ANALYSIS" },
-    canAccess(role, "targets") && { to: "/dashboard/satellite-intel", icon: <Satellite className="w-3.5 h-3.5" />, label: "Inteligencia Sat.", group: "ANALYSIS" },
-    canAccess(role, "estimation") && { to: "/dashboard/estimation", icon: <BarChart3 className="w-3.5 h-3.5" />, label: "Estimación Recursos", group: "ANALYSIS" },
-    canAccess(role, "inventory") && { to: "/dashboard/inventory", icon: <Boxes className="w-3.5 h-3.5" />, label: "Inventario", group: "ANALYSIS" },
-    canAccess(role, "reports") && { to: "/dashboard/reports", icon: <FileText className="w-3.5 h-3.5" />, label: "Reportes", group: "ANALYSIS" },
-    canAccess(role, "reports") && { to: "/dashboard/ni43101", icon: <FileText className="w-3.5 h-3.5" />, label: "Informe 43-101", group: "ANALYSIS" },
-    canAccess(role, "reports") && { to: "/dashboard/qps", icon: <BadgeCheck className="w-3.5 h-3.5" />, label: "QPs · Firmas", group: "ANALYSIS" },
+    canAccess(role, "qaqc") && {
+      to: "/dashboard/qaqc",
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
+      label: "QA/QC",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "targets") && {
+      to: "/dashboard/targets",
+      icon: <Target className="w-3.5 h-3.5" />,
+      label: "Targets",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "targets") && {
+      to: "/dashboard/satellite-intel",
+      icon: <Satellite className="w-3.5 h-3.5" />,
+      label: "Inteligencia Sat.",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "estimation") && {
+      to: "/dashboard/estimation",
+      icon: <BarChart3 className="w-3.5 h-3.5" />,
+      label: "Estimación Recursos",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "inventory") && {
+      to: "/dashboard/inventory",
+      icon: <Boxes className="w-3.5 h-3.5" />,
+      label: "Inventario",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "reports") && {
+      to: "/dashboard/reports",
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: "Reportes",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "reports") && {
+      to: "/dashboard/ni43101",
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: "Informe 43-101",
+      group: "ANALYSIS",
+    },
+    canAccess(role, "reports") && {
+      to: "/dashboard/qps",
+      icon: <BadgeCheck className="w-3.5 h-3.5" />,
+      label: "QPs · Firmas",
+      group: "ANALYSIS",
+    },
 
-    canAccess(role, "approvals") && { to: "/dashboard/approvals", icon: <ClipboardCheck className="w-3.5 h-3.5" />, label: "Aprobaciones", group: "GOVERNANCE" },
-    canAccess(role, "finance") && { to: "/dashboard/finance", icon: <DollarSign className="w-3.5 h-3.5" />, label: "Costos", group: "GOVERNANCE" },
-    canAccess(role, "hse") && { to: "/dashboard/hse", icon: <ShieldAlert className="w-3.5 h-3.5" />, label: "HSE", group: "GOVERNANCE" },
-    canAccess(role, "team") && { to: "/dashboard/team", icon: <Users className="w-3.5 h-3.5" />, label: "Equipo", group: "GOVERNANCE" },
-    canAccess(role, "audit") && { to: "/dashboard/audit", icon: <ClipboardList className="w-3.5 h-3.5" />, label: "Auditoría", group: "GOVERNANCE" },
-    canAccess(role, "audit") && { to: "/dashboard/validation", icon: <Database className="w-3.5 h-3.5" />, label: "Validación Datos", group: "GOVERNANCE" },
-    canAccess(role, "marketplace") && { to: "/dashboard/marketplace", icon: <LayersIcon className="w-3.5 h-3.5" />, label: "Marketplace Capas", group: "GOVERNANCE" },
-    { to: "/dashboard/deals", icon: <Briefcase className="w-3.5 h-3.5" />, label: "Marketplace Deals", group: "GOVERNANCE" },
+    canAccess(role, "approvals") && {
+      to: "/dashboard/approvals",
+      icon: <ClipboardCheck className="w-3.5 h-3.5" />,
+      label: "Aprobaciones",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "finance") && {
+      to: "/dashboard/finance",
+      icon: <DollarSign className="w-3.5 h-3.5" />,
+      label: "Costos",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "hse") && {
+      to: "/dashboard/hse",
+      icon: <ShieldAlert className="w-3.5 h-3.5" />,
+      label: "HSE",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "team") && {
+      to: "/dashboard/team",
+      icon: <Users className="w-3.5 h-3.5" />,
+      label: "Equipo",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "audit") && {
+      to: "/dashboard/audit",
+      icon: <ClipboardList className="w-3.5 h-3.5" />,
+      label: "Auditoría",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "audit") && {
+      to: "/dashboard/validation",
+      icon: <Database className="w-3.5 h-3.5" />,
+      label: "Validación Datos",
+      group: "GOVERNANCE",
+    },
+    canAccess(role, "marketplace") && {
+      to: "/dashboard/marketplace",
+      icon: <LayersIcon className="w-3.5 h-3.5" />,
+      label: "Marketplace Capas",
+      group: "GOVERNANCE",
+    },
+    {
+      to: "/dashboard/deals",
+      icon: <Briefcase className="w-3.5 h-3.5" />,
+      label: "Marketplace Deals",
+      group: "GOVERNANCE",
+    },
 
-    { to: "/dashboard/profile", icon: <UserCircle className="w-3.5 h-3.5" />, label: "Mi Perfil", group: "ACCOUNT" },
-    isSuperAdmin && { to: "/dashboard/admin", icon: <Crown className="w-3.5 h-3.5" />, label: "Admin", group: "ACCOUNT" },
-    canAccess(role, "palmeras") && { to: "/dashboard/palmeras", icon: <Mountain className="w-3.5 h-3.5" />, label: "Demo · Palmeras", group: "ACCOUNT" },
+    {
+      to: "/dashboard/profile",
+      icon: <UserCircle className="w-3.5 h-3.5" />,
+      label: "Mi Perfil",
+      group: "ACCOUNT",
+    },
+    isSuperAdmin && {
+      to: "/dashboard/admin",
+      icon: <Crown className="w-3.5 h-3.5" />,
+      label: "Admin",
+      group: "ACCOUNT",
+    },
+    canAccess(role, "palmeras") && {
+      to: "/dashboard/palmeras",
+      icon: <Mountain className="w-3.5 h-3.5" />,
+      label: "Demo · Palmeras",
+      group: "ACCOUNT",
+    },
   ].filter(Boolean) as RailItem[];
 
   return (
@@ -104,13 +287,14 @@ function AuthenticatedLayout() {
         onClose={() => setDrawerOpen(false)}
         items={items}
         userName={profile?.display_name ?? user.email ?? ""}
-        onSignOut={async () => { await signOut(); navigate({ to: "/" }); }}
+        onSignOut={async () => {
+          await signOut();
+          navigate({ to: "/" });
+        }}
       />
 
       <main
-        className={cn(
-          "relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]",
-        )}
+        className={cn("relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]")}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         <Outlet />
@@ -149,7 +333,11 @@ function MobileDrawer({
       <aside className="relative w-72 max-w-[85%] h-full bg-bg-panel border-r border-border flex flex-col animate-fade-up">
         <div className="h-10 flex items-center justify-between px-3 border-b border-border">
           <Logo size={14} textClassName="text-[11px]" />
-          <button type="button" onClick={onClose} className="p-1 text-text-dim hover:text-foreground">
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 text-text-dim hover:text-foreground"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -162,7 +350,9 @@ function MobileDrawer({
                 </div>
               )}
               {list.map((it) => {
-                const active = it.exact ? location.pathname === it.to : location.pathname === it.to || location.pathname.startsWith(it.to + "/");
+                const active = it.exact
+                  ? location.pathname === it.to
+                  : location.pathname === it.to || location.pathname.startsWith(it.to + "/");
                 return (
                   <Link
                     key={it.to}

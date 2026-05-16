@@ -302,15 +302,15 @@ Medium due to size of `ProjectMap.tsx`.
 
 # Product roadmap mapping
 
-| Executive roadmap item | Implementable next PRs |
-|---|---|
-| F1 — Endurecer seguridad | PR B, later SECURITY DEFINER audit checklist |
-| F2 — Job runner robusto | PR E, then edge-function job status UI |
-| F3 — Modularización frontend | PR H + continued service/query migrations |
-| F4 — Fusion Score 3D + IA | PR F + PR G |
-| F5 — SaaS multi-tenant | PR C + PR D |
-| F6 — Observabilidad | PR B + request headers integration |
-| F7 — Go-to-market | Demo seed data + onboarding checklist later |
+| Executive roadmap item       | Implementable next PRs                       |
+| ---------------------------- | -------------------------------------------- |
+| F1 — Endurecer seguridad     | PR B, later SECURITY DEFINER audit checklist |
+| F2 — Job runner robusto      | PR E, then edge-function job status UI       |
+| F3 — Modularización frontend | PR H + continued service/query migrations    |
+| F4 — Fusion Score 3D + IA    | PR F + PR G                                  |
+| F5 — SaaS multi-tenant       | PR C + PR D                                  |
+| F6 — Observabilidad          | PR B + request headers integration           |
+| F7 — Go-to-market            | Demo seed data + onboarding checklist later  |
 
 ---
 

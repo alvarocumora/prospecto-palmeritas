@@ -43,18 +43,33 @@ export function useDroneFlights(projectId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setFlights([]); setRasters([]); setLoading(false); return; }
+    if (!projectId) {
+      setFlights([]);
+      setRasters([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const [f, r] = await Promise.all([
-      supabase.from("drone_flights").select("*").eq("project_id", projectId).order("flown_at", { ascending: false, nullsFirst: false }),
-      supabase.from("drone_rasters").select("*").eq("project_id", projectId).order("captured_at", { ascending: false, nullsFirst: false }),
+      supabase
+        .from("drone_flights")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("flown_at", { ascending: false, nullsFirst: false }),
+      supabase
+        .from("drone_rasters")
+        .select("*")
+        .eq("project_id", projectId)
+        .order("captured_at", { ascending: false, nullsFirst: false }),
     ]);
     setFlights((f.data ?? []) as DroneFlight[]);
     setRasters((r.data ?? []) as DroneRaster[]);
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { flights, rasters, loading, refresh };
 }
@@ -127,7 +142,11 @@ export async function createRaster(payload: RasterInsert, userId: string) {
 
 export async function deleteRaster(id: string) {
   // Best-effort: also remove file from storage if storage_path set
-  const { data: row } = await supabase.from("drone_rasters").select("storage_path").eq("id", id).single();
+  const { data: row } = await supabase
+    .from("drone_rasters")
+    .select("storage_path")
+    .eq("id", id)
+    .single();
   if (row?.storage_path) {
     await supabase.storage.from("drone-rasters").remove([row.storage_path]);
   }
@@ -156,7 +175,9 @@ export async function uploadRasterFile(opts: {
   if (upErr) return { data: null, error: `Upload: ${upErr.message}` };
 
   // 2. Get public URL (bucket is private — we use signed URL in render layer; here we store path-derived URL placeholder)
-  const { data: signed } = await supabase.storage.from("drone-rasters").createSignedUrl(path, 60 * 60 * 24 * 7);
+  const { data: signed } = await supabase.storage
+    .from("drone-rasters")
+    .createSignedUrl(path, 60 * 60 * 24 * 7);
   const url = signed?.signedUrl ?? "";
 
   // 3. Insert DB row with processing=true
@@ -192,7 +213,12 @@ export async function uploadRasterFile(opts: {
 }
 
 /** Fetch a fresh signed URL for a stored raster (for in-map rendering). */
-export async function getRasterSignedUrl(storagePath: string, expiresIn = 60 * 60): Promise<string | null> {
-  const { data } = await supabase.storage.from("drone-rasters").createSignedUrl(storagePath, expiresIn);
+export async function getRasterSignedUrl(
+  storagePath: string,
+  expiresIn = 60 * 60,
+): Promise<string | null> {
+  const { data } = await supabase.storage
+    .from("drone-rasters")
+    .createSignedUrl(storagePath, expiresIn);
   return data?.signedUrl ?? null;
 }

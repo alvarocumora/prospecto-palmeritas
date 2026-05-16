@@ -1,6 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Layers, Loader2, Map as MapIcon, Mountain, Radar, Sparkles, Target as TargetIcon } from "lucide-react";
-import { useTargetSatelliteSummaries, type TargetSatelliteSummary } from "@/hooks/useTargetSatelliteSummaries";
+import {
+  Layers,
+  Loader2,
+  Map as MapIcon,
+  Mountain,
+  Radar,
+  Sparkles,
+  Target as TargetIcon,
+} from "lucide-react";
+import {
+  useTargetSatelliteSummaries,
+  type TargetSatelliteSummary,
+} from "@/hooks/useTargetSatelliteSummaries";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -9,11 +20,31 @@ type Props = {
   center: [number, number] | null; // [lat, lng]
 };
 
-type LayerKey = "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets" | "hotspots_high";
+type LayerKey =
+  | "aoi"
+  | "hyper_emit"
+  | "hyper_aster"
+  | "insar"
+  | "demdiff"
+  | "targets"
+  | "hotspots_high";
 
-const LAYER_META: Record<LayerKey, { label: string; color: string; icon: any; group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots" }> = {
+const LAYER_META: Record<
+  LayerKey,
+  {
+    label: string;
+    color: string;
+    icon: any;
+    group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots";
+  }
+> = {
   aoi: { label: "AOI proyecto", color: "#22d3ee", icon: MapIcon, group: "context" },
-  hotspots_high: { label: "Hotspots HIGH (sat)", color: "#ef4444", icon: Sparkles, group: "hotspots" },
+  hotspots_high: {
+    label: "Hotspots HIGH (sat)",
+    color: "#ef4444",
+    icon: Sparkles,
+    group: "hotspots",
+  },
   hyper_emit: { label: "EMIT (60 m)", color: "#a78bfa", icon: Sparkles, group: "hyper" },
   hyper_aster: { label: "ASTER (30 m)", color: "#f472b6", icon: Sparkles, group: "hyper" },
   insar: { label: "InSAR velocity (mm/a)", color: "#22d3ee", icon: Radar, group: "insar" },
@@ -29,9 +60,9 @@ function velocityColor(v: number | null): string {
   const a = Math.abs(v);
   if (a >= 25) return "#dc2626"; // red
   if (a >= 15) return "#f59e0b"; // amber
-  if (a >= 8) return "#fbbf24";  // yellow
-  if (a >= 3) return "#22d3ee";  // cyan
-  return "#34d399";              // green
+  if (a >= 8) return "#fbbf24"; // yellow
+  if (a >= 3) return "#22d3ee"; // cyan
+  return "#34d399"; // green
 }
 
 function statusColor(s: TargetSatelliteSummary["overallStatus"]): string {
@@ -44,7 +75,13 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   const layerRefs = useRef<Record<LayerKey, any>>({} as any);
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
-    aoi: true, hyper_emit: true, hyper_aster: true, insar: true, demdiff: true, targets: true, hotspots_high: true,
+    aoi: true,
+    hyper_emit: true,
+    hyper_aster: true,
+    insar: true,
+    demdiff: true,
+    targets: true,
+    hotspots_high: true,
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
   const [criticalOnly, setCriticalOnly] = useState(false);
@@ -68,13 +105,20 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       if (cancelled || !containerRef.current) return;
 
       const c = center ?? [-33.84, -71.15];
-      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: false }).setView(c, 12);
+      const map = L.map(containerRef.current, {
+        zoomControl: true,
+        attributionControl: false,
+      }).setView(c, 12);
 
-      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-        maxZoom: 19,
-      }).addTo(map);
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          maxZoom: 19,
+        },
+      ).addTo(map);
       L.tileLayer("https://stamen-tiles.a.ssl.fastly.net/terrain-labels/{z}/{x}/{y}.png", {
-        maxZoom: 18, opacity: 0.6,
+        maxZoom: 18,
+        opacity: 0.6,
       }).addTo(map);
 
       mapRef.current = map;
@@ -106,7 +150,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
           .eq("project_id", projectId),
         (supabase.from("insar_displacement") as any)
-          .select("id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date")
+          .select(
+            "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date",
+          )
           .eq("project_id", projectId),
         (supabase.from("stockpile_volumes") as any)
           .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
@@ -123,7 +169,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       setHotspots(hs.data ?? []);
       setLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [projectId]);
 
   // Render layers
@@ -145,8 +193,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
           .sort((a: any, b: any) => bboxArea(b) - bboxArea(a))[0];
         if (biggest) {
           L.geoJSON(biggest, {
-            style: { color: LAYER_META.aoi.color, weight: 2, dashArray: "6 4", fillOpacity: 0.05, fillColor: LAYER_META.aoi.color },
-          }).bindTooltip("AOI proyecto", { sticky: true }).addTo(groups.aoi);
+            style: {
+              color: LAYER_META.aoi.color,
+              weight: 2,
+              dashArray: "6 4",
+              fillOpacity: 0.05,
+              fillColor: LAYER_META.aoi.color,
+            },
+          })
+            .bindTooltip("AOI proyecto", { sticky: true })
+            .addTo(groups.aoi);
         }
       }
 
@@ -164,9 +220,11 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             fillColor: LAYER_META[key].color,
             fillOpacity: 0.08 + Math.min(0.2, Number(p.mean_score ?? 0) * 0.25),
           },
-        }).bindPopup(
-          `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.source}</b> · ${p.mineral}<br/>Ensamble: ${p.assemblage ?? "—"}<br/>Score med: ${Number(p.mean_score ?? 0).toFixed(2)} · max: ${Number(p.max_score ?? 0).toFixed(2)}<br/>${String(p.acquisition_date ?? "").slice(0, 10)}</div>`,
-        ).addTo(groups[key]);
+        })
+          .bindPopup(
+            `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.source}</b> · ${p.mineral}<br/>Ensamble: ${p.assemblage ?? "—"}<br/>Score med: ${Number(p.mean_score ?? 0).toFixed(2)} · max: ${Number(p.max_score ?? 0).toFixed(2)}<br/>${String(p.acquisition_date ?? "").slice(0, 10)}</div>`,
+          )
+          .addTo(groups[key]);
       });
 
       // InSAR points — colored by velocity
@@ -184,9 +242,11 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             weight: 1,
             fillColor: color,
             fillOpacity: 0.85,
-          }).bindPopup(
-            `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.asset_name ?? "InSAR"}</b><br/>v = ${v.toFixed(1)} mm/año<br/>Σ = ${Number(p.cumulative_displacement_mm ?? 0).toFixed(0)} mm<br/>coh = ${Number(p.coherence ?? 0).toFixed(2)}<br/>severidad: <b>${p.alert_severity ?? "—"}</b><br/>${p.end_date ?? ""}</div>`,
-          ).addTo(groups.insar);
+          })
+            .bindPopup(
+              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${p.asset_name ?? "InSAR"}</b><br/>v = ${v.toFixed(1)} mm/año<br/>Σ = ${Number(p.cumulative_displacement_mm ?? 0).toFixed(0)} mm<br/>coh = ${Number(p.coherence ?? 0).toFixed(2)}<br/>severidad: <b>${p.alert_severity ?? "—"}</b><br/>${p.end_date ?? ""}</div>`,
+            )
+            .addTo(groups.insar);
         });
       }
 
@@ -195,10 +255,17 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         stockData.forEach((s) => {
           if (!s.polygon_geojson) return;
           L.geoJSON(s.polygon_geojson, {
-            style: { color: LAYER_META.demdiff.color, weight: 2, fillColor: LAYER_META.demdiff.color, fillOpacity: 0.35 },
-          }).bindPopup(
-            `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${s.name}</b> · ${s.material ?? "—"}<br/>V = ${Number(s.volume_m3 ?? 0).toLocaleString()} m³<br/>A = ${Number(s.area_m2 ?? 0).toLocaleString()} m²<br/>h̄ = ${Number(s.mean_height_m ?? 0).toFixed(1)} m</div>`,
-          ).addTo(groups.demdiff);
+            style: {
+              color: LAYER_META.demdiff.color,
+              weight: 2,
+              fillColor: LAYER_META.demdiff.color,
+              fillOpacity: 0.35,
+            },
+          })
+            .bindPopup(
+              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${s.name}</b> · ${s.material ?? "—"}<br/>V = ${Number(s.volume_m3 ?? 0).toLocaleString()} m³<br/>A = ${Number(s.area_m2 ?? 0).toLocaleString()} m²<br/>h̄ = ${Number(s.mean_height_m ?? 0).toFixed(1)} m</div>`,
+            )
+            .addTo(groups.demdiff);
         });
       }
 
@@ -218,12 +285,23 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
               weight: 1.2,
               fillColor: color,
               fillOpacity: 0.85,
-            }).bindPopup(popup).addTo(groups.hotspots_high);
+            })
+              .bindPopup(popup)
+              .addTo(groups.hotspots_high);
           } else {
             L.geoJSON(g, {
               style: { color, weight: 1.5, fillColor: color, fillOpacity: 0.4, dashArray: "4 3" },
-              pointToLayer: (_f, ll) => L.circleMarker(ll, { radius: 8, color: "#0b1220", weight: 1.2, fillColor: color, fillOpacity: 0.85 }),
-            }).bindPopup(popup).addTo(groups.hotspots_high);
+              pointToLayer: (_f, ll) =>
+                L.circleMarker(ll, {
+                  radius: 8,
+                  color: "#0b1220",
+                  weight: 1.2,
+                  fillColor: color,
+                  fillOpacity: 0.85,
+                }),
+            })
+              .bindPopup(popup)
+              .addTo(groups.hotspots_high);
           }
         });
       }
@@ -243,9 +321,11 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
               weight: isCritical ? 2.5 : 1.5,
               fillColor: color,
               fillOpacity: 0.95,
-            }).bindPopup(
-              `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Prioridad: <b>${t.priority ?? "—"}</b> · Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
-            ).addTo(groups.targets);
+            })
+              .bindPopup(
+                `<div style="font-family:ui-monospace,monospace;font-size:11px"><b>${t.code}</b> · ${t.name}<br/>${t.targetType} · ${t.commodity ?? ""}<br/>Prioridad: <b>${t.priority ?? "—"}</b> · Estado: <b>${t.overallStatus.toUpperCase()}</b><br/>InSAR: ${t.insar.velocityMmYear != null ? t.insar.velocityMmYear.toFixed(1) + " mm/a" : "—"}<br/>Hiper: ${t.hyperspectral.productCount} prod · max ${t.hyperspectral.maxScore?.toFixed(2) ?? "—"}<br/>DEM-diff: ${t.demDiff.available ? Math.round(t.demDiff.volumeM3 ?? 0) + " m³" : "—"}</div>`,
+              )
+              .addTo(groups.targets);
           });
       }
 
@@ -265,11 +345,25 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
           });
           if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
-        } catch { /* noop */ }
+        } catch {
+          /* noop */
+        }
       }
     })();
-    return () => { cancelled = true; };
-  }, [ready, enabled, statusFilter, criticalOnly, hyperData, insarData, stockData, hotspots, summaries]);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    ready,
+    enabled,
+    statusFilter,
+    criticalOnly,
+    hyperData,
+    insarData,
+    stockData,
+    hotspots,
+    summaries,
+  ]);
 
   function toggle(k: LayerKey) {
     setEnabled((prev) => ({ ...prev, [k]: !prev[k] }));
@@ -280,9 +374,13 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       <header className="flex items-center justify-between gap-3 flex-wrap p-4 border-b border-border/30">
         <div className="flex items-center gap-2">
           <MapIcon className="w-4 h-4 text-signal-cyan" />
-          <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">Visor Geoespacial</h2>
+          <h2 className="text-sm font-mono uppercase tracking-wider text-foreground">
+            Visor Geoespacial
+          </h2>
           <span className="text-xs text-text-dim font-mono">
-            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles · {summaries.length} targets · <span className="text-signal-red">{hotspots.length} hotspots HIGH</span>)
+            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles ·{" "}
+            {summaries.length} targets ·{" "}
+            <span className="text-signal-red">{hotspots.length} hotspots HIGH</span>)
           </span>
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-text-dim" />}
@@ -300,16 +398,24 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
                 const m = LAYER_META[k];
                 const Icon = m.icon;
                 return (
-                  <label key={k} className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-1/60 cursor-pointer">
+                  <label
+                    key={k}
+                    className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-surface-1/60 cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       checked={enabled[k]}
                       onChange={() => toggle(k)}
                       className="w-3 h-3 accent-signal-cyan"
                     />
-                    <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: m.color }} />
+                    <span
+                      className="w-2.5 h-2.5 rounded-sm border border-border/50"
+                      style={{ background: m.color }}
+                    />
                     <Icon className="w-3 h-3 text-text-dim" />
-                    <span className="text-[11px] font-mono text-text-secondary flex-1">{m.label}</span>
+                    <span className="text-[11px] font-mono text-text-secondary flex-1">
+                      {m.label}
+                    </span>
                   </label>
                 );
               })}
@@ -318,12 +424,16 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim">Filtro targets</div>
+              <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim">
+                Filtro targets
+              </div>
               <button
                 onClick={() => setCriticalOnly((v) => !v)}
                 className={cn(
                   "text-[9px] font-mono uppercase px-1.5 py-0.5 rounded border transition-colors",
-                  criticalOnly ? "border-signal-red/60 bg-signal-red/10 text-signal-red" : "border-border/40 text-text-secondary hover:border-border",
+                  criticalOnly
+                    ? "border-signal-red/60 bg-signal-red/10 text-signal-red"
+                    : "border-border/40 text-text-secondary hover:border-border",
                 )}
                 title="Solo targets críticos / high priority"
               >
@@ -337,10 +447,18 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
                   onClick={() => setStatusFilter(k)}
                   className={cn(
                     "text-[10px] font-mono uppercase px-2 py-1 rounded border transition-colors",
-                    statusFilter === k ? "border-signal-cyan/60 bg-signal-cyan/10 text-signal-cyan" : "border-border/40 text-text-secondary hover:border-border",
+                    statusFilter === k
+                      ? "border-signal-cyan/60 bg-signal-cyan/10 text-signal-cyan"
+                      : "border-border/40 text-text-secondary hover:border-border",
                   )}
                 >
-                  {k === "all" ? "Todos" : k === "alert" ? "Alerta" : k === "monitor" ? "Monitor" : "OK"}
+                  {k === "all"
+                    ? "Todos"
+                    : k === "alert"
+                      ? "Alerta"
+                      : k === "monitor"
+                        ? "Monitor"
+                        : "OK"}
                 </button>
               ))}
             </div>
@@ -348,7 +466,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
 
           {/* Legend — InSAR velocity ramp */}
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Velocidad InSAR</div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">
+              Velocidad InSAR
+            </div>
             <div className="space-y-1 text-[10px] font-mono">
               {[
                 { c: "#34d399", l: "< 3 mm/año · estable" },
@@ -358,7 +478,10 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
                 { c: "#dc2626", l: "≥ 25 mm/año · crítico" },
               ].map((e) => (
                 <div key={e.c} className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-3 h-3 rounded-full border border-border/50" style={{ background: e.c }} />
+                  <span
+                    className="w-3 h-3 rounded-full border border-border/50"
+                    style={{ background: e.c }}
+                  />
                   {e.l}
                 </div>
               ))}
@@ -367,7 +490,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
 
           {/* Legend — Targets */}
           <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">Estado target</div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-text-dim mb-2">
+              Estado target
+            </div>
             <div className="space-y-1 text-[10px] font-mono">
               {[
                 { c: "#34d399", l: "Estable" },
@@ -375,7 +500,10 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
                 { c: "#ef4444", l: "Alerta" },
               ].map((e) => (
                 <div key={e.c} className="flex items-center gap-2 text-text-secondary">
-                  <span className="w-3 h-3 rounded-full border border-border/50" style={{ background: e.c }} />
+                  <span
+                    className="w-3 h-3 rounded-full border border-border/50"
+                    style={{ background: e.c }}
+                  />
                   {e.l}
                 </div>
               ))}
@@ -404,5 +532,7 @@ function bboxArea(g: any): number {
     const xs = c.map((p: number[]) => p[0]);
     const ys = c.map((p: number[]) => p[1]);
     return (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
-  } catch { return 0; }
+  } catch {
+    return 0;
+  }
 }

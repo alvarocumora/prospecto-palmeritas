@@ -125,7 +125,10 @@ function textOn(bg: string): string {
 }
 
 function abbr(code: string): string {
-  return code.replace(/[^a-zA-Z0-9]/g, "").slice(0, 3).toUpperCase();
+  return code
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 3)
+    .toUpperCase();
 }
 
 /**
@@ -152,10 +155,7 @@ export function StripLog({
   onHover?: (id: string | null) => void;
   onSelect?: (id: string) => void;
 }) {
-  const sorted = useMemo(
-    () => [...logs].sort((a, b) => a.depth_from - b.depth_from),
-    [logs]
-  );
+  const sorted = useMemo(() => [...logs].sort((a, b) => a.depth_from - b.depth_from), [logs]);
 
   const { min, max } = useMemo(() => {
     if (!sorted.length) return { min: 0, max: 1 };
@@ -209,7 +209,10 @@ export function StripLog({
     <div className="flex gap-1 select-none" style={{ height: height + headerH }}>
       {/* Depth axis */}
       <div className="flex flex-col" style={{ width: 28 }}>
-        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-right pr-1">
+        <div
+          style={{ height: headerH }}
+          className="text-[9px] font-mono font-semibold text-foreground text-right pr-1"
+        >
           m
         </div>
         <div className="relative text-[9px] font-mono text-text-secondary flex-1">
@@ -227,7 +230,10 @@ export function StripLog({
 
       {/* Au column */}
       <div className="flex flex-col" style={{ width: auWidth }}>
-        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+        <div
+          style={{ height: headerH }}
+          className="text-[9px] font-mono font-semibold text-foreground text-center"
+        >
           Au
         </div>
         <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
@@ -243,7 +249,9 @@ export function StripLog({
                 onMouseLeave={() => onHover?.(null)}
                 onClick={() => onSelect?.(l.id)}
                 className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer transition-all ${
-                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                  isHover
+                    ? "outline outline-2 outline-primary z-10"
+                    : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{ top, height: h, background: auColor(l.au_gpt) }}
               />
@@ -254,7 +262,10 @@ export function StripLog({
 
       {/* Lithology column */}
       <div className="flex flex-col" style={{ width: lithoWidth }}>
-        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+        <div
+          style={{ height: headerH }}
+          className="text-[9px] font-mono font-semibold text-foreground text-center"
+        >
           Lito
         </div>
         <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
@@ -274,7 +285,9 @@ export function StripLog({
                 onMouseLeave={() => onHover?.(null)}
                 onClick={() => onSelect?.(l.id)}
                 className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer flex items-center justify-center font-mono font-semibold transition-all ${
-                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                  isHover
+                    ? "outline outline-2 outline-primary z-10"
+                    : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{
                   top,
@@ -294,7 +307,10 @@ export function StripLog({
 
       {/* Alteration column */}
       <div className="flex flex-col" style={{ width: altWidth }}>
-        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+        <div
+          style={{ height: headerH }}
+          className="text-[9px] font-mono font-semibold text-foreground text-center"
+        >
           Alt
         </div>
         <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
@@ -314,7 +330,9 @@ export function StripLog({
                 onMouseLeave={() => onHover?.(null)}
                 onClick={() => onSelect?.(l.id)}
                 className={`absolute left-0 right-0 border-t border-background/40 cursor-pointer flex items-center justify-center font-mono font-semibold transition-all ${
-                  isHover ? "outline outline-2 outline-primary z-10" : "hover:outline hover:outline-1 hover:outline-foreground/60"
+                  isHover
+                    ? "outline outline-2 outline-primary z-10"
+                    : "hover:outline hover:outline-1 hover:outline-foreground/60"
                 }`}
                 style={{
                   top,
@@ -334,7 +352,10 @@ export function StripLog({
 
       {/* Intercept marker rail */}
       <div className="flex flex-col" style={{ width: intWidth }}>
-        <div style={{ height: headerH }} className="text-[9px] font-mono font-semibold text-foreground text-center">
+        <div
+          style={{ height: headerH }}
+          className="text-[9px] font-mono font-semibold text-foreground text-center"
+        >
           Int
         </div>
         <div className="relative border border-border bg-bg-secondary rounded-sm overflow-hidden flex-1">
@@ -360,16 +381,40 @@ export function StripLog({
       </div>
 
       {/* Legends */}
-      <div className="flex flex-col text-[9px] font-mono text-text-secondary gap-2 pl-1" style={{ marginTop: headerH }}>
+      <div
+        className="flex flex-col text-[9px] font-mono text-text-secondary gap-2 pl-1"
+        style={{ marginTop: headerH }}
+      >
         <div className="flex flex-col gap-0.5">
           <div className="font-semibold text-foreground">Au g/t</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#7f1d1d" }} />≥10</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#dc2626" }} />5–10</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#f97316" }} />2–5</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#facc15" }} />1–2</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#84cc16" }} />0.5–1</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#0891b2" }} />0.3–0.5</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#1e3a8a" }} />&lt;0.3</div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#7f1d1d" }} />
+            ≥10
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#dc2626" }} />
+            5–10
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#f97316" }} />
+            2–5
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#facc15" }} />
+            1–2
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#84cc16" }} />
+            0.5–1
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#0891b2" }} />
+            0.3–0.5
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#1e3a8a" }} />
+            &lt;0.3
+          </div>
         </div>
 
         {presentLithos.length > 0 && (
@@ -377,7 +422,10 @@ export function StripLog({
             <div className="font-semibold text-foreground">Lito</div>
             {presentLithos.map((c) => (
               <div key={c} className="flex items-center gap-1" title={c}>
-                <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: lithoColor(c) }} />
+                <span
+                  className="w-2.5 h-2.5 rounded-sm border border-border/50"
+                  style={{ background: lithoColor(c) }}
+                />
                 <span className="truncate max-w-[70px]">{c}</span>
               </div>
             ))}
@@ -389,7 +437,10 @@ export function StripLog({
             <div className="font-semibold text-foreground">Alt</div>
             {presentAlts.map((c) => (
               <div key={c} className="flex items-center gap-1" title={c}>
-                <span className="w-2.5 h-2.5 rounded-sm border border-border/50" style={{ background: altColor(c) }} />
+                <span
+                  className="w-2.5 h-2.5 rounded-sm border border-border/50"
+                  style={{ background: altColor(c) }}
+                />
                 <span className="truncate max-w-[70px]">{c}</span>
               </div>
             ))}

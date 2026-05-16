@@ -48,7 +48,9 @@ export function InviteMemberDialog({
       <div className="w-full max-w-md rounded border border-border bg-bg-secondary">
         <header className="px-4 py-3 border-b border-border flex items-center justify-between">
           <div className="font-mono font-semibold text-sm">Invitar miembro</div>
-          <button onClick={onClose}><X className="w-4 h-4" /></button>
+          <button onClick={onClose}>
+            <X className="w-4 h-4" />
+          </button>
         </header>
 
         {link ? (
@@ -57,15 +59,28 @@ export function InviteMemberDialog({
               Comparte este enlace con la persona invitada (válido 14 días).
             </p>
             <div className="flex gap-1.5">
-              <input readOnly value={link} className="flex-1 px-2 py-1.5 text-xs font-mono rounded border border-border bg-background" />
-              <button onClick={copy} className="px-2 rounded bg-gold text-bg-secondary"><Copy className="w-3.5 h-3.5" /></button>
+              <input
+                readOnly
+                value={link}
+                className="flex-1 px-2 py-1.5 text-xs font-mono rounded border border-border bg-background"
+              />
+              <button onClick={copy} className="px-2 rounded bg-gold text-bg-secondary">
+                <Copy className="w-3.5 h-3.5" />
+              </button>
             </div>
-            <button onClick={onClose} className="w-full mt-2 px-3 py-2 text-xs font-mono rounded border border-border hover:bg-accent">Cerrar</button>
+            <button
+              onClick={onClose}
+              className="w-full mt-2 px-3 py-2 text-xs font-mono rounded border border-border hover:bg-accent"
+            >
+              Cerrar
+            </button>
           </div>
         ) : (
           <form onSubmit={submit} className="p-4 space-y-3">
             <label className="block">
-              <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">Email</div>
+              <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">
+                Email
+              </div>
               <input
                 type="email"
                 required

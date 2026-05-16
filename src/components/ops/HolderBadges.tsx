@@ -14,7 +14,11 @@ export function HolderBadges({ counts }: { counts: Counts }) {
         const Icon = it.icon;
         if (it.n === 0) return null;
         return (
-          <span key={it.title} title={`${it.title}: ${it.n}`} className={`inline-flex items-center gap-0.5 ${it.color}`}>
+          <span
+            key={it.title}
+            title={`${it.title}: ${it.n}`}
+            className={`inline-flex items-center gap-0.5 ${it.color}`}
+          >
             <Icon className="w-3 h-3" /> {it.n}
           </span>
         );

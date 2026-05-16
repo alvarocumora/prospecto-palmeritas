@@ -21,7 +21,13 @@ export function HolderLinksPanel({
     if (!url.trim()) return;
     setBusy(true);
     try {
-      await addExternal({ holderId, projectId, userId, url: url.trim(), label: label.trim() || undefined });
+      await addExternal({
+        holderId,
+        projectId,
+        userId,
+        url: url.trim(),
+        label: label.trim() || undefined,
+      });
       setUrl("");
       setLabel("");
       toast.success("Enlace agregado");
@@ -50,7 +56,8 @@ export function HolderLinksPanel({
       <div className="border border-border rounded">
         <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-bg-secondary/40">
           <div className="font-mono text-[11px] uppercase tracking-wider text-text-secondary inline-flex items-center gap-1.5">
-            <Newspaper className="w-3.5 h-3.5 text-signal-cyan" /> Boletín minero ({data.bulletins.length})
+            <Newspaper className="w-3.5 h-3.5 text-signal-cyan" /> Boletín minero (
+            {data.bulletins.length})
           </div>
           <button
             onClick={onRescan}
@@ -63,7 +70,9 @@ export function HolderLinksPanel({
         {loading ? (
           <div className="p-3 text-xs text-text-secondary text-center">Cargando…</div>
         ) : data.bulletins.length === 0 ? (
-          <div className="p-3 text-xs text-text-secondary text-center">Sin coincidencias. Usa "Re-escanear" tras editar el RUT/nombre.</div>
+          <div className="p-3 text-xs text-text-secondary text-center">
+            Sin coincidencias. Usa "Re-escanear" tras editar el RUT/nombre.
+          </div>
         ) : (
           <div className="divide-y divide-border">
             {data.bulletins.map((l) => (
@@ -74,19 +83,34 @@ export function HolderLinksPanel({
                 <div className="min-w-0 flex-1">
                   <div className="truncate">
                     <span className="font-medium">{l.bulletin?.publication_type ?? "—"}</span>
-                    {l.bulletin?.concession_name && <span className="text-text-secondary"> · {l.bulletin.concession_name}</span>}
+                    {l.bulletin?.concession_name && (
+                      <span className="text-text-secondary"> · {l.bulletin.concession_name}</span>
+                    )}
                   </div>
                   <div className="text-[10px] text-text-secondary">
                     N° {l.bulletin?.publication_number ?? "—"} · {l.bulletin?.comuna ?? "—"}
-                    {l.auto_matched && <span className="ml-2 inline-flex items-center gap-0.5 text-signal-cyan"><Sparkles className="w-2.5 h-2.5" />auto</span>}
+                    {l.auto_matched && (
+                      <span className="ml-2 inline-flex items-center gap-0.5 text-signal-cyan">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        auto
+                      </span>
+                    )}
                   </div>
                 </div>
                 {l.bulletin?.source_url && (
-                  <a href={l.bulletin.source_url} target="_blank" rel="noreferrer" className="p-1 hover:bg-accent rounded">
+                  <a
+                    href={l.bulletin.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-1 hover:bg-accent rounded"
+                  >
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
-                <button onClick={() => remove(l.id).catch(() => toast.error("Error"))} className="p-1 hover:bg-destructive/20 text-destructive rounded">
+                <button
+                  onClick={() => remove(l.id).catch(() => toast.error("Error"))}
+                  className="p-1 hover:bg-destructive/20 text-destructive rounded"
+                >
                   <Trash2 className="w-3 h-3" />
                 </button>
               </div>
@@ -117,15 +141,28 @@ export function HolderLinksPanel({
                   </div>
                   <div className="text-[10px] text-text-secondary truncate">
                     {l.case?.court ?? "—"} · {l.case?.filed_at ?? ""} · {l.case?.status ?? ""}
-                    {l.auto_matched && <span className="ml-2 inline-flex items-center gap-0.5 text-signal-cyan"><Sparkles className="w-2.5 h-2.5" />auto</span>}
+                    {l.auto_matched && (
+                      <span className="ml-2 inline-flex items-center gap-0.5 text-signal-cyan">
+                        <Sparkles className="w-2.5 h-2.5" />
+                        auto
+                      </span>
+                    )}
                   </div>
                 </div>
                 {l.case?.source_url && (
-                  <a href={l.case.source_url} target="_blank" rel="noreferrer" className="p-1 hover:bg-accent rounded">
+                  <a
+                    href={l.case.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="p-1 hover:bg-accent rounded"
+                  >
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
-                <button onClick={() => remove(l.id).catch(() => toast.error("Error"))} className="p-1 hover:bg-destructive/20 text-destructive rounded">
+                <button
+                  onClick={() => remove(l.id).catch(() => toast.error("Error"))}
+                  className="p-1 hover:bg-destructive/20 text-destructive rounded"
+                >
                   <Trash2 className="w-3 h-3" />
                 </button>
               </div>
@@ -166,10 +203,18 @@ export function HolderLinksPanel({
               {data.external.map((l) => (
                 <div key={l.id} className="px-2 py-1.5 text-xs flex items-center gap-2">
                   <ExternalLink className="w-3 h-3 text-text-secondary" />
-                  <a href={l.external_url ?? "#"} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate hover:underline">
+                  <a
+                    href={l.external_url ?? "#"}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="min-w-0 flex-1 truncate hover:underline"
+                  >
                     {l.label || l.external_url}
                   </a>
-                  <button onClick={() => remove(l.id).catch(() => toast.error("Error"))} className="p-1 hover:bg-destructive/20 text-destructive rounded">
+                  <button
+                    onClick={() => remove(l.id).catch(() => toast.error("Error"))}
+                    className="p-1 hover:bg-destructive/20 text-destructive rounded"
+                  >
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>

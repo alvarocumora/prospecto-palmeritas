@@ -58,7 +58,7 @@ function getDrivers(inputs: FusionScoreInputs): string[] {
 
 export function calculateFusionScore(
   inputs: FusionScoreInputs,
-  weights: FusionScoreWeights = DEFAULT_FUSION_SCORE_WEIGHTS
+  weights: FusionScoreWeights = DEFAULT_FUSION_SCORE_WEIGHTS,
 ): FusionScore {
   const normalizedWeights = normalizeWeights(weights);
   const score = Math.round(
@@ -66,7 +66,7 @@ export function calculateFusionScore(
       clampScore(inputs.geochemistry) * normalizedWeights.geochemistry +
       clampScore(inputs.structural) * normalizedWeights.structural +
       clampScore(inputs.satellite) * normalizedWeights.satellite +
-      clampScore(inputs.drilling) * normalizedWeights.drilling
+      clampScore(inputs.drilling) * normalizedWeights.drilling,
   );
 
   return {

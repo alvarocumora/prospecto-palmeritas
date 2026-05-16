@@ -15,7 +15,10 @@ function colorFor(sensor: string): string {
 }
 
 function escape(s: string): string {
-  return s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c] as string));
+  return s.replace(
+    /[&<>"]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c] as string,
+  );
 }
 
 function flightPopup(f: DroneFlight): string {
@@ -78,7 +81,10 @@ export function buildDroneLayer(
     try {
       const overlay = L.imageOverlay(
         r.url,
-        [[minLat, minLng], [maxLat, maxLng]],
+        [
+          [minLat, minLng],
+          [maxLat, maxLng],
+        ],
         { opacity: 0.75, interactive: true },
       );
       overlay.bindPopup(rasterPopup(r));

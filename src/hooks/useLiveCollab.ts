@@ -58,7 +58,9 @@ export function useLiveCollab(projectId: string | null) {
         if (cancelled) return;
         displayNameRef.current = data?.display_name ?? user.email?.split("@")[0] ?? "Anon";
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   // Load + subscribe annotations (always on, regardless of "sharing")
@@ -82,7 +84,12 @@ export function useLiveCollab(projectId: string | null) {
       .channel(`annot:${projectId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "map_annotations", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "map_annotations",
+          filter: `project_id=eq.${projectId}`,
+        },
         (payload) => {
           setAnnotations((prev) => {
             if (payload.eventType === "INSERT") {
@@ -163,31 +170,37 @@ export function useLiveCollab(projectId: string | null) {
 
   // Throttled cursor broadcast
   const lastSentRef = useRef(0);
-  const broadcastCursor = useCallback((lat: number, lng: number) => {
-    if (!sharing || !channelRef.current || !user) return;
-    const now = Date.now();
-    if (now - lastSentRef.current < 80) return; // ~12 Hz max
-    lastSentRef.current = now;
-    void channelRef.current.track({
-      display_name: displayNameRef.current || "Anon",
-      color: colorForUser(user.id),
-      lat,
-      lng,
-      ts: now,
-    });
-  }, [sharing, user]);
+  const broadcastCursor = useCallback(
+    (lat: number, lng: number) => {
+      if (!sharing || !channelRef.current || !user) return;
+      const now = Date.now();
+      if (now - lastSentRef.current < 80) return; // ~12 Hz max
+      lastSentRef.current = now;
+      void channelRef.current.track({
+        display_name: displayNameRef.current || "Anon",
+        color: colorForUser(user.id),
+        lat,
+        lng,
+        ts: now,
+      });
+    },
+    [sharing, user],
+  );
 
   // Annotation CRUD
-  const addAnnotation = useCallback(async (lat: number, lng: number, text: string) => {
-    if (!projectId || !user) return null;
-    const { data, error } = await supabase
-      .from("map_annotations")
-      .insert({ project_id: projectId, created_by: user.id, lat, lng, text, color: "gold" })
-      .select()
-      .single();
-    if (error) throw error;
-    return data as MapAnnotation;
-  }, [projectId, user]);
+  const addAnnotation = useCallback(
+    async (lat: number, lng: number, text: string) => {
+      if (!projectId || !user) return null;
+      const { data, error } = await supabase
+        .from("map_annotations")
+        .insert({ project_id: projectId, created_by: user.id, lat, lng, text, color: "gold" })
+        .select()
+        .single();
+      if (error) throw error;
+      return data as MapAnnotation;
+    },
+    [projectId, user],
+  );
 
   const toggleResolved = useCallback(async (id: string, resolved: boolean) => {
     const { error } = await supabase.from("map_annotations").update({ resolved }).eq("id", id);

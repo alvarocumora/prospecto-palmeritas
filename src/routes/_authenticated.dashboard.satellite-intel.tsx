@@ -31,9 +31,10 @@ function SatelliteIntelPage() {
     );
   }
 
-  const bbox = active.center_lat != null && active.center_lng != null
-    ? bboxFromCenter(active.center_lat, active.center_lng, 8)
-    : null;
+  const bbox =
+    active.center_lat != null && active.center_lng != null
+      ? bboxFromCenter(active.center_lat, active.center_lng, 8)
+      : null;
 
   const getSections = () => [
     { id: "map", title: "1. Visor de Mapa (AOI y capas)", element: mapRef.current },
@@ -58,9 +59,18 @@ function SatelliteIntelPage() {
     {
       title: "Metodologías por módulo",
       rows: [
-        ["Hiperespectral", "Productos EMIT/ASTER procesados con índices SWIR para minerales arcillosos, óxidos y carbonatos."],
-        ["InSAR", "Series de desplazamiento LOS Sentinel-1 con coherencia y velocidad media; alertas por |v| ≥ 15 mm/yr."],
-        ["DEM-diff", "Diferencia DEM multi-temporal para volúmenes de stockpiles y cambios morfológicos."],
+        [
+          "Hiperespectral",
+          "Productos EMIT/ASTER procesados con índices SWIR para minerales arcillosos, óxidos y carbonatos.",
+        ],
+        [
+          "InSAR",
+          "Series de desplazamiento LOS Sentinel-1 con coherencia y velocidad media; alertas por |v| ≥ 15 mm/yr.",
+        ],
+        [
+          "DEM-diff",
+          "Diferencia DEM multi-temporal para volúmenes de stockpiles y cambios morfológicos.",
+        ],
       ] as Array<[string, string]>,
     },
   ];
@@ -74,7 +84,8 @@ function SatelliteIntelPage() {
             Inteligencia Satelital
           </h1>
           <p className="text-xs text-text-secondary mt-1">
-            Mapeo mineral hiperespectral (EMIT/ASTER), monitoreo InSAR y volúmenes derivados de DEM. Proyecto: {active.name}.
+            Mapeo mineral hiperespectral (EMIT/ASTER), monitoreo InSAR y volúmenes derivados de DEM.
+            Proyecto: {active.name}.
           </p>
         </div>
         <SatelliteIntelPdfExport
@@ -87,7 +98,11 @@ function SatelliteIntelPage() {
       <section ref={mapRef}>
         <SatelliteMapViewer
           projectId={active.id}
-          center={active.center_lat != null && active.center_lng != null ? [Number(active.center_lat), Number(active.center_lng)] : null}
+          center={
+            active.center_lat != null && active.center_lng != null
+              ? [Number(active.center_lat), Number(active.center_lng)]
+              : null
+          }
         />
       </section>
 
@@ -106,21 +121,33 @@ function SatelliteIntelPage() {
       <section ref={insarRef}>
         <InsarMonitoringPanel
           projectId={active.id}
-          defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
+          defaultCenter={
+            active.center_lat != null && active.center_lng != null
+              ? [active.center_lat, active.center_lng]
+              : null
+          }
         />
       </section>
 
       <section ref={demRef}>
         <StockpileVolumesPanel
           projectId={active.id}
-          defaultCenter={active.center_lat != null && active.center_lng != null ? [active.center_lat, active.center_lng] : null}
+          defaultCenter={
+            active.center_lat != null && active.center_lng != null
+              ? [active.center_lat, active.center_lng]
+              : null
+          }
         />
       </section>
     </div>
   );
 }
 
-function bboxFromCenter(lat: number, lng: number, kmHalf: number): [number, number, number, number] {
+function bboxFromCenter(
+  lat: number,
+  lng: number,
+  kmHalf: number,
+): [number, number, number, number] {
   const dLat = kmHalf / 111;
   const dLng = kmHalf / (111 * Math.cos((lat * Math.PI) / 180));
   return [lng - dLng, lat - dLat, lng + dLng, lat + dLat];

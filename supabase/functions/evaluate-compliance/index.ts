@@ -51,7 +51,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: cors });
   if (req.method !== "POST") {
     return new Response(JSON.stringify({ error: "POST required" }), {
-      status: 405, headers: { ...cors, "Content-Type": "application/json" },
+      status: 405,
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 
@@ -59,7 +60,8 @@ Deno.serve(async (req) => {
     const { report_id, standards } = await req.json();
     if (!report_id) {
       return new Response(JSON.stringify({ error: "report_id required" }), {
-        status: 400, headers: { ...cors, "Content-Type": "application/json" },
+        status: 400,
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
@@ -76,17 +78,22 @@ Deno.serve(async (req) => {
     if (rErr) throw rErr;
     if (!report) {
       return new Response(JSON.stringify({ error: "report_not_found" }), {
-        status: 404, headers: { ...cors, "Content-Type": "application/json" },
+        status: 404,
+        headers: { ...cors, "Content-Type": "application/json" },
       });
     }
 
-    const activeStandards = (standards && standards.length ? standards : report.active_standards) ?? ["ni43101"];
+    const activeStandards = (standards && standards.length
+      ? standards
+      : report.active_standards) ?? ["ni43101"];
     const threshold = report.compliance_threshold ?? 95;
 
     // 2) Reglas aplicables
     const { data: rules, error: rulesErr } = await admin
       .from("compliance_rules")
-      .select("id, standard, rule_code, section_no, title, severity, evaluator_type, evaluator_config")
+      .select(
+        "id, standard, rule_code, section_no, title, severity, evaluator_type, evaluator_config",
+      )
       .in("standard", activeStandards)
       .order("display_order");
     if (rulesErr) throw rulesErr;
@@ -106,7 +113,7 @@ Deno.serve(async (req) => {
       .select("rule_id, evidence_type")
       .eq("report_id", report_id);
     const evidenceByRule = new Map<string, { type: string }[]>();
-    for (const ev of (evidence ?? [])) {
+    for (const ev of evidence ?? []) {
       const arr = evidenceByRule.get(ev.rule_id) ?? [];
       arr.push({ type: ev.evidence_type });
       evidenceByRule.set(ev.rule_id, arr);
@@ -126,8 +133,18 @@ Deno.serve(async (req) => {
       if (rule.evaluator_type === "manual") {
         // Conserva manual previa o marca pending
         result = prev
-          ? { status: prev.status, score: prev.score ?? 0, notes: prev.evaluator_notes, auto: false }
-          : { status: "pending", score: 0, notes: "Pendiente de revisión manual del QP", auto: false };
+          ? {
+              status: prev.status,
+              score: prev.score ?? 0,
+              notes: prev.evaluator_notes,
+              auto: false,
+            }
+          : {
+              status: "pending",
+              score: 0,
+              notes: "Pendiente de revisión manual del QP",
+              auto: false,
+            };
       } else if (rule.evaluator_type === "auto_count") {
         const cfg = rule.evaluator_config ?? {};
         const table = cfg.table as string;
@@ -153,7 +170,8 @@ Deno.serve(async (req) => {
         const cfg = rule.evaluator_config ?? {};
         const table = cfg.table as string;
         const field = cfg.field as string;
-        const refId = cfg.ref === "report" ? report.id : cfg.ref === "project" ? report.project_id : null;
+        const refId =
+          cfg.ref === "report" ? report.id : cfg.ref === "project" ? report.project_id : null;
         const refField = cfg.ref === "report" ? "id" : "id";
         let ok = false;
         let val: any = null;
@@ -212,7 +230,16 @@ Deno.serve(async (req) => {
     }
 
     // 7) Calcula scores por estándar
-    const byStandard: Record<string, { score: number; status: string; mandatory_pass: number; mandatory_total: number; rules_total: number }> = {};
+    const byStandard: Record<
+      string,
+      {
+        score: number;
+        status: string;
+        mandatory_pass: number;
+        mandatory_total: number;
+        rules_total: number;
+      }
+    > = {};
     for (const std of activeStandards) {
       const stdRules = ruleList.filter((r) => r.standard === std);
       let weightedScore = 0;
@@ -243,7 +270,9 @@ Deno.serve(async (req) => {
 
     // 8) Score global = promedio de estándares
     const stdScores = Object.values(byStandard).map((s) => s.score);
-    const globalScore = stdScores.length ? Math.round(stdScores.reduce((a, b) => a + b, 0) / stdScores.length) : 0;
+    const globalScore = stdScores.length
+      ? Math.round(stdScores.reduce((a, b) => a + b, 0) / stdScores.length)
+      : 0;
 
     // 9) Cachea en technical_reports
     await admin
@@ -271,7 +300,8 @@ Deno.serve(async (req) => {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("evaluate-compliance error:", msg);
     return new Response(JSON.stringify({ error: msg }), {
-      status: 500, headers: { ...cors, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...cors, "Content-Type": "application/json" },
     });
   }
 });

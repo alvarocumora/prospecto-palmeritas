@@ -117,8 +117,8 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           </div>
 
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Ingrese la contraseña compartida por el operador para acceder al
-            mapa en vivo, malla de sondaje y tablero de inteligencia geológica.
+            Ingrese la contraseña compartida por el operador para acceder al mapa en vivo, malla de
+            sondaje y tablero de inteligencia geológica.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -149,9 +149,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
             </div>
 
             {error && (
-              <div className="text-xs text-alert font-mono uppercase tracking-wider">
-                {error}
-              </div>
+              <div className="text-xs text-alert font-mono uppercase tracking-wider">{error}</div>
             )}
 
             <button

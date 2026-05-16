@@ -3,15 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  AlertTriangle,
-  Bell,
-  CheckCheck,
-  Clock,
-  RefreshCw,
-  Settings,
-  XCircle,
-} from "lucide-react";
+import { AlertTriangle, Bell, CheckCheck, Clock, RefreshCw, Settings, XCircle } from "lucide-react";
 import { ConcessionAlertSettings } from "@/components/ops/ConcessionAlertSettings";
 import {
   useConcessionAlerts,
@@ -133,13 +125,7 @@ export function ConcessionAlertsPanel({ projectId }: { projectId: string | null 
   );
 }
 
-function AlertRow({
-  alert,
-  onRead,
-}: {
-  alert: ConcessionAlert;
-  onRead: (id: string) => void;
-}) {
+function AlertRow({ alert, onRead }: { alert: ConcessionAlert; onRead: (id: string) => void }) {
   const style = SEVERITY_STYLE[alert.severity] ?? SEVERITY_STYLE.info;
   const Icon = style.icon;
   return (

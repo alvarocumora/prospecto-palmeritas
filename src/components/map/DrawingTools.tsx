@@ -27,18 +27,21 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
     groupRef.current = fg;
 
     const updateCount = () => setCount(fg.getLayers().length);
-    
+
     // Leaflet Draw events
-    map.on("draw:created" as never, ((e: { layer: L.Layer }) => {
-      fg.addLayer(e.layer);
-      updateCount();
-      setActiveTool(null);
-      activeHandlerRef.current = null;
-    }) as never);
-    
+    map.on(
+      "draw:created" as never,
+      ((e: { layer: L.Layer }) => {
+        fg.addLayer(e.layer);
+        updateCount();
+        setActiveTool(null);
+        activeHandlerRef.current = null;
+      }) as never,
+    );
+
     map.on("draw:deleted" as never, updateCount as never);
     map.on("draw:edited" as never, updateCount as never);
-    
+
     return () => {
       // Cleanup if necessary, but keeping group across remounts is preferred
     };
@@ -52,15 +55,17 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
     type DrawNS = { Polygon: DrawCtor; Polyline: DrawCtor; Marker: DrawCtor };
     const Draw = (L as unknown as { Draw: DrawNS }).Draw;
     let handler: DrawHandler;
-    
+
     if (tool === "polygon") {
       handler = new Draw.Polygon(map, { shapeOptions: { color: "#F5A524", weight: 2 } });
     } else if (tool === "polyline") {
-      handler = new Draw.Polyline(map, { shapeOptions: { color: "#E11D48", weight: 3, dashArray: "5 5" } });
+      handler = new Draw.Polyline(map, {
+        shapeOptions: { color: "#E11D48", weight: 3, dashArray: "5 5" },
+      });
     } else {
       handler = new Draw.Marker(map);
     }
-    
+
     handler.enable();
     activeHandlerRef.current = handler;
     setActiveTool(tool);
@@ -82,13 +87,13 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
     if (!fg) return;
     const fc = fg.toGeoJSON() as FeatureCollection<Geometry>;
     if (fc.features.length === 0) return;
-    
+
     // Tag features with a source label
     fc.features = fc.features.map((f: Feature, i: number) => ({
       ...f,
       properties: { ...(f.properties ?? {}), drawn_at: new Date().toISOString(), feature_index: i },
     }));
-    
+
     const blob = new Blob([JSON.stringify(fc, null, 2)], { type: "application/geo+json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -134,7 +139,12 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
         <span className="text-foreground font-semibold uppercase tracking-wide inline-flex items-center gap-1.5">
           <Pencil className="w-3.5 h-3.5" /> Dibujo
         </span>
-        <button type="button" onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Cerrar"
+        >
           <X className="w-3.5 h-3.5" />
         </button>
       </div>

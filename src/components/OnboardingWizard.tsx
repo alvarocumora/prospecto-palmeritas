@@ -2,7 +2,15 @@ import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
-import { Loader2, ChevronRight, ChevronLeft, Sparkles, MapPin, Mountain, Check } from "lucide-react";
+import {
+  Loader2,
+  ChevronRight,
+  ChevronLeft,
+  Sparkles,
+  MapPin,
+  Mountain,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 
 const COMMODITIES = ["Au", "Au-Cu", "Cu", "Cu-Mo", "Ag", "Pb-Zn", "Li", "Fe", "Otro"];
@@ -97,7 +105,10 @@ export function OnboardingWizard() {
         ))}
       </div>
 
-      <form onSubmit={submit} className="rounded border border-border bg-bg-secondary p-5 space-y-4">
+      <form
+        onSubmit={submit}
+        className="rounded border border-border bg-bg-secondary p-5 space-y-4"
+      >
         {step === 0 && (
           <>
             <Header icon={<Mountain className="w-4 h-4" />} title="Identidad del proyecto" />
@@ -230,7 +241,11 @@ export function OnboardingWizard() {
               disabled={saving || !stepValid}
               className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded bg-gold text-background font-mono text-xs font-semibold disabled:opacity-50"
             >
-              {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />}
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Check className="w-3.5 h-3.5" />
+              )}
               Crear proyecto
             </button>
           )}
@@ -249,7 +264,15 @@ function Header({ icon, title }: { icon: React.ReactNode; title: string }) {
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">

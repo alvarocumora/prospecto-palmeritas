@@ -90,16 +90,27 @@ export function MobileMapInspector({
             disabled={locating || !map}
             className="inline-flex items-center justify-center gap-2 h-12 rounded-md border border-border bg-background hover:bg-accent text-sm font-mono disabled:opacity-50 active:scale-95 transition"
           >
-            {locating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4 text-gold" />}
+            {locating ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Crosshair className="w-4 h-4 text-gold" />
+            )}
             <span>Mi ubicación</span>
           </button>
           <button
             type="button"
-            onClick={() => { setOpen(false); onSnapshot(); }}
+            onClick={() => {
+              setOpen(false);
+              onSnapshot();
+            }}
             disabled={snapshotting || !map}
             className="inline-flex items-center justify-center gap-2 h-12 rounded-md border border-border bg-background hover:bg-accent text-sm font-mono disabled:opacity-50 active:scale-95 transition"
           >
-            {snapshotting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Camera className="w-4 h-4 text-gold" />}
+            {snapshotting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Camera className="w-4 h-4 text-gold" />
+            )}
             <span>Snapshot</span>
           </button>
         </div>
@@ -125,7 +136,11 @@ export function MobileMapInspector({
           ) : (
             <div className="space-y-2 max-h-[40dvh] overflow-y-auto pr-1">
               {rasters.map((r) => {
-                const s = rasterSettings[r.id] ?? { visible: false, opacity: 0.75, colormap: "none" as const };
+                const s = rasterSettings[r.id] ?? {
+                  visible: false,
+                  opacity: 0.75,
+                  colormap: "none" as const,
+                };
                 return (
                   <div key={r.id} className="border border-border rounded p-2.5 bg-bg-secondary/40">
                     <div className="flex items-center justify-between gap-2 mb-1.5">
@@ -142,7 +157,9 @@ export function MobileMapInspector({
                     </div>
                     {s.visible && (
                       <div className="flex items-center gap-2 mt-2">
-                        <span className="text-[10px] font-mono text-muted-foreground w-12">Opacidad</span>
+                        <span className="text-[10px] font-mono text-muted-foreground w-12">
+                          Opacidad
+                        </span>
                         <Slider
                           value={[Math.round((s.opacity ?? 0.75) * 100)]}
                           min={0}

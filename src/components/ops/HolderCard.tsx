@@ -18,7 +18,9 @@ export function HolderCard({ holder }: { holder: HolderWithCounts }) {
             <span className="font-mono text-sm font-semibold truncate">{holder.name}</span>
           </div>
           <div className="mt-1 grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-text-secondary">
-            <span>RUT: <span className="font-mono text-foreground">{holder.rut ?? "—"}</span></span>
+            <span>
+              RUT: <span className="font-mono text-foreground">{holder.rut ?? "—"}</span>
+            </span>
             <span>Tipo: {HOLDER_TYPE_LABELS[holder.holder_type] ?? holder.holder_type}</span>
             {holder.region && <span>Región: {holder.region}</span>}
             {holder.legal_repr_name && <span>R. legal: {holder.legal_repr_name}</span>}
@@ -28,7 +30,13 @@ export function HolderCard({ holder }: { holder: HolderWithCounts }) {
           <span className="font-mono text-[10px] text-text-secondary">
             {holder.concessions_count} CONCES.
           </span>
-          <HolderBadges counts={{ files: holder.files_count, bulletins: holder.bulletins_count, cases: holder.cases_count }} />
+          <HolderBadges
+            counts={{
+              files: holder.files_count,
+              bulletins: holder.bulletins_count,
+              cases: holder.cases_count,
+            }}
+          />
         </div>
       </div>
     </Link>

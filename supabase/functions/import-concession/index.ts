@@ -21,7 +21,9 @@ type ArcgisFeature = {
   geometry?: { rings?: number[][][] };
 };
 
-async function queryArcgis(code: string): Promise<{ feature: ArcgisFeature; layer: number } | null> {
+async function queryArcgis(
+  code: string,
+): Promise<{ feature: ArcgisFeature; layer: number } | null> {
   const safe = code.replace(/'/g, "''");
   for (const layer of LAYERS) {
     const params = new URLSearchParams({
@@ -125,7 +127,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_ANON_KEY")!,
       { global: { headers: { Authorization: authHeader } } },
     );
-    const { data: { user } } = await userClient.auth.getUser();
+    const {
+      data: { user },
+    } = await userClient.auth.getUser();
     if (!user) {
       return new Response(JSON.stringify({ error: "not authenticated" }), {
         status: 401,
@@ -145,7 +149,10 @@ Deno.serve(async (req) => {
       id?: string;
     };
     const results: Result[] = [];
-    let imported = 0, skipped = 0, failed = 0, notFound = 0;
+    let imported = 0,
+      skipped = 0,
+      failed = 0,
+      notFound = 0;
 
     for (const rawCode of codes) {
       const code = String(rawCode).trim();
@@ -160,7 +167,12 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (existing) {
         skipped++;
-        results.push({ code, status: "skipped", message: "Ya existe en el proyecto", id: existing.id });
+        results.push({
+          code,
+          status: "skipped",
+          message: "Ya existe en el proyecto",
+          id: existing.id,
+        });
         continue;
       }
 

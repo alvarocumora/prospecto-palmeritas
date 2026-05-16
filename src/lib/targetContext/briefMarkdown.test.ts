@@ -47,7 +47,7 @@ Categorías: **target, intercept**
         ...context,
         fusionScore: { score: 10, confidence: "low", drivers: [] },
         evidenceSummary: { total: 0, categories: [], labels: [] },
-      })
+      }),
     ).toContain("- Sin datos disponibles");
   });
 });

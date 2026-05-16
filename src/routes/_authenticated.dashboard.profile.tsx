@@ -11,7 +11,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/profile")({
 });
 
 const SPECIALTIES = ["exploración", "geotécnico", "geofísico", "catastro", "geoquímico", "otro"];
-const LANGUAGES = [{ v: "es", l: "Español" }, { v: "en", l: "English" }, { v: "pt", l: "Português" }];
+const LANGUAGES = [
+  { v: "es", l: "Español" },
+  { v: "en", l: "English" },
+  { v: "pt", l: "Português" },
+];
 
 function ProfilePage() {
   const { user, refreshProfile } = useAuth();
@@ -54,7 +58,10 @@ function ProfilePage() {
     e.preventDefault();
     if (!user) return;
     setSaving(true);
-    const certs = form.certifications.split(",").map((s) => s.trim()).filter(Boolean);
+    const certs = form.certifications
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -80,40 +87,82 @@ function ProfilePage() {
   return (
     <div className="p-4 md:p-8 max-w-2xl mx-auto pb-20 md:pb-8">
       <header className="mb-6">
-        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Cuenta</div>
+        <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+          Cuenta
+        </div>
         <h1 className="text-xl md:text-2xl font-bold mt-1">Mi Perfil</h1>
         <p className="text-xs text-muted-foreground mt-1">{user?.email}</p>
       </header>
 
-      <form onSubmit={submit} className="space-y-4 rounded border border-border bg-bg-secondary p-4">
+      <form
+        onSubmit={submit}
+        className="space-y-4 rounded border border-border bg-bg-secondary p-4"
+      >
         <Field label="Nombre">
-          <input value={form.display_name} onChange={(e) => setForm({ ...form, display_name: e.target.value })} className={inp} />
+          <input
+            value={form.display_name}
+            onChange={(e) => setForm({ ...form, display_name: e.target.value })}
+            className={inp}
+          />
         </Field>
         <Field label="Organización">
-          <input value={form.organization} onChange={(e) => setForm({ ...form, organization: e.target.value })} className={inp} />
+          <input
+            value={form.organization}
+            onChange={(e) => setForm({ ...form, organization: e.target.value })}
+            className={inp}
+          />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Especialidad">
-            <select value={form.specialty} onChange={(e) => setForm({ ...form, specialty: e.target.value })} className={inp}>
+            <select
+              value={form.specialty}
+              onChange={(e) => setForm({ ...form, specialty: e.target.value })}
+              className={inp}
+            >
               <option value="">— elegir —</option>
-              {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
+              {SPECIALTIES.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </select>
           </Field>
           <Field label="Idioma">
-            <select value={form.language} onChange={(e) => setForm({ ...form, language: e.target.value })} className={inp}>
-              {LANGUAGES.map((l) => <option key={l.v} value={l.v}>{l.l}</option>)}
+            <select
+              value={form.language}
+              onChange={(e) => setForm({ ...form, language: e.target.value })}
+              className={inp}
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l.v} value={l.v}>
+                  {l.l}
+                </option>
+              ))}
             </select>
           </Field>
         </div>
         <Field label="Certificaciones (separadas por coma)">
-          <input value={form.certifications} onChange={(e) => setForm({ ...form, certifications: e.target.value })} placeholder="QP NI 43-101, JORC CP" className={inp} />
+          <input
+            value={form.certifications}
+            onChange={(e) => setForm({ ...form, certifications: e.target.value })}
+            placeholder="QP NI 43-101, JORC CP"
+            className={inp}
+          />
         </Field>
         <div className="grid grid-cols-2 gap-3">
           <Field label="Teléfono">
-            <input value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className={inp} />
+            <input
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              className={inp}
+            />
           </Field>
           <Field label="País">
-            <input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} className={inp} />
+            <input
+              value={form.country}
+              onChange={(e) => setForm({ ...form, country: e.target.value })}
+              className={inp}
+            />
           </Field>
         </div>
         <button
@@ -129,7 +178,8 @@ function ProfilePage() {
   );
 }
 
-const inp = "w-full px-2 py-1.5 text-xs font-mono rounded border border-border bg-background focus:outline-none focus:border-gold";
+const inp =
+  "w-full px-2 py-1.5 text-xs font-mono rounded border border-border bg-background focus:outline-none focus:border-gold";
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (

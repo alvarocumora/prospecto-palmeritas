@@ -52,7 +52,8 @@ export function InstallPwaButton() {
         </button>
         {showIosHint && (
           <div className="absolute top-12 right-3 z-[1100] max-w-[260px] p-3 rounded-md border border-border bg-bg-panel/95 backdrop-blur shadow-lg text-[11px] font-mono text-foreground">
-            En Safari: toca <strong>Compartir</strong> ⬆️ y luego <strong>Añadir a pantalla de inicio</strong>.
+            En Safari: toca <strong>Compartir</strong> ⬆️ y luego{" "}
+            <strong>Añadir a pantalla de inicio</strong>.
             <button
               onClick={() => setShowIosHint(false)}
               className="block mt-2 text-gold underline text-[10px]"

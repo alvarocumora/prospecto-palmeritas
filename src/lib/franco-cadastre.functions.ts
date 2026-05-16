@@ -64,25 +64,53 @@ export const getFrancoCadastreCross = createServerFn({ method: "POST" })
       if (error) {
         console.error("franco_match_pertenencia error", error);
         rows.push({
-          kmlName, concessionId: null, concessionCode: null, concessionName: null,
-          holder: null, type: null, status: null, areaHaDb: null,
-          commune: null, region: null, overlapHa: 0, pctOfKml: 0, pctOfConcession: 0,
+          kmlName,
+          concessionId: null,
+          concessionCode: null,
+          concessionName: null,
+          holder: null,
+          type: null,
+          status: null,
+          areaHaDb: null,
+          commune: null,
+          region: null,
+          overlapHa: 0,
+          pctOfKml: 0,
+          pctOfConcession: 0,
           matchKind: "NONE",
         });
         continue;
       }
       const matches = (data ?? []) as Array<{
-        concession_id: string; code: string; name: string; holder: string | null;
-        concession_type: string; status: string; area_ha: number | null;
-        commune: string | null; region: string | null;
-        overlap_ha: number; pct_of_kml: number; pct_of_concession: number;
+        concession_id: string;
+        code: string;
+        name: string;
+        holder: string | null;
+        concession_type: string;
+        status: string;
+        area_ha: number | null;
+        commune: string | null;
+        region: string | null;
+        overlap_ha: number;
+        pct_of_kml: number;
+        pct_of_concession: number;
         match_kind: "EXACT" | "NAME~" | "GEOM";
       }>;
       if (matches.length === 0) {
         rows.push({
-          kmlName, concessionId: null, concessionCode: null, concessionName: null,
-          holder: null, type: null, status: null, areaHaDb: null,
-          commune: null, region: null, overlapHa: 0, pctOfKml: 0, pctOfConcession: 0,
+          kmlName,
+          concessionId: null,
+          concessionCode: null,
+          concessionName: null,
+          holder: null,
+          type: null,
+          status: null,
+          areaHaDb: null,
+          commune: null,
+          region: null,
+          overlapHa: 0,
+          pctOfKml: 0,
+          pctOfConcession: 0,
           matchKind: "NONE",
         });
         continue;

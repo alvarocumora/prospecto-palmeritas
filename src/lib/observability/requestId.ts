@@ -16,14 +16,16 @@ export function normalizeRequestId(value: string | null | undefined): string | n
 }
 
 export function createRequestId(scope = REQUEST_ID_PREFIX): string {
-  const safeScope = scope
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9-]/g, "-")
-    .replace(/-+/g, "-")
-    .replace(/^-|-$/g, "") || REQUEST_ID_PREFIX;
+  const safeScope =
+    scope
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || REQUEST_ID_PREFIX;
 
-  const randomPart = crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const randomPart =
+    crypto.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   return `${safeScope}:${randomPart}`;
 }
 

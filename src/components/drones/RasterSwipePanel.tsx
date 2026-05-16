@@ -72,7 +72,9 @@ export function RasterSwipePanel({ rasters, mapInst }: Props) {
       const px = Math.max(0, Math.min(rect.width, x - rect.left));
       setSplitPx(px);
     };
-    const onUp = () => { dragRef.current = false; };
+    const onUp = () => {
+      dragRef.current = false;
+    };
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
     window.addEventListener("touchmove", onMove);
@@ -101,7 +103,9 @@ export function RasterSwipePanel({ rasters, mapInst }: Props) {
         </button>
         {open && (
           <div className="rounded-md bg-bg-secondary/95 backdrop-blur border border-border p-3 w-72 space-y-2 shadow-lg">
-            <div className="text-[11px] font-mono text-muted-foreground uppercase">Comparar (antes / después)</div>
+            <div className="text-[11px] font-mono text-muted-foreground uppercase">
+              Comparar (antes / después)
+            </div>
             <label className="block text-xs">
               <span className="text-muted-foreground">A · izquierda</span>
               <select
@@ -156,8 +160,12 @@ export function RasterSwipePanel({ rasters, mapInst }: Props) {
         <div
           className="absolute top-0 bottom-0 w-1 bg-gold/80 z-[999] cursor-ew-resize shadow-[0_0_12px_rgba(240,201,107,0.6)]"
           style={{ left: `${splitPx}px` }}
-          onMouseDown={() => { dragRef.current = true; }}
-          onTouchStart={() => { dragRef.current = true; }}
+          onMouseDown={() => {
+            dragRef.current = true;
+          }}
+          onTouchStart={() => {
+            dragRef.current = true;
+          }}
         >
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-7 h-7 rounded-full bg-gold flex items-center justify-center">
             <GitCompareArrows className="h-3.5 w-3.5 text-bg-primary" />

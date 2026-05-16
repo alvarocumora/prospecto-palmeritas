@@ -62,9 +62,17 @@ export function GeophysicsModule({
   SectionTitle,
   Badge,
 }: {
-  Card: React.ComponentType<{ children: React.ReactNode; className?: string; accent?: "gold" | "copper" | "muted"; delay?: number }>;
+  Card: React.ComponentType<{
+    children: React.ReactNode;
+    className?: string;
+    accent?: "gold" | "copper" | "muted";
+    delay?: number;
+  }>;
   SectionTitle: React.ComponentType<{ icon?: any; children: React.ReactNode; sub?: string }>;
-  Badge: React.ComponentType<{ children: React.ReactNode; tone?: "gold" | "copper" | "teal" | "info" | "alert" | "muted" }>;
+  Badge: React.ComponentType<{
+    children: React.ReactNode;
+    tone?: "gold" | "copper" | "teal" | "info" | "alert" | "muted";
+  }>;
 }) {
   const { data, loading, error } = useGeophysicsData();
 
@@ -115,8 +123,12 @@ export function GeophysicsModule({
                       <td className="py-2 pr-3 text-right">{s.planned_km ?? "—"}</td>
                       <td className="py-2 pr-3 text-right">{s.station_spacing_m ?? "—"}</td>
                       <td className="py-2 pr-3 text-right">{s.expected_depth_m ?? "—"}</td>
-                      <td className="py-2 pr-3 text-right">{s.cost_usd?.toLocaleString("es-CL") ?? "—"}</td>
-                      <td className="py-2"><Badge tone="info">{s.status}</Badge></td>
+                      <td className="py-2 pr-3 text-right">
+                        {s.cost_usd?.toLocaleString("es-CL") ?? "—"}
+                      </td>
+                      <td className="py-2">
+                        <Badge tone="info">{s.status}</Badge>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -182,7 +194,9 @@ export function GeophysicsModule({
               <div className="p-3 rounded border border-border bg-bg-secondary">
                 <div className="text-muted-foreground uppercase text-[10px]">Promedio</div>
                 <div className="text-foreground text-base">
-                  {(data.stations.reduce((s, x) => s + (x.mag_nt ?? 0), 0) / data.stations.length).toFixed(0)}
+                  {(
+                    data.stations.reduce((s, x) => s + (x.mag_nt ?? 0), 0) / data.stations.length
+                  ).toFixed(0)}
                 </div>
               </div>
               <div className="p-3 rounded border border-border bg-bg-secondary">
@@ -208,7 +222,12 @@ export function GeophysicsModule({
                 <div className="text-foreground">{r.cite}</div>
                 <div className="text-muted-foreground">{r.work}</div>
                 {r.url && (
-                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="text-info text-[10px]">
+                  <a
+                    href={r.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-info text-[10px]"
+                  >
                     {r.url}
                   </a>
                 )}
@@ -217,8 +236,8 @@ export function GeophysicsModule({
           </ul>
           <p className="text-[10px] text-muted-foreground/70 mt-3">
             Overlays WMS regionales disponibles en el mapa: EMAG2 v3 (NOAA NCEI, anomalía magnética
-            global ~3.7 km) y WGM2012 (BGI/CGMW, gravimetría Bouguer). Ver toggle de capas arriba
-            a la derecha del mapa.
+            global ~3.7 km) y WGM2012 (BGI/CGMW, gravimetría Bouguer). Ver toggle de capas arriba a
+            la derecha del mapa.
           </p>
         </div>
       </Card>

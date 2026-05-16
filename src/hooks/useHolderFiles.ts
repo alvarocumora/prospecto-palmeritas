@@ -55,7 +55,16 @@ export function useHolderFiles(holderId: string | null) {
   }, [refresh]);
 
   const upload = useCallback(
-    async (file: File, opts: { holderId: string; projectId: string; userId: string; fileType: string; description?: string }) => {
+    async (
+      file: File,
+      opts: {
+        holderId: string;
+        projectId: string;
+        userId: string;
+        fileType: string;
+        description?: string;
+      },
+    ) => {
       const id = crypto.randomUUID();
       const safe = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
       const path = `${opts.projectId}/${opts.holderId}/${id}-${safe}`;
@@ -88,7 +97,9 @@ export function useHolderFiles(holderId: string | null) {
   );
 
   const getDownloadUrl = useCallback(async (path: string) => {
-    const { data: signed } = await supabase.storage.from("holder-files").createSignedUrl(path, 60 * 10);
+    const { data: signed } = await supabase.storage
+      .from("holder-files")
+      .createSignedUrl(path, 60 * 10);
     return signed?.signedUrl ?? null;
   }, []);
 

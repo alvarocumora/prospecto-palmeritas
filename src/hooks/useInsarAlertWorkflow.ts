@@ -37,7 +37,13 @@ export function useAddInsarAction() {
     mutationFn: (vars: {
       projectId: string;
       insarId: string;
-      actionType: "recommendation" | "status_change" | "dismissed" | "escalated" | "field_inspection" | "closed";
+      actionType:
+        | "recommendation"
+        | "status_change"
+        | "dismissed"
+        | "escalated"
+        | "field_inspection"
+        | "closed";
       recommendation?: string;
       notes?: string;
     }) => fn({ data: vars }),

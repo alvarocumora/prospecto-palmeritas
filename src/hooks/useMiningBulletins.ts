@@ -179,7 +179,9 @@ export function useCourtCases(limit = 100) {
     setLoading(false);
   }, [limit]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
   return { data, loading, refresh };
 }
 
@@ -188,7 +190,11 @@ export function useCourtCaseAlerts(projectId: string | null) {
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setData([]); setLoading(false); return; }
+    if (!projectId) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: rows } = await supabase
       .from("court_case_alerts")
@@ -200,15 +206,20 @@ export function useCourtCaseAlerts(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const markRead = useCallback(async (alertId: string) => {
-    await supabase
-      .from("court_case_alerts")
-      .update({ is_read: true, read_at: new Date().toISOString() })
-      .eq("id", alertId);
+  useEffect(() => {
     refresh();
   }, [refresh]);
+
+  const markRead = useCallback(
+    async (alertId: string) => {
+      await supabase
+        .from("court_case_alerts")
+        .update({ is_read: true, read_at: new Date().toISOString() })
+        .eq("id", alertId);
+      refresh();
+    },
+    [refresh],
+  );
 
   return { data, loading, refresh, markRead };
 }

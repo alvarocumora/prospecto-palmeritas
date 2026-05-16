@@ -9,7 +9,10 @@ export function useStockpileVolumes(projectId: string | null) {
   const [loading, setLoading] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setItems([]); return; }
+    if (!projectId) {
+      setItems([]);
+      return;
+    }
     setLoading(true);
     const { data } = await supabase
       .from("stockpile_volumes")
@@ -21,7 +24,9 @@ export function useStockpileVolumes(projectId: string | null) {
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
     if (!projectId) return;
@@ -29,11 +34,18 @@ export function useStockpileVolumes(projectId: string | null) {
       .channel(`stockpiles-${projectId}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "stockpile_volumes", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "stockpile_volumes",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .subscribe();
-    return () => { supabase.removeChannel(ch); };
+    return () => {
+      supabase.removeChannel(ch);
+    };
   }, [projectId, refresh]);
 
   return { items, loading, refresh };

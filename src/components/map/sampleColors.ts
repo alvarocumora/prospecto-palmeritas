@@ -1,11 +1,11 @@
 /** Au-grade color/size scale for sample markers. */
 export function auColor(au: number | null | undefined): string {
   if (au == null || au <= 0) return "#64748b"; // slate
-  if (au < 0.1) return "#0ea5e9";  // sky
-  if (au < 0.5) return "#14b8a6";  // teal
-  if (au < 1.0) return "#eab308";  // yellow
-  if (au < 5.0) return "#f97316";  // orange
-  return "#dc2626";                // red
+  if (au < 0.1) return "#0ea5e9"; // sky
+  if (au < 0.5) return "#14b8a6"; // teal
+  if (au < 1.0) return "#eab308"; // yellow
+  if (au < 5.0) return "#f97316"; // orange
+  return "#dc2626"; // red
 }
 
 export function auRadius(au: number | null | undefined): number {

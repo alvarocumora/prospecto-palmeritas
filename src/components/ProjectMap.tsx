@@ -1,6 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Maximize2, Minimize2, Wrench, Ruler, Crosshair, Download, Layers, Pencil } from "lucide-react";
-import type { Control, GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
+import {
+  Maximize2,
+  Minimize2,
+  Wrench,
+  Ruler,
+  Crosshair,
+  Download,
+  Layers,
+  Pencil,
+} from "lucide-react";
+import type {
+  Control,
+  GeoJSON as LeafletGeoJSON,
+  Layer,
+  Map as LeafletMap,
+  LayerGroup,
+} from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
@@ -39,9 +54,17 @@ import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
 import { useDrillHoles } from "@/hooks/useDrilling";
 import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
-import { computeIntercepts, bestIntercept, interceptScore, scoreToHaloStyle } from "@/lib/drilling/intercepts";
+import {
+  computeIntercepts,
+  bestIntercept,
+  interceptScore,
+  scoreToHaloStyle,
+} from "@/lib/drilling/intercepts";
 import { buildConcessionsLayer } from "./map/concessionLayer";
-import { buildConcesionesNacionalesLayer, type ConcesionTipo } from "./map/concesionesNacionalesLayer";
+import {
+  buildConcesionesNacionalesLayer,
+  type ConcesionTipo,
+} from "./map/concesionesNacionalesLayer";
 import { buildDrillCollarsLayer } from "./map/drillCollarsLayer";
 import { useLayerState, type LayerStateMap } from "@/hooks/useLayerState";
 import { LayerOpacityPanel, type ManagedLayer } from "./map/LayerOpacityPanel";
@@ -79,10 +102,7 @@ const ORIGEN_ORDER: CatastroOrigen[] = [
   "ESTACAMENTO",
 ];
 
-const DEFAULT_VISIBLE: ReadonlySet<CatastroOrigen> = new Set([
-  "EXPLOTA_1983",
-  "EXPLORA_1983",
-]);
+const DEFAULT_VISIBLE: ReadonlySet<CatastroOrigen> = new Set(["EXPLOTA_1983", "EXPLORA_1983"]);
 
 const DEFAULT_LAYER_STATE: LayerStateMap = {
   "basemap:esri-imagery": { visible: true, opacity: 1 },
@@ -120,7 +140,13 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "sernageomin:manifestacion": { visible: false, opacity: 0.55 },
 };
 
-export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemapOverride }: ProjectMapProps = {}) {
+export function ProjectMap({
+  samples,
+  onInspect,
+  fillHeight,
+  onMapReady,
+  basemapOverride,
+}: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -154,7 +180,9 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
   const { flights: droneFlights, rasters: droneRasters } = useDroneFlights(active?.id ?? null);
   const { targets } = useExplorationTargets(active?.id ?? null);
   const targetsRef = useRef<typeof targets>(targets);
-  useEffect(() => { targetsRef.current = targets; }, [targets]);
+  useEffect(() => {
+    targetsRef.current = targets;
+  }, [targets]);
   const targetsLayerRef = useRef<LayerGroup | null>(null);
   const scoresByHole = useMemo(() => {
     const out: Record<string, number> = {};
@@ -276,7 +304,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
       try {
         const MiniMapMod = await import("leaflet-minimap");
         await import("leaflet-minimap/dist/Control.MiniMap.min.css");
-        const MiniMap = (MiniMapMod as unknown as { default: new (layer: unknown, opts: unknown) => { addTo: (m: unknown) => void } }).default;
+        const MiniMap = (
+          MiniMapMod as unknown as {
+            default: new (layer: unknown, opts: unknown) => { addTo: (m: unknown) => void };
+          }
+        ).default;
         const miniLayer = L.tileLayer(
           "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
           { attribution: "", maxZoom: 13 },
@@ -288,7 +320,12 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           zoomLevelOffset: -5,
           toggleDisplay: true,
           minimized: false,
-          aimingRectOptions: { color: "#D4A24C", weight: 1, fillColor: "#D4A24C", fillOpacity: 0.15 },
+          aimingRectOptions: {
+            color: "#D4A24C",
+            weight: 1,
+            fillColor: "#D4A24C",
+            fillOpacity: 0.15,
+          },
           shadowRectOptions: { color: "#D4A24C", weight: 1, opacity: 0, fillOpacity: 0 },
         }).addTo(map);
       } catch (err) {
@@ -309,8 +346,8 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
 
       const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
         [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
-          fetch(u).then((r) => r.json())
-        )
+          fetch(u).then((r) => r.json()),
+        ),
       )) as AnyFC[];
       if (cancelled) return;
 
@@ -327,23 +364,112 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
 
       // Build managed layers list (basemaps + overlays). Catastro added later.
       const initial: ManagedLayer[] = [
-        { id: "basemap:esri-imagery", label: "Esri Imagery", group: "Basemap", layer: basemaps["Esri Imagery"], exclusive: true },
-        { id: "basemap:esri-topo", label: "Esri Topo", group: "Basemap", layer: basemaps["Esri Topo"], exclusive: true },
-        { id: "basemap:carto-dark", label: "CARTO Dark", group: "Basemap", layer: basemaps["CARTO Dark"], exclusive: true },
-        { id: "basemap:opentopo", label: "OpenTopoMap", group: "Basemap", layer: basemaps["OpenTopoMap"], exclusive: true },
-        { id: "geochile:litologia", label: "SERNAGEOMIN Geología 1:1M", group: "Geología Chile", layer: sernageomin.geologia1M },
-        { id: "geochile:yacimientos", label: "Yacimientos & faenas (SERNAGEOMIN)", group: "Geología Chile", layer: sernageomin.yacimientos },
-        { id: "geochile:areas-protegidas", label: "Áreas protegidas SNASPE", group: "Geología Chile", layer: sernageomin.areasProtegidas },
-        { id: "sat:s2-truecolor", label: "Sentinel-2 color verdadero (10 m)", group: "Satelital", layer: satellite.sentinel2TrueColor },
-        { id: "sat:s2-ndvi", label: "Sentinel-2 vegetación / NDVI", group: "Satelital", layer: satellite.sentinel2NDVI },
-        { id: "sat:worldcover", label: "ESA WorldCover 2021 (10 m)", group: "Satelital", layer: satellite.worldCover },
-        { id: "sat:copernicus-dem", label: "Copernicus DEM (relieve)", group: "Satelital", layer: satellite.copernicusDem },
-        { id: "geo:macrostrat", label: "Macrostrat (global, fallback)", group: "Geología", layer: geoOverlays["Geología Macrostrat (global)"] },
-        { id: "geophys:emag2", label: "Magnetometría EMAG2 (regional)", group: "Geofísica", layer: geophysicsWms["Magnetometría EMAG2 (regional)"] },
-        { id: "geophys:wgm2012", label: "Gravimetría WGM2012 (regional)", group: "Geofísica", layer: geophysicsWms["Gravimetría Bouguer WGM2012 (regional)"] },
-        { id: "geophys:hillshade", label: "Hillshade SRTM", group: "Geofísica", layer: geophysicsWms["Hillshade SRTM (Esri)"] },
-        { id: "ext:usgs-quakes", label: "Sismos USGS (último mes, M≥2.5)", group: "Datos externos", layer: usgsLayer },
-        { id: "ext:osm-infra", label: "OSM caminos & edificios (vista actual)", group: "Datos externos", layer: overpassCtl.group },
+        {
+          id: "basemap:esri-imagery",
+          label: "Esri Imagery",
+          group: "Basemap",
+          layer: basemaps["Esri Imagery"],
+          exclusive: true,
+        },
+        {
+          id: "basemap:esri-topo",
+          label: "Esri Topo",
+          group: "Basemap",
+          layer: basemaps["Esri Topo"],
+          exclusive: true,
+        },
+        {
+          id: "basemap:carto-dark",
+          label: "CARTO Dark",
+          group: "Basemap",
+          layer: basemaps["CARTO Dark"],
+          exclusive: true,
+        },
+        {
+          id: "basemap:opentopo",
+          label: "OpenTopoMap",
+          group: "Basemap",
+          layer: basemaps["OpenTopoMap"],
+          exclusive: true,
+        },
+        {
+          id: "geochile:litologia",
+          label: "SERNAGEOMIN Geología 1:1M",
+          group: "Geología Chile",
+          layer: sernageomin.geologia1M,
+        },
+        {
+          id: "geochile:yacimientos",
+          label: "Yacimientos & faenas (SERNAGEOMIN)",
+          group: "Geología Chile",
+          layer: sernageomin.yacimientos,
+        },
+        {
+          id: "geochile:areas-protegidas",
+          label: "Áreas protegidas SNASPE",
+          group: "Geología Chile",
+          layer: sernageomin.areasProtegidas,
+        },
+        {
+          id: "sat:s2-truecolor",
+          label: "Sentinel-2 color verdadero (10 m)",
+          group: "Satelital",
+          layer: satellite.sentinel2TrueColor,
+        },
+        {
+          id: "sat:s2-ndvi",
+          label: "Sentinel-2 vegetación / NDVI",
+          group: "Satelital",
+          layer: satellite.sentinel2NDVI,
+        },
+        {
+          id: "sat:worldcover",
+          label: "ESA WorldCover 2021 (10 m)",
+          group: "Satelital",
+          layer: satellite.worldCover,
+        },
+        {
+          id: "sat:copernicus-dem",
+          label: "Copernicus DEM (relieve)",
+          group: "Satelital",
+          layer: satellite.copernicusDem,
+        },
+        {
+          id: "geo:macrostrat",
+          label: "Macrostrat (global, fallback)",
+          group: "Geología",
+          layer: geoOverlays["Geología Macrostrat (global)"],
+        },
+        {
+          id: "geophys:emag2",
+          label: "Magnetometría EMAG2 (regional)",
+          group: "Geofísica",
+          layer: geophysicsWms["Magnetometría EMAG2 (regional)"],
+        },
+        {
+          id: "geophys:wgm2012",
+          label: "Gravimetría WGM2012 (regional)",
+          group: "Geofísica",
+          layer: geophysicsWms["Gravimetría Bouguer WGM2012 (regional)"],
+        },
+        {
+          id: "geophys:hillshade",
+          label: "Hillshade SRTM",
+          group: "Geofísica",
+          layer: geophysicsWms["Hillshade SRTM (Esri)"],
+        },
+        {
+          id: "ext:usgs-quakes",
+          label: "Sismos USGS (último mes, M≥2.5)",
+          group: "Datos externos",
+          layer: usgsLayer,
+        },
+        {
+          id: "ext:osm-infra",
+          label: "OSM caminos & edificios (vista actual)",
+          group: "Datos externos",
+          layer: overpassCtl.group,
+        },
       ];
       setManagedLayers(initial);
       setMapReady(true);
@@ -357,7 +483,10 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
       try {
         const b = map.getBounds();
         const bbox: [number, number, number, number] = [
-          b.getWest(), b.getSouth(), b.getEast(), b.getNorth(),
+          b.getWest(),
+          b.getSouth(),
+          b.getEast(),
+          b.getNorth(),
         ];
         const nacLayers: ManagedLayer[] = [];
         for (const tipo of tiposNac) {
@@ -369,7 +498,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
             layer,
           });
         }
-        if (!cancelled) setManagedLayers((prev) => [...prev.filter((p) => !p.id.startsWith("sernageomin:")), ...nacLayers]);
+        if (!cancelled)
+          setManagedLayers((prev) => [
+            ...prev.filter((p) => !p.id.startsWith("sernageomin:")),
+            ...nacLayers,
+          ]);
       } catch (err) {
         console.warn("[sernageomin] failed:", err);
       }
@@ -400,7 +533,9 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
     const surveys = geoph.surveys;
     const surveyIds = new Set(surveys.map((s) => s.id));
     const linesAll = geoph.lines.filter((l) => l.survey_id == null || surveyIds.has(l.survey_id));
-    const stationsAll = geoph.stations.filter((s) => s.survey_id == null || surveyIds.has(s.survey_id));
+    const stationsAll = geoph.stations.filter(
+      (s) => s.survey_id == null || surveyIds.has(s.survey_id),
+    );
 
     const synLines = linesAll.filter((l) => l.is_synthetic);
     const synStations = stationsAll.filter((s) => s.is_synthetic);
@@ -579,8 +714,6 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
     });
   }, [targets, onInspect]);
 
-
-
   // Fullscreen toggle
   const toggleFullscreen = useCallback(async () => {
     const el = wrapperRef.current;
@@ -647,7 +780,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
       const pt: [number, number] = [latlng.lat, latlng.lng];
       measurePointsRef.current.push(pt);
       if (measureLineRef.current) map.removeLayer(measureLineRef.current);
-      const line = L.polyline(measurePointsRef.current, { color: "#F5A524", weight: 3, dashArray: "5 5" });
+      const line = L.polyline(measurePointsRef.current, {
+        color: "#F5A524",
+        weight: 3,
+        dashArray: "5 5",
+      });
       line.addTo(map);
       measureLineRef.current = line;
       let total = 0;
@@ -717,7 +854,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           {!layersOpen && (
             <button
               type="button"
-              onClick={() => { setLayersOpen(true); setToolsOpen(false); setDrawOpen(false); }}
+              onClick={() => {
+                setLayersOpen(true);
+                setToolsOpen(false);
+                setDrawOpen(false);
+              }}
               className="w-9 h-9 inline-flex items-center justify-center rounded border border-border bg-background/95 backdrop-blur text-foreground hover:bg-accent shadow-md transition-colors"
               title="Capas y opacidad (L)"
             >
@@ -726,7 +867,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           )}
           <button
             type="button"
-            onClick={() => { setDrawOpen((v) => !v); setToolsOpen(false); setLayersOpen(false); }}
+            onClick={() => {
+              setDrawOpen((v) => !v);
+              setToolsOpen(false);
+              setLayersOpen(false);
+            }}
             className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${drawOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
             title="Dibujo (D)"
           >
@@ -742,7 +887,11 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           </button>
           <button
             type="button"
-            onClick={() => { setToolsOpen((v) => !v); setLayersOpen(false); setDrawOpen(false); }}
+            onClick={() => {
+              setToolsOpen((v) => !v);
+              setLayersOpen(false);
+              setDrawOpen(false);
+            }}
             className={`w-9 h-9 inline-flex items-center justify-center rounded border border-border ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-foreground hover:bg-accent"} backdrop-blur shadow-md transition-colors`}
             title="Más herramientas"
           >
@@ -754,39 +903,74 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
           <div className="absolute top-3 right-14 z-[500] w-60 rounded border border-border bg-background/95 backdrop-blur shadow-lg p-3 text-xs font-mono space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-foreground font-semibold uppercase tracking-wide">Gestión</span>
-              <button type="button" onClick={() => setToolsOpen(false)} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">✕</button>
+              <button
+                type="button"
+                onClick={() => setToolsOpen(false)}
+                className="text-muted-foreground hover:text-foreground"
+                aria-label="Cerrar"
+              >
+                ✕
+              </button>
             </div>
             <div className="space-y-1.5">
               <div className="text-muted-foreground/70 text-[10px] uppercase">Navegación</div>
-              <button type="button" onClick={centerOnAoi} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors">
+              <button
+                type="button"
+                onClick={centerOnAoi}
+                className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors"
+              >
                 <Crosshair className="w-3.5 h-3.5" /> Centrar en AOI
               </button>
               {measureDist != null && (
                 <div className="flex items-center justify-between text-[10px] px-2 py-1 rounded bg-bg-secondary border border-border">
                   <span className="text-muted-foreground">Distancia</span>
-                  <span className="text-foreground font-semibold">{(measureDist / 1000).toFixed(2)} km</span>
-                  <button type="button" onClick={clearMeasure} className="text-muted-foreground hover:text-destructive">✕</button>
+                  <span className="text-foreground font-semibold">
+                    {(measureDist / 1000).toFixed(2)} km
+                  </span>
+                  <button
+                    type="button"
+                    onClick={clearMeasure}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    ✕
+                  </button>
                 </div>
               )}
             </div>
             <div className="space-y-1.5 border-t border-border pt-2">
               <div className="text-muted-foreground/70 text-[10px] uppercase">Catastro</div>
-              <button type="button" onClick={handleExportPdf} disabled={Object.values(counts).every((n) => !n)} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={Object.values(counts).every((n) => !n)}
+                className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors"
+              >
                 <Download className="w-3.5 h-3.5" /> PDF pertenencias
               </button>
-              <button type="button" onClick={handleRefresh} disabled={refreshing} className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors">
+              <button
+                type="button"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent disabled:opacity-50 transition-colors"
+              >
                 ↻ {refreshing ? "Refrescando…" : "Refrescar catastro"}
               </button>
             </div>
             <div className="text-[10px] text-muted-foreground/70 border-t border-border pt-2">
-              Atajos: <strong>F</strong> pantalla · <strong>M</strong> medir · <strong>L</strong> capas · <strong>D</strong> dibujo
+              Atajos: <strong>F</strong> pantalla · <strong>M</strong> medir · <strong>L</strong>{" "}
+              capas · <strong>D</strong> dibujo
             </div>
           </div>
         )}
 
         <CatastroSearch map={mapRef.current} L={leafletRef.current} />
 
-        <DrawingTools open={drawOpen} onClose={() => setDrawOpen(false)} map={mapRef.current} L={leafletRef.current} />
+        <DrawingTools
+          open={drawOpen}
+          onClose={() => setDrawOpen(false)}
+          map={mapRef.current}
+          L={leafletRef.current}
+        />
 
         <LayerOpacityPanel
           open={layersOpen}
@@ -828,27 +1012,61 @@ export function ProjectMap({ samples, onInspect, fillHeight, onMapReady, basemap
               <span className="w-3 h-3 rounded-full border-2 border-teal" /> Cluster palmeras
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 bg-copper inline-block" style={{ transform: "rotate(45deg)" }} /> Labor antigua
+              <span
+                className="w-2.5 h-2.5 bg-copper inline-block"
+                style={{ transform: "rotate(45deg)" }}
+              />{" "}
+              Labor antigua
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar sondaje ({drillHoles.length})
+              <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar
+              sondaje ({drillHoles.length})
             </span>
-            <span className="inline-flex items-center gap-1.5" title="Halo = mejor intercept (Au g/t × m)">
+            <span
+              className="inline-flex items-center gap-1.5"
+              title="Halo = mejor intercept (Au g/t × m)"
+            >
               <span className="text-muted-foreground/70">Halo GT:</span>
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#86efac" }} title="≤5" />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#bef264" }} title="5–20" />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fbbf24" }} title="20–50" />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#fb923c" }} title="50–150" />
-              <span className="w-2.5 h-2.5 rounded-full" style={{ background: "#dc2626" }} title=">150" />
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#86efac" }}
+                title="≤5"
+              />
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#bef264" }}
+                title="5–20"
+              />
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#fbbf24" }}
+                title="20–50"
+              />
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#fb923c" }}
+                title="50–150"
+              />
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: "#dc2626" }}
+                title=">150"
+              />
               <span className="text-muted-foreground/70">g·m/t</span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-0.5" style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }} /> Línea geofísica
+              <span
+                className="w-3 h-0.5"
+                style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }}
+              />{" "}
+              Línea geofísica
             </span>
-            <span className="text-muted-foreground/70">· panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad</span>
+            <span className="text-muted-foreground/70">
+              · panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad
+            </span>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">

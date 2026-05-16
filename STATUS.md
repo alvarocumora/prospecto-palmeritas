@@ -7,30 +7,30 @@
 
 ## ✅ Verificación técnica
 
-| Check | Resultado |
-|---|---|
-| TypeScript (`tsc --noEmit`) | **0 errores** |
-| Supabase Linter (RLS / índices) | **0 issues** |
+| Check                                   | Resultado                                                                        |
+| --------------------------------------- | -------------------------------------------------------------------------------- |
+| TypeScript (`tsc --noEmit`)             | **0 errores**                                                                    |
+| Supabase Linter (RLS / índices)         | **0 issues**                                                                     |
 | Capas Fase 7 enchufadas en `ProjectMap` | OK (`sernageominLayers`, `satelliteLayers`, `targetsLayer`, `geoIntelInspector`) |
-| Sidebar HSE + Reports | OK (`_authenticated.tsx` líneas 146-147) |
-| Permisos por módulo (`useProjectRole`) | OK (`hse`, `reports` listados) |
-| Auth + sesión activa en preview | OK (super_admin, proyecto cargado) |
-| ESLint | Solo warnings de Prettier (formato), sin errores funcionales |
+| Sidebar HSE + Reports                   | OK (`_authenticated.tsx` líneas 146-147)                                         |
+| Permisos por módulo (`useProjectRole`)  | OK (`hse`, `reports` listados)                                                   |
+| Auth + sesión activa en preview         | OK (super_admin, proyecto cargado)                                               |
+| ESLint                                  | Solo warnings de Prettier (formato), sin errores funcionales                     |
 
 ---
 
 ## 📦 Fases implementadas
 
-| Fase | Alcance | Archivos clave |
-|---|---|---|
-| **1** | QA/QC + roles + workflow aprobación + KPIs ejecutivos | `useQaQc`, `useRecordApproval`, `useExecutiveKpis`, `RecordStatusBadge`, `RoleGate` |
-| **2** | Pipeline de targets de exploración | `useExplorationTargets`, `_authenticated.dashboard.targets.tsx`, `targetsLayer.ts` |
-| **3** | Inventario de testigos (core boxes) | `useCoreInventory`, `_authenticated.dashboard.inventory.tsx` |
-| **4** | Finanzas de campaña (presupuesto vs gasto) | `useCampaignFinance`, `_authenticated.dashboard.finance.tsx` |
-| **5** | Reportes PDF mensuales + NI 43-101 | `lib/pdf/monthly-report.ts`, `lib/export-ni43101-pdf.ts`, `_authenticated.dashboard.reports.tsx` |
-| **6** | HSE: permisos + incidentes + comunidad | `useHse`, `_authenticated.dashboard.hse.tsx` |
-| **7** | Capas geocientíficas reales (SERNAGEOMIN, Sentinel-2, Copernicus DEM) | `sernageominLayers.ts`, `satelliteLayers.ts`, `geoIntelInspector.ts` |
-| **Auth** | Login rediseñado con experiencia geológica | `auth.tsx`, `assets/auth-hero.jpg` |
+| Fase     | Alcance                                                               | Archivos clave                                                                                   |
+| -------- | --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **1**    | QA/QC + roles + workflow aprobación + KPIs ejecutivos                 | `useQaQc`, `useRecordApproval`, `useExecutiveKpis`, `RecordStatusBadge`, `RoleGate`              |
+| **2**    | Pipeline de targets de exploración                                    | `useExplorationTargets`, `_authenticated.dashboard.targets.tsx`, `targetsLayer.ts`               |
+| **3**    | Inventario de testigos (core boxes)                                   | `useCoreInventory`, `_authenticated.dashboard.inventory.tsx`                                     |
+| **4**    | Finanzas de campaña (presupuesto vs gasto)                            | `useCampaignFinance`, `_authenticated.dashboard.finance.tsx`                                     |
+| **5**    | Reportes PDF mensuales + NI 43-101                                    | `lib/pdf/monthly-report.ts`, `lib/export-ni43101-pdf.ts`, `_authenticated.dashboard.reports.tsx` |
+| **6**    | HSE: permisos + incidentes + comunidad                                | `useHse`, `_authenticated.dashboard.hse.tsx`                                                     |
+| **7**    | Capas geocientíficas reales (SERNAGEOMIN, Sentinel-2, Copernicus DEM) | `sernageominLayers.ts`, `satelliteLayers.ts`, `geoIntelInspector.ts`                             |
+| **Auth** | Login rediseñado con experiencia geológica                            | `auth.tsx`, `assets/auth-hero.jpg`                                                               |
 
 ---
 
@@ -73,6 +73,7 @@
 **26 tablas** con RLS habilitado y políticas por rol de proyecto.
 
 **Funciones SECURITY DEFINER** (10):
+
 - `is_project_member`, `has_project_role`, `is_super_admin` — auth helpers
 - `handle_new_user`, `add_project_owner_member` — triggers de signup
 - `accept_project_invitation`, `get_invitation_preview` — flujo de invitaciones
@@ -86,14 +87,14 @@
 
 ## 🌍 Capas de mapa (Fase 7 completa)
 
-| Grupo | Capas | Fuente |
-|---|---|---|
-| **Basemap** | OSM · Satélite · Topo | Esri / OSM |
-| **Geología Chile** | SERNAGEOMIN 1:1M · Yacimientos · Faenas · Macrostrat (fallback) | SERNAGEOMIN ArcGIS REST público |
-| **Satelital** | Sentinel-2 true color · Alteración arcillosa B11/B12 · Óxidos B4/B2 · Copernicus DEM hillshade | EOX · Esri World Elevation |
-| **Geofísica** | EMAG2 (regional) · WGM2012 Bouguer · Surveys del proyecto | NOAA · BGI · DB |
-| **Catastro** | Concesiones SERNAGEOMIN | ArcGIS REST oficial |
-| **Proyecto** | AOI · vetas · sondajes · muestras · drones · targets | DB + GeoJSON local |
+| Grupo              | Capas                                                                                          | Fuente                          |
+| ------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------- |
+| **Basemap**        | OSM · Satélite · Topo                                                                          | Esri / OSM                      |
+| **Geología Chile** | SERNAGEOMIN 1:1M · Yacimientos · Faenas · Macrostrat (fallback)                                | SERNAGEOMIN ArcGIS REST público |
+| **Satelital**      | Sentinel-2 true color · Alteración arcillosa B11/B12 · Óxidos B4/B2 · Copernicus DEM hillshade | EOX · Esri World Elevation      |
+| **Geofísica**      | EMAG2 (regional) · WGM2012 Bouguer · Surveys del proyecto                                      | NOAA · BGI · DB                 |
+| **Catastro**       | Concesiones SERNAGEOMIN                                                                        | ArcGIS REST oficial             |
+| **Proyecto**       | AOI · vetas · sondajes · muestras · drones · targets                                           | DB + GeoJSON local              |
 
 **Inspector multi-fuente** (`geoIntelInspector.ts`): click en mapa → litología SERNAGEOMIN + elevación + distancia a yacimiento más cercano.
 
@@ -102,12 +103,14 @@
 ## 🧪 Flujos verificados vs pendientes
 
 ### ✅ Verificado automáticamente
+
 - Compilación TypeScript completa
 - RLS policies sin warnings de seguridad
 - Sesión Supabase activa y proyecto cargando (`/dashboard/catastro` 200 OK)
 - Imports de capas Fase 7 resueltos
 
 ### ⏳ Pendiente de QA manual (recomendado)
+
 - Crear/editar/aprobar un drill_core_log y verificar audit_log
 - Importar CSV de stations y assays (componentes `StationCsvImport`, `AssayCsvImport`)
 - Generar PDF mensual con datos reales (`/dashboard/reports`)

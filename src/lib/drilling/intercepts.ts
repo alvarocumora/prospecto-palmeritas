@@ -47,7 +47,7 @@ function buildIntercept(group: DrillCoreLog[]): Intercept {
 export function computeIntercepts(
   logs: DrillCoreLog[],
   cutoff = DEFAULT_AU_CUTOFF,
-  maxInternalDilution = DEFAULT_INTERNAL_DILUTION_M
+  maxInternalDilution = DEFAULT_INTERNAL_DILUTION_M,
 ): Intercept[] {
   if (!logs.length) return [];
   const sorted = [...logs].sort((a, b) => a.depth_from - b.depth_from);

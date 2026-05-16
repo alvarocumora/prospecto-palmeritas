@@ -1,5 +1,10 @@
 import type { PlanId } from "@/types/featureFlags";
-import type { UsageLimitConfig, UsageLimitContext, UsageLimitDecision, UsageLimitKey } from "@/types/usage";
+import type {
+  UsageLimitConfig,
+  UsageLimitContext,
+  UsageLimitDecision,
+  UsageLimitKey,
+} from "@/types/usage";
 
 export const PLAN_USAGE_LIMITS: Record<PlanId, UsageLimitConfig> = {
   free: {
@@ -36,11 +41,14 @@ export function getUsageLimit(key: UsageLimitKey, context: UsageLimitContext) {
   const override = context.overrides?.[key];
   return {
     limit: override ?? PLAN_USAGE_LIMITS[context.plan][key],
-    source: override === undefined ? "plan" as const : "override" as const,
+    source: override === undefined ? ("plan" as const) : ("override" as const),
   };
 }
 
-export function evaluateUsageLimit(key: UsageLimitKey, context: UsageLimitContext): UsageLimitDecision {
+export function evaluateUsageLimit(
+  key: UsageLimitKey,
+  context: UsageLimitContext,
+): UsageLimitDecision {
   const used = Math.max(0, context.usage[key] ?? 0);
   const { limit, source } = getUsageLimit(key, context);
   const remaining = Math.max(0, limit - used);
@@ -55,11 +63,17 @@ export function evaluateUsageLimit(key: UsageLimitKey, context: UsageLimitContex
   };
 }
 
-export function canConsumeUsage(key: UsageLimitKey, context: UsageLimitContext, amount = 1): boolean {
+export function canConsumeUsage(
+  key: UsageLimitKey,
+  context: UsageLimitContext,
+  amount = 1,
+): boolean {
   const decision = evaluateUsageLimit(key, context);
   return decision.remaining >= amount;
 }
 
 export function evaluateAllUsageLimits(context: UsageLimitContext): UsageLimitDecision[] {
-  return (Object.keys(PLAN_USAGE_LIMITS[context.plan]) as UsageLimitKey[]).map((key) => evaluateUsageLimit(key, context));
+  return (Object.keys(PLAN_USAGE_LIMITS[context.plan]) as UsageLimitKey[]).map((key) =>
+    evaluateUsageLimit(key, context),
+  );
 }

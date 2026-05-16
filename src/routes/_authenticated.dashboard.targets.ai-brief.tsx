@@ -58,8 +58,8 @@ function AITargetBriefDemoPage() {
         </div>
         <h1 className="mt-1 text-2xl font-bold text-foreground">AI Target Brief Preview</h1>
         <p className="mt-2 max-w-3xl text-sm text-muted-foreground">
-          Demo interna del flujo Fusion Score → Evidencia → Target Context → Markdown Brief → Prompt Preview.
-          No llama modelos IA ni modifica datos productivos.
+          Demo interna del flujo Fusion Score → Evidencia → Target Context → Markdown Brief → Prompt
+          Preview. No llama modelos IA ni modifica datos productivos.
         </p>
       </header>
 

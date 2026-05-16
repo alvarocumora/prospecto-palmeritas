@@ -1,14 +1,18 @@
 // Export map annotations to CSV or PDF.
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { ANNOTATION_COLORS, ANNOTATION_PRIORITIES, type MapAnnotation } from "@/hooks/useMapAnnotations";
+import {
+  ANNOTATION_COLORS,
+  ANNOTATION_PRIORITIES,
+  type MapAnnotation,
+} from "@/hooks/useMapAnnotations";
 
 function colorLabel(c: string): string {
   return ANNOTATION_COLORS.find((x) => x.value === c)?.label ?? c;
 }
 
 function priorityLabel(p: string | null | undefined): string {
-  return ANNOTATION_PRIORITIES.find((x) => x.value === p)?.label ?? (p ?? "—");
+  return ANNOTATION_PRIORITIES.find((x) => x.value === p)?.label ?? p ?? "—";
 }
 
 export type UserNameMap = Map<string, string>;
@@ -26,17 +30,28 @@ function csvEscape(v: unknown): string {
   return s;
 }
 
-export function exportAnnotationsCsv(
-  annotations: MapAnnotation[],
-  meta: ExportMeta,
-) {
+export function exportAnnotationsCsv(annotations: MapAnnotation[], meta: ExportMeta) {
   const headers = [
-    "id", "lat", "lng",
-    "color", "color_label", "color_original",
-    "priority", "priority_label",
-    "text", "resolved", "resolved_reason", "resolved_by", "resolved_at",
-    "created_by", "created_by_name",
-    "target_code", "campaign_name", "phase", "created_at", "updated_at",
+    "id",
+    "lat",
+    "lng",
+    "color",
+    "color_label",
+    "color_original",
+    "priority",
+    "priority_label",
+    "text",
+    "resolved",
+    "resolved_reason",
+    "resolved_by",
+    "resolved_at",
+    "created_by",
+    "created_by_name",
+    "target_code",
+    "campaign_name",
+    "phase",
+    "created_at",
+    "updated_at",
   ];
   const rows = annotations.map((a) => [
     a.id,
@@ -50,12 +65,12 @@ export function exportAnnotationsCsv(
     a.text,
     a.resolved ? "true" : "false",
     a.resolved_reason ?? "",
-    a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? a.resolved_by : "",
+    a.resolved_by ? (meta.userMap?.get(a.resolved_by) ?? a.resolved_by) : "",
     a.resolved_at ?? "",
     a.created_by,
     meta.userMap?.get(a.created_by) ?? "",
-    a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "" : "",
-    a.campaign_id ? meta.campaignMap?.get(a.campaign_id)?.name ?? "" : "",
+    a.target_id ? (meta.targetMap?.get(a.target_id)?.code ?? "") : "",
+    a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "") : "",
     a.phase ?? "",
     a.created_at,
     a.updated_at,
@@ -72,10 +87,7 @@ export function exportAnnotationsCsv(
   URL.revokeObjectURL(url);
 }
 
-export function exportAnnotationsPdf(
-  annotations: MapAnnotation[],
-  meta: ExportMeta,
-) {
+export function exportAnnotationsPdf(annotations: MapAnnotation[], meta: ExportMeta) {
   const doc = new jsPDF({ unit: "pt", format: "a4", orientation: "landscape" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -95,10 +107,25 @@ export function exportAnnotationsPdf(
 
   autoTable(doc, {
     startY: 76,
-    head: [["#", "Lat", "Lng", "Prio", "Color", "Texto", "Creador", "Resuelta", "Motivo / por", "Target", "Campaña", "Fase"]],
+    head: [
+      [
+        "#",
+        "Lat",
+        "Lng",
+        "Prio",
+        "Color",
+        "Texto",
+        "Creador",
+        "Resuelta",
+        "Motivo / por",
+        "Target",
+        "Campaña",
+        "Fase",
+      ],
+    ],
     body: annotations.map((a, i) => {
       const resolvedCell = a.resolved
-        ? `${(a.resolved_reason ?? "—")}\n${a.resolved_by ? meta.userMap?.get(a.resolved_by) ?? "—" : "—"}${a.resolved_at ? ` · ${new Date(a.resolved_at).toLocaleDateString("es-CL")}` : ""}`
+        ? `${a.resolved_reason ?? "—"}\n${a.resolved_by ? (meta.userMap?.get(a.resolved_by) ?? "—") : "—"}${a.resolved_at ? ` · ${new Date(a.resolved_at).toLocaleDateString("es-CL")}` : ""}`
         : "";
       return [
         String(i + 1),
@@ -110,7 +137,7 @@ export function exportAnnotationsPdf(
         meta.userMap?.get(a.created_by) ?? "—",
         a.resolved ? "✓" : "",
         resolvedCell,
-        a.target_id ? meta.targetMap?.get(a.target_id)?.code ?? "—" : "",
+        a.target_id ? (meta.targetMap?.get(a.target_id)?.code ?? "—") : "",
         a.campaign_id ? (meta.campaignMap?.get(a.campaign_id)?.name ?? "").slice(0, 24) : "",
         a.phase ?? "",
       ];
@@ -146,7 +173,9 @@ export function exportAnnotationsPdf(
       const page = doc.getNumberOfPages();
       doc.setFontSize(8);
       doc.setTextColor(140);
-      doc.text(`Anotaciones · ${meta.projectName} · pág. ${page}`, pageW - 40, pageH - 16, { align: "right" });
+      doc.text(`Anotaciones · ${meta.projectName} · pág. ${page}`, pageW - 40, pageH - 16, {
+        align: "right",
+      });
     },
   });
 
@@ -168,9 +197,7 @@ export function exportAnnotationsPdf(
   type Bucket = { code: string; total: number; resolved: number; pending: number };
   const buckets = new Map<string, Bucket>();
   for (const a of annotations) {
-    const code = a.target_id
-      ? meta.targetMap?.get(a.target_id)?.code ?? "—"
-      : "Sin target";
+    const code = a.target_id ? (meta.targetMap?.get(a.target_id)?.code ?? "—") : "Sin target";
     const b = buckets.get(code) ?? { code, total: 0, resolved: 0, pending: 0 };
     b.total += 1;
     if (a.resolved) b.resolved += 1;
@@ -234,8 +261,14 @@ export function exportAnnotationsPdf(
     let minLng = Math.min(...lngs);
     let maxLng = Math.max(...lngs);
     // Padding contra bbox degenerado
-    if (maxLat - minLat < 1e-6) { maxLat += 0.0005; minLat -= 0.0005; }
-    if (maxLng - minLng < 1e-6) { maxLng += 0.0005; minLng -= 0.0005; }
+    if (maxLat - minLat < 1e-6) {
+      maxLat += 0.0005;
+      minLat -= 0.0005;
+    }
+    if (maxLng - minLng < 1e-6) {
+      maxLng += 0.0005;
+      minLng -= 0.0005;
+    }
 
     const grid: number[][] = Array.from({ length: rows }, () => Array(cols).fill(0));
     for (const a of annotations) {
@@ -281,7 +314,9 @@ export function exportAnnotationsPdf(
         if (v > 0 && cellW > 22 && cellH > 14) {
           doc.setFontSize(7);
           doc.setTextColor(t > 0.55 ? 255 : 30);
-          doc.text(String(v), heatX + x * cellW + cellW / 2, heatY + y * cellH + cellH / 2 + 2, { align: "center" });
+          doc.text(String(v), heatX + x * cellW + cellW / 2, heatY + y * cellH + cellH / 2 + 2, {
+            align: "center",
+          });
         }
       }
     }
@@ -336,7 +371,9 @@ export function exportAnnotationsPdf(
   doc.setTextColor(140);
   doc.text(
     `Anotaciones · ${meta.projectName} · pág. ${doc.getNumberOfPages()}`,
-    pageW2 - 40, pageH2 - 16, { align: "right" },
+    pageW2 - 40,
+    pageH2 - 16,
+    { align: "right" },
   );
 
   const stamp = new Date().toISOString().slice(0, 10);

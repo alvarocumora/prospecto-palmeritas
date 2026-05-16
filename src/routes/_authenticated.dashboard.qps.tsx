@@ -1,19 +1,46 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useQualifiedPersons, type QualifiedPerson, type TechnicalReport, type ReportSection } from "@/hooks/useQualifiedPersons";
+import {
+  useQualifiedPersons,
+  type QualifiedPerson,
+  type TechnicalReport,
+  type ReportSection,
+} from "@/hooks/useQualifiedPersons";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import {
-  UserCheck, Plus, FileText, ShieldCheck, Pencil, Trash2,
-  CheckCircle2, Clock, FileSignature, BadgeCheck, Loader2, RotateCcw,
+  UserCheck,
+  Plus,
+  FileText,
+  ShieldCheck,
+  Pencil,
+  Trash2,
+  CheckCircle2,
+  Clock,
+  FileSignature,
+  BadgeCheck,
+  Loader2,
+  RotateCcw,
 } from "lucide-react";
 import { ComplianceMatrix } from "@/components/qps/ComplianceMatrix";
 import { SignatureEnvelopesPanel } from "@/components/qps/SignatureEnvelopesPanel";
@@ -22,7 +49,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/qps")({
   head: () => ({
     meta: [
       { title: "QPs · Personas Calificadas | Geocapitals" },
-      { name: "description", content: "Gestión de Qualified Persons (NI 43-101): registro, asignaciones a reportes y estado de firma." },
+      {
+        name: "description",
+        content:
+          "Gestión de Qualified Persons (NI 43-101): registro, asignaciones a reportes y estado de firma.",
+      },
     ],
   }),
   component: QpsPage,
@@ -50,14 +81,26 @@ function QpsPage() {
   const role = useProjectRole();
   const writable = canWrite(role);
   const {
-    qps, reports, sections, loading,
-    createQp, updateQp, deleteQp,
-    createReport, deleteReport,
-    upsertSection, assignQpToSection, signSection, revokeSignature,
+    qps,
+    reports,
+    sections,
+    loading,
+    createQp,
+    updateQp,
+    deleteQp,
+    createReport,
+    deleteReport,
+    upsertSection,
+    assignQpToSection,
+    signSection,
+    revokeSignature,
   } = useQualifiedPersons();
 
   const [tab, setTab] = useState<"qps" | "reports" | "compliance" | "signatures">("qps");
-  const [qpDialog, setQpDialog] = useState<{ open: boolean; editing: QualifiedPerson | null }>({ open: false, editing: null });
+  const [qpDialog, setQpDialog] = useState<{ open: boolean; editing: QualifiedPerson | null }>({
+    open: false,
+    editing: null,
+  });
   const [reportDialog, setReportDialog] = useState(false);
   const [activeReportId, setActiveReportId] = useState<string | null>(null);
 
@@ -80,7 +123,9 @@ function QpsPage() {
           <BadgeCheck className="w-5 h-5 text-signal-cyan" />
           <div>
             <h1 className="text-base font-mono uppercase tracking-wide">Qualified Persons</h1>
-            <p className="text-[10px] text-text-dim font-mono">Registro · Asignaciones · Estado de firma NI 43-101</p>
+            <p className="text-[10px] text-text-dim font-mono">
+              Registro · Asignaciones · Estado de firma NI 43-101
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -97,61 +142,101 @@ function QpsPage() {
         </div>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance" | "signatures")}>
+      <Tabs
+        value={tab}
+        onValueChange={(v) => setTab(v as "qps" | "reports" | "compliance" | "signatures")}
+      >
         <TabsList>
-          <TabsTrigger value="qps"><UserCheck className="w-3 h-3 mr-1" /> Personas Calificadas ({qps.length})</TabsTrigger>
-          <TabsTrigger value="reports"><FileText className="w-3 h-3 mr-1" /> Reportes ({reports.length})</TabsTrigger>
-          <TabsTrigger value="compliance"><ShieldCheck className="w-3 h-3 mr-1" /> Compliance</TabsTrigger>
-          <TabsTrigger value="signatures"><FileSignature className="w-3 h-3 mr-1" /> Firmas</TabsTrigger>
+          <TabsTrigger value="qps">
+            <UserCheck className="w-3 h-3 mr-1" /> Personas Calificadas ({qps.length})
+          </TabsTrigger>
+          <TabsTrigger value="reports">
+            <FileText className="w-3 h-3 mr-1" /> Reportes ({reports.length})
+          </TabsTrigger>
+          <TabsTrigger value="compliance">
+            <ShieldCheck className="w-3 h-3 mr-1" /> Compliance
+          </TabsTrigger>
+          <TabsTrigger value="signatures">
+            <FileSignature className="w-3 h-3 mr-1" /> Firmas
+          </TabsTrigger>
         </TabsList>
 
         {/* QPs TAB */}
         <TabsContent value="qps" className="mt-4">
           {loading ? (
-            <div className="flex items-center gap-2 text-text-dim text-xs"><Loader2 className="w-3 h-3 animate-spin" /> Cargando…</div>
+            <div className="flex items-center gap-2 text-text-dim text-xs">
+              <Loader2 className="w-3 h-3 animate-spin" /> Cargando…
+            </div>
           ) : qps.length === 0 ? (
             <div className="border border-border rounded p-8 text-center text-text-dim font-mono text-xs">
-              No hay QPs registrados. {writable && "Haz clic en \"Registrar QP\"."}
+              No hay QPs registrados. {writable && 'Haz clic en "Registrar QP".'}
             </div>
           ) : (
             <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
               {qps.map((qp) => {
                 const assignedCount = sections.filter((s) => s.qp_id === qp.id).length;
-                const signedCount = sections.filter((s) => s.qp_id === qp.id && s.status === "signed").length;
+                const signedCount = sections.filter(
+                  (s) => s.qp_id === qp.id && s.status === "signed",
+                ).length;
                 return (
-                  <div key={qp.id} className="border border-border rounded p-3 bg-card flex flex-col gap-2">
+                  <div
+                    key={qp.id}
+                    className="border border-border rounded p-3 bg-card flex flex-col gap-2"
+                  >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
                         <div className="font-mono text-sm truncate flex items-center gap-1">
                           {qp.full_name}
                           {qp.is_verified && <BadgeCheck className="w-3 h-3 text-signal-cyan" />}
                         </div>
-                        <div className="text-[10px] text-text-dim font-mono truncate">{qp.profession}</div>
+                        <div className="text-[10px] text-text-dim font-mono truncate">
+                          {qp.profession}
+                        </div>
                       </div>
                       {writable && (
                         <div className="flex gap-1">
-                          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => setQpDialog({ open: true, editing: qp })}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-6 w-6"
+                            onClick={() => setQpDialog({ open: true, editing: qp })}
+                          >
                             <Pencil className="w-3 h-3" />
                           </Button>
-                          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => { if (confirm(`Eliminar QP ${qp.full_name}?`)) deleteQp(qp.id); }}>
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            className="h-6 w-6"
+                            onClick={() => {
+                              if (confirm(`Eliminar QP ${qp.full_name}?`)) deleteQp(qp.id);
+                            }}
+                          >
                             <Trash2 className="w-3 h-3 text-signal-red" />
                           </Button>
                         </div>
                       )}
                     </div>
                     <div className="text-[10px] font-mono text-text-dim space-y-0.5">
-                      <div><span className="text-foreground">Colegio:</span> {qp.registration_body}</div>
-                      <div><span className="text-foreground">Licencia:</span> {qp.license_no}</div>
+                      <div>
+                        <span className="text-foreground">Colegio:</span> {qp.registration_body}
+                      </div>
+                      <div>
+                        <span className="text-foreground">Licencia:</span> {qp.license_no}
+                      </div>
                       {qp.competency_areas.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1">
                           {qp.competency_areas.slice(0, 4).map((c) => (
-                            <Badge key={c} variant="outline" className="text-[9px] px-1 py-0">{c}</Badge>
+                            <Badge key={c} variant="outline" className="text-[9px] px-1 py-0">
+                              {c}
+                            </Badge>
                           ))}
                         </div>
                       )}
                     </div>
                     <div className="flex items-center justify-between text-[10px] font-mono pt-2 border-t border-border">
-                      <span className="text-text-dim">Secciones asignadas: <b className="text-foreground">{assignedCount}</b></span>
+                      <span className="text-text-dim">
+                        Secciones asignadas: <b className="text-foreground">{assignedCount}</b>
+                      </span>
                       <span className="text-signal-cyan">{signedCount} firmadas</span>
                     </div>
                   </div>
@@ -165,7 +250,7 @@ function QpsPage() {
         <TabsContent value="reports" className="mt-4">
           {reports.length === 0 ? (
             <div className="border border-border rounded p-8 text-center text-text-dim font-mono text-xs">
-              No hay reportes técnicos. {writable && "Crea uno con el botón \"Nuevo reporte\"."}
+              No hay reportes técnicos. {writable && 'Crea uno con el botón "Nuevo reporte".'}
             </div>
           ) : (
             <div className="grid gap-4 md:grid-cols-[260px_1fr]">
@@ -196,7 +281,12 @@ function QpsPage() {
                   onAssign={assignQpToSection}
                   onSign={signSection}
                   onRevoke={revokeSignature}
-                  onDeleteReport={() => { if (confirm("Eliminar reporte completo?")) { deleteReport(activeReportId); setActiveReportId(null); } }}
+                  onDeleteReport={() => {
+                    if (confirm("Eliminar reporte completo?")) {
+                      deleteReport(activeReportId);
+                      setActiveReportId(null);
+                    }
+                  }}
                 />
               )}
             </div>
@@ -212,7 +302,9 @@ function QpsPage() {
           ) : (
             <div className="grid gap-4 md:grid-cols-[260px_1fr]">
               <div className="space-y-1">
-                <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground px-1 mb-1">Reporte a evaluar</div>
+                <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground px-1 mb-1">
+                  Reporte a evaluar
+                </div>
                 {reports.map((r) => (
                   <button
                     key={r.id}
@@ -225,7 +317,15 @@ function QpsPage() {
                       <span className="uppercase">{r.report_type}</span>
                       <span>v{r.version}</span>
                       {r.compliance_score_cached != null && (
-                        <span className={r.compliance_score_cached >= 95 ? "text-emerald-500" : r.compliance_score_cached >= 70 ? "text-amber-500" : "text-rose-500"}>
+                        <span
+                          className={
+                            r.compliance_score_cached >= 95
+                              ? "text-emerald-500"
+                              : r.compliance_score_cached >= 70
+                                ? "text-amber-500"
+                                : "text-rose-500"
+                          }
+                        >
                           {r.compliance_score_cached}%
                         </span>
                       )}
@@ -277,17 +377,35 @@ function ReportStatusPill({ status }: { status: string }) {
     published: { label: "Publicado", cls: "text-signal-green border-signal-green/40" },
   };
   const m = map[status] ?? map.draft;
-  return <span className={`inline-flex items-center px-1 py-0 border rounded text-[9px] ${m.cls}`}>{m.label}</span>;
+  return (
+    <span className={`inline-flex items-center px-1 py-0 border rounded text-[9px] ${m.cls}`}>
+      {m.label}
+    </span>
+  );
 }
 
 function ReportDetail({
-  report, qps, sections, writable, onUpsertSection, onAssign, onSign, onRevoke, onDeleteReport,
+  report,
+  qps,
+  sections,
+  writable,
+  onUpsertSection,
+  onAssign,
+  onSign,
+  onRevoke,
+  onDeleteReport,
 }: {
   report: TechnicalReport;
   qps: QualifiedPerson[];
   sections: ReportSection[];
   writable: boolean;
-  onUpsertSection: (input: { report_id: string; section_no: number; title: string; qp_id?: string | null; status?: string }) => Promise<void>;
+  onUpsertSection: (input: {
+    report_id: string;
+    section_no: number;
+    title: string;
+    qp_id?: string | null;
+    status?: string;
+  }) => Promise<void>;
   onAssign: (sectionId: string, qpId: string | null) => Promise<void>;
   onSign: (sectionId: string) => Promise<void>;
   onRevoke: (sectionId: string) => Promise<void>;
@@ -309,14 +427,24 @@ function ReportDetail({
         <div>
           <div className="font-mono text-sm">{report.title}</div>
           <div className="text-[10px] text-text-dim font-mono mt-0.5">
-            {report.effective_date ? `Vigente: ${report.effective_date}` : "Sin fecha vigente"} · Lead QP: {qps.find(q => q.id === report.lead_qp_id)?.full_name ?? "—"}
+            {report.effective_date ? `Vigente: ${report.effective_date}` : "Sin fecha vigente"} ·
+            Lead QP: {qps.find((q) => q.id === report.lead_qp_id)?.full_name ?? "—"}
           </div>
         </div>
         <div className="flex items-center gap-3 text-[10px] font-mono">
-          <span><b className="text-signal-cyan">{signed}</b>/{total} firmadas</span>
-          <span><b className="text-foreground">{assigned}</b>/{total} asignadas</span>
+          <span>
+            <b className="text-signal-cyan">{signed}</b>/{total} firmadas
+          </span>
+          <span>
+            <b className="text-foreground">{assigned}</b>/{total} asignadas
+          </span>
           {writable && (
-            <Button variant="ghost" size="sm" className="h-6 text-signal-red" onClick={onDeleteReport}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-6 text-signal-red"
+              onClick={onDeleteReport}
+            >
               <Trash2 className="w-3 h-3 mr-1" /> Eliminar
             </Button>
           )}
@@ -337,7 +465,8 @@ function ReportDetail({
                 {s?.signed_at && (
                   <div className="text-[9px] text-signal-cyan font-mono mt-0.5 flex items-center gap-1">
                     <FileSignature className="w-3 h-3" />
-                    Firmado {new Date(s.signed_at).toLocaleString("es-CL")} · hash {s.signature_hash?.slice(0, 16)}…
+                    Firmado {new Date(s.signed_at).toLocaleString("es-CL")} · hash{" "}
+                    {s.signature_hash?.slice(0, 16)}…
                   </div>
                 )}
               </div>
@@ -349,7 +478,13 @@ function ReportDetail({
                   onValueChange={async (val) => {
                     const qpId = val === "__none" ? null : val;
                     if (!s) {
-                      await onUpsertSection({ report_id: report.id, section_no: def.no, title: def.title, qp_id: qpId, status: qpId ? "drafting" : "empty" });
+                      await onUpsertSection({
+                        report_id: report.id,
+                        section_no: def.no,
+                        title: def.title,
+                        qp_id: qpId,
+                        status: qpId ? "drafting" : "empty",
+                      });
                     } else {
                       await onAssign(s.id, qpId);
                     }
@@ -361,7 +496,9 @@ function ReportDetail({
                   <SelectContent>
                     <SelectItem value="__none">— Sin asignar —</SelectItem>
                     {qps.map((q) => (
-                      <SelectItem key={q.id} value={q.id}>{q.full_name} · {q.profession}</SelectItem>
+                      <SelectItem key={q.id} value={q.id}>
+                        {q.full_name} · {q.profession}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
@@ -370,12 +507,22 @@ function ReportDetail({
               <div className="flex items-center gap-1.5">
                 <SectionStatusBadge status={s?.status ?? "empty"} />
                 {writable && s && qp && !isSigned && (
-                  <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => onSign(s.id)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => onSign(s.id)}
+                  >
                     <ShieldCheck className="w-3 h-3 mr-1" /> Firmar
                   </Button>
                 )}
                 {writable && s && isSigned && (
-                  <Button size="sm" variant="ghost" className="h-7 text-xs text-signal-amber" onClick={() => onRevoke(s.id)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-7 text-xs text-signal-amber"
+                    onClick={() => onRevoke(s.id)}
+                  >
                     <RotateCcw className="w-3 h-3 mr-1" /> Revocar
                   </Button>
                 )}
@@ -390,14 +537,32 @@ function ReportDetail({
 
 function SectionStatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; icon: React.ReactNode; cls: string }> = {
-    empty: { label: "Vacía", icon: <Clock className="w-3 h-3" />, cls: "text-text-dim border-border" },
-    drafting: { label: "Redactando", icon: <Pencil className="w-3 h-3" />, cls: "text-signal-amber border-signal-amber/40" },
-    ready: { label: "Lista", icon: <CheckCircle2 className="w-3 h-3" />, cls: "text-foreground border-border" },
-    signed: { label: "Firmada", icon: <ShieldCheck className="w-3 h-3" />, cls: "text-signal-cyan border-signal-cyan/40 bg-signal-cyan/5" },
+    empty: {
+      label: "Vacía",
+      icon: <Clock className="w-3 h-3" />,
+      cls: "text-text-dim border-border",
+    },
+    drafting: {
+      label: "Redactando",
+      icon: <Pencil className="w-3 h-3" />,
+      cls: "text-signal-amber border-signal-amber/40",
+    },
+    ready: {
+      label: "Lista",
+      icon: <CheckCircle2 className="w-3 h-3" />,
+      cls: "text-foreground border-border",
+    },
+    signed: {
+      label: "Firmada",
+      icon: <ShieldCheck className="w-3 h-3" />,
+      cls: "text-signal-cyan border-signal-cyan/40 bg-signal-cyan/5",
+    },
   };
   const m = map[status] ?? map.empty;
   return (
-    <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 border rounded text-[9px] font-mono ${m.cls}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-1.5 py-0.5 border rounded text-[9px] font-mono ${m.cls}`}
+    >
       {m.icon} {m.label}
     </span>
   );
@@ -406,7 +571,10 @@ function SectionStatusBadge({ status }: { status: string }) {
 /* ========== DIALOGS ========== */
 
 function QpDialog({
-  open, editing, onClose, onSave,
+  open,
+  editing,
+  onClose,
+  onSave,
 }: {
   open: boolean;
   editing: QualifiedPerson | null;
@@ -414,8 +582,12 @@ function QpDialog({
   onSave: (data: Partial<QualifiedPerson>) => Promise<void>;
 }) {
   const [form, setForm] = useState({
-    full_name: "", profession: "", registration_body: "", license_no: "",
-    competency_areas: "", bio: "",
+    full_name: "",
+    profession: "",
+    registration_body: "",
+    license_no: "",
+    competency_areas: "",
+    bio: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -444,35 +616,65 @@ function QpDialog({
         <div className="grid gap-3">
           <div className="grid gap-1">
             <Label className="text-xs">Nombre completo *</Label>
-            <Input value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+            <Input
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-1">
               <Label className="text-xs">Profesión *</Label>
-              <Input placeholder="Geólogo / Mining Eng." value={form.profession} onChange={(e) => setForm({ ...form, profession: e.target.value })} />
+              <Input
+                placeholder="Geólogo / Mining Eng."
+                value={form.profession}
+                onChange={(e) => setForm({ ...form, profession: e.target.value })}
+              />
             </div>
             <div className="grid gap-1">
               <Label className="text-xs">N° licencia *</Label>
-              <Input value={form.license_no} onChange={(e) => setForm({ ...form, license_no: e.target.value })} />
+              <Input
+                value={form.license_no}
+                onChange={(e) => setForm({ ...form, license_no: e.target.value })}
+              />
             </div>
           </div>
           <div className="grid gap-1">
             <Label className="text-xs">Colegio / Asociación *</Label>
-            <Input placeholder="AusIMM · CIM · Colegio de Geólogos de Chile" value={form.registration_body} onChange={(e) => setForm({ ...form, registration_body: e.target.value })} />
+            <Input
+              placeholder="AusIMM · CIM · Colegio de Geólogos de Chile"
+              value={form.registration_body}
+              onChange={(e) => setForm({ ...form, registration_body: e.target.value })}
+            />
           </div>
           <div className="grid gap-1">
             <Label className="text-xs">Áreas de competencia (separadas por coma)</Label>
-            <Input placeholder="exploración, recursos, QA/QC" value={form.competency_areas} onChange={(e) => setForm({ ...form, competency_areas: e.target.value })} />
+            <Input
+              placeholder="exploración, recursos, QA/QC"
+              value={form.competency_areas}
+              onChange={(e) => setForm({ ...form, competency_areas: e.target.value })}
+            />
           </div>
           <div className="grid gap-1">
             <Label className="text-xs">Bio / experiencia</Label>
-            <Textarea rows={3} value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} />
+            <Textarea
+              rows={3}
+              value={form.bio}
+              onChange={(e) => setForm({ ...form, bio: e.target.value })}
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button
-            disabled={saving || !form.full_name || !form.profession || !form.license_no || !form.registration_body}
+            disabled={
+              saving ||
+              !form.full_name ||
+              !form.profession ||
+              !form.license_no ||
+              !form.registration_body
+            }
             onClick={async () => {
               setSaving(true);
               try {
@@ -481,10 +683,15 @@ function QpDialog({
                   profession: form.profession,
                   registration_body: form.registration_body,
                   license_no: form.license_no,
-                  competency_areas: form.competency_areas.split(",").map((s) => s.trim()).filter(Boolean),
+                  competency_areas: form.competency_areas
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter(Boolean),
                   bio: form.bio || null,
                 });
-              } finally { setSaving(false); }
+              } finally {
+                setSaving(false);
+              }
             }}
           >
             {saving && <Loader2 className="w-3 h-3 mr-1 animate-spin" />} Guardar
@@ -496,20 +703,40 @@ function QpDialog({
 }
 
 function ReportDialog({
-  open, qps, onClose, onSave,
+  open,
+  qps,
+  onClose,
+  onSave,
 }: {
   open: boolean;
   qps: QualifiedPerson[];
   onClose: () => void;
-  onSave: (data: { title: string; report_type: string; lead_qp_id: string | null; effective_date: string | null; summary: string | null }) => Promise<void>;
+  onSave: (data: {
+    title: string;
+    report_type: string;
+    lead_qp_id: string | null;
+    effective_date: string | null;
+    summary: string | null;
+  }) => Promise<void>;
 }) {
   const [form, setForm] = useState({
-    title: "", report_type: "ni43101", lead_qp_id: "", effective_date: "", summary: "",
+    title: "",
+    report_type: "ni43101",
+    lead_qp_id: "",
+    effective_date: "",
+    summary: "",
   });
   const [saving, setSaving] = useState(false);
 
   useMemo(() => {
-    if (open) setForm({ title: "", report_type: "ni43101", lead_qp_id: "", effective_date: "", summary: "" });
+    if (open)
+      setForm({
+        title: "",
+        report_type: "ni43101",
+        lead_qp_id: "",
+        effective_date: "",
+        summary: "",
+      });
   }, [open]);
 
   return (
@@ -521,13 +748,21 @@ function ReportDialog({
         <div className="grid gap-3">
           <div className="grid gap-1">
             <Label className="text-xs">Título *</Label>
-            <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            <Input
+              value={form.title}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
+            />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div className="grid gap-1">
               <Label className="text-xs">Tipo</Label>
-              <Select value={form.report_type} onValueChange={(v) => setForm({ ...form, report_type: v })}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+              <Select
+                value={form.report_type}
+                onValueChange={(v) => setForm({ ...form, report_type: v })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="ni43101">NI 43-101</SelectItem>
                   <SelectItem value="jorc">JORC</SelectItem>
@@ -537,26 +772,45 @@ function ReportDialog({
             </div>
             <div className="grid gap-1">
               <Label className="text-xs">Fecha vigente</Label>
-              <Input type="date" value={form.effective_date} onChange={(e) => setForm({ ...form, effective_date: e.target.value })} />
+              <Input
+                type="date"
+                value={form.effective_date}
+                onChange={(e) => setForm({ ...form, effective_date: e.target.value })}
+              />
             </div>
           </div>
           <div className="grid gap-1">
             <Label className="text-xs">Lead QP</Label>
-            <Select value={form.lead_qp_id || "__none"} onValueChange={(v) => setForm({ ...form, lead_qp_id: v === "__none" ? "" : v })}>
-              <SelectTrigger><SelectValue placeholder="Seleccionar…" /></SelectTrigger>
+            <Select
+              value={form.lead_qp_id || "__none"}
+              onValueChange={(v) => setForm({ ...form, lead_qp_id: v === "__none" ? "" : v })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar…" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="__none">— Sin Lead QP —</SelectItem>
-                {qps.map((q) => <SelectItem key={q.id} value={q.id}>{q.full_name}</SelectItem>)}
+                {qps.map((q) => (
+                  <SelectItem key={q.id} value={q.id}>
+                    {q.full_name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
           <div className="grid gap-1">
             <Label className="text-xs">Resumen</Label>
-            <Textarea rows={3} value={form.summary} onChange={(e) => setForm({ ...form, summary: e.target.value })} />
+            <Textarea
+              rows={3}
+              value={form.summary}
+              onChange={(e) => setForm({ ...form, summary: e.target.value })}
+            />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button
             disabled={saving || !form.title}
             onClick={async () => {
@@ -569,7 +823,9 @@ function ReportDialog({
                   effective_date: form.effective_date || null,
                   summary: form.summary || null,
                 });
-              } finally { setSaving(false); }
+              } finally {
+                setSaving(false);
+              }
             }}
           >
             {saving && <Loader2 className="w-3 h-3 mr-1 animate-spin" />} Crear

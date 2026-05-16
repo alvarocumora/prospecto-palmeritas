@@ -45,7 +45,10 @@ export function useLayerState(defaults: LayerStateMap) {
   const setOpacity = useCallback((id: string, opacity: number) => {
     setState((s) => ({
       ...s,
-      [id]: { ...(s[id] ?? { visible: true, opacity: 1 }), opacity: Math.max(0, Math.min(1, opacity)) },
+      [id]: {
+        ...(s[id] ?? { visible: true, opacity: 1 }),
+        opacity: Math.max(0, Math.min(1, opacity)),
+      },
     }));
   }, []);
 

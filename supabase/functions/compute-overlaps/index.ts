@@ -52,7 +52,7 @@ function bboxOf(geom: GeoJSONGeom | null): [number, number, number, number] | nu
 
 function bboxesIntersect(
   a: [number, number, number, number],
-  b: [number, number, number, number]
+  b: [number, number, number, number],
 ): { intersects: boolean; areaHa: number; pct: number } {
   const [ax1, ay1, ax2, ay2] = a;
   const [bx1, by1, bx2, by2] = b;
@@ -75,7 +75,7 @@ function bboxesIntersect(
 }
 
 async function fetchThirdPartyConcessions(
-  bbox: [number, number, number, number]
+  bbox: [number, number, number, number],
 ): Promise<Array<{ code: string; titular: string; bbox: [number, number, number, number] }>> {
   const out: Array<{ code: string; titular: string; bbox: [number, number, number, number] }> = [];
   for (const layer of [0, 1]) {
@@ -124,7 +124,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     const { data: rows, error } = await supabase

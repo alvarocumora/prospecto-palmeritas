@@ -3,9 +3,7 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import {
-  Briefcase, Search, Filter, Layers, Mountain, X,
-} from "lucide-react";
+import { Briefcase, Search, Filter, Layers, Mountain, X } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { usePropertyListings } from "@/hooks/usePropertyListings";
 import {
@@ -71,7 +69,8 @@ function DealsPage() {
     setStage("");
     setModality("");
   };
-  const activeFilters = (commodity ? 1 : 0) + (stage ? 1 : 0) + (modality ? 1 : 0) + (search ? 1 : 0);
+  const activeFilters =
+    (commodity ? 1 : 0) + (stage ? 1 : 0) + (modality ? 1 : 0) + (search ? 1 : 0);
 
   return (
     <div className="p-3 md:p-4 max-w-[1600px] mx-auto">
@@ -83,7 +82,8 @@ function DealsPage() {
           </h1>
         </div>
         <p className="text-xs font-mono text-muted-foreground">
-          Pertenencias, JVs, royalties y opciones de propiedades mineras. Firma NDA para acceder al data room.
+          Pertenencias, JVs, royalties y opciones de propiedades mineras. Firma NDA para acceder al
+          data room.
         </p>
       </header>
 
@@ -163,7 +163,9 @@ function DealsPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="text-center py-16 text-xs font-mono text-muted-foreground">Cargando ofertas…</div>
+        <div className="text-center py-16 text-xs font-mono text-muted-foreground">
+          Cargando ofertas…
+        </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-border rounded-lg">
           <Briefcase className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />

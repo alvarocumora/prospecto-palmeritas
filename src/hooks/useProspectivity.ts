@@ -52,7 +52,9 @@ export function useProspectivity(projectId: string | null) {
     }
   }, [projectId]);
 
-  useEffect(() => { void reload(); }, [reload]);
+  useEffect(() => {
+    void reload();
+  }, [reload]);
 
   return { latestRun, cells, loading, reload };
 }

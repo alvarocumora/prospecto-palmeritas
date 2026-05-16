@@ -35,7 +35,7 @@ function write(items: QueuedStation[]) {
 export function useOfflineQueue() {
   const [queue, setQueue] = useState<QueuedStation[]>([]);
   const [online, setOnline] = useState<boolean>(
-    typeof navigator === "undefined" ? true : navigator.onLine
+    typeof navigator === "undefined" ? true : navigator.onLine,
   );
 
   useEffect(() => {

@@ -91,49 +91,55 @@ export function useFieldPois(projectId: string | null) {
     };
   }, [projectId, queryClient]);
 
-  const create = useCallback(async (input: NewFieldPoi): Promise<FieldPoi> => {
-    const { data: userData, error: userErr } = await supabase.auth.getUser();
-    if (userErr || !userData.user) throw userErr ?? new Error("No autenticado");
-    const userId = userData.user.id;
+  const create = useCallback(
+    async (input: NewFieldPoi): Promise<FieldPoi> => {
+      const { data: userData, error: userErr } = await supabase.auth.getUser();
+      if (userErr || !userData.user) throw userErr ?? new Error("No autenticado");
+      const userId = userData.user.id;
 
-    let photo_path: string | null = null;
-    if (input.photo) {
-      const ext = input.photo.name.split(".").pop()?.toLowerCase() ?? "jpg";
-      const path = `${input.project_id}/${crypto.randomUUID()}.${ext}`;
-      const { error: upErr } = await supabase.storage
-        .from("field-poi-photos")
-        .upload(path, input.photo, { contentType: input.photo.type, upsert: false });
-      if (upErr) throw upErr;
-      photo_path = path;
-    }
+      let photo_path: string | null = null;
+      if (input.photo) {
+        const ext = input.photo.name.split(".").pop()?.toLowerCase() ?? "jpg";
+        const path = `${input.project_id}/${crypto.randomUUID()}.${ext}`;
+        const { error: upErr } = await supabase.storage
+          .from("field-poi-photos")
+          .upload(path, input.photo, { contentType: input.photo.type, upsert: false });
+        if (upErr) throw upErr;
+        photo_path = path;
+      }
 
-    const { data, error } = await supabase
-      .from("field_pois")
-      .insert({
-        project_id: input.project_id,
-        organization_id: input.organization_id,
-        poi_type: input.poi_type,
-        title: input.title,
-        note: input.note,
-        lat: input.lat,
-        lng: input.lng,
-        accuracy_m: input.accuracy_m,
-        elevation_m: input.elevation_m,
-        photo_path,
-        created_by: userId,
-      })
-      .select("*")
-      .single();
-    if (error) throw error;
-    queryClient.invalidateQueries({ queryKey: ["field-pois", input.project_id] });
-    return data as FieldPoi;
-  }, [queryClient]);
+      const { data, error } = await supabase
+        .from("field_pois")
+        .insert({
+          project_id: input.project_id,
+          organization_id: input.organization_id,
+          poi_type: input.poi_type,
+          title: input.title,
+          note: input.note,
+          lat: input.lat,
+          lng: input.lng,
+          accuracy_m: input.accuracy_m,
+          elevation_m: input.elevation_m,
+          photo_path,
+          created_by: userId,
+        })
+        .select("*")
+        .single();
+      if (error) throw error;
+      queryClient.invalidateQueries({ queryKey: ["field-pois", input.project_id] });
+      return data as FieldPoi;
+    },
+    [queryClient],
+  );
 
-  const remove = useCallback(async (id: string) => {
-    const { error } = await supabase.from("field_pois").delete().eq("id", id);
-    if (error) throw error;
-    if (projectId) queryClient.invalidateQueries({ queryKey: ["field-pois", projectId] });
-  }, [projectId, queryClient]);
+  const remove = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("field_pois").delete().eq("id", id);
+      if (error) throw error;
+      if (projectId) queryClient.invalidateQueries({ queryKey: ["field-pois", projectId] });
+    },
+    [projectId, queryClient],
+  );
 
   return {
     pois: query.data ?? [],
@@ -190,27 +196,32 @@ export function useFieldPoiQueue() {
     return item;
   }, []);
 
-  const flush = useCallback(async (
-    createFn: (p: NewFieldPoi) => Promise<FieldPoi>,
-  ): Promise<{ ok: number; failed: number }> => {
-    const items = readQueue();
-    let ok = 0, failed = 0;
-    const remaining: QueuedPoi[] = [];
-    for (const it of items) {
-      try {
-        const { localId: _l, queuedAt: _q, ...rest } = it;
-        void _l; void _q;
-        await createFn(rest);
-        ok++;
-      } catch {
-        failed++;
-        remaining.push(it);
+  const flush = useCallback(
+    async (
+      createFn: (p: NewFieldPoi) => Promise<FieldPoi>,
+    ): Promise<{ ok: number; failed: number }> => {
+      const items = readQueue();
+      let ok = 0,
+        failed = 0;
+      const remaining: QueuedPoi[] = [];
+      for (const it of items) {
+        try {
+          const { localId: _l, queuedAt: _q, ...rest } = it;
+          void _l;
+          void _q;
+          await createFn(rest);
+          ok++;
+        } catch {
+          failed++;
+          remaining.push(it);
+        }
       }
-    }
-    writeQueue(remaining);
-    setQueue(remaining);
-    return { ok, failed };
-  }, []);
+      writeQueue(remaining);
+      setQueue(remaining);
+      return { ok, failed };
+    },
+    [],
+  );
 
   return { queue, online, enqueue, flush };
 }

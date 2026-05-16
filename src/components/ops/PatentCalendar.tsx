@@ -13,29 +13,21 @@ import {
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const UTM_TO_CLP = 67429; // referencia oct-2025
 const CLP_TO_USD = 1 / 950;
 
-export function PatentCalendar({
-  projectId,
-  userId,
-}: {
-  projectId: string;
-  userId: string;
-}) {
+export function PatentCalendar({ projectId, userId }: { projectId: string; userId: string }) {
   const { data, loading, refresh } = useConcessionPatents(projectId);
   const { data: concessions } = useMiningConcessions(projectId);
   const [open, setOpen] = useState(false);
 
   const stats = useMemo(() => {
-    let totalUtm = 0, paid = 0, overdue = 0, upcoming = 0;
+    let totalUtm = 0,
+      paid = 0,
+      overdue = 0,
+      upcoming = 0;
     for (const p of data) {
       totalUtm += Number(p.amount_utm || 0);
       const st = patentDisplayStatus(p);
@@ -68,20 +60,28 @@ export function PatentCalendar({
       .update({ status: "paid", paid_at: new Date().toISOString().slice(0, 10) })
       .eq("id", p.id);
     if (error) toast.error(error.message);
-    else { toast.success("Patente marcada como pagada"); refresh(); }
+    else {
+      toast.success("Patente marcada como pagada");
+      refresh();
+    }
   };
 
   return (
-    <HudPanel
-      title="Patentes mineras · Calendario"
-      accent="amber"
-      className="bg-bg-panel/40"
-    >
+    <HudPanel title="Patentes mineras · Calendario" accent="amber" className="bg-bg-panel/40">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
         <Stat label="Total UTM" value={stats.totalUtm.toLocaleString("es-CL")} />
-        <Stat label="≈ CLP" value={(stats.totalUtm * UTM_TO_CLP).toLocaleString("es-CL", { maximumFractionDigits: 0 })} />
+        <Stat
+          label="≈ CLP"
+          value={(stats.totalUtm * UTM_TO_CLP).toLocaleString("es-CL", {
+            maximumFractionDigits: 0,
+          })}
+        />
         <Stat label="≈ USD" value={(stats.totalUtm * UTM_TO_CLP * CLP_TO_USD).toFixed(0)} />
-        <Stat label="Vencidas" value={String(stats.overdue)} color={stats.overdue > 0 ? "var(--signal-red)" : undefined} />
+        <Stat
+          label="Vencidas"
+          value={String(stats.overdue)}
+          color={stats.overdue > 0 ? "var(--signal-red)" : undefined}
+        />
       </div>
 
       <div className="flex items-center justify-between mb-2">
@@ -102,7 +102,9 @@ export function PatentCalendar({
         <div className="p-4 text-center text-[11px] font-mono text-text-dim">CARGANDO…</div>
       ) : data.length === 0 ? (
         <div className="p-6 text-center border border-dashed border-border rounded-[2px]">
-          <div className="text-[11px] font-mono text-text-dim">Sin patentes registradas. Agrega la primera para activar el calendario.</div>
+          <div className="text-[11px] font-mono text-text-dim">
+            Sin patentes registradas. Agrega la primera para activar el calendario.
+          </div>
         </div>
       ) : (
         <div className="space-y-3">
@@ -115,7 +117,10 @@ export function PatentCalendar({
                 {patents.map((p) => {
                   const st = patentDisplayStatus(p);
                   return (
-                    <div key={p.id} className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-accent/30">
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-2 px-2.5 py-1.5 hover:bg-accent/30"
+                    >
                       <span
                         className="w-1.5 h-1.5 rounded-full shrink-0"
                         style={{ background: PATENT_COLORS[st] }}
@@ -129,7 +134,10 @@ export function PatentCalendar({
                           {p.paid_at && ` · pagada ${p.paid_at}`}
                         </div>
                       </div>
-                      <span className="text-[10px] font-mono uppercase tracking-wider shrink-0" style={{ color: PATENT_COLORS[st] }}>
+                      <span
+                        className="text-[10px] font-mono uppercase tracking-wider shrink-0"
+                        style={{ color: PATENT_COLORS[st] }}
+                      >
                         {PATENT_LABELS[st]}
                       </span>
                       {st !== "paid" && (
@@ -156,7 +164,10 @@ export function PatentCalendar({
           userId={userId}
           concessions={concessions.map((c) => ({ id: c.id, label: `${c.code} — ${c.name}` }))}
           onClose={() => setOpen(false)}
-          onSaved={() => { setOpen(false); refresh(); }}
+          onSaved={() => {
+            setOpen(false);
+            refresh();
+          }}
         />
       )}
     </HudPanel>
@@ -167,7 +178,9 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="border border-border rounded-[2px] p-2 bg-bg-panel/50">
       <div className="text-[9px] font-mono uppercase tracking-wider text-text-dim">{label}</div>
-      <div className="text-sm font-mono font-semibold" style={color ? { color } : undefined}>{value}</div>
+      <div className="text-sm font-mono font-semibold" style={color ? { color } : undefined}>
+        {value}
+      </div>
     </div>
   );
 }
@@ -214,45 +227,89 @@ function PatentDialog({
     });
     setSaving(false);
     if (error) toast.error(error.message);
-    else { toast.success("Patente creada"); onSaved(); }
+    else {
+      toast.success("Patente creada");
+      onSaved();
+    }
   };
 
-  const inp = "w-full px-2 py-1 text-[11px] font-mono bg-bg-panel border border-border rounded-[2px] focus:outline-none focus:ring-1 focus:ring-signal-cyan";
+  const inp =
+    "w-full px-2 py-1 text-[11px] font-mono bg-bg-panel border border-border rounded-[2px] focus:outline-none focus:ring-1 focus:ring-signal-cyan";
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-sm font-mono uppercase tracking-wider">Nueva patente</DialogTitle>
+          <DialogTitle className="text-sm font-mono uppercase tracking-wider">
+            Nueva patente
+          </DialogTitle>
         </DialogHeader>
         <div className="space-y-2.5">
           <div>
             <label className="text-[10px] font-mono uppercase text-text-dim">Concesión</label>
-            <select className={inp} value={form.concession_id} onChange={(e) => setForm({ ...form, concession_id: e.target.value })}>
-              {concessions.map((c) => <option key={c.id} value={c.id}>{c.label}</option>)}
+            <select
+              className={inp}
+              value={form.concession_id}
+              onChange={(e) => setForm({ ...form, concession_id: e.target.value })}
+            >
+              {concessions.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.label}
+                </option>
+              ))}
             </select>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label className="text-[10px] font-mono uppercase text-text-dim">Año</label>
-              <input type="number" className={inp} value={form.year} onChange={(e) => setForm({ ...form, year: Number(e.target.value) })} />
+              <input
+                type="number"
+                className={inp}
+                value={form.year}
+                onChange={(e) => setForm({ ...form, year: Number(e.target.value) })}
+              />
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-text-dim">Monto UTM</label>
-              <input type="number" step="0.01" className={inp} value={form.amount_utm} onChange={(e) => setForm({ ...form, amount_utm: e.target.value })} />
+              <input
+                type="number"
+                step="0.01"
+                className={inp}
+                value={form.amount_utm}
+                onChange={(e) => setForm({ ...form, amount_utm: e.target.value })}
+              />
             </div>
           </div>
           <div>
             <label className="text-[10px] font-mono uppercase text-text-dim">Vencimiento</label>
-            <input type="date" className={inp} value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })} />
+            <input
+              type="date"
+              className={inp}
+              value={form.due_date}
+              onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+            />
           </div>
           <div>
             <label className="text-[10px] font-mono uppercase text-text-dim">Notas</label>
-            <textarea className={inp} rows={2} value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+            <textarea
+              className={inp}
+              rows={2}
+              value={form.notes}
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+            />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button onClick={onClose} className="px-3 py-1.5 text-[11px] font-mono uppercase border border-border rounded-[2px] hover:bg-accent">Cancelar</button>
-            <button onClick={onSave} disabled={saving} className="px-3 py-1.5 text-[11px] font-mono uppercase bg-signal-cyan text-bg-deep rounded-[2px] disabled:opacity-50">
+            <button
+              onClick={onClose}
+              className="px-3 py-1.5 text-[11px] font-mono uppercase border border-border rounded-[2px] hover:bg-accent"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onSave}
+              disabled={saving}
+              className="px-3 py-1.5 text-[11px] font-mono uppercase bg-signal-cyan text-bg-deep rounded-[2px] disabled:opacity-50"
+            >
               {saving ? "Guardando…" : "Guardar"}
             </button>
           </div>

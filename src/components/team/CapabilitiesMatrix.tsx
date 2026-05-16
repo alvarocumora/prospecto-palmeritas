@@ -11,7 +11,13 @@ import {
 import { MODULE_ROLES, WRITE_ROLES, type ProjectRole } from "@/hooks/useProjectRole";
 import { Eye, Pencil, Ban, RotateCcw, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function CapabilitiesMatrix({
   members,
@@ -36,7 +42,9 @@ export function CapabilitiesMatrix({
   }, [caps]);
 
   const selected = members.find((m) => m.user_id === selectedUserId) ?? null;
-  const overrides = selected ? overridesByUser.get(selected.user_id) ?? new Set<string>() : new Set<string>();
+  const overrides = selected
+    ? (overridesByUser.get(selected.user_id) ?? new Set<string>())
+    : new Set<string>();
 
   const toggle = async (module: string, action: ModuleAction, enabled: boolean) => {
     if (!selected) return;
@@ -81,7 +89,12 @@ export function CapabilitiesMatrix({
               size="sm"
               className="h-8 text-xs"
               onClick={async () => {
-                if (!confirm(`Restablecer permisos de ${selected.display_name ?? selected.email} al rol por defecto?`)) return;
+                if (
+                  !confirm(
+                    `Restablecer permisos de ${selected.display_name ?? selected.email} al rol por defecto?`,
+                  )
+                )
+                  return;
                 await clearMember(selected.user_id);
               }}
             >
@@ -108,8 +121,12 @@ export function CapabilitiesMatrix({
           <table className="w-full text-xs">
             <thead className="bg-background">
               <tr>
-                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">Módulo</th>
-                <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-24">Default rol</th>
+                <th className="text-left px-3 py-2 font-mono text-[10px] uppercase text-muted-foreground">
+                  Módulo
+                </th>
+                <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-24">
+                  Default rol
+                </th>
                 <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-24">
                   <Eye className="w-3 h-3 inline mr-1" /> Ver
                 </th>
@@ -119,7 +136,9 @@ export function CapabilitiesMatrix({
                 <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-24">
                   <Ban className="w-3 h-3 inline mr-1" /> Bloquear
                 </th>
-                <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-28">Resultado</th>
+                <th className="px-2 py-2 font-mono text-[10px] uppercase text-muted-foreground w-28">
+                  Resultado
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -173,7 +192,10 @@ export function CapabilitiesMatrix({
 }
 
 function CheckCell({
-  checked, disabled, danger, onChange,
+  checked,
+  disabled,
+  danger,
+  onChange,
 }: {
   checked: boolean;
   disabled?: boolean;
@@ -196,14 +218,30 @@ function DefaultPill({ role, module }: { role: ProjectRole; module: string }) {
   const hasAccess = allowed.includes(role);
   const hasWrite = hasAccess && WRITE_ROLES.includes(role);
   return (
-    <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${hasWrite ? "border-gold/40 text-gold" : hasAccess ? "border-border text-muted-foreground" : "border-destructive/30 text-destructive/70"}`}>
+    <span
+      className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${hasWrite ? "border-gold/40 text-gold" : hasAccess ? "border-border text-muted-foreground" : "border-destructive/30 text-destructive/70"}`}
+    >
       {hasWrite ? "edit" : hasAccess ? "view" : "—"}
     </span>
   );
 }
 
 function ResultPill({ view, edit }: { view: boolean; edit: boolean }) {
-  if (edit) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/30">PUEDE EDITAR</span>;
-  if (view) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border text-muted-foreground">SOLO VER</span>;
-  return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-destructive/10 text-destructive border border-destructive/30">SIN ACCESO</span>;
+  if (edit)
+    return (
+      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-gold/10 text-gold border border-gold/30">
+        PUEDE EDITAR
+      </span>
+    );
+  if (view)
+    return (
+      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded border border-border text-muted-foreground">
+        SOLO VER
+      </span>
+    );
+  return (
+    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-destructive/10 text-destructive border border-destructive/30">
+      SIN ACCESO
+    </span>
+  );
 }

@@ -110,7 +110,11 @@ export function useSurvey(surveyId: string | null) {
     const [s, l, st] = await Promise.all([
       supabase.from("geophysics_surveys").select("*").eq("id", surveyId).maybeSingle(),
       supabase.from("geophysics_lines").select("*").eq("survey_id", surveyId).order("line_id"),
-      supabase.from("geophysics_stations").select("*").eq("survey_id", surveyId).order("station_id"),
+      supabase
+        .from("geophysics_stations")
+        .select("*")
+        .eq("survey_id", surveyId)
+        .order("station_id"),
     ]);
     const firstErr = s.error || l.error || st.error;
     if (firstErr) {
@@ -157,7 +161,7 @@ export function useGeophysicsMutations() {
       if (error) throw error;
       return data as Survey;
     },
-    [user]
+    [user],
   );
 
   const updateSurvey = useCallback(async (id: string, patch: Partial<Survey>) => {
@@ -199,7 +203,7 @@ export function useGeophysicsMutations() {
       if (error) throw error;
       return data as Station;
     },
-    [user]
+    [user],
   );
 
   const updateStation = useCallback(async (id: string, patch: Partial<Station>) => {
@@ -228,8 +232,7 @@ export function useGeophysicsMutations() {
           survey_id: surveyId,
           created_by: user.id,
           line_id: payload.line_id ?? "L-NEW",
-          geometry_geojson:
-            payload.geometry_geojson ?? { type: "LineString", coordinates: [] },
+          geometry_geojson: payload.geometry_geojson ?? { type: "LineString", coordinates: [] },
           length_m: payload.length_m ?? null,
           is_synthetic: payload.is_synthetic ?? false,
           notes: payload.notes ?? null,
@@ -239,7 +242,7 @@ export function useGeophysicsMutations() {
       if (error) throw error;
       return data as unknown as Line;
     },
-    [user]
+    [user],
   );
 
   const updateLine = useCallback(async (id: string, patch: Partial<Line>) => {

@@ -16,7 +16,9 @@ export const GEO_COPILOT_EVIDENCE_CATEGORY_LABELS: Record<GeoCopilotEvidenceCate
   raster: "Raster",
 };
 
-export function groupEvidenceByCategory(evidence: GeoCopilotEvidenceRef[]): GeoCopilotEvidenceGroup[] {
+export function groupEvidenceByCategory(
+  evidence: GeoCopilotEvidenceRef[],
+): GeoCopilotEvidenceGroup[] {
   const groups = new Map<GeoCopilotEvidenceCategory, GeoCopilotEvidenceRef[]>();
 
   for (const item of evidence) {
@@ -46,7 +48,7 @@ export function summarizeEvidence(evidence: GeoCopilotEvidenceRef[]): GeoCopilot
 
 export function filterEvidenceByConfidence(
   evidence: GeoCopilotEvidenceRef[],
-  confidence: "low" | "medium" | "high"
+  confidence: "low" | "medium" | "high",
 ): GeoCopilotEvidenceRef[] {
   return evidence.filter((item) => item.confidence === confidence);
 }

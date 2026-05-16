@@ -5,7 +5,11 @@ import { Download, FileText, Loader2 } from "lucide-react";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import { Badge } from "@/features/palmeras/components/primitives/Badge";
-import { getFrancoCadastreCross, type FrancoCadastreCross, type FrancoPertenenciaMatch } from "@/lib/franco-cadastre.functions";
+import {
+  getFrancoCadastreCross,
+  type FrancoCadastreCross,
+  type FrancoPertenenciaMatch,
+} from "@/lib/franco-cadastre.functions";
 
 const PROJECT_TITLE = "Prospecto Franco (Gianfranco)";
 const REGION = "Valparaíso, Chile";
@@ -155,11 +159,12 @@ export function FrancoNI43101DraftPanel() {
       <div className="space-y-4">
         <DraftSection title="Sec. 3 — Property Description and Location">
           <p>
-            El prospecto <b>{PROJECT_TITLE}</b> se ubica en la Región de {REGION}. La propiedad minera
-            está constituida por <b>{exact.length} pertenencias confirmadas</b> en el catastro nacional,
-            totalizando <b>{data.totalAreaHa.toLocaleString("es-CL")} ha</b> bajo control del titular.
-            El KMZ aportado por el operador contiene <b>{data.totalKmlPolygons} polígonos</b>, de los
-            cuales <b>{data.matchedKmlPolygons}</b> fueron cruzados espacial y/o nominativamente contra{" "}
+            El prospecto <b>{PROJECT_TITLE}</b> se ubica en la Región de {REGION}. La propiedad
+            minera está constituida por <b>{exact.length} pertenencias confirmadas</b> en el
+            catastro nacional, totalizando <b>{data.totalAreaHa.toLocaleString("es-CL")} ha</b> bajo
+            control del titular. El KMZ aportado por el operador contiene{" "}
+            <b>{data.totalKmlPolygons} polígonos</b>, de los cuales <b>{data.matchedKmlPolygons}</b>{" "}
+            fueron cruzados espacial y/o nominativamente contra{" "}
             <b>{data.uniqueConcessions} concesiones</b> en la base de datos.
           </p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-3">
@@ -170,20 +175,24 @@ export function FrancoNI43101DraftPanel() {
               { l: "Superficie (ha)", v: data.totalAreaHa.toLocaleString("es-CL") },
             ].map((k) => (
               <div key={k.l} className="rounded border border-gold/30 bg-gold/5 p-2">
-                <div className="font-mono text-[10px] uppercase tracking-widest text-hint">{k.l}</div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-hint">
+                  {k.l}
+                </div>
                 <div className="font-mono text-base text-foreground">{k.v}</div>
               </div>
             ))}
           </div>
           <p className="mt-3">
-            <b>Estado de titulación.</b> Las pertenencias confirmadas figuran en el rol catastral con
-            código <code>GF-CONC-*</code> y status SERNAGEOMIN reportado en el Anexo A. Las{" "}
-            <b>{noMatch.length}</b> geometrías sin match corresponden a polígonos auxiliares del KMZ y
-            deben revisarse en QGIS antes de la auditoría QP.
+            <b>Estado de titulación.</b> Las pertenencias confirmadas figuran en el rol catastral
+            con código <code>GF-CONC-*</code> y status SERNAGEOMIN reportado en el Anexo A. Las{" "}
+            <b>{noMatch.length}</b> geometrías sin match corresponden a polígonos auxiliares del KMZ
+            y deben revisarse en QGIS antes de la auditoría QP.
           </p>
         </DraftSection>
 
-        <DraftSection title={`Anexo A — Pertenencias KMZ × Catastro (preview ${previewRows.length}/${data.rows.length})`}>
+        <DraftSection
+          title={`Anexo A — Pertenencias KMZ × Catastro (preview ${previewRows.length}/${data.rows.length})`}
+        >
           <div className="overflow-x-auto">
             <table className="w-full text-xs font-mono">
               <thead>
@@ -202,10 +211,24 @@ export function FrancoNI43101DraftPanel() {
                     <td className="py-1.5 pr-3 text-foreground">{r.kmlName}</td>
                     <td className="py-1.5 pr-3 text-muted-foreground">{r.concessionCode ?? "—"}</td>
                     <td className="py-1.5 pr-3 text-muted-foreground">{r.concessionName ?? "—"}</td>
-                    <td className="py-1.5 pr-3 text-right text-muted-foreground">{r.areaHaDb?.toFixed(2) ?? "—"}</td>
-                    <td className="py-1.5 pr-3 text-right text-foreground">{r.overlapHa.toFixed(2)}</td>
+                    <td className="py-1.5 pr-3 text-right text-muted-foreground">
+                      {r.areaHaDb?.toFixed(2) ?? "—"}
+                    </td>
+                    <td className="py-1.5 pr-3 text-right text-foreground">
+                      {r.overlapHa.toFixed(2)}
+                    </td>
                     <td className="py-1.5 pr-3">
-                      <Badge tone={r.matchKind === "EXACT" ? "teal" : r.matchKind === "GEOM" ? "gold" : r.matchKind === "NAME~" ? "muted" : "alert"}>
+                      <Badge
+                        tone={
+                          r.matchKind === "EXACT"
+                            ? "teal"
+                            : r.matchKind === "GEOM"
+                              ? "gold"
+                              : r.matchKind === "NAME~"
+                                ? "muted"
+                                : "alert"
+                        }
+                      >
                         {r.matchKind}
                       </Badge>
                     </td>

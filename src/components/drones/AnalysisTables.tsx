@@ -4,8 +4,14 @@ import type { DemDiff, StockpileVolume } from "@/hooks/useDroneAnalysis";
 import type { DroneRaster } from "@/hooks/useDroneFlights";
 
 export function DiffTable({
-  diffs, rasters, onDelete,
-}: { diffs: DemDiff[]; rasters: DroneRaster[]; onDelete: (id: string, name: string) => void }) {
+  diffs,
+  rasters,
+  onDelete,
+}: {
+  diffs: DemDiff[];
+  rasters: DroneRaster[];
+  onDelete: (id: string, name: string) => void;
+}) {
   if (diffs.length === 0) {
     return (
       <div className="border border-dashed border-border rounded p-8 text-center text-sm font-mono text-muted-foreground">
@@ -34,19 +40,34 @@ export function DiffTable({
             <tr key={d.id} className="border-t border-border hover:bg-accent/30">
               <td className="px-3 py-2 font-semibold">
                 <div>{d.name}</div>
-                <div className="text-[9px] text-muted-foreground">{new Date(d.created_at).toLocaleString()} · {d.cells_analyzed ?? 0} celdas</div>
+                <div className="text-[9px] text-muted-foreground">
+                  {new Date(d.created_at).toLocaleString()} · {d.cells_analyzed ?? 0} celdas
+                </div>
               </td>
               <td className="px-3 py-2 text-[10px] text-muted-foreground">
-                {nameOf(d.raster_before_id)}<br />→ {nameOf(d.raster_after_id)}
+                {nameOf(d.raster_before_id)}
+                <br />→ {nameOf(d.raster_after_id)}
               </td>
-              <td className="px-3 py-2 text-right text-teal font-semibold">{d.fill_volume_m3?.toLocaleString() ?? "—"}</td>
-              <td className="px-3 py-2 text-right text-destructive font-semibold">{d.cut_volume_m3?.toLocaleString() ?? "—"}</td>
-              <td className={`px-3 py-2 text-right font-bold ${(d.net_volume_m3 ?? 0) >= 0 ? "text-teal" : "text-destructive"}`}>
-                {(d.net_volume_m3 ?? 0) >= 0 ? "+" : ""}{d.net_volume_m3?.toLocaleString() ?? "—"}
+              <td className="px-3 py-2 text-right text-teal font-semibold">
+                {d.fill_volume_m3?.toLocaleString() ?? "—"}
               </td>
-              <td className="px-3 py-2 text-right text-muted-foreground">{d.diff_mean_m?.toFixed(3) ?? "—"}</td>
+              <td className="px-3 py-2 text-right text-destructive font-semibold">
+                {d.cut_volume_m3?.toLocaleString() ?? "—"}
+              </td>
+              <td
+                className={`px-3 py-2 text-right font-bold ${(d.net_volume_m3 ?? 0) >= 0 ? "text-teal" : "text-destructive"}`}
+              >
+                {(d.net_volume_m3 ?? 0) >= 0 ? "+" : ""}
+                {d.net_volume_m3?.toLocaleString() ?? "—"}
+              </td>
+              <td className="px-3 py-2 text-right text-muted-foreground">
+                {d.diff_mean_m?.toFixed(3) ?? "—"}
+              </td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => onDelete(d.id, d.name)} className="text-destructive hover:bg-destructive/10 p-1 rounded">
+                <button
+                  onClick={() => onDelete(d.id, d.name)}
+                  className="text-destructive hover:bg-destructive/10 p-1 rounded"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </td>
@@ -59,8 +80,14 @@ export function DiffTable({
 }
 
 export function StockpileTable({
-  stockpiles, rasters, onDelete,
-}: { stockpiles: StockpileVolume[]; rasters: DroneRaster[]; onDelete: (id: string, name: string) => void }) {
+  stockpiles,
+  rasters,
+  onDelete,
+}: {
+  stockpiles: StockpileVolume[];
+  rasters: DroneRaster[];
+  onDelete: (id: string, name: string) => void;
+}) {
   if (stockpiles.length === 0) {
     return (
       <div className="border border-dashed border-border rounded p-8 text-center text-sm font-mono text-muted-foreground">
@@ -95,16 +122,24 @@ export function StockpileTable({
               </td>
               <td className="px-3 py-2 text-muted-foreground text-[10px]">{nameOf(s.raster_id)}</td>
               <td className="px-3 py-2 text-muted-foreground text-[10px]">
-                {s.base_method}<br />
+                {s.base_method}
+                <br />
                 {s.base_elevation_m?.toFixed(2)} m
               </td>
-              <td className="px-3 py-2 text-right font-bold text-gold">{s.volume_m3?.toLocaleString() ?? "—"}</td>
-              <td className="px-3 py-2 text-right text-muted-foreground">{s.area_m2?.toLocaleString() ?? "—"}</td>
+              <td className="px-3 py-2 text-right font-bold text-gold">
+                {s.volume_m3?.toLocaleString() ?? "—"}
+              </td>
+              <td className="px-3 py-2 text-right text-muted-foreground">
+                {s.area_m2?.toLocaleString() ?? "—"}
+              </td>
               <td className="px-3 py-2 text-right text-muted-foreground">
                 {s.mean_height_m?.toFixed(2) ?? "—"} / {s.max_height_m?.toFixed(2) ?? "—"}
               </td>
               <td className="px-3 py-2 text-right">
-                <button onClick={() => onDelete(s.id, s.name)} className="text-destructive hover:bg-destructive/10 p-1 rounded">
+                <button
+                  onClick={() => onDelete(s.id, s.name)}
+                  className="text-destructive hover:bg-destructive/10 p-1 rounded"
+                >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </td>

@@ -12,8 +12,7 @@ import type { LeafletNS } from "./types";
  *    Uses the public Overpass API. Re-fetched on `moveend` when visible.
  */
 
-const USGS_FEED =
-  "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson";
+const USGS_FEED = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson";
 
 type USGSFeature = {
   type: "Feature";
@@ -37,9 +36,7 @@ function magColor(mag: number): string {
   return "#a3a3a3"; // grey
 }
 
-export async function buildUsgsEarthquakesLayer(
-  L: LeafletNS,
-): Promise<LayerGroup> {
+export async function buildUsgsEarthquakesLayer(L: LeafletNS): Promise<LayerGroup> {
   const group = L.layerGroup();
   try {
     const res = await fetch(USGS_FEED);
@@ -99,7 +96,13 @@ export function buildOverpassInfraLayer(L: LeafletNS): OverpassController {
       return;
     }
     const b = map.getBounds();
-    const key = [b.getSouth().toFixed(3), b.getWest().toFixed(3), b.getNorth().toFixed(3), b.getEast().toFixed(3), map.getZoom()].join(",");
+    const key = [
+      b.getSouth().toFixed(3),
+      b.getWest().toFixed(3),
+      b.getNorth().toFixed(3),
+      b.getEast().toFixed(3),
+      map.getZoom(),
+    ].join(",");
     if (key === lastFetchKey) return;
     lastFetchKey = key;
     pending = true;

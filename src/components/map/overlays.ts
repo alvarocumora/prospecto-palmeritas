@@ -2,16 +2,12 @@ import type { LeafletNS } from "./types";
 
 /** Geological raster overlays. Macrostrat is global and reliable. */
 export function buildGeologyOverlays(L: LeafletNS) {
-  const macrostratGeology = L.tileLayer(
-    "https://tiles.macrostrat.org/carto/{z}/{x}/{y}.png",
-    {
-      attribution:
-        'Geología &copy; <a href="https://macrostrat.org">Macrostrat</a> (UW–Madison)',
-      opacity: 0.75,
-      maxZoom: 16,
-      className: "macrostrat-overlay",
-    }
-  );
+  const macrostratGeology = L.tileLayer("https://tiles.macrostrat.org/carto/{z}/{x}/{y}.png", {
+    attribution: 'Geología &copy; <a href="https://macrostrat.org">Macrostrat</a> (UW–Madison)',
+    opacity: 0.75,
+    maxZoom: 16,
+    className: "macrostrat-overlay",
+  });
 
   return {
     "Geología Macrostrat (global)": macrostratGeology,
@@ -39,11 +35,7 @@ const CATASTRO_BASE =
 //   SITUACION_CONCESION, ID_SITUACION_CONCESION, TIPO_CONCESION, COMUNA,
 //   TITULAR_DIVISION
 
-export type CatastroOrigen =
-  | "EXPLOTA_1983"
-  | "EXPLOTA_1932"
-  | "EXPLORA_1983"
-  | "ESTACAMENTO";
+export type CatastroOrigen = "EXPLOTA_1983" | "EXPLOTA_1932" | "EXPLORA_1983" | "ESTACAMENTO";
 
 /** Single query that fetches all 4 property types in a bbox (constituidas). */
 export function catastroQueryUrl(bbox: {
@@ -60,7 +52,8 @@ export function catastroQueryUrl(bbox: {
     inSR: "4326",
     outSR: "4326",
     spatialRel: "esriSpatialRelIntersects",
-    outFields: "ORIGEN,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TITULAR_DIVISION,COMUNA",
+    outFields:
+      "ORIGEN,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TITULAR_DIVISION,COMUNA",
     returnGeometry: "true",
     f: "geojson",
   });
@@ -101,7 +94,7 @@ export const CATASTRO_STYLE: Record<
     fillColor: "#15D844",
     weight: 1.2,
     opacity: 0.95,
-    fillOpacity: 0.30,
+    fillOpacity: 0.3,
     label: "Exploración 1983",
   },
   ESTACAMENTO: {
@@ -109,7 +102,7 @@ export const CATASTRO_STYLE: Record<
     fillColor: "#ABFADB",
     weight: 1.2,
     opacity: 0.95,
-    fillOpacity: 0.30,
+    fillOpacity: 0.3,
     label: "Estacamento salitrero",
   },
 };
@@ -117,9 +110,7 @@ export const CATASTRO_STYLE: Record<
 export function catastroPopupHtml(p: Record<string, unknown>): string {
   const origen = (p.ORIGEN as CatastroOrigen) ?? "EXPLOTA_1983";
   const style = CATASTRO_STYLE[origen] ?? CATASTRO_STYLE.EXPLOTA_1983;
-  const rol = p.NUMERO_ROL
-    ? `${p.NUMERO_ROL}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`
-    : "—";
+  const rol = p.NUMERO_ROL ? `${p.NUMERO_ROL}${p.DV_ROL ? `-${p.DV_ROL}` : ""}` : "—";
   const area = p.HECTAREAS != null ? `${Number(p.HECTAREAS).toFixed(1)} ha` : "—";
   const venc = p.FECHA_VENCIMIENTO
     ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
@@ -153,7 +144,7 @@ export async function fetchMacrostratUnit(lat: number, lng: number) {
 export function macrostratPopupHtml(
   unit: Record<string, unknown> | undefined,
   lat: number,
-  lng: number
+  lng: number,
 ): string {
   if (!unit) {
     return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A89080;">
@@ -161,7 +152,8 @@ export function macrostratPopupHtml(
     </div>`;
   }
   const name = (unit.name as string) ?? (unit.strat_name as string) ?? "Unidad geológica";
-  const age = (unit.age as string) ?? (unit.b_age && unit.t_age ? `${unit.b_age}–${unit.t_age} Ma` : "—");
+  const age =
+    (unit.age as string) ?? (unit.b_age && unit.t_age ? `${unit.b_age}–${unit.t_age} Ma` : "—");
   const lith = (unit.lith as string) ?? "—";
   const descrip = (unit.descrip as string) ?? "";
   return `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:260px;">

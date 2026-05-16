@@ -65,10 +65,7 @@ export function MapLayout({
 
           {/* Action cluster flotante DENTRO del área de mapa */}
           {actionCluster && (
-            <div
-              className="absolute top-3 right-3 pointer-events-none"
-              style={{ zIndex: 720 }}
-            >
+            <div className="absolute top-3 right-3 pointer-events-none" style={{ zIndex: 720 }}>
               <div className="pointer-events-auto">{actionCluster}</div>
             </div>
           )}

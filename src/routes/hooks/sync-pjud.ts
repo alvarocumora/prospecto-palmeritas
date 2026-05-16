@@ -16,8 +16,7 @@ import crypto from "node:crypto";
 
 // PJUD search results page for mining cases (materia=Minería). The exact URL
 // changes occasionally; Firecrawl's JSON extraction tolerates layout drift.
-const PJUD_SEARCH_URL =
-  "https://oficinajudicialvirtual.pjud.cl/indexN.php#buscador";
+const PJUD_SEARCH_URL = "https://oficinajudicialvirtual.pjud.cl/indexN.php#buscador";
 
 type ScrapedCase = {
   case_number: string | null;
@@ -89,10 +88,10 @@ export const Route = createFileRoute("/hooks/sync-pjud")({
 
         const SUPABASE_URL = process.env.SUPABASE_URL;
         if (!SUPABASE_URL) {
-          return new Response(
-            JSON.stringify({ error: "SUPABASE_URL not configured" }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ error: "SUPABASE_URL not configured" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -152,14 +151,9 @@ export const Route = createFileRoute("/hooks/sync-pjud")({
 
           const extractPrompt = `Extrae todas las causas judiciales relacionadas con minería visibles en esta página del Poder Judicial de Chile (PJUD): oposiciones a mensura, sumarios sanitarios mineros, recursos ambientales mineros, juicios de servidumbre minera. Para cada causa incluye: número de rol, tribunal, jurisdicción, materia, demandante, demandado completo, RUT del demandado, comuna, región, fecha de ingreso (YYYY-MM-DD), último movimiento, estado, y URL de la causa si aparece.`;
 
-          const extracted = await firecrawlExtract(
-            PJUD_SEARCH_URL,
-            extractPrompt,
-            schema,
-          );
+          const extracted = await firecrawlExtract(PJUD_SEARCH_URL, extractPrompt, schema);
 
-          const cases =
-            (extracted as { cases?: ScrapedCase[] })?.cases ?? [];
+          const cases = (extracted as { cases?: ScrapedCase[] })?.cases ?? [];
 
           let inserted = 0;
           let skipped = 0;
@@ -232,22 +226,18 @@ export const Route = createFileRoute("/hooks/sync-pjud")({
                 } else if (
                   w.holder_name &&
                   cs.defendant &&
-                  cs.defendant
-                    .toLowerCase()
-                    .includes(w.holder_name.toLowerCase())
+                  cs.defendant.toLowerCase().includes(w.holder_name.toLowerCase())
                 ) {
                   matchType = "defendant_name";
                   detail = cs.defendant;
                 }
                 if (matchType) {
-                  const { error: aErr } = await adminClient
-                    .from("court_case_alerts")
-                    .insert({
-                      project_id: w.project_id,
-                      case_id: cs.id,
-                      match_type: matchType,
-                      match_detail: detail,
-                    });
+                  const { error: aErr } = await adminClient.from("court_case_alerts").insert({
+                    project_id: w.project_id,
+                    case_id: cs.id,
+                    match_type: matchType,
+                    match_detail: detail,
+                  });
                   if (!aErr) alertsCreated++;
                 }
               }
@@ -268,10 +258,10 @@ export const Route = createFileRoute("/hooks/sync-pjud")({
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           console.error("sync-pjud error:", message);
-          return new Response(
-            JSON.stringify({ success: false, error: message }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ success: false, error: message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
       },
     },

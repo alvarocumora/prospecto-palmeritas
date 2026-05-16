@@ -90,7 +90,11 @@ export function ListingDetailDrawer({
             <header className="shrink-0 border-b border-border">
               <div className="aspect-[16/7] bg-bg-elevated relative">
                 {listing.cover_image_url ? (
-                  <img src={listing.cover_image_url} alt={listing.title} className="w-full h-full object-cover" />
+                  <img
+                    src={listing.cover_image_url}
+                    alt={listing.title}
+                    className="w-full h-full object-cover"
+                  />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <Mountain className="w-12 h-12 text-muted-foreground/30" />
@@ -119,7 +123,9 @@ export function ListingDetailDrawer({
                     {listing.title}
                   </h2>
                   {listing.code && (
-                    <div className="text-[10px] font-mono text-muted-foreground">{listing.code}</div>
+                    <div className="text-[10px] font-mono text-muted-foreground">
+                      {listing.code}
+                    </div>
                   )}
                 </div>
               </div>
@@ -169,7 +175,9 @@ export function ListingDetailDrawer({
               {tab === "overview" && (
                 <div className="space-y-4">
                   <section>
-                    <h3 className="text-[10px] font-mono uppercase text-muted-foreground mb-2">Descripción</h3>
+                    <h3 className="text-[10px] font-mono uppercase text-muted-foreground mb-2">
+                      Descripción
+                    </h3>
                     <p className="text-xs font-mono text-foreground whitespace-pre-wrap leading-relaxed">
                       {listing.summary || "Sin descripción provista."}
                     </p>
@@ -192,11 +200,21 @@ export function ListingDetailDrawer({
                     </section>
                   )}
                   <section className="grid grid-cols-2 gap-3">
-                    <Field label="Modalidad" value={MODALITY_LABEL[listing.modality] ?? listing.modality} />
+                    <Field
+                      label="Modalidad"
+                      value={MODALITY_LABEL[listing.modality] ?? listing.modality}
+                    />
                     <Field label="Etapa" value={STAGE_LABEL[listing.stage] ?? listing.stage} />
                     <Field label="Commodity" value={listing.commodity} />
-                    <Field label="Royalty" value={listing.royalty_pct ? `${listing.royalty_pct}%` : "—"} icon={<Percent className="w-3 h-3" />} />
-                    <Field label="Publicado" value={new Date(listing.created_at).toLocaleDateString("es-CL")} />
+                    <Field
+                      label="Royalty"
+                      value={listing.royalty_pct ? `${listing.royalty_pct}%` : "—"}
+                      icon={<Percent className="w-3 h-3" />}
+                    />
+                    <Field
+                      label="Publicado"
+                      value={new Date(listing.created_at).toLocaleDateString("es-CL")}
+                    />
                     <Field label="Vistas" value={String(listing.views_count)} />
                   </section>
                 </div>
@@ -207,7 +225,8 @@ export function ListingDetailDrawer({
                   {!canSeeNda && (
                     <div className="mb-3 p-3 rounded border border-gold/30 bg-gold/5 text-xs font-mono text-foreground">
                       <Lock className="w-3.5 h-3.5 inline mr-1.5 text-gold" />
-                      Algunos archivos requieren NDA firmado. Ve a la pestaña <strong>Contacto / NDA</strong>.
+                      Algunos archivos requieren NDA firmado. Ve a la pestaña{" "}
+                      <strong>Contacto / NDA</strong>.
                     </div>
                   )}
                   {files.length === 0 ? (
@@ -229,15 +248,21 @@ export function ListingDetailDrawer({
                               <FileText className="w-3.5 h-3.5 text-gold shrink-0" />
                             )}
                             <div className="flex-1 min-w-0">
-                              <div className="text-xs font-mono text-foreground truncate">{f.file_name}</div>
+                              <div className="text-xs font-mono text-foreground truncate">
+                                {f.file_name}
+                              </div>
                               <div className="text-[10px] font-mono text-muted-foreground">
                                 {f.category ?? "documento"}
-                                {f.file_size_bytes ? ` · ${(f.file_size_bytes / 1024 / 1024).toFixed(2)} MB` : ""}
+                                {f.file_size_bytes
+                                  ? ` · ${(f.file_size_bytes / 1024 / 1024).toFixed(2)} MB`
+                                  : ""}
                                 {f.requires_nda && " · NDA"}
                               </div>
                             </div>
                             {locked ? (
-                              <span className="text-[10px] font-mono text-muted-foreground">Bloqueado</span>
+                              <span className="text-[10px] font-mono text-muted-foreground">
+                                Bloqueado
+                              </span>
                             ) : (
                               <span className="text-[10px] font-mono text-gold">Accesible</span>
                             )}
@@ -253,13 +278,16 @@ export function ListingDetailDrawer({
                 <div className="space-y-4">
                   {isOwner ? (
                     <div className="p-3 rounded border border-border bg-bg-elevated text-xs font-mono text-muted-foreground">
-                      Eres el titular de este listing. Las consultas de interesados aparecerán en tu bandeja.
+                      Eres el titular de este listing. Las consultas de interesados aparecerán en tu
+                      bandeja.
                     </div>
                   ) : (
                     <>
                       <section className="p-3 rounded border border-border bg-bg-elevated">
                         <div className="flex items-center gap-2 mb-2">
-                          <ShieldCheck className={`w-4 h-4 ${ndaSigned ? "text-gold" : "text-muted-foreground"}`} />
+                          <ShieldCheck
+                            className={`w-4 h-4 ${ndaSigned ? "text-gold" : "text-muted-foreground"}`}
+                          />
                           <h3 className="text-xs font-mono font-semibold">
                             Acuerdo de Confidencialidad (NDA)
                           </h3>
@@ -267,14 +295,15 @@ export function ListingDetailDrawer({
                         {ndaSigned ? (
                           <div className="text-[11px] font-mono text-foreground">
                             Firmaste el NDA el{" "}
-                            {new Date(inquiry!.nda_signed_at!).toLocaleString("es-CL")}. Puedes acceder a los
-                            archivos restringidos del data room.
+                            {new Date(inquiry!.nda_signed_at!).toLocaleString("es-CL")}. Puedes
+                            acceder a los archivos restringidos del data room.
                           </div>
                         ) : (
                           <>
                             <p className="text-[11px] font-mono text-muted-foreground mb-2 leading-relaxed">
-                              Al firmar accedes a información confidencial del titular bajo obligación de no
-                              divulgación. Tu nombre, email y fecha quedarán registrados.
+                              Al firmar accedes a información confidencial del titular bajo
+                              obligación de no divulgación. Tu nombre, email y fecha quedarán
+                              registrados.
                             </p>
                             <button
                               onClick={signNDA}
@@ -289,7 +318,9 @@ export function ListingDetailDrawer({
                       </section>
 
                       <section>
-                        <h3 className="text-xs font-mono font-semibold mb-2">Enviar consulta al titular</h3>
+                        <h3 className="text-xs font-mono font-semibold mb-2">
+                          Enviar consulta al titular
+                        </h3>
                         <textarea
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
@@ -303,12 +334,16 @@ export function ListingDetailDrawer({
                           className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border bg-background text-foreground hover:bg-accent text-xs font-mono disabled:opacity-50"
                         >
                           <Send className="w-3.5 h-3.5 text-gold" />
-                          {sending ? "Enviando…" : inquiry ? "Actualizar consulta" : "Enviar consulta"}
+                          {sending
+                            ? "Enviando…"
+                            : inquiry
+                              ? "Actualizar consulta"
+                              : "Enviar consulta"}
                         </button>
                         {inquiry && (
                           <div className="mt-2 text-[10px] font-mono text-muted-foreground">
-                            Estado actual: <span className="text-foreground">{inquiry.status}</span> · creada el{" "}
-                            {new Date(inquiry.created_at).toLocaleDateString("es-CL")}
+                            Estado actual: <span className="text-foreground">{inquiry.status}</span>{" "}
+                            · creada el {new Date(inquiry.created_at).toLocaleDateString("es-CL")}
                           </div>
                         )}
                       </section>

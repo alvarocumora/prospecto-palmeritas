@@ -55,15 +55,26 @@ async function postSearch(stacUrl: string, body: Record<string, unknown>): Promi
 
 function normalizeFeature(f: any, collection: string): StacItem {
   const props = (f?.properties ?? {}) as Record<string, unknown>;
-  const assets = (f?.assets ?? {}) as Record<string, { href?: string; type?: string; title?: string }>;
-  const bbox = Array.isArray(f?.bbox) && f.bbox.length >= 4
-    ? ([f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]] as [number, number, number, number])
-    : ([0, 0, 0, 0] as [number, number, number, number]);
-  const dt = (props["datetime"] as string) ?? (props["start_datetime"] as string) ?? new Date().toISOString();
-  const cloud = typeof props["eo:cloud_cover"] === "number"
-    ? (props["eo:cloud_cover"] as number)
-    : (typeof props["cloud_cover"] === "number" ? (props["cloud_cover"] as number) : null);
-  const thumb = assets["thumbnail"]?.href ?? assets["rendered_preview"]?.href ?? assets["browse"]?.href ?? null;
+  const assets = (f?.assets ?? {}) as Record<
+    string,
+    { href?: string; type?: string; title?: string }
+  >;
+  const bbox =
+    Array.isArray(f?.bbox) && f.bbox.length >= 4
+      ? ([f.bbox[0], f.bbox[1], f.bbox[2], f.bbox[3]] as [number, number, number, number])
+      : ([0, 0, 0, 0] as [number, number, number, number]);
+  const dt =
+    (props["datetime"] as string) ??
+    (props["start_datetime"] as string) ??
+    new Date().toISOString();
+  const cloud =
+    typeof props["eo:cloud_cover"] === "number"
+      ? (props["eo:cloud_cover"] as number)
+      : typeof props["cloud_cover"] === "number"
+        ? (props["cloud_cover"] as number)
+        : null;
+  const thumb =
+    assets["thumbnail"]?.href ?? assets["rendered_preview"]?.href ?? assets["browse"]?.href ?? null;
   const self = (f?.links ?? []).find((l: any) => l?.rel === "self")?.href ?? null;
   return {
     id: String(f?.id ?? ""),
@@ -91,7 +102,10 @@ export const searchStac = createServerFn({ method: "POST" })
       datetime: `${data.dateFrom}/${data.dateTo}`,
       limit: data.limit,
     };
-    if (data.cloudCoverMax !== undefined && (data.collection === "s2" || data.collection === "aster")) {
+    if (
+      data.cloudCoverMax !== undefined &&
+      (data.collection === "s2" || data.collection === "aster")
+    ) {
       body["query"] = { "eo:cloud_cover": { lt: data.cloudCoverMax } };
     }
 
@@ -112,18 +126,27 @@ export const searchStac = createServerFn({ method: "POST" })
         scene_id: it.id,
         stac_href: it.stacHref,
         acquisition_date: it.acquisitionDate,
-        bbox_geojson: { type: "Polygon", coordinates: [[
-          [it.bbox[0], it.bbox[1]], [it.bbox[2], it.bbox[1]],
-          [it.bbox[2], it.bbox[3]], [it.bbox[0], it.bbox[3]],
-          [it.bbox[0], it.bbox[1]],
-        ]] },
+        bbox_geojson: {
+          type: "Polygon",
+          coordinates: [
+            [
+              [it.bbox[0], it.bbox[1]],
+              [it.bbox[2], it.bbox[1]],
+              [it.bbox[2], it.bbox[3]],
+              [it.bbox[0], it.bbox[3]],
+              [it.bbox[0], it.bbox[1]],
+            ],
+          ],
+        },
         cloud_pct: it.cloudCover,
         thumbnail_url: it.thumbnailUrl,
         assets: JSON.parse(it.assetsJson),
         properties: JSON.parse(it.propertiesJson),
       }));
-      const { error } = await (supabase.from("stac_acquisitions") as any)
-        .upsert(rows, { onConflict: "project_id,collection,scene_id", ignoreDuplicates: true });
+      const { error } = await (supabase.from("stac_acquisitions") as any).upsert(rows, {
+        onConflict: "project_id,collection,scene_id",
+        ignoreDuplicates: true,
+      });
       if (error) console.warn("stac_acquisitions cache failed:", error.message);
     }
 
@@ -148,11 +171,15 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const bboxGeom = {
       type: "Polygon",
-      coordinates: [[
-        [data.bbox[0], data.bbox[1]], [data.bbox[2], data.bbox[1]],
-        [data.bbox[2], data.bbox[3]], [data.bbox[0], data.bbox[3]],
-        [data.bbox[0], data.bbox[1]],
-      ]],
+      coordinates: [
+        [
+          [data.bbox[0], data.bbox[1]],
+          [data.bbox[2], data.bbox[1]],
+          [data.bbox[2], data.bbox[3]],
+          [data.bbox[0], data.bbox[3]],
+          [data.bbox[0], data.bbox[1]],
+        ],
+      ],
     };
     // Productos por defecto que ASTER/EMIT pueden derivar
     const products = [
@@ -179,7 +206,10 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
       algorithm: "SAM",
       spectral_library: "USGS_v7",
       created_by: userId,
-      metadata: { seeded: true, note: "Productos derivados sintéticos pendientes de validación con worker Python real" },
+      metadata: {
+        seeded: true,
+        note: "Productos derivados sintéticos pendientes de validación con worker Python real",
+      },
     }));
     const { data: inserted, error } = await (supabase.from("hyperspectral_products") as any)
       .insert(rows)
@@ -216,7 +246,9 @@ export const explainHyperspectralProducts = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await (supabase.from("hyperspectral_products") as any)
-      .select("mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm")
+      .select(
+        "mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm",
+      )
       .eq("project_id", data.projectId)
       .in("id", data.productIds);
     if (error) return { ok: false, error: error.message, explanation: "", targets: [] as string[] };
@@ -230,9 +262,12 @@ export const explainHyperspectralProducts = createServerFn({ method: "POST" })
       return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", targets: [] };
     }
 
-    const summary = products.map((p) =>
-      `- ${p.mineral} (${p.assemblage ?? "n/a"}) · ${p.source} ${p.acquisition_date.slice(0,10)} · mean=${p.mean_score?.toFixed(2) ?? "?"} max=${p.max_score?.toFixed(2) ?? "?"} area=${p.area_ha?.toFixed(1) ?? "?"} ha · res=${p.pixel_size_m ?? "?"} m · ${p.algorithm}`
-    ).join("\n");
+    const summary = products
+      .map(
+        (p) =>
+          `- ${p.mineral} (${p.assemblage ?? "n/a"}) · ${p.source} ${p.acquisition_date.slice(0, 10)} · mean=${p.mean_score?.toFixed(2) ?? "?"} max=${p.max_score?.toFixed(2) ?? "?"} area=${p.area_ha?.toFixed(1) ?? "?"} ha · res=${p.pixel_size_m ?? "?"} m · ${p.algorithm}`,
+      )
+      .join("\n");
 
     const systemPrompt = `Eres un geólogo de exploración experto en mapeo hiperespectral (EMIT, EnMAP, ASTER) y modelos de alteración hidrotermal en pórfidos Cu-Au-Mo y epitermales chilenos. Tu trabajo es interpretar productos minerales derivados de sensores remotos para identificar zonas prospectivas. Sé conciso, técnico y orientado a decisión.`;
 
@@ -261,9 +296,12 @@ NO uses backticks ni markdown, solo JSON válido.`;
           temperature: 0.4,
         }),
       });
-      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", targets: [] };
-      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", targets: [] };
-      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", targets: [] };
+      if (aiRes.status === 429)
+        return { ok: false, error: "rate_limit", explanation: "", targets: [] };
+      if (aiRes.status === 402)
+        return { ok: false, error: "credits_exhausted", explanation: "", targets: [] };
+      if (!aiRes.ok)
+        return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", targets: [] };
       const json = await aiRes.json();
       const text: string = json?.choices?.[0]?.message?.content ?? "";
       const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
@@ -319,7 +357,13 @@ export const seedInsarMonitoring = createServerFn({ method: "POST" })
     const rows: any[] = [];
     for (const asset of data.assets) {
       // 6 puntos por activo: corona, talud, pie, cuerpo central x2, perímetro
-      const offsets: Array<{ dx: number; dy: number; vMean: number; vJitter: number; label: string }> = [
+      const offsets: Array<{
+        dx: number;
+        dy: number;
+        vMean: number;
+        vJitter: number;
+        label: string;
+      }> = [
         { dx: 0.0006, dy: 0.0006, vMean: -22, vJitter: 6, label: "cresta_norte" },
         { dx: 0.0006, dy: -0.0006, vMean: -18, vJitter: 5, label: "cresta_sur" },
         { dx: -0.0006, dy: 0.0006, vMean: -8, vJitter: 4, label: "talud_oeste" },
@@ -350,13 +394,15 @@ export const seedInsarMonitoring = createServerFn({ method: "POST" })
           point_geojson: { type: "Point", coordinates: [lng, lat] },
           bbox_geojson: {
             type: "Polygon",
-            coordinates: [[
-              [asset.lng - 0.002, asset.lat - 0.002],
-              [asset.lng + 0.002, asset.lat - 0.002],
-              [asset.lng + 0.002, asset.lat + 0.002],
-              [asset.lng - 0.002, asset.lat + 0.002],
-              [asset.lng - 0.002, asset.lat - 0.002],
-            ]],
+            coordinates: [
+              [
+                [asset.lng - 0.002, asset.lat - 0.002],
+                [asset.lng + 0.002, asset.lat - 0.002],
+                [asset.lng + 0.002, asset.lat + 0.002],
+                [asset.lng - 0.002, asset.lat + 0.002],
+                [asset.lng - 0.002, asset.lat - 0.002],
+              ],
+            ],
           },
           velocity_mm_year: velocity,
           cumulative_displacement_mm: cumulative,
@@ -389,7 +435,9 @@ export const explainInsarPattern = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     let q = (supabase.from("insar_displacement") as any)
-      .select("asset_name,asset_type,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,reference_date,end_date,metadata")
+      .select(
+        "asset_name,asset_type,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,reference_date,end_date,metadata",
+      )
       .eq("project_id", data.projectId)
       .order("velocity_mm_year", { ascending: true })
       .limit(60);
@@ -397,14 +445,19 @@ export const explainInsarPattern = createServerFn({ method: "POST" })
     const { data: rows, error } = await q;
     if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
     const points = (rows ?? []) as any[];
-    if (points.length === 0) return { ok: false, error: "Sin puntos InSAR", explanation: "", actions: [] };
+    if (points.length === 0)
+      return { ok: false, error: "Sin puntos InSAR", explanation: "", actions: [] };
 
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
+    if (!apiKey)
+      return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
 
-    const summary = points.map((p) =>
-      `- ${p.asset_name} (${p.asset_type}) [${p.metadata?.sample_label ?? "n/a"}] v=${p.velocity_mm_year} mm/yr · cum=${p.cumulative_displacement_mm ?? "?"} mm · coh=${p.coherence ?? "?"} · ${p.alert_severity}`
-    ).join("\n");
+    const summary = points
+      .map(
+        (p) =>
+          `- ${p.asset_name} (${p.asset_type}) [${p.metadata?.sample_label ?? "n/a"}] v=${p.velocity_mm_year} mm/yr · cum=${p.cumulative_displacement_mm ?? "?"} mm · coh=${p.coherence ?? "?"} · ${p.alert_severity}`,
+      )
+      .join("\n");
 
     const userPrompt = `Puntos InSAR (Sentinel-1 / OPERA DISP-S1) entre ${points[0].reference_date} y ${points[0].end_date}:
 ${summary}
@@ -423,15 +476,22 @@ NO uses backticks ni markdown.`;
         body: JSON.stringify({
           model: "google/gemini-2.5-pro",
           messages: [
-            { role: "system", content: "Eres ingeniero geotécnico senior especialista en seguridad de depósitos de relaves chilenos (DS 248/2007 SERNAGEOMIN, GISTM) y monitoreo satelital InSAR. Sé técnico, conciso y orientado a decisión." },
+            {
+              role: "system",
+              content:
+                "Eres ingeniero geotécnico senior especialista en seguridad de depósitos de relaves chilenos (DS 248/2007 SERNAGEOMIN, GISTM) y monitoreo satelital InSAR. Sé técnico, conciso y orientado a decisión.",
+            },
             { role: "user", content: userPrompt },
           ],
           temperature: 0.3,
         }),
       });
-      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", actions: [] };
-      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
-      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
+      if (aiRes.status === 429)
+        return { ok: false, error: "rate_limit", explanation: "", actions: [] };
+      if (aiRes.status === 402)
+        return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
+      if (!aiRes.ok)
+        return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
       const json = await aiRes.json();
       const text: string = json?.choices?.[0]?.message?.content ?? "";
       const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
@@ -463,7 +523,12 @@ const StockpileSeedInput = z.object({
   capturedAt: z.string().optional(),
 });
 
-function circlePolygon(lat: number, lng: number, radiusM: number, steps = 32): { type: "Polygon"; coordinates: number[][][] } {
+function circlePolygon(
+  lat: number,
+  lng: number,
+  radiusM: number,
+  steps = 32,
+): { type: "Polygon"; coordinates: number[][][] } {
   const coords: number[][] = [];
   const dLat = radiusM / 111320;
   const dLng = radiusM / (111320 * Math.cos((lat * Math.PI) / 180));
@@ -507,7 +572,8 @@ export const seedStockpileVolume = createServerFn({ method: "POST" })
       })
       .select("id")
       .single();
-    if (rErr || !raster) return { ok: false, error: rErr?.message ?? "raster insert failed", volume: null };
+    if (rErr || !raster)
+      return { ok: false, error: rErr?.message ?? "raster insert failed", volume: null };
 
     const { data: vol, error: vErr } = await (supabase.from("stockpile_volumes") as any)
       .insert({
@@ -549,14 +615,19 @@ export const explainStockpileChanges = createServerFn({ method: "POST" })
       .limit(60);
     if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
     const items = (rows ?? []) as any[];
-    if (items.length === 0) return { ok: false, error: "Sin stockpiles", explanation: "", actions: [] };
+    if (items.length === 0)
+      return { ok: false, error: "Sin stockpiles", explanation: "", actions: [] };
 
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
+    if (!apiKey)
+      return { ok: false, error: "LOVABLE_API_KEY not configured", explanation: "", actions: [] };
 
-    const summary = items.map((s) =>
-      `- ${s.name} (${s.material}) · area=${s.area_m2} m² · h_med=${s.mean_height_m} m · h_max=${s.max_height_m} m · V=${s.volume_m3} m³ · método=${s.base_method} · ${String(s.created_at).slice(0, 10)}`
-    ).join("\n");
+    const summary = items
+      .map(
+        (s) =>
+          `- ${s.name} (${s.material}) · area=${s.area_m2} m² · h_med=${s.mean_height_m} m · h_max=${s.max_height_m} m · V=${s.volume_m3} m³ · método=${s.base_method} · ${String(s.created_at).slice(0, 10)}`,
+      )
+      .join("\n");
 
     const userPrompt = `Mediciones de stockpiles vía DEM-diff multitemporal:
 ${summary}
@@ -575,15 +646,22 @@ NO uses backticks ni markdown.`;
         body: JSON.stringify({
           model: "google/gemini-2.5-pro",
           messages: [
-            { role: "system", content: "Eres ingeniero de minas senior experto en estimación de stockpiles vía topografía dron y DEM-diff multitemporal. Conoces normas de reconciliación mina-planta y densidades aparentes típicas en faenas chilenas. Sé conciso y técnico." },
+            {
+              role: "system",
+              content:
+                "Eres ingeniero de minas senior experto en estimación de stockpiles vía topografía dron y DEM-diff multitemporal. Conoces normas de reconciliación mina-planta y densidades aparentes típicas en faenas chilenas. Sé conciso y técnico.",
+            },
             { role: "user", content: userPrompt },
           ],
           temperature: 0.3,
         }),
       });
-      if (aiRes.status === 429) return { ok: false, error: "rate_limit", explanation: "", actions: [] };
-      if (aiRes.status === 402) return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
-      if (!aiRes.ok) return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
+      if (aiRes.status === 429)
+        return { ok: false, error: "rate_limit", explanation: "", actions: [] };
+      if (aiRes.status === 402)
+        return { ok: false, error: "credits_exhausted", explanation: "", actions: [] };
+      if (!aiRes.ok)
+        return { ok: false, error: `AI gateway ${aiRes.status}`, explanation: "", actions: [] };
       const json = await aiRes.json();
       const text: string = json?.choices?.[0]?.message?.content ?? "";
       const cleaned = text.replace(/^```json\s*|\s*```$/g, "").trim();
@@ -657,7 +735,12 @@ function bboxContains(bbox: any, lat: number, lng: number): boolean {
     if (!Array.isArray(coords) || coords.length < 4) return false;
     const xs = coords.map((c: number[]) => c[0]);
     const ys = coords.map((c: number[]) => c[1]);
-    return lng >= Math.min(...xs) && lng <= Math.max(...xs) && lat >= Math.min(...ys) && lat <= Math.max(...ys);
+    return (
+      lng >= Math.min(...xs) &&
+      lng <= Math.max(...xs) &&
+      lat >= Math.min(...ys) &&
+      lat <= Math.max(...ys)
+    );
   } catch {
     return false;
   }
@@ -665,14 +748,21 @@ function bboxContains(bbox: any, lat: number, lng: number): boolean {
 
 function pointFromGeom(g: any): [number, number] | null {
   try {
-    if (g?.type === "Point" && Array.isArray(g.coordinates)) return [g.coordinates[0], g.coordinates[1]];
+    if (g?.type === "Point" && Array.isArray(g.coordinates))
+      return [g.coordinates[0], g.coordinates[1]];
     if (g?.type === "Polygon" && Array.isArray(g.coordinates?.[0])) {
       const ring = g.coordinates[0];
-      let x = 0, y = 0;
-      for (const p of ring) { x += p[0]; y += p[1]; }
+      let x = 0,
+        y = 0;
+      for (const p of ring) {
+        x += p[0];
+        y += p[1];
+      }
       return [x / ring.length, y / ring.length];
     }
-  } catch { /* noop */ }
+  } catch {
+    /* noop */
+  }
   return null;
 }
 
@@ -680,7 +770,9 @@ function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): num
   const R = 6371000;
   const dLat = ((lat2 - lat1) * Math.PI) / 180;
   const dLng = ((lng2 - lng1) * Math.PI) / 180;
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
@@ -696,10 +788,14 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         .select("id,code,name,target_type,commodity,priority,score,lat,lng")
         .eq("project_id", pid),
       (supabase.from("hyperspectral_products") as any)
-        .select("id,acquisition_date,bbox_geojson,mineral,assemblage,mean_score,max_score,cells_above_threshold,area_ha")
+        .select(
+          "id,acquisition_date,bbox_geojson,mineral,assemblage,mean_score,max_score,cells_above_threshold,area_ha",
+        )
         .eq("project_id", pid),
       (supabase.from("insar_displacement") as any)
-        .select("id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date")
+        .select(
+          "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date",
+        )
         .eq("project_id", pid),
       (supabase.from("stockpile_volumes") as any)
         .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
@@ -716,14 +812,20 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
       const lng = t.lng != null ? Number(t.lng) : null;
 
       // Hyperspectral coverage
-      const matchingH = lat != null && lng != null
-        ? hyper.filter((h) => bboxContains(h.bbox_geojson, lat, lng))
-        : hyper; // fallback: project-wide
+      const matchingH =
+        lat != null && lng != null
+          ? hyper.filter((h) => bboxContains(h.bbox_geojson, lat, lng))
+          : hyper; // fallback: project-wide
       const minerals = Array.from(new Set(matchingH.map((h) => String(h.mineral)).filter(Boolean)));
-      const assemblages = Array.from(new Set(matchingH.map((h) => String(h.assemblage)).filter(Boolean)));
+      const assemblages = Array.from(
+        new Set(matchingH.map((h) => String(h.assemblage)).filter(Boolean)),
+      );
       const scores = matchingH.map((h) => Number(h.mean_score)).filter((n) => Number.isFinite(n));
       const maxScores = matchingH.map((h) => Number(h.max_score)).filter((n) => Number.isFinite(n));
-      const cellsAbove = matchingH.reduce((acc, h) => acc + (Number(h.cells_above_threshold) || 0), 0);
+      const cellsAbove = matchingH.reduce(
+        (acc, h) => acc + (Number(h.cells_above_threshold) || 0),
+        0,
+      );
       const areaHa = matchingH.reduce((acc, h) => acc + (Number(h.area_ha) || 0), 0);
       const latestH = matchingH.reduce<string | null>((acc, h) => {
         const d = h.acquisition_date ?? null;
@@ -740,7 +842,10 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
           const p = pointFromGeom(r.point_geojson);
           if (!p) continue;
           const d = haversineM(lat, lng, p[1], p[0]);
-          if (d < insarDist) { insarDist = d; insarRec = r; }
+          if (d < insarDist) {
+            insarDist = d;
+            insarRec = r;
+          }
         }
       }
       const vel = insarRec ? Number(insarRec.velocity_mm_year) : null;
@@ -760,7 +865,10 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
           const p = pointFromGeom(s.polygon_geojson);
           if (!p) continue;
           const d = haversineM(lat, lng, p[1], p[0]);
-          if (d < stockDist) { stockDist = d; stockRec = s; }
+          if (d < stockDist) {
+            stockDist = d;
+            stockRec = s;
+          }
         }
       }
       // Only attach a stockpile if reasonably close (≤5 km), else "no stockpile"
@@ -771,7 +879,7 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
       let status: "ok" | "monitor" | "alert" = "ok";
       if (sev === "critical") status = "alert";
       else if (sev === "warning" || trend === "warning") status = "alert";
-      else if (matchingH.length > 0 && (Math.max(...maxScores, 0) >= 0.7)) status = "monitor";
+      else if (matchingH.length > 0 && Math.max(...maxScores, 0) >= 0.7) status = "monitor";
       else if (sev === "info" && vel != null && Math.abs(vel) >= 8) status = "monitor";
 
       return {
@@ -782,7 +890,8 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         commodity: t.commodity ?? null,
         priority: t.priority,
         score: t.score != null ? Number(t.score) : null,
-        lat, lng,
+        lat,
+        lng,
         hyperspectral: {
           productCount: matchingH.length,
           minerals,
@@ -797,7 +906,10 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         insar: {
           available: !!insarRec,
           velocityMmYear: vel,
-          cumulativeMm: insarRec?.cumulative_displacement_mm != null ? Number(insarRec.cumulative_displacement_mm) : null,
+          cumulativeMm:
+            insarRec?.cumulative_displacement_mm != null
+              ? Number(insarRec.cumulative_displacement_mm)
+              : null,
           coherence: insarRec?.coherence != null ? Number(insarRec.coherence) : null,
           severity: (sev as any) ?? null,
           trend,
@@ -811,7 +923,8 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
           material: stockClose ? stockRec.material : null,
           volumeM3: stockClose && stockRec.volume_m3 != null ? Number(stockRec.volume_m3) : null,
           areaM2: stockClose && stockRec.area_m2 != null ? Number(stockRec.area_m2) : null,
-          meanHeightM: stockClose && stockRec.mean_height_m != null ? Number(stockRec.mean_height_m) : null,
+          meanHeightM:
+            stockClose && stockRec.mean_height_m != null ? Number(stockRec.mean_height_m) : null,
           distanceM: stockClose ? Math.round(stockDist) : null,
         },
         overallStatus: status,
@@ -830,7 +943,10 @@ const RunWorkflowInput = z.object({
   dryRun: z.boolean().optional(),
 });
 
-function priorityFor(velocity: number, severity: string | null): "low" | "medium" | "high" | "critical" {
+function priorityFor(
+  velocity: number,
+  severity: string | null,
+): "low" | "medium" | "high" | "critical" {
   const a = Math.abs(velocity);
   if (severity === "critical" || a >= 30) return "critical";
   if (a >= 20) return "high";
@@ -844,15 +960,30 @@ function recommendationFor(asset: string | null, vel: number): string {
   const base = `Detectada ${dir} de ${a.toFixed(1)} mm/año vía InSAR. `;
   switch (asset) {
     case "tailings_dam":
-      return base + "Inspección topográfica del talud aguas abajo, revisión piezómetros, validar borde libre y condición filtros. Considerar campaña LiDAR mensual y revisión QA del FoS según D.S. 248.";
+      return (
+        base +
+        "Inspección topográfica del talud aguas abajo, revisión piezómetros, validar borde libre y condición filtros. Considerar campaña LiDAR mensual y revisión QA del FoS según D.S. 248."
+      );
     case "open_pit":
-      return base + "Inspección visual del banco/berma involucrada, lectura de prismas y radar de talud, evaluar reperfilamiento o desaguado. Revisar cuñas/planos críticos en modelo geomecánico.";
+      return (
+        base +
+        "Inspección visual del banco/berma involucrada, lectura de prismas y radar de talud, evaluar reperfilamiento o desaguado. Revisar cuñas/planos críticos en modelo geomecánico."
+      );
     case "waste_dump":
-      return base + "Verificar geometría del botadero, drenaje basal y posibles fugas. Reducir ritmo de descarga si la velocidad supera umbral operacional.";
+      return (
+        base +
+        "Verificar geometría del botadero, drenaje basal y posibles fugas. Reducir ritmo de descarga si la velocidad supera umbral operacional."
+      );
     case "plant":
-      return base + "Coordinar con mantención estructural: nivelación de equipos, juntas y pernos de anclaje. Programar inspección geotécnica de fundaciones.";
+      return (
+        base +
+        "Coordinar con mantención estructural: nivelación de equipos, juntas y pernos de anclaje. Programar inspección geotécnica de fundaciones."
+      );
     default:
-      return base + "Programar inspección de campo, instalar/leer prismas y considerar batimetría/LiDAR para validar la magnitud reportada por satélite.";
+      return (
+        base +
+        "Programar inspección de campo, instalar/leer prismas y considerar batimetría/LiDAR para validar la magnitud reportada por satélite."
+      );
   }
 }
 
@@ -886,7 +1017,10 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
     due.setDate(due.getDate() + 14);
 
     for (const s of sites) {
-      if (taskedSet.has(s.id)) { skipped++; continue; }
+      if (taskedSet.has(s.id)) {
+        skipped++;
+        continue;
+      }
       const vel = Number(s.velocity_mm_year);
       const prio = priorityFor(vel, s.alert_severity);
       const rec = recommendationFor(s.asset_type, vel);
@@ -909,7 +1043,10 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
         .select("id")
         .single();
 
-      if (tErr || !task) { console.error("task insert failed", tErr); continue; }
+      if (tErr || !task) {
+        console.error("task insert failed", tErr);
+        continue;
+      }
 
       // 2. Log action in history
       await (supabase.from("insar_alert_actions") as any).insert({
@@ -934,7 +1071,14 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
 const AddRecInput = z.object({
   projectId: z.string().uuid(),
   insarId: z.string().uuid(),
-  actionType: z.enum(["recommendation","status_change","dismissed","escalated","field_inspection","closed"]),
+  actionType: z.enum([
+    "recommendation",
+    "status_change",
+    "dismissed",
+    "escalated",
+    "field_inspection",
+    "closed",
+  ]),
   recommendation: z.string().min(3).max(2000).optional(),
   notes: z.string().max(2000).optional(),
 });
@@ -978,13 +1122,17 @@ export const getInsarAlertHistory = createServerFn({ method: "POST" })
     const { supabase } = context;
 
     const { data: warnings } = await (supabase.from("insar_displacement") as any)
-      .select("id, asset_name, asset_type, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity, end_date, point_geojson")
+      .select(
+        "id, asset_name, asset_type, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity, end_date, point_geojson",
+      )
       .eq("project_id", data.projectId)
       .in("alert_severity", ["warning", "critical"])
       .order("velocity_mm_year", { ascending: false });
 
     const { data: actions } = await (supabase.from("insar_alert_actions") as any)
-      .select("id, insar_id, follow_up_task_id, action_type, severity_at_time, velocity_mm_year, recommendation, notes, created_at, created_by")
+      .select(
+        "id, insar_id, follow_up_task_id, action_type, severity_at_time, velocity_mm_year, recommendation, notes, created_at, created_by",
+      )
       .eq("project_id", data.projectId)
       .order("created_at", { ascending: false })
       .limit(500);

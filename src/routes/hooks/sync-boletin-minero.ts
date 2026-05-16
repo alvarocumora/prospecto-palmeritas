@@ -73,17 +73,13 @@ function hashPublication(p: ScrapedPublication): string {
   return crypto.createHash("sha256").update(key).digest("hex");
 }
 
-function pointInPolygon(
-  point: [number, number],
-  polygon: [number, number][],
-): boolean {
+function pointInPolygon(point: [number, number], polygon: [number, number][]): boolean {
   const [x, y] = point;
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
     const [xi, yi] = polygon[i];
     const [xj, yj] = polygon[j];
-    const intersect =
-      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+    const intersect = yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
     if (intersect) inside = !inside;
   }
   return inside;
@@ -119,10 +115,10 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
 
         const SUPABASE_URL = process.env.SUPABASE_URL;
         if (!SUPABASE_URL) {
-          return new Response(
-            JSON.stringify({ error: "SUPABASE_URL not configured" }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ error: "SUPABASE_URL not configured" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         // Use service role to bypass RLS for ingestion (cron is unauthenticated context)
@@ -153,12 +149,7 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
                     },
                     publication_type: {
                       type: "string",
-                      enum: [
-                        "pedimento",
-                        "mensura",
-                        "manifestacion",
-                        "otro",
-                      ],
+                      enum: ["pedimento", "mensura", "manifestacion", "otro"],
                     },
                     holder_name: { type: "string" },
                     holder_rut: {
@@ -182,15 +173,10 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
 
           const extractPrompt = `Extrae todas las publicaciones del Boletín Oficial de Minería de Chile visibles en esta página: pedimentos, mensuras y manifestaciones. Para cada una incluye: número de publicación, fecha (YYYY-MM-DD), tipo, titular completo, RUT del titular si aparece, nombre de la concesión, código si existe, región, provincia, comuna, área en hectáreas, y coordenadas centroide (lat/lng) si están disponibles.`;
 
-          const extracted = await firecrawlExtract(
-            BOLETIN_INDEX_URL,
-            extractPrompt,
-            schema,
-          );
+          const extracted = await firecrawlExtract(BOLETIN_INDEX_URL, extractPrompt, schema);
 
           const publications =
-            (extracted as { publications?: ScrapedPublication[] })
-              ?.publications ?? [];
+            (extracted as { publications?: ScrapedPublication[] })?.publications ?? [];
 
           let inserted = 0;
           let skipped = 0;
@@ -246,9 +232,7 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
           if (newBulletinIds.length > 0) {
             const { data: newBulletins } = await adminClient
               .from("mining_bulletins")
-              .select(
-                "id, holder_rut, holder_name, centroid_lat, centroid_lng",
-              )
+              .select("id, holder_rut, holder_name, centroid_lat, centroid_lng")
               .in("id", newBulletinIds);
 
             const { data: watchHolders } = await adminClient
@@ -276,32 +260,25 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
                 } else if (
                   w.holder_name &&
                   b.holder_name &&
-                  b.holder_name
-                    .toLowerCase()
-                    .includes(w.holder_name.toLowerCase())
+                  b.holder_name.toLowerCase().includes(w.holder_name.toLowerCase())
                 ) {
                   matchType = "holder_name";
                   detail = b.holder_name;
                 }
                 if (matchType) {
-                  const { error: aErr } = await adminClient
-                    .from("bulletin_alerts")
-                    .insert({
-                      project_id: w.project_id,
-                      bulletin_id: b.id,
-                      match_type: matchType,
-                      match_detail: detail,
-                    });
+                  const { error: aErr } = await adminClient.from("bulletin_alerts").insert({
+                    project_id: w.project_id,
+                    bulletin_id: b.id,
+                    match_type: matchType,
+                    match_detail: detail,
+                  });
                   if (!aErr) alertsCreated++;
                 }
               }
 
               // AOI match (centroid in polygon)
               if (b.centroid_lat != null && b.centroid_lng != null) {
-                const point: [number, number] = [
-                  Number(b.centroid_lng),
-                  Number(b.centroid_lat),
-                ];
+                const point: [number, number] = [Number(b.centroid_lng), Number(b.centroid_lat)];
                 const seenProjects = new Set<string>();
                 for (const c of campaigns ?? []) {
                   if (seenProjects.has(c.project_id)) continue;
@@ -309,14 +286,12 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
                   for (const poly of polygons) {
                     if (pointInPolygon(point, poly)) {
                       seenProjects.add(c.project_id);
-                      const { error: aErr } = await adminClient
-                        .from("bulletin_alerts")
-                        .insert({
-                          project_id: c.project_id,
-                          bulletin_id: b.id,
-                          match_type: "aoi",
-                          match_detail: `Centroide ${point[1].toFixed(4)}, ${point[0].toFixed(4)}`,
-                        });
+                      const { error: aErr } = await adminClient.from("bulletin_alerts").insert({
+                        project_id: c.project_id,
+                        bulletin_id: b.id,
+                        match_type: "aoi",
+                        match_detail: `Centroide ${point[1].toFixed(4)}, ${point[0].toFixed(4)}`,
+                      });
                       if (!aErr) alertsCreated++;
                       break;
                     }
@@ -343,13 +318,10 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
         } catch (err) {
           const message = err instanceof Error ? err.message : String(err);
           console.error("sync-boletin-minero error:", message);
-          return new Response(
-            JSON.stringify({ success: false, error: message }),
-            {
-              status: 500,
-              headers: { "Content-Type": "application/json" },
-            },
-          );
+          return new Response(JSON.stringify({ success: false, error: message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
       },
     },

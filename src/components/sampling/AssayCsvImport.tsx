@@ -1,5 +1,15 @@
 import { useMemo, useState } from "react";
-import { Upload, X, FileText, AlertTriangle, CheckCircle2, Loader2, Beaker, FlaskConical, ShieldCheck } from "lucide-react";
+import {
+  Upload,
+  X,
+  FileText,
+  AlertTriangle,
+  CheckCircle2,
+  Loader2,
+  Beaker,
+  FlaskConical,
+  ShieldCheck,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,18 +51,27 @@ export function AssayCsvImport({
     const blob = new Blob([TEMPLATE], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
-    a.href = url; a.download = "muestras_laboratorio_plantilla.csv"; a.click();
+    a.href = url;
+    a.download = "muestras_laboratorio_plantilla.csv";
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   const handleImport = async () => {
-    if (!user) { toast.error("Sin sesión"); return; }
-    if (validRows.length === 0) { toast.error("No hay filas válidas para importar"); return; }
+    if (!user) {
+      toast.error("Sin sesión");
+      return;
+    }
+    if (validRows.length === 0) {
+      toast.error("No hay filas válidas para importar");
+      return;
+    }
     setImporting(true);
     try {
       const payload = validRows.map((r: ParsedAssay) => {
         const noteParts: string[] = [];
-        if (r.qc_type !== "sample") noteParts.push(`QC:${r.qc_type}${r.parent_code ? ` of ${r.parent_code}` : ""}`);
+        if (r.qc_type !== "sample")
+          noteParts.push(`QC:${r.qc_type}${r.parent_code ? ` of ${r.parent_code}` : ""}`);
         if (r.warnings.length) noteParts.push(...r.warnings);
         return {
           project_id: projectId,
@@ -108,21 +127,35 @@ export function AssayCsvImport({
         <div className="p-4 space-y-4 overflow-y-auto">
           <div className="grid md:grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Archivo CSV (ALS / SGS / Bureau Veritas / ACME)</label>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+                Archivo CSV (ALS / SGS / Bureau Veritas / ACME)
+              </label>
               <input
                 type="file"
                 accept=".csv,text/csv"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f); }}
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) handleFile(f);
+                }}
                 className="block w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-primary file:text-primary-foreground file:font-mono file:cursor-pointer"
               />
-              <button onClick={downloadTemplate} className="mt-2 inline-flex items-center gap-1 text-[11px] font-mono text-primary hover:underline">
+              <button
+                onClick={downloadTemplate}
+                className="mt-2 inline-flex items-center gap-1 text-[11px] font-mono text-primary hover:underline"
+              >
                 <FileText className="w-3 h-3" /> Descargar plantilla
               </button>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Tipo muestra</label>
-                <select value={sampleType} onChange={(e) => setSampleType(e.target.value)} className="w-full text-xs bg-background border border-border rounded p-1.5 font-mono">
+                <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+                  Tipo muestra
+                </label>
+                <select
+                  value={sampleType}
+                  onChange={(e) => setSampleType(e.target.value)}
+                  className="w-full text-xs bg-background border border-border rounded p-1.5 font-mono"
+                >
                   <option value="rock_chip">Rock chip</option>
                   <option value="channel">Canal</option>
                   <option value="grab">Grab</option>
@@ -132,14 +165,23 @@ export function AssayCsvImport({
                 </select>
               </div>
               <div>
-                <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Zona</label>
-                <input value={zone} onChange={(e) => setZone(e.target.value)} placeholder="Ej: Vena Norte" className="w-full text-xs bg-background border border-border rounded p-1.5 font-mono" />
+                <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+                  Zona
+                </label>
+                <input
+                  value={zone}
+                  onChange={(e) => setZone(e.target.value)}
+                  placeholder="Ej: Vena Norte"
+                  className="w-full text-xs bg-background border border-border rounded p-1.5 font-mono"
+                />
               </div>
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">o pegar contenido</label>
+            <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">
+              o pegar contenido
+            </label>
             <textarea
               value={text}
               onChange={(e) => setText(e.target.value)}
@@ -150,9 +192,14 @@ export function AssayCsvImport({
           </div>
 
           <div className="text-[11px] font-mono text-muted-foreground leading-relaxed">
-            <strong className="text-foreground">Detección automática:</strong> elementos por nombre+unidad (Au_ppm, Ag g/t, Cu_pct, As_ppm…), valores bajo límite (&lt;0.005 → 0.0025).
+            <strong className="text-foreground">Detección automática:</strong> elementos por
+            nombre+unidad (Au_ppm, Ag g/t, Cu_pct, As_ppm…), valores bajo límite (&lt;0.005 →
+            0.0025).
             <br />
-            <strong className="text-foreground">QA/QC por código:</strong> <span className="text-info">BLK/BLANK</span> = blanco · <span className="text-info">STD/CRM/OREAS</span> = estándar · <span className="text-info">SAMPLE-D / -DUP</span> = duplicado.
+            <strong className="text-foreground">QA/QC por código:</strong>{" "}
+            <span className="text-info">BLK/BLANK</span> = blanco ·{" "}
+            <span className="text-info">STD/CRM/OREAS</span> = estándar ·{" "}
+            <span className="text-info">SAMPLE-D / -DUP</span> = duplicado.
           </div>
 
           {parsed?.headerError && (
@@ -163,10 +210,15 @@ export function AssayCsvImport({
 
           {parsed && Object.keys(parsed.detectedColumns).length > 0 && (
             <div className="rounded border border-border bg-muted/40 p-3">
-              <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">Columnas detectadas</div>
+              <div className="text-[10px] font-mono uppercase text-muted-foreground mb-1">
+                Columnas detectadas
+              </div>
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(parsed.detectedColumns).map(([logical, original]) => (
-                  <span key={logical} className="text-[10px] font-mono bg-background border border-border rounded px-1.5 py-0.5">
+                  <span
+                    key={logical}
+                    className="text-[10px] font-mono bg-background border border-border rounded px-1.5 py-0.5"
+                  >
                     <span className="text-primary">{logical}</span> ← {original}
                   </span>
                 ))}
@@ -176,10 +228,29 @@ export function AssayCsvImport({
 
           {parsed && parsed.rows.length > 0 && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono">
-              <Stat icon={<Beaker className="w-3 h-3" />} label="Muestras" value={parsed.qcStats.samples} />
-              <Stat icon={<ShieldCheck className="w-3 h-3" />} label="Blancos" value={parsed.qcStats.blanks} color="text-info" />
-              <Stat icon={<ShieldCheck className="w-3 h-3" />} label="Estándares" value={parsed.qcStats.standards} color="text-primary" />
-              <Stat icon={<ShieldCheck className="w-3 h-3" />} label="Duplicados" value={parsed.qcStats.duplicates} color="text-accent-foreground" />
+              <Stat
+                icon={<Beaker className="w-3 h-3" />}
+                label="Muestras"
+                value={parsed.qcStats.samples}
+              />
+              <Stat
+                icon={<ShieldCheck className="w-3 h-3" />}
+                label="Blancos"
+                value={parsed.qcStats.blanks}
+                color="text-info"
+              />
+              <Stat
+                icon={<ShieldCheck className="w-3 h-3" />}
+                label="Estándares"
+                value={parsed.qcStats.standards}
+                color="text-primary"
+              />
+              <Stat
+                icon={<ShieldCheck className="w-3 h-3" />}
+                label="Duplicados"
+                value={parsed.qcStats.duplicates}
+                color="text-accent-foreground"
+              />
             </div>
           )}
 
@@ -190,11 +261,20 @@ export function AssayCsvImport({
               </div>
               <ul className="text-[11px] font-mono space-y-0.5 max-h-32 overflow-y-auto">
                 {qcAlerts.slice(0, 20).map((a, i) => (
-                  <li key={i} className={a.severity === "critical" ? "text-destructive" : "text-orange-600 dark:text-orange-400"}>
+                  <li
+                    key={i}
+                    className={
+                      a.severity === "critical"
+                        ? "text-destructive"
+                        : "text-orange-600 dark:text-orange-400"
+                    }
+                  >
                     fila {a.rowNum} · {a.sample_code}: {a.message}
                   </li>
                 ))}
-                {qcAlerts.length > 20 && <li className="text-muted-foreground">… y {qcAlerts.length - 20} más</li>}
+                {qcAlerts.length > 20 && (
+                  <li className="text-muted-foreground">… y {qcAlerts.length - 20} más</li>
+                )}
               </ul>
             </div>
           )}
@@ -229,21 +309,37 @@ export function AssayCsvImport({
                 </thead>
                 <tbody>
                   {preview.map((r) => (
-                    <tr key={r.rowNum} className={`border-b border-border/40 ${r.errors.length ? "bg-destructive/5" : r.qc_type !== "sample" ? "bg-info/5" : ""}`}>
+                    <tr
+                      key={r.rowNum}
+                      className={`border-b border-border/40 ${r.errors.length ? "bg-destructive/5" : r.qc_type !== "sample" ? "bg-info/5" : ""}`}
+                    >
                       <td className="py-1 px-2 text-muted-foreground">{r.rowNum}</td>
-                      <td className="py-1 px-2">{r.sample_code || <span className="text-destructive">∅</span>}</td>
                       <td className="py-1 px-2">
-                        <span className={
-                          r.qc_type === "blank" ? "text-info" :
-                          r.qc_type === "standard" ? "text-primary" :
-                          r.qc_type === "duplicate" ? "text-accent-foreground" : "text-muted-foreground"
-                        }>{r.qc_type}</span>
+                        {r.sample_code || <span className="text-destructive">∅</span>}
+                      </td>
+                      <td className="py-1 px-2">
+                        <span
+                          className={
+                            r.qc_type === "blank"
+                              ? "text-info"
+                              : r.qc_type === "standard"
+                                ? "text-primary"
+                                : r.qc_type === "duplicate"
+                                  ? "text-accent-foreground"
+                                  : "text-muted-foreground"
+                          }
+                        >
+                          {r.qc_type}
+                        </span>
                       </td>
                       <td className="py-1 px-2 text-right">{r.au_gpt?.toFixed(3) ?? "—"}</td>
                       <td className="py-1 px-2 text-right">{r.ag_gpt?.toFixed(2) ?? "—"}</td>
                       <td className="py-1 px-2 text-right">{r.cu_pct?.toFixed(3) ?? "—"}</td>
                       <td className="py-1 px-2 text-right">{r.as_ppm ?? "—"}</td>
-                      <td className="py-1 px-2 text-muted-foreground truncate max-w-[180px]" title={[...r.errors, ...r.warnings].join(" | ")}>
+                      <td
+                        className="py-1 px-2 text-muted-foreground truncate max-w-[180px]"
+                        title={[...r.errors, ...r.warnings].join(" | ")}
+                      >
                         {r.errors[0] || r.warnings[0] || ""}
                       </td>
                     </tr>
@@ -260,7 +356,10 @@ export function AssayCsvImport({
         </div>
 
         <div className="flex items-center justify-between p-4 border-t border-border bg-muted/30">
-          <button onClick={onClose} className="text-xs font-mono text-muted-foreground hover:text-foreground">
+          <button
+            onClick={onClose}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground"
+          >
             Cancelar
           </button>
           <button
@@ -268,7 +367,11 @@ export function AssayCsvImport({
             disabled={importing || validRows.length === 0}
             className="inline-flex items-center gap-2 px-4 py-2 rounded bg-primary text-primary-foreground text-xs font-mono font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            {importing ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+            {importing ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Upload className="w-3 h-3" />
+            )}
             Importar {validRows.length} muestras
           </button>
         </div>
@@ -277,10 +380,23 @@ export function AssayCsvImport({
   );
 }
 
-function Stat({ icon, label, value, color = "text-foreground" }: { icon: React.ReactNode; label: string; value: number; color?: string }) {
+function Stat({
+  icon,
+  label,
+  value,
+  color = "text-foreground",
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  color?: string;
+}) {
   return (
     <div className="rounded border border-border bg-muted/30 p-2">
-      <div className="flex items-center gap-1 text-muted-foreground text-[10px] uppercase">{icon}{label}</div>
+      <div className="flex items-center gap-1 text-muted-foreground text-[10px] uppercase">
+        {icon}
+        {label}
+      </div>
       <div className={`text-lg font-bold ${color}`}>{value}</div>
     </div>
   );

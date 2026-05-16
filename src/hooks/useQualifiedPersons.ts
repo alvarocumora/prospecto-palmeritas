@@ -66,14 +66,30 @@ export function useQualifiedPersons() {
 
   const fetchAll = useCallback(async () => {
     if (!active?.id) {
-      setQps([]); setReports([]); setSections([]); setLoading(false); return;
+      setQps([]);
+      setReports([]);
+      setSections([]);
+      setLoading(false);
+      return;
     }
     setLoading(true);
     try {
-      const [{ data: qpData, error: qpErr }, { data: rData, error: rErr }, { data: sData, error: sErr }] = await Promise.all([
+      const [
+        { data: qpData, error: qpErr },
+        { data: rData, error: rErr },
+        { data: sData, error: sErr },
+      ] = await Promise.all([
         supabase.from("qualified_persons").select("*").order("full_name"),
-        supabase.from("technical_reports").select("*").eq("project_id", active.id).order("created_at", { ascending: false }),
-        supabase.from("technical_report_sections").select("*").eq("project_id", active.id).order("section_no"),
+        supabase
+          .from("technical_reports")
+          .select("*")
+          .eq("project_id", active.id)
+          .order("created_at", { ascending: false }),
+        supabase
+          .from("technical_report_sections")
+          .select("*")
+          .eq("project_id", active.id)
+          .order("section_no"),
       ]);
       if (qpErr) throw qpErr;
       if (rErr) throw rErr;
@@ -90,22 +106,31 @@ export function useQualifiedPersons() {
     }
   }, [active?.id]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => {
+    fetchAll();
+  }, [fetchAll]);
 
   const createQp = async (input: Partial<QualifiedPerson>) => {
     if (!user) throw new Error("No autenticado");
-    const { data, error } = await supabase.from("qualified_persons").insert({
-      user_id: user.id,
-      full_name: input.full_name ?? "",
-      profession: input.profession ?? "",
-      registration_body: input.registration_body ?? "",
-      license_no: input.license_no ?? "",
-      competency_areas: input.competency_areas ?? [],
-      bio: input.bio ?? null,
-      cv_url: input.cv_url ?? null,
-      signature_url: input.signature_url ?? null,
-    }).select().single();
-    if (error) { toast.error(error.message); throw error; }
+    const { data, error } = await supabase
+      .from("qualified_persons")
+      .insert({
+        user_id: user.id,
+        full_name: input.full_name ?? "",
+        profession: input.profession ?? "",
+        registration_body: input.registration_body ?? "",
+        license_no: input.license_no ?? "",
+        competency_areas: input.competency_areas ?? [],
+        bio: input.bio ?? null,
+        cv_url: input.cv_url ?? null,
+        signature_url: input.signature_url ?? null,
+      })
+      .select()
+      .single();
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("QP registrado");
     await fetchAll();
     return data;
@@ -113,31 +138,50 @@ export function useQualifiedPersons() {
 
   const updateQp = async (id: string, patch: Partial<QualifiedPerson>) => {
     const { error } = await supabase.from("qualified_persons").update(patch).eq("id", id);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("QP actualizado");
     await fetchAll();
   };
 
   const deleteQp = async (id: string) => {
     const { error } = await supabase.from("qualified_persons").delete().eq("id", id);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("QP eliminado");
     await fetchAll();
   };
 
-  const createReport = async (input: { title: string; report_type?: string; lead_qp_id?: string | null; effective_date?: string | null; summary?: string | null }) => {
+  const createReport = async (input: {
+    title: string;
+    report_type?: string;
+    lead_qp_id?: string | null;
+    effective_date?: string | null;
+    summary?: string | null;
+  }) => {
     if (!user || !active?.id) throw new Error("Sin proyecto activo");
-    const { data, error } = await supabase.from("technical_reports").insert({
-      project_id: active.id,
-      title: input.title,
-      report_type: input.report_type ?? "ni43101",
-      lead_qp_id: input.lead_qp_id ?? null,
-      effective_date: input.effective_date ?? null,
-      summary: input.summary ?? null,
-      status: "draft",
-      created_by: user.id,
-    }).select().single();
-    if (error) { toast.error(error.message); throw error; }
+    const { data, error } = await supabase
+      .from("technical_reports")
+      .insert({
+        project_id: active.id,
+        title: input.title,
+        report_type: input.report_type ?? "ni43101",
+        lead_qp_id: input.lead_qp_id ?? null,
+        effective_date: input.effective_date ?? null,
+        summary: input.summary ?? null,
+        status: "draft",
+        created_by: user.id,
+      })
+      .select()
+      .single();
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("Reporte creado");
     await fetchAll();
     return data;
@@ -148,29 +192,48 @@ export function useQualifiedPersons() {
       .from("technical_reports")
       .update(patch as never)
       .eq("id", id);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     await fetchAll();
   };
 
   const deleteReport = async (id: string) => {
     const { error } = await supabase.from("technical_reports").delete().eq("id", id);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("Reporte eliminado");
     await fetchAll();
   };
 
-  const upsertSection = async (input: { report_id: string; section_no: number; title: string; qp_id?: string | null; status?: string; content_md?: string }) => {
+  const upsertSection = async (input: {
+    report_id: string;
+    section_no: number;
+    title: string;
+    qp_id?: string | null;
+    status?: string;
+    content_md?: string;
+  }) => {
     if (!active?.id) throw new Error("Sin proyecto activo");
-    const { error } = await supabase.from("technical_report_sections").upsert({
-      report_id: input.report_id,
-      project_id: active.id,
-      section_no: input.section_no,
-      title: input.title,
-      qp_id: input.qp_id ?? null,
-      status: input.status ?? "empty",
-      content_md: input.content_md ?? "",
-    }, { onConflict: "report_id,section_no" });
-    if (error) { toast.error(error.message); throw error; }
+    const { error } = await supabase.from("technical_report_sections").upsert(
+      {
+        report_id: input.report_id,
+        project_id: active.id,
+        section_no: input.section_no,
+        title: input.title,
+        qp_id: input.qp_id ?? null,
+        status: input.status ?? "empty",
+        content_md: input.content_md ?? "",
+      },
+      { onConflict: "report_id,section_no" },
+    );
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     await fetchAll();
   };
 
@@ -179,7 +242,10 @@ export function useQualifiedPersons() {
       .from("technical_report_sections")
       .update({ qp_id: qpId })
       .eq("id", sectionId);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("QP asignado a la sección");
     await fetchAll();
   };
@@ -207,7 +273,10 @@ export function useQualifiedPersons() {
       .from("technical_report_sections")
       .update({ status: "signed", signed_at: new Date().toISOString(), signature_hash: hash })
       .eq("id", sectionId);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("Sección firmada");
     await fetchAll();
   };
@@ -217,16 +286,30 @@ export function useQualifiedPersons() {
       .from("technical_report_sections")
       .update({ status: "ready", signed_at: null, signature_hash: null })
       .eq("id", sectionId);
-    if (error) { toast.error(error.message); throw error; }
+    if (error) {
+      toast.error(error.message);
+      throw error;
+    }
     toast.success("Firma revocada");
     await fetchAll();
   };
 
   return {
-    qps, reports, sections, loading, error,
+    qps,
+    reports,
+    sections,
+    loading,
+    error,
     refresh: fetchAll,
-    createQp, updateQp, deleteQp,
-    createReport, updateReport, deleteReport,
-    upsertSection, assignQpToSection, signSection, revokeSignature,
+    createQp,
+    updateQp,
+    deleteQp,
+    createReport,
+    updateReport,
+    deleteReport,
+    upsertSection,
+    assignQpToSection,
+    signSection,
+    revokeSignature,
   };
 }

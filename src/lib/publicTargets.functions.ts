@@ -36,7 +36,9 @@ export const getPublicProjectTargets = createServerFn({ method: "GET" })
 
     const { data: targets, error: tErr } = await supabaseAdmin
       .from("exploration_targets")
-      .select("id, code, name, target_type, commodity, priority, stage, score, lat, lng, rationale, evidence")
+      .select(
+        "id, code, name, target_type, commodity, priority, stage, score, lat, lng, rationale, evidence",
+      )
       .eq("project_id", data.projectId)
       .order("priority", { ascending: false })
       .order("score", { ascending: false });

@@ -1,7 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowLeft, Loader2, MapPin, Wifi, WifiOff, Crosshair, AlertCircle, Trash2, RefreshCw,
+  ArrowLeft,
+  Loader2,
+  MapPin,
+  Wifi,
+  WifiOff,
+  Crosshair,
+  AlertCircle,
+  Trash2,
+  RefreshCw,
 } from "lucide-react";
 import { useSurvey, useGeophysicsMutations } from "@/hooks/useGeophysicsCRUD";
 import { useProjects } from "@/hooks/useProjects";
@@ -34,10 +42,11 @@ function FieldMode() {
   const [showMap, setShowMap] = useState(true);
 
   const projectCenter = useMemo(
-    () => (active?.center_lat != null && active?.center_lng != null
-      ? { lat: Number(active.center_lat), lng: Number(active.center_lng) }
-      : null),
-    [active]
+    () =>
+      active?.center_lat != null && active?.center_lng != null
+        ? { lat: Number(active.center_lat), lng: Number(active.center_lng) }
+        : null,
+    [active],
   );
 
   const distFromCenter = useMemo(() => {
@@ -83,7 +92,9 @@ function FieldMode() {
       refresh();
       if (!cancelled) toast.success("Cola sincronizada");
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [online]);
 
@@ -105,10 +116,13 @@ function FieldMode() {
 
   const accuracy = position?.accuracy ?? null;
   const accColor =
-    accuracy == null ? "bg-muted text-muted-foreground"
-    : accuracy < 10 ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
-    : accuracy < 30 ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
-    : "bg-red-500/15 text-red-400 border-red-500/30";
+    accuracy == null
+      ? "bg-muted text-muted-foreground"
+      : accuracy < 10
+        ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+        : accuracy < 30
+          ? "bg-amber-500/15 text-amber-400 border-amber-500/30"
+          : "bg-red-500/15 text-red-400 border-red-500/30";
 
   const handleCapture = async () => {
     if (!position) {
@@ -130,7 +144,10 @@ function FieldMode() {
       if (!online) throw new Error("offline");
       await createStation(active.id, survey.id, payload);
       toast.success(`Estación ${nextStationId} guardada`);
-      setMag(""); setIpC(""); setIpR(""); setNotes("");
+      setMag("");
+      setIpC("");
+      setIpR("");
+      setNotes("");
       refresh();
     } catch (e) {
       // queue
@@ -147,15 +164,16 @@ function FieldMode() {
         notes: payload.notes,
       });
       toast.warning(`Sin conexión — ${nextStationId} encolada`);
-      setMag(""); setIpC(""); setIpR(""); setNotes("");
+      setMag("");
+      setIpC("");
+      setIpR("");
+      setNotes("");
     } finally {
       setSaving(false);
     }
   };
 
-  const recent = [...stations]
-    .sort((a, b) => (a.station_id < b.station_id ? 1 : -1))
-    .slice(0, 5);
+  const recent = [...stations].sort((a, b) => (a.station_id < b.station_id ? 1 : -1)).slice(0, 5);
 
   return (
     <div className="min-h-screen bg-background flex flex-col pb-[200px]">
@@ -172,7 +190,9 @@ function FieldMode() {
           <div className="text-[10px] uppercase font-mono text-muted-foreground truncate">
             {survey.name}
           </div>
-          <div className={`inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded border ${online ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}>
+          <div
+            className={`inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded border ${online ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10"}`}
+          >
             {online ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
             {online ? "Online" : "Offline"}
           </div>
@@ -188,10 +208,14 @@ function FieldMode() {
           </div>
         </div>
         <div className="rounded border border-border bg-card px-3 py-2">
-          <div className="text-[10px] uppercase font-mono text-muted-foreground">Distancia centro</div>
+          <div className="text-[10px] uppercase font-mono text-muted-foreground">
+            Distancia centro
+          </div>
           <div className="text-lg font-bold font-mono">
             {distFromCenter != null
-              ? distFromCenter < 1000 ? `${distFromCenter.toFixed(0)} m` : `${(distFromCenter / 1000).toFixed(2)} km`
+              ? distFromCenter < 1000
+                ? `${distFromCenter.toFixed(0)} m`
+                : `${(distFromCenter / 1000).toFixed(2)} km`
               : "—"}
           </div>
         </div>
@@ -203,7 +227,7 @@ function FieldMode() {
           <div className="text-foreground">
             {position
               ? `${position.lat.toFixed(6)}, ${position.lng.toFixed(6)}${position.altitude != null ? ` · ${position.altitude.toFixed(0)} m` : ""}`
-              : gpsError ?? "Esperando señal…"}
+              : (gpsError ?? "Esperando señal…")}
           </div>
         </div>
         {gpsError && (
@@ -239,7 +263,9 @@ function FieldMode() {
       <section className="px-4 space-y-3">
         <div className="rounded border border-border bg-card px-3 py-3">
           <div className="flex items-center justify-between mb-2">
-            <div className="text-[10px] uppercase font-mono text-muted-foreground">Próxima estación</div>
+            <div className="text-[10px] uppercase font-mono text-muted-foreground">
+              Próxima estación
+            </div>
             <div className="text-sm font-bold text-gold font-mono">{nextStationId}</div>
           </div>
           <div className="grid grid-cols-3 gap-2">
@@ -283,15 +309,23 @@ function FieldMode() {
         {queue.length > 0 && (
           <div className="rounded border border-amber-500/30 bg-amber-500/5">
             <div className="px-3 py-2 border-b border-amber-500/20 text-[10px] uppercase font-mono text-amber-400 flex items-center justify-between">
-              <span className="inline-flex items-center gap-1"><RefreshCw className="w-3 h-3" /> Cola offline ({queue.length})</span>
+              <span className="inline-flex items-center gap-1">
+                <RefreshCw className="w-3 h-3" /> Cola offline ({queue.length})
+              </span>
             </div>
             <ul className="divide-y divide-amber-500/10 max-h-32 overflow-auto">
               {queue.map((q: QueuedStation) => (
                 <li key={q.id} className="px-3 py-2 flex items-center justify-between text-xs">
                   <div className="font-mono">
-                    {q.station_id} <span className="text-muted-foreground">{q.lat.toFixed(4)}, {q.lng.toFixed(4)}</span>
+                    {q.station_id}{" "}
+                    <span className="text-muted-foreground">
+                      {q.lat.toFixed(4)}, {q.lng.toFixed(4)}
+                    </span>
                   </div>
-                  <button onClick={() => remove(q.id)} className="text-muted-foreground hover:text-red-400">
+                  <button
+                    onClick={() => remove(q.id)}
+                    className="text-muted-foreground hover:text-red-400"
+                  >
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </li>
@@ -320,7 +354,15 @@ function FieldMode() {
   );
 }
 
-function FieldInput({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FieldInput({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <label className="block">
       <span className="text-[9px] uppercase font-mono text-muted-foreground">{label}</span>

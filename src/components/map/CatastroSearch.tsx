@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Search, X, Loader2 } from "lucide-react";
 import type { GeoJSON as LeafletGeoJSON, Map as LeafletMap } from "leaflet";
-import {
-  searchCatastroByCode,
-  summarizeHit,
-  type CatastroHit,
-} from "./searchCatastro";
+import { searchCatastroByCode, summarizeHit, type CatastroHit } from "./searchCatastro";
 import type { LeafletNS } from "./types";
 
 interface Props {
@@ -146,7 +142,10 @@ export function CatastroSearch({ map, L }: Props) {
         {loading && <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" />}
         <button
           type="button"
-          onClick={() => { clearAll(); setOpen(false); }}
+          onClick={() => {
+            clearAll();
+            setOpen(false);
+          }}
           className="text-muted-foreground hover:text-foreground"
           aria-label="Cerrar"
         >
@@ -178,7 +177,10 @@ export function CatastroSearch({ map, L }: Props) {
                     <span>{s.titular}</span>
                   </div>
                   <div className="text-muted-foreground/70 text-[10px]">
-                    {s.areaHa != null ? `${Number(s.areaHa).toLocaleString("es-CL")} ha` : "sin área"} · {h.layerLabel}
+                    {s.areaHa != null
+                      ? `${Number(s.areaHa).toLocaleString("es-CL")} ha`
+                      : "sin área"}{" "}
+                    · {h.layerLabel}
                   </div>
                 </button>
               </li>

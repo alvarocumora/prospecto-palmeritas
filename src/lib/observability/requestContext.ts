@@ -17,7 +17,7 @@ export function createRequestContextHeaders(context: Pick<RequestContext, "reque
 
 export function withRequestContextMetadata(
   context: RequestContext,
-  metadata: Record<string, unknown>
+  metadata: Record<string, unknown>,
 ): RequestContext {
   return {
     ...context,
@@ -30,5 +30,7 @@ export function withRequestContextMetadata(
 
 export function getRequestContextActorKey(context: RequestContext): string {
   const { userId, organizationId, projectId } = context.actor;
-  return [organizationId ?? "org:none", projectId ?? "project:none", userId ?? "user:none"].join("/");
+  return [organizationId ?? "org:none", projectId ?? "project:none", userId ?? "user:none"].join(
+    "/",
+  );
 }

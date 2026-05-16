@@ -53,7 +53,9 @@ export function MobileTabPicker<T extends string>({
             style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
           >
             <div className="sticky top-0 bg-bg-panel flex items-center justify-between px-4 h-11 border-b border-border">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-text-dim">Sección</span>
+              <span className="font-mono text-[11px] uppercase tracking-wider text-text-dim">
+                Sección
+              </span>
               <button type="button" onClick={() => setOpen(false)} className="p-1 text-text-dim">
                 <X className="w-4 h-4" />
               </button>

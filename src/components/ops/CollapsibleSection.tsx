@@ -34,7 +34,9 @@ export function CollapsibleSection({
               {title}
               {typeof count === "number" && <span className="ml-1.5 text-text-dim">({count})</span>}
             </span>
-            <ChevronDown className={cn("w-4 h-4 text-text-dim transition-transform", open && "rotate-180")} />
+            <ChevronDown
+              className={cn("w-4 h-4 text-text-dim transition-transform", open && "rotate-180")}
+            />
           </button>
           {open && <div className="mt-2">{children}</div>}
         </div>
@@ -55,7 +57,9 @@ export function CollapsibleSection({
           {title}
           {typeof count === "number" && <span className="ml-1.5 text-text-dim">({count})</span>}
         </span>
-        <ChevronDown className={cn("w-4 h-4 text-text-dim transition-transform", open && "rotate-180")} />
+        <ChevronDown
+          className={cn("w-4 h-4 text-text-dim transition-transform", open && "rotate-180")}
+        />
       </button>
       {open && <div className="mt-2">{children}</div>}
     </div>

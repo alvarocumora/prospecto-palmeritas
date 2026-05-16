@@ -4,12 +4,7 @@ import type { DrillHole } from "@/hooks/useDrilling";
 import { STATUS_COLORS, STATUS_LABELS, progressPct } from "@/hooks/useDrilling";
 
 /** UTM (WGS84) → lat/lng. Default zone 19S (typical for central Chile). */
-function utmToLatLng(
-  easting: number,
-  northing: number,
-  zone = 19,
-  south = true
-): [number, number] {
+function utmToLatLng(easting: number, northing: number, zone = 19, south = true): [number, number] {
   const a = 6378137.0;
   const f = 1 / 298.257223563;
   const k0 = 0.9996;
@@ -20,9 +15,7 @@ function utmToLatLng(
   const y = south ? northing - 10000000.0 : northing;
 
   const M = y / k0;
-  const mu =
-    M /
-    (a * (1 - e2 / 4 - (3 * e2 * e2) / 64 - (5 * e2 * e2 * e2) / 256));
+  const mu = M / (a * (1 - e2 / 4 - (3 * e2 * e2) / 64 - (5 * e2 * e2 * e2) / 256));
   const e1 = (1 - Math.sqrt(1 - e2)) / (1 + Math.sqrt(1 - e2));
 
   const J1 = (3 * e1) / 2 - (27 * e1 ** 3) / 32;
@@ -49,25 +42,14 @@ function utmToLatLng(
 
   const Q1 = (N1 * tanFp) / R1;
   const Q2 = (D * D) / 2;
-  const Q3 =
-    ((5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ep2) * Math.pow(D, 4)) / 24;
+  const Q3 = ((5 + 3 * T1 + 10 * C1 - 4 * C1 * C1 - 9 * ep2) * Math.pow(D, 4)) / 24;
   const Q4 =
-    ((61 +
-      90 * T1 +
-      298 * C1 +
-      45 * T1 * T1 -
-      252 * ep2 -
-      3 * C1 * C1) *
-      Math.pow(D, 6)) /
-    720;
+    ((61 + 90 * T1 + 298 * C1 + 45 * T1 * T1 - 252 * ep2 - 3 * C1 * C1) * Math.pow(D, 6)) / 720;
   const lat = fp - Q1 * (Q2 - Q3 + Q4);
 
   const Q5 = D;
   const Q6 = ((1 + 2 * T1 + C1) * Math.pow(D, 3)) / 6;
-  const Q7 =
-    ((5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * ep2 + 24 * T1 * T1) *
-      Math.pow(D, 5)) /
-    120;
+  const Q7 = ((5 - 2 * C1 + 28 * T1 - 3 * C1 * C1 + 8 * ep2 + 24 * T1 * T1) * Math.pow(D, 5)) / 120;
   const lon = (Q5 - Q6 + Q7) / cosFp;
 
   const lonOrigin = ((zone - 1) * 6 - 180 + 3) * (Math.PI / 180);
@@ -114,7 +96,7 @@ export function buildDrillCollarsLayer(
   L: LeafletNS,
   holes: DrillHole[],
   scoresByHole?: Record<string, number>,
-  haloStyleFor?: (score: number) => { color: string; radius: number; label: string } | null
+  haloStyleFor?: (score: number) => { color: string; radius: number; label: string } | null,
 ): LayerGroup {
   const group = L.layerGroup();
   for (const h of holes) {
@@ -149,7 +131,7 @@ export function buildDrillCollarsLayer(
     if (halo && score > 0) {
       popup = popup.replace(
         "</div></div>",
-        `</div><div style="margin-top:6px;border-top:1px solid #3a322c;padding-top:6px;">Mejor intercept: <strong style="color:${halo.color};">${score.toFixed(1)} g·m/t</strong> <span style="color:#A89080;">(${halo.label})</span></div></div>`
+        `</div><div style="margin-top:6px;border-top:1px solid #3a322c;padding-top:6px;">Mejor intercept: <strong style="color:${halo.color};">${score.toFixed(1)} g·m/t</strong> <span style="color:#A89080;">(${halo.label})</span></div></div>`,
       );
     }
     marker.bindPopup(popup);

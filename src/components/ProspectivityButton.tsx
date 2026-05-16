@@ -2,7 +2,11 @@ import { useState } from "react";
 import type { Map as LeafletMap } from "leaflet";
 import { Flame, Loader2, Trash2, Info } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
-import { useProspectivity, type ProspectivityCell, type ProspectivityRun } from "@/hooks/useProspectivity";
+import {
+  useProspectivity,
+  type ProspectivityCell,
+  type ProspectivityRun,
+} from "@/hooks/useProspectivity";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -32,11 +36,16 @@ export function ProspectivityButton({ map, onRunChange }: Props) {
     const b = map.getBounds();
     setGenerating(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/prospectivity-grid`;
       const resp = await fetch(url, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token ?? ""}` },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? ""}`,
+        },
         body: JSON.stringify({
           project_id: active.id,
           bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
@@ -61,8 +70,15 @@ export function ProspectivityButton({ map, onRunChange }: Props) {
   const clearLatest = async () => {
     if (!active?.id || !latestRun) return;
     if (!confirm("¿Borrar el run actual de prospectividad?")) return;
-    const { error: cellErr } = await supabase.from("prospectivity_cells").delete().eq("project_id", active.id).eq("run_id", latestRun.id);
-    if (cellErr) { toast.error(cellErr.message); return; }
+    const { error: cellErr } = await supabase
+      .from("prospectivity_cells")
+      .delete()
+      .eq("project_id", active.id)
+      .eq("run_id", latestRun.id);
+    if (cellErr) {
+      toast.error(cellErr.message);
+      return;
+    }
     await supabase.from("prospectivity_runs").delete().eq("id", latestRun.id);
     toast.success("Run eliminado");
     await reload();
@@ -77,12 +93,19 @@ export function ProspectivityButton({ map, onRunChange }: Props) {
         className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-gold/50 bg-bg-secondary/95 backdrop-blur text-foreground hover:bg-gold/10 hover:border-gold disabled:opacity-50 text-[11px] font-mono shadow-md transition-colors"
         title="Generar heatmap de prospectividad sobre la vista actual del mapa"
       >
-        {generating ? <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" /> : <Flame className="w-3.5 h-3.5 text-gold" />}
+        {generating ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin text-gold" />
+        ) : (
+          <Flame className="w-3.5 h-3.5 text-gold" />
+        )}
         <span className="hidden sm:inline">Prospectividad IA</span>
       </button>
       {latestRun && (
         <div className="rounded border border-border bg-bg-secondary/95 backdrop-blur px-2 py-1.5 text-[10px] font-mono text-muted-foreground shadow-md">
-          <button onClick={() => setOpen(!open)} className="inline-flex items-center gap-1 hover:text-foreground">
+          <button
+            onClick={() => setOpen(!open)}
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
             <Info className="w-3 h-3" />
             {cells.length} celdas · {new Date(latestRun.generated_at).toLocaleDateString()}
           </button>
@@ -91,7 +114,10 @@ export function ProspectivityButton({ map, onRunChange }: Props) {
               <div>Tamaño celda: {latestRun.cell_size_m} m</div>
               <div>Total registradas: {latestRun.cell_count}</div>
               {loadingCells && <div>Cargando…</div>}
-              <button onClick={clearLatest} className="inline-flex items-center gap-1 text-destructive hover:text-destructive/80 mt-1">
+              <button
+                onClick={clearLatest}
+                className="inline-flex items-center gap-1 text-destructive hover:text-destructive/80 mt-1"
+              >
                 <Trash2 className="w-3 h-3" /> Borrar run
               </button>
             </div>

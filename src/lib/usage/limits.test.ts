@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { canConsumeUsage, evaluateAllUsageLimits, evaluateUsageLimit, getUsageLimit } from "./limits";
+import {
+  canConsumeUsage,
+  evaluateAllUsageLimits,
+  evaluateUsageLimit,
+  getUsageLimit,
+} from "./limits";
 
 describe("usage limit evaluator", () => {
   it("returns plan defaults", () => {
@@ -15,7 +20,7 @@ describe("usage limit evaluator", () => {
         plan: "starter",
         usage: {},
         overrides: { projects_per_org: 12 },
-      })
+      }),
     ).toEqual({ limit: 12, source: "override" });
   });
 
@@ -24,7 +29,7 @@ describe("usage limit evaluator", () => {
       evaluateUsageLimit("ai_briefs_per_month", {
         plan: "pro",
         usage: { ai_briefs_per_month: 25 },
-      })
+      }),
     ).toEqual({
       key: "ai_briefs_per_month",
       used: 25,
@@ -40,7 +45,7 @@ describe("usage limit evaluator", () => {
       evaluateUsageLimit("ni43101_exports_per_month", {
         plan: "starter",
         usage: { ni43101_exports_per_month: 1 },
-      }).allowed
+      }).allowed,
     ).toBe(false);
   });
 
@@ -63,7 +68,7 @@ describe("usage limit evaluator", () => {
       evaluateUsageLimit("storage_gb", {
         plan: "free",
         usage: { storage_gb: -10 },
-      }).used
+      }).used,
     ).toBe(0);
   });
 });

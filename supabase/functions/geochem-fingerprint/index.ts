@@ -9,7 +9,17 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const ELEMENTS = ["au_gpt", "ag_gpt", "cu_pct", "as_ppm", "sb_ppm", "hg_ppm", "pb_ppm", "zn_ppm", "mo_ppm"] as const;
+const ELEMENTS = [
+  "au_gpt",
+  "ag_gpt",
+  "cu_pct",
+  "as_ppm",
+  "sb_ppm",
+  "hg_ppm",
+  "pb_ppm",
+  "zn_ppm",
+  "mo_ppm",
+] as const;
 type Elem = (typeof ELEMENTS)[number];
 
 type SampleRow = {
@@ -92,7 +102,10 @@ function jacobiEigen(A: number[][]): { values: number[]; vectors: number[][] } {
       for (let q = p + 1; q < n; q++) {
         if (Math.abs(a[p][q]) < 1e-14) continue;
         const theta = (a[q][q] - a[p][p]) / (2 * a[p][q]);
-        const t = theta >= 0 ? 1 / (theta + Math.sqrt(1 + theta * theta)) : 1 / (theta - Math.sqrt(1 + theta * theta));
+        const t =
+          theta >= 0
+            ? 1 / (theta + Math.sqrt(1 + theta * theta))
+            : 1 / (theta - Math.sqrt(1 + theta * theta));
         const c = 1 / Math.sqrt(1 + t * t);
         const s = t * c;
         const app = a[p][p];
@@ -142,7 +155,11 @@ function project(X: number[][], vectors: number[][], k: number): number[][] {
 
 /* ---------- K-means ---------- */
 
-function kmeans(points: number[][], k: number, maxIter = 50): { labels: number[]; centroids: number[][] } {
+function kmeans(
+  points: number[][],
+  k: number,
+  maxIter = 50,
+): { labels: number[]; centroids: number[][] } {
   const n = points.length;
   const dim = points[0].length;
   // k-means++ init
@@ -163,7 +180,10 @@ function kmeans(points: number[][], k: number, maxIter = 50): { labels: number[]
     let idx = 0;
     for (let i = 0; i < n; i++) {
       r -= dists[i];
-      if (r <= 0) { idx = i; break; }
+      if (r <= 0) {
+        idx = i;
+        break;
+      }
     }
     centroids.push(points[idx].slice());
   }
@@ -176,9 +196,15 @@ function kmeans(points: number[][], k: number, maxIter = 50): { labels: number[]
       for (let c = 0; c < k; c++) {
         let d = 0;
         for (let j = 0; j < dim; j++) d += (points[i][j] - centroids[c][j]) ** 2;
-        if (d < bestD) { bestD = d; best = c; }
+        if (d < bestD) {
+          bestD = d;
+          best = c;
+        }
       }
-      if (labels[i] !== best) { labels[i] = best; changed = true; }
+      if (labels[i] !== best) {
+        labels[i] = best;
+        changed = true;
+      }
     }
     const sums = Array.from({ length: k }, () => new Array(dim).fill(0));
     const counts = new Array(k).fill(0);
@@ -197,9 +223,12 @@ function kmeans(points: number[][], k: number, maxIter = 50): { labels: number[]
 /* ---------- Pathfinder + signature classification ---------- */
 
 function pathfinderScores(rows: SampleRow[]): Record<string, number> {
-  const realSamples = rows.filter((r) => !["blank", "standard", "duplicate"].includes(r.sample_type));
+  const realSamples = rows.filter(
+    (r) => !["blank", "standard", "duplicate"].includes(r.sample_type),
+  );
   const n = Math.max(1, realSamples.length);
-  const sum = (k: Elem) => realSamples.reduce((a, r) => a + Math.max(0, (r[k] as number | null) ?? 0), 0) / n;
+  const sum = (k: Elem) =>
+    realSamples.reduce((a, r) => a + Math.max(0, (r[k] as number | null) ?? 0), 0) / n;
   return {
     epithermal: Math.log10(1 + sum("as_ppm") + sum("sb_ppm") + sum("hg_ppm") * 10),
     porphyry: Math.log10(1 + sum("cu_pct") * 1000 + sum("mo_ppm") * 5),
@@ -209,7 +238,10 @@ function pathfinderScores(rows: SampleRow[]): Record<string, number> {
   };
 }
 
-function classifySignature(scores: Record<string, number>): { signature: string; confidence: number } {
+function classifySignature(scores: Record<string, number>): {
+  signature: string;
+  confidence: number;
+} {
   const entries = Object.entries(scores);
   const total = entries.reduce((a, [, v]) => a + Math.max(0, v), 0) || 1;
   entries.sort((a, b) => b[1] - a[1]);
@@ -232,7 +264,10 @@ Deno.serve(async (req) => {
   try {
     const { project_id, k = 4, notes } = await req.json();
     if (!project_id) {
-      return new Response(JSON.stringify({ error: "project_id requerido" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "project_id requerido" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const authHeader = req.headers.get("Authorization") ?? "";
     const supabase = createClient(
@@ -243,32 +278,50 @@ Deno.serve(async (req) => {
 
     const { data: userResp, error: userErr } = await supabase.auth.getUser();
     if (userErr || !userResp.user) {
-      return new Response(JSON.stringify({ error: "no autenticado" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: "no autenticado" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const userId = userResp.user.id;
 
     const { data: samples, error } = await supabase
       .from("sampling_results")
-      .select("id,sample_code,sample_type,au_gpt,ag_gpt,cu_pct,as_ppm,sb_ppm,hg_ppm,pb_ppm,zn_ppm,mo_ppm")
+      .select(
+        "id,sample_code,sample_type,au_gpt,ag_gpt,cu_pct,as_ppm,sb_ppm,hg_ppm,pb_ppm,zn_ppm,mo_ppm",
+      )
       .eq("project_id", project_id)
       .limit(5000);
 
     if (error) {
-      return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
     const rows = (samples ?? []) as SampleRow[];
     const real = rows.filter((r) => !["blank", "standard"].includes(r.sample_type));
     if (real.length < 5) {
-      return new Response(JSON.stringify({ error: `Se requieren al menos 5 muestras (encontradas ${real.length})` }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(
+        JSON.stringify({ error: `Se requieren al menos 5 muestras (encontradas ${real.length})` }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     // Decide which elements have signal (>30% non-null/positive)
     const usable: Elem[] = ELEMENTS.filter((e) => {
-      const present = real.filter((r) => (r[e] as number | null) != null && (r[e] as number) > 0).length;
+      const present = real.filter(
+        (r) => (r[e] as number | null) != null && (r[e] as number) > 0,
+      ).length;
       return present / real.length > 0.3;
     });
     if (usable.length < 2) {
-      return new Response(JSON.stringify({ error: "Datos geoquímicos insuficientes (se requieren ≥2 elementos con cobertura)" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(
+        JSON.stringify({
+          error: "Datos geoquímicos insuficientes (se requieren ≥2 elementos con cobertura)",
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     // Build matrix
@@ -298,7 +351,9 @@ Deno.serve(async (req) => {
 
     const clusterAgg = Array.from({ length: kClusters }, (_, c) => {
       const ids = real.filter((_, i) => labels[i] === c).map((r) => r.id);
-      const auMean = real.filter((_, i) => labels[i] === c).reduce((a, r) => a + (r.au_gpt ?? 0), 0) / Math.max(1, ids.length);
+      const auMean =
+        real.filter((_, i) => labels[i] === c).reduce((a, r) => a + (r.au_gpt ?? 0), 0) /
+        Math.max(1, ids.length);
       return {
         cluster: c,
         centroid_pc1: centroids[c][0],
@@ -338,12 +393,20 @@ Deno.serve(async (req) => {
       .single();
 
     if (insErr) {
-      return new Response(JSON.stringify({ error: insErr.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ error: insErr.message }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(JSON.stringify({ analysis: inserted }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(JSON.stringify({ analysis: inserted }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error(e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 });

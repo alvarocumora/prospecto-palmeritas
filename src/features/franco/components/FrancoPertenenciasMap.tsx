@@ -8,7 +8,10 @@ import type { Feature } from "geojson";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import francoPertenenciasRaw from "@/data/geo/franco_pertenencias.geojson?raw";
-import { getFrancoCadastreCross, type FrancoPertenenciaMatch } from "@/lib/franco-cadastre.functions";
+import {
+  getFrancoCadastreCross,
+  type FrancoPertenenciaMatch,
+} from "@/lib/franco-cadastre.functions";
 
 type FCFeature = {
   type: "Feature";
@@ -71,10 +74,13 @@ export function FrancoPertenenciasMap() {
         attributionControl: true,
       }).setView([-33.82, -71.05], 13);
 
-      L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-        attribution: "Tiles © Esri",
-        maxZoom: 19,
-      }).addTo(map);
+      L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution: "Tiles © Esri",
+          maxZoom: 19,
+        },
+      ).addTo(map);
       mapRef.current = map;
     })();
     return () => {
@@ -113,8 +119,9 @@ export function FrancoPertenenciasMap() {
         onEachFeature: (feat, lyr) => {
           const name = (feat.properties as { name?: string } | undefined)?.name?.trim() ?? "(s/n)";
           const m = matchByName.get(name);
-          const html = m && m.matchKind !== "NONE"
-            ? `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.35">
+          const html =
+            m && m.matchKind !== "NONE"
+              ? `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.35">
                  <div style="font-weight:700;color:#d4af37">${name}</div>
                  <div>Concesión: <b>${m.concessionName ?? "—"}</b></div>
                  <div>Código: ${m.concessionCode ?? "—"}</div>
@@ -123,7 +130,7 @@ export function FrancoPertenenciasMap() {
                  <div>Overlap: ${m.overlapHa.toFixed(2)} ha (${m.pctOfKml.toFixed(1)}%)</div>
                  <div>Match: <b>${m.matchKind}</b> · ${m.status ?? ""}</div>
                </div>`
-            : `<div style="font-family:ui-monospace,monospace;font-size:11px">
+              : `<div style="font-family:ui-monospace,monospace;font-size:11px">
                  <div style="font-weight:700;color:#9ca3af">${name}</div>
                  <div>Sin match en catastro</div>
                </div>`;
@@ -146,7 +153,10 @@ export function FrancoPertenenciasMap() {
   return (
     <Card className="p-6" accent="gold">
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-        <SectionTitle icon={MapPin} sub="Pertenencias KMZ sobre satélite · color = estado de match con catastro real">
+        <SectionTitle
+          icon={MapPin}
+          sub="Pertenencias KMZ sobre satélite · color = estado de match con catastro real"
+        >
           Live map · Pertenencias Franco
         </SectionTitle>
         <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
@@ -171,7 +181,9 @@ export function FrancoPertenenciasMap() {
       </div>
       <div className="mt-2 text-[11px] font-mono uppercase tracking-wider text-hint">
         {FC_DATA.features.length} polígonos KMZ ·{" "}
-        {data ? `${data.matchedKmlPolygons} con match · ${data.uniqueConcessions} concesiones únicas` : "—"}
+        {data
+          ? `${data.matchedKmlPolygons} con match · ${data.uniqueConcessions} concesiones únicas`
+          : "—"}
       </div>
     </Card>
   );

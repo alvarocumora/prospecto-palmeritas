@@ -34,7 +34,9 @@ export function useAnnotationHistory(annotationId: string | null) {
       setLoading(false);
       return;
     }
-    const userIds = Array.from(new Set((data ?? []).map((r) => r.user_id).filter(Boolean) as string[]));
+    const userIds = Array.from(
+      new Set((data ?? []).map((r) => r.user_id).filter(Boolean) as string[]),
+    );
     let nameMap = new Map<string, string>();
     if (userIds.length > 0) {
       const { data: profs } = await supabase
@@ -48,7 +50,7 @@ export function useAnnotationHistory(annotationId: string | null) {
         id: r.id,
         action: r.action as AnnotationHistoryEntry["action"],
         user_id: r.user_id,
-        user_name: r.user_id ? nameMap.get(r.user_id) ?? null : null,
+        user_name: r.user_id ? (nameMap.get(r.user_id) ?? null) : null,
         created_at: r.created_at,
         payload: (r.payload ?? null) as Record<string, unknown> | null,
       })),
@@ -64,7 +66,10 @@ export function useAnnotationHistory(annotationId: string | null) {
 }
 
 /** Compares two adjacent payloads to summarize what changed. Newer entry's payload vs previous. */
-export function summarizeDiff(curr: Record<string, unknown> | null, prev: Record<string, unknown> | null): string[] {
+export function summarizeDiff(
+  curr: Record<string, unknown> | null,
+  prev: Record<string, unknown> | null,
+): string[] {
   if (!curr) return [];
   const tracked: { key: string; label: string }[] = [
     { key: "text", label: "texto" },

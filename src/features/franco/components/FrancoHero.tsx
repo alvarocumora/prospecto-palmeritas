@@ -16,7 +16,8 @@ export function FrancoHero() {
         <p className="mt-3 font-mono text-sm text-gold-light">{FRANCO_PROJECT.coords} · WGS84</p>
         <p className="mt-4 text-sm text-muted-foreground max-w-3xl">
           {FRANCO_PROJECT.location} · Operador:{" "}
-          <span className="text-foreground">{FRANCO_PROJECT.operator}</span> · Inicio: {FRANCO_PROJECT.created}
+          <span className="text-foreground">{FRANCO_PROJECT.operator}</span> · Inicio:{" "}
+          {FRANCO_PROJECT.created}
         </p>
         <p className="mt-6 text-xs text-muted-foreground font-mono uppercase tracking-wider">
           Datos por cargar — pendiente informe pre NI 43-101

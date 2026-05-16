@@ -3,11 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { GeologyData } from "@/hooks/useGeologyData";
 import type { GeophysicsData } from "@/hooks/useGeophysicsData";
 import { captureElement } from "./pdf/captureMap";
-import {
-  createState,
-  drawFooter,
-  drawHeader,
-} from "./pdf/primitives";
+import { createState, drawFooter, drawHeader } from "./pdf/primitives";
 import {
   PROJECT,
   fillToc,
@@ -131,7 +127,9 @@ async function fetchCatastro(): Promise<CatastroRow[]> {
     };
     const result = await loadCatastro(L, bbox);
     const aoi = await loadAoiPolygon();
-    const booleanIntersects = (turfBI as { default: typeof import("@turf/boolean-intersects").default }).default;
+    const booleanIntersects = (
+      turfBI as { default: typeof import("@turf/boolean-intersects").default }
+    ).default;
 
     const tipoLabels: Record<string, string> = {
       EXPLOTA_1983: "Explot. 1983",
@@ -152,9 +150,10 @@ async function fetchCatastro(): Promise<CatastroRow[]> {
             // ignore
           }
         }
-        const venc = p.FECHA_VENCIMIENTO != null && Number.isFinite(Number(p.FECHA_VENCIMIENTO))
-          ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
-          : "—";
+        const venc =
+          p.FECHA_VENCIMIENTO != null && Number.isFinite(Number(p.FECHA_VENCIMIENTO))
+            ? new Date(Number(p.FECHA_VENCIMIENTO)).toLocaleDateString("es-CL")
+            : "—";
         rows.push({
           tipo: tipoLabels[origen] ?? origen,
           rol: `${p.NUMERO_ROL ?? "—"}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`,
@@ -187,7 +186,9 @@ type InternalConcessionRow = {
   expires: string;
 };
 
-async function fetchInternalConcessions(projectId: string | null | undefined): Promise<InternalConcessionRow[]> {
+async function fetchInternalConcessions(
+  projectId: string | null | undefined,
+): Promise<InternalConcessionRow[]> {
   if (!projectId) return [];
   try {
     const { data, error } = await supabase
@@ -195,15 +196,17 @@ async function fetchInternalConcessions(projectId: string | null | undefined): P
       .select("code,name,holder,concession_type,status,area_ha,expires_at")
       .eq("project_id", projectId);
     if (error || !data) return [];
-    return (data as Array<{
-      code: string;
-      name: string;
-      holder: string | null;
-      concession_type: string;
-      status: string;
-      area_ha: number | null;
-      expires_at: string | null;
-    }>).map((r) => ({
+    return (
+      data as Array<{
+        code: string;
+        name: string;
+        holder: string | null;
+        concession_type: string;
+        status: string;
+        area_ha: number | null;
+        expires_at: string | null;
+      }>
+    ).map((r) => ({
       code: r.code,
       name: r.name,
       holder: r.holder ?? "—",
@@ -252,17 +255,39 @@ export type Ni43101SectionId =
   | "annexC";
 
 export const ALL_SECTIONS: Ni43101SectionId[] = [
-  "execSummary","intro","reliance","property","zoning","climate","history","geology",
-  "depositType","exploration","drilling","qaqc","dataVerification","resourceEstimates",
-  "economicAnalysis","budget","conclusions","references","annexA","annexB","annexC",
+  "execSummary",
+  "intro",
+  "reliance",
+  "property",
+  "zoning",
+  "climate",
+  "history",
+  "geology",
+  "depositType",
+  "exploration",
+  "drilling",
+  "qaqc",
+  "dataVerification",
+  "resourceEstimates",
+  "economicAnalysis",
+  "budget",
+  "conclusions",
+  "references",
+  "annexA",
+  "annexB",
+  "annexC",
 ];
 
-async function fetchResourceEstimates(projectId: string | null | undefined): Promise<ResourceEstimateData | null> {
+async function fetchResourceEstimates(
+  projectId: string | null | undefined,
+): Promise<ResourceEstimateData | null> {
   if (!projectId) return null;
   try {
     const { data, error } = await supabase
       .from("resource_models")
-      .select("name, commodity, method, block_size_x, block_size_y, block_size_z, search_radius, composite_length, cutoff_grade, density_t_m3, blocks_estimated, blocks_total, composites_count, tonnage_total, tonnage_above_cutoff, mean_grade, metal_content, estimated_at, status")
+      .select(
+        "name, commodity, method, block_size_x, block_size_y, block_size_z, search_radius, composite_length, cutoff_grade, density_t_m3, blocks_estimated, blocks_total, composites_count, tonnage_total, tonnage_above_cutoff, mean_grade, metal_content, estimated_at, status",
+      )
       .eq("project_id", projectId)
       .eq("status", "complete")
       .order("estimated_at", { ascending: false });
@@ -273,12 +298,16 @@ async function fetchResourceEstimates(projectId: string | null | undefined): Pro
   }
 }
 
-async function fetchEconomicAnalysis(projectId: string | null | undefined): Promise<EconomicAnalysisData | null> {
+async function fetchEconomicAnalysis(
+  projectId: string | null | undefined,
+): Promise<EconomicAnalysisData | null> {
   if (!projectId) return null;
   try {
     const { data: scs, error } = await supabase
       .from("economic_scenarios")
-      .select("id, name, model_id, commodity_price_usd, price_unit, recovery_pct, royalty_pct, discount_rate_pct, annual_throughput_t, capex_usd, mining_cost_usd_t, processing_cost_usd_t, ga_cost_usd_t, nsr_cutoff_usd_t, ore_tonnes, waste_tonnes, strip_ratio, mean_grade, metal_payable, gross_revenue_usd, total_opex_usd, ebitda_usd, npv_usd, irr_pct, payback_years, mine_life_years, computed_at, resource_models(name, commodity)")
+      .select(
+        "id, name, model_id, commodity_price_usd, price_unit, recovery_pct, royalty_pct, discount_rate_pct, annual_throughput_t, capex_usd, mining_cost_usd_t, processing_cost_usd_t, ga_cost_usd_t, nsr_cutoff_usd_t, ore_tonnes, waste_tonnes, strip_ratio, mean_grade, metal_payable, gross_revenue_usd, total_opex_usd, ebitda_usd, npv_usd, irr_pct, payback_years, mine_life_years, computed_at, resource_models(name, commodity)",
+      )
       .eq("project_id", projectId)
       .eq("status", "complete")
       .order("computed_at", { ascending: false });
@@ -318,7 +347,9 @@ async function fetchEconomicAnalysis(projectId: string | null | undefined): Prom
     const baseId = (scs as any[])[0].id;
     const { data: schRows } = await supabase
       .from("economic_schedule")
-      .select("year, ore_tonnes, waste_tonnes, revenue_usd, opex_usd, cashflow_usd, cumulative_cashflow_usd")
+      .select(
+        "year, ore_tonnes, waste_tonnes, revenue_usd, opex_usd, cashflow_usd, cumulative_cashflow_usd",
+      )
       .eq("scenario_id", baseId)
       .order("year");
     const schedule = (schRows ?? []).map((r: any) => ({
@@ -338,19 +369,30 @@ async function fetchEconomicAnalysis(projectId: string | null | undefined): Prom
   }
 }
 
-async function fetchComplianceAnnex(reportId: string | null | undefined): Promise<ComplianceAnnexData | null> {
+async function fetchComplianceAnnex(
+  reportId: string | null | undefined,
+): Promise<ComplianceAnnexData | null> {
   if (!reportId) return null;
   try {
     const { data: report } = await supabase
       .from("technical_reports")
-      .select("id, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at")
+      .select(
+        "id, active_standards, compliance_threshold, compliance_score_cached, compliance_evaluated_at",
+      )
       .eq("id", reportId)
       .maybeSingle();
     if (!report) return null;
     const stds = (report.active_standards as string[] | null) ?? ["ni43101"];
     const [{ data: rules }, { data: evals }, { data: links }] = await Promise.all([
-      supabase.from("compliance_rules").select("id, standard, rule_code, title, severity").in("standard", stds as any).order("display_order"),
-      supabase.from("compliance_evaluations").select("rule_id, status, auto_evaluated").eq("report_id", reportId),
+      supabase
+        .from("compliance_rules")
+        .select("id, standard, rule_code, title, severity")
+        .in("standard", stds as any)
+        .order("display_order"),
+      supabase
+        .from("compliance_evaluations")
+        .select("rule_id, status, auto_evaluated")
+        .eq("report_id", reportId),
       supabase.from("report_evidence_links").select("rule_id").eq("report_id", reportId),
     ]);
     const evCount = new Map<string, number>();
@@ -364,7 +406,10 @@ async function fetchComplianceAnnex(reportId: string | null | undefined): Promis
     const detailRules: ComplianceAnnexData["rules"] = [];
     for (const std of stds) {
       const stdRules = (rules ?? []).filter((r: any) => r.standard === std);
-      let weighted = 0, weight = 0, mPass = 0, mTotal = 0;
+      let weighted = 0,
+        weight = 0,
+        mPass = 0,
+        mTotal = 0;
       for (const r of stdRules as any[]) {
         const w = r.severity === "mandatory" ? 1.0 : r.severity === "recommended" ? 0.3 : 0.1;
         weight += w;
@@ -380,7 +425,7 @@ async function fetchComplianceAnnex(reportId: string | null | undefined): Promis
           standard: r.standard,
           title: r.title,
           severity: r.severity,
-          status: (ev?.status ?? "pending"),
+          status: ev?.status ?? "pending",
           auto: !!ev?.auto_evaluated,
           evidence_count: evCount.get(r.id) ?? 0,
         });
@@ -409,27 +454,31 @@ async function fetchComplianceAnnex(reportId: string | null | undefined): Promis
   }
 }
 
-export async function exportNI43101(opts: {
-  setActive?: (id: string) => void;
-  getCurrent?: () => string;
-  mapSelector?: string;
-  basemap?: "satellite" | "topo";
-  includeInternalConcessions?: boolean;
-  includeZoning?: boolean;
-  projectId?: string | null;
-  /** Optional report id to include Annex C compliance certificate. */
-  reportId?: string | null;
-  onProgress?: (step: string | { label: string; current: number; total: number; phase?: string }) => void;
-  /** When true, returns blob/url/toc instead of triggering a download. */
-  preview?: boolean;
-  /** Subset of sections to render. If omitted, all sections are included. */
-  sections?: Ni43101SectionId[];
-  /**
-   * Switch the live map's basemap before snapshot capture.
-   * Used to capture both topo and satellite views with active overlays.
-   */
-  setBasemap?: (b: "satellite" | "topo") => void | Promise<void>;
-} = {}): Promise<Ni43101Result | void> {
+export async function exportNI43101(
+  opts: {
+    setActive?: (id: string) => void;
+    getCurrent?: () => string;
+    mapSelector?: string;
+    basemap?: "satellite" | "topo";
+    includeInternalConcessions?: boolean;
+    includeZoning?: boolean;
+    projectId?: string | null;
+    /** Optional report id to include Annex C compliance certificate. */
+    reportId?: string | null;
+    onProgress?: (
+      step: string | { label: string; current: number; total: number; phase?: string },
+    ) => void;
+    /** When true, returns blob/url/toc instead of triggering a download. */
+    preview?: boolean;
+    /** Subset of sections to render. If omitted, all sections are included. */
+    sections?: Ni43101SectionId[];
+    /**
+     * Switch the live map's basemap before snapshot capture.
+     * Used to capture both topo and satellite views with active overlays.
+     */
+    setBasemap?: (b: "satellite" | "topo") => void | Promise<void>;
+  } = {},
+): Promise<Ni43101Result | void> {
   const {
     setActive,
     getCurrent,
@@ -487,11 +536,22 @@ export async function exportNI43101(opts: {
 
   // Parallel data fetch
   onProgress?.("Cargando catastro, datos geológicos y compliance…");
-  const [geo, geophys, catastroRows, internalConcessions, assayCount, complianceData, resourceData, economicData] = await Promise.all([
+  const [
+    geo,
+    geophys,
+    catastroRows,
+    internalConcessions,
+    assayCount,
+    complianceData,
+    resourceData,
+    economicData,
+  ] = await Promise.all([
     fetchGeology(),
     fetchGeophysics(),
     fetchCatastro(),
-    includeInternalConcessions ? fetchInternalConcessions(projectId) : Promise.resolve<InternalConcessionRow[]>([]),
+    includeInternalConcessions
+      ? fetchInternalConcessions(projectId)
+      : Promise.resolve<InternalConcessionRow[]>([]),
     fetchAssayCount(projectId),
     fetchComplianceAnnex(reportId),
     fetchResourceEstimates(projectId),
@@ -525,27 +585,104 @@ export async function exportNI43101(opts: {
     { id: "cover", label: "Portada", run: () => renderCover(s, mapFig) },
     { id: "toc", label: "Índice (placeholder)", run: () => renderTocPlaceholder(s) },
   ];
-  if (has("execSummary")) plan.push({ id: "execSummary", label: "Resumen ejecutivo", run: () => renderExecSummary(s) });
-  if (has("intro")) plan.push({ id: "intro", label: "§1 Introducción", run: () => renderSection1_Intro(s) });
-  if (has("reliance")) plan.push({ id: "reliance", label: "§2 Confianza en otros expertos", run: () => renderSection2_Reliance(s) });
-  if (has("property")) plan.push({ id: "property", label: "§3 Descripción y ubicación (mapa + catastro)", run: () => renderSection3_Property(s, mapFig, catastroRows, validations) });
-  if (includeZoning && has("zoning")) plan.push({ id: "zoning", label: "§3.bis Zonificación geológica (satélite)", run: () => renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length) });
-  if (has("climate")) plan.push({ id: "climate", label: "§4 Clima e infraestructura", run: () => renderSection4_Climate(s) });
-  if (has("history")) plan.push({ id: "history", label: "§5 Historia", run: () => renderSection5_History(s) });
-  if (has("geology")) plan.push({ id: "geology", label: "§6 Geología local y regional", run: () => renderSection6_Geology(s, geo) });
-  if (has("depositType")) plan.push({ id: "depositType", label: "§7 Tipo de depósito", run: () => renderSection7_DepositType(s, geo) });
-  if (has("exploration")) plan.push({ id: "exploration", label: "§8 Exploración (geofísica/geoquímica)", run: () => renderSection8_Exploration(s, geophys) });
-  if (has("drilling")) plan.push({ id: "drilling", label: "§9 Sondajes", run: () => renderSection9_Drilling(s) });
-  if (has("qaqc")) plan.push({ id: "qaqc", label: "§10 QA/QC", run: () => renderSection10_QAQC(s, validations) });
-  if (has("dataVerification")) plan.push({ id: "dataVerification", label: "§11 Verificación de datos", run: () => renderSection11_DataVerification(s, validations) });
-  if (has("resourceEstimates")) plan.push({ id: "resourceEstimates", label: "§14 Estimación de recursos", run: () => renderSection14bis_ResourceEstimates(s, resourceData) });
-  if (has("economicAnalysis")) plan.push({ id: "economicAnalysis", label: "§19 Análisis económico", run: () => renderSection19_EconomicAnalysis(s, economicData) });
-  if (has("budget")) plan.push({ id: "budget", label: "§12 Presupuesto", run: () => renderSection12_Budget(s) });
-  if (has("conclusions")) plan.push({ id: "conclusions", label: "§13 Conclusiones", run: () => renderSection13_Conclusions(s) });
-  if (has("references")) plan.push({ id: "references", label: "§14 Referencias", run: () => renderSection14_References(s, geo?.references ?? []) });
-  if (has("annexA")) plan.push({ id: "annexA", label: "Anexo A · Catastro", run: () => renderAnnexA(s, catastroRows, internalConcessions, validations) });
-  if (has("annexB")) plan.push({ id: "annexB", label: "Anexo B · Geofísica", run: () => renderAnnexB(s, geophys) });
-  if (has("annexC") && complianceData) plan.push({ id: "annexC", label: "Anexo C · Compliance", run: () => renderAnnexC_Compliance(s, complianceData) });
+  if (has("execSummary"))
+    plan.push({ id: "execSummary", label: "Resumen ejecutivo", run: () => renderExecSummary(s) });
+  if (has("intro"))
+    plan.push({ id: "intro", label: "§1 Introducción", run: () => renderSection1_Intro(s) });
+  if (has("reliance"))
+    plan.push({
+      id: "reliance",
+      label: "§2 Confianza en otros expertos",
+      run: () => renderSection2_Reliance(s),
+    });
+  if (has("property"))
+    plan.push({
+      id: "property",
+      label: "§3 Descripción y ubicación (mapa + catastro)",
+      run: () => renderSection3_Property(s, mapFig, catastroRows, validations),
+    });
+  if (includeZoning && has("zoning"))
+    plan.push({
+      id: "zoning",
+      label: "§3.bis Zonificación geológica (satélite)",
+      run: () => renderSection3bis_Zoning(s, satelliteFig, geo, internalConcessions.length),
+    });
+  if (has("climate"))
+    plan.push({
+      id: "climate",
+      label: "§4 Clima e infraestructura",
+      run: () => renderSection4_Climate(s),
+    });
+  if (has("history"))
+    plan.push({ id: "history", label: "§5 Historia", run: () => renderSection5_History(s) });
+  if (has("geology"))
+    plan.push({
+      id: "geology",
+      label: "§6 Geología local y regional",
+      run: () => renderSection6_Geology(s, geo),
+    });
+  if (has("depositType"))
+    plan.push({
+      id: "depositType",
+      label: "§7 Tipo de depósito",
+      run: () => renderSection7_DepositType(s, geo),
+    });
+  if (has("exploration"))
+    plan.push({
+      id: "exploration",
+      label: "§8 Exploración (geofísica/geoquímica)",
+      run: () => renderSection8_Exploration(s, geophys),
+    });
+  if (has("drilling"))
+    plan.push({ id: "drilling", label: "§9 Sondajes", run: () => renderSection9_Drilling(s) });
+  if (has("qaqc"))
+    plan.push({ id: "qaqc", label: "§10 QA/QC", run: () => renderSection10_QAQC(s, validations) });
+  if (has("dataVerification"))
+    plan.push({
+      id: "dataVerification",
+      label: "§11 Verificación de datos",
+      run: () => renderSection11_DataVerification(s, validations),
+    });
+  if (has("resourceEstimates"))
+    plan.push({
+      id: "resourceEstimates",
+      label: "§14 Estimación de recursos",
+      run: () => renderSection14bis_ResourceEstimates(s, resourceData),
+    });
+  if (has("economicAnalysis"))
+    plan.push({
+      id: "economicAnalysis",
+      label: "§19 Análisis económico",
+      run: () => renderSection19_EconomicAnalysis(s, economicData),
+    });
+  if (has("budget"))
+    plan.push({ id: "budget", label: "§12 Presupuesto", run: () => renderSection12_Budget(s) });
+  if (has("conclusions"))
+    plan.push({
+      id: "conclusions",
+      label: "§13 Conclusiones",
+      run: () => renderSection13_Conclusions(s),
+    });
+  if (has("references"))
+    plan.push({
+      id: "references",
+      label: "§14 Referencias",
+      run: () => renderSection14_References(s, geo?.references ?? []),
+    });
+  if (has("annexA"))
+    plan.push({
+      id: "annexA",
+      label: "Anexo A · Catastro",
+      run: () => renderAnnexA(s, catastroRows, internalConcessions, validations),
+    });
+  if (has("annexB"))
+    plan.push({ id: "annexB", label: "Anexo B · Geofísica", run: () => renderAnnexB(s, geophys) });
+  if (has("annexC") && complianceData)
+    plan.push({
+      id: "annexC",
+      label: "Anexo C · Compliance",
+      run: () => renderAnnexC_Compliance(s, complianceData),
+    });
 
   // Add finalization steps to total so bar reflects real work.
   const finalizationSteps = 2; // header/footer pass + TOC fill
@@ -562,7 +699,12 @@ export async function exportNI43101(opts: {
   }
 
   // Re-stamp header/footer on every non-cover page (cover is page 1)
-  onProgress?.({ label: "Aplicando encabezado y pie de página…", current: plan.length + 1, total, phase: "finalize" });
+  onProgress?.({
+    label: "Aplicando encabezado y pie de página…",
+    current: plan.length + 1,
+    total,
+    phase: "finalize",
+  });
   await yieldToUi();
   const totalPages = s.doc.getNumberOfPages();
   for (let pg = 2; pg <= totalPages; pg++) {
@@ -572,7 +714,12 @@ export async function exportNI43101(opts: {
   }
 
   // Fill TOC entries on the reserved page
-  onProgress?.({ label: "Generando índice (TOC)…", current: plan.length + 2, total, phase: "finalize" });
+  onProgress?.({
+    label: "Generando índice (TOC)…",
+    current: plan.length + 2,
+    total,
+    phase: "finalize",
+  });
   await yieldToUi();
   fillToc(s, tocPageNum, totalPages);
 

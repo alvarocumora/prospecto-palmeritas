@@ -15,9 +15,7 @@ export function ViewModeToggle({
         type="button"
         onClick={() => onChange("2d")}
         className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono transition-colors ${
-          mode === "2d"
-            ? "bg-gold text-background"
-            : "text-foreground hover:bg-accent"
+          mode === "2d" ? "bg-gold text-background" : "text-foreground hover:bg-accent"
         }`}
         title="Vista 2D Leaflet"
       >
@@ -28,9 +26,7 @@ export function ViewModeToggle({
         type="button"
         onClick={() => onChange("3d")}
         className={`inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-mono border-l border-border transition-colors ${
-          mode === "3d"
-            ? "bg-gold text-background"
-            : "text-foreground hover:bg-accent"
+          mode === "3d" ? "bg-gold text-background" : "text-foreground hover:bg-accent"
         }`}
         title="Vista 3D MapLibre + deck.gl"
       >

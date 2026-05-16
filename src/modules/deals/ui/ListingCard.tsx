@@ -36,18 +36,24 @@ export function ListingCard({ listing, onOpen }: { listing: PropertyListing; onO
           </h3>
         </div>
         <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
-          <span className="px-1.5 py-0.5 rounded bg-bg-elevated border border-border">{listing.commodity}</span>
+          <span className="px-1.5 py-0.5 rounded bg-bg-elevated border border-border">
+            {listing.commodity}
+          </span>
           <span>{STAGE_LABEL[listing.stage] ?? listing.stage}</span>
         </div>
         {(listing.region || listing.country) && (
           <div className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
             <MapPin className="w-3 h-3" />
             {[listing.region, listing.country].filter(Boolean).join(", ")}
-            {listing.area_ha && <span className="ml-auto">{listing.area_ha.toLocaleString("es-CL")} ha</span>}
+            {listing.area_ha && (
+              <span className="ml-auto">{listing.area_ha.toLocaleString("es-CL")} ha</span>
+            )}
           </div>
         )}
         {listing.summary && (
-          <p className="text-[11px] font-mono text-muted-foreground line-clamp-2 mt-1">{listing.summary}</p>
+          <p className="text-[11px] font-mono text-muted-foreground line-clamp-2 mt-1">
+            {listing.summary}
+          </p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between border-t border-border">
           <div className="text-xs font-mono text-gold font-semibold">

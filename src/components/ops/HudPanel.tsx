@@ -21,12 +21,17 @@ export function HudPanel({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   const accentClass =
-    accent === "amber" ? "before:bg-signal-amber"
-    : accent === "red" ? "before:bg-signal-red"
-    : accent === "green" ? "before:bg-signal-green"
-    : accent === "violet" ? "before:bg-signal-violet"
-    : accent === "none" ? "before:bg-transparent"
-    : "before:bg-signal-cyan";
+    accent === "amber"
+      ? "before:bg-signal-amber"
+      : accent === "red"
+        ? "before:bg-signal-red"
+        : accent === "green"
+          ? "before:bg-signal-green"
+          : accent === "violet"
+            ? "before:bg-signal-violet"
+            : accent === "none"
+              ? "before:bg-transparent"
+              : "before:bg-signal-cyan";
   return (
     <div
       className={cn(
@@ -51,7 +56,9 @@ export function HudPanel({
                 className="p-0.5 text-text-dim hover:text-foreground transition-colors"
                 aria-label={open ? "Colapsar" : "Expandir"}
               >
-                <ChevronDown className={cn("w-3 h-3 transition-transform", !open && "-rotate-90")} />
+                <ChevronDown
+                  className={cn("w-3 h-3 transition-transform", !open && "-rotate-90")}
+                />
               </button>
             )}
             {onClose && (

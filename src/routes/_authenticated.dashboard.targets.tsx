@@ -3,10 +3,30 @@ import { useMemo, useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
 import {
-  useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
-  type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
+  useExplorationTargets,
+  TARGET_STAGES,
+  STAGE_META,
+  PRIORITY_META,
+  type TargetStage,
+  type TargetPriority,
+  type TargetType,
+  type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy, FileDown, Loader2 } from "lucide-react";
+import {
+  Target,
+  Plus,
+  ChevronRight,
+  ChevronLeft,
+  X,
+  Trash2,
+  MapPin,
+  Sparkles,
+  LayoutGrid,
+  Map as MapIcon,
+  Trophy,
+  FileDown,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
@@ -21,7 +41,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/targets")({
 function TargetsPage() {
   const { active } = useProjects();
   const role = useProjectRole();
-  const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
+  const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(
+    active?.id ?? null,
+  );
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState<"kanban" | "map" | "ranking">("kanban");
   const [exporting, setExporting] = useState(false);
@@ -44,7 +66,9 @@ function TargetsPage() {
       // Capture ranking
       setView("ranking");
       await new Promise((r) => setTimeout(r, 700));
-      const rankingCanvas = rankingWrapRef.current ? await snapshotElement(rankingWrapRef.current) : null;
+      const rankingCanvas = rankingWrapRef.current
+        ? await snapshotElement(rankingWrapRef.current)
+        : null;
 
       buildTargetsPDF({
         mapCanvas,
@@ -65,20 +89,31 @@ function TargetsPage() {
 
   const grouped = useMemo(() => {
     const m: Record<TargetStage, ExplorationTarget[]> = {
-      generated: [], validated: [], drill_ready: [], drilling: [], drilled: [], closed: [],
+      generated: [],
+      validated: [],
+      drill_ready: [],
+      drilling: [],
+      drilled: [],
+      closed: [],
     };
     for (const t of targets) m[t.stage].push(t);
     return m;
   }, [targets]);
 
-  const stats = useMemo(() => ({
-    total: targets.length,
-    drillReady: grouped.drill_ready.length,
-    active: targets.filter((t) => t.stage !== "closed" && t.stage !== "drilled").length,
-    plannedMeters: targets.filter((t) => t.stage === "drill_ready").reduce((s, t) => s + (Number(t.planned_meters) || 0), 0),
-  }), [targets, grouped]);
+  const stats = useMemo(
+    () => ({
+      total: targets.length,
+      drillReady: grouped.drill_ready.length,
+      active: targets.filter((t) => t.stage !== "closed" && t.stage !== "drilled").length,
+      plannedMeters: targets
+        .filter((t) => t.stage === "drill_ready")
+        .reduce((s, t) => s + (Number(t.planned_meters) || 0), 0),
+    }),
+    [targets, grouped],
+  );
 
-  if (!active) return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
+  if (!active)
+    return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
 
   async function move(id: string, dir: "next" | "prev") {
     const t = targets.find((x) => x.id === id);
@@ -108,12 +143,15 @@ function TargetsPage() {
     <div className="p-4 md:p-8 max-w-[1600px] mx-auto pb-20 md:pb-8">
       <header className="mb-6 flex items-start justify-between gap-4 flex-wrap">
         <div>
-          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">Proyecto · {active.code}</div>
+          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+            Proyecto · {active.code}
+          </div>
           <h1 className="text-xl md:text-2xl font-bold mt-1 inline-flex items-center gap-2">
             <Target className="w-5 h-5 text-gold" /> Targets Pipeline
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Generación → Validación → Drill-Ready → Perforación. Convierte exploración en decisiones.
+            Generación → Validación → Drill-Ready → Perforación. Convierte exploración en
+            decisiones.
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -148,7 +186,11 @@ function TargetsPage() {
             className="px-3 py-1.5 text-xs font-mono rounded border border-emerald-500/40 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
             title="Exporta mapa + ranking a PDF para enviar por correo o WhatsApp"
           >
-            {exporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileDown className="w-3 h-3" />}
+            {exporting ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <FileDown className="w-3 h-3" />
+            )}
             {exporting ? "Generando…" : "Exportar PDF"}
           </button>
           <Link
@@ -173,7 +215,11 @@ function TargetsPage() {
         <Stat label="Total" value={String(stats.total)} />
         <Stat label="Activos" value={String(stats.active)} color="text-info" />
         <Stat label="Drill-Ready" value={String(stats.drillReady)} color="text-gold" />
-        <Stat label="m planificados" value={stats.plannedMeters.toLocaleString(undefined, { maximumFractionDigits: 0 })} color="text-copper" />
+        <Stat
+          label="m planificados"
+          value={stats.plannedMeters.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+          color="text-copper"
+        />
       </div>
 
       {loading ? (
@@ -182,12 +228,18 @@ function TargetsPage() {
         <div className="rounded border border-dashed border-border bg-bg-secondary p-12 text-center">
           <Target className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
           <div className="font-mono text-sm">Sin targets aún</div>
-          <p className="text-xs text-muted-foreground mt-1">Crea tu primer target con la evidencia geológica/geofísica que lo respalde.</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Crea tu primer target con la evidencia geológica/geofísica que lo respalde.
+          </p>
         </div>
       ) : view === "map" ? (
-        <div ref={mapWrapRef}><TargetsMap targets={targets} /></div>
+        <div ref={mapWrapRef}>
+          <TargetsMap targets={targets} />
+        </div>
       ) : view === "ranking" ? (
-        <div ref={rankingWrapRef}><TargetsExecutivePanel targets={targets} /></div>
+        <div ref={rankingWrapRef}>
+          <TargetsExecutivePanel targets={targets} />
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (
@@ -211,7 +263,10 @@ function TargetsPage() {
           onSaved={async (t) => {
             const { error } = await addTarget(t);
             if (error) toast.error(error);
-            else { toast.success("Target creado"); setShowForm(false); }
+            else {
+              toast.success("Target creado");
+              setShowForm(false);
+            }
           }}
         />
       )}
@@ -219,7 +274,15 @@ function TargetsPage() {
   );
 }
 
-function Stat({ label, value, color = "text-foreground" }: { label: string; value: string; color?: string }) {
+function Stat({
+  label,
+  value,
+  color = "text-foreground",
+}: {
+  label: string;
+  value: string;
+  color?: string;
+}) {
   return (
     <div className="rounded border border-border bg-bg-secondary p-3">
       <div className="text-[10px] font-mono uppercase text-muted-foreground">{label}</div>
@@ -229,7 +292,12 @@ function Stat({ label, value, color = "text-foreground" }: { label: string; valu
 }
 
 function Column({
-  stage, targets, writable, onNext, onPrev, onDelete,
+  stage,
+  targets,
+  writable,
+  onNext,
+  onPrev,
+  onDelete,
 }: {
   stage: TargetStage;
   targets: ExplorationTarget[];
@@ -241,18 +309,34 @@ function Column({
   const meta = STAGE_META[stage];
   return (
     <div className="rounded border border-border bg-bg-secondary flex flex-col min-h-[200px]">
-      <div className={`px-2.5 py-2 border-b border-border flex items-center justify-between ${meta.color.split(" ").filter(c => c.startsWith("bg-")).join(" ")}`}>
-        <div className={`text-[10px] font-mono uppercase tracking-wider ${meta.color.split(" ").find(c => c.startsWith("text-")) ?? ""}`}>
+      <div
+        className={`px-2.5 py-2 border-b border-border flex items-center justify-between ${meta.color
+          .split(" ")
+          .filter((c) => c.startsWith("bg-"))
+          .join(" ")}`}
+      >
+        <div
+          className={`text-[10px] font-mono uppercase tracking-wider ${meta.color.split(" ").find((c) => c.startsWith("text-")) ?? ""}`}
+        >
           {meta.label}
         </div>
         <div className="text-[10px] font-mono text-muted-foreground">{targets.length}</div>
       </div>
       <div className="p-2 space-y-2 flex-1">
         {targets.length === 0 && (
-          <div className="text-[10px] font-mono text-muted-foreground text-center py-4 opacity-60">Vacío</div>
+          <div className="text-[10px] font-mono text-muted-foreground text-center py-4 opacity-60">
+            Vacío
+          </div>
         )}
         {targets.map((t) => (
-          <Card key={t.id} target={t} writable={writable} onNext={onNext} onPrev={onPrev} onDelete={onDelete} />
+          <Card
+            key={t.id}
+            target={t}
+            writable={writable}
+            onNext={onNext}
+            onPrev={onPrev}
+            onDelete={onDelete}
+          />
         ))}
       </div>
     </div>
@@ -260,7 +344,11 @@ function Column({
 }
 
 function Card({
-  target, writable, onNext, onPrev, onDelete,
+  target,
+  writable,
+  onNext,
+  onPrev,
+  onDelete,
 }: {
   target: ExplorationTarget;
   writable: boolean;
@@ -279,23 +367,29 @@ function Card({
           <div className="text-[10px] font-mono text-muted-foreground">{target.code}</div>
           <div className="text-xs font-semibold truncate">{target.name}</div>
         </div>
-        <span className={`text-[9px] font-mono uppercase px-1 py-0.5 rounded border ${pri.color}`}>{pri.label}</span>
+        <span className={`text-[9px] font-mono uppercase px-1 py-0.5 rounded border ${pri.color}`}>
+          {pri.label}
+        </span>
       </div>
 
       <div className="mt-1.5 flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
         <span>{target.target_type}</span>
         {target.commodity && <span>· {target.commodity}</span>}
-        {target.score != null && <span className="ml-auto text-gold">★ {Number(target.score).toFixed(0)}</span>}
+        {target.score != null && (
+          <span className="ml-auto text-gold">★ {Number(target.score).toFixed(0)}</span>
+        )}
       </div>
 
-      {(target.lat != null && target.lng != null) && (
+      {target.lat != null && target.lng != null && (
         <div className="mt-1 text-[9px] font-mono text-muted-foreground inline-flex items-center gap-1">
           <MapPin className="w-2.5 h-2.5" /> {target.lat.toFixed(4)}, {target.lng.toFixed(4)}
         </div>
       )}
 
       {target.planned_meters != null && (
-        <div className="mt-1 text-[9px] font-mono text-copper">{target.planned_meters} m planificados</div>
+        <div className="mt-1 text-[9px] font-mono text-copper">
+          {target.planned_meters} m planificados
+        </div>
       )}
 
       {target.rationale && (
@@ -337,7 +431,9 @@ function Card({
 }
 
 function TargetDialog({
-  projectId: _projectId, onClose, onSaved,
+  projectId: _projectId,
+  onClose,
+  onSaved,
 }: {
   projectId: string;
   onClose: () => void;
@@ -357,19 +453,30 @@ function TargetDialog({
   const [rationale, setRationale] = useState("");
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={onClose}>
-      <div className="bg-bg-secondary border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="bg-bg-secondary border border-border rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="px-4 py-3 border-b border-border flex items-center justify-between">
           <div className="font-mono text-sm font-semibold inline-flex items-center gap-2">
             <Target className="w-4 h-4 text-gold" /> Nuevo target exploratorio
           </div>
-          <button type="button" onClick={onClose}><X className="w-4 h-4" /></button>
+          <button type="button" onClick={onClose}>
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            if (!code.trim() || !name.trim()) { toast.error("Código y nombre son requeridos"); return; }
+            if (!code.trim() || !name.trim()) {
+              toast.error("Código y nombre son requeridos");
+              return;
+            }
             onSaved({
               code: code.trim().toUpperCase(),
               name: name.trim(),
@@ -389,24 +496,72 @@ function TargetDialog({
         >
           <div className="grid grid-cols-2 gap-3">
             <Field label="Código" required>
-              <input className="input" value={code} onChange={(e) => setCode(e.target.value)} placeholder="TGT-001" required />
+              <input
+                className="input"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="TGT-001"
+                required
+              />
             </Field>
             <Field label="Tipo">
-              <select className="input" value={target_type} onChange={(e) => setTargetType(e.target.value as TargetType)}>
-                {(["vein", "disseminated", "skarn", "porphyry", "epithermal", "iocg", "vms", "placer", "other"] as TargetType[]).map((t) => (
-                  <option key={t} value={t}>{t}</option>
+              <select
+                className="input"
+                value={target_type}
+                onChange={(e) => setTargetType(e.target.value as TargetType)}
+              >
+                {(
+                  [
+                    "vein",
+                    "disseminated",
+                    "skarn",
+                    "porphyry",
+                    "epithermal",
+                    "iocg",
+                    "vms",
+                    "placer",
+                    "other",
+                  ] as TargetType[]
+                ).map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
                 ))}
               </select>
             </Field>
           </div>
           <Field label="Nombre" required>
-            <input className="input" value={name} onChange={(e) => setName(e.target.value)} placeholder="Veta Norte profunda" required />
+            <input
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Veta Norte profunda"
+              required
+            />
           </Field>
           <div className="grid grid-cols-3 gap-3">
-            <Field label="Commodity"><input className="input" value={commodity} onChange={(e) => setCommodity(e.target.value)} placeholder="Au" /></Field>
-            <Field label="Zona"><input className="input" value={target_zone} onChange={(e) => setZone(e.target.value)} placeholder="Sector A" /></Field>
+            <Field label="Commodity">
+              <input
+                className="input"
+                value={commodity}
+                onChange={(e) => setCommodity(e.target.value)}
+                placeholder="Au"
+              />
+            </Field>
+            <Field label="Zona">
+              <input
+                className="input"
+                value={target_zone}
+                onChange={(e) => setZone(e.target.value)}
+                placeholder="Sector A"
+              />
+            </Field>
             <Field label="Prioridad">
-              <select className="input" value={priority} onChange={(e) => setPriority(e.target.value as TargetPriority)}>
+              <select
+                className="input"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as TargetPriority)}
+              >
                 <option value="low">Baja</option>
                 <option value="medium">Media</option>
                 <option value="high">Alta</option>
@@ -415,22 +570,76 @@ function TargetDialog({
             </Field>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Field label="Latitud"><input className="input" type="number" step="any" value={lat} onChange={(e) => setLat(e.target.value)} /></Field>
-            <Field label="Longitud"><input className="input" type="number" step="any" value={lng} onChange={(e) => setLng(e.target.value)} /></Field>
+            <Field label="Latitud">
+              <input
+                className="input"
+                type="number"
+                step="any"
+                value={lat}
+                onChange={(e) => setLat(e.target.value)}
+              />
+            </Field>
+            <Field label="Longitud">
+              <input
+                className="input"
+                type="number"
+                step="any"
+                value={lng}
+                onChange={(e) => setLng(e.target.value)}
+              />
+            </Field>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            <Field label="Score 0-100"><input className="input" type="number" min={0} max={100} value={score} onChange={(e) => setScore(e.target.value)} /></Field>
-            <Field label="m planificados"><input className="input" type="number" value={planned_meters} onChange={(e) => setMeters(e.target.value)} /></Field>
-            <Field label="Costo USD"><input className="input" type="number" value={estimated_cost_usd} onChange={(e) => setCost(e.target.value)} /></Field>
+            <Field label="Score 0-100">
+              <input
+                className="input"
+                type="number"
+                min={0}
+                max={100}
+                value={score}
+                onChange={(e) => setScore(e.target.value)}
+              />
+            </Field>
+            <Field label="m planificados">
+              <input
+                className="input"
+                type="number"
+                value={planned_meters}
+                onChange={(e) => setMeters(e.target.value)}
+              />
+            </Field>
+            <Field label="Costo USD">
+              <input
+                className="input"
+                type="number"
+                value={estimated_cost_usd}
+                onChange={(e) => setCost(e.target.value)}
+              />
+            </Field>
           </div>
           <Field label="Justificación geológica">
-            <textarea className="input min-h-[80px]" value={rationale} onChange={(e) => setRationale(e.target.value)}
-              placeholder="Anomalía cargabilidad IP coincidente con alteración argílica avanzada y rock chips Au > 1 g/t…" />
+            <textarea
+              className="input min-h-[80px]"
+              value={rationale}
+              onChange={(e) => setRationale(e.target.value)}
+              placeholder="Anomalía cargabilidad IP coincidente con alteración argílica avanzada y rock chips Au > 1 g/t…"
+            />
           </Field>
 
           <div className="flex justify-end gap-2 pt-2 border-t border-border">
-            <button type="button" onClick={onClose} className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent">Cancelar</button>
-            <button type="submit" className="px-3 py-1.5 text-xs font-mono rounded bg-gold text-background hover:bg-gold/90">Crear</button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 py-1.5 text-xs font-mono rounded border border-border hover:bg-accent"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              className="px-3 py-1.5 text-xs font-mono rounded bg-gold text-background hover:bg-gold/90"
+            >
+              Crear
+            </button>
           </div>
         </form>
       </div>
@@ -439,10 +648,21 @@ function TargetDialog({
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
-      <span className="text-[10px] font-mono uppercase text-muted-foreground">{label}{required && <span className="text-destructive ml-0.5">*</span>}</span>
+      <span className="text-[10px] font-mono uppercase text-muted-foreground">
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
+      </span>
       <div className="mt-1">{children}</div>
     </label>
   );

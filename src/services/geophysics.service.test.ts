@@ -40,7 +40,9 @@ describe("fetchGeophysicsData", () => {
   it("returns normalized geophysics data from Supabase tables", async () => {
     const surveys = [{ id: "s1", project_id: null, name: "IP Survey", display_order: 1 }];
     const lines = [{ id: "l1", project_id: null, line_id: "L-001", is_synthetic: true }];
-    const stations = [{ id: "st1", project_id: null, station_id: "ST-001", lat: -33.9, lng: -71.1 }];
+    const stations = [
+      { id: "st1", project_id: null, station_id: "ST-001", lat: -33.9, lng: -71.1 },
+    ];
 
     fromMock
       .mockReturnValueOnce(queryResult({ data: surveys, error: null }))
@@ -64,7 +66,10 @@ describe("fetchGeophysicsData", () => {
     const lineQuery = queryResult({ data: [], error: null });
     const stationQuery = queryResult({ data: [], error: null });
 
-    fromMock.mockReturnValueOnce(surveyQuery).mockReturnValueOnce(lineQuery).mockReturnValueOnce(stationQuery);
+    fromMock
+      .mockReturnValueOnce(surveyQuery)
+      .mockReturnValueOnce(lineQuery)
+      .mockReturnValueOnce(stationQuery);
 
     await fetchGeophysicsData("project-1");
 

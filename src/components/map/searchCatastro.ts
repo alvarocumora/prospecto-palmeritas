@@ -15,10 +15,7 @@ export type CatastroHit = {
  * Busca por CODIGO o ROL en ambas capas. Devuelve hasta `limit` resultados.
  * Sanitiza el input contra inyección SQL básica del WHERE de ArcGIS.
  */
-export async function searchCatastroByCode(
-  rawTerm: string,
-  limit = 10,
-): Promise<CatastroHit[]> {
+export async function searchCatastroByCode(rawTerm: string, limit = 10): Promise<CatastroHit[]> {
   const term = rawTerm.trim();
   if (!term) return [];
   // Solo letras, números, espacio, guion, punto, slash — campos típicos de

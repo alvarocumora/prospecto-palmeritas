@@ -27,12 +27,16 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
     ["sign"],
   );
   const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
-  return Array.from(new Uint8Array(sig)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(sig))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 async function sha256Hex(message: string): Promise<string> {
   const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(message));
-  return Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 function jsonResp(body: unknown, status = 200) {
@@ -79,10 +83,21 @@ Deno.serve(async (req) => {
       const document_title = payload.document_title as string;
       const document_hash = payload.document_hash as string;
       const document_ref_id = (payload.document_ref_id as string | null) ?? null;
-      const signers = (payload.signers as Array<{
-        user_id: string; name: string; role: string; email?: string; order?: number;
-      }>) ?? [];
-      if (!project_id || !document_type || !document_title || !document_hash || signers.length === 0) {
+      const signers =
+        (payload.signers as Array<{
+          user_id: string;
+          name: string;
+          role: string;
+          email?: string;
+          order?: number;
+        }>) ?? [];
+      if (
+        !project_id ||
+        !document_type ||
+        !document_title ||
+        !document_hash ||
+        signers.length === 0
+      ) {
         return jsonResp({ error: "missing_fields" }, 400);
       }
 

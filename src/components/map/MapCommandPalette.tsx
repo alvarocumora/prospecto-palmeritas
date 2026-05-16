@@ -15,8 +15,17 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import {
-  Crosshair, Drill, Target, Layers, Box, Map as MapIcon,
-  Sparkles, Flame, Scissors, Camera, FileText,
+  Crosshair,
+  Drill,
+  Target,
+  Layers,
+  Box,
+  Map as MapIcon,
+  Sparkles,
+  Flame,
+  Scissors,
+  Camera,
+  FileText,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import type { DrillHole } from "@/hooks/useDrilling";
@@ -35,7 +44,13 @@ interface Props {
 }
 
 export function MapCommandPalette({
-  map, holes, targets, rasters, viewMode, onViewModeChange, onSnapshot,
+  map,
+  holes,
+  targets,
+  rasters,
+  viewMode,
+  onViewModeChange,
+  onSnapshot,
 }: Props) {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
@@ -74,7 +89,13 @@ export function MapCommandPalette({
     const arr = Array.isArray(bbox) ? bbox : bbox.bbox;
     if (!arr || arr.length < 4) return;
     const [minLng, minLat, maxLng, maxLat] = arr;
-    map.fitBounds([[minLat, minLng], [maxLat, maxLng]], { padding: [40, 40] });
+    map.fitBounds(
+      [
+        [minLat, minLng],
+        [maxLat, maxLng],
+      ],
+      { padding: [40, 40] },
+    );
     setOpen(false);
   };
 
@@ -94,7 +115,9 @@ export function MapCommandPalette({
       >
         <Crosshair className="w-3 h-3 text-gold" />
         <span>Buscar</span>
-        <kbd className="ml-1 px-1 py-0 rounded bg-bg-secondary border border-border text-[9px]">⌘K</kbd>
+        <kbd className="ml-1 px-1 py-0 rounded bg-bg-secondary border border-border text-[9px]">
+          ⌘K
+        </kbd>
       </button>
 
       <CommandDialog open={open} onOpenChange={setOpen}>
@@ -103,13 +126,23 @@ export function MapCommandPalette({
           <CommandEmpty>Sin resultados.</CommandEmpty>
 
           <CommandGroup heading="Acciones rápidas">
-            <CommandItem onSelect={() => { onViewModeChange(viewMode === "2d" ? "3d" : "2d"); setOpen(false); }}>
+            <CommandItem
+              onSelect={() => {
+                onViewModeChange(viewMode === "2d" ? "3d" : "2d");
+                setOpen(false);
+              }}
+            >
               {viewMode === "2d" ? <Box className="w-4 h-4" /> : <MapIcon className="w-4 h-4" />}
               <span>Cambiar a vista {viewMode === "2d" ? "3D" : "2D"}</span>
               <CommandShortcut>V</CommandShortcut>
             </CommandItem>
             {onSnapshot && viewMode === "2d" && (
-              <CommandItem onSelect={() => { onSnapshot(); setOpen(false); }}>
+              <CommandItem
+                onSelect={() => {
+                  onSnapshot();
+                  setOpen(false);
+                }}
+              >
                 <Camera className="w-4 h-4" />
                 <span>Capturar snapshot PNG</span>
               </CommandItem>
@@ -119,15 +152,30 @@ export function MapCommandPalette({
           <CommandSeparator />
 
           <CommandGroup heading="Herramientas">
-            <CommandItem onSelect={() => { document.querySelector<HTMLButtonElement>('[title*="Geo-Intel Brief"]')?.click(); setOpen(false); }}>
+            <CommandItem
+              onSelect={() => {
+                document.querySelector<HTMLButtonElement>('[title*="Geo-Intel Brief"]')?.click();
+                setOpen(false);
+              }}
+            >
               <Sparkles className="w-4 h-4" />
               <span>Generar Geo-Intel Brief</span>
             </CommandItem>
-            <CommandItem onSelect={() => { document.querySelector<HTMLButtonElement>('[title*="Prospectividad"]')?.click(); setOpen(false); }}>
+            <CommandItem
+              onSelect={() => {
+                document.querySelector<HTMLButtonElement>('[title*="Prospectividad"]')?.click();
+                setOpen(false);
+              }}
+            >
               <Flame className="w-4 h-4" />
               <span>Heatmap de prospectividad IA</span>
             </CommandItem>
-            <CommandItem onSelect={() => { document.querySelector<HTMLButtonElement>('[title*="Sección 2D"]')?.click(); setOpen(false); }}>
+            <CommandItem
+              onSelect={() => {
+                document.querySelector<HTMLButtonElement>('[title*="Sección 2D"]')?.click();
+                setOpen(false);
+              }}
+            >
               <Scissors className="w-4 h-4" />
               <span>Construir sección 2D</span>
             </CommandItem>
@@ -138,7 +186,11 @@ export function MapCommandPalette({
               <CommandSeparator />
               <CommandGroup heading={`Sondajes (${holes.length})`}>
                 {holes.slice(0, 50).map((h) => (
-                  <CommandItem key={h.id} value={`hole ${h.hole_id} ${h.target_zone ?? ""}`} onSelect={() => flyToHole(h)}>
+                  <CommandItem
+                    key={h.id}
+                    value={`hole ${h.hole_id} ${h.target_zone ?? ""}`}
+                    onSelect={() => flyToHole(h)}
+                  >
                     <Drill className="w-4 h-4" />
                     <span className="font-mono">{h.hole_id}</span>
                     <span className="ml-auto text-[10px] text-muted-foreground">
@@ -155,7 +207,11 @@ export function MapCommandPalette({
               <CommandSeparator />
               <CommandGroup heading={`Targets (${targets.length})`}>
                 {targets.slice(0, 30).map((t) => (
-                  <CommandItem key={t.id} value={`target ${t.code} ${t.name}`} onSelect={() => flyToTarget(t)}>
+                  <CommandItem
+                    key={t.id}
+                    value={`target ${t.code} ${t.name}`}
+                    onSelect={() => flyToTarget(t)}
+                  >
                     <Target className="w-4 h-4" />
                     <span className="font-mono">{t.code}</span>
                     <span className="text-muted-foreground truncate">— {t.name}</span>
@@ -173,10 +229,16 @@ export function MapCommandPalette({
               <CommandSeparator />
               <CommandGroup heading={`Rasters drone (${rasters.length})`}>
                 {rasters.slice(0, 20).map((r) => (
-                  <CommandItem key={r.id} value={`raster ${r.name} ${r.raster_type}`} onSelect={() => flyToRaster(r)}>
+                  <CommandItem
+                    key={r.id}
+                    value={`raster ${r.name} ${r.raster_type}`}
+                    onSelect={() => flyToRaster(r)}
+                  >
                     <Layers className="w-4 h-4" />
                     <span className="truncate">{r.name}</span>
-                    <span className="ml-auto text-[10px] text-muted-foreground uppercase">{r.raster_type}</span>
+                    <span className="ml-auto text-[10px] text-muted-foreground uppercase">
+                      {r.raster_type}
+                    </span>
                   </CommandItem>
                 ))}
               </CommandGroup>

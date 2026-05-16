@@ -24,7 +24,9 @@ export function isJobStale(input: JobStatusInput, now = Date.now()): boolean {
   return now - updatedAt > staleAfterMs;
 }
 
-export function getAttemptsRemaining(input: Pick<JobStatusInput, "attempts" | "maxAttempts">): number {
+export function getAttemptsRemaining(
+  input: Pick<JobStatusInput, "attempts" | "maxAttempts">,
+): number {
   return Math.max(0, input.maxAttempts - input.attempts);
 }
 

@@ -1,6 +1,11 @@
 import type { LayerGroup } from "leaflet";
 import type { LeafletNS } from "./types";
-import { EXPIRY_COLORS, expiryStatus, daysUntilExpiry, type MiningConcession } from "@/hooks/useMiningConcessions";
+import {
+  EXPIRY_COLORS,
+  expiryStatus,
+  daysUntilExpiry,
+  type MiningConcession,
+} from "@/hooks/useMiningConcessions";
 
 function popupHtml(c: MiningConcession): string {
   const status = expiryStatus(c.expires_at);
@@ -24,14 +29,11 @@ function popupHtml(c: MiningConcession): string {
 
 function escape(s: string): string {
   return String(s).replace(/[&<>"']/g, (m) =>
-    m === "&" ? "&amp;" : m === "<" ? "&lt;" : m === ">" ? "&gt;" : m === '"' ? "&quot;" : "&#39;"
+    m === "&" ? "&amp;" : m === "<" ? "&lt;" : m === ">" ? "&gt;" : m === '"' ? "&quot;" : "&#39;",
   );
 }
 
-export function buildConcessionsLayer(
-  L: LeafletNS,
-  concessions: MiningConcession[]
-): LayerGroup {
+export function buildConcessionsLayer(L: LeafletNS, concessions: MiningConcession[]): LayerGroup {
   const group = L.layerGroup();
   for (const c of concessions) {
     if (!c.geometry_geojson) continue;

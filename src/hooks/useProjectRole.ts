@@ -21,9 +21,18 @@ export function useProjectRole(): ProjectRole | null {
 }
 
 const ALL_VIEW: ProjectRole[] = [
-  "owner", "admin", "project_manager", "chief_geologist", "geologist",
-  "qaqc_officer", "field_technician", "drilling_supervisor", "hse_officer",
-  "community_relations", "viewer", "external_consultant",
+  "owner",
+  "admin",
+  "project_manager",
+  "chief_geologist",
+  "geologist",
+  "qaqc_officer",
+  "field_technician",
+  "drilling_supervisor",
+  "hse_officer",
+  "community_relations",
+  "viewer",
+  "external_consultant",
 ];
 
 /** Permission matrix per module. */
@@ -39,21 +48,70 @@ export const MODULE_ROLES: Record<string, ProjectRole[]> = {
   team: ["owner", "admin", "project_manager"],
   audit: ["owner", "admin", "project_manager", "chief_geologist"],
   approvals: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer"],
-  targets: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "external_consultant", "viewer"],
-  inventory: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer", "field_technician", "drilling_supervisor"],
+  targets: [
+    "owner",
+    "admin",
+    "project_manager",
+    "chief_geologist",
+    "geologist",
+    "external_consultant",
+    "viewer",
+  ],
+  inventory: [
+    "owner",
+    "admin",
+    "project_manager",
+    "chief_geologist",
+    "geologist",
+    "qaqc_officer",
+    "field_technician",
+    "drilling_supervisor",
+  ],
   finance: ["owner", "admin", "project_manager", "chief_geologist"],
   marketplace: ["owner", "admin", "project_manager", "chief_geologist", "geologist"],
-  hse: ["owner", "admin", "project_manager", "chief_geologist", "hse_officer", "community_relations", "field_technician", "drilling_supervisor", "geologist"],
-  reports: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "qaqc_officer", "hse_officer", "external_consultant"],
-  estimation: ["owner", "admin", "project_manager", "chief_geologist", "geologist", "external_consultant"],
+  hse: [
+    "owner",
+    "admin",
+    "project_manager",
+    "chief_geologist",
+    "hse_officer",
+    "community_relations",
+    "field_technician",
+    "drilling_supervisor",
+    "geologist",
+  ],
+  reports: [
+    "owner",
+    "admin",
+    "project_manager",
+    "chief_geologist",
+    "geologist",
+    "qaqc_officer",
+    "hse_officer",
+    "external_consultant",
+  ],
+  estimation: [
+    "owner",
+    "admin",
+    "project_manager",
+    "chief_geologist",
+    "geologist",
+    "external_consultant",
+  ],
   profile: ALL_VIEW,
   settings: ["owner"],
 };
 
 /** Roles allowed to write (create/edit/delete) data. */
 export const WRITE_ROLES: ProjectRole[] = [
-  "owner", "admin", "project_manager", "chief_geologist", "geologist",
-  "qaqc_officer", "field_technician", "drilling_supervisor",
+  "owner",
+  "admin",
+  "project_manager",
+  "chief_geologist",
+  "geologist",
+  "qaqc_officer",
+  "field_technician",
+  "drilling_supervisor",
 ];
 
 export function canAccess(role: ProjectRole | null, module: keyof typeof MODULE_ROLES): boolean {

@@ -13,7 +13,9 @@ function distM(lat1: number, lng1: number, lat2: number, lng2: number) {
   const toRad = (d: number) => (d * Math.PI) / 180;
   const dLat = toRad(lat2 - lat1);
   const dLng = toRad(lng2 - lng1);
-  const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(a));
 }
 
@@ -27,14 +29,19 @@ Deno.serve(async (req) => {
   try {
     const { project_id, bbox, cell_size_m = 250, notes } = await req.json();
     if (!project_id || !Array.isArray(bbox) || bbox.length !== 4) {
-      return new Response(JSON.stringify({ error: "project_id and bbox [minLng,minLat,maxLng,maxLat] required" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({ error: "project_id and bbox [minLng,minLat,maxLng,maxLat] required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
     const [minLng, minLat, maxLng, maxLat] = bbox.map(Number);
     if ([minLng, minLat, maxLng, maxLat].some((n) => !Number.isFinite(n))) {
       return new Response(JSON.stringify({ error: "bbox values must be numeric" }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
@@ -44,8 +51,14 @@ Deno.serve(async (req) => {
     const userClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
-    const { data: { user } } = await userClient.auth.getUser();
-    if (!user) return new Response(JSON.stringify({ error: "not_authenticated" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    const {
+      data: { user },
+    } = await userClient.auth.getUser();
+    if (!user)
+      return new Response(JSON.stringify({ error: "not_authenticated" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
@@ -61,16 +74,34 @@ Deno.serve(async (req) => {
     const nLng = Math.ceil(lngSpan / cellLngStep);
     const total = nLat * nLng;
     if (total > 5000) {
-      return new Response(JSON.stringify({ error: `Grid too large (${total} cells). Reduce bbox or increase cell_size_m. Max 5000.` }), {
-        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return new Response(
+        JSON.stringify({
+          error: `Grid too large (${total} cells). Reduce bbox or increase cell_size_m. Max 5000.`,
+        }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        },
+      );
     }
 
     // Fetch evidence
     const [targets, holes, logs] = await Promise.all([
-      admin.from("exploration_targets").select("lat,lng,score,priority,stage").eq("project_id", project_id).not("lat", "is", null).not("lng", "is", null),
-      admin.from("drill_holes").select("id,easting,northing,actual_depth").eq("project_id", project_id),
-      admin.from("drill_core_logs").select("hole_id,au_gpt,cu_pct").eq("project_id", project_id).gte("au_gpt", 0.3),
+      admin
+        .from("exploration_targets")
+        .select("lat,lng,score,priority,stage")
+        .eq("project_id", project_id)
+        .not("lat", "is", null)
+        .not("lng", "is", null),
+      admin
+        .from("drill_holes")
+        .select("id,easting,northing,actual_depth")
+        .eq("project_id", project_id),
+      admin
+        .from("drill_core_logs")
+        .select("hole_id,au_gpt,cu_pct")
+        .eq("project_id", project_id)
+        .gte("au_gpt", 0.3),
     ]);
 
     // Build hole lat/lng map (skip those without — UTM conversion not implemented here)
@@ -100,8 +131,14 @@ Deno.serve(async (req) => {
     const runId = crypto.randomUUID();
 
     const cellsRows: Array<{
-      project_id: string; run_id: string; cell_lat: number; cell_lng: number;
-      cell_size_m: number; score: number; features: Record<string, unknown>; generated_by: string;
+      project_id: string;
+      run_id: string;
+      cell_lat: number;
+      cell_lng: number;
+      cell_size_m: number;
+      score: number;
+      features: Record<string, unknown>;
+      generated_by: string;
     }> = [];
 
     for (let i = 0; i < nLat; i++) {
@@ -158,7 +195,18 @@ Deno.serve(async (req) => {
       id: runId,
       project_id,
       generated_by: user.id,
-      bbox_geojson: { type: "Polygon", coordinates: [[[minLng, minLat], [maxLng, minLat], [maxLng, maxLat], [minLng, maxLat], [minLng, minLat]]] },
+      bbox_geojson: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [minLng, minLat],
+            [maxLng, minLat],
+            [maxLng, maxLat],
+            [minLng, maxLat],
+            [minLng, minLat],
+          ],
+        ],
+      },
       cell_size_m,
       cell_count: cellsRows.length,
       weights,
@@ -173,16 +221,20 @@ Deno.serve(async (req) => {
       if (error) throw error;
     }
 
-    return new Response(JSON.stringify({
-      run_id: runId,
-      cell_count: cellsRows.length,
-      total_grid: total,
-      max_score: cellsRows.reduce((m, c) => Math.max(m, c.score), 0),
-    }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return new Response(
+      JSON.stringify({
+        run_id: runId,
+        cell_count: cellsRows.length,
+        total_grid: total,
+        max_score: cellsRows.reduce((m, c) => Math.max(m, c.score), 0),
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     console.error("prospectivity-grid", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

@@ -1,12 +1,37 @@
 import { useEffect, useState } from "react";
-import { useEconomicScenarios, type EconomicScenario, type ScheduleRow } from "@/hooks/useEconomicScenarios";
+import {
+  useEconomicScenarios,
+  type EconomicScenario,
+  type ScheduleRow,
+} from "@/hooks/useEconomicScenarios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { DollarSign, Plus, Play, Trash2, Loader2, TrendingUp, Calendar, Layers } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DollarSign,
+  Plus,
+  Play,
+  Trash2,
+  Loader2,
+  TrendingUp,
+  Calendar,
+  Layers,
+} from "lucide-react";
 
 type Props = {
   modelId: string;
@@ -36,7 +61,8 @@ function fmtT(v: number | null | undefined): string {
 }
 
 export function EconomicScenariosPanel({ modelId, modelName, commodity, writable }: Props) {
-  const { scenarios, loading, create, remove, compute, getSchedule } = useEconomicScenarios(modelId);
+  const { scenarios, loading, create, remove, compute, getSchedule } =
+    useEconomicScenarios(modelId);
   const [dialog, setDialog] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
   const [scheduleFor, setScheduleFor] = useState<EconomicScenario | null>(null);
@@ -44,16 +70,26 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
 
   useEffect(() => {
     if (scheduleFor) {
-      getSchedule(scheduleFor.id).then(setSchedule).catch(() => setSchedule([]));
+      getSchedule(scheduleFor.id)
+        .then(setSchedule)
+        .catch(() => setSchedule([]));
     } else setSchedule([]);
   }, [scheduleFor, getSchedule]);
 
-  const defaultPrice = commodity === "au" || commodity === "ag" ? "usd_per_oz" :
-    (commodity === "cu" || commodity === "mo" || commodity === "pb" || commodity === "zn") ? "usd_per_lb" : "usd_per_t";
+  const defaultPrice =
+    commodity === "au" || commodity === "ag"
+      ? "usd_per_oz"
+      : commodity === "cu" || commodity === "mo" || commodity === "pb" || commodity === "zn"
+        ? "usd_per_lb"
+        : "usd_per_t";
 
   const handleRun = async (id: string) => {
     setRunning(id);
-    try { await compute(id); } finally { setRunning(null); }
+    try {
+      await compute(id);
+    } finally {
+      setRunning(null);
+    }
   };
 
   return (
@@ -63,7 +99,12 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
           <DollarSign className="w-3 h-3" /> Análisis económico
         </div>
         {writable && (
-          <Button size="sm" variant="outline" className="h-6 text-[10px] px-2" onClick={() => setDialog(true)}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-6 text-[10px] px-2"
+            onClick={() => setDialog(true)}
+          >
             <Plus className="w-3 h-3 mr-1" /> Escenario
           </Button>
         )}
@@ -72,7 +113,9 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
       {loading ? (
         <div className="text-text-dim text-[10px] font-mono">Cargando…</div>
       ) : scenarios.length === 0 ? (
-        <div className="text-text-dim text-[10px] font-mono italic">Sin escenarios. Crea uno para calcular NPV/IRR.</div>
+        <div className="text-text-dim text-[10px] font-mono italic">
+          Sin escenarios. Crea uno para calcular NPV/IRR.
+        </div>
       ) : (
         <div className="space-y-1.5">
           {scenarios.map((s) => (
@@ -82,7 +125,9 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
               writable={writable}
               running={running === s.id}
               onRun={() => handleRun(s.id)}
-              onDelete={() => { if (confirm(`Eliminar "${s.name}"?`)) remove(s.id); }}
+              onDelete={() => {
+                if (confirm(`Eliminar "${s.name}"?`)) remove(s.id);
+              }}
               onViewSchedule={() => setScheduleFor(s)}
             />
           ))}
@@ -95,7 +140,10 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
         modelName={modelName}
         defaultUnit={defaultPrice}
         onClose={() => setDialog(false)}
-        onSave={async (data) => { await create(data); setDialog(false); }}
+        onSave={async (data) => {
+          await create(data);
+          setDialog(false);
+        }}
       />
 
       <Dialog open={!!scheduleFor} onOpenChange={(o) => !o && setScheduleFor(null)}>
@@ -126,8 +174,14 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
                     <td className="px-2 py-1 text-right">{fmtT(r.ore_tonnes)}</td>
                     <td className="px-2 py-1 text-right">{fmtT(r.waste_tonnes)}</td>
                     <td className="px-2 py-1 text-right">{fmtUsd(r.revenue_usd)}</td>
-                    <td className="px-2 py-1 text-right text-signal-red/80">-{fmtUsd(r.opex_usd)}</td>
-                    <td className={`px-2 py-1 text-right ${r.cashflow_usd >= 0 ? "text-signal-cyan" : "text-signal-red"}`}>{fmtUsd(r.cashflow_usd)}</td>
+                    <td className="px-2 py-1 text-right text-signal-red/80">
+                      -{fmtUsd(r.opex_usd)}
+                    </td>
+                    <td
+                      className={`px-2 py-1 text-right ${r.cashflow_usd >= 0 ? "text-signal-cyan" : "text-signal-red"}`}
+                    >
+                      {fmtUsd(r.cashflow_usd)}
+                    </td>
                     <td className="px-2 py-1 text-right">{fmtUsd(r.cumulative_cashflow_usd)}</td>
                   </tr>
                 ))}
@@ -140,48 +194,100 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
   );
 }
 
-function ScenarioRow({ scenario, writable, running, onRun, onDelete, onViewSchedule }: {
-  scenario: EconomicScenario; writable: boolean; running: boolean;
-  onRun: () => void; onDelete: () => void; onViewSchedule: () => void;
+function ScenarioRow({
+  scenario,
+  writable,
+  running,
+  onRun,
+  onDelete,
+  onViewSchedule,
+}: {
+  scenario: EconomicScenario;
+  writable: boolean;
+  running: boolean;
+  onRun: () => void;
+  onDelete: () => void;
+  onViewSchedule: () => void;
 }) {
-  const statusColor = {
-    draft: "border-border text-text-dim",
-    running: "border-signal-amber/50 text-signal-amber",
-    complete: "border-signal-cyan/50 text-signal-cyan",
-    failed: "border-signal-red/50 text-signal-red",
-  }[scenario.status] ?? "border-border text-text-dim";
+  const statusColor =
+    {
+      draft: "border-border text-text-dim",
+      running: "border-signal-amber/50 text-signal-amber",
+      complete: "border-signal-cyan/50 text-signal-cyan",
+      failed: "border-signal-red/50 text-signal-red",
+    }[scenario.status] ?? "border-border text-text-dim";
 
   return (
     <div className="border border-border/60 rounded p-2 bg-background/40 space-y-1.5">
       <div className="flex items-center justify-between gap-2">
         <div className="font-mono text-xs truncate">{scenario.name}</div>
-        <Badge variant="outline" className={`text-[9px] ${statusColor}`}>{scenario.status}</Badge>
+        <Badge variant="outline" className={`text-[9px] ${statusColor}`}>
+          {scenario.status}
+        </Badge>
       </div>
       {scenario.status === "complete" && (
         <div className="grid grid-cols-4 gap-2 text-[10px] font-mono">
-          <Mini label="NPV" value={fmtUsd(scenario.npv_usd)} highlight={(scenario.npv_usd ?? 0) > 0} />
-          <Mini label="IRR" value={scenario.irr_pct != null ? `${scenario.irr_pct.toFixed(1)}%` : "—"} />
+          <Mini
+            label="NPV"
+            value={fmtUsd(scenario.npv_usd)}
+            highlight={(scenario.npv_usd ?? 0) > 0}
+          />
+          <Mini
+            label="IRR"
+            value={scenario.irr_pct != null ? `${scenario.irr_pct.toFixed(1)}%` : "—"}
+          />
           <Mini label="Mineral" value={fmtT(scenario.ore_tonnes)} />
           <Mini label="Vida" value={`${scenario.mine_life_years ?? "—"} a`} />
-          <Mini label="Strip" value={scenario.strip_ratio != null ? scenario.strip_ratio.toFixed(2) : "—"} />
-          <Mini label="Cutoff" value={scenario.nsr_cutoff_usd_t != null ? `$${scenario.nsr_cutoff_usd_t.toFixed(1)}/t` : "—"} />
-          <Mini label="Payback" value={scenario.payback_years != null ? `${scenario.payback_years} a` : "—"} />
+          <Mini
+            label="Strip"
+            value={scenario.strip_ratio != null ? scenario.strip_ratio.toFixed(2) : "—"}
+          />
+          <Mini
+            label="Cutoff"
+            value={
+              scenario.nsr_cutoff_usd_t != null ? `$${scenario.nsr_cutoff_usd_t.toFixed(1)}/t` : "—"
+            }
+          />
+          <Mini
+            label="Payback"
+            value={scenario.payback_years != null ? `${scenario.payback_years} a` : "—"}
+          />
           <Mini label="EBITDA" value={fmtUsd(scenario.ebitda_usd)} />
         </div>
       )}
       <div className="flex items-center gap-1.5 pt-1 border-t border-border/50">
         {scenario.status === "complete" && (
-          <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" onClick={onViewSchedule}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 text-[10px] px-2"
+            onClick={onViewSchedule}
+          >
             <Calendar className="w-3 h-3 mr-1" /> Schedule
           </Button>
         )}
         {writable && (
           <>
-            <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2" disabled={running} onClick={onRun}>
-              {running ? <Loader2 className="w-3 h-3 mr-1 animate-spin" /> : <Play className="w-3 h-3 mr-1" />}
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 text-[10px] px-2"
+              disabled={running}
+              onClick={onRun}
+            >
+              {running ? (
+                <Loader2 className="w-3 h-3 mr-1 animate-spin" />
+              ) : (
+                <Play className="w-3 h-3 mr-1" />
+              )}
               {scenario.status === "complete" ? "Recalcular" : "Calcular"}
             </Button>
-            <Button size="sm" variant="ghost" className="h-6 text-[10px] px-2 text-signal-red ml-auto" onClick={onDelete}>
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-6 text-[10px] px-2 text-signal-red ml-auto"
+              onClick={onDelete}
+            >
               <Trash2 className="w-3 h-3" />
             </Button>
           </>
@@ -200,14 +306,26 @@ function Mini({ label, value, highlight }: { label: string; value: string; highl
   );
 }
 
-function CreateScenarioDialog({ open, modelId, modelName, defaultUnit, onClose, onSave }: {
-  open: boolean; modelId: string; modelName: string; defaultUnit: string;
+function CreateScenarioDialog({
+  open,
+  modelId,
+  modelName,
+  defaultUnit,
+  onClose,
+  onSave,
+}: {
+  open: boolean;
+  modelId: string;
+  modelName: string;
+  defaultUnit: string;
   onClose: () => void;
   onSave: (data: Parameters<ReturnType<typeof useEconomicScenarios>["create"]>[0]) => Promise<void>;
 }) {
   const [name, setName] = useState("");
   const [priceUnit, setPriceUnit] = useState(defaultUnit);
-  const [price, setPrice] = useState(PRICE_UNITS.find((p) => p.v === defaultUnit)?.defaultPrice ?? 2400);
+  const [price, setPrice] = useState(
+    PRICE_UNITS.find((p) => p.v === defaultUnit)?.defaultPrice ?? 2400,
+  );
   const [recovery, setRecovery] = useState(90);
   const [miningCost, setMiningCost] = useState(3.5);
   const [procCost, setProcCost] = useState(18);
@@ -244,7 +362,9 @@ function CreateScenarioDialog({ open, modelId, modelName, defaultUnit, onClose, 
         slope_angle_deg: slope,
       });
       setName("");
-    } finally { setSaving(false); }
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -259,21 +379,36 @@ function CreateScenarioDialog({ open, modelId, modelName, defaultUnit, onClose, 
         <div className="grid gap-3">
           <div>
             <Label className="text-xs font-mono">Nombre del escenario</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Base · Au $2400/oz" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Base · Au $2400/oz"
+            />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div className="col-span-2">
               <Label className="text-xs font-mono">Unidad de precio</Label>
               <Select value={priceUnit} onValueChange={setPriceUnit}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {PRICE_UNITS.map((p) => <SelectItem key={p.v} value={p.v}>{p.l}</SelectItem>)}
+                  {PRICE_UNITS.map((p) => (
+                    <SelectItem key={p.v} value={p.v}>
+                      {p.l}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label className="text-xs font-mono">Precio</Label>
-              <Input type="number" step={0.1} value={price} onChange={(e) => setPrice(Number(e.target.value))} />
+              <Input
+                type="number"
+                step={0.1}
+                value={price}
+                onChange={(e) => setPrice(Number(e.target.value))}
+              />
             </div>
           </div>
           <div className="grid grid-cols-4 gap-3">
@@ -289,14 +424,22 @@ function CreateScenarioDialog({ open, modelId, modelName, defaultUnit, onClose, 
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Field label="Capex (USD)" value={capex} setValue={setCapex} step={1_000_000} />
-            <Field label="Throughput (t/año)" value={throughput} setValue={setThroughput} step={100_000} />
+            <Field
+              label="Throughput (t/año)"
+              value={throughput}
+              setValue={setThroughput}
+              step={100_000}
+            />
           </div>
           <div className="text-[10px] text-text-dim font-mono flex items-center gap-1">
-            <Layers className="w-3 h-3" /> El motor usa pit-shell heurístico (cono flotante) + NSR. Para PEA/PFS contrastar con software dedicado.
+            <Layers className="w-3 h-3" /> El motor usa pit-shell heurístico (cono flotante) + NSR.
+            Para PEA/PFS contrastar con software dedicado.
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose}>
+            Cancelar
+          </Button>
           <Button onClick={handleSave} disabled={!name.trim() || saving}>
             {saving && <Loader2 className="w-3 h-3 mr-1 animate-spin" />}
             Crear escenario
@@ -307,11 +450,26 @@ function CreateScenarioDialog({ open, modelId, modelName, defaultUnit, onClose, 
   );
 }
 
-function Field({ label, value, setValue, step }: { label: string; value: number; setValue: (n: number) => void; step?: number }) {
+function Field({
+  label,
+  value,
+  setValue,
+  step,
+}: {
+  label: string;
+  value: number;
+  setValue: (n: number) => void;
+  step?: number;
+}) {
   return (
     <div>
       <Label className="text-xs font-mono">{label}</Label>
-      <Input type="number" step={step ?? 0.1} value={value} onChange={(e) => setValue(Number(e.target.value))} />
+      <Input
+        type="number"
+        step={step ?? 0.1}
+        value={value}
+        onChange={(e) => setValue(Number(e.target.value))}
+      />
     </div>
   );
 }

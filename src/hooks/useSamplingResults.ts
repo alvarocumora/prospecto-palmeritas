@@ -32,7 +32,11 @@ export function useSamplingResults(projectId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setData([]); setLoading(false); return; }
+    if (!projectId) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: rows, error: err } = await supabase
       .from("sampling_results")
@@ -40,12 +44,19 @@ export function useSamplingResults(projectId: string | null) {
       .eq("project_id", projectId)
       .order("created_at", { ascending: false })
       .limit(2000);
-    if (err) { setError(err.message); setData([]); }
-    else { setData((rows ?? []) as SamplingResult[]); setError(null); }
+    if (err) {
+      setError(err.message);
+      setData([]);
+    } else {
+      setData((rows ?? []) as SamplingResult[]);
+      setError(null);
+    }
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { data, loading, error, refresh };
 }

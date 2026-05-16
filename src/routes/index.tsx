@@ -1,5 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Map, Activity, Drill, TestTube2, ArrowRight, Shield, Layers, Zap, Play } from "lucide-react";
+import {
+  Map,
+  Activity,
+  Drill,
+  TestTube2,
+  ArrowRight,
+  Shield,
+  Layers,
+  Zap,
+  Play,
+} from "lucide-react";
 import { Logo } from "@/components/Logo";
 import heroImage from "@/assets/hero-mining.jpg";
 import featureCatastro from "@/assets/feature-catastro.jpg";
@@ -17,9 +27,9 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Geocapitals — Exploración minera moderna" },
       {
         property: "og:description",
-        content: "Catastro, geofísica, sondajes y muestreo en una sola plataforma para geólogos profesionales.",
+        content:
+          "Catastro, geofísica, sondajes y muestreo en una sola plataforma para geólogos profesionales.",
       },
-      
     ],
   }),
   component: LandingPage,
@@ -157,9 +167,21 @@ function LandingPage() {
       {/* Why */}
       <section className="border-t border-border bg-bg-secondary/40">
         <div className="max-w-5xl mx-auto px-4 py-20 grid md:grid-cols-3 gap-8 text-sm">
-          <Why icon={<Shield className="w-4 h-4 text-gold" />} title="Datos seguros por proyecto" desc="Cada proyecto con su equipo, roles y permisos. RLS a nivel de fila." />
-          <Why icon={<Layers className="w-4 h-4 text-gold" />} title="Mapa con todas tus capas" desc="Catastro, geofísica WMS regional, geología Macrostrat, opacidad por capa." />
-          <Why icon={<Zap className="w-4 h-4 text-gold" />} title="Sin instalación" desc="Funciona en el navegador. Tus geólogos de campo trabajan desde el celular." />
+          <Why
+            icon={<Shield className="w-4 h-4 text-gold" />}
+            title="Datos seguros por proyecto"
+            desc="Cada proyecto con su equipo, roles y permisos. RLS a nivel de fila."
+          />
+          <Why
+            icon={<Layers className="w-4 h-4 text-gold" />}
+            title="Mapa con todas tus capas"
+            desc="Catastro, geofísica WMS regional, geología Macrostrat, opacidad por capa."
+          />
+          <Why
+            icon={<Zap className="w-4 h-4 text-gold" />}
+            title="Sin instalación"
+            desc="Funciona en el navegador. Tus geólogos de campo trabajan desde el celular."
+          />
         </div>
       </section>
 
@@ -169,7 +191,9 @@ function LandingPage() {
         <div className="relative">
           <Logo size={32} showText={false} className="mb-6 justify-center" />
           <h2 className="text-2xl md:text-3xl font-bold">¿Listo para tu próxima campaña?</h2>
-          <p className="mt-3 text-muted-foreground">Crea tu cuenta y empieza a gestionar proyectos en minutos.</p>
+          <p className="mt-3 text-muted-foreground">
+            Crea tu cuenta y empieza a gestionar proyectos en minutos.
+          </p>
           <Link
             to="/auth"
             className="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-md bg-gold text-background font-mono text-sm font-semibold hover:bg-gold-light transition-colors shadow-[0_0_30px_-5px_oklch(0.78_0.13_75/0.6)]"
@@ -190,7 +214,17 @@ function LandingPage() {
   );
 }
 
-function VisualFeature({ image, tag, title, desc }: { image: string; tag: string; title: string; desc: string }) {
+function VisualFeature({
+  image,
+  tag,
+  title,
+  desc,
+}: {
+  image: string;
+  tag: string;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="group relative rounded-lg border border-border bg-bg-secondary overflow-hidden hover:border-gold/40 transition-colors">
       <div className="aspect-[4/3] overflow-hidden bg-background">
@@ -212,7 +246,15 @@ function VisualFeature({ image, tag, title, desc }: { image: string; tag: string
   );
 }
 
-function FeatureCard({ icon, title, desc }: { icon: React.ReactNode; title: string; desc: string }) {
+function FeatureCard({
+  icon,
+  title,
+  desc,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+}) {
   return (
     <div className="rounded-lg border border-border bg-bg-secondary p-5 hover:border-gold/40 hover:bg-bg-secondary/70 transition-colors">
       <div className="w-9 h-9 rounded-md border border-border bg-background inline-flex items-center justify-center mb-3">
@@ -229,7 +271,9 @@ function Why({ icon, title, desc }: { icon: React.ReactNode; title: string; desc
     <div>
       <div className="inline-flex items-center gap-2 mb-2">
         {icon}
-        <span className="font-mono font-semibold text-foreground text-xs uppercase tracking-wider">{title}</span>
+        <span className="font-mono font-semibold text-foreground text-xs uppercase tracking-wider">
+          {title}
+        </span>
       </div>
       <p className="text-muted-foreground leading-relaxed">{desc}</p>
     </div>

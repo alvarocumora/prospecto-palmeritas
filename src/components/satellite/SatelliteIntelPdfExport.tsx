@@ -42,8 +42,18 @@ export function SatelliteIntelPdfExport({ projectName, getSections, getAnnexes }
   };
 
   return (
-    <Button onClick={handleExport} disabled={busy} size="sm" variant="outline" className="font-mono uppercase tracking-wider text-xs">
-      {busy ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Download className="w-4 h-4 mr-2" />}
+    <Button
+      onClick={handleExport}
+      disabled={busy}
+      size="sm"
+      variant="outline"
+      className="font-mono uppercase tracking-wider text-xs"
+    >
+      {busy ? (
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      ) : (
+        <Download className="w-4 h-4 mr-2" />
+      )}
       {busy ? "Generando PDF…" : "Exportar PDF"}
     </Button>
   );

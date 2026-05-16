@@ -29,19 +29,30 @@ export function useExplorationCampaigns(projectId: string | null) {
   const [error, setError] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!projectId) { setData([]); setLoading(false); return; }
+    if (!projectId) {
+      setData([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data: rows, error: err } = await supabase
       .from("exploration_campaigns")
       .select("*")
       .eq("project_id", projectId)
       .order("started_at", { ascending: false, nullsFirst: false });
-    if (err) { setError(err.message); setData([]); }
-    else { setData((rows ?? []) as ExplorationCampaign[]); setError(null); }
+    if (err) {
+      setError(err.message);
+      setData([]);
+    } else {
+      setData((rows ?? []) as ExplorationCampaign[]);
+      setError(null);
+    }
     setLoading(false);
   }, [projectId]);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return { data, loading, error, refresh };
 }

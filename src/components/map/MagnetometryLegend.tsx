@@ -11,7 +11,7 @@ export function MagnetometryLegend({ stats }: { stats: MagStats | null }) {
   const span = Math.max(
     Math.abs(stats.max - stats.baseline),
     Math.abs(stats.min - stats.baseline),
-    1
+    1,
   );
   // 7 stops -1..+1
   const stops = [-1, -0.66, -0.33, 0, 0.33, 0.66, 1];
@@ -30,7 +30,8 @@ export function MagnetometryLegend({ stats }: { stats: MagStats | null }) {
       </span>
       <span className="text-muted-foreground">{stats.max.toFixed(0)} nT</span>
       <span className="text-muted-foreground/70">
-        · base <strong className="text-foreground">{stats.baseline.toFixed(0)}</strong> · n={stats.count}
+        · base <strong className="text-foreground">{stats.baseline.toFixed(0)}</strong> · n=
+        {stats.count}
       </span>
     </div>
   );

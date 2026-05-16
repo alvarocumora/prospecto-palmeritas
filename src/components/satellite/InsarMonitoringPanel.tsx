@@ -48,8 +48,24 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
 
   const [assets, setAssets] = useState<Asset[]>(() =>
     defaultCenter
-      ? [{ id: crypto.randomUUID(), name: "Relave principal", type: "tailings_dam", lat: defaultCenter[0], lng: defaultCenter[1] }]
-      : [{ id: crypto.randomUUID(), name: "Relave Paipote", type: "tailings_dam", lat: -27.4083, lng: -70.0667 }],
+      ? [
+          {
+            id: crypto.randomUUID(),
+            name: "Relave principal",
+            type: "tailings_dam",
+            lat: defaultCenter[0],
+            lng: defaultCenter[1],
+          },
+        ]
+      : [
+          {
+            id: crypto.randomUUID(),
+            name: "Relave Paipote",
+            type: "tailings_dam",
+            lat: -27.4083,
+            lng: -70.0667,
+          },
+        ],
   );
   const [running, setRunning] = useState(false);
   const [explainerLoading, setExplainerLoading] = useState(false);
@@ -79,8 +95,12 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
   }, [points]);
 
   async function runMonitoring() {
-    if (assets.length === 0) { setError("Añade al menos un activo a monitorear"); return; }
-    setError(null); setRunning(true);
+    if (assets.length === 0) {
+      setError("Añade al menos un activo a monitorear");
+      return;
+    }
+    setError(null);
+    setRunning(true);
     try {
       const { ok, error } = await seedFn({
         data: {
@@ -91,40 +111,57 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
       });
       if (!ok) throw new Error(error ?? "fallo desconocido");
       await refresh();
-    } catch (e) { setError((e as Error).message); }
-    finally { setRunning(false); }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setRunning(false);
+    }
   }
 
   async function runExplainer() {
-    setError(null); setExplainerLoading(true); setExplanation(""); setActions([]);
+    setError(null);
+    setExplainerLoading(true);
+    setExplanation("");
+    setActions([]);
     try {
       const res = await explainFn({ data: { projectId } });
       if (!res.ok) {
-        const msg = res.error === "rate_limit" ? "Límite IA alcanzado, reintenta."
-          : res.error === "credits_exhausted" ? "Créditos Lovable AI agotados."
-          : `IA: ${res.error}`;
+        const msg =
+          res.error === "rate_limit"
+            ? "Límite IA alcanzado, reintenta."
+            : res.error === "credits_exhausted"
+              ? "Créditos Lovable AI agotados."
+              : `IA: ${res.error}`;
         throw new Error(msg);
       }
       setExplanation(res.explanation);
       setActions(res.actions);
-    } catch (e) { setError((e as Error).message); }
-    finally { setExplainerLoading(false); }
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setExplainerLoading(false);
+    }
   }
 
   async function clearAll() {
     if (!confirm("¿Eliminar todos los puntos InSAR del proyecto?")) return;
     await supabase.from("insar_displacement").delete().eq("project_id", projectId);
-    setExplanation(""); setActions([]); await refresh();
+    setExplanation("");
+    setActions([]);
+    await refresh();
   }
 
   function addAsset() {
-    setAssets((prev) => [...prev, {
-      id: crypto.randomUUID(),
-      name: `Activo ${prev.length + 1}`,
-      type: "tailings_dam",
-      lat: defaultCenter?.[0] ?? -33.45,
-      lng: defaultCenter?.[1] ?? -70.66,
-    }]);
+    setAssets((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name: `Activo ${prev.length + 1}`,
+        type: "tailings_dam",
+        lat: defaultCenter?.[0] ?? -33.45,
+        lng: defaultCenter?.[1] ?? -70.66,
+      },
+    ]);
   }
 
   function updateAsset(id: string, patch: Partial<Asset>) {
@@ -148,7 +185,11 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
             disabled={running || assets.length === 0}
             className="inline-flex items-center gap-1.5 text-xs font-mono uppercase px-3 py-1.5 rounded bg-signal-cyan text-background hover:opacity-90 disabled:opacity-50"
           >
-            {running ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Activity className="w-3.5 h-3.5" />}
+            {running ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Activity className="w-3.5 h-3.5" />
+            )}
             Procesar 12 meses
           </button>
           <button
@@ -156,11 +197,19 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
             disabled={explainerLoading || points.length === 0}
             className="inline-flex items-center gap-1.5 text-xs font-mono uppercase px-3 py-1.5 rounded border border-signal-cyan text-signal-cyan hover:bg-signal-cyan/10 disabled:opacity-50"
           >
-            {explainerLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            {explainerLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3.5 h-3.5" />
+            )}
             Diagnóstico IA
           </button>
           {points.length > 0 && (
-            <button onClick={clearAll} className="inline-flex items-center gap-1 text-xs px-2 py-1.5 rounded border border-border text-text-dim hover:bg-accent" title="Limpiar puntos">
+            <button
+              onClick={clearAll}
+              className="inline-flex items-center gap-1 text-xs px-2 py-1.5 rounded border border-border text-text-dim hover:bg-accent"
+              title="Limpiar puntos"
+            >
               <Trash2 className="w-3.5 h-3.5" />
             </button>
           )}
@@ -170,14 +219,21 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
       {/* Resumen severidades */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
         {(["info", "watch", "warning", "critical"] as const).map((sev) => (
-          <div key={sev} className={cn("rounded border px-3 py-2 text-xs font-mono", SEVERITY_STYLES[sev])}>
-            <div className="text-[10px] uppercase tracking-wider opacity-80">{SEVERITY_LABEL[sev]}</div>
+          <div
+            key={sev}
+            className={cn("rounded border px-3 py-2 text-xs font-mono", SEVERITY_STYLES[sev])}
+          >
+            <div className="text-[10px] uppercase tracking-wider opacity-80">
+              {SEVERITY_LABEL[sev]}
+            </div>
             <div className="text-lg tabular-nums">{summary.counts[sev]}</div>
           </div>
         ))}
         <div className="rounded border border-border bg-bg-panel px-3 py-2 text-xs font-mono">
           <div className="text-[10px] uppercase tracking-wider text-text-dim">Peor v</div>
-          <div className="text-lg tabular-nums text-foreground">{summary.worst.toFixed(1)} <span className="text-[10px] text-text-dim">mm/yr</span></div>
+          <div className="text-lg tabular-nums text-foreground">
+            {summary.worst.toFixed(1)} <span className="text-[10px] text-text-dim">mm/yr</span>
+          </div>
         </div>
       </div>
 
@@ -187,7 +243,10 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
           <div className="text-[11px] font-mono uppercase tracking-wider text-text-secondary">
             Activos a monitorear · {assets.length}
           </div>
-          <button onClick={addAsset} className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent">
+          <button
+            onClick={addAsset}
+            className="inline-flex items-center gap-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+          >
             <Plus className="w-3 h-3" /> añadir
           </button>
         </div>
@@ -206,22 +265,31 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
                 className="col-span-3 text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono"
               >
                 {Object.entries(ASSET_TYPE_LABEL).map(([k, v]) => (
-                  <option key={k} value={k}>{v}</option>
+                  <option key={k} value={k}>
+                    {v}
+                  </option>
                 ))}
               </select>
               <input
-                type="number" step="0.0001" value={a.lat}
+                type="number"
+                step="0.0001"
+                value={a.lat}
                 onChange={(e) => updateAsset(a.id, { lat: Number(e.target.value) })}
                 className="col-span-2 text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono tabular-nums"
                 placeholder="lat"
               />
               <input
-                type="number" step="0.0001" value={a.lng}
+                type="number"
+                step="0.0001"
+                value={a.lng}
                 onChange={(e) => updateAsset(a.id, { lng: Number(e.target.value) })}
                 className="col-span-2 text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono tabular-nums"
                 placeholder="lng"
               />
-              <button onClick={() => removeAsset(a.id)} className="col-span-1 inline-flex justify-center text-text-dim hover:text-red-400">
+              <button
+                onClick={() => removeAsset(a.id)}
+                className="col-span-1 inline-flex justify-center text-text-dim hover:text-red-400"
+              >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -230,7 +298,9 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
       </div>
 
       {error && (
-        <div className="rounded border border-signal-amber bg-signal-amber/10 px-3 py-2 text-xs font-mono text-signal-amber">{error}</div>
+        <div className="rounded border border-signal-amber bg-signal-amber/10 px-3 py-2 text-xs font-mono text-signal-amber">
+          {error}
+        </div>
       )}
 
       {(explanation || actions.length > 0) && (
@@ -238,13 +308,24 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
           <div className="text-[11px] font-mono uppercase tracking-wider text-signal-cyan flex items-center gap-1.5">
             <Sparkles className="w-3.5 h-3.5" /> Diagnóstico IA · Geotécnico InSAR
           </div>
-          {explanation && <p className="text-xs leading-relaxed text-foreground whitespace-pre-line">{explanation}</p>}
+          {explanation && (
+            <p className="text-xs leading-relaxed text-foreground whitespace-pre-line">
+              {explanation}
+            </p>
+          )}
           {actions.length > 0 && (
             <div>
-              <div className="text-[10px] font-mono uppercase text-text-secondary mb-1">Acciones recomendadas</div>
+              <div className="text-[10px] font-mono uppercase text-text-secondary mb-1">
+                Acciones recomendadas
+              </div>
               <ul className="space-y-1">
                 {actions.map((t, i) => (
-                  <li key={i} className="text-xs text-foreground border-l-2 border-signal-cyan pl-2">{t}</li>
+                  <li
+                    key={i}
+                    className="text-xs text-foreground border-l-2 border-signal-cyan pl-2"
+                  >
+                    {t}
+                  </li>
                 ))}
               </ul>
             </div>
@@ -267,15 +348,29 @@ export function InsarMonitoringPanel({ projectId, defaultCenter }: Props) {
         ) : (
           <div className="divide-y divide-border">
             {Array.from(grouped.entries()).map(([assetName, items]) => {
-              const worst = items.reduce((acc, p) => Math.abs(p.velocity_mm_year) > Math.abs(acc) ? p.velocity_mm_year : acc, 0);
+              const worst = items.reduce(
+                (acc, p) =>
+                  Math.abs(p.velocity_mm_year) > Math.abs(acc) ? p.velocity_mm_year : acc,
+                0,
+              );
               return (
                 <div key={assetName} className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <div className="text-[11px] font-mono uppercase tracking-wider text-foreground">
                       {assetName} <span className="text-text-dim">· {items.length} pts</span>
                     </div>
-                    <div className={cn("text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded border",
-                      Math.abs(worst) >= 40 ? SEVERITY_STYLES.critical : Math.abs(worst) >= 15 ? SEVERITY_STYLES.warning : Math.abs(worst) >= 5 ? SEVERITY_STYLES.watch : SEVERITY_STYLES.info)}>
+                    <div
+                      className={cn(
+                        "text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded border",
+                        Math.abs(worst) >= 40
+                          ? SEVERITY_STYLES.critical
+                          : Math.abs(worst) >= 15
+                            ? SEVERITY_STYLES.warning
+                            : Math.abs(worst) >= 5
+                              ? SEVERITY_STYLES.watch
+                              : SEVERITY_STYLES.info,
+                      )}
+                    >
                       {worst.toFixed(1)} mm/yr
                     </div>
                   </div>
@@ -306,7 +401,12 @@ function PointRow({ p }: { p: InsarPoint }) {
     <div className="rounded border border-border bg-bg-panel/40 px-2.5 py-2 text-xs">
       <div className="flex items-center justify-between gap-2">
         <span className="font-mono text-foreground">{label}</span>
-        <span className={cn("text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded border", SEVERITY_STYLES[sev])}>
+        <span
+          className={cn(
+            "text-[10px] font-mono tabular-nums px-1.5 py-0.5 rounded border",
+            SEVERITY_STYLES[sev],
+          )}
+        >
           {p.velocity_mm_year.toFixed(1)} mm/yr
         </span>
       </div>
@@ -322,11 +422,17 @@ function PointRow({ p }: { p: InsarPoint }) {
             stroke="currentColor"
             strokeWidth="1.2"
             className={cn(
-              Math.abs(p.velocity_mm_year) >= 40 ? "text-red-400"
-                : Math.abs(p.velocity_mm_year) >= 15 ? "text-signal-amber"
-                : "text-signal-cyan"
+              Math.abs(p.velocity_mm_year) >= 40
+                ? "text-red-400"
+                : Math.abs(p.velocity_mm_year) >= 15
+                  ? "text-signal-amber"
+                  : "text-signal-cyan",
             )}
-            points={ts.map((t, i) => `${(i / (ts.length - 1)) * 100},${24 - ((t[1] - min) / range) * 22 - 1}`).join(" ")}
+            points={ts
+              .map(
+                (t, i) => `${(i / (ts.length - 1)) * 100},${24 - ((t[1] - min) / range) * 22 - 1}`,
+              )
+              .join(" ")}
           />
         </svg>
       )}

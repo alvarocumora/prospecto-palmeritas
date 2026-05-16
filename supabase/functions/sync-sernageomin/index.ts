@@ -51,7 +51,7 @@ async function queryArcgis(code: string): Promise<Record<string, unknown> | null
 
 function diffFields(
   before: Concession,
-  attrs: Record<string, unknown>
+  attrs: Record<string, unknown>,
 ): Record<string, { from: unknown; to: unknown }> {
   const diff: Record<string, { from: unknown; to: unknown }> = {};
   const newHolder = (attrs.TITULAR ?? attrs.NOMBRE_TIT ?? null) as string | null;
@@ -83,7 +83,7 @@ Deno.serve(async (req) => {
 
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
     const { data: rows, error } = await supabase

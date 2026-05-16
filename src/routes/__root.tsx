@@ -49,12 +49,16 @@ export const Route = createRootRoute({
       { property: "og:title", content: "Geocapitals · Exploración minera moderna" },
       {
         property: "og:description",
-        content: "Catastro, geofísica, sondajes y muestreo en una sola plataforma para geólogos profesionales.",
+        content:
+          "Catastro, geofísica, sondajes y muestreo en una sola plataforma para geólogos profesionales.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Geocapitals · Exploración minera moderna" },
-      { name: "twitter:description", content: "Catastro, geofísica, sondajes y muestreo en una sola plataforma." },
+      {
+        name: "twitter:description",
+        content: "Catastro, geofísica, sondajes y muestreo en una sola plataforma.",
+      },
       { property: "og:image", content: "/og-image.jpg" },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -100,7 +104,11 @@ function RootComponent() {
     if (!("serviceWorker" in navigator)) return;
 
     const inIframe = (() => {
-      try { return window.self !== window.top; } catch { return true; }
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
     })();
     const host = window.location.hostname;
     const isPreviewHost =
@@ -111,9 +119,12 @@ function RootComponent() {
 
     if (inIframe || isPreviewHost) {
       // Never register SW inside the editor preview / iframes — unregister any leftovers.
-      navigator.serviceWorker.getRegistrations().then((rs) => {
-        rs.forEach((r) => r.unregister().catch(() => {}));
-      }).catch(() => {});
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((rs) => {
+          rs.forEach((r) => r.unregister().catch(() => {}));
+        })
+        .catch(() => {});
       return;
     }
 

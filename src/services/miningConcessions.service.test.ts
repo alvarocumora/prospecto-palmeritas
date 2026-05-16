@@ -52,7 +52,9 @@ describe("fetchMiningConcessions", () => {
   });
 
   it("throws Supabase errors", async () => {
-    fromMock.mockReturnValueOnce(queryResult({ data: null, error: new Error("concessions unavailable") }));
+    fromMock.mockReturnValueOnce(
+      queryResult({ data: null, error: new Error("concessions unavailable") }),
+    );
 
     await expect(fetchMiningConcessions("project-1")).rejects.toThrow("concessions unavailable");
   });

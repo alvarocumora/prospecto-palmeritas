@@ -9,7 +9,16 @@ import {
   type ExpenseCategory,
 } from "@/hooks/useCampaignFinance";
 import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
-import { DollarSign, TrendingUp, TrendingDown, CheckCircle2, XCircle, Clock, Plus, Trash2 } from "lucide-react";
+import {
+  DollarSign,
+  TrendingUp,
+  TrendingDown,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/finance")({
@@ -26,14 +35,17 @@ function FinancePage() {
   const effectiveCampaignId = campaignId ?? campaigns[0]?.id ?? null;
   const fin = useCampaignFinance(projectId, effectiveCampaignId);
 
-  const canEdit = canAccess(role, "overview") && ["owner", "admin", "project_manager", "chief_geologist"].includes(role ?? "");
+  const canEdit =
+    canAccess(role, "overview") &&
+    ["owner", "admin", "project_manager", "chief_geologist"].includes(role ?? "");
   const canApprove = ["owner", "admin", "project_manager"].includes(role ?? "");
 
   // Aggregations
   const summary = useMemo(() => {
     const plannedByCat: Record<string, number> = {};
     const actualByCat: Record<string, number> = {};
-    for (const b of fin.budgets) plannedByCat[b.category] = (plannedByCat[b.category] ?? 0) + Number(b.planned_amount_usd);
+    for (const b of fin.budgets)
+      plannedByCat[b.category] = (plannedByCat[b.category] ?? 0) + Number(b.planned_amount_usd);
     for (const e of fin.expenses) {
       if (e.status !== "rejected") {
         actualByCat[e.category] = (actualByCat[e.category] ?? 0) + Number(e.amount_usd);
@@ -49,11 +61,21 @@ function FinancePage() {
       .reduce((acc, e) => acc + Number(e.amount_usd), 0);
     const costPerMeter = totalMeters > 0 ? drillingCost / totalMeters : null;
     const pending = fin.expenses.filter((e) => e.status === "pending");
-    return { plannedByCat, actualByCat, planned, actual, costPerMeter, totalMeters, pendingCount: pending.length };
+    return {
+      plannedByCat,
+      actualByCat,
+      planned,
+      actual,
+      costPerMeter,
+      totalMeters,
+      pendingCount: pending.length,
+    };
   }, [fin.budgets, fin.expenses]);
 
   if (!projectId) {
-    return <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto.</div>;
+    return (
+      <div className="p-6 text-sm font-mono text-muted-foreground">Selecciona un proyecto.</div>
+    );
   }
 
   return (
@@ -77,14 +99,17 @@ function FinancePage() {
         >
           <option value="">— Selecciona —</option>
           {campaigns.map((c) => (
-            <option key={c.id} value={c.id}>{c.name} ({c.phase})</option>
+            <option key={c.id} value={c.id}>
+              {c.name} ({c.phase})
+            </option>
           ))}
         </select>
       </div>
 
       {!effectiveCampaignId && (
         <div className="text-sm font-mono text-muted-foreground bg-muted/30 border border-border rounded p-6 text-center">
-          Crea una campaña en <span className="text-gold">Campañas</span> para empezar a registrar presupuesto y gastos.
+          Crea una campaña en <span className="text-gold">Campañas</span> para empezar a registrar
+          presupuesto y gastos.
         </div>
       )}
 
@@ -92,9 +117,24 @@ function FinancePage() {
         <>
           {/* KPIs */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-            <KpiCard label="Presupuesto" value={`$${summary.planned.toLocaleString()}`} icon={<DollarSign className="w-4 h-4" />} accent="text-info" />
-            <KpiCard label="Gasto real" value={`$${summary.actual.toLocaleString()}`} icon={<TrendingUp className="w-4 h-4" />} accent={summary.actual > summary.planned ? "text-destructive" : "text-teal"} />
-            <KpiCard label="Saldo" value={`$${(summary.planned - summary.actual).toLocaleString()}`} icon={<TrendingDown className="w-4 h-4" />} accent={summary.planned - summary.actual >= 0 ? "text-teal" : "text-destructive"} />
+            <KpiCard
+              label="Presupuesto"
+              value={`$${summary.planned.toLocaleString()}`}
+              icon={<DollarSign className="w-4 h-4" />}
+              accent="text-info"
+            />
+            <KpiCard
+              label="Gasto real"
+              value={`$${summary.actual.toLocaleString()}`}
+              icon={<TrendingUp className="w-4 h-4" />}
+              accent={summary.actual > summary.planned ? "text-destructive" : "text-teal"}
+            />
+            <KpiCard
+              label="Saldo"
+              value={`$${(summary.planned - summary.actual).toLocaleString()}`}
+              icon={<TrendingDown className="w-4 h-4" />}
+              accent={summary.planned - summary.actual >= 0 ? "text-teal" : "text-destructive"}
+            />
             <KpiCard
               label="USD/metro perf."
               value={summary.costPerMeter != null ? `$${summary.costPerMeter.toFixed(0)}` : "—"}
@@ -106,7 +146,9 @@ function FinancePage() {
 
           {/* Budget vs Actual table */}
           <section className="mb-8">
-            <h2 className="text-sm font-semibold mb-3 font-mono uppercase tracking-wider text-muted-foreground">Presupuesto por categoría</h2>
+            <h2 className="text-sm font-semibold mb-3 font-mono uppercase tracking-wider text-muted-foreground">
+              Presupuesto por categoría
+            </h2>
             <div className="border border-border rounded overflow-hidden">
               <table className="w-full text-xs font-mono">
                 <thead className="bg-muted/50">
@@ -130,7 +172,9 @@ function FinancePage() {
                         <td className="px-3 py-2">{CATEGORY_LABELS[cat]}</td>
                         <td className="px-3 py-2 text-right">${planned.toLocaleString()}</td>
                         <td className="px-3 py-2 text-right">${actual.toLocaleString()}</td>
-                        <td className={`px-3 py-2 text-right ${over ? "text-destructive" : "text-teal"}`}>
+                        <td
+                          className={`px-3 py-2 text-right ${over ? "text-destructive" : "text-teal"}`}
+                        >
                           ${(planned - actual).toLocaleString()}
                         </td>
                         <td className="px-3 py-2">
@@ -160,7 +204,10 @@ function FinancePage() {
           {/* Expenses list */}
           <section className="mt-8">
             <h2 className="text-sm font-semibold mb-3 font-mono uppercase tracking-wider text-muted-foreground">
-              Gastos registrados {summary.pendingCount > 0 && <span className="ml-2 text-gold">· {summary.pendingCount} pendientes</span>}
+              Gastos registrados{" "}
+              {summary.pendingCount > 0 && (
+                <span className="ml-2 text-gold">· {summary.pendingCount} pendientes</span>
+              )}
             </h2>
             <div className="border border-border rounded overflow-hidden">
               <table className="w-full text-xs font-mono">
@@ -178,7 +225,11 @@ function FinancePage() {
                 </thead>
                 <tbody>
                   {fin.expenses.length === 0 && (
-                    <tr><td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">Sin gastos registrados.</td></tr>
+                    <tr>
+                      <td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">
+                        Sin gastos registrados.
+                      </td>
+                    </tr>
                   )}
                   {fin.expenses.map((e) => (
                     <tr key={e.id} className="border-t border-border">
@@ -186,7 +237,9 @@ function FinancePage() {
                       <td className="px-3 py-2">{CATEGORY_LABELS[e.category]}</td>
                       <td className="px-3 py-2 max-w-xs truncate">{e.description}</td>
                       <td className="px-3 py-2 text-muted-foreground">{e.vendor ?? "—"}</td>
-                      <td className="px-3 py-2 text-right font-semibold">${Number(e.amount_usd).toLocaleString()}</td>
+                      <td className="px-3 py-2 text-right font-semibold">
+                        ${Number(e.amount_usd).toLocaleString()}
+                      </td>
                       <td className="px-3 py-2 text-right">{e.meters_drilled ?? "—"}</td>
                       <td className="px-3 py-2 text-center">
                         <StatusBadge status={e.status} />
@@ -198,17 +251,23 @@ function FinancePage() {
                               <button
                                 onClick={async () => {
                                   const { error } = await fin.setExpenseStatus(e.id, "approved");
-                                  if (error) toast.error(error); else toast.success("Aprobado");
+                                  if (error) toast.error(error);
+                                  else toast.success("Aprobado");
                                 }}
                                 className="text-teal hover:underline"
-                              >Aprobar</button>
+                              >
+                                Aprobar
+                              </button>
                               <button
                                 onClick={async () => {
                                   const { error } = await fin.setExpenseStatus(e.id, "rejected");
-                                  if (error) toast.error(error); else toast.success("Rechazado");
+                                  if (error) toast.error(error);
+                                  else toast.success("Rechazado");
                                 }}
                                 className="text-destructive hover:underline"
-                              >Rechazar</button>
+                              >
+                                Rechazar
+                              </button>
                             </>
                           )}
                           {canEdit && (
@@ -216,10 +275,13 @@ function FinancePage() {
                               onClick={async () => {
                                 if (!confirm("¿Eliminar este gasto?")) return;
                                 const { error } = await fin.deleteExpense(e.id);
-                                if (error) toast.error(error); else toast.success("Eliminado");
+                                if (error) toast.error(error);
+                                else toast.success("Eliminado");
                               }}
                               className="text-muted-foreground hover:text-destructive inline-flex"
-                            ><Trash2 className="w-3 h-3" /></button>
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
                           )}
                         </td>
                       )}
@@ -235,13 +297,25 @@ function FinancePage() {
   );
 }
 
-function KpiCard({ label, value, sub, icon, accent }: {
-  label: string; value: string; sub?: string; icon: React.ReactNode; accent: string;
+function KpiCard({
+  label,
+  value,
+  sub,
+  icon,
+  accent,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+  icon: React.ReactNode;
+  accent: string;
 }) {
   return (
     <div className="border border-border rounded p-3 bg-bg-secondary">
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] uppercase font-mono text-muted-foreground tracking-wider">{label}</span>
+        <span className="text-[10px] uppercase font-mono text-muted-foreground tracking-wider">
+          {label}
+        </span>
         <span className={accent}>{icon}</span>
       </div>
       <div className={`text-lg font-semibold ${accent}`}>{value}</div>
@@ -251,20 +325,48 @@ function KpiCard({ label, value, sub, icon, accent }: {
 }
 
 function StatusBadge({ status }: { status: "pending" | "approved" | "rejected" }) {
-  if (status === "approved") return <span className="inline-flex items-center gap-1 text-teal text-[10px]"><CheckCircle2 className="w-3 h-3" />Aprobado</span>;
-  if (status === "rejected") return <span className="inline-flex items-center gap-1 text-destructive text-[10px]"><XCircle className="w-3 h-3" />Rechazado</span>;
-  return <span className="inline-flex items-center gap-1 text-gold text-[10px]"><Clock className="w-3 h-3" />Pendiente</span>;
+  if (status === "approved")
+    return (
+      <span className="inline-flex items-center gap-1 text-teal text-[10px]">
+        <CheckCircle2 className="w-3 h-3" />
+        Aprobado
+      </span>
+    );
+  if (status === "rejected")
+    return (
+      <span className="inline-flex items-center gap-1 text-destructive text-[10px]">
+        <XCircle className="w-3 h-3" />
+        Rechazado
+      </span>
+    );
+  return (
+    <span className="inline-flex items-center gap-1 text-gold text-[10px]">
+      <Clock className="w-3 h-3" />
+      Pendiente
+    </span>
+  );
 }
 
-function BudgetEditor({ cat, current, onSave }: {
-  cat: ExpenseCategory; current: number;
+function BudgetEditor({
+  cat,
+  current,
+  onSave,
+}: {
+  cat: ExpenseCategory;
+  current: number;
   onSave: (cat: ExpenseCategory, amount: number) => Promise<{ error: string | null }>;
 }) {
   const [editing, setEditing] = useState(false);
   const [val, setVal] = useState(current.toString());
   if (!editing) {
     return (
-      <button onClick={() => { setVal(current.toString()); setEditing(true); }} className="text-gold hover:underline text-[10px]">
+      <button
+        onClick={() => {
+          setVal(current.toString());
+          setEditing(true);
+        }}
+        className="text-gold hover:underline text-[10px]"
+      >
         Editar
       </button>
     );
@@ -272,25 +374,48 @@ function BudgetEditor({ cat, current, onSave }: {
   return (
     <span className="inline-flex items-center gap-1">
       <input
-        type="number" value={val} onChange={(e) => setVal(e.target.value)}
+        type="number"
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
         className="w-20 px-1 py-0.5 text-[10px] border border-border rounded bg-background"
       />
       <button
         onClick={async () => {
-          const n = parseFloat(val); if (!Number.isFinite(n) || n < 0) { toast.error("Monto inválido"); return; }
+          const n = parseFloat(val);
+          if (!Number.isFinite(n) || n < 0) {
+            toast.error("Monto inválido");
+            return;
+          }
           const { error } = await onSave(cat, n);
-          if (error) toast.error(error); else { toast.success("Guardado"); setEditing(false); }
+          if (error) toast.error(error);
+          else {
+            toast.success("Guardado");
+            setEditing(false);
+          }
         }}
-        className="text-teal text-[10px]">OK</button>
-      <button onClick={() => setEditing(false)} className="text-muted-foreground text-[10px]">×</button>
+        className="text-teal text-[10px]"
+      >
+        OK
+      </button>
+      <button onClick={() => setEditing(false)} className="text-muted-foreground text-[10px]">
+        ×
+      </button>
     </span>
   );
 }
 
-function ExpenseForm({ onAdd }: {
-  onAdd: (input: { category: ExpenseCategory; description: string; amount_usd: number;
-    vendor?: string | null; invoice_number?: string | null; meters_drilled?: number | null;
-    expense_date?: string; }) => Promise<{ error: string | null }>;
+function ExpenseForm({
+  onAdd,
+}: {
+  onAdd: (input: {
+    category: ExpenseCategory;
+    description: string;
+    amount_usd: number;
+    vendor?: string | null;
+    invoice_number?: string | null;
+    meters_drilled?: number | null;
+    expense_date?: string;
+  }) => Promise<{ error: string | null }>;
 }) {
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<ExpenseCategory>("drilling");
@@ -317,17 +442,34 @@ function ExpenseForm({ onAdd }: {
       onSubmit={async (e) => {
         e.preventDefault();
         const n = parseFloat(amount);
-        if (!Number.isFinite(n) || n < 0) { toast.error("Monto inválido"); return; }
-        if (!description.trim()) { toast.error("Descripción requerida"); return; }
+        if (!Number.isFinite(n) || n < 0) {
+          toast.error("Monto inválido");
+          return;
+        }
+        if (!description.trim()) {
+          toast.error("Descripción requerida");
+          return;
+        }
         const m = meters ? parseFloat(meters) : null;
         const { error } = await onAdd({
-          category, description: description.trim(), amount_usd: n,
-          vendor: vendor || null, invoice_number: invoice || null,
-          meters_drilled: m, expense_date: date,
+          category,
+          description: description.trim(),
+          amount_usd: n,
+          vendor: vendor || null,
+          invoice_number: invoice || null,
+          meters_drilled: m,
+          expense_date: date,
         });
-        if (error) { toast.error(error); return; }
+        if (error) {
+          toast.error(error);
+          return;
+        }
         toast.success("Gasto agregado");
-        setDescription(""); setAmount(""); setVendor(""); setInvoice(""); setMeters("");
+        setDescription("");
+        setAmount("");
+        setVendor("");
+        setInvoice("");
+        setMeters("");
         setOpen(false);
       }}
       className="border border-border rounded p-4 bg-bg-secondary space-y-3"
@@ -335,47 +477,98 @@ function ExpenseForm({ onAdd }: {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div>
           <label className="text-[10px] uppercase font-mono text-muted-foreground">Categoría</label>
-          <select value={category} onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background">
-            {EXPENSE_CATEGORIES.map((c) => <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>)}
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          >
+            {EXPENSE_CATEGORIES.map((c) => (
+              <option key={c} value={c}>
+                {CATEGORY_LABELS[c]}
+              </option>
+            ))}
           </select>
         </div>
         <div>
           <label className="text-[10px] uppercase font-mono text-muted-foreground">Fecha</label>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          />
         </div>
         <div>
-          <label className="text-[10px] uppercase font-mono text-muted-foreground">Monto USD *</label>
-          <input type="number" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} required
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+          <label className="text-[10px] uppercase font-mono text-muted-foreground">
+            Monto USD *
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          />
         </div>
         <div>
-          <label className="text-[10px] uppercase font-mono text-muted-foreground">Metros (sondaje)</label>
-          <input type="number" step="0.01" value={meters} onChange={(e) => setMeters(e.target.value)}
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+          <label className="text-[10px] uppercase font-mono text-muted-foreground">
+            Metros (sondaje)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            value={meters}
+            onChange={(e) => setMeters(e.target.value)}
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          />
         </div>
       </div>
       <div>
-        <label className="text-[10px] uppercase font-mono text-muted-foreground">Descripción *</label>
-        <input value={description} onChange={(e) => setDescription(e.target.value)} required
-          className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+        <label className="text-[10px] uppercase font-mono text-muted-foreground">
+          Descripción *
+        </label>
+        <input
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          required
+          className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+        />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-[10px] uppercase font-mono text-muted-foreground">Proveedor</label>
-          <input value={vendor} onChange={(e) => setVendor(e.target.value)}
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+          <input
+            value={vendor}
+            onChange={(e) => setVendor(e.target.value)}
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          />
         </div>
         <div>
-          <label className="text-[10px] uppercase font-mono text-muted-foreground">Nº Factura</label>
-          <input value={invoice} onChange={(e) => setInvoice(e.target.value)}
-            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background" />
+          <label className="text-[10px] uppercase font-mono text-muted-foreground">
+            Nº Factura
+          </label>
+          <input
+            value={invoice}
+            onChange={(e) => setInvoice(e.target.value)}
+            className="w-full mt-0.5 px-2 py-1 text-xs font-mono border border-border rounded bg-background"
+          />
         </div>
       </div>
       <div className="flex gap-2 pt-1">
-        <button type="submit" className="px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold">Guardar</button>
-        <button type="button" onClick={() => setOpen(false)} className="px-3 py-1.5 rounded border border-border text-xs font-mono">Cancelar</button>
+        <button
+          type="submit"
+          className="px-3 py-1.5 rounded bg-gold text-bg-primary text-xs font-mono font-semibold"
+        >
+          Guardar
+        </button>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="px-3 py-1.5 rounded border border-border text-xs font-mono"
+        >
+          Cancelar
+        </button>
       </div>
     </form>
   );

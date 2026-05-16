@@ -10,10 +10,13 @@ interface Props {
   projectId: string | null;
 }
 
-const FIELD_META: Record<ConcessionFieldChange["field"], { label: string; icon: typeof Building2; color: string }> = {
-  holder:  { label: "Titular", icon: Building2, color: "text-blue-500" },
+const FIELD_META: Record<
+  ConcessionFieldChange["field"],
+  { label: string; icon: typeof Building2; color: string }
+> = {
+  holder: { label: "Titular", icon: Building2, color: "text-blue-500" },
   area_ha: { label: "Área (ha)", icon: Ruler, color: "text-amber-500" },
-  status:  { label: "Estado", icon: Activity, color: "text-emerald-500" },
+  status: { label: "Estado", icon: Activity, color: "text-emerald-500" },
 };
 
 export function ConcessionChangeHistoryPanel({ projectId }: Props) {
@@ -27,7 +30,8 @@ export function ConcessionChangeHistoryPanel({ projectId }: Props) {
   if (!summary.length) {
     return (
       <div className="text-xs font-mono text-muted-foreground p-3 border border-border rounded">
-        Aún no hay cambios registrados. Cuando una concesión sincronice y cambie su titular, área o estado, aparecerá aquí.
+        Aún no hay cambios registrados. Cuando una concesión sincronice y cambie su titular, área o
+        estado, aparecerá aquí.
       </div>
     );
   }
@@ -64,9 +68,12 @@ export function ConcessionChangeHistoryPanel({ projectId }: Props) {
                     onClick={() => hasChanges && setOpenId(isOpen ? null : row.concession_id)}
                   >
                     <td className="px-3 py-2">
-                      {hasChanges && (isOpen
-                        ? <ChevronDown className="w-3.5 h-3.5" />
-                        : <ChevronRight className="w-3.5 h-3.5" />)}
+                      {hasChanges &&
+                        (isOpen ? (
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        ))}
                     </td>
                     <td className="px-3 py-2">
                       <div className="text-foreground font-semibold">{row.code ?? "—"}</div>

@@ -34,26 +34,21 @@ function sentinel2NDVI(L: LeafletNS) {
     format: "image/png",
     transparent: false,
     opacity: 0.85,
-    attribution:
-      'Sentinel-2 NDVI &copy; <a href="https://s2maps.eu">EOX IT Services</a>',
+    attribution: 'Sentinel-2 NDVI &copy; <a href="https://s2maps.eu">EOX IT Services</a>',
   });
 }
 
 function worldCover(L: LeafletNS) {
   // ESA WorldCover 2021 a 10 m — clases de cobertura, útil para distinguir
   // suelo desnudo (potencial alteración) de vegetación.
-  return L.tileLayer.wms(
-    "https://services.terrascope.be/wms/v2",
-    {
-      layers: "WORLDCOVER_2021_MAP",
-      format: "image/png",
-      transparent: true,
-      version: "1.3.0",
-      opacity: 0.55,
-      attribution:
-        'ESA WorldCover 2021 &copy; <a href="https://esa-worldcover.org">ESA</a>',
-    },
-  );
+  return L.tileLayer.wms("https://services.terrascope.be/wms/v2", {
+    layers: "WORLDCOVER_2021_MAP",
+    format: "image/png",
+    transparent: true,
+    version: "1.3.0",
+    opacity: 0.55,
+    attribution: 'ESA WorldCover 2021 &copy; <a href="https://esa-worldcover.org">ESA</a>',
+  });
 }
 
 function copernicusDemColored(L: LeafletNS) {

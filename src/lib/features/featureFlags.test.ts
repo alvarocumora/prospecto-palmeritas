@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { evaluateFeatureFlag, isFeatureEnabled, isKnownPlan, listEnabledFeatures } from "./featureFlags";
+import {
+  evaluateFeatureFlag,
+  isFeatureEnabled,
+  isKnownPlan,
+  listEnabledFeatures,
+} from "./featureFlags";
 
 describe("feature flag evaluator", () => {
   it("detects known plans", () => {
@@ -35,7 +40,7 @@ describe("feature flag evaluator", () => {
         overrides: {
           "geocapital.ai_copilot": { enabled: true, reason: "pilot tenant" },
         },
-      })
+      }),
     ).toEqual({ enabled: true, source: "override", reason: "pilot tenant" });
 
     expect(
@@ -44,7 +49,7 @@ describe("feature flag evaluator", () => {
         overrides: {
           "geocapital.marketplace": { enabled: false },
         },
-      })
+      }),
     ).toEqual({
       enabled: false,
       source: "override",
@@ -60,7 +65,7 @@ describe("feature flag evaluator", () => {
           "geocapital.ai_copilot": { enabled: true },
           "geocapital.marketplace": { enabled: false },
         },
-      })
+      }),
     ).toEqual(["geocapital.ai_copilot"]);
   });
 });

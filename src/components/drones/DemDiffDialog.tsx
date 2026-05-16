@@ -14,8 +14,8 @@ interface Props {
 }
 
 export function DemDiffDialog({ projectId, userId, rasters, onClose, onSaved }: Props) {
-  const dsmRasters = rasters.filter((r) =>
-    ["dsm", "dtm", "dem"].includes(r.raster_type) && r.storage_path && r.bounds_geojson,
+  const dsmRasters = rasters.filter(
+    (r) => ["dsm", "dtm", "dem"].includes(r.raster_type) && r.storage_path && r.bounds_geojson,
   );
   const [name, setName] = useState("");
   const [beforeId, setBeforeId] = useState("");
@@ -30,7 +30,12 @@ export function DemDiffDialog({ projectId, userId, rasters, onClose, onSaved }: 
     if (beforeId === afterId) return toast.error("Los rasters deben ser diferentes");
     setRunning(true);
     const { data, error } = await runDemDiff({
-      projectId, userId, name: name.trim(), rasterBeforeId: beforeId, rasterAfterId: afterId, notes: notes.trim() || undefined,
+      projectId,
+      userId,
+      name: name.trim(),
+      rasterBeforeId: beforeId,
+      rasterAfterId: afterId,
+      notes: notes.trim() || undefined,
     });
     setRunning(false);
     if (error || !data) return toast.error(error ?? "Error en el cálculo");
@@ -46,7 +51,9 @@ export function DemDiffDialog({ projectId, userId, rasters, onClose, onSaved }: 
             <GitCompareArrows className="w-4 h-4 text-gold" />
             <h3 className="text-sm font-mono font-semibold">Comparar DSM (cut/fill)</h3>
           </div>
-          <button onClick={onClose} className="p-1 hover:bg-accent rounded"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} className="p-1 hover:bg-accent rounded">
+            <X className="w-4 h-4" />
+          </button>
         </div>
         <form onSubmit={submit} className="p-4 space-y-3 text-xs font-mono">
           {dsmRasters.length < 2 && (
@@ -55,39 +62,67 @@ export function DemDiffDialog({ projectId, userId, rasters, onClose, onSaved }: 
             </div>
           )}
           <Field label="Nombre del análisis" required>
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Stockpile A — Ago vs Oct"
-              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary" />
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Stockpile A — Ago vs Oct"
+              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary"
+            />
           </Field>
           <Field label="DSM antes (T1)" required>
-            <select value={beforeId} onChange={(e) => setBeforeId(e.target.value)}
-              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary">
+            <select
+              value={beforeId}
+              onChange={(e) => setBeforeId(e.target.value)}
+              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary"
+            >
               <option value="">— Selecciona —</option>
               {dsmRasters.map((r) => (
-                <option key={r.id} value={r.id}>{r.name} ({r.captured_at ?? "sin fecha"})</option>
+                <option key={r.id} value={r.id}>
+                  {r.name} ({r.captured_at ?? "sin fecha"})
+                </option>
               ))}
             </select>
           </Field>
           <Field label="DSM después (T2)" required>
-            <select value={afterId} onChange={(e) => setAfterId(e.target.value)}
-              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary">
+            <select
+              value={afterId}
+              onChange={(e) => setAfterId(e.target.value)}
+              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary"
+            >
               <option value="">— Selecciona —</option>
               {dsmRasters.map((r) => (
-                <option key={r.id} value={r.id}>{r.name} ({r.captured_at ?? "sin fecha"})</option>
+                <option key={r.id} value={r.id}>
+                  {r.name} ({r.captured_at ?? "sin fecha"})
+                </option>
               ))}
             </select>
           </Field>
           <Field label="Notas">
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2}
-              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary" />
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={2}
+              className="w-full px-2 py-1.5 rounded border border-border bg-bg-secondary"
+            />
           </Field>
           <div className="text-[10px] text-muted-foreground bg-bg-secondary p-2 rounded">
-            ⓘ Se calcula sobre la intersección de bounds (máx 256×256 celdas). Asume DSM proyectados (UTM).
+            ⓘ Se calcula sobre la intersección de bounds (máx 256×256 celdas). Asume DSM proyectados
+            (UTM).
           </div>
           <div className="flex justify-end gap-2 pt-1">
-            <button type="button" onClick={onClose} disabled={running}
-              className="px-3 py-1.5 rounded border border-border hover:bg-accent">Cancelar</button>
-            <button type="submit" disabled={running || dsmRasters.length < 2}
-              className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold disabled:opacity-50 inline-flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={running}
+              className="px-3 py-1.5 rounded border border-border hover:bg-accent"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={running || dsmRasters.length < 2}
+              className="px-3 py-1.5 rounded bg-gold text-bg-primary font-semibold disabled:opacity-50 inline-flex items-center gap-1.5"
+            >
               {running && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               {running ? "Calculando…" : "Calcular cut/fill"}
             </button>
@@ -98,11 +133,20 @@ export function DemDiffDialog({ projectId, userId, rasters, onClose, onSaved }: 
   );
 }
 
-function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
+function Field({
+  label,
+  required,
+  children,
+}: {
+  label: string;
+  required?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <label className="block text-[10px] uppercase text-muted-foreground mb-1">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+        {label}
+        {required && <span className="text-destructive ml-0.5">*</span>}
       </label>
       {children}
     </div>

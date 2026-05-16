@@ -15,7 +15,9 @@ export function FilterSelect({
 }) {
   return (
     <div className="relative inline-flex items-center">
-      {icon && <span className="absolute left-2 text-muted-foreground pointer-events-none">{icon}</span>}
+      {icon && (
+        <span className="absolute left-2 text-muted-foreground pointer-events-none">{icon}</span>
+      )}
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}

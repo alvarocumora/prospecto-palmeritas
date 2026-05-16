@@ -54,7 +54,7 @@ export async function captureMapSnapshot(
 
   ctx.drawImage(mapCanvas, 0, 0);
 
-  const dpi = (opts.scale ?? 2);
+  const dpi = opts.scale ?? 2;
   const pad = 16 * dpi;
   const fontHeader = `${14 * dpi}px ui-monospace, SFMono-Regular, Menlo, monospace`;
   const fontTitle = `bold ${18 * dpi}px ui-sans-serif, system-ui, sans-serif`;
@@ -174,7 +174,14 @@ export function downloadDataUrl(dataUrl: string, filename: string) {
   document.body.removeChild(a);
 }
 
-function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
   const rr = Math.min(r, w / 2, h / 2);
   ctx.beginPath();
   ctx.moveTo(x + rr, y);

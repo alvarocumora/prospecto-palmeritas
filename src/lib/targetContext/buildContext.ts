@@ -1,8 +1,13 @@
 import { calculateFusionScore } from "@/lib/fusionScore";
 import { summarizeEvidence } from "@/lib/geoCopilot";
-import type { ExplorationTargetContext, ExplorationTargetContextInput } from "@/types/targetContext";
+import type {
+  ExplorationTargetContext,
+  ExplorationTargetContextInput,
+} from "@/types/targetContext";
 
-export function buildExplorationTargetContext(input: ExplorationTargetContextInput): ExplorationTargetContext {
+export function buildExplorationTargetContext(
+  input: ExplorationTargetContextInput,
+): ExplorationTargetContext {
   return {
     targetId: input.targetId,
     name: input.name,
@@ -12,6 +17,8 @@ export function buildExplorationTargetContext(input: ExplorationTargetContextInp
   };
 }
 
-export function createTargetBriefTitle(context: Pick<ExplorationTargetContext, "name" | "fusionScore">): string {
+export function createTargetBriefTitle(
+  context: Pick<ExplorationTargetContext, "name" | "fusionScore">,
+): string {
   return `${context.name} · Fusion Score ${context.fusionScore.score} · ${context.fusionScore.confidence}`;
 }

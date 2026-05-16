@@ -10,7 +10,7 @@ describe("calculateFusionScore", () => {
         structural: 70,
         satellite: 50,
         drilling: 40,
-      })
+      }),
     ).toEqual({
       score: 63,
       confidence: "medium",
@@ -26,7 +26,7 @@ describe("calculateFusionScore", () => {
         structural: 75,
         satellite: 70,
         drilling: 65,
-      })
+      }),
     ).toEqual({
       score: 79,
       confidence: "high",
@@ -48,7 +48,7 @@ describe("calculateFusionScore", () => {
         structural: 15,
         satellite: 10,
         drilling: 0,
-      }).confidence
+      }).confidence,
     ).toBe("low");
   });
 
@@ -60,7 +60,7 @@ describe("calculateFusionScore", () => {
         structural: Number.NaN,
         satellite: 50,
         drilling: 100,
-      }).score
+      }).score,
     ).toBe(48);
   });
 
@@ -80,8 +80,8 @@ describe("calculateFusionScore", () => {
           structural: 0,
           satellite: 0,
           drilling: 0,
-        }
-      ).score
+        },
+      ).score,
     ).toBe(100);
   });
 });

@@ -41,12 +41,22 @@ export function useUnreadCatastroAlerts(projectId: string | null) {
       .channel(`catastro-alerts-${projectId}-${Math.random().toString(36).slice(2, 10)}`)
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "bulletin_alerts", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "bulletin_alerts",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "court_case_alerts", filter: `project_id=eq.${projectId}` },
+        {
+          event: "*",
+          schema: "public",
+          table: "court_case_alerts",
+          filter: `project_id=eq.${projectId}`,
+        },
         () => refresh(),
       )
       .subscribe();

@@ -32,7 +32,9 @@ export function GeoAssistant() {
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant") {
-          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: assistantSoFar } : m);
+          return prev.map((m, i) =>
+            i === prev.length - 1 ? { ...m, content: assistantSoFar } : m,
+          );
         }
         return [...prev, { role: "assistant", content: assistantSoFar }];
       });
@@ -40,7 +42,9 @@ export function GeoAssistant() {
 
     try {
       const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/geo-assistant`;
-      const { data: { session } } = await (await import("@/integrations/supabase/client")).supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await (await import("@/integrations/supabase/client")).supabase.auth.getSession();
       const resp = await fetch(url, {
         method: "POST",
         headers: {
@@ -73,7 +77,10 @@ export function GeoAssistant() {
           if (line.startsWith(":") || line.trim() === "") continue;
           if (!line.startsWith("data: ")) continue;
           const json = line.slice(6).trim();
-          if (json === "[DONE]") { done = true; break; }
+          if (json === "[DONE]") {
+            done = true;
+            break;
+          }
           try {
             const parsed = JSON.parse(json);
             const content = parsed.choices?.[0]?.delta?.content;
@@ -142,9 +149,13 @@ export function GeoAssistant() {
             )}
             {messages.map((m, i) => (
               <div key={i} className={m.role === "user" ? "text-right" : ""}>
-                <div className={`inline-block max-w-[90%] px-2.5 py-1.5 rounded text-xs whitespace-pre-wrap ${
-                  m.role === "user" ? "bg-gold/15 text-foreground" : "bg-background border border-border text-foreground"
-                }`}>
+                <div
+                  className={`inline-block max-w-[90%] px-2.5 py-1.5 rounded text-xs whitespace-pre-wrap ${
+                    m.role === "user"
+                      ? "bg-gold/15 text-foreground"
+                      : "bg-background border border-border text-foreground"
+                  }`}
+                >
                   {m.content}
                 </div>
               </div>
@@ -160,7 +171,12 @@ export function GeoAssistant() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  send();
+                }
+              }}
               placeholder="Pregunta al asistente…"
               className="flex-1 px-2 py-1.5 text-xs font-mono rounded border border-border bg-background focus:outline-none focus:border-gold"
               disabled={streaming}

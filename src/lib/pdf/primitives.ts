@@ -91,9 +91,7 @@ export function drawFooter(s: PdfState, totalPages?: number) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
   doc.text("CONFIDENCIAL · Inversiones Bioenergy SpA", PAGE.margin, 290);
-  const pageTxt = totalPages
-    ? `Pág. ${s.pageNum} de ${totalPages}`
-    : `Pág. ${s.pageNum}`;
+  const pageTxt = totalPages ? `Pág. ${s.pageNum} de ${totalPages}` : `Pág. ${s.pageNum}`;
   doc.text(pageTxt, PAGE.width - PAGE.margin, 290, { align: "right" });
   doc.text(new Date().toLocaleDateString("es-CL"), PAGE.width / 2, 290, { align: "center" });
 }
@@ -247,7 +245,7 @@ export function figure(
 ): number {
   s.figureN += 1;
   const w = opts.width ?? PAGE.width - PAGE.margin * 2;
-  const h = opts.height ?? (w * 0.62);
+  const h = opts.height ?? w * 0.62;
   ensureSpace(s, h + 12);
   const { doc } = s;
   doc.addImage(imgDataUrl, "JPEG", PAGE.margin, s.cursorY, w, h, undefined, "FAST");

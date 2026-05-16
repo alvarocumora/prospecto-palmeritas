@@ -117,8 +117,8 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           </div>
 
           <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            Ingrese la contraseña compartida por el operador para acceder al
-            borrador pre NI 43-101 y al tablero de inteligencia geológica.
+            Ingrese la contraseña compartida por el operador para acceder al borrador pre NI 43-101
+            y al tablero de inteligencia geológica.
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">

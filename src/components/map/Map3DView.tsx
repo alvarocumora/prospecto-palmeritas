@@ -22,9 +22,7 @@ const FALLBACK_STYLE: maplibregl.StyleSpecification = {
     },
     terrain: {
       type: "raster-dem",
-      tiles: [
-        "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png",
-      ],
+      tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
       tileSize: 256,
       encoding: "terrarium",
       maxzoom: 15,
@@ -124,7 +122,11 @@ export function Map3DView({
   useEffect(() => {
     const m = mapRef.current;
     if (!m || !styleReady) return;
-    try { m.setTerrain({ source: "terrain", exaggeration }); } catch { /* ignore */ }
+    try {
+      m.setTerrain({ source: "terrain", exaggeration });
+    } catch {
+      /* ignore */
+    }
   }, [exaggeration, styleReady]);
 
   const holeData = useMemo(() => {
@@ -193,7 +195,8 @@ export function Map3DView({
           elevationScale: -1,
           getPosition: (d: { position: [number, number] }) => d.position,
           getElevation: (d: { elevation: number }) => d.elevation,
-          getFillColor: (d: { color: [number, number, number] }) => [...d.color, 220] as [number, number, number, number],
+          getFillColor: (d: { color: [number, number, number] }) =>
+            [...d.color, 220] as [number, number, number, number],
           getLineColor: [10, 10, 10, 255],
         }),
         new ScatterplotLayer({
@@ -208,7 +211,8 @@ export function Map3DView({
           lineWidthMinPixels: 2,
           getPosition: (d: { position: [number, number] }) => d.position,
           getRadius: (d: { radius: number }) => d.radius,
-          getFillColor: (d: { color: [number, number, number] }) => [...d.color, 180] as [number, number, number, number],
+          getFillColor: (d: { color: [number, number, number] }) =>
+            [...d.color, 180] as [number, number, number, number],
           getLineColor: [255, 255, 255, 255],
         }),
       ],
@@ -250,7 +254,10 @@ export function Map3DView({
             <span className="text-foreground">{exaggeration.toFixed(1)}×</span>
           </div>
           <input
-            type="range" min={0} max={5} step={0.1}
+            type="range"
+            min={0}
+            max={5}
+            step={0.1}
             value={exaggeration}
             onChange={(e) => setExaggeration(parseFloat(e.target.value))}
             className="w-full accent-gold h-1"

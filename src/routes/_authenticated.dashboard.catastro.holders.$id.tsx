@@ -19,7 +19,12 @@ function HolderProfilePage() {
 
   return (
     <div className="p-4 md:p-6 pb-20 md:pb-6">
-      <HolderProfile holderId={id} projectId={active.id} projectName={active.name} userId={user.id} />
+      <HolderProfile
+        holderId={id}
+        projectId={active.id}
+        projectName={active.name}
+        userId={user.id}
+      />
     </div>
   );
 }

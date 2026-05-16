@@ -150,7 +150,9 @@ export function CatastroOverlapPanel({ catastroFeatures, projectConcessions }: P
     <div className="border border-border rounded overflow-hidden bg-bg-secondary/30">
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-bg-secondary">
         <div className="flex items-center gap-2 text-xs min-w-0">
-          <span className="font-mono uppercase tracking-wider text-text-secondary">Análisis de superposición</span>
+          <span className="font-mono uppercase tracking-wider text-text-secondary">
+            Análisis de superposición
+          </span>
           <span className="text-text-dim font-mono">
             {eligibleProject.length} concesiones · {catastroFeatures.length} pertenencias en vista
           </span>
@@ -176,17 +178,29 @@ export function CatastroOverlapPanel({ catastroFeatures, projectConcessions }: P
           {eligibleProject.length === 0
             ? "Tus concesiones no tienen geometría cargada — no se puede calcular superposición."
             : catastroFeatures.length === 0
-            ? "Carga primero el catastro SERNAGEOMIN en el mapa (botón “Cargar”)."
-            : "Pulsa “Calcular” para cuantificar las hectáreas superpuestas."}
+              ? "Carga primero el catastro SERNAGEOMIN en el mapa (botón “Cargar”)."
+              : "Pulsa “Calcular” para cuantificar las hectáreas superpuestas."}
         </div>
       )}
 
       {totals && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-3 border-b border-border">
           <Stat label="Concesiones" value={String(rows?.length ?? 0)} />
-          <Stat label="Con conflicto" value={String(totals.conflicting)} color={totals.conflicting > 0 ? "#dc2626" : undefined} />
-          <Stat label="Ha superpuestas" value={totals.totalOverlap.toFixed(1)} color={totals.totalOverlap > 0 ? "#ea580c" : undefined} />
-          <Stat label="% del área propia" value={`${totals.pct.toFixed(1)}%`} color={totals.pct > 5 ? "#dc2626" : undefined} />
+          <Stat
+            label="Con conflicto"
+            value={String(totals.conflicting)}
+            color={totals.conflicting > 0 ? "#dc2626" : undefined}
+          />
+          <Stat
+            label="Ha superpuestas"
+            value={totals.totalOverlap.toFixed(1)}
+            color={totals.totalOverlap > 0 ? "#ea580c" : undefined}
+          />
+          <Stat
+            label="% del área propia"
+            value={`${totals.pct.toFixed(1)}%`}
+            color={totals.pct > 5 ? "#dc2626" : undefined}
+          />
         </div>
       )}
 
@@ -200,8 +214,7 @@ export function CatastroOverlapPanel({ catastroFeatures, projectConcessions }: P
                   <span
                     className="w-2 h-2 rounded-full shrink-0"
                     style={{
-                      background:
-                        r.overlapHa === 0 ? "#0d9488" : danger ? "#dc2626" : "#f59e0b",
+                      background: r.overlapHa === 0 ? "#0d9488" : danger ? "#dc2626" : "#f59e0b",
                     }}
                   />
                   <div className="min-w-0 flex-1">
@@ -210,14 +223,22 @@ export function CatastroOverlapPanel({ catastroFeatures, projectConcessions }: P
                       <span className="text-text-secondary"> — {r.concession.name}</span>
                     </div>
                     <div className="text-[11px] text-text-dim">
-                      {r.concessionAreaHa.toFixed(1)} ha propias · {r.hits.length} pertenencias intersectan
+                      {r.concessionAreaHa.toFixed(1)} ha propias · {r.hits.length} pertenencias
+                      intersectan
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-sm font-mono font-semibold" style={{ color: danger ? "#dc2626" : r.overlapHa > 0 ? "#ea580c" : "#0d9488" }}>
+                    <div
+                      className="text-sm font-mono font-semibold"
+                      style={{
+                        color: danger ? "#dc2626" : r.overlapHa > 0 ? "#ea580c" : "#0d9488",
+                      }}
+                    >
                       {r.overlapHa.toFixed(1)} ha
                     </div>
-                    <div className="text-[11px] text-text-dim">{r.pctOfConcession.toFixed(1)}% propio</div>
+                    <div className="text-[11px] text-text-dim">
+                      {r.pctOfConcession.toFixed(1)}% propio
+                    </div>
                   </div>
                 </summary>
                 {r.hits.length > 0 && (
@@ -271,7 +292,9 @@ function Stat({ label, value, color }: { label: string; value: string; color?: s
   return (
     <div className="border border-border rounded p-2 bg-bg-elevated/50">
       <div className="text-[10px] uppercase tracking-wider text-text-secondary">{label}</div>
-      <div className="text-base font-semibold font-mono" style={color ? { color } : undefined}>{value}</div>
+      <div className="text-base font-semibold font-mono" style={color ? { color } : undefined}>
+        {value}
+      </div>
     </div>
   );
 }
