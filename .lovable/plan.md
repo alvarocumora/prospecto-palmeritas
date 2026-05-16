@@ -1,75 +1,82 @@
-# Plan — Crear Proyecto "Distrito Cuprífero Los Verdes – Tilama"
+# Plan: PWA móvil para mapa de exploración en terreno
 
-Carga de datos del informe Andes Rock Geoconsultores en GeoCapitals, lista para visualizar en mapa, targets, catastro y como base para upgrade a NI 43-101.
+Activar instalación tipo app en móvil (Android/iOS) sobre una vista de mapa optimizada para campo, con pertenencias mineras visibles y un botón flotante para marcar puntos de interés con nota geolocalizada.
 
-## 1. Proyecto base
+> **Aviso importante sobre PWA en Lovable**: las PWA son una característica avanzada. Las funciones de instalación, ícono en home screen y uso offline básico **solo funcionarán en la URL publicada** (`geocapitals.com` / `*.lovable.app`), no dentro del preview del editor. Para evitar romper el preview, NO activaré service worker con caché agresiva; usaremos la ruta "manifest-only + SW kill-switch seguro" que recomienda la plataforma.
 
-Insert en `projects`:
-- code: `LV-TIL-001`
-- name: `Distrito Cuprífero Los Verdes – Tilama`
-- commodity: `Cu-Au-Ag`
-- country: `Chile` · region: `Coquimbo` · commune: `Los Vilos`
-- crs_epsg: `32719` (UTM 19S WGS84)
-- center: convertido desde UTM ~300500 E / 6453300 N → **lat -32.0257, lng -71.0123** (aprox; recalculo exacto con proj4 al ejecutar)
-- status: `active`
-- description: resumen ejecutivo (skarn Cu + vetiformes Cu-Au-Ag, control Riedel dextral, dos zonas económicas conceptuales La Guanaca y Castellana)
+---
 
-## 2. Titulares (`holders`)
+## 1. Instalabilidad móvil (manifest-only, sin caché que rompa el preview)
 
-- Carlos Fernández Vásquez → 4 pertenencias grupo Alto Los Verdes
-- Carlos Fernández Chacana → 5 pertenencias grupo Fernández Chacana
+- `public/manifest.webmanifest` con: `name: "Geocapitals Field"`, `short_name: "Geocapitals"`, `display: "standalone"`, `orientation: "portrait"`, `theme_color` y `background_color` desde tokens del design system, `start_url: "/dashboard/field-map"`, `scope: "/"`.
+- Íconos generados (192, 512, maskable 512) en `public/icons/`.
+- Tags en `src/routes/__root.tsx` head: `link[rel=manifest]`, `meta[name=theme-color]`, `apple-touch-icon`, `apple-mobile-web-app-capable`, `viewport-fit=cover`.
+- **No** instalar `vite-plugin-pwa`. **No** registrar service worker con runtime caching (rompe el preview en iframe).
+- Botón "Instalar app" en la nueva vista móvil que captura `beforeinstallprompt` (Android/Chrome) y muestra instrucciones para iOS Safari (Compartir → Añadir a inicio).
 
-## 3. Pertenencias (`mining_concessions`) — 11 registros
+## 2. Nueva ruta `/dashboard/field-map` (mapa de campo móvil-first)
 
-Como puntos/centroides (sin shapefile oficial todavía), marcados `source='informe_andes_rock'`, `status='vigente_declarado'`:
+Archivo: `src/routes/_authenticated.dashboard.field-map.tsx`.
 
-Grupo Los Verdes (titular Vásquez): Alto Los Verdes, Alto Los Verdes 2, Alto Los Verdes 4, Alto Los Verdes 5, Los Verdes 5-1-12, Los Verdes 4-1-10, Cumbre Nevado 1-30, Las Palmas 1-30, Las Trancas 1-20, Los Peumos 1-20.
+Capas sobre Leaflet (reusando patrones de `ProjectMap` y `src/components/map/`):
+- Basemap satelital (Esri World Imagery) + toggle topográfico.
+- **Pertenencias mineras** del proyecto activo (usa `useMiningConcessions` ya existente) con estilo por estado (vigente / en trámite / caducada) y popup con código, titular, hectáreas.
+- AOI del proyecto.
+- Targets de exploración (`useExplorationTargets` + `targetsLayer.ts` existente).
+- **Capa de POIs de campo** (nueva, ver sección 4).
+- `CoordinateFooter` + posición GPS actual con `useGeolocation` (punto azul + halo de precisión).
 
-Grupo Fernández Chacana: Lucas 1-9, Mandela 1-10, Chele Norte 1-8, Naranjo Norte, Naranjo Sur.
+UX móvil:
+- Header colapsable; el mapa ocupa todo el alto disponible (`100dvh` menos safe-area).
+- Reutiliza `MobileMapInspector` para toggles de capas y opacidad.
+- FAB principal dorado abajo-derecha: **"Marcar punto"** (icono `MapPin`).
+- FAB secundario: **"Mi ubicación"** (centrar y seguir GPS).
+- Indicador online/offline (`OnlineStatusBadge`).
 
-Geometría: centroide derivado del mapa Andes Rock (imagen subida) con `notes='Pendiente shapefile oficial SERNAGEOMIN'`.
+## 3. Flujo "Marcar punto de interés con nota"
 
-## 4. Targets (`exploration_targets`) — 9 registros
+Al tocar el FAB "Marcar punto":
+1. Captura coordenadas actuales del GPS (alta precisión); si falta permiso, fallback al centro del mapa con aviso.
+2. Abre un `Sheet` inferior con formulario:
+   - Tipo (select): afloramiento, alteración, veta, estructura, muestra, contacto litológico, infraestructura, riesgo HSE, otro.
+   - Título corto (obligatorio).
+   - Nota (textarea, multilínea).
+   - Foto opcional (input `capture="environment"` → sube a Storage del proyecto).
+   - Precisión GPS y timestamp (auto, solo lectura).
+3. Botón "Guardar" persiste el POI y lo dibuja inmediatamente en el mapa.
+4. Si está offline: se encola usando el patrón `useOfflineQueue` existente y se sincroniza al recuperar conexión.
 
-Conversión UTM 19S → WGS84 vía `pyproj` al ejecutar.
+Tap sobre un POI existente → popup con título, tipo, nota, autor, fecha, foto miniatura, y acciones "Editar" / "Eliminar" (según rol).
 
-| Code | Nombre | Tipo | Prioridad | UTM E | UTM N |
-|---|---|---|---|---|---|
-| LV-T-001 | TIL1 Los Verdes | vein | high | 302025 | 6453773 |
-| LV-T-002 | TIL2 Castellana feeder | vein | **critical** | 301103 | 6454455 |
-| LV-T-003 | TIL4 Alto Los Verdes | skarn | high | 300388 | 6455200 |
-| LV-T-004 | TIL5 Los Peumos | vein | medium | 300527 | 6452753 |
-| LV-T-005 | TIL6 Mineralización central | skarn | high | 300128 | 6452963 |
-| LV-T-006 | TIL7 Mandela | vein | medium | 297369 | 6454397 |
-| LV-T-007 | TIL8 Chele Norte | vein | medium | 297294 | 6453332 |
-| LV-T-008 | Zona La Guanaca | skarn | **critical** | 300500 | 6453300 |
-| LV-T-009 | Zona Castellana | vein | high | 300900 | 6454100 |
+## 4. Backend (Lovable Cloud)
 
-Para LV-T-008 (La Guanaca): `rationale` = "600×10×200 m, ~3.24 Mt @ 3.5–4% Cu visual"; `evidence` JSON con dimensiones y tonelaje conceptual.
-Para LV-T-009 (Castellana): "250×5×150 m, ~506 kt @ 0.8–1% Cu".
+Nueva tabla `field_pois` con:
+- Vinculada al proyecto, organización y usuario autor.
+- Tipo, título, nota, lat/lng, precisión GPS, elevación opcional, URL de foto.
+- RLS multi-tenant siguiendo el patrón existente (lectura: miembros del proyecto; escritura: miembros con rol mínimo `geologist`/`field`; borrado: autor o `admin`, validado vía `has_role()`).
+- Índice geoespacial (lat, lng) y por `project_id`.
 
-## 5. Modelo geológico (notas en proyecto)
+Bucket de Storage `field-poi-photos` (privado) con políticas por proyecto.
 
-Guardado en `description` + opcionalmente en una nota markdown:
-- Depósito: Skarn Cu + vetiformes Cu-Au-Ag + enriquecimiento supergénico
-- Mineralogía: Cpy, Bn, Cv, Cc, Cz, Atc, Mlc
-- Alteraciones: potásica, propilítica, hematítica, skarn calcosilicatado
-- Estructuras: N-S, NNE-SSW, NE-SW, NNW-SSE — Riedel dextral
+Hook `useFieldPois(projectId)` con React Query + suscripción realtime para colaboración en vivo entre geólogos en terreno.
 
-## 6. Próximos pasos (no se ejecutan ahora, se dejan como TODO)
+## 5. Navegación
 
-- Importar shapefile oficial SERNAGEOMIN (cuando esté disponible)
-- Correr análisis Sentinel-2 / ASTER sobre AOI del distrito (función ya disponible)
-- Generar campaña de muestreo geoquímico en La Guanaca + Castellana
-- Calcular Fusion Score sobre los 9 targets
-- Producir teaser PDF + data room
+- Entrada nueva en el menú lateral: **"Mapa de campo"** (icono `Compass`), visible en móvil y desktop.
+- En móvil, la barra inferior incluye acceso directo a esta vista.
+
+---
 
 ## Detalles técnicos
 
-- Migración SQL única (`supabase--migration`) con todos los inserts en transacción
-- Conversión UTM→WGS84 inline con `ST_Transform(ST_SetSRID(ST_MakePoint(E,N),32719),4326)` para evitar dependencia de pyproj
-- `created_by` = primer usuario admin existente (lookup por `has_role`)
-- `organization_id` = misma org que proyectos existentes
-- Sin tocar código frontend — el proyecto aparecerá automáticamente en `/dashboard/projects` y mapa vía hooks ya existentes (`useProjects`, `useExplorationTargets`, `useMiningConcessions`)
+- **Stack**: TanStack Start file-based routing, Leaflet (ya en el proyecto), Tailwind v4, shadcn `Sheet`/`Select`/`Textarea`.
+- **Geolocalización**: reutiliza `src/hooks/useGeolocation.ts`; añade `watchPosition` mientras el FAB "Seguir" esté activo.
+- **Offline**: cola en `localStorage` vía `useOfflineQueue`; al volver online, `flush` hace insert batch a `field_pois` y sube fotos pendientes.
+- **Performance móvil**: capas de pertenencias en GeoJSON con `simplify` cuando hay >500 polígonos; `preferCanvas: true` en el mapa.
+- **Accesibilidad**: FAB ≥48px, contraste AA, safe-area-inset respetada.
 
-¿Apruebas para ejecutar la migración?
+## Lo que NO incluye este plan
+
+- Modo offline completo del mapa (tiles cacheados). Se puede agregar después con un service worker dedicado y tiles MBTiles o cache de tiles raster — requiere su propio plan por el impacto en el preview.
+- Edición masiva de POIs ni exportación a shapefile (se puede sumar después).
+- Cambios al PDF NI 43-101.

@@ -1,0 +1,26 @@
+{
+  "name": "Geocapitals Field",
+  "short_name": "Geocapitals",
+  "description": "Mapa de exploración en terreno: pertenencias mineras y captura de puntos de interés geolocalizados.",
+  "start_url": "/dashboard/field-map",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0a09",
+  "theme_color": "#0b0a09",
+  "categories": ["productivity", "utilities", "business"],
+  "icons": [
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

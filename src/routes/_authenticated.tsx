@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck, Database, BarChart3, Satellite,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck, Database, BarChart3, Satellite, MapPin,
 } from "lucide-react";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
@@ -67,6 +67,7 @@ function AuthenticatedLayout() {
     canAccess(role, "geophysics") && { to: "/dashboard/geophysics", icon: <Activity className="w-3.5 h-3.5" />, label: "Geofísica", group: "FIELD" },
     canAccess(role, "geophysics") && { to: "/dashboard/drones", icon: <Plane className="w-3.5 h-3.5" />, label: "Drones", group: "FIELD" },
     canAccess(role, "drilling") && { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes", group: "FIELD" },
+    { to: "/dashboard/field-map", icon: <MapPin className="w-3.5 h-3.5" />, label: "Mapa de campo", group: "FIELD" },
     canAccess(role, "sampling") && { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo", group: "FIELD" },
 
     canAccess(role, "qaqc") && { to: "/dashboard/qaqc", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QA/QC", group: "ANALYSIS" },

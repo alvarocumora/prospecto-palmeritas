@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Compass, Drill, Map as MapIcon, Menu } from "lucide-react";
+import { LayoutDashboard, Compass, MapPin, Map as MapIcon, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Slot = {
@@ -23,7 +23,7 @@ export function MobileBottomNav({
   const slots: Slot[] = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Home" },
     { to: "/dashboard/map", icon: Compass, label: "Mapa", matchPrefix: true },
-    { to: "/dashboard/drilling", icon: Drill, label: "Campo", matchPrefix: true },
+    { to: "/dashboard/field-map", icon: MapPin, label: "Campo", matchPrefix: true },
     { to: "/dashboard/catastro", icon: MapIcon, label: "Catastro", matchPrefix: true, badge: catastroAlerts },
     { icon: Menu, label: "Más", onClick: onMoreClick },
   ];
