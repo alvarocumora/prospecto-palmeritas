@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
           let q = admin.from(table).select("id", { count: "exact", head: true });
           if (projectFilter(cfg)) q = q.eq("project_id", report.project_id);
           if (cfg.where) {
-            for (const [k, v] of Object.entries(cfg.where)) q = q.eq(k, v as any);
+            for (const [k, v] of Object.entries(cfg.where)) q = q.eq(k, v as unknown);
           }
           const { count: c } = await q;
           count = c ?? 0;
