@@ -600,6 +600,62 @@ export function ProjectMap({
     });
   }, [geoph, active?.id]);
 
+  // Build geology feature layers (host rock + alteration) from geological_features
+  useEffect(() => {
+    const L = leafletRef.current;
+    if (!L || !mapReady || !geologyMap) return;
+    const lithoLG = lithologyLayerRef.current;
+    const altLG = alterationLayerRef.current;
+    lithoLG?.clearLayers();
+    altLG?.clearLayers();
+
+    const built = buildGeologyFeatureLayers(L, geologyMap);
+    built.lithologyLayer.eachLayer((l) => lithoLG?.addLayer(l));
+    built.alterationLayer.eachLayer((l) => altLG?.addLayer(l));
+
+    setLithoLegend(built.lithologyLegend);
+    setAltLegend(built.alterationLegend);
+  }, [geologyMap, mapReady]);
+
+  // Render prospect location marker (project center)
+  useEffect(() => {
+    const L = leafletRef.current;
+    const layer = prospectLayerRef.current;
+    if (!L || !layer || !mapReady) return;
+    layer.clearLayers();
+    const lat = active?.center_lat;
+    const lng = active?.center_lng;
+    if (lat == null || lng == null) return;
+
+    const icon = L.divIcon({
+      html: `<div style="position:relative;width:36px;height:36px;">
+        <div style="position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle,rgba(240,201,107,0.45) 0%,rgba(240,201,107,0) 70%);animation:prospect-pulse 2.4s ease-out infinite;"></div>
+        <svg viewBox="0 0 24 24" width="36" height="36" style="position:absolute;inset:0;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.6));">
+          <path d="M12 2 L14.5 9 L22 9.3 L16 14 L18 21.5 L12 17.3 L6 21.5 L8 14 L2 9.3 L9.5 9 Z"
+                fill="#F0C96B" stroke="#3a2f1f" stroke-width="1" stroke-linejoin="round"/>
+        </svg>
+      </div>`,
+      className: "prospect-marker-icon",
+      iconSize: [36, 36],
+      iconAnchor: [18, 18],
+    });
+
+    const m = L.marker([lat, lng], { icon, zIndexOffset: 1000 });
+    m.bindTooltip(
+      `<strong>${active?.name ?? "Prospecto"}</strong><br/><span style="color:#A89080;">${active?.code ?? ""}${active?.commodity ? ` · ${active.commodity}` : ""}</span>`,
+      { direction: "top", offset: [0, -18], className: "geo-tooltip" },
+    );
+    m.bindPopup(`<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
+      <strong style="color:#F0C96B;">${active?.name ?? "Prospecto"}</strong><br/>
+      <span style="color:#A89080;">${active?.code ?? ""}</span><br/>
+      ${active?.commodity ? `Commodity: ${active.commodity}<br/>` : ""}
+      ${active?.region ? `Región: ${active.region}<br/>` : ""}
+      Lat/Lng: ${lat.toFixed(5)}, ${lng.toFixed(5)}
+    </div>`);
+    layer.addLayer(m);
+  }, [active?.id, active?.center_lat, active?.center_lng, active?.name, active?.code, active?.commodity, active?.region, mapReady]);
+
+
   // Build mining concessions layer for the active project
   useEffect(() => {
     const L = leafletRef.current;
