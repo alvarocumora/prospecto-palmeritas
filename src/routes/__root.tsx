@@ -95,6 +95,32 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!("serviceWorker" in navigator)) return;
+
+    const inIframe = (() => {
+      try { return window.self !== window.top; } catch { return true; }
+    })();
+    const host = window.location.hostname;
+    const isPreviewHost =
+      host.includes("id-preview--") ||
+      host.includes("lovableproject.com") ||
+      host === "localhost" ||
+      host === "127.0.0.1";
+
+    if (inIframe || isPreviewHost) {
+      // Never register SW inside the editor preview / iframes — unregister any leftovers.
+      navigator.serviceWorker.getRegistrations().then((rs) => {
+        rs.forEach((r) => r.unregister().catch(() => {}));
+      }).catch(() => {});
+      return;
+    }
+
+    // Production: register kill-switch-friendly SW
+    navigator.serviceWorker.register("/sw.js", { scope: "/" }).catch(() => {});
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
