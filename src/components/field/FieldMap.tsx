@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff } from "lucide-react";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Target } from "lucide-react";
 import { toast } from "sonner";
 
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions, EXPIRY_COLORS, expiryStatus } from "@/hooks/useMiningConcessions";
 import { useFieldPois, useFieldPoiQueue, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 
 import { CoordinateFooter } from "@/components/map/CoordinateFooter";
 import { buildFieldPoisLayer } from "@/components/field/poiLayer";
+import { buildFieldTargetsLayer } from "@/components/field/targetsLayer";
 import { POISheet } from "@/components/field/POISheet";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
 
@@ -26,6 +28,7 @@ export function FieldMap() {
   const LRef = useRef<LeafletNS | null>(null);
   const concessionLayerRef = useRef<LayerGroup | null>(null);
   const poiLayerRef = useRef<LayerGroup | null>(null);
+  const targetsLayerRef = useRef<LayerGroup | null>(null);
   const meMarkerRef = useRef<Marker | null>(null);
   const meCircleRef = useRef<Circle | null>(null);
 
@@ -37,6 +40,7 @@ export function FieldMap() {
   >(null);
 
   const { data: concessions } = useMiningConcessions(projectId);
+  const { targets } = useExplorationTargets(projectId);
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
   const { queue, online, enqueue, flush } = useFieldPoiQueue();
   const { position, status: geoStatus } = useGeolocation(true);
@@ -107,14 +111,6 @@ export function FieldMap() {
             dashArray: isPending ? "6 4" : undefined,
           }),
         });
-        layer.bindPopup(
-          `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;min-width:180px">
-            <div style="font-weight:700;margin-bottom:3px;color:#F0C96B">${c.code} — ${c.name}</div>
-            <div style="color:#A89080">Titular: ${c.holder ?? "—"}</div>
-            <div style="color:#A89080">Sup: ${c.area_ha ?? "—"} ha</div>
-            <div style="color:${color};margin-top:3px">${c.expires_at ?? "Sin fecha"}</div>
-          </div>`,
-        );
         group.addLayer(layer);
         const b = layer.getBounds();
         bounds = bounds ? bounds.extend(b) : b;
@@ -124,6 +120,28 @@ export function FieldMap() {
     concessionLayerRef.current = group;
     if (bounds && bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   }, [concessions, mapReady]);
+
+  // Targets layer
+  useEffect(() => {
+    const L = LRef.current; const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+
+    if (targetsLayerRef.current) {
+      map.removeLayer(targetsLayerRef.current);
+      targetsLayerRef.current = null;
+    }
+
+    if (!targets.length) return;
+
+    const group = buildFieldTargetsLayer(L, targets, {
+      onSelect: (target) => {
+        toast.message(`${target.code} · ${target.name}`);
+      },
+    });
+
+    group.addTo(map);
+    targetsLayerRef.current = group;
+  }, [targets, mapReady]);
 
   // POIs layer
   useEffect(() => {
@@ -236,6 +254,9 @@ export function FieldMap() {
           <div className="text-sm font-mono font-semibold truncate text-foreground">{active?.name}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          <span className="inline-flex items-center gap-1 px-2 py-1 rounded border border-info/30 bg-info/10 text-[10px] font-mono text-info">
+            <Target className="w-3 h-3" /> {targets.length} targets
+          </span>
           {!online && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded border border-signal-amber/40 bg-signal-amber/10 text-[10px] font-mono text-signal-amber">
               <WifiOff className="w-3 h-3" /> Offline{queue.length > 0 ? ` · ${queue.length}` : ""}
@@ -250,12 +271,10 @@ export function FieldMap() {
         </div>
       </div>
 
-      {/* Map */}
       <div ref={containerRef} className="absolute inset-0" style={{ top: 0 }} />
 
       <CoordinateFooter map={mapRef.current} />
 
-      {/* Legend */}
       <div
         className="absolute z-[900] left-2 px-2 py-1.5 rounded border border-border bg-background/85 backdrop-blur text-[10px] font-mono"
         style={{ bottom: "calc(env(safe-area-inset-bottom) + 6.5rem)" }}
@@ -273,7 +292,6 @@ export function FieldMap() {
         )}
       </div>
 
-      {/* FABs */}
       <button
         type="button"
         onClick={handleLocate}
@@ -297,15 +315,3 @@ export function FieldMap() {
       </button>
 
       <POISheet
-        open={sheetOpen}
-        onOpenChange={setSheetOpen}
-        coords={pendingCoords}
-        online={online}
-        projectId={projectId}
-        organizationId={orgId}
-        onSave={async (p: NewFieldPoi) => { await create(p); }}
-        onQueue={(p) => enqueue(p)}
-      />
-    </div>
-  );
-}
