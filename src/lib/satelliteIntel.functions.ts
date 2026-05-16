@@ -886,7 +886,7 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
       }, null);
 
       // InSAR — closest point
-      let insarRec: any = null;
+      let insarRec: InsarSel | null = null;
       let insarDist = Infinity;
       if (lat != null && lng != null) {
         for (const r of insar) {
