@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Compass, Drill, Map as MapIcon, Menu } from "lucide-react";
+import { LayoutDashboard, Compass, MapPin, Map as MapIcon, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Slot = {
