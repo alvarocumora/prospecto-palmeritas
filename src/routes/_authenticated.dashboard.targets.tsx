@@ -39,6 +39,8 @@ import {
   SAT_INDEX_CODES,
 } from "@/hooks/useProjectSatelliteAnomalies";
 import { useRunSatelliteAnalysisOnTargets } from "@/hooks/useRunSatelliteAnalysisOnTargets";
+import { useSatelliteAnalysisProgress } from "@/hooks/useSatelliteAnalysisProgress";
+import { SatelliteAnalysisProgress } from "@/components/targets/SatelliteAnalysisProgress";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
