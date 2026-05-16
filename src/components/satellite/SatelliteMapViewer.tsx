@@ -18,6 +18,51 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
+type HyperRow = {
+  id: string;
+  source: string | null;
+  mineral: string | null;
+  assemblage: string | null;
+  bbox_geojson: Geometry | null;
+  mean_score: number | null;
+  max_score: number | null;
+  acquisition_date: string | null;
+};
+
+type InsarRow = {
+  id: string;
+  asset_name: string | null;
+  asset_type: string | null;
+  point_geojson: Geometry | null;
+  velocity_mm_year: number | null;
+  cumulative_displacement_mm: number | null;
+  coherence: number | null;
+  alert_severity: string | null;
+  end_date: string | null;
+};
+
+type StockRow = {
+  id: string;
+  name: string;
+  material: string | null;
+  polygon_geojson: Geometry | null;
+  volume_m3: number | null;
+  area_m2: number | null;
+  mean_height_m: number | null;
+};
+
+type HotspotRow = {
+  id: string;
+  index_code: string | null;
+  geometry: Geometry | null;
+  severity: string | null;
+  score: number | null;
+  area_ha: number | null;
+  detected_at: string | null;
+  notes: string | null;
+};
+
+
 type Props = {
   projectId: string;
   center: [number, number] | null; // [lat, lng]
