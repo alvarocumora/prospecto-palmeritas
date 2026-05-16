@@ -36,10 +36,7 @@ import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { GeologyLegend } from "./map/GeologyLegend";
 import { addProjectFeatures } from "./map/featureLayers";
 import { bboxAround, clearCatastroCache, loadCatastro } from "./map/catastroLayer";
-import {
-  buildGeologyFeatureLayers,
-  type GeologyLegendEntry,
-} from "./map/geologyFeatureLayers";
+import { buildGeologyFeatureLayers, type GeologyLegendEntry } from "./map/geologyFeatureLayers";
 import { useProjectGeologyMap } from "@/hooks/useProjectGeologyMap";
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
@@ -653,8 +650,16 @@ export function ProjectMap({
       Lat/Lng: ${lat.toFixed(5)}, ${lng.toFixed(5)}
     </div>`);
     layer.addLayer(m);
-  }, [active?.id, active?.center_lat, active?.center_lng, active?.name, active?.code, active?.commodity, active?.region, mapReady]);
-
+  }, [
+    active?.id,
+    active?.center_lat,
+    active?.center_lng,
+    active?.name,
+    active?.code,
+    active?.commodity,
+    active?.region,
+    mapReady,
+  ]);
 
   // Build mining concessions layer for the active project
   useEffect(() => {
