@@ -1432,7 +1432,7 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
           index_code: indexCode,
           status: "succeeded",
           bbox: aoiBbox as unknown as number[],
-          aoi_geometry: aoiGeom as unknown as Record<string, unknown>,
+          aoi_geometry: JSON.parse(JSON.stringify(aoiGeom)),
           external_scene_id: sceneId,
           evalscript_version: "v1-heuristic-target-batch",
           date_from: dateFrom,
@@ -1475,7 +1475,7 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
           project_id: data.projectId,
           run_id: runRow.id,
           index_code: indexCode,
-          geometry: poly as unknown as Record<string, unknown>,
+          geometry: JSON.parse(JSON.stringify(poly)),
           bbox: [
             poly.coordinates[0][0][0],
             poly.coordinates[0][0][1],
