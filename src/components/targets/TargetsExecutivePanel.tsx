@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero } from "lucide-react";
+import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero, RefreshCw } from "lucide-react";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
@@ -127,6 +127,41 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
     toast.info("Solicitando GPS… el ranking se ordenará por distancia");
   }
 
+  const [refreshing, setRefreshing] = useState(false);
+  function refreshLocation() {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocalización no soportada en este dispositivo");
+      return;
+    }
+    setGpsOn(true);
+    setRefreshing(true);
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        const gp: GeoPosition = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+          accuracy: p.coords.accuracy,
+          altitude: p.coords.altitude,
+          altitudeAccuracy: p.coords.altitudeAccuracy,
+          heading: p.coords.heading,
+          speed: p.coords.speed,
+          timestamp: p.timestamp,
+        };
+        // Manual refresh: trust this fix even if outside the accuracy threshold
+        trustedRef.current = gp;
+        setTrustedPos(gp);
+        setRefreshing(false);
+        toast.success(`Ubicación actualizada · ±${gp.accuracy.toFixed(0)} m`);
+      },
+      (err) => {
+        setRefreshing(false);
+        if (err.code === err.PERMISSION_DENIED) toast.error("Permiso de ubicación denegado");
+        else toast.error(`GPS: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+    );
+  }
+
   const aggregate = useMemo(() => {
     const all = enriched.map((r) => r.m);
     const sum = (k: keyof Metrics) => all.reduce((s, m) => s + m[k], 0);
@@ -198,19 +233,31 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={toggleGps}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
-              gpsOn
-                ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
-                : "border-border text-muted-foreground hover:bg-accent"
-            }`}
-            title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
-          >
-            {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
-            {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
-          </button>
+          <div className="inline-flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={refreshLocation}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-sky-500/40 text-sky-300 bg-sky-500/5 hover:bg-sky-500/10 disabled:opacity-50 text-[10px] font-mono"
+              title="Solicitar una nueva lectura GPS y recalcular ranking"
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Actualizando…" : "Actualizar ubicación"}
+            </button>
+            <button
+              type="button"
+              onClick={toggleGps}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
+                gpsOn
+                  ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+                  : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+              title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
+            >
+              {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
+              {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
+            </button>
+          </div>
         </div>
 
         {gpsOn && (
