@@ -46,7 +46,7 @@ export function useProjectSatelliteAnomalies(projectId: string | null) {
         HYDROTHERMAL_ALTERATION: [],
         STRUCTURAL_LINEAMENTS: [],
       };
-      for (const row of (data ?? []) as AnomalyRow[]) {
+      for (const row of (data ?? []) as unknown as AnomalyRow[]) {
         if (grouped[row.index_code]) grouped[row.index_code].push(row);
       }
       return grouped;
