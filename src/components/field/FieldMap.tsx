@@ -176,11 +176,19 @@ export function FieldMap() {
       map.removeLayer(targetsLayerRef.current);
       targetsLayerRef.current = null;
     }
-    if (!targets.length) return;
-    const group = buildFieldTargetsLayer(L, targets);
+    if (!targets.length || !showTargets) return;
+    const safe = targets.filter(
+      (t) =>
+        t.lat != null &&
+        t.lng != null &&
+        Number.isFinite(Number(t.lat)) &&
+        Number.isFinite(Number(t.lng)),
+    );
+    if (safe.length === 0) return;
+    const group = buildFieldTargetsLayer(L, safe);
     group.addTo(map);
     targetsLayerRef.current = group;
-  }, [targets, mapReady]);
+  }, [targets, mapReady, showTargets]);
 
   // GPS marker
   useEffect(() => {
