@@ -139,6 +139,16 @@ function TargetsPage() {
               <Trophy className="w-3 h-3" /> Ranking
             </button>
           </div>
+          <button
+            type="button"
+            onClick={handleExportPDF}
+            disabled={exporting || targets.length === 0}
+            className="px-3 py-1.5 text-xs font-mono rounded border border-emerald-500/40 text-emerald-400 bg-emerald-500/5 hover:bg-emerald-500/10 inline-flex items-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Exporta mapa + ranking a PDF para enviar por correo o WhatsApp"
+          >
+            {exporting ? <Loader2 className="w-3 h-3 animate-spin" /> : <FileDown className="w-3 h-3" />}
+            {exporting ? "Generando…" : "Exportar PDF"}
+          </button>
           <Link
             to="/dashboard/targets/ai-brief"
             className="px-3 py-1.5 text-xs font-mono rounded border border-info/40 text-info bg-info/5 hover:bg-info/10 inline-flex items-center gap-1.5"
