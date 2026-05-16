@@ -109,7 +109,7 @@ function buildPit(
   // Start from top and propagate downward: any ore block included pulls in cone above
   // For simplicity here: mark every block whose grade is ore AND which has a feasible cone of mostly economic mass above.
   for (const b of blocks) {
-    const key = `${b.ix}_${b.iy}_${b.iz}`;
+    const _key = `${b.ix}_${b.iy}_${b.iz}`;
     if (!oreFlag.get(b.id)) continue;
     const depthSteps = maxZ - b.iz;
     const radius = Math.ceil(depthSteps * lateralPerStep);

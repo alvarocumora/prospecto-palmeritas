@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
         proj,
         holes,
         surveys,
-        samples,
+        _samples,
         conc,
         litho,
         alter,
@@ -105,11 +105,11 @@ Deno.serve(async (req) => {
       ]);
 
       const totalM = (holes.data ?? []).reduce(
-        (s: number, h: any) => s + (Number(h.actual_depth) || 0),
+        (s: number, h) => s + (Number(h.actual_depth) || 0),
         0,
       );
       const allAu = (logs.data ?? [])
-        .map((s: any) => Number(s.au_gpt))
+        .map((s) => Number(s.au_gpt))
         .filter((v) => !isNaN(v) && v > 0);
       const auAvg = allAu.length
         ? (allAu.reduce((a, b) => a + b, 0) / allAu.length).toFixed(2)
@@ -118,13 +118,10 @@ Deno.serve(async (req) => {
       const auP90 = allAu.length
         ? [...allAu].sort((a, b) => a - b)[Math.floor(allAu.length * 0.9)].toFixed(2)
         : "—";
-      const capEx = (surveys.data ?? []).reduce(
-        (s: number, x: any) => s + (Number(x.cost_usd) || 0),
-        0,
-      );
+      const capEx = (surveys.data ?? []).reduce((s: number, x) => s + (Number(x.cost_usd) || 0), 0);
 
       const today = new Date();
-      const expiringSoon = (permits.data ?? []).filter((p: any) => {
+      const expiringSoon = (permits.data ?? []).filter((p) => {
         if (!p.expires_at) return false;
         const days = (new Date(p.expires_at).getTime() - today.getTime()) / 86400000;
         return days >= 0 && days <= 60;
@@ -140,14 +137,14 @@ ${proj.data?.description ?? ""}
 Litología (${(litho.data ?? []).length} unidades):
 ${(litho.data ?? [])
   .slice(0, 8)
-  .map((l: any) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`)
+  .map((l) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`)
   .join("\n")}
 
 Alteración (${(alter.data ?? []).length} zonas):
 ${(alter.data ?? [])
   .slice(0, 6)
   .map(
-    (a: any) =>
+    (a) =>
       `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, intensidad ${a.intensity ?? "?"}]`,
   )
   .join("\n")}
@@ -155,14 +152,14 @@ ${(alter.data ?? [])
 Mineralogía clave:
 ${(miner.data ?? [])
   .slice(0, 8)
-  .map((m: any) => `  · ${m.mineral} (${m.paragenetic_stage ?? "?"}, ${m.abundance ?? "?"})`)
+  .map((m) => `  · ${m.mineral} (${m.paragenetic_stage ?? "?"}, ${m.abundance ?? "?"})`)
   .join("\n")}
 
 Estructuras (${(feats.data ?? []).length}):
 ${(feats.data ?? [])
   .slice(0, 6)
   .map(
-    (f: any) =>
+    (f) =>
       `  · ${f.feature_code} ${f.name} ${f.feature_type} ${f.strike ?? ""}/${f.dip ?? ""} ${f.length_m ?? "?"}m`,
   )
   .join("\n")}
@@ -171,7 +168,7 @@ ${(feats.data ?? [])
 ${(holes.data ?? [])
   .slice(0, 10)
   .map(
-    (h: any) =>
+    (h) =>
       `  · ${h.hole_id} ${h.status} az${h.azimuth ?? "?"}/${h.dip ?? "?"}° ${h.actual_depth ?? "?"}/${h.planned_depth ?? "?"}m → ${h.target_zone ?? ""}`,
   )
   .join("\n")}
@@ -181,7 +178,7 @@ Au promedio: ${auAvg} g/t · P90: ${auP90} g/t · Max: ${auMax} g/t
 ${(logs.data ?? [])
   .slice(0, 15)
   .map(
-    (l: any) =>
+    (l) =>
       `  · ${l.hole_id} ${l.depth_from}-${l.depth_to}m: Au ${l.au_gpt} g/t${l.cu_pct ? ` Cu ${l.cu_pct}%` : ""} · ${l.lithology ?? "?"} / ${l.alteration ?? "?"}`,
   )
   .join("\n")}
@@ -191,7 +188,7 @@ ${(surveys.data ?? []).length} surveys · CapEx USD ${capEx.toLocaleString()}
 ${(surveys.data ?? [])
   .slice(0, 5)
   .map(
-    (s: any) =>
+    (s) =>
       `  · ${s.name} [${s.method}, ${s.status}] ${s.planned_km ?? "?"} km, prof ${s.expected_depth_m ?? "?"}m`,
   )
   .join("\n")}
@@ -200,7 +197,7 @@ ${(surveys.data ?? [])
 ${(targets.data ?? [])
   .slice(0, 10)
   .map(
-    (t: any) =>
+    (t) =>
       `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} (${t.lat?.toFixed(4) ?? "?"}, ${t.lng?.toFixed(4) ?? "?"}) ${t.rationale ?? ""}`,
   )
   .join("\n")}
@@ -210,17 +207,17 @@ ${expiringSoon.length} permisos vencen en ≤60 días:
 ${
   expiringSoon
     .slice(0, 5)
-    .map((p: any) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`)
+    .map((p) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`)
     .join("\n") || "  (ninguno crítico)"
 }
 ${(incidents.data ?? []).length} incidentes abiertos.
 
 ═══ CATASTRO ═══
-${(conc.data ?? []).length} concesiones, ${(conc.data ?? []).reduce((s: number, c: any) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total.
+${(conc.data ?? []).length} concesiones, ${(conc.data ?? []).reduce((s: number, c) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total.
 ${(conc.data ?? [])
   .slice(0, 5)
   .map(
-    (c: any) =>
+    (c) =>
       `  · ${c.code} ${c.name} [${c.concession_type}/${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`,
   )
   .join("\n")}

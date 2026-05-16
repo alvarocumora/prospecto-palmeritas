@@ -29,7 +29,7 @@ interface Rule {
   title: string;
   severity: string; // mandatory | recommended | conditional
   evaluator_type: string;
-  evaluator_config: Record<string, any> | null;
+  evaluator_config: Record<string, unknown> | null;
 }
 
 interface Report {
@@ -120,11 +120,11 @@ Deno.serve(async (req) => {
     }
 
     // 5) Evalúa cada regla
-    const upserts: any[] = [];
+    const upserts: Evaluation[] = [];
     const blocking: { rule_code: string; title: string; severity: string }[] = [];
     const warnings: { rule_code: string; title: string }[] = [];
 
-    const projectFilter = (cfg: any): boolean => cfg?.project_scope !== false;
+    const projectFilter = (cfg: Record<string, unknown>): boolean => cfg?.project_scope !== false;
 
     for (const rule of ruleList) {
       const prev = existingMap.get(rule.id);
@@ -154,7 +154,7 @@ Deno.serve(async (req) => {
           let q = admin.from(table).select("id", { count: "exact", head: true });
           if (projectFilter(cfg)) q = q.eq("project_id", report.project_id);
           if (cfg.where) {
-            for (const [k, v] of Object.entries(cfg.where)) q = q.eq(k, v as any);
+            for (const [k, v] of Object.entries(cfg.where)) q = q.eq(k, v as unknown);
           }
           const { count: c } = await q;
           count = c ?? 0;
@@ -174,10 +174,10 @@ Deno.serve(async (req) => {
           cfg.ref === "report" ? report.id : cfg.ref === "project" ? report.project_id : null;
         const refField = cfg.ref === "report" ? "id" : "id";
         let ok = false;
-        let val: any = null;
+        let val: unknown = null;
         if (table && field && refId) {
           const { data } = await admin.from(table).select(field).eq(refField, refId).maybeSingle();
-          val = (data as any)?.[field];
+          val = (data as Record<string, unknown> | null)?.[field];
           ok = val !== null && val !== undefined && val !== "";
         }
         result = {

@@ -49,7 +49,7 @@ function std(v: number[], m: number): number {
 
 /** Center-log-ratio-ish: log(x + epsilon) then z-score. Standard for geochem PCA. */
 function preprocessMatrix(rows: number[][]): { X: number[][]; means: number[]; sds: number[] } {
-  const n = rows.length;
+  const _n = rows.length;
   const p = rows[0].length;
   const log = rows.map((r) => r.map((v) => Math.log10((v ?? 0) + 1e-6)));
   const means: number[] = [];
