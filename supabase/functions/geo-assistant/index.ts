@@ -118,10 +118,7 @@ Deno.serve(async (req) => {
       const auP90 = allAu.length
         ? [...allAu].sort((a, b) => a - b)[Math.floor(allAu.length * 0.9)].toFixed(2)
         : "—";
-      const capEx = (surveys.data ?? []).reduce(
-        (s: number, x) => s + (Number(x.cost_usd) || 0),
-        0,
-      );
+      const capEx = (surveys.data ?? []).reduce((s: number, x) => s + (Number(x.cost_usd) || 0), 0);
 
       const today = new Date();
       const expiringSoon = (permits.data ?? []).filter((p) => {

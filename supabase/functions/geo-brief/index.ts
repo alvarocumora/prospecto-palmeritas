@@ -155,10 +155,7 @@ CONCESIONES:
 ${
   (conc.data ?? [])
     .slice(0, 5)
-    .map(
-      (c) =>
-        `  · ${c.code} ${c.name} [${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`,
-    )
+    .map((c) => `  · ${c.code} ${c.name} [${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`)
     .join("\n") || "  (sin concesiones)"
 }
 `.trim();
