@@ -396,8 +396,8 @@ function Card({
         <p className="mt-1.5 text-[10px] text-muted-foreground line-clamp-2">{target.rationale}</p>
       )}
 
-      {writable && (
-        <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
+      <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between gap-1">
+        {writable ? (
           <button
             type="button"
             onClick={() => canPrev && onPrev(target.id)}
@@ -407,25 +407,41 @@ function Card({
           >
             <ChevronLeft className="w-3 h-3" />
           </button>
-          <button
-            type="button"
-            onClick={() => onDelete(target)}
-            className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-            title="Eliminar"
-          >
-            <Trash2 className="w-3 h-3" />
-          </button>
-          <button
-            type="button"
-            onClick={() => canNext && onNext(target.id)}
-            disabled={!canNext}
-            className="p-1 rounded hover:bg-accent text-gold disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Siguiente etapa"
-          >
-            <ChevronRight className="w-3 h-3" />
-          </button>
-        </div>
-      )}
+        ) : (
+          <span />
+        )}
+        <Link
+          to="/dashboard/targets/ai-brief"
+          search={{ targetId: target.id }}
+          className="p-1 rounded text-info hover:bg-info/10 inline-flex items-center gap-1 text-[10px] font-mono"
+          title="Abrir AI Brief con evidencia geológica de este target"
+        >
+          <Sparkles className="w-3 h-3" /> Brief
+        </Link>
+        {writable ? (
+          <>
+            <button
+              type="button"
+              onClick={() => onDelete(target)}
+              className="p-1 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              title="Eliminar"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+            <button
+              type="button"
+              onClick={() => canNext && onNext(target.id)}
+              disabled={!canNext}
+              className="p-1 rounded hover:bg-accent text-gold disabled:opacity-30 disabled:cursor-not-allowed"
+              title="Siguiente etapa"
+            >
+              <ChevronRight className="w-3 h-3" />
+            </button>
+          </>
+        ) : (
+          <span />
+        )}
+      </div>
     </div>
   );
 }

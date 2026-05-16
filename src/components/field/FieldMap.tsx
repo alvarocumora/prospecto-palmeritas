@@ -33,6 +33,7 @@ export function FieldMap() {
   const meCircleRef = useRef<Circle | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
+  const [showTargets, setShowTargets] = useState(true);
   const [follow, setFollow] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{
@@ -175,11 +176,19 @@ export function FieldMap() {
       map.removeLayer(targetsLayerRef.current);
       targetsLayerRef.current = null;
     }
-    if (!targets.length) return;
-    const group = buildFieldTargetsLayer(L, targets);
+    if (!targets.length || !showTargets) return;
+    const safe = targets.filter(
+      (t) =>
+        t.lat != null &&
+        t.lng != null &&
+        Number.isFinite(Number(t.lat)) &&
+        Number.isFinite(Number(t.lng)),
+    );
+    if (safe.length === 0) return;
+    const group = buildFieldTargetsLayer(L, safe);
     group.addTo(map);
     targetsLayerRef.current = group;
-  }, [targets, mapReady]);
+  }, [targets, mapReady, showTargets]);
 
   // GPS marker
   useEffect(() => {
@@ -282,12 +291,19 @@ export function FieldMap() {
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {targets.length > 0 && (
-            <span
-              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gold/40 bg-gold/10 text-[10px] font-mono text-gold"
-              title={`${targets.length} targets en este proyecto`}
+            <button
+              type="button"
+              onClick={() => setShowTargets((v) => !v)}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono transition-colors ${
+                showTargets
+                  ? "border-gold/40 bg-gold/10 text-gold"
+                  : "border-border bg-background/70 text-muted-foreground hover:text-foreground"
+              }`}
+              title={`${targets.length} targets · ${showTargets ? "Ocultar" : "Mostrar"}`}
+              aria-pressed={showTargets}
             >
               <TargetIcon className="w-3 h-3" /> {targets.length}
-            </span>
+            </button>
           )}
           {!online && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded border border-signal-amber/40 bg-signal-amber/10 text-[10px] font-mono text-signal-amber">
