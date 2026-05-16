@@ -254,6 +254,14 @@ export function FieldMap() {
           <div className="text-sm font-mono font-semibold truncate text-foreground">{active?.name}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {targets.length > 0 && (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gold/40 bg-gold/10 text-[10px] font-mono text-gold"
+              title={`${targets.length} targets en este proyecto`}
+            >
+              <TargetIcon className="w-3 h-3" /> {targets.length}
+            </span>
+          )}
           {!online && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded border border-signal-amber/40 bg-signal-amber/10 text-[10px] font-mono text-signal-amber">
               <WifiOff className="w-3 h-3" /> Offline{queue.length > 0 ? ` · ${queue.length}` : ""}
