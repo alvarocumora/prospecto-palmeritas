@@ -78,17 +78,17 @@ Deno.serve(async (req) => {
 
     // Filter targets within radius
     const nearbyTargets = (targets.data ?? [])
-      .filter((t: any) => t.lat != null && t.lng != null)
-      .map((t: any) => ({ ...t, dist_m: haversineM(lat, lng, t.lat, t.lng) }))
-      .filter((t: any) => t.dist_m <= radius_m * 3)
-      .sort((a: any, b: any) => a.dist_m - b.dist_m)
+      .filter((t) => t.lat != null && t.lng != null)
+      .map((t) => ({ ...t, dist_m: haversineM(lat, lng, t.lat, t.lng) }))
+      .filter((t) => t.dist_m <= radius_m * 3)
+      .sort((a, b) => a.dist_m - b.dist_m)
       .slice(0, 8);
 
     // Holes are in UTM easting/northing — we approximate by passing all and let LLM reason.
     const nearbyHoles = (holes.data ?? []).slice(0, 10);
 
     const today = new Date();
-    const expiringSoon = (permits.data ?? []).filter((p: any) => {
+    const expiringSoon = (permits.data ?? []).filter((p) => {
       if (!p.expires_at) return false;
       const days = (new Date(p.expires_at).getTime() - today.getTime()) / 86400000;
       return days >= 0 && days <= 90;
@@ -114,7 +114,7 @@ LITOLOGÍA del proyecto:
 ${
   (litho.data ?? [])
     .slice(0, 6)
-    .map((l: any) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`)
+    .map((l) => `  · ${l.unit_code} ${l.name} (${l.rock_type ?? "?"}, ${l.age ?? "?"})`)
     .join("\n") || "  (sin datos)"
 }
 
@@ -122,22 +122,22 @@ ALTERACIÓN:
 ${
   (alter.data ?? [])
     .slice(0, 6)
-    .map((a: any) => `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, ${a.intensity ?? "?"}]`)
+    .map((a) => `  · ${a.zone_code} ${a.name} [${a.assemblage ?? "?"}, ${a.intensity ?? "?"}]`)
     .join("\n") || "  (sin datos)"
 }
 
 TARGETS CERCANOS (${nearbyTargets.length}):
-${nearbyTargets.map((t: any) => `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} a ${t.dist_m.toFixed(0)} m · ${t.rationale ?? ""}`).join("\n") || "  (ninguno en el área)"}
+${nearbyTargets.map((t) => `  · ${t.code} ${t.name} [${t.priority}/${t.stage}] score ${t.score ?? "?"} a ${t.dist_m.toFixed(0)} m · ${t.rationale ?? ""}`).join("\n") || "  (ninguno en el área)"}
 
 SONDAJES DEL PROYECTO (${nearbyHoles.length} de ${(holes.data ?? []).length}):
-${nearbyHoles.map((h: any) => `  · ${h.hole_id} ${h.status} ${h.actual_depth ?? "?"}m → ${h.target_zone ?? ""}`).join("\n") || "  (sin sondajes)"}
+${nearbyHoles.map((h) => `  · ${h.hole_id} ${h.status} ${h.actual_depth ?? "?"}m → ${h.target_zone ?? ""}`).join("\n") || "  (sin sondajes)"}
 
 INTERCEPTS DESTACADOS (Au ≥ 0.3 g/t):
 ${
   (samples.data ?? [])
     .slice(0, 10)
     .map(
-      (l: any) =>
+      (l) =>
         `  · ${l.hole_id} ${l.depth_from}-${l.depth_to}m: Au ${l.au_gpt} g/t${l.cu_pct ? ` Cu ${l.cu_pct}%` : ""} · ${l.lithology ?? "?"} / ${l.alteration ?? "?"}`,
     )
     .join("\n") || "  (sin intercepts)"
@@ -147,7 +147,7 @@ PERMISOS QUE VENCEN ≤90d:
 ${
   expiringSoon
     .slice(0, 5)
-    .map((p: any) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`)
+    .map((p) => `  ⚠ ${p.title} (${p.permit_type}) vence ${p.expires_at}`)
     .join("\n") || "  (ninguno)"
 }
 
@@ -156,7 +156,7 @@ ${
   (conc.data ?? [])
     .slice(0, 5)
     .map(
-      (c: any) =>
+      (c) =>
         `  · ${c.code} ${c.name} [${c.status}] ${c.area_ha ?? "?"} ha · ${c.holder ?? "?"}`,
     )
     .join("\n") || "  (sin concesiones)"

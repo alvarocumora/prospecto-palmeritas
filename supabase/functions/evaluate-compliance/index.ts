@@ -120,11 +120,11 @@ Deno.serve(async (req) => {
     }
 
     // 5) Evalúa cada regla
-    const upserts: any[] = [];
+    const upserts[] = [];
     const blocking: { rule_code: string; title: string; severity: string }[] = [];
     const warnings: { rule_code: string; title: string }[] = [];
 
-    const projectFilter = (cfg: any): boolean => cfg?.project_scope !== false;
+    const projectFilter = (cfg): boolean => cfg?.project_scope !== false;
 
     for (const rule of ruleList) {
       const prev = existingMap.get(rule.id);
@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
           cfg.ref === "report" ? report.id : cfg.ref === "project" ? report.project_id : null;
         const refField = cfg.ref === "report" ? "id" : "id";
         let ok = false;
-        let val: any = null;
+        let val = null;
         if (table && field && refId) {
           const { data } = await admin.from(table).select(field).eq(refField, refId).maybeSingle();
           val = (data as any)?.[field];
