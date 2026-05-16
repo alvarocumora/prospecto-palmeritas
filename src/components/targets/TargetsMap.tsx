@@ -263,6 +263,92 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
             {tracking ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
             {tracking ? "Siguiendo" : "Seguir"}
           </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowCfg((v) => !v)}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border ${
+                showCfg ? "border-amber-500/50 text-amber-300 bg-amber-500/10" : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+              title="Configurar alertas de geofence"
+            >
+              <Settings2 className="w-3 h-3" />
+              Alertas
+            </button>
+            {showCfg && (
+              <div className="absolute right-0 top-full mt-1 z-[500] w-72 rounded-md border border-border bg-background shadow-xl p-3 space-y-3">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-amber-400">
+                  <Bell className="w-3 h-3" /> Geofence
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
+                    <span className="text-muted-foreground">Radio de alerta</span>
+                    <span className="text-foreground tabular-nums">
+                      {geofenceCfg.radius >= 1000
+                        ? `${(geofenceCfg.radius / 1000).toFixed(1)} km`
+                        : `${geofenceCfg.radius} m`}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={20}
+                    max={2000}
+                    step={10}
+                    value={geofenceCfg.radius}
+                    onChange={(e) => setGeofenceCfg((c) => ({ ...c, radius: Number(e.target.value) }))}
+                    className="w-full accent-amber-500"
+                  />
+                  <div className="flex justify-between text-[9px] font-mono text-muted-foreground">
+                    <span>20 m</span><span>2 km</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-mono text-muted-foreground">Notificar al acercarse a:</div>
+                  <div className="grid grid-cols-2 gap-1">
+                    {(Object.keys(PRIORITY_COLORS) as TargetPriority[]).map((p) => (
+                      <label
+                        key={p}
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border text-[10px] font-mono cursor-pointer hover:bg-accent"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={geofenceCfg.alertPriorities[p]}
+                          onChange={(e) =>
+                            setGeofenceCfg((c) => ({
+                              ...c,
+                              alertPriorities: { ...c.alertPriorities, [p]: e.target.checked },
+                            }))
+                          }
+                          className="accent-amber-500"
+                        />
+                        <span className="w-2 h-2 rounded-full" style={{ background: PRIORITY_COLORS[p] }} />
+                        <span>{PRIORITY_META[p].label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGeofenceCfg({ radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES });
+                      insideRef.current.clear();
+                    }}
+                    className="text-[10px] font-mono text-muted-foreground hover:text-foreground"
+                  >
+                    Restablecer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCfg(false)}
+                    className="text-[10px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+                  >
+                    Listo
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <span className="text-muted-foreground hidden md:inline">
             {filtered.length} / {geoTargets.length} visibles
           </span>
