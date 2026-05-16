@@ -390,7 +390,7 @@ async function fetchComplianceAnnex(
       supabase
         .from("compliance_rules")
         .select("id, standard, rule_code, title, severity")
-        .in("standard", stds as string[])
+        .in("standard", stds as ("ch20235" | "gkz" | "jorc2012" | "ni43101" | "perc" | "samrec" | "sk1300")[])
         .order("display_order"),
       supabase
         .from("compliance_evaluations")
@@ -403,7 +403,7 @@ async function fetchComplianceAnnex(
       if (!l.rule_id) continue;
       evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
     }
-    type EvalRow = { rule_id: string | null; status: string | null; auto_evaluated: boolean | null };
+    type EvalRow = NonNullable<typeof evals>[number];
     const evalMap = new Map<string, EvalRow>(
       (evals ?? []).filter((e): e is EvalRow & { rule_id: string } => !!e.rule_id).map((e) => [e.rule_id, e]),
     );
@@ -430,8 +430,8 @@ async function fetchComplianceAnnex(
           rule_code: r.rule_code,
           standard: r.standard,
           title: r.title,
-          severity: r.severity,
-          status: ev?.status ?? "pending",
+          severity: r.severity as "mandatory" | "recommended" | "conditional",
+          status: (ev?.status ?? "pending") as "pass" | "fail" | "warn" | "na" | "pending",
           auto: !!ev?.auto_evaluated,
           evidence_count: evCount.get(r.id) ?? 0,
         });
