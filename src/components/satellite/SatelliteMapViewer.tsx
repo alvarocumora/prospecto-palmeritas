@@ -41,7 +41,7 @@ const LAYER_META: Record<
   {
     label: string;
     color: string;
-    icon: any;
+    icon: LucideIcon;
     group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots";
   }
 > = {
