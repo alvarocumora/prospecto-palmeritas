@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import type { LatLngBoundsExpression, Map as LeafletMap } from "leaflet";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { MapPin, Filter, Crosshair, Navigation, NavigationOff, Loader2 } from "lucide-react";
+import { MapPin, Filter, Crosshair, Navigation, NavigationOff, Loader2, Bell, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { UserLocationLayer } from "./UserLocationLayer";
@@ -24,8 +24,31 @@ const PRIORITY_RADIUS: Record<TargetPriority, number> = {
   low: 5,
 };
 
-const GEOFENCE_ENTER_M = 100;
-const GEOFENCE_EXIT_M = 150;
+const GEOFENCE_STORAGE_KEY = "targets_geofence_cfg_v1";
+const DEFAULT_RADIUS = 100;
+const DEFAULT_ALERT_PRIORITIES: Record<TargetPriority, boolean> = {
+  critical: true, high: true, medium: false, low: false,
+};
+
+type GeofenceCfg = {
+  radius: number;
+  alertPriorities: Record<TargetPriority, boolean>;
+};
+
+function loadGeofenceCfg(): GeofenceCfg {
+  if (typeof window === "undefined") return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+  try {
+    const raw = window.localStorage.getItem(GEOFENCE_STORAGE_KEY);
+    if (!raw) return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+    const parsed = JSON.parse(raw);
+    return {
+      radius: Number.isFinite(parsed.radius) ? Math.min(5000, Math.max(20, Number(parsed.radius))) : DEFAULT_RADIUS,
+      alertPriorities: { ...DEFAULT_ALERT_PRIORITIES, ...(parsed.alertPriorities ?? {}) },
+    };
+  } catch {
+    return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+  }
+}
 
 function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
   const map = useMap();
@@ -90,6 +113,13 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
   // Effective position: tracking takes precedence over one-shot
   const position: GeoPosition | null = tracking ? watchPos : oncePos;
 
+  const [geofenceCfg, setGeofenceCfg] = useState<GeofenceCfg>(() => loadGeofenceCfg());
+  const [showCfg, setShowCfg] = useState(false);
+
+  useEffect(() => {
+    try { window.localStorage.setItem(GEOFENCE_STORAGE_KEY, JSON.stringify(geofenceCfg)); } catch { /* noop */ }
+  }, [geofenceCfg]);
+
   const leafletRef = useRef<LeafletMap | null>(null);
   const onMapReady = (m: LeafletMap) => { leafletRef.current = m; };
 
@@ -127,24 +157,26 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
     );
   }
 
-  // Geofence alerts (critical + high)
+  // Geofence alerts (configurable radius + priorities)
   const insideRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!position) return;
+    const enterM = geofenceCfg.radius;
+    const exitM = geofenceCfg.radius * 1.5;
     for (const t of filtered) {
-      if (t.priority !== "critical" && t.priority !== "high") continue;
+      if (!geofenceCfg.alertPriorities[t.priority]) continue;
       if (t.lat == null || t.lng == null) continue;
       const d = haversineMeters(position, { lat: Number(t.lat), lng: Number(t.lng) });
       const wasInside = insideRef.current.has(t.id);
-      if (!wasInside && d <= GEOFENCE_ENTER_M) {
+      if (!wasInside && d <= enterM) {
         insideRef.current.add(t.id);
         toast.success(`Cerca de ${t.code} (${d.toFixed(0)} m) · ${PRIORITY_META[t.priority].label}`, { duration: 6000 });
         try { navigator.vibrate?.([200, 100, 200]); } catch { /* noop */ }
-      } else if (wasInside && d > GEOFENCE_EXIT_M) {
+      } else if (wasInside && d > exitM) {
         insideRef.current.delete(t.id);
       }
     }
-  }, [position, filtered]);
+  }, [position, filtered, geofenceCfg]);
 
   function goToTarget(t: ExplorationTarget) {
     if (!leafletRef.current || t.lat == null || t.lng == null) return;
@@ -231,6 +263,92 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
             {tracking ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
             {tracking ? "Siguiendo" : "Seguir"}
           </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowCfg((v) => !v)}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border ${
+                showCfg ? "border-amber-500/50 text-amber-300 bg-amber-500/10" : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+              title="Configurar alertas de geofence"
+            >
+              <Settings2 className="w-3 h-3" />
+              Alertas
+            </button>
+            {showCfg && (
+              <div className="absolute right-0 top-full mt-1 z-[500] w-72 rounded-md border border-border bg-background shadow-xl p-3 space-y-3">
+                <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-amber-400">
+                  <Bell className="w-3 h-3" /> Geofence
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-mono">
+                    <span className="text-muted-foreground">Radio de alerta</span>
+                    <span className="text-foreground tabular-nums">
+                      {geofenceCfg.radius >= 1000
+                        ? `${(geofenceCfg.radius / 1000).toFixed(1)} km`
+                        : `${geofenceCfg.radius} m`}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={20}
+                    max={2000}
+                    step={10}
+                    value={geofenceCfg.radius}
+                    onChange={(e) => setGeofenceCfg((c) => ({ ...c, radius: Number(e.target.value) }))}
+                    className="w-full accent-amber-500"
+                  />
+                  <div className="flex justify-between text-[9px] font-mono text-muted-foreground">
+                    <span>20 m</span><span>2 km</span>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <div className="text-[10px] font-mono text-muted-foreground">Notificar al acercarse a:</div>
+                  <div className="grid grid-cols-2 gap-1">
+                    {(Object.keys(PRIORITY_COLORS) as TargetPriority[]).map((p) => (
+                      <label
+                        key={p}
+                        className="inline-flex items-center gap-1.5 px-2 py-1 rounded border border-border text-[10px] font-mono cursor-pointer hover:bg-accent"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={geofenceCfg.alertPriorities[p]}
+                          onChange={(e) =>
+                            setGeofenceCfg((c) => ({
+                              ...c,
+                              alertPriorities: { ...c.alertPriorities, [p]: e.target.checked },
+                            }))
+                          }
+                          className="accent-amber-500"
+                        />
+                        <span className="w-2 h-2 rounded-full" style={{ background: PRIORITY_COLORS[p] }} />
+                        <span>{PRIORITY_META[p].label}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-1 border-t border-border">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setGeofenceCfg({ radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES });
+                      insideRef.current.clear();
+                    }}
+                    className="text-[10px] font-mono text-muted-foreground hover:text-foreground"
+                  >
+                    Restablecer
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowCfg(false)}
+                    className="text-[10px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+                  >
+                    Listo
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
           <span className="text-muted-foreground hidden md:inline">
             {filtered.length} / {geoTargets.length} visibles
           </span>
