@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Target, MapPin, ExternalLink } from "lucide-react";
@@ -132,7 +132,9 @@ function SharePage() {
           <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 inline-flex items-center gap-1.5">
             <MapPin className="w-3 h-3" /> Mapa de targets
           </div>
-          <TargetsMap targets={targets} />
+          <ClientOnly fallback={<div className="h-[480px] rounded-md border border-border bg-bg-secondary animate-pulse" />}>
+            {() => <TargetsMap targets={targets} />}
+          </ClientOnly>
         </section>
 
         {/* Ranking */}
