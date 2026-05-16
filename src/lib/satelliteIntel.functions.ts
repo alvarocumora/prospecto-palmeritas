@@ -472,7 +472,18 @@ export const explainInsarPattern = createServerFn({ method: "POST" })
     if (data.assetName) q = q.eq("asset_name", data.assetName);
     const { data: rows, error } = await q;
     if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
-    const points = (rows ?? []) as any[];
+    const points = (rows ?? []) as Pick<
+      InsarRow,
+      | "asset_name"
+      | "asset_type"
+      | "velocity_mm_year"
+      | "cumulative_displacement_mm"
+      | "coherence"
+      | "alert_severity"
+      | "reference_date"
+      | "end_date"
+      | "metadata"
+    >[];
     if (points.length === 0)
       return { ok: false, error: "Sin puntos InSAR", explanation: "", actions: [] };
 
