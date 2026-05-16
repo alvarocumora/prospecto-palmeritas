@@ -1051,7 +1051,10 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
 
     if (wErr) return { ok: false, error: wErr.message, created: 0, skipped: 0, total: 0 };
 
-    const sites = (warnings ?? []) as any[];
+    const sites = (warnings ?? []) as Pick<
+      InsarRow,
+      "id" | "asset_name" | "asset_type" | "velocity_mm_year" | "alert_severity" | "end_date"
+    >[];
     if (data.dryRun) return { ok: true, error: null, created: 0, skipped: 0, total: sites.length };
 
     // Avoid duplicates: skip sites already with an open task linked
