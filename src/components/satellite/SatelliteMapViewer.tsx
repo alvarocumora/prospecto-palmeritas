@@ -119,8 +119,8 @@ function statusColor(s: TargetSatelliteSummary["overallStatus"]): string {
 
 export function SatelliteMapViewer({ projectId, center }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const layerRefs = useRef<Record<LayerKey, any>>({} as any);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerRefs = useRef<Record<LayerKey, LayerGroup>>({} as Record<LayerKey, LayerGroup>);
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
     aoi: true,
@@ -133,10 +133,10 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
   const [criticalOnly, setCriticalOnly] = useState(false);
-  const [hyperData, setHyperData] = useState<any[]>([]);
-  const [insarData, setInsarData] = useState<any[]>([]);
-  const [stockData, setStockData] = useState<any[]>([]);
-  const [hotspots, setHotspots] = useState<any[]>([]);
+  const [hyperData, setHyperData] = useState<HyperRow[]>([]);
+  const [insarData, setInsarData] = useState<InsarRow[]>([]);
+  const [stockData, setStockData] = useState<StockRow[]>([]);
+  const [hotspots, setHotspots] = useState<HotspotRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
