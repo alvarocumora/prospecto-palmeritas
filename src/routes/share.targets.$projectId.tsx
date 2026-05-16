@@ -133,7 +133,7 @@ function SharePage() {
             <MapPin className="w-3 h-3" /> Mapa de targets
           </div>
           <ClientOnly fallback={<div className="h-[480px] rounded-md border border-border bg-bg-secondary animate-pulse" />}>
-            {() => <TargetsMap targets={targets} />}
+            <TargetsMap targets={targets} />
           </ClientOnly>
         </section>
 
