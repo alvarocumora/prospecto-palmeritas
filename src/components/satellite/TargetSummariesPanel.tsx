@@ -54,7 +54,7 @@ export function TargetSummariesPanel({ projectId }: Props) {
   const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
-  const summaries = data?.summaries ?? [];
+  const summaries = useMemo(() => data?.summaries ?? [], [data]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();

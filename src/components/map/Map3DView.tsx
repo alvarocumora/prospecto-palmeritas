@@ -7,7 +7,7 @@ import type { DrillHole, DrillCoreLog } from "@/hooks/useDrilling";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 import { Box } from "lucide-react";
 
-const STYLE_URL =
+const _STYLE_URL =
   "https://api.maptiler.com/maps/hybrid/style.json?key=get_your_own_OpIi9ZULNHzrESv6T2vL";
 
 const FALLBACK_STYLE: maplibregl.StyleSpecification = {
@@ -111,6 +111,7 @@ export function Map3DView({
       map.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

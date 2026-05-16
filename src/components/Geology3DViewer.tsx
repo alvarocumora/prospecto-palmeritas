@@ -347,5 +347,5 @@ export function Geology3DViewer({ className }: Props) {
   );
 }
 
-// Re-export para evitar warning unused import en helpers
+// eslint-disable-next-line react-refresh/only-export-components
 export { toScene };
