@@ -153,6 +153,20 @@ export function FieldMap() {
     poiLayerRef.current = group;
   }, [pois, mapReady, remove]);
 
+  // Targets layer (read-only en terreno)
+  useEffect(() => {
+    const L = LRef.current; const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    if (targetsLayerRef.current) {
+      map.removeLayer(targetsLayerRef.current);
+      targetsLayerRef.current = null;
+    }
+    if (!targets.length) return;
+    const group = buildFieldTargetsLayer(L, targets);
+    group.addTo(map);
+    targetsLayerRef.current = group;
+  }, [targets, mapReady]);
+
   // GPS marker
   useEffect(() => {
     const L = LRef.current; const map = mapRef.current;
