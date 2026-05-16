@@ -1201,8 +1201,34 @@ export const getInsarAlertHistory = createServerFn({ method: "POST" })
       .eq("source", "insar_alert");
 
     return {
-      sites: (warnings ?? []) as any[],
-      actions: (actions ?? []) as any[],
-      tasks: (tasks ?? []) as any[],
+      sites: (warnings ?? []) as Pick<
+        InsarRow,
+        | "id"
+        | "asset_name"
+        | "asset_type"
+        | "velocity_mm_year"
+        | "cumulative_displacement_mm"
+        | "coherence"
+        | "alert_severity"
+        | "end_date"
+        | "point_geojson"
+      >[],
+      actions: (actions ?? []) as Pick<
+        InsarActionRow,
+        | "id"
+        | "insar_id"
+        | "follow_up_task_id"
+        | "action_type"
+        | "severity_at_time"
+        | "velocity_mm_year"
+        | "recommendation"
+        | "notes"
+        | "created_at"
+        | "created_by"
+      >[],
+      tasks: (tasks ?? []) as Pick<
+        FollowUpTaskRow,
+        "id" | "title" | "status" | "priority" | "due_date" | "source_ref"
+      >[],
     };
   });
