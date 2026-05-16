@@ -773,10 +773,12 @@ export type TargetSatelliteSummary = {
 
 function bboxContains(bbox: unknown, lat: number, lng: number): boolean {
   try {
-    const coords = bbox?.coordinates?.[0];
-    if (!Array.isArray(coords) || coords.length < 4) return false;
-    const xs = coords.map((c: number[]) => c[0]);
-    const ys = coords.map((c: number[]) => c[1]);
+    const g = bbox as GeoJsonGeometry | null;
+    const coordsRaw = (g?.coordinates as unknown[] | undefined)?.[0];
+    if (!Array.isArray(coordsRaw) || coordsRaw.length < 4) return false;
+    const coords = coordsRaw as number[][];
+    const xs = coords.map((c) => c[0]);
+    const ys = coords.map((c) => c[1]);
     return (
       lng >= Math.min(...xs) &&
       lng <= Math.max(...xs) &&
@@ -788,12 +790,15 @@ function bboxContains(bbox: unknown, lat: number, lng: number): boolean {
   }
 }
 
-function pointFromGeom(g: any): [number, number] | null {
+function pointFromGeom(g: unknown): [number, number] | null {
   try {
-    if (g?.type === "Point" && Array.isArray(g.coordinates))
-      return [g.coordinates[0], g.coordinates[1]];
-    if (g?.type === "Polygon" && Array.isArray(g.coordinates?.[0])) {
-      const ring = g.coordinates[0];
+    const geom = g as GeoJsonGeometry | null;
+    if (geom?.type === "Point" && Array.isArray(geom.coordinates)) {
+      const c = geom.coordinates as number[];
+      return [c[0], c[1]];
+    }
+    if (geom?.type === "Polygon" && Array.isArray((geom.coordinates as unknown[])?.[0])) {
+      const ring = (geom.coordinates as number[][][])[0];
       let x = 0,
         y = 0;
       for (const p of ring) {
