@@ -157,24 +157,26 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
     );
   }
 
-  // Geofence alerts (critical + high)
+  // Geofence alerts (configurable radius + priorities)
   const insideRef = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!position) return;
+    const enterM = geofenceCfg.radius;
+    const exitM = geofenceCfg.radius * 1.5;
     for (const t of filtered) {
-      if (t.priority !== "critical" && t.priority !== "high") continue;
+      if (!geofenceCfg.alertPriorities[t.priority]) continue;
       if (t.lat == null || t.lng == null) continue;
       const d = haversineMeters(position, { lat: Number(t.lat), lng: Number(t.lng) });
       const wasInside = insideRef.current.has(t.id);
-      if (!wasInside && d <= GEOFENCE_ENTER_M) {
+      if (!wasInside && d <= enterM) {
         insideRef.current.add(t.id);
         toast.success(`Cerca de ${t.code} (${d.toFixed(0)} m) · ${PRIORITY_META[t.priority].label}`, { duration: 6000 });
         try { navigator.vibrate?.([200, 100, 200]); } catch { /* noop */ }
-      } else if (wasInside && d > GEOFENCE_EXIT_M) {
+      } else if (wasInside && d > exitM) {
         insideRef.current.delete(t.id);
       }
     }
-  }, [position, filtered]);
+  }, [position, filtered, geofenceCfg]);
 
   function goToTarget(t: ExplorationTarget) {
     if (!leafletRef.current || t.lat == null || t.lng == null) return;
