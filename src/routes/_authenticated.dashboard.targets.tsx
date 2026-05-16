@@ -138,6 +138,7 @@ function TargetsPage() {
         <TargetsMap targets={targets} />
       ) : view === "ranking" ? (
         <TargetsExecutivePanel targets={targets} />
+      ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-3 overflow-x-auto">
           {TARGET_STAGES.map((stage) => (
             <Column
