@@ -157,6 +157,9 @@ export function ProjectMap({
   const geophysicsRealLayerRef = useRef<LayerGroup | null>(null);
   const measureLineRef = useRef<Layer | null>(null);
   const measurePointsRef = useRef<[number, number][]>([]);
+  const lithologyLayerRef = useRef<LayerGroup | null>(null);
+  const alterationLayerRef = useRef<LayerGroup | null>(null);
+  const prospectLayerRef = useRef<LayerGroup | null>(null);
 
   const [counts, setCounts] = useState<Partial<Record<CatastroOrigen, number>>>({});
   const [refreshing, setRefreshing] = useState(false);
@@ -169,7 +172,10 @@ export function ProjectMap({
   const [managedLayers, setManagedLayers] = useState<ManagedLayer[]>([]);
   const [mapReady, setMapReady] = useState(false);
   const [magStats, setMagStats] = useState<MagStats | null>(null);
+  const [lithoLegend, setLithoLegend] = useState<GeologyLegendEntry[]>([]);
+  const [altLegend, setAltLegend] = useState<GeologyLegendEntry[]>([]);
   const { active } = useProjects();
+  const { data: geologyMap } = useProjectGeologyMap(active?.id ?? null);
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
   const { data: drillHoles } = useDrillHoles(active?.id ?? null);
