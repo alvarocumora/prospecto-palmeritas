@@ -1,15 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
 import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
+import { exportTargetsPDF } from "@/lib/exportTargetsPDF";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
