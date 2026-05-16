@@ -6,6 +6,7 @@ import {
   Popup,
   LayersControl,
   Tooltip,
+  GeoJSON,
   useMap,
 } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
