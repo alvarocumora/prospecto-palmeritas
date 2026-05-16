@@ -9,12 +9,7 @@ import {
   Layers,
   Pencil,
 } from "lucide-react";
-import type {
-  GeoJSON as LeafletGeoJSON,
-  Layer,
-  Map as LeafletMap,
-  LayerGroup,
-} from "leaflet";
+import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
