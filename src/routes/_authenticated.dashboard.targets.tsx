@@ -20,6 +20,7 @@ function TargetsPage() {
   const role = useProjectRole();
   const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
   const [showForm, setShowForm] = useState(false);
+  const [view, setView] = useState<"kanban" | "map">("kanban");
   const writable = canWrite(role);
 
   const grouped = useMemo(() => {
