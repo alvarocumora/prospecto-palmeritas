@@ -444,6 +444,24 @@ export function ProjectMap({
           layer: geoOverlays["Geología Macrostrat (global)"],
         },
         {
+          id: "geo:prospect",
+          label: "Ubicación del prospecto",
+          group: "Geología",
+          layer: (prospectLayerRef.current ??= L.layerGroup()),
+        },
+        {
+          id: "geo:host-rock",
+          label: "Host rock (unidades litológicas)",
+          group: "Geología",
+          layer: (lithologyLayerRef.current ??= L.layerGroup()),
+        },
+        {
+          id: "geo:alteration",
+          label: "Alteración hidrotermal",
+          group: "Geología",
+          layer: (alterationLayerRef.current ??= L.layerGroup()),
+        },
+        {
           id: "geophys:emag2",
           label: "Magnetometría EMAG2 (regional)",
           group: "Geofísica",
