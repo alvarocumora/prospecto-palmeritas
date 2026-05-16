@@ -77,6 +77,22 @@ function TargetsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
+          <div className="inline-flex rounded border border-border overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setView("kanban")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 ${view === "kanban" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <LayoutGrid className="w-3 h-3" /> Kanban
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("map")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 border-l border-border ${view === "map" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <MapIcon className="w-3 h-3" /> Mapa
+            </button>
+          </div>
           <Link
             to="/dashboard/targets/ai-brief"
             className="px-3 py-1.5 text-xs font-mono rounded border border-info/40 text-info bg-info/5 hover:bg-info/10 inline-flex items-center gap-1.5"
