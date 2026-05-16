@@ -62,7 +62,6 @@ type HotspotRow = {
   notes: string | null;
 };
 
-
 type Props = {
   projectId: string;
   center: [number, number] | null; // [lat, lng]
@@ -398,8 +397,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             const g = a.geometry;
             if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
           });
-          if (map && bounds.isValid())
-            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+          if (map && bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         } catch {
           /* noop */
         }
