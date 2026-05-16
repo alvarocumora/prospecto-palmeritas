@@ -1063,7 +1063,11 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
       .select("insar_id, action_type, follow_up_task_id")
       .in("insar_id", insarIds.length ? insarIds : ["00000000-0000-0000-0000-000000000000"])
       .eq("action_type", "task_created");
-    const taskedSet = new Set((existing ?? []).map((r: any) => r.insar_id));
+    const taskedSet = new Set(
+      ((existing ?? []) as Pick<InsarActionRow, "insar_id" | "action_type" | "follow_up_task_id">[]).map(
+        (r) => r.insar_id,
+      ),
+    );
 
     let created = 0;
     let skipped = 0;
