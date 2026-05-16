@@ -223,7 +223,9 @@ export function StockpileVolumesPanel({ projectId, defaultCenter }: Props) {
         <div className="flex items-center gap-2 flex-wrap">
           <select
             value={recentSource}
-            onChange={(e) => setRecentSource(e.target.value as "Drone" | "WorldView-3" | "Pleiades")}
+            onChange={(e) =>
+              setRecentSource(e.target.value as "Drone" | "WorldView-3" | "Pleiades")
+            }
             className="text-xs bg-bg-panel border border-border rounded px-2 py-1 font-mono"
           >
             <option value="Drone">DEM Drone · 0.1 m</option>
