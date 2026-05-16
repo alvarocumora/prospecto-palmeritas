@@ -50,7 +50,7 @@ function toExplorationTarget(t: PublicTarget): ExplorationTarget {
     score: t.score,
     confidence_pct: null,
     rationale: t.rationale,
-    evidence: t.evidence,
+    evidence: t.evidence as ExplorationTarget["evidence"],
     assigned_to: null,
     planned_meters: null,
     estimated_cost_usd: null,
