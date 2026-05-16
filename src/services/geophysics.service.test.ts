@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchGeophysicsData } from "./geophysics.service";
 
-const fromMock = vi.fn();
+const { fromMock } = vi.hoisted(() => ({ fromMock: vi.fn() }));
 
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
