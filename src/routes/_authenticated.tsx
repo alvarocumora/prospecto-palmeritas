@@ -6,7 +6,7 @@ import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectR
 import {
   Mountain, LayoutDashboard, Map as MapIcon, Activity, Drill,
   TestTube2, FolderKanban, LogOut,
-  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck, Database, BarChart3, Satellite,
+  Users, ClipboardList, Layers as LayersIcon, UserCircle, Crown, Compass, Plane, Calendar, ShieldCheck, ClipboardCheck, Target, Boxes, DollarSign, ShieldAlert, FileText, X, Briefcase, BadgeCheck, Database, BarChart3, Satellite, MapPin,
 } from "lucide-react";
 import { GeoAssistant } from "@/components/GeoAssistant";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
