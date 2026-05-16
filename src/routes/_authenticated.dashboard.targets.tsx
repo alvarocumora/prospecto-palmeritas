@@ -140,6 +140,7 @@ function TargetsPage() {
               <Trophy className="w-3 h-3" /> Ranking
             </button>
           </div>
+          <InstallPWAButton />
           <button
             type="button"
             onClick={handleExportPDF}
