@@ -93,6 +93,13 @@ function TargetsPage() {
             >
               <MapIcon className="w-3 h-3" /> Mapa
             </button>
+            <button
+              type="button"
+              onClick={() => setView("ranking")}
+              className={`px-2.5 py-1.5 text-xs font-mono inline-flex items-center gap-1.5 border-l border-border ${view === "ranking" ? "bg-gold/10 text-gold" : "text-muted-foreground hover:bg-accent"}`}
+            >
+              <Trophy className="w-3 h-3" /> Ranking
+            </button>
           </div>
           <Link
             to="/dashboard/targets/ai-brief"
