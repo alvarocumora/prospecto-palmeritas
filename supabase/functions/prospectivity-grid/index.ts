@@ -116,13 +116,15 @@ Deno.serve(async (req) => {
       interceptByHole.set(l.hole_id as string, cur);
     }
 
-    const tgs = (targets.data ?? []).map((t: any) => ({
-      lat: Number(t.lat),
-      lng: Number(t.lng),
-      score: Number(t.score) || 50,
-      priority: t.priority,
-      stage: t.stage,
-    }));
+    const tgs = (targets.data ?? []).map(
+      (t: { lat: unknown; lng: unknown; score: unknown; priority: string; stage: string }) => ({
+        lat: Number(t.lat),
+        lng: Number(t.lng),
+        score: Number(t.score) || 50,
+        priority: t.priority,
+        stage: t.stage,
+      }),
+    );
 
     const PRIORITY_W: Record<string, number> = { critical: 1.0, high: 0.8, medium: 0.5, low: 0.3 };
     const weights = { targets: 0.6, target_density: 0.4, intercepts: 0.0 }; // intercepts disabled until UTM->latlng

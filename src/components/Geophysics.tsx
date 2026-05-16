@@ -68,7 +68,11 @@ export function GeophysicsModule({
     accent?: "gold" | "copper" | "muted";
     delay?: number;
   }>;
-  SectionTitle: React.ComponentType<{ icon?: any; children: React.ReactNode; sub?: string }>;
+  SectionTitle: React.ComponentType<{
+    icon?: React.ComponentType<{ className?: string }>;
+    children: React.ReactNode;
+    sub?: string;
+  }>;
   Badge: React.ComponentType<{
     children: React.ReactNode;
     tone?: "gold" | "copper" | "teal" | "info" | "alert" | "muted";

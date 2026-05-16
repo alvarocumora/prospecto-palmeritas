@@ -88,7 +88,7 @@ export function Ni43101GeoExport({ projectId, projectName }: Props) {
       const dataFilename = format === "csv" ? `${filenameBase}.csv` : `${filenameBase}.geojson`;
 
       if (format === "csv") {
-        const flat = rows.map((r: any) => {
+        const flat = rows.map((r: Record<string, unknown>) => {
           const out: Record<string, unknown> = {};
           for (const [k, v] of Object.entries(r)) {
             out[k] = v && typeof v === "object" ? JSON.stringify(v) : v;
