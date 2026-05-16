@@ -67,8 +67,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   const tasks = data?.tasks ?? [];
 
   const tasksByInsar = useMemo(() => {
-    const m = new Map<string, any[]>();
-    tasks.forEach((t: any) => {
+    const m = new Map<string, (typeof tasks)[number][]>();
+    tasks.forEach((t) => {
       if (!t.source_ref) return;
       const list = m.get(t.source_ref) ?? [];
       list.push(t);
@@ -78,8 +78,8 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   }, [tasks]);
 
   const actionsByInsar = useMemo(() => {
-    const m = new Map<string, any[]>();
-    actions.forEach((a: any) => {
+    const m = new Map<string, (typeof actions)[number][]>();
+    actions.forEach((a) => {
       const list = m.get(a.insar_id) ?? [];
       list.push(a);
       m.set(a.insar_id, list);
@@ -89,13 +89,13 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
 
   const stats = useMemo(() => {
     const taskedSet = new Set(
-      actions.filter((a: any) => a.action_type === "task_created").map((a: any) => a.insar_id),
+      actions.filter((a) => a.action_type === "task_created").map((a) => a.insar_id),
     );
     return {
       total: sites.length,
       tasked: taskedSet.size,
       pending: sites.length - taskedSet.size,
-      tasksOpen: tasks.filter((t: any) => t.status === "open" || t.status === "in_progress").length,
+      tasksOpen: tasks.filter((t) => t.status === "open" || t.status === "in_progress").length,
     };
   }, [sites, actions, tasks]);
 
@@ -179,7 +179,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
         </div>
       ) : (
         <div className="divide-y divide-border/20">
-          {sites.map((s: any) => {
+          {sites.map((s) => {
             const vel = Number(s.velocity_mm_year);
             const prio = priorityFor(vel, s.alert_severity);
             const siteTasks = tasksByInsar.get(s.id) ?? [];
@@ -308,7 +308,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         Sin eventos registrados todavía.
                       </div>
                     ) : (
-                      siteActions.map((a: any) => (
+                      siteActions.map((a) => (
                         <div key={a.id} className="flex items-start gap-2 text-[11px] font-mono">
                           <span
                             className={cn(
@@ -342,7 +342,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         <div className="text-[10px] text-text-dim font-mono uppercase mb-1">
                           Tareas vinculadas
                         </div>
-                        {siteTasks.map((t: any) => (
+                        {siteTasks.map((t) => (
                           <div
                             key={t.id}
                             className="text-[11px] font-mono text-text-secondary flex items-center gap-2"

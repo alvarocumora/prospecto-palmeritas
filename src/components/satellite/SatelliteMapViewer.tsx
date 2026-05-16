@@ -1,4 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { LucideIcon } from "lucide-react";
+import type { Map as LeafletMap, LayerGroup } from "leaflet";
+import type { Geometry } from "geojson";
 import {
   Layers,
   Loader2,
@@ -14,6 +17,50 @@ import {
 } from "@/hooks/useTargetSatelliteSummaries";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+
+type HyperRow = {
+  id: string;
+  source: string | null;
+  mineral: string | null;
+  assemblage: string | null;
+  bbox_geojson: Geometry | null;
+  mean_score: number | null;
+  max_score: number | null;
+  acquisition_date: string | null;
+};
+
+type InsarRow = {
+  id: string;
+  asset_name: string | null;
+  asset_type: string | null;
+  point_geojson: Geometry | null;
+  velocity_mm_year: number | null;
+  cumulative_displacement_mm: number | null;
+  coherence: number | null;
+  alert_severity: string | null;
+  end_date: string | null;
+};
+
+type StockRow = {
+  id: string;
+  name: string;
+  material: string | null;
+  polygon_geojson: Geometry | null;
+  volume_m3: number | null;
+  area_m2: number | null;
+  mean_height_m: number | null;
+};
+
+type HotspotRow = {
+  id: string;
+  index_code: string | null;
+  geometry: Geometry | null;
+  severity: string | null;
+  score: number | null;
+  area_ha: number | null;
+  detected_at: string | null;
+  notes: string | null;
+};
 
 type Props = {
   projectId: string;
@@ -34,7 +81,7 @@ const LAYER_META: Record<
   {
     label: string;
     color: string;
-    icon: any;
+    icon: LucideIcon;
     group: "context" | "hyper" | "insar" | "dem" | "targets" | "hotspots";
   }
 > = {
@@ -71,8 +118,8 @@ function statusColor(s: TargetSatelliteSummary["overallStatus"]): string {
 
 export function SatelliteMapViewer({ projectId, center }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const mapRef = useRef<any>(null);
-  const layerRefs = useRef<Record<LayerKey, any>>({} as any);
+  const mapRef = useRef<LeafletMap | null>(null);
+  const layerRefs = useRef<Record<LayerKey, LayerGroup>>({} as Record<LayerKey, LayerGroup>);
   const [ready, setReady] = useState(false);
   const [enabled, setEnabled] = useState<Record<LayerKey, boolean>>({
     aoi: true,
@@ -85,10 +132,10 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
   const [criticalOnly, setCriticalOnly] = useState(false);
-  const [hyperData, setHyperData] = useState<any[]>([]);
-  const [insarData, setInsarData] = useState<any[]>([]);
-  const [stockData, setStockData] = useState<any[]>([]);
-  const [hotspots, setHotspots] = useState<any[]>([]);
+  const [hyperData, setHyperData] = useState<HyperRow[]>([]);
+  const [insarData, setInsarData] = useState<InsarRow[]>([]);
+  const [stockData, setStockData] = useState<StockRow[]>([]);
+  const [hotspots, setHotspots] = useState<HotspotRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
@@ -146,27 +193,31 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
     setLoading(true);
     (async () => {
       const [h, i, s, hs] = await Promise.all([
-        (supabase.from("hyperspectral_products") as any)
+        supabase
+          .from("hyperspectral_products")
           .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
           .eq("project_id", projectId),
-        (supabase.from("insar_displacement") as any)
+        supabase
+          .from("insar_displacement")
           .select(
             "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date",
           )
           .eq("project_id", projectId),
-        (supabase.from("stockpile_volumes") as any)
+        supabase
+          .from("stockpile_volumes")
           .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
           .eq("project_id", projectId),
-        (supabase.from("satellite_anomalies") as any)
+        supabase
+          .from("satellite_anomalies")
           .select("id,index_code,geometry,severity,score,area_ha,detected_at,notes")
           .eq("project_id", projectId)
           .in("severity", ["high", "HIGH", "High", "critical", "Critical", "CRITICAL"]),
       ]);
       if (cancelled) return;
-      setHyperData(h.data ?? []);
-      setInsarData(i.data ?? []);
-      setStockData(s.data ?? []);
-      setHotspots(hs.data ?? []);
+      setHyperData((h.data ?? []) as unknown as HyperRow[]);
+      setInsarData((i.data ?? []) as unknown as InsarRow[]);
+      setStockData((s.data ?? []) as unknown as StockRow[]);
+      setHotspots((hs.data ?? []) as unknown as HotspotRow[]);
       setLoading(false);
     })();
     return () => {
@@ -183,14 +234,14 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       if (cancelled) return;
       const map = mapRef.current;
       const groups = layerRefs.current;
-      Object.values(groups).forEach((g: any) => g.clearLayers());
+      Object.values(groups).forEach((g) => g.clearLayers());
 
       // AOI — derive from union of hyperspectral bboxes (largest)
       if (enabled.aoi && hyperData.length > 0) {
         const biggest = hyperData
           .map((p) => p.bbox_geojson)
           .filter(Boolean)
-          .sort((a: any, b: any) => bboxArea(b) - bboxArea(a))[0];
+          .sort((a, b) => bboxArea(b) - bboxArea(a))[0];
         if (biggest) {
           L.geoJSON(biggest, {
             style: {
@@ -334,7 +385,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         try {
           const bounds = L.latLngBounds([]);
           hyperData.forEach((p) => {
-            const c = p.bbox_geojson?.coordinates?.[0];
+            const bbox = p.bbox_geojson;
+            const c =
+              bbox && "coordinates" in bbox ? (bbox.coordinates as unknown[])[0] : undefined;
             if (Array.isArray(c)) c.forEach((pt: number[]) => bounds.extend([pt[1], pt[0]]));
           });
           summaries.forEach((t) => {
@@ -344,7 +397,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             const g = a.geometry;
             if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
           });
-          if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+          if (map && bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         } catch {
           /* noop */
         }
@@ -525,9 +578,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   );
 }
 
-function bboxArea(g: any): number {
+function bboxArea(g: Geometry | null | undefined): number {
   try {
-    const c = g?.coordinates?.[0];
+    const c = g && "coordinates" in g ? (g.coordinates as unknown[])[0] : undefined;
     if (!Array.isArray(c)) return 0;
     const xs = c.map((p: number[]) => p[0]);
     const ys = c.map((p: number[]) => p[1]);
