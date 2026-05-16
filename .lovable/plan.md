@@ -1,101 +1,70 @@
 
 ## Objetivo
+Mientras se ejecuta `runSatelliteAnalysisOnTargets`, mostrar al usuario una barra de progreso con estado granular (índice actual, runs creados, anomalías insertadas) que se actualiza en vivo a medida que el server fn escribe filas en la base.
 
-Llevar todo el análisis satelital y las **capas de catastro** dentro del enlace existente **`/dashboard/targets`** (vista Map). Sobre el basemap Esri ya configurado se añaden: los targets actuales, polígonos de concesiones mineras del proyecto y las anomalías satelitales por índice. Se incorpora botón "Correr análisis satelital" (Top-10 targets · IRON_OXIDE, CLAY_MINERALS, HYDROTHERMAL_ALTERATION, STRUCTURAL_LINEAMENTS) y el PDF actual incluirá las nuevas capas.
+## Estrategia: Supabase Realtime (sin refactorizar el server fn)
+
+El server fn ya inserta secuencialmente 4 runs (uno por índice) y luego N anomalías por run con `pipeline_version='target-batch-v1'`. En vez de convertirlo a streaming, escuchamos los `INSERT` en tiempo real desde el cliente — funciona porque Realtime ya está disponible para esas tablas.
+
+Pasos esperados:
+- 4 runs en `satellite_analysis_runs` (uno por índice elegido)
+- N×4 anomalías en `satellite_anomalies` (N = targets enviados, típicamente 10 ⇒ 40)
 
 ## Cambios
 
-### 1) Server function `runSatelliteAnalysisOnTargets`
+### 1. Migración: habilitar realtime en las tablas
 
-Archivo: `src/lib/satelliteIntel.functions.ts` (append).
+```sql
+ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_analysis_runs;
+ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_anomalies;
+ALTER TABLE public.satellite_analysis_runs REPLICA IDENTITY FULL;
+ALTER TABLE public.satellite_anomalies REPLICA IDENTITY FULL;
+```
+(idempotente: envolver en `DO $$ BEGIN ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`)
 
-Input (Zod):
+### 2. Nuevo hook `src/hooks/useSatelliteAnalysisProgress.ts`
+
 ```ts
-{ projectId: uuid, targetIds: uuid[].max(10),
-  indexCodes: ("IRON_OXIDE"|"CLAY_MINERALS"|"HYDROTHERMAL_ALTERATION"|"STRUCTURAL_LINEAMENTS")[],
-  dateFrom?: string, dateTo?: string }
+useSatelliteAnalysisProgress({
+  projectId,
+  enabled,           // true mientras runSat.isPending
+  startedAt,         // Date marca de inicio
+  expectedRuns,      // 4
+  expectedAnomalies, // targetCount * indexCount
+}) => {
+  runsDone, anomaliesDone, currentIndex, percent, stage
+}
 ```
 
-Flujo por índice:
-1. Calcula AOI = unión de bboxes ~1.5 km alrededor de cada target.
-2. STAC search en Microsoft Planetary Computer (`sentinel-2-l2a`, cloud<20%) sobre AOI; toma la escena con menor cloud cover.
-3. Inserta `satellite_analysis_runs` (`provider='planetary_computer'`, `sensor='sentinel-2-l2a'`, `status='succeeded'`, `bbox`, `aoi_geometry`, `external_scene_id`, `parameters={ scope:'target-batch', targetIds, ... }`).
-4. Por target, genera polígono buffer (~250 m, GeoJSON Polygon en WGS84) e inserta en `satellite_anomalies` con `score` heurístico (combinación de score del target, peso del índice y cloud cover), `severity` por umbrales 0.4 / 0.7 y `area_ha`.
+Internamente:
+- Abre un `channel('sat-progress-<projectId>')` con dos `postgres_changes`:
+  - `event:'INSERT', schema:'public', table:'satellite_analysis_runs', filter:'project_id=eq.<id>'`
+  - `event:'INSERT', schema:'public', table:'satellite_anomalies', filter:'project_id=eq.<id>'`
+- Filtra por `created_at >= startedAt` y `pipeline_version === 'target-batch-v1'` (runs) para no contar inserciones ajenas.
+- Mantiene `currentIndex` = `index_code` del último run recibido.
+- `percent` = `0.3 * runsDone/expectedRuns + 0.7 * anomaliesDone/expectedAnomalies` (clamp 0–100).
+- Cleanup: `supabase.removeChannel` cuando `enabled=false` o al desmontar.
 
-Devuelve `{ runs, anomaliesByIndex }`. Mismo patrón que `seedHyperspectralFromScene` (sin cómputo raster en edge runtime — la heurística produce evidencia trazable a una escena Sentinel-2 real).
+### 3. Nuevo componente `src/components/targets/SatelliteAnalysisProgress.tsx`
 
-### 2) Hooks
+- Usa `<Progress />` de shadcn + chips de estado por índice (`IRON_OXIDE`, `CLAY_MINERALS`, `HYDROTHERMAL_ALTERATION`, `STRUCTURAL_LINEAMENTS`) con check cuando su run aparece.
+- Línea de texto: `Procesando {currentIndex} · {runsDone}/4 índices · {anomaliesDone}/{expectedAnomalies} anomalías`.
+- Aparece como banner sticky encima del mapa/tabla cuando `runSat.isPending`.
 
-- `src/hooks/useProjectSatelliteAnomalies.ts` — `useQuery` que lee `satellite_anomalies` del proyecto (con join a `satellite_analysis_runs.parameters` para filtrar `scope='target-batch'`), agrupados por `index_code`.
-- `src/hooks/useProjectMiningConcessions.ts` — `useQuery` sobre `mining_concessions` filtrado por `project_id`, devuelve `{ id, code, name, holder, status, area_ha, geometry_geojson }`.
-- `src/hooks/useRunSatelliteAnalysisOnTargets.ts` — `useMutation` que llama al server fn e invalida las dos queries anteriores.
+### 4. Wire en `src/routes/_authenticated.dashboard.targets.tsx`
 
-### 3) `TargetsMap` (extensión, no reescritura)
-
-Archivo: `src/components/targets/TargetsMap.tsx`.
-
-Añadir dentro del `<LayersControl>` existente:
-
-- **Overlay "Catastro (concesiones)"**: `GeoJSON` con polígonos coloreados por `concession_type` (explotación rojo translúcido, exploración amarillo). Tooltip con `code · holder · area_ha`. Estilo `weight: 1.5, fillOpacity: 0.18`.
-- **Overlays por índice satelital** (4): `GeoJSON` con polígonos de anomalías; colores definidos en `src/styles.css`:
-  - `--sat-iron` (rojo), `--sat-clay` (naranja), `--sat-hydro` (morado), `--sat-struct` (cian).
-  - `fillOpacity` proporcional a `score`. Popup con índice, severidad, score, área y target asociado.
-- **Leyenda** dentro del mismo control inferior derecho (extender el actual o un nuevo componente `MapLegend`) mostrando swatches de cada capa + conteos.
-
-Props nuevas opcionales del componente: `concessions`, `anomaliesByIndex`. Si no se pasan, no se renderizan (compatibilidad).
-
-### 4) Página de targets
-
-Archivo: `src/routes/_authenticated.dashboard.targets.tsx`.
-
-- Importar los dos hooks nuevos + `useRunSatelliteAnalysisOnTargets`.
-- En el header, junto al botón "Exportar PDF", añadir botón **"Correr análisis satelital"** (icono `Satellite`, color signal-cyan) que calcula `top10ByScore(targets)` y dispara la mutation con los 4 índices. Estado de loading con spinner y `toast.success/error`.
-- Pasar `concessions` y `anomaliesByIndex` al `<TargetsMap />` existente.
-- Sin nueva ruta: todo dentro de la vista "Map" actual.
-
-### 5) Export PDF
-
-Archivo: `src/lib/exportTargetsPDF.ts`.
-
-- El flujo actual (`view='map'` → snapshot del `mapWrapRef`) ya capturará las nuevas capas porque viven dentro del mismo contenedor.
-- Añadir al PDF una nueva sección **"Capas activas"** con tabla:
-  - Targets (conteo · top-3 por score)
-  - Concesiones (conteo · holders únicos · área total ha)
-  - Anomalías por índice (conteo y severidad alta).
-- Sin cambios al flujo de captura — solo enriquecer el resumen.
-
-### 6) Tokens y assets
-
-- `src/styles.css`: añadir tokens `oklch` `--sat-iron`, `--sat-clay`, `--sat-hydro`, `--sat-struct` y `--catastro-explotacion`, `--catastro-exploracion`.
-- Sin cambios en navegación (se mantiene el link "Targets" actual).
+- En `handleRunSatellite`: setear `runStartedAt = new Date()` y `expectedAnomalies = top10.length * 4` antes de `mutateAsync`.
+- Renderizar `<SatelliteAnalysisProgress … />` cuando `runSat.isPending`.
+- Al `onSuccess` del mutation, invalidar `['project-satellite-anomalies', projectId]` y `['project-mining-concessions', projectId]` para que el mapa repinte las capas (los hooks existentes ya usan TanStack Query).
+- Mantener el toast final actual ("Análisis listo · X índices · Y anomalías").
 
 ## Detalles técnicos
-
-- **RLS**: server fn corre con `requireSupabaseAuth`; inserts usan `created_by = auth.uid()`. Lecturas de `mining_concessions` ya tienen política por `is_project_member`.
-- **Idempotencia runs**: trigger `trg_sat_run_versioning` se encarga del `version`.
-- **Tipos**: regenerados automáticamente tras la migration (no hay schema nuevo — solo inserts), `src/integrations/supabase/types.ts` no requiere edición manual.
-- **Performance**: 4 runs + ~40 anomalías ≤ 1 s. Las concesiones (15 polígonos) son livianas.
-- **Captura PDF**: esperar 2.5 s tras `setView("map")` (ya está) garantiza tiles Esri + GeoJSON renderizados.
-
-## Archivos a crear / editar
-
-Nuevos:
-- `src/hooks/useProjectSatelliteAnomalies.ts`
-- `src/hooks/useProjectMiningConcessions.ts`
-- `src/hooks/useRunSatelliteAnalysisOnTargets.ts`
-- `src/components/targets/TargetsMapLegend.tsx`
-
-Editados:
-- `src/lib/satelliteIntel.functions.ts` (append `runSatelliteAnalysisOnTargets`)
-- `src/components/targets/TargetsMap.tsx` (overlays catastro + anomalías + leyenda)
-- `src/routes/_authenticated.dashboard.targets.tsx` (botón "Correr análisis", pasar props al mapa)
-- `src/lib/exportTargetsPDF.ts` (resumen de capas)
-- `src/styles.css` (tokens de color)
+- No tocar la firma ni el cuerpo del server fn — sigue devolviendo el resumen al final.
+- Realtime usa la sesión del usuario y respeta RLS existentes en ambas tablas.
+- Si Realtime se cae, el `onSuccess` del mutation sigue cerrando el progreso al 100% como fallback.
+- Solo afecta UI/datos; sin cambios en PDF ni en la lógica de análisis.
 
 ## Verificación
-
-1. `npx tsc --noEmit` y `npx eslint .` → 0 errores / 0 warnings.
-2. En `/dashboard/targets`, vista Map: ver targets + 15 polígonos de catastro de Tilama Los Verdes.
-3. Click en **"Correr análisis satelital"** → toast de éxito → aparecen 4 capas nuevas (IRON_OXIDE, CLAY_MINERALS, HYDROTHERMAL_ALTERATION, STRUCTURAL_LINEAMENTS) con polígonos coloreados sobre los Top-10 targets.
-4. DB: `satellite_analysis_runs` aumenta en 4 filas con `parameters->>'scope'='target-batch'`; `satellite_anomalies` aumenta ~40.
-5. **"Exportar PDF"** descarga `targets-pipeline.pdf` con el mapa Esri + todas las capas visibles + sección "Capas activas".
+1. SQL: confirmar que las dos tablas figuran en `pg_publication_tables` con `pubname='supabase_realtime'`.
+2. UI: pulsar el botón → ver barra avanzando, chips de índices iluminándose, contador de anomalías subiendo.
+3. Backend: tras finalizar, `SELECT count(*) FROM satellite_analysis_runs WHERE pipeline_version='target-batch-v1'` debe coincidir con `runsDone` mostrado.
