@@ -2,7 +2,7 @@ import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tansta
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
-import { useProjectRole, canAccess, type ProjectRole } from "@/hooks/useProjectRole";
+import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import {
   Mountain,
   LayoutDashboard,

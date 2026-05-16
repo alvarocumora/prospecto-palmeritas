@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { Check, Loader2, MapPin, Radio, Activity, Target as TargetIcon, Lock } from "lucide-react";
 import type { ReactNode } from "react";
 

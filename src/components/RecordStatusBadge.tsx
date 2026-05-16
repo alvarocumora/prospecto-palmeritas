@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { CheckCircle2, Clock, Eye, Archive } from "lucide-react";
 
 export type RecordStatus = "draft" | "review" | "approved" | "archived";

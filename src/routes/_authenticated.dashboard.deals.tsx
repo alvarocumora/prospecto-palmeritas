@@ -13,7 +13,6 @@ import {
   STAGE_LABEL,
   STAGE_OPTIONS,
 } from "@/modules/deals/domain/constants";
-import { fmtUSD } from "@/modules/deals/domain/format";
 import { FilterSelect } from "@/modules/deals/ui/FilterSelect";
 import { ListingCard } from "@/modules/deals/ui/ListingCard";
 import { ListingDetailDrawer } from "@/modules/deals/ui/ListingDetailDrawer";

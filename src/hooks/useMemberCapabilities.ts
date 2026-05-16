@@ -159,6 +159,7 @@ export function useMyCapabilities() {
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active?.id, user?.id]);
 
   return {

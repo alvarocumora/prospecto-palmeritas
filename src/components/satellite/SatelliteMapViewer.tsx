@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { LucideIcon } from "lucide-react";
 import type { Map as LeafletMap, LayerGroup } from "leaflet";
 import type { Geometry } from "geojson";
@@ -139,7 +139,10 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
-  const summaries = summariesRes?.summaries ?? [];
+  const summaries = useMemo<TargetSatelliteSummary[]>(
+    () => summariesRes?.summaries ?? [],
+    [summariesRes],
+  );
 
   // Init Leaflet map (client only)
   useEffect(() => {
@@ -185,6 +188,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         mapRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load satellite data

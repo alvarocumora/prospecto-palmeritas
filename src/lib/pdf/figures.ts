@@ -1,4 +1,3 @@
-import type jsPDF from "jspdf";
 import { COLORS, PAGE, PdfState, ensureSpace, setRGB } from "./primitives";
 
 /* ============================================================

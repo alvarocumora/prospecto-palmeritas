@@ -9,13 +9,7 @@ import {
   Layers,
   Pencil,
 } from "lucide-react";
-import type {
-  Control,
-  GeoJSON as LeafletGeoJSON,
-  Layer,
-  Map as LeafletMap,
-  LayerGroup,
-} from "leaflet";
+import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 import aoiData from "@/data/geo/aoi.geojson?url";
@@ -31,7 +25,6 @@ import {
   buildGeologyOverlays,
   CATASTRO_STYLE,
   fetchMacrostratUnit,
-  macrostratPopupHtml,
   type CatastroOrigen,
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
@@ -41,12 +34,7 @@ import { buildSatelliteLayers } from "./map/satelliteLayers";
 import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
 import { MagnetometryLegend } from "./map/MagnetometryLegend";
 import { addProjectFeatures } from "./map/featureLayers";
-import {
-  bboxAround,
-  clearCatastroCache,
-  loadCatastro,
-  wireMacrostratClickPopup,
-} from "./map/catastroLayer";
+import { bboxAround, clearCatastroCache, loadCatastro } from "./map/catastroLayer";
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
@@ -522,6 +510,7 @@ export function ProjectMap({
       cancelled = true;
       cleanup?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadCatastroData]);
 
   // Build geophysics layers (planned/synthetic + real captured) for the active project

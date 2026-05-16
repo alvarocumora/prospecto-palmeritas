@@ -106,7 +106,7 @@ function ApprovalsPage() {
   if (!active)
     return <div className="p-8 text-sm text-muted-foreground">Selecciona un proyecto.</div>;
 
-  async function reload() {
+  async function _reload() {
     setFilter((f) => f); // trigger effect
     const ev = new Event("storage");
     window.dispatchEvent(ev);
