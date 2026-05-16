@@ -31,7 +31,7 @@ Deno.serve(async (req) => {
         proj,
         holes,
         surveys,
-        samples,
+        _samples,
         conc,
         litho,
         alter,
