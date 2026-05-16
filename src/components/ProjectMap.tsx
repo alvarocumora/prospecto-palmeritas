@@ -33,8 +33,14 @@ import { buildUsgsEarthquakesLayer, buildOverpassInfraLayer } from "./map/extern
 import { buildSatelliteLayers } from "./map/satelliteLayers";
 import { buildGeophysicsLayer, computeMagStats, type MagStats } from "./map/geophysicsLayers";
 import { MagnetometryLegend } from "./map/MagnetometryLegend";
+import { GeologyLegend } from "./map/GeologyLegend";
 import { addProjectFeatures } from "./map/featureLayers";
 import { bboxAround, clearCatastroCache, loadCatastro } from "./map/catastroLayer";
+import {
+  buildGeologyFeatureLayers,
+  type GeologyLegendEntry,
+} from "./map/geologyFeatureLayers";
+import { useProjectGeologyMap } from "@/hooks/useProjectGeologyMap";
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
 import { useGeophysicsData } from "@/hooks/useGeophysicsData";
@@ -98,6 +104,9 @@ const DEFAULT_LAYER_STATE: LayerStateMap = {
   "basemap:carto-dark": { visible: false, opacity: 1 },
   "basemap:opentopo": { visible: false, opacity: 1 },
   "geo:macrostrat": { visible: false, opacity: 0.7 },
+  "geo:host-rock": { visible: true, opacity: 0.85 },
+  "geo:alteration": { visible: true, opacity: 0.75 },
+  "geo:prospect": { visible: true, opacity: 1 },
   "geochile:litologia": { visible: true, opacity: 0.65 },
   "geochile:yacimientos": { visible: true, opacity: 0.95 },
   "geochile:areas-protegidas": { visible: false, opacity: 0.5 },
