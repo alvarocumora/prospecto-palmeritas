@@ -60,7 +60,8 @@ export function GeologicalEvidenceSummary({
             <Sparkles className="w-3 h-3 text-gold" /> Geological Evidence Summary
           </div>
           <div className="text-xs text-muted-foreground mt-0.5">
-            Features dentro de {radiusM >= 1000 ? `${(radiusM / 1000).toFixed(1)} km` : `${radiusM} m`} del target ·{" "}
+            Features dentro de{" "}
+            {radiusM >= 1000 ? `${(radiusM / 1000).toFixed(1)} km` : `${radiusM} m`} del target ·{" "}
             {data.nearby.length} elementos
           </div>
         </div>

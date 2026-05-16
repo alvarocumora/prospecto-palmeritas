@@ -72,8 +72,14 @@ export function buildTargetGeologyEvidence(input: TargetGeologyInput): TargetGeo
   nearby.sort((a, b) => a.distanceM - b.distanceM);
 
   // Aggregate by unit
-  const lithoAgg = new Map<string, { unit: LithologyMapUnit; count: number; minDistanceM: number }>();
-  const altAgg = new Map<string, { unit: AlterationMapUnit; count: number; minDistanceM: number }>();
+  const lithoAgg = new Map<
+    string,
+    { unit: LithologyMapUnit; count: number; minDistanceM: number }
+  >();
+  const altAgg = new Map<
+    string,
+    { unit: AlterationMapUnit; count: number; minDistanceM: number }
+  >();
 
   for (const n of nearby) {
     if (n.lithology) {

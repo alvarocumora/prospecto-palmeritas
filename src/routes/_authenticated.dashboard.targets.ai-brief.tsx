@@ -57,7 +57,11 @@ function AITargetBriefPage() {
     [targets, targetId],
   );
 
-  const { data: geo, loading: geoLoading, error: geoError } = useTargetGeologyEvidence(
+  const {
+    data: geo,
+    loading: geoLoading,
+    error: geoError,
+  } = useTargetGeologyEvidence(
     active?.id ?? null,
     selected ? { lat: selected.lat, lng: selected.lng } : null,
     1500,
@@ -93,7 +97,10 @@ function AITargetBriefPage() {
     <div className="mx-auto max-w-6xl p-4 md:p-8 pb-20 md:pb-8 space-y-6">
       <header>
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-          <Link to="/dashboard/targets" className="inline-flex items-center gap-1 hover:text-foreground">
+          <Link
+            to="/dashboard/targets"
+            className="inline-flex items-center gap-1 hover:text-foreground"
+          >
             <ArrowLeft className="w-3 h-3" /> Targets
           </Link>
           <span>·</span>
@@ -110,7 +117,12 @@ function AITargetBriefPage() {
       </header>
 
       {selected && (
-        <GeologicalEvidenceSummary data={geo} loading={geoLoading} error={geoError} radiusM={1500} />
+        <GeologicalEvidenceSummary
+          data={geo}
+          loading={geoLoading}
+          error={geoError}
+          radiusM={1500}
+        />
       )}
 
       {loading && targetId ? (
