@@ -127,6 +127,41 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
     toast.info("Solicitando GPS… el ranking se ordenará por distancia");
   }
 
+  const [refreshing, setRefreshing] = useState(false);
+  function refreshLocation() {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocalización no soportada en este dispositivo");
+      return;
+    }
+    setGpsOn(true);
+    setRefreshing(true);
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        const gp: GeoPosition = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+          accuracy: p.coords.accuracy,
+          altitude: p.coords.altitude,
+          altitudeAccuracy: p.coords.altitudeAccuracy,
+          heading: p.coords.heading,
+          speed: p.coords.speed,
+          timestamp: p.timestamp,
+        };
+        // Manual refresh: trust this fix even if outside the accuracy threshold
+        trustedRef.current = gp;
+        setTrustedPos(gp);
+        setRefreshing(false);
+        toast.success(`Ubicación actualizada · ±${gp.accuracy.toFixed(0)} m`);
+      },
+      (err) => {
+        setRefreshing(false);
+        if (err.code === err.PERMISSION_DENIED) toast.error("Permiso de ubicación denegado");
+        else toast.error(`GPS: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+    );
+  }
+
   const aggregate = useMemo(() => {
     const all = enriched.map((r) => r.m);
     const sum = (k: keyof Metrics) => all.reduce((s, m) => s + m[k], 0);
