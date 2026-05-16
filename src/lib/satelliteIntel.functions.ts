@@ -143,7 +143,7 @@ export const searchStac = createServerFn({ method: "POST" })
         assets: JSON.parse(it.assetsJson),
         properties: JSON.parse(it.propertiesJson),
       }));
-      const { error } = await supabase.from("stac_acquisitions").upsert(rows, {
+      const { error } = await (supabase.from("stac_acquisitions") as any).upsert(rows, {
         onConflict: "project_id,collection,scene_id",
         ignoreDuplicates: true,
       });
@@ -211,7 +211,7 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
         note: "Productos derivados sintéticos pendientes de validación con worker Python real",
       },
     }));
-    const { data: inserted, error } = await supabase.from("hyperspectral_products")
+    const { data: inserted, error } = await (supabase.from("hyperspectral_products") as any)
       .insert(rows)
       .select("*");
     if (error) return { ok: false, error: error.message, products: [] };
@@ -245,7 +245,7 @@ export const explainHyperspectralProducts = createServerFn({ method: "POST" })
   .inputValidator((input) => ExplainInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: rows, error } = await supabase.from("hyperspectral_products")
+    const { data: rows, error } = await (supabase.from("hyperspectral_products") as any)
       .select(
         "mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm",
       )
@@ -417,7 +417,7 @@ export const seedInsarMonitoring = createServerFn({ method: "POST" })
       }
     }
 
-    const { data: inserted, error } = await supabase.from("insar_displacement")
+    const { data: inserted, error } = await (supabase.from("insar_displacement") as any)
       .insert(rows)
       .select("*");
     if (error) return { ok: false, error: error.message, points: [] };
@@ -434,7 +434,7 @@ export const explainInsarPattern = createServerFn({ method: "POST" })
   .inputValidator((input) => ExplainInsarInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    let q = supabase.from("insar_displacement")
+    let q = (supabase.from("insar_displacement") as any)
       .select(
         "asset_name,asset_type,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,reference_date,end_date,metadata",
       )
@@ -557,7 +557,7 @@ export const seedStockpileVolume = createServerFn({ method: "POST" })
     const captured = data.capturedAt ?? new Date().toISOString();
 
     // Registrar raster reciente como referencia trazable
-    const { data: raster, error: rErr } = await supabase.from("drone_rasters")
+    const { data: raster, error: rErr } = await (supabase.from("drone_rasters") as any)
       .insert({
         project_id: data.projectId,
         created_by: userId,
@@ -575,7 +575,7 @@ export const seedStockpileVolume = createServerFn({ method: "POST" })
     if (rErr || !raster)
       return { ok: false, error: rErr?.message ?? "raster insert failed", volume: null };
 
-    const { data: vol, error: vErr } = await supabase.from("stockpile_volumes")
+    const { data: vol, error: vErr } = await (supabase.from("stockpile_volumes") as any)
       .insert({
         project_id: data.projectId,
         created_by: userId,
@@ -608,7 +608,7 @@ export const explainStockpileChanges = createServerFn({ method: "POST" })
   .inputValidator((input) => ExplainStockpileInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
-    const { data: rows, error } = await supabase.from("stockpile_volumes")
+    const { data: rows, error } = await (supabase.from("stockpile_volumes") as any)
       .select("name,material,area_m2,mean_height_m,max_height_m,volume_m3,base_method,created_at")
       .eq("project_id", data.projectId)
       .order("created_at", { ascending: false })
@@ -784,20 +784,20 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
     const pid = data.projectId;
 
     const [tRes, hRes, iRes, sRes] = await Promise.all([
-      supabase.from("exploration_targets")
+      (supabase.from("exploration_targets") as any)
         .select("id,code,name,target_type,commodity,priority,score,lat,lng")
         .eq("project_id", pid),
-      supabase.from("hyperspectral_products")
+      (supabase.from("hyperspectral_products") as any)
         .select(
           "id,acquisition_date,bbox_geojson,mineral,assemblage,mean_score,max_score,cells_above_threshold,area_ha",
         )
         .eq("project_id", pid),
-      supabase.from("insar_displacement")
+      (supabase.from("insar_displacement") as any)
         .select(
           "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date",
         )
         .eq("project_id", pid),
-      supabase.from("stockpile_volumes")
+      (supabase.from("stockpile_volumes") as any)
         .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
         .eq("project_id", pid),
     ]);
@@ -993,7 +993,7 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const { data: warnings, error: wErr } = await supabase.from("insar_displacement")
+    const { data: warnings, error: wErr } = await (supabase.from("insar_displacement") as any)
       .select("id, asset_name, asset_type, velocity_mm_year, alert_severity, end_date")
       .eq("project_id", data.projectId)
       .in("alert_severity", ["warning", "critical"]);
@@ -1005,7 +1005,7 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
 
     // Avoid duplicates: skip sites already with an open task linked
     const insarIds = sites.map((s) => s.id);
-    const { data: existing } = await supabase.from("insar_alert_actions")
+    const { data: existing } = await (supabase.from("insar_alert_actions") as any)
       .select("insar_id, action_type, follow_up_task_id")
       .in("insar_id", insarIds.length ? insarIds : ["00000000-0000-0000-0000-000000000000"])
       .eq("action_type", "task_created");
@@ -1027,7 +1027,7 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
       const title = `[InSAR ${prio.toUpperCase()}] ${s.asset_name ?? "Sitio"} — ${vel.toFixed(1)} mm/año`;
 
       // 1. Create follow-up task
-      const { data: task, error: tErr } = await supabase.from("follow_up_tasks")
+      const { data: task, error: tErr } = await (supabase.from("follow_up_tasks") as any)
         .insert({
           project_id: data.projectId,
           title,
@@ -1049,7 +1049,7 @@ export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
       }
 
       // 2. Log action in history
-      await supabase.from("insar_alert_actions").insert({
+      await (supabase.from("insar_alert_actions") as any).insert({
         project_id: data.projectId,
         insar_id: s.id,
         follow_up_task_id: task.id,
@@ -1089,12 +1089,12 @@ export const addInsarAlertAction = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
 
-    const { data: insar } = await supabase.from("insar_displacement")
+    const { data: insar } = await (supabase.from("insar_displacement") as any)
       .select("alert_severity, velocity_mm_year, asset_type")
       .eq("id", data.insarId)
       .maybeSingle();
 
-    const { data: row, error } = await supabase.from("insar_alert_actions")
+    const { data: row, error } = await (supabase.from("insar_alert_actions") as any)
       .insert({
         project_id: data.projectId,
         insar_id: data.insarId,
@@ -1121,7 +1121,7 @@ export const getInsarAlertHistory = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
 
-    const { data: warnings } = await supabase.from("insar_displacement")
+    const { data: warnings } = await (supabase.from("insar_displacement") as any)
       .select(
         "id, asset_name, asset_type, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity, end_date, point_geojson",
       )
@@ -1129,7 +1129,7 @@ export const getInsarAlertHistory = createServerFn({ method: "POST" })
       .in("alert_severity", ["warning", "critical"])
       .order("velocity_mm_year", { ascending: false });
 
-    const { data: actions } = await supabase.from("insar_alert_actions")
+    const { data: actions } = await (supabase.from("insar_alert_actions") as any)
       .select(
         "id, insar_id, follow_up_task_id, action_type, severity_at_time, velocity_mm_year, recommendation, notes, created_at, created_by",
       )
@@ -1137,7 +1137,7 @@ export const getInsarAlertHistory = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(500);
 
-    const { data: tasks } = await supabase.from("follow_up_tasks")
+    const { data: tasks } = await (supabase.from("follow_up_tasks") as any)
       .select("id, title, status, priority, due_date, source_ref")
       .eq("project_id", data.projectId)
       .eq("source", "insar_alert");
