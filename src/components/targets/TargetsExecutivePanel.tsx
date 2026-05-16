@@ -122,8 +122,42 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
 
   if (targets.length === 0) return null;
 
+  const gpsLabel =
+    status === "denied" ? "GPS denegado" :
+    status === "unavailable" ? "GPS no soportado" :
+    status === "error" ? "GPS error" :
+    position ? `GPS ±${position.accuracy.toFixed(0)} m` :
+    gpsOn ? "Buscando señal…" : "GPS apagado";
+
   return (
     <div className="space-y-4">
+      {/* GPS / sort toggle */}
+      <div className="flex items-center justify-between gap-3 flex-wrap rounded border border-border bg-bg-secondary px-3 py-2">
+        <div className="inline-flex items-center gap-2 text-[10px] font-mono">
+          <Compass className="w-3.5 h-3.5 text-sky-400" />
+          <span className="text-muted-foreground">Orden:</span>
+          <span className="text-foreground">
+            {sortByDistance ? "Distancia desde mi ubicación" : "Score / ley Cu"}
+          </span>
+          <span className={`ml-2 ${status === "denied" || status === "error" ? "text-destructive" : position ? "text-sky-400" : "text-muted-foreground"}`}>
+            · {gpsLabel}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={toggleGps}
+          className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
+            gpsOn
+              ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+              : "border-border text-muted-foreground hover:bg-accent"
+          }`}
+          title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
+        >
+          {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
+          {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
+        </button>
+      </div>
+
       {/* Aggregate KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <MetricCard label="Cu máx" value={fmt(aggregate.cu.max_pct, "%", 3)} sub={`Prom. ${fmt(aggregate.cu.avg_pct, "%", 3)}`} color="text-copper" />
