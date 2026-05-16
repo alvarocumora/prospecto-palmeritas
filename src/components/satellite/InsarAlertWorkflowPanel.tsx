@@ -342,7 +342,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
                         <div className="text-[10px] text-text-dim font-mono uppercase mb-1">
                           Tareas vinculadas
                         </div>
-                        {siteTasks.map((t: any) => (
+                        {siteTasks.map((t) => (
                           <div
                             key={t.id}
                             className="text-[11px] font-mono text-text-secondary flex items-center gap-2"
