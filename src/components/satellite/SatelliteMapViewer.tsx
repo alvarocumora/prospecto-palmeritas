@@ -194,27 +194,31 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
     setLoading(true);
     (async () => {
       const [h, i, s, hs] = await Promise.all([
-        (supabase.from("hyperspectral_products") as any)
+        supabase
+          .from("hyperspectral_products")
           .select("id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date")
           .eq("project_id", projectId),
-        (supabase.from("insar_displacement") as any)
+        supabase
+          .from("insar_displacement")
           .select(
             "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date",
           )
           .eq("project_id", projectId),
-        (supabase.from("stockpile_volumes") as any)
+        supabase
+          .from("stockpile_volumes")
           .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m")
           .eq("project_id", projectId),
-        (supabase.from("satellite_anomalies") as any)
+        supabase
+          .from("satellite_anomalies")
           .select("id,index_code,geometry,severity,score,area_ha,detected_at,notes")
           .eq("project_id", projectId)
           .in("severity", ["high", "HIGH", "High", "critical", "Critical", "CRITICAL"]),
       ]);
       if (cancelled) return;
-      setHyperData(h.data ?? []);
-      setInsarData(i.data ?? []);
-      setStockData(s.data ?? []);
-      setHotspots(hs.data ?? []);
+      setHyperData((h.data ?? []) as unknown as HyperRow[]);
+      setInsarData((i.data ?? []) as unknown as InsarRow[]);
+      setStockData((s.data ?? []) as unknown as StockRow[]);
+      setHotspots((hs.data ?? []) as unknown as HotspotRow[]);
       setLoading(false);
     })();
     return () => {
