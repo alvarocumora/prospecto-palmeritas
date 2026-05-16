@@ -24,8 +24,31 @@ const PRIORITY_RADIUS: Record<TargetPriority, number> = {
   low: 5,
 };
 
-const GEOFENCE_ENTER_M = 100;
-const GEOFENCE_EXIT_M = 150;
+const GEOFENCE_STORAGE_KEY = "targets_geofence_cfg_v1";
+const DEFAULT_RADIUS = 100;
+const DEFAULT_ALERT_PRIORITIES: Record<TargetPriority, boolean> = {
+  critical: true, high: true, medium: false, low: false,
+};
+
+type GeofenceCfg = {
+  radius: number;
+  alertPriorities: Record<TargetPriority, boolean>;
+};
+
+function loadGeofenceCfg(): GeofenceCfg {
+  if (typeof window === "undefined") return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+  try {
+    const raw = window.localStorage.getItem(GEOFENCE_STORAGE_KEY);
+    if (!raw) return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+    const parsed = JSON.parse(raw);
+    return {
+      radius: Number.isFinite(parsed.radius) ? Math.min(5000, Math.max(20, Number(parsed.radius))) : DEFAULT_RADIUS,
+      alertPriorities: { ...DEFAULT_ALERT_PRIORITIES, ...(parsed.alertPriorities ?? {}) },
+    };
+  } catch {
+    return { radius: DEFAULT_RADIUS, alertPriorities: DEFAULT_ALERT_PRIORITIES };
+  }
+}
 
 function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
   const map = useMap();
