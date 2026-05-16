@@ -69,7 +69,7 @@ export function GeophysicsModule({
     delay?: number;
   }>;
   SectionTitle: React.ComponentType<{
-    icon?: React.ComponentType<{ className?: string }>;
+    icon?: LucideIcon;
     children: React.ReactNode;
     sub?: string;
   }>;
