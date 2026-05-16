@@ -10,7 +10,7 @@ import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, L
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
-import { exportTargetsPDF } from "@/lib/exportTargetsPDF";
+import { snapshotElement, buildTargetsPDF } from "@/lib/exportTargetsPDF";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
