@@ -6,9 +6,10 @@ import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles, LayoutGrid, Map as MapIcon, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
+import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
