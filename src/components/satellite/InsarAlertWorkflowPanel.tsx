@@ -179,7 +179,7 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
         </div>
       ) : (
         <div className="divide-y divide-border/20">
-          {sites.map((s: any) => {
+          {sites.map((s) => {
             const vel = Number(s.velocity_mm_year);
             const prio = priorityFor(vel, s.alert_severity);
             const siteTasks = tasksByInsar.get(s.id) ?? [];
