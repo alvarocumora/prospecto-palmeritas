@@ -298,6 +298,14 @@ function TargetsPage() {
         />
       </div>
 
+      {runSat.isPending && (
+        <SatelliteAnalysisProgress
+          progress={satProgress}
+          expectedRuns={SAT_INDEX_CODES.length}
+          expectedAnomalies={expectedAnomalies}
+        />
+      )}
+
       {loading ? (
         <div className="text-sm text-muted-foreground">Cargando…</div>
       ) : targets.length === 0 ? (
