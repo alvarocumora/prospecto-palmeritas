@@ -46,7 +46,7 @@ const SearchInput = z.object({
   limit: z.number().int().min(1).max(50).default(20),
 });
 
-// JSON-safe alias for serializable maps over the RPC boundary.
+
 
 export type StacItem = {
   id: string;
