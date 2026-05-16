@@ -104,6 +104,16 @@
   --alert: var(--signal-red);
   --destructive: var(--signal-red);
   --destructive-foreground: oklch(0.98 0.003 240);
+
+  /* Satellite index palette (anomalías por índice) */
+  --sat-iron: oklch(0.65 0.2 30); /* rojo óxido */
+  --sat-clay: oklch(0.78 0.16 60); /* naranja arcilla */
+  --sat-hydro: oklch(0.62 0.2 305); /* morado hidrotermal */
+  --sat-struct: oklch(0.78 0.12 200); /* cian estructural */
+
+  /* Catastro minero */
+  --catastro-explotacion: oklch(0.68 0.18 25);
+  --catastro-exploracion: oklch(0.82 0.16 90);
 }
 
 @layer base {
