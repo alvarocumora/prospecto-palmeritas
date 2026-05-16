@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass } from "lucide-react";
-import { useGeolocation, haversineMeters } from "@/hooks/useGeolocation";
+import { Trophy, TrendingUp, Crown, Star, Medal, Navigation, NavigationOff, Compass, Signal, SignalLow, SignalZero } from "lucide-react";
+import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { toast } from "sonner";
 
 function fmtDistance(m: number): string {
@@ -11,6 +11,19 @@ function fmtDistance(m: number): string {
   if (m < 10000) return `${(m / 1000).toFixed(2)} km`;
   return `${(m / 1000).toFixed(1)} km`;
 }
+
+type AccuracyTier = { label: string; color: string; bg: string; border: string; Icon: typeof Signal };
+
+function accuracyTier(acc: number | null): AccuracyTier {
+  if (acc == null) return { label: "sin señal", color: "text-muted-foreground", bg: "bg-muted/20", border: "border-border", Icon: SignalZero };
+  if (acc <= 15) return { label: "excelente", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/40", Icon: Signal };
+  if (acc <= 50) return { label: "buena", color: "text-sky-400", bg: "bg-sky-500/10", border: "border-sky-500/40", Icon: Signal };
+  if (acc <= 150) return { label: "regular", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/40", Icon: SignalLow };
+  return { label: "pobre", color: "text-destructive", bg: "bg-destructive/10", border: "border-destructive/40", Icon: SignalZero };
+}
+
+const ACCURACY_THRESHOLDS = [20, 50, 100, 250, 1000] as const;
+const DEFAULT_ACCURACY_THRESHOLD = 100;
 
 type Metrics = { cu_ppm: number; mo_ppm: number; au_ppb: number; ag_ppm: number };
 
