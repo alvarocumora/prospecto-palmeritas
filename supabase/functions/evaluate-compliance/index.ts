@@ -120,11 +120,11 @@ Deno.serve(async (req) => {
     }
 
     // 5) Evalúa cada regla
-    const upserts[] = [];
+    const upserts: Evaluation[] = [];
     const blocking: { rule_code: string; title: string; severity: string }[] = [];
     const warnings: { rule_code: string; title: string }[] = [];
 
-    const projectFilter = (cfg): boolean => cfg?.project_scope !== false;
+    const projectFilter = (cfg: Record<string, unknown>): boolean => cfg?.project_scope !== false;
 
     for (const rule of ruleList) {
       const prev = existingMap.get(rule.id);
