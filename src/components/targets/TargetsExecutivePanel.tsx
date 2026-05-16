@@ -191,18 +191,31 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
                 </div>
               ) : (
                 <ul className="divide-y divide-border">
-                  {rows.map(({ t, m }, idx) => (
+                  {rows.map(({ t, m, distance }, idx) => (
                     <li key={t.id} className="px-3 py-2 hover:bg-accent/30 transition-colors">
                       <div className="flex items-start gap-2">
                         <div className="text-[10px] font-mono text-muted-foreground w-5 pt-0.5">#{idx + 1}</div>
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-2">
                             <div className="text-xs font-mono font-semibold truncate">{t.code}</div>
-                            {t.score != null && (
-                              <span className="inline-flex items-center gap-0.5 text-[10px] font-mono text-gold shrink-0">
-                                <Star className="w-2.5 h-2.5 fill-gold" /> {Number(t.score).toFixed(0)}
-                              </span>
-                            )}
+                            <div className="inline-flex items-center gap-2 shrink-0">
+                              {sortByDistance && (
+                                <span
+                                  className={`inline-flex items-center gap-0.5 text-[10px] font-mono ${
+                                    distance == null ? "text-muted-foreground" : "text-sky-400"
+                                  }`}
+                                  title={distance == null ? "Sin coordenadas" : "Distancia desde tu ubicación"}
+                                >
+                                  <Compass className="w-2.5 h-2.5" />
+                                  {distance == null ? "—" : fmtDistance(distance)}
+                                </span>
+                              )}
+                              {t.score != null && (
+                                <span className="inline-flex items-center gap-0.5 text-[10px] font-mono text-gold">
+                                  <Star className="w-2.5 h-2.5 fill-gold" /> {Number(t.score).toFixed(0)}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           <div className="text-[10px] font-mono text-muted-foreground truncate">{t.name}</div>
 
