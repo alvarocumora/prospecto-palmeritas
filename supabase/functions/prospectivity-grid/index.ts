@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
     }
 
     // Fetch evidence
-    const [targets, holes, logs] = await Promise.all([
+    const [targets, _holes, logs] = await Promise.all([
       admin
         .from("exploration_targets")
         .select("lat,lng,score,priority,stage")
