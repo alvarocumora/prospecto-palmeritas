@@ -653,7 +653,10 @@ export const explainStockpileChanges = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(60);
     if (error) return { ok: false, error: error.message, explanation: "", actions: [] as string[] };
-    const items = (rows ?? []) as any[];
+    const items = (rows ?? []) as Pick<
+      StockRow,
+      "name" | "material" | "area_m2" | "mean_height_m" | "max_height_m" | "volume_m3" | "base_method" | "created_at"
+    >[];
     if (items.length === 0)
       return { ok: false, error: "Sin stockpiles", explanation: "", actions: [] };
 
