@@ -771,7 +771,7 @@ export type TargetSatelliteSummary = {
   overallStatus: "ok" | "monitor" | "alert";
 };
 
-function bboxContains(bbox: any, lat: number, lng: number): boolean {
+function bboxContains(bbox: unknown, lat: number, lng: number): boolean {
   try {
     const coords = bbox?.coordinates?.[0];
     if (!Array.isArray(coords) || coords.length < 4) return false;
