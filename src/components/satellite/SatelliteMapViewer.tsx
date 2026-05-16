@@ -386,7 +386,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         try {
           const bounds = L.latLngBounds([]);
           hyperData.forEach((p) => {
-            const c = p.bbox_geojson?.coordinates?.[0];
+            const bbox = p.bbox_geojson;
+            const c =
+              bbox && "coordinates" in bbox ? (bbox.coordinates as unknown[])[0] : undefined;
             if (Array.isArray(c)) c.forEach((pt: number[]) => bounds.extend([pt[1], pt[0]]));
           });
           summaries.forEach((t) => {
@@ -396,7 +398,8 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             const g = a.geometry;
             if (g?.type === "Point") bounds.extend([g.coordinates[1], g.coordinates[0]]);
           });
-          if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+          if (map && bounds.isValid())
+            map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
         } catch {
           /* noop */
         }
