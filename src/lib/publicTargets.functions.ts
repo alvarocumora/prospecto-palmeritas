@@ -14,7 +14,7 @@ export type PublicTarget = {
   lat: number | null;
   lng: number | null;
   rationale: string | null;
-  evidence: Record<string, unknown> | null;
+  evidence: Record<string, string | number | boolean | null> | null;
 };
 
 export type PublicTargetsPayload = {

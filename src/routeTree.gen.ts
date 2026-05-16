@@ -19,6 +19,7 @@ import { Route as InvitationsTokenRouteImport } from './routes/invitations.$toke
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
+import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
@@ -107,6 +108,11 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
+  id: '/share/targets/$projectId',
+  path: '/share/targets/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
   id: '/api/public/sync-catastro',
   path: '/api/public/sync-catastro',
@@ -370,6 +376,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -418,6 +425,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -468,6 +476,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -518,6 +527,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/share/targets/$projectId'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
@@ -566,6 +576,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/share/targets/$projectId'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
@@ -634,6 +646,7 @@ export interface RootRouteChildren {
   LiveFrancoRoute: typeof LiveFrancoRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
+  ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
 }
 
@@ -708,6 +721,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/share/targets/$projectId': {
+      id: '/share/targets/$projectId'
+      path: '/share/targets/$projectId'
+      fullPath: '/share/targets/$projectId'
+      preLoaderRoute: typeof ShareTargetsProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/public/sync-catastro': {
       id: '/api/public/sync-catastro'
@@ -1121,6 +1141,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveFrancoRoute: LiveFrancoRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
+  ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
 }
