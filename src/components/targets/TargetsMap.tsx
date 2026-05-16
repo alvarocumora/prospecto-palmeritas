@@ -113,6 +113,13 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
   // Effective position: tracking takes precedence over one-shot
   const position: GeoPosition | null = tracking ? watchPos : oncePos;
 
+  const [geofenceCfg, setGeofenceCfg] = useState<GeofenceCfg>(() => loadGeofenceCfg());
+  const [showCfg, setShowCfg] = useState(false);
+
+  useEffect(() => {
+    try { window.localStorage.setItem(GEOFENCE_STORAGE_KEY, JSON.stringify(geofenceCfg)); } catch { /* noop */ }
+  }, [geofenceCfg]);
+
   const leafletRef = useRef<LeafletMap | null>(null);
   const onMapReady = (m: LeafletMap) => { leafletRef.current = m; };
 
