@@ -33,6 +33,7 @@ export function FieldMap() {
   const meCircleRef = useRef<Circle | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
+  const [showTargets, setShowTargets] = useState(true);
   const [follow, setFollow] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{
