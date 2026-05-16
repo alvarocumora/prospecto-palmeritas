@@ -27,7 +27,7 @@ const ASSEMBLAGE_LABEL: Record<string, string> = {
   potassic: "Potásica",
 };
 
-function bboxFromCenter(lat: number, lng: number, kmHalf = 8): [number, number, number, number] {
+function _bboxFromCenter(lat: number, lng: number, kmHalf = 8): [number, number, number, number] {
   const dLat = kmHalf / 111;
   const dLng = kmHalf / (111 * Math.cos((lat * Math.PI) / 180));
   return [lng - dLng, lat - dLat, lng + dLng, lat + dLat];
