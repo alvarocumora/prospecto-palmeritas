@@ -494,7 +494,7 @@ export const explainInsarPattern = createServerFn({ method: "POST" })
     const summary = points
       .map(
         (p) =>
-          `- ${p.asset_name} (${p.asset_type}) [${p.metadata?.sample_label ?? "n/a"}] v=${p.velocity_mm_year} mm/yr · cum=${p.cumulative_displacement_mm ?? "?"} mm · coh=${p.coherence ?? "?"} · ${p.alert_severity}`,
+          `- ${p.asset_name} (${p.asset_type}) [${(p.metadata as Record<string, unknown> | null)?.sample_label ?? "n/a"}] v=${p.velocity_mm_year} mm/yr · cum=${p.cumulative_displacement_mm ?? "?"} mm · coh=${p.coherence ?? "?"} · ${p.alert_severity}`,
       )
       .join("\n");
 
