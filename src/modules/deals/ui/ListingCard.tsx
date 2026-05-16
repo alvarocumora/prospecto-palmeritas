@@ -1,4 +1,4 @@
-import { Briefcase, Eye, Layers, MapPin, Mountain } from "lucide-react";
+import { Briefcase, Eye, MapPin, Mountain } from "lucide-react";
 import type { PropertyListing } from "@/hooks/usePropertyListings";
 import { fmtUSD } from "../domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";

@@ -149,7 +149,7 @@ function FieldMode() {
       setIpR("");
       setNotes("");
       refresh();
-    } catch (e) {
+    } catch (_e) {
       // queue
       enqueue({
         projectId: active.id,

@@ -10,7 +10,6 @@ import {
   h1,
   h2,
   newPage,
-  nextTableN,
   p,
   setRGB,
   tableCaption,
