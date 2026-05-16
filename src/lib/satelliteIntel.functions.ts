@@ -923,7 +923,7 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         }
       }
       // Only attach a stockpile if reasonably close (≤5 km), else "no stockpile"
-      const stockClose = stockRec && stockDist <= 5000;
+      const stockClose: StockSel | null = stockRec && stockDist <= 5000 ? stockRec : null;
 
       // Overall status
       const sev = insarRec?.alert_severity ?? null;
@@ -962,7 +962,7 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
               ? Number(insarRec.cumulative_displacement_mm)
               : null,
           coherence: insarRec?.coherence != null ? Number(insarRec.coherence) : null,
-          severity: (sev as any) ?? null,
+          severity: (sev as "info" | "warning" | "critical" | null) ?? null,
           trend,
           assetType: insarRec?.asset_type ?? null,
           distanceM: insarRec ? Math.round(insarDist) : null,
@@ -970,12 +970,12 @@ export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
         },
         demDiff: {
           available: !!stockClose,
-          stockpileName: stockClose ? stockRec.name : null,
-          material: stockClose ? stockRec.material : null,
-          volumeM3: stockClose && stockRec.volume_m3 != null ? Number(stockRec.volume_m3) : null,
-          areaM2: stockClose && stockRec.area_m2 != null ? Number(stockRec.area_m2) : null,
+          stockpileName: stockClose ? stockClose.name : null,
+          material: stockClose ? stockClose.material : null,
+          volumeM3: stockClose && stockClose.volume_m3 != null ? Number(stockClose.volume_m3) : null,
+          areaM2: stockClose && stockClose.area_m2 != null ? Number(stockClose.area_m2) : null,
           meanHeightM:
-            stockClose && stockRec.mean_height_m != null ? Number(stockRec.mean_height_m) : null,
+            stockClose && stockClose.mean_height_m != null ? Number(stockClose.mean_height_m) : null,
           distanceM: stockClose ? Math.round(stockDist) : null,
         },
         overallStatus: status,
