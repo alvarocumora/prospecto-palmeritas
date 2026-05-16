@@ -313,7 +313,10 @@ async function fetchEconomicAnalysis(
       .order("computed_at", { ascending: false });
     if (error || !scs || scs.length === 0) return null;
 
-    const scenarios = (scs as any[]).map((sc) => ({
+    type ScenarioRow = (typeof scs)[number] & {
+      resource_models?: { name?: string | null; commodity?: string | null } | null;
+    };
+    const scenarios = (scs as ScenarioRow[]).map((sc) => ({
       name: sc.name,
       model_name: sc.resource_models?.name ?? "—",
       commodity: sc.resource_models?.commodity ?? "—",
@@ -344,7 +347,7 @@ async function fetchEconomicAnalysis(
     }));
 
     // Schedule del primer escenario
-    const baseId = (scs as any[])[0].id;
+    const baseId = scs[0].id;
     const { data: schRows } = await supabase
       .from("economic_schedule")
       .select(
@@ -352,7 +355,7 @@ async function fetchEconomicAnalysis(
       )
       .eq("scenario_id", baseId)
       .order("year");
-    const schedule = (schRows ?? []).map((r: any) => ({
+    const schedule = (schRows ?? []).map((r) => ({
       scenario_name: scenarios[0].name,
       year: r.year,
       ore_tonnes: r.ore_tonnes,
@@ -387,7 +390,10 @@ async function fetchComplianceAnnex(
       supabase
         .from("compliance_rules")
         .select("id, standard, rule_code, title, severity")
-        .in("standard", stds as any)
+        .in(
+          "standard",
+          stds as ("ch20235" | "gkz" | "jorc2012" | "ni43101" | "perc" | "samrec" | "sk1300")[],
+        )
         .order("display_order"),
       supabase
         .from("compliance_evaluations")
@@ -400,20 +406,25 @@ async function fetchComplianceAnnex(
       if (!l.rule_id) continue;
       evCount.set(l.rule_id, (evCount.get(l.rule_id) ?? 0) + 1);
     }
-    const evalMap = new Map((evals ?? []).map((e: any) => [e.rule_id, e]));
+    type EvalRow = NonNullable<typeof evals>[number];
+    const evalMap = new Map<string, EvalRow>(
+      (evals ?? [])
+        .filter((e): e is EvalRow & { rule_id: string } => !!e.rule_id)
+        .map((e) => [e.rule_id, e]),
+    );
     const byStd: ComplianceAnnexData["byStandard"] = {};
     const threshold = report.compliance_threshold ?? 95;
     const detailRules: ComplianceAnnexData["rules"] = [];
     for (const std of stds) {
-      const stdRules = (rules ?? []).filter((r: any) => r.standard === std);
+      const stdRules = (rules ?? []).filter((r) => r.standard === std);
       let weighted = 0,
         weight = 0,
         mPass = 0,
         mTotal = 0;
-      for (const r of stdRules as any[]) {
+      for (const r of stdRules) {
         const w = r.severity === "mandatory" ? 1.0 : r.severity === "recommended" ? 0.3 : 0.1;
         weight += w;
-        const ev: any = evalMap.get(r.id);
+        const ev = evalMap.get(r.id);
         if (ev?.status === "pass") weighted += w;
         else if (ev?.status === "warn") weighted += w * 0.5;
         if (r.severity === "mandatory") {
@@ -424,8 +435,8 @@ async function fetchComplianceAnnex(
           rule_code: r.rule_code,
           standard: r.standard,
           title: r.title,
-          severity: r.severity,
-          status: ev?.status ?? "pending",
+          severity: r.severity as "mandatory" | "recommended" | "conditional",
+          status: (ev?.status ?? "pending") as "pass" | "fail" | "warn" | "na" | "pending",
           auto: !!ev?.auto_evaluated,
           evidence_count: evCount.get(r.id) ?? 0,
         });
