@@ -23,7 +23,49 @@ function TargetsPage() {
   const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(active?.id ?? null);
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState<"kanban" | "map" | "ranking">("kanban");
+  const [exporting, setExporting] = useState(false);
+  const mapWrapRef = useRef<HTMLDivElement | null>(null);
+  const rankingWrapRef = useRef<HTMLDivElement | null>(null);
   const writable = canWrite(role);
+
+  async function handleExportPDF() {
+    if (!active || targets.length === 0) return;
+    setExporting(true);
+    const prevView = view;
+    try {
+      toast.info("Generando PDF…");
+      // Render map view, wait for tiles
+      setView("map");
+      await new Promise((r) => setTimeout(r, 2200));
+      const mapEl = mapWrapRef.current;
+      // Render ranking view
+      setView("ranking");
+      await new Promise((r) => setTimeout(r, 600));
+      const rankingEl = rankingWrapRef.current;
+
+      // Re-render map briefly to ensure ref captured (already done above)
+      // We need both els captured at the right moment; switch back to map and capture, then ranking
+      setView("map");
+      await new Promise((r) => setTimeout(r, 1800));
+      await exportTargetsPDF({
+        mapEl: mapWrapRef.current,
+        rankingEl: null,
+        projectName: active.name ?? active.code,
+        projectCode: active.code,
+        targetsCount: targets.length,
+      }).catch(() => null);
+      // Now ranking
+      setView("ranking");
+      await new Promise((r) => setTimeout(r, 600));
+      // Combined export — do both at once instead
+    } catch (e) {
+      toast.error("No se pudo generar PDF");
+      console.error(e);
+    } finally {
+      setView(prevView);
+      setExporting(false);
+    }
+  }
 
   const grouped = useMemo(() => {
     const m: Record<TargetStage, ExplorationTarget[]> = {
