@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapContainer, TileLayer, CircleMarker, Popup, LayersControl, Tooltip, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import type { LatLngBoundsExpression } from "leaflet";
+import type { LatLngBoundsExpression, Map as LeafletMap } from "leaflet";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { MapPin, Filter } from "lucide-react";
+import { MapPin, Filter, Crosshair, Navigation, NavigationOff, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
+import { UserLocationLayer } from "./UserLocationLayer";
+import { NearestTargetPanel } from "./NearestTargetPanel";
 
 const PRIORITY_COLORS: Record<TargetPriority, string> = {
   critical: "#ef4444",
@@ -20,11 +24,20 @@ const PRIORITY_RADIUS: Record<TargetPriority, number> = {
   low: 5,
 };
 
+const GEOFENCE_ENTER_M = 100;
+const GEOFENCE_EXIT_M = 150;
+
 function FitBounds({ bounds }: { bounds: LatLngBoundsExpression | null }) {
   const map = useMap();
   useEffect(() => {
     if (bounds) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
   }, [bounds, map]);
+  return null;
+}
+
+function MapRefCatcher({ onReady }: { onReady: (m: LeafletMap) => void }) {
+  const map = useMap();
+  useEffect(() => { onReady(map); }, [map, onReady]);
   return null;
 }
 
@@ -68,6 +81,76 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
 
   const mapRef = useRef<HTMLDivElement>(null);
 
+  // === GPS ===
+  const [tracking, setTracking] = useState(false);
+  const [onceLoading, setOnceLoading] = useState(false);
+  const [oncePos, setOncePos] = useState<GeoPosition | null>(null);
+  const { position: watchPos, status, error } = useGeolocation(tracking);
+
+  // Effective position: tracking takes precedence over one-shot
+  const position: GeoPosition | null = tracking ? watchPos : oncePos;
+
+  const leafletRef = useRef<LeafletMap | null>(null);
+  const onMapReady = (m: LeafletMap) => { leafletRef.current = m; };
+
+  function locateOnce() {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocalización no soportada en este dispositivo");
+      return;
+    }
+    setOnceLoading(true);
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        const gp: GeoPosition = {
+          lat: p.coords.latitude,
+          lng: p.coords.longitude,
+          accuracy: p.coords.accuracy,
+          altitude: p.coords.altitude,
+          altitudeAccuracy: p.coords.altitudeAccuracy,
+          heading: p.coords.heading,
+          speed: p.coords.speed,
+          timestamp: p.timestamp,
+        };
+        setOncePos(gp);
+        setOnceLoading(false);
+        if (leafletRef.current) {
+          leafletRef.current.setView([gp.lat, gp.lng], Math.max(leafletRef.current.getZoom(), 15));
+        }
+        toast.success(`Ubicación obtenida · ±${gp.accuracy.toFixed(0)} m`);
+      },
+      (err) => {
+        setOnceLoading(false);
+        if (err.code === err.PERMISSION_DENIED) toast.error("Permiso de ubicación denegado");
+        else toast.error(`GPS: ${err.message}`);
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+    );
+  }
+
+  // Geofence alerts (critical + high)
+  const insideRef = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!position) return;
+    for (const t of filtered) {
+      if (t.priority !== "critical" && t.priority !== "high") continue;
+      if (t.lat == null || t.lng == null) continue;
+      const d = haversineMeters(position, { lat: Number(t.lat), lng: Number(t.lng) });
+      const wasInside = insideRef.current.has(t.id);
+      if (!wasInside && d <= GEOFENCE_ENTER_M) {
+        insideRef.current.add(t.id);
+        toast.success(`Cerca de ${t.code} (${d.toFixed(0)} m) · ${PRIORITY_META[t.priority].label}`, { duration: 6000 });
+        try { navigator.vibrate?.([200, 100, 200]); } catch { /* noop */ }
+      } else if (wasInside && d > GEOFENCE_EXIT_M) {
+        insideRef.current.delete(t.id);
+      }
+    }
+  }, [position, filtered]);
+
+  function goToTarget(t: ExplorationTarget) {
+    if (!leafletRef.current || t.lat == null || t.lng == null) return;
+    leafletRef.current.setView([Number(t.lat), Number(t.lng)], Math.max(leafletRef.current.getZoom(), 16));
+  }
+
   if (geoTargets.length === 0) {
     return (
       <div className="rounded border border-dashed border-border bg-bg-secondary p-8 text-center">
@@ -76,6 +159,13 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
       </div>
     );
   }
+
+  const gpsLabel =
+    status === "denied" ? "GPS denegado" :
+    status === "unavailable" ? "GPS no soportado" :
+    status === "error" ? `GPS error` :
+    position ? `GPS ±${position.accuracy.toFixed(0)} m` :
+    tracking ? "Buscando señal…" : "GPS apagado";
 
   return (
     <div className="rounded border border-border bg-bg-secondary overflow-hidden">
@@ -114,13 +204,47 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
           </>
         )}
 
-        <div className="ml-auto text-muted-foreground">
-          {filtered.length} / {geoTargets.length} targets visibles
+        <div className="ml-auto flex items-center gap-2">
+          <span className={`text-[10px] ${status === "denied" || status === "error" ? "text-destructive" : position ? "text-sky-400" : "text-muted-foreground"}`}>
+            {gpsLabel}
+          </span>
+          <button
+            type="button"
+            onClick={locateOnce}
+            disabled={onceLoading}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-sky-500/40 text-sky-300 bg-sky-500/5 hover:bg-sky-500/10 disabled:opacity-50"
+            title="Obtener mi ubicación una vez"
+          >
+            {onceLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Crosshair className="w-3 h-3" />}
+            Ubicarme
+          </button>
+          <button
+            type="button"
+            onClick={() => setTracking((v) => !v)}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded border ${
+              tracking
+                ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+                : "border-border text-muted-foreground hover:bg-accent"
+            }`}
+            title={tracking ? "Detener seguimiento GPS" : "Iniciar seguimiento GPS"}
+          >
+            {tracking ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
+            {tracking ? "Siguiendo" : "Seguir"}
+          </button>
+          <span className="text-muted-foreground hidden md:inline">
+            {filtered.length} / {geoTargets.length} visibles
+          </span>
         </div>
       </div>
 
+      {error && status === "denied" && (
+        <div className="px-3 py-1.5 text-[10px] font-mono text-destructive bg-destructive/5 border-b border-destructive/20">
+          Permiso de ubicación denegado. Habilita el GPS en los ajustes del navegador para usar el mapa en terreno.
+        </div>
+      )}
+
       {/* Map */}
-      <div ref={mapRef} className="h-[420px] md:h-[520px] w-full">
+      <div ref={mapRef} className="relative h-[420px] md:h-[520px] w-full">
         <MapContainer
           center={bounds ? undefined : [-32.04, -71.08]}
           bounds={bounds ?? undefined}
@@ -128,6 +252,7 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
           scrollWheelZoom
           style={{ height: "100%", width: "100%", background: "#0a0a0a" }}
         >
+          <MapRefCatcher onReady={onMapReady} />
           <FitBounds bounds={bounds} />
           <LayersControl position="topright">
             <LayersControl.BaseLayer checked name="Satélite (Esri)">
@@ -154,6 +279,8 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
               />
             </LayersControl.BaseLayer>
           </LayersControl>
+
+          <UserLocationLayer position={position} follow={tracking} />
 
           {filtered.map((t) => {
             const color = PRIORITY_COLORS[t.priority];
@@ -208,6 +335,16 @@ export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
             );
           })}
         </MapContainer>
+
+        {/* Nearest target overlay */}
+        {position && (
+          <div
+            className="absolute left-2 bottom-2 right-2 md:right-auto md:max-w-md z-[400] px-3 py-2 rounded-md border border-sky-500/30 bg-background/90 backdrop-blur shadow-lg"
+          >
+            <div className="text-[9px] font-mono uppercase tracking-wider text-sky-400 mb-1">Target más cercano</div>
+            <NearestTargetPanel position={position} targets={filtered} onGoTo={goToTarget} />
+          </div>
+        )}
       </div>
     </div>
   );

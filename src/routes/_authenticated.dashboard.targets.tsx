@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 import { snapshotElement, buildTargetsPDF } from "@/lib/exportTargetsPDF";
+import { InstallPWAButton } from "@/components/pwa/InstallPWAButton";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
   head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
@@ -139,6 +140,7 @@ function TargetsPage() {
               <Trophy className="w-3 h-3" /> Ranking
             </button>
           </div>
+          <InstallPWAButton />
           <button
             type="button"
             onClick={handleExportPDF}
