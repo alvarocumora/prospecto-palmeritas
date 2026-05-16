@@ -27,6 +27,14 @@ import { toast } from "sonner";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { UserLocationLayer } from "./UserLocationLayer";
 import { NearestTargetPanel } from "./NearestTargetPanel";
+import type { ConcessionRow } from "@/hooks/useProjectMiningConcessions";
+import type {
+  AnomaliesByIndex,
+  AnomalyRow,
+  SatIndexCode,
+} from "@/hooks/useProjectSatelliteAnomalies";
+import { TargetsMapLegend, INDEX_META } from "./TargetsMapLegend";
+import type { PathOptions } from "leaflet";
 
 const PRIORITY_COLORS: Record<TargetPriority, string> = {
   critical: "#ef4444",
@@ -90,7 +98,15 @@ function MapRefCatcher({ onReady }: { onReady: (m: LeafletMap) => void }) {
   return null;
 }
 
-export function TargetsMap({ targets }: { targets: ExplorationTarget[] }) {
+export function TargetsMap({
+  targets,
+  concessions,
+  anomaliesByIndex,
+}: {
+  targets: ExplorationTarget[];
+  concessions?: ConcessionRow[];
+  anomaliesByIndex?: AnomaliesByIndex;
+}) {
   const geoTargets = useMemo(
     () =>
       targets.filter(
