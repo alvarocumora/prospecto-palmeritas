@@ -139,7 +139,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
-  const summaries = summariesRes?.summaries ?? [];
+  const summaries = useMemo(() => summariesRes?.summaries ?? [], [summariesRes]);
 
   // Init Leaflet map (client only)
   useEffect(() => {
@@ -185,6 +185,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         mapRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Load satellite data

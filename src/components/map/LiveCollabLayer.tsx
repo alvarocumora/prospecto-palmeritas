@@ -8,7 +8,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Map as LeafletMap, Marker, LayerGroup } from "leaflet";
 import type { LeafletNS } from "./types";
 import { useLiveCollab, type LiveCursor, type MapAnnotation } from "@/hooks/useLiveCollab";
-import { MessageSquarePlus, Users, Check, Trash2, X } from "lucide-react";
+import { MessageSquarePlus, Users, X } from "lucide-react";
 import { toast } from "sonner";
 
 type Props = {
@@ -102,10 +102,12 @@ export function LiveCollabLayer({ projectId, map, L }: Props) {
 
   // Cleanup cursors layer when unmounting / map changes
   useEffect(() => {
+    const markers = cursorMarkersRef.current;
+    const layer = cursorLayerRef.current;
     return () => {
-      cursorMarkersRef.current.forEach((m) => m.remove());
-      cursorMarkersRef.current.clear();
-      cursorLayerRef.current?.remove();
+      markers.forEach((m) => m.remove());
+      markers.clear();
+      layer?.remove();
       cursorLayerRef.current = null;
     };
   }, [map]);

@@ -10,7 +10,6 @@ import {
   Pencil,
 } from "lucide-react";
 import type {
-  Control,
   GeoJSON as LeafletGeoJSON,
   Layer,
   Map as LeafletMap,
@@ -31,7 +30,6 @@ import {
   buildGeologyOverlays,
   CATASTRO_STYLE,
   fetchMacrostratUnit,
-  macrostratPopupHtml,
   type CatastroOrigen,
 } from "./map/overlays";
 import { buildGeophysicsOverlays } from "./map/geophysicsOverlays";
@@ -45,7 +43,6 @@ import {
   bboxAround,
   clearCatastroCache,
   loadCatastro,
-  wireMacrostratClickPopup,
 } from "./map/catastroLayer";
 
 import { loadAoiPolygon, type AoiPolygon } from "./map/aoiPolygon";
@@ -522,6 +519,7 @@ export function ProjectMap({
       cancelled = true;
       cleanup?.();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadCatastroData]);
 
   // Build geophysics layers (planned/synthetic + real captured) for the active project

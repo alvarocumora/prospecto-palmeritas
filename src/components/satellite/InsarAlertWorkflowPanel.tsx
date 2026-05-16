@@ -62,9 +62,9 @@ export function InsarAlertWorkflowPanel({ projectId }: Props) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [composer, setComposer] = useState<{ insarId: string; text: string } | null>(null);
 
-  const sites = data?.sites ?? [];
-  const actions = data?.actions ?? [];
-  const tasks = data?.tasks ?? [];
+  const sites = useMemo(() => data?.sites ?? [], [data]);
+  const actions = useMemo(() => data?.actions ?? [], [data]);
+  const tasks = useMemo(() => data?.tasks ?? [], [data]);
 
   const tasksByInsar = useMemo(() => {
     const m = new Map<string, (typeof tasks)[number][]>();
