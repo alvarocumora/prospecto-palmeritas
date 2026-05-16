@@ -5,6 +5,27 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+
+type HyperRow = Tables<"hyperspectral_products">;
+type InsarRow = Tables<"insar_displacement">;
+type StockRow = Tables<"stockpile_volumes">;
+type TargetRow = Tables<"exploration_targets">;
+type InsarActionRow = Tables<"insar_alert_actions">;
+type FollowUpTaskRow = Tables<"follow_up_tasks">;
+
+type StacFeature = {
+  id?: string | number;
+  bbox?: number[];
+  properties?: Record<string, unknown>;
+  assets?: Record<string, { href?: string; type?: string; title?: string }>;
+  links?: Array<{ rel?: string; href?: string }>;
+};
+
+type GeoJsonGeometry = {
+  type?: string;
+  coordinates?: unknown;
+};
 
 const COLLECTIONS = {
   s2: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "sentinel-2-l2a" },
