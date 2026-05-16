@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff } from "lucide-react";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Target as TargetIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions, EXPIRY_COLORS, expiryStatus } from "@/hooks/useMiningConcessions";
 import { useFieldPois, useFieldPoiQueue, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 
 import { CoordinateFooter } from "@/components/map/CoordinateFooter";
 import { buildFieldPoisLayer } from "@/components/field/poiLayer";
+import { buildFieldTargetsLayer } from "@/components/field/fieldTargetsLayer";
 import { POISheet } from "@/components/field/POISheet";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
 
@@ -26,6 +28,7 @@ export function FieldMap() {
   const LRef = useRef<LeafletNS | null>(null);
   const concessionLayerRef = useRef<LayerGroup | null>(null);
   const poiLayerRef = useRef<LayerGroup | null>(null);
+  const targetsLayerRef = useRef<LayerGroup | null>(null);
   const meMarkerRef = useRef<Marker | null>(null);
   const meCircleRef = useRef<Circle | null>(null);
 
@@ -39,6 +42,7 @@ export function FieldMap() {
   const { data: concessions } = useMiningConcessions(projectId);
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
   const { queue, online, enqueue, flush } = useFieldPoiQueue();
+  const { targets } = useExplorationTargets(projectId);
   const { position, status: geoStatus } = useGeolocation(true);
 
   // Init map
