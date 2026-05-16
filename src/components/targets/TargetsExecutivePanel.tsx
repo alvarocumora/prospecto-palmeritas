@@ -233,19 +233,31 @@ export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={toggleGps}
-            className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
-              gpsOn
-                ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
-                : "border-border text-muted-foreground hover:bg-accent"
-            }`}
-            title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
-          >
-            {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
-            {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
-          </button>
+          <div className="inline-flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={refreshLocation}
+              disabled={refreshing}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-sky-500/40 text-sky-300 bg-sky-500/5 hover:bg-sky-500/10 disabled:opacity-50 text-[10px] font-mono"
+              title="Solicitar una nueva lectura GPS y recalcular ranking"
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Actualizando…" : "Actualizar ubicación"}
+            </button>
+            <button
+              type="button"
+              onClick={toggleGps}
+              className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono ${
+                gpsOn
+                  ? "border-emerald-500/50 text-emerald-300 bg-emerald-500/10"
+                  : "border-border text-muted-foreground hover:bg-accent"
+              }`}
+              title={gpsOn ? "Apagar GPS y ordenar por score" : "Activar GPS y ordenar por distancia"}
+            >
+              {gpsOn ? <Navigation className="w-3 h-3" /> : <NavigationOff className="w-3 h-3" />}
+              {gpsOn ? "Ordenando por distancia" : "Ordenar por distancia (GPS)"}
+            </button>
+          </div>
         </div>
 
         {gpsOn && (
