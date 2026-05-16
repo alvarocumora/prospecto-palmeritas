@@ -216,7 +216,7 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
       { mineral: "chlorite", assemblage: "propylitic", mean: 0.48, max: 0.72, area: 31.2 },
       { mineral: "hematite", assemblage: "iron_oxide_gossan", mean: 0.62, max: 0.91, area: 12.8 },
     ];
-    const rows = products.map((p) => ({
+    const rows: TablesInsert<"hyperspectral_products">[] = products.map((p) => ({
       project_id: data.projectId,
       source: data.source,
       acquisition_date: data.acquisitionDate,
@@ -224,8 +224,8 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
       stac_href: data.stacHref ?? null,
       bbox_geojson: bboxGeom,
       pixel_size_m: data.source === "ASTER" ? 30 : data.source === "EMIT" ? 60 : 30,
-      mineral: p.mineral,
-      assemblage: p.assemblage,
+      mineral: p.mineral as HyperRow["mineral"],
+      assemblage: p.assemblage as HyperRow["assemblage"],
       mean_score: p.mean,
       max_score: p.max,
       area_ha: p.area,
@@ -238,7 +238,8 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
         note: "Productos derivados sintéticos pendientes de validación con worker Python real",
       },
     }));
-    const { data: inserted, error } = await supabase.from("hyperspectral_products")
+    const { data: inserted, error } = await supabase
+      .from("hyperspectral_products")
       .insert(rows)
       .select("*");
     if (error) return { ok: false, error: error.message, products: [] };
