@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
@@ -6,7 +6,7 @@ import {
   useExplorationTargets, TARGET_STAGES, STAGE_META, PRIORITY_META,
   type TargetStage, type TargetPriority, type TargetType, type ExplorationTarget,
 } from "@/hooks/useExplorationTargets";
-import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin } from "lucide-react";
+import { Target, Plus, ChevronRight, ChevronLeft, X, Trash2, MapPin, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
@@ -74,15 +74,23 @@ function TargetsPage() {
             Generación → Validación → Drill-Ready → Perforación. Convierte exploración en decisiones.
           </p>
         </div>
-        {writable && (
-          <button
-            type="button"
-            onClick={() => setShowForm(true)}
-            className="px-3 py-1.5 text-xs font-mono rounded border border-gold/40 text-gold bg-gold/5 hover:bg-gold/10 inline-flex items-center gap-1.5"
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            to="/dashboard/targets/ai-brief"
+            className="px-3 py-1.5 text-xs font-mono rounded border border-info/40 text-info bg-info/5 hover:bg-info/10 inline-flex items-center gap-1.5"
           >
-            <Plus className="w-3 h-3" /> Nuevo target
-          </button>
-        )}
+            <Sparkles className="w-3 h-3" /> AI Brief Preview
+          </Link>
+          {writable && (
+            <button
+              type="button"
+              onClick={() => setShowForm(true)}
+              className="px-3 py-1.5 text-xs font-mono rounded border border-gold/40 text-gold bg-gold/5 hover:bg-gold/10 inline-flex items-center gap-1.5"
+            >
+              <Plus className="w-3 h-3" /> Nuevo target
+            </button>
+          )}
+        </div>
       </header>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
