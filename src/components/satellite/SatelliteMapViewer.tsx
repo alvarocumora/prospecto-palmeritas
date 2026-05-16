@@ -242,7 +242,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
         const biggest = hyperData
           .map((p) => p.bbox_geojson)
           .filter(Boolean)
-          .sort((a: any, b: any) => bboxArea(b) - bboxArea(a))[0];
+          .sort((a, b) => bboxArea(b) - bboxArea(a))[0];
         if (biggest) {
           L.geoJSON(biggest, {
             style: {
