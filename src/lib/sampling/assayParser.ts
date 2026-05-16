@@ -157,10 +157,10 @@ function classifyHeader(h: string): { logical: string; unit: string } | null {
 /** Detect QC type by sample code conventions. */
 export function detectQcType(code: string): { type: QcType; parent: string | null } {
   const c = code.toUpperCase().trim();
-  if (/^(BLK|BLANK)[\-_]?\d*$/.test(c) || c.includes("BLANK"))
+  if (/^(BLK|BLANK)[-_]?\d*$/.test(c) || c.includes("BLANK"))
     return { type: "blank", parent: null };
   if (
-    /^(STD|CRM|STANDARD|REF)[\-_]?\w*$/.test(c) ||
+    /^(STD|CRM|STANDARD|REF)[-_]?\w*$/.test(c) ||
     c.startsWith("OREAS") ||
     c.startsWith("CDN") ||
     c.startsWith("GBM")
@@ -168,9 +168,9 @@ export function detectQcType(code: string): { type: QcType; parent: string | nul
     return { type: "standard", parent: null };
   }
   // Duplicates: SAMPLE-D, SAMPLE_DUP, SAMPLE.DUPL, DUP-001
-  const dupSuffix = c.match(/^(.+?)[\-_.](D|DUP|DUPL|DUPLICATE)$/);
+  const dupSuffix = c.match(/^(.+?)[-_.](D|DUP|DUPL|DUPLICATE)$/);
   if (dupSuffix) return { type: "duplicate", parent: dupSuffix[1] };
-  if (/^(DUP|DUPLICATE)[\-_]?\w+$/.test(c)) return { type: "duplicate", parent: null };
+  if (/^(DUP|DUPLICATE)[-_]?\w+$/.test(c)) return { type: "duplicate", parent: null };
   return { type: "sample", parent: null };
 }
 

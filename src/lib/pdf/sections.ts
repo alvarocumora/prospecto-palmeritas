@@ -1538,7 +1538,7 @@ export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnal
     alternateRowStyles: { fillColor: COLORS.panel },
     margin: { left: PAGE.margin, right: PAGE.margin },
   });
-  // @ts-expect-error
+  // @ts-expect-error jspdf-autotable mutates doc.lastAutoTable at runtime, not in types
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
 
   // Resultados clave
@@ -1568,7 +1568,7 @@ export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnal
     alternateRowStyles: { fillColor: COLORS.panel },
     margin: { left: PAGE.margin, right: PAGE.margin },
   });
-  // @ts-expect-error
+  // @ts-expect-error jspdf-autotable mutates doc.lastAutoTable at runtime, not in types
   s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
 
   // Schedule anual del primer escenario completo (si existe)
@@ -1597,7 +1597,7 @@ export function renderSection19_EconomicAnalysis(s: PdfState, data: EconomicAnal
       alternateRowStyles: { fillColor: COLORS.panel },
       margin: { left: PAGE.margin, right: PAGE.margin },
     });
-    // @ts-expect-error
+    // @ts-expect-error jspdf-autotable mutates doc.lastAutoTable at runtime, not in types
     s.cursorY = (s.doc.lastAutoTable?.finalY ?? s.cursorY) + 6;
   }
 
