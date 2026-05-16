@@ -1,11 +1,15 @@
+import { lazy } from "react";
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Target, MapPin, ExternalLink } from "lucide-react";
 import { getPublicProjectTargets, type PublicTarget } from "@/lib/publicTargets.functions";
-import { TargetsMap } from "@/components/targets/TargetsMap";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
+
+const TargetsMap = lazy(() =>
+  import("@/components/targets/TargetsMap").then((m) => ({ default: m.TargetsMap })),
+);
 
 export const Route = createFileRoute("/share/targets/$projectId")({
   head: ({ params }) => ({
