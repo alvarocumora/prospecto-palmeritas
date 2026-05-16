@@ -1,16 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff } from "lucide-react";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Target as TargetIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { useProjects } from "@/hooks/useProjects";
 import { useMiningConcessions, EXPIRY_COLORS, expiryStatus } from "@/hooks/useMiningConcessions";
 import { useFieldPois, useFieldPoiQueue, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { useGeolocation } from "@/hooks/useGeolocation";
+import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 
 import { CoordinateFooter } from "@/components/map/CoordinateFooter";
 import { buildFieldPoisLayer } from "@/components/field/poiLayer";
+import { buildFieldTargetsLayer } from "@/components/field/fieldTargetsLayer";
 import { POISheet } from "@/components/field/POISheet";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
 
@@ -26,6 +28,7 @@ export function FieldMap() {
   const LRef = useRef<LeafletNS | null>(null);
   const concessionLayerRef = useRef<LayerGroup | null>(null);
   const poiLayerRef = useRef<LayerGroup | null>(null);
+  const targetsLayerRef = useRef<LayerGroup | null>(null);
   const meMarkerRef = useRef<Marker | null>(null);
   const meCircleRef = useRef<Circle | null>(null);
 
@@ -39,6 +42,7 @@ export function FieldMap() {
   const { data: concessions } = useMiningConcessions(projectId);
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
   const { queue, online, enqueue, flush } = useFieldPoiQueue();
+  const { targets } = useExplorationTargets(projectId);
   const { position, status: geoStatus } = useGeolocation(true);
 
   // Init map
@@ -149,6 +153,20 @@ export function FieldMap() {
     poiLayerRef.current = group;
   }, [pois, mapReady, remove]);
 
+  // Targets layer (read-only en terreno)
+  useEffect(() => {
+    const L = LRef.current; const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    if (targetsLayerRef.current) {
+      map.removeLayer(targetsLayerRef.current);
+      targetsLayerRef.current = null;
+    }
+    if (!targets.length) return;
+    const group = buildFieldTargetsLayer(L, targets);
+    group.addTo(map);
+    targetsLayerRef.current = group;
+  }, [targets, mapReady]);
+
   // GPS marker
   useEffect(() => {
     const L = LRef.current; const map = mapRef.current;
@@ -236,6 +254,14 @@ export function FieldMap() {
           <div className="text-sm font-mono font-semibold truncate text-foreground">{active?.name}</div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
+          {targets.length > 0 && (
+            <span
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-gold/40 bg-gold/10 text-[10px] font-mono text-gold"
+              title={`${targets.length} targets en este proyecto`}
+            >
+              <TargetIcon className="w-3 h-3" /> {targets.length}
+            </span>
+          )}
           {!online && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded border border-signal-amber/40 bg-signal-amber/10 text-[10px] font-mono text-signal-amber">
               <WifiOff className="w-3 h-3" /> Offline{queue.length > 0 ? ` · ${queue.length}` : ""}
