@@ -55,8 +55,33 @@ function fmt(n: number, suffix: string, decimals = 0): string {
 
 export function TargetsExecutivePanel({ targets }: { targets: ExplorationTarget[] }) {
   const [gpsOn, setGpsOn] = useState(false);
-  const { position, status } = useGeolocation(gpsOn);
+  const [accuracyThreshold, setAccuracyThreshold] = useState<number>(DEFAULT_ACCURACY_THRESHOLD);
+  const { position: rawPosition, status } = useGeolocation(gpsOn);
+
+  // Only accept positions whose accuracy is within the threshold.
+  // We keep the last "trusted" position so the ranking doesn't jump around
+  // every time the device returns a noisy fix.
+  const trustedRef = useRef<GeoPosition | null>(null);
+  const [trustedPos, setTrustedPos] = useState<GeoPosition | null>(null);
+
+  useEffect(() => {
+    if (!gpsOn) {
+      trustedRef.current = null;
+      setTrustedPos(null);
+      return;
+    }
+    if (!rawPosition) return;
+    if (rawPosition.accuracy <= accuracyThreshold) {
+      trustedRef.current = rawPosition;
+      setTrustedPos(rawPosition);
+    }
+  }, [gpsOn, rawPosition, accuracyThreshold]);
+
+  const position = trustedPos;
+  const currentAccuracy = rawPosition?.accuracy ?? null;
+  const trustedAccuracy = trustedPos?.accuracy ?? null;
   const sortByDistance = gpsOn && !!position;
+  const accuracyOk = currentAccuracy != null && currentAccuracy <= accuracyThreshold;
 
   const enriched = useMemo(
     () => targets.map((t) => {
