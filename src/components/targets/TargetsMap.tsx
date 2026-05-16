@@ -4,7 +4,7 @@ import "leaflet/dist/leaflet.css";
 import type { LatLngBoundsExpression, Map as LeafletMap } from "leaflet";
 import type { ExplorationTarget, TargetPriority } from "@/hooks/useExplorationTargets";
 import { PRIORITY_META } from "@/hooks/useExplorationTargets";
-import { MapPin, Filter, Crosshair, Navigation, NavigationOff, Loader2 } from "lucide-react";
+import { MapPin, Filter, Crosshair, Navigation, NavigationOff, Loader2, Bell, Settings2 } from "lucide-react";
 import { toast } from "sonner";
 import { useGeolocation, haversineMeters, type GeoPosition } from "@/hooks/useGeolocation";
 import { UserLocationLayer } from "./UserLocationLayer";
