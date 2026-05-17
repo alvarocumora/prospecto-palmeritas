@@ -1,70 +1,73 @@
-
 ## Objetivo
-Mientras se ejecuta `runSatelliteAnalysisOnTargets`, mostrar al usuario una barra de progreso con estado granular (índice actual, runs creados, anomalías insertadas) que se actualiza en vivo a medida que el server fn escribe filas en la base.
 
-## Estrategia: Supabase Realtime (sin refactorizar el server fn)
+Reemplazar los polígonos/cuadrados semi-transparentes actuales de las anomalías satelitales en `/dashboard/targets` por un **mapa de calor (heatmap) continuo tipo Sentinel/ASTER** —similar a las figuras del Pre-NI 43-101— sobreimpreso al basemap Esri World Imagery.
 
-El server fn ya inserta secuencialmente 4 runs (uno por índice) y luego N anomalías por run con `pipeline_version='target-batch-v1'`. En vez de convertirlo a streaming, escuchamos los `INSERT` en tiempo real desde el cliente — funciona porque Realtime ya está disponible para esas tablas.
+## Diagnóstico del estado actual
 
-Pasos esperados:
-- 4 runs en `satellite_analysis_runs` (uno por índice elegido)
-- N×4 anomalías en `satellite_anomalies` (N = targets enviados, típicamente 10 ⇒ 40)
+- En `src/components/targets/TargetsMap.tsx` (líneas 558-607) cada anomalía se pinta como **GeoJSON polígono** (o punto) con `fillOpacity ~0.15-0.55`. Resultado en mobile: cuadrados translúcidos amontonados sin gradiente, ilegibles cuando hay 40+ features.
+- El screenshot del usuario (`IMG_0999.png`) confirma el ruido visual: óxidos, arcillas, hidrotermal y lineamientos compiten encima del satelital.
+- El target visual deseado (`IMG_0689-2.png`) es un **kernel suave con colormap por índice** (rojo Fe, naranja arcilla, magenta hidrotermal, cian estructural), con barra de escala 0-1.
 
-## Cambios
+## Plan (Sprint 1 — visual, sin tocar backend)
 
-### 1. Migración: habilitar realtime en las tablas
+### 1. Dependencia
+- `bun add leaflet.heat` + `bun add -d @types/leaflet.heat` (o tipos locales). Es el plugin estándar Leaflet para heatmaps gaussianos, ~3 KB, sin SSR (cargar dentro del `ClientOnly`/lazy ya existente).
 
-```sql
-ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_analysis_runs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_anomalies;
-ALTER TABLE public.satellite_analysis_runs REPLICA IDENTITY FULL;
-ALTER TABLE public.satellite_anomalies REPLICA IDENTITY FULL;
-```
-(idempotente: envolver en `DO $$ BEGIN ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`)
+### 2. Nuevo componente `SatelliteHeatLayer.tsx`
+- Recibe `anomaliesByIndex` + `indexCode` + `visible`.
+- Convierte cada `AnomalyRow` a puntos pesados:
+  - Si `geometry.type === 'Point'` → 1 punto con peso = `score`.
+  - Si polígono → calcula centroide (turf ya está disponible o usamos una util mínima) + ~6-10 puntos jittered dentro del bbox proporcional al `area_ha` y al `score`, para que el kernel rellene el halo.
+- Crea `L.heatLayer(points, { radius, blur, maxZoom, max: 1, gradient })` con **gradiente por índice**:
+  - IRON_OXIDE: `{0.2:'#fde68a', 0.5:'#f59e0b', 0.8:'#dc2626', 1:'#7f1d1d'}`
+  - CLAY_MINERALS: amarillo→naranja→marrón
+  - HYDROTHERMAL_ALTERATION: lavanda→magenta→violeta oscuro
+  - STRUCTURAL_LINEAMENTS: se mantiene como líneas (no heatmap), ya que es lineal.
+- Escala dinámica: `radius = 18 + zoomDelta * 4`, `blur = 22`. Se reescala en evento `zoomend`.
 
-### 2. Nuevo hook `src/hooks/useSatelliteAnalysisProgress.ts`
+### 3. Integración en `TargetsMap.tsx`
+- Reemplazar el bloque `anomaliesByIndex && (Object.keys(INDEX_META)...)` de líneas 558-607.
+- Para los 3 índices raster (Fe, arcillas, hidrotermal): renderizar `<SatelliteHeatLayer />` dentro de `LayersControl.Overlay checked`.
+- Para `STRUCTURAL_LINEAMENTS`: mantener `GeoJSON` actual pero con `weight: 2.4` y `dashArray: '4 3'` para que se lean encima del calor.
+- Añadir un toggle global "Mostrar como capas" (debug) que vuelva al render polígonos antiguo —retención para QA, oculto por default detrás de un `?debug=heat` query param. (opcional, podemos saltarlo).
 
-```ts
-useSatelliteAnalysisProgress({
-  projectId,
-  enabled,           // true mientras runSat.isPending
-  startedAt,         // Date marca de inicio
-  expectedRuns,      // 4
-  expectedAnomalies, // targetCount * indexCount
-}) => {
-  runsDone, anomaliesDone, currentIndex, percent, stage
-}
-```
+### 4. Leyenda y escala
+- Actualizar `TargetsMapLegend.tsx`: además del conteo, dibujar una mini-barra de gradiente (4 stops) por índice usando un `<div style="background:linear-gradient(...)">` que coincida con el gradient del heat. Texto: "score 0 → 1".
+- Mostrar nota: "Kernel gaussiano 20 m · datos Sentinel-2 / ASTER".
 
-Internamente:
-- Abre un `channel('sat-progress-<projectId>')` con dos `postgres_changes`:
-  - `event:'INSERT', schema:'public', table:'satellite_analysis_runs', filter:'project_id=eq.<id>'`
-  - `event:'INSERT', schema:'public', table:'satellite_anomalies', filter:'project_id=eq.<id>'`
-- Filtra por `created_at >= startedAt` y `pipeline_version === 'target-batch-v1'` (runs) para no contar inserciones ajenas.
-- Mantiene `currentIndex` = `index_code` del último run recibido.
-- `percent` = `0.3 * runsDone/expectedRuns + 0.7 * anomaliesDone/expectedAnomalies` (clamp 0–100).
-- Cleanup: `supabase.removeChannel` cuando `enabled=false` o al desmontar.
+### 5. Performance
+- Memoizar la lista de puntos por índice con `useMemo([anomaliesByIndex, indexCode])`.
+- Usar `whenReady` para añadir/quitar la capa imperativa en vez de re-render React por zoom.
+- Cap a 5000 puntos por índice (más que suficiente: hoy hay ~11 por índice).
 
-### 3. Nuevo componente `src/components/targets/SatelliteAnalysisProgress.tsx`
+### 6. Persistencia mobile
+- En viewport <640px: reducir `radius` a 14 y `blur` a 18 para que cada cluster se distinga (el screenshot del user es 440 px).
+- El control de capas Leaflet ya permite togglear cada índice individualmente.
 
-- Usa `<Progress />` de shadcn + chips de estado por índice (`IRON_OXIDE`, `CLAY_MINERALS`, `HYDROTHERMAL_ALTERATION`, `STRUCTURAL_LINEAMENTS`) con check cuando su run aparece.
-- Línea de texto: `Procesando {currentIndex} · {runsDone}/4 índices · {anomaliesDone}/{expectedAnomalies} anomalías`.
-- Aparece como banner sticky encima del mapa/tabla cuando `runSat.isPending`.
+## Fuera de alcance (Sprint 2, futuro)
 
-### 4. Wire en `src/routes/_authenticated.dashboard.targets.tsx`
-
-- En `handleRunSatellite`: setear `runStartedAt = new Date()` y `expectedAnomalies = top10.length * 4` antes de `mutateAsync`.
-- Renderizar `<SatelliteAnalysisProgress … />` cuando `runSat.isPending`.
-- Al `onSuccess` del mutation, invalidar `['project-satellite-anomalies', projectId]` y `['project-mining-concessions', projectId]` para que el mapa repinte las capas (los hooks existentes ya usan TanStack Query).
-- Mantener el toast final actual ("Análisis listo · X índices · Y anomalías").
+- Generar **rasters reales** desde el server (COG con `gdal_rasterize` del polígono pesado) para drape sobre el DEM en `Geology3DViewer`. Hoy solo mejoramos la 2D.
+- Pintar el heatmap también en `share.targets.$projectId.tsx` (público) — fácil después, mismo componente.
+- Slider de threshold "mostrar solo score ≥ X".
 
 ## Detalles técnicos
-- No tocar la firma ni el cuerpo del server fn — sigue devolviendo el resumen al final.
-- Realtime usa la sesión del usuario y respeta RLS existentes en ambas tablas.
-- Si Realtime se cae, el `onSuccess` del mutation sigue cerrando el progreso al 100% como fallback.
-- Solo afecta UI/datos; sin cambios en PDF ni en la lógica de análisis.
 
-## Verificación
-1. SQL: confirmar que las dos tablas figuran en `pg_publication_tables` con `pubname='supabase_realtime'`.
-2. UI: pulsar el botón → ver barra avanzando, chips de índices iluminándose, contador de anomalías subiendo.
-3. Backend: tras finalizar, `SELECT count(*) FROM satellite_analysis_runs WHERE pipeline_version='target-batch-v1'` debe coincidir con `runsDone` mostrado.
+```text
+TargetsMap
+ ├─ MapContainer (Esri WorldImagery)
+ │   ├─ LayersControl
+ │   │   ├─ Overlay "Sat · Óxido de Fe"        → SatelliteHeatLayer(IRON_OXIDE)
+ │   │   ├─ Overlay "Sat · Arcillas"           → SatelliteHeatLayer(CLAY_MINERALS)
+ │   │   ├─ Overlay "Sat · Alt. hidrotermal"   → SatelliteHeatLayer(HYDROTHERMAL_ALTERATION)
+ │   │   └─ Overlay "Sat · Lineamientos"       → GeoJSON líneas (sin heat)
+ │   └─ CircleMarkers de targets (sin cambios)
+ └─ TargetsMapLegend (con barras de gradiente)
+```
+
+Archivos a tocar:
+- `src/components/targets/SatelliteHeatLayer.tsx` *(nuevo)*
+- `src/components/targets/TargetsMap.tsx` *(reemplazar bloque anomalías)*
+- `src/components/targets/TargetsMapLegend.tsx` *(añadir mini-barras gradiente)*
+- `package.json` *(añadir leaflet.heat)*
+
+Sin migraciones, sin tocar server functions. Una vez aprobado, lo implemento y verificás en preview.
