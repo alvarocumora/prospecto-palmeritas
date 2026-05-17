@@ -34,6 +34,7 @@ import type {
   SatIndexCode,
 } from "@/hooks/useProjectSatelliteAnomalies";
 import { TargetsMapLegend, INDEX_META } from "./TargetsMapLegend";
+import { SatelliteHeatLayer } from "./SatelliteHeatLayer";
 import type { PathOptions } from "leaflet";
 
 const PRIORITY_COLORS: Record<TargetPriority, string> = {
