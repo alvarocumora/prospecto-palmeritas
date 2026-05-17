@@ -604,14 +604,18 @@ export function TargetsMap({
                   );
                 }
 
-                // Índices raster: heatmap gaussiano
-                return (
-                  <LayersControl.Overlay checked key={idx} name={`Sat · ${meta.label}`}>
-                    <SatelliteHeatLayer anomalies={arr} indexCode={idx} />
-                  </LayersControl.Overlay>
-                );
+                // Índices raster: heatmap renderizado fuera de LayersControl (más abajo)
+                return null;
               })}
           </LayersControl>
+
+          {anomaliesByIndex &&
+            (Object.keys(INDEX_META) as SatIndexCode[]).map((idx) => {
+              if (idx === "STRUCTURAL_LINEAMENTS") return null;
+              const arr = anomaliesByIndex[idx];
+              if (!arr || arr.length === 0) return null;
+              return <SatelliteHeatLayer key={idx} anomalies={arr} indexCode={idx} />;
+            })}
 
           <UserLocationLayer position={position} follow={tracking} />
 
