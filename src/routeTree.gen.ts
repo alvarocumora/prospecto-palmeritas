@@ -22,6 +22,7 @@ import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
+import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
@@ -123,6 +124,11 @@ const AuthenticatedDashboardIndexRoute =
 const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
   id: '/share/targets/$projectId',
   path: '/share/targets/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
+  id: '/catastro/c/$code',
+  path: '/catastro/c/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
@@ -390,6 +396,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -441,6 +448,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -494,6 +502,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -547,6 +556,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
@@ -598,6 +608,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
@@ -650,6 +661,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
@@ -672,6 +684,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
+  CatastroCCodeRoute: typeof CatastroCCodeRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
 }
@@ -767,6 +780,13 @@ declare module '@tanstack/react-router' {
       path: '/share/targets/$projectId'
       fullPath: '/share/targets/$projectId'
       preLoaderRoute: typeof ShareTargetsProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/c/$code': {
+      id: '/catastro/c/$code'
+      path: '/catastro/c/$code'
+      fullPath: '/catastro/c/$code'
+      preLoaderRoute: typeof CatastroCCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/sync-catastro': {
@@ -1183,6 +1203,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
+  CatastroCCodeRoute: CatastroCCodeRoute,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
