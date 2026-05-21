@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
+import { WatchlistButton } from "@/features/catastro-public/WatchlistButton";
 import { getConcessionByCode } from "@/lib/catastroPublic.functions";
 import { Building2, MapPin, Ruler, Calendar, Database, ArrowLeft } from "lucide-react";
 
@@ -112,13 +113,14 @@ function ConcessionPage() {
           </div>
         </div>
 
-        <div className="mt-6 p-4 border border-dashed border-border rounded-md text-xs font-mono text-muted-foreground">
-          Las herramientas pro (monitoreo, traslapes, exportes PDF/GeoJSON) estarán disponibles
-          próximamente con el plan Pro.{" "}
-          <Link to="/catastro/precios" className="text-primary underline">
-            Ver planes
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <WatchlistButton code={c.code} />
+          <Link
+            to="/catastro/precios"
+            className="text-xs font-mono text-muted-foreground hover:text-foreground underline"
+          >
+            Ver planes Pro
           </Link>
-          .
         </div>
       </article>
     </PublicCatastroShell>

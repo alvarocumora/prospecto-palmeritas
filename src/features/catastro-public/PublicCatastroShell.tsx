@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Map, Search, Bell, FileText, LogIn } from "lucide-react";
 import { ReactNode } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function PublicCatastroShell({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
@@ -33,12 +35,21 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
               Plataforma completa
             </a>
           </nav>
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <LogIn className="w-3.5 h-3.5" /> Acceder
-          </Link>
+          {user ? (
+            <Link
+              to="/catastro/app/watchlist"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Bell className="w-3.5 h-3.5" /> Mis monitoreos
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Acceder
+            </Link>
+          )}
         </div>
       </header>
       <main className="flex-1">{children}</main>

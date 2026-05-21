@@ -1265,6 +1265,78 @@ export type Database = {
           },
         ]
       }
+      catastro_alerts: {
+        Row: {
+          alert_type: string
+          concession_code: string
+          created_at: string
+          id: string
+          message: string | null
+          payload: Json | null
+          read_at: string | null
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          concession_code: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          read_at?: string | null
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          concession_code?: string
+          created_at?: string
+          id?: string
+          message?: string | null
+          payload?: Json | null
+          read_at?: string | null
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      catastro_aoi: {
+        Row: {
+          area_ha: number | null
+          created_at: string
+          description: string | null
+          geometry: Json
+          id: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area_ha?: number | null
+          created_at?: string
+          description?: string | null
+          geometry: Json
+          id?: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area_ha?: number | null
+          created_at?: string
+          description?: string | null
+          geometry?: Json
+          id?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       catastro_cache: {
         Row: {
           bbox: number[]
@@ -1292,6 +1364,72 @@ export type Database = {
           fetched_at?: string
           geojson?: Json
           source?: string
+        }
+        Relationships: []
+      }
+      catastro_exports: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          export_type: string
+          file_url: string | null
+          id: string
+          status: string
+          target_ref: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          export_type: string
+          file_url?: string | null
+          id?: string
+          status?: string
+          target_ref: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          export_type?: string
+          file_url?: string | null
+          id?: string
+          status?: string
+          target_ref?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      catastro_watchlist: {
+        Row: {
+          concession_code: string
+          created_at: string
+          id: string
+          notes: string | null
+          notify_email: boolean
+          notify_push: boolean
+          user_id: string
+        }
+        Insert: {
+          concession_code: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notify_email?: boolean
+          notify_push?: boolean
+          user_id: string
+        }
+        Update: {
+          concession_code?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          notify_email?: boolean
+          notify_push?: boolean
+          user_id?: string
         }
         Relationships: []
       }
@@ -12673,6 +12811,15 @@ export type Database = {
         Returns: boolean
       }
       catastro_plan: { Args: { _user_id: string }; Returns: string }
+      catastro_plan_limits: {
+        Args: { _user_id: string }
+        Returns: {
+          max_aoi: number
+          max_exports_month: number
+          max_watches: number
+          plan: string
+        }[]
+      }
       check_catastro_conflict: {
         Args: { _lat: number; _lng: number; _project_id: string }
         Returns: {
