@@ -177,7 +177,7 @@ export const getConcessionByCode = createServerFn({ method: "GET" })
         granted_at: row.granted_at,
         centroid_lat: null,
         centroid_lng: null,
-        geometry: row.geometry,
+        geometry: (row.geometry ?? null) as GeoJSON.Geometry | null,
         source: "cache",
         last_synced_at: row.last_synced_at,
       };
