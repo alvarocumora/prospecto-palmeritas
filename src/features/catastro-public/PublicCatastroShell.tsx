@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Map, Search, Bell, FileText, LogIn } from "lucide-react";
 import { ReactNode } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export function PublicCatastroShell({ children }: { children: ReactNode }) {
   return (
