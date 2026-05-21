@@ -20,7 +20,7 @@ export type PublicConcession = {
   granted_at: string | null;
   centroid_lat: number | null;
   centroid_lng: number | null;
-  geometry: unknown | null;
+  geometry: GeoJSON.Geometry | null;
   source: "cache" | "sernageomin";
   last_synced_at: string | null;
 };
