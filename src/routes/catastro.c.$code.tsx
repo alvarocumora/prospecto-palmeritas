@@ -1,5 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
+import { WatchlistButton } from "@/features/catastro-public/WatchlistButton";
 import { getConcessionByCode } from "@/lib/catastroPublic.functions";
 import { Building2, MapPin, Ruler, Calendar, Database, ArrowLeft } from "lucide-react";
 
