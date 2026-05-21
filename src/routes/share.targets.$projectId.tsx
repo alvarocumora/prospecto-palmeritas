@@ -103,53 +103,56 @@ function SharePage() {
   const geoCount = targets.filter((t) => t.lat != null && t.lng != null).length;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-bg-secondary">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+    <div className="min-h-[100dvh] bg-background">
+      <header className="border-b border-border bg-bg-secondary/95 backdrop-blur supports-[backdrop-filter]:bg-bg-secondary/80">
+        <div className="max-w-[1400px] mx-auto px-3 md:px-6 py-3 md:py-4 flex items-start md:items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[9px] md:text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
               Vista pública · solo lectura
             </div>
-            <h1 className="text-lg md:text-xl font-bold mt-1 inline-flex items-center gap-2">
-              <Target className="w-5 h-5 text-gold" />
-              {data.project.name}
+            <h1 className="text-base md:text-xl font-bold mt-1 inline-flex items-center gap-2 leading-tight">
+              <Target className="w-4 h-4 md:w-5 md:h-5 text-gold shrink-0" />
+              <span className="truncate">{data.project.name}</span>
             </h1>
-            <div className="text-[11px] font-mono text-muted-foreground mt-0.5">
-              {data.project.code} · {targets.length} targets · {geoCount} con coordenadas
+            <div className="text-[10px] md:text-[11px] font-mono text-muted-foreground mt-0.5">
+              {data.project.code} · {targets.length} targets · {geoCount} georreferenciados
             </div>
           </div>
           <a
             href="https://geocapitals.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] font-mono text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            className="hidden sm:inline-flex text-[11px] font-mono text-muted-foreground hover:text-foreground items-center gap-1 shrink-0"
           >
             geocapitals.com <ExternalLink className="w-3 h-3" />
           </a>
         </div>
       </header>
 
-      <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
-        {/* Map */}
-        <section>
-          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 inline-flex items-center gap-1.5">
+      <main className="max-w-[1400px] mx-auto px-0 md:px-6 py-0 md:py-6 md:space-y-6">
+        <section className="md:rounded-lg md:overflow-hidden">
+          <div className="px-3 md:px-0 py-2 md:pt-0 text-[10px] font-mono uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1.5">
             <MapPin className="w-3 h-3" /> Mapa de targets
           </div>
-          <ClientOnly fallback={<div className="h-[480px] rounded-md border border-border bg-bg-secondary animate-pulse" />}>
-            <TargetsMap targets={targets} />
-          </ClientOnly>
+          <div className="md:rounded-lg md:overflow-hidden">
+            <ClientOnly
+              fallback={
+                <div className="h-[calc(100dvh-116px)] min-h-[420px] md:h-[520px] rounded-none md:rounded-md border-y md:border border-border bg-bg-secondary animate-pulse" />
+              }
+            >
+              <TargetsMap targets={targets} />
+            </ClientOnly>
+          </div>
         </section>
 
-        {/* Ranking */}
-        <section>
+        <section className="px-3 md:px-0 py-5 md:py-0">
           <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
             Ranking por prioridad
           </div>
           <TargetsExecutivePanel targets={targets} />
         </section>
 
-        <footer className="pt-4 border-t border-border text-[10px] font-mono text-muted-foreground text-center">
+        <footer className="mx-3 md:mx-0 pt-4 pb-6 border-t border-border text-[10px] font-mono text-muted-foreground text-center">
           Documento generado por Geocapitals · Vista pública sin datos confidenciales
         </footer>
       </main>
