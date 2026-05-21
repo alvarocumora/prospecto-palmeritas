@@ -1,70 +1,113 @@
+# Módulo Público de Catastro — `catastro.geocapitals.com`
 
-## Objetivo
-Mientras se ejecuta `runSatelliteAnalysisOnTargets`, mostrar al usuario una barra de progreso con estado granular (índice actual, runs creados, anomalías insertadas) que se actualiza en vivo a medida que el server fn escribe filas en la base.
+Plataforma profesional freemium para operadores mineros en Chile, con mapa nacional SERNAGEOMIN, búsqueda, fichas SEO, alertas y reportes. Reutiliza infraestructura existente (`sync-catastro`, `concession_history`, `mining_concessions`, `concesionesNacionalesLayer`).
 
-## Estrategia: Supabase Realtime (sin refactorizar el server fn)
+## Modelo de negocio
 
-El server fn ya inserta secuencialmente 4 runs (uno por índice) y luego N anomalías por run con `pipeline_version='target-batch-v1'`. En vez de convertirlo a streaming, escuchamos los `INSERT` en tiempo real desde el cliente — funciona porque Realtime ya está disponible para esas tablas.
+| Plan | Precio (USD/mes) | Límites |
+|---|---|---|
+| **Free** | $0 | Mapa nacional, búsqueda ilimitada, ficha básica, 1 watchlist (3 concesiones) |
+| **Pro** | $49 | 50 watches, alertas email/push, traslapes, AOI ilimitadas, 20 exports PDF/GeoJSON, sin marca de agua |
+| **Enterprise** | $299 | Watches ilimitados, Shapefile, API, multi-usuario, reportes due-diligence batch, soporte |
 
-Pasos esperados:
-- 4 runs en `satellite_analysis_runs` (uno por índice elegido)
-- N×4 anomalías en `satellite_anomalies` (N = targets enviados, típicamente 10 ⇒ 40)
+Pagos vía **Lovable Payments (Stripe)** — suscripción mensual. Webhook actualiza `subscriptions` table.
 
-## Cambios
+## Arquitectura de rutas
 
-### 1. Migración: habilitar realtime en las tablas
+Subdominio `catastro.geocapitals.com` apuntando al mismo deployment, ruteado por dominio en `__root.tsx` o split build. Rutas:
 
-```sql
-ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_analysis_runs;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.satellite_anomalies;
-ALTER TABLE public.satellite_analysis_runs REPLICA IDENTITY FULL;
-ALTER TABLE public.satellite_anomalies REPLICA IDENTITY FULL;
-```
-(idempotente: envolver en `DO $$ BEGIN ... EXCEPTION WHEN duplicate_object THEN NULL; END $$;`)
-
-### 2. Nuevo hook `src/hooks/useSatelliteAnalysisProgress.ts`
-
-```ts
-useSatelliteAnalysisProgress({
-  projectId,
-  enabled,           // true mientras runSat.isPending
-  startedAt,         // Date marca de inicio
-  expectedRuns,      // 4
-  expectedAnomalies, // targetCount * indexCount
-}) => {
-  runsDone, anomaliesDone, currentIndex, percent, stage
-}
+```text
+/                              → Landing comercial (hero, mapa demo, planes, SEO)
+/mapa                          → App full-screen: mapa nacional + filtros + buscador
+/c/$code                       → Ficha SSR de concesión (SEO indexable, og:image)
+/titular/$rut                  → Perfil público de titular (concesiones, mapa, totales)
+/region/$slug                  → Landing por región (Antofagasta, Atacama...)
+/precios                       → Planes y comparación
+/login, /signup, /cuenta       → Auth + gestión suscripción
+/app/watchlist                 → (Pro) Watchlist + alertas
+/app/aoi                       → (Pro) AOI dibujada + análisis traslapes
+/app/exports                   → (Pro) Historial reportes PDF/GeoJSON
 ```
 
-Internamente:
-- Abre un `channel('sat-progress-<projectId>')` con dos `postgres_changes`:
-  - `event:'INSERT', schema:'public', table:'satellite_analysis_runs', filter:'project_id=eq.<id>'`
-  - `event:'INSERT', schema:'public', table:'satellite_anomalies', filter:'project_id=eq.<id>'`
-- Filtra por `created_at >= startedAt` y `pipeline_version === 'target-batch-v1'` (runs) para no contar inserciones ajenas.
-- Mantiene `currentIndex` = `index_code` del último run recibido.
-- `percent` = `0.3 * runsDone/expectedRuns + 0.7 * anomaliesDone/expectedAnomalies` (clamp 0–100).
-- Cleanup: `supabase.removeChannel` cuando `enabled=false` o al desmontar.
+Todas las rutas `/c/$code`, `/titular/$rut`, `/region/$slug` con `head()` individual (title, description, og:image generado).
 
-### 3. Nuevo componente `src/components/targets/SatelliteAnalysisProgress.tsx`
+## Backend
 
-- Usa `<Progress />` de shadcn + chips de estado por índice (`IRON_OXIDE`, `CLAY_MINERALS`, `HYDROTHERMAL_ALTERATION`, `STRUCTURAL_LINEAMENTS`) con check cuando su run aparece.
-- Línea de texto: `Procesando {currentIndex} · {runsDone}/4 índices · {anomaliesDone}/{expectedAnomalies} anomalías`.
-- Aparece como banner sticky encima del mapa/tabla cuando `runSat.isPending`.
+### Tablas nuevas (migración)
+- `public_concessions_cache` — snapshot de SERNAGEOMIN por código (titular, área, vigencia, geometría, region, comuna, last_synced_at). Permite búsqueda rápida sin golpear ArcGIS. Indexes: gin(titular trgm), btree(rut), gist(geometry).
+- `public_holders` — agregado por RUT (nombre, total_concesiones, total_ha, regiones, last_updated).
+- `catastro_watchlist` — user_id, concession_code, notify_email, notify_push, created_at. RLS por user_id.
+- `catastro_alerts` — user_id, code, alert_type (holder_change, area_change, status_change, expiring, missing), payload, read_at.
+- `catastro_aoi` — user_id, name, geometry (geography polygon), created_at. RLS por user_id.
+- `catastro_exports` — user_id, type (pdf|geojson|shp), target (code|aoi|rut), file_url, created_at.
+- `subscriptions` — user_id, plan ('free'|'pro'|'enterprise'), status, stripe_customer_id, stripe_sub_id, current_period_end.
+- Helper `public.catastro_plan(uid uuid)` SECURITY DEFINER → text.
 
-### 4. Wire en `src/routes/_authenticated.dashboard.targets.tsx`
+### Server functions (`createServerFn`)
+- `searchConcessions` — full-text por titular/RUT/código/comuna, paginado, sin auth.
+- `getConcessionByCode` — ficha pública (cache + fallback ArcGIS).
+- `getHolderByRut` — agregado público.
+- `getRegionStats` — agregados por región.
+- `addToWatchlist`, `removeFromWatchlist`, `listMyWatchlist` — auth + chequeo límite por plan.
+- `createAoi`, `analyzeAoiOverlaps` — usa `compute-overlaps` existente.
+- `requestExport` — genera PDF/GeoJSON/SHP, guarda en storage, retorna URL.
+- `createCheckoutSession`, `cancelSubscription` — Stripe.
 
-- En `handleRunSatellite`: setear `runStartedAt = new Date()` y `expectedAnomalies = top10.length * 4` antes de `mutateAsync`.
-- Renderizar `<SatelliteAnalysisProgress … />` cuando `runSat.isPending`.
-- Al `onSuccess` del mutation, invalidar `['project-satellite-anomalies', projectId]` y `['project-mining-concessions', projectId]` para que el mapa repinte las capas (los hooks existentes ya usan TanStack Query).
-- Mantener el toast final actual ("Análisis listo · X índices · Y anomalías").
+### Server routes
+- `/api/public/catastro/sitemap.xml` — sitemap dinámico de concesiones top + titulares + regiones.
+- `/api/public/stripe-webhook` — verifica firma, actualiza `subscriptions`.
 
-## Detalles técnicos
-- No tocar la firma ni el cuerpo del server fn — sigue devolviendo el resumen al final.
-- Realtime usa la sesión del usuario y respeta RLS existentes en ambas tablas.
-- Si Realtime se cae, el `onSuccess` del mutation sigue cerrando el progreso al 100% como fallback.
-- Solo afecta UI/datos; sin cambios en PDF ni en la lógica de análisis.
+### Jobs (pg_cron existente)
+- `refresh-public-cache` diario: paginación masiva de capas 0 y 1 SERNAGEOMIN → `public_concessions_cache` + `public_holders`.
+- `dispatch-catastro-alerts` cada hora: diff sobre `public_concessions_cache` por watchlist activa, inserta `catastro_alerts`, envía email vía Resend.
 
-## Verificación
-1. SQL: confirmar que las dos tablas figuran en `pg_publication_tables` con `pubname='supabase_realtime'`.
-2. UI: pulsar el botón → ver barra avanzando, chips de índices iluminándose, contador de anomalías subiendo.
-3. Backend: tras finalizar, `SELECT count(*) FROM satellite_analysis_runs WHERE pipeline_version='target-batch-v1'` debe coincidir con `runsDone` mostrado.
+## Frontend
+
+### Componentes nuevos
+- `src/features/catastro-public/` — feature aislada del dashboard interno.
+  - `LandingHero.tsx`, `PricingTable.tsx`, `LiveMapDemo.tsx`
+  - `PublicCatastroMap.tsx` — Leaflet + Esri base + capas SERNAGEOMIN (reutiliza `concesionesNacionalesLayer`) + buscador + drawer ficha.
+  - `ConcessionPublicCard.tsx` — ficha SSR-friendly (server-rendered).
+  - `HolderProfile.tsx` — perfil titular con mapa + lista.
+  - `WatchlistPanel.tsx`, `AlertsBell.tsx` (Pro)
+  - `AoiDrawTool.tsx` + `OverlapsResultPanel.tsx` (Pro)
+  - `ExportDialog.tsx` (Pro)
+  - `PlanGate.tsx` — wrapper que limita features según `subscriptions.plan`.
+
+### SEO
+- `head()` por ruta con title/desc únicos.
+- JSON-LD `Place`/`Organization` por ficha y titular.
+- Sitemap dinámico + robots.txt.
+- og:image generado server-side por ficha (mapa estático).
+
+## Fases de implementación
+
+**Fase 1 — Fundaciones (sin pagos)**
+1. Migración: `public_concessions_cache`, `public_holders`, `subscriptions`, helper `catastro_plan`.
+2. Job de refresh inicial (semilla nacional).
+3. Rutas `/`, `/mapa`, `/c/$code`, `/titular/$rut`, `/precios` con SEO y server functions de búsqueda/ficha.
+4. Landing comercial + mapa público funcional.
+
+**Fase 2 — Cuentas y freemium gating**
+5. Auth pública (signup/login con Google), `PlanGate`, watchlist Free (3 items).
+6. Migración watchlist + alerts + AOI + exports.
+
+**Fase 3 — Monetización**
+7. `recommend_payment_provider` → `enable_stripe_payments`.
+8. Productos Pro/Enterprise, checkout, webhook, portal cliente.
+9. `PlanGate` enforce límites reales.
+
+**Fase 4 — Herramientas Pro**
+10. AOI + traslapes + reportes PDF/GeoJSON/SHP.
+11. Job de alertas (cron horario) + Resend email.
+12. Perfiles de titular SEO + sitemap dinámico.
+
+**Fase 5 — Subdominio y pulido**
+13. Configurar `catastro.geocapitals.com` (auto setup Lovable).
+14. Detección de host en `__root.tsx` para mostrar shell público vs dashboard.
+15. Analytics, plantillas email, onboarding.
+
+## Decisiones pendientes
+- ¿Confirmamos arrancar por **Fase 1** ahora (mapa + búsqueda + fichas SEO públicas, sin pagos todavía)? Es la base sobre la que se monta todo lo demás y entrega valor demostrable en ~1 iteración.
+- Precios definitivos USD/CLP (puedo dejar los sugeridos como placeholder).
+- ¿Quieres soporte multi-idioma (es/en) desde el inicio o solo español?
