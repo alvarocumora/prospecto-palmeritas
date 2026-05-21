@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
@@ -75,6 +76,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroIndexRoute = CatastroIndexRouteImport.update({
+  id: '/catastro/',
+  path: '/catastro/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivePalmerasRoute = LivePalmerasRouteImport.update({
@@ -344,6 +350,7 @@ export interface FileRoutesByFullPath {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro/': typeof CatastroIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -393,6 +400,7 @@ export interface FileRoutesByTo {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro': typeof CatastroIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -444,6 +452,7 @@ export interface FileRoutesById {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -495,6 +504,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro/'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -544,6 +554,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -594,6 +605,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro/'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
@@ -645,6 +657,7 @@ export interface RootRouteChildren {
   InvitationsTokenRoute: typeof InvitationsTokenRoute
   LiveFrancoRoute: typeof LiveFrancoRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
+  CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
@@ -678,6 +691,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/': {
+      id: '/catastro/'
+      path: '/catastro'
+      fullPath: '/catastro/'
+      preLoaderRoute: typeof CatastroIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/palmeras': {
@@ -1140,6 +1160,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvitationsTokenRoute: InvitationsTokenRoute,
   LiveFrancoRoute: LiveFrancoRoute,
   LivePalmerasRoute: LivePalmerasRoute,
+  CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
