@@ -35,12 +35,21 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
               Plataforma completa
             </a>
           </nav>
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            <LogIn className="w-3.5 h-3.5" /> Acceder
-          </Link>
+          {user ? (
+            <Link
+              to="/catastro/app/watchlist"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <Bell className="w-3.5 h-3.5" /> Mis monitoreos
+            </Link>
+          ) : (
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              <LogIn className="w-3.5 h-3.5" /> Acceder
+            </Link>
+          )}
         </div>
       </header>
       <main className="flex-1">{children}</main>
