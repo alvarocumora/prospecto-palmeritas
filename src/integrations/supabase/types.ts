@@ -9071,6 +9071,114 @@ export type Database = {
           },
         ]
       }
+      public_concessions_cache: {
+        Row: {
+          area_ha: number | null
+          centroid: unknown
+          code: string
+          commune: string | null
+          concession_type: string
+          created_at: string
+          datum: string | null
+          expires_at: string | null
+          geometry: unknown
+          granted_at: string | null
+          holder: string | null
+          id: string
+          last_synced_at: string
+          name: string | null
+          province: string | null
+          raw_attrs: Json | null
+          region: string | null
+          region_slug: string | null
+          rut: string | null
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          centroid?: unknown
+          code: string
+          commune?: string | null
+          concession_type: string
+          created_at?: string
+          datum?: string | null
+          expires_at?: string | null
+          geometry?: unknown
+          granted_at?: string | null
+          holder?: string | null
+          id?: string
+          last_synced_at?: string
+          name?: string | null
+          province?: string | null
+          raw_attrs?: Json | null
+          region?: string | null
+          region_slug?: string | null
+          rut?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          centroid?: unknown
+          code?: string
+          commune?: string | null
+          concession_type?: string
+          created_at?: string
+          datum?: string | null
+          expires_at?: string | null
+          geometry?: unknown
+          granted_at?: string | null
+          holder?: string | null
+          id?: string
+          last_synced_at?: string
+          name?: string | null
+          province?: string | null
+          raw_attrs?: Json | null
+          region?: string | null
+          region_slug?: string | null
+          rut?: string | null
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      public_holders: {
+        Row: {
+          created_at: string
+          holder_name: string
+          holder_slug: string
+          id: string
+          last_updated: string
+          regions: string[]
+          rut: string | null
+          total_area_ha: number
+          total_concessions: number
+        }
+        Insert: {
+          created_at?: string
+          holder_name: string
+          holder_slug: string
+          id?: string
+          last_updated?: string
+          regions?: string[]
+          rut?: string | null
+          total_area_ha?: number
+          total_concessions?: number
+        }
+        Update: {
+          created_at?: string
+          holder_name?: string
+          holder_slug?: string
+          id?: string
+          last_updated?: string
+          regions?: string[]
+          rut?: string | null
+          total_area_ha?: number
+          total_concessions?: number
+        }
+        Relationships: []
+      }
       qaqc_results: {
         Row: {
           certificate: string | null
@@ -11576,6 +11684,42 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          current_period_end: string | null
+          id: string
+          plan: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_period_end?: string | null
+          id?: string
+          plan?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       system_config: {
         Row: {
           key: string
@@ -12528,6 +12672,7 @@ export type Database = {
         Args: { _pedimento_id: string }
         Returns: boolean
       }
+      catastro_plan: { Args: { _user_id: string }; Returns: string }
       check_catastro_conflict: {
         Args: { _lat: number; _lng: number; _project_id: string }
         Returns: {

@@ -1,73 +1,113 @@
-## Objetivo
+# Módulo Público de Catastro — `catastro.geocapitals.com`
 
-Reemplazar los polígonos/cuadrados semi-transparentes actuales de las anomalías satelitales en `/dashboard/targets` por un **mapa de calor (heatmap) continuo tipo Sentinel/ASTER** —similar a las figuras del Pre-NI 43-101— sobreimpreso al basemap Esri World Imagery.
+Plataforma profesional freemium para operadores mineros en Chile, con mapa nacional SERNAGEOMIN, búsqueda, fichas SEO, alertas y reportes. Reutiliza infraestructura existente (`sync-catastro`, `concession_history`, `mining_concessions`, `concesionesNacionalesLayer`).
 
-## Diagnóstico del estado actual
+## Modelo de negocio
 
-- En `src/components/targets/TargetsMap.tsx` (líneas 558-607) cada anomalía se pinta como **GeoJSON polígono** (o punto) con `fillOpacity ~0.15-0.55`. Resultado en mobile: cuadrados translúcidos amontonados sin gradiente, ilegibles cuando hay 40+ features.
-- El screenshot del usuario (`IMG_0999.png`) confirma el ruido visual: óxidos, arcillas, hidrotermal y lineamientos compiten encima del satelital.
-- El target visual deseado (`IMG_0689-2.png`) es un **kernel suave con colormap por índice** (rojo Fe, naranja arcilla, magenta hidrotermal, cian estructural), con barra de escala 0-1.
+| Plan | Precio (USD/mes) | Límites |
+|---|---|---|
+| **Free** | $0 | Mapa nacional, búsqueda ilimitada, ficha básica, 1 watchlist (3 concesiones) |
+| **Pro** | $49 | 50 watches, alertas email/push, traslapes, AOI ilimitadas, 20 exports PDF/GeoJSON, sin marca de agua |
+| **Enterprise** | $299 | Watches ilimitados, Shapefile, API, multi-usuario, reportes due-diligence batch, soporte |
 
-## Plan (Sprint 1 — visual, sin tocar backend)
+Pagos vía **Lovable Payments (Stripe)** — suscripción mensual. Webhook actualiza `subscriptions` table.
 
-### 1. Dependencia
-- `bun add leaflet.heat` + `bun add -d @types/leaflet.heat` (o tipos locales). Es el plugin estándar Leaflet para heatmaps gaussianos, ~3 KB, sin SSR (cargar dentro del `ClientOnly`/lazy ya existente).
+## Arquitectura de rutas
 
-### 2. Nuevo componente `SatelliteHeatLayer.tsx`
-- Recibe `anomaliesByIndex` + `indexCode` + `visible`.
-- Convierte cada `AnomalyRow` a puntos pesados:
-  - Si `geometry.type === 'Point'` → 1 punto con peso = `score`.
-  - Si polígono → calcula centroide (turf ya está disponible o usamos una util mínima) + ~6-10 puntos jittered dentro del bbox proporcional al `area_ha` y al `score`, para que el kernel rellene el halo.
-- Crea `L.heatLayer(points, { radius, blur, maxZoom, max: 1, gradient })` con **gradiente por índice**:
-  - IRON_OXIDE: `{0.2:'#fde68a', 0.5:'#f59e0b', 0.8:'#dc2626', 1:'#7f1d1d'}`
-  - CLAY_MINERALS: amarillo→naranja→marrón
-  - HYDROTHERMAL_ALTERATION: lavanda→magenta→violeta oscuro
-  - STRUCTURAL_LINEAMENTS: se mantiene como líneas (no heatmap), ya que es lineal.
-- Escala dinámica: `radius = 18 + zoomDelta * 4`, `blur = 22`. Se reescala en evento `zoomend`.
-
-### 3. Integración en `TargetsMap.tsx`
-- Reemplazar el bloque `anomaliesByIndex && (Object.keys(INDEX_META)...)` de líneas 558-607.
-- Para los 3 índices raster (Fe, arcillas, hidrotermal): renderizar `<SatelliteHeatLayer />` dentro de `LayersControl.Overlay checked`.
-- Para `STRUCTURAL_LINEAMENTS`: mantener `GeoJSON` actual pero con `weight: 2.4` y `dashArray: '4 3'` para que se lean encima del calor.
-- Añadir un toggle global "Mostrar como capas" (debug) que vuelva al render polígonos antiguo —retención para QA, oculto por default detrás de un `?debug=heat` query param. (opcional, podemos saltarlo).
-
-### 4. Leyenda y escala
-- Actualizar `TargetsMapLegend.tsx`: además del conteo, dibujar una mini-barra de gradiente (4 stops) por índice usando un `<div style="background:linear-gradient(...)">` que coincida con el gradient del heat. Texto: "score 0 → 1".
-- Mostrar nota: "Kernel gaussiano 20 m · datos Sentinel-2 / ASTER".
-
-### 5. Performance
-- Memoizar la lista de puntos por índice con `useMemo([anomaliesByIndex, indexCode])`.
-- Usar `whenReady` para añadir/quitar la capa imperativa en vez de re-render React por zoom.
-- Cap a 5000 puntos por índice (más que suficiente: hoy hay ~11 por índice).
-
-### 6. Persistencia mobile
-- En viewport <640px: reducir `radius` a 14 y `blur` a 18 para que cada cluster se distinga (el screenshot del user es 440 px).
-- El control de capas Leaflet ya permite togglear cada índice individualmente.
-
-## Fuera de alcance (Sprint 2, futuro)
-
-- Generar **rasters reales** desde el server (COG con `gdal_rasterize` del polígono pesado) para drape sobre el DEM en `Geology3DViewer`. Hoy solo mejoramos la 2D.
-- Pintar el heatmap también en `share.targets.$projectId.tsx` (público) — fácil después, mismo componente.
-- Slider de threshold "mostrar solo score ≥ X".
-
-## Detalles técnicos
+Subdominio `catastro.geocapitals.com` apuntando al mismo deployment, ruteado por dominio en `__root.tsx` o split build. Rutas:
 
 ```text
-TargetsMap
- ├─ MapContainer (Esri WorldImagery)
- │   ├─ LayersControl
- │   │   ├─ Overlay "Sat · Óxido de Fe"        → SatelliteHeatLayer(IRON_OXIDE)
- │   │   ├─ Overlay "Sat · Arcillas"           → SatelliteHeatLayer(CLAY_MINERALS)
- │   │   ├─ Overlay "Sat · Alt. hidrotermal"   → SatelliteHeatLayer(HYDROTHERMAL_ALTERATION)
- │   │   └─ Overlay "Sat · Lineamientos"       → GeoJSON líneas (sin heat)
- │   └─ CircleMarkers de targets (sin cambios)
- └─ TargetsMapLegend (con barras de gradiente)
+/                              → Landing comercial (hero, mapa demo, planes, SEO)
+/mapa                          → App full-screen: mapa nacional + filtros + buscador
+/c/$code                       → Ficha SSR de concesión (SEO indexable, og:image)
+/titular/$rut                  → Perfil público de titular (concesiones, mapa, totales)
+/region/$slug                  → Landing por región (Antofagasta, Atacama...)
+/precios                       → Planes y comparación
+/login, /signup, /cuenta       → Auth + gestión suscripción
+/app/watchlist                 → (Pro) Watchlist + alertas
+/app/aoi                       → (Pro) AOI dibujada + análisis traslapes
+/app/exports                   → (Pro) Historial reportes PDF/GeoJSON
 ```
 
-Archivos a tocar:
-- `src/components/targets/SatelliteHeatLayer.tsx` *(nuevo)*
-- `src/components/targets/TargetsMap.tsx` *(reemplazar bloque anomalías)*
-- `src/components/targets/TargetsMapLegend.tsx` *(añadir mini-barras gradiente)*
-- `package.json` *(añadir leaflet.heat)*
+Todas las rutas `/c/$code`, `/titular/$rut`, `/region/$slug` con `head()` individual (title, description, og:image generado).
 
-Sin migraciones, sin tocar server functions. Una vez aprobado, lo implemento y verificás en preview.
+## Backend
+
+### Tablas nuevas (migración)
+- `public_concessions_cache` — snapshot de SERNAGEOMIN por código (titular, área, vigencia, geometría, region, comuna, last_synced_at). Permite búsqueda rápida sin golpear ArcGIS. Indexes: gin(titular trgm), btree(rut), gist(geometry).
+- `public_holders` — agregado por RUT (nombre, total_concesiones, total_ha, regiones, last_updated).
+- `catastro_watchlist` — user_id, concession_code, notify_email, notify_push, created_at. RLS por user_id.
+- `catastro_alerts` — user_id, code, alert_type (holder_change, area_change, status_change, expiring, missing), payload, read_at.
+- `catastro_aoi` — user_id, name, geometry (geography polygon), created_at. RLS por user_id.
+- `catastro_exports` — user_id, type (pdf|geojson|shp), target (code|aoi|rut), file_url, created_at.
+- `subscriptions` — user_id, plan ('free'|'pro'|'enterprise'), status, stripe_customer_id, stripe_sub_id, current_period_end.
+- Helper `public.catastro_plan(uid uuid)` SECURITY DEFINER → text.
+
+### Server functions (`createServerFn`)
+- `searchConcessions` — full-text por titular/RUT/código/comuna, paginado, sin auth.
+- `getConcessionByCode` — ficha pública (cache + fallback ArcGIS).
+- `getHolderByRut` — agregado público.
+- `getRegionStats` — agregados por región.
+- `addToWatchlist`, `removeFromWatchlist`, `listMyWatchlist` — auth + chequeo límite por plan.
+- `createAoi`, `analyzeAoiOverlaps` — usa `compute-overlaps` existente.
+- `requestExport` — genera PDF/GeoJSON/SHP, guarda en storage, retorna URL.
+- `createCheckoutSession`, `cancelSubscription` — Stripe.
+
+### Server routes
+- `/api/public/catastro/sitemap.xml` — sitemap dinámico de concesiones top + titulares + regiones.
+- `/api/public/stripe-webhook` — verifica firma, actualiza `subscriptions`.
+
+### Jobs (pg_cron existente)
+- `refresh-public-cache` diario: paginación masiva de capas 0 y 1 SERNAGEOMIN → `public_concessions_cache` + `public_holders`.
+- `dispatch-catastro-alerts` cada hora: diff sobre `public_concessions_cache` por watchlist activa, inserta `catastro_alerts`, envía email vía Resend.
+
+## Frontend
+
+### Componentes nuevos
+- `src/features/catastro-public/` — feature aislada del dashboard interno.
+  - `LandingHero.tsx`, `PricingTable.tsx`, `LiveMapDemo.tsx`
+  - `PublicCatastroMap.tsx` — Leaflet + Esri base + capas SERNAGEOMIN (reutiliza `concesionesNacionalesLayer`) + buscador + drawer ficha.
+  - `ConcessionPublicCard.tsx` — ficha SSR-friendly (server-rendered).
+  - `HolderProfile.tsx` — perfil titular con mapa + lista.
+  - `WatchlistPanel.tsx`, `AlertsBell.tsx` (Pro)
+  - `AoiDrawTool.tsx` + `OverlapsResultPanel.tsx` (Pro)
+  - `ExportDialog.tsx` (Pro)
+  - `PlanGate.tsx` — wrapper que limita features según `subscriptions.plan`.
+
+### SEO
+- `head()` por ruta con title/desc únicos.
+- JSON-LD `Place`/`Organization` por ficha y titular.
+- Sitemap dinámico + robots.txt.
+- og:image generado server-side por ficha (mapa estático).
+
+## Fases de implementación
+
+**Fase 1 — Fundaciones (sin pagos)**
+1. Migración: `public_concessions_cache`, `public_holders`, `subscriptions`, helper `catastro_plan`.
+2. Job de refresh inicial (semilla nacional).
+3. Rutas `/`, `/mapa`, `/c/$code`, `/titular/$rut`, `/precios` con SEO y server functions de búsqueda/ficha.
+4. Landing comercial + mapa público funcional.
+
+**Fase 2 — Cuentas y freemium gating**
+5. Auth pública (signup/login con Google), `PlanGate`, watchlist Free (3 items).
+6. Migración watchlist + alerts + AOI + exports.
+
+**Fase 3 — Monetización**
+7. `recommend_payment_provider` → `enable_stripe_payments`.
+8. Productos Pro/Enterprise, checkout, webhook, portal cliente.
+9. `PlanGate` enforce límites reales.
+
+**Fase 4 — Herramientas Pro**
+10. AOI + traslapes + reportes PDF/GeoJSON/SHP.
+11. Job de alertas (cron horario) + Resend email.
+12. Perfiles de titular SEO + sitemap dinámico.
+
+**Fase 5 — Subdominio y pulido**
+13. Configurar `catastro.geocapitals.com` (auto setup Lovable).
+14. Detección de host en `__root.tsx` para mostrar shell público vs dashboard.
+15. Analytics, plantillas email, onboarding.
+
+## Decisiones pendientes
+- ¿Confirmamos arrancar por **Fase 1** ahora (mapa + búsqueda + fichas SEO públicas, sin pagos todavía)? Es la base sobre la que se monta todo lo demás y entrega valor demostrable en ~1 iteración.
+- Precios definitivos USD/CLP (puedo dejar los sugeridos como placeholder).
+- ¿Quieres soporte multi-idioma (es/en) desde el inicio o solo español?

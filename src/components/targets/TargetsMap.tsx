@@ -34,7 +34,6 @@ import type {
   SatIndexCode,
 } from "@/hooks/useProjectSatelliteAnomalies";
 import { TargetsMapLegend, INDEX_META } from "./TargetsMapLegend";
-import { SatelliteHeatLayer } from "./SatelliteHeatLayer";
 import type { PathOptions } from "leaflet";
 
 const PRIORITY_COLORS: Record<TargetPriority, string> = {
@@ -561,61 +560,52 @@ export function TargetsMap({
                 const arr = anomaliesByIndex[idx];
                 if (!arr || arr.length === 0) return null;
                 const meta = INDEX_META[idx];
-
-                // Lineamientos: líneas vectoriales (no heatmap)
-                if (idx === "STRUCTURAL_LINEAMENTS") {
-                  return (
-                    <LayersControl.Overlay checked key={idx} name={`Sat · ${meta.label}`}>
-                      <GeoJSON
-                        key={`${idx}-${arr.length}`}
-                        data={
-                          {
-                            type: "FeatureCollection",
-                            features: arr.map((a: AnomalyRow) => ({
-                              type: "Feature" as const,
-                              geometry: a.geometry,
-                              properties: {
-                                id: a.id,
-                                score: a.score,
-                                severity: a.severity,
-                                notes: a.notes,
-                              },
-                            })),
-                          } as GeoJSON.FeatureCollection
-                        }
-                        style={(): PathOptions => ({
+                return (
+                  <LayersControl.Overlay checked key={idx} name={`Sat · ${meta.label}`}>
+                    <GeoJSON
+                      key={`${idx}-${arr.length}`}
+                      data={
+                        {
+                          type: "FeatureCollection",
+                          features: arr.map((a: AnomalyRow) => ({
+                            type: "Feature" as const,
+                            geometry: a.geometry,
+                            properties: {
+                              id: a.id,
+                              index_code: a.index_code,
+                              severity: a.severity,
+                              score: a.score,
+                              area_ha: a.area_ha,
+                              notes: a.notes,
+                            },
+                          })),
+                        } as GeoJSON.FeatureCollection
+                      }
+                      style={(feat): PathOptions => {
+                        const score = Number(feat?.properties?.score ?? 0.5);
+                        return {
                           color: `var(${meta.cssVar})`,
-                          weight: 2.4,
-                          dashArray: "4 3",
-                          opacity: 0.9,
-                        })}
-                        onEachFeature={(feat, layer) => {
-                          const p = feat.properties as {
-                            severity: string;
-                            score: number;
-                            notes: string | null;
-                          };
-                          layer.bindPopup(
-                            `<div class="text-[10px] font-mono space-y-0.5 min-w-[180px]"><div><strong>${meta.label}</strong></div><div>Severidad: ${p.severity}</div><div>Score: ${Number(p.score).toFixed(2)}</div>${p.notes ? `<div class="text-gray-500 pt-1 border-t border-gray-200">${p.notes}</div>` : ""}</div>`,
-                          );
-                        }}
-                      />
-                    </LayersControl.Overlay>
-                  );
-                }
-
-                // Índices raster: heatmap renderizado fuera de LayersControl (más abajo)
-                return null;
+                          weight: 1.4,
+                          fillColor: `var(${meta.cssVar})`,
+                          fillOpacity: Math.max(0.15, Math.min(0.55, score * 0.6)),
+                        };
+                      }}
+                      onEachFeature={(feat, layer) => {
+                        const p = feat.properties as {
+                          severity: string;
+                          score: number;
+                          area_ha: number | null;
+                          notes: string | null;
+                        };
+                        layer.bindPopup(
+                          `<div class="text-[10px] font-mono space-y-0.5 min-w-[180px]"><div><strong>${meta.label}</strong></div><div>Severidad: ${p.severity}</div><div>Score: ${Number(p.score).toFixed(2)}</div><div>Área: ${p.area_ha ?? "—"} ha</div>${p.notes ? `<div class="text-gray-500 pt-1 border-t border-gray-200">${p.notes}</div>` : ""}</div>`,
+                        );
+                      }}
+                    />
+                  </LayersControl.Overlay>
+                );
               })}
           </LayersControl>
-
-          {anomaliesByIndex &&
-            (Object.keys(INDEX_META) as SatIndexCode[]).map((idx) => {
-              if (idx === "STRUCTURAL_LINEAMENTS") return null;
-              const arr = anomaliesByIndex[idx];
-              if (!arr || arr.length === 0) return null;
-              return <SatelliteHeatLayer key={idx} anomalies={arr} indexCode={idx} />;
-            })}
 
           <UserLocationLayer position={position} follow={tracking} />
 

@@ -13,13 +13,17 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
+import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
+import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
@@ -77,6 +81,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatastroIndexRoute = CatastroIndexRouteImport.update({
+  id: '/catastro/',
+  path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LivePalmerasRoute = LivePalmerasRouteImport.update({
   id: '/live/palmeras',
   path: '/live/palmeras',
@@ -102,6 +111,16 @@ const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
   path: '/hooks/sync-boletin-minero',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
+  id: '/catastro/precios',
+  path: '/catastro/precios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroMapaRoute = CatastroMapaRouteImport.update({
+  id: '/catastro/mapa',
+  path: '/catastro/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardIndexRoute =
   AuthenticatedDashboardIndexRouteImport.update({
     id: '/dashboard/',
@@ -111,6 +130,11 @@ const AuthenticatedDashboardIndexRoute =
 const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
   id: '/share/targets/$projectId',
   path: '/share/targets/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
+  id: '/catastro/c/$code',
+  path: '/catastro/c/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
@@ -339,11 +363,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro/': typeof CatastroIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -376,6 +403,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -388,11 +416,14 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro': typeof CatastroIndexRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -425,6 +456,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -439,11 +471,14 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -476,6 +511,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/catastro/c/$code': typeof CatastroCCodeRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
@@ -490,11 +526,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/catastro/mapa'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro/'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -527,6 +566,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
@@ -539,11 +579,14 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/catastro/mapa'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -576,6 +619,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
@@ -589,11 +633,14 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/catastro/mapa'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
     | '/live/palmeras'
+    | '/catastro/'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
@@ -626,6 +673,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
     | '/api/public/sync-catastro'
+    | '/catastro/c/$code'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
@@ -640,12 +688,16 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  CatastroMapaRoute: typeof CatastroMapaRoute
+  CatastroPreciosRoute: typeof CatastroPreciosRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
   LiveFrancoRoute: typeof LiveFrancoRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
+  CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
+  CatastroCCodeRoute: typeof CatastroCCodeRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
 }
@@ -678,6 +730,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/': {
+      id: '/catastro/'
+      path: '/catastro'
+      fullPath: '/catastro/'
+      preLoaderRoute: typeof CatastroIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/palmeras': {
@@ -715,6 +774,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/catastro/precios': {
+      id: '/catastro/precios'
+      path: '/catastro/precios'
+      fullPath: '/catastro/precios'
+      preLoaderRoute: typeof CatastroPreciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/mapa': {
+      id: '/catastro/mapa'
+      path: '/catastro/mapa'
+      fullPath: '/catastro/mapa'
+      preLoaderRoute: typeof CatastroMapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/': {
       id: '/_authenticated/dashboard/'
       path: '/dashboard'
@@ -727,6 +800,13 @@ declare module '@tanstack/react-router' {
       path: '/share/targets/$projectId'
       fullPath: '/share/targets/$projectId'
       preLoaderRoute: typeof ShareTargetsProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/c/$code': {
+      id: '/catastro/c/$code'
+      path: '/catastro/c/$code'
+      fullPath: '/catastro/c/$code'
+      preLoaderRoute: typeof CatastroCCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/sync-catastro': {
@@ -1135,12 +1215,16 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  CatastroMapaRoute: CatastroMapaRoute,
+  CatastroPreciosRoute: CatastroPreciosRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
   LiveFrancoRoute: LiveFrancoRoute,
   LivePalmerasRoute: LivePalmerasRoute,
+  CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
+  CatastroCCodeRoute: CatastroCCodeRoute,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
@@ -1148,13 +1232,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
