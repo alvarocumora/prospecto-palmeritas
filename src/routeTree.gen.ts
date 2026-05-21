@@ -19,6 +19,7 @@ import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
@@ -106,6 +107,11 @@ const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
 const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
   id: '/hooks/sync-boletin-minero',
   path: '/hooks/sync-boletin-minero',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
+  id: '/catastro/precios',
+  path: '/catastro/precios',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -345,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -395,6 +402,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -447,6 +455,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/catastro/precios': typeof CatastroPreciosRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -499,6 +508,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -549,6 +559,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -600,6 +611,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/catastro/precios'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -652,6 +664,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  CatastroPreciosRoute: typeof CatastroPreciosRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
@@ -733,6 +746,13 @@ declare module '@tanstack/react-router' {
       path: '/hooks/sync-boletin-minero'
       fullPath: '/hooks/sync-boletin-minero'
       preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/precios': {
+      id: '/catastro/precios'
+      path: '/catastro/precios'
+      fullPath: '/catastro/precios'
+      preLoaderRoute: typeof CatastroPreciosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
@@ -1155,6 +1175,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  CatastroPreciosRoute: CatastroPreciosRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
