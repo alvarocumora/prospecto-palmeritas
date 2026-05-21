@@ -1,10 +1,14 @@
-import { lazy } from "react";
+import { lazy, useMemo } from "react";
 import { createFileRoute, ClientOnly } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Target, MapPin, ExternalLink } from "lucide-react";
+import { Target, MapPin, ExternalLink, Compass } from "lucide-react";
 import { getPublicProjectTargets, type PublicTarget } from "@/lib/publicTargets.functions";
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
+import { ArRadarOverlay } from "@/components/ar/ArRadarOverlay";
+import { useGeolocation } from "@/hooks/useGeolocation";
+import { projectExplorationObjects } from "@/lib/ar/anomalyProjection";
+import { targetsToArSources } from "@/lib/ar/targetsToArSources";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 
 const TargetsMap = lazy(() =>
@@ -66,6 +70,39 @@ function toExplorationTarget(t: PublicTarget): ExplorationTarget {
     created_at: "",
     updated_at: "",
   };
+}
+
+function PublicTargetsRadar({ targets }: { targets: ExplorationTarget[] }) {
+  const { position } = useGeolocation(true);
+
+  const radarObjects = useMemo(() => {
+    if (!position) return [];
+
+    return projectExplorationObjects(
+      {
+        lat: position.lat,
+        lng: position.lng,
+        altitudeM: position.altitude,
+        headingDeg: position.heading,
+      },
+      targetsToArSources(targets),
+      {
+        maxDistanceM: 5000,
+        nearbyDistanceM: 250,
+      },
+    );
+  }, [position, targets]);
+
+  if (!position || radarObjects.length === 0) return null;
+
+  return (
+    <section className="px-3 md:px-0 pt-3 md:pt-0">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 inline-flex items-center gap-1.5">
+        <Compass className="w-3 h-3" /> AR Radar
+      </div>
+      <ArRadarOverlay objects={radarObjects} headingDeg={position.heading} />
+    </section>
+  );
 }
 
 function SharePage() {
@@ -130,6 +167,10 @@ function SharePage() {
       </header>
 
       <main className="max-w-[1400px] mx-auto px-0 md:px-6 py-0 md:py-6 md:space-y-6">
+        <ClientOnly fallback={null}>
+          <PublicTargetsRadar targets={targets} />
+        </ClientOnly>
+
         <section className="md:rounded-lg md:overflow-hidden">
           <div className="px-3 md:px-0 py-2 md:pt-0 text-[10px] font-mono uppercase tracking-wider text-muted-foreground inline-flex items-center gap-1.5">
             <MapPin className="w-3 h-3" /> Mapa de targets
