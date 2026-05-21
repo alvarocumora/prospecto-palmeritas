@@ -4,6 +4,7 @@ import { ReactNode } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
 export function PublicCatastroShell({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
