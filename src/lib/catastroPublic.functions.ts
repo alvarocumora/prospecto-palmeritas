@@ -91,7 +91,7 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
         granted_at: null,
         centroid_lat: null,
         centroid_lng: null,
-        geometry: f.geometry,
+        geometry: (f.geometry ?? null) as GeoJSON.Geometry | null,
         source: "sernageomin",
         last_synced_at: null,
       };
