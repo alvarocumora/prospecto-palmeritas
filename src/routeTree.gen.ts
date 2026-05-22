@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as IndexRouteImport } from './routes/index_'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -66,6 +67,11 @@ import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './r
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/index_',
+  path: '/index',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -368,6 +374,7 @@ const AuthenticatedDashboardCatastroHoldersIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/index': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -422,6 +429,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/index': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -478,6 +486,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/index_': typeof IndexRoute
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -534,6 +543,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/index'
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -588,6 +598,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/index'
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -643,6 +654,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/index_'
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -699,6 +711,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  IndexRoute: typeof IndexRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
@@ -722,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/index_': {
+      id: '/index_'
+      path: '/index'
+      fullPath: '/index'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1234,6 +1254,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  IndexRoute: IndexRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
@@ -1253,13 +1274,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
