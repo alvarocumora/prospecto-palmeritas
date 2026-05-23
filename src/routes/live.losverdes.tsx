@@ -79,8 +79,14 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
       } else {
         setError(res.error ?? "Acceso denegado");
       }
-    } catch {
-      setError("Error de red");
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/Importing a module script failed|Failed to fetch dynamically imported module|ChunkLoadError/i.test(msg)) {
+        setError("Nueva versión disponible, recargando…");
+        setTimeout(() => window.location.reload(), 600);
+      } else {
+        setError("Error de red. Verifica tu conexión e intenta de nuevo.");
+      }
     } finally {
       setLoading(false);
     }
