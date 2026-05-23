@@ -67,9 +67,24 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Capas por modo
   const surfaceMode = mode === "surface";
   const subsurfaceMode = mode === "subsurface";
+  const centerLng = Number(active?.center_lng ?? -70.5);
+  const centerLat = Number(active?.center_lat ?? -30);
 
   const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, surfaceMode);
-  const { layer: holesLayer } = useDrillHolesLayer(active?.id ?? null, subsurfaceMode);
+  // Collares (columnas) — útil en zoom alejado.
+  const { layer: holesColumnLayer } = useDrillHolesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
+  // Trayectorias 3D + intercepts coloreados por Au — el verdadero subsuelo.
+  const { layers: trajectoryLayers, holeCount, interceptCount } = useDrillTrajectoriesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
     active?.id ?? null,
     subsurfaceMode,
