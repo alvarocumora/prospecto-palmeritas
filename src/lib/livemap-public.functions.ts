@@ -18,9 +18,16 @@ export type PublicTarget = {
   rationale: string | null;
 };
 
+export type PublicProjectConcession = {
+  code: string;
+  name: string;
+  holder: string | null;
+};
+
 export type PublicProjectLayers = {
   project: { id: string; name: string; center_lat: number | null; center_lng: number | null };
   targets: PublicTarget[];
+  concessions: PublicProjectConcession[];
 };
 
 export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handler(
