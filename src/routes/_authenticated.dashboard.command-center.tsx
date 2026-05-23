@@ -236,8 +236,6 @@ function CommandCenter() {
 
       {/* === FOOTER TICKER === */}
       <footer className="absolute bottom-0 left-0 right-0 h-7 border-t border-border bg-bg-secondary/80 backdrop-blur flex items-center px-4 gap-6 text-[10px] font-mono z-20">
-        <div className="text-muted-foreground uppercase tracking-wider">Mercado</div>
-      <footer className="absolute bottom-0 left-0 right-0 h-7 border-t border-border bg-bg-secondary/80 backdrop-blur flex items-center px-4 gap-6 text-[10px] font-mono z-20">
         <div className="text-muted-foreground uppercase tracking-wider">Mercado (demo)</div>
         <Ticker label="Cu" unit="US$/lb" value="4.21" delta="+1.2%" up />
         <Ticker label="Au" unit="US$/oz" value="2,347" delta="+0.8%" up />
