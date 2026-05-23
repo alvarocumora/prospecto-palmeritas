@@ -1,13 +1,25 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2 } from "lucide-react";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Box, Flame, Zap } from "lucide-react";
 import { toast } from "sonner";
 
-import { getLosVerdesPublicLayers, type PublicTarget } from "@/lib/livemap-public.functions";
+import {
+  getLosVerdesPublicLayers,
+  getLosVerdesAnomalies,
+  type PublicTarget,
+  type LosVerdesAnomalies,
+} from "@/lib/livemap-public.functions";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
+import {
+  buildAnomalyHeatLayer,
+  buildLineamentsLayer,
+  removeLayer,
+} from "@/components/field/anomalyHeatLayer";
+
+const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
 type LeafletNS = typeof import("leaflet");
 
