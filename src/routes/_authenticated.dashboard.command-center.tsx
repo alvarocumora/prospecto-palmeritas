@@ -47,12 +47,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/command-center")
 });
 
 // ---------- Sidebar (rutas existentes) ----------
-const NAV: Array<{ to: string; icon: typeof Activity; label: string }> = [
+const NAV: Array<{ to: string; icon: LucideIcon; label: string }> = [
   { to: "/dashboard", icon: Activity, label: "Resumen Ejecutivo" },
   { to: "/dashboard/targets", icon: Crosshair, label: "Exploración" },
   { to: "/dashboard/geology3d", icon: Mountain, label: "Geología 3D" },
   { to: "/dashboard/geophysics", icon: Radio, label: "Geofísica" },
-  { to: "/dashboard/sampling", icon: TestTubeIcon, label: "Geoquímica" },
+  { to: "/dashboard/sampling", icon: TestTube2, label: "Geoquímica" },
   { to: "/dashboard/drilling", icon: Drill, label: "Perforación" },
   { to: "/dashboard/estimation", icon: Layers, label: "Modelado de Recursos" },
   { to: "/dashboard/targets/ai-brief", icon: Sparkles, label: "AI Targeting" },
@@ -62,10 +62,6 @@ const NAV: Array<{ to: string; icon: typeof Activity; label: string }> = [
   { to: "/dashboard/ni43101", icon: FileSignature, label: "Reportes NI 43-101" },
   { to: "/dashboard/marketplace", icon: TargetIcon, label: "Deals" },
 ];
-
-function TestTubeIcon(props: React.ComponentProps<typeof Activity>) {
-  return <Activity {...props} />;
-}
 
 // ---------- Componente principal ----------
 function CommandCenter() {
