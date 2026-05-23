@@ -1,80 +1,64 @@
-# Heatmap de anomalías + Proyección 3D en Live Field PWA
+## Objetivo
 
-Añadir al `/live/losverdes` dos capacidades visuales tipo "GS Detectors / Map Your Mining":
+Activar una capa de **Catastro Minero SERNAGEOMIN** sobre el Live Map PWA (`/live/losverdes`) y resaltar las 15 pertenencias del proyecto (LV-C-001 a LV-C-015) sobre el cuadrante real publicado por el organismo oficial. Esto reemplaza el plano impreso de las fotos por polígonos georreferenciados que se actualizan automáticamente.
 
-1. **Heatmap de anomalías + lineamientos estructurales** sobre el satélite (look amarillo/rojo, estilo "vetas de oro").
-2. **Modal de proyección 3D** de estructuras + targets extruidos en profundidad (estilo cubo geológico).
+## Qué se va a ver en terreno
 
-Datos ya existentes en el proyecto Los Verdes — sin nuevas migraciones.
+- Polígonos oficiales de **Explotación 1983**, **Explotación 1932**, **Exploración 1983** y **Estacamento** alrededor del proyecto.
+- Las concesiones **del titular Carlos Fernández** resaltadas en amarillo intenso con borde grueso (match por nombre contra la base SERNAGEOMIN).
+- Popup oficial: ROL, nombre, titular, hectáreas, vencimiento, comuna.
+- Chip nuevo: `[📋 Catastro]` con conteo en vivo (`📋 142`).
+- Mini-leyenda con los 4 colores ORIGEN cuando el toggle está activo.
 
-## 1. Server fns públicas nuevas
+## Cómo se conecta (técnico)
 
-`src/lib/livemap-public.functions.ts` (extender):
-
-- `getLosVerdesAnomalies()` → con `supabaseAdmin`:
-  - `magTargets`: de `mag_targets` (10 puntos) → `{lat, lng, mag_nt, score, rank}`.
-  - `satAnomalies`: de `satellite_anomalies` (45) → `{centroid_lat, centroid_lng, score, severity, index_code, area_ha}` (extraer centroid del GeoJSON).
-  - `lineaments`: filtro `index_code='STRUCTURAL_LINEAMENTS'` → polígonos completos para dibujar como líneas tipo "veta".
-- `getLosVerdes3DScene()` → retorna escena simplificada:
-  - `dem`: grilla 32×32 de elevaciones (puede ser plana o derivada de bbox).
-  - `targets`: lat/lng/elev/score/priority.
-  - `magAnomalies`: lat/lng/intensity para extrusión.
-  - `lineaments`: lista de polylines con `strike` (azimuth) y `dip` por defecto 70° (vertical default).
-
-## 2. Heatmap en Leaflet
-
-Nuevo helper `src/components/field/anomalyHeatLayer.ts`:
-- `bun add leaflet.heat` + tipo manual `@types/leaflet.heat` o declaración local.
-- Función `buildAnomalyHeatLayer(L, points, opts)`:
-  - Combina `magTargets` (peso = score normalizado) + centroides de `satAnomalies`.
-  - Gradiente magnético: `{0.0:'#1e3a8a', 0.3:'#0ea5e9', 0.5:'#facc15', 0.7:'#fb923c', 1.0:'#dc2626'}`.
-  - `radius: 35, blur: 25, maxZoom: 17`.
-- Función `buildLineamentsLayer(L, lineaments)`:
-  - Polylines amarillas `{color:'#facc15', weight:3, opacity:0.9}` + halo `{color:'#fb923c', weight:6, opacity:0.4}` para efecto glow "veta".
-
-## 3. UI en `FieldMapPublic.tsx`
-
-Top-bar de chips compactos (reemplaza/extiende los toggles actuales):
+La infraestructura ya existe en el dashboard interno y se reutiliza tal cual — no hay tablas nuevas ni migraciones:
 
 ```text
-[● ONLINE] [🎯 Targets] [🔥 Heatmap] [⚡ Vetas] [📦 3D] [⬇ Exportar]
+src/components/map/catastroLayer.ts   →  loadCatastro(L, bbox)  + bboxAround()
+src/components/map/overlays.ts        →  CATASTRO_STYLE + popup oficial
 ```
 
-- Estados nuevos: `showHeatmap`, `showLineaments`, `show3D`.
-- Lazy-fetch de `getLosVerdesAnomalies` solo al activar Heatmap/Vetas la primera vez.
-- Leyenda inferior izquierda compacta cuando heatmap está ON.
-- Botón "3D" abre modal full-screen `<Structures3DViewer />`.
+`loadCatastro` consulta el **ArcGIS FeatureServer público** de SERNAGEOMIN (sin API key, sin RLS) y cachea 24h en `localStorage`. Funciona offline después de la primera carga.
 
-## 4. Visor 3D — `src/components/field/Structures3DViewer.tsx`
+### Cambios
 
-Three.js puro (mismo patrón que `Geology3DViewer`):
+1. **`FieldMapPublic.tsx`**
+   - Nuevos estados: `showCatastro`, `catastroCount`, `loadingCatastro`, `catastroLayerRef`.
+   - Nuevo chip `[📋 Catastro]` (color `#22c55e`) entre `Vetas` y `3D`.
+   - `useEffect` que, al activar el toggle:
+     - calcula `bboxAround([center_lat, center_lng], 6)` (≈ 12×12 km, cubre todo el cluster Los Verdes / Tilama).
+     - llama `loadCatastro(L, bbox)`.
+     - añade los 4 layers ORIGEN al mapa.
+     - resalta features cuyo `NOMBRE` matchee (normalizado) cualquier `mining_concession.name` del proyecto → restyle con `weight: 4, color: '#facc15', fillOpacity: 0.35`.
+     - actualiza `catastroCount` con el total.
+   - Al desactivar: `removeLayer()` y mantiene el cache para próxima activación.
 
-- **Caja base**: plano horizontal con grilla + textura satellite del bbox proyectada (o un color sólido si no se descarga tile).
-- **Targets**: cilindros verticales en (x,y) escalados por `score`, color por priority (rojo/dorado/azul).
-- **Anomalías magnéticas**: columnas semitransparentes (rojo→amarillo) en posición de cada `mag_target`, altura = `mag_nt` normalizado.
-- **Lineamientos como planos verticales (estructuras)**: para cada polyline, generar un plano `PlaneGeometry` extruido hacia abajo (profundidad estimada por largo del lineamiento × 0.3), inclinado según `dip`. Color amarillo translúcido.
-- `OrbitControls` (rotar / zoom táctil). Reset view, toggle de cada capa, ejes XYZ con escala (metros).
-- Modal con `position:fixed inset-0 z-[3000]`, header con "Proyección 3D · Los Verdes" + cerrar.
+2. **`livemap-public.functions.ts`**
+   - Extender `getLosVerdesPublicLayers` para incluir `projectConcessions: { code, name, holder }[]` desde `mining_concessions` (filtro `project_id`, sin geometría — solo metadata para el matching cliente). Bypassa RLS vía `supabaseAdmin`.
 
-## 5. Performance + bundle
+3. **Mini-leyenda flotante** (debajo de la legend del heatmap)
+   - 4 cuadritos con label corto: `Explot. '83 · Explot. '32 · Explor. '83 · Estacament.`
+   - Visible solo cuando `showCatastro` está activo.
 
-- `leaflet.heat`: ~4 KB gzipped, import dinámico al activar el toggle.
-- `Structures3DViewer`: lazy via `React.lazy()` para no cargar Three.js hasta que el usuario presione "3D".
-- Server fns cachean en memoria del cliente vía `useState` (no se re-piden al togglear OFF/ON).
+4. **Estado online/offline**
+   - Si está offline y no hay cache, mostrar toast: "Catastro requiere conexión la primera vez".
+   - Si hay cache, carga normal y muestra badge `cached` discreto.
 
-## 6. Files
+## Lo que NO se hace en esta iteración
 
-```text
-src/lib/livemap-public.functions.ts            (+ 2 fns nuevas)
-src/components/field/FieldMapPublic.tsx        (toggles + integración)
-src/components/field/anomalyHeatLayer.ts       (nuevo)
-src/components/field/Structures3DViewer.tsx    (nuevo, lazy)
-package.json: + leaflet.heat
-```
+- No se editan los registros en `mining_concessions` (siguen sin geometría en la DB; el matching es solo visual).
+- No se agrega un job para sincronizar geometría desde SERNAGEOMIN → DB (eso queda para un sprint posterior si se quiere persistir).
+- No se toca el dashboard interno ni se modifica RLS.
 
-## 7. Notas
+## Archivos a modificar
 
-- Sin migraciones, sin cambios en RLS.
-- Las server fns públicas exponen solo campos no sensibles (score, posición, intensidad).
-- Mobile-first: chips 36–44 px, modal 3D respeta `safe-area-inset`, gestos touch nativos de OrbitControls.
-- Inspiración visual (referencias del usuario): vetas amarillas brillantes sobre satellite (TikTok kurdistán) + cubo 3D con drape geofísico (GS Detectors).
+- `src/components/field/FieldMapPublic.tsx` (toggle, layer, leyenda, matching)
+- `src/lib/livemap-public.functions.ts` (añadir `projectConcessions` al payload)
+
+## Validación
+
+- Abrir `/live/losverdes` en móvil → activar `📋 Catastro` → ver polígonos rosados/azules sobre el área.
+- Verificar que las 15 pertenencias del titular Fernández aparezcan resaltadas en amarillo.
+- Tocar un polígono → popup con ROL + titular + vencimiento.
+- Desactivar conexión → re-activar toggle → debe servir desde cache.
