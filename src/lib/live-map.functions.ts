@@ -32,3 +32,4 @@ function buildVerifier(envVar: string) {
 
 export const verifyLiveMapPassword = buildVerifier("LIVE_MAP_PASSWORD");
 export const verifyFrancoLiveMapPassword = buildVerifier("LIVE_MAP_FRANCO_PASSWORD");
+export const verifyLosVerdesLiveMapPassword = buildVerifier("LIVE_MAP_LOSVERDES_PASSWORD");
