@@ -99,13 +99,14 @@ function CommandCenter() {
 
         <div className="flex-1" />
 
-        <Weather />
+        <Weather lat={active?.center_lat ?? null} lng={active?.center_lng ?? null} />
         <ClockBlock now={now} />
         <ProjectSelector
           projects={projects}
           activeId={active?.id ?? null}
           onChange={setActiveId}
         />
+
         <button className="relative w-9 h-9 rounded border border-border bg-bg-elevated hover:bg-accent transition-colors flex items-center justify-center">
           <Bell className="w-4 h-4 text-muted-foreground" />
           {kpis && kpis.alertsUnread > 0 && (
