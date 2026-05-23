@@ -20,9 +20,11 @@ import {
   ShieldCheck,
   Sparkles,
   Target as TargetIcon,
+  TestTube2,
   TrendingDown,
   TrendingUp,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
