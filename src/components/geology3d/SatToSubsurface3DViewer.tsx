@@ -212,7 +212,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         });
       }
     });
-    return out;
+    continue;
   }, [anomGrouped, enabled, depthScale, showColumns]);
 
   // ---------- VETAS: planos inclinados 3D desde lineamientos ----------
@@ -288,7 +288,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         score,
       });
     }
-    return out;
+    continue;
   }, [anomGrouped, showPorphyry, porphyryDepthM]);
 
   // ---------- PLAN DE MINA: sondajes propuestos como paths 3D ----------
@@ -301,7 +301,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
       path: [number, number, number][]; color: [number, number, number]; name: string;
     }> = [];
     for (const t of targets) {
-      if (t.lat == null || t.lng == null) return out;
+      if (t.lat == null || t.lng == null) continue;
       // dirección perpendicular al norte aproximado (azimut 90° E)
       const { dLng } = metersToDegrees(horiz, t.lat);
       const color: [number, number, number] =
@@ -317,7 +317,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         name: `${t.code} · ${t.name}`,
       });
     }
-    return out;
+    continue;
   }, [targets, showDrillPlan, drillLengthM, drillDipDeg]);
 
   // ---------- FOOTPRINT de rajo abierto en superficie ----------
@@ -338,7 +338,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
       ring.push(ring[0]);
       out.push({ polygon: ring, name: `Rajo conceptual · ${t.code}`, priority: t.priority ?? "" });
     }
-    return out;
+    continue;
   }, [targets, showPit]);
 
   const targetData = useMemo(() => {
