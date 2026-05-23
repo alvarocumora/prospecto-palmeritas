@@ -288,7 +288,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         score,
       });
     }
-    continue;
+    return out;
   }, [anomGrouped, showPorphyry, porphyryDepthM]);
 
   // ---------- PLAN DE MINA: sondajes propuestos como paths 3D ----------
