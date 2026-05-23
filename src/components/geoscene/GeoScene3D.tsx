@@ -57,7 +57,7 @@ export function GeoScene3D({
           {mode === "surface" && <Geology3DViewer className="h-full w-full" />}
           {mode === "subsurface" && variant !== "mag" && <SatToSubsurface3DViewer />}
           {mode === "subsurface" && variant === "mag" && <MagAnomaly3DPro />}
-          {mode === "resource" && <BlockModel3DViewer />}
+          {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
     </div>
