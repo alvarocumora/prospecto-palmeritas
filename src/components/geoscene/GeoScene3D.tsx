@@ -74,3 +74,25 @@ function SceneLoading() {
     </div>
   );
 }
+
+function ResourceModeStub() {
+  return (
+    <div className="absolute inset-0 flex items-center justify-center bg-bg-panel p-6">
+      <div className="max-w-sm text-center space-y-2">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          Resource mode
+        </div>
+        <div className="text-sm text-foreground">
+          Selecciona un modelo de recursos desde Estimación para visualizar bloques,
+          leyes y pit shells aquí.
+        </div>
+        <a
+          href="/dashboard/estimation"
+          className="inline-block mt-2 text-xs font-mono text-gold hover:underline"
+        >
+          Abrir Estimación →
+        </a>
+      </div>
+    </div>
+  );
+}
