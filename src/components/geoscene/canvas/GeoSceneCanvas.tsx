@@ -12,6 +12,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useProjects } from "@/hooks/useProjects";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
+import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import type { GeoSceneMode } from "../types";
@@ -68,6 +69,10 @@ export function GeoSceneCanvas({ mode }: Props) {
 
   const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, surfaceMode);
   const { layer: holesLayer } = useDrillHolesLayer(active?.id ?? null, subsurfaceMode);
+  const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
+    active?.id ?? null,
+    subsurfaceMode,
+  );
 
   // Init map
   useEffect(() => {
@@ -116,9 +121,9 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Empujar capas deck.gl
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
-    const layers = [targetsLayer, holesLayer].filter(Boolean);
+    const layers = [targetsLayer, holesLayer, anomaliesLayer].filter(Boolean);
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, holesLayer]);
+  }, [ready, targetsLayer, holesLayer, anomaliesLayer]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
@@ -140,8 +145,8 @@ export function GeoSceneCanvas({ mode }: Props) {
   }, []);
 
   const layerCount = useMemo(
-    () => [targetsLayer, holesLayer].filter(Boolean).length,
-    [targetsLayer, holesLayer],
+    () => [targetsLayer, holesLayer, anomaliesLayer].filter(Boolean).length,
+    [targetsLayer, holesLayer, anomaliesLayer],
   );
 
   return (
@@ -157,6 +162,9 @@ export function GeoSceneCanvas({ mode }: Props) {
       )}
       <div className="absolute bottom-3 right-3 z-10 text-[10px] font-mono text-muted-foreground bg-bg-secondary/90 backdrop-blur border border-border rounded px-2 py-1">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}
+        {subsurfaceMode && anomaliesCount > 0 && (
+          <span className="ml-1 text-gold">· {anomaliesCount} anomalías</span>
+        )}
       </div>
     </div>
   );
