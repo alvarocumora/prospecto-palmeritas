@@ -1,118 +1,112 @@
-## Diagnóstico del v2.0
 
-El script actual (`lv5_report.mjs`, jsPDF + sharp) llegó a 14 páginas pero arrastra tres techos duros:
+# Plan: Visor 3D Minero Disruptivo (Geocapitals v5)
 
-1. **Render cartográfico artesanal.** Mosaico ESRI compuesto a mano, sin proyección real ni reglas cartográficas (norte, escala gráfica, grilla UTM, leyenda). El "mapa raro" que reportaste viene de mezclar lat/lon con píxeles sin un CRS de verdad.
-2. **3D conceptual.** Proyección isométrica calculada a mano en canvas 2D. No hay topografía real drapeada ni interpolación implícita; las vetas son cuñas dibujadas, no superficies estructurales.
-3. **Proxy magnético sin pipeline geofísico.** La grilla 200×200 multivariada no aplica continuación ascendente, primera derivada vertical, ni reducción al polo — los tres productos estándar de cualquier informe geofísico serio.
+Objetivo: reemplazar el visor Plotly actual por una experiencia 3D minera de nivel "Awwwards + industria", combinando datasets gratuitos globales con modelado geológico implícito y capas satelitales con anomalías magnéticas marcadas como targets.
 
-Para subir a nivel "Pre-NI 43-101 defendible" el camino correcto es **dejar de reinventar** y montar el informe sobre librerías open-source de la industria geocientífica.
+## 1. Stack base (frontend 3D)
 
-## Stack propuesto (todo open-source, en sandbox local)
+Reemplazo del visor Plotly por **CesiumJS + Resium** (React bindings) como motor principal:
 
-| Capa | Librería | Para qué |
+- Globo 3D real con terreno (Cesium World Terrain o **Copernicus GLO-30 DEM** vía Cesium Ion gratis con cuenta).
+- Imagery satelital: **ESRI World Imagery**, **Sentinel-2 L2A** (Microsoft Planetary Computer STAC, gratis) y **MapTiler/MapLibre** como fallback.
+- Overlays vectoriales (vetas, fallas, targets) en **GeoJSON 3D** con extrusión por profundidad.
+- Capa subterránea: `Cesium.Primitive` + `GeometryInstance` para sólidos 3D (vetas, intrusivos, anomalías magnéticas a profundidad).
+- Repos de referencia que copiaremos patrones:
+  - `Gaia3D/MineMonitor3D` (monitoreo de mina abierta sobre Cesium).
+  - `kurtlawrence/dirtvz` (renderizado web 3D para minería, Rust+WASM).
+  - `reearth/reearth-visualizer` (plataforma WebGIS Cesium completa, Apache-2.0).
+  - `NOC-OI/zarr-cesium` (Zarr/COG sobre Cesium — ideal para grids magnéticos).
+  - `darkmine-oss/baselode` (toolkit exploración minera, GPL).
+
+## 2. Datasets libres a integrar
+
+| Capa | Fuente | Acceso |
 |---|---|---|
-| Cartografía | **GeoPandas + Contextily + Matplotlib + Cartopy** | Mapas con CRS real (EPSG:32719 UTM 19S), basemap ESRI/Sentinel, leyenda, escala, norte, grilla |
-| Geofísica | **Fatiando a Terra (Harmonica + Verde)** | Grillado de muestras, continuación ascendente, 1ª derivada vertical, reducción al polo, contornos |
-| 3D estructural | **PyVista + GemPy (lite) + rasterio** | DEM Copernicus real drapeado con Sentinel-2/carta geológica, vetas como superficies implícitas, sondajes, targets, pit conceptual. Export a PNG (lámina) **y** HTML interactivo embebible. |
-| Cartas SERNAGEOMIN | **WMS GetMap** vs `catastro.sernageomin.cl/arcgis/.../Geologia_Base_1M` (ya validado en `src/components/map/sernageominLayers.ts`) + **Hoja Illapel 1:250.000** georreferenciada manualmente | Capa geológica oficial drapeada sobre el bbox de LV-5 |
-| Reporte | **ReportLab (Platypus)** + plantilla NI 43-101 lite | Reemplaza jsPDF — soporte nativo de tablas, TOC, figuras vectoriales, headers/footers, paginación |
+| Terreno DEM 30 m | Copernicus GLO-30 (Planetary Computer / OpenTopography) | STAC + COG |
+| Satelital RGB / NDVI / ratios alteración | Sentinel-2 L2A (PC STAC) | STAC firmado |
+| Anomalía magnética global | **EMAG2 v3** NOAA NCEI (2 arc-min) | GeoTIFF + WMS ArcGIS REST |
+| Gravedad | WGM2012 BGI | GeoTIFF |
+| Geología regional Chile | SERNAGEOMIN WMS Hoja Illapel | WMS |
+| Catastro minero | SERNAGEOMIN catastro WFS | WFS GeoJSON |
+| Sísmica histórica | USGS Earthquake API | REST JSON |
 
-Referencias relevantes que se evaluarán/reutilizarán:
-- `fatiando/harmonica` — pipeline magnético estándar (ya validado en docs oficiales).
-- `gempy-project/gempy` (1.2k★) — modelo implícito 3D a partir de orientaciones; usamos modo "lite" con los lineamientos como input.
-- `Loop3D/LoopStructural` (258★) — alternativa más liviana si GemPy es pesado para el sandbox.
-- `chapmangj/geoinsights3d` (MIT) — referencia de pipeline de drillholes → PyVista (no se importa, se mira el patrón).
+EMAG2 v3 nos permite mostrar la anomalía magnética real del sector Tilama (no sintética) y marcar máximos locales como targets.
 
-## Estructura del informe v3.0 (16–20 pp)
+## 3. Modelado geológico 3D real
+
+Sustituir las vetas dibujadas a mano por un modelo implícito:
+
+- **GemPy 2025** o **LoopStructural** (Python, MIT) en un job server-side para generar el modelo 3D desde puntos de superficie + orientaciones.
+- Salida en **`.glb` / `.gltf`** (vía `pyvista` → `trimesh`) que Cesium carga como `Cesium3DTileset` o `Model`.
+- Anomalías magnéticas convertidas a **isosuperficies 3D** (scikit-image marching cubes) y exportadas a glTF para superponerlas a profundidad.
+
+## 4. Pipeline de datos (backend Lovable Cloud)
+
+Server functions TanStack (`createServerFn`) nuevas:
+
+1. `fetchMagAnomaly(bbox)` → descarga subset EMAG2 desde el ImageServer NOAA, recorta y devuelve COG + estadísticos (max, σ, percentiles).
+2. `detectMagTargets(bbox, threshold)` → corre detección de máximos locales (scipy `peak_local_max`) y devuelve puntos GeoJSON con rank + magnitud.
+3. `fetchSentinelTile(bbox, date)` → STAC search en Planetary Computer, firma asset y devuelve URL COG.
+4. `buildGeologyModel(projectId)` → GemPy/LoopStructural genera glTF y lo sube a Storage.
+5. `getSernageominLayers(bbox)` → WMS/WFS proxy con cache en `geo_cache` table.
+
+Tablas nuevas: `mag_targets`, `geology_models`, `satellite_scenes`, `geo_cache`.
+
+## 5. Módulos UI
+
+- `/dashboard/3d-pro` — visor Cesium full-screen con panel de capas:
+  - Toggle: Satélite, NDVI, Alteración (SWIR ratios), DEM hillshade, Magnetismo, Gravedad, Geología SERNAGEOMIN, Catastro, Vetas, Targets, Modelo geológico 3D, Cross-section.
+  - Slider de profundidad (drape de magnetismo a 0/500/1000/2000 m).
+  - Time slider para Sentinel-2.
+  - Click en anomalía → popup con valor nT, rank, recomendación IA.
+- `/dashboard/3d-pro/cross-section` — corte vertical interactivo a lo largo de polilínea dibujada.
+- `/dashboard/3d-pro/ai-copilot` — chat Lovable AI (gemini-2.5-pro) con contexto del modelo 3D + anomalías visibles.
+
+## 6. Fases de entrega
 
 ```text
-0. Portada + ficha resumen + mapa de ubicación nacional
-1. Resumen ejecutivo + tesis de inversión
-2. Tenencia: tabla concesiones LV-5 + vecinos + cumplimiento patentes
-3. Mapa cartográfico maestro (basemap ESRI + concesiones + targets + muestras)
-4. Carta geológica SERNAGEOMIN (WMS 1:1M + Hoja Illapel 1:250k) drapeada sobre LV-5
-5. Geología local interpretada + leyenda litoestratigráfica
-6. Mineralización y targets (tabla 108 targets filtrados a LV-5 + láminas por target crítico)
-7. Exploración satelital Sentinel-2 (índices alteración: clay B11/B12, iron-ox B4/B2, NDVI)
-8. Geofísica — proxy magnético v2 (Harmonica):
-   8a. Campo total proxy
-   8b. Continuación ascendente 100 m
-   8c. Primera derivada vertical (realce de bordes estructurales)
-   8d. Contornos sobre satelital
-9. Modelo 3D estructural (PyVista):
-   9a. Lámina isométrica con DEM + concesión + vetas + targets
-   9b. Sección NW-SE atravesando targets críticos
-   9c. Link al HTML interactivo (export PyVista standalone)
-10. Plan minero conceptual (footprint + drilling fase 1 + cronograma)
-11. CAPEX/OPEX scoping + ask de inversión
-12. QA/QC, limitaciones, disclaimers
-13. Próximos pasos NI 43-101 formal
-14. Anexos: tablas completas, láminas A3
+Fase 1 (Sprint 1, ~2 días)
+  - Instalar cesium + resium, montar /dashboard/3d-pro vacío con terreno + ESRI.
+  - Server fn fetchMagAnomaly (EMAG2) + capa raster sobre Cesium.
+  - Detección targets + marcadores 3D.
+
+Fase 2 (Sprint 2)
+  - Sentinel-2 STAC + ratios alteración (Kaufmann, Sabins).
+  - SERNAGEOMIN WMS + catastro WFS como overlays.
+  - Panel de capas con opacidad y slider de profundidad.
+
+Fase 3 (Sprint 3)
+  - Pipeline GemPy/LoopStructural → glTF en Storage.
+  - Carga del modelo subterráneo + cross-section dibujable.
+  - Export del visor a PDF NI 43-101 (snapshot + link QR).
+
+Fase 4 (Sprint 4)
+  - AI copilot geológico con contexto espacial.
+  - Fusion score (mag + alteración + estructura) → ranking automático de targets.
+  - Compartir vista vía URL firmada (token) para inversores.
 ```
 
-## Cambios concretos respecto al v2
+## 7. Detalles técnicos clave
 
-### A. Mapas con CRS real
+- Cesium Ion token como secret `CESIUM_ION_TOKEN` (free tier: 5 GB + terreno mundial).
+- Planetary Computer no requiere API key para search; el `sign()` se hace server-side con `planetary-computer` (Python) o llamada REST a `/sas/sign`.
+- EMAG2 vía `https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer/exportImage` (parámetros bbox + bboxSR=4326 + format=tiff) — sin auth.
+- GemPy se ejecuta en un job Python externo (Lovable Cloud workers no soportan binarios pesados); usar **Modal.com** o **Fly Machines** como runner gratuito y guardar el glTF en Storage. Alternativa puramente JS: `geomodel-js` o resampling propio.
+- Todos los rasters servidos como **COG** y leídos en Cesium con `zarr-cesium` o `CesiumGS/3d-tiles` pipeline.
 
-- Reproyección de toda la data del proyecto a **EPSG:32719** (UTM 19S, el huso de Tilama).
-- `contextily` para traer basemap ESRI World Imagery **como raster real**, no mosaico jpeg pegado.
-- Grilla UTM cada 500 m, escala gráfica, flecha N, leyenda categórica para concesiones/targets/muestras.
-- Misma proyección reutilizada en mapa geológico, mapa de anomalías y proyección XY del 3D → todas las láminas son comparables pixel a pixel.
+## 8. Riesgos y mitigación
 
-### B. Carta geológica SERNAGEOMIN integrada
+- **GemPy requiere Python pesado**: usar runner externo, no Worker. Si bloquea, MVP con isosuperficies de EMAG2 + vetas vectoriales (sin GemPy) ya entrega 80 % del valor.
+- **Cesium bundle grande (~3 MB gz)**: code-split en ruta `/dashboard/3d-pro` con `lazy()`.
+- **CORS de NOAA/SERNAGEOMIN**: proxy server-side obligatorio.
+- **Cesium Ion free tier**: si se supera, fallback a Cesium Terrain Provider de OpenTopography.
 
-Dos fuentes complementarias:
-- **WMS oficial 1:1M** (`catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer`, capa `0`) — `GetMap` directo al bbox LV-5, drapeado al 60% sobre ESRI.
-- **Hoja Illapel 1:250.000** (SERNAGEOMIN 1991, dominio público) — descarga del PNG/PDF público y georreferencia manual con `rasterio` usando 4 GCPs conocidos. Permite litología a escala distrital.
-- Disclaimer: ambas fuentes citadas explícitamente en cada figura.
+## 9. Entregables verificables
 
-### C. Pipeline geofísico real (Harmonica)
+- Ruta `/dashboard/3d-pro` funcional con al menos: terreno + satélite + EMAG2 + targets magnéticos del distrito Los Verdes-Tilama.
+- Tabla `mag_targets` con ≥ 5 anomalías reales detectadas vía EMAG2.
+- PDF NI 43-101 v5 con snapshot del visor y QR al enlace 3D público.
 
-Reemplaza la grilla multivariada artesanal:
-1. Construir "pseudo-puntos magnéticos" a partir de la densidad de anomalías Sentinel + Cu geoquímico.
-2. `harmonica.EquivalentSources` para grillar a malla regular.
-3. `harmonica.upward_continuation(distance=100m)` → suaviza ruido superficial.
-4. `harmonica.derivative_upward(order=1)` → realza contactos y estructuras.
-5. Contornos isolíneas cada 5 nT-equivalente, colormap geofísico (`cmocean.balance` o `RdBu_r`).
-6. Cada lámina incluye **el script de generación en pie de página** para trazabilidad.
-7. Disclaimer "proxy multivariado, no sustituye magnetometría terrestre" reforzado.
+---
 
-### D. 3D real con PyVista
-
-- DEM Copernicus 30 m recortado al bbox LV-5 (`rasterio` + `pyvista.StructuredGrid`).
-- Drapeado de Sentinel-2 **y** de la carta geológica como texturas seleccionables.
-- Vetas como `pyvista.PolyData` superficies implícitas: tomamos strike/dip de los lineamientos dominantes y los proyectamos a -500 m con cortes -100 m.
-- Sondajes propuestos como cilindros (`pyvista.Tube`) coloreados por leyenda.
-- Targets críticos como esferas escaladas por score.
-- Pit conceptual: prisma truncado parametrizado por área somera + ángulo de talud.
-- **Doble export**: PNG 4K (lámina del PDF) **+** HTML interactivo standalone (`scene.export_html`) que se entrega junto al PDF en `/mnt/documents/`.
-
-### E. ReportLab Platypus en vez de jsPDF
-
-- Plantilla con `BaseDocTemplate` + frames + footer con paginación y atribuciones.
-- TOC automático, tablas con `LongTable`, figuras vectoriales SVG cuando aplique.
-- Sin más bugs de hex de 3 caracteres, sin `setColor` artesanal.
-
-## Detalles técnicos
-
-- Script Python en `/tmp/lv5_report_v3/` con módulos: `data.py` (queries Supabase), `maps.py` (GeoPandas/Contextily), `geophys.py` (Harmonica), `model3d.py` (PyVista), `report.py` (ReportLab), `main.py`.
-- Dependencias instaladas vía `pip install --user` en sandbox (todas puro-Python o wheels: geopandas, contextily, rasterio, fatiando-harmonica, pyvista, reportlab, cmocean, owslib). No requieren GUI — PyVista off-screen con `pyvista.start_xvfb()` o `OSMesa`.
-- Datos vía `psql` (proyecto `7a499b02-…`): geometrías reales con `ST_AsGeoJSON(ST_Transform(geom, 4326))`, targets, muestras, anomalías.
-- WMS SERNAGEOMIN consultado con `owslib.wms.WebMapService` para `GetMap` reproyectado.
-- QA obligatorio: `pdftoppm -r 150` página por página, revisión visual de cada figura, búsqueda de glifos rotos / texto recortado / mapas sin leyenda.
-
-## Entregables
-
-1. `Distrito_Los_Verdes_Tilama_PreNI43-101_v3.0.pdf` (16–20 pp, ReportLab) en `/mnt/documents/`.
-2. `Distrito_Los_Verdes_Tilama_modelo3D_v3.html` (PyVista standalone, rotable, zoom, capas on/off) en `/mnt/documents/`.
-3. `Distrito_Los_Verdes_Tilama_anexo_laminas_A3.pdf` — láminas cartográficas A3 a alta resolución.
-
-## Lo que NO incluye este plan
-
-- Campaña magnetométrica real (sigue siendo recomendación para fase siguiente).
-- Modelo de recursos JORC/NI 43-101 formal con QP firmante.
-- Cambios en la plataforma Geocapitals (UI, edge functions, DB schema, visor 3D de la app).
-- Integración del HTML interactivo dentro de la app web (queda como artefacto descargable).
-
-¿Apruebas que arranque con esta v3.0 sobre stack Python geocientífico?
+Confírmame si avanzo con la **Fase 1** (Cesium + Resium + EMAG2 + targets reales) ya en el siguiente turno, o si prefieres que empiece por otra fase / ajuste el alcance (p. ej. saltarme GemPy y quedarme con isosuperficies puras).
