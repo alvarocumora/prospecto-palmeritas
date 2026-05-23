@@ -40,6 +40,7 @@ import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
+import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
@@ -232,6 +233,12 @@ const AuthenticatedDashboardMapRoute =
     path: '/dashboard/map',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardLv5Page5Route =
+  AuthenticatedDashboardLv5Page5RouteImport.update({
+    id: '/dashboard/lv5-page5',
+    path: '/dashboard/lv5-page5',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardInventoryRoute =
   AuthenticatedDashboardInventoryRouteImport.update({
     id: '/dashboard/inventory',
@@ -394,6 +401,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -448,6 +456,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -504,6 +513,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -560,6 +570,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/lv5-page5'
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
@@ -614,6 +625,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/lv5-page5'
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
@@ -669,6 +681,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
+    | '/_authenticated/dashboard/lv5-page5'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/ni43101'
@@ -934,6 +947,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMapRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/lv5-page5': {
+      id: '/_authenticated/dashboard/lv5-page5'
+      path: '/dashboard/lv5-page5'
+      fullPath: '/dashboard/lv5-page5'
+      preLoaderRoute: typeof AuthenticatedDashboardLv5Page5RouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/inventory': {
       id: '/_authenticated/dashboard/inventory'
       path: '/dashboard/inventory'
@@ -1169,6 +1189,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
+  AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
@@ -1206,6 +1227,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
+  AuthenticatedDashboardLv5Page5Route: AuthenticatedDashboardLv5Page5Route,
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
