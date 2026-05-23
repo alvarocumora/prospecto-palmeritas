@@ -1,9 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { Lock, Eye, EyeOff, Loader2, MapPin } from "lucide-react";
 
-import { verifyLosVerdesLiveMapPassword } from "@/lib/live-map.functions";
+import type { LiveMapVerifyResult } from "@/lib/live-map.server";
 import { FieldMapPublic } from "@/components/field/FieldMapPublic";
 
 const STORAGE_KEY = "live_map_losverdes_token";
@@ -60,7 +59,6 @@ function LiveLosVerdesPage() {
 }
 
 function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
-  const verify = useServerFn(verifyLosVerdesLiveMapPassword);
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -72,12 +70,17 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await verify({ data: { password } });
+      const response = await fetch("/api/public/live-map/losverdes/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const res = (await response.json()) as LiveMapVerifyResult;
       if (res.ok && res.token) {
         sessionStorage.setItem(STORAGE_KEY, res.token);
         onUnlock();
       } else {
-        setError(res.error ?? "Acceso denegado");
+        setError(!res.ok ? res.error : "Acceso denegado");
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);

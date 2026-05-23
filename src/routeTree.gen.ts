@@ -64,6 +64,7 @@ import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authe
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
@@ -379,6 +380,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const ApiPublicLiveMapLosverdesVerifyRoute =
+  ApiPublicLiveMapLosverdesVerifyRouteImport.update({
+    id: '/api/public/live-map/losverdes/verify',
+    path: '/api/public/live-map/losverdes/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
   AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport.update({
     id: '/field',
@@ -449,6 +456,7 @@ export interface FileRoutesByFullPath {
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -507,6 +515,7 @@ export interface FileRoutesByTo {
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -567,6 +576,7 @@ export interface FileRoutesById {
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -627,6 +637,7 @@ export interface FileRouteTypes {
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
+    | '/api/public/live-map/losverdes/verify'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -685,6 +696,7 @@ export interface FileRouteTypes {
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
+    | '/api/public/live-map/losverdes/verify'
   id:
     | '__root__'
     | '/'
@@ -744,6 +756,7 @@ export interface FileRouteTypes {
     | '/api/public/verify-compliance/$reportId'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
+    | '/api/public/live-map/losverdes/verify'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -765,6 +778,7 @@ export interface RootRouteChildren {
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
+  ApiPublicLiveMapLosverdesVerifyRoute: typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1154,6 +1168,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/api/public/live-map/losverdes/verify': {
+      id: '/api/public/live-map/losverdes/verify'
+      path: '/api/public/live-map/losverdes/verify'
+      fullPath: '/api/public/live-map/losverdes/verify'
+      preLoaderRoute: typeof ApiPublicLiveMapLosverdesVerifyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/geophysics/$surveyId/field': {
       id: '/_authenticated/dashboard/geophysics/$surveyId/field'
       path: '/field'
@@ -1337,7 +1358,18 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
+  ApiPublicLiveMapLosverdesVerifyRoute: ApiPublicLiveMapLosverdesVerifyRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
