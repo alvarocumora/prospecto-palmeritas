@@ -667,3 +667,29 @@ function NoteSheet({
     </div>
   );
 }
+
+function ChipBtn({
+  active,
+  color,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  color: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="pointer-events-auto min-h-[36px] px-2.5 rounded-md border font-mono text-[11px] backdrop-blur"
+      style={{
+        background: active ? `${color}26` : "rgba(20,18,15,0.85)",
+        borderColor: active ? color : "var(--border)",
+        color: active ? color : "var(--muted-foreground)",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
