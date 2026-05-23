@@ -43,6 +43,16 @@ export function GeoScene3D({
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
+  const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<SceneFocusDetail>).detail;
+      if (detail) setFocus(detail);
+    };
+    window.addEventListener(SCENE_FOCUS_EVENT, handler);
+    return () => window.removeEventListener(SCENE_FOCUS_EVENT, handler);
+  }, []);
 
   return (
     <div className={`relative h-full w-full bg-bg-panel ${className}`}>
