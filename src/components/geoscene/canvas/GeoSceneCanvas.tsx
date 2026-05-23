@@ -69,6 +69,10 @@ export function GeoSceneCanvas({ mode }: Props) {
 
   const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, surfaceMode);
   const { layer: holesLayer } = useDrillHolesLayer(active?.id ?? null, subsurfaceMode);
+  const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
+    active?.id ?? null,
+    subsurfaceMode,
+  );
 
   // Init map
   useEffect(() => {
