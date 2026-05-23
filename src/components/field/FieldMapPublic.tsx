@@ -128,6 +128,11 @@ export function FieldMapPublic() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showLineaments, setShowLineaments] = useState(false);
   const [show3D, setShow3D] = useState(false);
+  const [showCatastro, setShowCatastro] = useState(false);
+  const [catastroCount, setCatastroCount] = useState<number | null>(null);
+  const [loadingCatastro, setLoadingCatastro] = useState(false);
+  const [projectConcessions, setProjectConcessions] = useState<PublicProjectConcession[]>([]);
+  const catastroLayerRef = useRef<LayerGroup | null>(null);
   const [anomalies, setAnomalies] = useState<LosVerdesAnomalies | null>(null);
   const [loadingAnoms, setLoadingAnoms] = useState(false);
   const heatLayerRef = useRef<LayerGroup | null>(null);
@@ -137,6 +142,19 @@ export function FieldMapPublic() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [online, setOnline] = useState(
     typeof navigator !== "undefined" ? navigator.onLine : true,
+  );
+
+  const projectConcessionNorm = useMemo(
+    () =>
+      projectConcessions.map((c) =>
+        c.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, " ")
+          .trim(),
+      ),
+    [projectConcessions],
   );
 
   const { position, status: geoStatus } = useGeolocation(true);
