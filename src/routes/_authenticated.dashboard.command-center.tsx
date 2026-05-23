@@ -209,7 +209,7 @@ function CommandCenter() {
           </Panel>
           <Panel className="col-span-3 row-span-4" label="KPI · QA/QC" accent="amber">
             <GaugeBlock
-              value={kpis?.qaqcFailRate != null ? 1 - kpis.qaqcFailRate : null}
+              value={kpis?.qaqcFailRate != null ? 1 - kpis.qaqcFailRate / 100 : null}
               label="Tasa Aprobado"
               unit="%"
               color="amber"
