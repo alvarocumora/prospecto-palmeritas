@@ -80,7 +80,7 @@ function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
         sessionStorage.setItem(STORAGE_KEY, res.token);
         onUnlock();
       } else {
-        setError(res.error ?? "Contraseña incorrecta.");
+        setError(!res.ok ? res.error : "Contraseña incorrecta.");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error de verificación.");
