@@ -1,52 +1,89 @@
-# Informe PDF profesional — Tilama (Los Verdes)
+# Plan — Visor 3D satelital, herramientas de terreno y Live Map Tilama
 
-Generación **one-shot** del PDF, descargable desde `/mnt/documents/`. No se toca la app (sin nuevas rutas ni componentes). El proyecto en BD es `Distrito Cuprífero Los Verdes – Tilama` (centro −32.0389, −71.1128).
+Alcance grande. Lo divido en 3 sprints entregables por separado para que valides cada uno antes de seguir.
 
-## Datos reales que usaré (Supabase, proyecto Tilama)
+---
 
-- **45 anomalías satelitales** clasificadas: 11 hidrotermal (high), 11 óxidos de Fe (10 high + 1 med), 11 arcillas (10 high + 1 med), 11 lineamientos estructurales (2 high + 9 med), 1 NDVI.
-- **108 exploration_targets** priorizados.
-- **15 concesiones mineras** del distrito.
-- **0 magnetometría de campo** → la sección "magnética" se construye con la **firma magnética inferida de satélite** (ratios SWIR/NIR + lineamientos DEM), declarado explícitamente en el informe. Si quieres magnetometría real, hay que cargarla antes; se lo dejo señalado como "siguiente paso".
+## Sprint 1 — Visor 3D "Satélite → Subsuelo" (genérico, todos los proyectos)
 
-## Estructura del PDF (A4, ~25–30 páginas)
+**Componente nuevo**: `src/components/geology3d/SatToSubsurface3DViewer.tsx`
 
-1. **Portada** — Logo, título, AOI, fecha, disclaimer NI 43-101 preliminar.
-2. **Resumen ejecutivo** — Tesis (Cu pórfido + IOCG distrital), 5 KPIs (área, # targets, anomalías high, concesiones, score promedio).
-3. **Ubicación y accesos** — Mapa Esri World Imagery con AOI + caminos, tabla de coordenadas, contexto regional (Faja Cretácica).
-4. **Marco geológico** — Litología, edades, mineralización conocida en distrito.
-5. **Geofísica magnética + anomalías satelitales** (3–4 páginas)
-   - Mapa Esri sat + halos hidrotermales (rojo), óxidos Fe (naranja), arcillas (violeta).
-   - Mapa Sentinel-2 con índice SWIR/NIR realzado.
-   - Tabla de los 11 anomalías high de hidrotermal + score.
-6. **Estructuras 3D satelitales** (3 páginas)
-   - Mapa Esri con lineamientos NW-SE y N-S.
-   - **Render 3D real** del DEM Copernicus con drape Sentinel-2 + anomalías extruidas (capturas estáticas desde tres ángulos: oblicuo NE, oblicuo SW, vertical). Genero los renders server-side con `gl` headless o, si no es viable en sandbox, con `pydeck`/`matplotlib 3D` sobre el DEM real descargado del endpoint Copernicus.
-   - Sección esquemática estructura-mineralización.
-7. **Targets priorizados** — Tabla top-15 (de los 108) con coords, tipo, score, evidencia satelital cruzada.
-8. **Concesiones** — Mapa Esri + tabla de las 15 concesiones (titular, tipo, vencimiento, superficie).
-9. **Plan de explotación preliminar** (4 páginas)
-   - Método propuesto (open pit cuprífero supérgeno + sulfuros primarios a profundidad).
-   - Tonelaje conceptual (rango por analogía distrital, claramente marcado como "exploration target, no recurso").
-   - Capex/opex orientativo, escenarios de precio Cu (3.50 / 4.00 / 4.50 USD/lb), NPV/IRR sensibilidad.
-   - Cronograma 24 meses (sondajes → recursos NI 43-101 → PEA).
-10. **Riesgos, permisos, comunidades, siguientes pasos**.
-11. **Anexos** — Metodología, fuentes, coordenadas completas, glosario.
+Cubo geo-referenciado tipo OKM Rover / Map Your Mining:
+- **Cara superior** = textura Sentinel-2 (Esri World Imagery fallback) sobre DEM Copernicus (relieve real).
+- **Caras laterales y base** = corte vertical sintético. Cada anomalía satelital (`satellite_anomalies`) se proyecta hacia abajo como columna 3D con:
+  - profundidad ∝ `score` (0–100 → 0–500 m)
+  - color por `index_code` (Fe oxides, arcillas, hidrotermal, lineamientos)
+  - opacidad por `severity`
+- Targets (`exploration_targets`) como esferas en superficie con halo.
+- Sondajes existentes (si hay) trazados reales hacia abajo (ya existe `Geology3DViewer` — reutilizo el patrón maplibre + deck.gl `ColumnLayer` + `TerrainLayer`).
 
-## Cómo se generan los mapas
+**Reutiliza** lo que ya hay (`src/lib/geology3d/`, `scene3d.server`, `Map3DView.tsx`). No reescribe.
 
-- **Esri World Imagery + Sentinel-2 cloudless + Copernicus DEM hillshade** → descargo tiles XYZ vía `staticmap`/`mercantile`+`Pillow` componiendo el AOI a ~zoom 13–15. Overlays de anomalías y lineamientos dibujados con `Pillow` desde el GeoJSON real de Supabase.
-- **Render 3D**: descargo el DEM real Copernicus 30 m del AOI (mismo origen que `scene3d.server`), lo proyecto con `numpy` + `matplotlib` 3D surface, dropeo el Sentinel-2 como textura y extruyo las anomalías high como columnas verticales coloreadas por score. Tres ángulos.
+**Server fn**: `getSatToSubsurfaceScene({ projectId })` en `src/lib/satToSubsurface.functions.ts` — agrupa anomalías + DEM bbox + sample Sentinel-2 tile URL. RLS por proyecto vía `requireSupabaseAuth`.
 
-## Render técnico
+**Ruta**: `/dashboard/sat3d` (`_authenticated.dashboard.sat3d.tsx`) — selector de proyecto + visor full-screen.
 
-- Python en `/tmp/`: `reportlab` para layout, `Pillow` + `mercantile` + `requests` para basemaps, `numpy` + `matplotlib` para 3D, `psycopg2` o `read_query` para datos.
-- QA obligatorio: convierto cada página del PDF a JPG y reviso visualmente antes de entregar.
-- Output: `/mnt/documents/Tilama_Informe_Mina_Explotacion.pdf` + `<presentation-artifact>` para descarga.
+**También integrado en**: MissionControl de cada proyecto (Tilama / Palmeras / Franco) como nueva pestaña "Subsuelo 3D".
 
-## Avisos honestos
+---
 
-- El informe se etiqueta **"Preliminar / Exploration Target"**: sin sondajes ni magnetometría de campo, no es NI 43-101 firmable. Sirve para inversores y due diligence inicial.
-- Si quieres magnetometría **real** (no derivada de satélite), súbeme el CSV de estaciones o dame OK para cargar un dataset sintético calibrado al distrito.
+## Sprint 2 — Herramientas de terreno (módulo `/dashboard/field`)
 
-¿Apruebo y construyo?
+Se construye sobre el `FieldMap.tsx` existente.
+
+1. **GPS + captura POI** — ya existe (`useFieldPois`, `POISheet`). Verifico y pulo UX.
+2. **Overlay anomalías satelitales** — nueva capa Leaflet en `FieldMap`: lee `satellite_anomalies` del proyecto activo, dibuja polígonos coloreados por índice con toggle on/off (panel lateral). Reutiliza `anomalyHeatLayer.ts`.
+3. **Brújula AR / rumbo** — usa `ArRadarOverlay` ya presente. Botón "Modo AR" en FieldMap → abre overlay full-screen con `DeviceOrientation` API + targets cercanos en radar polar (rumbo + distancia).
+4. **Export GPX/KML** — botón "Exportar" en FieldMap:
+   - GPX: POIs + targets + tracks (servidor: `exportFieldGpx.functions.ts`, devuelve string XML).
+   - KML: igual + halos de anomalías como polígonos coloreados (abre en Google Earth con relieve real).
+   - Descarga directa via Blob.
+
+---
+
+## Sprint 3 — Nuevo `/live/tilama` público
+
+Clon estructural de `/live/losverdes`:
+- Password gate (env `LIVE_MAP_TILAMA_PASSWORD`, server route `api/public/live-map/tilama/verify`).
+- Vista pública con Esri World Imagery + 45 anomalías + 108 targets + 15 concesiones de Tilama.
+- Botón "Ver subsuelo 3D" → embed del nuevo `SatToSubsurface3DViewer` en modo read-only.
+- Sin login. RLS bypass solo para los IDs whitelisteados de Tilama (server fn pública).
+
+Requiere secret nuevo: **`LIVE_MAP_TILAMA_PASSWORD`** (te lo pido al iniciar Sprint 3).
+
+---
+
+## Sprint 4 (opcional, después de validar) — Regenerar PDF Tilama
+
+Añadir al PDF actual una sección nueva "Vista 3D satélite→subsuelo" con 3 renders (NE/SW/Top) del cubo del Sprint 1 (matplotlib 3D, no captura del navegador). Una sola pasada de script Python.
+
+---
+
+## Detalles técnicos
+
+```text
+src/
+├── components/geology3d/
+│   └── SatToSubsurface3DViewer.tsx        [NEW] — maplibre + deck.gl
+├── lib/
+│   └── satToSubsurface.functions.ts       [NEW] — server fn agregadora
+├── components/field/
+│   ├── FieldMap.tsx                       [EDIT] — toggle anomalías + AR + export
+│   └── satAnomalyLayer.ts                 [NEW] — capa Leaflet
+├── lib/
+│   └── fieldExport.functions.ts           [NEW] — GPX/KML server fn
+├── routes/
+│   ├── _authenticated.dashboard.sat3d.tsx [NEW]
+│   ├── live.tilama.tsx                    [NEW]
+│   └── api.public.live-map.tilama.verify.ts [NEW]
+```
+
+Stack: maplibre-gl + @deck.gl/layers (TerrainLayer, ColumnLayer, ScatterplotLayer, BitmapLayer para textura sat) ya instalados. Sin nuevas deps pesadas.
+
+---
+
+## Pregunta antes de empezar
+
+Sprint 1 es el corazón (visor 3D real reusable). Sprints 2 y 3 dependen poco entre sí.
+
+**¿Lo hago todo seguido o entrego Sprint 1 primero para que lo valides en pantalla y después sigo?** Te recomiendo entregar Sprint 1 primero — son ~6 archivos y vale más verlo funcionando que esperar el combo completo.
