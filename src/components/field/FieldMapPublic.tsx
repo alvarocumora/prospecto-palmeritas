@@ -569,6 +569,11 @@ export function FieldMapPublic() {
           <Zap className="w-3 h-3 inline mr-1" />
           Vetas
         </ChipBtn>
+        <ChipBtn active={showCatastro} color="#22c55e" onClick={() => setShowCatastro((v) => !v)}>
+          <Layers className="w-3 h-3 inline mr-1" />
+          Catastro{catastroCount != null && showCatastro ? ` · ${catastroCount}` : ""}
+          {loadingCatastro && <Loader2 className="w-3 h-3 inline ml-1 animate-spin" />}
+        </ChipBtn>
         <ChipBtn active={show3D} color="#a78bfa" onClick={() => setShow3D(true)}>
           <Box className="w-3 h-3 inline mr-1" />
           3D
