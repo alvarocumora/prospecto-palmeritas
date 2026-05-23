@@ -170,10 +170,11 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
 
       {/* Actions zone */}
       <div className="flex items-center gap-1.5 h-full pr-2 pl-3 border-l border-border/60">
+        <GlobalGeoCopilot />
         <button
           type="button"
           title="Command palette (⌘K)"
-          className="hidden sm:inline-flex items-center gap-1 h-7 px-2 rounded-[2px] border border-border bg-bg-elevated text-text-mono hover:border-signal-cyan hover:text-signal-cyan transition-colors font-mono text-[10px]"
+          className="hidden lg:inline-flex items-center gap-1 h-7 px-2 rounded-[2px] border border-border bg-bg-elevated text-text-mono hover:border-signal-cyan hover:text-signal-cyan transition-colors font-mono text-[10px]"
         >
           <Command className="w-3 h-3" />
           <span>⌘K</span>
