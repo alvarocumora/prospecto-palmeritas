@@ -497,7 +497,7 @@ async function buildPdf() {
   const M = 14;
 
   // Helpers
-  const setColor = (h) => { const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16); return [r,g,b]; };
+  const setColor = (h) => { let x=h.replace('#',''); if(x.length===3) x=x.split('').map(c=>c+c).join(''); const r=parseInt(x.slice(0,2),16),g=parseInt(x.slice(2,4),16),b=parseInt(x.slice(4,6),16); return [r,g,b]; };
   const fillRect = (x,y,w,h,hex) => { const [r,g,b]=setColor(hex); doc.setFillColor(r,g,b); doc.rect(x,y,w,h,'F'); };
   const text = (s, x, y, opts={}) => {
     if (opts.color) { const [r,g,b]=setColor(opts.color); doc.setTextColor(r,g,b); }
