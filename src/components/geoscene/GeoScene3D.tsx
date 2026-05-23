@@ -1,8 +1,13 @@
-import { lazy, Suspense, useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Loader2, Sparkles, Crosshair, X } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
+import {
+  ANCHOR_LABEL,
+  SCENE_FOCUS_EVENT,
+  type SceneFocusDetail,
+} from "./anchors";
 
 // Lazy-load de visores legacy: cada modo solo carga su engine cuando se activa.
 // Sprint 3+: estos se reescriben como capas deck.gl sobre un canvas único.
@@ -38,6 +43,16 @@ export function GeoScene3D({
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
+  const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<SceneFocusDetail>).detail;
+      if (detail) setFocus(detail);
+    };
+    window.addEventListener(SCENE_FOCUS_EVENT, handler);
+    return () => window.removeEventListener(SCENE_FOCUS_EVENT, handler);
+  }, []);
 
   return (
     <div className={`relative h-full w-full bg-bg-panel ${className}`}>
@@ -61,6 +76,27 @@ export function GeoScene3D({
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
+
+      {/* Focus banner: chip clicado en el copilot */}
+      {focus && (
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-bg-secondary/95 backdrop-blur border border-gold/60 rounded px-2.5 py-1.5 shadow-lg">
+          <Crosshair className="w-3.5 h-3.5 text-gold animate-pulse" />
+          <div className="text-[11px] font-mono">
+            <span className="text-muted-foreground uppercase mr-1">
+              {ANCHOR_LABEL[focus.kind]}
+            </span>
+            <span className="text-gold font-semibold">{focus.code}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFocus(null)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Quitar foco"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
 
       {/* Contextual AI copilot */}
       <SceneCopilot mode={mode} variant={variant} />

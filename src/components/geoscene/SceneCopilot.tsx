@@ -4,6 +4,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { GeoSceneMode, GeoSceneVariant } from "./types";
+import { ANCHOR_LABEL, emitSceneFocus, parseAnchors } from "./anchors";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
@@ -185,7 +186,7 @@ export function SceneCopilot({
                       : "bg-background border border-border text-foreground"
                   }`}
                 >
-                  {m.content}
+                  {m.role === "assistant" ? renderWithAnchors(m.content) : m.content}
                 </div>
               </div>
             ))}
@@ -223,4 +224,24 @@ export function SceneCopilot({
       )}
     </>
   );
+}
+
+function renderWithAnchors(text: string) {
+  const parts = parseAnchors(text);
+  return parts.map((p, i) => {
+    if (p.type === "text") return <span key={i}>{p.value}</span>;
+    const { kind, code } = p.anchor;
+    return (
+      <button
+        key={i}
+        type="button"
+        onClick={() => emitSceneFocus(p.anchor)}
+        className="inline-flex items-center gap-1 mx-0.5 px-1.5 py-0.5 rounded border border-gold/40 bg-gold/10 hover:bg-gold/20 text-[10px] font-mono uppercase text-gold transition-colors align-baseline"
+        title={`Enfocar ${ANCHOR_LABEL[kind]} ${code} en la escena`}
+      >
+        <span className="opacity-70">{ANCHOR_LABEL[kind]}</span>
+        <span className="font-semibold">{code}</span>
+      </button>
+    );
+  });
 }

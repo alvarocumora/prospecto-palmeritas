@@ -237,6 +237,14 @@ REGLAS:
 - Usa unidades SI, notación geológica estándar (Au g/t, Cu %, m, °).
 - Responde en máx 6 párrafos, con bullets cuando ayuden.
 
+ANCLAJES DE ESCENA (OBLIGATORIO):
+- Cada vez que menciones un target, sondaje o anomalía del contexto, etiqueta la primera aparición usando exactamente estos tokens en línea:
+  · [target:CODE]    p.ej. [target:T-007]
+  · [hole:HOLE_ID]   p.ej. [hole:DDH-12]
+  · [anomaly:CODE]   p.ej. [anomaly:MAG-03]
+- Usa SIEMPRE el código exacto que aparece en el contexto. No inventes códigos.
+- Estos tokens se renderizan como chips clicables que enfocan la entidad en la escena 3D.
+
 CONTEXTO DEL PROYECTO:
 ${projectContext}${focusBlock}`;
 
