@@ -1,14 +1,15 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import "leaflet/dist/leaflet.css";
-import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap } from "lucide-react";
+import type { GeoJSON as LeafletGeoJSON, LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   getLosVerdesPublicLayers,
   getLosVerdesAnomalies,
   type PublicTarget,
+  type PublicProjectConcession,
   type LosVerdesAnomalies,
 } from "@/lib/livemap-public.functions";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -18,6 +19,8 @@ import {
   buildLineamentsLayer,
   removeLayer,
 } from "@/components/field/anomalyHeatLayer";
+import { loadCatastro, bboxAround } from "@/components/map/catastroLayer";
+import { CATASTRO_STYLE, type CatastroOrigen } from "@/components/map/overlays";
 
 const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
