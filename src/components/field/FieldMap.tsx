@@ -645,6 +645,27 @@ export function FieldMap() {
         }}
         onQueue={(p) => enqueue(p)}
       />
+
+      {arOpen && (
+        <div className="absolute inset-0 z-[2000] bg-background/95 backdrop-blur p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-mono text-gold">Brújula AR · Targets cercanos</div>
+            <button
+              type="button"
+              onClick={() => setArOpen(false)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border text-[11px] font-mono"
+            >
+              <X className="w-3 h-3" /> Cerrar
+            </button>
+          </div>
+          <ArRadarOverlay objects={arObjects} headingDeg={arHeading} />
+          {!position && (
+            <div className="text-[11px] font-mono text-muted-foreground">
+              Esperando señal GPS…
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
