@@ -1,89 +1,124 @@
-# Plan — Visor 3D satelital, herramientas de terreno y Live Map Tilama
+# Geocapitals OS — Plataforma Unificada de Exploración y Certificación Minera
 
-Alcance grande. Lo divido en 3 sprints entregables por separado para que valides cada uno antes de seguir.
+## Visión
 
----
+Una sola plataforma donde un proyecto minero vive su ciclo completo —desde la primera anomalía satelital hasta el NI 43-101 firmado y el deal cerrado con inversionistas— con **IA geológica, 3D real y trazabilidad criptográfica** como columna vertebral.
 
-## Sprint 1 — Visor 3D "Satélite → Subsuelo" (genérico, todos los proyectos)
-
-**Componente nuevo**: `src/components/geology3d/SatToSubsurface3DViewer.tsx`
-
-Cubo geo-referenciado tipo OKM Rover / Map Your Mining:
-- **Cara superior** = textura Sentinel-2 (Esri World Imagery fallback) sobre DEM Copernicus (relieve real).
-- **Caras laterales y base** = corte vertical sintético. Cada anomalía satelital (`satellite_anomalies`) se proyecta hacia abajo como columna 3D con:
-  - profundidad ∝ `score` (0–100 → 0–500 m)
-  - color por `index_code` (Fe oxides, arcillas, hidrotermal, lineamientos)
-  - opacidad por `severity`
-- Targets (`exploration_targets`) como esferas en superficie con halo.
-- Sondajes existentes (si hay) trazados reales hacia abajo (ya existe `Geology3DViewer` — reutilizo el patrón maplibre + deck.gl `ColumnLayer` + `TerrainLayer`).
-
-**Reutiliza** lo que ya hay (`src/lib/geology3d/`, `scene3d.server`, `Map3DView.tsx`). No reescribe.
-
-**Server fn**: `getSatToSubsurfaceScene({ projectId })` en `src/lib/satToSubsurface.functions.ts` — agrupa anomalías + DEM bbox + sample Sentinel-2 tile URL. RLS por proyecto vía `requireSupabaseAuth`.
-
-**Ruta**: `/dashboard/sat3d` (`_authenticated.dashboard.sat3d.tsx`) — selector de proyecto + visor full-screen.
-
-**También integrado en**: MissionControl de cada proyecto (Tilama / Palmeras / Franco) como nueva pestaña "Subsuelo 3D".
+Hoy Geocapitals tiene 135 tablas, 35 edge functions, 3D real (Copernicus + Sentinel), catastro, satelital, geofísica, drilling, NI 43-101 y deals. Pero está **fragmentado en ~60 rutas** sin un hilo narrativo. Este plan no agrega features: **unifica, jerarquiza y le da una identidad visionaria.**
 
 ---
 
-## Sprint 2 — Herramientas de terreno (módulo `/dashboard/field`)
+## Los 4 pilares unificadores
 
-Se construye sobre el `FieldMap.tsx` existente.
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  1. EXPLORE    →  2. MODEL    →  3. CERTIFY   →  4. DEAL    │
+│  (descubrir)      (entender)     (validar)        (monetizar)│
+└─────────────────────────────────────────────────────────────┘
+        ↑                                              ↓
+        └──────── Geo Copilot (IA transversal) ────────┘
+```
 
-1. **GPS + captura POI** — ya existe (`useFieldPois`, `POISheet`). Verifico y pulo UX.
-2. **Overlay anomalías satelitales** — nueva capa Leaflet en `FieldMap`: lee `satellite_anomalies` del proyecto activo, dibuja polígonos coloreados por índice con toggle on/off (panel lateral). Reutiliza `anomalyHeatLayer.ts`.
-3. **Brújula AR / rumbo** — usa `ArRadarOverlay` ya presente. Botón "Modo AR" en FieldMap → abre overlay full-screen con `DeviceOrientation` API + targets cercanos en radar polar (rumbo + distancia).
-4. **Export GPX/KML** — botón "Exportar" en FieldMap:
-   - GPX: POIs + targets + tracks (servidor: `exportFieldGpx.functions.ts`, devuelve string XML).
-   - KML: igual + halos de anomalías como polígonos coloreados (abre en Google Earth con relieve real).
-   - Descarga directa via Blob.
-
----
-
-## Sprint 3 — Nuevo `/live/tilama` público
-
-Clon estructural de `/live/losverdes`:
-- Password gate (env `LIVE_MAP_TILAMA_PASSWORD`, server route `api/public/live-map/tilama/verify`).
-- Vista pública con Esri World Imagery + 45 anomalías + 108 targets + 15 concesiones de Tilama.
-- Botón "Ver subsuelo 3D" → embed del nuevo `SatToSubsurface3DViewer` en modo read-only.
-- Sin login. RLS bypass solo para los IDs whitelisteados de Tilama (server fn pública).
-
-Requiere secret nuevo: **`LIVE_MAP_TILAMA_PASSWORD`** (te lo pido al iniciar Sprint 3).
+Cada módulo actual se reasigna a uno de estos 4 pilares. Se eliminan rutas huérfanas y se consolidan duplicados (ej. 3 visores 3D → 1 visor canónico con modos).
 
 ---
 
-## Sprint 4 (opcional, después de validar) — Regenerar PDF Tilama
+## Fase 1 — Mission Control unificado (la "portada operativa")
 
-Añadir al PDF actual una sección nueva "Vista 3D satélite→subsuelo" con 3 renders (NE/SW/Top) del cubo del Sprint 1 (matplotlib 3D, no captura del navegador). Una sola pasada de script Python.
+Reemplaza el dashboard actual por un **cockpit único por proyecto** con 4 zonas que mapean a los 4 pilares. Layout tipo Bloomberg/Palantir:
+
+```text
+┌──────────────────────────────────────────────────────────┐
+│ Header: Proyecto · Commodity · Fase · Fusion Score · QPS │
+├────────────────┬─────────────────────────────────────────┤
+│  EXPLORE       │   MODEL (visor 3D real, centro)         │
+│  - Targets     │   ┌─────────────────────────────────┐   │
+│  - Sat anom    │   │  DEM + Sentinel + anomalías     │   │
+│  - Geofísica   │   │  vetas + pórfidos + drill holes │   │
+│  - Catastro    │   └─────────────────────────────────┘   │
+├────────────────┼─────────────────────────────────────────┤
+│  CERTIFY       │   DEAL                                  │
+│  - NI 43-101   │   - Data room · Inversionistas         │
+│  - QPS sigs    │   - Marketplace · Compliance           │
+└────────────────┴─────────────────────────────────────────┘
+```
+
+- Una sola navegación lateral con los 4 pilares (no 60 entradas).
+- El visor 3D real (Geology3DViewer + SatToSubsurface) se vuelve el centro visual del cockpit, no una ruta separada.
+- Fusion Score y QPS status siempre visibles en el header como "signos vitales" del proyecto.
+
+## Fase 2 — Geo Copilot transversal
+
+Un copiloto IA persistente (drawer derecho, atajo ⌘K) que entiende el contexto del proyecto y puede:
+
+- "Genérame 5 targets desde las anomalías Sentinel + lineamientos magnéticos"
+- "Explica el target T-042 en lenguaje QP"
+- "Redacta la sección 9 del NI 43-101 con la data actual"
+- "Compara este proyecto con depósitos pórfido análogos en Chile"
+
+Usa `google/gemini-3.1-pro-preview` para razonamiento + `gemini-3.1-flash-image-preview` para overlays geológicos. Reusa `geo-assistant` y `geo-brief` ya existentes, los unifica detrás de una sola UI.
+
+## Fase 3 — 3D canónico (un solo visor, tres modos)
+
+Hoy hay `Geology3DViewer`, `SatToSubsurface3DViewer`, `MagAnomaly3DPro`, `BlockModel3DViewer`. Se consolidan en **un solo `GeoScene3D`** con modos:
+
+- **Surface**: DEM + Sentinel + catastro + targets
+- **Subsurface**: vetas, pórfidos, drill holes, secciones
+- **Resource**: bloques, leyes, pit shells, NPV/IRR
+
+Mismo motor (deck.gl), mismas capas base, toggles arriba. Esto elimina ~3000 líneas de duplicación.
+
+## Fase 4 — Certificación como producto de primera clase
+
+NI 43-101 deja de ser un PDF generado on-demand y se vuelve un **documento vivo** versionado:
+
+- Editor sección por sección con QP asignado
+- Cada figura/tabla referencia data viva (si cambian las anomalías, la sección 9 se marca "stale")
+- Firma criptográfica por sección (envelopes que ya existen en `signature_envelopes`)
+- Verificación pública vía `/api/public/verify-compliance/$reportId` (ya existe)
+- Export PDF determinista + hash on-chain opcional
+
+Esto convierte la certificación en el **moat defendible** vs competidores.
+
+## Fase 5 — Deal Room conectado
+
+Cuando un proyecto alcanza cierto Fusion Score + NI 43-101 firmado, automáticamente puede publicarse al marketplace con:
+
+- One-pager auto-generado (hero del cockpit + KPIs + scenarios económicos)
+- Data room con permisos granulares por inversionista
+- Tracking de quién vio qué (ya existe `usage` types)
+
+---
+
+## Roadmap propuesto (6 sprints de 1 semana)
+
+| Sprint | Entregable | Foco |
+|---|---|---|
+| 1 | Mission Control shell + navegación de 4 pilares | UX/IA unificada |
+| 2 | Visor 3D canónico (GeoScene3D) con 3 modos | Consolidación técnica |
+| 3 | Geo Copilot drawer transversal | IA |
+| 4 | NI 43-101 documento vivo + staleness tracking | Certificación |
+| 5 | Deal Room conectado al cockpit | Monetización |
+| 6 | Onboarding visionario + landing geocapitals.com | Go-to-market |
 
 ---
 
 ## Detalles técnicos
 
-```text
-src/
-├── components/geology3d/
-│   └── SatToSubsurface3DViewer.tsx        [NEW] — maplibre + deck.gl
-├── lib/
-│   └── satToSubsurface.functions.ts       [NEW] — server fn agregadora
-├── components/field/
-│   ├── FieldMap.tsx                       [EDIT] — toggle anomalías + AR + export
-│   └── satAnomalyLayer.ts                 [NEW] — capa Leaflet
-├── lib/
-│   └── fieldExport.functions.ts           [NEW] — GPX/KML server fn
-├── routes/
-│   ├── _authenticated.dashboard.sat3d.tsx [NEW]
-│   ├── live.tilama.tsx                    [NEW]
-│   └── api.public.live-map.tilama.verify.ts [NEW]
-```
-
-Stack: maplibre-gl + @deck.gl/layers (TerrainLayer, ColumnLayer, ScatterplotLayer, BitmapLayer para textura sat) ya instalados. Sin nuevas deps pesadas.
+- **Rutas**: colapsar `_authenticated.dashboard.*` (~40 rutas) a 4 rutas raíz (`/explore`, `/model`, `/certify`, `/deal`) + sub-rutas. Mantener compatibilidad con redirects 6 meses.
+- **Diseño**: paleta `Midnight Indigo` + acentos `Emerald Prestige` (autoridad técnica + lujo minero). Tipografía: Space Grotesk + DM Sans. Tokens en `src/styles.css`.
+- **Estado**: TanStack Query como única fuente para data del proyecto activo. Eliminar duplicación entre `useProjects`, `useExecutiveKpis`, etc.
+- **Backend**: 35 edge functions auditadas — consolidar las 8 de "compute-*" en un dispatcher único `compute-engine` con tipo de cómputo como input.
+- **Realtime**: canal único `project:{id}` que multiplexa targets, anomalías, firmas, etc., en vez de N canales.
 
 ---
 
-## Pregunta antes de empezar
+## Preguntas antes de empezar
 
-Sprint 1 es el corazón (visor 3D real reusable). Sprints 2 y 3 dependen poco entre sí.
+Para asegurar que el sprint 1 sea exactamente lo que esperas:
 
-**¿Lo hago todo seguido o entrego Sprint 1 primero para que lo valides en pantalla y después sigo?** Te recomiendo entregar Sprint 1 primero — son ~6 archivos y vale más verlo funcionando que esperar el combo completo.
+1. **¿Empezamos por el Mission Control (Fase 1)** como primer entregable visible, o prefieres que ataquemos primero la **consolidación del visor 3D** (Fase 2) porque es el diferenciador visual más fuerte?
+2. **¿Mantenemos las rutas antiguas como redirects** durante la migración, o hacemos un corte limpio (riesgo si hay usuarios con bookmarks)?
+3. **¿La certificación NI 43-101 viva** (Fase 4) debe incluir firma on-chain desde el inicio, o lo dejamos como opt-in para una v2?
+
+Apruébame el plan (o ajústalo) y arrancamos por la fase que prefieras.
