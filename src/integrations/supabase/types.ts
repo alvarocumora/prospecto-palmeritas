@@ -1653,6 +1653,42 @@ export type Database = {
         }
         Relationships: []
       }
+      commodity_prices: {
+        Row: {
+          change_pct: number
+          created_at: string
+          id: string
+          name: string
+          price: number
+          source: string | null
+          symbol: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          change_pct?: number
+          created_at?: string
+          id?: string
+          name: string
+          price: number
+          source?: string | null
+          symbol: string
+          unit: string
+          updated_at?: string
+        }
+        Update: {
+          change_pct?: number
+          created_at?: string
+          id?: string
+          name?: string
+          price?: number
+          source?: string | null
+          symbol?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       community_events: {
         Row: {
           attendees: number | null
