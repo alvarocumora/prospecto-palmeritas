@@ -212,7 +212,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         });
       }
     });
-    continue;
+    return out;
   }, [anomGrouped, enabled, depthScale, showColumns]);
 
   // ---------- VETAS: planos inclinados 3D desde lineamientos ----------
