@@ -600,6 +600,37 @@ export function FieldMapPublic() {
         </div>
       )}
 
+      {/* Catastro mini-legend */}
+      {showCatastro && (
+        <div className={`absolute ${showHeatmap ? "bottom-36" : "bottom-20"} left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground`}>
+          <div className="text-gold font-bold mb-1">Catastro SERNAGEOMIN</div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+            {(Object.keys(CATASTRO_STYLE) as CatastroOrigen[]).map((o) => (
+              <div key={o} className="flex items-center gap-1.5">
+                <span
+                  className="inline-block w-3 h-2 rounded-sm border"
+                  style={{
+                    background: CATASTRO_STYLE[o].fillColor,
+                    borderColor: CATASTRO_STYLE[o].color,
+                    opacity: 0.85,
+                  }}
+                />
+                <span>{CATASTRO_STYLE[o].label}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-1.5 col-span-2 mt-0.5 pt-1 border-t border-border">
+              <span
+                className="inline-block w-3 h-2 rounded-sm border-2"
+                style={{ background: "#facc1559", borderColor: "#facc15" }}
+              />
+              <span className="text-yellow-300">Pertenencias del proyecto</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+
       {/* Bottom controls */}
       <div className="absolute bottom-4 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2">
         <div className="flex items-center gap-2">
