@@ -1,13 +1,22 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Loader2, Sparkles, Crosshair, X } from "lucide-react";
+import { Loader2, Sparkles, Crosshair, X, Layers, Box } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
-import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
+import {
+  MODE_LABELS,
+  type GeoSceneEngine,
+  type GeoSceneMode,
+  type GeoSceneProps,
+} from "./types";
 import {
   ANCHOR_LABEL,
   SCENE_FOCUS_EVENT,
   type SceneFocusDetail,
 } from "./anchors";
+
+const GeoSceneCanvas = lazy(() =>
+  import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
+);
 
 // Lazy-load de visores legacy: cada modo solo carga su engine cuando se activa.
 // Sprint 3+: estos se reescriben como capas deck.gl sobre un canvas único.
@@ -39,9 +48,12 @@ export function GeoScene3D({
   variant = "default",
   showModeTabs = true,
   className = "",
+  engine: engineProp,
 }: GeoSceneProps) {
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
+  const [internalEngine, setInternalEngine] = useState<GeoSceneEngine>(engineProp ?? "deckgl");
   const mode = modeProp ?? internalMode;
+  const engine = engineProp ?? internalEngine;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
 
@@ -63,6 +75,34 @@ export function GeoScene3D({
             <Sparkles className="w-3 h-3 text-gold" />
             GeoScene3D · {meta.sub}
           </div>
+          {!engineProp && (
+            <div className="flex items-center rounded border border-border bg-bg-secondary/95 backdrop-blur overflow-hidden text-[10px] font-mono uppercase">
+              <button
+                type="button"
+                onClick={() => setInternalEngine("deckgl")}
+                className={`inline-flex items-center gap-1 px-2 py-1 ${
+                  engine === "deckgl"
+                    ? "bg-gold text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Motor unificado MapLibre + deck.gl con terreno real"
+              >
+                <Layers className="w-3 h-3" /> deck.gl
+              </button>
+              <button
+                type="button"
+                onClick={() => setInternalEngine("legacy")}
+                className={`inline-flex items-center gap-1 px-2 py-1 border-l border-border ${
+                  engine === "legacy"
+                    ? "bg-gold text-background"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+                title="Motor heredado (three.js)"
+              >
+                <Box className="w-3 h-3" /> legacy
+              </button>
+            </div>
+          )}
           <ModeTabs mode={mode} onChange={setInternalMode} />
         </div>
       )}
@@ -70,12 +110,20 @@ export function GeoScene3D({
       {/* Scene */}
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
-          {mode === "surface" && <Geology3DViewer className="h-full w-full" />}
-          {mode === "subsurface" && variant !== "mag" && <SatToSubsurface3DViewer />}
-          {mode === "subsurface" && variant === "mag" && <MagAnomaly3DPro />}
+          {engine === "deckgl" && mode !== "resource" && <GeoSceneCanvas mode={mode} />}
+          {engine === "legacy" && mode === "surface" && (
+            <Geology3DViewer className="h-full w-full" />
+          )}
+          {engine === "legacy" && mode === "subsurface" && variant !== "mag" && (
+            <SatToSubsurface3DViewer />
+          )}
+          {engine === "legacy" && mode === "subsurface" && variant === "mag" && (
+            <MagAnomaly3DPro />
+          )}
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
+
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (

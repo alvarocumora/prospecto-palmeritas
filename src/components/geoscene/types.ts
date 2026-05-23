@@ -13,9 +13,13 @@ export const MODE_LABELS: Record<GeoSceneMode, { label: string; sub: string }> =
   resource: { label: "Resource", sub: "Bloques · leyes · pit · NPV" },
 };
 
+export type GeoSceneEngine = "legacy" | "deckgl";
+
 export type GeoSceneProps = {
   mode?: GeoSceneMode;
   variant?: GeoSceneVariant;
   showModeTabs?: boolean;
   className?: string;
+  /** Motor de renderizado: legacy (three.js) o deckgl (MapLibre + deck.gl). */
+  engine?: GeoSceneEngine;
 };
