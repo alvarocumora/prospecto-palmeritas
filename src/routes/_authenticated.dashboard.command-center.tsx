@@ -499,34 +499,41 @@ function Ticker({
 // ---------- Data widgets ----------
 
 function AnomalySummary({ projectId }: { projectId: string | null }) {
-  const [counts, setCounts] = useState<{ critical: number; high: number; medium: number; low: number; total: number }>({
-    critical: 0,
-    high: 0,
-    medium: 0,
-    low: 0,
-    total: 0,
-  });
+  const [counts, setCounts] = useState<{
+    critical: number; high: number; medium: number; low: number;
+    geoTotal: number; satTotal: number; total: number;
+  }>({ critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 });
   useEffect(() => {
     if (!projectId) {
-      setCounts({ critical: 0, high: 0, medium: 0, low: 0, total: 0 });
+      setCounts({ critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 });
       return;
     }
     let cancelled = false;
-    supabase
-      .from("geophysics_anomalies")
-      .select("severity")
-      .eq("project_id", projectId)
-      .neq("status", "dismissed")
-      .then(({ data }) => {
-        if (cancelled) return;
-        const c = { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
-        for (const r of (data ?? []) as Array<{ severity: string | null }>) {
-          c.total += 1;
-          const s = (r.severity ?? "medium").toLowerCase() as keyof typeof c;
-          if (s in c) (c as Record<string, number>)[s] += 1;
+    Promise.all([
+      supabase.from("geophysics_anomalies").select("severity").eq("project_id", projectId).neq("status", "dismissed"),
+      supabase.from("satellite_anomalies").select("severity").eq("project_id", projectId),
+    ]).then(([geo, sat]) => {
+      if (cancelled) return;
+      const c = { critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 };
+      const tally = (rows: Array<{ severity: string | null }> | null) => {
+        for (const r of rows ?? []) {
+          const s = (r.severity ?? "medium").toLowerCase();
+          if (s === "critical" || s === "high" || s === "medium" || s === "low") {
+            (c as Record<string, number>)[s] += 1;
+          } else {
+            c.medium += 1;
+          }
         }
-        setCounts(c);
-      });
+      };
+      const geoRows = (geo.data ?? []) as Array<{ severity: string | null }>;
+      const satRows = (sat.data ?? []) as Array<{ severity: string | null }>;
+      tally(geoRows);
+      tally(satRows);
+      c.geoTotal = geoRows.length;
+      c.satTotal = satRows.length;
+      c.total = c.geoTotal + c.satTotal;
+      setCounts(c);
+    });
     return () => {
       cancelled = true;
     };
@@ -546,7 +553,7 @@ function AnomalySummary({ projectId }: { projectId: string | null }) {
         {counts.total}
       </div>
       <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
-        Detectadas
+        Detectadas · {counts.satTotal} sat · {counts.geoTotal} geo
       </div>
       <div className="mt-3 border-t border-border/40 pt-2 flex-1">
         <Row label="Crítica" n={counts.critical} color="var(--signal-violet)" />
