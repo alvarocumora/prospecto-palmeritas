@@ -4,6 +4,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import type { GeoSceneMode, GeoSceneVariant } from "./types";
+import { ANCHOR_LABEL, emitSceneFocus, parseAnchors } from "./anchors";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
