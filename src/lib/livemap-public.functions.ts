@@ -18,9 +18,16 @@ export type PublicTarget = {
   rationale: string | null;
 };
 
+export type PublicProjectConcession = {
+  code: string;
+  name: string;
+  holder: string | null;
+};
+
 export type PublicProjectLayers = {
   project: { id: string; name: string; center_lat: number | null; center_lng: number | null };
   targets: PublicTarget[];
+  concessions: PublicProjectConcession[];
 };
 
 export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handler(
@@ -44,6 +51,13 @@ export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handle
       .order("score", { ascending: false });
     if (tErr) throw new Error(tErr.message);
 
+    const { data: concessions, error: cErr } = await supabaseAdmin
+      .from("mining_concessions")
+      .select("code, name, holder")
+      .eq("project_id", LOSVERDES_PROJECT_ID)
+      .order("code", { ascending: true });
+    if (cErr) throw new Error(cErr.message);
+
     return {
       project: {
         id: project.id,
@@ -52,6 +66,7 @@ export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handle
         center_lng: project.center_lng != null ? Number(project.center_lng) : null,
       },
       targets: (targets ?? []) as PublicTarget[],
+      concessions: (concessions ?? []) as PublicProjectConcession[],
     };
   },
 );

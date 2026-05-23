@@ -1,14 +1,15 @@
-import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import "leaflet/dist/leaflet.css";
-import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap } from "lucide-react";
+import type { GeoJSON as LeafletGeoJSON, LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap, Layers } from "lucide-react";
 import { toast } from "sonner";
 
 import {
   getLosVerdesPublicLayers,
   getLosVerdesAnomalies,
   type PublicTarget,
+  type PublicProjectConcession,
   type LosVerdesAnomalies,
 } from "@/lib/livemap-public.functions";
 import { useGeolocation } from "@/hooks/useGeolocation";
@@ -18,6 +19,8 @@ import {
   buildLineamentsLayer,
   removeLayer,
 } from "@/components/field/anomalyHeatLayer";
+import { loadCatastro, bboxAround } from "@/components/map/catastroLayer";
+import { CATASTRO_STYLE, type CatastroOrigen } from "@/components/map/overlays";
 
 const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
@@ -125,6 +128,11 @@ export function FieldMapPublic() {
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [showLineaments, setShowLineaments] = useState(false);
   const [show3D, setShow3D] = useState(false);
+  const [showCatastro, setShowCatastro] = useState(false);
+  const [catastroCount, setCatastroCount] = useState<number | null>(null);
+  const [loadingCatastro, setLoadingCatastro] = useState(false);
+  const [projectConcessions, setProjectConcessions] = useState<PublicProjectConcession[]>([]);
+  const catastroLayerRef = useRef<LayerGroup | null>(null);
   const [anomalies, setAnomalies] = useState<LosVerdesAnomalies | null>(null);
   const [loadingAnoms, setLoadingAnoms] = useState(false);
   const heatLayerRef = useRef<LayerGroup | null>(null);
@@ -134,6 +142,19 @@ export function FieldMapPublic() {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [online, setOnline] = useState(
     typeof navigator !== "undefined" ? navigator.onLine : true,
+  );
+
+  const projectConcessionNorm = useMemo(
+    () =>
+      projectConcessions.map((c) =>
+        c.name
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/\s+/g, " ")
+          .trim(),
+      ),
+    [projectConcessions],
   );
 
   const { position, status: geoStatus } = useGeolocation(true);
@@ -161,6 +182,7 @@ export function FieldMapPublic() {
         const data = await fetchLayers();
         if (cancel) return;
         setTargets(data.targets);
+        setProjectConcessions(data.concessions ?? []);
         if (data.project.center_lat != null && data.project.center_lng != null) {
           setCenter([data.project.center_lat, data.project.center_lng]);
         }
@@ -300,6 +322,91 @@ export function FieldMapPublic() {
     if (!showLineaments || !anomalies) return;
     lineamentsLayerRef.current = buildLineamentsLayer(L, map, anomalies.lineaments);
   }, [showLineaments, anomalies, mapReady]);
+
+  // Catastro SERNAGEOMIN layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    let active = true;
+
+    const cleanup = () => {
+      if (catastroLayerRef.current) {
+        map.removeLayer(catastroLayerRef.current);
+        catastroLayerRef.current = null;
+      }
+    };
+
+    if (!showCatastro) {
+      cleanup();
+      return;
+    }
+    if (loadingCatastro) return;
+
+    setLoadingCatastro(true);
+    (async () => {
+      try {
+        const bbox = bboxAround(center, 8);
+        const result = await loadCatastro(L, bbox);
+        if (!active) return;
+        cleanup();
+
+        const group = L.layerGroup();
+        const norms = projectConcessionNorm;
+        for (const origen of Object.keys(result.layersByOrigen) as CatastroOrigen[]) {
+          const layer = result.layersByOrigen[origen] as LeafletGeoJSON | undefined;
+          if (!layer) continue;
+          // Re-style features that match a project concession by NOMBRE
+          layer.eachLayer((sub) => {
+            const f = (sub as unknown as { feature?: { properties?: Record<string, unknown> } })
+              .feature;
+            const name = String(f?.properties?.NOMBRE ?? "")
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, " ")
+              .trim();
+            const match = name && norms.some((n) => n && (name === n || name.includes(n) || n.includes(name)));
+            if (match && "setStyle" in sub) {
+              (sub as unknown as { setStyle: (s: Record<string, unknown>) => void }).setStyle({
+                color: "#facc15",
+                weight: 4,
+                opacity: 1,
+                fillColor: "#facc15",
+                fillOpacity: 0.35,
+              });
+              (sub as unknown as { bringToFront: () => void }).bringToFront?.();
+            }
+          });
+          group.addLayer(layer);
+        }
+        group.addTo(map);
+        catastroLayerRef.current = group;
+        setCatastroCount(result.total);
+        if (result.cached) {
+          toast.message("Catastro desde cache (24h)");
+        } else {
+          toast.success(`Catastro: ${result.total} concesiones`);
+        }
+      } catch (e) {
+        console.error(e);
+        if (!online) {
+          toast.error("Catastro requiere conexión la primera vez");
+        } else {
+          toast.error("No se pudo cargar el catastro");
+        }
+        setShowCatastro(false);
+      } finally {
+        if (active) setLoadingCatastro(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showCatastro, mapReady, center, projectConcessionNorm]);
+
 
 
 
@@ -462,6 +569,11 @@ export function FieldMapPublic() {
           <Zap className="w-3 h-3 inline mr-1" />
           Vetas
         </ChipBtn>
+        <ChipBtn active={showCatastro} color="#22c55e" onClick={() => setShowCatastro((v) => !v)}>
+          <Layers className="w-3 h-3 inline mr-1" />
+          Catastro{catastroCount != null && showCatastro ? ` · ${catastroCount}` : ""}
+          {loadingCatastro && <Loader2 className="w-3 h-3 inline ml-1 animate-spin" />}
+        </ChipBtn>
         <ChipBtn active={show3D} color="#a78bfa" onClick={() => setShow3D(true)}>
           <Box className="w-3 h-3 inline mr-1" />
           3D
@@ -487,6 +599,37 @@ export function FieldMapPublic() {
           <div className="flex justify-between mt-1"><span>baja</span><span>alta</span></div>
         </div>
       )}
+
+      {/* Catastro mini-legend */}
+      {showCatastro && (
+        <div className={`absolute ${showHeatmap ? "bottom-36" : "bottom-20"} left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground`}>
+          <div className="text-gold font-bold mb-1">Catastro SERNAGEOMIN</div>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1">
+            {(Object.keys(CATASTRO_STYLE) as CatastroOrigen[]).map((o) => (
+              <div key={o} className="flex items-center gap-1.5">
+                <span
+                  className="inline-block w-3 h-2 rounded-sm border"
+                  style={{
+                    background: CATASTRO_STYLE[o].fillColor,
+                    borderColor: CATASTRO_STYLE[o].color,
+                    opacity: 0.85,
+                  }}
+                />
+                <span>{CATASTRO_STYLE[o].label}</span>
+              </div>
+            ))}
+            <div className="flex items-center gap-1.5 col-span-2 mt-0.5 pt-1 border-t border-border">
+              <span
+                className="inline-block w-3 h-2 rounded-sm border-2"
+                style={{ background: "#facc1559", borderColor: "#facc15" }}
+              />
+              <span className="text-yellow-300">Pertenencias del proyecto</span>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* Bottom controls */}
       <div className="absolute bottom-4 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2">
