@@ -99,13 +99,14 @@ function CommandCenter() {
 
         <div className="flex-1" />
 
-        <Weather />
+        <Weather lat={active?.center_lat ?? null} lng={active?.center_lng ?? null} />
         <ClockBlock now={now} />
         <ProjectSelector
           projects={projects}
           activeId={active?.id ?? null}
           onChange={setActiveId}
         />
+
         <button className="relative w-9 h-9 rounded border border-border bg-bg-elevated hover:bg-accent transition-colors flex items-center justify-center">
           <Bell className="w-4 h-4 text-muted-foreground" />
           {kpis && kpis.alertsUnread > 0 && (
@@ -236,14 +237,12 @@ function CommandCenter() {
 
       {/* === FOOTER TICKER === */}
       <footer className="absolute bottom-0 left-0 right-0 h-7 border-t border-border bg-bg-secondary/80 backdrop-blur flex items-center px-4 gap-6 text-[10px] font-mono z-20">
-        <div className="text-muted-foreground uppercase tracking-wider">Mercado (demo)</div>
-        <Ticker label="Cu" unit="US$/lb" value="4.21" delta="+1.2%" up />
-        <Ticker label="Au" unit="US$/oz" value="2,347" delta="+0.8%" up />
-        <Ticker label="Ag" unit="US$/oz" value="28.65" delta="+1.5%" up />
-        <Ticker label="Li" unit="US$/t" value="14,200" delta="-0.4%" up={false} />
+        <div className="text-muted-foreground uppercase tracking-wider">Mercado</div>
+        <CommodityTicker />
         <div className="flex-1" />
         <div className="text-muted-foreground">Reloj local · {now.toLocaleTimeString()}</div>
       </footer>
+
     </div>
   );
 }
@@ -266,17 +265,104 @@ function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
 }
 
-function Weather() {
+function Weather({ lat, lng }: { lat: number | string | null; lng: number | string | null }) {
+  const [data, setData] = useState<{ temp: number; wind: number; code: number } | null>(null);
+  const latN = lat != null ? Number(lat) : NaN;
+  const lngN = lng != null ? Number(lng) : NaN;
+  useEffect(() => {
+    if (!Number.isFinite(latN) || !Number.isFinite(lngN)) {
+      setData(null);
+      return;
+    }
+    let cancelled = false;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latN}&longitude=${lngN}&current=temperature_2m,wind_speed_10m,weather_code&timezone=auto`;
+    fetch(url)
+      .then((r) => r.json())
+      .then((j) => {
+        if (cancelled) return;
+        const c = j?.current;
+        if (c) setData({ temp: c.temperature_2m, wind: c.wind_speed_10m, code: c.weather_code });
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [latN, lngN]);
+  const label = weatherCodeLabel(data?.code);
   return (
     <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded border border-border bg-bg-elevated">
       <Cloud className="w-3.5 h-3.5 text-signal-cyan" />
       <div className="text-[10px] font-mono">
-        <div className="text-foreground">22°C · Despejado</div>
-        <div className="text-muted-foreground">Viento 12 km/h NW</div>
+        <div className="text-foreground">
+          {data ? `${Math.round(data.temp)}°C · ${label}` : "— · —"}
+        </div>
+        <div className="text-muted-foreground">
+          {data ? `Viento ${Math.round(data.wind)} km/h` : "Sin coords"}
+        </div>
       </div>
     </div>
   );
 }
+
+function weatherCodeLabel(code?: number) {
+  if (code == null) return "—";
+  if (code === 0) return "Despejado";
+  if (code <= 3) return "Parc. nublado";
+  if (code <= 48) return "Niebla";
+  if (code <= 67) return "Lluvia";
+  if (code <= 77) return "Nieve";
+  if (code <= 82) return "Chubascos";
+  if (code <= 99) return "Tormenta";
+  return "—";
+}
+
+function CommodityTicker() {
+  const [rows, setRows] = useState<
+    Array<{ symbol: string; unit: string; price: number; change_pct: number }>
+  >([]);
+  useEffect(() => {
+    let cancelled = false;
+    const load = () =>
+      supabase
+        .from("commodity_prices")
+        .select("symbol,unit,price,change_pct")
+        .order("symbol")
+        .then(({ data }) => {
+          if (!cancelled && data) setRows(data as typeof rows);
+        });
+    load();
+    const ch = supabase
+      .channel("commodity_prices")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "commodity_prices" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(ch);
+    };
+  }, []);
+  if (rows.length === 0) {
+    return <span className="text-muted-foreground">Sin datos</span>;
+  }
+  return (
+    <>
+      {rows.map((r) => (
+        <Ticker
+          key={r.symbol}
+          label={r.symbol}
+          unit={r.unit}
+          value={r.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+          delta={`${r.change_pct >= 0 ? "+" : ""}${r.change_pct.toFixed(1)}%`}
+          up={r.change_pct >= 0}
+        />
+      ))}
+    </>
+  );
+}
+
 
 function ClockBlock({ now }: { now: Date }) {
   return (
