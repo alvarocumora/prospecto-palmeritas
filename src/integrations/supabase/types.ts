@@ -6677,6 +6677,164 @@ export type Database = {
           },
         ]
       }
+      mag_target_revalidation_diffs: {
+        Row: {
+          change_type: string
+          created_at: string
+          id: string
+          mag_delta_nt: number | null
+          name: string | null
+          new_lat: number | null
+          new_lon: number | null
+          new_mag_nt: number | null
+          new_rank: number | null
+          prev_lat: number | null
+          prev_lon: number | null
+          prev_mag_nt: number | null
+          prev_rank: number | null
+          project_id: string
+          rank_delta: number | null
+          revalidation_id: string
+          shift_m: number | null
+        }
+        Insert: {
+          change_type: string
+          created_at?: string
+          id?: string
+          mag_delta_nt?: number | null
+          name?: string | null
+          new_lat?: number | null
+          new_lon?: number | null
+          new_mag_nt?: number | null
+          new_rank?: number | null
+          prev_lat?: number | null
+          prev_lon?: number | null
+          prev_mag_nt?: number | null
+          prev_rank?: number | null
+          project_id: string
+          rank_delta?: number | null
+          revalidation_id: string
+          shift_m?: number | null
+        }
+        Update: {
+          change_type?: string
+          created_at?: string
+          id?: string
+          mag_delta_nt?: number | null
+          name?: string | null
+          new_lat?: number | null
+          new_lon?: number | null
+          new_mag_nt?: number | null
+          new_rank?: number | null
+          prev_lat?: number | null
+          prev_lon?: number | null
+          prev_mag_nt?: number | null
+          prev_rank?: number | null
+          project_id?: string
+          rank_delta?: number | null
+          revalidation_id?: string
+          shift_m?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mag_target_revalidation_diffs_revalidation_id_fkey"
+            columns: ["revalidation_id"]
+            isOneToOne: false
+            referencedRelation: "mag_target_revalidations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mag_target_revalidations: {
+        Row: {
+          added_count: number
+          bbox: Json
+          created_at: string
+          created_by: string | null
+          grid_n: number
+          id: string
+          mag_changed_count: number
+          max_mag_delta_nt: number | null
+          max_shift_m: number | null
+          mean_mag_delta_nt: number | null
+          mean_shift_m: number | null
+          moved_count: number
+          new_count: number
+          new_snapshot: Json | null
+          prev_count: number
+          prev_snapshot: Json | null
+          project_id: string
+          removed_count: number
+          stats: Json | null
+          top_k: number
+          triggered_by: string
+          unchanged_count: number
+        }
+        Insert: {
+          added_count?: number
+          bbox: Json
+          created_at?: string
+          created_by?: string | null
+          grid_n: number
+          id?: string
+          mag_changed_count?: number
+          max_mag_delta_nt?: number | null
+          max_shift_m?: number | null
+          mean_mag_delta_nt?: number | null
+          mean_shift_m?: number | null
+          moved_count?: number
+          new_count?: number
+          new_snapshot?: Json | null
+          prev_count?: number
+          prev_snapshot?: Json | null
+          project_id: string
+          removed_count?: number
+          stats?: Json | null
+          top_k: number
+          triggered_by?: string
+          unchanged_count?: number
+        }
+        Update: {
+          added_count?: number
+          bbox?: Json
+          created_at?: string
+          created_by?: string | null
+          grid_n?: number
+          id?: string
+          mag_changed_count?: number
+          max_mag_delta_nt?: number | null
+          max_shift_m?: number | null
+          mean_mag_delta_nt?: number | null
+          mean_shift_m?: number | null
+          moved_count?: number
+          new_count?: number
+          new_snapshot?: Json | null
+          prev_count?: number
+          prev_snapshot?: Json | null
+          project_id?: string
+          removed_count?: number
+          stats?: Json | null
+          top_k?: number
+          triggered_by?: string
+          unchanged_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mag_target_revalidations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mag_target_revalidations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mag_targets: {
         Row: {
           bbox: Json | null

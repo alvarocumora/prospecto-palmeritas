@@ -40,6 +40,7 @@ import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
+import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
@@ -234,6 +235,12 @@ const AuthenticatedDashboardMapRoute =
     path: '/dashboard/map',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardMagRevalidationsRoute =
+  AuthenticatedDashboardMagRevalidationsRouteImport.update({
+    id: '/dashboard/mag-revalidations',
+    path: '/dashboard/mag-revalidations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardLv5Page5Route =
   AuthenticatedDashboardLv5Page5RouteImport.update({
     id: '/dashboard/lv5-page5',
@@ -410,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
+  '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -466,6 +474,7 @@ export interface FileRoutesByTo {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
+  '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -524,6 +533,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
+  '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
@@ -582,6 +592,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/lv5-page5'
+    | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
@@ -638,6 +649,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/lv5-page5'
+    | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
@@ -695,6 +707,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/lv5-page5'
+    | '/_authenticated/dashboard/mag-revalidations'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/ni43101'
@@ -960,6 +973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMapRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/mag-revalidations': {
+      id: '/_authenticated/dashboard/mag-revalidations'
+      path: '/dashboard/mag-revalidations'
+      fullPath: '/dashboard/mag-revalidations'
+      preLoaderRoute: typeof AuthenticatedDashboardMagRevalidationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/lv5-page5': {
       id: '/_authenticated/dashboard/lv5-page5'
       path: '/dashboard/lv5-page5'
@@ -1211,6 +1231,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
+  AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
@@ -1250,6 +1271,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
   AuthenticatedDashboardLv5Page5Route: AuthenticatedDashboardLv5Page5Route,
+  AuthenticatedDashboardMagRevalidationsRoute:
+    AuthenticatedDashboardMagRevalidationsRoute,
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
@@ -1297,13 +1320,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
