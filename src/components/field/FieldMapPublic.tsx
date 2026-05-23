@@ -182,6 +182,7 @@ export function FieldMapPublic() {
         const data = await fetchLayers();
         if (cancel) return;
         setTargets(data.targets);
+        setProjectConcessions(data.concessions ?? []);
         if (data.project.center_lat != null && data.project.center_lng != null) {
           setCenter([data.project.center_lat, data.project.center_lng]);
         }
