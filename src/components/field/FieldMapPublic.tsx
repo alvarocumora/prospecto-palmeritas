@@ -228,6 +228,55 @@ export function FieldMapPublic() {
     targetsLayerRef.current = group;
   }, [targets, showTargets, mapReady]);
 
+  // Lazy-fetch anomalies the first time heatmap or lineaments is enabled
+  useEffect(() => {
+    if (!showHeatmap && !showLineaments) return;
+    if (anomalies || loadingAnoms) return;
+    setLoadingAnoms(true);
+    fetchAnomalies()
+      .then((data) => setAnomalies(data))
+      .catch((e) => {
+        console.error(e);
+        toast.error("No se pudieron cargar anomalías");
+      })
+      .finally(() => setLoadingAnoms(false));
+  }, [showHeatmap, showLineaments, anomalies, loadingAnoms, fetchAnomalies]);
+
+  // Heatmap layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    let active = true;
+    removeLayer(map, heatLayerRef.current);
+    heatLayerRef.current = null;
+    if (!showHeatmap || !anomalies) return;
+    (async () => {
+      const layer = await buildAnomalyHeatLayer(L, map, anomalies.magTargets, anomalies.satAnomalies);
+      if (!active) {
+        removeLayer(map, layer);
+        return;
+      }
+      heatLayerRef.current = layer;
+    })();
+    return () => {
+      active = false;
+    };
+  }, [showHeatmap, anomalies, mapReady]);
+
+  // Lineaments layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    removeLayer(map, lineamentsLayerRef.current);
+    lineamentsLayerRef.current = null;
+    if (!showLineaments || !anomalies) return;
+    lineamentsLayerRef.current = buildLineamentsLayer(L, map, anomalies.lineaments);
+  }, [showLineaments, anomalies, mapReady]);
+
+
+
   // POI layer
   useEffect(() => {
     const L = LRef.current;
