@@ -14,6 +14,7 @@ import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
 import { useDrillTrajectoriesLayer } from "./useDrillTrajectoriesLayer";
 import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
+import { useSatAnomaliesLayer } from "./useSatAnomaliesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import type { GeoSceneMode } from "../types";
@@ -89,6 +90,10 @@ export function GeoSceneCanvas({ mode }: Props) {
     active?.id ?? null,
     subsurfaceMode,
   );
+  const { layer: satAnomaliesLayer, count: satAnomaliesCount } = useSatAnomaliesLayer(
+    active?.id ?? null,
+    surfaceMode,
+  );
 
   // Init map
   useEffect(() => {
@@ -137,11 +142,15 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Empujar capas deck.gl
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
-    const layers = [targetsLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer].filter(
-      Boolean,
-    );
+    const layers = [
+      targetsLayer,
+      satAnomaliesLayer,
+      holesColumnLayer,
+      ...trajectoryLayers,
+      anomaliesLayer,
+    ].filter(Boolean);
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
+  }, [ready, targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
@@ -164,8 +173,9 @@ export function GeoSceneCanvas({ mode }: Props) {
 
   const layerCount = useMemo(
     () =>
-      [targetsLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer].filter(Boolean).length,
-    [targetsLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer],
+      [targetsLayer, satAnomaliesLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer]
+        .filter(Boolean).length,
+    [targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer],
   );
 
   return (
@@ -181,6 +191,9 @@ export function GeoSceneCanvas({ mode }: Props) {
       )}
       <div className="absolute bottom-3 right-3 z-10 text-[10px] font-mono text-muted-foreground bg-bg-secondary/90 backdrop-blur border border-border rounded px-2 py-1">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}
+        {surfaceMode && satAnomaliesCount > 0 && (
+          <span className="ml-1 text-gold">· {satAnomaliesCount} anomalías sat</span>
+        )}
         {subsurfaceMode && holeCount > 0 && (
           <span className="ml-1 text-gold">
             · {holeCount} sondajes · {interceptCount} intercepts
