@@ -6677,6 +6677,69 @@ export type Database = {
           },
         ]
       }
+      mag_targets: {
+        Row: {
+          bbox: Json | null
+          created_at: string
+          created_by: string | null
+          id: string
+          lat: number
+          lon: number
+          mag_nt: number
+          metadata: Json
+          name: string
+          project_id: string
+          radius_m: number
+          rank: number
+          source: string
+        }
+        Insert: {
+          bbox?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat: number
+          lon: number
+          mag_nt: number
+          metadata?: Json
+          name: string
+          project_id: string
+          radius_m?: number
+          rank?: number
+          source?: string
+        }
+        Update: {
+          bbox?: Json | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          lat?: number
+          lon?: number
+          mag_nt?: number
+          metadata?: Json
+          name?: string
+          project_id?: string
+          radius_m?: number
+          rank?: number
+          source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mag_targets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mag_targets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       magnetic_derivatives: {
         Row: {
           computed_at: string | null
