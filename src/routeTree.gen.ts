@@ -58,6 +58,7 @@ import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
+import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -341,6 +342,12 @@ const AuthenticatedDashboardAdminRoute =
     path: '/dashboard/admin',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboard3dProRoute =
+  AuthenticatedDashboard3dProRouteImport.update({
+    id: '/dashboard/3d-pro',
+    path: '/dashboard/3d-pro',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiPublicVerifyComplianceReportIdRoute =
   ApiPublicVerifyComplianceReportIdRouteImport.update({
     id: '/api/public/verify-compliance/$reportId',
@@ -384,6 +391,7 @@ export interface FileRoutesByFullPath {
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro/': typeof CatastroIndexRoute
+  '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -439,6 +447,7 @@ export interface FileRoutesByTo {
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro': typeof CatastroIndexRoute
+  '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -496,6 +505,7 @@ export interface FileRoutesById {
   '/live/franco': typeof LiveFrancoRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro/': typeof CatastroIndexRoute
+  '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
@@ -553,6 +563,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/palmeras'
     | '/catastro/'
+    | '/dashboard/3d-pro'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -608,6 +619,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/palmeras'
     | '/catastro'
+    | '/dashboard/3d-pro'
     | '/dashboard/admin'
     | '/dashboard/approvals'
     | '/dashboard/audit'
@@ -664,6 +676,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/palmeras'
     | '/catastro/'
+    | '/_authenticated/dashboard/3d-pro'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
@@ -1073,6 +1086,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/3d-pro': {
+      id: '/_authenticated/dashboard/3d-pro'
+      path: '/dashboard/3d-pro'
+      fullPath: '/dashboard/3d-pro'
+      preLoaderRoute: typeof AuthenticatedDashboard3dProRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/public/verify-compliance/$reportId': {
       id: '/api/public/verify-compliance/$reportId'
       path: '/api/public/verify-compliance/$reportId'
@@ -1172,6 +1192,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
@@ -1208,6 +1229,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedDashboard3dProRoute: AuthenticatedDashboard3dProRoute,
   AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
