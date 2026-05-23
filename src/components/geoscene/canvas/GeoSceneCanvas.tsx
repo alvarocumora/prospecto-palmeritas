@@ -89,8 +89,7 @@ export function GeoSceneCanvas({ mode }: Props) {
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
     map.on("load", () => {
       const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
-      // @ts-expect-error — IControl typing entre maplibre y mapbox
-      map.addControl(overlay);
+      map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
       setReady(true);
     });
