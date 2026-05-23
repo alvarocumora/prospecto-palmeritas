@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
+import { GeoScene3D } from "@/components/geoscene";
 import {
   Plus,
   ArrowRight,
