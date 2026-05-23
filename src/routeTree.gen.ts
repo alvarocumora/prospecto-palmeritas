@@ -15,6 +15,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
+import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
@@ -93,6 +94,11 @@ const CatastroIndexRoute = CatastroIndexRouteImport.update({
 const LivePalmerasRoute = LivePalmerasRouteImport.update({
   id: '/live/palmeras',
   path: '/live/palmeras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveLosverdesRoute = LiveLosverdesRouteImport.update({
+  id: '/live/losverdes',
+  path: '/live/losverdes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveFrancoRoute = LiveFrancoRouteImport.update({
@@ -396,6 +402,7 @@ export interface FileRoutesByFullPath {
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
+  '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro/': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -453,6 +460,7 @@ export interface FileRoutesByTo {
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
+  '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -512,6 +520,7 @@ export interface FileRoutesById {
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/live/franco': typeof LiveFrancoRoute
+  '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -571,6 +580,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
+    | '/live/losverdes'
     | '/live/palmeras'
     | '/catastro/'
     | '/dashboard/3d-pro'
@@ -628,6 +638,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
+    | '/live/losverdes'
     | '/live/palmeras'
     | '/catastro'
     | '/dashboard/3d-pro'
@@ -686,6 +697,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-pjud'
     | '/invitations/$token'
     | '/live/franco'
+    | '/live/losverdes'
     | '/live/palmeras'
     | '/catastro/'
     | '/_authenticated/dashboard/3d-pro'
@@ -745,6 +757,7 @@ export interface RootRouteChildren {
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
   LiveFrancoRoute: typeof LiveFrancoRoute
+  LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
@@ -796,6 +809,13 @@ declare module '@tanstack/react-router' {
       path: '/live/palmeras'
       fullPath: '/live/palmeras'
       preLoaderRoute: typeof LivePalmerasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/losverdes': {
+      id: '/live/losverdes'
+      path: '/live/losverdes'
+      fullPath: '/live/losverdes'
+      preLoaderRoute: typeof LiveLosverdesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/franco': {
@@ -1308,6 +1328,7 @@ const rootRouteChildren: RootRouteChildren = {
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
   LiveFrancoRoute: LiveFrancoRoute,
+  LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
