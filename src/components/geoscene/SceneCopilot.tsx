@@ -186,7 +186,7 @@ export function SceneCopilot({
                       : "bg-background border border-border text-foreground"
                   }`}
                 >
-                  {m.content}
+                  {m.role === "assistant" ? renderWithAnchors(m.content) : m.content}
                 </div>
               </div>
             ))}
