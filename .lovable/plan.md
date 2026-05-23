@@ -1,112 +1,90 @@
 
-# Plan: Visor 3D Minero Disruptivo (Geocapitals v5)
+# Plan — Plano Georref v1.3 con imagen satelital real + 3D fotorrealista
 
-Objetivo: reemplazar el visor Plotly actual por una experiencia 3D minera de nivel "Awwwards + industria", combinando datasets gratuitos globales con modelado geológico implícito y capas satelitales con anomalías magnéticas marcadas como targets.
+## Objetivo
 
-## 1. Stack base (frontend 3D)
+Reemplazar los thumbnails sintéticos del PDF actual (`Plano_Georref_Modelo3D_LosVerdes_v1.2.pdf`) por **imágenes satelitales reales georreferenciadas** del distrito Los Verdes-Tilama y montar el plano del modelo 3D sobre esa base, con coherencia de coordenadas (UTM 19S), escala y grilla. Mejorar también el informe (capas, leyenda, metodología, fuentes).
 
-Reemplazo del visor Plotly por **CesiumJS + Resium** (React bindings) como motor principal:
-
-- Globo 3D real con terreno (Cesium World Terrain o **Copernicus GLO-30 DEM** vía Cesium Ion gratis con cuenta).
-- Imagery satelital: **ESRI World Imagery**, **Sentinel-2 L2A** (Microsoft Planetary Computer STAC, gratis) y **MapTiler/MapLibre** como fallback.
-- Overlays vectoriales (vetas, fallas, targets) en **GeoJSON 3D** con extrusión por profundidad.
-- Capa subterránea: `Cesium.Primitive` + `GeometryInstance` para sólidos 3D (vetas, intrusivos, anomalías magnéticas a profundidad).
-- Repos de referencia que copiaremos patrones:
-  - `Gaia3D/MineMonitor3D` (monitoreo de mina abierta sobre Cesium).
-  - `kurtlawrence/dirtvz` (renderizado web 3D para minería, Rust+WASM).
-  - `reearth/reearth-visualizer` (plataforma WebGIS Cesium completa, Apache-2.0).
-  - `NOC-OI/zarr-cesium` (Zarr/COG sobre Cesium — ideal para grids magnéticos).
-  - `darkmine-oss/baselode` (toolkit exploración minera, GPL).
-
-## 2. Datasets libres a integrar
+## 1. Fuentes satelitales abiertas (sin API key obligatoria)
 
 | Capa | Fuente | Acceso |
 |---|---|---|
-| Terreno DEM 30 m | Copernicus GLO-30 (Planetary Computer / OpenTopography) | STAC + COG |
-| Satelital RGB / NDVI / ratios alteración | Sentinel-2 L2A (PC STAC) | STAC firmado |
-| Anomalía magnética global | **EMAG2 v3** NOAA NCEI (2 arc-min) | GeoTIFF + WMS ArcGIS REST |
-| Gravedad | WGM2012 BGI | GeoTIFF |
-| Geología regional Chile | SERNAGEOMIN WMS Hoja Illapel | WMS |
-| Catastro minero | SERNAGEOMIN catastro WFS | WFS GeoJSON |
-| Sísmica histórica | USGS Earthquake API | REST JSON |
+| RGB color real 10 m | **Sentinel-2 L2A** vía Microsoft Planetary Computer STAC (firma SAS pública) | STAC search + asset COG |
+| RGB color real 10 m (fallback) | **Sentinel-2 L2A** vía AWS Open Data `s3://sentinel-cogs` | HTTPS COG público |
+| Mosaico anual <1 m | **ESRI World Imagery** WMTS (tile service público) | XYZ tiles |
+| Topo / hillshade | **Copernicus GLO-30 DEM** vía Planetary Computer | COG |
+| SRTM 30 m (fallback DEM) | **OpenTopography** público | GeoTIFF |
+| Geología regional | SERNAGEOMIN WMS Hoja Illapel | WMS |
 
-EMAG2 v3 nos permite mostrar la anomalía magnética real del sector Tilama (no sintética) y marcar máximos locales como targets.
+## 2. Repos de referencia (open source) para pipeline imagen + 3D
 
-## 3. Modelado geológico 3D real
+- `microsoft/PlanetaryComputerExamples` — patrones STAC + signing + COG.
+- `cogeotiff/rio-tiler` y `developmentseed/titiler` — recorte/render de COG a PNG georreferenciado.
+- `mapbox/rasterio` + `pyproj` — reproyección WGS84 ↔ UTM 19S.
+- `OpenDroneMap/ODM` — flujos foto→ortomosaico→DEM 3D.
+- `CesiumGS/cesium` + `NASA-AMMOS/3DTilesRendererJS` — visualización 3D.
+- `giswqs/leafmap` / `geemap` — ejemplos de mosaicos Sentinel.
+- `nasa/pyGMT` y `pyvista/pyvista` — render 3D drape (raster sobre DEM) a PNG.
 
-Sustituir las vetas dibujadas a mano por un modelo implícito:
+Estos repos sirven como guía para el script Python local; no se instalan como dependencias del proyecto Lovable.
 
-- **GemPy 2025** o **LoopStructural** (Python, MIT) en un job server-side para generar el modelo 3D desde puntos de superficie + orientaciones.
-- Salida en **`.glb` / `.gltf`** (vía `pyvista` → `trimesh`) que Cesium carga como `Cesium3DTileset` o `Model`.
-- Anomalías magnéticas convertidas a **isosuperficies 3D** (scikit-image marching cubes) y exportadas a glTF para superponerlas a profundidad.
-
-## 4. Pipeline de datos (backend Lovable Cloud)
-
-Server functions TanStack (`createServerFn`) nuevas:
-
-1. `fetchMagAnomaly(bbox)` → descarga subset EMAG2 desde el ImageServer NOAA, recorta y devuelve COG + estadísticos (max, σ, percentiles).
-2. `detectMagTargets(bbox, threshold)` → corre detección de máximos locales (scipy `peak_local_max`) y devuelve puntos GeoJSON con rank + magnitud.
-3. `fetchSentinelTile(bbox, date)` → STAC search en Planetary Computer, firma asset y devuelve URL COG.
-4. `buildGeologyModel(projectId)` → GemPy/LoopStructural genera glTF y lo sube a Storage.
-5. `getSernageominLayers(bbox)` → WMS/WFS proxy con cache en `geo_cache` table.
-
-Tablas nuevas: `mag_targets`, `geology_models`, `satellite_scenes`, `geo_cache`.
-
-## 5. Módulos UI
-
-- `/dashboard/3d-pro` — visor Cesium full-screen con panel de capas:
-  - Toggle: Satélite, NDVI, Alteración (SWIR ratios), DEM hillshade, Magnetismo, Gravedad, Geología SERNAGEOMIN, Catastro, Vetas, Targets, Modelo geológico 3D, Cross-section.
-  - Slider de profundidad (drape de magnetismo a 0/500/1000/2000 m).
-  - Time slider para Sentinel-2.
-  - Click en anomalía → popup con valor nT, rank, recomendación IA.
-- `/dashboard/3d-pro/cross-section` — corte vertical interactivo a lo largo de polilínea dibujada.
-- `/dashboard/3d-pro/ai-copilot` — chat Lovable AI (gemini-2.5-pro) con contexto del modelo 3D + anomalías visibles.
-
-## 6. Fases de entrega
+## 3. Pipeline de generación (script Python en `/tmp`)
 
 ```text
-Fase 1 (Sprint 1, ~2 días)
-  - Instalar cesium + resium, montar /dashboard/3d-pro vacío con terreno + ESRI.
-  - Server fn fetchMagAnomaly (EMAG2) + capa raster sobre Cesium.
-  - Detección targets + marcadores 3D.
-
-Fase 2 (Sprint 2)
-  - Sentinel-2 STAC + ratios alteración (Kaufmann, Sabins).
-  - SERNAGEOMIN WMS + catastro WFS como overlays.
-  - Panel de capas con opacidad y slider de profundidad.
-
-Fase 3 (Sprint 3)
-  - Pipeline GemPy/LoopStructural → glTF en Storage.
-  - Carga del modelo subterráneo + cross-section dibujable.
-  - Export del visor a PDF NI 43-101 (snapshot + link QR).
-
-Fase 4 (Sprint 4)
-  - AI copilot geológico con contexto espacial.
-  - Fusion score (mag + alteración + estructura) → ranking automático de targets.
-  - Compartir vista vía URL firmada (token) para inversores.
+1. AOI = bbox Los Verdes-Tilama (UTM 19S, ~10 x 8 km)
+2. STAC search Sentinel-2 L2A (cloud_cover < 10 %, último año) → asset visual COG
+3. rio-tiler.crop(bbox) → RGB PNG + sidecar PGW/.aux (georef)
+4. Reproyección a EPSG:32719 (UTM 19S)
+5. Composite por capa:
+   - Página 1: RGB Sentinel + grilla UTM + escala + targets + collares DDH
+   - Galería p.2: thumbnails RGB-real, DEM hillshade real, anomalía MAG sobre RGB,
+                  targets sobre RGB, modelo 3D drape (PyVista render)
+   - Mapa drill p.3: RGB Sentinel como basemap real + trazas DDH + secciones
+6. Render 3D fotorrealista (PyVista): DEM Copernicus + drape RGB Sentinel + 
+   targets extruidos + trazas DDH 3D → PNG (vista oblicua NW→SE)
+7. Ensamble PDF A3 con ReportLab (4-5 páginas) + QR al visor 3D
 ```
 
-## 7. Detalles técnicos clave
+## 4. Cambios en el PDF (v1.3)
 
-- Cesium Ion token como secret `CESIUM_ION_TOKEN` (free tier: 5 GB + terreno mundial).
-- Planetary Computer no requiere API key para search; el `sign()` se hace server-side con `planetary-computer` (Python) o llamada REST a `/sas/sign`.
-- EMAG2 vía `https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer/exportImage` (parámetros bbox + bboxSR=4326 + format=tiff) — sin auth.
-- GemPy se ejecuta en un job Python externo (Lovable Cloud workers no soportan binarios pesados); usar **Modal.com** o **Fly Machines** como runner gratuito y guardar el glTF en Storage. Alternativa puramente JS: `geomodel-js` o resampling propio.
-- Todos los rasters servidos como **COG** y leídos en Cesium con `zarr-cesium` o `CesiumGS/3d-tiles` pipeline.
+- **Página 1 — Plano Georref:** basemap Sentinel-2 RGB real bajo grilla UTM, norte, escala gráfica, cartela con fuente/fecha de escena, datum WGS84/UTM 19S, leyenda con simbología real.
+- **Página 2 — Galería de capas:** miniaturas con **imagen real**:
+  1. Sentinel-2 RGB true color
+  2. Sentinel-2 SWIR ratio (alteración hidrotermal)
+  3. DEM Copernicus + hillshade
+  4. Anomalía magnética EMAG2 drapeada sobre RGB
+  5. Targets ranked sobre RGB
+  6. Vista 3D fotorrealista (drape RGB sobre DEM)
+  Cada una con QR al visor `/dashboard/3d-pro?layer=...`.
+- **Página 3 — Plan de perforación:** mismo mapa pero con basemap Sentinel real en vez de fondo neutro.
+- **Página 4 — Tabla DDH** (sin cambios estructurales).
+- **Página 5 nueva — Metodología y fuentes:** STAC IDs de las escenas Sentinel usadas, fecha de adquisición, cloud cover, resolución, datum, software, hashes SHA-256, referencia a EMAG2v3 y Copernicus.
 
-## 8. Riesgos y mitigación
+## 5. Mejoras de informe
 
-- **GemPy requiere Python pesado**: usar runner externo, no Worker. Si bloquea, MVP con isosuperficies de EMAG2 + vetas vectoriales (sin GemPy) ya entrega 80 % del valor.
-- **Cesium bundle grande (~3 MB gz)**: code-split en ruta `/dashboard/3d-pro` con `lazy()`.
-- **CORS de NOAA/SERNAGEOMIN**: proxy server-side obligatorio.
-- **Cesium Ion free tier**: si se supera, fallback a Cesium Terrain Provider de OpenTopography.
+- Cartela ISO 5457 (título, escala, datum, autor, fecha, versión, hoja n/N).
+- Leyenda unificada con simbología consistente entre páginas.
+- Texto resumen ejecutivo de 1 párrafo en página 1.
+- Nota de licencia: Sentinel-2 (Copernicus, libre), EMAG2v3 (NOAA, libre), DEM Copernicus (ESA, libre).
+- QR maestro al PDF actualizado + link corto.
 
-## 9. Entregables verificables
+## 6. Entregables
 
-- Ruta `/dashboard/3d-pro` funcional con al menos: terreno + satélite + EMAG2 + targets magnéticos del distrito Los Verdes-Tilama.
-- Tabla `mag_targets` con ≥ 5 anomalías reales detectadas vía EMAG2.
-- PDF NI 43-101 v5 con snapshot del visor y QR al enlace 3D público.
+- `Plano_Georref_Modelo3D_LosVerdes_v1.3.pdf` (5 páginas, A3 landscape) en `/mnt/documents/`.
+- Anexo: `scenes_metadata.json` con IDs STAC y checksums.
+- QA visual obligatorio: render de cada página como JPG y revisión antes de entregar.
 
----
+## 7. Riesgos y mitigación
 
-Confírmame si avanzo con la **Fase 1** (Cesium + Resium + EMAG2 + targets reales) ya en el siguiente turno, o si prefieres que empiece por otra fase / ajuste el alcance (p. ej. saltarme GemPy y quedarme con isosuperficies puras).
+- **STAC sin red en sandbox** → fallback a mosaico ESRI World Imagery XYZ (también público) o a una escena Sentinel cacheada vía AWS S3 público.
+- **PyVista headless** → usar `pyvista.start_xvfb()` o renderer `osmesa`; si falla, fallback a drape 2.5D con matplotlib + hillshade.
+- **Nubes en escena Sentinel** → seleccionar mejor escena del año (mínimo cloud_cover sobre AOI).
+
+## 8. Notas técnicas
+
+- Todo el trabajo es generación de artefacto en `/tmp` + salida a `/mnt/documents/`. No toca código de la app Lovable.
+- Coordenadas de referencia: AOI ~ `lon [-71.30, -71.18]`, `lat [-32.13, -32.03]` (Los Verdes-Tilama).
+- Proyección de salida: EPSG:32719 (WGS84 / UTM 19S).
+- Datums declarados explícitamente en cartela y metadatos.
+
+Confirma para pasar a build y generar `v1.3` con basemap satelital real y 3D fotorrealista.
