@@ -1,5 +1,9 @@
 // Sprint 5.4 — Visor 3D de sondajes + intercepts + targets.
 // Three.js puro, sin react-three-fiber para mantener el bundle bajo.
+/**
+ * @deprecated Sprint 2 · Usar `<GeoScene3D mode="surface" />` desde `@/components/geoscene`.
+ * Este componente se borrará en el siguiente sprint de limpieza.
+ */
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";

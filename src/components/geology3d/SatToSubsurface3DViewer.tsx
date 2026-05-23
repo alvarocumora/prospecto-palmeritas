@@ -1,6 +1,9 @@
 // Sprint 1+ — Visor 3D "Satélite → Subsuelo" enriquecido para plan de mina.
 // Capas: anomalías (columnas), VETAS inclinadas (planos 3D), PÓRFIDOS (cilindros profundos),
 // SONDAJES propuestos (PathLayer 3D) y FOOTPRINT de rajo abierto.
+/**
+ * @deprecated Sprint 2 · Usar `<GeoScene3D mode="subsurface" />` desde `@/components/geoscene`.
+ */
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
