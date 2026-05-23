@@ -12,6 +12,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useProjects } from "@/hooks/useProjects";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
+import { useDrillTrajectoriesLayer } from "./useDrillTrajectoriesLayer";
 import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
@@ -66,9 +67,24 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Capas por modo
   const surfaceMode = mode === "surface";
   const subsurfaceMode = mode === "subsurface";
+  const centerLng = Number(active?.center_lng ?? -70.5);
+  const centerLat = Number(active?.center_lat ?? -30);
 
   const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, surfaceMode);
-  const { layer: holesLayer } = useDrillHolesLayer(active?.id ?? null, subsurfaceMode);
+  // Collares (columnas) — útil en zoom alejado.
+  const { layer: holesColumnLayer } = useDrillHolesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
+  // Trayectorias 3D + intercepts coloreados por Au — el verdadero subsuelo.
+  const { layers: trajectoryLayers, holeCount, interceptCount } = useDrillTrajectoriesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
     active?.id ?? null,
     subsurfaceMode,
@@ -121,9 +137,11 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Empujar capas deck.gl
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
-    const layers = [targetsLayer, holesLayer, anomaliesLayer].filter(Boolean);
+    const layers = [targetsLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer].filter(
+      Boolean,
+    );
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, holesLayer, anomaliesLayer]);
+  }, [ready, targetsLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
@@ -145,8 +163,9 @@ export function GeoSceneCanvas({ mode }: Props) {
   }, []);
 
   const layerCount = useMemo(
-    () => [targetsLayer, holesLayer, anomaliesLayer].filter(Boolean).length,
-    [targetsLayer, holesLayer, anomaliesLayer],
+    () =>
+      [targetsLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer].filter(Boolean).length,
+    [targetsLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer],
   );
 
   return (
@@ -162,6 +181,11 @@ export function GeoSceneCanvas({ mode }: Props) {
       )}
       <div className="absolute bottom-3 right-3 z-10 text-[10px] font-mono text-muted-foreground bg-bg-secondary/90 backdrop-blur border border-border rounded px-2 py-1">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}
+        {subsurfaceMode && holeCount > 0 && (
+          <span className="ml-1 text-gold">
+            · {holeCount} sondajes · {interceptCount} intercepts
+          </span>
+        )}
         {subsurfaceMode && anomaliesCount > 0 && (
           <span className="ml-1 text-gold">· {anomaliesCount} anomalías</span>
         )}
