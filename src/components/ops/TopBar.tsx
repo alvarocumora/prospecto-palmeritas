@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { Logo } from "@/components/Logo";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
+import { GlobalGeoCopilot } from "@/components/ops/GlobalGeoCopilot";
 import { cn } from "@/lib/utils";
 
 const ROUTE_LABELS: Record<string, string> = {
