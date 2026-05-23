@@ -1,5 +1,8 @@
 // Fase 1 — Visor 3D Pro con anomalías magnéticas reales EMAG2 (NOAA NCEI).
 // Mapa Leaflet con capa satelital ESRI + overlay raster EMAG2 + marcadores de targets.
+/**
+ * @deprecated Sprint 2 · Usar `<GeoScene3D mode="subsurface" variant="mag" />` desde `@/components/geoscene`.
+ */
 import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
