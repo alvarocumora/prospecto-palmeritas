@@ -1,7 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Target as TargetIcon } from "lucide-react";
+import {
+  Crosshair,
+  MapPin,
+  Loader2,
+  RefreshCw,
+  WifiOff,
+  Target as TargetIcon,
+  Layers,
+  Compass,
+  Download,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useProjects } from "@/hooks/useProjects";
@@ -9,14 +20,55 @@ import { useMiningConcessions, EXPIRY_COLORS, expiryStatus } from "@/hooks/useMi
 import { useFieldPois, useFieldPoiQueue, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
+import {
+  useProjectSatelliteAnomalies,
+  SAT_INDEX_CODES,
+  type SatIndexCode,
+} from "@/hooks/useProjectSatelliteAnomalies";
 
 import { CoordinateFooter } from "@/components/map/CoordinateFooter";
 import { buildFieldPoisLayer } from "@/components/field/poiLayer";
 import { buildFieldTargetsLayer } from "@/components/field/fieldTargetsLayer";
+import {
+  buildSatAnomalyOverlay,
+  INDEX_COLOR as SAT_COLOR,
+  INDEX_LABEL as SAT_LABEL,
+} from "@/components/field/satAnomalyLayer";
 import { POISheet } from "@/components/field/POISheet";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
+import { ArRadarOverlay } from "@/components/ar/ArRadarOverlay";
+import { buildGpx, buildKml, downloadBlob } from "@/lib/fieldExport";
+import type { ArProjectedObject } from "@/types/ar";
 
 type LeafletNS = typeof import("leaflet");
+
+function haversineMeters(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const la1 = (a.lat * Math.PI) / 180;
+  const la2 = (b.lat * Math.PI) / 180;
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
+}
+function bearingDeg(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const la1 = (a.lat * Math.PI) / 180;
+  const la2 = (b.lat * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const y = Math.sin(dLng) * Math.cos(la2);
+  const x =
+    Math.cos(la1) * Math.sin(la2) -
+    Math.sin(la1) * Math.cos(la2) * Math.cos(dLng);
+  return (((Math.atan2(y, x) * 180) / Math.PI) + 360) % 360;
+}
 
 export function FieldMap() {
   const { active } = useProjects();
