@@ -185,7 +185,7 @@ function CommandCenter() {
             padded={false}
           >
             <div className="absolute inset-0 overflow-hidden">
-              <SceneCopilot mode={mode} variant="floating" />
+              <SceneCopilot mode={mode} variant="default" />
             </div>
           </Panel>
 
