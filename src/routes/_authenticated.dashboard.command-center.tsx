@@ -209,7 +209,7 @@ function CommandCenter() {
           </Panel>
           <Panel className="col-span-3 row-span-4" label="KPI · QA/QC" accent="amber">
             <GaugeBlock
-              value={kpis?.qaqcFailRate != null ? 1 - kpis.qaqcFailRate : null}
+              value={kpis?.qaqcFailRate != null ? 1 - kpis.qaqcFailRate / 100 : null}
               label="Tasa Aprobado"
               unit="%"
               color="amber"
@@ -236,13 +236,13 @@ function CommandCenter() {
 
       {/* === FOOTER TICKER === */}
       <footer className="absolute bottom-0 left-0 right-0 h-7 border-t border-border bg-bg-secondary/80 backdrop-blur flex items-center px-4 gap-6 text-[10px] font-mono z-20">
-        <div className="text-muted-foreground uppercase tracking-wider">Mercado</div>
+        <div className="text-muted-foreground uppercase tracking-wider">Mercado (demo)</div>
         <Ticker label="Cu" unit="US$/lb" value="4.21" delta="+1.2%" up />
         <Ticker label="Au" unit="US$/oz" value="2,347" delta="+0.8%" up />
         <Ticker label="Ag" unit="US$/oz" value="28.65" delta="+1.5%" up />
         <Ticker label="Li" unit="US$/t" value="14,200" delta="-0.4%" up={false} />
         <div className="flex-1" />
-        <div className="text-muted-foreground">Última sincronización · {now.toLocaleTimeString()}</div>
+        <div className="text-muted-foreground">Reloj local · {now.toLocaleTimeString()}</div>
       </footer>
     </div>
   );
@@ -499,34 +499,41 @@ function Ticker({
 // ---------- Data widgets ----------
 
 function AnomalySummary({ projectId }: { projectId: string | null }) {
-  const [counts, setCounts] = useState<{ critical: number; high: number; medium: number; low: number; total: number }>({
-    critical: 0,
-    high: 0,
-    medium: 0,
-    low: 0,
-    total: 0,
-  });
+  const [counts, setCounts] = useState<{
+    critical: number; high: number; medium: number; low: number;
+    geoTotal: number; satTotal: number; total: number;
+  }>({ critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 });
   useEffect(() => {
     if (!projectId) {
-      setCounts({ critical: 0, high: 0, medium: 0, low: 0, total: 0 });
+      setCounts({ critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 });
       return;
     }
     let cancelled = false;
-    supabase
-      .from("geophysics_anomalies")
-      .select("severity")
-      .eq("project_id", projectId)
-      .neq("status", "dismissed")
-      .then(({ data }) => {
-        if (cancelled) return;
-        const c = { critical: 0, high: 0, medium: 0, low: 0, total: 0 };
-        for (const r of (data ?? []) as Array<{ severity: string | null }>) {
-          c.total += 1;
-          const s = (r.severity ?? "medium").toLowerCase() as keyof typeof c;
-          if (s in c) (c as Record<string, number>)[s] += 1;
+    Promise.all([
+      supabase.from("geophysics_anomalies").select("severity").eq("project_id", projectId).neq("status", "dismissed"),
+      supabase.from("satellite_anomalies").select("severity").eq("project_id", projectId),
+    ]).then(([geo, sat]) => {
+      if (cancelled) return;
+      const c = { critical: 0, high: 0, medium: 0, low: 0, geoTotal: 0, satTotal: 0, total: 0 };
+      const tally = (rows: Array<{ severity: string | null }> | null) => {
+        for (const r of rows ?? []) {
+          const s = (r.severity ?? "medium").toLowerCase();
+          if (s === "critical" || s === "high" || s === "medium" || s === "low") {
+            (c as Record<string, number>)[s] += 1;
+          } else {
+            c.medium += 1;
+          }
         }
-        setCounts(c);
-      });
+      };
+      const geoRows = (geo.data ?? []) as Array<{ severity: string | null }>;
+      const satRows = (sat.data ?? []) as Array<{ severity: string | null }>;
+      tally(geoRows);
+      tally(satRows);
+      c.geoTotal = geoRows.length;
+      c.satTotal = satRows.length;
+      c.total = c.geoTotal + c.satTotal;
+      setCounts(c);
+    });
     return () => {
       cancelled = true;
     };
@@ -546,7 +553,7 @@ function AnomalySummary({ projectId }: { projectId: string | null }) {
         {counts.total}
       </div>
       <div className="text-[10px] text-muted-foreground uppercase tracking-wider mt-1">
-        Detectadas
+        Detectadas · {counts.satTotal} sat · {counts.geoTotal} geo
       </div>
       <div className="mt-3 border-t border-border/40 pt-2 flex-1">
         <Row label="Crítica" n={counts.critical} color="var(--signal-violet)" />
