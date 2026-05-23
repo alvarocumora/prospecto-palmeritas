@@ -1,64 +1,40 @@
-## Objetivo
+## Problema
 
-Activar una capa de **Catastro Minero SERNAGEOMIN** sobre el Live Map PWA (`/live/losverdes`) y resaltar las 15 pertenencias del proyecto (LV-C-001 a LV-C-015) sobre el cuadrante real publicado por el organismo oficial. Esto reemplaza el plano impreso de las fotos por polígonos georreferenciados que se actualizan automáticamente.
+En `/live/losverdes` ingresas `losverdes5` y sale **"Error de red"** en vez de entrar al mapa. La PWA carga la página, pero el POST al server function `verifyLosVerdesLiveMapPassword` falla.
 
-## Qué se va a ver en terreno
+## Causa más probable
 
-- Polígonos oficiales de **Explotación 1983**, **Explotación 1932**, **Exploración 1983** y **Estacamento** alrededor del proyecto.
-- Las concesiones **del titular Carlos Fernández** resaltadas en amarillo intenso con borde grueso (match por nombre contra la base SERNAGEOMIN).
-- Popup oficial: ROL, nombre, titular, hectáreas, vencimiento, comuna.
-- Chip nuevo: `[📋 Catastro]` con conteo en vivo (`📋 142`).
-- Mini-leyenda con los 4 colores ORIGEN cuando el toggle está activo.
+`Importing a module script failed` en consola (visto en logs previos): el bundle cliente intenta cargar un chunk dinámico (el del server fn) cuyo hash ya no existe en el servidor porque hubo un rebuild entre la carga del HTML y el click. El `catch` del formulario lo reporta como "Error de red".
 
-## Cómo se conecta (técnico)
+Ya quedó en código un guard que detecta este error y hace `window.location.reload()` automáticamente — pero **solo aplica después de cargar una vez la nueva versión**. La sesión actual del usuario sigue con el bundle viejo.
 
-La infraestructura ya existe en el dashboard interno y se reutiliza tal cual — no hay tablas nuevas ni migraciones:
+## Plan de verificación (3 pasos, sin tocar código todavía)
 
-```text
-src/components/map/catastroLayer.ts   →  loadCatastro(L, bbox)  + bboxAround()
-src/components/map/overlays.ts        →  CATASTRO_STYLE + popup oficial
-```
+### 1. Forzar recarga dura del cliente
+- Pedirte que hagas **hard refresh** en la preview (botón ⟳ del editor o `Cmd+Shift+R`) sobre `/live/losverdes`.
+- Esto baja el nuevo `index.html` + el chunk actualizado del server fn.
 
-`loadCatastro` consulta el **ArcGIS FeatureServer público** de SERNAGEOMIN (sin API key, sin RLS) y cachea 24h en `localStorage`. Funciona offline después de la primera carga.
+### 2. Probar el flujo end-to-end
+- Ingresar `losverdes5`.
+- Resultados esperados:
+  - **Si entra al mapa** → el problema era 100% chunk obsoleto, ya resuelto por el guard. Se cierra el ticket.
+  - **Si vuelve a salir "Error de red"** → el server fn no responde, hay que ir al paso 3.
+  - **Si sale "Contraseña incorrecta"** → el secret `LIVE_MAP_LOSVERDES_PASSWORD` en Cloud no es `losverdes5`; lo actualizamos.
 
-### Cambios
+### 3. Diagnóstico server-side (solo si paso 2 falla con "Error de red")
+- Revisar Worker logs publicados filtrando por `verifyLosVerdesLiveMapPassword`.
+- Invocar el server fn vía `stack_modern--invoke-server-function` con `losverdes5` y mirar status real.
+- Confirmar que `LIVE_MAP_LOSVERDES_PASSWORD` y `LIVE_MAP_SESSION_SECRET` están provisionados (ya verifiqué que sí existen como secrets de proyecto).
 
-1. **`FieldMapPublic.tsx`**
-   - Nuevos estados: `showCatastro`, `catastroCount`, `loadingCatastro`, `catastroLayerRef`.
-   - Nuevo chip `[📋 Catastro]` (color `#22c55e`) entre `Vetas` y `3D`.
-   - `useEffect` que, al activar el toggle:
-     - calcula `bboxAround([center_lat, center_lng], 6)` (≈ 12×12 km, cubre todo el cluster Los Verdes / Tilama).
-     - llama `loadCatastro(L, bbox)`.
-     - añade los 4 layers ORIGEN al mapa.
-     - resalta features cuyo `NOMBRE` matchee (normalizado) cualquier `mining_concession.name` del proyecto → restyle con `weight: 4, color: '#facc15', fillOpacity: 0.35`.
-     - actualiza `catastroCount` con el total.
-   - Al desactivar: `removeLayer()` y mantiene el cache para próxima activación.
+## Plan de build
 
-2. **`livemap-public.functions.ts`**
-   - Extender `getLosVerdesPublicLayers` para incluir `projectConcessions: { code, name, holder }[]` desde `mining_concessions` (filtro `project_id`, sin geometría — solo metadata para el matching cliente). Bypassa RLS vía `supabaseAdmin`.
+- Correr `bunx tsc --noEmit` para confirmar 0 errores (ya verifiqué hace minutos: limpio).
+- Si tras el hard refresh la app entra al mapa, **publicar** desde el botón Publish para que el nuevo bundle quede como versión estable en `prospecto-palmeritas.lovable.app` y la PWA en terreno tome los chunks frescos.
 
-3. **Mini-leyenda flotante** (debajo de la legend del heatmap)
-   - 4 cuadritos con label corto: `Explot. '83 · Explot. '32 · Explor. '83 · Estacament.`
-   - Visible solo cuando `showCatastro` está activo.
+## Mejora opcional (si querés que la apruebe en otro turno)
 
-4. **Estado online/offline**
-   - Si está offline y no hay cache, mostrar toast: "Catastro requiere conexión la primera vez".
-   - Si hay cache, carga normal y muestra badge `cached` discreto.
+Hacer el handler del gate más robusto reintentando el `verify()` una vez si el primer intento falla por chunk obsoleto, sin necesidad de reload manual. Útil para terreno con conexión intermitente. No es bloqueante para usar la app hoy.
 
-## Lo que NO se hace en esta iteración
+## Entregable inmediato
 
-- No se editan los registros en `mining_concessions` (siguen sin geometría en la DB; el matching es solo visual).
-- No se agrega un job para sincronizar geometría desde SERNAGEOMIN → DB (eso queda para un sprint posterior si se quiere persistir).
-- No se toca el dashboard interno ni se modifica RLS.
-
-## Archivos a modificar
-
-- `src/components/field/FieldMapPublic.tsx` (toggle, layer, leyenda, matching)
-- `src/lib/livemap-public.functions.ts` (añadir `projectConcessions` al payload)
-
-## Validación
-
-- Abrir `/live/losverdes` en móvil → activar `📋 Catastro` → ver polígonos rosados/azules sobre el área.
-- Verificar que las 15 pertenencias del titular Fernández aparezcan resaltadas en amarillo.
-- Tocar un polígono → popup con ROL + titular + vencimiento.
-- Desactivar conexión → re-activar toggle → debe servir desde cache.
+Hacé el hard refresh y volvé a probar `losverdes5`. Decime qué mensaje sale exactamente y desde ahí ajustamos.
