@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState } from "react";
 import { Loader2, Sparkles } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
+import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
 
 // Lazy-load de visores legacy: cada modo solo carga su engine cuando se activa.
@@ -60,6 +61,9 @@ export function GeoScene3D({
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
+
+      {/* Contextual AI copilot */}
+      <SceneCopilot mode={mode} variant={variant} />
     </div>
   );
 }
