@@ -1,8 +1,13 @@
-import { lazy, Suspense, useState } from "react";
-import { Loader2, Sparkles } from "lucide-react";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Loader2, Sparkles, Crosshair, X } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
+import {
+  ANCHOR_LABEL,
+  SCENE_FOCUS_EVENT,
+  type SceneFocusDetail,
+} from "./anchors";
 
 // Lazy-load de visores legacy: cada modo solo carga su engine cuando se activa.
 // Sprint 3+: estos se reescriben como capas deck.gl sobre un canvas único.
