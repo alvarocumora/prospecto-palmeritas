@@ -423,17 +423,48 @@ export function FieldMapPublic() {
         </div>
       </div>
 
+      {/* Layer chips row */}
+      <div className="absolute top-14 left-3 right-3 z-[1000] flex flex-wrap gap-1.5 pointer-events-none">
+        <ChipBtn active={showTargets} color="#F0C96B" onClick={() => setShowTargets((v) => !v)}>
+          🎯 Targets
+        </ChipBtn>
+        <ChipBtn active={showHeatmap} color="#dc2626" onClick={() => setShowHeatmap((v) => !v)}>
+          <Flame className="w-3 h-3 inline mr-1" />
+          Heatmap
+        </ChipBtn>
+        <ChipBtn active={showLineaments} color="#facc15" onClick={() => setShowLineaments((v) => !v)}>
+          <Zap className="w-3 h-3 inline mr-1" />
+          Vetas
+        </ChipBtn>
+        <ChipBtn active={show3D} color="#a78bfa" onClick={() => setShow3D(true)}>
+          <Box className="w-3 h-3 inline mr-1" />
+          3D
+        </ChipBtn>
+        {loadingAnoms && (
+          <span className="pointer-events-auto inline-flex items-center gap-1 px-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground">
+            <Loader2 className="w-3 h-3 animate-spin" /> anomalías
+          </span>
+        )}
+      </div>
+
+      {/* Heatmap legend */}
+      {showHeatmap && (
+        <div className="absolute bottom-20 left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground">
+          <div className="text-gold font-bold mb-1">Intensidad anomalía</div>
+          <div
+            className="h-2 w-32 rounded"
+            style={{
+              background:
+                "linear-gradient(90deg,#1e3a8a 0%,#0ea5e9 30%,#facc15 50%,#fb923c 70%,#dc2626 100%)",
+            }}
+          />
+          <div className="flex justify-between mt-1"><span>baja</span><span>alta</span></div>
+        </div>
+      )}
+
       {/* Bottom controls */}
       <div className="absolute bottom-4 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowTargets((v) => !v)}
-            className={`min-h-[44px] px-3 rounded-md border font-mono text-xs ${
-              showTargets ? "bg-gold/15 border-gold text-gold" : "bg-bg-panel/90 border-border text-muted-foreground"
-            }`}
-          >
-            Targets {showTargets ? "ON" : "OFF"}
-          </button>
           <button
             onClick={() => setFollow((v) => !v)}
             className={`min-h-[44px] px-3 rounded-md border font-mono text-xs ${
@@ -477,7 +508,7 @@ export function FieldMapPublic() {
       </div>
 
       {geoStatus === "denied" && (
-        <div className="absolute top-16 left-3 right-3 z-[1000] p-3 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs flex items-center gap-2">
+        <div className="absolute top-28 left-3 right-3 z-[1000] p-3 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs flex items-center gap-2">
           <WifiOff className="w-4 h-4" />
           Permite el acceso a la ubicación en tu navegador para usar el GPS.
         </div>
@@ -500,6 +531,16 @@ export function FieldMapPublic() {
             toast.success("Nota guardada localmente");
           }}
         />
+      )}
+
+      {show3D && (
+        <Suspense fallback={
+          <div className="fixed inset-0 z-[3000] bg-bg-app flex items-center justify-center text-muted-foreground font-mono text-xs gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> Cargando 3D…
+          </div>
+        }>
+          <Structures3DViewer onClose={() => setShow3D(false)} />
+        </Suspense>
       )}
     </div>
   );
