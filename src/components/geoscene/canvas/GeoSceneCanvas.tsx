@@ -90,6 +90,10 @@ export function GeoSceneCanvas({ mode }: Props) {
     active?.id ?? null,
     subsurfaceMode,
   );
+  const { layer: satAnomaliesLayer, count: satAnomaliesCount } = useSatAnomaliesLayer(
+    active?.id ?? null,
+    surfaceMode,
+  );
 
   // Init map
   useEffect(() => {
