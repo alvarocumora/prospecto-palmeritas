@@ -254,6 +254,113 @@ export function FieldMap() {
     targetsLayerRef.current = group;
   }, [targets, mapReady, showTargets]);
 
+  // Satellite anomalies overlay
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    if (satLayerRef.current) {
+      map.removeLayer(satLayerRef.current);
+      satLayerRef.current = null;
+    }
+    if (!showSatAnoms || !satGrouped) return;
+    const filtered = SAT_INDEX_CODES.flatMap((idx) =>
+      satEnabled[idx] ? satGrouped[idx] : [],
+    );
+    if (filtered.length === 0) return;
+    const group = buildSatAnomalyOverlay(L, filtered);
+    group.addTo(map);
+    satLayerRef.current = group;
+  }, [satGrouped, satEnabled, showSatAnoms, mapReady]);
+
+  // AR heading via DeviceOrientationEvent
+  useEffect(() => {
+    if (!arOpen) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      // webkitCompassHeading on iOS; alpha is CCW from north on others
+      const wk = (e as unknown as { webkitCompassHeading?: number })
+        .webkitCompassHeading;
+      if (typeof wk === "number") {
+        setArHeading(wk);
+      } else if (e.alpha != null) {
+        setArHeading((360 - e.alpha) % 360);
+      }
+    };
+    // iOS 13+ needs explicit permission
+    const anyDOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<"granted" | "denied">;
+    };
+    if (typeof anyDOE.requestPermission === "function") {
+      anyDOE.requestPermission().then((p) => {
+        if (p === "granted") window.addEventListener("deviceorientation", handler);
+      });
+    } else {
+      window.addEventListener("deviceorientation", handler);
+    }
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, [arOpen]);
+
+  const arObjects = useMemo<ArProjectedObject[]>(() => {
+    if (!arOpen || !position) return [];
+    const me = { lat: position.lat, lng: position.lng };
+    const items: ArProjectedObject[] = [];
+    for (const t of targets) {
+      if (t.lat == null || t.lng == null) continue;
+      const pt = { lat: t.lat, lng: t.lng };
+      const d = haversineMeters(me, pt);
+      const b = bearingDeg(me, pt);
+      const rel =
+        arHeading != null ? (((b - arHeading + 540) % 360) - 180) : null;
+      items.push({
+        id: t.id,
+        type: "target",
+        label: `${t.code} · ${t.name}`,
+        labelCompact: t.code,
+        lat: t.lat,
+        lng: t.lng,
+        distanceM: d,
+        bearingDeg: b,
+        relativeBearingDeg: rel,
+        relativeElevationM: null,
+        isNearby: d < 500,
+        confidence: t.score,
+      });
+    }
+    items.sort((a, b) => a.distanceM - b.distanceM);
+    return items.slice(0, 20);
+  }, [arOpen, position, targets, arHeading]);
+
+  const handleExportGpx = () => {
+    if (!active) return;
+    const xml = buildGpx({ projectName: active.name, pois, targets });
+    downloadBlob(
+      xml,
+      `${active.code}_terreno_${Date.now()}.gpx`,
+      "application/gpx+xml",
+    );
+    toast.success("GPX descargado");
+  };
+  const handleExportKml = () => {
+    if (!active) return;
+    const allAnoms = satGrouped
+      ? SAT_INDEX_CODES.flatMap((idx) => satGrouped[idx])
+      : [];
+    const xml = buildKml({
+      projectName: active.name,
+      pois,
+      targets,
+      anomalies: allAnoms,
+    });
+    downloadBlob(
+      xml,
+      `${active.code}_terreno_${Date.now()}.kml`,
+      "application/vnd.google-earth.kml+xml",
+    );
+    toast.success("KML descargado (abre con Google Earth)");
+  };
+
+
+
   // GPS marker
   useEffect(() => {
     const L = LRef.current;
