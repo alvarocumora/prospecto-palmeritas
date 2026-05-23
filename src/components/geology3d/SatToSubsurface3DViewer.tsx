@@ -212,7 +212,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         });
       }
     });
-    continue;
+    return out;
   }, [anomGrouped, enabled, depthScale, showColumns]);
 
   // ---------- VETAS: planos inclinados 3D desde lineamientos ----------
@@ -288,7 +288,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         score,
       });
     }
-    continue;
+    return out;
   }, [anomGrouped, showPorphyry, porphyryDepthM]);
 
   // ---------- PLAN DE MINA: sondajes propuestos como paths 3D ----------
@@ -317,7 +317,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         name: `${t.code} · ${t.name}`,
       });
     }
-    continue;
+    return out;
   }, [targets, showDrillPlan, drillLengthM, drillDipDeg]);
 
   // ---------- FOOTPRINT de rajo abierto en superficie ----------
@@ -338,7 +338,7 @@ export function SatToSubsurface3DViewer({ className }: Props) {
       ring.push(ring[0]);
       out.push({ polygon: ring, name: `Rajo conceptual · ${t.code}`, priority: t.priority ?? "" });
     }
-    continue;
+    return out;
   }, [targets, showPit]);
 
   const targetData = useMemo(() => {
