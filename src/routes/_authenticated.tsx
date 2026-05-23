@@ -35,7 +35,7 @@ import {
   Satellite,
   MapPin,
 } from "lucide-react";
-import { GeoAssistant } from "@/components/GeoAssistant";
+
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
