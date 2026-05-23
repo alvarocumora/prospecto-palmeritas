@@ -1,90 +1,74 @@
+# Live Field Map PWA — Los Verdes (Tilama)
 
-# Plan — Plano Georref v1.3 con imagen satelital real + 3D fotorrealista
+Reutiliza la infraestructura ya existente (`FieldMap.tsx`, `field_pois`, `useFieldPoiQueue`, `InstallPwaButton`, patrón `/live/palmeras`) y la expone como PWA pública con contraseña, lista para usar **hoy en terreno**.
 
-## Objetivo
+## 1. Nueva ruta `/live/losverdes`
 
-Reemplazar los thumbnails sintéticos del PDF actual (`Plano_Georref_Modelo3D_LosVerdes_v1.2.pdf`) por **imágenes satelitales reales georreferenciadas** del distrito Los Verdes-Tilama y montar el plano del modelo 3D sobre esa base, con coherencia de coordenadas (UTM 19S), escala y grilla. Mejorar también el informe (capas, leyenda, metodología, fuentes).
+Archivo: `src/routes/live.losverdes.tsx`
 
-## 1. Fuentes satelitales abiertas (sin API key obligatoria)
+- Patrón idéntico a `live.palmeras.tsx`: `PasswordGate` → contenido protegido.
+- `sessionStorage` key: `live_map_losverdes_token`.
+- Banner "Live Field · Los Verdes · Confidencial" + botón cerrar sesión.
+- Renderiza `<FieldFieldMapPublic projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" />`.
+- `head()` con `noindex,nofollow` + `theme-color` + manifest link.
 
-| Capa | Fuente | Acceso |
-|---|---|---|
-| RGB color real 10 m | **Sentinel-2 L2A** vía Microsoft Planetary Computer STAC (firma SAS pública) | STAC search + asset COG |
-| RGB color real 10 m (fallback) | **Sentinel-2 L2A** vía AWS Open Data `s3://sentinel-cogs` | HTTPS COG público |
-| Mosaico anual <1 m | **ESRI World Imagery** WMTS (tile service público) | XYZ tiles |
-| Topo / hillshade | **Copernicus GLO-30 DEM** vía Planetary Computer | COG |
-| SRTM 30 m (fallback DEM) | **OpenTopography** público | GeoTIFF |
-| Geología regional | SERNAGEOMIN WMS Hoja Illapel | WMS |
+## 2. Verifier nuevo
 
-## 2. Repos de referencia (open source) para pipeline imagen + 3D
+En `src/lib/live-map.functions.ts`:
+- Añadir `export const verifyLosVerdesLiveMapPassword = buildVerifier("LIVE_MAP_LOSVERDES_PASSWORD");`
+- Pedir secret `LIVE_MAP_LOSVERDES_PASSWORD` via `add_secret`.
 
-- `microsoft/PlanetaryComputerExamples` — patrones STAC + signing + COG.
-- `cogeotiff/rio-tiler` y `developmentseed/titiler` — recorte/render de COG a PNG georreferenciado.
-- `mapbox/rasterio` + `pyproj` — reproyección WGS84 ↔ UTM 19S.
-- `OpenDroneMap/ODM` — flujos foto→ortomosaico→DEM 3D.
-- `CesiumGS/cesium` + `NASA-AMMOS/3DTilesRendererJS` — visualización 3D.
-- `giswqs/leafmap` / `geemap` — ejemplos de mosaicos Sentinel.
-- `nasa/pyGMT` y `pyvista/pyvista` — render 3D drape (raster sobre DEM) a PNG.
+## 3. Variante pública del FieldMap
 
-Estos repos sirven como guía para el script Python local; no se instalan como dependencias del proyecto Lovable.
+Hoy `FieldMap` depende de `useProjects()` (sesión autenticada) y de RLS que exige `is_project_member`. Para el modo `/live/*` (sin login):
 
-## 3. Pipeline de generación (script Python en `/tmp`)
+Opción elegida: **modo "solo lectura + notas anónimas locales"** para no abrir RLS:
+- Nuevo componente `src/components/field/FieldMapPublic.tsx` (basado en FieldMap):
+  - Recibe `projectId` por prop, salta `useProjects`.
+  - Carga concesiones y targets vía **server fn pública** nueva (`getPublicFieldData`) que usa `supabaseAdmin` y retorna solo capas no sensibles del proyecto Los Verdes (concesiones vigentes, exploration_targets, bbox).
+  - **POIs/notas:** se guardan en `localStorage` + `IndexedDB` (cola), NO en `field_pois`. Botón "Exportar GeoJSON/CSV" para subirlos luego desde el dashboard autenticado.
+  - GPS, foto (input file), seguimiento y capa targets clicable: igual que FieldMap.
+- Esto evita exponer escritura sin auth y mantiene el principio de RLS estricto del proyecto.
+
+Server fn nueva en `src/lib/livemap-public.functions.ts`:
+- `getLosVerdesPublicLayers()` → `{ concessions, targets, center, bbox }` filtrado por `project_id`.
+
+## 4. PWA (manifest + install)
+
+- `public/manifest.losverdes.json` con `name`, `short_name: "LV Field"`, `start_url: "/live/losverdes"`, `display: standalone`, `theme_color`, iconos.
+- Link `<link rel="manifest" href="/manifest.losverdes.json">` inyectado por `head()` de la ruta.
+- Reutiliza `InstallPwaButton` ya existente.
+- **No** se añade service worker (regla del proyecto: PWA solo manifest, sin SW por iframes de preview). Instalable en móvil sin offline shell.
+
+## 5. Importador de notas al dashboard
+
+En `/_authenticated/dashboard/field-map` añadir botón "Importar notas del Live PWA" que:
+- Lee localStorage `live_map_losverdes_pois`.
+- Inserta en `field_pois` vía server fn autenticada.
+- Limpia la cola local.
+
+## 6. Acceso desde el PDF / dashboard
+
+- Card en `/dashboard/index` para "Distrito Los Verdes": link + QR a `/live/losverdes`.
+- (Opcional, fuera de scope si quieres rápido) añadir QR a la página 1 del PDF v1.4.
+
+## Entregables
 
 ```text
-1. AOI = bbox Los Verdes-Tilama (UTM 19S, ~10 x 8 km)
-2. STAC search Sentinel-2 L2A (cloud_cover < 10 %, último año) → asset visual COG
-3. rio-tiler.crop(bbox) → RGB PNG + sidecar PGW/.aux (georef)
-4. Reproyección a EPSG:32719 (UTM 19S)
-5. Composite por capa:
-   - Página 1: RGB Sentinel + grilla UTM + escala + targets + collares DDH
-   - Galería p.2: thumbnails RGB-real, DEM hillshade real, anomalía MAG sobre RGB,
-                  targets sobre RGB, modelo 3D drape (PyVista render)
-   - Mapa drill p.3: RGB Sentinel como basemap real + trazas DDH + secciones
-6. Render 3D fotorrealista (PyVista): DEM Copernicus + drape RGB Sentinel + 
-   targets extruidos + trazas DDH 3D → PNG (vista oblicua NW→SE)
-7. Ensamble PDF A3 con ReportLab (4-5 páginas) + QR al visor 3D
+src/routes/live.losverdes.tsx                (nuevo)
+src/components/field/FieldMapPublic.tsx       (nuevo)
+src/lib/livemap-public.functions.ts           (nuevo)
+src/lib/live-map.functions.ts                 (+ verifier)
+public/manifest.losverdes.json                (nuevo)
+src/routes/_authenticated.dashboard.field-map.tsx  (+ importador)
+secret: LIVE_MAP_LOSVERDES_PASSWORD
 ```
 
-## 4. Cambios en el PDF (v1.3)
+## Notas técnicas
 
-- **Página 1 — Plano Georref:** basemap Sentinel-2 RGB real bajo grilla UTM, norte, escala gráfica, cartela con fuente/fecha de escena, datum WGS84/UTM 19S, leyenda con simbología real.
-- **Página 2 — Galería de capas:** miniaturas con **imagen real**:
-  1. Sentinel-2 RGB true color
-  2. Sentinel-2 SWIR ratio (alteración hidrotermal)
-  3. DEM Copernicus + hillshade
-  4. Anomalía magnética EMAG2 drapeada sobre RGB
-  5. Targets ranked sobre RGB
-  6. Vista 3D fotorrealista (drape RGB sobre DEM)
-  Cada una con QR al visor `/dashboard/3d-pro?layer=...`.
-- **Página 3 — Plan de perforación:** mismo mapa pero con basemap Sentinel real en vez de fondo neutro.
-- **Página 4 — Tabla DDH** (sin cambios estructurales).
-- **Página 5 nueva — Metodología y fuentes:** STAC IDs de las escenas Sentinel usadas, fecha de adquisición, cloud cover, resolución, datum, software, hashes SHA-256, referencia a EMAG2v3 y Copernicus.
+- No se modifican RLS de `field_pois` (siguen requiriendo `is_project_member`).
+- La server fn pública solo expone capas no sensibles ya presentes en `exploration_targets` + `mining_concessions` del proyecto Los Verdes.
+- Mobile-first: controles grandes (≥44px), bottom-sheet, contraste alto sobre satélite Esri.
+- Sin Service Worker (cumple regla `pwa` del proyecto).
 
-## 5. Mejoras de informe
-
-- Cartela ISO 5457 (título, escala, datum, autor, fecha, versión, hoja n/N).
-- Leyenda unificada con simbología consistente entre páginas.
-- Texto resumen ejecutivo de 1 párrafo en página 1.
-- Nota de licencia: Sentinel-2 (Copernicus, libre), EMAG2v3 (NOAA, libre), DEM Copernicus (ESA, libre).
-- QR maestro al PDF actualizado + link corto.
-
-## 6. Entregables
-
-- `Plano_Georref_Modelo3D_LosVerdes_v1.3.pdf` (5 páginas, A3 landscape) en `/mnt/documents/`.
-- Anexo: `scenes_metadata.json` con IDs STAC y checksums.
-- QA visual obligatorio: render de cada página como JPG y revisión antes de entregar.
-
-## 7. Riesgos y mitigación
-
-- **STAC sin red en sandbox** → fallback a mosaico ESRI World Imagery XYZ (también público) o a una escena Sentinel cacheada vía AWS S3 público.
-- **PyVista headless** → usar `pyvista.start_xvfb()` o renderer `osmesa`; si falla, fallback a drape 2.5D con matplotlib + hillshade.
-- **Nubes en escena Sentinel** → seleccionar mejor escena del año (mínimo cloud_cover sobre AOI).
-
-## 8. Notas técnicas
-
-- Todo el trabajo es generación de artefacto en `/tmp` + salida a `/mnt/documents/`. No toca código de la app Lovable.
-- Coordenadas de referencia: AOI ~ `lon [-71.30, -71.18]`, `lat [-32.13, -32.03]` (Los Verdes-Tilama).
-- Proyección de salida: EPSG:32719 (WGS84 / UTM 19S).
-- Datums declarados explícitamente en cartela y metadatos.
-
-Confirma para pasar a build y generar `v1.3` con basemap satelital real y 3D fotorrealista.
+¿Apruebas para implementar?
