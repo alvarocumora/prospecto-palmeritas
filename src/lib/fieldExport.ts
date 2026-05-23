@@ -40,7 +40,7 @@ export function buildGpx(opts: {
       `  <wpt lat="${p.lat}" lon="${p.lng}">
     ${p.elevation_m != null ? `<ele>${p.elevation_m}</ele>` : ""}
     <name>${xmlEscape(p.title ?? "POI")}</name>
-    <desc>${xmlEscape(p.notes ?? "")}</desc>
+    <desc>${xmlEscape(p.note ?? "")}</desc>
     <sym>Flag, Blue</sym>
     <type>field-poi</type>
   </wpt>`,
@@ -83,7 +83,7 @@ export function buildKml(opts: {
     .map(
       (p) => `    <Placemark>
       <name>${xmlEscape(p.title ?? "POI")}</name>
-      <description>${xmlEscape(p.notes ?? "")}</description>
+      <description>${xmlEscape(p.note ?? "")}</description>
       <styleUrl>#poi</styleUrl>
       <Point><coordinates>${p.lng},${p.lat},${p.elevation_m ?? 0}</coordinates></Point>
     </Placemark>`,
