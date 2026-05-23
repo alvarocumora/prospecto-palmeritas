@@ -12,6 +12,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useProjects } from "@/hooks/useProjects";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
+import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import type { GeoSceneMode } from "../types";
