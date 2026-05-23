@@ -295,8 +295,8 @@ export const revalidateMagTargets = createServerFn({ method: "POST" })
         mean_mag_delta_nt: mean(magDeltas),
         max_mag_delta_nt: maxOf(magDeltas),
         stats,
-        prev_snapshot: prev,
-        new_snapshot: peaks,
+        prev_snapshot: prev as unknown as Record<string, unknown>[],
+        new_snapshot: peaks as unknown as Record<string, unknown>[],
         triggered_by: data.triggeredBy,
         created_by: userId,
       })
