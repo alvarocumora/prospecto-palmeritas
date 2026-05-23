@@ -1,124 +1,116 @@
-# Geocapitals OS — Plataforma Unificada de Exploración y Certificación Minera
+# Sprint 2 — GeoScene3D: visor 3D canónico unificado
 
-## Visión
+Consolidamos los 4 visores 3D actuales en **un solo componente `GeoScene3D`** con 3 modos conmutables. Este es el corazón visual de Mission Control y elimina ~3000 líneas de duplicación.
 
-Una sola plataforma donde un proyecto minero vive su ciclo completo —desde la primera anomalía satelital hasta el NI 43-101 firmado y el deal cerrado con inversionistas— con **IA geológica, 3D real y trazabilidad criptográfica** como columna vertebral.
+## Estado actual (fragmentado)
 
-Hoy Geocapitals tiene 135 tablas, 35 edge functions, 3D real (Copernicus + Sentinel), catastro, satelital, geofísica, drilling, NI 43-101 y deals. Pero está **fragmentado en ~60 rutas** sin un hilo narrativo. Este plan no agrega features: **unifica, jerarquiza y le da una identidad visionaria.**
+| Visor | Ubicación | Rol |
+|---|---|---|
+| `Geology3DViewer` | `src/components/Geology3DViewer.tsx` | DEM + Sentinel + anomalías superficie |
+| `SatToSubsurface3DViewer` | `src/components/geology3d/` | Vetas, pórfidos, drill holes, pits |
+| `MagAnomaly3DPro` | `src/features/mag3d/` | Anomalías magnéticas extruidas |
+| `BlockModel3DViewer` | `src/components/estimation/` | Bloques, leyes, NPV |
+| `Map3DView` | `src/components/map/` | MapLibre + deck.gl 2.5D con drill columns |
 
----
+Cinco entry points, tres motores diferentes (deck.gl, three.js puro, MapLibre+deck), capas duplicadas, controles inconsistentes.
 
-## Los 4 pilares unificadores
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  1. EXPLORE    →  2. MODEL    →  3. CERTIFY   →  4. DEAL    │
-│  (descubrir)      (entender)     (validar)        (monetizar)│
-└─────────────────────────────────────────────────────────────┘
-        ↑                                              ↓
-        └──────── Geo Copilot (IA transversal) ────────┘
-```
-
-Cada módulo actual se reasigna a uno de estos 4 pilares. Se eliminan rutas huérfanas y se consolidan duplicados (ej. 3 visores 3D → 1 visor canónico con modos).
-
----
-
-## Fase 1 — Mission Control unificado (la "portada operativa")
-
-Reemplaza el dashboard actual por un **cockpit único por proyecto** con 4 zonas que mapean a los 4 pilares. Layout tipo Bloomberg/Palantir:
+## Objetivo
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Header: Proyecto · Commodity · Fase · Fusion Score · QPS │
-├────────────────┬─────────────────────────────────────────┤
-│  EXPLORE       │   MODEL (visor 3D real, centro)         │
-│  - Targets     │   ┌─────────────────────────────────┐   │
-│  - Sat anom    │   │  DEM + Sentinel + anomalías     │   │
-│  - Geofísica   │   │  vetas + pórfidos + drill holes │   │
-│  - Catastro    │   └─────────────────────────────────┘   │
-├────────────────┼─────────────────────────────────────────┤
-│  CERTIFY       │   DEAL                                  │
-│  - NI 43-101   │   - Data room · Inversionistas         │
-│  - QPS sigs    │   - Marketplace · Compliance           │
-└────────────────┴─────────────────────────────────────────┘
+│  GeoScene3D  · proyecto activo                           │
+│  ┌─[ Surface ]─[ Subsurface ]─[ Resource ]──────────┐    │
+│  │                                                  │    │
+│  │   deck.gl + MapLibre (base común)               │    │
+│  │   DEM Copernicus + Sentinel drape                │    │
+│  │   capas conmutables según modo                   │    │
+│  │                                                  │    │
+│  └──────────────────────────────────────────────────┘    │
+│  Toggles: catastro · targets · anomalías sat · mag ·     │
+│           vetas · pórfidos · sondajes · bloques · pit    │
+└──────────────────────────────────────────────────────────┘
 ```
 
-- Una sola navegación lateral con los 4 pilares (no 60 entradas).
-- El visor 3D real (Geology3DViewer + SatToSubsurface) se vuelve el centro visual del cockpit, no una ruta separada.
-- Fusion Score y QPS status siempre visibles en el header como "signos vitales" del proyecto.
+## Arquitectura técnica
 
-## Fase 2 — Geo Copilot transversal
+**Motor único: MapLibre + deck.gl MapboxOverlay** (ya probado en `Map3DView`).
+- Razón: DEM real + Sentinel basemap + georreferenciación WGS84 + interacción nativa de mapa. Three.js puro pierde el contexto geográfico.
+- `MagAnomaly3DPro` (three.js local) se reescribe como capa deck.gl `ColumnLayer` sobre el mismo canvas.
 
-Un copiloto IA persistente (drawer derecho, atajo ⌘K) que entiende el contexto del proyecto y puede:
+**Estructura de archivos nueva:**
+```
+src/components/geoscene/
+  GeoScene3D.tsx              ← componente público único
+  modes/
+    SurfaceMode.tsx           ← DEM + Sentinel + catastro + targets + anom sat
+    SubsurfaceMode.tsx        ← vetas + pórfidos + sondajes + mag 3D
+    ResourceMode.tsx          ← bloques + pit shells + NPV overlay
+  layers/
+    useDemTerrainLayer.ts     ← Copernicus DEM
+    useSentinelRasterLayer.ts ← Sentinel MPC drape
+    useDrillHoleLayer.ts      ← columns + intercepts (reusa lib/3d/holeGeometry)
+    useAnomalyColumnLayer.ts  ← anomalías sat/mag extruidas
+    useVeinPolylineLayer.ts   ← vetas 3D
+    usePorphyryLayer.ts       ← elipsoides pórfidos
+    useBlockModelLayer.ts     ← bloques (port desde BlockModel3DViewer)
+    usePitShellLayer.ts       ← pit shells
+  controls/
+    LayerTogglePanel.tsx      ← panel único de capas
+    ModeTabs.tsx              ← Surface/Subsurface/Resource
+    SceneLegend.tsx           ← leyenda contextual al modo
+  types.ts                    ← GeoSceneMode, LayerToggleState, etc.
+  index.ts
+```
 
-- "Genérame 5 targets desde las anomalías Sentinel + lineamientos magnéticos"
-- "Explica el target T-042 en lenguaje QP"
-- "Redacta la sección 9 del NI 43-101 con la data actual"
-- "Compara este proyecto con depósitos pórfido análogos en Chile"
+**API pública:**
+```tsx
+<GeoScene3D
+  projectId={projectId}
+  mode="surface"               // o "subsurface" | "resource"
+  initialLayers={{ targets: true, sentinel: true, ... }}
+  onTargetClick={(t) => ...}
+  onHoleClick={(h) => ...}
+/>
+```
 
-Usa `google/gemini-3.1-pro-preview` para razonamiento + `gemini-3.1-flash-image-preview` para overlays geológicos. Reusa `geo-assistant` y `geo-brief` ya existentes, los unifica detrás de una sola UI.
+## Plan de migración (sin romper lo que existe)
 
-## Fase 3 — 3D canónico (un solo visor, tres modos)
+1. **Crear `GeoScene3D`** con los 3 modos vacíos + tabs + panel de capas.
+2. **Portar capas una por una** desde cada visor legacy a hooks `useXxxLayer.ts` (cada hook devuelve un `Layer` deck.gl). Tests existentes (`Geology3DSceneSummary.test.tsx`) siguen pasando.
+3. **Mission Control** apunta al nuevo `<GeoScene3D>` en su zona central (reemplaza el placeholder actual del dashboard).
+4. **Rutas legacy se vuelven thin wrappers** que renderizan `<GeoScene3D mode="..." />`:
+   - `/dashboard/geology3d` → mode="surface"
+   - `/dashboard/sat3d` → mode="subsurface"
+   - `/dashboard/3d-pro` → mode="subsurface" con preset mag
+   - `/dashboard/estimation` (sección 3D) → mode="resource"
+5. **Deprecación suave**: los componentes viejos quedan marcados `@deprecated` en JSDoc 1 sprint, luego se borran.
 
-Hoy hay `Geology3DViewer`, `SatToSubsurface3DViewer`, `MagAnomaly3DPro`, `BlockModel3DViewer`. Se consolidan en **un solo `GeoScene3D`** con modos:
+## Detalles de UX
 
-- **Surface**: DEM + Sentinel + catastro + targets
-- **Subsurface**: vetas, pórfidos, drill holes, secciones
-- **Resource**: bloques, leyes, pit shells, NPV/IRR
+- **Tabs de modo** arriba (Surface · Subsurface · Resource), no en sidebar. Cambiar modo no remonta el mapa, solo conmuta capas (transición suave).
+- **Panel de capas** lateral derecho, agrupado por modo, con contador (ej. "Sondajes (47)").
+- **Leyenda contextual** abajo-izquierda, cambia según capas visibles.
+- **Sincronización camera**: al cambiar de modo, mantener bearing/pitch/center.
+- **Header compartido**: Fusion Score + QPS visibles también en este visor (consistencia con Mission Control).
 
-Mismo motor (deck.gl), mismas capas base, toggles arriba. Esto elimina ~3000 líneas de duplicación.
+## Tokens de diseño
 
-## Fase 4 — Certificación como producto de primera clase
+Reusa la paleta Midnight Indigo + Emerald Prestige ya definida. Sin colores hardcoded — toggles usan `--primary`, `--accent`, `--muted-foreground`. Las rampas de Au g/t y anomalías quedan como constantes tipadas en `src/components/geoscene/layers/colorRamps.ts` (única fuente).
 
-NI 43-101 deja de ser un PDF generado on-demand y se vuelve un **documento vivo** versionado:
+## Lo que NO hace este sprint
 
-- Editor sección por sección con QP asignado
-- Cada figura/tabla referencia data viva (si cambian las anomalías, la sección 9 se marca "stale")
-- Firma criptográfica por sección (envelopes que ya existen en `signature_envelopes`)
-- Verificación pública vía `/api/public/verify-compliance/$reportId` (ya existe)
-- Export PDF determinista + hash on-chain opcional
+- No toca backend ni edge functions.
+- No agrega capas nuevas que no existan hoy en algún visor.
+- No implementa el Geo Copilot (Sprint 3).
+- No toca NI 43-101 vivo (Sprint 4).
 
-Esto convierte la certificación en el **moat defendible** vs competidores.
+## Entregable verificable
 
-## Fase 5 — Deal Room conectado
+- Mission Control muestra el visor real (no placeholder) con DEM + Sentinel + targets activos.
+- Las 4 rutas legacy renderizan vía `GeoScene3D` y se ven idénticas o mejores que hoy.
+- Cambiar modo no recarga el mapa.
+- Tests existentes verdes; añadimos test de smoke para `GeoScene3D` que monta los 3 modos.
 
-Cuando un proyecto alcanza cierto Fusion Score + NI 43-101 firmado, automáticamente puede publicarse al marketplace con:
+## Pregunta antes de arrancar
 
-- One-pager auto-generado (hero del cockpit + KPIs + scenarios económicos)
-- Data room con permisos granulares por inversionista
-- Tracking de quién vio qué (ya existe `usage` types)
-
----
-
-## Roadmap propuesto (6 sprints de 1 semana)
-
-| Sprint | Entregable | Foco |
-|---|---|---|
-| 1 | Mission Control shell + navegación de 4 pilares | UX/IA unificada |
-| 2 | Visor 3D canónico (GeoScene3D) con 3 modos | Consolidación técnica |
-| 3 | Geo Copilot drawer transversal | IA |
-| 4 | NI 43-101 documento vivo + staleness tracking | Certificación |
-| 5 | Deal Room conectado al cockpit | Monetización |
-| 6 | Onboarding visionario + landing geocapitals.com | Go-to-market |
-
----
-
-## Detalles técnicos
-
-- **Rutas**: colapsar `_authenticated.dashboard.*` (~40 rutas) a 4 rutas raíz (`/explore`, `/model`, `/certify`, `/deal`) + sub-rutas. Mantener compatibilidad con redirects 6 meses.
-- **Diseño**: paleta `Midnight Indigo` + acentos `Emerald Prestige` (autoridad técnica + lujo minero). Tipografía: Space Grotesk + DM Sans. Tokens en `src/styles.css`.
-- **Estado**: TanStack Query como única fuente para data del proyecto activo. Eliminar duplicación entre `useProjects`, `useExecutiveKpis`, etc.
-- **Backend**: 35 edge functions auditadas — consolidar las 8 de "compute-*" en un dispatcher único `compute-engine` con tipo de cómputo como input.
-- **Realtime**: canal único `project:{id}` que multiplexa targets, anomalías, firmas, etc., en vez de N canales.
-
----
-
-## Preguntas antes de empezar
-
-Para asegurar que el sprint 1 sea exactamente lo que esperas:
-
-1. **¿Empezamos por el Mission Control (Fase 1)** como primer entregable visible, o prefieres que ataquemos primero la **consolidación del visor 3D** (Fase 2) porque es el diferenciador visual más fuerte?
-2. **¿Mantenemos las rutas antiguas como redirects** durante la migración, o hacemos un corte limpio (riesgo si hay usuarios con bookmarks)?
-3. **¿La certificación NI 43-101 viva** (Fase 4) debe incluir firma on-chain desde el inicio, o lo dejamos como opt-in para una v2?
-
-Apruébame el plan (o ajústalo) y arrancamos por la fase que prefieras.
+¿Migramos las 4 rutas legacy a wrappers en este mismo sprint, o solo dejamos el componente nuevo + Mission Control y las rutas viejas se migran en un sprint de limpieza posterior? Lo recomendado es **migrar todo en este sprint** para no quedar con dos visores en paralelo, pero suma ~2 días.
