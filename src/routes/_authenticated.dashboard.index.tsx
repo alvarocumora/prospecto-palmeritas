@@ -262,6 +262,28 @@ function DashboardHome() {
         />
       </section>
 
+      {/* Visor 3D canónico embebido — corazón visual de Mission Control */}
+      <section className="rounded border border-border bg-bg-secondary overflow-hidden">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Box className="w-4 h-4 text-signal-violet" />
+            <h2 className="text-[11px] font-mono uppercase tracking-wider text-foreground">
+              GeoScene3D · visor canónico
+            </h2>
+          </div>
+          <Link
+            to="/dashboard/sat3d"
+            className="text-[10px] font-mono text-gold hover:underline"
+          >
+            Pantalla completa →
+          </Link>
+        </div>
+        <div className="h-[480px] relative">
+          <GeoScene3D />
+        </div>
+      </section>
+
+
       {/* Atajos rápidos */}
       <section>
         <div className="flex items-center justify-between mb-2">
