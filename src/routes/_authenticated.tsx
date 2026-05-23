@@ -302,7 +302,7 @@ function AuthenticatedLayout() {
 
       <StatusBar />
       <MobileBottomNav onMoreClick={() => setDrawerOpen(true)} catastroAlerts={catastroAlerts} />
-      <GeoAssistant />
+      
     </div>
   );
 }
