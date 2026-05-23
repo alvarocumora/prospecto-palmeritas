@@ -1,74 +1,80 @@
-# Live Field Map PWA — Los Verdes (Tilama)
+# Heatmap de anomalías + Proyección 3D en Live Field PWA
 
-Reutiliza la infraestructura ya existente (`FieldMap.tsx`, `field_pois`, `useFieldPoiQueue`, `InstallPwaButton`, patrón `/live/palmeras`) y la expone como PWA pública con contraseña, lista para usar **hoy en terreno**.
+Añadir al `/live/losverdes` dos capacidades visuales tipo "GS Detectors / Map Your Mining":
 
-## 1. Nueva ruta `/live/losverdes`
+1. **Heatmap de anomalías + lineamientos estructurales** sobre el satélite (look amarillo/rojo, estilo "vetas de oro").
+2. **Modal de proyección 3D** de estructuras + targets extruidos en profundidad (estilo cubo geológico).
 
-Archivo: `src/routes/live.losverdes.tsx`
+Datos ya existentes en el proyecto Los Verdes — sin nuevas migraciones.
 
-- Patrón idéntico a `live.palmeras.tsx`: `PasswordGate` → contenido protegido.
-- `sessionStorage` key: `live_map_losverdes_token`.
-- Banner "Live Field · Los Verdes · Confidencial" + botón cerrar sesión.
-- Renderiza `<FieldFieldMapPublic projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" />`.
-- `head()` con `noindex,nofollow` + `theme-color` + manifest link.
+## 1. Server fns públicas nuevas
 
-## 2. Verifier nuevo
+`src/lib/livemap-public.functions.ts` (extender):
 
-En `src/lib/live-map.functions.ts`:
-- Añadir `export const verifyLosVerdesLiveMapPassword = buildVerifier("LIVE_MAP_LOSVERDES_PASSWORD");`
-- Pedir secret `LIVE_MAP_LOSVERDES_PASSWORD` via `add_secret`.
+- `getLosVerdesAnomalies()` → con `supabaseAdmin`:
+  - `magTargets`: de `mag_targets` (10 puntos) → `{lat, lng, mag_nt, score, rank}`.
+  - `satAnomalies`: de `satellite_anomalies` (45) → `{centroid_lat, centroid_lng, score, severity, index_code, area_ha}` (extraer centroid del GeoJSON).
+  - `lineaments`: filtro `index_code='STRUCTURAL_LINEAMENTS'` → polígonos completos para dibujar como líneas tipo "veta".
+- `getLosVerdes3DScene()` → retorna escena simplificada:
+  - `dem`: grilla 32×32 de elevaciones (puede ser plana o derivada de bbox).
+  - `targets`: lat/lng/elev/score/priority.
+  - `magAnomalies`: lat/lng/intensity para extrusión.
+  - `lineaments`: lista de polylines con `strike` (azimuth) y `dip` por defecto 70° (vertical default).
 
-## 3. Variante pública del FieldMap
+## 2. Heatmap en Leaflet
 
-Hoy `FieldMap` depende de `useProjects()` (sesión autenticada) y de RLS que exige `is_project_member`. Para el modo `/live/*` (sin login):
+Nuevo helper `src/components/field/anomalyHeatLayer.ts`:
+- `bun add leaflet.heat` + tipo manual `@types/leaflet.heat` o declaración local.
+- Función `buildAnomalyHeatLayer(L, points, opts)`:
+  - Combina `magTargets` (peso = score normalizado) + centroides de `satAnomalies`.
+  - Gradiente magnético: `{0.0:'#1e3a8a', 0.3:'#0ea5e9', 0.5:'#facc15', 0.7:'#fb923c', 1.0:'#dc2626'}`.
+  - `radius: 35, blur: 25, maxZoom: 17`.
+- Función `buildLineamentsLayer(L, lineaments)`:
+  - Polylines amarillas `{color:'#facc15', weight:3, opacity:0.9}` + halo `{color:'#fb923c', weight:6, opacity:0.4}` para efecto glow "veta".
 
-Opción elegida: **modo "solo lectura + notas anónimas locales"** para no abrir RLS:
-- Nuevo componente `src/components/field/FieldMapPublic.tsx` (basado en FieldMap):
-  - Recibe `projectId` por prop, salta `useProjects`.
-  - Carga concesiones y targets vía **server fn pública** nueva (`getPublicFieldData`) que usa `supabaseAdmin` y retorna solo capas no sensibles del proyecto Los Verdes (concesiones vigentes, exploration_targets, bbox).
-  - **POIs/notas:** se guardan en `localStorage` + `IndexedDB` (cola), NO en `field_pois`. Botón "Exportar GeoJSON/CSV" para subirlos luego desde el dashboard autenticado.
-  - GPS, foto (input file), seguimiento y capa targets clicable: igual que FieldMap.
-- Esto evita exponer escritura sin auth y mantiene el principio de RLS estricto del proyecto.
+## 3. UI en `FieldMapPublic.tsx`
 
-Server fn nueva en `src/lib/livemap-public.functions.ts`:
-- `getLosVerdesPublicLayers()` → `{ concessions, targets, center, bbox }` filtrado por `project_id`.
-
-## 4. PWA (manifest + install)
-
-- `public/manifest.losverdes.json` con `name`, `short_name: "LV Field"`, `start_url: "/live/losverdes"`, `display: standalone`, `theme_color`, iconos.
-- Link `<link rel="manifest" href="/manifest.losverdes.json">` inyectado por `head()` de la ruta.
-- Reutiliza `InstallPwaButton` ya existente.
-- **No** se añade service worker (regla del proyecto: PWA solo manifest, sin SW por iframes de preview). Instalable en móvil sin offline shell.
-
-## 5. Importador de notas al dashboard
-
-En `/_authenticated/dashboard/field-map` añadir botón "Importar notas del Live PWA" que:
-- Lee localStorage `live_map_losverdes_pois`.
-- Inserta en `field_pois` vía server fn autenticada.
-- Limpia la cola local.
-
-## 6. Acceso desde el PDF / dashboard
-
-- Card en `/dashboard/index` para "Distrito Los Verdes": link + QR a `/live/losverdes`.
-- (Opcional, fuera de scope si quieres rápido) añadir QR a la página 1 del PDF v1.4.
-
-## Entregables
+Top-bar de chips compactos (reemplaza/extiende los toggles actuales):
 
 ```text
-src/routes/live.losverdes.tsx                (nuevo)
-src/components/field/FieldMapPublic.tsx       (nuevo)
-src/lib/livemap-public.functions.ts           (nuevo)
-src/lib/live-map.functions.ts                 (+ verifier)
-public/manifest.losverdes.json                (nuevo)
-src/routes/_authenticated.dashboard.field-map.tsx  (+ importador)
-secret: LIVE_MAP_LOSVERDES_PASSWORD
+[● ONLINE] [🎯 Targets] [🔥 Heatmap] [⚡ Vetas] [📦 3D] [⬇ Exportar]
 ```
 
-## Notas técnicas
+- Estados nuevos: `showHeatmap`, `showLineaments`, `show3D`.
+- Lazy-fetch de `getLosVerdesAnomalies` solo al activar Heatmap/Vetas la primera vez.
+- Leyenda inferior izquierda compacta cuando heatmap está ON.
+- Botón "3D" abre modal full-screen `<Structures3DViewer />`.
 
-- No se modifican RLS de `field_pois` (siguen requiriendo `is_project_member`).
-- La server fn pública solo expone capas no sensibles ya presentes en `exploration_targets` + `mining_concessions` del proyecto Los Verdes.
-- Mobile-first: controles grandes (≥44px), bottom-sheet, contraste alto sobre satélite Esri.
-- Sin Service Worker (cumple regla `pwa` del proyecto).
+## 4. Visor 3D — `src/components/field/Structures3DViewer.tsx`
 
-¿Apruebas para implementar?
+Three.js puro (mismo patrón que `Geology3DViewer`):
+
+- **Caja base**: plano horizontal con grilla + textura satellite del bbox proyectada (o un color sólido si no se descarga tile).
+- **Targets**: cilindros verticales en (x,y) escalados por `score`, color por priority (rojo/dorado/azul).
+- **Anomalías magnéticas**: columnas semitransparentes (rojo→amarillo) en posición de cada `mag_target`, altura = `mag_nt` normalizado.
+- **Lineamientos como planos verticales (estructuras)**: para cada polyline, generar un plano `PlaneGeometry` extruido hacia abajo (profundidad estimada por largo del lineamiento × 0.3), inclinado según `dip`. Color amarillo translúcido.
+- `OrbitControls` (rotar / zoom táctil). Reset view, toggle de cada capa, ejes XYZ con escala (metros).
+- Modal con `position:fixed inset-0 z-[3000]`, header con "Proyección 3D · Los Verdes" + cerrar.
+
+## 5. Performance + bundle
+
+- `leaflet.heat`: ~4 KB gzipped, import dinámico al activar el toggle.
+- `Structures3DViewer`: lazy via `React.lazy()` para no cargar Three.js hasta que el usuario presione "3D".
+- Server fns cachean en memoria del cliente vía `useState` (no se re-piden al togglear OFF/ON).
+
+## 6. Files
+
+```text
+src/lib/livemap-public.functions.ts            (+ 2 fns nuevas)
+src/components/field/FieldMapPublic.tsx        (toggles + integración)
+src/components/field/anomalyHeatLayer.ts       (nuevo)
+src/components/field/Structures3DViewer.tsx    (nuevo, lazy)
+package.json: + leaflet.heat
+```
+
+## 7. Notas
+
+- Sin migraciones, sin cambios en RLS.
+- Las server fns públicas exponen solo campos no sensibles (score, posición, intensidad).
+- Mobile-first: chips 36–44 px, modal 3D respeta `safe-area-inset`, gestos touch nativos de OrbitControls.
+- Inspiración visual (referencias del usuario): vetas amarillas brillantes sobre satellite (TikTok kurdistán) + cubo 3D con drape geofísico (GS Detectors).

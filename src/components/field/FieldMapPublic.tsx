@@ -1,13 +1,25 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2 } from "lucide-react";
+import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap } from "lucide-react";
 import { toast } from "sonner";
 
-import { getLosVerdesPublicLayers, type PublicTarget } from "@/lib/livemap-public.functions";
+import {
+  getLosVerdesPublicLayers,
+  getLosVerdesAnomalies,
+  type PublicTarget,
+  type LosVerdesAnomalies,
+} from "@/lib/livemap-public.functions";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
+import {
+  buildAnomalyHeatLayer,
+  buildLineamentsLayer,
+  removeLayer,
+} from "@/components/field/anomalyHeatLayer";
+
+const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
 type LeafletNS = typeof import("leaflet");
 
@@ -84,6 +96,14 @@ export function FieldMapPublic() {
   const [loadingData, setLoadingData] = useState(true);
   const [follow, setFollow] = useState(false);
   const [showTargets, setShowTargets] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showLineaments, setShowLineaments] = useState(false);
+  const [show3D, setShow3D] = useState(false);
+  const [anomalies, setAnomalies] = useState<LosVerdesAnomalies | null>(null);
+  const [loadingAnoms, setLoadingAnoms] = useState(false);
+  const heatLayerRef = useRef<LayerGroup | null>(null);
+  const lineamentsLayerRef = useRef<LayerGroup | null>(null);
+  const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const [pois, setPois] = useState<LocalPoi[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [online, setOnline] = useState(
@@ -207,6 +227,55 @@ export function FieldMapPublic() {
     group.addTo(map);
     targetsLayerRef.current = group;
   }, [targets, showTargets, mapReady]);
+
+  // Lazy-fetch anomalies the first time heatmap or lineaments is enabled
+  useEffect(() => {
+    if (!showHeatmap && !showLineaments) return;
+    if (anomalies || loadingAnoms) return;
+    setLoadingAnoms(true);
+    fetchAnomalies()
+      .then((data) => setAnomalies(data))
+      .catch((e) => {
+        console.error(e);
+        toast.error("No se pudieron cargar anomalías");
+      })
+      .finally(() => setLoadingAnoms(false));
+  }, [showHeatmap, showLineaments, anomalies, loadingAnoms, fetchAnomalies]);
+
+  // Heatmap layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    let active = true;
+    removeLayer(map, heatLayerRef.current);
+    heatLayerRef.current = null;
+    if (!showHeatmap || !anomalies) return;
+    (async () => {
+      const layer = await buildAnomalyHeatLayer(L, map, anomalies.magTargets, anomalies.satAnomalies);
+      if (!active) {
+        removeLayer(map, layer);
+        return;
+      }
+      heatLayerRef.current = layer;
+    })();
+    return () => {
+      active = false;
+    };
+  }, [showHeatmap, anomalies, mapReady]);
+
+  // Lineaments layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    removeLayer(map, lineamentsLayerRef.current);
+    lineamentsLayerRef.current = null;
+    if (!showLineaments || !anomalies) return;
+    lineamentsLayerRef.current = buildLineamentsLayer(L, map, anomalies.lineaments);
+  }, [showLineaments, anomalies, mapReady]);
+
+
 
   // POI layer
   useEffect(() => {
@@ -354,17 +423,48 @@ export function FieldMapPublic() {
         </div>
       </div>
 
+      {/* Layer chips row */}
+      <div className="absolute top-14 left-3 right-3 z-[1000] flex flex-wrap gap-1.5 pointer-events-none">
+        <ChipBtn active={showTargets} color="#F0C96B" onClick={() => setShowTargets((v) => !v)}>
+          🎯 Targets
+        </ChipBtn>
+        <ChipBtn active={showHeatmap} color="#dc2626" onClick={() => setShowHeatmap((v) => !v)}>
+          <Flame className="w-3 h-3 inline mr-1" />
+          Heatmap
+        </ChipBtn>
+        <ChipBtn active={showLineaments} color="#facc15" onClick={() => setShowLineaments((v) => !v)}>
+          <Zap className="w-3 h-3 inline mr-1" />
+          Vetas
+        </ChipBtn>
+        <ChipBtn active={show3D} color="#a78bfa" onClick={() => setShow3D(true)}>
+          <Box className="w-3 h-3 inline mr-1" />
+          3D
+        </ChipBtn>
+        {loadingAnoms && (
+          <span className="pointer-events-auto inline-flex items-center gap-1 px-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground">
+            <Loader2 className="w-3 h-3 animate-spin" /> anomalías
+          </span>
+        )}
+      </div>
+
+      {/* Heatmap legend */}
+      {showHeatmap && (
+        <div className="absolute bottom-20 left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground">
+          <div className="text-gold font-bold mb-1">Intensidad anomalía</div>
+          <div
+            className="h-2 w-32 rounded"
+            style={{
+              background:
+                "linear-gradient(90deg,#1e3a8a 0%,#0ea5e9 30%,#facc15 50%,#fb923c 70%,#dc2626 100%)",
+            }}
+          />
+          <div className="flex justify-between mt-1"><span>baja</span><span>alta</span></div>
+        </div>
+      )}
+
       {/* Bottom controls */}
       <div className="absolute bottom-4 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2">
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowTargets((v) => !v)}
-            className={`min-h-[44px] px-3 rounded-md border font-mono text-xs ${
-              showTargets ? "bg-gold/15 border-gold text-gold" : "bg-bg-panel/90 border-border text-muted-foreground"
-            }`}
-          >
-            Targets {showTargets ? "ON" : "OFF"}
-          </button>
           <button
             onClick={() => setFollow((v) => !v)}
             className={`min-h-[44px] px-3 rounded-md border font-mono text-xs ${
@@ -408,7 +508,7 @@ export function FieldMapPublic() {
       </div>
 
       {geoStatus === "denied" && (
-        <div className="absolute top-16 left-3 right-3 z-[1000] p-3 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs flex items-center gap-2">
+        <div className="absolute top-28 left-3 right-3 z-[1000] p-3 rounded-md bg-amber-500/15 border border-amber-500/40 text-amber-300 font-mono text-xs flex items-center gap-2">
           <WifiOff className="w-4 h-4" />
           Permite el acceso a la ubicación en tu navegador para usar el GPS.
         </div>
@@ -431,6 +531,16 @@ export function FieldMapPublic() {
             toast.success("Nota guardada localmente");
           }}
         />
+      )}
+
+      {show3D && (
+        <Suspense fallback={
+          <div className="fixed inset-0 z-[3000] bg-bg-app flex items-center justify-center text-muted-foreground font-mono text-xs gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" /> Cargando 3D…
+          </div>
+        }>
+          <Structures3DViewer onClose={() => setShow3D(false)} />
+        </Suspense>
       )}
     </div>
   );
@@ -555,5 +665,31 @@ function NoteSheet({
         </div>
       </form>
     </div>
+  );
+}
+
+function ChipBtn({
+  active,
+  color,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  color: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="pointer-events-auto min-h-[36px] px-2.5 rounded-md border font-mono text-[11px] backdrop-blur"
+      style={{
+        background: active ? `${color}26` : "rgba(20,18,15,0.85)",
+        borderColor: active ? color : "var(--border)",
+        color: active ? color : "var(--muted-foreground)",
+      }}
+    >
+      {children}
+    </button>
   );
 }
