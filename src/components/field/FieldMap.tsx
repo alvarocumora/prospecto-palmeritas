@@ -81,11 +81,22 @@ export function FieldMap() {
   const concessionLayerRef = useRef<LayerGroup | null>(null);
   const poiLayerRef = useRef<LayerGroup | null>(null);
   const targetsLayerRef = useRef<LayerGroup | null>(null);
+  const satLayerRef = useRef<LayerGroup | null>(null);
   const meMarkerRef = useRef<Marker | null>(null);
   const meCircleRef = useRef<Circle | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
   const [showTargets, setShowTargets] = useState(true);
+  const [showSatAnoms, setShowSatAnoms] = useState(true);
+  const [satEnabled, setSatEnabled] = useState<Record<SatIndexCode, boolean>>({
+    IRON_OXIDE: true,
+    CLAY_MINERALS: true,
+    HYDROTHERMAL_ALTERATION: true,
+    STRUCTURAL_LINEAMENTS: true,
+  });
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
+  const [arOpen, setArOpen] = useState(false);
+  const [arHeading, setArHeading] = useState<number | null>(null);
   const [follow, setFollow] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{
@@ -99,6 +110,7 @@ export function FieldMap() {
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
   const { queue, online, enqueue, flush } = useFieldPoiQueue();
   const { targets } = useExplorationTargets(projectId);
+  const { data: satGrouped } = useProjectSatelliteAnomalies(projectId);
   const { position, status: geoStatus } = useGeolocation(true);
 
   // Init map
