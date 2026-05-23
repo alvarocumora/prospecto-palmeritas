@@ -1,90 +1,118 @@
-## Objetivo
+## Diagnóstico del v2.0
 
-Generar `Distrito_Los_Verdes_Tilama_PreNI43-101_v2.0.pdf` (12–16 páginas) siguiendo la estructura de los reportes Pre-NI 43-101 ya entregados (Las Palmeras / Las Arenas / Franco), con foco en **Los Verdes 5** y arreglando dos puntos críticos del v2:
+El script actual (`lv5_report.mjs`, jsPDF + sharp) llegó a 14 páginas pero arrastra tres techos duros:
 
-1. El "mapa integrado" del v2 quedó ilegible (envolvente calculada sin basemap, símbolos amontonados).
-2. La proyección 3D de vetas era plana y conceptual, sin amarre al mapa ni a las anomalías.
+1. **Render cartográfico artesanal.** Mosaico ESRI compuesto a mano, sin proyección real ni reglas cartográficas (norte, escala gráfica, grilla UTM, leyenda). El "mapa raro" que reportaste viene de mezclar lat/lon con píxeles sin un CRS de verdad.
+2. **3D conceptual.** Proyección isométrica calculada a mano en canvas 2D. No hay topografía real drapeada ni interpolación implícita; las vetas son cuñas dibujadas, no superficies estructurales.
+3. **Proxy magnético sin pipeline geofísico.** La grilla 200×200 multivariada no aplica continuación ascendente, primera derivada vertical, ni reducción al polo — los tres productos estándar de cualquier informe geofísico serio.
 
-## Estructura del informe (alineada a guía NI 43-101 lite)
+Para subir a nivel "Pre-NI 43-101 defendible" el camino correcto es **dejar de reinventar** y montar el informe sobre librerías open-source de la industria geocientífica.
+
+## Stack propuesto (todo open-source, en sandbox local)
+
+| Capa | Librería | Para qué |
+|---|---|---|
+| Cartografía | **GeoPandas + Contextily + Matplotlib + Cartopy** | Mapas con CRS real (EPSG:32719 UTM 19S), basemap ESRI/Sentinel, leyenda, escala, norte, grilla |
+| Geofísica | **Fatiando a Terra (Harmonica + Verde)** | Grillado de muestras, continuación ascendente, 1ª derivada vertical, reducción al polo, contornos |
+| 3D estructural | **PyVista + GemPy (lite) + rasterio** | DEM Copernicus real drapeado con Sentinel-2/carta geológica, vetas como superficies implícitas, sondajes, targets, pit conceptual. Export a PNG (lámina) **y** HTML interactivo embebible. |
+| Cartas SERNAGEOMIN | **WMS GetMap** vs `catastro.sernageomin.cl/arcgis/.../Geologia_Base_1M` (ya validado en `src/components/map/sernageominLayers.ts`) + **Hoja Illapel 1:250.000** georreferenciada manualmente | Capa geológica oficial drapeada sobre el bbox de LV-5 |
+| Reporte | **ReportLab (Platypus)** + plantilla NI 43-101 lite | Reemplaza jsPDF — soporte nativo de tablas, TOC, figuras vectoriales, headers/footers, paginación |
+
+Referencias relevantes que se evaluarán/reutilizarán:
+- `fatiando/harmonica` — pipeline magnético estándar (ya validado en docs oficiales).
+- `gempy-project/gempy` (1.2k★) — modelo implícito 3D a partir de orientaciones; usamos modo "lite" con los lineamientos como input.
+- `Loop3D/LoopStructural` (258★) — alternativa más liviana si GemPy es pesado para el sandbox.
+- `chapmangj/geoinsights3d` (MIT) — referencia de pipeline de drillholes → PyVista (no se importa, se mira el patrón).
+
+## Estructura del informe v3.0 (16–20 pp)
 
 ```text
-1. Resumen ejecutivo (tesis, ask, hitos 12 m)
-2. Propiedad y tenencia      → ficha de Los Verdes 5 + vecinos del distrito
-3. Accesibilidad, fisiografía, infraestructura
-4. Historia y trabajos previos
-5. Geología regional y local + modelo de yacimiento (IOCG / Cu-Au estructural)
-6. Mineralización y targets  → tabla de los 108 targets, filtrada a LV-5
-7. Exploración satelital      → índices Sentinel-2 + lineamientos
-8. Geofísica (proxy magnético) → mapa raster por capas
-9. Modelo 3D de estructuras y plan minero conceptual
-10. QA/QC y limitaciones
-11. Próximos pasos, presupuesto, cronograma
-12. Anexos (láminas A3, tablas)
+0. Portada + ficha resumen + mapa de ubicación nacional
+1. Resumen ejecutivo + tesis de inversión
+2. Tenencia: tabla concesiones LV-5 + vecinos + cumplimiento patentes
+3. Mapa cartográfico maestro (basemap ESRI + concesiones + targets + muestras)
+4. Carta geológica SERNAGEOMIN (WMS 1:1M + Hoja Illapel 1:250k) drapeada sobre LV-5
+5. Geología local interpretada + leyenda litoestratigráfica
+6. Mineralización y targets (tabla 108 targets filtrados a LV-5 + láminas por target crítico)
+7. Exploración satelital Sentinel-2 (índices alteración: clay B11/B12, iron-ox B4/B2, NDVI)
+8. Geofísica — proxy magnético v2 (Harmonica):
+   8a. Campo total proxy
+   8b. Continuación ascendente 100 m
+   8c. Primera derivada vertical (realce de bordes estructurales)
+   8d. Contornos sobre satelital
+9. Modelo 3D estructural (PyVista):
+   9a. Lámina isométrica con DEM + concesión + vetas + targets
+   9b. Sección NW-SE atravesando targets críticos
+   9c. Link al HTML interactivo (export PyVista standalone)
+10. Plan minero conceptual (footprint + drilling fase 1 + cronograma)
+11. CAPEX/OPEX scoping + ask de inversión
+12. QA/QC, limitaciones, disclaimers
+13. Próximos pasos NI 43-101 formal
+14. Anexos: tablas completas, láminas A3
 ```
 
-## Lo nuevo / lo que cambia respecto al v2
+## Cambios concretos respecto al v2
 
-### A. Basemap satelital ESRI real
+### A. Mapas con CRS real
 
-- Render del mapa principal sobre **ESRI World Imagery** (tile service público `World_Imagery/MapServer/tile/{z}/{y}/{x}`, sin API key).
-- Cálculo del bbox a partir de la geometría real de la concesión LV-5 (PostGIS `ST_Envelope` + buffer 10%), zoom 14–15, mosaico de 4×4 tiles, composición server-side a PNG y embebido en el PDF.
-- Reproyección WebMercator → lat/lon para ubicar targets, muestras y anomalías encima con coordenadas correctas (no la "envolvente calculada" del v2).
-- Capas overlay con leyenda y toggle visual:
-  - Polígono LV-5 (rojo) + concesiones colindantes (gris)
-  - Targets por prioridad (rojo crítico / naranja alto / amarillo medio)
-  - Muestras geoquímicas coloreadas por % Cu (escala continua)
-  - Anomalías Sentinel-2 por tipo (hidrotermal, óxidos Fe, arcillas) como halos semitransparentes
-  - Lineamientos estructurales (líneas blancas)
+- Reproyección de toda la data del proyecto a **EPSG:32719** (UTM 19S, el huso de Tilama).
+- `contextily` para traer basemap ESRI World Imagery **como raster real**, no mosaico jpeg pegado.
+- Grilla UTM cada 500 m, escala gráfica, flecha N, leyenda categórica para concesiones/targets/muestras.
+- Misma proyección reutilizada en mapa geológico, mapa de anomalías y proyección XY del 3D → todas las láminas son comparables pixel a pixel.
 
-### B. Mapa de "anomalías magnéticas" por color y capas
+### B. Carta geológica SERNAGEOMIN integrada
 
-Como no hay magnetometría real, se construye **proxy geofísico explícito y etiquetado como tal**:
+Dos fuentes complementarias:
+- **WMS oficial 1:1M** (`catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer`, capa `0`) — `GetMap` directo al bbox LV-5, drapeado al 60% sobre ESRI.
+- **Hoja Illapel 1:250.000** (SERNAGEOMIN 1991, dominio público) — descarga del PNG/PDF público y georreferencia manual con `rasterio` usando 4 GCPs conocidos. Permite litología a escala distrital.
+- Disclaimer: ambas fuentes citadas explícitamente en cada figura.
 
-- Grilla 200×200 sobre el bbox de LV-5.
-- Campo escalar combinado: densidad de anomalías Sentinel + densidad de lineamientos + gradiente de muestras de Cu.
-- Render como **heatmap multicapa** con colormap geofísico (azul → cyan → verde → amarillo → rojo → magenta) y contornos isolíneas.
-- 3 capas separadas en páginas contiguas: (i) proxy magnético total, (ii) primera derivada / gradiente, (iii) anomalías residuales sobre satelital.
-- Disclaimer técnico en cada página: "proxy multivariado, no sustituye levantamiento magnetométrico terrestre".
+### C. Pipeline geofísico real (Harmonica)
 
-### C. 3D mejorado de estructuras + plan de mina
+Reemplaza la grilla multivariada artesanal:
+1. Construir "pseudo-puntos magnéticos" a partir de la densidad de anomalías Sentinel + Cu geoquímico.
+2. `harmonica.EquivalentSources` para grillar a malla regular.
+3. `harmonica.upward_continuation(distance=100m)` → suaviza ruido superficial.
+4. `harmonica.derivative_upward(order=1)` → realza contactos y estructuras.
+5. Contornos isolíneas cada 5 nT-equivalente, colormap geofísico (`cmocean.balance` o `RdBu_r`).
+6. Cada lámina incluye **el script de generación en pie de página** para trazabilidad.
+7. Disclaimer "proxy multivariado, no sustituye magnetometría terrestre" reforzado.
 
-- Proyección isométrica calibrada (mantengo el motor del v2 pero amarrado al bbox del mapa, misma escala XY que el basemap).
-- Estructuras principales modeladas como **planos inclinados** con strike/dip derivados de los lineamientos dominantes, no líneas rectas.
-- Profundidad hasta -500 m con cortes cada -100 m.
-- Capas:
-  - Topografía drapeada (DEM Copernicus, ya disponible en `scene3d.server`)
-  - Polígono concesión proyectado en superficie
-  - Vetas y cross-cuts como cuerpos tabulares coloreados por ley estimada
-  - Pit/galería conceptual (rampa de acceso + niveles) con cotas
-  - Targets críticos como esferas rojas a la profundidad sugerida
-- Segunda lámina: **sección vertical NW-SE** atravesando los targets de mayor ley, con litología/alteración inferida y trazas de vetas.
+### D. 3D real con PyVista
 
-### D. Plan minero conceptual (página dedicada)
+- DEM Copernicus 30 m recortado al bbox LV-5 (`rasterio` + `pyvista.StructuredGrid`).
+- Drapeado de Sentinel-2 **y** de la carta geológica como texturas seleccionables.
+- Vetas como `pyvista.PolyData` superficies implícitas: tomamos strike/dip de los lineamientos dominantes y los proyectamos a -500 m con cortes -100 m.
+- Sondajes propuestos como cilindros (`pyvista.Tube`) coloreados por leyenda.
+- Targets críticos como esferas escaladas por score.
+- Pit conceptual: prisma truncado parametrizado por área somera + ángulo de talud.
+- **Doble export**: PNG 4K (lámina del PDF) **+** HTML interactivo standalone (`scene.export_html`) que se entrega junto al PDF en `/mnt/documents/`.
 
-- Método sugerido (cielo abierto inicial sobre target somero + sublevel stoping en estructuras profundas), con justificación.
-- Footprint en planta superpuesto al mapa satelital.
-- Programa de drilling fase 1 (objetivo m perforados, n° de sondajes, malla, costo).
-- CAPEX/OPEX a nivel de scoping (rangos, no PEA).
-- Cronograma 24 meses con hitos (drilling → recursos inferidos → PEA).
+### E. ReportLab Platypus en vez de jsPDF
+
+- Plantilla con `BaseDocTemplate` + frames + footer con paginación y atribuciones.
+- TOC automático, tablas con `LongTable`, figuras vectoriales SVG cuando aplique.
+- Sin más bugs de hex de 3 caracteres, sin `setColor` artesanal.
 
 ## Detalles técnicos
 
-- Script Node.js + `jsPDF` (mismo patrón que v2), nuevo archivo `/tmp/los_verdes_v3.mjs`.
-- Descarga de tiles ESRI con `fetch` paralelo (limit 8 concurrentes), cache local en `/tmp/tiles/`.
-- Composición de basemap con `sharp` no es viable en Worker pero **aquí corre en sandbox local**, así que uso `sharp` o `canvas` Node-side para componer el mosaico y exportar a JPEG antes de embeber en PDF.
-- Datos desde la DB Supabase: reuso queries del v2 (proyecto `7a499b02-…`) + agrego `ST_AsGeoJSON` de los polígonos de concesión para tener geometría real.
-- QA obligatorio: convertir el PDF a imágenes con `pdftoppm` y revisar página por página antes de entregar (mapa legible, leyenda visible, 3D no recortado, sin glifos rotos).
+- Script Python en `/tmp/lv5_report_v3/` con módulos: `data.py` (queries Supabase), `maps.py` (GeoPandas/Contextily), `geophys.py` (Harmonica), `model3d.py` (PyVista), `report.py` (ReportLab), `main.py`.
+- Dependencias instaladas vía `pip install --user` en sandbox (todas puro-Python o wheels: geopandas, contextily, rasterio, fatiando-harmonica, pyvista, reportlab, cmocean, owslib). No requieren GUI — PyVista off-screen con `pyvista.start_xvfb()` o `OSMesa`.
+- Datos vía `psql` (proyecto `7a499b02-…`): geometrías reales con `ST_AsGeoJSON(ST_Transform(geom, 4326))`, targets, muestras, anomalías.
+- WMS SERNAGEOMIN consultado con `owslib.wms.WebMapService` para `GetMap` reproyectado.
+- QA obligatorio: `pdftoppm -r 150` página por página, revisión visual de cada figura, búsqueda de glifos rotos / texto recortado / mapas sin leyenda.
 
-## Entregable
+## Entregables
 
-- `Distrito_Los_Verdes_Tilama_PreNI43-101_v2.0.pdf` en `/mnt/documents/`
-- Disclaimers visibles donde uso proxies (magnético, 3D conceptual)
-- Sin cambios en la app web (todo es generación de artefacto vía script)
+1. `Distrito_Los_Verdes_Tilama_PreNI43-101_v3.0.pdf` (16–20 pp, ReportLab) en `/mnt/documents/`.
+2. `Distrito_Los_Verdes_Tilama_modelo3D_v3.html` (PyVista standalone, rotable, zoom, capas on/off) en `/mnt/documents/`.
+3. `Distrito_Los_Verdes_Tilama_anexo_laminas_A3.pdf` — láminas cartográficas A3 a alta resolución.
 
 ## Lo que NO incluye este plan
 
-- Levantamiento magnético real (requiere campaña terrestre)
-- Modelo de recursos JORC/NI 43-101 formal (requiere QP firmante)
-- Cambios en la plataforma Geocapitals (UI, edge functions, DB schema)
+- Campaña magnetométrica real (sigue siendo recomendación para fase siguiente).
+- Modelo de recursos JORC/NI 43-101 formal con QP firmante.
+- Cambios en la plataforma Geocapitals (UI, edge functions, DB schema, visor 3D de la app).
+- Integración del HTML interactivo dentro de la app web (queda como artefacto descargable).
 
-¿Apruebas que arranque con esta versión 2.0?
+¿Apruebas que arranque con esta v3.0 sobre stack Python geocientífico?
