@@ -142,11 +142,15 @@ export function GeoSceneCanvas({ mode }: Props) {
   // Empujar capas deck.gl
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
-    const layers = [targetsLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer].filter(
-      Boolean,
-    );
+    const layers = [
+      targetsLayer,
+      satAnomaliesLayer,
+      holesColumnLayer,
+      ...trajectoryLayers,
+      anomaliesLayer,
+    ].filter(Boolean);
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
+  }, [ready, targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
