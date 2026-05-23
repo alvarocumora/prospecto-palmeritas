@@ -486,9 +486,97 @@ export function FieldMap() {
               <RefreshCw className="w-3 h-3 animate-spin" /> Sincronizando {queue.length}
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setLayerPanelOpen((v) => !v)}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono transition-colors ${
+              layerPanelOpen
+                ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300"
+                : "border-border bg-background/70 text-muted-foreground hover:text-foreground"
+            }`}
+            title="Capas satelitales"
+          >
+            <Layers className="w-3 h-3" /> Capas
+          </button>
+          <button
+            type="button"
+            onClick={() => setArOpen(true)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Brújula AR"
+          >
+            <Compass className="w-3 h-3" /> AR
+          </button>
+          <button
+            type="button"
+            onClick={handleExportGpx}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Exportar GPX"
+          >
+            <Download className="w-3 h-3" /> GPX
+          </button>
+          <button
+            type="button"
+            onClick={handleExportKml}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Exportar KML (Google Earth)"
+          >
+            <Download className="w-3 h-3" /> KML
+          </button>
           <InstallPwaButton />
         </div>
       </div>
+
+      {/* Panel capas satelitales */}
+      {layerPanelOpen && (
+        <div
+          className="absolute z-[1000] right-3 w-60 rounded border border-border bg-background/95 backdrop-blur shadow-xl p-3 space-y-2"
+          style={{ top: "calc(env(safe-area-inset-top) + 3.5rem)" }}
+        >
+          <div className="flex items-center justify-between text-[10px] font-mono uppercase text-muted-foreground">
+            <span>Anomalías satelitales</span>
+            <button
+              type="button"
+              onClick={() => setLayerPanelOpen(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+          <label className="flex items-center gap-1.5 text-[11px] font-mono cursor-pointer pb-1 border-b border-border/50">
+            <input
+              type="checkbox"
+              checked={showSatAnoms}
+              onChange={(e) => setShowSatAnoms(e.target.checked)}
+              className="accent-gold"
+            />
+            Mostrar overlay
+          </label>
+          {SAT_INDEX_CODES.map((idx) => {
+            const count = satGrouped?.[idx]?.length ?? 0;
+            return (
+              <label
+                key={idx}
+                className="flex items-center gap-1.5 text-[11px] font-mono cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={satEnabled[idx]}
+                  onChange={(e) =>
+                    setSatEnabled((s) => ({ ...s, [idx]: e.target.checked }))
+                  }
+                  disabled={!showSatAnoms}
+                  className="accent-gold"
+                />
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-sm"
+                  style={{ background: SAT_COLOR[idx] }}
+                />
+                {SAT_LABEL[idx]} ({count})
+              </label>
+            );
+          })}
+        </div>
+      )}
 
       {/* Map */}
       <div ref={containerRef} className="absolute inset-0" style={{ top: 0 }} />
