@@ -96,6 +96,14 @@ export function FieldMapPublic() {
   const [loadingData, setLoadingData] = useState(true);
   const [follow, setFollow] = useState(false);
   const [showTargets, setShowTargets] = useState(true);
+  const [showHeatmap, setShowHeatmap] = useState(false);
+  const [showLineaments, setShowLineaments] = useState(false);
+  const [show3D, setShow3D] = useState(false);
+  const [anomalies, setAnomalies] = useState<LosVerdesAnomalies | null>(null);
+  const [loadingAnoms, setLoadingAnoms] = useState(false);
+  const heatLayerRef = useRef<LayerGroup | null>(null);
+  const lineamentsLayerRef = useRef<LayerGroup | null>(null);
+  const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const [pois, setPois] = useState<LocalPoi[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [online, setOnline] = useState(
