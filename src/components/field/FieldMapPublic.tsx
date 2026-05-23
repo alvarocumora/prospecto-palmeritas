@@ -323,6 +323,91 @@ export function FieldMapPublic() {
     lineamentsLayerRef.current = buildLineamentsLayer(L, map, anomalies.lineaments);
   }, [showLineaments, anomalies, mapReady]);
 
+  // Catastro SERNAGEOMIN layer
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    let active = true;
+
+    const cleanup = () => {
+      if (catastroLayerRef.current) {
+        map.removeLayer(catastroLayerRef.current);
+        catastroLayerRef.current = null;
+      }
+    };
+
+    if (!showCatastro) {
+      cleanup();
+      return;
+    }
+    if (loadingCatastro) return;
+
+    setLoadingCatastro(true);
+    (async () => {
+      try {
+        const bbox = bboxAround(center, 8);
+        const result = await loadCatastro(L, bbox);
+        if (!active) return;
+        cleanup();
+
+        const group = L.layerGroup();
+        const norms = projectConcessionNorm;
+        for (const origen of Object.keys(result.layersByOrigen) as CatastroOrigen[]) {
+          const layer = result.layersByOrigen[origen] as LeafletGeoJSON | undefined;
+          if (!layer) continue;
+          // Re-style features that match a project concession by NOMBRE
+          layer.eachLayer((sub) => {
+            const f = (sub as unknown as { feature?: { properties?: Record<string, unknown> } })
+              .feature;
+            const name = String(f?.properties?.NOMBRE ?? "")
+              .toLowerCase()
+              .normalize("NFD")
+              .replace(/[\u0300-\u036f]/g, "")
+              .replace(/\s+/g, " ")
+              .trim();
+            const match = name && norms.some((n) => n && (name === n || name.includes(n) || n.includes(name)));
+            if (match && "setStyle" in sub) {
+              (sub as unknown as { setStyle: (s: Record<string, unknown>) => void }).setStyle({
+                color: "#facc15",
+                weight: 4,
+                opacity: 1,
+                fillColor: "#facc15",
+                fillOpacity: 0.35,
+              });
+              (sub as unknown as { bringToFront: () => void }).bringToFront?.();
+            }
+          });
+          group.addLayer(layer);
+        }
+        group.addTo(map);
+        catastroLayerRef.current = group;
+        setCatastroCount(result.total);
+        if (result.cached) {
+          toast.message("Catastro desde cache (24h)");
+        } else {
+          toast.success(`Catastro: ${result.total} concesiones`);
+        }
+      } catch (e) {
+        console.error(e);
+        if (!online) {
+          toast.error("Catastro requiere conexión la primera vez");
+        } else {
+          toast.error("No se pudo cargar el catastro");
+        }
+        setShowCatastro(false);
+      } finally {
+        if (active) setLoadingCatastro(false);
+      }
+    })();
+
+    return () => {
+      active = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showCatastro, mapReady, center, projectConcessionNorm]);
+
+
 
 
   // POI layer
