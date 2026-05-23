@@ -77,6 +77,27 @@ export function GeoScene3D({
         </Suspense>
       </div>
 
+      {/* Focus banner: chip clicado en el copilot */}
+      {focus && (
+        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-bg-secondary/95 backdrop-blur border border-gold/60 rounded px-2.5 py-1.5 shadow-lg">
+          <Crosshair className="w-3.5 h-3.5 text-gold animate-pulse" />
+          <div className="text-[11px] font-mono">
+            <span className="text-muted-foreground uppercase mr-1">
+              {ANCHOR_LABEL[focus.kind]}
+            </span>
+            <span className="text-gold font-semibold">{focus.code}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setFocus(null)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Quitar foco"
+          >
+            <X className="w-3 h-3" />
+          </button>
+        </div>
+      )}
+
       {/* Contextual AI copilot */}
       <SceneCopilot mode={mode} variant={variant} />
     </div>
