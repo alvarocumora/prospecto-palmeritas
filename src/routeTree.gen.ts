@@ -31,6 +31,7 @@ import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
 import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
+import { Route as AuthenticatedDashboardSat3dRouteImport } from './routes/_authenticated.dashboard.sat3d'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
 import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
@@ -180,6 +181,12 @@ const AuthenticatedDashboardSatelliteIntelRoute =
   AuthenticatedDashboardSatelliteIntelRouteImport.update({
     id: '/dashboard/satellite-intel',
     path: '/dashboard/satellite-intel',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSat3dRoute =
+  AuthenticatedDashboardSat3dRouteImport.update({
+    id: '/dashboard/sat3d',
+    path: '/dashboard/sat3d',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSamplingRoute =
@@ -442,6 +449,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -501,6 +509,7 @@ export interface FileRoutesByTo {
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -562,6 +571,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
+  '/_authenticated/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/_authenticated/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
@@ -623,6 +633,7 @@ export interface FileRouteTypes {
     | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
+    | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
     | '/dashboard/targets'
     | '/dashboard/team'
@@ -682,6 +693,7 @@ export interface FileRouteTypes {
     | '/dashboard/qps'
     | '/dashboard/reports'
     | '/dashboard/sampling'
+    | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
     | '/dashboard/targets'
     | '/dashboard/team'
@@ -742,6 +754,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/qps'
     | '/_authenticated/dashboard/reports'
     | '/_authenticated/dashboard/sampling'
+    | '/_authenticated/dashboard/sat3d'
     | '/_authenticated/dashboard/satellite-intel'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
@@ -935,6 +948,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/satellite-intel'
       fullPath: '/dashboard/satellite-intel'
       preLoaderRoute: typeof AuthenticatedDashboardSatelliteIntelRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/sat3d': {
+      id: '/_authenticated/dashboard/sat3d'
+      path: '/dashboard/sat3d'
+      fullPath: '/dashboard/sat3d'
+      preLoaderRoute: typeof AuthenticatedDashboardSat3dRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/sampling': {
@@ -1283,6 +1303,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
+  AuthenticatedDashboardSat3dRoute: typeof AuthenticatedDashboardSat3dRoute
   AuthenticatedDashboardSatelliteIntelRoute: typeof AuthenticatedDashboardSatelliteIntelRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRouteWithChildren
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
@@ -1325,6 +1346,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
   AuthenticatedDashboardSamplingRoute: AuthenticatedDashboardSamplingRoute,
+  AuthenticatedDashboardSat3dRoute: AuthenticatedDashboardSat3dRoute,
   AuthenticatedDashboardSatelliteIntelRoute:
     AuthenticatedDashboardSatelliteIntelRoute,
   AuthenticatedDashboardTargetsRoute:
@@ -1363,13 +1385,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

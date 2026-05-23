@@ -1,7 +1,18 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Target as TargetIcon } from "lucide-react";
+import {
+  Crosshair,
+  MapPin,
+  Loader2,
+  RefreshCw,
+  WifiOff,
+  Target as TargetIcon,
+  Layers,
+  Compass,
+  Download,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { useProjects } from "@/hooks/useProjects";
@@ -9,14 +20,55 @@ import { useMiningConcessions, EXPIRY_COLORS, expiryStatus } from "@/hooks/useMi
 import { useFieldPois, useFieldPoiQueue, type NewFieldPoi } from "@/hooks/useFieldPois";
 import { useGeolocation } from "@/hooks/useGeolocation";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
+import {
+  useProjectSatelliteAnomalies,
+  SAT_INDEX_CODES,
+  type SatIndexCode,
+} from "@/hooks/useProjectSatelliteAnomalies";
 
 import { CoordinateFooter } from "@/components/map/CoordinateFooter";
 import { buildFieldPoisLayer } from "@/components/field/poiLayer";
 import { buildFieldTargetsLayer } from "@/components/field/fieldTargetsLayer";
+import {
+  buildSatAnomalyOverlay,
+  INDEX_COLOR as SAT_COLOR,
+  INDEX_LABEL as SAT_LABEL,
+} from "@/components/field/satAnomalyLayer";
 import { POISheet } from "@/components/field/POISheet";
 import { InstallPwaButton } from "@/components/field/InstallPwaButton";
+import { ArRadarOverlay } from "@/components/ar/ArRadarOverlay";
+import { buildGpx, buildKml, downloadBlob } from "@/lib/fieldExport";
+import type { ArProjectedObject } from "@/types/ar";
 
 type LeafletNS = typeof import("leaflet");
+
+function haversineMeters(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const R = 6371000;
+  const dLat = ((b.lat - a.lat) * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const la1 = (a.lat * Math.PI) / 180;
+  const la2 = (b.lat * Math.PI) / 180;
+  const x =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
+}
+function bearingDeg(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+): number {
+  const la1 = (a.lat * Math.PI) / 180;
+  const la2 = (b.lat * Math.PI) / 180;
+  const dLng = ((b.lng - a.lng) * Math.PI) / 180;
+  const y = Math.sin(dLng) * Math.cos(la2);
+  const x =
+    Math.cos(la1) * Math.sin(la2) -
+    Math.sin(la1) * Math.cos(la2) * Math.cos(dLng);
+  return (((Math.atan2(y, x) * 180) / Math.PI) + 360) % 360;
+}
 
 export function FieldMap() {
   const { active } = useProjects();
@@ -29,11 +81,22 @@ export function FieldMap() {
   const concessionLayerRef = useRef<LayerGroup | null>(null);
   const poiLayerRef = useRef<LayerGroup | null>(null);
   const targetsLayerRef = useRef<LayerGroup | null>(null);
+  const satLayerRef = useRef<LayerGroup | null>(null);
   const meMarkerRef = useRef<Marker | null>(null);
   const meCircleRef = useRef<Circle | null>(null);
 
   const [mapReady, setMapReady] = useState(false);
   const [showTargets, setShowTargets] = useState(true);
+  const [showSatAnoms, setShowSatAnoms] = useState(true);
+  const [satEnabled, setSatEnabled] = useState<Record<SatIndexCode, boolean>>({
+    IRON_OXIDE: true,
+    CLAY_MINERALS: true,
+    HYDROTHERMAL_ALTERATION: true,
+    STRUCTURAL_LINEAMENTS: true,
+  });
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
+  const [arOpen, setArOpen] = useState(false);
+  const [arHeading, setArHeading] = useState<number | null>(null);
   const [follow, setFollow] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pendingCoords, setPendingCoords] = useState<{
@@ -47,6 +110,7 @@ export function FieldMap() {
   const { pois, create, remove, loading: poisLoading } = useFieldPois(projectId);
   const { queue, online, enqueue, flush } = useFieldPoiQueue();
   const { targets } = useExplorationTargets(projectId);
+  const { data: satGrouped } = useProjectSatelliteAnomalies(projectId);
   const { position, status: geoStatus } = useGeolocation(true);
 
   // Init map
@@ -190,6 +254,113 @@ export function FieldMap() {
     targetsLayerRef.current = group;
   }, [targets, mapReady, showTargets]);
 
+  // Satellite anomalies overlay
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    if (satLayerRef.current) {
+      map.removeLayer(satLayerRef.current);
+      satLayerRef.current = null;
+    }
+    if (!showSatAnoms || !satGrouped) return;
+    const filtered = SAT_INDEX_CODES.flatMap((idx) =>
+      satEnabled[idx] ? satGrouped[idx] : [],
+    );
+    if (filtered.length === 0) return;
+    const group = buildSatAnomalyOverlay(L, filtered);
+    group.addTo(map);
+    satLayerRef.current = group;
+  }, [satGrouped, satEnabled, showSatAnoms, mapReady]);
+
+  // AR heading via DeviceOrientationEvent
+  useEffect(() => {
+    if (!arOpen) return;
+    const handler = (e: DeviceOrientationEvent) => {
+      // webkitCompassHeading on iOS; alpha is CCW from north on others
+      const wk = (e as unknown as { webkitCompassHeading?: number })
+        .webkitCompassHeading;
+      if (typeof wk === "number") {
+        setArHeading(wk);
+      } else if (e.alpha != null) {
+        setArHeading((360 - e.alpha) % 360);
+      }
+    };
+    // iOS 13+ needs explicit permission
+    const anyDOE = DeviceOrientationEvent as unknown as {
+      requestPermission?: () => Promise<"granted" | "denied">;
+    };
+    if (typeof anyDOE.requestPermission === "function") {
+      anyDOE.requestPermission().then((p) => {
+        if (p === "granted") window.addEventListener("deviceorientation", handler);
+      });
+    } else {
+      window.addEventListener("deviceorientation", handler);
+    }
+    return () => window.removeEventListener("deviceorientation", handler);
+  }, [arOpen]);
+
+  const arObjects = useMemo<ArProjectedObject[]>(() => {
+    if (!arOpen || !position) return [];
+    const me = { lat: position.lat, lng: position.lng };
+    const items: ArProjectedObject[] = [];
+    for (const t of targets) {
+      if (t.lat == null || t.lng == null) continue;
+      const pt = { lat: t.lat, lng: t.lng };
+      const d = haversineMeters(me, pt);
+      const b = bearingDeg(me, pt);
+      const rel =
+        arHeading != null ? (((b - arHeading + 540) % 360) - 180) : null;
+      items.push({
+        id: t.id,
+        type: "target",
+        label: `${t.code} · ${t.name}`,
+        labelCompact: t.code,
+        lat: t.lat,
+        lng: t.lng,
+        distanceM: d,
+        bearingDeg: b,
+        relativeBearingDeg: rel,
+        relativeElevationM: null,
+        isNearby: d < 500,
+        confidence: t.score,
+      });
+    }
+    items.sort((a, b) => a.distanceM - b.distanceM);
+    return items.slice(0, 20);
+  }, [arOpen, position, targets, arHeading]);
+
+  const handleExportGpx = () => {
+    if (!active) return;
+    const xml = buildGpx({ projectName: active.name, pois, targets });
+    downloadBlob(
+      xml,
+      `${active.code}_terreno_${Date.now()}.gpx`,
+      "application/gpx+xml",
+    );
+    toast.success("GPX descargado");
+  };
+  const handleExportKml = () => {
+    if (!active) return;
+    const allAnoms = satGrouped
+      ? SAT_INDEX_CODES.flatMap((idx) => satGrouped[idx])
+      : [];
+    const xml = buildKml({
+      projectName: active.name,
+      pois,
+      targets,
+      anomalies: allAnoms,
+    });
+    downloadBlob(
+      xml,
+      `${active.code}_terreno_${Date.now()}.kml`,
+      "application/vnd.google-earth.kml+xml",
+    );
+    toast.success("KML descargado (abre con Google Earth)");
+  };
+
+
+
   // GPS marker
   useEffect(() => {
     const L = LRef.current;
@@ -315,9 +486,97 @@ export function FieldMap() {
               <RefreshCw className="w-3 h-3 animate-spin" /> Sincronizando {queue.length}
             </span>
           )}
+          <button
+            type="button"
+            onClick={() => setLayerPanelOpen((v) => !v)}
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-mono transition-colors ${
+              layerPanelOpen
+                ? "border-cyan-500/50 bg-cyan-500/10 text-cyan-300"
+                : "border-border bg-background/70 text-muted-foreground hover:text-foreground"
+            }`}
+            title="Capas satelitales"
+          >
+            <Layers className="w-3 h-3" /> Capas
+          </button>
+          <button
+            type="button"
+            onClick={() => setArOpen(true)}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Brújula AR"
+          >
+            <Compass className="w-3 h-3" /> AR
+          </button>
+          <button
+            type="button"
+            onClick={handleExportGpx}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Exportar GPX"
+          >
+            <Download className="w-3 h-3" /> GPX
+          </button>
+          <button
+            type="button"
+            onClick={handleExportKml}
+            className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border bg-background/70 text-[10px] font-mono text-muted-foreground hover:text-foreground"
+            title="Exportar KML (Google Earth)"
+          >
+            <Download className="w-3 h-3" /> KML
+          </button>
           <InstallPwaButton />
         </div>
       </div>
+
+      {/* Panel capas satelitales */}
+      {layerPanelOpen && (
+        <div
+          className="absolute z-[1000] right-3 w-60 rounded border border-border bg-background/95 backdrop-blur shadow-xl p-3 space-y-2"
+          style={{ top: "calc(env(safe-area-inset-top) + 3.5rem)" }}
+        >
+          <div className="flex items-center justify-between text-[10px] font-mono uppercase text-muted-foreground">
+            <span>Anomalías satelitales</span>
+            <button
+              type="button"
+              onClick={() => setLayerPanelOpen(false)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+          <label className="flex items-center gap-1.5 text-[11px] font-mono cursor-pointer pb-1 border-b border-border/50">
+            <input
+              type="checkbox"
+              checked={showSatAnoms}
+              onChange={(e) => setShowSatAnoms(e.target.checked)}
+              className="accent-gold"
+            />
+            Mostrar overlay
+          </label>
+          {SAT_INDEX_CODES.map((idx) => {
+            const count = satGrouped?.[idx]?.length ?? 0;
+            return (
+              <label
+                key={idx}
+                className="flex items-center gap-1.5 text-[11px] font-mono cursor-pointer"
+              >
+                <input
+                  type="checkbox"
+                  checked={satEnabled[idx]}
+                  onChange={(e) =>
+                    setSatEnabled((s) => ({ ...s, [idx]: e.target.checked }))
+                  }
+                  disabled={!showSatAnoms}
+                  className="accent-gold"
+                />
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-sm"
+                  style={{ background: SAT_COLOR[idx] }}
+                />
+                {SAT_LABEL[idx]} ({count})
+              </label>
+            );
+          })}
+        </div>
+      )}
 
       {/* Map */}
       <div ref={containerRef} className="absolute inset-0" style={{ top: 0 }} />
@@ -386,6 +645,27 @@ export function FieldMap() {
         }}
         onQueue={(p) => enqueue(p)}
       />
+
+      {arOpen && (
+        <div className="absolute inset-0 z-[2000] bg-background/95 backdrop-blur p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-mono text-gold">Brújula AR · Targets cercanos</div>
+            <button
+              type="button"
+              onClick={() => setArOpen(false)}
+              className="inline-flex items-center gap-1 px-2 py-1 rounded border border-border text-[11px] font-mono"
+            >
+              <X className="w-3 h-3" /> Cerrar
+            </button>
+          </div>
+          <ArRadarOverlay objects={arObjects} headingDeg={arHeading} />
+          {!position && (
+            <div className="text-[11px] font-mono text-muted-foreground">
+              Esperando señal GPS…
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
