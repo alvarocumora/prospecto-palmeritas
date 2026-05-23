@@ -16,11 +16,6 @@ const SatToSubsurface3DViewer = lazy(() =>
 const MagAnomaly3DPro = lazy(() =>
   import("@/features/mag3d/MagAnomaly3DPro").then((m) => ({ default: m.MagAnomaly3DPro })),
 );
-const BlockModel3DViewer = lazy(() =>
-  import("@/components/estimation/BlockModel3DViewer").then((m) => ({
-    default: m.BlockModel3DViewer,
-  })),
-);
 
 /**
  * GeoScene3D — visor 3D canónico unificado de Geocapitals.
