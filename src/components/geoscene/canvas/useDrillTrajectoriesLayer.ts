@@ -83,6 +83,11 @@ function holeSegment(
   ];
 }
 
+type RealTrajectory = {
+  hole_id: string;
+  points: Array<{ md: number; x: number; y: number; z: number }>;
+};
+
 export function useDrillTrajectoriesLayer(
   projectId: string | null,
   centerLng: number,
@@ -91,50 +96,108 @@ export function useDrillTrajectoriesLayer(
 ) {
   const [holes, setHoles] = useState<Hole[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
+  const [real, setReal] = useState<Map<string, RealTrajectory["points"]>>(new Map());
 
   useEffect(() => {
     if (!projectId || !visible) {
       setHoles([]);
       setLogs([]);
+      setReal(new Map());
       return;
     }
     let cancelled = false;
-    Promise.all([
-      supabase
-        .from("drill_holes")
-        .select("hole_id,easting,northing,elevation,actual_depth,planned_depth,azimuth,dip,status")
-        .eq("project_id", projectId),
-      supabase
-        .from("drill_core_logs")
-        .select("hole_id,depth_from,depth_to,au_gpt")
-        .eq("project_id", projectId)
-        .gt("au_gpt", 0),
-    ]).then(([h, l]) => {
+    (async () => {
+      const [{ data: h }, { data: l }] = await Promise.all([
+        supabase
+          .from("drill_holes")
+          .select(
+            "id,hole_id,easting,northing,elevation,actual_depth,planned_depth,azimuth,dip,status",
+          )
+          .eq("project_id", projectId),
+        supabase
+          .from("drill_core_logs")
+          .select("hole_id,depth_from,depth_to,au_gpt")
+          .eq("project_id", projectId)
+          .gt("au_gpt", 0),
+      ]);
       if (cancelled) return;
-      setHoles(
-        ((h.data ?? []) as Hole[]).filter((x) => x.easting != null && x.northing != null),
+      const holeRows = ((h ?? []) as (Hole & { id: string })[]).filter(
+        (x) => x.easting != null && x.northing != null,
       );
-      setLogs((l.data ?? []) as Log[]);
-    });
+      setHoles(holeRows);
+      setLogs((l ?? []) as Log[]);
+
+      const holeIds = holeRows.map((x) => x.id);
+      if (holeIds.length > 0) {
+        const { data: trajRows } = await supabase
+          .from("drill_hole_trajectories")
+          .select("hole_id,points")
+          .in("hole_id", holeIds);
+        if (cancelled) return;
+        const m = new Map<string, RealTrajectory["points"]>();
+        const codeByUuid = new Map(holeRows.map((x) => [x.id, x.hole_id] as const));
+        for (const r of trajRows ?? []) {
+          const code = codeByUuid.get(r.hole_id as string);
+          const pts = r.points as RealTrajectory["points"] | null;
+          if (code && Array.isArray(pts) && pts.length >= 2) m.set(code, pts);
+        }
+        setReal(m);
+      } else {
+        setReal(new Map());
+      }
+    })();
     return () => {
       cancelled = true;
     };
   }, [projectId, visible]);
+
+  // Si hay trayectoria real, la usamos. La engine devuelve x/y en el mismo
+  // marco local (metros) que collar.easting/northing, y z absoluto. La
+  // convertimos a lng/lat respecto al centro del proyecto.
+  function realPath(h: Hole, pts: RealTrajectory["points"]): Vec3[] {
+    const collarE = Number(h.easting ?? 0);
+    const collarN = Number(h.northing ?? 0);
+    const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
+    return pts.map((p) => [
+      centerLng + p.x / mPerDegLng,
+      centerLat + p.y / M_PER_DEG_LAT,
+      p.z,
+    ]).map(
+      (v, i) =>
+        // Si la engine devolvió coords relativas al collar (no globales),
+        // ajustamos sumando el offset del collar. Para futuro-proofing
+        // comprobamos por el primer punto.
+        i === 0 && Math.hypot(pts[0].x - collarE, pts[0].y - collarN) > 1
+          ? ([
+              centerLng + (pts[i].x + collarE) / mPerDegLng,
+              centerLat + (pts[i].y + collarN) / M_PER_DEG_LAT,
+              pts[i].z,
+            ] as Vec3)
+          : (v as Vec3),
+    );
+  }
 
   const trajectories = useMemo(
     () =>
       holes.map((h) => {
         const total = Number(h.actual_depth ?? h.planned_depth ?? 100);
         const collar = holeCollarLngLat(h, centerLng, centerLat);
+        const realPts = real.get(h.hole_id);
+        const path = realPts && realPts.length >= 2
+          ? realPath(h, realPts)
+          : holeSegment(h, centerLng, centerLat, 0, total);
         return {
           code: h.hole_id,
-          path: holeSegment(h, centerLng, centerLat, 0, total),
+          path,
           status: (h.status ?? "planned").toLowerCase(),
           collarLng: collar.lng,
           collarLat: collar.lat,
+          isReal: Boolean(realPts && realPts.length >= 2),
         };
       }),
-    [holes, centerLng, centerLat],
+    // realPath uses centerLng/centerLat which are deps below
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [holes, centerLng, centerLat, real],
   );
 
   const intercepts = useMemo(() => {
