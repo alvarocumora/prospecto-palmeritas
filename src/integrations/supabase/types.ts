@@ -3710,6 +3710,76 @@ export type Database = {
           },
         ]
       }
+      drill_hole_surveys: {
+        Row: {
+          azimuth: number
+          created_at: string
+          depth: number
+          dip: number
+          hole_id: string
+          id: string
+        }
+        Insert: {
+          azimuth: number
+          created_at?: string
+          depth: number
+          dip: number
+          hole_id: string
+          id?: string
+        }
+        Update: {
+          azimuth?: number
+          created_at?: string
+          depth?: number
+          dip?: number
+          hole_id?: string
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drill_hole_surveys_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      drill_hole_trajectories: {
+        Row: {
+          computed_at: string
+          engine_version: string
+          hole_id: string
+          id: string
+          points: Json
+          total_length: number
+        }
+        Insert: {
+          computed_at?: string
+          engine_version?: string
+          hole_id: string
+          id?: string
+          points: Json
+          total_length: number
+        }
+        Update: {
+          computed_at?: string
+          engine_version?: string
+          hole_id?: string
+          id?: string
+          points?: Json
+          total_length?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drill_hole_trajectories_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: true
+            referencedRelation: "drill_holes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       drill_holes: {
         Row: {
           actual_depth: number | null
