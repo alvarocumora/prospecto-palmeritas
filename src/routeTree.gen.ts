@@ -20,6 +20,7 @@ import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as DiagMiningEngineRouteImport } from './routes/diag.mining-engine'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
@@ -122,6 +123,11 @@ const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
 const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
   id: '/hooks/sync-boletin-minero',
   path: '/hooks/sync-boletin-minero',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiagMiningEngineRoute = DiagMiningEngineRouteImport.update({
+  id: '/diag/mining-engine',
+  path: '/diag/mining-engine',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
@@ -419,6 +425,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -480,6 +487,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -543,6 +551,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -606,6 +615,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/diag/mining-engine'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -667,6 +677,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/diag/mining-engine'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -729,6 +740,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/diag/mining-engine'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -792,6 +804,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
+  DiagMiningEngineRoute: typeof DiagMiningEngineRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
@@ -884,6 +897,13 @@ declare module '@tanstack/react-router' {
       path: '/hooks/sync-boletin-minero'
       fullPath: '/hooks/sync-boletin-minero'
       preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diag/mining-engine': {
+      id: '/diag/mining-engine'
+      path: '/diag/mining-engine'
+      fullPath: '/diag/mining-engine'
+      preLoaderRoute: typeof DiagMiningEngineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/precios': {
@@ -1390,6 +1410,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
+  DiagMiningEngineRoute: DiagMiningEngineRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
