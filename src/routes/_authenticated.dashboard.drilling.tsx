@@ -333,6 +333,10 @@ function DrillingModule() {
           }}
         />
       )}
+
+      {surveysHole && (
+        <SurveysDialog hole={surveysHole} onClose={() => setSurveysHole(null)} />
+      )}
     </div>
   );
 }
