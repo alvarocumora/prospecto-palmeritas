@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Plus, Pencil, Trash2, FileText, Compass } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -17,6 +18,8 @@ import { computeIntercepts, bestIntercept, formatIntercept } from "@/lib/drillin
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
+import { SurveysDialog } from "@/components/drilling/SurveysDialog";
+import { computeProjectTrajectories } from "@/lib/miningEngine.functions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drilling")({
@@ -33,6 +36,9 @@ function DrillingModule() {
   const [editing, setEditing] = useState<DrillHole | null>(null);
   const [creating, setCreating] = useState(false);
   const [logHole, setLogHole] = useState<DrillHole | null>(null);
+  const [surveysHole, setSurveysHole] = useState<DrillHole | null>(null);
+  const [batchRunning, setBatchRunning] = useState(false);
+  const computeAll = useServerFn(computeProjectTrajectories);
 
   const bestByHole = useMemo(() => {
     const m: Record<string, ReturnType<typeof bestIntercept>> = {};
@@ -84,6 +90,28 @@ function DrillingModule() {
     }
   };
 
+  const onRecomputeAll = async () => {
+    if (!active) return;
+    setBatchRunning(true);
+    try {
+      const r = await computeAll({ data: { projectId: active.id } });
+      if (r.failed === 0) {
+        toast.success(`Trayectorias recalculadas: ${r.succeeded}/${r.attempted}`);
+      } else {
+        toast.warning(
+          `Recalculadas ${r.succeeded}/${r.attempted}. ${r.failed} fallidas (${r.failures
+            .map((f) => f.hole_id)
+            .slice(0, 3)
+            .join(", ")}${r.failures.length > 3 ? "…" : ""})`,
+        );
+      }
+    } catch (e) {
+      toast.error(String((e as Error).message ?? e));
+    } finally {
+      setBatchRunning(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -93,12 +121,23 @@ function DrillingModule() {
             DDH del proyecto · {active.code} · {active.name}
           </p>
         </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
-        >
-          <Plus className="w-4 h-4" /> Nuevo sondaje
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onRecomputeAll}
+            disabled={batchRunning || data.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50"
+            title="Calcular trayectorias 3D vía mining-engine para todos los sondajes del proyecto"
+          >
+            <Compass className="w-4 h-4" />
+            {batchRunning ? "Calculando…" : "Recalcular trayectorias"}
+          </button>
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
+          >
+            <Plus className="w-4 h-4" /> Nuevo sondaje
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -235,6 +274,13 @@ function DrillingModule() {
                             <FileText className="w-3.5 h-3.5" />
                           </button>
                           <button
+                            onClick={() => setSurveysHole(h)}
+                            className="p-1 rounded hover:bg-accent"
+                            title="Surveys y trayectoria 3D"
+                          >
+                            <Compass className="w-3.5 h-3.5" />
+                          </button>
+                          <button
                             onClick={() => setEditing(h)}
                             className="p-1 rounded hover:bg-accent"
                             title="Editar"
@@ -286,6 +332,10 @@ function DrillingModule() {
             refreshLogs();
           }}
         />
+      )}
+
+      {surveysHole && (
+        <SurveysDialog hole={surveysHole} onClose={() => setSurveysHole(null)} />
       )}
     </div>
   );
