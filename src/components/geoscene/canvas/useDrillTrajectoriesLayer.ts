@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 
 type Hole = {
+  id?: string;
   hole_id: string;
   easting: number | null;
   northing: number | null;
