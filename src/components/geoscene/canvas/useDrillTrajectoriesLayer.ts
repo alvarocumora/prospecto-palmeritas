@@ -152,29 +152,13 @@ export function useDrillTrajectoriesLayer(
     };
   }, [projectId, visible]);
 
-  // Si hay trayectoria real, la usamos. La engine devuelve x/y en el mismo
-  // marco local (metros) que collar.easting/northing, y z absoluto. La
-  // convertimos a lng/lat respecto al centro del proyecto.
-  function realPath(h: Hole, pts: RealTrajectory["points"]): Vec3[] {
-    const collarE = Number(h.easting ?? 0);
-    const collarN = Number(h.northing ?? 0);
+  // mining-engine /desurvey devuelve x/y absolutos en el mismo marco local
+  // (metros) que collar.easting/northing y z absoluto en metros.
+  function realPath(_h: Hole, pts: RealTrajectory["points"]): Vec3[] {
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
-    return pts.map((p) => [
-      centerLng + p.x / mPerDegLng,
-      centerLat + p.y / M_PER_DEG_LAT,
-      p.z,
-    ]).map(
-      (v, i) =>
-        // Si la engine devolvió coords relativas al collar (no globales),
-        // ajustamos sumando el offset del collar. Para futuro-proofing
-        // comprobamos por el primer punto.
-        i === 0 && Math.hypot(pts[0].x - collarE, pts[0].y - collarN) > 1
-          ? ([
-              centerLng + (pts[i].x + collarE) / mPerDegLng,
-              centerLat + (pts[i].y + collarN) / M_PER_DEG_LAT,
-              pts[i].z,
-            ] as Vec3)
-          : (v as Vec3),
+    return pts.map(
+      (p) =>
+        [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
     );
   }
 
