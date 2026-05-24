@@ -274,6 +274,13 @@ function DrillingModule() {
                             <FileText className="w-3.5 h-3.5" />
                           </button>
                           <button
+                            onClick={() => setSurveysHole(h)}
+                            className="p-1 rounded hover:bg-accent"
+                            title="Surveys y trayectoria 3D"
+                          >
+                            <Compass className="w-3.5 h-3.5" />
+                          </button>
+                          <button
                             onClick={() => setEditing(h)}
                             className="p-1 rounded hover:bg-accent"
                             title="Editar"
