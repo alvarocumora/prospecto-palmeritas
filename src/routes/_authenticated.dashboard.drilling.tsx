@@ -39,6 +39,9 @@ function DrillingModule() {
   const [surveysHole, setSurveysHole] = useState<DrillHole | null>(null);
   const [batchRunning, setBatchRunning] = useState(false);
   const computeAll = useServerFn(computeProjectTrajectories);
+
+  const bestByHole = useMemo(() => {
+    const m: Record<string, ReturnType<typeof bestIntercept>> = {};
     for (const h of data) {
       const logs = byHole[h.id] ?? [];
       m[h.id] = bestIntercept(computeIntercepts(logs, 0.5, 2));
