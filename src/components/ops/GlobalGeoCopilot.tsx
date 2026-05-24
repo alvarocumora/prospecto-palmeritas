@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useLocation } from "@tanstack/react-router";
-import { Sparkles, X, Send, Loader2 } from "lucide-react";
+import { Sparkles, X, Send, Loader2, History, Plus, Trash2 } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -8,6 +8,14 @@ import { cn } from "@/lib/utils";
 import { ANCHOR_LABEL, emitSceneFocus, parseAnchors } from "@/components/geoscene/anchors";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type Conversation = {
+  id: string;
+  title: string;
+  module: string;
+  project_id: string | null;
+  updated_at: string;
+  messages: Msg[];
+};
 
 const MODULE_LABELS: Record<string, string> = {
   "/dashboard": "Mission Control",
@@ -83,17 +91,28 @@ const DEFAULT_SUGGESTIONS = [
   "¿Qué permisos vencen y qué actividad bloquean?",
 ];
 
+function titleFrom(messages: Msg[]): string {
+  const first = messages.find((m) => m.role === "user");
+  if (!first) return "Nueva conversación";
+  return first.content.slice(0, 60).trim() + (first.content.length > 60 ? "…" : "");
+}
+
 export function GlobalGeoCopilot() {
   const { active } = useProjects();
   const location = useLocation();
   const moduleLabel = resolveModule(location.pathname);
   const [open, setOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [convId, setConvId] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const btnRef = useRef<HTMLButtonElement | null>(null);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -123,6 +142,108 @@ export function GlobalGeoCopilot() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
+
+  // Load conversations for current project+module when opening or context changes
+  const loadConversations = useCallback(async () => {
+    setLoadingHistory(true);
+    try {
+      let q = supabase
+        .from("geo_copilot_conversations")
+        .select("id,title,module,project_id,updated_at,messages")
+        .eq("module", moduleLabel)
+        .order("updated_at", { ascending: false })
+        .limit(30);
+      if (active?.id) q = q.eq("project_id", active.id);
+      else q = q.is("project_id", null);
+      const { data, error } = await q;
+      if (error) throw error;
+      setConversations((data ?? []) as Conversation[]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingHistory(false);
+    }
+  }, [active?.id, moduleLabel]);
+
+  useEffect(() => {
+    if (!open) return;
+    loadConversations();
+  }, [open, loadConversations]);
+
+  // Reset active conversation when project/module changes
+  useEffect(() => {
+    setConvId(null);
+    setMessages([]);
+    setShowHistory(false);
+  }, [active?.id, moduleLabel]);
+
+  // Persist messages (debounced) — create on first message, update afterwards
+  useEffect(() => {
+    if (messages.length === 0 || streaming) return;
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    saveTimer.current = setTimeout(async () => {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (!user) return;
+        const title = titleFrom(messages);
+        if (!convId) {
+          const { data, error } = await supabase
+            .from("geo_copilot_conversations")
+            .insert({
+              user_id: user.id,
+              project_id: active?.id ?? null,
+              module: moduleLabel,
+              title,
+              messages: messages as unknown as never,
+            })
+            .select("id")
+            .single();
+          if (error) throw error;
+          setConvId(data.id);
+        } else {
+          const { error } = await supabase
+            .from("geo_copilot_conversations")
+            .update({ messages: messages as unknown as never, title })
+            .eq("id", convId);
+          if (error) throw error;
+        }
+      } catch (e) {
+        console.error("[GeoCopilot] save error", e);
+      }
+    }, 600);
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [messages, streaming, convId, active?.id, moduleLabel]);
+
+  const newConversation = () => {
+    setConvId(null);
+    setMessages([]);
+    setShowHistory(false);
+  };
+
+  const openConversation = (c: Conversation) => {
+    setConvId(c.id);
+    setMessages(Array.isArray(c.messages) ? c.messages : []);
+    setShowHistory(false);
+  };
+
+  const deleteConversation = async (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("¿Borrar esta conversación?")) return;
+    const { error } = await supabase.from("geo_copilot_conversations").delete().eq("id", id);
+    if (error) {
+      toast.error("No se pudo borrar");
+      return;
+    }
+    setConversations((prev) => prev.filter((c) => c.id !== id));
+    if (convId === id) {
+      setConvId(null);
+      setMessages([]);
+    }
+  };
 
   const send = async (overrideText?: string) => {
     const text = (overrideText ?? input).trim();
@@ -205,6 +326,8 @@ export function GlobalGeoCopilot() {
       toast.error("No se pudo conectar con el copilot");
     } finally {
       setStreaming(false);
+      // refresh history list after a response so order updates
+      loadConversations();
     }
   };
 
@@ -233,95 +356,166 @@ export function GlobalGeoCopilot() {
       {open && (
         <div
           ref={panelRef}
-          className="fixed top-10 right-2 sm:right-3 z-50 w-[min(94vw,440px)] h-[min(72vh,560px)] flex flex-col rounded-[3px] border border-border bg-bg-secondary/98 backdrop-blur shadow-2xl animate-fade-up"
+          className="fixed top-10 right-2 sm:right-3 z-50 w-[min(94vw,460px)] h-[min(76vh,600px)] flex flex-col rounded-[3px] border border-border bg-bg-secondary/98 backdrop-blur shadow-2xl animate-fade-up"
           role="dialog"
           aria-label="Geo Copilot global"
         >
           <header className="px-3 py-2 border-b border-border flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-gold" />
-            <div className="font-mono text-xs font-semibold flex-1">
+            <div className="font-mono text-xs font-semibold flex-1 min-w-0 truncate">
               Geo Copilot ·{" "}
               <span className="text-gold uppercase tracking-wider">{moduleLabel}</span>
             </div>
-            <span className="text-[10px] font-mono text-muted-foreground truncate max-w-[120px]">
+            <span className="text-[10px] font-mono text-muted-foreground truncate max-w-[100px]">
               {active?.code ?? "Sin proyecto"}
             </span>
             <button
               type="button"
+              onClick={() => setShowHistory((v) => !v)}
+              title="Historial"
+              className={cn(
+                "p-1 rounded transition-colors",
+                showHistory ? "text-gold bg-gold/10" : "text-text-dim hover:text-foreground",
+              )}
+            >
+              <History className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
+              onClick={newConversation}
+              title="Nueva conversación"
+              className="p-1 text-text-dim hover:text-foreground"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+            <button
+              type="button"
               onClick={() => setOpen(false)}
-              className="text-text-dim hover:text-foreground"
+              className="p-1 text-text-dim hover:text-foreground"
               aria-label="Cerrar"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           </header>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
-            {messages.length === 0 && (
-              <div className="text-xs text-muted-foreground font-mono space-y-2">
-                <p className="text-gold">
-                  Pregunta sobre cualquier módulo. Contexto del proyecto activo y módulo actual
-                  inyectado automáticamente.
-                </p>
-                <div className="grid grid-cols-1 gap-1.5 pt-1">
-                  {suggestions.map((q) => (
+          {showHistory ? (
+            <div className="flex-1 overflow-y-auto">
+              <div className="px-3 py-2 text-[10px] font-mono uppercase tracking-wider text-text-dim border-b border-border">
+                Historial · {moduleLabel} · {active?.code ?? "sin proyecto"}
+              </div>
+              {loadingHistory && (
+                <div className="px-3 py-4 text-xs text-muted-foreground font-mono inline-flex items-center gap-1.5">
+                  <Loader2 className="w-3 h-3 animate-spin" /> cargando…
+                </div>
+              )}
+              {!loadingHistory && conversations.length === 0 && (
+                <div className="px-3 py-6 text-xs text-muted-foreground font-mono text-center">
+                  Sin conversaciones previas en este módulo.
+                </div>
+              )}
+              <ul>
+                {conversations.map((c) => (
+                  <li key={c.id}>
                     <button
-                      key={q}
                       type="button"
-                      onClick={() => send(q)}
-                      className="text-left px-2 py-1 rounded border border-border hover:border-gold hover:bg-gold/5 transition-colors"
+                      onClick={() => openConversation(c)}
+                      className={cn(
+                        "w-full text-left px-3 py-2 border-b border-border/40 hover:bg-bg-elevated transition-colors flex items-start gap-2 group",
+                        convId === c.id && "bg-bg-elevated border-l-2 border-l-gold",
+                      )}
                     >
-                      {q}
+                      <div className="flex-1 min-w-0">
+                        <div className="text-[12px] font-mono text-foreground truncate">
+                          {c.title}
+                        </div>
+                        <div className="text-[10px] text-text-dim font-mono tabular-nums">
+                          {new Date(c.updated_at).toLocaleString()} ·{" "}
+                          {Array.isArray(c.messages) ? c.messages.length : 0} msg
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={(e) => deleteConversation(c.id, e)}
+                        className="opacity-0 group-hover:opacity-100 text-text-dim hover:text-signal-red p-1"
+                        aria-label="Borrar"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                      </button>
                     </button>
-                  ))}
-                </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <>
+              <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 space-y-3 text-sm">
+                {messages.length === 0 && (
+                  <div className="text-xs text-muted-foreground font-mono space-y-2">
+                    <p className="text-gold">
+                      Pregunta sobre cualquier módulo. Las conversaciones se guardan por proyecto y
+                      módulo — abre el ícono de historial para retomarlas.
+                    </p>
+                    <div className="grid grid-cols-1 gap-1.5 pt-1">
+                      {suggestions.map((q) => (
+                        <button
+                          key={q}
+                          type="button"
+                          onClick={() => send(q)}
+                          className="text-left px-2 py-1 rounded border border-border hover:border-gold hover:bg-gold/5 transition-colors"
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {messages.map((m, i) => (
+                  <div key={i} className={m.role === "user" ? "text-right" : ""}>
+                    <div
+                      className={cn(
+                        "inline-block max-w-[90%] px-2.5 py-1.5 rounded text-xs whitespace-pre-wrap",
+                        m.role === "user"
+                          ? "bg-gold/15 text-foreground"
+                          : "bg-background border border-border text-foreground",
+                      )}
+                    >
+                      {m.role === "assistant" ? renderWithAnchors(m.content) : m.content}
+                    </div>
+                  </div>
+                ))}
+                {streaming && (
+                  <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 className="w-3 h-3 animate-spin" /> pensando…
+                  </div>
+                )}
               </div>
-            )}
-            {messages.map((m, i) => (
-              <div key={i} className={m.role === "user" ? "text-right" : ""}>
-                <div
-                  className={cn(
-                    "inline-block max-w-[90%] px-2.5 py-1.5 rounded text-xs whitespace-pre-wrap",
-                    m.role === "user"
-                      ? "bg-gold/15 text-foreground"
-                      : "bg-background border border-border text-foreground",
-                  )}
-                >
-                  {m.role === "assistant" ? renderWithAnchors(m.content) : m.content}
-                </div>
-              </div>
-            ))}
-            {streaming && (
-              <div className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <Loader2 className="w-3 h-3 animate-spin" /> pensando…
-              </div>
-            )}
-          </div>
 
-          <div className="p-2 border-t border-border flex gap-1.5">
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  send();
-                }
-              }}
-              placeholder={`Pregunta sobre ${moduleLabel}…`}
-              className="flex-1 px-2 py-1.5 text-xs font-mono rounded border border-border bg-background focus:outline-none focus:border-gold"
-              disabled={streaming}
-              autoFocus
-            />
-            <button
-              type="button"
-              onClick={() => send()}
-              disabled={streaming || !input.trim()}
-              className="px-2 py-1.5 rounded bg-gold text-bg-secondary disabled:opacity-50"
-            >
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          </div>
+              <div className="p-2 border-t border-border flex gap-1.5">
+                <input
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      send();
+                    }
+                  }}
+                  placeholder={`Pregunta sobre ${moduleLabel}…`}
+                  className="flex-1 px-2 py-1.5 text-xs font-mono rounded border border-border bg-background focus:outline-none focus:border-gold"
+                  disabled={streaming}
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => send()}
+                  disabled={streaming || !input.trim()}
+                  className="px-2 py-1.5 rounded bg-gold text-bg-secondary disabled:opacity-50"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </>
+          )}
         </div>
       )}
     </>
