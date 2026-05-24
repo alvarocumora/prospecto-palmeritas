@@ -121,12 +121,23 @@ function DrillingModule() {
             DDH del proyecto · {active.code} · {active.name}
           </p>
         </div>
-        <button
-          onClick={() => setCreating(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
-        >
-          <Plus className="w-4 h-4" /> Nuevo sondaje
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={onRecomputeAll}
+            disabled={batchRunning || data.length === 0}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent disabled:opacity-50"
+            title="Calcular trayectorias 3D vía mining-engine para todos los sondajes del proyecto"
+          >
+            <Compass className="w-4 h-4" />
+            {batchRunning ? "Calculando…" : "Recalcular trayectorias"}
+          </button>
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
+          >
+            <Plus className="w-4 h-4" /> Nuevo sondaje
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
