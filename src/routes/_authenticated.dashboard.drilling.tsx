@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Plus, Pencil, Trash2, FileText } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { Plus, Pencil, Trash2, FileText, Compass } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -17,6 +18,8 @@ import { computeIntercepts, bestIntercept, formatIntercept } from "@/lib/drillin
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
+import { SurveysDialog } from "@/components/drilling/SurveysDialog";
+import { computeProjectTrajectories } from "@/lib/miningEngine.functions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/dashboard/drilling")({
