@@ -8,6 +8,7 @@ from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
 from .desurvey import desurvey
+from .composite import composite_intervals
 
 app = FastAPI(title="mining-engine", version="0.1.0")
 
@@ -80,10 +81,66 @@ class StubResponse(BaseModel):
     message: str
 
 
-@app.post("/composite", response_model=StubResponse)
-def composite_stub(authorization: Optional[str] = Header(default=None)) -> StubResponse:
+class CompositeInterval(BaseModel):
+    from_: float = Field(alias="from", ge=0)
+    to: float = Field(ge=0)
+    values: dict = Field(default_factory=dict)
+
+    class Config:
+        populate_by_name = True
+
+
+class CompositeRequest(BaseModel):
+    intervals: List[CompositeInterval]
+    length: float = Field(default=1.0, gt=0, le=100)
+    start: Optional[float] = None
+    end: Optional[float] = None
+    min_recovery: float = Field(default=0.5, ge=0, le=1)
+
+
+class CompositeResultItem(BaseModel):
+    from_: float = Field(alias="from")
+    to: float
+    length: float
+    recovery: float
+    values: dict
+
+    class Config:
+        populate_by_name = True
+
+
+class CompositeResponse(BaseModel):
+    composites: List[CompositeResultItem]
+    count: int
+
+
+@app.post("/composite", response_model=CompositeResponse)
+def composite_endpoint(
+    body: CompositeRequest,
+    authorization: Optional[str] = Header(default=None),
+) -> CompositeResponse:
     _check_auth(authorization)
-    return StubResponse(status="todo", message="compositing pendiente (sprint 2)")
+    if not body.intervals:
+        raise HTTPException(status_code=400, detail="intervals requerido")
+    raw = [
+        {"from": it.from_, "to": it.to, "values": it.values}
+        for it in body.intervals
+    ]
+    composites = composite_intervals(
+        raw,
+        length=body.length,
+        start=body.start,
+        end=body.end,
+        min_recovery=body.min_recovery,
+    )
+    items = [
+        CompositeResultItem(
+            **{"from": c["from"], "to": c["to"], "length": c["length"],
+               "recovery": c["recovery"], "values": c["values"]}
+        )
+        for c in composites
+    ]
+    return CompositeResponse(composites=items, count=len(items))
 
 
 @app.post("/variogram", response_model=StubResponse)
