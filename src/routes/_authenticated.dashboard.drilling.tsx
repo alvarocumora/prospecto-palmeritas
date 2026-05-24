@@ -90,6 +90,28 @@ function DrillingModule() {
     }
   };
 
+  const onRecomputeAll = async () => {
+    if (!active) return;
+    setBatchRunning(true);
+    try {
+      const r = await computeAll({ data: { projectId: active.id } });
+      if (r.failed === 0) {
+        toast.success(`Trayectorias recalculadas: ${r.succeeded}/${r.attempted}`);
+      } else {
+        toast.warning(
+          `Recalculadas ${r.succeeded}/${r.attempted}. ${r.failed} fallidas (${r.failures
+            .map((f) => f.hole_id)
+            .slice(0, 3)
+            .join(", ")}${r.failures.length > 3 ? "…" : ""})`,
+        );
+      }
+    } catch (e) {
+      toast.error(String((e as Error).message ?? e));
+    } finally {
+      setBatchRunning(false);
+    }
+  };
+
   return (
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
