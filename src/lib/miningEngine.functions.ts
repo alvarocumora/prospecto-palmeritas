@@ -35,6 +35,84 @@ async function callDesurvey(payload: {
 }
 
 // ---------------------------------------------------------------------------
+// /composite — length-weighted compositing
+// ---------------------------------------------------------------------------
+type CompositeOut = {
+  composites: Array<{
+    from: number;
+    to: number;
+    length: number;
+    recovery: number;
+    values: Record<string, number | null>;
+  }>;
+  count: number;
+};
+
+async function callComposite(payload: {
+  intervals: Array<{ from: number; to: number; values: Record<string, number | null> }>;
+  length: number;
+  start?: number;
+  end?: number;
+  min_recovery?: number;
+}): Promise<CompositeOut> {
+  const token = process.env.MINING_ENGINE_TOKEN;
+  const r = await fetch(`${engineBase()}/composite`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  });
+  const txt = await r.text();
+  if (!r.ok) throw new Error(`mining-engine /composite ${r.status}: ${txt}`);
+  return JSON.parse(txt) as CompositeOut;
+}
+
+// compositeHole: lee drill_core_logs y devuelve compuestos en memoria.
+// Variables compuestas: au_gpt, ag_gpt, cu_pct (las que tengan dato).
+export const compositeHole = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        holeId: z.string().uuid(),
+        length: z.number().gt(0).lte(50).default(1),
+        minRecovery: z.number().min(0).max(1).default(0.5),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: logs, error } = await supabase
+      .from("drill_core_logs")
+      .select("depth_from,depth_to,au_gpt,ag_gpt,cu_pct")
+      .eq("hole_id", data.holeId)
+      .order("depth_from", { ascending: true });
+    if (error) throw new Error(error.message);
+    if (!logs || logs.length === 0) {
+      return { composites: [], count: 0, source_intervals: 0 };
+    }
+
+    const intervals = logs.map((l) => ({
+      from: Number(l.depth_from),
+      to: Number(l.depth_to),
+      values: {
+        au_gpt: l.au_gpt == null ? null : Number(l.au_gpt),
+        ag_gpt: l.ag_gpt == null ? null : Number(l.ag_gpt),
+        cu_pct: l.cu_pct == null ? null : Number(l.cu_pct),
+      },
+    }));
+
+    const out = await callComposite({
+      intervals,
+      length: data.length,
+      min_recovery: data.minRecovery,
+    });
+    return { ...out, source_intervals: logs.length };
+  });
+
+// ---------------------------------------------------------------------------
 // Diagnóstico (página /diag/mining-engine)
 // ---------------------------------------------------------------------------
 export const testMiningEngine = createServerFn({ method: "GET" }).handler(async () => {
