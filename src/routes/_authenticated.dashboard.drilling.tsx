@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { Plus, Pencil, Trash2, FileText, Compass } from "lucide-react";
+import { Plus, Pencil, Trash2, FileText, Compass, Layers } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -19,6 +19,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { CoreLogPanel } from "@/components/drilling/CoreLogPanel";
 import { SurveysDialog } from "@/components/drilling/SurveysDialog";
+import { CompositeDialog } from "@/components/drilling/CompositeDialog";
 import { computeProjectTrajectories } from "@/lib/miningEngine.functions";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -37,6 +38,7 @@ function DrillingModule() {
   const [creating, setCreating] = useState(false);
   const [logHole, setLogHole] = useState<DrillHole | null>(null);
   const [surveysHole, setSurveysHole] = useState<DrillHole | null>(null);
+  const [compHole, setCompHole] = useState<DrillHole | null>(null);
   const [batchRunning, setBatchRunning] = useState(false);
   const computeAll = useServerFn(computeProjectTrajectories);
 
@@ -281,6 +283,13 @@ function DrillingModule() {
                             <Compass className="w-3.5 h-3.5" />
                           </button>
                           <button
+                            onClick={() => setCompHole(h)}
+                            className="p-1 rounded hover:bg-accent"
+                            title="Compositar assays"
+                          >
+                            <Layers className="w-3.5 h-3.5" />
+                          </button>
+                          <button
                             onClick={() => setEditing(h)}
                             className="p-1 rounded hover:bg-accent"
                             title="Editar"
@@ -336,6 +345,10 @@ function DrillingModule() {
 
       {surveysHole && (
         <SurveysDialog hole={surveysHole} onClose={() => setSurveysHole(null)} />
+      )}
+
+      {compHole && (
+        <CompositeDialog hole={compHole} onClose={() => setCompHole(null)} />
       )}
     </div>
   );
