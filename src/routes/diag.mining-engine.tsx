@@ -36,6 +36,11 @@ function DiagMiningEngine() {
     queryFn: () => runPit(),
     enabled: false,
   });
+  const sched = useQuery({
+    queryKey: ["diag-schedule"],
+    queryFn: () => runSch(),
+    enabled: false,
+  });
 
   return (
     <div className="container mx-auto max-w-3xl p-6 space-y-6">
