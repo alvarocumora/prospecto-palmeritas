@@ -51,39 +51,46 @@ export function WireframeStudio({ model }: { model: ResourceModel }) {
     setSamplesLoading(true);
     const valueCol =
       model.commodity === "au" ? "au_gpt" : model.commodity === "ag" ? "ag_gpt" : "cu_pct";
-    supabase
-      .from("drill_core_logs")
-      .select(`depth_from,depth_to,${valueCol},drill_holes!inner(easting,northing,elevation,project_id)`)
-      .eq("drill_holes.project_id", model.project_id)
-      .not(valueCol, "is", null)
-      .limit(5000)
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        if (error) {
-          toast.error(error.message);
-          setSamples([]);
-        } else {
-          const rows = (data ?? []).map((r: Record<string, unknown>) => {
-            const h = r.drill_holes as { easting: number; northing: number; elevation: number };
-            const mid = (Number(r.depth_from) + Number(r.depth_to)) / 2;
-            return {
-              x: Number(h.easting),
-              y: Number(h.northing),
-              z: Number(h.elevation) - mid,
-              grade: Number(r[valueCol]),
-            };
-          });
-          setSamples(
-            rows.map((r) => ({
-              x: r.x,
-              y: r.y,
-              z: r.z,
-              indicator: r.grade >= cutoff ? 1 : 0,
-            })),
-          );
-        }
-        setSamplesLoading(false);
-      });
+    (async () => {
+      const { data, error } = await supabase
+        .from("drill_core_logs")
+        .select(
+          `depth_from,depth_to,${valueCol},drill_holes!inner(easting,northing,elevation,project_id)`,
+        )
+        .eq("drill_holes.project_id", model.project_id)
+        .not(valueCol, "is", null)
+        .limit(5000);
+      if (cancelled) return;
+      if (error) {
+        toast.error(error.message);
+        setSamples([]);
+      } else {
+        const rows = ((data ?? []) as unknown as Array<Record<string, unknown>>).map((r) => {
+          const h = r.drill_holes as {
+            easting: number;
+            northing: number;
+            elevation: number;
+          };
+          const mid = (Number(r.depth_from) + Number(r.depth_to)) / 2;
+          const grade = Number(r[valueCol]);
+          return {
+            x: Number(h.easting),
+            y: Number(h.northing),
+            z: Number(h.elevation) - mid,
+            grade,
+          };
+        });
+        setSamples(
+          rows.map((r) => ({
+            x: r.x,
+            y: r.y,
+            z: r.z,
+            indicator: r.grade >= cutoff ? 1 : 0,
+          })),
+        );
+      }
+      setSamplesLoading(false);
+    })();
     return () => {
       cancelled = true;
     };

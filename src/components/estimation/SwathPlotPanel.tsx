@@ -118,9 +118,11 @@ export function SwathPlotPanel({ modelId, unit }: { modelId: string; unit: strin
                   fontSize: 11,
                   fontFamily: "ui-monospace, monospace",
                 }}
-                formatter={(v: number | null, k: string) =>
-                  v == null ? "—" : k === "comp" || k === "est" ? v.toFixed(3) : v
-                }
+                formatter={(v, k) => {
+                  if (v == null) return "—";
+                  const n = typeof v === "number" ? v : Number(v);
+                  return k === "comp" || k === "est" ? n.toFixed(3) : n;
+                }}
               />
               <Legend wrapperStyle={{ fontSize: 10 }} />
               <Bar dataKey="nC" name="# compósitos" fill="hsl(var(--muted))" yAxisId={0} hide />
