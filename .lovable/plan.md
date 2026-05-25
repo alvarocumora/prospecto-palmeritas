@@ -1,116 +1,118 @@
-# Sprint 2 — GeoScene3D: visor 3D canónico unificado
 
-Consolidamos los 4 visores 3D actuales en **un solo componente `GeoScene3D`** con 3 modos conmutables. Este es el corazón visual de Mission Control y elimina ~3000 líneas de duplicación.
+# Plan: Suite de planificación minera 3D estilo Datamine/Leapfrog
 
-## Estado actual (fragmentado)
+Roadmap híbrido de 6-8 semanas, organizado en 4 sprints paralelizables. Cálculos pesados en `mining-engine` (Railway/Python con scipy, networkx, PuLP, trimesh), interacciones ligeras y UI en server functions de TanStack.
 
-| Visor | Ubicación | Rol |
-|---|---|---|
-| `Geology3DViewer` | `src/components/Geology3DViewer.tsx` | DEM + Sentinel + anomalías superficie |
-| `SatToSubsurface3DViewer` | `src/components/geology3d/` | Vetas, pórfidos, drill holes, pits |
-| `MagAnomaly3DPro` | `src/features/mag3d/` | Anomalías magnéticas extruidas |
-| `BlockModel3DViewer` | `src/components/estimation/` | Bloques, leyes, NPV |
-| `Map3DView` | `src/components/map/` | MapLibre + deck.gl 2.5D con drill columns |
+## Estado base (ya en producción)
 
-Cinco entry points, tres motores diferentes (deck.gl, three.js puro, MapLibre+deck), capas duplicadas, controles inconsistentes.
+- `GeoScene3D` (MapLibre + deck.gl) con terreno DEM real, sondajes desurveyados, anomalías extruidas
+- `BlockModel3DViewer` con InstancedMesh + cutoff dinámico
+- `mining-engine` con `/desurvey` y `/composite` operativos
+- Tabla `resource_blocks` + edge function `estimate-resources`
 
-## Objetivo
+## Sprint 1 — Cross-section + Geomodelado implícito (semanas 1-2)
 
+**Backend (mining-engine):**
+- `/section` — corta sondajes/bloques con un plano (origen + azimut + dip), devuelve polilíneas 2D + intercepts proyectados
+- `/wireframe-rbf` — interpolación implícita por Radial Basis Function (scipy) sobre compositos + indicador binario (ore/waste), devuelve mesh trimesh (vértices + caras + isovalor)
+- `/swath-plot` — comparación compositos vs bloques estimados por bandas X/Y/Z
+
+**Frontend:**
+- `SectionViewer` (nueva ruta `/dashboard/section`): canvas SVG/Konva con plano editable (azimut/dip sliders), sondajes proyectados con leyes, contactos litológicos, bloques cortados
+- `WireframeLayer` en GeoScene3D: capa `SimpleMeshLayer` de deck.gl renderizando el sólido RBF semi-transparente sobre el terreno
+- `SwathPlotPanel` en estimación: tres gráficos Recharts (X/Y/Z) compositos vs estimado
+
+## Sprint 2 — Pit optimization + Diseño (semanas 3-4)
+
+**Backend (mining-engine):**
+- `/pit-optim` — Lerchs-Grossmann via pseudoflow (networkx) sobre `resource_blocks`: inputs (precio, recuperación, costo mina/proceso, ángulo de talud), outputs (pit shell por precio, NPV, stripping ratio, tonelaje ore/waste)
+- `/pit-design` — genera bancos + bermas + rampa helicoidal con pendiente máx desde el pit shell óptimo
+- Migración: tablas `pit_shells` y `pit_designs` (geometría JSONB + métricas)
+
+**Frontend:**
+- `PitOptimDialog` con sliders de precio (Au $/oz, Cu $/lb), grid de resultados (shell, NPV, t ore, strip ratio)
+- `PitShellsLayer` en GeoScene3D modo `resource`: capa `PolygonLayer` extruida coloreada por precio incremental (nested shells)
+- `BenchDesignPanel` con perfil del pit en sección y tabla de bancos
+
+## Sprint 3 — Scheduling + Drillhole planning (semanas 5-6)
+
+**Backend (mining-engine):**
+- `/schedule` — secuenciación de bloques por períodos (PuLP MILP simplificado o heurística por benches), respeta precedencias del pit shell y capacidad anual de mina/planta
+- `/drillhole-design` — toma targets + restricciones (azimut/dip preferidos, distancia mínima entre collares, longitud máx, costo $/m), devuelve collares óptimos + trayectorias
+
+**Frontend:**
+- `ScheduleTimeline` (D3/Recharts): bloques coloreados por período, curvas acumuladas de tonelaje, ley media, NPV, stripping
+- `ScheduleAnimationLayer` en GeoScene3D: animación de bloques apareciendo/desapareciendo por período
+- `DrillhPlanWizard` (ruta `/dashboard/drilling/plan`): selecciona targets → genera campaña → preview 3D + tabla costos
+- Persistencia: `drill_campaigns` + `planned_holes`
+
+## Sprint 4 — Interop industria (semanas 7-8)
+
+**Backend (mining-engine):**
+- `/export/dxf` — sondajes, wireframes, pit designs, secciones (ezdxf)
+- `/export/omf` — Open Mining Format (omf python lib): block model, drillholes, surfaces
+- `/export/csv-plan` — plan minero por período (formato compatible Datamine NPV Scheduler)
+- `/import/dxf` — leer wireframes/surfaces externos de Leapfrog/Vulcan
+
+**Frontend:**
+- `ExportHub` (ruta `/dashboard/exports`): selector de objetos + formato + descarga directa
+- Botones de import en geología y resource modeling
+
+## Detalle técnico
+
+### Arquitectura de cálculo
 ```text
-┌──────────────────────────────────────────────────────────┐
-│  GeoScene3D  · proyecto activo                           │
-│  ┌─[ Surface ]─[ Subsurface ]─[ Resource ]──────────┐    │
-│  │                                                  │    │
-│  │   deck.gl + MapLibre (base común)               │    │
-│  │   DEM Copernicus + Sentinel drape                │    │
-│  │   capas conmutables según modo                   │    │
-│  │                                                  │    │
-│  └──────────────────────────────────────────────────┘    │
-│  Toggles: catastro · targets · anomalías sat · mag ·     │
-│           vetas · pórfidos · sondajes · bloques · pit    │
-└──────────────────────────────────────────────────────────┘
+TanStack server fn          mining-engine (Railway)
+─────────────────           ─────────────────────────
+section.functions.ts   ───▶ POST /section          (numpy)
+wireframe.functions.ts ───▶ POST /wireframe-rbf    (scipy RBF + trimesh)
+pitOptim.functions.ts  ───▶ POST /pit-optim        (networkx pseudoflow)
+schedule.functions.ts  ───▶ POST /schedule         (PuLP MILP)
+drillPlan.functions.ts ───▶ POST /drillhole-design (scipy.optimize)
+export.functions.ts    ───▶ POST /export/{format}  (ezdxf, omf)
 ```
 
-## Arquitectura técnica
+### Dependencias nuevas
+- **Python**: `scipy`, `networkx`, `pulp`, `trimesh`, `ezdxf`, `omf`, `pyproj`
+- **TS**: `@deck.gl/mesh-layers` (SimpleMeshLayer para wireframes), `konva` (cross-section 2D)
 
-**Motor único: MapLibre + deck.gl MapboxOverlay** (ya probado en `Map3DView`).
-- Razón: DEM real + Sentinel basemap + georreferenciación WGS84 + interacción nativa de mapa. Three.js puro pierde el contexto geográfico.
-- `MagAnomaly3DPro` (three.js local) se reescribe como capa deck.gl `ColumnLayer` sobre el mismo canvas.
+### Tablas nuevas (migraciones)
+- `pit_shells` — geometría JSONB, precio, NPV, métricas
+- `pit_designs` — bancos, rampas, ángulo de talud
+- `mine_schedules` — períodos, bloque_id, secuencia, NPV período
+- `drill_campaigns` + `planned_holes` — diseños de campaña con costos
+- `geology_wireframes` — sólidos RBF (mesh JSONB, isovalor, commodity)
 
-**Estructura de archivos nueva:**
-```
-src/components/geoscene/
-  GeoScene3D.tsx              ← componente público único
-  modes/
-    SurfaceMode.tsx           ← DEM + Sentinel + catastro + targets + anom sat
-    SubsurfaceMode.tsx        ← vetas + pórfidos + sondajes + mag 3D
-    ResourceMode.tsx          ← bloques + pit shells + NPV overlay
-  layers/
-    useDemTerrainLayer.ts     ← Copernicus DEM
-    useSentinelRasterLayer.ts ← Sentinel MPC drape
-    useDrillHoleLayer.ts      ← columns + intercepts (reusa lib/3d/holeGeometry)
-    useAnomalyColumnLayer.ts  ← anomalías sat/mag extruidas
-    useVeinPolylineLayer.ts   ← vetas 3D
-    usePorphyryLayer.ts       ← elipsoides pórfidos
-    useBlockModelLayer.ts     ← bloques (port desde BlockModel3DViewer)
-    usePitShellLayer.ts       ← pit shells
-  controls/
-    LayerTogglePanel.tsx      ← panel único de capas
-    ModeTabs.tsx              ← Surface/Subsurface/Resource
-    SceneLegend.tsx           ← leyenda contextual al modo
-  types.ts                    ← GeoSceneMode, LayerToggleState, etc.
-  index.ts
-```
+### Capas nuevas en GeoScene3D
+- `WireframeLayer` (SimpleMeshLayer) — sólidos RBF
+- `PitShellsLayer` (PolygonLayer extruido) — nested shells por precio
+- `ScheduleLayer` (InstancedMesh animado) — bloques por período
+- `PlannedHolesLayer` (PathLayer + ColumnLayer) — campañas propuestas vs ejecutadas
 
-**API pública:**
-```tsx
-<GeoScene3D
-  projectId={projectId}
-  mode="surface"               // o "subsurface" | "resource"
-  initialLayers={{ targets: true, sentinel: true, ... }}
-  onTargetClick={(t) => ...}
-  onHoleClick={(h) => ...}
-/>
-```
+### Validación visual
+- Swath plots (sprint 1) — calidad de estimación
+- Reconciliation panel — compositos vs bloques en cada wireframe
+- Pit walkthrough — animación de cámara siguiendo rampa
 
-## Plan de migración (sin romper lo que existe)
+## Entregables por sprint
 
-1. **Crear `GeoScene3D`** con los 3 modos vacíos + tabs + panel de capas.
-2. **Portar capas una por una** desde cada visor legacy a hooks `useXxxLayer.ts` (cada hook devuelve un `Layer` deck.gl). Tests existentes (`Geology3DSceneSummary.test.tsx`) siguen pasando.
-3. **Mission Control** apunta al nuevo `<GeoScene3D>` en su zona central (reemplaza el placeholder actual del dashboard).
-4. **Rutas legacy se vuelven thin wrappers** que renderizan `<GeoScene3D mode="..." />`:
-   - `/dashboard/geology3d` → mode="surface"
-   - `/dashboard/sat3d` → mode="subsurface"
-   - `/dashboard/3d-pro` → mode="subsurface" con preset mag
-   - `/dashboard/estimation` (sección 3D) → mode="resource"
-5. **Deprecación suave**: los componentes viejos quedan marcados `@deprecated` en JSDoc 1 sprint, luego se borran.
+| Sprint | Ruta nueva | Métricas de éxito |
+|---|---|---|
+| 1 | `/dashboard/section` | Corte arbitrario < 500ms, wireframe RBF de un cuerpo en < 5s |
+| 2 | `/dashboard/pit-optim` | Pit shell para 50k bloques < 30s, NPV calculado |
+| 3 | `/dashboard/drilling/plan` | Schedule 5 años < 60s, plan de 20 collares generado |
+| 4 | `/dashboard/exports` | DXF leído en AutoCAD, OMF abierto en Leapfrog Viewer |
 
-## Detalles de UX
+## Riesgos y mitigaciones
 
-- **Tabs de modo** arriba (Surface · Subsurface · Resource), no en sidebar. Cambiar modo no remonta el mapa, solo conmuta capas (transición suave).
-- **Panel de capas** lateral derecho, agrupado por modo, con contador (ej. "Sondajes (47)").
-- **Leyenda contextual** abajo-izquierda, cambia según capas visibles.
-- **Sincronización camera**: al cambiar de modo, mantener bearing/pitch/center.
-- **Header compartido**: Fusion Score + QPS visibles también en este visor (consistencia con Mission Control).
+- **Pseudoflow en Python puro es lento**: si > 60s para 100k bloques, portar el core a Cython o usar `mining-pit-optim` (paquete C++ con bindings)
+- **RBF no escala >10k compositos**: implementar octree + partition of unity como fallback
+- **Workers de Cloudflare no pueden hacer cómputo pesado**: por eso todo lo intensivo va a Railway, los server functions solo orquestan
+- **OMF v2 todavía es beta**: empezar con OMF v1 (estable) y agregar v2 cuando se libere
 
-## Tokens de diseño
+## Lo que NO está en este plan (fase 2)
 
-Reusa la paleta Midnight Indigo + Emerald Prestige ya definida. Sin colores hardcoded — toggles usan `--primary`, `--accent`, `--muted-foreground`. Las rampas de Au g/t y anomalías quedan como constantes tipadas en `src/components/geoscene/layers/colorRamps.ts` (única fuente).
-
-## Lo que NO hace este sprint
-
-- No toca backend ni edge functions.
-- No agrega capas nuevas que no existan hoy en algún visor.
-- No implementa el Geo Copilot (Sprint 3).
-- No toca NI 43-101 vivo (Sprint 4).
-
-## Entregable verificable
-
-- Mission Control muestra el visor real (no placeholder) con DEM + Sentinel + targets activos.
-- Las 4 rutas legacy renderizan vía `GeoScene3D` y se ven idénticas o mejores que hoy.
-- Cambiar modo no recarga el mapa.
-- Tests existentes verdes; añadimos test de smoke para `GeoScene3D` que monta los 3 modos.
-
-## Pregunta antes de arrancar
-
-¿Migramos las 4 rutas legacy a wrappers en este mismo sprint, o solo dejamos el componente nuevo + Mission Control y las rutas viejas se migran en un sprint de limpieza posterior? Lo recomendado es **migrar todo en este sprint** para no quedar con dos visores en paralelo, pero suma ~2 días.
+- Stope optimization subterránea (MSO) — solo si confirmamos clientes con minería subterránea
+- Geostatística avanzada (kriging con variogramas direccionales, simulación condicional) — el IDW/RBF actual cubre el 80%
+- Realidad aumentada en terreno — ya existe `ArRadarOverlay`, se integraría al plan de campaña en fase 2
+- Integración directa con Datamine Studio RM via API propietaria — costoso y poco demanda
