@@ -373,6 +373,65 @@ export const testMiningEngine = createServerFn({ method: "GET" }).handler(async 
   return { ok: true, ...results };
 });
 
+// Diagnóstico /composite: toma el hole con más drill_core_logs y compone.
+export const testCompositeEndpoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase } = context;
+    const { data: logs, error } = await supabase
+      .from("drill_core_logs")
+      .select("hole_id,depth_from,depth_to,au_gpt,ag_gpt,cu_pct")
+      .order("depth_from", { ascending: true })
+      .limit(5000);
+    if (error) throw new Error(error.message);
+    if (!logs || logs.length === 0) {
+      return { ok: false, error: "Sin drill_core_logs en la base" };
+    }
+    const counts = new Map<string, number>();
+    for (const l of logs) counts.set(l.hole_id, (counts.get(l.hole_id) ?? 0) + 1);
+    const [holeId, n] = [...counts.entries()].sort((a, b) => b[1] - a[1])[0];
+    const holeLogs = logs.filter((l) => l.hole_id === holeId);
+
+    const { data: holeRow } = await supabase
+      .from("drill_holes")
+      .select("hole_id")
+      .eq("id", holeId)
+      .maybeSingle();
+
+    const intervals = holeLogs.map((l) => ({
+      from: Number(l.depth_from),
+      to: Number(l.depth_to),
+      values: {
+        au_gpt: l.au_gpt == null ? null : Number(l.au_gpt),
+        ag_gpt: l.ag_gpt == null ? null : Number(l.ag_gpt),
+        cu_pct: l.cu_pct == null ? null : Number(l.cu_pct),
+      },
+    }));
+
+    const t0 = Date.now();
+    try {
+      const out = await callComposite({ intervals, length: 2, min_recovery: 0.5 });
+      return {
+        ok: true,
+        hole_id: holeId,
+        hole_code: holeRow?.hole_id ?? null,
+        source_intervals: n,
+        composites_count: out.count,
+        elapsed_ms: Date.now() - t0,
+        sample: out.composites.slice(0, 5),
+      };
+    } catch (e) {
+      return {
+        ok: false,
+        hole_id: holeId,
+        hole_code: holeRow?.hole_id ?? null,
+        source_intervals: n,
+        elapsed_ms: Date.now() - t0,
+        error: String(e),
+      };
+    }
+  });
+
 // ---------------------------------------------------------------------------
 // computeHoleTrajectory: desurvey + persistencia en drill_hole_trajectories.
 // Si el hole tiene <2 survey shots, sintetiza dos desde collar (az/dip) hasta
