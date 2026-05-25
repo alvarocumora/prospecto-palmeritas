@@ -519,6 +519,161 @@ export const testCompositeEndpoint = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
+// Diagnóstico /wireframe-rbf — end-to-end con persistencia
+// ---------------------------------------------------------------------------
+async function callWireframeRaw(payload: {
+  samples: Array<{ x: number; y: number; z: number; indicator: number }>;
+  iso?: number;
+  grid_n?: number;
+  pad?: number;
+  smooth?: number;
+}): Promise<{
+  status: string;
+  vertices: number[][];
+  faces: number[][];
+  bbox?: { min: number[]; max: number[] };
+  volume_m3?: number;
+  samples_used?: number;
+  fallback?: string;
+}> {
+  const token = process.env.MINING_ENGINE_TOKEN;
+  const r = await fetch(`${engineBase()}/wireframe-rbf`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ iso: 0.5, grid_n: 24, pad: 50, smooth: 5, ...payload }),
+  });
+  const txt = await r.text();
+  if (!r.ok) throw new Error(`mining-engine /wireframe-rbf ${r.status}: ${txt}`);
+  return JSON.parse(txt);
+}
+
+export const testWireframeEndpoint = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const t0 = Date.now();
+
+    // 1) Elige proyecto del usuario con más logs Au + collares
+    const { data: holes, error: hErr } = await supabase
+      .from("drill_holes")
+      .select("id,project_id,easting,northing,elevation")
+      .not("easting", "is", null)
+      .not("northing", "is", null)
+      .limit(2000);
+    if (hErr) throw new Error(hErr.message);
+    if (!holes?.length) return { ok: false, error: "Sin sondajes con collar" };
+
+    const holeById = new Map(holes.map((h) => [h.id, h]));
+    const { data: logs, error: lErr } = await supabase
+      .from("drill_core_logs")
+      .select("hole_id,depth_from,depth_to,au_gpt")
+      .not("au_gpt", "is", null)
+      .in("hole_id", holes.map((h) => h.id))
+      .limit(5000);
+    if (lErr) throw new Error(lErr.message);
+    if (!logs?.length) return { ok: false, error: "Sin logs Au" };
+
+    // Agrupar por project_id y elegir el más denso
+    const byProject = new Map<string, typeof logs>();
+    for (const l of logs) {
+      const h = holeById.get(l.hole_id);
+      if (!h || !h.project_id) continue;
+      const arr = byProject.get(h.project_id) ?? [];
+      arr.push(l);
+      byProject.set(h.project_id, arr);
+    }
+    const [projectId, projLogs] = [...byProject.entries()].sort(
+      (a, b) => b[1].length - a[1].length,
+    )[0];
+
+    // 2) Construir samples (x,y,z,indicator) en metros locales relativos al centro de los collares
+    const usedHoles = new Set<string>();
+    projLogs.forEach((l) => usedHoles.add(l.hole_id));
+    const collarList = [...usedHoles].map((id) => holeById.get(id)!).filter(Boolean);
+    const cx = collarList.reduce((s, h) => s + Number(h.easting), 0) / collarList.length;
+    const cy = collarList.reduce((s, h) => s + Number(h.northing), 0) / collarList.length;
+
+    const cutoff = 0.3; // g/t Au
+    const samples = projLogs.map((l) => {
+      const h = holeById.get(l.hole_id)!;
+      const midZ = -((Number(l.depth_from) + Number(l.depth_to)) / 2);
+      return {
+        x: Number(h.easting) - cx,
+        y: Number(h.northing) - cy,
+        z: Number(h.elevation ?? 0) + midZ,
+        indicator: Number(l.au_gpt) >= cutoff ? 1 : 0,
+      };
+    });
+    const ones = samples.filter((s) => s.indicator === 1).length;
+
+    // 3) Llamar Railway /wireframe-rbf
+    const wf = await callWireframeRaw({ samples, iso: 0.5, grid_n: 24, smooth: 5, pad: 50 });
+
+    // 4) Persistir en geology_wireframes
+    const name = `diag-test-${new Date().toISOString().slice(0, 19)}`;
+    const { data: row, error: insErr } = await supabase
+      .from("geology_wireframes")
+      .insert({
+        project_id: projectId,
+        name,
+        commodity: "au",
+        iso: 0.5,
+        smooth: 5,
+        grid_n: 24,
+        pad: 50,
+        samples_used: wf.samples_used ?? samples.length,
+        volume_m3: wf.volume_m3 ?? null,
+        vertices: wf.vertices,
+        faces: wf.faces,
+        bbox: wf.bbox ?? null,
+        origin_lng: null,
+        origin_lat: null,
+        created_by: userId,
+        metadata: { diag: true, source: "testWireframeEndpoint" },
+      })
+      .select("id,created_at,volume_m3,samples_used")
+      .single();
+    if (insErr) throw new Error(`Insert geology_wireframes: ${insErr.message}`);
+
+    // 5) Re-leer para verificar persistencia
+    const { data: verify, error: vErr } = await supabase
+      .from("geology_wireframes")
+      .select("id,name,project_id,vertices,faces")
+      .eq("id", row.id)
+      .single();
+    if (vErr) throw new Error(`Verify read: ${vErr.message}`);
+
+    return {
+      ok: true,
+      project_id: projectId,
+      holes_used: collarList.length,
+      samples_total: samples.length,
+      samples_ore: ones,
+      cutoff_au_gpt: cutoff,
+      railway: {
+        status: wf.status,
+        vertices: wf.vertices?.length ?? 0,
+        faces: wf.faces?.length ?? 0,
+        volume_m3: wf.volume_m3 ?? null,
+        samples_used: wf.samples_used ?? null,
+        fallback: wf.fallback ?? null,
+      },
+      persisted: {
+        id: row.id,
+        name,
+        created_at: row.created_at,
+        verified_vertices: Array.isArray(verify.vertices) ? verify.vertices.length : null,
+        verified_faces: Array.isArray(verify.faces) ? verify.faces.length : null,
+      },
+      elapsed_ms: Date.now() - t0,
+    };
+  });
+
+
+// ---------------------------------------------------------------------------
 // computeHoleTrajectory: desurvey + persistencia en drill_hole_trajectories.
 // Si el hole tiene <2 survey shots, sintetiza dos desde collar (az/dip) hasta
 // profundidad real/planificada — trayectoria recta georeferenciada.
