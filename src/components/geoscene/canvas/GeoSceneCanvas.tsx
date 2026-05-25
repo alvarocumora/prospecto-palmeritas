@@ -15,6 +15,7 @@ import { useDrillHolesLayer } from "./useDrillHolesLayer";
 import { useDrillTrajectoriesLayer } from "./useDrillTrajectoriesLayer";
 import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
 import { useSatAnomaliesLayer } from "./useSatAnomaliesLayer";
+import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import type { GeoSceneMode } from "../types";
