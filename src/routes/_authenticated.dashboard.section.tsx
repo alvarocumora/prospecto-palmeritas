@@ -6,11 +6,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
+import { useResourceModels } from "@/hooks/useResourceModels";
 import { sectionProject } from "@/lib/miningEngine.functions";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Loader2, Scissors, RefreshCw } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/section")({
@@ -30,6 +38,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/section")({
 function SectionPage() {
   const { active } = useProjects();
   const sectionFn = useServerFn(sectionProject);
+  const { models } = useResourceModels();
+  const completeModels = useMemo(() => models.filter((m) => m.status === "complete"), [models]);
 
   const defaultX = Number(active?.center_lng ?? 0);
   const defaultY = Number(active?.center_lat ?? 0);
@@ -39,6 +49,7 @@ function SectionPage() {
   const [originZ, setOriginZ] = useState<number>(0);
   const [azimuth, setAzimuth] = useState<number>(90);
   const [bandM, setBandM] = useState<number>(100);
+  const [modelId, setModelId] = useState<string>("none");
 
   const params = active
     ? {
@@ -48,6 +59,7 @@ function SectionPage() {
         origin_z: originZ,
         azimuth_deg: azimuth,
         band_m: bandM,
+        modelId: modelId === "none" ? null : modelId,
       }
     : null;
 
@@ -117,6 +129,22 @@ function SectionPage() {
             value={[bandM]}
             onValueChange={(v) => setBandM(v[0])}
           />
+        </ControlField>
+
+        <ControlField label="Modelo de bloques (opcional)">
+          <Select value={modelId} onValueChange={setModelId}>
+            <SelectTrigger className="h-8 text-xs">
+              <SelectValue placeholder="Sin modelo" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Sin modelo</SelectItem>
+              {completeModels.map((m) => (
+                <SelectItem key={m.id} value={m.id}>
+                  {m.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </ControlField>
 
         <Button
@@ -206,6 +234,25 @@ function SectionCanvas({ data }: { data: SectionData }) {
     >
       {/* Grid */}
       <GridLines bounds={bounds} sx={sx} sy={sy} W={W} H={H} padding={padding} />
+
+      {/* Bloques estimados proyectados */}
+      {data.extra_points
+        ?.filter((p) => p.kind === "block")
+        .map((p, i) => {
+          const g = typeof p.grade === "number" ? p.grade : null;
+          const fill = g == null ? "#3b3b4f" : g >= 1 ? "#facc15" : g >= 0.3 ? "#f59e0b" : "#6b7080";
+          return (
+            <rect
+              key={`b${i}`}
+              x={sx(Number(p.s)) - 2}
+              y={sy(Number(p.h)) - 2}
+              width={4}
+              height={4}
+              fill={fill}
+              opacity={0.7}
+            />
+          );
+        })}
 
       {/* Trayectorias */}
       {visibleHoles.map((t) => {

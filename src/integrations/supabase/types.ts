@@ -5259,6 +5259,87 @@ export type Database = {
           },
         ]
       }
+      geology_wireframes: {
+        Row: {
+          bbox: Json | null
+          commodity: string | null
+          created_at: string
+          created_by: string
+          faces: Json
+          grid_n: number
+          id: string
+          iso: number
+          metadata: Json | null
+          name: string
+          origin_lat: number | null
+          origin_lng: number | null
+          pad: number
+          project_id: string
+          samples_used: number | null
+          smooth: number
+          updated_at: string
+          vertices: Json
+          volume_m3: number | null
+        }
+        Insert: {
+          bbox?: Json | null
+          commodity?: string | null
+          created_at?: string
+          created_by: string
+          faces: Json
+          grid_n?: number
+          id?: string
+          iso?: number
+          metadata?: Json | null
+          name: string
+          origin_lat?: number | null
+          origin_lng?: number | null
+          pad?: number
+          project_id: string
+          samples_used?: number | null
+          smooth?: number
+          updated_at?: string
+          vertices: Json
+          volume_m3?: number | null
+        }
+        Update: {
+          bbox?: Json | null
+          commodity?: string | null
+          created_at?: string
+          created_by?: string
+          faces?: Json
+          grid_n?: number
+          id?: string
+          iso?: number
+          metadata?: Json | null
+          name?: string
+          origin_lat?: number | null
+          origin_lng?: number | null
+          pad?: number
+          project_id?: string
+          samples_used?: number | null
+          smooth?: number
+          updated_at?: string
+          vertices?: Json
+          volume_m3?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geology_wireframes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "geology_wireframes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       geophysics_anomalies: {
         Row: {
           anomaly_type: string

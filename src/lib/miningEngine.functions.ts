@@ -140,6 +140,7 @@ export const sectionProject = createServerFn({ method: "POST" })
         origin_z: z.number().default(0),
         azimuth_deg: z.number().min(0).max(360),
         band_m: z.number().gt(0).lte(2000).default(50),
+        modelId: z.string().uuid().nullable().optional(),
       })
       .parse(input),
   )
@@ -151,7 +152,47 @@ export const sectionProject = createServerFn({ method: "POST" })
       .eq("project_id", data.projectId);
     if (error) throw new Error(error.message);
     const holeIds = (holes ?? []).map((h) => h.id);
-    if (holeIds.length === 0) {
+
+    let trajectories: Array<{
+      hole_id: string;
+      hole_code: string | null;
+      points: Array<{ md: number; x: number; y: number; z: number }>;
+    }> = [];
+    if (holeIds.length > 0) {
+      const { data: trajRows } = await supabase
+        .from("drill_hole_trajectories")
+        .select("hole_id,points")
+        .in("hole_id", holeIds);
+      trajectories = (trajRows ?? []).map((t) => {
+        const meta = holes!.find((h) => h.id === t.hole_id);
+        return {
+          hole_id: t.hole_id,
+          hole_code: meta?.hole_id ?? null,
+          points:
+            (t.points as Array<{ md: number; x: number; y: number; z: number }>) ?? [],
+        };
+      });
+    }
+
+    // Bloques estimados (opcional) — se proyectan como extra_points con kind=block
+    let extraPoints: Array<Record<string, number | string | null>> = [];
+    if (data.modelId) {
+      const { data: blocks } = await supabase
+        .from("resource_blocks")
+        .select("x,y,z,grade")
+        .eq("model_id", data.modelId)
+        .not("grade", "is", null)
+        .limit(8000);
+      extraPoints = (blocks ?? []).map((b) => ({
+        kind: "block",
+        x: Number(b.x),
+        y: Number(b.y),
+        z: Number(b.z),
+        grade: b.grade == null ? null : Number(b.grade),
+      }));
+    }
+
+    if (trajectories.length === 0 && extraPoints.length === 0) {
       return {
         azimuth_deg: data.azimuth_deg,
         band_m: data.band_m,
@@ -160,19 +201,6 @@ export const sectionProject = createServerFn({ method: "POST" })
         bounds: { s_min: 0, s_max: 0, h_min: 0, h_max: 0 },
       };
     }
-    const { data: trajRows } = await supabase
-      .from("drill_hole_trajectories")
-      .select("hole_id,points")
-      .in("hole_id", holeIds);
-
-    const trajectories = (trajRows ?? []).map((t) => {
-      const meta = holes!.find((h) => h.id === t.hole_id);
-      return {
-        hole_id: t.hole_id,
-        hole_code: meta?.hole_id ?? null,
-        points: (t.points as Array<{ md: number; x: number; y: number; z: number }>) ?? [],
-      };
-    });
 
     const token = process.env.MINING_ENGINE_TOKEN;
     const r = await fetch(`${engineBase()}/section`, {
@@ -188,12 +216,70 @@ export const sectionProject = createServerFn({ method: "POST" })
         azimuth_deg: data.azimuth_deg,
         band_m: data.band_m,
         trajectories,
-        extra_points: [],
+        extra_points: extraPoints,
       }),
     });
     const txt = await r.text();
     if (!r.ok) throw new Error(`mining-engine /section ${r.status}: ${txt}`);
     return JSON.parse(txt) as SectionOut;
+  });
+
+// ---------------------------------------------------------------------------
+// saveWireframe — persiste la malla RBF en geology_wireframes
+// ---------------------------------------------------------------------------
+export const saveWireframe = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        projectId: z.string().uuid(),
+        name: z.string().min(1).max(200),
+        commodity: z.string().max(10).nullable().optional(),
+        iso: z.number().min(0).max(1),
+        smooth: z.number().min(0).max(1000),
+        grid_n: z.number().int().min(8).max(80),
+        pad: z.number().min(0).max(1000),
+        samples_used: z.number().int().nullable().optional(),
+        volume_m3: z.number().nullable().optional(),
+        vertices: z.array(z.array(z.number()).length(3)),
+        faces: z.array(z.array(z.number().int()).length(3)),
+        bbox: z
+          .object({
+            min: z.array(z.number()).length(3),
+            max: z.array(z.number()).length(3),
+          })
+          .nullable()
+          .optional(),
+        origin_lng: z.number().nullable().optional(),
+        origin_lat: z.number().nullable().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("geology_wireframes")
+      .insert({
+        project_id: data.projectId,
+        name: data.name,
+        commodity: data.commodity ?? null,
+        iso: data.iso,
+        smooth: data.smooth,
+        grid_n: data.grid_n,
+        pad: data.pad,
+        samples_used: data.samples_used ?? null,
+        volume_m3: data.volume_m3 ?? null,
+        vertices: data.vertices,
+        faces: data.faces,
+        bbox: data.bbox ?? null,
+        origin_lng: data.origin_lng ?? null,
+        origin_lat: data.origin_lat ?? null,
+        created_by: userId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, id: row.id };
   });
 
 // ---------------------------------------------------------------------------
