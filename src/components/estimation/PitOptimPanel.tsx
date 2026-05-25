@@ -50,6 +50,7 @@ export function PitOptimPanel({
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState<PitResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [show3d, setShow3d] = useState(false);
 
   const selected = scenarioId ?? scenarios[0]?.id ?? null;
   const unit =
