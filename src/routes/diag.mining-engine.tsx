@@ -7,6 +7,7 @@ import {
   testWireframeEndpoint,
 } from "@/lib/miningEngine.functions";
 import { testPitOptim } from "@/lib/pitOptim.functions";
+import { testSchedule } from "@/lib/schedule.functions";
 
 export const Route = createFileRoute("/diag/mining-engine")({
   component: DiagMiningEngine,
