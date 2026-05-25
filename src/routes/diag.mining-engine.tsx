@@ -7,6 +7,7 @@ import {
   testWireframeEndpoint,
 } from "@/lib/miningEngine.functions";
 import { testPitOptim } from "@/lib/pitOptim.functions";
+import { testSchedule } from "@/lib/schedule.functions";
 
 export const Route = createFileRoute("/diag/mining-engine")({
   component: DiagMiningEngine,
@@ -17,6 +18,7 @@ function DiagMiningEngine() {
   const runComp = useServerFn(testCompositeEndpoint);
   const runWf = useServerFn(testWireframeEndpoint);
   const runPit = useServerFn(testPitOptim);
+  const runSch = useServerFn(testSchedule);
 
   const health = useQuery({ queryKey: ["diag-mining-engine"], queryFn: () => run() });
   const composite = useQuery({
@@ -32,6 +34,11 @@ function DiagMiningEngine() {
   const pit = useQuery({
     queryKey: ["diag-pit-optim"],
     queryFn: () => runPit(),
+    enabled: false,
+  });
+  const sched = useQuery({
+    queryKey: ["diag-schedule"],
+    queryFn: () => runSch(),
     enabled: false,
   });
 
@@ -128,6 +135,29 @@ function DiagMiningEngine() {
         {pit.data && (
           <pre className="text-xs p-3 bg-muted rounded-md overflow-auto">
             {JSON.stringify(pit.data, null, 2)}
+          </pre>
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold">Scheduling NPV anual</h2>
+          <button
+            onClick={() => sched.refetch()}
+            className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground"
+            disabled={sched.isFetching}
+          >
+            {sched.isFetching ? "…" : "Probar"}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Sobre el escenario con pit más reciente: empaca bloques in-pit por banco + margen,
+          descuenta cashflow anual y persiste <code>economic_schedule</code> + NPV/IRR/payback.
+        </p>
+        {sched.error && <pre className="text-destructive text-xs">{String(sched.error)}</pre>}
+        {sched.data && (
+          <pre className="text-xs p-3 bg-muted rounded-md overflow-auto max-h-96">
+            {JSON.stringify(sched.data, null, 2)}
           </pre>
         )}
       </section>
