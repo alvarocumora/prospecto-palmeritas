@@ -580,7 +580,7 @@ export const testWireframeEndpoint = createServerFn({ method: "POST" })
     const byProject = new Map<string, typeof logs>();
     for (const l of logs) {
       const h = holeById.get(l.hole_id);
-      if (!h) continue;
+      if (!h || !h.project_id) continue;
       const arr = byProject.get(h.project_id) ?? [];
       arr.push(l);
       byProject.set(h.project_id, arr);
