@@ -9,6 +9,7 @@
         "@deck.gl/core": "^9",
         "@deck.gl/layers": "^9",
         "@deck.gl/mapbox": "^9",
+        "@deck.gl/mesh-layers": "^9",
         "@hookform/resolvers": "^5.2.2",
         "@radix-ui/react-accordion": "^1.2.12",
         "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -194,6 +195,8 @@
 
     "@deck.gl/mapbox": ["@deck.gl/mapbox@9.3.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@deck.gl/mapbox/-/mapbox-9.3.2.tgz", { "dependencies": { "@math.gl/web-mercator": "^4.1.0" }, "peerDependencies": { "@deck.gl/core": "~9.3.0", "@luma.gl/core": "~9.3.3" } }, "sha512-+T9pJwsOXwjUxyGN6oiBMfIs28VtDIG1V1Rqz4qqn4TjjNEFFw+xO0olJIg8FO5IAqw2OtePdsrMj0tX8tHdGQ=="],
 
+    "@deck.gl/mesh-layers": ["@deck.gl/mesh-layers@9.3.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@deck.gl/mesh-layers/-/mesh-layers-9.3.2.tgz", { "dependencies": { "@loaders.gl/gltf": "^4.4.1", "@loaders.gl/schema": "^4.4.1", "@luma.gl/gltf": "^9.3.3", "@luma.gl/shadertools": "^9.3.3" }, "peerDependencies": { "@deck.gl/core": "~9.3.0", "@luma.gl/core": "~9.3.3", "@luma.gl/engine": "~9.3.3" } }, "sha512-9KeEnEx8PYalFPq/jSb1983QtjwZeuz64OfHH8I2VOB3eOhtRDxaTAaelbkVkD3E9HqlU2dD6f9huYsuv1WZfw=="],
+
     "@dimforge/rapier3d-compat": ["@dimforge/rapier3d-compat@0.12.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@dimforge/rapier3d-compat/-/rapier3d-compat-0.12.0.tgz", {}, "sha512-uekIGetywIgopfD97oDL5PfeezkFpNhwlzlaEYNOA0N6ghdsOvh/HYjSMek5Q2O1PYvRSDFcqFVJl4r4ZBwOow=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.9.2", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-3U4+MIWHImeyu1wnmVygh5WlgfYDtyf0k8AbLhMFxOipihf6nrWC4syIm/SwEeec0mNSafiiNnMJwbza/Is6Lw=="],
@@ -348,6 +351,10 @@
 
     "@loaders.gl/core": ["@loaders.gl/core@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/core/-/core-4.4.1.tgz", { "dependencies": { "@loaders.gl/loader-utils": "4.4.1", "@loaders.gl/schema": "4.4.1", "@loaders.gl/schema-utils": "4.4.1", "@loaders.gl/worker-utils": "4.4.1", "@probe.gl/log": "^4.1.1" } }, "sha512-/s4IuvCCQUepvhjLnmePwQppGko2d1pxRS+sp7lyExU0uiqo5dVsAKaCZ2VnddBkFWgDVb/wvcZUBmv/dWcj0Q=="],
 
+    "@loaders.gl/draco": ["@loaders.gl/draco@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/draco/-/draco-4.4.2.tgz", { "dependencies": { "@loaders.gl/loader-utils": "4.4.2", "@loaders.gl/schema": "4.4.2", "@loaders.gl/schema-utils": "4.4.2", "@loaders.gl/worker-utils": "4.4.2", "draco3d": "1.5.7" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-UByWIt/yhxMFBIlyoqJYaj0rnTz/wwDWbI4CVQc/MzbLZW7NtUkDyYDcjbjE2SBWpu6Ef4ryojGd/NWIA3Yknw=="],
+
+    "@loaders.gl/gltf": ["@loaders.gl/gltf@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/gltf/-/gltf-4.4.2.tgz", { "dependencies": { "@loaders.gl/draco": "4.4.2", "@loaders.gl/images": "4.4.2", "@loaders.gl/loader-utils": "4.4.2", "@loaders.gl/schema": "4.4.2", "@loaders.gl/textures": "4.4.2", "@math.gl/core": "^4.1.0" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-aBvI7P/1GxePdHIvuyTM4A8yt3F5ph4dq0mkyJHmEjBl1Cwh3mDZJI1JSlZAFVilTZ6NxJZOiHUYWe1pBloVvw=="],
+
     "@loaders.gl/images": ["@loaders.gl/images@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/images/-/images-4.4.1.tgz", { "dependencies": { "@loaders.gl/loader-utils": "4.4.1" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-v9A4BliEKGxhLuEbh0Ke8ElUlp04KxpKIknUtXXWoEaszAMTSrHI3YhaL/JdRlHraC1VUF/sjzbSBFkKh7nxJg=="],
 
     "@loaders.gl/loader-utils": ["@loaders.gl/loader-utils@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/loader-utils/-/loader-utils-4.4.1.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.1", "@loaders.gl/worker-utils": "4.4.1", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1" } }, "sha512-waosL7VtVRfXsNOXtAM3rOjZyNQD0lQBlhuB5/oY+E+lNzYNFlzgiGXiDOwBpcs7dK7kW2Vv8+KcxyIGIyXOtg=="],
@@ -355,6 +362,8 @@
     "@loaders.gl/schema": ["@loaders.gl/schema@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema/-/schema-4.4.1.tgz", { "dependencies": { "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" } }, "sha512-s7NjEnyK6jZvJJSWj/mHq+S9mHRHVzIYtFP+C7sMf1gVCQbdkt6OSAMUWRzwPr9+whQNVWjZ9pbLsI/IPW3zvw=="],
 
     "@loaders.gl/schema-utils": ["@loaders.gl/schema-utils@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema-utils/-/schema-utils-4.4.1.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.1", "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-4upip2O6MFaWzk68/lnna7P2uRj9NQ8MIk/ff3CLbciP5/9lKl1qyuzObz5JrJRYzfGB6I81vpOn6FSVQ6m6KQ=="],
+
+    "@loaders.gl/textures": ["@loaders.gl/textures@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/textures/-/textures-4.4.2.tgz", { "dependencies": { "@loaders.gl/images": "4.4.2", "@loaders.gl/loader-utils": "4.4.2", "@loaders.gl/schema": "4.4.2", "@loaders.gl/worker-utils": "4.4.2", "@math.gl/types": "^4.1.0", "ktx-parse": "^0.7.0", "texture-compressor": "^1.0.2" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-+GKcHEE0GjpuSJ6qbuRsB0CaOSUhJ1epUvhMP5GVK7I6+bwSvG8nqmRRGXFQNmYsbFANwG+wjwKf16wqJwP6vg=="],
 
     "@loaders.gl/worker-utils": ["@loaders.gl/worker-utils@4.4.1", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/worker-utils/-/worker-utils-4.4.1.tgz", { "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-ovMyIyj9dlChuHuD64Bel7Mir2UYlmLqlZ9MMzVxzTTLvaudJoNAXi6Disp0ooxwF62ZqjNXXutaSbS6UDeuIg=="],
 
@@ -367,6 +376,8 @@
     "@luma.gl/core": ["@luma.gl/core@9.3.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@luma.gl/core/-/core-9.3.3.tgz", { "dependencies": { "@math.gl/types": "^4.1.0", "@probe.gl/env": "^4.1.1", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1", "@types/offscreencanvas": "^2019.7.3" } }, "sha512-jCFm2htvrVpcXIy85TBTF1ROgMfknKnfw2OH+Vydr41hiCFd6nqr79gM3f2uhaNkal0BghFNqF3qDioKiUWtew=="],
 
     "@luma.gl/engine": ["@luma.gl/engine@9.3.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@luma.gl/engine/-/engine-9.3.3.tgz", { "dependencies": { "@math.gl/core": "^4.1.0", "@math.gl/types": "^4.1.0", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1" }, "peerDependencies": { "@luma.gl/core": "~9.3.0", "@luma.gl/shadertools": "~9.3.0" } }, "sha512-StmMTzUcUlpKMU3wvWU48A6OQyphptD9zVGBsSkK6iHIBdtBKlOcmqRkyfvRouo8JHtlrnoJDHLVKhxorwhGAg=="],
+
+    "@luma.gl/gltf": ["@luma.gl/gltf@9.3.3", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@luma.gl/gltf/-/gltf-9.3.3.tgz", { "dependencies": { "@loaders.gl/core": "~4.4.0", "@loaders.gl/gltf": "~4.4.0", "@loaders.gl/textures": "~4.4.0", "@math.gl/core": "^4.1.0" }, "peerDependencies": { "@luma.gl/core": "~9.3.0", "@luma.gl/engine": "~9.3.0", "@luma.gl/shadertools": "~9.3.0" } }, "sha512-/wty4PHYeQelXvDJesyuMdqtAfpL1XcyEQffcEAwKwu9w7JdkygSShdUwTT1iF7no0uGKuWgq824dVC9WBBQcw=="],
 
     "@luma.gl/shadertools": ["@luma.gl/shadertools@9.3.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@luma.gl/shadertools/-/shadertools-9.3.3.tgz", { "dependencies": { "@math.gl/core": "^4.1.0", "@math.gl/types": "^4.1.0" }, "peerDependencies": { "@luma.gl/core": "~9.3.0" } }, "sha512-4ZfG4/Utix951vqyiG/JIx+Eg+GMNwOxgr/07/i0gf7bK1gJZIEQ5BxVcDw4MCQfdoVlGPGzl0cQKbdqBvaCAQ=="],
 
@@ -1230,6 +1241,8 @@
 
     "domutils": ["domutils@3.2.2", "", { "dependencies": { "dom-serializer": "^2.0.0", "domelementtype": "^2.3.0", "domhandler": "^5.0.3" } }, "sha512-6kZKyUajlDuqlHKVX1w7gyslj9MPIXzIFiz/rGu35uC1wMi+kMhQwGhl4lt9unC9Vb9INnY9Z3/ZA3+FhASLaw=="],
 
+    "draco3d": ["draco3d@1.5.7", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/draco3d/-/draco3d-1.5.7.tgz", {}, "sha512-m6WCKt/erDXcw+70IJXnG7M3awwQPAsZvJGX5zY7beBqpELw6RDGkYVU0W43AFxye4pDZ5i2Lbyc/NNGqwjUVQ=="],
+
     "earcut": ["earcut@2.2.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/earcut/-/earcut-2.2.4.tgz", {}, "sha512-/pjZsA1b4RPHbeWZQn66SWS8nZZWLQQ23oE3Eam7aroEFGEvwKAsJfZ9ytiEMycfzXWpca4FA9QIOehf7PocBQ=="],
 
     "electron-to-chromium": ["electron-to-chromium@1.5.336", "", {}, "sha512-AbH9q9J455r/nLmdNZes0G0ZKcRX73FicwowalLs6ijwOmCJSRRrLX63lcAlzy9ux3dWK1w1+1nsBJEWN11hcQ=="],
@@ -1380,6 +1393,8 @@
 
     "ignore": ["ignore@5.3.2", "", {}, "sha512-hsBTNUqQTDwkWtcdYI2i06Y/nUBEsNEDJKjWdigLvegy8kDuJAS8uRlpkkcQpyEXL0Z/pjDy5HBmMjRCJ2gq+g=="],
 
+    "image-size": ["image-size@0.7.5", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/image-size/-/image-size-0.7.5.tgz", { "bin": { "image-size": "bin/image-size.js" } }, "sha512-Hiyv+mXHfFEP7LzUL/llg9RwFxxY+o9N3JVLIeG5E7iFIFAalxvRU9UZthBdYDEVnzHMgjnKJPPpay5BWf1g9g=="],
+
     "immer": ["immer@10.2.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/immer/-/immer-10.2.0.tgz", {}, "sha512-d/+XTN3zfODyjr89gM3mPq1WNX2B8pYsu7eORitdwyA2sBubnTl3laYlBk4sXY5FUa5qTZGBDPJICVbvqzjlbw=="],
 
     "import-fresh": ["import-fresh@3.3.1", "", { "dependencies": { "parent-module": "^1.0.0", "resolve-from": "^4.0.0" } }, "sha512-TR3KfrTZTYLPB6jUjfx6MF9WcWrHL9su5TObK4ZkYgBdWKPOFoSoQIdEuTuR82pmtxH2spWG9h6etwfr1pLBqQ=="],
@@ -1447,6 +1462,8 @@
     "kind-of": ["kind-of@6.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/kind-of/-/kind-of-6.0.3.tgz", {}, "sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw=="],
 
     "kleur": ["kleur@4.1.5", "", {}, "sha512-o+NO+8WrRiQEE4/7nwRJhN1HWpVmJm511pBHUxPLtp0BUISzlBplORYSmTclCnJvQq2tKu/sgl3xVpkc7ZWuQQ=="],
+
+    "ktx-parse": ["ktx-parse@0.7.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/ktx-parse/-/ktx-parse-0.7.1.tgz", {}, "sha512-FeA3g56ksdFNwjXJJsc1CCc7co+AJYDp6ipIp878zZ2bU8kWROatLYf39TQEd4/XRSUvBXovQ8gaVKWPXsCLEQ=="],
 
     "leaflet": ["leaflet@1.9.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/leaflet/-/leaflet-1.9.4.tgz", {}, "sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA=="],
 
@@ -1720,6 +1737,8 @@
 
     "splaytree-ts": ["splaytree-ts@1.0.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/splaytree-ts/-/splaytree-ts-1.0.2.tgz", {}, "sha512-0kGecIZNIReCSiznK3uheYB8sbstLjCZLiwcQwbmLhgHJj2gz6OnSPkVzJQCMnmEz1BQ4gPK59ylhBoEWOhGNA=="],
 
+    "sprintf-js": ["sprintf-js@1.0.3", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/sprintf-js/-/sprintf-js-1.0.3.tgz", {}, "sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g=="],
+
     "srvx": ["srvx@0.11.15", "", { "bin": "bin/srvx.mjs" }, "sha512-iXsux0UcOjdvs0LCMa2Ws3WwcDUozA3JN3BquNXkaFPP7TpRqgunKdEgoZ/uwb1J6xaYHfxtz9Twlh6yzwM6Tg=="],
 
     "stackback": ["stackback@0.0.2", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/stackback/-/stackback-0.0.2.tgz", {}, "sha512-1XMJE5fQo1jGH6Y/7ebnwPOBEkIEnT4QF32d5R1+VXdXveM0IBMJt8zfaxX1P3QhVwrYe+576+jkANtSS2mBbw=="],
@@ -1759,6 +1778,8 @@
     "tapable": ["tapable@2.3.2", "", {}, "sha512-1MOpMXuhGzGL5TTCZFItxCc0AARf1EZFQkGqMm7ERKj8+Hgr5oLvJOVFcC+lRmR8hCe2S3jC4T5D7Vg/d7/fhA=="],
 
     "text-segmentation": ["text-segmentation@1.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/text-segmentation/-/text-segmentation-1.0.3.tgz", { "dependencies": { "utrie": "^1.0.2" } }, "sha512-iOiPUo/BGnZ6+54OsWxZidGCsdU8YbE4PSpdPinp7DeMtUJNJBoJ/ouUSTJjHkh1KntHaltHl/gDs2FC4i5+Nw=="],
+
+    "texture-compressor": ["texture-compressor@1.0.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/texture-compressor/-/texture-compressor-1.0.2.tgz", { "dependencies": { "argparse": "^1.0.10", "image-size": "^0.7.4" }, "bin": { "texture-compressor": "./bin/texture-compressor.js" } }, "sha512-dStVgoaQ11mA5htJ+RzZ51ZxIZqNOgWKAIvtjLrW1AliQQLCmrDqNzQZ8Jh91YealQ95DXt4MEduLzJmbs6lig=="],
 
     "thenify": ["thenify@3.3.1", "", { "dependencies": { "any-promise": "^1.0.0" } }, "sha512-RVZSIV5IG10Hk3enotrhvz0T9em6cyHBLkH/YAZuKqd8hRkKhSfCGIcP2KUY0EPxndzANBmNllzWPwak+bheSw=="],
 
@@ -1906,6 +1927,28 @@
 
     "@eslint/eslintrc/globals": ["globals@14.0.0", "", {}, "sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ=="],
 
+    "@loaders.gl/draco/@loaders.gl/loader-utils": ["@loaders.gl/loader-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/loader-utils/-/loader-utils-4.4.2.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.2", "@loaders.gl/worker-utils": "4.4.2", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1" } }, "sha512-kqwBbyRC7rrQVsnJyKeoaig9hxaa5oj91OKqWm27HPuVn4q2dD67SEhiG0ND62eRp0tLY6jTqEcI5kDzHBZ6MA=="],
+
+    "@loaders.gl/draco/@loaders.gl/schema": ["@loaders.gl/schema@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema/-/schema-4.4.2.tgz", { "dependencies": { "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" } }, "sha512-mJTZehTHIFl8ed+03nebuPAMnLP8Yp00DKTzCnKT2HNy/uV4+Sw+GrGIuhPHGU8tdQmtBXRURGM2ZxUAxMfGKg=="],
+
+    "@loaders.gl/draco/@loaders.gl/schema-utils": ["@loaders.gl/schema-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema-utils/-/schema-utils-4.4.2.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.2", "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-yYYRD/POBEO72rhIyLASrqKUUhfIOQuFk/fgInN6Td2qvFgsHbo5UaCM4sTqVUWwNxNvXDQi8ezpbnCa/yi+OQ=="],
+
+    "@loaders.gl/draco/@loaders.gl/worker-utils": ["@loaders.gl/worker-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/worker-utils/-/worker-utils-4.4.2.tgz", { "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-oiZ0SoC1QKrOkhYPlVZ6Q06CtmuFRyZw2rwzmT08ZyaGtOArIJHDjlhxzwWiv+6fdws47Ub5uIGsdI1Ab1xYsA=="],
+
+    "@loaders.gl/gltf/@loaders.gl/images": ["@loaders.gl/images@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/images/-/images-4.4.2.tgz", { "dependencies": { "@loaders.gl/loader-utils": "4.4.2" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-b+1keNvPlyLniWtX4ZaThz2dF2aohi8Q+OEsDF2hJNZYyZJOqP9b/72UhlVk+inxTJfTLRBNARs2TJ2ssBlelg=="],
+
+    "@loaders.gl/gltf/@loaders.gl/loader-utils": ["@loaders.gl/loader-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/loader-utils/-/loader-utils-4.4.2.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.2", "@loaders.gl/worker-utils": "4.4.2", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1" } }, "sha512-kqwBbyRC7rrQVsnJyKeoaig9hxaa5oj91OKqWm27HPuVn4q2dD67SEhiG0ND62eRp0tLY6jTqEcI5kDzHBZ6MA=="],
+
+    "@loaders.gl/gltf/@loaders.gl/schema": ["@loaders.gl/schema@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema/-/schema-4.4.2.tgz", { "dependencies": { "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" } }, "sha512-mJTZehTHIFl8ed+03nebuPAMnLP8Yp00DKTzCnKT2HNy/uV4+Sw+GrGIuhPHGU8tdQmtBXRURGM2ZxUAxMfGKg=="],
+
+    "@loaders.gl/textures/@loaders.gl/images": ["@loaders.gl/images@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/images/-/images-4.4.2.tgz", { "dependencies": { "@loaders.gl/loader-utils": "4.4.2" }, "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-b+1keNvPlyLniWtX4ZaThz2dF2aohi8Q+OEsDF2hJNZYyZJOqP9b/72UhlVk+inxTJfTLRBNARs2TJ2ssBlelg=="],
+
+    "@loaders.gl/textures/@loaders.gl/loader-utils": ["@loaders.gl/loader-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/loader-utils/-/loader-utils-4.4.2.tgz", { "dependencies": { "@loaders.gl/schema": "4.4.2", "@loaders.gl/worker-utils": "4.4.2", "@probe.gl/log": "^4.1.1", "@probe.gl/stats": "^4.1.1" } }, "sha512-kqwBbyRC7rrQVsnJyKeoaig9hxaa5oj91OKqWm27HPuVn4q2dD67SEhiG0ND62eRp0tLY6jTqEcI5kDzHBZ6MA=="],
+
+    "@loaders.gl/textures/@loaders.gl/schema": ["@loaders.gl/schema@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/schema/-/schema-4.4.2.tgz", { "dependencies": { "@types/geojson": "^7946.0.7", "apache-arrow": ">= 17.0.0" } }, "sha512-mJTZehTHIFl8ed+03nebuPAMnLP8Yp00DKTzCnKT2HNy/uV4+Sw+GrGIuhPHGU8tdQmtBXRURGM2ZxUAxMfGKg=="],
+
+    "@loaders.gl/textures/@loaders.gl/worker-utils": ["@loaders.gl/worker-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/worker-utils/-/worker-utils-4.4.2.tgz", { "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-oiZ0SoC1QKrOkhYPlVZ6Q06CtmuFRyZw2rwzmT08ZyaGtOArIJHDjlhxzwWiv+6fdws47Ub5uIGsdI1Ab1xYsA=="],
+
     "@maplibre/maplibre-gl-style-spec/quickselect": ["quickselect@2.0.0", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/quickselect/-/quickselect-2.0.0.tgz", {}, "sha512-RKJ22hX8mHe3Y6wH/N3wCM6BWtjaxIyyUIkpHOvfFnxdI4yD4tBXEBKSbriGujF6jnSVkJrffuo6vxACiSSxIw=="],
 
     "@poppinss/dumper/supports-color": ["supports-color@10.2.2", "", {}, "sha512-SS+jx45GF1QjgEXQx4NJZV9ImqmO2NPz5FNsIHrsDjh2YsHnawpan7SNQ1o8NuhrbHZy9AZhIoCUiCeaW/C80g=="],
@@ -2006,7 +2049,11 @@
 
     "sweepline-intersections/tinyqueue": ["tinyqueue@2.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/tinyqueue/-/tinyqueue-2.0.3.tgz", {}, "sha512-ppJZNDuKGgxzkHihX8v9v9G5f+18gzaTfrukGrq6ueg0lmH4nqVnA2IPG0AEH3jKEk2GRJCUhDoqpoiw3PHLBA=="],
 
+    "texture-compressor/argparse": ["argparse@1.0.10", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/argparse/-/argparse-1.0.10.tgz", { "dependencies": { "sprintf-js": "~1.0.2" } }, "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg=="],
+
     "wrangler/esbuild": ["esbuild@0.27.3", "", { "optionalDependencies": { "@esbuild/aix-ppc64": "0.27.3", "@esbuild/android-arm": "0.27.3", "@esbuild/android-arm64": "0.27.3", "@esbuild/android-x64": "0.27.3", "@esbuild/darwin-arm64": "0.27.3", "@esbuild/darwin-x64": "0.27.3", "@esbuild/freebsd-arm64": "0.27.3", "@esbuild/freebsd-x64": "0.27.3", "@esbuild/linux-arm": "0.27.3", "@esbuild/linux-arm64": "0.27.3", "@esbuild/linux-ia32": "0.27.3", "@esbuild/linux-loong64": "0.27.3", "@esbuild/linux-mips64el": "0.27.3", "@esbuild/linux-ppc64": "0.27.3", "@esbuild/linux-riscv64": "0.27.3", "@esbuild/linux-s390x": "0.27.3", "@esbuild/linux-x64": "0.27.3", "@esbuild/netbsd-arm64": "0.27.3", "@esbuild/netbsd-x64": "0.27.3", "@esbuild/openbsd-arm64": "0.27.3", "@esbuild/openbsd-x64": "0.27.3", "@esbuild/openharmony-arm64": "0.27.3", "@esbuild/sunos-x64": "0.27.3", "@esbuild/win32-arm64": "0.27.3", "@esbuild/win32-ia32": "0.27.3", "@esbuild/win32-x64": "0.27.3" }, "bin": "bin/esbuild" }, "sha512-8VwMnyGCONIs6cWue2IdpHxHnAjzxnw2Zr7MkVxB2vjmQ2ivqGFb4LEG3SMnv0Gb2F/G/2yA8zUaiL1gywDCCg=="],
+
+    "@loaders.gl/gltf/@loaders.gl/loader-utils/@loaders.gl/worker-utils": ["@loaders.gl/worker-utils@4.4.2", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@loaders.gl/worker-utils/-/worker-utils-4.4.2.tgz", { "peerDependencies": { "@loaders.gl/core": "~4.4.0" } }, "sha512-oiZ0SoC1QKrOkhYPlVZ6Q06CtmuFRyZw2rwzmT08ZyaGtOArIJHDjlhxzwWiv+6fdws47Ub5uIGsdI1Ab1xYsA=="],
 
     "@typescript-eslint/typescript-estree/minimatch/brace-expansion": ["brace-expansion@5.0.5", "", { "dependencies": { "balanced-match": "^4.0.2" } }, "sha512-VZznLgtwhn+Mact9tfiwx64fA9erHH/MCXEUfB/0bX/6Fz6ny5EGTXYltMocqg4xFAQZtnO3DHWWXi8RiuN7cQ=="],
 
