@@ -34,6 +34,7 @@ import {
   BarChart3,
   Satellite,
   MapPin,
+  Scissors,
 } from "lucide-react";
 
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
@@ -143,6 +144,12 @@ function AuthenticatedLayout() {
       to: "/dashboard/drilling",
       icon: <Drill className="w-3.5 h-3.5" />,
       label: "Sondajes",
+      group: "FIELD",
+    },
+    canAccess(role, "drilling") && {
+      to: "/dashboard/section",
+      icon: <Scissors className="w-3.5 h-3.5" />,
+      label: "Sección 3D",
       group: "FIELD",
     },
     {

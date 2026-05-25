@@ -113,6 +113,229 @@ export const compositeHole = createServerFn({ method: "POST" })
   });
 
 // ---------------------------------------------------------------------------
+// /section — corte vertical arbitrario sobre sondajes de un proyecto
+// ---------------------------------------------------------------------------
+type SectionTrajOut = {
+  hole_id: string;
+  hole_code: string | null;
+  points: Array<{ md: number; s: number; h: number; d: number; in_band: boolean }>;
+  intercepts: Array<Record<string, number | string | null>>;
+};
+type SectionOut = {
+  azimuth_deg: number;
+  band_m: number;
+  trajectories: SectionTrajOut[];
+  extra_points: Array<Record<string, number | string | null>>;
+  bounds: { s_min: number; s_max: number; h_min: number; h_max: number };
+};
+
+export const sectionProject = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        projectId: z.string().uuid(),
+        origin_x: z.number(),
+        origin_y: z.number(),
+        origin_z: z.number().default(0),
+        azimuth_deg: z.number().min(0).max(360),
+        band_m: z.number().gt(0).lte(2000).default(50),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }): Promise<SectionOut> => {
+    const { supabase } = context;
+    const { data: holes, error } = await supabase
+      .from("drill_holes")
+      .select("id,hole_id")
+      .eq("project_id", data.projectId);
+    if (error) throw new Error(error.message);
+    const holeIds = (holes ?? []).map((h) => h.id);
+    if (holeIds.length === 0) {
+      return {
+        azimuth_deg: data.azimuth_deg,
+        band_m: data.band_m,
+        trajectories: [],
+        extra_points: [],
+        bounds: { s_min: 0, s_max: 0, h_min: 0, h_max: 0 },
+      };
+    }
+    const { data: trajRows } = await supabase
+      .from("drill_hole_trajectories")
+      .select("hole_id,points")
+      .in("hole_id", holeIds);
+
+    const trajectories = (trajRows ?? []).map((t) => {
+      const meta = holes!.find((h) => h.id === t.hole_id);
+      return {
+        hole_id: t.hole_id,
+        hole_code: meta?.hole_id ?? null,
+        points: (t.points as Array<{ md: number; x: number; y: number; z: number }>) ?? [],
+      };
+    });
+
+    const token = process.env.MINING_ENGINE_TOKEN;
+    const r = await fetch(`${engineBase()}/section`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        origin_x: data.origin_x,
+        origin_y: data.origin_y,
+        origin_z: data.origin_z,
+        azimuth_deg: data.azimuth_deg,
+        band_m: data.band_m,
+        trajectories,
+        extra_points: [],
+      }),
+    });
+    const txt = await r.text();
+    if (!r.ok) throw new Error(`mining-engine /section ${r.status}: ${txt}`);
+    return JSON.parse(txt) as SectionOut;
+  });
+
+// ---------------------------------------------------------------------------
+// /wireframe-rbf — superficie implícita para indicador binario (ore/waste)
+// ---------------------------------------------------------------------------
+export const wireframeFromComposites = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        samples: z
+          .array(
+            z.object({
+              x: z.number(),
+              y: z.number(),
+              z: z.number(),
+              indicator: z.number().min(0).max(1),
+            }),
+          )
+          .min(4),
+        iso: z.number().min(0).max(1).default(0.5),
+        grid_n: z.number().int().min(8).max(80).default(32),
+        pad: z.number().min(0).max(1000).default(50),
+        smooth: z.number().min(0).max(1000).default(5),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const token = process.env.MINING_ENGINE_TOKEN;
+    const r = await fetch(`${engineBase()}/wireframe-rbf`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(data),
+    });
+    const txt = await r.text();
+    if (!r.ok) throw new Error(`mining-engine /wireframe-rbf ${r.status}: ${txt}`);
+    return JSON.parse(txt) as {
+      status: string;
+      vertices: number[][];
+      faces: number[][];
+      bbox?: { min: number[]; max: number[] };
+      volume_m3?: number;
+      samples_used?: number;
+      iso?: number;
+      grid_n?: number;
+    };
+  });
+
+// ---------------------------------------------------------------------------
+// /swath-plot — validación visual compositos vs bloques estimados
+// ---------------------------------------------------------------------------
+export const swathPlotForModel = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        modelId: z.string().uuid(),
+        axis: z.enum(["x", "y", "z"]).default("z"),
+        n_bands: z.number().int().min(5).max(100).default(20),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: blocks, error: bErr } = await supabase
+      .from("resource_blocks")
+      .select("x,y,z,grade")
+      .eq("model_id", data.modelId)
+      .not("grade", "is", null)
+      .limit(10000);
+    if (bErr) throw new Error(bErr.message);
+
+    // Compositos: drill_core_logs georef via collares — promediamos con elevation.
+    const { data: model } = await supabase
+      .from("resource_models")
+      .select("project_id,commodity")
+      .eq("id", data.modelId)
+      .maybeSingle();
+    if (!model) throw new Error("modelo no encontrado");
+
+    const valueCol =
+      model.commodity === "au" ? "au_gpt" : model.commodity === "ag" ? "ag_gpt" : "cu_pct";
+
+    const { data: comp } = await supabase
+      .from("drill_core_logs")
+      .select(
+        `depth_from,depth_to,${valueCol},drill_holes!inner(easting,northing,elevation,project_id)`,
+      )
+      .eq("drill_holes.project_id", model.project_id)
+      .not(valueCol, "is", null)
+      .limit(20000);
+
+    const composites = (comp ?? []).map((row: Record<string, unknown>) => {
+      const h = row.drill_holes as { easting: number; northing: number; elevation: number };
+      const mid = (Number(row.depth_from) + Number(row.depth_to)) / 2;
+      return {
+        x: Number(h.easting),
+        y: Number(h.northing),
+        z: Number(h.elevation) - mid,
+        grade: Number(row[valueCol]),
+      };
+    });
+
+    const token = process.env.MINING_ENGINE_TOKEN;
+    const r = await fetch(`${engineBase()}/swath-plot`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify({
+        composites,
+        blocks: (blocks ?? []).map((b) => ({
+          x: Number(b.x),
+          y: Number(b.y),
+          z: Number(b.z),
+          grade: Number(b.grade),
+        })),
+        axis: data.axis,
+        n_bands: data.n_bands,
+      }),
+    });
+    const txt = await r.text();
+    if (!r.ok) throw new Error(`mining-engine /swath-plot ${r.status}: ${txt}`);
+    return JSON.parse(txt) as {
+      axis: string;
+      bands: Array<{
+        center: number;
+        low: number;
+        high: number;
+        n_composites: number;
+        n_blocks: number;
+        mean_composites: number | null;
+        mean_blocks: number | null;
+      }>;
+    };
+  });
+
+// ---------------------------------------------------------------------------
 // Diagnóstico (página /diag/mining-engine)
 // ---------------------------------------------------------------------------
 export const testMiningEngine = createServerFn({ method: "GET" }).handler(async () => {
