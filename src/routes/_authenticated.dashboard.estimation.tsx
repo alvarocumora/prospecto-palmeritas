@@ -37,6 +37,7 @@ import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
 import { SwathPlotPanel } from "@/components/estimation/SwathPlotPanel";
 import { WireframeStudio } from "@/components/estimation/WireframeStudio";
+import { PitOptimPanel } from "@/components/estimation/PitOptimPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
