@@ -154,10 +154,19 @@ export function GeoSceneCanvas({ mode }: Props) {
       satAnomaliesLayer,
       holesColumnLayer,
       ...trajectoryLayers,
+      ...wireframeLayers,
       anomaliesLayer,
     ].filter(Boolean);
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
+  }, [
+    ready,
+    targetsLayer,
+    satAnomaliesLayer,
+    holesColumnLayer,
+    trajectoryLayers,
+    wireframeLayers,
+    anomaliesLayer,
+  ]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
