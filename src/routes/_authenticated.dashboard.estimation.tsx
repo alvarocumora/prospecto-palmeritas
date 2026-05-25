@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
+import { SwathPlotPanel } from "@/components/estimation/SwathPlotPanel";
+import { WireframeStudio } from "@/components/estimation/WireframeStudio";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
@@ -276,13 +278,22 @@ function ModelCard({
       </div>
 
       {model.status === "complete" && (
-        <div className="pt-2 border-t border-border">
+        <div className="pt-2 border-t border-border space-y-3">
           <EconomicScenariosPanel
             modelId={model.id}
             modelName={model.name}
             commodity={model.commodity}
             writable={writable}
           />
+          <SwathPlotPanel modelId={model.id} unit={unit} />
+          <details className="border border-border rounded">
+            <summary className="px-2 py-1.5 text-[10px] font-mono cursor-pointer uppercase text-text-dim hover:text-foreground">
+              Modelado implícito (RBF wireframe)
+            </summary>
+            <div className="p-2">
+              <WireframeStudio model={model} />
+            </div>
+          </details>
         </div>
       )}
     </div>
