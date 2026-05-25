@@ -31,6 +31,7 @@ import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.s
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
+import { Route as AuthenticatedDashboardSectionRouteImport } from './routes/_authenticated.dashboard.section'
 import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
 import { Route as AuthenticatedDashboardSat3dRouteImport } from './routes/_authenticated.dashboard.sat3d'
 import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
@@ -182,6 +183,12 @@ const AuthenticatedDashboardTargetsRoute =
   AuthenticatedDashboardTargetsRouteImport.update({
     id: '/dashboard/targets',
     path: '/dashboard/targets',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSectionRoute =
+  AuthenticatedDashboardSectionRouteImport.update({
+    id: '/dashboard/section',
+    path: '/dashboard/section',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSatelliteIntelRoute =
@@ -466,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
+  '/dashboard/section': typeof AuthenticatedDashboardSectionRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -528,6 +536,7 @@ export interface FileRoutesByTo {
   '/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
+  '/dashboard/section': typeof AuthenticatedDashboardSectionRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -592,6 +601,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/sampling': typeof AuthenticatedDashboardSamplingRoute
   '/_authenticated/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/_authenticated/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
+  '/_authenticated/dashboard/section': typeof AuthenticatedDashboardSectionRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
@@ -656,6 +666,7 @@ export interface FileRouteTypes {
     | '/dashboard/sampling'
     | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
+    | '/dashboard/section'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
@@ -718,6 +729,7 @@ export interface FileRouteTypes {
     | '/dashboard/sampling'
     | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
+    | '/dashboard/section'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
@@ -781,6 +793,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sampling'
     | '/_authenticated/dashboard/sat3d'
     | '/_authenticated/dashboard/satellite-intel'
+    | '/_authenticated/dashboard/section'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
@@ -974,6 +987,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/targets'
       fullPath: '/dashboard/targets'
       preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/section': {
+      id: '/_authenticated/dashboard/section'
+      path: '/dashboard/section'
+      fullPath: '/dashboard/section'
+      preLoaderRoute: typeof AuthenticatedDashboardSectionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/satellite-intel': {
@@ -1346,6 +1366,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardSamplingRoute: typeof AuthenticatedDashboardSamplingRoute
   AuthenticatedDashboardSat3dRoute: typeof AuthenticatedDashboardSat3dRoute
   AuthenticatedDashboardSatelliteIntelRoute: typeof AuthenticatedDashboardSatelliteIntelRoute
+  AuthenticatedDashboardSectionRoute: typeof AuthenticatedDashboardSectionRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRouteWithChildren
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
@@ -1392,6 +1413,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardSat3dRoute: AuthenticatedDashboardSat3dRoute,
   AuthenticatedDashboardSatelliteIntelRoute:
     AuthenticatedDashboardSatelliteIntelRoute,
+  AuthenticatedDashboardSectionRoute: AuthenticatedDashboardSectionRoute,
   AuthenticatedDashboardTargetsRoute:
     AuthenticatedDashboardTargetsRouteWithChildren,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
