@@ -287,6 +287,7 @@ function ModelCard({
             writable={writable}
           />
           <SwathPlotPanel modelId={model.id} unit={unit} />
+          <PitOptimPanel modelId={model.id} commodity={model.commodity} writable={writable} />
           <details className="border border-border rounded">
             <summary className="px-2 py-1.5 text-[10px] font-mono cursor-pointer uppercase text-text-dim hover:text-foreground">
               Modelado implícito (RBF wireframe)
