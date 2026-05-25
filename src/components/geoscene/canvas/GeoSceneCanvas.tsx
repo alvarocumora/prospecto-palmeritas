@@ -95,6 +95,12 @@ export function GeoSceneCanvas({ mode }: Props) {
     active?.id ?? null,
     surfaceMode,
   );
+  const { layers: wireframeLayers, count: wireframeCount } = useWireframesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
 
   // Init map
   useEffect(() => {
