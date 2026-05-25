@@ -138,6 +138,29 @@ function DiagMiningEngine() {
           </pre>
         )}
       </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold">Scheduling NPV anual</h2>
+          <button
+            onClick={() => sched.refetch()}
+            className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground"
+            disabled={sched.isFetching}
+          >
+            {sched.isFetching ? "…" : "Probar"}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Sobre el escenario con pit más reciente: empaca bloques in-pit por banco + margen,
+          descuenta cashflow anual y persiste <code>economic_schedule</code> + NPV/IRR/payback.
+        </p>
+        {sched.error && <pre className="text-destructive text-xs">{String(sched.error)}</pre>}
+        {sched.data && (
+          <pre className="text-xs p-3 bg-muted rounded-md overflow-auto max-h-96">
+            {JSON.stringify(sched.data, null, 2)}
+          </pre>
+        )}
+      </section>
     </div>
   );
 }
