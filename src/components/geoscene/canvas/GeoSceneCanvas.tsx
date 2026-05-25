@@ -189,9 +189,22 @@ export function GeoSceneCanvas({ mode }: Props) {
 
   const layerCount = useMemo(
     () =>
-      [targetsLayer, satAnomaliesLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer]
-        .filter(Boolean).length,
-    [targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer],
+      [
+        targetsLayer,
+        satAnomaliesLayer,
+        holesColumnLayer,
+        ...trajectoryLayers,
+        ...wireframeLayers,
+        anomaliesLayer,
+      ].filter(Boolean).length,
+    [
+      targetsLayer,
+      satAnomaliesLayer,
+      holesColumnLayer,
+      trajectoryLayers,
+      wireframeLayers,
+      anomaliesLayer,
+    ],
   );
 
   return (
@@ -214,6 +227,9 @@ export function GeoSceneCanvas({ mode }: Props) {
           <span className="ml-1 text-gold">
             · {holeCount} sondajes · {interceptCount} intercepts
           </span>
+        )}
+        {subsurfaceMode && wireframeCount > 0 && (
+          <span className="ml-1 text-gold">· {wireframeCount} wireframes</span>
         )}
         {subsurfaceMode && anomaliesCount > 0 && (
           <span className="ml-1 text-gold">· {anomaliesCount} anomalías</span>
