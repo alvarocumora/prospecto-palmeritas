@@ -10,8 +10,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Mountain, Loader2, TrendingUp } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Mountain, Loader2, TrendingUp, Box as BoxIcon } from "lucide-react";
 import { toast } from "sonner";
+import { SchedulePanel } from "./SchedulePanel";
+import { PitShell3DViewer } from "./PitShell3DViewer";
 
 type PitResult = Awaited<ReturnType<typeof optimizePit>>;
 
