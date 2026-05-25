@@ -15,6 +15,7 @@ import { useDrillHolesLayer } from "./useDrillHolesLayer";
 import { useDrillTrajectoriesLayer } from "./useDrillTrajectoriesLayer";
 import { useGeophysAnomaliesLayer } from "./useGeophysAnomaliesLayer";
 import { useSatAnomaliesLayer } from "./useSatAnomaliesLayer";
+import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import type { GeoSceneMode } from "../types";
@@ -94,6 +95,12 @@ export function GeoSceneCanvas({ mode }: Props) {
     active?.id ?? null,
     surfaceMode,
   );
+  const { layers: wireframeLayers, count: wireframeCount } = useWireframesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    subsurfaceMode,
+  );
 
   // Init map
   useEffect(() => {
@@ -147,10 +154,19 @@ export function GeoSceneCanvas({ mode }: Props) {
       satAnomaliesLayer,
       holesColumnLayer,
       ...trajectoryLayers,
+      ...wireframeLayers,
       anomaliesLayer,
     ].filter(Boolean);
     overlayRef.current.setProps({ layers });
-  }, [ready, targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer]);
+  }, [
+    ready,
+    targetsLayer,
+    satAnomaliesLayer,
+    holesColumnLayer,
+    trajectoryLayers,
+    wireframeLayers,
+    anomaliesLayer,
+  ]);
 
   // Anclajes del copilot → flyTo
   useEffect(() => {
@@ -173,9 +189,22 @@ export function GeoSceneCanvas({ mode }: Props) {
 
   const layerCount = useMemo(
     () =>
-      [targetsLayer, satAnomaliesLayer, holesColumnLayer, ...trajectoryLayers, anomaliesLayer]
-        .filter(Boolean).length,
-    [targetsLayer, satAnomaliesLayer, holesColumnLayer, trajectoryLayers, anomaliesLayer],
+      [
+        targetsLayer,
+        satAnomaliesLayer,
+        holesColumnLayer,
+        ...trajectoryLayers,
+        ...wireframeLayers,
+        anomaliesLayer,
+      ].filter(Boolean).length,
+    [
+      targetsLayer,
+      satAnomaliesLayer,
+      holesColumnLayer,
+      trajectoryLayers,
+      wireframeLayers,
+      anomaliesLayer,
+    ],
   );
 
   return (
@@ -198,6 +227,9 @@ export function GeoSceneCanvas({ mode }: Props) {
           <span className="ml-1 text-gold">
             · {holeCount} sondajes · {interceptCount} intercepts
           </span>
+        )}
+        {subsurfaceMode && wireframeCount > 0 && (
+          <span className="ml-1 text-gold">· {wireframeCount} wireframes</span>
         )}
         {subsurfaceMode && anomaliesCount > 0 && (
           <span className="ml-1 text-gold">· {anomaliesCount} anomalías</span>
