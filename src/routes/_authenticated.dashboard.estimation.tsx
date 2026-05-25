@@ -37,6 +37,7 @@ import { BlockModel3DViewer } from "@/components/estimation/BlockModel3DViewer";
 import { EconomicScenariosPanel } from "@/components/estimation/EconomicScenariosPanel";
 import { SwathPlotPanel } from "@/components/estimation/SwathPlotPanel";
 import { WireframeStudio } from "@/components/estimation/WireframeStudio";
+import { PitOptimPanel } from "@/components/estimation/PitOptimPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/estimation")({
   head: () => ({
@@ -286,6 +287,7 @@ function ModelCard({
             writable={writable}
           />
           <SwathPlotPanel modelId={model.id} unit={unit} />
+          <PitOptimPanel modelId={model.id} commodity={model.commodity} writable={writable} />
           <details className="border border-border rounded">
             <summary className="px-2 py-1.5 text-[10px] font-mono cursor-pointer uppercase text-text-dim hover:text-foreground">
               Modelado implícito (RBF wireframe)

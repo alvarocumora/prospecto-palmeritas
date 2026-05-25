@@ -6,6 +6,7 @@ import {
   testCompositeEndpoint,
   testWireframeEndpoint,
 } from "@/lib/miningEngine.functions";
+import { testPitOptim } from "@/lib/pitOptim.functions";
 
 export const Route = createFileRoute("/diag/mining-engine")({
   component: DiagMiningEngine,
@@ -15,6 +16,7 @@ function DiagMiningEngine() {
   const run = useServerFn(testMiningEngine);
   const runComp = useServerFn(testCompositeEndpoint);
   const runWf = useServerFn(testWireframeEndpoint);
+  const runPit = useServerFn(testPitOptim);
 
   const health = useQuery({ queryKey: ["diag-mining-engine"], queryFn: () => run() });
   const composite = useQuery({
@@ -25,6 +27,11 @@ function DiagMiningEngine() {
   const wireframe = useQuery({
     queryKey: ["diag-mining-engine-wireframe"],
     queryFn: () => runWf(),
+    enabled: false,
+  });
+  const pit = useQuery({
+    queryKey: ["diag-pit-optim"],
+    queryFn: () => runPit(),
     enabled: false,
   });
 
@@ -97,6 +104,30 @@ function DiagMiningEngine() {
         {wireframe.data && (
           <pre className="text-xs p-3 bg-muted rounded-md overflow-auto">
             {JSON.stringify(wireframe.data, null, 2)}
+          </pre>
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold">Pit Optimization (floating-cone)</h2>
+          <button
+            onClick={() => pit.refetch()}
+            className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground"
+            disabled={pit.isFetching}
+          >
+            {pit.isFetching ? "…" : "Probar"}
+          </button>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Toma el escenario económico más reciente con bloques estimados, computa valor por bloque
+          (NSR − OPEX), corre floating-cone con el slope del escenario y persiste{" "}
+          <code>resource_block_economics</code> + KPIs del pit en el escenario.
+        </p>
+        {pit.error && <pre className="text-destructive text-xs">{String(pit.error)}</pre>}
+        {pit.data && (
+          <pre className="text-xs p-3 bg-muted rounded-md overflow-auto">
+            {JSON.stringify(pit.data, null, 2)}
           </pre>
         )}
       </section>
