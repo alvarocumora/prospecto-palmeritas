@@ -176,11 +176,44 @@ export function PitOptimPanel({
                   Persistidos {result.persisted_block_econ} bloques en{" "}
                   <code>resource_block_economics</code> · {result.elapsed_ms} ms
                 </div>
+                <div className="col-span-2 md:col-span-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => setShow3d(true)}
+                  >
+                    <BoxIcon className="w-3 h-3 mr-1" /> Ver pit shell 3D
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {result && (
+              <div className="border-t border-border pt-2">
+                <div className="text-[9px] uppercase text-text-dim font-mono mb-1">
+                  Scheduling NPV anual
+                </div>
+                <SchedulePanel scenarioId={selected} disabled={!writable} />
               </div>
             )}
           </>
         )}
       </div>
+
+      <Dialog open={show3d} onOpenChange={setShow3d}>
+        <DialogContent className="max-w-5xl p-0 overflow-hidden">
+          <DialogHeader className="px-4 py-3 border-b border-border">
+            <DialogTitle className="font-mono text-sm flex items-center gap-2">
+              <BoxIcon className="w-4 h-4 text-signal-cyan" />
+              Pit shell 3D
+            </DialogTitle>
+          </DialogHeader>
+          <div className="p-3">
+            {selected && <PitShell3DViewer scenarioId={selected} />}
+          </div>
+        </DialogContent>
+      </Dialog>
     </details>
   );
 }
