@@ -6,6 +6,7 @@ import {
   testCompositeEndpoint,
   testWireframeEndpoint,
 } from "@/lib/miningEngine.functions";
+import { testPitOptim } from "@/lib/pitOptim.functions";
 
 export const Route = createFileRoute("/diag/mining-engine")({
   component: DiagMiningEngine,
@@ -15,6 +16,7 @@ function DiagMiningEngine() {
   const run = useServerFn(testMiningEngine);
   const runComp = useServerFn(testCompositeEndpoint);
   const runWf = useServerFn(testWireframeEndpoint);
+  const runPit = useServerFn(testPitOptim);
 
   const health = useQuery({ queryKey: ["diag-mining-engine"], queryFn: () => run() });
   const composite = useQuery({
@@ -25,6 +27,11 @@ function DiagMiningEngine() {
   const wireframe = useQuery({
     queryKey: ["diag-mining-engine-wireframe"],
     queryFn: () => runWf(),
+    enabled: false,
+  });
+  const pit = useQuery({
+    queryKey: ["diag-pit-optim"],
+    queryFn: () => runPit(),
     enabled: false,
   });
 
