@@ -235,6 +235,25 @@ function SectionCanvas({ data }: { data: SectionData }) {
       {/* Grid */}
       <GridLines bounds={bounds} sx={sx} sy={sy} W={W} H={H} padding={padding} />
 
+      {/* Bloques estimados proyectados */}
+      {data.extra_points
+        ?.filter((p) => p.kind === "block")
+        .map((p, i) => {
+          const g = typeof p.grade === "number" ? p.grade : null;
+          const fill = g == null ? "#3b3b4f" : g >= 1 ? "#facc15" : g >= 0.3 ? "#f59e0b" : "#6b7080";
+          return (
+            <rect
+              key={`b${i}`}
+              x={sx(Number(p.s)) - 2}
+              y={sy(Number(p.h)) - 2}
+              width={4}
+              height={4}
+              fill={fill}
+              opacity={0.7}
+            />
+          );
+        })}
+
       {/* Trayectorias */}
       {visibleHoles.map((t) => {
         const path = t.points
