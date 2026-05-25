@@ -18,6 +18,7 @@ function DiagMiningEngine() {
   const runComp = useServerFn(testCompositeEndpoint);
   const runWf = useServerFn(testWireframeEndpoint);
   const runPit = useServerFn(testPitOptim);
+  const runSch = useServerFn(testSchedule);
 
   const health = useQuery({ queryKey: ["diag-mining-engine"], queryFn: () => run() });
   const composite = useQuery({
