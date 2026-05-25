@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { testMiningEngine } from "@/lib/miningEngine.functions";
+import { testMiningEngine, testCompositeEndpoint } from "@/lib/miningEngine.functions";
 
 export const Route = createFileRoute("/diag/mining-engine")({
   component: DiagMiningEngine,
@@ -9,28 +9,63 @@ export const Route = createFileRoute("/diag/mining-engine")({
 
 function DiagMiningEngine() {
   const run = useServerFn(testMiningEngine);
-  const { data, isLoading, error, refetch, isFetching } = useQuery({
+  const runComp = useServerFn(testCompositeEndpoint);
+
+  const health = useQuery({
     queryKey: ["diag-mining-engine"],
     queryFn: () => run(),
   });
+  const composite = useQuery({
+    queryKey: ["diag-mining-engine-composite"],
+    queryFn: () => runComp(),
+  });
 
   return (
-    <div className="container mx-auto max-w-3xl p-6 space-y-4">
+    <div className="container mx-auto max-w-3xl p-6 space-y-6">
       <h1 className="text-2xl font-bold">Diagnóstico mining-engine</h1>
-      <button
-        onClick={() => refetch()}
-        className="px-4 py-2 rounded-md bg-primary text-primary-foreground"
-        disabled={isFetching}
-      >
-        {isFetching ? "Probando…" : "Probar de nuevo"}
-      </button>
-      {isLoading && <p>Probando conexión…</p>}
-      {error && <pre className="text-destructive">{String(error)}</pre>}
-      {data && (
-        <pre className="text-xs p-4 bg-muted rounded-md overflow-auto">
-          {JSON.stringify(data, null, 2)}
-        </pre>
-      )}
+
+      <section className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold">/health + /desurvey</h2>
+          <button
+            onClick={() => health.refetch()}
+            className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground"
+            disabled={health.isFetching}
+          >
+            {health.isFetching ? "…" : "Probar"}
+          </button>
+        </div>
+        {health.error && <pre className="text-destructive text-xs">{String(health.error)}</pre>}
+        {health.data && (
+          <pre className="text-xs p-3 bg-muted rounded-md overflow-auto">
+            {JSON.stringify(health.data, null, 2)}
+          </pre>
+        )}
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold">/composite (sondaje real)</h2>
+          <button
+            onClick={() => composite.refetch()}
+            className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground"
+            disabled={composite.isFetching}
+          >
+            {composite.isFetching ? "…" : "Probar"}
+          </button>
+        </div>
+        <p className="text-xs text-text-secondary">
+          Toma el sondaje con más drill_core_logs y compone a 2 m con recovery mín. 0.5.
+        </p>
+        {composite.error && (
+          <pre className="text-destructive text-xs">{String(composite.error)}</pre>
+        )}
+        {composite.data && (
+          <pre className="text-xs p-3 bg-muted rounded-md overflow-auto">
+            {JSON.stringify(composite.data, null, 2)}
+          </pre>
+        )}
+      </section>
     </div>
   );
 }
