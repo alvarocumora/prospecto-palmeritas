@@ -398,7 +398,7 @@ export const testPitOptim = createServerFn({ method: "POST" })
         .not("grade", "is", null);
       if ((count ?? 0) > 0) {
         const out = await optimizePit({ data: { scenarioId: sc.id } });
-        return { ok: true, scenario_name: sc.name, ...out };
+        return { scenario_name: sc.name, ...out };
       }
     }
     return { ok: false, error: "Ningún escenario tiene bloques estimados" };
