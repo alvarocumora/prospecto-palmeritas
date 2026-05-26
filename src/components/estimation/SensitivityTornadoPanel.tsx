@@ -124,7 +124,7 @@ export function SensitivityTornadoPanel({ scenarioId }: { scenarioId: string }) 
                 <ReferenceLine x={0} stroke="currentColor" />
                 <Tooltip
                   contentStyle={{ fontSize: 10, fontFamily: "monospace" }}
-                  formatter={(v: number) => `${v.toFixed(1)}M USD`}
+                  formatter={(v) => `${Number(v).toFixed(1)}M USD`}
                 />
                 <Bar dataKey="low" stackId="a">
                   {chartData.map((_, i) => (
