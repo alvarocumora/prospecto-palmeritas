@@ -245,6 +245,8 @@ function ScenarioRow({
   onRun,
   onDelete,
   onViewSchedule,
+  onTornado,
+  tornadoActive,
 }: {
   scenario: EconomicScenario;
   writable: boolean;
@@ -252,6 +254,8 @@ function ScenarioRow({
   onRun: () => void;
   onDelete: () => void;
   onViewSchedule: () => void;
+  onTornado?: () => void;
+  tornadoActive?: boolean;
 }) {
   const statusColor =
     {
