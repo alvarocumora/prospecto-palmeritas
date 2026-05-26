@@ -167,6 +167,12 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
                 if (confirm(`Eliminar "${s.name}"?`)) remove(s.id);
               }}
               onViewSchedule={() => setScheduleFor(s)}
+              onTornado={
+                s.status === "complete"
+                  ? () => setTornadoFor(tornadoFor === s.id ? null : s.id)
+                  : undefined
+              }
+              tornadoActive={tornadoFor === s.id}
             />
           ))}
         </div>
