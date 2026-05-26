@@ -272,6 +272,17 @@ export function FieldMapPublic() {
           ${t.rationale ? `<div style="color:#C8B8A8;margin-top:6px;font-size:11px">${t.rationale.slice(0, 200)}</div>` : ""}
         </div>`,
       );
+      m.on("click", () => {
+        if (t.lat == null || t.lng == null) return;
+        emitLosVerdesFocus({
+          kind: "target",
+          id: t.code,
+          label: t.name,
+          lat: t.lat,
+          lng: t.lng,
+          source: "fieldmap",
+        });
+      });
       m.addTo(group);
     }
     group.addTo(map);
