@@ -44,6 +44,7 @@ type Props = {
   modelName: string;
   commodity: string;
   writable: boolean;
+  model?: React.ComponentProps<typeof Ni43101ExportButton>["model"];
 };
 
 const PRICE_UNITS: { v: string; l: string; defaultPrice: number }[] = [
