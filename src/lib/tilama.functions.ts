@@ -25,7 +25,7 @@ export type TilamaSatAnomaly = {
   severity: string | null;
   score: number | null;
   area_ha: number | null;
-  geometry: unknown;
+  geometry: GeoJSON.Geometry | null;
   bbox: number[] | null;
 };
 
