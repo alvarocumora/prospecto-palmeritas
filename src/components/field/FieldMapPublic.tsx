@@ -21,6 +21,7 @@ import {
 } from "@/components/field/anomalyHeatLayer";
 import { loadCatastro, bboxAround } from "@/components/map/catastroLayer";
 import { CATASTRO_STYLE, type CatastroOrigen } from "@/components/map/overlays";
+import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
@@ -271,11 +272,64 @@ export function FieldMapPublic() {
           ${t.rationale ? `<div style="color:#C8B8A8;margin-top:6px;font-size:11px">${t.rationale.slice(0, 200)}</div>` : ""}
         </div>`,
       );
+      m.on("click", () => {
+        if (t.lat == null || t.lng == null) return;
+        emitLosVerdesFocus({
+          kind: "target",
+          id: t.code,
+          label: t.name,
+          lat: t.lat,
+          lng: t.lng,
+          source: "fieldmap",
+        });
+      });
       m.addTo(group);
     }
     group.addTo(map);
     targetsLayerRef.current = group;
   }, [targets, showTargets, mapReady]);
+
+  // Recibe focus desde el visor 3D → vuela y dibuja un anillo pulsante
+  useEffect(() => {
+    const L = LRef.current;
+    const map = mapRef.current;
+    if (!L || !map || !mapReady) return;
+    const off = onLosVerdesFocus((d) => {
+      if (d.source === "fieldmap") return;
+      map.flyTo([d.lat, d.lng], Math.max(map.getZoom(), 15), { duration: 0.8 });
+      const color = d.kind === "target" ? "#F0C96B" : d.kind === "sat" ? "#ef4444" : "#a855f7";
+      const pulse = L.circleMarker([d.lat, d.lng], {
+        radius: 8,
+        color,
+        weight: 3,
+        fillColor: color,
+        fillOpacity: 0.25,
+      }).addTo(map);
+      let r = 8;
+      let grow = true;
+      const iv = window.setInterval(() => {
+        r += grow ? 3 : -3;
+        if (r >= 32) grow = false;
+        if (r <= 8) grow = true;
+        pulse.setRadius(r);
+      }, 90);
+      const tip = L.popup({ closeButton: true, autoClose: false })
+        .setLatLng([d.lat, d.lng])
+        .setContent(
+          `<div style="font-family:monospace;font-size:11px">
+            <div style="color:${color};font-weight:700">${d.kind.toUpperCase()}</div>
+            <div style="color:#E8DDD0">${d.label ?? d.id}</div>
+          </div>`,
+        )
+        .openOn(map);
+      window.setTimeout(() => {
+        window.clearInterval(iv);
+        map.removeLayer(pulse);
+        map.closePopup(tip);
+      }, 4000);
+    });
+    return off;
+  }, [mapReady]);
 
   // Lazy-fetch anomalies the first time heatmap or lineaments is enabled
   useEffect(() => {

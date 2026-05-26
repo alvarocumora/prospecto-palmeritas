@@ -15,6 +15,10 @@ import type {
   MagAnomalyPoint,
   Lineament,
 } from "@/lib/livemap-public.functions";
+import {
+  emitLosVerdesFocus,
+  onLosVerdesFocus,
+} from "@/lib/losverdes-focus";
 
 const PRIORITY_COLOR: Record<string, string> = {
   critical: "#dc2626",
@@ -289,6 +293,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "sat",
+          id: String(p.id ?? p.index_code ?? ""),
+          label: String(p.index_code ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
       map.on("click", "targets-pt", (e) => {
         const f = e.features?.[0];
@@ -303,6 +315,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "target",
+          id: String(p.code ?? ""),
+          label: String(p.name ?? p.code ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
       map.on("click", "mag-halo", (e) => {
         const f = e.features?.[0];
@@ -318,6 +338,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "mag",
+          id: String(p.id ?? p.name ?? ""),
+          label: String(p.name ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
 
       for (const id of ["sat-anom-extr", "targets-pt", "mag-halo"]) {
@@ -351,6 +379,26 @@ export function LosVerdesScene3D({
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
   }, [layers]);
+
+  // Escucha selección desde otras vistas (FieldMap) → flyTo + pulso
+  useEffect(() => {
+    const off = onLosVerdesFocus((d) => {
+      if (d.source === "scene3d") return;
+      const m = mapRef.current;
+      if (!m) return;
+      m.flyTo({ center: [d.lng, d.lat], zoom: 14.5, pitch: 62, speed: 1.2 });
+      const popup = new maplibregl.Popup({ closeButton: true, offset: 12 })
+        .setLngLat([d.lng, d.lat])
+        .setHTML(
+          `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+            <strong>${d.kind.toUpperCase()}</strong><br/>${d.label ?? d.id}
+          </div>`,
+        )
+        .addTo(m);
+      window.setTimeout(() => popup.remove(), 4000);
+    });
+    return off;
+  }, []);
 
   return (
     <div className="relative w-full h-[640px] rounded-lg overflow-hidden border border-border bg-bg-secondary">
