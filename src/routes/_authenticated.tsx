@@ -152,12 +152,6 @@ function AuthenticatedLayout() {
       label: "Sección 3D",
       group: "FIELD",
     },
-    {
-      to: "/dashboard/field-map",
-      icon: <MapPin className="w-3.5 h-3.5" />,
-      label: "Mapa de campo",
-      group: "FIELD",
-    },
     canAccess(role, "sampling") && {
       to: "/dashboard/sampling",
       icon: <TestTube2 className="w-3.5 h-3.5" />,
@@ -273,12 +267,6 @@ function AuthenticatedLayout() {
       to: "/dashboard/admin",
       icon: <Crown className="w-3.5 h-3.5" />,
       label: "Admin",
-      group: "ACCOUNT",
-    },
-    canAccess(role, "palmeras") && {
-      to: "/dashboard/palmeras",
-      icon: <Mountain className="w-3.5 h-3.5" />,
-      label: "Demo · Palmeras",
       group: "ACCOUNT",
     },
   ].filter(Boolean) as RailItem[];
