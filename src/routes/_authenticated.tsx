@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import {
-  Mountain,
+  // Mountain removed: palmeras demo no longer in sidebar
   LayoutDashboard,
   Map as MapIcon,
   Activity,
@@ -33,7 +33,7 @@ import {
   Database,
   BarChart3,
   Satellite,
-  MapPin,
+  // MapPin removed: field-map consolidated into /dashboard/map
   Scissors,
 } from "lucide-react";
 
