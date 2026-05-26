@@ -67,13 +67,16 @@ function fmtT(v: number | null | undefined): string {
   return `${v.toFixed(0)} t`;
 }
 
-export function EconomicScenariosPanel({ modelId, modelName, commodity, writable }: Props) {
+export function EconomicScenariosPanel({ modelId, modelName, commodity, writable, model }: Props) {
   const { scenarios, loading, create, remove, compute, getSchedule } =
     useEconomicScenarios(modelId);
+  const { active } = useProjects();
   const [dialog, setDialog] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
   const [scheduleFor, setScheduleFor] = useState<EconomicScenario | null>(null);
   const [schedule, setSchedule] = useState<ScheduleRow[]>([]);
+  const [tornadoFor, setTornadoFor] = useState<string | null>(null);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   useEffect(() => {
     if (scheduleFor) {
