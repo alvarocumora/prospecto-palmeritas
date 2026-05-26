@@ -108,17 +108,45 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
         <div className="flex items-center gap-1.5 text-[10px] font-mono text-text-dim uppercase">
           <DollarSign className="w-3 h-3" /> Análisis económico
         </div>
-        {writable && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-6 text-[10px] px-2"
-            onClick={() => setDialog(true)}
-          >
-            <Plus className="w-3 h-3 mr-1" /> Escenario
-          </Button>
-        )}
+        <div className="flex items-center gap-1 flex-wrap">
+          {scenarios.filter((s) => s.status === "complete").length >= 2 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-[10px] px-2"
+              onClick={() => setCompareOpen(true)}
+            >
+              <GitCompare className="w-3 h-3 mr-1" /> Comparar
+            </Button>
+          )}
+          {model && scenarios.length > 0 && (
+            <Ni43101ExportButton
+              model={model}
+              scenarios={scenarios}
+              projectName={active?.name ?? "proyecto"}
+            />
+          )}
+          {writable && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-[10px] px-2"
+              onClick={() => setDialog(true)}
+            >
+              <Plus className="w-3 h-3 mr-1" /> Escenario
+            </Button>
+          )}
+        </div>
       </div>
+
+      {tornadoFor && <SensitivityTornadoPanel scenarioId={tornadoFor} />}
+
+      <ScenarioCompareDialog
+        open={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        scenarios={scenarios}
+      />
+
 
       {loading ? (
         <div className="text-text-dim text-[10px] font-mono">Cargando…</div>
