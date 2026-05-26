@@ -1,16 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Consolidado en /dashboard/project-report (detecta proyecto activo).
 export const Route = createFileRoute("/_authenticated/dashboard/palmeras")({
-  head: () => ({
-    meta: [
-      { title: "Trackmin GeoIntel · Prospecto Palmeras (TRK-ALH-001)" },
-      {
-        name: "description",
-        content:
-          "Dashboard de inteligencia geológica para Prospecto Palmeras, Alhué — exploración Au–Cu epitermal–mesotermal. Operado por Inversiones Bioenergy SpA.",
-      },
-    ],
-  }),
-  component: TrackminGeoIntel,
+  beforeLoad: () => {
+    throw redirect({ to: "/dashboard/project-report" });
+  },
 });
