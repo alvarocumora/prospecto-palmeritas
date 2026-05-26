@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS public.change_log CASCADE;
+DROP TABLE IF EXISTS public.client_error_log CASCADE;
+DROP TABLE IF EXISTS public.tenant_audit_log CASCADE;
+DROP TABLE IF EXISTS public.satellite_jobs CASCADE;
+DROP TABLE IF EXISTS public.satellite_layer_cache CASCADE;
+DROP TABLE IF EXISTS public.satellite_shared_views CASCADE;
+DROP TABLE IF EXISTS public.satellite_timeseries_points CASCADE;
+DROP TABLE IF EXISTS public.satellite_evidence_reports CASCADE;
+DROP TABLE IF EXISTS public.user_map_layer_prefs CASCADE;
