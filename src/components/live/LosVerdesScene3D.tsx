@@ -15,6 +15,10 @@ import type {
   MagAnomalyPoint,
   Lineament,
 } from "@/lib/livemap-public.functions";
+import {
+  emitLosVerdesFocus,
+  onLosVerdesFocus,
+} from "@/lib/losverdes-focus";
 
 const PRIORITY_COLOR: Record<string, string> = {
   critical: "#dc2626",
