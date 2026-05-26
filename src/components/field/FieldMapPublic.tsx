@@ -21,6 +21,7 @@ import {
 } from "@/components/field/anomalyHeatLayer";
 import { loadCatastro, bboxAround } from "@/components/map/catastroLayer";
 import { CATASTRO_STYLE, type CatastroOrigen } from "@/components/map/overlays";
+import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 const Structures3DViewer = lazy(() => import("@/components/field/Structures3DViewer"));
 
