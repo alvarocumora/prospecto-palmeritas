@@ -1162,109 +1162,6 @@ export type Database = {
           },
         ]
       }
-      card_comments: {
-        Row: {
-          author_id: string
-          body: string
-          card_id: string
-          card_type: string
-          created_at: string
-          edited_at: string | null
-          id: string
-          organization_id: string
-          parent_id: string | null
-          project_id: string | null
-        }
-        Insert: {
-          author_id: string
-          body: string
-          card_id: string
-          card_type: string
-          created_at?: string
-          edited_at?: string | null
-          id?: string
-          organization_id: string
-          parent_id?: string | null
-          project_id?: string | null
-        }
-        Update: {
-          author_id?: string
-          body?: string
-          card_id?: string
-          card_type?: string
-          created_at?: string
-          edited_at?: string | null
-          id?: string
-          organization_id?: string
-          parent_id?: string | null
-          project_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "card_comments_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "card_comments_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "card_comments"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "card_comments_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "npv_por_proyecto"
-            referencedColumns: ["project_id"]
-          },
-          {
-            foreignKeyName: "card_comments_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      card_mentions: {
-        Row: {
-          comment_id: string
-          created_at: string
-          id: string
-          mentioned_user_id: string
-          organization_id: string
-          read_at: string | null
-        }
-        Insert: {
-          comment_id: string
-          created_at?: string
-          id?: string
-          mentioned_user_id: string
-          organization_id: string
-          read_at?: string | null
-        }
-        Update: {
-          comment_id?: string
-          created_at?: string
-          id?: string
-          mentioned_user_id?: string
-          organization_id?: string
-          read_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "card_mentions_comment_id_fkey"
-            columns: ["comment_id"]
-            isOneToOne: false
-            referencedRelation: "card_comments"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       catastro_alerts: {
         Row: {
           alert_type: string
@@ -2709,51 +2606,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      credit_ledger: {
-        Row: {
-          created_at: string
-          delta: number
-          id: string
-          metadata: Json | null
-          reason: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          delta: number
-          id?: string
-          metadata?: Json | null
-          reason: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          delta?: number
-          id?: string
-          metadata?: Json | null
-          reason?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
-      credit_wallets: {
-        Row: {
-          balance: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          balance?: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          balance?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       data_room_access_grants: {
         Row: {
@@ -4316,99 +4168,6 @@ export type Database = {
             columns: ["scenario_id"]
             isOneToOne: false
             referencedRelation: "economic_scenarios"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      escrito_templates: {
-        Row: {
-          abogado_colegiatura: string | null
-          abogado_direccion: string | null
-          abogado_email: string | null
-          abogado_nombre: string | null
-          abogado_rut: string | null
-          abogado_telefono: string | null
-          created_at: string
-          cuerpo_template: string
-          estudio_direccion: string | null
-          estudio_email: string | null
-          estudio_nombre: string | null
-          estudio_telefono: string | null
-          estudio_web: string | null
-          forma_notificacion: string | null
-          id: string
-          is_default: boolean
-          logo_url: string | null
-          nombre: string
-          otrosies: Json
-          owner_id: string
-          project_id: string | null
-          suma_template: string
-          updated_at: string
-        }
-        Insert: {
-          abogado_colegiatura?: string | null
-          abogado_direccion?: string | null
-          abogado_email?: string | null
-          abogado_nombre?: string | null
-          abogado_rut?: string | null
-          abogado_telefono?: string | null
-          created_at?: string
-          cuerpo_template?: string
-          estudio_direccion?: string | null
-          estudio_email?: string | null
-          estudio_nombre?: string | null
-          estudio_telefono?: string | null
-          estudio_web?: string | null
-          forma_notificacion?: string | null
-          id?: string
-          is_default?: boolean
-          logo_url?: string | null
-          nombre: string
-          otrosies?: Json
-          owner_id: string
-          project_id?: string | null
-          suma_template?: string
-          updated_at?: string
-        }
-        Update: {
-          abogado_colegiatura?: string | null
-          abogado_direccion?: string | null
-          abogado_email?: string | null
-          abogado_nombre?: string | null
-          abogado_rut?: string | null
-          abogado_telefono?: string | null
-          created_at?: string
-          cuerpo_template?: string
-          estudio_direccion?: string | null
-          estudio_email?: string | null
-          estudio_nombre?: string | null
-          estudio_telefono?: string | null
-          estudio_web?: string | null
-          forma_notificacion?: string | null
-          id?: string
-          is_default?: boolean
-          logo_url?: string | null
-          nombre?: string
-          otrosies?: Json
-          owner_id?: string
-          project_id?: string | null
-          suma_template?: string
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "escrito_templates_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "npv_por_proyecto"
-            referencedColumns: ["project_id"]
-          },
-          {
-            foreignKeyName: "escrito_templates_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -7452,36 +7211,6 @@ export type Database = {
           },
         ]
       }
-      marketplace_layer_reviews: {
-        Row: {
-          comment: string | null
-          created_at: string
-          id: string
-          layer_key: string
-          rating: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          layer_key: string
-          rating: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          comment?: string | null
-          created_at?: string
-          id?: string
-          layer_key?: string
-          rating?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       mensuras: {
         Row: {
           acta_url: string | null
@@ -8266,72 +7995,6 @@ export type Database = {
           total_features?: number | null
           unchanged_count?: number | null
           updated_count?: number | null
-        }
-        Relationships: []
-      }
-      mining_owner_profiles: {
-        Row: {
-          company_name: string | null
-          country: string
-          created_at: string
-          entity_type: string
-          full_name: string
-          id: string
-          intent: string
-          notes: string | null
-          num_concessions: number
-          phone: string | null
-          primary_commodity: string | null
-          region: string | null
-          rejection_reason: string | null
-          review_status: Database["public"]["Enums"]["review_status"]
-          reviewed_at: string | null
-          reviewed_by: string | null
-          rut: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          company_name?: string | null
-          country?: string
-          created_at?: string
-          entity_type: string
-          full_name: string
-          id?: string
-          intent: string
-          notes?: string | null
-          num_concessions?: number
-          phone?: string | null
-          primary_commodity?: string | null
-          region?: string | null
-          rejection_reason?: string | null
-          review_status?: Database["public"]["Enums"]["review_status"]
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          rut?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          company_name?: string | null
-          country?: string
-          created_at?: string
-          entity_type?: string
-          full_name?: string
-          id?: string
-          intent?: string
-          notes?: string | null
-          num_concessions?: number
-          phone?: string | null
-          primary_commodity?: string | null
-          region?: string | null
-          rejection_reason?: string | null
-          review_status?: Database["public"]["Enums"]["review_status"]
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          rut?: string | null
-          updated_at?: string
-          user_id?: string
         }
         Relationships: []
       }
@@ -12332,54 +11995,6 @@ export type Database = {
         }
         Relationships: []
       }
-      team_member_profiles: {
-        Row: {
-          area: string | null
-          created_at: string
-          full_name: string
-          id: string
-          notes: string | null
-          phone: string | null
-          rejection_reason: string | null
-          requested_role: string
-          review_status: Database["public"]["Enums"]["review_status"]
-          reviewed_at: string | null
-          reviewed_by: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          area?: string | null
-          created_at?: string
-          full_name: string
-          id?: string
-          notes?: string | null
-          phone?: string | null
-          rejection_reason?: string | null
-          requested_role: string
-          review_status?: Database["public"]["Enums"]["review_status"]
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          area?: string | null
-          created_at?: string
-          full_name?: string
-          id?: string
-          notes?: string | null
-          phone?: string | null
-          rejection_reason?: string | null
-          requested_role?: string
-          review_status?: Database["public"]["Enums"]["review_status"]
-          reviewed_at?: string | null
-          reviewed_by?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
-      }
       technical_report_sections: {
         Row: {
           change_log: Json
@@ -12772,41 +12387,6 @@ export type Database = {
           },
         ]
       }
-      usage_counters: {
-        Row: {
-          id: string
-          metric: string
-          organization_id: string
-          period_start: string
-          updated_at: string
-          value: number
-        }
-        Insert: {
-          id?: string
-          metric: string
-          organization_id: string
-          period_start: string
-          updated_at?: string
-          value?: number
-        }
-        Update: {
-          id?: string
-          metric?: string
-          organization_id?: string
-          period_start?: string
-          updated_at?: string
-          value?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "usage_counters_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       user_map_layer_prefs: {
         Row: {
           created_at: string
@@ -12830,50 +12410,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      user_subscriptions: {
-        Row: {
-          created_at: string
-          current_period_end: string | null
-          id: string
-          plan_id: string
-          status: string
-          stripe_customer_id: string | null
-          stripe_subscription_id: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          current_period_end?: string | null
-          id?: string
-          plan_id?: string
-          status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          current_period_end?: string | null
-          id?: string
-          plan_id?: string
-          status?: string
-          stripe_customer_id?: string | null
-          stripe_subscription_id?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_subscriptions_plan_id_fkey"
-            columns: ["plan_id"]
-            isOneToOne: false
-            referencedRelation: "subscription_plans"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       validation_snapshots: {
         Row: {
@@ -13038,41 +12574,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      workspace_function_roles: {
-        Row: {
-          created_at: string
-          granted_by: string | null
-          id: string
-          organization_id: string
-          role: Database["public"]["Enums"]["workspace_function_role"]
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          granted_by?: string | null
-          id?: string
-          organization_id: string
-          role: Database["public"]["Enums"]["workspace_function_role"]
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          granted_by?: string | null
-          id?: string
-          organization_id?: string
-          role?: Database["public"]["Enums"]["workspace_function_role"]
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workspace_function_roles_organization_id_fkey"
-            columns: ["organization_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
