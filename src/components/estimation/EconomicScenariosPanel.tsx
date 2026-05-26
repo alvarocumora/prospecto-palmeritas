@@ -31,13 +31,20 @@ import {
   TrendingUp,
   Calendar,
   Layers,
+  Activity,
+  GitCompare,
 } from "lucide-react";
+import { SensitivityTornadoPanel } from "./SensitivityTornadoPanel";
+import { ScenarioCompareDialog } from "./ScenarioCompareDialog";
+import { Ni43101ExportButton } from "./Ni43101ExportButton";
+import { useProjects } from "@/hooks/useProjects";
 
 type Props = {
   modelId: string;
   modelName: string;
   commodity: string;
   writable: boolean;
+  model?: React.ComponentProps<typeof Ni43101ExportButton>["model"];
 };
 
 const PRICE_UNITS: { v: string; l: string; defaultPrice: number }[] = [
@@ -60,13 +67,16 @@ function fmtT(v: number | null | undefined): string {
   return `${v.toFixed(0)} t`;
 }
 
-export function EconomicScenariosPanel({ modelId, modelName, commodity, writable }: Props) {
+export function EconomicScenariosPanel({ modelId, modelName, commodity, writable, model }: Props) {
   const { scenarios, loading, create, remove, compute, getSchedule } =
     useEconomicScenarios(modelId);
+  const { active } = useProjects();
   const [dialog, setDialog] = useState(false);
   const [running, setRunning] = useState<string | null>(null);
   const [scheduleFor, setScheduleFor] = useState<EconomicScenario | null>(null);
   const [schedule, setSchedule] = useState<ScheduleRow[]>([]);
+  const [tornadoFor, setTornadoFor] = useState<string | null>(null);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   useEffect(() => {
     if (scheduleFor) {
@@ -98,17 +108,45 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
         <div className="flex items-center gap-1.5 text-[10px] font-mono text-text-dim uppercase">
           <DollarSign className="w-3 h-3" /> Análisis económico
         </div>
-        {writable && (
-          <Button
-            size="sm"
-            variant="outline"
-            className="h-6 text-[10px] px-2"
-            onClick={() => setDialog(true)}
-          >
-            <Plus className="w-3 h-3 mr-1" /> Escenario
-          </Button>
-        )}
+        <div className="flex items-center gap-1 flex-wrap">
+          {scenarios.filter((s) => s.status === "complete").length >= 2 && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-[10px] px-2"
+              onClick={() => setCompareOpen(true)}
+            >
+              <GitCompare className="w-3 h-3 mr-1" /> Comparar
+            </Button>
+          )}
+          {model && scenarios.length > 0 && (
+            <Ni43101ExportButton
+              model={model}
+              scenarios={scenarios}
+              projectName={active?.name ?? "proyecto"}
+            />
+          )}
+          {writable && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-6 text-[10px] px-2"
+              onClick={() => setDialog(true)}
+            >
+              <Plus className="w-3 h-3 mr-1" /> Escenario
+            </Button>
+          )}
+        </div>
       </div>
+
+      {tornadoFor && <SensitivityTornadoPanel scenarioId={tornadoFor} />}
+
+      <ScenarioCompareDialog
+        open={compareOpen}
+        onClose={() => setCompareOpen(false)}
+        scenarios={scenarios}
+      />
+
 
       {loading ? (
         <div className="text-text-dim text-[10px] font-mono">Cargando…</div>
@@ -129,6 +167,12 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
                 if (confirm(`Eliminar "${s.name}"?`)) remove(s.id);
               }}
               onViewSchedule={() => setScheduleFor(s)}
+              onTornado={
+                s.status === "complete"
+                  ? () => setTornadoFor(tornadoFor === s.id ? null : s.id)
+                  : undefined
+              }
+              tornadoActive={tornadoFor === s.id}
             />
           ))}
         </div>
@@ -201,6 +245,8 @@ function ScenarioRow({
   onRun,
   onDelete,
   onViewSchedule,
+  onTornado,
+  tornadoActive,
 }: {
   scenario: EconomicScenario;
   writable: boolean;
@@ -208,6 +254,8 @@ function ScenarioRow({
   onRun: () => void;
   onDelete: () => void;
   onViewSchedule: () => void;
+  onTornado?: () => void;
+  tornadoActive?: boolean;
 }) {
   const statusColor =
     {
@@ -264,6 +312,16 @@ function ScenarioRow({
             onClick={onViewSchedule}
           >
             <Calendar className="w-3 h-3 mr-1" /> Schedule
+          </Button>
+        )}
+        {onTornado && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className={`h-6 text-[10px] px-2 ${tornadoActive ? "text-signal-cyan" : ""}`}
+            onClick={onTornado}
+          >
+            <Activity className="w-3 h-3 mr-1" /> Tornado
           </Button>
         )}
         {writable && (

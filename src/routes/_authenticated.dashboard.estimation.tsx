@@ -285,6 +285,7 @@ function ModelCard({
             modelName={model.name}
             commodity={model.commodity}
             writable={writable}
+            model={model}
           />
           <SwathPlotPanel modelId={model.id} unit={unit} />
           <PitOptimPanel modelId={model.id} commodity={model.commodity} writable={writable} />
