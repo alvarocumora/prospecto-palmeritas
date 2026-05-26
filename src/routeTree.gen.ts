@@ -14,6 +14,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
@@ -95,6 +96,11 @@ const IndexRoute = IndexRouteImport.update({
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveTilamaRoute = LiveTilamaRouteImport.update({
+  id: '/live/tilama',
+  path: '/live/tilama',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LivePalmerasRoute = LivePalmerasRouteImport.update({
@@ -446,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/live/tilama': typeof LiveTilamaRoute
   '/catastro/': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -510,6 +517,7 @@ export interface FileRoutesByTo {
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/live/tilama': typeof LiveTilamaRoute
   '/catastro': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -576,6 +584,7 @@ export interface FileRoutesById {
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
+  '/live/tilama': typeof LiveTilamaRoute
   '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -642,6 +651,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
+    | '/live/tilama'
     | '/catastro/'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -706,6 +716,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
+    | '/live/tilama'
     | '/catastro'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -771,6 +782,7 @@ export interface FileRouteTypes {
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
+    | '/live/tilama'
     | '/catastro/'
     | '/_authenticated/dashboard/3d-pro'
     | '/_authenticated/dashboard/admin'
@@ -837,6 +849,7 @@ export interface RootRouteChildren {
   LiveFrancoRoute: typeof LiveFrancoRoute
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
+  LiveTilamaRoute: typeof LiveTilamaRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
@@ -881,6 +894,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro'
       fullPath: '/catastro/'
       preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/tilama': {
+      id: '/live/tilama'
+      path: '/live/tilama'
+      fullPath: '/live/tilama'
+      preLoaderRoute: typeof LiveTilamaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/palmeras': {
@@ -1462,6 +1482,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveFrancoRoute: LiveFrancoRoute,
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
+  LiveTilamaRoute: LiveTilamaRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
@@ -1474,3 +1495,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
