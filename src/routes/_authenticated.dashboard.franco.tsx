@@ -1,16 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Consolidado en /dashboard/project-report (detecta proyecto activo).
 export const Route = createFileRoute("/_authenticated/dashboard/franco")({
-  head: () => ({
-    meta: [
-      { title: "Trackmin GeoIntel · Prospecto Franco (TRK-FRC-002)" },
-      {
-        name: "description",
-        content:
-          "Dashboard de inteligencia geológica para Prospecto Franco — borrador pre NI 43-101 (datos pendientes de carga).",
-      },
-    ],
-  }),
-  component: FrancoDashboard,
+  beforeLoad: () => {
+    throw redirect({ to: "/dashboard/project-report" });
+  },
 });

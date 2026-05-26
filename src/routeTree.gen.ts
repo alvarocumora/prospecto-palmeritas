@@ -39,6 +39,7 @@ import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
+import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
@@ -231,6 +232,12 @@ const AuthenticatedDashboardProjectsRoute =
   AuthenticatedDashboardProjectsRouteImport.update({
     id: '/dashboard/projects',
     path: '/dashboard/projects',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectReportRoute =
+  AuthenticatedDashboardProjectReportRouteImport.update({
+    id: '/dashboard/project-report',
+    path: '/dashboard/project-report',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardProfileRoute =
@@ -466,6 +473,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
@@ -529,6 +537,7 @@ export interface FileRoutesByTo {
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
@@ -594,6 +603,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
+  '/_authenticated/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
@@ -659,6 +669,7 @@ export interface FileRouteTypes {
     | '/dashboard/ni43101'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
+    | '/dashboard/project-report'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
@@ -722,6 +733,7 @@ export interface FileRouteTypes {
     | '/dashboard/ni43101'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
+    | '/dashboard/project-report'
     | '/dashboard/projects'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
@@ -786,6 +798,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/ni43101'
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/profile'
+    | '/_authenticated/dashboard/project-report'
     | '/_authenticated/dashboard/projects'
     | '/_authenticated/dashboard/qaqc'
     | '/_authenticated/dashboard/qps'
@@ -1043,6 +1056,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/projects'
       fullPath: '/dashboard/projects'
       preLoaderRoute: typeof AuthenticatedDashboardProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/project-report': {
+      id: '/_authenticated/dashboard/project-report'
+      path: '/dashboard/project-report'
+      fullPath: '/dashboard/project-report'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectReportRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/profile': {
@@ -1359,6 +1379,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
+  AuthenticatedDashboardProjectReportRoute: typeof AuthenticatedDashboardProjectReportRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
   AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
@@ -1405,6 +1426,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
+  AuthenticatedDashboardProjectReportRoute:
+    AuthenticatedDashboardProjectReportRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
   AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
@@ -1451,3 +1474,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
