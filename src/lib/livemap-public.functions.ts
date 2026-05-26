@@ -91,6 +91,8 @@ export type SatAnomalyPoint = {
   area_ha: number | null;
   lat: number;
   lng: number;
+  /** Polygon outer ring as [lng,lat] pairs (deck.gl convention). Null for point geometries. */
+  polygon: [number, number][] | null;
 };
 
 export type Lineament = {
