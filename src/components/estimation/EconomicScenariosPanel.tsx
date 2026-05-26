@@ -31,7 +31,13 @@ import {
   TrendingUp,
   Calendar,
   Layers,
+  Activity,
+  GitCompare,
 } from "lucide-react";
+import { SensitivityTornadoPanel } from "./SensitivityTornadoPanel";
+import { ScenarioCompareDialog } from "./ScenarioCompareDialog";
+import { Ni43101ExportButton } from "./Ni43101ExportButton";
+import { useProjects } from "@/hooks/useProjects";
 
 type Props = {
   modelId: string;
