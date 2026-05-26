@@ -164,6 +164,7 @@ export function FieldMapPublic() {
   }, []);
 
   useEffect(() => {
+    setOnline(navigator.onLine);
     const up = () => setOnline(true);
     const down = () => setOnline(false);
     window.addEventListener("online", up);
