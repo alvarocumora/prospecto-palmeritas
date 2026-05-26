@@ -314,6 +314,16 @@ function ScenarioRow({
             <Calendar className="w-3 h-3 mr-1" /> Schedule
           </Button>
         )}
+        {onTornado && (
+          <Button
+            size="sm"
+            variant="ghost"
+            className={`h-6 text-[10px] px-2 ${tornadoActive ? "text-signal-cyan" : ""}`}
+            onClick={onTornado}
+          >
+            <Activity className="w-3 h-3 mr-1" /> Tornado
+          </Button>
+        )}
         {writable && (
           <>
             <Button
