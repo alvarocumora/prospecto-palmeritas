@@ -293,6 +293,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "sat",
+          id: String(p.id ?? p.index_code ?? ""),
+          label: String(p.index_code ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
       map.on("click", "targets-pt", (e) => {
         const f = e.features?.[0];
@@ -307,6 +315,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "target",
+          id: String(p.code ?? ""),
+          label: String(p.name ?? p.code ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
       map.on("click", "mag-halo", (e) => {
         const f = e.features?.[0];
@@ -322,6 +338,14 @@ export function LosVerdesScene3D({
             </div>`,
           )
           .addTo(map);
+        emitLosVerdesFocus({
+          kind: "mag",
+          id: String(p.id ?? p.name ?? ""),
+          label: String(p.name ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
       });
 
       for (const id of ["sat-anom-extr", "targets-pt", "mag-halo"]) {
