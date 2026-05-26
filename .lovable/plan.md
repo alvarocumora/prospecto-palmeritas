@@ -1,118 +1,99 @@
+# Plan de Estabilización: 1 Centro de Mando + limpieza de rutas y tablas
 
-# Plan: Suite de planificación minera 3D estilo Datamine/Leapfrog
+## Diagnóstico actual
 
-Roadmap híbrido de 6-8 semanas, organizado en 4 sprints paralelizables. Cálculos pesados en `mining-engine` (Railway/Python con scipy, networkx, PuLP, trimesh), interacciones ligeras y UI en server functions de TanStack.
+- **62 archivos de rutas**, con varias pantallas que cumplen rol de "dashboard":
+  - `dashboard/index` (Mission Control)
+  - `dashboard/command-center`
+  - `dashboard/map`, `dashboard/field-map`
+  - `dashboard/3d-pro`, `dashboard/geology3d`, `dashboard/sat3d`
+  - Dashboards de proyecto-piloto: `dashboard/palmeras`, `dashboard/franco`, `dashboard/lv5-page5`
+  - Vistas live duplicadas: `live.palmeras`, `live.franco`, `live.losverdes`
+- **200 tablas en `public`**, de las cuales **108 están vacías** (muchas son features inacabadas: `card_*`, `escrito_templates`, `mining_owner_profiles`, `marketplace_layer_reviews`, `satellite_layer_cache`, `dem_diffs`, `geology_wireframes`, etc.)
+- Top de uso real: `cadastre_*`, `mineral_deposits`, `job_*`, `audit_log`, `resource_blocks`, `drill_*`, `sampling_results`, `exploration_targets`, `satellite_anomalies`.
 
-## Estado base (ya en producción)
+## Objetivo
 
-- `GeoScene3D` (MapLibre + deck.gl) con terreno DEM real, sondajes desurveyados, anomalías extruidas
-- `BlockModel3DViewer` con InstancedMesh + cutoff dinámico
-- `mining-engine` con `/desurvey` y `/composite` operativos
-- Tabla `resource_blocks` + edge function `estimate-resources`
+1. **Una sola ruta es el Centro de Mando**: `/dashboard` (`_authenticated.dashboard.index.tsx`).
+2. Resto de pantallas pasan a ser **módulos** accesibles desde el sidebar, no "dashboards alternativos".
+3. Eliminar rutas obsoletas y tablas huérfanas sin romper features vivos.
 
-## Sprint 1 — Cross-section + Geomodelado implícito (semanas 1-2)
+---
 
-**Backend (mining-engine):**
-- `/section` — corta sondajes/bloques con un plano (origen + azimut + dip), devuelve polilíneas 2D + intercepts proyectados
-- `/wireframe-rbf` — interpolación implícita por Radial Basis Function (scipy) sobre compositos + indicador binario (ore/waste), devuelve mesh trimesh (vértices + caras + isovalor)
-- `/swath-plot` — comparación compositos vs bloques estimados por bandas X/Y/Z
+## Fase 1 — Consolidación de dashboards (UI, sin tocar DB)
 
-**Frontend:**
-- `SectionViewer` (nueva ruta `/dashboard/section`): canvas SVG/Konva con plano editable (azimut/dip sliders), sondajes proyectados con leyes, contactos litológicos, bloques cortados
-- `WireframeLayer` en GeoScene3D: capa `SimpleMeshLayer` de deck.gl renderizando el sólido RBF semi-transparente sobre el terreno
-- `SwathPlotPanel` en estimación: tres gráficos Recharts (X/Y/Z) compositos vs estimado
+**Centro de Mando único:** `/_authenticated/dashboard/` (Mission Control existente).
 
-## Sprint 2 — Pit optimization + Diseño (semanas 3-4)
+- **Fusionar** `command-center` dentro del index (mover sus widgets útiles), luego eliminar la ruta.
+- **Renombrar conceptualmente** y degradar a módulos:
+  - `3d-pro`, `geology3d`, `sat3d` → un solo módulo `/dashboard/3d` con tabs (Geology / Satellite / Pro).
+  - `map`, `field-map` → un solo `/dashboard/map` con toggle "campo".
+- **Dashboards de proyecto piloto** (`palmeras`, `franco`, `lv5-page5`):
+  - Sacarlos del nav principal.
+  - Mantenerlos detrás de una sola entrada genérica `/dashboard/project-report` que detecta el proyecto activo y carga el feature correspondiente (`features/palmeras`, `features/franco`).
+- Actualizar `TopBar` + `ROUTE_LABELS` y el sidebar para reflejar la nueva IA (information architecture).
 
-**Backend (mining-engine):**
-- `/pit-optim` — Lerchs-Grossmann via pseudoflow (networkx) sobre `resource_blocks`: inputs (precio, recuperación, costo mina/proceso, ángulo de talud), outputs (pit shell por precio, NPV, stripping ratio, tonelaje ore/waste)
-- `/pit-design` — genera bancos + bermas + rampa helicoidal con pendiente máx desde el pit shell óptimo
-- Migración: tablas `pit_shells` y `pit_designs` (geometría JSONB + métricas)
+**Entregable Fase 1:** UI con un solo "centro de mando", sin borrar archivos todavía.
 
-**Frontend:**
-- `PitOptimDialog` con sliders de precio (Au $/oz, Cu $/lb), grid de resultados (shell, NPV, t ore, strip ratio)
-- `PitShellsLayer` en GeoScene3D modo `resource`: capa `PolygonLayer` extruida coloreada por precio incremental (nested shells)
-- `BenchDesignPanel` con perfil del pit en sección y tabla de bancos
+---
 
-## Sprint 3 — Scheduling + Drillhole planning (semanas 5-6)
+## Fase 2 — Limpieza de rutas
 
-**Backend (mining-engine):**
-- `/schedule` — secuenciación de bloques por períodos (PuLP MILP simplificado o heurística por benches), respeta precedencias del pit shell y capacidad anual de mina/planta
-- `/drillhole-design` — toma targets + restricciones (azimut/dip preferidos, distancia mínima entre collares, longitud máx, costo $/m), devuelve collares óptimos + trayectorias
+Borrar/redirigir rutas reemplazadas:
 
-**Frontend:**
-- `ScheduleTimeline` (D3/Recharts): bloques coloreados por período, curvas acumuladas de tonelaje, ley media, NPV, stripping
-- `ScheduleAnimationLayer` en GeoScene3D: animación de bloques apareciendo/desapareciendo por período
-- `DrillhPlanWizard` (ruta `/dashboard/drilling/plan`): selecciona targets → genera campaña → preview 3D + tabla costos
-- Persistencia: `drill_campaigns` + `planned_holes`
-
-## Sprint 4 — Interop industria (semanas 7-8)
-
-**Backend (mining-engine):**
-- `/export/dxf` — sondajes, wireframes, pit designs, secciones (ezdxf)
-- `/export/omf` — Open Mining Format (omf python lib): block model, drillholes, surfaces
-- `/export/csv-plan` — plan minero por período (formato compatible Datamine NPV Scheduler)
-- `/import/dxf` — leer wireframes/surfaces externos de Leapfrog/Vulcan
-
-**Frontend:**
-- `ExportHub` (ruta `/dashboard/exports`): selector de objetos + formato + descarga directa
-- Botones de import en geología y resource modeling
-
-## Detalle técnico
-
-### Arquitectura de cálculo
 ```text
-TanStack server fn          mining-engine (Railway)
-─────────────────           ─────────────────────────
-section.functions.ts   ───▶ POST /section          (numpy)
-wireframe.functions.ts ───▶ POST /wireframe-rbf    (scipy RBF + trimesh)
-pitOptim.functions.ts  ───▶ POST /pit-optim        (networkx pseudoflow)
-schedule.functions.ts  ───▶ POST /schedule         (PuLP MILP)
-drillPlan.functions.ts ───▶ POST /drillhole-design (scipy.optimize)
-export.functions.ts    ───▶ POST /export/{format}  (ezdxf, omf)
+ELIMINAR
+  _authenticated.dashboard.command-center.tsx     → merged en /dashboard
+  _authenticated.dashboard.3d-pro.tsx             → /dashboard/3d (tab pro)
+  _authenticated.dashboard.geology3d.tsx          → /dashboard/3d (tab geology)
+  _authenticated.dashboard.sat3d.tsx              → /dashboard/3d (tab satellite)
+  _authenticated.dashboard.field-map.tsx          → /dashboard/map (modo campo)
+  _authenticated.dashboard.lv5-page5.tsx          → behind /dashboard/project-report
+  live.losverdes.tsx                              → no project activo, candidato a borrar
+REVISAR (mantener si tienen tráfico real)
+  diag.mining-engine.tsx, validation, mag-revalidations  → mover a /dashboard/admin/*
 ```
 
-### Dependencias nuevas
-- **Python**: `scipy`, `networkx`, `pulp`, `trimesh`, `ezdxf`, `omf`, `pyproj`
-- **TS**: `@deck.gl/mesh-layers` (SimpleMeshLayer para wireframes), `konva` (cross-section 2D)
+Para cada ruta borrada: redirección suave desde `__root` o un `notFoundComponent` que apunte a `/dashboard`. Validar `routeTree.gen.ts` se regenere limpio.
 
-### Tablas nuevas (migraciones)
-- `pit_shells` — geometría JSONB, precio, NPV, métricas
-- `pit_designs` — bancos, rampas, ángulo de talud
-- `mine_schedules` — períodos, bloque_id, secuencia, NPV período
-- `drill_campaigns` + `planned_holes` — diseños de campaña con costos
-- `geology_wireframes` — sólidos RBF (mesh JSONB, isovalor, commodity)
+---
 
-### Capas nuevas en GeoScene3D
-- `WireframeLayer` (SimpleMeshLayer) — sólidos RBF
-- `PitShellsLayer` (PolygonLayer extruido) — nested shells por precio
-- `ScheduleLayer` (InstancedMesh animado) — bloques por período
-- `PlannedHolesLayer` (PathLayer + ColumnLayer) — campañas propuestas vs ejecutadas
+## Fase 3 — Limpieza de tablas
 
-### Validación visual
-- Swath plots (sprint 1) — calidad de estimación
-- Reconciliation panel — compositos vs bloques en cada wireframe
-- Pit walkthrough — animación de cámara siguiendo rampa
+Política: **borrar solo si vacías + sin código que las referencie + sin FK entrantes**.
 
-## Entregables por sprint
+Pipeline por tabla candidata:
+1. `SELECT count(*)` (ya tenemos 108 vacías).
+2. `rg <table_name> src/ supabase/ services/` → 0 hits.
+3. `SELECT … FROM pg_constraint WHERE confrelid = <oid>` → sin FKs entrantes.
+4. Si pasa los 3 filtros → migration `DROP TABLE` agrupada por dominio.
 
-| Sprint | Ruta nueva | Métricas de éxito |
-|---|---|---|
-| 1 | `/dashboard/section` | Corte arbitrario < 500ms, wireframe RBF de un cuerpo en < 5s |
-| 2 | `/dashboard/pit-optim` | Pit shell para 50k bloques < 30s, NPV calculado |
-| 3 | `/dashboard/drilling/plan` | Schedule 5 años < 60s, plan de 20 collares generado |
-| 4 | `/dashboard/exports` | DXF leído en AutoCAD, OMF abierto en Leapfrog Viewer |
+**Lotes propuestos** (una migration por lote, revisable):
 
-## Riesgos y mitigaciones
+- **Lote A — features muertas obvias**: `card_comments`, `card_mentions`, `escrito_templates`, `mining_owner_profiles`, `marketplace_layer_reviews`, `workspace_function_roles`, `community_events`, `team_member_profiles`.
+- **Lote B — satellite duplicado**: revisar y consolidar `satellite_jobs` vs `satellite_analysis_jobs`, `satellite_layers` vs `satellite_layer_cache`, `satellite_evidence` vs `satellite_evidence_reports`, `satellite_shared_views`, `satellite_targets`, `satellite_timeseries_points`, `stac_acquisitions`.
+- **Lote C — catastro / holders duplicados**: `public_concessions_cache`, `public_holders`, `holder_files`, `holder_links`, `concession_files`, `concession_field_changes` (si están vacíos y reemplazados por `cadastre_*`).
+- **Lote D — billing/credits sin uso**: `credit_ledger`, `credit_wallets`, `subscriptions`, `user_subscriptions`, `usage_counters` (mantener solo `billing_plans` + `organization_subscriptions`).
+- **Lote E — QPS / signatures sin uso**: `signature_envelopes`, `signature_audit_trail`, `document_signatures`, `qp_signed_layers`, `evidence_qp_*`, `certifier_*` (si la feature QPS no está activa).
+- **Lote F — misceláneas vacías**: `dem_diffs`, `geology_wireframes`, `map_annotations`, `map_views`, `user_map_layer_prefs`, `validation_snapshots`, `change_log`, `tenant_audit_log`, `client_error_log`.
 
-- **Pseudoflow en Python puro es lento**: si > 60s para 100k bloques, portar el core a Cython o usar `mining-pit-optim` (paquete C++ con bindings)
-- **RBF no escala >10k compositos**: implementar octree + partition of unity como fallback
-- **Workers de Cloudflare no pueden hacer cómputo pesado**: por eso todo lo intensivo va a Railway, los server functions solo orquestan
-- **OMF v2 todavía es beta**: empezar con OMF v1 (estable) y agregar v2 cuando se libere
+Cada lote = 1 migration con `DROP TABLE IF EXISTS … CASCADE` solo tras confirmar los 3 filtros.
 
-## Lo que NO está en este plan (fase 2)
+---
 
-- Stope optimization subterránea (MSO) — solo si confirmamos clientes con minería subterránea
-- Geostatística avanzada (kriging con variogramas direccionales, simulación condicional) — el IDW/RBF actual cubre el 80%
-- Realidad aumentada en terreno — ya existe `ArRadarOverlay`, se integraría al plan de campaña en fase 2
-- Integración directa con Datamine Studio RM via API propietaria — costoso y poco demanda
+## Fase 4 — Verificación
+
+- `npm run validate` + typecheck.
+- Smoke manual: login → `/dashboard` carga, sidebar muestra módulos consolidados, navegación a 3D/Map/Estimation/Catastro/Targets funciona.
+- `supabase--linter` para detectar policies huérfanas tras los DROPs.
+- Actualizar `mem://plan/produccion-maestra` con la nueva IA.
+
+---
+
+## Preguntas antes de ejecutar
+
+1. **Pilotos** (`palmeras`, `franco`, `lv5-page5`): ¿los conservamos detrás de `/dashboard/project-report` o los archivamos del todo?
+2. **Feature QPS / firmas**: ¿está realmente en uso o puedo borrar el Lote E completo?
+3. **Billing**: ¿usamos `organization_subscriptions` (es la activa) o el set `subscriptions`/`user_subscriptions`?
+
+Con esas 3 respuestas arranco Fase 1 directamente.

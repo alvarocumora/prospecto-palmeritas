@@ -213,12 +213,12 @@ function DashboardHome() {
             { label: "Muestras", value: loading ? "…" : fmt(k?.totalSamples) },
           ]}
           links={[
-            { to: "/dashboard/sat3d", icon: <Box className="w-3.5 h-3.5" />, label: "Visor 3D" },
-            { to: "/dashboard/geology3d", icon: <Mountain className="w-3.5 h-3.5" />, label: "Geología 3D" },
+            { to: "/dashboard/geology3d", icon: <Box className="w-3.5 h-3.5" />, label: "Visor 3D" },
             { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes" },
             { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo" },
+            { to: "/dashboard/estimation", icon: <Layers className="w-3.5 h-3.5" />, label: "Estimación" },
           ]}
-          primary={{ to: "/dashboard/sat3d", label: "Abrir visor 3D" }}
+          primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
         />
 
         <Pillar
@@ -272,7 +272,7 @@ function DashboardHome() {
             </h2>
           </div>
           <Link
-            to="/dashboard/sat3d"
+            to="/dashboard/geology3d"
             className="text-[10px] font-mono text-gold hover:underline"
           >
             Pantalla completa →
@@ -296,8 +296,8 @@ function DashboardHome() {
         </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
           <Shortcut to="/dashboard/map" icon={<MapIcon className="w-4 h-4 text-gold" />} title="Mapa táctico" />
-          <Shortcut to="/dashboard/3d-pro" icon={<Box className="w-4 h-4 text-signal-violet" />} title="3D Pro" />
-          <Shortcut to="/dashboard/field-map" icon={<Crosshair className="w-4 h-4 text-teal" />} title="Campo" />
+          <Shortcut to="/dashboard/geology3d" icon={<Box className="w-4 h-4 text-signal-violet" />} title="Visor 3D" />
+          <Shortcut to="/dashboard/catastro" icon={<Crosshair className="w-4 h-4 text-teal" />} title="Catastro" />
           <Shortcut to="/dashboard/estimation" icon={<Layers className="w-4 h-4 text-copper" />} title="Estimación" />
           <Shortcut to="/dashboard/hse" icon={<ShieldCheck className="w-4 h-4 text-info" />} title="HSE" />
           <Shortcut to="/dashboard/team" icon={<Sparkles className="w-4 h-4 text-gold" />} title="Equipo" />

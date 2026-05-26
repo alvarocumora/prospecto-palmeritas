@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import {
-  Mountain,
+  // Mountain removed: palmeras demo no longer in sidebar
   LayoutDashboard,
   Map as MapIcon,
   Activity,
@@ -33,7 +33,7 @@ import {
   Database,
   BarChart3,
   Satellite,
-  MapPin,
+  // MapPin removed: field-map consolidated into /dashboard/map
   Scissors,
 } from "lucide-react";
 
@@ -152,12 +152,6 @@ function AuthenticatedLayout() {
       label: "Sección 3D",
       group: "FIELD",
     },
-    {
-      to: "/dashboard/field-map",
-      icon: <MapPin className="w-3.5 h-3.5" />,
-      label: "Mapa de campo",
-      group: "FIELD",
-    },
     canAccess(role, "sampling") && {
       to: "/dashboard/sampling",
       icon: <TestTube2 className="w-3.5 h-3.5" />,
@@ -273,12 +267,6 @@ function AuthenticatedLayout() {
       to: "/dashboard/admin",
       icon: <Crown className="w-3.5 h-3.5" />,
       label: "Admin",
-      group: "ACCOUNT",
-    },
-    canAccess(role, "palmeras") && {
-      to: "/dashboard/palmeras",
-      icon: <Mountain className="w-3.5 h-3.5" />,
-      label: "Demo · Palmeras",
       group: "ACCOUNT",
     },
   ].filter(Boolean) as RailItem[];
