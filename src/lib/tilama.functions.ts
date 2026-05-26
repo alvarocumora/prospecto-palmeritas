@@ -38,7 +38,7 @@ export type TilamaConcession = {
   holder: string | null;
   area_ha: number | null;
   commune: string | null;
-  geometry_geojson: unknown;
+  geometry_geojson: GeoJSON.Geometry | null;
 };
 
 export type TilamaTarget = {
