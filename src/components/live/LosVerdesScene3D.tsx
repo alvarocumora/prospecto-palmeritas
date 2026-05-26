@@ -380,6 +380,26 @@ export function LosVerdesScene3D({
     else m.once("idle", apply);
   }, [layers]);
 
+  // Escucha selección desde otras vistas (FieldMap) → flyTo + pulso
+  useEffect(() => {
+    const off = onLosVerdesFocus((d) => {
+      if (d.source === "scene3d") return;
+      const m = mapRef.current;
+      if (!m) return;
+      m.flyTo({ center: [d.lng, d.lat], zoom: 14.5, pitch: 62, speed: 1.2 });
+      const popup = new maplibregl.Popup({ closeButton: true, offset: 12 })
+        .setLngLat([d.lng, d.lat])
+        .setHTML(
+          `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+            <strong>${d.kind.toUpperCase()}</strong><br/>${d.label ?? d.id}
+          </div>`,
+        )
+        .addTo(m);
+      window.setTimeout(() => popup.remove(), 4000);
+    });
+    return off;
+  }, []);
+
   return (
     <div className="relative w-full h-[640px] rounded-lg overflow-hidden border border-border bg-bg-secondary">
       <div ref={ref} className="absolute inset-0" />
