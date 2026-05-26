@@ -125,10 +125,10 @@ export function FieldMapPublic() {
   const [loadingData, setLoadingData] = useState(true);
   const [follow, setFollow] = useState(false);
   const [showTargets, setShowTargets] = useState(true);
-  const [showHeatmap, setShowHeatmap] = useState(false);
-  const [showLineaments, setShowLineaments] = useState(false);
+  const [showHeatmap, setShowHeatmap] = useState(true);
+  const [showLineaments, setShowLineaments] = useState(true);
   const [show3D, setShow3D] = useState(false);
-  const [showCatastro, setShowCatastro] = useState(false);
+  const [showCatastro, setShowCatastro] = useState(true);
   const [catastroCount, setCatastroCount] = useState<number | null>(null);
   const [loadingCatastro, setLoadingCatastro] = useState(false);
   const [projectConcessions, setProjectConcessions] = useState<PublicProjectConcession[]>([]);
@@ -140,9 +140,9 @@ export function FieldMapPublic() {
   const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const [pois, setPois] = useState<LocalPoi[]>([]);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [online, setOnline] = useState(
-    typeof navigator !== "undefined" ? navigator.onLine : true,
-  );
+  // Default `true` on SSR/first render to avoid hydration mismatch;
+  // real online status syncs in the effect below after mount.
+  const [online, setOnline] = useState(true);
 
   const projectConcessionNorm = useMemo(
     () =>
@@ -164,6 +164,7 @@ export function FieldMapPublic() {
   }, []);
 
   useEffect(() => {
+    setOnline(navigator.onLine);
     const up = () => setOnline(true);
     const down = () => setOnline(false);
     window.addEventListener("online", up);
