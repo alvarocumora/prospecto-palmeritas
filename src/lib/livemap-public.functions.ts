@@ -91,6 +91,8 @@ export type SatAnomalyPoint = {
   area_ha: number | null;
   lat: number;
   lng: number;
+  /** Polygon outer ring as [lng,lat] pairs (deck.gl convention). Null for point geometries. */
+  polygon: [number, number][] | null;
 };
 
 export type Lineament = {
@@ -162,6 +164,7 @@ export const getLosVerdesAnomalies = createServerFn({ method: "GET" }).handler(
       let lat = 0;
       let lng = 0;
       let path: [number, number][] = [];
+      let polygonLngLat: [number, number][] | null = null;
 
       if (geom.type === "Point" && Array.isArray(geom.coordinates)) {
         const [glng, glat] = geom.coordinates as [number, number];
@@ -174,6 +177,7 @@ export const getLosVerdesAnomalies = createServerFn({ method: "GET" }).handler(
         lat = clat;
         lng = clng;
         path = outer.map(([x, y]) => [Number(y), Number(x)] as [number, number]);
+        polygonLngLat = outer.map(([x, y]) => [Number(x), Number(y)] as [number, number]);
       } else {
         continue;
       }
@@ -186,6 +190,7 @@ export const getLosVerdesAnomalies = createServerFn({ method: "GET" }).handler(
         area_ha: row.area_ha != null ? Number(row.area_ha) : null,
         lat,
         lng,
+        polygon: polygonLngLat,
       });
 
       if (row.index_code === "STRUCTURAL_LINEAMENTS" && path.length >= 2) {
