@@ -18,12 +18,38 @@ import type {
 import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
 import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 
-const COMMODITY_COLOR: Record<string, string> = {
-  Cu: "#fb923c",
-  "Cu-Au": "#facc15",
-  "Cu-Ag": "#c084fc",
+// Color por commodity individual (chips de leyenda y filtro).
+const COMMODITY_TOKENS = ["Au", "Ag", "Cu", "Mo"] as const;
+type CommodityToken = (typeof COMMODITY_TOKENS)[number];
+const COMMODITY_COLOR: Record<CommodityToken, string> = {
   Au: "#fde047",
+  Ag: "#c084fc",
+  Cu: "#fb923c",
+  Mo: "#38bdf8",
 };
+const COMMODITY_LABEL: Record<CommodityToken, string> = {
+  Au: "Oro",
+  Ag: "Plata",
+  Cu: "Cobre",
+  Mo: "Molibdeno",
+};
+
+// Parsea "Cu-Au" → ["Cu","Au"], "Au/Ag" → ["Au","Ag"], etc.
+function parseCommodities(raw: string | null | undefined): CommodityToken[] {
+  if (!raw) return ["Cu"];
+  const tokens = raw
+    .split(/[-+/,\s]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const out = tokens.filter((t): t is CommodityToken =>
+    (COMMODITY_TOKENS as readonly string[]).includes(t),
+  );
+  return out.length ? out : ["Cu"];
+}
+
+function veinColor(raw: string | null | undefined): string {
+  return COMMODITY_COLOR[parseCommodities(raw)[0]];
+}
 const PHASE_COLOR: Record<string, string> = {
   heap_leach: "#22d3ee",
   open_pit: "#f59e0b",
