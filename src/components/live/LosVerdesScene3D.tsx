@@ -536,6 +536,10 @@ export function LosVerdesScene3D({
       setVis("lineaments-line", layers.lineaments);
       setVis("mag-halo", layers.mag);
       setVis("targets-pt", layers.targets);
+      setVis("veins-line", layers.veins);
+      setVis("veins-glow", layers.veins);
+      setVis("phases-extr", layers.plan);
+      setVis("phases-outline", layers.plan);
     };
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
@@ -600,6 +604,8 @@ export function LosVerdesScene3D({
         {[
           { k: "sat" as const, label: "Anomalías SAT (3D)", color: "#f59e0b" },
           { k: "lineaments" as const, label: "Lineamientos", color: "#ef4444" },
+          { k: "veins" as const, label: "Vetas Cu-Au-Ag", color: "#fb923c" },
+          { k: "plan" as const, label: "Fases de explotación", color: "#22d3ee" },
           { k: "mag" as const, label: "Magnéticas", color: "#a855f7" },
           { k: "targets" as const, label: "Targets", color: "#dc2626" },
         ].map((row) => (
