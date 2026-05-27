@@ -1,14 +1,20 @@
 // Visor 3D MapLibre para Distrito Los Verdes (Tilama).
-// - DEM Terrarium real + Esri World Imagery
-// - Anomalías satelitales extruidas (volumen proporcional a score)
-// - Lineamientos estructurales 3D
-// - Targets de exploración por prioridad
-// - Halos magnéticos
-// - KPIs de volumen estimado de material anómalo
+// Coherencia geológica:
+//  - Anomalías SAT extruidas desde la cota real del DEM (no desde 0 msnm)
+//  - Fases del plan según método: open_pit baja, underground subterránea, heap_leach arriba
+//  - Vetas: traza superficial + footprint inclinado proyectado por strike/dip
+// Herramientas reales (industria):
+//  - Medición distancia/área con elevación (Terra Draw + DEM)
+//  - Fullscreen, reset cámara, exageración configurable
+//  - Coord readout (lat/lng/cota) bajo cursor
+//  - Bookmarks de vista por proyecto (localStorage)
+//  - Búsqueda de veta/target → flyTo
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Layers, Mountain, Activity } from "lucide-react";
+import { MaplibreMeasureControl } from "@watergis/maplibre-gl-terradraw";
+import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
+import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw } from "lucide-react";
 import type {
   PublicTarget,
   SatAnomalyPoint,
@@ -17,8 +23,13 @@ import type {
 } from "@/lib/livemap-public.functions";
 import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
 import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
+import {
+  centroid,
+  polygonCentroid,
+  lineMidpoint,
+  veinDipFootprint,
+} from "@/lib/losverdes-geometry";
 
-// Color por commodity individual (chips de leyenda y filtro).
 const COMMODITY_TOKENS = ["Au", "Ag", "Cu", "Mo"] as const;
 type CommodityToken = (typeof COMMODITY_TOKENS)[number];
 const COMMODITY_COLOR: Record<CommodityToken, string> = {
@@ -34,7 +45,6 @@ const COMMODITY_LABEL: Record<CommodityToken, string> = {
   Mo: "Molibdeno",
 };
 
-// Parsea "Cu-Au" → ["Cu","Au"], "Au/Ag" → ["Au","Ag"], etc.
 function parseCommodities(raw: string | null | undefined): CommodityToken[] {
   if (!raw) return ["Cu"];
   const tokens = raw
@@ -50,6 +60,7 @@ function parseCommodities(raw: string | null | undefined): CommodityToken[] {
 function veinColor(raw: string | null | undefined): string {
   return COMMODITY_COLOR[parseCommodities(raw)[0]];
 }
+
 const PHASE_COLOR: Record<string, string> = {
   heap_leach: "#22d3ee",
   open_pit: "#f59e0b",
@@ -104,6 +115,37 @@ function buildStyle(): maplibregl.StyleSpecification {
   };
 }
 
+// Tipos crudos para featureCollections internas
+type FC = GeoJSON.FeatureCollection;
+
+interface Bookmark {
+  id: string;
+  name: string;
+  center: [number, number];
+  zoom: number;
+  pitch: number;
+  bearing: number;
+}
+
+const LS_BOOKMARKS = "losverdes.bookmarks.v1";
+
+function loadBookmarks(): Bookmark[] {
+  try {
+    const raw = localStorage.getItem(LS_BOOKMARKS);
+    return raw ? (JSON.parse(raw) as Bookmark[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveBookmarks(bms: Bookmark[]) {
+  try {
+    localStorage.setItem(LS_BOOKMARKS, JSON.stringify(bms));
+  } catch {
+    /* ignore */
+  }
+}
+
 export function LosVerdesScene3D({
   centerLat,
   centerLng,
@@ -125,12 +167,19 @@ export function LosVerdesScene3D({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
+  // Referencias a las FC originales (sin elev) para re-aplicar pinning a terreno
+  const satFCRef = useRef<FC | null>(null);
+  const phasesFCRef = useRef<FC | null>(null);
+  const veinPlanesFCRef = useRef<FC | null>(null);
+  const pinnedRef = useRef(false);
+
   const [layers, setLayers] = useState({
     sat: true,
     mag: false,
     lineaments: true,
     targets: true,
     veins: true,
+    veinPlanes: true,
     plan: true,
   });
   const [commoditiesOn, setCommoditiesOn] = useState<Record<CommodityToken, boolean>>({
@@ -139,6 +188,13 @@ export function LosVerdesScene3D({
     Cu: true,
     Mo: true,
   });
+  const [exag, setExag] = useState(1.6);
+  const [cursor, setCursor] = useState<{ lng: number; lat: number; elev: number | null } | null>(
+    null,
+  );
+  const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => loadBookmarks());
+  const [search, setSearch] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
   const kpis = useMemo(() => {
@@ -147,18 +203,44 @@ export function LosVerdesScene3D({
     let high = 0;
     for (const a of satAnomalies) {
       const s = Math.max(0, Math.min(1, Number(a.score ?? 0)));
-      const h = 100 + s * 600; // metros de "espesor visual"
+      const h = 100 + s * 600;
       const areaHa = Number(a.area_ha ?? 0);
       totalAreaHa += areaHa;
-      totalVolM3 += areaHa * 10000 * h; // ha→m² · h
+      totalVolM3 += areaHa * 10000 * h;
       if (a.severity === "high") high++;
     }
     return {
-      totalVolMm3: totalVolM3 / 1e6, // millones de m³
+      totalVolMm3: totalVolM3 / 1e6,
       totalAreaHa,
       highCount: high,
     };
   }, [satAnomalies]);
+
+  // Lista combinada para búsqueda
+  const searchHits = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return [] as Array<{ kind: "veta" | "target"; label: string; lng: number; lat: number }>;
+    const out: Array<{ kind: "veta" | "target"; label: string; lng: number; lat: number }> = [];
+    for (const v of veins) {
+      const lbl = `${v.code} ${v.name}`.toLowerCase();
+      if (lbl.includes(q) && v.geometry?.coordinates?.length) {
+        const m = lineMidpoint(v.geometry);
+        if (m) out.push({ kind: "veta", label: `${v.code} · ${v.name}`, lng: m[0], lat: m[1] });
+      }
+    }
+    for (const t of targets) {
+      const lbl = `${t.code ?? ""} ${t.name ?? ""}`.toLowerCase();
+      if (lbl.includes(q) && t.lat != null && t.lng != null) {
+        out.push({
+          kind: "target",
+          label: `${t.code} · ${t.name}`,
+          lng: Number(t.lng),
+          lat: Number(t.lat),
+        });
+      }
+    }
+    return out.slice(0, 8);
+  }, [search, veins, targets]);
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
@@ -173,35 +255,52 @@ export function LosVerdesScene3D({
     });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
+    map.addControl(new maplibregl.FullscreenControl(), "top-right");
+
+    // Herramienta de medición (distancia + área) con elevación del DEM
+    try {
+      const measure = new MaplibreMeasureControl({
+        modes: ["render", "linestring", "polygon", "delete-selection", "delete"],
+        open: false,
+        computeElevation: true,
+      });
+      map.addControl(measure, "top-right");
+    } catch (err) {
+      console.warn("[scene3d] Terra Draw measure no se pudo inicializar", err);
+    }
     mapRef.current = map;
 
     map.on("load", () => {
-      // ---- Anomalías satelitales (polígonos extruidos) ----
-      const satFC: GeoJSON.FeatureCollection = {
+      // ---- Anomalías SAT (fill-extrusion anclado al DEM) ----
+      const satFC: FC = {
         type: "FeatureCollection",
         features: satAnomalies
           .filter((a) => a.polygon && a.polygon.length >= 3)
           .map((a) => {
             const s = Math.max(0, Math.min(1, Number(a.score ?? 0)));
             const h = 100 + s * 600;
+            const ring = a.polygon as [number, number][];
+            const c = centroid(ring);
             return {
               type: "Feature",
-              geometry: {
-                type: "Polygon",
-                coordinates: [a.polygon as [number, number][]],
-              },
+              geometry: { type: "Polygon", coordinates: [ring] },
               properties: {
                 id: a.id,
                 index_code: a.index_code,
                 severity: a.severity,
                 score: Number(a.score ?? 0),
                 area_ha: a.area_ha ?? 0,
-                height: h,
+                thickness: h,
+                base: 0,
+                top: h,
+                centroid_lng: c[0],
+                centroid_lat: c[1],
                 color: SEVERITY_COLOR[a.severity] ?? "#f59e0b",
               },
             } as GeoJSON.Feature;
           }),
       };
+      satFCRef.current = satFC;
       map.addSource("sat-anom", { type: "geojson", data: satFC });
       map.addLayer({
         id: "sat-anom-extr",
@@ -209,8 +308,8 @@ export function LosVerdesScene3D({
         source: "sat-anom",
         paint: {
           "fill-extrusion-color": ["get", "color"],
-          "fill-extrusion-height": ["get", "height"],
-          "fill-extrusion-base": 0,
+          "fill-extrusion-base": ["get", "base"],
+          "fill-extrusion-height": ["get", "top"],
           "fill-extrusion-opacity": 0.7,
         },
       });
@@ -222,7 +321,7 @@ export function LosVerdesScene3D({
       });
 
       // ---- Lineamientos estructurales ----
-      const linFC: GeoJSON.FeatureCollection = {
+      const linFC: FC = {
         type: "FeatureCollection",
         features: lineaments.map((l) => ({
           type: "Feature",
@@ -250,8 +349,8 @@ export function LosVerdesScene3D({
         },
       });
 
-      // ---- Anomalías magnéticas (halos circulares) ----
-      const magFC: GeoJSON.FeatureCollection = {
+      // ---- Anomalías magnéticas (halos) ----
+      const magFC: FC = {
         type: "FeatureCollection",
         features: magTargets.map((m) => ({
           type: "Feature",
@@ -279,17 +378,14 @@ export function LosVerdesScene3D({
         },
       });
 
-      // ---- Targets exploración ----
-      const tgtFC: GeoJSON.FeatureCollection = {
+      // ---- Targets ----
+      const tgtFC: FC = {
         type: "FeatureCollection",
         features: targets
           .filter((t) => t.lat != null && t.lng != null)
           .map((t) => ({
             type: "Feature",
-            geometry: {
-              type: "Point",
-              coordinates: [Number(t.lng), Number(t.lat)],
-            },
+            geometry: { type: "Point", coordinates: [Number(t.lng), Number(t.lat)] },
             properties: {
               code: t.code,
               name: t.name,
@@ -313,28 +409,40 @@ export function LosVerdesScene3D({
         },
       });
 
-      // ---- Fases del plan de explotación (polígonos 3D) ----
-      const phaseFC: GeoJSON.FeatureCollection = {
+      // ---- Fases del plan de explotación ----
+      // base/top se calculan a partir del DEM una vez cargado.
+      // Para que MapLibre acepte el extrusion, top > base; usamos thickness real.
+      const phaseFC: FC = {
         type: "FeatureCollection",
         features: phases
           .filter((p) => (p.area_polygon?.coordinates?.[0]?.length ?? 0) >= 3)
-          .map((p) => ({
-            type: "Feature",
-            geometry: p.area_polygon as GeoJSON.Polygon,
-            properties: {
-              id: p.id,
-              phase_no: p.phase_no,
-              name: p.name,
-              method: p.method,
-              tonnes: p.cubication?.tonnes ?? 0,
-              revenue: p.cubication?.revenueUsd ?? 0,
-              npv: p.cubication?.npvUsd ?? 0,
-              capex: p.cubication?.capexUsd ?? 0,
-              height: Number(p.avg_thickness_m ?? 30),
-              color: PHASE_COLOR[p.method ?? ""] ?? "#64748b",
-            },
-          })),
+          .map((p) => {
+            const c = polygonCentroid(p.area_polygon) ?? [centerLng, centerLat];
+            const thickness = Math.max(5, Number(p.avg_thickness_m ?? 30));
+            return {
+              type: "Feature",
+              geometry: p.area_polygon as GeoJSON.Polygon,
+              properties: {
+                id: p.id,
+                phase_no: p.phase_no,
+                name: p.name,
+                method: p.method ?? "open_pit",
+                tonnes: p.cubication?.tonnes ?? 0,
+                revenue: p.cubication?.revenueUsd ?? 0,
+                npv: p.cubication?.npvUsd ?? 0,
+                capex: p.cubication?.capexUsd ?? 0,
+                thickness,
+                // base/top finales en m AMSL — placeholder hasta que pinemos al DEM
+                base: 0,
+                top: thickness,
+                centroid_lng: c[0],
+                centroid_lat: c[1],
+                color: PHASE_COLOR[p.method ?? ""] ?? "#64748b",
+              },
+            } as GeoJSON.Feature;
+          }),
       };
+      phasesFCRef.current = phaseFC;
       map.addSource("phases", { type: "geojson", data: phaseFC });
       map.addLayer({
         id: "phases-extr",
@@ -342,20 +450,77 @@ export function LosVerdesScene3D({
         source: "phases",
         paint: {
           "fill-extrusion-color": ["get", "color"],
-          "fill-extrusion-height": ["*", ["get", "height"], 3],
-          "fill-extrusion-base": 0,
-          "fill-extrusion-opacity": 0.35,
+          "fill-extrusion-base": ["get", "base"],
+          "fill-extrusion-height": ["get", "top"],
+          "fill-extrusion-opacity": 0.42,
         },
       });
       map.addLayer({
         id: "phases-outline",
         type: "line",
         source: "phases",
-        paint: { "line-color": ["get", "color"], "line-width": 1.6, "line-dasharray": [2, 1] },
+        paint: { "line-color": ["get", "color"], "line-width": 1.8, "line-dasharray": [2, 1] },
       });
 
-      // ---- Vetas (traza superficial + cuerpo extruido en profundidad) ----
-      const veinLineFC: GeoJSON.FeatureCollection = {
+      // ---- Vetas: footprint inclinado (proyección strike/dip a profundidad) ----
+      const planeFeatures: GeoJSON.Feature[] = [];
+      for (const v of veins) {
+        const trace = v.geometry?.coordinates;
+        if (!trace || trace.length < 2) continue;
+        const depthBottom = Number(v.depth_bottom_m ?? 0);
+        if (depthBottom <= 0) continue;
+        const ring = veinDipFootprint({
+          trace,
+          dip_deg: Number(v.dip_deg ?? 75),
+          dip_dir_deg: Number(v.dip_dir_deg ?? 90),
+          depth_bottom_m: depthBottom,
+        });
+        if (!ring) continue;
+        const toks = parseCommodities(v.commodity);
+        planeFeatures.push({
+          type: "Feature",
+          geometry: { type: "Polygon", coordinates: ring },
+          properties: {
+            id: v.id,
+            code: v.code,
+            name: v.name,
+            commodity: v.commodity ?? "Cu",
+            has_au: toks.includes("Au"),
+            has_ag: toks.includes("Ag"),
+            has_cu: toks.includes("Cu"),
+            has_mo: toks.includes("Mo"),
+            depth_top: Number(v.depth_top_m ?? 0),
+            depth_bottom: depthBottom,
+            color: veinColor(v.commodity),
+          },
+        });
+      }
+      const veinPlaneFC: FC = { type: "FeatureCollection", features: planeFeatures };
+      veinPlanesFCRef.current = veinPlaneFC;
+      map.addSource("vein-planes", { type: "geojson", data: veinPlaneFC });
+      map.addLayer({
+        id: "vein-planes-fill",
+        type: "fill",
+        source: "vein-planes",
+        paint: {
+          "fill-color": ["get", "color"],
+          "fill-opacity": 0.18,
+        },
+      });
+      map.addLayer({
+        id: "vein-planes-outline",
+        type: "line",
+        source: "vein-planes",
+        paint: {
+          "line-color": ["get", "color"],
+          "line-width": 1.2,
+          "line-dasharray": [1.5, 1.5],
+          "line-opacity": 0.7,
+        },
+      });
+
+      // ---- Vetas: traza superficial ----
+      const veinLineFC: FC = {
         type: "FeatureCollection",
         features: veins
           .filter((v) => (v.geometry?.coordinates?.length ?? 0) >= 2)
@@ -369,7 +534,6 @@ export function LosVerdesScene3D({
                 code: v.code,
                 name: v.name,
                 commodity: v.commodity ?? "Cu",
-                commodity_primary: toks[0],
                 has_au: toks.includes("Au"),
                 has_ag: toks.includes("Ag"),
                 has_cu: toks.includes("Cu"),
@@ -377,6 +541,8 @@ export function LosVerdesScene3D({
                 strike: v.strike_deg ?? 0,
                 dip: v.dip_deg ?? 75,
                 thickness: v.thickness_m ?? 0,
+                depth_top: v.depth_top_m ?? 0,
+                depth_bottom: v.depth_bottom_m ?? 0,
                 tonnes: v.cubication?.tonnes ?? 0,
                 revenue: v.cubication?.revenueUsd ?? 0,
                 color: veinColor(v.commodity),
@@ -385,16 +551,6 @@ export function LosVerdesScene3D({
           }),
       };
       map.addSource("veins", { type: "geojson", data: veinLineFC });
-      map.addLayer({
-        id: "veins-line",
-        type: "line",
-        source: "veins",
-        paint: {
-          "line-color": ["get", "color"],
-          "line-width": 3.2,
-          "line-opacity": 0.95,
-        },
-      });
       map.addLayer({
         id: "veins-glow",
         type: "line",
@@ -406,9 +562,19 @@ export function LosVerdesScene3D({
           "line-blur": 4,
         },
       });
+      map.addLayer({
+        id: "veins-line",
+        type: "line",
+        source: "veins",
+        paint: {
+          "line-color": ["get", "color"],
+          "line-width": 3.2,
+          "line-opacity": 0.95,
+        },
+      });
 
-      // ---- Popups vetas / fases ----
-      const veinPopup = new maplibregl.Popup({ closeButton: true, offset: 8 });
+      // ---- Popups ----
+      const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
       map.on("click", "veins-line", (e) => {
         const f = e.features?.[0];
         if (!f) return;
@@ -418,13 +584,14 @@ export function LosVerdesScene3D({
           tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
         const rev = Number(p.revenue ?? 0);
         const rFmt = rev >= 1e6 ? `$${(rev / 1e6).toFixed(1)}M` : `$${(rev / 1e3).toFixed(0)}k`;
-        veinPopup
+        popup
           .setLngLat(e.lngLat)
           .setHTML(
             `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
               <strong>${p.code}</strong> · ${p.commodity}<br/>${p.name}<br/>
               Strike ${Number(p.strike).toFixed(0)}° · Dip ${Number(p.dip).toFixed(0)}°<br/>
               Potencia: ${Number(p.thickness).toFixed(1)} m<br/>
+              Profundidad: ${Number(p.depth_top).toFixed(0)}–${Number(p.depth_bottom).toFixed(0)} m<br/>
               Recurso conceptual: <b>${tFmt}</b><br/>
               In-situ value: <b>${rFmt}</b>
             </div>`,
@@ -448,7 +615,7 @@ export function LosVerdesScene3D({
           tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
         const npv = Number(p.npv ?? 0);
         const npvFmt = `${npv < 0 ? "-" : ""}$${(Math.abs(npv) / 1e6).toFixed(1)}M`;
-        veinPopup
+        popup
           .setLngLat(e.lngLat)
           .setHTML(
             `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
@@ -460,9 +627,6 @@ export function LosVerdesScene3D({
           )
           .addTo(map);
       });
-
-      // ---- Popups ----
-      const popup = new maplibregl.Popup({ closeButton: false });
       map.on("click", "sat-anom-extr", (e) => {
         const f = e.features?.[0];
         if (!f) return;
@@ -475,7 +639,8 @@ export function LosVerdesScene3D({
               Severidad: <b>${p.severity}</b><br/>
               Score: ${Number(p.score).toFixed(2)}<br/>
               Área: ${Number(p.area_ha).toFixed(1)} ha<br/>
-              Espesor (estim): ${Number(p.height).toFixed(0)} m
+              Espesor: ${Number(p.thickness).toFixed(0)} m<br/>
+              Base: ${Number(p.base).toFixed(0)} m AMSL
             </div>`,
           )
           .addTo(map);
@@ -534,20 +699,88 @@ export function LosVerdesScene3D({
         });
       });
 
-      for (const id of ["sat-anom-extr", "targets-pt", "mag-halo"]) {
+      for (const id of [
+        "sat-anom-extr",
+        "targets-pt",
+        "mag-halo",
+        "veins-line",
+        "phases-extr",
+      ]) {
         map.on("mouseenter", id, () => (map.getCanvas().style.cursor = "pointer"));
         map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
       }
+
+      // ---- Mousemove → coord readout ----
+      map.on("mousemove", (e) => {
+        const elev = map.queryTerrainElevation
+          ? (map.queryTerrainElevation(e.lngLat) ?? null)
+          : null;
+        setCursor({ lng: e.lngLat.lng, lat: e.lngLat.lat, elev });
+      });
+      map.on("mouseout", () => setCursor(null));
+
+      // ---- Pin de fill-extrusion al DEM ----
+      // El DEM tarda en cargar; intentamos en `idle` y reintentamos al evento
+      // `sourcedata` del raster-dem hasta tener un elevation finito.
+      const pin = () => {
+        if (pinnedRef.current) return;
+        // Comprobación con un sondeo en el centro
+        const probe = map.queryTerrainElevation([centerLng, centerLat]);
+        if (probe == null || !isFinite(probe)) return;
+        pinnedRef.current = true;
+
+        // Sat anomalías: base = elev_centroide, top = base + thickness
+        const sat = satFCRef.current;
+        if (sat) {
+          for (const f of sat.features) {
+            const lng = Number(f.properties?.centroid_lng);
+            const lat = Number(f.properties?.centroid_lat);
+            const elev = map.queryTerrainElevation([lng, lat]) ?? 0;
+            const th = Number(f.properties?.thickness ?? 200);
+            f.properties = { ...f.properties, base: Math.max(0, elev), top: Math.max(0, elev) + th };
+          }
+          (map.getSource("sat-anom") as maplibregl.GeoJSONSource).setData(sat);
+        }
+
+        // Fases: base/top según método
+        const ph = phasesFCRef.current;
+        if (ph) {
+          for (const f of ph.features) {
+            const lng = Number(f.properties?.centroid_lng);
+            const lat = Number(f.properties?.centroid_lat);
+            const elev = map.queryTerrainElevation([lng, lat]) ?? 0;
+            const th = Number(f.properties?.thickness ?? 30);
+            const method = String(f.properties?.method ?? "open_pit");
+            let base = elev;
+            let top = elev + th;
+            if (method === "open_pit") {
+              base = Math.max(0, elev - th);
+              top = elev;
+            } else if (method === "underground") {
+              base = Math.max(0, elev - (th + 50));
+              top = Math.max(5, elev - 50);
+            } else {
+              base = elev;
+              top = elev + th;
+            }
+            if (top <= base) top = base + 5;
+            f.properties = { ...f.properties, base, top };
+          }
+          (map.getSource("phases") as maplibregl.GeoJSONSource).setData(ph);
+        }
+      };
+      map.on("idle", pin);
     });
 
     return () => {
       map.remove();
       mapRef.current = null;
+      pinnedRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Toggle visibilidad sin recrear mapa
+  // Toggle visibilidad + filtro de commodities
   useEffect(() => {
     const m = mapRef.current;
     if (!m) return;
@@ -563,10 +796,11 @@ export function LosVerdesScene3D({
       setVis("targets-pt", layers.targets);
       setVis("veins-line", layers.veins);
       setVis("veins-glow", layers.veins);
+      setVis("vein-planes-fill", layers.veinPlanes);
+      setVis("vein-planes-outline", layers.veinPlanes);
       setVis("phases-extr", layers.plan);
       setVis("phases-outline", layers.plan);
 
-      // Filtro por commodity sobre vetas
       const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
         (c) => commoditiesOn[c],
       );
@@ -579,7 +813,7 @@ export function LosVerdesScene3D({
             ),
           ]
         : ["==", ["literal", 1], ["literal", 0]];
-      for (const id of ["veins-line", "veins-glow"]) {
+      for (const id of ["veins-line", "veins-glow", "vein-planes-fill", "vein-planes-outline"]) {
         if (m.getLayer(id)) m.setFilter(id, veinFilter);
       }
     };
@@ -587,7 +821,22 @@ export function LosVerdesScene3D({
     else m.once("idle", apply);
   }, [layers, commoditiesOn]);
 
-  // Escucha selección desde otras vistas (FieldMap) → flyTo + pulso
+  // Exageración del terreno
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    const apply = () => {
+      try {
+        m.setTerrain({ source: "terrain", exaggeration: exag });
+      } catch {
+        /* ignore */
+      }
+    };
+    if (m.isStyleLoaded()) apply();
+    else m.once("idle", apply);
+  }, [exag]);
+
+  // Escucha selección desde otras vistas (FieldMap) → flyTo
   useEffect(() => {
     const off = onLosVerdesFocus((d) => {
       if (d.source === "scene3d") return;
@@ -606,6 +855,68 @@ export function LosVerdesScene3D({
     });
     return off;
   }, []);
+
+  // Handlers UI
+  const resetCamera = () => {
+    mapRef.current?.easeTo({
+      center: [centerLng, centerLat],
+      zoom: 12.5,
+      pitch: 62,
+      bearing: -25,
+      duration: 900,
+    });
+  };
+
+  const saveBookmark = () => {
+    const m = mapRef.current;
+    if (!m) return;
+    const name = window.prompt("Nombre del bookmark:", `Vista ${bookmarks.length + 1}`);
+    if (!name) return;
+    const c = m.getCenter();
+    const bm: Bookmark = {
+      id: crypto.randomUUID(),
+      name,
+      center: [c.lng, c.lat],
+      zoom: m.getZoom(),
+      pitch: m.getPitch(),
+      bearing: m.getBearing(),
+    };
+    const next = [...bookmarks, bm];
+    setBookmarks(next);
+    saveBookmarks(next);
+  };
+
+  const goBookmark = (bm: Bookmark) => {
+    mapRef.current?.easeTo({
+      center: bm.center,
+      zoom: bm.zoom,
+      pitch: bm.pitch,
+      bearing: bm.bearing,
+      duration: 900,
+    });
+  };
+
+  const removeBookmark = (id: string) => {
+    const next = bookmarks.filter((b) => b.id !== id);
+    setBookmarks(next);
+    saveBookmarks(next);
+  };
+
+  const flyToHit = (lng: number, lat: number, label: string, kind: "veta" | "target") => {
+    const m = mapRef.current;
+    if (!m) return;
+    m.flyTo({ center: [lng, lat], zoom: 15, pitch: 62, speed: 1.2 });
+    setSearch("");
+    setSearchOpen(false);
+    emitLosVerdesFocus({
+      kind: kind === "veta" ? "target" : "target",
+      id: label,
+      label,
+      lat,
+      lng,
+      source: "scene3d",
+    });
+  };
 
   return (
     <div className="relative w-full h-[640px] rounded-lg overflow-hidden border border-border bg-bg-secondary">
@@ -638,6 +949,96 @@ export function LosVerdesScene3D({
         </div>
       </div>
 
+      {/* Toolbar central (búsqueda + cámara + bookmarks) */}
+      <div className="absolute top-3 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setSearchOpen((v) => !v)}
+            title="Buscar veta/target"
+            className="bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1.5 text-[11px] flex items-center gap-1.5 hover:border-gold/50"
+          >
+            <Search className="w-3.5 h-3.5" /> Buscar
+          </button>
+          {searchOpen && (
+            <div className="absolute top-full mt-1 left-0 w-[260px] bg-bg-secondary/98 backdrop-blur border border-border rounded p-2 shadow-lg">
+              <input
+                autoFocus
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Código o nombre…"
+                className="w-full bg-transparent border border-border rounded px-2 py-1 text-[11px] outline-none focus:border-gold/60"
+              />
+              {searchHits.length > 0 && (
+                <ul className="mt-1 max-h-[200px] overflow-auto text-[11px]">
+                  {searchHits.map((h, i) => (
+                    <li key={i}>
+                      <button
+                        type="button"
+                        onClick={() => flyToHit(h.lng, h.lat, h.label, h.kind)}
+                        className="w-full text-left px-2 py-1 rounded hover:bg-bg-primary/60"
+                      >
+                        <span className="text-muted-foreground uppercase text-[9px] mr-1">
+                          {h.kind}
+                        </span>
+                        {h.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={resetCamera}
+          title="Reset cámara"
+          className="bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1.5 text-[11px] flex items-center gap-1.5 hover:border-gold/50"
+        >
+          <RotateCcw className="w-3.5 h-3.5" /> Reset
+        </button>
+        <button
+          type="button"
+          onClick={saveBookmark}
+          title="Guardar vista"
+          className="bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1.5 text-[11px] flex items-center gap-1.5 hover:border-gold/50"
+        >
+          <Bookmark className="w-3.5 h-3.5" /> Guardar
+        </button>
+      </div>
+
+      {/* Exageración + readout cursor */}
+      <div className="absolute bottom-16 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1.5 min-w-[200px]">
+        <div className="flex items-center gap-2">
+          <Mountain className="w-3 h-3 text-gold" />
+          <span className="text-muted-foreground">Exag DEM</span>
+          <input
+            type="range"
+            min={1}
+            max={3}
+            step={0.1}
+            value={exag}
+            onChange={(e) => setExag(Number(e.target.value))}
+            className="flex-1 accent-gold"
+          />
+          <span className="text-foreground tabular-nums">{exag.toFixed(1)}×</span>
+        </div>
+        <div className="flex items-center gap-2 border-t border-border/60 pt-1.5">
+          <Crosshair className="w-3 h-3 text-gold" />
+          {cursor ? (
+            <span className="tabular-nums text-foreground">
+              {cursor.lat.toFixed(4)}, {cursor.lng.toFixed(4)}
+              {cursor.elev != null && (
+                <span className="text-muted-foreground"> · {cursor.elev.toFixed(0)} m</span>
+              )}
+            </span>
+          ) : (
+            <span className="text-muted-foreground">— · — · —</span>
+          )}
+        </div>
+      </div>
+
       {/* Capas */}
       <div className="absolute bottom-3 right-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1.5">
         <div className="text-gold uppercase tracking-wider flex items-center gap-1.5">
@@ -646,7 +1047,8 @@ export function LosVerdesScene3D({
         {[
           { k: "sat" as const, label: "Anomalías SAT (3D)", color: "#f59e0b" },
           { k: "lineaments" as const, label: "Lineamientos", color: "#ef4444" },
-          { k: "veins" as const, label: "Vetas Cu-Au-Ag", color: "#fb923c" },
+          { k: "veins" as const, label: "Vetas (traza)", color: "#fb923c" },
+          { k: "veinPlanes" as const, label: "Vetas (footprint dip)", color: "#fbbf24" },
           { k: "plan" as const, label: "Fases de explotación", color: "#22d3ee" },
           { k: "mag" as const, label: "Magnéticas", color: "#a855f7" },
           { k: "targets" as const, label: "Targets", color: "#dc2626" },
@@ -664,8 +1066,8 @@ export function LosVerdesScene3D({
         ))}
       </div>
 
-      {/* Leyenda + filtro de commodities */}
-      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-2 max-w-[230px]">
+      {/* Leyenda commodities + Bookmarks */}
+      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-2 max-w-[260px]">
         <div>
           <div className="text-gold uppercase tracking-wider mb-1">Vetas por commodity</div>
           <div className="flex flex-wrap gap-1.5">
@@ -694,18 +1096,33 @@ export function LosVerdesScene3D({
             })}
           </div>
         </div>
-        <div className="border-t border-border/60 pt-1.5">
-          <div className="text-muted-foreground uppercase tracking-wider mb-1">Severidad SAT</div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+        {bookmarks.length > 0 && (
+          <div className="border-t border-border/60 pt-1.5">
+            <div className="text-muted-foreground uppercase tracking-wider mb-1">Bookmarks</div>
+            <ul className="space-y-0.5 max-h-[110px] overflow-auto">
+              {bookmarks.map((bm) => (
+                <li key={bm.id} className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    onClick={() => goBookmark(bm)}
+                    className="flex-1 text-left px-1.5 py-0.5 rounded hover:bg-bg-primary/60 truncate"
+                    title={bm.name}
+                  >
+                    {bm.name}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeBookmark(bm.id)}
+                    className="text-muted-foreground hover:text-rose-400 px-1"
+                    title="Eliminar"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
