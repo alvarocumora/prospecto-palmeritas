@@ -1179,7 +1179,34 @@ export function LosVerdesScene3D({
         >
           <Bookmark className="w-3.5 h-3.5" /> Guardar
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSectionMode((v) => {
+              const next = !v;
+              if (!next) { setSectionPts([]); setSectionData(null); }
+              return next;
+            });
+          }}
+          title="Sección transversal (clic A, clic B)"
+          className={`backdrop-blur border rounded px-2 py-1.5 text-[11px] flex items-center gap-1.5 ${
+            sectionMode
+              ? "bg-gold/20 border-gold text-gold"
+              : "bg-bg-secondary/95 border-border hover:border-gold/50"
+          }`}
+        >
+          <Slice className="w-3.5 h-3.5" /> Sección {sectionMode ? `(${sectionPts.length}/2)` : ""}
+        </button>
       </div>
+
+      {sectionData && (
+        <CrossSectionPanel
+          samples={sectionData.samples}
+          veinHits={sectionData.veinHits}
+          phaseHits={sectionData.phaseHits}
+          onClose={() => { setSectionPts([]); setSectionData(null); setSectionMode(false); }}
+        />
+      )}
 
       {/* Exageración + readout cursor */}
       <div className="absolute bottom-16 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1.5 min-w-[200px]">
