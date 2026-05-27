@@ -664,17 +664,47 @@ export function LosVerdesScene3D({
         ))}
       </div>
 
-      {/* Leyenda */}
-      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1">
-        <div className="text-muted-foreground uppercase tracking-wider">Severidad</div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+      {/* Leyenda + filtro de commodities */}
+      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-2 max-w-[230px]">
+        <div>
+          <div className="text-gold uppercase tracking-wider mb-1">Vetas por commodity</div>
+          <div className="flex flex-wrap gap-1.5">
+            {COMMODITY_TOKENS.map((c) => {
+              const on = commoditiesOn[c];
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCommoditiesOn((p) => ({ ...p, [c]: !p[c] }))}
+                  className="flex items-center gap-1.5 px-1.5 py-0.5 rounded border transition-colors"
+                  style={{
+                    borderColor: on ? COMMODITY_COLOR[c] : "rgba(148,163,184,0.3)",
+                    background: on ? `${COMMODITY_COLOR[c]}22` : "transparent",
+                    opacity: on ? 1 : 0.45,
+                  }}
+                  title={`${COMMODITY_LABEL[c]} (${c})`}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-sm"
+                    style={{ background: COMMODITY_COLOR[c] }}
+                  />
+                  <span className="text-foreground">{c}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
+        <div className="border-t border-border/60 pt-1.5">
+          <div className="text-muted-foreground uppercase tracking-wider mb-1">Severidad SAT</div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
+          </div>
         </div>
       </div>
     </div>
