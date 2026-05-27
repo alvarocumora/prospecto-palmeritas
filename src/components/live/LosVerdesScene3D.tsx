@@ -14,7 +14,7 @@ import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MaplibreMeasureControl } from "@watergis/maplibre-gl-terradraw";
 import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
-import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw } from "lucide-react";
+import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw, Slice } from "lucide-react";
 import type {
   PublicTarget,
   SatAnomalyPoint,
@@ -28,7 +28,16 @@ import {
   polygonCentroid,
   lineMidpoint,
   veinDipFootprint,
+  haversineMeters,
+  lerpLngLat,
+  segmentRingIntersections,
 } from "@/lib/losverdes-geometry";
+import {
+  CrossSectionPanel,
+  type SectionSample,
+  type SectionVeinHit,
+  type SectionPhaseHit,
+} from "./CrossSectionPanel";
 
 const COMMODITY_TOKENS = ["Au", "Ag", "Cu", "Mo"] as const;
 type CommodityToken = (typeof COMMODITY_TOKENS)[number];
