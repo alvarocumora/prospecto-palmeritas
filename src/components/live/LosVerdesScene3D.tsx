@@ -730,6 +730,40 @@ export function LosVerdesScene3D({
         map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
       }
 
+      // ---- Capa de línea de sección ----
+      map.addSource("section-line", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "section-line-l",
+        type: "line",
+        source: "section-line",
+        paint: { "line-color": "#fde047", "line-width": 3, "line-dasharray": [2, 1] },
+      });
+      map.addLayer({
+        id: "section-line-pts",
+        type: "circle",
+        source: "section-line",
+        filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "#fde047",
+          "circle-stroke-color": "#0b1220",
+          "circle-stroke-width": 1.5,
+        },
+      });
+
+      // ---- Click handler para sección (captura A y B) ----
+      map.on("click", (e) => {
+        if (!sectionModeRef.current) return;
+        const cur = sectionPtsRef.current;
+        const next: [number, number][] = cur.length >= 2
+          ? [[e.lngLat.lng, e.lngLat.lat]]
+          : [...cur, [e.lngLat.lng, e.lngLat.lat]];
+        setSectionPts(next);
+      });
+
       // ---- Mousemove → coord readout ----
       map.on("mousemove", (e) => {
         const elev = map.queryTerrainElevation
