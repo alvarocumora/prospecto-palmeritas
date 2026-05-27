@@ -301,7 +301,7 @@ export function LosVerdesScene3D({
       const phaseFC: GeoJSON.FeatureCollection = {
         type: "FeatureCollection",
         features: phases
-          .filter((p) => p.area_polygon?.coordinates?.[0]?.length >= 3)
+          .filter((p) => (p.area_polygon?.coordinates?.[0]?.length ?? 0) >= 3)
           .map((p) => ({
             type: "Feature",
             geometry: p.area_polygon as GeoJSON.Polygon,
@@ -342,7 +342,7 @@ export function LosVerdesScene3D({
       const veinLineFC: GeoJSON.FeatureCollection = {
         type: "FeatureCollection",
         features: veins
-          .filter((v) => v.geometry?.coordinates?.length >= 2)
+          .filter((v) => (v.geometry?.coordinates?.length ?? 0) >= 2)
           .map((v) => ({
             type: "Feature",
             geometry: v.geometry as GeoJSON.LineString,
