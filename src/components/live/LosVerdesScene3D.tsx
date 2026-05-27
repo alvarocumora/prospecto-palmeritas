@@ -91,6 +91,8 @@ export function LosVerdesScene3D({
   magTargets,
   lineaments,
   targets,
+  veins = [],
+  phases = [],
 }: {
   centerLat: number;
   centerLng: number;
@@ -98,14 +100,18 @@ export function LosVerdesScene3D({
   magTargets: MagAnomalyPoint[];
   lineaments: Lineament[];
   targets: PublicTarget[];
+  veins?: VeinPublic[];
+  phases?: MinePlanPhasePublic[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [layers, setLayers] = useState({
     sat: true,
-    mag: true,
+    mag: false,
     lineaments: true,
     targets: true,
+    veins: true,
+    plan: true,
   });
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
