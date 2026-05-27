@@ -1,65 +1,90 @@
+## Objetivo
 
-# Visor 3D Los Verdes — Coherencia + herramientas reales
+Generar un informe PDF en calidad de pre-feasibility (estilo NI 43-101 sección "Mining Operations + Economic Analysis") para el activo **Los Verdes 5 – Distrito Tilama**, descompuesto por los tres frentes identificados en la imagen:
 
-## Diagnóstico del visor actual
+- **Frente 1 – La Guanaca** (prioridad alta, leyes 1.76 – 4.34 % Cu)
+- **Frente 2 – Los Verdes** (acceso actual, leyes 0.38 – 1.07 % Cu)
+- **Frente 3 – Castellana** (zona norte, leyes 3.24 – 6.83 % Cu)
 
-`src/components/live/LosVerdesScene3D.tsx` usa MapLibre + DEM Terrarium + Esri Imagery con seis capas (SAT extruidas, lineamientos, mag, targets, vetas, fases del plan), toggles, filtro por commodity, popups y bus `losverdes:focus`. Sin embargo la **proyección 3D no es geológicamente coherente** y **no hay herramientas reales** (medición, perfil, dibujo, coordenadas).
+## Estructura del PDF (15-18 páginas, formato Letter)
 
-### Problemas de proyección 3D
-1. **Anomalías SAT**: `fill-extrusion-base = 0`. Con terreno exagerado 1.6×, los prismas atraviesan/quedan flotando sobre el DEM en vez de "salir" de la superficie.
-2. **Fases del plan minero**: se extruyen *hacia arriba* `avg_thickness_m * 3` desde base 0 → aparecen como montañas, no como pit ni cuerpo subterráneo.
-3. **Vetas**: sólo son `LineString` drapeadas. Faltan los planos inclinados reales (strike + dip + profundidad top/bottom + potencia) que ya están en la tabla `veins`.
-4. **Lineamientos y mag**: OK como están (drape + halo 2.5D).
+1. **Portada ejecutiva** — branding Geocapitals, mapa de frentes (la imagen adjunta), ubicación regional, sello "Pre-NI 43-101 – Informe Interno".
+2. **Resumen ejecutivo** — recursos inferidos por frente, capex inicial, opex/t, payback estimado.
+3. **Marco geológico** — Cretácico Inferior, vetas epi-mesotermales Cu-Au, mineralogía (calcopirita, bornita, óxidos verdes).
+4. **Catastro minero** — tabla de concesiones (`mining_concessions`) que cubren cada frente, hectáreas, holder, vigencia.
+5. **Anomalías satelitales** — Sentinel-2 (clay, iron, hydroxyl) por frente, top 10 anomalías con score, severidad y área.
+6. **Sistema de vetas** — ficha por veta (V-LG-01, V-LG-02, V-CS-01, V-CS-02, V-TM-01, V-ES-01) con strike/dip/potencia/longitud/commodity.
+7. **Modelo 3D — snapshot del visor MapLibre** — render PNG del viewer `/live/losverdes` con DEM, drape satelital, vetas 3D y anomalías extruidas, capturado server-side.
+8. **Plan de explotación por frente** — método (rajo abierto pequeño / pirquén mecanizado / underground selectivo), fases de la BD `mine_plan_phases`, secuencia 24 meses, cubicación (tonelaje × ley × densidad 2.7 t/m³), strip ratio, recuperación esperada (chancado + venta directa a planta ENAMI).
+9. **Programa de producción** — t/mes por frente, tCu fino, leyes promedio mezcladas, calendario Year 1 / Year 2.
+10. **Plan OPEX – Comparativa 3 plantas ENAMI**:
+    - Planta Delta (Ovalle) ~155 km
+    - Planta Manuel A. Matta (Cabildo) ~135 km
+    - Planta Vallenar ~370 km
+    - Para cada una: distancia, costo transporte (USD/t·km × t), tarifa maquila ENAMI, regalía, PMP cobre (fórmula tarifario ENAMI 2025), pago neto al productor (USD/t).
+    - Tabla resumen con ganador y recomendación.
+11. **OPEX detallado USD/t** — perforación, tronadura (factor carga ~0.35 kg/t), carguío (cargador frontal 3 m³), chancado primario (móvil mandíbula), transporte interno, transporte camión 30 t a planta, administración, contingencia 15 %.
+12. **Análisis económico** — flujo de caja simplificado 24 meses, NPV (8 %), IRR, break-even ley Cu por frente.
+13. **Riesgos & mitigaciones** — geotécnicos, hídricos, sociales (comunidades Tilama), permisos sectoriales (DGA, Sernageomin).
+14. **Disclaimer & QP** — JORC/NI 43-101 disclaimer estándar, alcance del informe.
 
-### Herramientas que faltan vs estándar industria
-Medición (distancia/área), perfil de elevación, dibujo de AOI/vetas ad-hoc, lectura de coordenadas + cota bajo cursor, fullscreen, reset de bearing/pitch, bookmarks de cámara, búsqueda por código y sección transversal.
+## Datos a usar (ya en BD para project_id Tilama)
 
-## Fase 1 — Coherencia 3D (sin nuevas deps)
+- `projects`, `mining_concessions` (catastro)
+- `satellite_anomalies` (60 top score)
+- `exploration_targets` (anomalías TOO + clusters)
+- `veins` (6 estructuras)
+- `mine_plan_phases` (3 fases cargadas)
+- Muestras destacadas de la imagen: TOO-126, 155, 156 (La Guanaca); TOO-103, 105, 124 (Los Verdes); TOO-183, 184, 210 (Castellana).
 
-Archivo: `src/components/live/LosVerdesScene3D.tsx` + nuevo helper `src/lib/losverdes-geometry.ts`.
+## Implementación técnica
 
-1. **Anomalías SAT pegadas al terreno**: tras `map.on("load")`, para cada feature calcular `baseElev = map.queryTerrainElevation(centroid)`; escribir esa cota en la propiedad `base` y usar `"fill-extrusion-base": ["get", "base"]`, `"fill-extrusion-height": ["+", ["get","base"], ["get","height"]]`. Re-query cuando termine de cargar DEM (`"sourcedata"` para `terrain`).
-2. **Fases del plan**:
-   - `open_pit` → extruir *hacia abajo*: base = terrain elev, top = terrain elev − `avg_thickness_m` (usando expresión `+ base, height` con `height` negativo no es soportado; en su lugar pintamos polígono semi-transparente al nivel del pit y un anillo `line` rojo de borde + cuerpo subterráneo como `phases-body` con base/height bajo terreno).
-   - `underground` → caja `fill-extrusion` con base = terrain − `depth_top_m`, height = espesor.
-   - `heap_leach` → prisma sobre terreno (extrude arriba con base anclada).
-3. **Vetas como planos 3D**: `losverdes-geometry.ts` genera, por cada veta, un polígono cuadrilátero proyectando la traza superficial hacia profundidad según `strike_deg`, `dip_deg`, `dip_dir_deg`, `depth_top_m`, `depth_bottom_m`, `thickness_m`. Capa nueva `veins-plane` (`fill-extrusion` o `fill` con altura desde DEM) coloreada por commodity. Mantener la línea superficial actual.
-4. **Exageración configurable**: slider `1×/1.5×/2×` que llama `map.setTerrain({ source, exaggeration })`. Coherente con la escala vertical real.
+### 1. Server function `getLosVerdes5Report` (`src/lib/losverdes5.functions.ts`)
+- Agrega data Tilama + asocia anomalías / vetas / fases a cada uno de los 3 frentes vía bounding box (centro La Guanaca −32.044/−71.115, Los Verdes −32.049/−71.105, Castellana −32.027/−71.099).
+- Calcula KPIs por frente: nº muestras, ley Cu promedio/máx, área anomalía, tCu fino in-situ estimado (largo×potencia×alto×densidad×ley).
 
-## Fase 2 — Herramientas reales
+### 2. Server function `captureLosVerdes3D` (`src/lib/losverdes5-snapshot.server.ts`)
+- Renderiza headless el visor `/live/losverdes` (usando puppeteer/playwright si disponible — fallback: compone PNG estático con DEM tile + overlays SVG de vetas/frentes usando `sharp`-less canvas API ya disponible en el server).
+- **Plan B (más robusto en worker runtime)**: construir la figura 3D como **SVG isométrico** server-side con elevación sintética + polígonos de los 3 frentes + trazas de vetas, embebido como vector en el PDF (sin dependencia de browser headless).
 
-### 2.1 Medición, perfil y dibujo (dep nueva)
-`bun add @watergis/maplibre-gl-terradraw` — añade `MaplibreMeasureControl` (distancia + área con unidades, lee elevación del `raster-dem` que ya tenemos) y `MaplibreTerradrawControl` (dibujo de point/line/polygon/rectangle/circle/freehand). Botones tipo "Medir" y "Dibujar AOI" en el panel del visor.
+### 3. Módulo de cálculo `src/lib/mining-economics.ts`
+- `enamiPayment(ton, leyCu, lme, plant)` aplicando tarifario público ENAMI (PMP, maquila, créditos Au/Ag, descuentos por humedad/impurezas, regalía).
+- `transportCost(km, tons, rate=0.18 USD/t·km)`.
+- `phaseOpex(phase)` desglose por partida.
 
-### 2.2 Controles nativos MapLibre (sin dep)
-- `FullscreenControl`, `GeolocateControl` (campo).
-- Botón "Reset cámara" → `easeTo({ bearing:-25, pitch:62, zoom:12.5 })`.
-- Readout flotante con `lat/lng/cota` actualizando en `mousemove` (usa `queryTerrainElevation`).
-- Bookmarks: guardar `{center, zoom, bearing, pitch}` en `localStorage` por proyecto.
-- Búsqueda local: input que filtra vetas/targets por `code/name` y hace `flyTo` + emite `losverdes:focus`.
+### 4. Generador PDF `src/lib/losverdes5-pdf.ts`
+- Basado en `tilama-pdf.ts` pero modular: helpers `coverPage`, `frenteSection`, `enamiCompareTable`, `cashflowTable`, `risksSection`.
+- Embebe la imagen adjunta del usuario como figura principal de portada (subida a `src/assets/losverdes5-frentes.jpg`).
+- Embebe el snapshot/SVG 3D.
 
-### 2.3 Sección transversal (sin dep)
-Botón "Sección": el usuario dibuja una línea con Terra Draw. Abre panel inferior con SVG que muestra: perfil topográfico (muestreo de `queryTerrainElevation` cada N metros), intersecciones con vetas (planos calculados en 2.3 proyectados al plano vertical), y rectángulos del plan minero atravesados. Inspirado conceptualmente en `equinor/esv-intersection` pero reimplementado a medida porque ESV es para wells.
+### 5. Route `src/routes/live.losverdes5.tsx`
+- Página ligera con botón "Descargar Informe PDF Los Verdes 5" que invoca la server fn, recibe blob y dispara descarga.
+- Vista previa de KPIs por frente y mini-mapa de ubicación.
 
-## Fase 3 — Repos GitHub de referencia
+### 6. Activos
+- Copiar imagen adjunta a `src/assets/losverdes5-frentes.jpg`.
 
-| Repo | Uso |
+## Supuestos económicos (parametrizables en `mining-economics.ts`)
+
+| Parámetro | Valor base |
 |---|---|
-| `@watergis/maplibre-gl-terradraw` | **Dependencia**: measure + draw con DEM elevation. |
-| `opengeos/maplibre-gl-components` | **Referencia**: patrones para minimap, basemap switcher, swipe, terrain toggle, bookmark, print. Cherry-pick sin instalar. |
-| `geoman-io/maplibre-geoman` | Alternativa más potente a Terra Draw si en el futuro queremos editor pro (snap, split, rotate). No instalar ahora. |
-| `darkmine-oss/baselode` | **Referencia minera**: desurvey, viewer 3D de sondajes, cubicación. Para integrar en `useDrillTrajectoriesLayer` y validar `mining-calc.ts`. |
-| `equinor/esv-intersection` | **Referencia visual** de cross-section bien hecha (TS, MIT). No depender. |
-| `Trapar-waves/react-visgl-maplibre` | **Referencia** de cómo sincronizar `react-three-map`/Three.js con MapLibre + DEM si queremos modelos 3D realistas de pits o headframes. |
-| `opengeos/maplibre-gl-lidar` | Futuro: drape de nubes de puntos LiDAR/Drone. Fuera de scope ahora. |
+| LME Cu | 9 200 USD/t (4.17 USD/lb) |
+| Tarifa transporte camión 30 t | 0.18 USD/t·km |
+| Maquila ENAMI tarifa pequeña minería | 95 USD/t mineral |
+| Recuperación planta | 85 % Cu |
+| Densidad mineral in-situ | 2.7 t/m³ |
+| Cut-off económico | 0.8 % Cu |
+| Factor carga explosivo | 0.35 kg/t |
+| Strip ratio asumido | 2.5:1 rajo, 0:1 underground |
+| Tasa descuento NPV | 8 % |
 
-## Detalles técnicos
+## Entregables
 
-- **Pin de fill-extrusion al terreno**: MapLibre no expone `*-from-terrain` estable; usamos `queryTerrainElevation` por feature y guardamos `base` en `properties`, refrescando al evento `idle` del source `terrain`.
-- **Veta como plano inclinado**: dado A=(lng,lat) y B=(lng,lat) de la traza superficial, el plano se obtiene desplazando A y B en dirección `dip_dir_deg` (perpendicular a `strike`) una distancia horizontal `h = depth/tan(dip)`, con `base = terrain(A,B) − depth_top`, `top = terrain(A,B) − depth_bottom`. Polígono final con cuatro vértices y altura por vértice.
-- **Sección transversal**: muestreo cada `max(20m, length/300)` puntos, SVG `viewBox` proporcional a longitud × (cota_max − cota_min + buffer 200m bajo el target más profundo). Ejes con cotas mAS y abscisa en metros.
-- **PDF**: las nuevas capas/medidas no entran al PDF en esta fase; sólo el visor interactivo.
+- Nuevo archivo PDF descargable desde `/live/losverdes5`.
+- Código modular reutilizable (`mining-economics.ts`) para futuros informes de otros prospectos.
+- Sin cambios destructivos a `tilama-pdf.ts` existente (queda como informe distrital general).
 
-## Pendientes que no toca este plan
+## Validación
 
-Globe view, LiDAR, swipe, Three.js avanzado, edición persistente de vetas en DB. Quedan para iteración posterior.
+- `tsc --noEmit` limpio.
+- Render del PDF en sandbox vía script de prueba, conversión a imágenes con `pdftoppm` y revisión QA visual página a página antes de entregar.
