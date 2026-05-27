@@ -14,7 +14,7 @@ import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { MaplibreMeasureControl } from "@watergis/maplibre-gl-terradraw";
 import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
-import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw } from "lucide-react";
+import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw, Slice } from "lucide-react";
 import type {
   PublicTarget,
   SatAnomalyPoint,
@@ -28,7 +28,16 @@ import {
   polygonCentroid,
   lineMidpoint,
   veinDipFootprint,
+  haversineMeters,
+  lerpLngLat,
+  segmentRingIntersections,
 } from "@/lib/losverdes-geometry";
+import {
+  CrossSectionPanel,
+  type SectionSample,
+  type SectionVeinHit,
+  type SectionPhaseHit,
+} from "./CrossSectionPanel";
 
 const COMMODITY_TOKENS = ["Au", "Ag", "Cu", "Mo"] as const;
 type CommodityToken = (typeof COMMODITY_TOKENS)[number];
@@ -195,6 +204,17 @@ export function LosVerdesScene3D({
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => loadBookmarks());
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [sectionMode, setSectionMode] = useState(false);
+  const [sectionPts, setSectionPts] = useState<[number, number][]>([]);
+  const [sectionData, setSectionData] = useState<{
+    samples: SectionSample[];
+    veinHits: SectionVeinHit[];
+    phaseHits: SectionPhaseHit[];
+  } | null>(null);
+  const sectionModeRef = useRef(false);
+  const sectionPtsRef = useRef<[number, number][]>([]);
+  useEffect(() => { sectionModeRef.current = sectionMode; }, [sectionMode]);
+  useEffect(() => { sectionPtsRef.current = sectionPts; }, [sectionPts]);
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
   const kpis = useMemo(() => {
@@ -710,6 +730,40 @@ export function LosVerdesScene3D({
         map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
       }
 
+      // ---- Capa de línea de sección ----
+      map.addSource("section-line", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "section-line-l",
+        type: "line",
+        source: "section-line",
+        paint: { "line-color": "#fde047", "line-width": 3, "line-dasharray": [2, 1] },
+      });
+      map.addLayer({
+        id: "section-line-pts",
+        type: "circle",
+        source: "section-line",
+        filter: ["==", ["geometry-type"], "Point"],
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "#fde047",
+          "circle-stroke-color": "#0b1220",
+          "circle-stroke-width": 1.5,
+        },
+      });
+
+      // ---- Click handler para sección (captura A y B) ----
+      map.on("click", (e) => {
+        if (!sectionModeRef.current) return;
+        const cur = sectionPtsRef.current;
+        const next: [number, number][] = cur.length >= 2
+          ? [[e.lngLat.lng, e.lngLat.lat]]
+          : [...cur, [e.lngLat.lng, e.lngLat.lat]];
+        setSectionPts(next);
+      });
+
       // ---- Mousemove → coord readout ----
       map.on("mousemove", (e) => {
         const elev = map.queryTerrainElevation
@@ -835,6 +889,125 @@ export function LosVerdesScene3D({
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
   }, [exag]);
+
+  // Cursor crosshair cuando sectionMode activo
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    m.getCanvas().style.cursor = sectionMode ? "crosshair" : "";
+  }, [sectionMode]);
+
+  // Refleja sectionPts en la capa + calcula perfil cuando hay A-B
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    const src = m.getSource("section-line") as maplibregl.GeoJSONSource | undefined;
+    if (!src) return;
+    const features: GeoJSON.Feature[] = sectionPts.map((pt) => ({
+      type: "Feature",
+      geometry: { type: "Point", coordinates: pt },
+      properties: {},
+    }));
+    if (sectionPts.length === 2) {
+      features.push({
+        type: "Feature",
+        geometry: { type: "LineString", coordinates: sectionPts },
+        properties: {},
+      });
+    }
+    src.setData({ type: "FeatureCollection", features });
+
+    if (sectionPts.length !== 2) {
+      setSectionData(null);
+      return;
+    }
+    const [A, B] = sectionPts as [[number, number], [number, number]];
+    const totalDist = haversineMeters(A, B);
+    const N = 160;
+    const samples: SectionSample[] = [];
+    for (let i = 0; i <= N; i++) {
+      const t = i / N;
+      const pt = lerpLngLat(A, B, t);
+      const e = m.queryTerrainElevation
+        ? (m.queryTerrainElevation({ lng: pt[0], lat: pt[1] }) ?? 0)
+        : 0;
+      samples.push({ dist_m: totalDist * t, elev_m: e });
+    }
+
+    // Función distancia a lo largo de A-B para un punto cualquiera (proyección).
+    const dx = B[0] - A[0], dy = B[1] - A[1];
+    const len2 = dx * dx + dy * dy || 1;
+    const projDist = (pt: [number, number]) => {
+      const t = ((pt[0] - A[0]) * dx + (pt[1] - A[1]) * dy) / len2;
+      const tt = Math.max(0, Math.min(1, t));
+      return tt * totalDist;
+    };
+
+    // Vetas: usamos la TRAZA superficial (LineString) — intersección 1D con A-B.
+    const veinHits: SectionVeinHit[] = [];
+    for (const v of veins) {
+      const trace = v.geometry?.coordinates;
+      if (!trace || trace.length < 2) continue;
+      for (let i = 0; i < trace.length - 1; i++) {
+        const p1 = trace[i] as [number, number];
+        const p2 = trace[i + 1] as [number, number];
+        // segmentIntersect reusado
+        const x1 = A[0], y1 = A[1], x2 = B[0], y2 = B[1];
+        const x3 = p1[0], y3 = p1[1], x4 = p2[0], y4 = p2[1];
+        const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+        if (Math.abs(den) < 1e-12) continue;
+        const tA = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+        const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+        if (tA < 0 || tA > 1 || u < 0 || u > 1) continue;
+        const ix: [number, number] = [x1 + tA * (x2 - x1), y1 + tA * (y2 - y1)];
+        const surf = m.queryTerrainElevation
+          ? (m.queryTerrainElevation({ lng: ix[0], lat: ix[1] }) ?? 0)
+          : 0;
+        veinHits.push({
+          vein_code: v.code,
+          vein_name: v.name,
+          commodity: v.commodity ?? "Cu",
+          color: veinColor(v.commodity),
+          dist_m: tA * totalDist,
+          surface_elev_m: surf,
+          depth_top_m: Number(v.depth_top_m ?? 0),
+          depth_bottom_m: Number(v.depth_bottom_m ?? 100),
+        });
+        break;
+      }
+    }
+
+    // Fases: intersección segmento-polígono → entrada/salida.
+    const phaseHits: SectionPhaseHit[] = [];
+    for (const p of phases) {
+      const ring = p.area_polygon?.coordinates?.[0] as [number, number][] | undefined;
+      if (!ring || ring.length < 4) continue;
+      const ints = segmentRingIntersections(A, B, ring);
+      if (ints.length < 2) continue;
+      const dists = ints.map(projDist).sort((a, b) => a - b);
+      const c = polygonCentroid(p.area_polygon);
+      const elev = c && m.queryTerrainElevation
+        ? (m.queryTerrainElevation({ lng: c[0], lat: c[1] }) ?? 0)
+        : 0;
+      const th = Math.max(5, Number(p.avg_thickness_m ?? 30));
+      const method = p.method ?? "open_pit";
+      let base = elev, top = elev + th;
+      if (method === "open_pit") { base = elev - th; top = elev; }
+      else if (method === "underground") { base = elev - (th + 50); top = elev - 50; }
+      phaseHits.push({
+        phase_no: p.phase_no,
+        name: p.name,
+        method,
+        color: PHASE_COLOR[method] ?? "#64748b",
+        dist_m_in: dists[0],
+        dist_m_out: dists[dists.length - 1],
+        base_m: base,
+        top_m: top,
+      });
+    }
+
+    setSectionData({ samples, veinHits, phaseHits });
+  }, [sectionPts, veins, phases]);
 
   // Escucha selección desde otras vistas (FieldMap) → flyTo
   useEffect(() => {
@@ -1006,7 +1179,34 @@ export function LosVerdesScene3D({
         >
           <Bookmark className="w-3.5 h-3.5" /> Guardar
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSectionMode((v) => {
+              const next = !v;
+              if (!next) { setSectionPts([]); setSectionData(null); }
+              return next;
+            });
+          }}
+          title="Sección transversal (clic A, clic B)"
+          className={`backdrop-blur border rounded px-2 py-1.5 text-[11px] flex items-center gap-1.5 ${
+            sectionMode
+              ? "bg-gold/20 border-gold text-gold"
+              : "bg-bg-secondary/95 border-border hover:border-gold/50"
+          }`}
+        >
+          <Slice className="w-3.5 h-3.5" /> Sección {sectionMode ? `(${sectionPts.length}/2)` : ""}
+        </button>
       </div>
+
+      {sectionData && (
+        <CrossSectionPanel
+          samples={sectionData.samples}
+          veinHits={sectionData.veinHits}
+          phaseHits={sectionData.phaseHits}
+          onClose={() => { setSectionPts([]); setSectionData(null); setSectionMode(false); }}
+        />
+      )}
 
       {/* Exageración + readout cursor */}
       <div className="absolute bottom-16 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1.5 min-w-[200px]">
