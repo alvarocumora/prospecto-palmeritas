@@ -133,6 +133,12 @@ export function LosVerdesScene3D({
     veins: true,
     plan: true,
   });
+  const [commoditiesOn, setCommoditiesOn] = useState<Record<CommodityToken, boolean>>({
+    Au: true,
+    Ag: true,
+    Cu: true,
+    Mo: true,
+  });
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
   const kpis = useMemo(() => {
