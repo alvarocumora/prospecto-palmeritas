@@ -204,6 +204,17 @@ export function LosVerdesScene3D({
   const [bookmarks, setBookmarks] = useState<Bookmark[]>(() => loadBookmarks());
   const [search, setSearch] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
+  const [sectionMode, setSectionMode] = useState(false);
+  const [sectionPts, setSectionPts] = useState<[number, number][]>([]);
+  const [sectionData, setSectionData] = useState<{
+    samples: SectionSample[];
+    veinHits: SectionVeinHit[];
+    phaseHits: SectionPhaseHit[];
+  } | null>(null);
+  const sectionModeRef = useRef(false);
+  const sectionPtsRef = useRef<[number, number][]>([]);
+  useEffect(() => { sectionModeRef.current = sectionMode; }, [sectionMode]);
+  useEffect(() => { sectionPtsRef.current = sectionPts; }, [sectionPts]);
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
   const kpis = useMemo(() => {
