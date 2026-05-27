@@ -81,9 +81,14 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   doc.setTextColor(148, 163, 184);
   doc.text(
     `${report.project.commodity ?? "Cu-Au-Ag"} · ${report.project.region ?? "Coquimbo"} · ${report.project.country ?? "Chile"}`,
-    MARGIN, 152,
+    MARGIN,
+    152,
   );
-  doc.text(`Código: ${report.project.code} · Emisión: ${new Date().toLocaleDateString("es-CL")}`, MARGIN, 166);
+  doc.text(
+    `Código: ${report.project.code} · Emisión: ${new Date().toLocaleDateString("es-CL")}`,
+    MARGIN,
+    166,
+  );
   y = 210;
 
   // Resumen ejecutivo
@@ -93,11 +98,26 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   );
 
   h2("Indicadores clave");
-  kv("Coordenadas centro:", `${report.project.center_lat.toFixed(4)}°, ${report.project.center_lng.toFixed(4)}°`);
-  kv("Concesiones activas:", `${report.stats.concessionsTotal} (${fmtNum(report.stats.concessionsHa, 0)} ha total)`);
-  kv("Anomalías satelitales detectadas:", `${report.stats.satTotal} (${report.stats.satHigh} alta · ${report.stats.satMedium} media)`);
-  kv("Targets de exploración:", `${report.stats.targetsTotal} (${report.stats.targetsCritical} críticos · ${report.stats.targetsHigh} alta prioridad)`);
-  kv("Mineralogía dominante:", "Calcopirita · bornita · covelina · calcosina · crisocola · atacamita");
+  kv(
+    "Coordenadas centro:",
+    `${report.project.center_lat.toFixed(4)}°, ${report.project.center_lng.toFixed(4)}°`,
+  );
+  kv(
+    "Concesiones activas:",
+    `${report.stats.concessionsTotal} (${fmtNum(report.stats.concessionsHa, 0)} ha total)`,
+  );
+  kv(
+    "Anomalías satelitales detectadas:",
+    `${report.stats.satTotal} (${report.stats.satHigh} alta · ${report.stats.satMedium} media)`,
+  );
+  kv(
+    "Targets de exploración:",
+    `${report.stats.targetsTotal} (${report.stats.targetsCritical} críticos · ${report.stats.targetsHigh} alta prioridad)`,
+  );
+  kv(
+    "Mineralogía dominante:",
+    "Calcopirita · bornita · covelina · calcosina · crisocola · atacamita",
+  );
 
   // Contexto geológico
   h1("2. Contexto Geológico");
@@ -266,8 +286,14 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
       const c = p.cubication;
       h2(`Fase ${p.phase_no} · ${p.name}`);
       kv("Método:", String(p.method ?? "—"));
-      kv("Ventana:", `Año ${p.start_year} a Año ${(p.start_year ?? 0) + (p.duration_years ?? 0)} (${p.duration_years} años)`);
-      kv("Espesor medio / densidad:", `${fmtNum(p.avg_thickness_m, 0)} m · ${fmtNum(p.density_tm3, 2)} t/m³`);
+      kv(
+        "Ventana:",
+        `Año ${p.start_year} a Año ${(p.start_year ?? 0) + (p.duration_years ?? 0)} (${p.duration_years} años)`,
+      );
+      kv(
+        "Espesor medio / densidad:",
+        `${fmtNum(p.avg_thickness_m, 0)} m · ${fmtNum(p.density_tm3, 2)} t/m³`,
+      );
       kv("Recovery / OPEX:", `${fmtNum(p.recovery_pct, 0)}% · $${fmtNum(p.opex_usd_t, 1)}/t`);
       if (c) {
         kv("Tonelaje:", `${fmtNum(c.tonnes / 1e6, 2)} Mt`);
@@ -296,7 +322,8 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
     doc.setTextColor(148, 163, 184);
     doc.text(
       `Geocapitals · Distrito Los Verdes – Tilama · ${report.project.code}`,
-      MARGIN, pageH - 24,
+      MARGIN,
+      pageH - 24,
     );
     doc.text(`Página ${i} de ${pageCount}`, pageW - MARGIN, pageH - 24, { align: "right" });
   }

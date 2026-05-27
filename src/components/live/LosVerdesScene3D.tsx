@@ -15,14 +15,8 @@ import type {
   MagAnomalyPoint,
   Lineament,
 } from "@/lib/livemap-public.functions";
-import type {
-  VeinPublic,
-  MinePlanPhasePublic,
-} from "@/lib/losverdes-veins.functions";
-import {
-  emitLosVerdesFocus,
-  onLosVerdesFocus,
-} from "@/lib/losverdes-focus";
+import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
+import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 const COMMODITY_COLOR: Record<string, string> = {
   Cu: "#fb923c",
@@ -245,13 +239,7 @@ export function LosVerdesScene3D({
         type: "circle",
         source: "mag",
         paint: {
-          "circle-radius": [
-            "interpolate",
-            ["exponential", 2],
-            ["zoom"],
-            10, 6,
-            16, 60,
-          ],
+          "circle-radius": ["interpolate", ["exponential", 2], ["zoom"], 10, 6, 16, 60],
           "circle-color": "#a855f7",
           "circle-opacity": 0.22,
           "circle-stroke-color": "#c084fc",
@@ -275,8 +263,7 @@ export function LosVerdesScene3D({
               name: t.name,
               priority: (t.priority ?? "medium").toLowerCase(),
               score: Number(t.score ?? 0),
-              color:
-                PRIORITY_COLOR[(t.priority ?? "medium").toLowerCase()] ?? "#3b82f6",
+              color: PRIORITY_COLOR[(t.priority ?? "medium").toLowerCase()] ?? "#3b82f6",
             },
           })),
       };
@@ -286,10 +273,7 @@ export function LosVerdesScene3D({
         type: "circle",
         source: "targets",
         paint: {
-          "circle-radius": [
-            "interpolate", ["linear"], ["get", "score"],
-            0, 4, 50, 7, 100, 11,
-          ],
+          "circle-radius": ["interpolate", ["linear"], ["get", "score"], 0, 4, 50, 7, 100, 11],
           "circle-color": ["get", "color"],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 1.4,
@@ -390,7 +374,8 @@ export function LosVerdesScene3D({
         if (!f) return;
         const p = f.properties as Record<string, unknown>;
         const tonnes = Number(p.tonnes ?? 0);
-        const tFmt = tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
+        const tFmt =
+          tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
         const rev = Number(p.revenue ?? 0);
         const rFmt = rev >= 1e6 ? `$${(rev / 1e6).toFixed(1)}M` : `$${(rev / 1e3).toFixed(0)}k`;
         veinPopup
@@ -419,7 +404,8 @@ export function LosVerdesScene3D({
         if (!f) return;
         const p = f.properties as Record<string, unknown>;
         const tonnes = Number(p.tonnes ?? 0);
-        const tFmt = tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
+        const tFmt =
+          tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
         const npv = Number(p.npv ?? 0);
         const npvFmt = `${npv < 0 ? "-" : ""}$${(Math.abs(npv) / 1e6).toFixed(1)}M`;
         veinPopup
@@ -434,7 +420,6 @@ export function LosVerdesScene3D({
           )
           .addTo(map);
       });
-
 
       // ---- Popups ----
       const popup = new maplibregl.Popup({ closeButton: false });
@@ -613,15 +598,10 @@ export function LosVerdesScene3D({
             <input
               type="checkbox"
               checked={layers[row.k]}
-              onChange={(e) =>
-                setLayers((p) => ({ ...p, [row.k]: e.target.checked }))
-              }
+              onChange={(e) => setLayers((p) => ({ ...p, [row.k]: e.target.checked }))}
               className="accent-gold w-3 h-3"
             />
-            <span
-              className="w-3 h-3 rounded-sm"
-              style={{ background: row.color }}
-            />
+            <span className="w-3 h-3 rounded-sm" style={{ background: row.color }} />
             <span>{row.label}</span>
           </label>
         ))}
@@ -630,9 +610,15 @@ export function LosVerdesScene3D({
       {/* Leyenda */}
       <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1">
         <div className="text-muted-foreground uppercase tracking-wider">Severidad</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja</div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
+        </div>
       </div>
     </div>
   );

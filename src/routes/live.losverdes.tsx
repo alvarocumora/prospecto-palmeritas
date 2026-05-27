@@ -2,15 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  MapPin,
-  FileDown,
-  Loader2,
-  Layers,
-  Target,
-  Satellite,
-  Pickaxe,
-} from "lucide-react";
+import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -19,10 +11,7 @@ import { Card } from "@/components/ui/card";
 import { FieldMapPublic } from "@/components/field/FieldMapPublic";
 import { LosVerdesScene3D } from "@/components/live/LosVerdesScene3D";
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
-import {
-  getLosVerdesPublicLayers,
-  getLosVerdesAnomalies,
-} from "@/lib/livemap-public.functions";
+import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
@@ -61,17 +50,24 @@ function fmtT(v: number): string {
 
 function severityColor(s: string | null) {
   switch ((s ?? "").toLowerCase()) {
-    case "high": return "bg-red-500/20 text-red-300 border-red-500/40";
-    case "medium": return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-    default: return "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
+    case "high":
+      return "bg-red-500/20 text-red-300 border-red-500/40";
+    case "medium":
+      return "bg-amber-500/20 text-amber-300 border-amber-500/40";
+    default:
+      return "bg-yellow-500/20 text-yellow-300 border-yellow-500/40";
   }
 }
 function priorityColor(p: string | null) {
   switch ((p ?? "").toLowerCase()) {
-    case "critical": return "bg-red-500/20 text-red-300 border-red-500/40";
-    case "high": return "bg-amber-500/20 text-amber-300 border-amber-500/40";
-    case "medium": return "bg-blue-500/20 text-blue-300 border-blue-500/40";
-    default: return "bg-slate-500/20 text-slate-300 border-slate-500/40";
+    case "critical":
+      return "bg-red-500/20 text-red-300 border-red-500/40";
+    case "high":
+      return "bg-amber-500/20 text-amber-300 border-amber-500/40";
+    case "medium":
+      return "bg-blue-500/20 text-blue-300 border-blue-500/40";
+    default:
+      return "bg-slate-500/20 text-slate-300 border-slate-500/40";
   }
 }
 
@@ -197,9 +193,7 @@ function LiveLosVerdesPage() {
               Visor 3D · Esri + DEM · Anomalías · Vetas · Plan
             </h2>
             {(layersQ.isLoading || anomsQ.isLoading || miningQ.isLoading) && (
-              <span className="font-mono text-[10px] text-muted-foreground">
-                cargando datos…
-              </span>
+              <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
             )}
           </div>
           {anomsQ.data && layersQ.data ? (
@@ -254,9 +248,7 @@ function LiveLosVerdesPage() {
                 </div>
               ))}
               {!miningQ.data?.veins.length && (
-                <div className="text-[11px] text-muted-foreground italic">
-                  Sin vetas cargadas.
-                </div>
+                <div className="text-[11px] text-muted-foreground italic">Sin vetas cargadas.</div>
               )}
             </div>
           </Card>
@@ -298,7 +290,10 @@ function LiveLosVerdesPage() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="outline" className={`text-[9px] ${severityColor(a.severity)}`}>
+                      <Badge
+                        variant="outline"
+                        className={`text-[9px] ${severityColor(a.severity)}`}
+                      >
                         {a.severity ?? "—"}
                       </Badge>
                       <span className="font-mono text-foreground/80 text-[10px]">
@@ -321,7 +316,10 @@ function LiveLosVerdesPage() {
                       <div className="text-foreground/90 truncate">{t.name}</div>
                     </div>
                     <div className="flex flex-col items-end gap-1">
-                      <Badge variant="outline" className={`text-[9px] ${priorityColor(t.priority)}`}>
+                      <Badge
+                        variant="outline"
+                        className={`text-[9px] ${priorityColor(t.priority)}`}
+                      >
                         {t.priority ?? "—"}
                       </Badge>
                       <span className="font-mono text-foreground/80 text-[10px]">
@@ -352,8 +350,16 @@ function LiveLosVerdesPage() {
 }
 
 function KPI({
-  icon, label, value, sub,
-}: { icon: React.ReactNode; label: string; value: React.ReactNode; sub?: string }) {
+  icon,
+  label,
+  value,
+  sub,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+  sub?: string;
+}) {
   return (
     <Card className="p-3 bg-bg-secondary border-border">
       <div className="flex items-center justify-between text-muted-foreground">
@@ -367,15 +373,23 @@ function KPI({
 }
 
 function Panel({
-  title, count, children,
-}: { title: string; count: number; children: React.ReactNode }) {
+  title,
+  count,
+  children,
+}: {
+  title: string;
+  count: number;
+  children: React.ReactNode;
+}) {
   return (
     <Card className="p-4 bg-bg-secondary border-border">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-[11px] font-mono uppercase tracking-wider text-foreground/90">
           {title}
         </h3>
-        <Badge variant="outline" className="text-[10px] font-mono">{count}</Badge>
+        <Badge variant="outline" className="text-[10px] font-mono">
+          {count}
+        </Badge>
       </div>
       {children}
     </Card>

@@ -50,14 +50,22 @@ export function MinePlanPanel({ phases }: { phases: MinePlanPhasePublic[] }) {
       </div>
       <div className="space-y-2">
         {phases.map((p) => {
-          const meta = METHOD_LABEL[p.method ?? ""] ?? { label: p.method ?? "—", icon: Pickaxe, color: "#64748b" };
+          const meta = METHOD_LABEL[p.method ?? ""] ?? {
+            label: p.method ?? "—",
+            icon: Pickaxe,
+            color: "#64748b",
+          };
           const Icon = meta.icon;
           const c = p.cubication;
           const ring = p.area_polygon?.coordinates?.[0];
           const onClick = () => {
             if (!ring || ring.length === 0) return;
-            let lat = 0, lng = 0;
-            for (const [x, y] of ring) { lng += x; lat += y; }
+            let lat = 0,
+              lng = 0;
+            for (const [x, y] of ring) {
+              lng += x;
+              lat += y;
+            }
             lng /= ring.length;
             lat /= ring.length;
             emitLosVerdesFocus({
@@ -115,8 +123,16 @@ export function MinePlanPanel({ phases }: { phases: MinePlanPhasePublic[] }) {
 }
 
 function Mini({
-  label, value, highlight, danger,
-}: { label: string; value: string; highlight?: boolean; danger?: boolean }) {
+  label,
+  value,
+  highlight,
+  danger,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+  danger?: boolean;
+}) {
   return (
     <div className="flex flex-col">
       <span className="text-muted-foreground text-[9px] uppercase">{label}</span>

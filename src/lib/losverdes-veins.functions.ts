@@ -100,9 +100,7 @@ export const getLosVerdesMining = createServerFn({ method: "GET" }).handler(
       const grade = (row.grade_estimate ?? {}) as Record<string, number>;
       const density = Number(row.density_tm3 ?? 2.7);
       const cubication =
-        length > 0 &&
-        Number(row.thickness_m ?? 0) > 0 &&
-        Number(row.depth_bottom_m ?? 0) > 0
+        length > 0 && Number(row.thickness_m ?? 0) > 0 && Number(row.depth_bottom_m ?? 0) > 0
           ? cubicateVein({
               length_m: length,
               thickness_m: Number(row.thickness_m ?? 0),
@@ -140,10 +138,7 @@ export const getLosVerdesMining = createServerFn({ method: "GET" }).handler(
       const poly = row.area_polygon as MinePlanPhasePublic["area_polygon"];
       const ring = poly?.coordinates?.[0] ?? null;
       const grade = (row.grade_estimate ?? {}) as Record<string, number>;
-      const prices = (row.metal_price_assumption ?? defaultPrices) as Record<
-        string,
-        number
-      >;
+      const prices = (row.metal_price_assumption ?? defaultPrices) as Record<string, number>;
       const cubication =
         ring && ring.length >= 3
           ? cubicatePhase({
