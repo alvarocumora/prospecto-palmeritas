@@ -3,13 +3,14 @@
 // portada, contexto geológico, catastro, anomalías satelitales, targets, disclaimer.
 import { jsPDF } from "jspdf";
 import type { TilamaReport } from "@/lib/tilama.functions";
+import type { LosVerdesMining } from "@/lib/losverdes-veins.functions";
 
 function fmtNum(v: number | null | undefined, dec = 1): string {
   if (v == null || Number.isNaN(Number(v))) return "—";
   return Number(v).toLocaleString("es-CL", { maximumFractionDigits: dec });
 }
 
-export function generateTilamaPdf(report: TilamaReport): jsPDF {
+export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining): jsPDF {
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -210,6 +211,72 @@ export function generateTilamaPdf(report: TilamaReport): jsPDF {
   para(
     "Sistemas estructurales mapeados: N-S (regional, eje principal), NNE-SSW (control vetiforme Cu-Au), NE-SW (riedel sintético) y NNW-SSE (riedel antitético). La intersección N-S × NE-SW define los nodos de mayor densidad de mineralización supergénica.",
   );
+
+  // Vetas + plan minero (si hay datos)
+  if (mining) {
+    h1("6b. Vetas Cu-Au-Ag y Cubicación Conceptual");
+    para(
+      `Se han mapeado ${mining.veins.length} vetas con cubicación conceptual basada en geometría superficial × potencia × profundidad × densidad. Tonelaje total conceptual: ${fmtNum(mining.totals.veinTonnes / 1000, 0)} kt · valor in-situ: USD ${fmtNum(mining.totals.veinRevenueUsd / 1e6, 1)}M.`,
+    );
+    if (mining.veins.length) {
+      h2("Vetas principales");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(9);
+      doc.setTextColor(71, 85, 105);
+      doc.text("Código", MARGIN, y);
+      doc.text("Nombre", MARGIN + 70, y);
+      doc.text("Strk/Dip", MARGIN + 230, y);
+      doc.text("Pot. m", MARGIN + 300, y);
+      doc.text("Tonelaje", MARGIN + 360, y);
+      doc.text("Valor USD", MARGIN + 440, y);
+      y += 12;
+      doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(15, 23, 42);
+      for (const v of mining.veins) {
+        ensure(13);
+        doc.text(String(v.code).slice(0, 14), MARGIN, y);
+        doc.text(String(v.name).slice(0, 32), MARGIN + 70, y);
+        doc.text(
+          `${(v.strike_deg ?? 0).toFixed(0)}/${(v.dip_deg ?? 0).toFixed(0)}`,
+          MARGIN + 230,
+          y,
+        );
+        doc.text(fmtNum(v.thickness_m, 1), MARGIN + 300, y);
+        doc.text(
+          v.cubication ? `${(v.cubication.tonnes / 1000).toFixed(0)} kt` : "—",
+          MARGIN + 360,
+          y,
+        );
+        doc.text(
+          v.cubication ? `$${(v.cubication.revenueUsd / 1e6).toFixed(1)}M` : "—",
+          MARGIN + 440,
+          y,
+        );
+        y += 12;
+      }
+      y += 6;
+    }
+
+    h1("6c. Plan de Explotación Conceptual");
+    para(
+      `Plan en ${mining.phases.length} fases · tonelaje total ${fmtNum(mining.totals.phaseTonnes / 1e6, 2)} Mt · CAPEX agregado USD ${fmtNum(mining.totals.capexUsdTotal / 1e6, 0)}M · NPV @8% USD ${fmtNum(mining.totals.npvUsdTotal / 1e6, 1)}M.`,
+    );
+    for (const p of mining.phases) {
+      const c = p.cubication;
+      h2(`Fase ${p.phase_no} · ${p.name}`);
+      kv("Método:", String(p.method ?? "—"));
+      kv("Ventana:", `Año ${p.start_year} a Año ${(p.start_year ?? 0) + (p.duration_years ?? 0)} (${p.duration_years} años)`);
+      kv("Espesor medio / densidad:", `${fmtNum(p.avg_thickness_m, 0)} m · ${fmtNum(p.density_tm3, 2)} t/m³`);
+      kv("Recovery / OPEX:", `${fmtNum(p.recovery_pct, 0)}% · $${fmtNum(p.opex_usd_t, 1)}/t`);
+      if (c) {
+        kv("Tonelaje:", `${fmtNum(c.tonnes / 1e6, 2)} Mt`);
+        kv("Revenue conceptual:", `USD ${fmtNum(c.revenueUsd / 1e6, 1)}M`);
+        kv("CAPEX:", `USD ${fmtNum(c.capexUsd / 1e6, 0)}M`);
+        kv("NPV @8%:", `USD ${fmtNum(c.npvUsd / 1e6, 1)}M`);
+      }
+    }
+  }
 
   // Disclaimer
   h1("7. Disclaimer y Próximos Pasos");
