@@ -565,10 +565,27 @@ export function LosVerdesScene3D({
       setVis("veins-glow", layers.veins);
       setVis("phases-extr", layers.plan);
       setVis("phases-outline", layers.plan);
+
+      // Filtro por commodity sobre vetas
+      const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
+        (c) => commoditiesOn[c],
+      );
+      const veinFilter: maplibregl.FilterSpecification = enabled.length
+        ? [
+            "any",
+            ...enabled.map(
+              (c) =>
+                ["==", ["get", `has_${c.toLowerCase()}`], true] as maplibregl.ExpressionSpecification,
+            ),
+          ]
+        : ["==", ["literal", 1], ["literal", 0]];
+      for (const id of ["veins-line", "veins-glow"]) {
+        if (m.getLayer(id)) m.setFilter(id, veinFilter);
+      }
     };
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
-  }, [layers]);
+  }, [layers, commoditiesOn]);
 
   // Escucha selección desde otras vistas (FieldMap) → flyTo + pulso
   useEffect(() => {
