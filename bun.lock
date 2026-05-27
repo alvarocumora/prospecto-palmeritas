@@ -52,6 +52,7 @@
         "@types/leaflet": "^1.9.21",
         "@types/leaflet-draw": "^1.0.13",
         "@types/three": "^0.184.0",
+        "@watergis/maplibre-gl-terradraw": "^1.13.1",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -1051,6 +1052,8 @@
 
     "@vitest/utils": ["@vitest/utils@3.2.4", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@vitest/utils/-/utils-3.2.4.tgz", { "dependencies": { "@vitest/pretty-format": "3.2.4", "loupe": "^3.1.4", "tinyrainbow": "^2.0.0" } }, "sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA=="],
 
+    "@watergis/maplibre-gl-terradraw": ["@watergis/maplibre-gl-terradraw@1.13.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/@watergis/maplibre-gl-terradraw/-/maplibre-gl-terradraw-1.13.1.tgz", { "peerDependencies": { "maplibre-gl": "^4.0.0 || ^5.0.0", "terra-draw": "^1.0.0", "terra-draw-maplibre-gl-adapter": "^1.0.0" }, "optionalPeers": ["terra-draw-maplibre-gl-adapter"] }, "sha512-SWBb1paFAI0aA/GkWtHU5MkufzuXTQF1AOLNH3DXoCTAaZLMJ7/QnXt4ex6Lke6EjzTZjQmVLWEbkyatY7hc8A=="],
+
     "acorn": ["acorn@8.16.0", "", { "bin": "bin/acorn" }, "sha512-UVJyE9MttOsBQIDKw1skb9nAwQuR5wuGD3+82K6JgJlm/Y+KI92oNsMNGZCYdDsVtRHSak0pcV5Dno5+4jh9sw=="],
 
     "acorn-jsx": ["acorn-jsx@5.3.2", "", { "peerDependencies": { "acorn": "^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ=="],
@@ -1776,6 +1779,8 @@
     "tailwindcss": ["tailwindcss@4.2.2", "", {}, "sha512-KWBIxs1Xb6NoLdMVqhbhgwZf2PGBpPEiwOqgI4pFIYbNTfBXiKYyWoTsXgBQ9WFg/OlhnvHaY+AEpW7wSmFo2Q=="],
 
     "tapable": ["tapable@2.3.2", "", {}, "sha512-1MOpMXuhGzGL5TTCZFItxCc0AARf1EZFQkGqMm7ERKj8+Hgr5oLvJOVFcC+lRmR8hCe2S3jC4T5D7Vg/d7/fhA=="],
+
+    "terra-draw": ["terra-draw@1.30.1", "https://europe-west1-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/terra-draw/-/terra-draw-1.30.1.tgz", {}, "sha512-EvX2iQANF6/c4HIbVJ5XCdWus/rRv9onwIpqWU4iaWkQHAjqQAh2RtH+OicUXVRrAFyELjYbZBh9iWlsYnUzoA=="],
 
     "text-segmentation": ["text-segmentation@1.0.3", "https://europe-west4-npm.pkg.dev/lovable-core-prod/sandbox-npm-cache/text-segmentation/-/text-segmentation-1.0.3.tgz", { "dependencies": { "utrie": "^1.0.2" } }, "sha512-iOiPUo/BGnZ6+54OsWxZidGCsdU8YbE4PSpdPinp7DeMtUJNJBoJ/ouUSTJjHkh1KntHaltHl/gDs2FC4i5+Nw=="],
 
