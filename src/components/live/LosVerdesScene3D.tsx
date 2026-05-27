@@ -15,10 +15,26 @@ import type {
   MagAnomalyPoint,
   Lineament,
 } from "@/lib/livemap-public.functions";
+import type {
+  VeinPublic,
+  MinePlanPhasePublic,
+} from "@/lib/losverdes-veins.functions";
 import {
   emitLosVerdesFocus,
   onLosVerdesFocus,
 } from "@/lib/losverdes-focus";
+
+const COMMODITY_COLOR: Record<string, string> = {
+  Cu: "#fb923c",
+  "Cu-Au": "#facc15",
+  "Cu-Ag": "#c084fc",
+  Au: "#fde047",
+};
+const PHASE_COLOR: Record<string, string> = {
+  heap_leach: "#22d3ee",
+  open_pit: "#f59e0b",
+  underground: "#a855f7",
+};
 
 const PRIORITY_COLOR: Record<string, string> = {
   critical: "#dc2626",
