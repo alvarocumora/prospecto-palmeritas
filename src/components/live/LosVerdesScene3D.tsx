@@ -18,12 +18,38 @@ import type {
 import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
 import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 
-const COMMODITY_COLOR: Record<string, string> = {
-  Cu: "#fb923c",
-  "Cu-Au": "#facc15",
-  "Cu-Ag": "#c084fc",
+// Color por commodity individual (chips de leyenda y filtro).
+const COMMODITY_TOKENS = ["Au", "Ag", "Cu", "Mo"] as const;
+type CommodityToken = (typeof COMMODITY_TOKENS)[number];
+const COMMODITY_COLOR: Record<CommodityToken, string> = {
   Au: "#fde047",
+  Ag: "#c084fc",
+  Cu: "#fb923c",
+  Mo: "#38bdf8",
 };
+const COMMODITY_LABEL: Record<CommodityToken, string> = {
+  Au: "Oro",
+  Ag: "Plata",
+  Cu: "Cobre",
+  Mo: "Molibdeno",
+};
+
+// Parsea "Cu-Au" → ["Cu","Au"], "Au/Ag" → ["Au","Ag"], etc.
+function parseCommodities(raw: string | null | undefined): CommodityToken[] {
+  if (!raw) return ["Cu"];
+  const tokens = raw
+    .split(/[-+/,\s]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
+  const out = tokens.filter((t): t is CommodityToken =>
+    (COMMODITY_TOKENS as readonly string[]).includes(t),
+  );
+  return out.length ? out : ["Cu"];
+}
+
+function veinColor(raw: string | null | undefined): string {
+  return COMMODITY_COLOR[parseCommodities(raw)[0]];
+}
 const PHASE_COLOR: Record<string, string> = {
   heap_leach: "#22d3ee",
   open_pit: "#f59e0b",
@@ -106,6 +132,12 @@ export function LosVerdesScene3D({
     targets: true,
     veins: true,
     plan: true,
+  });
+  const [commoditiesOn, setCommoditiesOn] = useState<Record<CommodityToken, boolean>>({
+    Au: true,
+    Ag: true,
+    Cu: true,
+    Mo: true,
   });
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
@@ -327,22 +359,30 @@ export function LosVerdesScene3D({
         type: "FeatureCollection",
         features: veins
           .filter((v) => (v.geometry?.coordinates?.length ?? 0) >= 2)
-          .map((v) => ({
-            type: "Feature",
-            geometry: v.geometry as GeoJSON.LineString,
-            properties: {
-              id: v.id,
-              code: v.code,
-              name: v.name,
-              commodity: v.commodity ?? "Cu",
-              strike: v.strike_deg ?? 0,
-              dip: v.dip_deg ?? 75,
-              thickness: v.thickness_m ?? 0,
-              tonnes: v.cubication?.tonnes ?? 0,
-              revenue: v.cubication?.revenueUsd ?? 0,
-              color: COMMODITY_COLOR[v.commodity ?? "Cu"] ?? "#fb923c",
-            },
-          })),
+          .map((v) => {
+            const toks = parseCommodities(v.commodity);
+            return {
+              type: "Feature",
+              geometry: v.geometry as GeoJSON.LineString,
+              properties: {
+                id: v.id,
+                code: v.code,
+                name: v.name,
+                commodity: v.commodity ?? "Cu",
+                commodity_primary: toks[0],
+                has_au: toks.includes("Au"),
+                has_ag: toks.includes("Ag"),
+                has_cu: toks.includes("Cu"),
+                has_mo: toks.includes("Mo"),
+                strike: v.strike_deg ?? 0,
+                dip: v.dip_deg ?? 75,
+                thickness: v.thickness_m ?? 0,
+                tonnes: v.cubication?.tonnes ?? 0,
+                revenue: v.cubication?.revenueUsd ?? 0,
+                color: veinColor(v.commodity),
+              },
+            };
+          }),
       };
       map.addSource("veins", { type: "geojson", data: veinLineFC });
       map.addLayer({
@@ -525,10 +565,27 @@ export function LosVerdesScene3D({
       setVis("veins-glow", layers.veins);
       setVis("phases-extr", layers.plan);
       setVis("phases-outline", layers.plan);
+
+      // Filtro por commodity sobre vetas
+      const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
+        (c) => commoditiesOn[c],
+      );
+      const veinFilter: maplibregl.FilterSpecification = enabled.length
+        ? [
+            "any",
+            ...enabled.map(
+              (c) =>
+                ["==", ["get", `has_${c.toLowerCase()}`], true] as maplibregl.ExpressionSpecification,
+            ),
+          ]
+        : ["==", ["literal", 1], ["literal", 0]];
+      for (const id of ["veins-line", "veins-glow"]) {
+        if (m.getLayer(id)) m.setFilter(id, veinFilter);
+      }
     };
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
-  }, [layers]);
+  }, [layers, commoditiesOn]);
 
   // Escucha selección desde otras vistas (FieldMap) → flyTo + pulso
   useEffect(() => {
@@ -607,17 +664,47 @@ export function LosVerdesScene3D({
         ))}
       </div>
 
-      {/* Leyenda */}
-      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1">
-        <div className="text-muted-foreground uppercase tracking-wider">Severidad</div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+      {/* Leyenda + filtro de commodities */}
+      <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-2 max-w-[230px]">
+        <div>
+          <div className="text-gold uppercase tracking-wider mb-1">Vetas por commodity</div>
+          <div className="flex flex-wrap gap-1.5">
+            {COMMODITY_TOKENS.map((c) => {
+              const on = commoditiesOn[c];
+              return (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCommoditiesOn((p) => ({ ...p, [c]: !p[c] }))}
+                  className="flex items-center gap-1.5 px-1.5 py-0.5 rounded border transition-colors"
+                  style={{
+                    borderColor: on ? COMMODITY_COLOR[c] : "rgba(148,163,184,0.3)",
+                    background: on ? `${COMMODITY_COLOR[c]}22` : "transparent",
+                    opacity: on ? 1 : 0.45,
+                  }}
+                  title={`${COMMODITY_LABEL[c]} (${c})`}
+                >
+                  <span
+                    className="w-2.5 h-2.5 rounded-sm"
+                    style={{ background: COMMODITY_COLOR[c] }}
+                  />
+                  <span className="text-foreground">{c}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
-        </div>
-        <div className="flex items-center gap-2">
-          <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
+        <div className="border-t border-border/60 pt-1.5">
+          <div className="text-muted-foreground uppercase tracking-wider mb-1">Severidad SAT</div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Alta
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Media
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-sm bg-[#eab308]" /> Baja
+          </div>
         </div>
       </div>
     </div>
