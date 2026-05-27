@@ -1,98 +1,65 @@
-## Objetivo
 
-Un solo visor público del prospecto Los Verdes / Tilama en **`/live/losverdes`** que muestre, sobre imagen satelital + DEM real:
+# Visor 3D Los Verdes — Coherencia + herramientas reales
 
-1. Catastro minero (SERNAGEOMIN + concesiones del proyecto resaltadas).
-2. Targets de exploración (sincronizados con el mapa de campo, ya hecho).
-3. Anomalías satelitales y magnéticas (extruidas en 3D, ya hecho — se mejoran).
-4. **Estructuras y vetas** dibujadas con rumbo/manteo correctos y extruidas en profundidad.
-5. **Plan de explotación conceptual + cubicación** (fases, tonelaje, ley, NPV/CAPEX rápido por target).
-6. Botón de **PDF descargable** (lo que hoy tiene `/live/tilama`).
+## Diagnóstico del visor actual
 
-`/live/tilama` queda como redirect a `/live/losverdes` para no romper links.
+`src/components/live/LosVerdesScene3D.tsx` usa MapLibre + DEM Terrarium + Esri Imagery con seis capas (SAT extruidas, lineamientos, mag, targets, vetas, fases del plan), toggles, filtro por commodity, popups y bus `losverdes:focus`. Sin embargo la **proyección 3D no es geológicamente coherente** y **no hay herramientas reales** (medición, perfil, dibujo, coordenadas).
 
----
+### Problemas de proyección 3D
+1. **Anomalías SAT**: `fill-extrusion-base = 0`. Con terreno exagerado 1.6×, los prismas atraviesan/quedan flotando sobre el DEM en vez de "salir" de la superficie.
+2. **Fases del plan minero**: se extruyen *hacia arriba* `avg_thickness_m * 3` desde base 0 → aparecen como montañas, no como pit ni cuerpo subterráneo.
+3. **Vetas**: sólo son `LineString` drapeadas. Faltan los planos inclinados reales (strike + dip + profundidad top/bottom + potencia) que ya están en la tabla `veins`.
+4. **Lineamientos y mag**: OK como están (drape + halo 2.5D).
 
-## Fase 1 · Unificar rutas
+### Herramientas que faltan vs estándar industria
+Medición (distancia/área), perfil de elevación, dibujo de AOI/vetas ad-hoc, lectura de coordenadas + cota bajo cursor, fullscreen, reset de bearing/pitch, bookmarks de cámara, búsqueda por código y sección transversal.
 
-- Convertir `src/routes/live.tilama.tsx` en un redirect simple a `/live/losverdes`.
-- Mover el header "Pre-NI 43-101", KPIs, botón PDF y paneles (catastro / anomalías / targets) desde `live.tilama.tsx` al layout de `live.losverdes.tsx`.
-- Mantener el `LosVerdesScene3D` (MapLibre + Esri + DEM Terrarium + anomalías extruidas) como visor principal, y el `FieldMapPublic` como segunda sección de campo.
+## Fase 1 — Coherencia 3D (sin nuevas deps)
 
-## Fase 2 · Datos: vetas y plan de explotación
+Archivo: `src/components/live/LosVerdesScene3D.tsx` + nuevo helper `src/lib/losverdes-geometry.ts`.
 
-Migración nueva (Supabase):
+1. **Anomalías SAT pegadas al terreno**: tras `map.on("load")`, para cada feature calcular `baseElev = map.queryTerrainElevation(centroid)`; escribir esa cota en la propiedad `base` y usar `"fill-extrusion-base": ["get", "base"]`, `"fill-extrusion-height": ["+", ["get","base"], ["get","height"]]`. Re-query cuando termine de cargar DEM (`"sourcedata"` para `terrain`).
+2. **Fases del plan**:
+   - `open_pit` → extruir *hacia abajo*: base = terrain elev, top = terrain elev − `avg_thickness_m` (usando expresión `+ base, height` con `height` negativo no es soportado; en su lugar pintamos polígono semi-transparente al nivel del pit y un anillo `line` rojo de borde + cuerpo subterráneo como `phases-body` con base/height bajo terreno).
+   - `underground` → caja `fill-extrusion` con base = terrain − `depth_top_m`, height = espesor.
+   - `heap_leach` → prisma sobre terreno (extrude arriba con base anclada).
+3. **Vetas como planos 3D**: `losverdes-geometry.ts` genera, por cada veta, un polígono cuadrilátero proyectando la traza superficial hacia profundidad según `strike_deg`, `dip_deg`, `dip_dir_deg`, `depth_top_m`, `depth_bottom_m`, `thickness_m`. Capa nueva `veins-plane` (`fill-extrusion` o `fill` con altura desde DEM) coloreada por commodity. Mantener la línea superficial actual.
+4. **Exageración configurable**: slider `1×/1.5×/2×` que llama `map.setTerrain({ source, exaggeration })`. Coherente con la escala vertical real.
 
-- **`public.veins`**: `id`, `project_id`, `code`, `name`, `commodity`, `strike_deg` (rumbo 0–360), `dip_deg` (manteo 0–90), `dip_dir_deg`, `thickness_m` (potencia), `length_m`, `depth_top_m`, `depth_bottom_m`, `grade_estimate` (jsonb: `{cu_pct, au_gpt, ag_gpt}`), `density_tm3` (default 2.7), `confidence` (low/medium/high), `geometry` (GeoJSON LineString WGS84 — traza en superficie), `notes`.
-- **`public.mine_plan_phases`**: `id`, `project_id`, `phase_no`, `name`, `target_id` (fk exploration_targets), `method` (open_pit/underground/heap_leach), `area_polygon` (GeoJSON Polygon), `avg_thickness_m`, `density_tm3`, `cutoff_grade`, `recovery_pct`, `capex_usd`, `opex_usd_t`, `metal_price_assumption` (jsonb), `start_year`, `duration_years`, `notes`.
-- GRANTs `service_role` + `authenticated`; RLS por `project_id` vía `user_can_access_project()` (helper ya existente).
-- Política pública de lectura SOLO filtrada por el `LOSVERDES_PROJECT_ID` para que los serverFn `getLosVerdesPublicLayers`/nuevos puedan leer con `supabaseAdmin` sin exponer otros proyectos.
-- **Seed** con datos reales del distrito Los Verdes (5–8 vetas con rumbo NS/NNW típico del cinturón + 2–3 fases de plan: óxidos heap leach superficial → sulfuros open pit → underground en profundidad).
-- **Fallback**: si `veins` está vacío para el proyecto, derivar trazas desde `STRUCTURAL_LINEAMENTS` de `satellite_anomalies` (rumbo desde la polilínea, manteo 70°, potencia 5 m por defecto).
+## Fase 2 — Herramientas reales
 
-## Fase 3 · Server functions
+### 2.1 Medición, perfil y dibujo (dep nueva)
+`bun add @watergis/maplibre-gl-terradraw` — añade `MaplibreMeasureControl` (distancia + área con unidades, lee elevación del `raster-dem` que ya tenemos) y `MaplibreTerradrawControl` (dibujo de point/line/polygon/rectangle/circle/freehand). Botones tipo "Medir" y "Dibujar AOI" en el panel del visor.
 
-`src/lib/livemap-public.functions.ts`:
+### 2.2 Controles nativos MapLibre (sin dep)
+- `FullscreenControl`, `GeolocateControl` (campo).
+- Botón "Reset cámara" → `easeTo({ bearing:-25, pitch:62, zoom:12.5 })`.
+- Readout flotante con `lat/lng/cota` actualizando en `mousemove` (usa `queryTerrainElevation`).
+- Bookmarks: guardar `{center, zoom, bearing, pitch}` en `localStorage` por proyecto.
+- Búsqueda local: input que filtra vetas/targets por `code/name` y hace `flyTo` + emite `losverdes:focus`.
 
-- `getLosVerdesVeins()` → devuelve `Vein[]` (curadas o fallback de lineamientos).
-- `getLosVerdesMinePlan()` → devuelve `{ phases: Phase[], summary: { totalTonnes, totalContainedCu_t, totalContainedAu_oz, totalCapex, weightedNpv } }`. Cubicación por fase:
-  - `tonnes = area_m2 × avg_thickness_m × density_tm3`
-  - `containedMetal = tonnes × grade × recovery`
-  - NPV simplificado: `(price × metal_recovered − opex × tonnes − capex) / (1+0.08)^year_mid`.
-- Extender `getLosVerdesPublicLayers` para devolver también `veins` y `minePlan` en un solo round-trip.
+### 2.3 Sección transversal (sin dep)
+Botón "Sección": el usuario dibuja una línea con Terra Draw. Abre panel inferior con SVG que muestra: perfil topográfico (muestreo de `queryTerrainElevation` cada N metros), intersecciones con vetas (planos calculados en 2.3 proyectados al plano vertical), y rectángulos del plan minero atravesados. Inspirado conceptualmente en `equinor/esv-intersection` pero reimplementado a medida porque ESV es para wells.
 
-## Fase 4 · Visualización 3D de vetas (`LosVerdesScene3D.tsx`)
+## Fase 3 — Repos GitHub de referencia
 
-- Nueva fuente GeoJSON `veins` con polígonos 3D generados desde la traza:
-  - Para cada veta, construir un polígono rectangular en planta proyectando la traza perpendicular según `dip_dir_deg`, ancho = `length_m × cos(dip)` aprox, y extruir con `fill-extrusion-base = elevDEM − depth_top_m` y `fill-extrusion-height = depth_bottom_m − depth_top_m`.
-  - Color por commodity (Cu rojo, Au dorado, Ag plata) y opacidad 0.55 para ver el DEM por detrás.
-- Capa adicional `vein-trace` (line) para la traza en superficie con `line-width` proporcional a `thickness_m` y `line-dasharray` por confianza.
-- Popup con rumbo/manteo/potencia/ley estimada/tonelaje conceptual.
-- Nuevo toggle "Vetas / Estructuras" en el panel de capas.
-- Sincronización con `losverdes-focus` (kind: `"vein"`, `"phase"`) → click en panel vuela y resalta.
+| Repo | Uso |
+|---|---|
+| `@watergis/maplibre-gl-terradraw` | **Dependencia**: measure + draw con DEM elevation. |
+| `opengeos/maplibre-gl-components` | **Referencia**: patrones para minimap, basemap switcher, swipe, terrain toggle, bookmark, print. Cherry-pick sin instalar. |
+| `geoman-io/maplibre-geoman` | Alternativa más potente a Terra Draw si en el futuro queremos editor pro (snap, split, rotate). No instalar ahora. |
+| `darkmine-oss/baselode` | **Referencia minera**: desurvey, viewer 3D de sondajes, cubicación. Para integrar en `useDrillTrajectoriesLayer` y validar `mining-calc.ts`. |
+| `equinor/esv-intersection` | **Referencia visual** de cross-section bien hecha (TS, MIT). No depender. |
+| `Trapar-waves/react-visgl-maplibre` | **Referencia** de cómo sincronizar `react-three-map`/Three.js con MapLibre + DEM si queremos modelos 3D realistas de pits o headframes. |
+| `opengeos/maplibre-gl-lidar` | Futuro: drape de nubes de puntos LiDAR/Drone. Fuera de scope ahora. |
 
-## Fase 5 · Plan de explotación (UI + cubicación)
+## Detalles técnicos
 
-Componente nuevo `src/components/live/MinePlanPanel.tsx`:
+- **Pin de fill-extrusion al terreno**: MapLibre no expone `*-from-terrain` estable; usamos `queryTerrainElevation` por feature y guardamos `base` en `properties`, refrescando al evento `idle` del source `terrain`.
+- **Veta como plano inclinado**: dado A=(lng,lat) y B=(lng,lat) de la traza superficial, el plano se obtiene desplazando A y B en dirección `dip_dir_deg` (perpendicular a `strike`) una distancia horizontal `h = depth/tan(dip)`, con `base = terrain(A,B) − depth_top`, `top = terrain(A,B) − depth_bottom`. Polígono final con cuatro vértices y altura por vértice.
+- **Sección transversal**: muestreo cada `max(20m, length/300)` puntos, SVG `viewBox` proporcional a longitud × (cota_max − cota_min + buffer 200m bajo el target más profundo). Ejes con cotas mAS y abscisa en metros.
+- **PDF**: las nuevas capas/medidas no entran al PDF en esta fase; sólo el visor interactivo.
 
-- Tabla de fases con: nº, método, target, área (ha), tonelaje (Mt), ley promedio, metal contenido, CAPEX, NPV simple.
-- Mini-cards de KPI agregados (total Mt, total Cu_t, total Au_oz, CAPEX total, NPV total).
-- Cada fila clickeable → emite `losverdes:focus` para volar a la fase en el 3D.
+## Pendientes que no toca este plan
 
-Capa 3D "Fases de explotación":
-
-- Polígonos `area_polygon` extruidos por `avg_thickness_m`, coloreados por número de fase (gradiente verde→ámbar→rojo).
-- Etiqueta flotante por fase con tonelaje.
-
-## Fase 6 · PDF y QA
-
-- Extender `src/lib/tilama-pdf.ts` (renombrar internamente o dejar) para incluir secciones nuevas: tabla de vetas y tabla de plan de explotación con cubicación.
-- Mover el botón "Descargar informe PDF" al header de `/live/losverdes`.
-- Smoke test del flujo en preview: cargan capas, toggles funcionan, click en veta/fase vuela, PDF descarga.
-
----
-
-## Detalle técnico (resumen)
-
-- **Cubicación visual**: las vetas se extruyen como polígonos 3D porque MapLibre no soporta planos inclinados nativos; se compensa con `fill-extrusion-base` calculado a partir del DEM (sample del raster en el centroide) y `dip` se muestra como atributo + flecha de azimuth en superficie. Para v2 se evaluaría deck.gl `PolygonLayer` con offset por dip.
-- **Fallback de vetas desde lineamientos**: `strikeFromPath()` ya existe en `livemap-public.functions.ts` (línea 248). Se reutiliza.
-- **Cubicación**: módulo puro `src/lib/mining-calc.ts` con funciones `tonnage()`, `containedMetal()`, `simpleNpv()` testeables.
-- **Rutas**: `/live/tilama` queda con `loader: () => redirect({ to: "/live/losverdes" })`.
-- **Sin cambios** en `client.ts`, `types.ts`, `auth-middleware.ts` ni en otros visores autenticados (Geology3DViewer, MissionControl).
-
-## Archivos a crear
-
-- `src/components/live/MinePlanPanel.tsx`
-- `src/components/live/VeinsLegend.tsx`
-- `src/lib/mining-calc.ts` (+ tests)
-- Migración SQL para `veins` y `mine_plan_phases` + seed Los Verdes
-
-## Archivos a modificar
-
-- `src/routes/live.losverdes.tsx` (layout completo: hero + KPIs + 3D + paneles + plan + PDF)
-- `src/routes/live.tilama.tsx` (→ redirect)
-- `src/components/live/LosVerdesScene3D.tsx` (capas vetas + fases + toggles + focus)
-- `src/lib/livemap-public.functions.ts` (`getLosVerdesVeins`, `getLosVerdesMinePlan`, ampliar layers)
-- `src/lib/losverdes-focus.ts` (añadir kinds `vein` y `phase`)
-- `src/lib/tilama-pdf.ts` (secciones vetas + plan)
-- `src/components/field/FieldMapPublic.tsx` (focus para `vein`/`phase` con anillo pulsante)
+Globe view, LiDAR, swipe, Three.js avanzado, edición persistente de vetas en DB. Quedan para iteración posterior.
