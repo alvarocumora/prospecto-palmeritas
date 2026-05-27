@@ -7194,6 +7194,83 @@ export type Database = {
           },
         ]
       }
+      mine_plan_phases: {
+        Row: {
+          area_polygon: Json | null
+          avg_thickness_m: number
+          capex_usd: number
+          created_at: string
+          cutoff_grade: number
+          density_tm3: number
+          duration_years: number
+          grade_estimate: Json
+          id: string
+          metal_price_assumption: Json
+          method: string
+          name: string
+          notes: string | null
+          opex_usd_t: number
+          phase_no: number
+          project_id: string
+          recovery_pct: number
+          start_year: number
+          target_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          area_polygon?: Json | null
+          avg_thickness_m?: number
+          capex_usd?: number
+          created_at?: string
+          cutoff_grade?: number
+          density_tm3?: number
+          duration_years?: number
+          grade_estimate?: Json
+          id?: string
+          metal_price_assumption?: Json
+          method?: string
+          name: string
+          notes?: string | null
+          opex_usd_t?: number
+          phase_no: number
+          project_id: string
+          recovery_pct?: number
+          start_year?: number
+          target_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area_polygon?: Json | null
+          avg_thickness_m?: number
+          capex_usd?: number
+          created_at?: string
+          cutoff_grade?: number
+          density_tm3?: number
+          duration_years?: number
+          grade_estimate?: Json
+          id?: string
+          metal_price_assumption?: Json
+          method?: string
+          name?: string
+          notes?: string | null
+          opex_usd_t?: number
+          phase_no?: number
+          project_id?: string
+          recovery_pct?: number
+          start_year?: number
+          target_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mine_plan_phases_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mine_shifts: {
         Row: {
           created_at: string
@@ -11868,6 +11945,72 @@ export type Database = {
           },
         ]
       }
+      veins: {
+        Row: {
+          code: string
+          commodity: string
+          confidence: string
+          created_at: string
+          density_tm3: number
+          depth_bottom_m: number
+          depth_top_m: number
+          dip_deg: number
+          dip_dir_deg: number
+          geometry: Json | null
+          grade_estimate: Json
+          id: string
+          length_m: number
+          name: string
+          notes: string | null
+          project_id: string
+          strike_deg: number
+          thickness_m: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          commodity?: string
+          confidence?: string
+          created_at?: string
+          density_tm3?: number
+          depth_bottom_m?: number
+          depth_top_m?: number
+          dip_deg?: number
+          dip_dir_deg?: number
+          geometry?: Json | null
+          grade_estimate?: Json
+          id?: string
+          length_m?: number
+          name: string
+          notes?: string | null
+          project_id: string
+          strike_deg?: number
+          thickness_m?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          commodity?: string
+          confidence?: string
+          created_at?: string
+          density_tm3?: number
+          depth_bottom_m?: number
+          depth_top_m?: number
+          dip_deg?: number
+          dip_dir_deg?: number
+          geometry?: Json | null
+          grade_estimate?: Json
+          id?: string
+          length_m?: number
+          name?: string
+          notes?: string | null
+          project_id?: string
+          strike_deg?: number
+          thickness_m?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       watch_events: {
         Row: {
           cadastre_external_id: string | null
@@ -12390,6 +12533,10 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      lv_user_can_access_project: {
+        Args: { _project_id: string }
+        Returns: boolean
+      }
       mask_sensitive_jsonb: { Args: { _data: Json }; Returns: Json }
       match_holder_publications: {
         Args: { _holder_id: string }
