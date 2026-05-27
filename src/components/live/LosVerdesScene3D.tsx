@@ -353,22 +353,30 @@ export function LosVerdesScene3D({
         type: "FeatureCollection",
         features: veins
           .filter((v) => (v.geometry?.coordinates?.length ?? 0) >= 2)
-          .map((v) => ({
-            type: "Feature",
-            geometry: v.geometry as GeoJSON.LineString,
-            properties: {
-              id: v.id,
-              code: v.code,
-              name: v.name,
-              commodity: v.commodity ?? "Cu",
-              strike: v.strike_deg ?? 0,
-              dip: v.dip_deg ?? 75,
-              thickness: v.thickness_m ?? 0,
-              tonnes: v.cubication?.tonnes ?? 0,
-              revenue: v.cubication?.revenueUsd ?? 0,
-              color: COMMODITY_COLOR[v.commodity ?? "Cu"] ?? "#fb923c",
-            },
-          })),
+          .map((v) => {
+            const toks = parseCommodities(v.commodity);
+            return {
+              type: "Feature",
+              geometry: v.geometry as GeoJSON.LineString,
+              properties: {
+                id: v.id,
+                code: v.code,
+                name: v.name,
+                commodity: v.commodity ?? "Cu",
+                commodity_primary: toks[0],
+                has_au: toks.includes("Au"),
+                has_ag: toks.includes("Ag"),
+                has_cu: toks.includes("Cu"),
+                has_mo: toks.includes("Mo"),
+                strike: v.strike_deg ?? 0,
+                dip: v.dip_deg ?? 75,
+                thickness: v.thickness_m ?? 0,
+                tonnes: v.cubication?.tonnes ?? 0,
+                revenue: v.cubication?.revenueUsd ?? 0,
+                color: veinColor(v.commodity),
+              },
+            };
+          }),
       };
       map.addSource("veins", { type: "geojson", data: veinLineFC });
       map.addLayer({
