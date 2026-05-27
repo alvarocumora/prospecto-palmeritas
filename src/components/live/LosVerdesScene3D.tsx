@@ -297,6 +297,145 @@ export function LosVerdesScene3D({
         },
       });
 
+      // ---- Fases del plan de explotación (polígonos 3D) ----
+      const phaseFC: GeoJSON.FeatureCollection = {
+        type: "FeatureCollection",
+        features: phases
+          .filter((p) => p.area_polygon?.coordinates?.[0]?.length >= 3)
+          .map((p) => ({
+            type: "Feature",
+            geometry: p.area_polygon as GeoJSON.Polygon,
+            properties: {
+              id: p.id,
+              phase_no: p.phase_no,
+              name: p.name,
+              method: p.method,
+              tonnes: p.cubication?.tonnes ?? 0,
+              revenue: p.cubication?.revenueUsd ?? 0,
+              npv: p.cubication?.npvUsd ?? 0,
+              capex: p.cubication?.capexUsd ?? 0,
+              height: Number(p.avg_thickness_m ?? 30),
+              color: PHASE_COLOR[p.method ?? ""] ?? "#64748b",
+            },
+          })),
+      };
+      map.addSource("phases", { type: "geojson", data: phaseFC });
+      map.addLayer({
+        id: "phases-extr",
+        type: "fill-extrusion",
+        source: "phases",
+        paint: {
+          "fill-extrusion-color": ["get", "color"],
+          "fill-extrusion-height": ["*", ["get", "height"], 3],
+          "fill-extrusion-base": 0,
+          "fill-extrusion-opacity": 0.35,
+        },
+      });
+      map.addLayer({
+        id: "phases-outline",
+        type: "line",
+        source: "phases",
+        paint: { "line-color": ["get", "color"], "line-width": 1.6, "line-dasharray": [2, 1] },
+      });
+
+      // ---- Vetas (traza superficial + cuerpo extruido en profundidad) ----
+      const veinLineFC: GeoJSON.FeatureCollection = {
+        type: "FeatureCollection",
+        features: veins
+          .filter((v) => v.geometry?.coordinates?.length >= 2)
+          .map((v) => ({
+            type: "Feature",
+            geometry: v.geometry as GeoJSON.LineString,
+            properties: {
+              id: v.id,
+              code: v.code,
+              name: v.name,
+              commodity: v.commodity ?? "Cu",
+              strike: v.strike_deg ?? 0,
+              dip: v.dip_deg ?? 75,
+              thickness: v.thickness_m ?? 0,
+              tonnes: v.cubication?.tonnes ?? 0,
+              revenue: v.cubication?.revenueUsd ?? 0,
+              color: COMMODITY_COLOR[v.commodity ?? "Cu"] ?? "#fb923c",
+            },
+          })),
+      };
+      map.addSource("veins", { type: "geojson", data: veinLineFC });
+      map.addLayer({
+        id: "veins-line",
+        type: "line",
+        source: "veins",
+        paint: {
+          "line-color": ["get", "color"],
+          "line-width": 3.2,
+          "line-opacity": 0.95,
+        },
+      });
+      map.addLayer({
+        id: "veins-glow",
+        type: "line",
+        source: "veins",
+        paint: {
+          "line-color": ["get", "color"],
+          "line-width": 9,
+          "line-opacity": 0.18,
+          "line-blur": 4,
+        },
+      });
+
+      // ---- Popups vetas / fases ----
+      const veinPopup = new maplibregl.Popup({ closeButton: true, offset: 8 });
+      map.on("click", "veins-line", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        const tonnes = Number(p.tonnes ?? 0);
+        const tFmt = tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
+        const rev = Number(p.revenue ?? 0);
+        const rFmt = rev >= 1e6 ? `$${(rev / 1e6).toFixed(1)}M` : `$${(rev / 1e3).toFixed(0)}k`;
+        veinPopup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>${p.code}</strong> · ${p.commodity}<br/>${p.name}<br/>
+              Strike ${Number(p.strike).toFixed(0)}° · Dip ${Number(p.dip).toFixed(0)}°<br/>
+              Potencia: ${Number(p.thickness).toFixed(1)} m<br/>
+              Recurso conceptual: <b>${tFmt}</b><br/>
+              In-situ value: <b>${rFmt}</b>
+            </div>`,
+          )
+          .addTo(map);
+        emitLosVerdesFocus({
+          kind: "target",
+          id: String(p.code ?? ""),
+          label: String(p.name ?? ""),
+          lat: e.lngLat.lat,
+          lng: e.lngLat.lng,
+          source: "scene3d",
+        });
+      });
+      map.on("click", "phases-extr", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        const tonnes = Number(p.tonnes ?? 0);
+        const tFmt = tonnes >= 1e6 ? `${(tonnes / 1e6).toFixed(2)} Mt` : `${(tonnes / 1e3).toFixed(0)} kt`;
+        const npv = Number(p.npv ?? 0);
+        const npvFmt = `${npv < 0 ? "-" : ""}$${(Math.abs(npv) / 1e6).toFixed(1)}M`;
+        veinPopup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>F${p.phase_no} · ${p.method}</strong><br/>${p.name}<br/>
+              Tonelaje: <b>${tFmt}</b><br/>
+              CAPEX: $${(Number(p.capex) / 1e6).toFixed(0)}M<br/>
+              NPV @8%: <b style="color:${npv > 0 ? "#059669" : "#dc2626"}">${npvFmt}</b>
+            </div>`,
+          )
+          .addTo(map);
+      });
+
+
       // ---- Popups ----
       const popup = new maplibregl.Popup({ closeButton: false });
       map.on("click", "sat-anom-extr", (e) => {
