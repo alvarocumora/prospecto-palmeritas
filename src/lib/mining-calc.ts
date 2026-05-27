@@ -34,9 +34,7 @@ export function lineLengthM(line: LngLat[]): number {
     const dLng = ((lng2 - lng1) * Math.PI) / 180;
     const a =
       Math.sin(dLat / 2) ** 2 +
-      Math.cos((lat1 * Math.PI) / 180) *
-        Math.cos((lat2 * Math.PI) / 180) *
-        Math.sin(dLng / 2) ** 2;
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLng / 2) ** 2;
     total += R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
   return total;
@@ -59,12 +57,7 @@ export type Cubication = {
   revenueUsd: number;
 };
 
-function applyGrade(
-  tonnes: number,
-  grade: Grade,
-  recovery: number,
-  prices: Prices,
-): Cubication {
+function applyGrade(tonnes: number, grade: Grade, recovery: number, prices: Prices): Cubication {
   const metal: Cubication["containedMetal"] = {};
   let revenue = 0;
   const cu = Number(grade.cu_pct ?? 0);
