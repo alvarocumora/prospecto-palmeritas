@@ -67,3 +67,52 @@ export function veinDipFootprint(input: {
   ];
   return [ring];
 }
+
+/** Distancia geodésica (Haversine) entre dos lng/lat en metros. */
+export function haversineMeters(a: LngLat, b: LngLat): number {
+  const R = 6378137;
+  const dLat = ((b[1] - a[1]) * Math.PI) / 180;
+  const dLng = ((b[0] - a[0]) * Math.PI) / 180;
+  const lat1 = (a[1] * Math.PI) / 180;
+  const lat2 = (b[1] * Math.PI) / 180;
+  const h =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
+}
+
+/** Interpolación lineal lng/lat para muestreo de perfil (sección corta, ~planar). */
+export function lerpLngLat(a: LngLat, b: LngLat, t: number): LngLat {
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+}
+
+/** Intersección de dos segmentos en plano lng/lat. Devuelve punto o null. */
+export function segmentIntersect(
+  p1: LngLat,
+  p2: LngLat,
+  p3: LngLat,
+  p4: LngLat,
+): LngLat | null {
+  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1];
+  const x3 = p3[0], y3 = p3[1], x4 = p4[0], y4 = p4[1];
+  const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+  if (Math.abs(den) < 1e-12) return null;
+  const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+  const u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+  if (t < 0 || t > 1 || u < 0 || u > 1) return null;
+  return [x1 + t * (x2 - x1), y1 + t * (y2 - y1)];
+}
+
+/** Intersecciones entre un segmento y un polígono (anillo exterior). */
+export function segmentRingIntersections(
+  a: LngLat,
+  b: LngLat,
+  ring: LngLat[],
+): LngLat[] {
+  const out: LngLat[] = [];
+  for (let i = 0; i < ring.length - 1; i++) {
+    const hit = segmentIntersect(a, b, ring[i], ring[i + 1]);
+    if (hit) out.push(hit);
+  }
+  return out;
+}
