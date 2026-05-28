@@ -315,6 +315,46 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   // Rango razonable de posición del plano según eje
   const planeRange = effectiveClip.axis === "y" ? 800 : 3000;
 
+  // Visibility / solo helpers
+  const visible = (l: "dem" | "holes" | "iso" | "blocks" | "targets" | "debug") =>
+    soloLayer === "all" || soloLayer === l;
+
+  // Bounds reales para AutoFit (transformando UTM-like → three: x, z*VE, -y)
+  const sceneBounds: SceneBounds = useMemo(() => {
+    const holePts: Array<[number, number, number]> = [];
+    for (const h of holes) {
+      holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
+      const azRad = (h.azimuth * Math.PI) / 180;
+      const dipRad = (h.dip * Math.PI) / 180;
+      const len = h.depth;
+      const ex = h.collar.x + Math.sin(azRad) * Math.cos(dipRad) * len;
+      const ey = (h.collar.z - Math.sin(dipRad) * len) * verticalExaggeration;
+      const ez = -(h.collar.y + Math.cos(azRad) * Math.cos(dipRad) * len);
+      holePts.push([ex, ey, ez]);
+    }
+    const targetPts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
+      t.collar.x,
+      -t.depth * verticalExaggeration,
+      -t.collar.y,
+    ]);
+    return computeSceneBounds([
+      demMesh ? { positions: demMesh.positions } : {},
+      iso ? { positions: iso.positions } : {},
+      blockModel ? { positions: blockModel.positions } : {},
+      { points: holePts },
+      { points: targetPts },
+    ]);
+  }, [demMesh, iso, blockModel, holes, drillTargets, verticalExaggeration]);
+
+  // Fallback synthetic demo cuando no hay datasets reales
+  const noRealData =
+    !demMesh &&
+    (!iso || iso.vertexCount === 0) &&
+    holes.length === 0 &&
+    (!blockModel || blockModel.count === 0) &&
+    (!drillTargets || drillTargets.targets.length === 0);
+
+
   return (
     <div
       className="relative w-full rounded-lg border border-border overflow-hidden bg-[#08090c]"
