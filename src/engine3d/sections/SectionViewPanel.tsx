@@ -220,11 +220,17 @@ function LegendRow({ y, color, label }: { y: number; color: string; label: strin
   );
 }
 
+type LayoutCtx = {
+  u0: number; u1: number; v0: number; v1: number;
+  s: number; innerW: number; innerH: number;
+  toX: (u: number) => number; toY: (v: number) => number;
+};
+
 function SectionGrid({
   layout,
   kind,
 }: {
-  layout: NonNullable<ReturnType<typeof useLayout>>;
+  layout: LayoutCtx;
   kind: "vertical" | "plan";
 }) {
   const stepU = niceStep(layout.u1 - layout.u0);
@@ -238,7 +244,6 @@ function SectionGrid({
 
   return (
     <g>
-      {/* gridlines */}
       {uTicks.map((u, i) => (
         <line key={`gu-${i}`} x1={layout.toX(u)} y1={PAD.t} x2={layout.toX(u)} y2={SVG_H - PAD.b}
           stroke="#1f2937" strokeWidth={0.5} />
@@ -247,10 +252,8 @@ function SectionGrid({
         <line key={`gv-${i}`} x1={PAD.l} y1={layout.toY(v)} x2={SVG_W - PAD.r} y2={layout.toY(v)}
           stroke="#1f2937" strokeWidth={0.5} />
       ))}
-      {/* axes */}
       <line x1={PAD.l} y1={SVG_H - PAD.b} x2={SVG_W - PAD.r} y2={SVG_H - PAD.b} stroke="#475569" strokeWidth={0.8} />
       <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={SVG_H - PAD.b} stroke="#475569" strokeWidth={0.8} />
-      {/* tick labels */}
       {uTicks.map((u, i) => (
         <text key={`tu-${i}`} x={layout.toX(u)} y={SVG_H - PAD.b + 12}
           fontFamily="monospace" fontSize="9" fill="#94a3b8" textAnchor="middle">
@@ -263,7 +266,6 @@ function SectionGrid({
           {Math.round(v)}
         </text>
       ))}
-      {/* axis labels */}
       <text x={(PAD.l + SVG_W - PAD.r) / 2} y={SVG_H - 6} fontFamily="monospace" fontSize="10"
         fill="#cbd5e1" textAnchor="middle">
         u · {kind === "vertical" ? "distancia horizontal (m)" : "este (m)"}
@@ -274,13 +276,4 @@ function SectionGrid({
       </text>
     </g>
   );
-}
-
-// Helper type for SectionGrid layout prop
-function useLayout() {
-  return null as null | {
-    u0: number; u1: number; v0: number; v1: number;
-    s: number; innerW: number; innerH: number;
-    toX: (u: number) => number; toY: (v: number) => number;
-  };
 }
