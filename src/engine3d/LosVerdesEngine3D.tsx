@@ -1505,3 +1505,92 @@ function LayerRow({ name, mounted, visible, count, extra }: { name: string; moun
 }
 
 
+type LayerKey = "debug" | "points" | "holes" | "dem" | "basemap" | "iso" | "blocks" | "fx";
+type TestKey = "points" | "holes" | "dem" | "esri" | "iso" | "all";
+
+function LayerRecoveryPanel({
+  checks,
+  errors,
+  canSwitchToCinematic,
+  debugMode,
+  onSetDebug,
+  onForceFit,
+  onTest,
+}: {
+  checks: Record<LayerKey, boolean>;
+  errors: Partial<Record<LayerKey, string | null>>;
+  canSwitchToCinematic: boolean;
+  debugMode: boolean;
+  onSetDebug: (v: boolean) => void;
+  onForceFit: () => void;
+  onTest: (l: TestKey) => void;
+}) {
+  const rows: Array<{ key: LayerKey; label: string }> = [
+    { key: "debug", label: "Debug primitives" },
+    { key: "points", label: "Anomaly points" },
+    { key: "holes", label: "Drillholes" },
+    { key: "dem", label: "DEM" },
+    { key: "basemap", label: "Basemap" },
+    { key: "iso", label: "Isosurface" },
+    { key: "blocks", label: "Blocks" },
+    { key: "fx", label: "Postprocessing" },
+  ];
+  return (
+    <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="uppercase tracking-wider text-emerald-300">Layer Recovery</span>
+        <button
+          onClick={() => onSetDebug(!debugMode)}
+          className={`px-2 py-0.5 rounded border text-[9px] uppercase ${debugMode ? "border-emerald-400/70 bg-emerald-500/15 text-emerald-200" : "border-border bg-black/40 text-muted-foreground"}`}
+        >
+          {debugMode ? "Debug ON" : "Debug OFF"}
+        </button>
+      </div>
+      <div className="space-y-0.5">
+        {rows.map((r) => {
+          const ok = checks[r.key];
+          const err = errors[r.key];
+          return (
+            <div key={r.key} className="flex items-start justify-between gap-2 leading-tight">
+              <span className="text-foreground/80">{r.label}</span>
+              <span className="flex flex-col items-end">
+                <span className={ok ? "text-emerald-300" : "text-rose-300"}>{ok ? "✓" : "✗"}</span>
+                {err && <span className="text-[8px] text-rose-300/80 max-w-[160px] truncate" title={err}>{err}</span>}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="grid grid-cols-3 gap-1 pt-1 border-t border-border/40">
+        {(["points", "holes", "dem", "esri", "iso", "all"] as TestKey[]).map((t) => (
+          <button
+            key={t}
+            onClick={() => onTest(t)}
+            className="px-1.5 py-1 rounded border border-border text-[9px] uppercase tracking-wider bg-black/40 text-foreground/80 hover:bg-cyan-500/15 hover:border-cyan-400/60"
+          >
+            test {t}
+          </button>
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-1">
+        <button
+          onClick={onForceFit}
+          className="px-1.5 py-1 rounded border border-cyan-400/60 bg-cyan-500/10 text-[9px] uppercase tracking-wider text-cyan-200"
+        >
+          Force fit camera
+        </button>
+        <button
+          onClick={() => onSetDebug(false)}
+          disabled={!canSwitchToCinematic}
+          className={`px-1.5 py-1 rounded border text-[9px] uppercase tracking-wider ${canSwitchToCinematic ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground cursor-not-allowed"}`}
+          title={canSwitchToCinematic ? "Switch to cinematic mode" : "Wait until points + holes + camera fit OK"}
+        >
+          Go Cinematic
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+
