@@ -105,7 +105,7 @@ export type FrenteRollup = {
     opex_usd_t: number;
     start_year: number;
     duration_years: number;
-    grade_estimate: Record<string, unknown>;
+    grade_cu_pct: number | null;
   } | null;
   metrics: {
     sampleCount: number;
