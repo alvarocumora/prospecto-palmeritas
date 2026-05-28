@@ -103,6 +103,66 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
 
+  // Sprint 4: QA/QC sobre el bundle importado
+  const qaqcInput = useMemo(() => {
+    if (!importedBundle) return null;
+    return {
+      collars: importedBundle.collars,
+      surveys: importedBundle.surveys,
+      assays: importedBundle.assays,
+      lithology: importedBundle.lithology,
+    };
+  }, [importedBundle]);
+  const { result: qaqcResult, busy: qaqcBusy } = useQAQC(qaqcInput);
+
+  // Aplicar estimation settings sobre los blockParams
+  useEffect(() => {
+    setBlockParams((p) => applyEstimation(p, estimation));
+  }, [estimation]);
+
+  // Log block model rebuilds + versionado
+  useEffect(() => {
+    if (!blockModel) return;
+    const inputHash = computeHash({
+      n: points.length,
+      bbox: blockModel.blockSize,
+      commodity: blockModel.commodity,
+    });
+    const summary = {
+      blocks: blockModel.count,
+      tonnes: blockModel.stats.tonnesTotal,
+      gradeMean: blockModel.stats.gradeMean,
+      metalContent: blockModel.stats.metalTotal,
+      cutoff: blockFilters.cutoff,
+      measured: blockModel.stats.measured,
+      indicated: blockModel.stats.indicated,
+      inferred: blockModel.stats.inferred,
+    };
+    const v = modelVersions.push({ inputHash, settings: blockParams, summary });
+    auditTrail.log("blockmodel.build", { modelId: v.modelId, summary });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockModel]);
+
+  // Log QA/QC runs
+  useEffect(() => {
+    if (qaqcResult) {
+      auditTrail.log("qaqc.run", { summary: qaqcResult.summary });
+    }
+  }, [qaqcResult]);
+
+  // Log CSV imports
+  useEffect(() => {
+    if (importedBundle) {
+      auditTrail.log("import.csv", {
+        collars: importedBundle.collars.length,
+        surveys: importedBundle.surveys.length,
+        assays: importedBundle.assays.length,
+        lithology: importedBundle.lithology.length,
+        errors: importedBundle.errors.length,
+      });
+    }
+  }, [importedBundle]);
+
   const { output: iso, busy: isoBusy } = useIsosurface(
     renderMode === "iso" ? points : [],
     isoParams,
