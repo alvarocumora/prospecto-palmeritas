@@ -191,6 +191,7 @@ export function LosVerdesScene3D({
     veins: true,
     veinPlanes: true,
     plan: true,
+    drills: true,
   });
   const [commoditiesOn, setCommoditiesOn] = useState<Record<CommodityToken, boolean>>({
     Au: true,
