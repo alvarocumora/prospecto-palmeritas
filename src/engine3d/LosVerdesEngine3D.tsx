@@ -124,6 +124,27 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
+  const anomaliesSource = pointsQ.data?.source ?? "empty";
+  const drillholesSource = holesQ.data?.source ?? "empty";
+  const geoCount = pointsQ.data?.stats.geo ?? 0;
+  const satCount = pointsQ.data?.stats.sat ?? 0;
+
+  // Sprint 6 data-binding diagnostics
+  useEffect(() => {
+    if (!pointsQ.data && !holesQ.data) return;
+    // eslint-disable-next-line no-console
+    console.log("[engine3d] datasets", {
+      projectId,
+      anomaliesGeophysical: geoCount,
+      anomaliesSatellite: satCount,
+      anomaliesTotal: points.length,
+      drillholes: holes.length,
+      drillholesSource,
+      anomaliesSource,
+    });
+  }, [pointsQ.data, holesQ.data, projectId, geoCount, satCount, points.length, holes.length, anomaliesSource, drillholesSource]);
+
+
 
 
   // Sprint 4: QA/QC sobre el bundle importado
