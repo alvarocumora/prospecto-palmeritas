@@ -510,9 +510,36 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     ]);
   }, [sceneBounds, pointCloudBounds, plannedHoleBounds]);
 
+  // Per-layer bounds for SceneBBox diagnostics panel
+  const isoBounds: SceneBounds = useMemo(
+    () => (iso ? computeSceneBounds([{ positions: iso.positions }]) : null),
+    [iso],
+  );
+  const demBounds: SceneBounds = useMemo(
+    () => (demMesh ? computeSceneBounds([{ positions: demMesh.positions }]) : null),
+    [demMesh],
+  );
+  const blocksBounds: SceneBounds = useMemo(
+    () => (blockModel ? computeSceneBounds([{ positions: blockModel.positions }]) : null),
+    [blockModel],
+  );
+  const targetsBounds: SceneBounds = useMemo(() => {
+    const pts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
+      t.collar.x,
+      -t.depth * verticalExaggeration,
+      -t.collar.y,
+    ]);
+    return computeSceneBounds([{ points: pts }]);
+  }, [drillTargets, verticalExaggeration]);
+
   const renderBounds = debugMinimalScene ? debugSceneBounds : sceneBounds ?? debugSceneBounds;
   const forceFitCamera = useCallback(() => {
     setFitCameraNonce((n) => n + 1);
+  }, []);
+  const frameLayer = useCallback((b: SceneBounds) => {
+    if (!b) return;
+    setFrameBounds(b);
+    setFrameNonce((n) => n + 1);
   }, []);
 
 
