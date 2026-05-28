@@ -86,7 +86,7 @@ export const generateSectionNarrative = createServerFn({ method: "POST" })
       project_id: data.projectId,
       section: data.sectionId,
       data_hash: data.dataHash,
-      payload: narrative as unknown as Record<string, unknown>,
+      payload: narrative as never,
       model: "google/gemini-2.5-pro",
     }, { onConflict: "project_id,section,data_hash" });
 
