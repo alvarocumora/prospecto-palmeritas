@@ -716,6 +716,20 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           }}
         />
 
+        {/* Scene BBox diagnostics */}
+        <SceneBBoxPanel
+          rows={[
+            { name: "anomalyIso", bounds: isoBounds },
+            { name: "drillholes", bounds: plannedHoleBounds },
+            { name: "dem", bounds: demBounds },
+            { name: "blockModel", bounds: blocksBounds },
+            { name: "pointCloud", bounds: pointCloudBounds },
+            { name: "targets", bounds: targetsBounds },
+            { name: "scene", bounds: sceneBounds },
+          ]}
+          onFrame={frameLayer}
+        />
+
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
           <div className="flex items-center gap-2">
