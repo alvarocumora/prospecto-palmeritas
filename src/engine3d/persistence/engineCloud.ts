@@ -51,8 +51,8 @@ export async function saveBlockModelVersion(input: {
       version_label: input.versionLabel,
       input_hash: input.inputHash ?? null,
       settings_hash: input.settingsHash ?? null,
-      settings: (input.settings ?? {}) as never,
-      resource_summary: (input.resourceSummary ?? {}) as never,
+      settings: (input.settings ?? {}) as unknown as Json,
+      resource_summary: (input.resourceSummary ?? {}) as unknown as Json,
       block_count: input.blockCount ?? null,
       binary_path: input.binaryPath ?? null,
       notes: input.notes ?? null,
@@ -78,7 +78,7 @@ export async function saveQAQCReport(input: {
     project_id: input.projectId,
     label: input.label ?? null,
     summary: input.summary,
-    issues: input.issues as never,
+    issues: input.issues as unknown as Json,
     critical_count: input.criticalCount,
     warning_count: input.warningCount,
     created_by: user?.id ?? null,
@@ -102,7 +102,7 @@ export async function saveAIInterpretation(input: {
     summary: input.summary,
     uncertainty: input.uncertainty,
     upside: input.upside,
-    payload: input.payload as never,
+    payload: input.payload as unknown as Json,
     created_by: user?.id ?? null,
   });
   if (error) throw error;
@@ -173,7 +173,7 @@ export async function saveDrillTargetsBatch(
     confidence: t.confidence ?? null,
     estimated_cost: t.estimated_cost ?? null,
     scenario: t.scenario ?? null,
-    payload: (t.payload ?? {}) as never,
+    payload: (t.payload ?? {}) as unknown as Json,
     created_by: user?.id ?? null,
   }));
   const { error } = await supabase.from("engine_drill_targets").insert(rows);
@@ -195,7 +195,7 @@ export async function saveGeneratedReport(input: {
     kind: input.kind,
     title: input.title ?? null,
     format: input.format ?? "json",
-    payload: (input.payload ?? null) as never,
+    payload: (input.payload ?? null) as unknown as Json,
     storage_path: input.storagePath ?? null,
     created_by: user?.id ?? null,
   });
@@ -218,7 +218,7 @@ export async function logEngineAudit(input: {
     action: input.action,
     entity_type: input.entityType ?? null,
     entity_id: input.entityId ?? null,
-    payload: (input.payload ?? {}) as never,
+    payload: (input.payload ?? {}) as unknown as Json,
   });
 }
 
