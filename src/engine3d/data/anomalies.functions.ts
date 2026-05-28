@@ -2,7 +2,7 @@
 // en coordenadas locales ENU (metros) listas para voxelizar.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const InputSchema = z.object({
   projectId: z.string().uuid(),
@@ -23,7 +23,8 @@ export type AnomalyDataset = {
   points: AnomalyPoint[];
   bbox: { minLng: number; maxLng: number; minLat: number; maxLat: number };
   center: { lng: number; lat: number };
-  stats: { count: number; vMin: number; vMax: number };
+  stats: { count: number; vMin: number; vMax: number; geo: number; sat: number };
+  source: "server" | "empty";
 };
 
 /** Conversión simple lng/lat → metros ENU sobre un centro local. */
@@ -45,22 +46,22 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
     const [geoRes, satRes] = await Promise.all([
-      supabase
+      supabaseAdmin
         .from("geophysics_anomalies")
         .select("lat,lng,estimated_depth_m,peak_value,confidence_pct,severity")
         .eq("project_id", data.projectId),
-      supabase
+      supabaseAdmin
         .from("satellite_anomalies")
         .select("geometry,score,severity,area_ha,index_code")
         .eq("project_id", data.projectId),
     ]);
 
     const geoRows = (geoRes.data ?? []).filter(
-      (r): r is typeof r & { lat: number; lng: number } =>
+      (r: { lat: number | null; lng: number | null }): r is typeof r & { lat: number; lng: number } =>
         r.lat != null && r.lng != null,
     );
     const satRows = (satRes.data ?? []).filter(
-      (r): r is typeof r & { geometry: unknown } => r.geometry != null,
+      (r: { geometry: unknown }): r is typeof r & { geometry: unknown } => r.geometry != null,
     );
 
     // Extrae centro de cada punto
@@ -88,12 +89,16 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
       allLngLat.push({ lng: c.lng, lat: c.lat, v, depth, kind: "satellite" });
     }
 
+    const geoCount = geoRows.length;
+    const satCount = satRows.length;
+
     if (allLngLat.length === 0) {
       return {
         points: [],
         bbox: { minLng: 0, maxLng: 0, minLat: 0, maxLat: 0 },
         center: { lng: 0, lat: 0 },
-        stats: { count: 0, vMin: 0, vMax: 1 },
+        stats: { count: 0, vMin: 0, vMax: 1, geo: 0, sat: 0 },
+        source: "empty",
       } satisfies AnomalyDataset;
     }
 
@@ -120,7 +125,8 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
       points,
       bbox,
       center,
-      stats: { count: points.length, vMin: Math.min(...vs), vMax: Math.max(...vs) },
+      stats: { count: points.length, vMin: Math.min(...vs), vMax: Math.max(...vs), geo: geoCount, sat: satCount },
+      source: "server",
     } satisfies AnomalyDataset;
   });
 

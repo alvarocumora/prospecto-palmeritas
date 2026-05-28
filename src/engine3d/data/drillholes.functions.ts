@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import proj4 from "proj4";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { lngLatToMeters } from "@/engine3d/geospatial/crs";
 
 const InputSchema = z.object({
@@ -29,6 +29,7 @@ export type DrillholeSegment = {
 export type DrillholesDataset = {
   holes: DrillholeSegment[];
   count: number;
+  source: "server" | "planned-from-targets" | "empty";
 };
 
 // EPSG:32719 = WGS84 / UTM zone 19S (Chile central — Los Verdes)
@@ -45,24 +46,85 @@ export const getDrillholes = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
     const [projectRes, holesRes] = await Promise.all([
-      supabase
+      supabaseAdmin
         .from("projects")
         .select("center_lng, center_lat")
         .eq("id", data.projectId)
         .maybeSingle(),
-      supabase
+      supabaseAdmin
         .from("drill_holes")
         .select("hole_id, easting, northing, elevation, azimuth, dip, actual_depth, planned_depth, status, is_ai")
         .eq("project_id", data.projectId),
     ]);
 
-    const rows = (holesRes.data ?? []).filter(
-      (r): r is typeof r & { easting: number; northing: number } =>
+    type HoleRow = {
+      hole_id: string | null;
+      easting: number | null;
+      northing: number | null;
+      elevation: number | null;
+      azimuth: number | null;
+      dip: number | null;
+      actual_depth: number | null;
+      planned_depth: number | null;
+      status: string | null;
+      is_ai: boolean | null;
+    };
+
+    const rows = ((holesRes.data ?? []) as HoleRow[]).filter(
+      (r): r is HoleRow & { easting: number; northing: number } =>
         r.easting != null && r.northing != null,
     );
 
+    const projectCenterLng =
+      projectRes.data?.center_lng != null ? Number(projectRes.data.center_lng) : null;
+    const projectCenterLat =
+      projectRes.data?.center_lat != null ? Number(projectRes.data.center_lat) : null;
+
+    // Fallback: si no hay drillholes reales, generar sondajes "planned/synthetic"
+    // a partir de los targets de exploración del proyecto.
     if (rows.length === 0) {
-      return { holes: [], count: 0 } satisfies DrillholesDataset;
+      const tRes = await supabaseAdmin
+        .from("exploration_targets")
+        .select("code, name, lat, lng, elevation_m, priority")
+        .eq("project_id", data.projectId)
+        .neq("stage", "closed");
+      type TargetRow = {
+        code: string | null;
+        name: string | null;
+        lat: number | null;
+        lng: number | null;
+        elevation_m: number | null;
+        priority: string | null;
+      };
+      const trows = ((tRes.data ?? []) as TargetRow[]).filter(
+        (t): t is TargetRow & { lat: number; lng: number } => t.lat != null && t.lng != null,
+      );
+      if (trows.length === 0) {
+        return { holes: [], count: 0, source: "empty" } satisfies DrillholesDataset;
+      }
+      const centerLng =
+        projectCenterLng ?? trows.reduce((s, r) => s + r.lng, 0) / trows.length;
+      const centerLat =
+        projectCenterLat ?? trows.reduce((s, r) => s + r.lat, 0) / trows.length;
+      const elevs = trows.map((r) => Number(r.elevation_m ?? 0));
+      const refElev = elevs.reduce((a, b) => a + b, 0) / Math.max(1, elevs.length);
+      const holes: DrillholeSegment[] = trows.map((r, i) => {
+        const { x, y } = lngLatToMeters(r.lng, r.lat, centerLng, centerLat);
+        const elev = Number(r.elevation_m ?? refElev);
+        const depth = (r.priority ?? "").toLowerCase() === "critical" ? 350 : 250;
+        const collarZ = elev - refElev;
+        return {
+          collar: { x, y, z: collarZ },
+          toe: { x, y, z: collarZ - depth },
+          holeId: r.code ?? r.name ?? `PLAN-${i + 1}`,
+          azimuth: 0,
+          dip: 90,
+          depth,
+          status: "planned",
+          isAi: true,
+        };
+      });
+      return { holes, count: holes.length, source: "planned-from-targets" } satisfies DrillholesDataset;
     }
 
     // Centro: usa el del proyecto si existe; si no, deriva del promedio de collares (UTM→lng/lat)
@@ -73,13 +135,9 @@ export const getDrillholes = createServerFn({ method: "POST" })
     });
 
     const centerLng =
-      projectRes.data?.center_lng != null
-        ? Number(projectRes.data.center_lng)
-        : rowsLngLat.reduce((s, r) => s + r.lng, 0) / rowsLngLat.length;
+      projectCenterLng ?? rowsLngLat.reduce((s, r) => s + r.lng, 0) / rowsLngLat.length;
     const centerLat =
-      projectRes.data?.center_lat != null
-        ? Number(projectRes.data.center_lat)
-        : rowsLngLat.reduce((s, r) => s + r.lat, 0) / rowsLngLat.length;
+      projectCenterLat ?? rowsLngLat.reduce((s, r) => s + r.lat, 0) / rowsLngLat.length;
 
     const elevations = rows.map((r) => Number(r.elevation ?? 0));
     const refElev =
@@ -89,14 +147,10 @@ export const getDrillholes = createServerFn({ method: "POST" })
       const { x, y } = lngLatToMeters(r.lng, r.lat, centerLng, centerLat);
       const elev = Number(r.elevation ?? refElev);
       const depth = Math.max(0, Number(r.actual_depth ?? r.planned_depth ?? 0));
-      // Azimuth: grados desde Norte (Y+ ENU), girando hacia Este (X+).
       const azRad = (Number(r.azimuth ?? 0) * Math.PI) / 180;
-      // Dip: ángulo bajo la horizontal (positive = down). 90 = vertical.
       const dipRad = (Number(r.dip ?? 90) * Math.PI) / 180;
       const horiz = depth * Math.cos(dipRad);
       const dz = depth * Math.sin(dipRad);
-      // Colar z relativa: queremos profundidad bajo la superficie ⇒ z=elev-refElev en superficie
-      // Para una escena enfocada en sondajes, ponemos colar en z = (elev - refElev), toe en z = collar.z - dz
       const collarZ = elev - refElev;
       const dx = horiz * Math.sin(azRad);
       const dy = horiz * Math.cos(azRad);
@@ -112,5 +166,5 @@ export const getDrillholes = createServerFn({ method: "POST" })
       };
     });
 
-    return { holes, count: holes.length } satisfies DrillholesDataset;
+    return { holes, count: holes.length, source: "server" } satisfies DrillholesDataset;
   });

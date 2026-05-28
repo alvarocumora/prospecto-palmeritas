@@ -124,6 +124,27 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
+  const anomaliesSource = pointsQ.data?.source ?? "empty";
+  const drillholesSource = holesQ.data?.source ?? "empty";
+  const geoCount = pointsQ.data?.stats.geo ?? 0;
+  const satCount = pointsQ.data?.stats.sat ?? 0;
+
+  // Sprint 6 data-binding diagnostics
+  useEffect(() => {
+    if (!pointsQ.data && !holesQ.data) return;
+    // eslint-disable-next-line no-console
+    console.log("[engine3d] datasets", {
+      projectId,
+      anomaliesGeophysical: geoCount,
+      anomaliesSatellite: satCount,
+      anomaliesTotal: points.length,
+      drillholes: holes.length,
+      drillholesSource,
+      anomaliesSource,
+    });
+  }, [pointsQ.data, holesQ.data, projectId, geoCount, satCount, points.length, holes.length, anomaliesSource, drillholesSource]);
+
+
 
 
   // Sprint 4: QA/QC sobre el bundle importado
@@ -375,7 +396,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </div>
           ) : (
             <div className="text-muted-foreground space-y-0.5">
-              <div>{pointsQ.data?.stats.count ?? 0} anomalías · {holes.length} sondajes</div>
+              <div>{pointsQ.data?.stats.count ?? 0} anomalías ({geoCount}geo·{satCount}sat) · {holes.length} sondajes</div>
+              <div className="text-[9px]">
+                src anom: <span className="text-cyan-300">{anomaliesSource}</span> · holes:{" "}
+                <span className={drillholesSource === "planned-from-targets" ? "text-amber-300" : "text-cyan-300"}>
+                  {drillholesSource}
+                </span>
+              </div>
               {renderMode === "iso" && iso && (
                 <div>
                   field {iso.resolution}³ ·{" "}
@@ -950,13 +977,29 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       </Canvas>
 
 
-      {pointsQ.data && pointsQ.data.points.length === 0 && holes.length === 0 && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="bg-black/80 px-4 py-3 rounded-md text-[11px] font-mono text-amber-300 border border-amber-500/40">
-            Sin anomalías ni sondajes para este proyecto.
+      {(() => {
+        if (!pointsQ.data && !holesQ.data) return null;
+        const msgs: string[] = [];
+        if (anomaliesSource === "empty" && drillholesSource === "empty") msgs.push("No source data loaded");
+        if (points.length > 0 && (!iso || iso.vertexCount === 0) && !isoBusy)
+          msgs.push("Anomalies loaded but MC empty");
+        if (drillholesSource === "planned-from-targets")
+          msgs.push("Drillholes missing, using planned targets");
+        if (noRealData) msgs.push("Synthetic demo active");
+        if (msgs.length === 0) return null;
+        return (
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none flex flex-col gap-1 items-center">
+            {msgs.map((m) => (
+              <div
+                key={m}
+                className="bg-black/80 px-3 py-1 rounded text-[10px] font-mono text-amber-300 border border-amber-500/40"
+              >
+                {m}
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {showSectionPanel && (
         <SectionViewPanel
