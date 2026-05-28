@@ -295,6 +295,79 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           <ToggleRow label="Helper visual" value={showClipHelper} onChange={setShowClipHelper} />
         </div>
 
+        {/* Section export / corte 2D */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
+          <div className="flex items-center gap-2">
+            <FileDown className="w-3 h-3 text-fuchsia-300" />
+            <span className="uppercase tracking-wider text-fuchsia-300">section view</span>
+          </div>
+          <div>
+            <Label className="text-[9px] uppercase">Corredor · ±{(sectionWidth / 2).toFixed(0)} m</Label>
+            <div className="grid grid-cols-5 gap-1 mt-1">
+              {[5, 10, 25, 50, 100].map((w) => (
+                <Button
+                  key={w}
+                  size="sm"
+                  variant={sectionWidth === w ? "default" : "outline"}
+                  className="h-6 text-[10px] px-1"
+                  onClick={() => setSectionWidth(w)}
+                >
+                  {w}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label className="text-[9px] uppercase">Follow drillhole</Label>
+            <select
+              className="mt-1 w-full bg-black/60 border border-border rounded px-1.5 py-1 text-[10px] font-mono"
+              value={followHoleId ?? ""}
+              onChange={(e) => setFollowHoleId(e.target.value || null)}
+            >
+              <option value="">— ninguno —</option>
+              {holes.map((h) => (
+                <option key={h.holeId} value={h.holeId}>
+                  {h.holeId} · {h.azimuth.toFixed(0)}°/{h.dip.toFixed(0)}°
+                </option>
+              ))}
+            </select>
+          </div>
+          {section.result && (
+            <div className="text-muted-foreground text-[9px] leading-tight">
+              {section.result.stats.holesIntersected} sondajes ·{" "}
+              {section.result.stats.samplesInSlab} muestras ·{" "}
+              {section.result.anomalySegments.length} segs · {section.result.stats.elapsedMs.toFixed(0)} ms
+              {section.busy && " · calculando…"}
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-1">
+            <Button
+              size="sm"
+              className="h-7 text-[10px]"
+              onClick={() => {
+                setShowSectionPanel(true);
+                setSectionTrigger((n) => n + 1);
+              }}
+              disabled={section.busy}
+            >
+              Generate
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-[10px]"
+              onClick={() => {
+                setShowSectionPanel(false);
+                setFollowHoleId(null);
+                section.reset();
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+
+
         {/* Terreno DEM */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
           <div className="flex items-center gap-2">
