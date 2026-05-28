@@ -1143,3 +1143,18 @@ function ClassChip({ label, active, onClick, color }: { label: string; active: b
   );
 }
 
+function LayerRow({ name, mounted, visible, count, extra }: { name: string; mounted: boolean; visible: boolean; count: number; extra?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 font-mono">
+      <span className="text-foreground/80">{name}</span>
+      <span className="flex gap-1.5 items-center">
+        <span className={mounted ? "text-emerald-300" : "text-muted-foreground"}>{mounted ? "●" : "○"}</span>
+        <span className={visible ? "text-cyan-300" : "text-muted-foreground"}>{visible ? "vis" : "hid"}</span>
+        <span className="text-amber-300">{count.toLocaleString()}</span>
+        {extra && <span className="text-muted-foreground">{extra}</span>}
+      </span>
+    </div>
+  );
+}
+
+
