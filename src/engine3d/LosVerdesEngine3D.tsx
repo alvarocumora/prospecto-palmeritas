@@ -472,6 +472,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const fogEnabled = !debugMinimalScene && volumeFog;
   const cinematicEnabled = !debugMinimalScene && cinematic;
   const clippingEnabled = !debugMinimalScene ? clippingPlanes : [];
+  const effectiveShowPoints = debugMinimalScene ? true : showPoints;
+  const effectiveShowHoles = debugMinimalScene ? true : showHoles;
+  const effectiveShowGrid = debugMinimalScene ? true : showGrid;
   const effectiveShowSurface = debugMinimalScene ? false : showSurface;
   const effectiveShowBlocks = debugMinimalScene ? false : showBlocks;
   const effectiveShowTargets3D = debugMinimalScene ? false : showTargets3D;
