@@ -647,6 +647,45 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           </div>
         </div>
 
+        {/* Layer Recovery Checklist */}
+        <LayerRecoveryPanel
+          checks={{
+            debug: debugRenderMode,
+            points: effectiveShowPoints && points.length > 0,
+            holes: effectiveShowHoles && holes.length > 0,
+            dem: effectiveDemEnabled && !!demMesh,
+            basemap: basemapEnabled && !(basemapStatus?.failed),
+            iso: effectiveShowSurface && !!iso && iso.triangleCount > 0,
+            blocks: effectiveShowBlocks && !!blockModel && blockModel.count > 0,
+            fx: cinematicEnabled && !fxError,
+          }}
+          errors={{
+            iso: iso && iso.triangleCount === 0 ? `MC empty (mode=${iso.mode})` : null,
+            blocks: blockError ? String(blockError) : null,
+            basemap: basemapStatus?.failed ? `basemap ${basemapStatus.source} failed` : null,
+            fx: fxError,
+          }}
+          canSwitchToCinematic={points.length > 0 && holes.length > 0 && !!sceneBounds}
+          debugMode={debugRenderMode}
+          onSetDebug={setDebugRenderMode}
+          onForceFit={forceFitCamera}
+          onTest={(layer) => {
+            switch (layer) {
+              case "points": setShowPoints(true); break;
+              case "holes": setShowHoles(true); break;
+              case "dem": setDemEnabled(true); setDebugRenderMode(false); break;
+              case "esri": setBasemapSource("esri"); setDebugRenderMode(false); break;
+              case "iso": setShowSurface(true); setDebugRenderMode(false); break;
+              case "all":
+                setShowPoints(true); setShowHoles(true);
+                setDemEnabled(true); setBasemapSource("esri");
+                setShowSurface(true); setShowBlocks(true);
+                setDebugRenderMode(false);
+                break;
+            }
+            setFitCameraNonce((n) => n + 1);
+          }}
+        />
 
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
