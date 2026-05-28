@@ -22,11 +22,11 @@ export function DrillholeImportPanel({ onImport, onClose }: Props) {
   });
   const [bundle, setBundle] = useState<ParsedDrillholeBundle | null>(null);
 
-  const refs: Record<Kind, React.RefObject<HTMLInputElement>> = {
-    collar: useRef<HTMLInputElement>(null),
-    survey: useRef<HTMLInputElement>(null),
-    assay: useRef<HTMLInputElement>(null),
-    lithology: useRef<HTMLInputElement>(null),
+  const refs = {
+    collar: useRef<HTMLInputElement | null>(null),
+    survey: useRef<HTMLInputElement | null>(null),
+    assay: useRef<HTMLInputElement | null>(null),
+    lithology: useRef<HTMLInputElement | null>(null),
   };
 
   const onFile = (kind: Kind, file: File | null) => {
