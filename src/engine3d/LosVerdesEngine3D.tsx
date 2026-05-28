@@ -1049,6 +1049,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
+        <CinematicEffects enabled={cinematic} intensity={cineIntensity} />
       </Canvas>
 
       {showNorth && <NorthArrow />}
