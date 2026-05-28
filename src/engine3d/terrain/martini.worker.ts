@@ -27,7 +27,6 @@ self.onmessage = (e: MessageEvent<MartiniInput>) => {
 
   // Martini requiere Float32Array de tamaño size*size
   const terrain = new Float32Array(heights);
-  // @ts-expect-error martini sin tipos
   const martini = new Martini(size);
   const tile = martini.createTile(terrain);
   const mesh = tile.getMesh(errorMeters);
