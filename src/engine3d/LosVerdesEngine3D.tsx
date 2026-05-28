@@ -6,10 +6,11 @@
 // - Clipping planes dinámicos X/Y/Z/libre + helper visual + invert
 // - DEM real triangulado con Martini (worker)
 import { Canvas, useThree } from "@react-three/fiber";
-import { MapControls, Stats } from "@react-three/drei";
+import { Html, MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import * as THREE from "three";
 
 function InvalidateOnChange({ deps }: { deps: unknown[] }) {
   const invalidate = useThree((s) => s.invalidate);
@@ -48,7 +49,7 @@ import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
-import { AutoFitCamera, computeSceneBounds, type SceneBounds } from "@/engine3d/sections/AutoFitCamera";
+import { AutoFitCamera, computeSceneBounds, fitCameraToBounds, type SceneBounds } from "@/engine3d/sections/AutoFitCamera";
 import { SyntheticDemoScene } from "@/engine3d/layers/SyntheticDemoScene";
 import { useSection } from "@/engine3d/hooks/useSection";
 import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
