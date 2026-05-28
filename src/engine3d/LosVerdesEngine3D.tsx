@@ -467,6 +467,49 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     (!blockModel || blockModel.count === 0) &&
     (!drillTargets || drillTargets.targets.length === 0);
 
+  const debugMinimalScene = debugRenderMode;
+  const basemapEnabled = !debugMinimalScene && basemapSource !== "none";
+  const fogEnabled = !debugMinimalScene && volumeFog;
+  const cinematicEnabled = !debugMinimalScene && cinematic;
+  const clippingEnabled = !debugMinimalScene ? clippingPlanes : [];
+  const effectiveShowSurface = debugMinimalScene ? false : showSurface;
+  const effectiveShowBlocks = debugMinimalScene ? false : showBlocks;
+  const effectiveShowTargets3D = debugMinimalScene ? false : showTargets3D;
+  const effectiveDemEnabled = debugMinimalScene ? false : demEnabled;
+
+  const pointCloudBounds: SceneBounds = useMemo(() => {
+    const rawPoints: Array<[number, number, number]> = points.map((p) => [
+      p.x,
+      p.z * verticalExaggeration,
+      -p.y,
+    ]);
+    return computeSceneBounds([{ points: rawPoints }]);
+  }, [points, verticalExaggeration]);
+
+  const plannedHoleBounds: SceneBounds = useMemo(() => {
+    const holePts: Array<[number, number, number]> = [];
+    for (const h of holes) {
+      holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
+      holePts.push([h.toe.x, h.toe.z * verticalExaggeration, -h.toe.y]);
+    }
+    return computeSceneBounds([{ points: holePts }]);
+  }, [holes, verticalExaggeration]);
+
+  const debugSceneBounds: SceneBounds = useMemo(() => {
+    const helper = 4000;
+    return computeSceneBounds([
+      { points: [[-helper, -helper * 0.25, -helper], [helper, helper * 0.25, helper]] },
+      ...(sceneBounds ? [{ points: [sceneBounds.min, sceneBounds.max] as Array<[number, number, number]> }] : []),
+      ...(pointCloudBounds ? [{ points: [pointCloudBounds.min, pointCloudBounds.max] as Array<[number, number, number]> }] : []),
+      ...(plannedHoleBounds ? [{ points: [plannedHoleBounds.min, plannedHoleBounds.max] as Array<[number, number, number]> }] : []),
+    ]);
+  }, [sceneBounds, pointCloudBounds, plannedHoleBounds]);
+
+  const renderBounds = debugMinimalScene ? debugSceneBounds : sceneBounds ?? debugSceneBounds;
+  const forceFitCamera = useCallback(() => {
+    setFitCameraNonce((n) => n + 1);
+  }, []);
+
 
   return (
     <div
