@@ -10,6 +10,7 @@ type Props = {
   radius?: number;
   onHover?: (hole: DrillholeSegment | null) => void;
   clippingPlanes?: THREE.Plane[];
+  unlit?: boolean;
 };
 
 const UP = new THREE.Vector3(0, 1, 0);
