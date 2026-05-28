@@ -2,7 +2,7 @@
 // en coordenadas locales ENU (metros) listas para voxelizar.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const InputSchema = z.object({
   projectId: z.string().uuid(),
