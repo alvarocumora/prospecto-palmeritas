@@ -10,13 +10,18 @@ import { MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown } from "lucide-react";
+import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown, Boxes, Upload } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
 import { getDrillholes, type DrillholeSegment } from "@/engine3d/data/drillholes.functions";
 import { useVoxelModel, DEFAULT_VOXEL_PARAMS, type VoxelParams } from "@/engine3d/hooks/useVoxelModel";
 import { useIsosurface, DEFAULT_ISO_PARAMS, type IsosurfaceParams } from "@/engine3d/hooks/useIsosurface";
 import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainDEM";
+import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/engine3d/hooks/useBlockModel";
+import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
+import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
+import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
+import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
 import { useSection } from "@/engine3d/hooks/useSection";
@@ -73,6 +78,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [sectionTrigger, setSectionTrigger] = useState(0);
   const [showSectionPanel, setShowSectionPanel] = useState(false);
   const [followHoleId, setFollowHoleId] = useState<string | null>(null);
+  const [blockParams, setBlockParams] = useState<BlockModelParams>(DEFAULT_BLOCK_PARAMS);
+  const [blockFilters, setBlockFilters] = useState<BlockFilters>(DEFAULT_BLOCK_FILTERS);
+  const [showBlocks, setShowBlocks] = useState(true);
+  const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [showImportPanel, setShowImportPanel] = useState(false);
+  const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
+  const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
@@ -84,6 +96,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const { output: voxels, busy: voxBusy } = useVoxelModel(
     renderMode === "voxel" ? points : [],
     voxelParams,
+  );
+  const { output: blockModel, busy: blockBusy, error: blockError } = useBlockModel(
+    blockParams.enabled ? points : [],
+    blockParams,
   );
   const { mesh: demMesh, busy: demBusy, loading: demLoading } = useTerrainDEM(
     projectId,
@@ -394,7 +410,178 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           <ToggleRow label="Wireframe" value={demWireframe} onChange={setDemWireframe} />
         </div>
 
-        {/* Capas */}
+        {/* Block model */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
+          <div className="flex items-center gap-2">
+            <Boxes className="w-3 h-3 text-amber-300" />
+            <span className="uppercase tracking-wider text-amber-300">block model</span>
+          </div>
+          <ToggleRow
+            label="Engine activo"
+            value={blockParams.enabled}
+            onChange={(v) => setBlockParams((p) => ({ ...p, enabled: v }))}
+          />
+          {blockParams.enabled && (
+            <>
+              <div>
+                <Label className="text-[9px] uppercase">Block size · {blockParams.blockSize} m</Label>
+                <Slider
+                  min={10} max={100} step={5}
+                  value={[blockParams.blockSize]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, blockSize: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Commodity</Label>
+                <div className="grid grid-cols-4 gap-1 mt-1">
+                  {(["au", "ag", "cu", "fe"] as const).map((c) => (
+                    <Button
+                      key={c}
+                      size="sm"
+                      variant={blockParams.commodity === c ? "default" : "outline"}
+                      className="h-6 text-[10px] px-1"
+                      onClick={() => setBlockParams((p) => ({ ...p, commodity: c }))}
+                    >
+                      {c.toUpperCase()}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Grade scale · 0..1 → {blockParams.gradeScale} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                </Label>
+                <Slider
+                  min={0.5} max={20} step={0.5}
+                  value={[blockParams.gradeScale]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, gradeScale: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Search radius · {blockParams.searchRadius} m</Label>
+                <Slider
+                  min={20} max={500} step={10}
+                  value={[blockParams.searchRadius]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, searchRadius: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Cutoff · {blockFilters.cutoff.toFixed(2)} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                </Label>
+                <Slider
+                  min={0} max={Math.max(2, blockParams.gradeScale)} step={0.05}
+                  value={[blockFilters.cutoff]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, cutoff: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Confianza mín · {(blockFilters.minConfidence * 100).toFixed(0)}%</Label>
+                <Slider
+                  min={0} max={1} step={0.05}
+                  value={[blockFilters.minConfidence]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, minConfidence: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Depth · {blockFilters.minDepth}–{blockFilters.maxDepth} m
+                </Label>
+                <Slider
+                  min={0} max={1000} step={25}
+                  value={[blockFilters.minDepth, blockFilters.maxDepth]}
+                  onValueChange={([a, b]) => setBlockFilters((f) => ({ ...f, minDepth: a, maxDepth: b }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Color por</Label>
+                <div className="grid grid-cols-3 gap-1 mt-1">
+                  {(["grade", "classification", "confidence"] as const).map((m) => (
+                    <Button
+                      key={m}
+                      size="sm"
+                      variant={blockFilters.colorBy === m ? "default" : "outline"}
+                      className="h-6 text-[10px] px-1"
+                      onClick={() => setBlockFilters((f) => ({ ...f, colorBy: m }))}
+                    >
+                      {m === "classification" ? "class" : m === "confidence" ? "conf" : "grade"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Opacidad · {blockFilters.opacity.toFixed(2)}</Label>
+                <Slider
+                  min={0.1} max={1} step={0.05}
+                  value={[blockFilters.opacity]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, opacity: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <ClassChip
+                  label="MEAS"
+                  active={blockFilters.showMeasured}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showMeasured: !f.showMeasured }))}
+                  color="bg-green-500/70"
+                />
+                <ClassChip
+                  label="IND"
+                  active={blockFilters.showIndicated}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showIndicated: !f.showIndicated }))}
+                  color="bg-yellow-500/70"
+                />
+                <ClassChip
+                  label="INF"
+                  active={blockFilters.showInferred}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showInferred: !f.showInferred }))}
+                  color="bg-red-500/70"
+                />
+              </div>
+              {blockError && (
+                <div className="text-[9px] text-amber-300">{blockError}</div>
+              )}
+              {blockModel && (
+                <div className="text-muted-foreground text-[9px] leading-tight">
+                  {blockModel.count.toLocaleString()} bloques · medias {blockModel.stats.gradeMean.toFixed(2)} ·{" "}
+                  {(blockModel.stats.tonnesTotal / 1_000_000).toFixed(2)} Mt · {blockModel.stats.elapsedMs.toFixed(0)} ms
+                  {blockBusy && " · calc…"}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-1">
+                <Button
+                  size="sm"
+                  className="h-7 text-[10px]"
+                  disabled={!blockModel}
+                  onClick={() => setShowResourcePanel(true)}
+                >
+                  Resource KPI
+                </Button>
+                <ToggleRow label="Visible" value={showBlocks} onChange={setShowBlocks} />
+              </div>
+            </>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full h-7 text-[10px] mt-1"
+            onClick={() => setShowImportPanel(true)}
+          >
+            <Upload className="w-3 h-3 mr-1" /> Import CSV holes
+          </Button>
+          {importedBundle && (
+            <div className="text-[9px] text-emerald-300">
+              ✓ {importedBundle.collars.length} collars · {importedBundle.assays.length} assays importados
+            </div>
+          )}
+        </div>
+
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-1.5">
           <ToggleRow label={renderMode === "iso" ? "Isosurface" : "Voxel cubes"} value={showSurface} onChange={setShowSurface} />
           <ToggleRow label="Sondajes" value={showHoles} onChange={setShowHoles} />
@@ -490,6 +677,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
+          {showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
+            <BlockModelLayer
+              model={blockModel}
+              filters={blockFilters}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingPlanes}
+            />
+          )}
           {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
         </Suspense>
 
@@ -520,6 +715,28 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           followHoleId={followHoleId}
         />
       )}
+
+
+      {showResourcePanel && blockModel && (
+        <ResourceModelPanel
+          model={blockModel}
+          filters={blockFilters}
+          price={econ.price}
+          opex={econ.opex}
+          capex={econ.capex}
+          recovery={econ.recovery}
+          discount={econ.discount}
+          years={econ.years}
+          onClose={() => setShowResourcePanel(false)}
+        />
+      )}
+
+      {showImportPanel && (
+        <DrillholeImportPanel
+          onClose={() => setShowImportPanel(false)}
+          onImport={(b) => setImportedBundle(b)}
+        />
+      )}
     </div>
   );
 }
@@ -532,3 +749,19 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
     </div>
   );
 }
+
+function ClassChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center justify-center gap-1 h-6 rounded text-[9px] uppercase border ${
+        active ? "border-amber-400/60 text-foreground" : "border-border/40 text-muted-foreground opacity-60"
+      }`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-sm ${color}`} />
+      {label}
+    </button>
+  );
+}
+
