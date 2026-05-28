@@ -12,8 +12,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { MaplibreMeasureControl } from "@watergis/maplibre-gl-terradraw";
-import "@watergis/maplibre-gl-terradraw/dist/maplibre-gl-terradraw.css";
 import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw, Slice } from "lucide-react";
 import type {
   PublicTarget,
@@ -277,17 +275,6 @@ export function LosVerdesScene3D({
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
     map.addControl(new maplibregl.FullscreenControl(), "top-right");
 
-    // Herramienta de medición (distancia + área) con elevación del DEM
-    try {
-      const measure = new MaplibreMeasureControl({
-        modes: ["render", "linestring", "polygon", "delete-selection", "delete"],
-        open: false,
-        computeElevation: true,
-      });
-      map.addControl(measure, "top-right");
-    } catch (err) {
-      console.warn("[scene3d] Terra Draw measure no se pudo inicializar", err);
-    }
     mapRef.current = map;
 
     map.on("load", () => {
