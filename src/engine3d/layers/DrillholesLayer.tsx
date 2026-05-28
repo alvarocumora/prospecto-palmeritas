@@ -9,6 +9,7 @@ type Props = {
   verticalExaggeration?: number;
   radius?: number;
   onHover?: (hole: DrillholeSegment | null) => void;
+  clippingPlanes?: THREE.Plane[];
 };
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -39,6 +40,7 @@ export function DrillholesLayer({
   verticalExaggeration = 1,
   radius = 6,
   onHover,
+  clippingPlanes,
 }: Props) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const count = holes.length;
@@ -57,9 +59,16 @@ export function DrillholesLayer({
         roughness: 0.45,
         emissive: new THREE.Color(0x111111),
         emissiveIntensity: 0.2,
+        clippingPlanes: clippingPlanes ?? [],
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
+
+  useEffect(() => {
+    material.clippingPlanes = clippingPlanes ?? [];
+    material.needsUpdate = true;
+  }, [material, clippingPlanes]);
 
   useEffect(() => {
     const mesh = meshRef.current;
