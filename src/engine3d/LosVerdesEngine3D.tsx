@@ -162,6 +162,29 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     4000,
   );
 
+  // Sprint 4: log block model rebuilds + versionado (después de useBlockModel)
+  useEffect(() => {
+    if (!blockModel) return;
+    const inputHash = computeHash({
+      n: points.length,
+      blockSize: blockModel.blockSize,
+      commodity: blockModel.commodity,
+    });
+    const summary = {
+      blocks: blockModel.count,
+      tonnes: blockModel.stats.tonnesTotal,
+      gradeMean: blockModel.stats.gradeMean,
+      metalContent: blockModel.stats.metalTotal,
+      cutoff: blockFilters.cutoff,
+      measured: blockModel.stats.measured,
+      indicated: blockModel.stats.indicated,
+      inferred: blockModel.stats.inferred,
+    };
+    const v = modelVersions.push({ inputHash, settings: blockParams, summary });
+    auditTrail.log("blockmodel.build", { modelId: v.modelId, summary });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockModel]);
+
   // Section mode = clipping forzado activo
   const effectiveClip = useMemo<ClipParams>(
     () => (sectionMode ? { ...clipParams, enabled: true } : clipParams),
