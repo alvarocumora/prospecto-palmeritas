@@ -121,7 +121,10 @@ function LiveLosVerdesPage() {
   const [catBusy, setCatBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+
 
 
   useEffect(() => {
