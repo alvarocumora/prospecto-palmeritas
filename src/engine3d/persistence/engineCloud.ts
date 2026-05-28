@@ -1,6 +1,9 @@
 // engineCloud — Sprint 6
 // Helpers de persistencia sobre Supabase: versions, QA/QC, AI, targets, reports, audit, comments.
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
+
+const toJson = (v: unknown): Json => (v ?? null) as Json;
 
 // ---------- Block Model Versions ----------
 export type BlockModelVersionRow = {
