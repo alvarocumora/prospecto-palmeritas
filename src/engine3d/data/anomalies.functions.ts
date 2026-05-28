@@ -23,7 +23,8 @@ export type AnomalyDataset = {
   points: AnomalyPoint[];
   bbox: { minLng: number; maxLng: number; minLat: number; maxLat: number };
   center: { lng: number; lat: number };
-  stats: { count: number; vMin: number; vMax: number };
+  stats: { count: number; vMin: number; vMax: number; geo: number; sat: number };
+  source: "server" | "empty";
 };
 
 /** Conversión simple lng/lat → metros ENU sobre un centro local. */
