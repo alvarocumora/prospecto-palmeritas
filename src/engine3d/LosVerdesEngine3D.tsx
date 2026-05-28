@@ -805,6 +805,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             />
           )}
           {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
+          {showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
+            <DrillTargetLayer
+              targets={drillTargets.targets}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingPlanes}
+              onHover={setHoveredTarget}
+            />
+          )}
         </Suspense>
 
         <MapControls
