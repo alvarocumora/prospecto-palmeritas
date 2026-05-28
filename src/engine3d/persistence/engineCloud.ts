@@ -74,7 +74,7 @@ export async function saveQAQCReport(input: {
   const { error } = await supabase.from("engine_qaqc_reports").insert({
     project_id: input.projectId,
     label: input.label ?? null,
-    summary: input.summary as never,
+    summary: input.summary,
     issues: input.issues as never,
     critical_count: input.criticalCount,
     warning_count: input.warningCount,
@@ -96,7 +96,7 @@ export async function saveAIInterpretation(input: {
   const { error } = await supabase.from("engine_ai_interpretations").insert({
     project_id: input.projectId,
     block_model_version_id: input.blockModelVersionId ?? null,
-    summary: input.summary as never,
+    summary: input.summary,
     uncertainty: input.uncertainty,
     upside: input.upside,
     payload: input.payload as never,
@@ -170,7 +170,7 @@ export async function saveDrillTargetsBatch(
     confidence: t.confidence ?? null,
     estimated_cost: t.estimated_cost ?? null,
     scenario: t.scenario ?? null,
-    payload: t.payload ?? {},
+    payload: (t.payload ?? {}) as never,
     created_by: user?.id ?? null,
   }));
   const { error } = await supabase.from("engine_drill_targets").insert(rows);
