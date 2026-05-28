@@ -89,14 +89,9 @@ function marchingCubes(
   const edgeCache = new Map<number, number>();
 
   const sample = (i: number, j: number, k: number) => field[(k * res + j) * res + i];
-  const idxOf = (i: number, j: number, k: number) => (k * res + j) * res + i;
 
   let fMin = Infinity, fMax = -Infinity;
 
-  // edgeKey: encode (cellI,cellJ,cellK,edgeIdx) into a single number
-  // res max ~128 → cube < 128^3 = 2M, *12 = 24M, safe in number
-  const keyOf = (ci: number, cj: number, ck: number, e: number) =>
-    ((ck * (res + 1) + cj) * (res + 1) + ci) * 12 + e;
 
   // Cache valid samples to avoid recomputing
   for (let k = 0; k < res - 1; k++) {
