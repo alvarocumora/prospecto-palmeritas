@@ -813,6 +813,55 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           onImport={(b) => setImportedBundle(b)}
         />
       )}
+
+      {/* Sprint 4: Tabs dock */}
+      <EngineTabsDock
+        active={activeTab}
+        onChange={(t) => {
+          setActiveTab(t);
+          if (t === "section") setShowSectionPanel(true);
+          if (t === "resource") setShowResourcePanel(true);
+          if (t === "ni43101") setNi43Mode(true);
+          if (t === "viewer") {
+            setShowSectionPanel(false);
+            setShowResourcePanel(false);
+            setNi43Mode(false);
+          }
+        }}
+        badges={{
+          qaqc: qaqcResult?.summary.critical || qaqcResult?.summary.warning || undefined,
+          ni43101: ni43Mode ? "ON" : undefined,
+        }}
+      />
+
+      {activeTab === "qaqc" && (
+        <QAQCPanel result={qaqcResult} busy={qaqcBusy} onClose={() => setActiveTab("viewer")} />
+      )}
+      {activeTab === "estimation" && (
+        <EstimationSettingsPanel
+          value={estimation}
+          onChange={setEstimation}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "ni43101" && (
+        <NI43101Panel
+          projectId={projectId}
+          model={blockModel}
+          params={blockParams}
+          estimation={estimation}
+          qaqc={qaqcResult}
+          bundle={importedBundle}
+          econ={econ}
+          onClose={() => {
+            setActiveTab("viewer");
+            setNi43Mode(false);
+          }}
+        />
+      )}
+      {activeTab === "audit" && (
+        <AuditTrailPanel onClose={() => setActiveTab("viewer")} />
+      )}
     </div>
   );
 }
