@@ -82,10 +82,10 @@ export function applyEstimation(
 ): BlockModelParams {
   return {
     ...base,
-    idwPower: est.idwPower,
+    power: est.idwPower,
     searchRadius: est.searchRadius,
     minSamples: est.minSamples,
     maxSamples: est.maxSamples,
     density: est.defaultDensity,
-  } as BlockModelParams;
+  };
 }
