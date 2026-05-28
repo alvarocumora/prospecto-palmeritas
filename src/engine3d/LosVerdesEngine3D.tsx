@@ -753,7 +753,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         shadows={false}
         style={{ width: "100%", height: "100%" }}
         onCreated={({ gl, invalidate }) => {
-          gl.localClippingEnabled = sectionMode;
+          gl.localClippingEnabled = true;
           setTimeout(() => invalidate(), 300);
         }}
       >
