@@ -1,146 +1,169 @@
 
-# Plan — Validación + Visor Geológico Profesional (GeoCapitals)
+# Informe Técnico Pre-NI 43-101 / JORC — Alto Los Verdes 5 (Tilama)
 
-Estado actual ya cubierto: Debug Render Mode ON, helpers (axes 5000 + grid 8000 + esfera roja + cubo wireframe), Force Fit Camera, frameloop="always", borde cyan, unlit para puntos/sondajes, Layer Recovery Checklist con botones Test, fallback blob para Marching Cubes, Basemap ESRI/OSM/Topo, DEM Martini, Anomaly Isosurface (MeshPhysicalMaterial), Drillholes instanciados, Block Model, Drill Targets IA.
-
-Lo que falta es **(1) cerrar diagnóstico** para confirmar que la cámara mira la anomalía, y **(2) progresar al visor profesional**. Plan en 6 fases atómicas, cada una verificable en HUD.
-
----
-
-## Fase 1 — Diagnóstico de cámara y bounding box (1 fase)
-
-Objetivo: descartar definitivamente "la anomalía está fuera del frustum o tiene escala absurda".
-
-- Añadir **`<Stats />`** (drei) toggleable desde HUD Layer Recovery.
-- Asegurar que `axesHelper(1000)` y `gridHelper(5000, 50)` queden visibles **incluso en modo Cinematic** (hoy solo en Debug).
-- Nuevo panel **"Scene BBox"** en HUD que muestre, por capa:
-  - `anomalyIso`: `box.min / box.max / center / size` (Box3.setFromObject)
-  - `drillholes`: idem
-  - `dem`: idem
-  - `blockModel`: idem
-  - `pointCloud`: idem
-- Resaltar en rojo si `|min|>1e6`, `size<1`, o el centro queda fuera del frustum actual de la cámara.
-- Botón **"Frame this layer"** por fila → llama `fitCameraToBounds(layerBounds)`.
-
-Verificación: con datos reales de Los Verdes, la fila `anomalyIso` debe mostrar coordenadas razonables (UTM zona 19S) y un `size` coherente con el área del proyecto.
+Proyecto: **LV-TIL-001 · Distrito Cuprífero Los Verdes – Tilama** (Coquimbo, Cu-Au-Ag).
+Entregable: **página interactiva navegable + export PDF idéntico**, con escena 3D estilo Datamine embebida y secciones pre-NI 43-101 completas. Datos reales del backend + IA Lovable (`google/gemini-2.5-pro`) rellenando vacíos como "modelo preliminar" claramente etiquetado.
 
 ---
 
-## Fase 2 — Layer Control unificado estilo Leapfrog
+## 1. Datos reales ya disponibles en backend
 
-Objetivo: reemplazar los toggles dispersos por un único panel jerárquico.
+Verificado para `project_id = 7a499b02-…`:
 
-Estructura del panel `LayerControlPanel.tsx`:
+| Capa | Cantidad | Fuente |
+|------|---------:|--------|
+| Concesiones catastro | 15 | `mining_concessions` |
+| Anomalías satelitales | 45 | `satellite_anomalies` |
+| Vetas modeladas | 6 | `veins` |
+| Exploration targets | 108 | `exploration_targets` |
+| Mag targets | 10 | `mag_targets` |
+| Resource model | 1 | `resource_models` |
+| Sondajes históricos | 0 → **IA preliminar** |
+| Geofísica IP/Mag | 0 → **IA preliminar** |
+| QAQC | 0 → **IA preliminar** |
+
+Todo lo marcado "IA preliminar" lleva watermark visible en informe y panel: *"Modelo preliminar generado por IA — no apto para reporte NI 43-101 / JORC público sin campaña de validación"*.
+
+---
+
+## 2. Arquitectura del entregable
 
 ```text
-☑ Base / GIS
-   ☑ Topografía (DEM)
-   ☑ Textura satelital (ESRI / OSM / Topo)
-   ☑ Grid + ejes
-☑ Geología
-   ☐ Litología
-   ☐ Fallas
-   ☐ Alteración
-☑ Exploración
-   ☑ Sondajes (DDH)
-   ☑ Anomalías SAT
-   ☑ Isosuperficies
-☑ Recursos
-   ☑ Block Model
-   ☑ Cut-off slider
-☑ IA
-   ☑ Targets ranking
-   ☐ AI Geologist overlay
+src/routes/_authenticated.reports.losverdes.pre43101.tsx   ← página interactiva
+src/routes/api/reports/losverdes-pdf.ts                    ← endpoint export PDF (server route)
+src/features/reports/pre43101/
+  ├─ Pre43101Shell.tsx          ← layout con TOC sticky + secciones
+  ├─ sections/
+  │   ├─ ExecutiveSummary.tsx   ← §1 Summary
+  │   ├─ PropertyCatastro.tsx   ← §2 Property + 15 concesiones + mapa
+  │   ├─ Geology.tsx            ← §3 Regional + local + alteración
+  │   ├─ Exploration.tsx        ← §4 Sat (45) + Geofísica IA
+  │   ├─ Drilling.tsx           ← §5 Sondajes (IA preliminar)
+  │   ├─ SampleQAQC.tsx         ← §6 QAQC IA preliminar
+  │   ├─ MineralResource.tsx    ← §7 Resource model + 6 vetas
+  │   ├─ Targets3D.tsx          ← §8 Visor 3D Datamine embebido (foco)
+  │   ├─ RiskOpportunities.tsx  ← §9
+  │   └─ Recommendations.tsx    ← §10 Plan + presupuesto + QP
+  ├─ data/usePre43101Data.ts    ← un solo serverFn que devuelve todo
+  ├─ ai/generateNarrative.functions.ts ← IA por sección
+  └─ export/pdfBuilder.ts       ← jspdf + html2canvas para PDF idéntico
 ```
 
-- Cada nodo: checkbox + opacidad + botón "solo" + botón "frame".
-- Estado persistido en `useLayerState` (ya existe el hook).
-- Reemplaza los bloques de toggles actuales (Anomalías, DEM, Clipping…) — esos pasan a colapsables hijos dentro de cada grupo.
+### Visor 3D Datamine embebido
+
+Reutiliza `LosVerdesEngine3D` (motor ya existe con DEM Martini + ESRI drape + isosurface + drillholes + block model + AI targets). En la sección §8 se monta con:
+
+- Modo **Cinematic** por defecto (no Debug)
+- Camera fly-through automático: catastro → anomalías sat → vetas → sondajes → targets
+- Panel lateral con `AITargetTable` (top 10 targets rankeados)
+- Botón **"Snapshot al PDF"** que captura WebGL → canvas → embebe en página correspondiente
+
+### Export PDF
+
+Server route `/api/reports/losverdes-pdf` recibe el `reportId`, renderiza con Puppeteer **no** (no compatible Workers) → usa **`@react-pdf/renderer`** server-side replicando layout, con snapshots del 3D capturados previamente desde el cliente y subidos a Supabase Storage (`reports/losverdes/{reportId}/snap-*.png`).
 
 ---
 
-## Fase 3 — Sondajes profesionales (color por commodity)
+## 3. Secciones del informe (estándar NI 43-101 / JORC Table 1)
 
-Hoy los sondajes son cilindros instanciados con color por anomalía. Mejorar:
-
-- Color por **commodity activo** (Au/Cu/Ag/Mo/REE/Li) usando `commodityColors.ts` + escala lineal sobre assays.
-- Si el bundle CSV importado trae assays reales, usarlos; si no, usar el grade interpolado del block model.
-- **Etiquetas flotantes** (drei `Html sprite`) con `DDH-ID · azimut/dip · profundidad` al hover.
-- Toggle "Mostrar collares" / "Mostrar trayectorias" / "Mostrar assays >cutoff" por separado.
-- Leyenda de gradiente fija abajo-derecha del Canvas.
+| § | Sección | Fuente datos |
+|---|---------|--------------|
+| 1 | Summary ejecutivo | IA sintetiza KPIs reales |
+| 2 | Property & catastro | 15 concesiones reales + estado patentes |
+| 3 | Accessibility, climate, infra | IA (Tilama, ruta D-71) |
+| 4 | History | IA + minas vecinas conocidas |
+| 5 | Geological setting | IA + 6 vetas reales |
+| 6 | Deposit types | IA (IOCG / pórfido Cu-Au) |
+| 7 | Exploration | 45 anomalías sat reales + mapa |
+| 8 | Drilling | "Modelo preliminar IA" + 108 targets planificados |
+| 9 | Sample prep, QAQC | "Modelo preliminar IA" |
+| 10 | Data verification | Auto-check vs. backend |
+| 11 | Mineral processing | IA (preliminar) |
+| 12 | Mineral resource estimate | 1 resource model real + 6 vetas |
+| 13 | Adjacent properties | IA + concesiones vecinas |
+| 14 | **Visor 3D Datamine** | LosVerdesEngine3D embebido |
+| 15 | Interpretación y conclusiones | IA con todo el contexto |
+| 16 | Recomendaciones + presupuesto | IA, fases 1-2-3 con USD |
+| 17 | QP statement | Placeholder editable |
 
 ---
 
-## Fase 4 — Contexto geográfico real (DEM + ESRI drape)
+## 4. Capa IA (Lovable AI Gateway)
 
-Hoy ya hay `TerrainMartiniLayer` + `BasemapLayer`. Falta integrarlos visualmente como un único terreno texturizado (no dos planos separados):
+`generateNarrative.functions.ts` — `createServerFn` por sección, modelo `google/gemini-2.5-pro`, structured output con Zod:
 
-- En `TerrainMartiniLayer`, samplear el tile ESRI activo y aplicarlo como **textura difusa** sobre el mesh Martini (drape verdadero, no cuadrado plano debajo).
-- Exageración vertical compartida con el resto de la escena.
-- Cuando falla ESRI → fallback OSM → fallback grid (ya implementado, mantener).
-- Quitar el `BasemapLayer` plano cuando hay DEM (evita z-fighting); usarlo solo si DEM está OFF.
-
-Resultado esperado: las anomalías y sondajes "se apoyan" sobre la topografía real de Tilama.
-
----
-
-## Fase 5 — AI Target Engine (panel lateral derecho)
-
-Ya existe `useDrillTargets` + `AIGeologistPanel` + `TargetPlanningPanel`. Falta consolidarlos en una **tabla compacta** estilo Mission Control:
-
-```text
-AI TARGET ENGINE                          [export CSV]
-─────────────────────────────────────────────────────
-#  Target    Score  Conf%  Depth   Commodity  AI why
-1  TGT-01     94     91    620 m   Cu-Au      [open]
-2  TGT-02     88     84    410 m   Cu         [open]
-…
+```ts
+Output.object({ schema: z.object({
+  title: z.string(),
+  paragraphs: z.array(z.string()),
+  bullets: z.array(z.string()).optional(),
+  tables: z.array(z.object({ headers: z.array(z.string()), rows: z.array(z.array(z.string())) })).optional(),
+  warnings: z.array(z.string()).optional(), // marca "preliminar"
+}) })
 ```
 
-- Click fila → cámara vuela al target + abre `TargetExplainerDialog` (ya existe).
-- Score se calcula con `aiGeologist.ts` (ya existe) combinando magnetometría / IP / geoquímica / sondajes históricos / penalización QAQC (ya ponderado por `qaqcPenalty`).
-- Botón "Generar campaña" → exporta plan de sondajes al panel `TargetPlanningPanel`.
+Cache por `(project_id, section, data_hash)` en tabla `report_section_cache` para no re-llamar IA en cada visita. Regenerar bajo demanda con botón.
 
 ---
 
-## Fase 6 — Layout Command Center
+## 5. Migración DB
 
-Reorganizar `/live/losverdes` y `/dashboard/geology3d` en grid de mando:
+Una sola tabla nueva:
 
-```text
-┌────────────────────────────────────────────────────┐
-│ Header (KPIs + Sync catastro + PDF)               │
-├────────────┬───────────────────────────┬───────────┤
-│ Layer      │                           │ AI        │
-│ Control    │   3D Geological Scene     │ Targets   │
-│ Drillholes │   (LosVerdesEngine3D)     │ Ranking   │
-│ Filters    │                           │           │
-├────────────┴───────────────────────────┴───────────┤
-│ Geophysics │ Resource Model │ ESG │ Drill Plan    │
-└────────────────────────────────────────────────────┘
+```sql
+CREATE TABLE public.report_section_cache (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
+  section text NOT NULL,
+  data_hash text NOT NULL,
+  payload jsonb NOT NULL,
+  model text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(project_id, section, data_hash)
+);
+-- GRANTs authenticated + service_role, RLS por organization_id via projects join
 ```
 
-- Sidebar izquierdo: `LayerControlPanel` (Fase 2) en columna fija 280px, colapsable.
-- Sidebar derecho: `AITargetTable` (Fase 5) en columna fija 320px, colapsable.
-- Banda inferior: tabs (Geophysics / Resources / ESG / Drill Plan) usando los paneles existentes (`ResourceModelPanel`, `NI43101Panel`, etc.).
-- Canvas central ocupa todo el espacio restante (mínimo 720px alto en desktop).
-- En mobile/tablet: sidebars colapsan a iconos (shadcn `Sidebar` con `collapsible="icon"`).
+Bucket Storage `reports` (privado) para PDFs + snapshots 3D.
 
 ---
 
-## Notas de implementación
+## 6. Navegación
 
-- Todo el trabajo de Fases 1-5 se hace dentro de `src/engine3d/`. La Fase 6 toca `src/routes/live.losverdes.tsx` y `src/routes/_authenticated.dashboard.geology3d.tsx`.
-- No se introducen dependencias nuevas: ya están `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing`, `martini`, `proj4`.
-- Cada fase es un commit independiente; tras cada una el HUD Layer Recovery debe mostrar todos los ✓ verdes antes de pasar a la siguiente.
+- Link nuevo en `/dashboard` → "Informe pre-NI 43-101" (visible solo en proyectos con `commodity` minero).
+- Ruta: `/_authenticated/reports/losverdes/pre43101`
+- Botón flotante **"Descargar PDF"** persistente.
 
 ---
 
-## Orden sugerido de ejecución
+## 7. Orden de ejecución (un solo turno de build)
 
-1. **Fase 1** (diagnóstico bbox) — desbloquea confianza en que el render funciona.
-2. **Fase 4** (DEM + ESRI drape) — máximo impacto visual, "deja de flotar en negro".
-3. **Fase 3** (sondajes pro) — clave para diferenciarse de un dashboard 3D genérico.
-4. **Fase 2** (Layer Control unificado) — limpieza UX previa a salir del modo beta.
-5. **Fase 5** (AI Target Engine) — narrativa para inversores.
-6. **Fase 6** (Command Center) — empaque final estilo Foundry/Leapfrog.
+1. Migración `report_section_cache` + bucket `reports`
+2. `usePre43101Data` serverFn (agrega los 11 queries de §1 en uno)
+3. `generateNarrative` serverFn IA + cache
+4. `Pre43101Shell` + 10 componentes de sección
+5. Embeber `LosVerdesEngine3D` en `Targets3D.tsx` con fly-through
+6. `pdfBuilder` con `@react-pdf/renderer` (instalar dep)
+7. Server route `/api/reports/losverdes-pdf`
+8. Link en dashboard + ruta TanStack
+
+---
+
+## 8. Detalles técnicos
+
+- **No nuevas deps 3D**: el motor ya existe (`LosVerdesEngine3D` + `TerrainMartiniLayer` + `AnomalyIsosurfaceLayer` + `DrillholesLayer` + `BlockModelLayer`).
+- **Nueva dep**: `@react-pdf/renderer` (Worker-compatible, pure JS).
+- **IA**: Lovable AI Gateway con `google/gemini-2.5-pro`, secret `LOVABLE_API_KEY` ya provisionado.
+- **Snapshots 3D**: capturados client-side con `gl.domElement.toDataURL('image/png')` desde el `Canvas` de R3F, subidos vía `supabase.storage.from('reports').upload()`.
+- **i18n**: informe completo en **español** (consistente con producto), con switch ES/EN futuro.
+- **Watermark "preliminar"**: badge rojo en cada sección IA + nota legal al pie del PDF.
+
+---
+
+## 9. Fuera de alcance
+
+- Firma digital QP (placeholder editable, sin DocuSign integrado en esta iteración).
+- Estimación de recursos real (se usa el 1 modelo ya existente; no se re-corre kriging).
+- Traducción EN/FR del PDF.
+- Publicación a SERNAGEOMIN o sitio público (informe queda privado al proyecto).
+

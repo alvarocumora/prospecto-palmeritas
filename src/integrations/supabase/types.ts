@@ -10184,6 +10184,54 @@ export type Database = {
         }
         Relationships: []
       }
+      report_section_cache: {
+        Row: {
+          created_at: string
+          data_hash: string
+          id: string
+          model: string
+          payload: Json
+          project_id: string
+          section: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_hash: string
+          id?: string
+          model?: string
+          payload: Json
+          project_id: string
+          section: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_hash?: string
+          id?: string
+          model?: string
+          payload?: Json
+          project_id?: string
+          section?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_section_cache_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "report_section_cache_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       resource_block_economics: {
         Row: {
           block_id: string
