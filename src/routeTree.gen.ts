@@ -68,6 +68,7 @@ import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
+import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
@@ -408,6 +409,12 @@ const ApiPublicVerifyComplianceReportIdRoute =
     path: '/api/public/verify-compliance/$reportId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedReportsLosverdesPre43101Route =
+  AuthenticatedReportsLosverdesPre43101RouteImport.update({
+    id: '/reports/losverdes/pre43101',
+    path: '/reports/losverdes/pre43101',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardTargetsAiBriefRoute =
   AuthenticatedDashboardTargetsAiBriefRouteImport.update({
     id: '/ai-brief',
@@ -499,6 +506,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -564,6 +572,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -631,6 +640,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -698,6 +708,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
+    | '/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
@@ -763,6 +774,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
+    | '/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
@@ -829,6 +841,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
+    | '/_authenticated/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
@@ -1274,6 +1287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/reports/losverdes/pre43101': {
+      id: '/_authenticated/reports/losverdes/pre43101'
+      path: '/reports/losverdes/pre43101'
+      fullPath: '/reports/losverdes/pre43101'
+      preLoaderRoute: typeof AuthenticatedReportsLosverdesPre43101RouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/targets/ai-brief': {
       id: '/_authenticated/dashboard/targets/ai-brief'
       path: '/ai-brief'
@@ -1412,6 +1432,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedReportsLosverdesPre43101Route: typeof AuthenticatedReportsLosverdesPre43101Route
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -1462,6 +1483,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedReportsLosverdesPre43101Route:
+    AuthenticatedReportsLosverdesPre43101Route,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
