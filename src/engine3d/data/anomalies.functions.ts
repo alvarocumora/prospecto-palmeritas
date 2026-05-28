@@ -89,12 +89,16 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
       allLngLat.push({ lng: c.lng, lat: c.lat, v, depth, kind: "satellite" });
     }
 
+    const geoCount = geoRows.length;
+    const satCount = satRows.length;
+
     if (allLngLat.length === 0) {
       return {
         points: [],
         bbox: { minLng: 0, maxLng: 0, minLat: 0, maxLat: 0 },
         center: { lng: 0, lat: 0 },
-        stats: { count: 0, vMin: 0, vMax: 1 },
+        stats: { count: 0, vMin: 0, vMax: 1, geo: 0, sat: 0 },
+        source: "empty",
       } satisfies AnomalyDataset;
     }
 
@@ -121,7 +125,8 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
       points,
       bbox,
       center,
-      stats: { count: points.length, vMin: Math.min(...vs), vMax: Math.max(...vs) },
+      stats: { count: points.length, vMin: Math.min(...vs), vMax: Math.max(...vs), geo: geoCount, sat: satCount },
+      source: "server",
     } satisfies AnomalyDataset;
   });
 
