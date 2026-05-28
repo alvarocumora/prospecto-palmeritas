@@ -1,90 +1,84 @@
+## Diagnóstico
+
+El PDF actual (`Los_Verdes_5_Informe_Profesional_v1.pdf`) se generó con un script Node aislado (`/tmp/lv5_report.mjs`) que:
+- No sigue el sistema de marca de `docs/report-generation-guide.md` (paleta `--primary #0E5F4F` / `--accent #C8A24A`, portada full-bleed, header band, sello, página de validación, anexos numerados).
+- Reemplazó las imágenes ESRI por una **proyección isométrica vectorial sintética**, porque el runtime Worker no soporta navegador headless.
+- No incluye catastro real (sólo tablas de texto) ni el visor 3D real (`Geology3DViewer`/`live/losverdes` con DEM + drape Sentinel + vetas + anomalías extruidas).
+
 ## Objetivo
 
-Generar un informe PDF en calidad de pre-feasibility (estilo NI 43-101 sección "Mining Operations + Economic Analysis") para el activo **Los Verdes 5 – Distrito Tilama**, descompuesto por los tres frentes identificados en la imagen:
+Generar el informe **desde el cliente** (browser), reutilizando los visores reales de la plataforma y los primitives PDF (`src/lib/pdf/*`) que ya implementan la guía. Esto da imágenes ESRI reales, catastro real y captura del 3D real, sin depender de Puppeteer en Workers.
 
-- **Frente 1 – La Guanaca** (prioridad alta, leyes 1.76 – 4.34 % Cu)
-- **Frente 2 – Los Verdes** (acceso actual, leyes 0.38 – 1.07 % Cu)
-- **Frente 3 – Castellana** (zona norte, leyes 3.24 – 6.83 % Cu)
+## Arquitectura
 
-## Estructura del PDF (15-18 páginas, formato Letter)
+```text
+/live/losverdes5  (ruta cliente, ya existe)
+   └── botón "Generar Informe Profesional"
+         ↓
+   exportLosVerdes5Report()  ← nuevo, client-side
+         ├─ getLosVerdes5Report() server fn  → datos (concesiones, vetas, anomalías, targets, fronts)
+         ├─ <ReportRenderStage/>             → componente oculto (off-screen) que monta por frente:
+         │     • MapLibre ESRI World Imagery + overlay catastro + anomalías (Mapbox-style)
+         │     • LosVerdesScene3D (DEM + drape Sentinel + vetas 3D + anomalías extruidas)
+         │     • Geology3DViewer (geofísica: isosurfaces magnéticas)
+         ├─ captureElement(...)              → 1 PNG ESRI + 1 PNG 3D geo + 1 PNG 3D geof por frente
+         └─ buildPdf(state, captures, data)  → usa primitives.ts + figures.ts + secciones del guide
+```
 
-1. **Portada ejecutiva** — branding Geocapitals, mapa de frentes (la imagen adjunta), ubicación regional, sello "Pre-NI 43-101 – Informe Interno".
-2. **Resumen ejecutivo** — recursos inferidos por frente, capex inicial, opex/t, payback estimado.
-3. **Marco geológico** — Cretácico Inferior, vetas epi-mesotermales Cu-Au, mineralogía (calcopirita, bornita, óxidos verdes).
-4. **Catastro minero** — tabla de concesiones (`mining_concessions`) que cubren cada frente, hectáreas, holder, vigencia.
-5. **Anomalías satelitales** — Sentinel-2 (clay, iron, hydroxyl) por frente, top 10 anomalías con score, severidad y área.
-6. **Sistema de vetas** — ficha por veta (V-LG-01, V-LG-02, V-CS-01, V-CS-02, V-TM-01, V-ES-01) con strike/dip/potencia/longitud/commodity.
-7. **Modelo 3D — snapshot del visor MapLibre** — render PNG del viewer `/live/losverdes` con DEM, drape satelital, vetas 3D y anomalías extruidas, capturado server-side.
-8. **Plan de explotación por frente** — método (rajo abierto pequeño / pirquén mecanizado / underground selectivo), fases de la BD `mine_plan_phases`, secuencia 24 meses, cubicación (tonelaje × ley × densidad 2.7 t/m³), strip ratio, recuperación esperada (chancado + venta directa a planta ENAMI).
-9. **Programa de producción** — t/mes por frente, tCu fino, leyes promedio mezcladas, calendario Year 1 / Year 2.
-10. **Plan OPEX – Comparativa 3 plantas ENAMI**:
-    - Planta Delta (Ovalle) ~155 km
-    - Planta Manuel A. Matta (Cabildo) ~135 km
-    - Planta Vallenar ~370 km
-    - Para cada una: distancia, costo transporte (USD/t·km × t), tarifa maquila ENAMI, regalía, PMP cobre (fórmula tarifario ENAMI 2025), pago neto al productor (USD/t).
-    - Tabla resumen con ganador y recomendación.
-11. **OPEX detallado USD/t** — perforación, tronadura (factor carga ~0.35 kg/t), carguío (cargador frontal 3 m³), chancado primario (móvil mandíbula), transporte interno, transporte camión 30 t a planta, administración, contingencia 15 %.
-12. **Análisis económico** — flujo de caja simplificado 24 meses, NPV (8 %), IRR, break-even ley Cu por frente.
-13. **Riesgos & mitigaciones** — geotécnicos, hídricos, sociales (comunidades Tilama), permisos sectoriales (DGA, Sernageomin).
-14. **Disclaimer & QP** — JORC/NI 43-101 disclaimer estándar, alcance del informe.
+## Estructura del PDF (siguiendo §5 de la guía)
 
-## Datos a usar (ya en BD para project_id Tilama)
+| Pág | Contenido |
+|---|---|
+| 1 | Cover full-bleed `PRIMARY_DK` + sello "PRE-NI 43-101 v1" + meta |
+| 2 | TOC + marco regulatorio (§9.1) |
+| 3 | Resumen ejecutivo: 6 KPIs (recursos in-situ, USD in-situ, planta destino, NPV, IRR, payback) |
+| 4 | Contexto geológico distrito Tilama (Cretácico Inf, vetas epi-mesotermales Cu-Au) |
+| 5-7 | **Una sección por frente** (La Guanaca / Los Verdes / Castellana): captura ESRI con catastro y anomalías superpuestas, tabla concesiones, tabla anomalías top-10, tabla vetas |
+| 8 | Snapshot 3D real del distrito (`LosVerdesScene3D`) con leyenda |
+| 9 | Modelo geofísico 3D (`MagAnomaly3DPro`/`Geology3DViewer`) — isosurfaces magnéticas + anomalías a profundidad |
+| 10 | Cubicación in-situ por frente (largo × potencia × alto × 2.7 × ley) |
+| 11 | Comparativa 3 plantas ENAMI (Matta · Delta · Vallenar): distancia, transporte, maquila, pago neto USD/t |
+| 12 | Plan de explotación 24 meses por frente (método, fases `mine_plan_phases`, ramp-up) |
+| 13 | OPEX detallado USD/t (perforación, tronadura, carguío, chancado, transporte, admin, contingencia 15%) |
+| 14 | Flujo de caja 24 meses + NPV (8%) + IRR + sensibilidad LME Cu |
+| 15 | Riesgos & mitigaciones |
+| 16 | Disclaimer NI 43-101 §2.3 + página de validación (QR + Ed25519, §8) |
 
-- `projects`, `mining_concessions` (catastro)
-- `satellite_anomalies` (60 top score)
-- `exploration_targets` (anomalías TOO + clusters)
-- `veins` (6 estructuras)
-- `mine_plan_phases` (3 fases cargadas)
-- Muestras destacadas de la imagen: TOO-126, 155, 156 (La Guanaca); TOO-103, 105, 124 (Los Verdes); TOO-183, 184, 210 (Castellana).
+## Capturas reales — cómo
+
+1. **ESRI por frente**: monta un `<MapContainer>` Leaflet off-screen (1200×800 px) con basemap `World_Imagery` (ESRI), encima:
+   - polígonos `mining_concessions` por frente (estilo `CATASTRO_STYLE`)
+   - puntos `satellite_anomalies` coloreados por `severity`
+   - bbox del frente, escala y norte (ya existe en `src/lib/map/snapshot.ts`)
+   - `captureMapSnapshot()` → PNG decorado con leyenda
+2. **3D geología por frente**: monta `LosVerdesScene3D` en contenedor 1200×800, espera `onLoad`, `captureElement()`.
+3. **3D geofísica**: monta `MagAnomaly3DPro` filtrado por bbox del frente, `captureElement()`.
+
+Las capturas usan `html2canvas-pro` (ya en uso en `catastro-map.ts`) → embebidas como JPEG en el PDF vía `figures.ts` con caption auto-numerado.
 
 ## Implementación técnica
 
-### 1. Server function `getLosVerdes5Report` (`src/lib/losverdes5.functions.ts`)
-- Agrega data Tilama + asocia anomalías / vetas / fases a cada uno de los 3 frentes vía bounding box (centro La Guanaca −32.044/−71.115, Los Verdes −32.049/−71.105, Castellana −32.027/−71.099).
-- Calcula KPIs por frente: nº muestras, ley Cu promedio/máx, área anomalía, tCu fino in-situ estimado (largo×potencia×alto×densidad×ley).
+**Archivos nuevos**
+- `src/lib/pdf/losverdes5-report.ts` — orquesta capturas + arma PDF con primitives. ~600 líneas, modular.
+- `src/lib/pdf/lv5-sections.ts` — helpers: `coverLV5`, `frenteSection`, `enamiCompareTable`, `cashflowTable`, `validationPage`.
+- `src/components/live/Lv5ReportStage.tsx` — stage React off-screen que monta los 3 visores secuencialmente por frente y expone refs DOM para captura.
 
-### 2. Server function `captureLosVerdes3D` (`src/lib/losverdes5-snapshot.server.ts`)
-- Renderiza headless el visor `/live/losverdes` (usando puppeteer/playwright si disponible — fallback: compone PNG estático con DEM tile + overlays SVG de vetas/frentes usando `sharp`-less canvas API ya disponible en el server).
-- **Plan B (más robusto en worker runtime)**: construir la figura 3D como **SVG isométrico** server-side con elevación sintética + polígonos de los 3 frentes + trazas de vetas, embebido como vector en el PDF (sin dependencia de browser headless).
+**Archivos editados**
+- `src/routes/live.losverdes5.tsx` — botón "Generar Informe Profesional" que dispara el flujo y descarga.
+- `src/lib/losverdes5.functions.ts` — añadir `area_ha`, `severity`, geometría `ST_AsGeoJSON` a anomalías y concesiones (para overlays mapa).
 
-### 3. Módulo de cálculo `src/lib/mining-economics.ts`
-- `enamiPayment(ton, leyCu, lme, plant)` aplicando tarifario público ENAMI (PMP, maquila, créditos Au/Ag, descuentos por humedad/impurezas, regalía).
-- `transportCost(km, tons, rate=0.18 USD/t·km)`.
-- `phaseOpex(phase)` desglose por partida.
-
-### 4. Generador PDF `src/lib/losverdes5-pdf.ts`
-- Basado en `tilama-pdf.ts` pero modular: helpers `coverPage`, `frenteSection`, `enamiCompareTable`, `cashflowTable`, `risksSection`.
-- Embebe la imagen adjunta del usuario como figura principal de portada (subida a `src/assets/losverdes5-frentes.jpg`).
-- Embebe el snapshot/SVG 3D.
-
-### 5. Route `src/routes/live.losverdes5.tsx`
-- Página ligera con botón "Descargar Informe PDF Los Verdes 5" que invoca la server fn, recibe blob y dispara descarga.
-- Vista previa de KPIs por frente y mini-mapa de ubicación.
-
-### 6. Activos
-- Copiar imagen adjunta a `src/assets/losverdes5-frentes.jpg`.
-
-## Supuestos económicos (parametrizables en `mining-economics.ts`)
-
-| Parámetro | Valor base |
-|---|---|
-| LME Cu | 9 200 USD/t (4.17 USD/lb) |
-| Tarifa transporte camión 30 t | 0.18 USD/t·km |
-| Maquila ENAMI tarifa pequeña minería | 95 USD/t mineral |
-| Recuperación planta | 85 % Cu |
-| Densidad mineral in-situ | 2.7 t/m³ |
-| Cut-off económico | 0.8 % Cu |
-| Factor carga explosivo | 0.35 kg/t |
-| Strip ratio asumido | 2.5:1 rajo, 0:1 underground |
-| Tasa descuento NPV | 8 % |
+**Sin cambios**
+- `primitives.ts`, `figures.ts`, `sections.ts` — se reutilizan tal cual.
+- `mining-economics.ts` — ya implementa ENAMI + OPEX.
 
 ## Entregables
 
-- Nuevo archivo PDF descargable desde `/live/losverdes5`.
-- Código modular reutilizable (`mining-economics.ts`) para futuros informes de otros prospectos.
-- Sin cambios destructivos a `tilama-pdf.ts` existente (queda como informe distrital general).
+1. Nuevo PDF `Los_Verdes_5_PreNI43-101_v2.pdf` con marca Geocapitals correcta, imágenes ESRI reales con catastro + anomalías por frente, snapshot 3D real del distrito, snapshot 3D geofísico, página de validación QR.
+2. Botón funcional en `/live/losverdes5` para regenerarlo en cualquier momento.
+3. QA visual: convertir PDF a PNG con `pdftoppm` y revisar las 16 páginas antes de entregar.
 
-## Validación
+## Riesgos & mitigaciones
 
-- `tsc --noEmit` limpio.
-- Render del PDF en sandbox vía script de prueba, conversión a imágenes con `pdftoppm` y revisión QA visual página a página antes de entregar.
+- **Tiles ESRI tarda en cargar** → esperar evento `tileload`/timeout 4s antes de capturar.
+- **WebGL del visor 3D no se renderiza off-screen** → forzar `preserveDrawingBuffer: true` en MapLibre/three y capturar canvas directamente (no via html2canvas).
+- **Tamaño PDF** → comprimir JPEG calidad 0.82 y redimensionar capturas a 1600 px máx.
