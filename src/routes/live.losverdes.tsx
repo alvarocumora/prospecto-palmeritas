@@ -441,7 +441,19 @@ function LiveLosVerdesPage() {
           <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold mb-2">
             Mapa de campo · GPS + Catastro + Capas
           </h2>
-          <FieldMapPublic />
+          {mounted ? (
+            <Suspense
+              fallback={
+                <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando mapa de campo…
+                </div>
+              }
+            >
+              <FieldMapPublic />
+            </Suspense>
+          ) : (
+            <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary" />
+          )}
         </section>
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
