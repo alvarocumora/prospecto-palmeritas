@@ -100,6 +100,60 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   );
   const clippingPlanes = useClippingPlanes(effectiveClip);
 
+  // Plano en formato sectionEngine (normal three + constant THREE.Plane: n·p + c = 0)
+  const planeNormal = useMemo(() => {
+    const ax = effectiveClip.axis;
+    let n =
+      ax === "x" ? { x: 1, y: 0, z: 0 } :
+      ax === "y" ? { x: 0, y: 1, z: 0 } :
+      ax === "z" ? { x: 0, y: 0, z: 1 } :
+      { ...(effectiveClip.freeNormal ?? { x: 1, y: 0, z: 0 }) };
+    if (effectiveClip.invert) n = { x: -n.x, y: -n.y, z: -n.z };
+    const len = Math.hypot(n.x, n.y, n.z) || 1;
+    return { x: n.x / len, y: n.y / len, z: n.z / len };
+  }, [effectiveClip.axis, effectiveClip.invert, effectiveClip.freeNormal]);
+  const planeConstant = -effectiveClip.position;
+
+  // Section engine — auto-recalcula al cambiar plano/ancho/datasets o trigger manual
+  const section = useSection({
+    iso,
+    terrain: demMesh ?? null,
+    holes,
+    samples: points,
+    planeNormal,
+    planeConstant,
+    width: sectionWidth,
+    verticalExaggeration,
+    trigger: sectionTrigger,
+  });
+
+  // Follow drillhole: alinea plano de corte al azimut del sondaje (perpendicular a azimut).
+  useEffect(() => {
+    if (!followHoleId) return;
+    const h = holes.find((x) => x.holeId === followHoleId);
+    if (!h) return;
+    const azRad = (h.azimuth * Math.PI) / 180;
+    // dirección horizontal del sondaje en three: (sin(az), 0, -cos(az))
+    // normal del plano que contiene la traza vertical: cross(dir, up) = (cos(az), 0, sin(az))
+    const nx = Math.cos(azRad);
+    const nz = Math.sin(azRad);
+    // collar en three
+    const cx = h.collar.x;
+    const cy = h.collar.z * verticalExaggeration;
+    const cz = -h.collar.y;
+    const position = nx * cx + 0 * cy + nz * cz;
+    setClipParams((p) => ({
+      ...p,
+      enabled: true,
+      axis: "free",
+      freeNormal: { x: nx, y: 0, z: nz },
+      position,
+      invert: false,
+    }));
+    setSectionMode(true);
+    setShowSectionPanel(true);
+  }, [followHoleId, holes, verticalExaggeration]);
+
   const cameraInitial = useMemo<[number, number, number]>(() => [2400, 1800, 2400], []);
   const busy = (renderMode === "iso" ? isoBusy : voxBusy) || demBusy;
 
