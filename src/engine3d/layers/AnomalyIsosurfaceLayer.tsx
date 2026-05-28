@@ -106,7 +106,39 @@ export function AnomalyIsosurfaceLayer({
     geometry.dispose();
   }, [geometry]);
 
-  if (iso.vertexCount === 0) return null;
+  if (iso.vertexCount === 0) {
+    // Fallback blob mode: render gaussian spheres around top anomalies
+    if (iso.mode === "blob" && iso.blobs.length > 0) {
+      return (
+        <group>
+          {iso.blobs.map((b, i) => {
+            const col = new THREE.Color();
+            heatColor(b.v, col);
+            return (
+              <mesh
+                key={i}
+                position={[b.x, b.z * verticalExaggeration, -b.y]}
+              >
+                <sphereGeometry args={[b.r, 24, 16]} />
+                <meshStandardMaterial
+                  color={col}
+                  transparent
+                  opacity={Math.max(0.25, opacity * 0.7)}
+                  emissive={col}
+                  emissiveIntensity={0.35}
+                  roughness={0.6}
+                  metalness={0.05}
+                  depthWrite={false}
+                  clippingPlanes={clippingPlanes ?? []}
+                />
+              </mesh>
+            );
+          })}
+        </group>
+      );
+    }
+    return null;
+  }
 
   return (
     <mesh ref={meshRef} geometry={geometry} material={material} castShadow={false} receiveShadow={false} />
