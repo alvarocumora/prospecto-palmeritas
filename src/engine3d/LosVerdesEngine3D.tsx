@@ -706,6 +706,17 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
+      {showSectionPanel && (
+        <SectionViewPanel
+          result={section.result}
+          busy={section.busy}
+          onClose={() => setShowSectionPanel(false)}
+          onFollowHole={(id) => setFollowHoleId(id)}
+          followHoleId={followHoleId}
+        />
+      )}
+
+
       {showResourcePanel && blockModel && (
         <ResourceModelPanel
           model={blockModel}
