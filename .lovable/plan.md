@@ -1,75 +1,148 @@
-# Live Los Verdes nivel Datamine + IA
 
-Objetivo: que `/live/losverdes` se vea y opere como Datamine Discover3D — capas geocientíficas reales en 3D, herramientas analíticas y un copiloto IA conectado a Lovable AI Gateway (Gemini 2.5 Pro).
+# GeoCapitals 3D Engine — Refactor a arquitectura modular
 
-## Fase 1 — Datos reales y server fns
+Reemplazo del visor monolítico actual (`LosVerdesScene3D.tsx`, Three.js plano sobre MapLibre) por un engine geocientífico modular inspirado en Leapfrog/Datamine, con render GPU correcto y pipeline de voxel→isosurface real.
 
-1. **Auditar tablas existentes** para Los Verdes: `drillholes`, `drillhole_assays`, `vein_geometries`/`vein_polygons`, `mag_anomalies`/`anomalies`, `targets`, `fusion_scores`. Identificar qué hay y qué falta.
-2. Si falta, crear migración con tablas mínimas y RLS por proyecto (`is_project_member`):
-   - `drillholes` (id, project_id, collar lng/lat/elev, azimuth, dip, depth)
-   - `drillhole_assays` (hole_id, from_m, to_m, cu_pct, au_gpt, ag_gpt)
-   - `vein_solids` (id, project_id, geom GeoJSON, dip, strike, top_elev, bottom_elev, mineral)
-   - `anomaly_voxels` (id, project_id, lng, lat, depth_m, size_m, intensity, source: mag|grav|sat)
-   - `ai_targets` (id, project_id, lng, lat, depth_m, score, explanation, generated_by, created_at)
-3. Sembrar dataset coherente para Los Verdes (coords del proyecto) si está vacío — marcado `source='seed'` para reemplazo posterior.
-4. Crear `src/lib/losverdes3d.functions.ts` con server fns:
-   - `getLosVerdesScene3DData({ projectId, filters })` → drillholes, vetas, voxels, targets en una llamada.
-   - `getCrossSection({ projectId, p1, p2, buffer_m })` → sondajes y vetas intersectando el corte.
+## Alcance de este sprint
 
-## Fase 2 — Visor 3D nivel Datamine
+**SÍ se construye ahora:**
+- Nueva arquitectura `/engine /geology /render /streaming /workers` con R3F.
+- Pipeline voxel → marching cubes para anomalías magnéticas/satelitales (prioridad #1).
+- Sondajes (`drill_holes`, 24 reales) e IDs/targets como capas secundarias usando `InstancedMesh`.
+- Workers para interpolación IDW y extracción de isosurfaces (no bloquear el main thread).
+- Sustitución del viewer en `MissionControl` / ruta `/live/losverdes`.
 
-Refactor `src/components/live/LosVerdesScene3D.tsx` (mantener MapLibre + DEM + drape Sentinel existente) y añadir capas vía deck.gl ya presente:
+**NO se incluye (queda para Sprint 2+):**
+- CesiumJS, vtk.js, Potree (bundle pesado, requiere tile server propio).
+- WebAssembly / Rust geometry engine.
+- Kriging real (solo IDW + placeholder para kriging).
+- Block model viewer, mine planning, digital twin.
 
-- **Drillholes**: `PathLayer` 3D con color por ley máxima del tramo (Cu/Au); tooltip con assays.
-- **Vetas/mantos**: `SolidPolygonLayer` extruido entre `top_elev` y `bottom_elev`, color por mineral, semi-transparente.
-- **Voxel anomalías**: `ColumnLayer`/`PointCloudLayer` con altura/opacidad por intensidad, paleta turbo.
-- **Targets IA**: `ScatterplotLayer` 3D con halo proporcional al `fusion_score`, click abre Target Explainer.
-- **Leyenda + toggles** por capa, sliders de profundidad/ley/fecha en panel flotante.
+## Datos reales disponibles (verificado en DB)
 
-## Fase 3 — Herramientas interactivas
+| Tabla | Filas | Uso |
+|---|---|---|
+| `geophysics_anomalies` | 34 | puntos lat/lng/depth/peak → voxel IDW |
+| `satellite_anomalies` | 104 | polígonos GeoJSON + score → extrusión + voxel superficial |
+| `magnetic_grids` | 1 (sin raster) | metadato, raster cuando llegue |
+| `drill_holes` | 24 | sondajes 3D con `drill_hole_trajectories` |
+| `veins` | 6 | polígonos extruidos |
+| `geophysics_stations` | 0 | (vacío — no se usa hasta poblar) |
 
-Panel lateral `LosVerdesToolbar`:
+No hay assays con leyes XYZ todavía (`geochem_analyses` por confirmar contenido). El pipeline voxel se alimenta de los 34+104 puntos/polígonos de anomalías; cuando llegue el raster del magnetic_grid se enchufa directo.
 
-- **Cross-section dinámica**: dibujar línea en mapa → modal con SVG del corte (sondajes + vetas + voxels intersectados) calculado server-side.
-- **Medición 3D**: distancia/área/volumen con deck.gl `EditableGeoJsonLayer`.
-- **Fly-through**: presets de cámara (norte→sur, plan→sección, órbita target) animados con `flyTo`/`easeTo`.
-- **Filtros vivos**: ley mín Cu/Au, profundidad máx, rango fechas → re-query server fn con filtros.
+## Arquitectura
 
-## Fase 4 — Copiloto IA (Lovable AI Gateway)
+```text
+src/engine3d/
+├── core/
+│   ├── R3FCanvas.tsx           # <Canvas> con WebGL2, frameloop="demand"
+│   ├── CameraRig.tsx           # MapControls + fly-to + presets
+│   └── SceneProviders.tsx      # context: bbox, CRS, time, filters
+├── render/
+│   ├── postprocess.ts          # SSAO + bloom + depth fog (lazy)
+│   ├── shaders/
+│   │   ├── voxelHeat.glsl
+│   │   └── drillholeAssay.glsl
+│   └── lod.ts                  # frustum + distance LOD policy
+├── geology/
+│   ├── interpolation/
+│   │   ├── idw.ts              # IDW 3D, runs en worker
+│   │   └── kriging.ts          # placeholder API-compat
+│   ├── voxels/
+│   │   ├── VoxelGrid.ts        # estructura Float32Array + bbox + spacing
+│   │   └── buildFromPoints.ts  # puntos XYZV → grid
+│   ├── isosurface/
+│   │   └── marchingCubes.ts    # three-stdlib MarchingCubes wrapper
+│   └── chunking/
+│       └── octree.ts           # subdivisión espacial
+├── geospatial/
+│   ├── crs.ts                  # lng/lat ↔ ENU local meters
+│   └── terrain.ts              # DEM Copernicus (reusa scene3d.server)
+├── layers/
+│   ├── TerrainLayer.tsx        # malla DEM + drape Sentinel
+│   ├── AnomalyVoxelLayer.tsx   # voxel + isosurface IA (prio #1)
+│   ├── DrillholeLayer.tsx      # InstancedMesh cilindros con assays
+│   ├── VeinLayer.tsx           # polígonos extruidos shader
+│   └── TargetLayer.tsx         # esferas IA + heatmap
+├── workers/
+│   ├── interpolation.worker.ts # IDW en background
+│   └── isosurface.worker.ts    # marching cubes en background
+├── hooks/
+│   ├── useTerrain.ts
+│   ├── useDrillholes.ts
+│   ├── useVoxelModel.ts        # ← key: orquesta worker IDW + MC
+│   ├── useIsosurface.ts
+│   └── useSectionTool.ts
+└── data/
+    ├── anomalies.functions.ts  # createServerFn → puntos XYZV
+    ├── drillholes.functions.ts
+    └── veins.functions.ts
+```
 
-Crear `src/lib/ai-gateway.server.ts` con el helper estándar (`createOpenAICompatible` + header `Lovable-API-Key`). Modelo por defecto `google/gemini-2.5-pro`.
+## Pipeline voxel → isosurface (núcleo del sprint)
 
-Server fns IA en `src/lib/losverdes-ai.functions.ts`:
+```text
+geophysics_anomalies (lat,lng,depth,peak,confidence)
+        +
+satellite_anomalies (polygon,score → centroide + score como "peak")
+        ↓
+serverFn getAnomalyPoints({projectId,bbox}) → [{x,y,z,v}]
+        ↓
+[worker] buildVoxelGrid → Float32Array(NxNxN) por IDW (power=2, radius=auto)
+        ↓
+[worker] marchingCubes(grid, isovalue=p75) → BufferGeometry
+        ↓
+postMessage → AnomalyVoxelLayer monta <mesh> con voxelHeat shader
+        ↓
+slider de isovalue + transparencia + clipping plane → re-extrae sin recomputar grid
+```
 
-- `explainTarget({ targetId })` → genera explicación estructurada (geología, satélite, estructural, riesgo) con `Output.object`.
-- `geoCopilotChat` → streaming via `/api/chat/losverdes` (server route) con tools:
-  - `highlightLayer(layer)` — emite evento al cliente para resaltar.
-  - `runCrossSection(p1,p2)` — llama server fn.
-  - `queryAssays(holeId)` — consulta DB.
-- `generateAITargets({ projectId })` → analiza fusión de capas y inserta nuevos `ai_targets` con `generated_by='gemini-2.5-pro'`.
-- `generateNI43101Summary({ projectId })` → bullets ejecutivos.
+Optimizaciones obligatorias:
+- Grid base 64³ (LOD lejos) → 128³ (cámara cerca), no más.
+- `Float32Array` transferible al worker (`postMessage([buf], [buf])`).
+- `useMemo` + dependencias estables; jamás `useState` de geometría.
+- `frameloop="demand"`: solo renderiza en interacción/cambio.
+- `InstancedMesh` para sondajes y targets.
 
-UI en panel lateral con AI Elements (`Conversation`, `Message`, `PromptInput`, `Tool`).
+## Migración del viewer
 
-## Fase 5 — QA
+1. `Geology3DViewer` y `LosVerdesScene3D` quedan deprecados pero NO se borran este sprint (se mantienen como fallback bajo flag `?engine=legacy`).
+2. Nueva ruta interna `/live/losverdes` monta `<R3FCanvas>` + capas. Mismo URL público, mismo título.
+3. Mobile (440px viewport actual del usuario): pixel ratio cap a 1.5, voxel a 32³, sin SSAO/bloom.
 
-- Render del visor con datos reales/seed.
-- Smoke test de cada server fn vía `invoke-server-function`.
-- Verificar RLS (`is_project_member`) y que `LOVABLE_API_KEY` está presente.
-- Probar copiloto con 3 prompts típicos ("¿por qué T-03 tiene score alto?", "muéstrame el corte N-S", "resume el yacimiento").
+## Server functions nuevas
 
-## Detalles técnicos
+```ts
+// src/engine3d/data/anomalies.functions.ts
+getAnomalyPoints({projectId, bbox}) → {points: [{x,y,z,v,kind}], bbox, stats}
+getVoxelGrid({projectId, bbox, resolution})  // opcional cache server-side
+```
 
-- Stack: TanStack Start + React 19, MapLibre v5 + deck.gl, AI SDK + `@ai-sdk/openai-compatible`.
-- Sin Edge Functions nuevas: todo en `createServerFn` y un único server route `/api/chat/losverdes` para streaming.
-- Tokens semánticos de `src/styles.css` para toda UI nueva.
-- Memoria del proyecto actualizada al cerrar cada sprint.
+Reusa `scene3d.server.ts` para DEM/Sentinel (ya existe y funciona).
 
-## Entrega por sprints
+## Dependencias a instalar
 
-- **Sprint 1 (este)**: Fase 1 + Fase 2 (capas reales en visor) + Target Explainer básico.
-- **Sprint 2**: Cross-section + medición + filtros.
-- **Sprint 3**: Geo Copilot conversacional con tools.
-- **Sprint 4**: Auto-generación de targets + resumen NI 43-101 + fly-through.
+```bash
+bun add @react-three/fiber @react-three/drei three-stdlib
+```
 
-¿Apruebo y arranco Sprint 1?
+`three` ya está. No se añade Cesium/Potree/vtk/deck.gl en este sprint.
+
+## Entregables verificables
+
+1. `/live/losverdes` muestra terreno + isosurface naranja/roja de anomalías mag+sat, > 30fps en mobile real.
+2. Slider de isovalue mueve la malla sin congelar UI (worker funcionando).
+3. Sondajes reales (24) visibles como cilindros instanciados con color por trayectoria.
+4. Botón "Engine legacy" para volver al viewer viejo en caso de regresión.
+5. Sin warnings de `Invalid LngLat`, sin re-render global en cambio de filtro.
+
+## Riesgos
+
+- **Datos pobres para voxel real**: solo 34+104 puntos. La isosurface será suave/poco "geológica". Mitigación: añadir jitter sintético controlado SOLO si el usuario lo activa; documentar como "preview" hasta cargar magnetic_grid raster.
+- **Bundle size**: R3F+drei+three-stdlib ≈ +180KB gzip. Aceptable; Cesium/vtk hubieran sido +2MB.
+- **WebGL2 en iOS viejos**: fallback a WebGL1 con voxel 32³ y sin postprocess.
+
+## Fuera de alcance (explícito)
+
+CesiumJS, Potree, vtk.js, deck.gl, WebGPU, Rust/WASM, kriging real, block models, mine planning, digital twin, IoT. Todo eso son Sprints 2-4 según `mem://plan/3d-ia-disruptivo`.
