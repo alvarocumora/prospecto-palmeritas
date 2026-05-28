@@ -677,6 +677,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
+          {showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
+            <BlockModelLayer
+              model={blockModel}
+              filters={blockFilters}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingPlanes}
+            />
+          )}
           {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
         </Suspense>
 
