@@ -823,19 +823,23 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </mesh>
 
         <Suspense fallback={null}>
-          {demEnabled && demMesh ? (
+          {noRealData && <SyntheticDemoScene verticalExaggeration={verticalExaggeration} />}
+
+          {visible("dem") && demEnabled && demMesh ? (
             <TerrainMartiniLayer
               mesh={demMesh}
               clippingPlanes={clippingPlanes}
               wireframe={demWireframe}
             />
           ) : (
-            showGrid && <TerrainPlane size={4000} />
+            visible("dem") && showGrid && <TerrainPlane size={4000} />
           )}
 
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
-          {showPoints && <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />}
-          {showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
+          {visible("iso") && showPoints && (
+            <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />
+          )}
+          {visible("iso") && showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
             <AnomalyIsosurfaceLayer
               iso={iso}
               opacity={opacity}
@@ -843,14 +847,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
+          {visible("iso") && showSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
             <AnomalyVoxelLayer
               voxels={voxels}
               opacity={opacity}
               verticalExaggeration={verticalExaggeration}
             />
           )}
-          {showHoles && holes.length > 0 && (
+          {visible("holes") && showHoles && holes.length > 0 && (
             <DrillholesLayer
               holes={holes}
               verticalExaggeration={verticalExaggeration}
@@ -858,7 +862,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
+          {visible("blocks") && showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
             <BlockModelLayer
               model={blockModel}
               filters={blockFilters}
@@ -866,8 +870,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
-          {showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
+          {visible("debug") && showClipHelper && (
+            <ClippingPlaneController params={effectiveClip} size={4500} />
+          )}
+          {visible("targets") && showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
             <DrillTargetLayer
               targets={drillTargets.targets}
               verticalExaggeration={verticalExaggeration}
@@ -877,15 +883,18 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           )}
         </Suspense>
 
+        <AutoFitCamera bounds={sceneBounds} enabled={autoFit} />
         <MapControls
+          makeDefault
           enableDamping
           dampingFactor={0.08}
-          minDistance={300}
-          maxDistance={10_000}
+          minDistance={10}
+          maxDistance={100_000}
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
       </Canvas>
+
 
       {pointsQ.data && pointsQ.data.points.length === 0 && holes.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
