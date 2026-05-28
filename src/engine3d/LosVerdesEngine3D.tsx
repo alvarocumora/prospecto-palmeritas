@@ -125,6 +125,15 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [autoFit, setAutoFit] = useState(true);
   const [showLayerDebug, setShowLayerDebug] = useState(false);
 
+  // Sprint: Basemap / GIS
+  const [basemapSource, setBasemapSource] = useState<BasemapSource>("esri");
+  const [basemapOpacity, setBasemapOpacity] = useState(0.85);
+  const [showCoords, setShowCoords] = useState(true);
+  const [showScaleBar, setShowScaleBar] = useState(true);
+  const [showNorth, setShowNorth] = useState(true);
+  const [basemapStatus, setBasemapStatus] = useState<{ source: BasemapSource; failed: boolean; zoom: number } | null>(null);
+  const BASEMAP_EXTENT = 4000;
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
   const anomaliesSource = pointsQ.data?.source ?? "empty";
