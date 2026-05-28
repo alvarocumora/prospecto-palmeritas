@@ -266,6 +266,7 @@ function LiveLosVerdesPage() {
               targets={layersQ.data.targets}
               veins={miningQ.data?.veins ?? []}
               phases={miningQ.data?.phases ?? []}
+              drillholes={drillsQ.data?.holes ?? []}
             />
           ) : (
             <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
