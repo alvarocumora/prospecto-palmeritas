@@ -944,7 +944,25 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             />
           ) : (
             visible("dem") && showGrid && <TerrainPlane size={4000} />
-          )}
+          }
+
+          {(() => {
+            const center = pointsQ.data?.center;
+            if (!center || (center.lng === 0 && center.lat === 0)) return null;
+            if (basemapSource === "none") return null;
+            return (
+              <BasemapLayer
+                source={basemapSource}
+                centerLng={center.lng}
+                centerLat={center.lat}
+                extentMeters={BASEMAP_EXTENT}
+                opacity={basemapOpacity}
+                demMesh={demEnabled ? demMesh : null}
+                onStatus={setBasemapStatus}
+              />
+            );
+          })()}
+
 
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
           {visible("iso") && showPoints && (
