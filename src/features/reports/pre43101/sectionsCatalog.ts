@@ -1,7 +1,7 @@
 // Catálogo de las 17 secciones del informe pre-NI 43-101 / JORC.
 // Cada sección define si depende de IA, si es "preliminar" cuando no hay datos
 // reales, y un breve prompt-context que se manda al modelo.
-import type { Pre43101Data } from "../data/pre43101Data.functions";
+import type { Pre43101Data } from "./data/pre43101Data.types";
 
 export type SectionDef = {
   id: string;
