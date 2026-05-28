@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { FieldMapPublic } from "@/components/field/FieldMapPublic";
 import { LosVerdesScene3D } from "@/components/live/LosVerdesScene3D";
+import { LosVerdesEngine3D } from "@/engine3d/LosVerdesEngine3D";
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
@@ -248,15 +249,29 @@ function LiveLosVerdesPage() {
 
         {/* 3D Scene */}
         <section>
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
-              Visor 3D · Esri + DEM · Anomalías · Vetas · Plan
+              {engineMode === "new"
+                ? "Engine 3D · Voxel IDW · Isosurface IA (sprint 1)"
+                : "Visor 3D · Esri + DEM · Anomalías · Vetas · Plan"}
             </h2>
-            {(layersQ.isLoading || anomsQ.isLoading || miningQ.isLoading) && (
-              <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
-            )}
+            <div className="flex items-center gap-2">
+              {(layersQ.isLoading || anomsQ.isLoading || miningQ.isLoading) && (
+                <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
+              )}
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-[10px] font-mono"
+                onClick={() => setEngineMode((m) => (m === "new" ? "legacy" : "new"))}
+              >
+                {engineMode === "new" ? "Ver viewer clásico" : "Activar Engine 3D (beta)"}
+              </Button>
+            </div>
           </div>
-          {anomsQ.data && layersQ.data ? (
+          {engineMode === "new" ? (
+            <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
+          ) : anomsQ.data && layersQ.data ? (
             <LosVerdesScene3D
               centerLat={centerLat}
               centerLng={centerLng}
