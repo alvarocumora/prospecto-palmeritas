@@ -785,15 +785,69 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
-      <div className="absolute bottom-2 right-2 z-10 bg-black/75 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border space-y-0.5">
-        <div className="uppercase tracking-wider text-emerald-300 mb-1">debug · canvas mounted</div>
-        <div>cam: [{cameraInitial.join(", ")}]</div>
+      <div className="absolute bottom-2 right-2 z-10 bg-black/80 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border space-y-1 max-w-[280px]">
+        <div className="flex items-center justify-between">
+          <span className="uppercase tracking-wider text-emerald-300">debug · mounted</span>
+          <button
+            type="button"
+            onClick={() => setShowLayerDebug((v) => !v)}
+            className="text-[9px] underline text-cyan-300"
+          >
+            {showLayerDebug ? "hide" : "layers"}
+          </button>
+        </div>
+        <div>cam: [{cameraInitial.join(", ")}] · fit:
+          <span className={autoFit ? "text-emerald-300" : "text-muted-foreground"}> {autoFit ? "auto" : "manual"}</span>
+        </div>
+        <div>bounds: {sceneBounds
+          ? `${sceneBounds.min.map((n) => n.toFixed(0)).join(",")} → ${sceneBounds.max.map((n) => n.toFixed(0)).join(",")}`
+          : "—"}
+        </div>
         <div>points: {points.length} · holes: {holes.length}</div>
         <div>iso tri: {iso?.triangleCount ?? 0} · dem tri: {demMesh?.triangleCount ?? 0}</div>
         <div>blocks: {blockModel?.count ?? 0} · targets: {drillTargets?.targets.length ?? 0}</div>
-        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span></div>
+        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span>
+          {noRealData && <span className="ml-2 text-amber-300">· DEMO</span>}
+        </div>
         {blockError ? <div className="text-red-400">err: {String(blockError).slice(0, 50)}</div> : null}
+
+        {/* Solo layer chips */}
+        <div className="pt-1 border-t border-border/40 grid grid-cols-4 gap-1">
+          {(["all", "dem", "holes", "iso", "blocks", "targets", "debug"] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setSoloLayer(k)}
+              className={`h-5 rounded text-[9px] uppercase border ${
+                soloLayer === k ? "border-emerald-400/60 text-emerald-300" : "border-border/40 text-muted-foreground"
+              }`}
+            >
+              {k}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setAutoFit((v) => !v)}
+            className={`h-5 rounded text-[9px] uppercase border ${
+              autoFit ? "border-cyan-400/60 text-cyan-300" : "border-border/40 text-muted-foreground"
+            }`}
+          >
+            fit
+          </button>
+        </div>
+
+        {showLayerDebug && (
+          <div className="pt-1 border-t border-border/40 space-y-0.5 text-[9px]">
+            <LayerRow name="DEM" mounted={!!demMesh} visible={visible("dem") && demEnabled} count={demMesh?.triangleCount ?? 0} extra={demBusy ? "busy" : "ok"} />
+            <LayerRow name="Isosurface" mounted={!!iso} visible={visible("iso") && showSurface} count={iso?.triangleCount ?? 0} extra={isoBusy ? "busy" : `op ${opacity.toFixed(2)}`} />
+            <LayerRow name="Drillholes" mounted={holes.length > 0} visible={visible("holes") && showHoles} count={holes.length} extra="instanced" />
+            <LayerRow name="Block Model" mounted={!!blockModel} visible={visible("blocks") && showBlocks && blockParams.enabled} count={blockModel?.count ?? 0} extra={blockBusy ? "busy" : `cut ${blockFilters.cutoff}`} />
+            <LayerRow name="Targets" mounted={!!drillTargets} visible={visible("targets") && showTargets3D} count={drillTargets?.targets.length ?? 0} extra={targetsBusy ? "busy" : `A ${drillTargets?.stats.aPriority ?? 0}`} />
+            <LayerRow name="Clip Helper" mounted={true} visible={visible("debug") && showClipHelper} count={clippingPlanes.length} extra={effectiveClip.enabled ? "active" : "idle"} />
+          </div>
+        )}
       </div>
+
 
 
       <Canvas
