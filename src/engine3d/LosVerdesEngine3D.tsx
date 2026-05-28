@@ -5,11 +5,18 @@
 // - Drillholes reales como cilindros instanciados (UTM→ENU vía proj4)
 // - Clipping planes dinámicos X/Y/Z/libre + helper visual + invert
 // - DEM real triangulado con Martini (worker)
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useState } from "react";
+
+function InvalidateOnChange({ deps }: { deps: unknown[] }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => { invalidate(); }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
 import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown, Boxes, Upload } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
@@ -139,6 +146,8 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [cinematic, setCinematic] = useState(true);
   const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
   const [volumeFog, setVolumeFog] = useState(true);
+  const [fxError, setFxError] = useState<string | null>(null);
+
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
@@ -397,7 +406,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   return (
     <div
       className="relative w-full rounded-lg border border-border overflow-hidden bg-[#08090c]"
-      style={{ height }}
+      style={{ height, minHeight: 640 }}
     >
       {/* HUD top-left */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 max-w-[300px] max-h-[calc(100%-1rem)] overflow-y-auto pr-1">
@@ -1082,8 +1091,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
-        <CinematicEffects enabled={cinematic} intensity={cineIntensity} />
+        <InvalidateOnChange deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, sceneBounds]} />
+        <CinematicEffects
+          enabled={cinematic}
+          intensity={cineIntensity}
+          onError={(m) => setFxError(m)}
+        />
       </Canvas>
+
 
       {showNorth && <NorthArrow />}
       {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
