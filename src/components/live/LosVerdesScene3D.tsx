@@ -20,6 +20,7 @@ import type {
   Lineament,
 } from "@/lib/livemap-public.functions";
 import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
+import type { LosVerdesDrillhole } from "@/lib/losverdes-ai.functions";
 import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 import {
   centroid,
