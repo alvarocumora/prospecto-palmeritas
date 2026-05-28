@@ -10,6 +10,7 @@ type Props = {
   radius?: number;
   onHover?: (hole: DrillholeSegment | null) => void;
   clippingPlanes?: THREE.Plane[];
+  unlit?: boolean;
 };
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -41,6 +42,7 @@ export function DrillholesLayer({
   radius = 6,
   onHover,
   clippingPlanes,
+  unlit = false,
 }: Props) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const count = holes.length;
@@ -52,17 +54,24 @@ export function DrillholesLayer({
   );
 
   const material = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        vertexColors: false,
+    () => {
+      if (unlit) {
+        return new THREE.MeshBasicMaterial({
+          vertexColors: true,
+          clippingPlanes: clippingPlanes ?? [],
+          toneMapped: false,
+        });
+      }
+      return new THREE.MeshStandardMaterial({
+        vertexColors: true,
         metalness: 0.35,
         roughness: 0.45,
         emissive: new THREE.Color(0x111111),
         emissiveIntensity: 0.2,
         clippingPlanes: clippingPlanes ?? [],
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [],
+      });
+    },
+    [clippingPlanes, unlit],
   );
 
   useEffect(() => {

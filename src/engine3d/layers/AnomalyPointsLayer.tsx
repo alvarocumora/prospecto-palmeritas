@@ -7,22 +7,31 @@ import type { AnomalyPoint } from "@/engine3d/data/anomalies.functions";
 export function AnomalyPointsLayer({
   points,
   verticalExaggeration = 1,
+  unlit = false,
 }: {
   points: AnomalyPoint[];
   verticalExaggeration?: number;
+  unlit?: boolean;
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => new THREE.SphereGeometry(15, 12, 8), []);
   const material = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
+    () => {
+      if (unlit) {
+        return new THREE.MeshBasicMaterial({
+          vertexColors: true,
+          toneMapped: false,
+        });
+      }
+      return new THREE.MeshStandardMaterial({
         vertexColors: true,
         emissive: new THREE.Color(0xffffff),
         emissiveIntensity: 0.4,
         metalness: 0.4,
         roughness: 0.35,
-      }),
-    [],
+      });
+    },
+    [unlit],
   );
 
   useEffect(() => {
