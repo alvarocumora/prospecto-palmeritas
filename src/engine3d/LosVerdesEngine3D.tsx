@@ -146,6 +146,8 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [cinematic, setCinematic] = useState(true);
   const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
   const [volumeFog, setVolumeFog] = useState(true);
+  const [fxError, setFxError] = useState<string | null>(null);
+
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
