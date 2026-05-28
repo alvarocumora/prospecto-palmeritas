@@ -397,7 +397,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   return (
     <div
       className="relative w-full rounded-lg border border-border overflow-hidden bg-[#08090c]"
-      style={{ height }}
+      style={{ height, minHeight: 640 }}
     >
       {/* HUD top-left */}
       <div className="absolute top-2 left-2 z-10 flex flex-col gap-1.5 max-w-[300px] max-h-[calc(100%-1rem)] overflow-y-auto pr-1">
