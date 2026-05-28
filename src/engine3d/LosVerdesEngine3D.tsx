@@ -5,11 +5,18 @@
 // - Drillholes reales como cilindros instanciados (UTM→ENU vía proj4)
 // - Clipping planes dinámicos X/Y/Z/libre + helper visual + invert
 // - DEM real triangulado con Martini (worker)
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Suspense, useEffect, useMemo, useState } from "react";
+
+function InvalidateOnChange({ deps }: { deps: unknown[] }) {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => { invalidate(); }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  return null;
+}
+
 import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown, Boxes, Upload } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
