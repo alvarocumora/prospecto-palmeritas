@@ -615,6 +615,7 @@ export function LosVerdesScene3D({
           "circle-stroke-width": 1.5,
         },
       });
+      const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
       map.on("click", "drillholes-extr", (e) => {
         const f = e.features?.[0];
         if (!f) return;
