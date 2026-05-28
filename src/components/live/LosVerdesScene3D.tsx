@@ -337,9 +337,13 @@ export function LosVerdesScene3D({
 
     const fitInitialView = () => {
       if (initialViewConfiguredRef.current) return;
-      initialViewConfiguredRef.current = true;
+
+      const containerWidth = ref.current?.clientWidth ?? 0;
+      const containerHeight = ref.current?.clientHeight ?? 0;
+      if (containerWidth < 220 || containerHeight < 220) return;
 
       if (!sceneBounds) {
+        initialViewConfiguredRef.current = true;
         map.easeTo({
           center: [centerLng, centerLat],
           zoom: isMobile ? 12.2 : 12.8,
@@ -356,13 +360,25 @@ export function LosVerdesScene3D({
 
       const lngSpan = Math.abs(sceneBounds.maxLng - sceneBounds.minLng);
       const latSpan = Math.abs(sceneBounds.maxLat - sceneBounds.minLat);
+      const center: [number, number] = [
+        (sceneBounds.minLng + sceneBounds.maxLng) / 2,
+        (sceneBounds.minLat + sceneBounds.maxLat) / 2,
+      ];
+
+      const maxSpan = Math.max(lngSpan, latSpan);
+      let zoom = 13.8;
+      if (maxSpan > 0.32) zoom = 9.4;
+      else if (maxSpan > 0.2) zoom = 10.1;
+      else if (maxSpan > 0.12) zoom = 10.8;
+      else if (maxSpan > 0.08) zoom = 11.3;
+      else if (maxSpan > 0.04) zoom = 12;
+      else if (maxSpan > 0.02) zoom = 12.7;
+      if (isMobile) zoom -= 0.5;
 
       if (lngSpan < 0.0005 && latSpan < 0.0005) {
+        initialViewConfiguredRef.current = true;
         map.easeTo({
-          center: [
-            (sceneBounds.minLng + sceneBounds.maxLng) / 2,
-            (sceneBounds.minLat + sceneBounds.maxLat) / 2,
-          ],
+          center,
           zoom: isMobile ? 13 : 13.8,
           pitch: initialPitch,
           bearing: initialBearing,
@@ -371,18 +387,15 @@ export function LosVerdesScene3D({
         return;
       }
 
-      map.fitBounds(
-        [
-          [sceneBounds.minLng, sceneBounds.minLat],
-          [sceneBounds.maxLng, sceneBounds.maxLat],
-        ],
-        {
-          padding,
-          maxZoom: isMobile ? 12.9 : 13.8,
-          duration: 0,
-        },
-      );
-      map.easeTo({ pitch: initialPitch, bearing: initialBearing, duration: 0 });
+      initialViewConfiguredRef.current = true;
+      map.easeTo({
+        center,
+        zoom,
+        pitch: initialPitch,
+        bearing: initialBearing,
+        padding,
+        duration: 0,
+      });
     };
 
     const resizeObserver =
