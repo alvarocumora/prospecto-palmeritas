@@ -406,6 +406,12 @@ function LiveLosVerdesPage() {
           Geocapitals · Informe pre-NI 43-101 · Estimaciones conceptuales, no recursos informados.
         </footer>
       </div>
+      <TargetExplainerDialog
+        open={aiTarget !== null}
+        targetCode={aiTarget?.code ?? null}
+        targetName={aiTarget?.name ?? null}
+        onClose={() => setAiTarget(null)}
+      />
     </div>
   );
 }
