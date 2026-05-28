@@ -97,7 +97,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     renderMode === "voxel" ? points : [],
     voxelParams,
   );
-  const { mesh: demMesh, busy: demBusy, loading: demLoading } = useTerrainDEM(
+  const { output: blockModel, busy: blockBusy, error: blockError } = useBlockModel(
+    blockParams.enabled ? points : [],
+    blockParams,
+  );
     projectId,
     demEnabled,
     demQuality,
