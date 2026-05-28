@@ -80,6 +80,7 @@ function LiveLosVerdesPage() {
   const fetchAnoms = useServerFn(getLosVerdesAnomalies);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchReport = useServerFn(getTilamaReport);
+  const fetchDrillholes = useServerFn(getLosVerdesDrillholes);
 
   const layersQ = useQuery({
     queryKey: ["losverdes", "public-layers"],
@@ -100,6 +101,11 @@ function LiveLosVerdesPage() {
     queryKey: ["losverdes", "report"],
     queryFn: () => fetchReport(),
     staleTime: 60_000,
+  });
+  const drillsQ = useQuery({
+    queryKey: ["losverdes", "drillholes"],
+    queryFn: () => fetchDrillholes(),
+    staleTime: 10 * 60_000,
   });
 
   const [pdfBusy, setPdfBusy] = useState(false);
