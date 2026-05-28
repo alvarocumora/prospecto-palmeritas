@@ -79,7 +79,7 @@
     "leaflet-minimap": "^3.6.1",
     "leaflet.heat": "^0.2.0",
     "lucide-react": "^0.575.0",
-    "maplibre-gl": "^4",
+    "maplibre-gl": "^5",
     "react": "^19.2.0",
     "react-day-picker": "^9.14.0",
     "react-dom": "^19.2.0",
