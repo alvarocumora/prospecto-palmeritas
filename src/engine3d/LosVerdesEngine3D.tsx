@@ -114,8 +114,15 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showTargets3D, setShowTargets3D] = useState(true);
   const [hoveredTarget, setHoveredTarget] = useState<DrillTarget | null>(null);
 
+  // Sprint visibility: solo + autofit + debug panel
+  type SoloLayer = "all" | "dem" | "holes" | "iso" | "blocks" | "targets" | "debug";
+  const [soloLayer, setSoloLayer] = useState<SoloLayer>("all");
+  const [autoFit, setAutoFit] = useState(true);
+  const [showLayerDebug, setShowLayerDebug] = useState(false);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
+
 
   // Sprint 4: QA/QC sobre el bundle importado
   const qaqcInput = useMemo(() => {
