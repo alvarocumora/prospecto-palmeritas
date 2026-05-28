@@ -882,8 +882,24 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         badges={{
           qaqc: qaqcResult?.summary.critical || qaqcResult?.summary.warning || undefined,
           ni43101: ni43Mode ? "ON" : undefined,
+          targets: drillTargets?.stats.aPriority || undefined,
+          ai: aiInterpretation ? aiInterpretation.upside.slice(0, 3).toUpperCase() : undefined,
         }}
       />
+
+      {hoveredTarget && (
+        <div className="absolute bottom-2 left-2 z-20 bg-black/85 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-cyan-500/40 max-w-[260px]">
+          <div className="text-cyan-200 uppercase tracking-wider mb-1">
+            {hoveredTarget.targetId} · {hoveredTarget.priority}
+          </div>
+          <div className="text-muted-foreground space-y-0.5">
+            <div>score: <span className="text-foreground">{(hoveredTarget.score * 100).toFixed(0)}</span></div>
+            <div>depth: <span className="text-foreground">{hoveredTarget.depth.toFixed(0)} m</span></div>
+            <div>cost: <span className="text-foreground">${(hoveredTarget.estimatedCost / 1000).toFixed(0)}k</span></div>
+            <div className="text-[9px] pt-1">{hoveredTarget.rationale[0]}</div>
+          </div>
+        </div>
+      )}
 
       {activeTab === "qaqc" && (
         <QAQCPanel result={qaqcResult} busy={qaqcBusy} onClose={() => setActiveTab("viewer")} />
@@ -912,6 +928,67 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       )}
       {activeTab === "audit" && (
         <AuditTrailPanel onClose={() => setActiveTab("viewer")} />
+      )}
+      {activeTab === "ai" && (
+        <AIGeologistPanel
+          interpretation={aiInterpretation}
+          onRegenerate={() => {
+            const i = runAIGeologist({
+              points,
+              holes,
+              blockModel: blockModel ?? null,
+              qaqc: qaqcResult,
+              bundle: importedBundle,
+            });
+            setAiInterpretation(i);
+            auditTrail.log("ni43101.snapshot", { kind: "ai.interpretation", headline: i.headline, upside: i.upside });
+          }}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "targets" && (
+        <TargetPlanningPanel
+          output={drillTargets}
+          busy={targetsBusy}
+          scenarioIds={scenarioIds}
+          onToggleScenario={(id) => {
+            setScenarioIds((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            });
+            auditTrail.log("preset.save", { kind: "scenario.toggle", targetId: id });
+          }}
+          onExportCsv={(targets) => {
+            downloadString(
+              `drill-plan-${new Date().toISOString().replace(/[:.]/g, "-")}.csv`,
+              exportTargetsCsv(targets),
+              "text/csv",
+            );
+            auditTrail.log("section.export", { kind: "drill.plan.csv", count: targets.length });
+          }}
+          onGenerateInvestorSummary={() => setActiveTab("reports")}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "reports" && (
+        <ReportsPanel
+          input={{
+            projectId,
+            ai: aiInterpretation,
+            blockModel: blockModel ?? null,
+            qaqc: qaqcResult,
+            bundle: importedBundle,
+            targets: drillTargets,
+            scenarioTargets: (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
+            econ,
+            campaignCost: computeCampaignCost(
+              (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
+            ),
+          }}
+          onClose={() => setActiveTab("viewer")}
+        />
       )}
     </div>
   );
