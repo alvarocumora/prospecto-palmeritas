@@ -589,6 +589,10 @@ export function LosVerdesScene3D({
         type: "geojson",
         data: { type: "FeatureCollection", features: [] },
       });
+      map.addSource("drillhole-collars", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
       map.addLayer({
         id: "drillholes-extr",
         type: "fill-extrusion",
@@ -611,6 +615,39 @@ export function LosVerdesScene3D({
           "circle-stroke-width": 1.5,
         },
       });
+      map.on("click", "drillholes-extr", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>${p.hole_id}</strong> · veta ${p.vein_code}<br/>
+              Tramo: ${Number(p.from_m).toFixed(0)}–${Number(p.to_m).toFixed(0)} m<br/>
+              Cu: <b>${Number(p.cu_pct).toFixed(2)}%</b> · Au: <b>${Number(p.au_gpt).toFixed(2)} g/t</b><br/>
+              Ag: ${Number(p.ag_gpt).toFixed(1)} g/t
+            </div>`,
+          )
+          .addTo(map);
+      });
+      map.on("click", "drillholes-collars", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>${p.hole_id}</strong><br/>Veta: ${p.vein_code}<br/>
+              Profundidad: ${Number(p.depth_m).toFixed(0)} m · Az ${Number(p.azimuth_deg).toFixed(0)}° / Dip ${Number(p.dip_deg).toFixed(0)}°<br/>
+              Cu máx: ${Number(p.max_cu_pct).toFixed(2)}% · Au máx: ${Number(p.max_au_gpt).toFixed(2)} g/t
+            </div>`,
+          )
+          .addTo(map);
+      });
+
+
 
       const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
       map.on("click", "veins-line", (e) => {
