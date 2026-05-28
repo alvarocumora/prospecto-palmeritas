@@ -101,7 +101,7 @@ export function AnomalyIsosurfaceLayer({
 
   useEffect(() => {
     material.opacity = opacity;
-    material.depthWrite = opacity > 0.85;
+    material.depthWrite = false;
     material.clippingPlanes = clippingPlanes ?? [];
     material.needsUpdate = true;
   }, [material, opacity, clippingPlanes]);
