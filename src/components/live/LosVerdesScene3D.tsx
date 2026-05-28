@@ -320,7 +320,6 @@ export function LosVerdesScene3D({
       pitch: initialPitch,
       bearing: initialBearing,
       maxPitch: 80,
-      antialias: true,
     });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
@@ -1009,7 +1008,35 @@ export function LosVerdesScene3D({
       initialViewConfiguredRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [centerLat, centerLng, sceneBounds]);
+  }, []);
+
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m || !sceneBounds || !m.isStyleLoaded() || initialViewConfiguredRef.current) return;
+
+    const isMobile =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    const initialPitch = isMobile ? 48 : 62;
+    const initialBearing = isMobile ? -12 : -25;
+    const padding = isMobile
+      ? { top: 116, right: 20, bottom: 184, left: 20 }
+      : { top: 80, right: 320, bottom: 100, left: 80 };
+
+    initialViewConfiguredRef.current = true;
+    m.resize();
+    m.fitBounds(
+      [
+        [sceneBounds.minLng, sceneBounds.minLat],
+        [sceneBounds.maxLng, sceneBounds.maxLat],
+      ],
+      {
+        padding,
+        maxZoom: isMobile ? 12.9 : 13.8,
+        duration: 0,
+      },
+    );
+    m.easeTo({ pitch: initialPitch, bearing: initialBearing, duration: 0 });
+  }, [sceneBounds]);
 
   // Toggle visibilidad + filtro de commodities
   useEffect(() => {
