@@ -14,6 +14,7 @@ import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
+import { getLosVerdesDrillholes } from "@/lib/losverdes-ai.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
@@ -79,6 +80,7 @@ function LiveLosVerdesPage() {
   const fetchAnoms = useServerFn(getLosVerdesAnomalies);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchReport = useServerFn(getTilamaReport);
+  const fetchDrillholes = useServerFn(getLosVerdesDrillholes);
 
   const layersQ = useQuery({
     queryKey: ["losverdes", "public-layers"],
@@ -99,6 +101,11 @@ function LiveLosVerdesPage() {
     queryKey: ["losverdes", "report"],
     queryFn: () => fetchReport(),
     staleTime: 60_000,
+  });
+  const drillsQ = useQuery({
+    queryKey: ["losverdes", "drillholes"],
+    queryFn: () => fetchDrillholes(),
+    staleTime: 10 * 60_000,
   });
 
   const [pdfBusy, setPdfBusy] = useState(false);
@@ -259,6 +266,7 @@ function LiveLosVerdesPage() {
               targets={layersQ.data.targets}
               veins={miningQ.data?.veins ?? []}
               phases={miningQ.data?.phases ?? []}
+              drillholes={drillsQ.data?.holes ?? []}
             />
           ) : (
             <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
@@ -398,6 +406,12 @@ function LiveLosVerdesPage() {
           Geocapitals · Informe pre-NI 43-101 · Estimaciones conceptuales, no recursos informados.
         </footer>
       </div>
+      <TargetExplainerDialog
+        open={aiTarget !== null}
+        targetCode={aiTarget?.code ?? null}
+        targetName={aiTarget?.name ?? null}
+        onClose={() => setAiTarget(null)}
+      />
     </div>
   );
 }

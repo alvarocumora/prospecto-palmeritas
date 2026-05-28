@@ -20,6 +20,7 @@ import type {
   Lineament,
 } from "@/lib/livemap-public.functions";
 import type { VeinPublic, MinePlanPhasePublic } from "@/lib/losverdes-veins.functions";
+import type { LosVerdesDrillhole } from "@/lib/losverdes-ai.functions";
 import { emitLosVerdesFocus, onLosVerdesFocus } from "@/lib/losverdes-focus";
 import {
   centroid,
@@ -162,6 +163,7 @@ export function LosVerdesScene3D({
   targets,
   veins = [],
   phases = [],
+  drillholes = [],
 }: {
   centerLat: number;
   centerLng: number;
@@ -171,6 +173,7 @@ export function LosVerdesScene3D({
   targets: PublicTarget[];
   veins?: VeinPublic[];
   phases?: MinePlanPhasePublic[];
+  drillholes?: LosVerdesDrillhole[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
@@ -188,6 +191,7 @@ export function LosVerdesScene3D({
     veins: true,
     veinPlanes: true,
     plan: true,
+    drills: true,
   });
   const [commoditiesOn, setCommoditiesOn] = useState<Record<CommodityToken, boolean>>({
     Au: true,
@@ -580,8 +584,70 @@ export function LosVerdesScene3D({
         },
       });
 
-      // ---- Popups ----
+      // ---- Sondajes 3D (drillholes): fill-extrusion por tramo, color por ley ----
+      map.addSource("drillholes", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addSource("drillhole-collars", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "drillholes-extr",
+        type: "fill-extrusion",
+        source: "drillholes",
+        paint: {
+          "fill-extrusion-color": ["get", "color"],
+          "fill-extrusion-base": ["get", "base"],
+          "fill-extrusion-height": ["get", "top"],
+          "fill-extrusion-opacity": 0.92,
+        },
+      });
+      map.addLayer({
+        id: "drillholes-collars",
+        type: "circle",
+        source: "drillhole-collars",
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "#fde047",
+          "circle-stroke-color": "#0b1220",
+          "circle-stroke-width": 1.5,
+        },
+      });
       const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
+      map.on("click", "drillholes-extr", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>${p.hole_id}</strong> · veta ${p.vein_code}<br/>
+              Tramo: ${Number(p.from_m).toFixed(0)}–${Number(p.to_m).toFixed(0)} m<br/>
+              Cu: <b>${Number(p.cu_pct).toFixed(2)}%</b> · Au: <b>${Number(p.au_gpt).toFixed(2)} g/t</b><br/>
+              Ag: ${Number(p.ag_gpt).toFixed(1)} g/t
+            </div>`,
+          )
+          .addTo(map);
+      });
+      map.on("click", "drillholes-collars", (e) => {
+        const f = e.features?.[0];
+        if (!f) return;
+        const p = f.properties as Record<string, unknown>;
+        popup
+          .setLngLat(e.lngLat)
+          .setHTML(
+            `<div style="font:11px system-ui;color:#0f172a;line-height:1.5">
+              <strong>${p.hole_id}</strong><br/>Veta: ${p.vein_code}<br/>
+              Profundidad: ${Number(p.depth_m).toFixed(0)} m · Az ${Number(p.azimuth_deg).toFixed(0)}° / Dip ${Number(p.dip_deg).toFixed(0)}°<br/>
+              Cu máx: ${Number(p.max_cu_pct).toFixed(2)}% · Au máx: ${Number(p.max_au_gpt).toFixed(2)} g/t
+            </div>`,
+          )
+          .addTo(map);
+      });
+
       map.on("click", "veins-line", (e) => {
         const f = e.features?.[0];
         if (!f) return;
@@ -712,6 +778,8 @@ export function LosVerdesScene3D({
         "mag-halo",
         "veins-line",
         "phases-extr",
+        "drillholes-extr",
+        "drillholes-collars",
       ]) {
         map.on("mouseenter", id, () => (map.getCanvas().style.cursor = "pointer"));
         map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
@@ -841,6 +909,9 @@ export function LosVerdesScene3D({
       setVis("vein-planes-outline", layers.veinPlanes);
       setVis("phases-extr", layers.plan);
       setVis("phases-outline", layers.plan);
+      setVis("drillholes-extr", layers.drills);
+      setVis("drillholes-collars", layers.drills);
+
 
       const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
         (c) => commoditiesOn[c],
@@ -876,6 +947,69 @@ export function LosVerdesScene3D({
     if (m.isStyleLoaded()) apply();
     else m.once("idle", apply);
   }, [exag]);
+
+  // Drillholes: rebuild GeoJSON pinned to DEM cada vez que cambian los datos
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    const apply = () => {
+      const src = m.getSource("drillholes") as maplibregl.GeoJSONSource | undefined;
+      const collarsSrc = m.getSource("drillhole-collars") as maplibregl.GeoJSONSource | undefined;
+      if (!src || !collarsSrc) return;
+      const features: GeoJSON.Feature[] = [];
+      const collarFeatures: GeoJSON.Feature[] = [];
+      for (const h of drillholes) {
+        const elev = m.queryTerrainElevation
+          ? (m.queryTerrainElevation([h.collar_lng, h.collar_lat]) ?? 0)
+          : 0;
+        collarFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [h.collar_lng, h.collar_lat] },
+          properties: {
+            hole_id: h.hole_id,
+            vein_code: h.vein_code,
+            depth_m: h.depth_m,
+            azimuth_deg: h.azimuth_deg,
+            dip_deg: h.dip_deg,
+            max_cu_pct: h.max_cu_pct,
+            max_au_gpt: h.max_au_gpt,
+          },
+        });
+        for (const seg of h.segments) {
+          const sinDip = Math.sin((h.dip_deg * Math.PI) / 180);
+          const top = Math.max(0, elev - seg.depth_from_m * sinDip);
+          const base = Math.max(0, elev - seg.depth_to_m * sinDip);
+          features.push({
+            type: "Feature",
+            geometry: { type: "Polygon", coordinates: [seg.ring] },
+            properties: {
+              hole_id: h.hole_id,
+              vein_code: h.vein_code,
+              color: seg.color,
+              base,
+              top,
+              from_m: seg.assay.from_m,
+              to_m: seg.assay.to_m,
+              cu_pct: seg.assay.cu_pct,
+              au_gpt: seg.assay.au_gpt,
+              ag_gpt: seg.assay.ag_gpt,
+            },
+          });
+        }
+      }
+      src.setData({ type: "FeatureCollection", features });
+      collarsSrc.setData({ type: "FeatureCollection", features: collarFeatures });
+    };
+    if (m.isStyleLoaded()) {
+      apply();
+      // Re-aplicar cuando el DEM esté listo
+      m.once("idle", apply);
+    } else {
+      m.once("idle", apply);
+    }
+  }, [drillholes]);
+
+
 
   // Cursor crosshair cuando sectionMode activo
   useEffect(() => {
