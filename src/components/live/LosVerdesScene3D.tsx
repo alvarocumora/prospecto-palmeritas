@@ -182,6 +182,48 @@ export function LosVerdesScene3D({
   const phasesFCRef = useRef<FC | null>(null);
   const veinPlanesFCRef = useRef<FC | null>(null);
   const pinnedRef = useRef(false);
+  const initialViewConfiguredRef = useRef(false);
+
+  const sceneBounds = useMemo(() => {
+    let minLng = Number.POSITIVE_INFINITY;
+    let minLat = Number.POSITIVE_INFINITY;
+    let maxLng = Number.NEGATIVE_INFINITY;
+    let maxLat = Number.NEGATIVE_INFINITY;
+
+    const pushLngLat = (lng: number | null | undefined, lat: number | null | undefined) => {
+      if (lng == null || lat == null || !Number.isFinite(lng) || !Number.isFinite(lat)) return;
+      minLng = Math.min(minLng, lng);
+      minLat = Math.min(minLat, lat);
+      maxLng = Math.max(maxLng, lng);
+      maxLat = Math.max(maxLat, lat);
+    };
+
+    satAnomalies.forEach((a) => {
+      if (a.polygon?.length) {
+        a.polygon.forEach(([lng, lat]) => pushLngLat(lng, lat));
+      } else {
+        pushLngLat(a.lng, a.lat);
+      }
+    });
+    magTargets.forEach((m) => pushLngLat(m.lng, m.lat));
+    lineaments.forEach((l) => l.path.forEach(([lat, lng]) => pushLngLat(lng, lat)));
+    targets.forEach((t) => pushLngLat(t.lng, t.lat));
+    veins.forEach((v) => v.geometry?.coordinates?.forEach(([lng, lat]) => pushLngLat(lng, lat)));
+    phases.forEach((p) =>
+      p.area_polygon?.coordinates?.forEach((ring) =>
+        ring.forEach(([lng, lat]) => pushLngLat(lng, lat)),
+      ),
+    );
+    drillholes.forEach((h) => pushLngLat(h.collar_lng, h.collar_lat));
+
+    if (![minLng, minLat, maxLng, maxLat].every(Number.isFinite)) return null;
+    return {
+      minLng,
+      minLat,
+      maxLng,
+      maxLat,
+    };
+  }, [drillholes, lineaments, magTargets, phases, satAnomalies, targets, veins]);
 
   const [layers, setLayers] = useState({
     sat: true,
@@ -266,20 +308,91 @@ export function LosVerdesScene3D({
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
+    const isMobile =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    const initialPitch = isMobile ? 48 : 62;
+    const initialBearing = isMobile ? -12 : -25;
     const map = new maplibregl.Map({
       container: ref.current,
       style: buildStyle(),
       center: [centerLng, centerLat],
-      zoom: 12.5,
-      pitch: 62,
-      bearing: -25,
+      zoom: isMobile ? 11.7 : 12.5,
+      pitch: initialPitch,
+      bearing: initialBearing,
       maxPitch: 80,
+      antialias: true,
     });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
     map.addControl(new maplibregl.ScaleControl({ unit: "metric" }), "bottom-right");
     map.addControl(new maplibregl.FullscreenControl(), "top-right");
 
     mapRef.current = map;
+
+    const resizeMap = () => {
+      try {
+        map.resize();
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const fitInitialView = () => {
+      if (initialViewConfiguredRef.current) return;
+      initialViewConfiguredRef.current = true;
+
+      if (!sceneBounds) {
+        map.easeTo({
+          center: [centerLng, centerLat],
+          zoom: isMobile ? 12.2 : 12.8,
+          pitch: initialPitch,
+          bearing: initialBearing,
+          duration: 0,
+        });
+        return;
+      }
+
+      const padding = isMobile
+        ? { top: 116, right: 20, bottom: 184, left: 20 }
+        : { top: 80, right: 320, bottom: 100, left: 80 };
+
+      const lngSpan = Math.abs(sceneBounds.maxLng - sceneBounds.minLng);
+      const latSpan = Math.abs(sceneBounds.maxLat - sceneBounds.minLat);
+
+      if (lngSpan < 0.0005 && latSpan < 0.0005) {
+        map.easeTo({
+          center: [
+            (sceneBounds.minLng + sceneBounds.maxLng) / 2,
+            (sceneBounds.minLat + sceneBounds.maxLat) / 2,
+          ],
+          zoom: isMobile ? 13 : 13.8,
+          pitch: initialPitch,
+          bearing: initialBearing,
+          duration: 0,
+        });
+        return;
+      }
+
+      map.fitBounds(
+        [
+          [sceneBounds.minLng, sceneBounds.minLat],
+          [sceneBounds.maxLng, sceneBounds.maxLat],
+        ],
+        {
+          padding,
+          maxZoom: isMobile ? 12.9 : 13.8,
+          duration: 0,
+        },
+      );
+      map.easeTo({ pitch: initialPitch, bearing: initialBearing, duration: 0 });
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => resizeMap())
+        : null;
+    resizeObserver?.observe(ref.current);
+    const resizeRaf = requestAnimationFrame(resizeMap);
+    const resizeTimer = window.setTimeout(resizeMap, 180);
 
     map.on("load", () => {
       // ---- Anomalías SAT (fill-extrusion anclado al DEM) ----
@@ -878,16 +991,25 @@ export function LosVerdesScene3D({
           (map.getSource("phases") as maplibregl.GeoJSONSource).setData(ph);
         }
       };
+      map.once("idle", () => {
+        resizeMap();
+        fitInitialView();
+        pin();
+      });
       map.on("idle", pin);
     });
 
     return () => {
+      window.clearTimeout(resizeTimer);
+      cancelAnimationFrame(resizeRaf);
+      resizeObserver?.disconnect();
       map.remove();
       mapRef.current = null;
       pinnedRef.current = false;
+      initialViewConfiguredRef.current = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [centerLat, centerLng, sceneBounds]);
 
   // Toggle visibilidad + filtro de commodities
   useEffect(() => {
