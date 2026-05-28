@@ -1,16 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { FieldMapPublic } from "@/components/field/FieldMapPublic";
-import { LosVerdesScene3D } from "@/components/live/LosVerdesScene3D";
-import { LosVerdesEngine3D } from "@/engine3d/LosVerdesEngine3D";
+// Browser-only viewers (maplibre-gl / leaflet / deck.gl) — cargar solo en cliente para evitar
+// que el SSR del worker falle por referencias a `window`/`document` a nivel de módulo.
+const FieldMapPublic = lazy(() =>
+  import("@/components/field/FieldMapPublic").then((m) => ({ default: m.FieldMapPublic })),
+);
+const LosVerdesScene3D = lazy(() =>
+  import("@/components/live/LosVerdesScene3D").then((m) => ({ default: m.LosVerdesScene3D })),
+);
+const LosVerdesEngine3D = lazy(() =>
+  import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+);
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
@@ -113,7 +121,10 @@ function LiveLosVerdesPage() {
   const [catBusy, setCatBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+
 
 
   useEffect(() => {
@@ -271,24 +282,38 @@ function LiveLosVerdesPage() {
               </Button>
             </div>
           </div>
-          {engineMode === "new" ? (
-            <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
-          ) : anomsQ.data && layersQ.data ? (
-            <LosVerdesScene3D
-              centerLat={centerLat}
-              centerLng={centerLng}
-              satAnomalies={anomsQ.data.satAnomalies}
-              magTargets={anomsQ.data.magTargets}
-              lineaments={anomsQ.data.lineaments}
-              targets={layersQ.data.targets}
-              veins={miningQ.data?.veins ?? []}
-              phases={miningQ.data?.phases ?? []}
-              drillholes={drillsQ.data?.holes ?? []}
-            />
-          ) : (
+          {!mounted ? (
             <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-              Cargando escena 3D…
+              Inicializando visor 3D…
             </div>
+          ) : (
+            <Suspense
+              fallback={
+                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando escena 3D…
+                </div>
+              }
+            >
+              {engineMode === "new" ? (
+                <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
+              ) : anomsQ.data && layersQ.data ? (
+                <LosVerdesScene3D
+                  centerLat={centerLat}
+                  centerLng={centerLng}
+                  satAnomalies={anomsQ.data.satAnomalies}
+                  magTargets={anomsQ.data.magTargets}
+                  lineaments={anomsQ.data.lineaments}
+                  targets={layersQ.data.targets}
+                  veins={miningQ.data?.veins ?? []}
+                  phases={miningQ.data?.phases ?? []}
+                  drillholes={drillsQ.data?.holes ?? []}
+                />
+              ) : (
+                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando escena 3D…
+                </div>
+              )}
+            </Suspense>
           )}
         </section>
 
@@ -416,7 +441,19 @@ function LiveLosVerdesPage() {
           <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold mb-2">
             Mapa de campo · GPS + Catastro + Capas
           </h2>
-          <FieldMapPublic />
+          {mounted ? (
+            <Suspense
+              fallback={
+                <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando mapa de campo…
+                </div>
+              }
+            >
+              <FieldMapPublic />
+            </Suspense>
+          ) : (
+            <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary" />
+          )}
         </section>
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
