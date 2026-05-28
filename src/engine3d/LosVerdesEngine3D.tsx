@@ -41,6 +41,8 @@ import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
+import { AutoFitCamera, computeSceneBounds, type SceneBounds } from "@/engine3d/sections/AutoFitCamera";
+import { SyntheticDemoScene } from "@/engine3d/layers/SyntheticDemoScene";
 import { useSection } from "@/engine3d/hooks/useSection";
 import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
 import { AnomalyVoxelLayer } from "@/engine3d/layers/AnomalyVoxelLayer";
@@ -114,8 +116,15 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showTargets3D, setShowTargets3D] = useState(true);
   const [hoveredTarget, setHoveredTarget] = useState<DrillTarget | null>(null);
 
+  // Sprint visibility: solo + autofit + debug panel
+  type SoloLayer = "all" | "dem" | "holes" | "iso" | "blocks" | "targets" | "debug";
+  const [soloLayer, setSoloLayer] = useState<SoloLayer>("all");
+  const [autoFit, setAutoFit] = useState(true);
+  const [showLayerDebug, setShowLayerDebug] = useState(false);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
+
 
   // Sprint 4: QA/QC sobre el bundle importado
   const qaqcInput = useMemo(() => {
@@ -305,6 +314,46 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
   // Rango razonable de posición del plano según eje
   const planeRange = effectiveClip.axis === "y" ? 800 : 3000;
+
+  // Visibility / solo helpers
+  const visible = (l: "dem" | "holes" | "iso" | "blocks" | "targets" | "debug") =>
+    soloLayer === "all" || soloLayer === l;
+
+  // Bounds reales para AutoFit (transformando UTM-like → three: x, z*VE, -y)
+  const sceneBounds: SceneBounds = useMemo(() => {
+    const holePts: Array<[number, number, number]> = [];
+    for (const h of holes) {
+      holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
+      const azRad = (h.azimuth * Math.PI) / 180;
+      const dipRad = (h.dip * Math.PI) / 180;
+      const len = h.depth;
+      const ex = h.collar.x + Math.sin(azRad) * Math.cos(dipRad) * len;
+      const ey = (h.collar.z - Math.sin(dipRad) * len) * verticalExaggeration;
+      const ez = -(h.collar.y + Math.cos(azRad) * Math.cos(dipRad) * len);
+      holePts.push([ex, ey, ez]);
+    }
+    const targetPts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
+      t.collar.x,
+      -t.depth * verticalExaggeration,
+      -t.collar.y,
+    ]);
+    return computeSceneBounds([
+      demMesh ? { positions: demMesh.positions } : {},
+      iso ? { positions: iso.positions } : {},
+      blockModel ? { positions: blockModel.positions } : {},
+      { points: holePts },
+      { points: targetPts },
+    ]);
+  }, [demMesh, iso, blockModel, holes, drillTargets, verticalExaggeration]);
+
+  // Fallback synthetic demo cuando no hay datasets reales
+  const noRealData =
+    !demMesh &&
+    (!iso || iso.vertexCount === 0) &&
+    holes.length === 0 &&
+    (!blockModel || blockModel.count === 0) &&
+    (!drillTargets || drillTargets.targets.length === 0);
+
 
   return (
     <div
@@ -736,15 +785,69 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
-      <div className="absolute bottom-2 right-2 z-10 bg-black/75 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border space-y-0.5">
-        <div className="uppercase tracking-wider text-emerald-300 mb-1">debug · canvas mounted</div>
-        <div>cam: [{cameraInitial.join(", ")}]</div>
+      <div className="absolute bottom-2 right-2 z-10 bg-black/80 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border space-y-1 max-w-[280px]">
+        <div className="flex items-center justify-between">
+          <span className="uppercase tracking-wider text-emerald-300">debug · mounted</span>
+          <button
+            type="button"
+            onClick={() => setShowLayerDebug((v) => !v)}
+            className="text-[9px] underline text-cyan-300"
+          >
+            {showLayerDebug ? "hide" : "layers"}
+          </button>
+        </div>
+        <div>cam: [{cameraInitial.join(", ")}] · fit:
+          <span className={autoFit ? "text-emerald-300" : "text-muted-foreground"}> {autoFit ? "auto" : "manual"}</span>
+        </div>
+        <div>bounds: {sceneBounds
+          ? `${sceneBounds.min.map((n) => n.toFixed(0)).join(",")} → ${sceneBounds.max.map((n) => n.toFixed(0)).join(",")}`
+          : "—"}
+        </div>
         <div>points: {points.length} · holes: {holes.length}</div>
         <div>iso tri: {iso?.triangleCount ?? 0} · dem tri: {demMesh?.triangleCount ?? 0}</div>
         <div>blocks: {blockModel?.count ?? 0} · targets: {drillTargets?.targets.length ?? 0}</div>
-        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span></div>
+        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span>
+          {noRealData && <span className="ml-2 text-amber-300">· DEMO</span>}
+        </div>
         {blockError ? <div className="text-red-400">err: {String(blockError).slice(0, 50)}</div> : null}
+
+        {/* Solo layer chips */}
+        <div className="pt-1 border-t border-border/40 grid grid-cols-4 gap-1">
+          {(["all", "dem", "holes", "iso", "blocks", "targets", "debug"] as const).map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setSoloLayer(k)}
+              className={`h-5 rounded text-[9px] uppercase border ${
+                soloLayer === k ? "border-emerald-400/60 text-emerald-300" : "border-border/40 text-muted-foreground"
+              }`}
+            >
+              {k}
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setAutoFit((v) => !v)}
+            className={`h-5 rounded text-[9px] uppercase border ${
+              autoFit ? "border-cyan-400/60 text-cyan-300" : "border-border/40 text-muted-foreground"
+            }`}
+          >
+            fit
+          </button>
+        </div>
+
+        {showLayerDebug && (
+          <div className="pt-1 border-t border-border/40 space-y-0.5 text-[9px]">
+            <LayerRow name="DEM" mounted={!!demMesh} visible={visible("dem") && demEnabled} count={demMesh?.triangleCount ?? 0} extra={demBusy ? "busy" : "ok"} />
+            <LayerRow name="Isosurface" mounted={!!iso} visible={visible("iso") && showSurface} count={iso?.triangleCount ?? 0} extra={isoBusy ? "busy" : `op ${opacity.toFixed(2)}`} />
+            <LayerRow name="Drillholes" mounted={holes.length > 0} visible={visible("holes") && showHoles} count={holes.length} extra="instanced" />
+            <LayerRow name="Block Model" mounted={!!blockModel} visible={visible("blocks") && showBlocks && blockParams.enabled} count={blockModel?.count ?? 0} extra={blockBusy ? "busy" : `cut ${blockFilters.cutoff}`} />
+            <LayerRow name="Targets" mounted={!!drillTargets} visible={visible("targets") && showTargets3D} count={drillTargets?.targets.length ?? 0} extra={targetsBusy ? "busy" : `A ${drillTargets?.stats.aPriority ?? 0}`} />
+            <LayerRow name="Clip Helper" mounted={true} visible={visible("debug") && showClipHelper} count={clippingPlanes.length} extra={effectiveClip.enabled ? "active" : "idle"} />
+          </div>
+        )}
       </div>
+
 
 
       <Canvas
@@ -774,19 +877,23 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </mesh>
 
         <Suspense fallback={null}>
-          {demEnabled && demMesh ? (
+          {noRealData && <SyntheticDemoScene verticalExaggeration={verticalExaggeration} />}
+
+          {visible("dem") && demEnabled && demMesh ? (
             <TerrainMartiniLayer
               mesh={demMesh}
               clippingPlanes={clippingPlanes}
               wireframe={demWireframe}
             />
           ) : (
-            showGrid && <TerrainPlane size={4000} />
+            visible("dem") && showGrid && <TerrainPlane size={4000} />
           )}
 
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
-          {showPoints && <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />}
-          {showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
+          {visible("iso") && showPoints && (
+            <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />
+          )}
+          {visible("iso") && showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
             <AnomalyIsosurfaceLayer
               iso={iso}
               opacity={opacity}
@@ -794,14 +901,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
+          {visible("iso") && showSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
             <AnomalyVoxelLayer
               voxels={voxels}
               opacity={opacity}
               verticalExaggeration={verticalExaggeration}
             />
           )}
-          {showHoles && holes.length > 0 && (
+          {visible("holes") && showHoles && holes.length > 0 && (
             <DrillholesLayer
               holes={holes}
               verticalExaggeration={verticalExaggeration}
@@ -809,7 +916,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
+          {visible("blocks") && showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
             <BlockModelLayer
               model={blockModel}
               filters={blockFilters}
@@ -817,8 +924,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingPlanes}
             />
           )}
-          {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
-          {showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
+          {visible("debug") && showClipHelper && (
+            <ClippingPlaneController params={effectiveClip} size={4500} />
+          )}
+          {visible("targets") && showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
             <DrillTargetLayer
               targets={drillTargets.targets}
               verticalExaggeration={verticalExaggeration}
@@ -828,15 +937,18 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           )}
         </Suspense>
 
+        <AutoFitCamera bounds={sceneBounds} enabled={autoFit} />
         <MapControls
+          makeDefault
           enableDamping
           dampingFactor={0.08}
-          minDistance={300}
-          maxDistance={10_000}
+          minDistance={10}
+          maxDistance={100_000}
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
       </Canvas>
+
 
       {pointsQ.data && pointsQ.data.points.length === 0 && holes.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -1030,4 +1142,19 @@ function ClassChip({ label, active, onClick, color }: { label: string; active: b
     </button>
   );
 }
+
+function LayerRow({ name, mounted, visible, count, extra }: { name: string; mounted: boolean; visible: boolean; count: number; extra?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2 font-mono">
+      <span className="text-foreground/80">{name}</span>
+      <span className="flex gap-1.5 items-center">
+        <span className={mounted ? "text-emerald-300" : "text-muted-foreground"}>{mounted ? "●" : "○"}</span>
+        <span className={visible ? "text-cyan-300" : "text-muted-foreground"}>{visible ? "vis" : "hid"}</span>
+        <span className="text-amber-300">{count.toLocaleString()}</span>
+        {extra && <span className="text-muted-foreground">{extra}</span>}
+      </span>
+    </div>
+  );
+}
+
 
