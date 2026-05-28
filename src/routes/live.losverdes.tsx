@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -11,11 +11,13 @@ import { Card } from "@/components/ui/card";
 import { FieldMapPublic } from "@/components/field/FieldMapPublic";
 import { LosVerdesScene3D } from "@/components/live/LosVerdesScene3D";
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
+import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
+import { onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 export const Route = createFileRoute("/live/losverdes")({
   head: () => ({
@@ -101,7 +103,16 @@ function LiveLosVerdesPage() {
 
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
+  const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+
+  useEffect(() => {
+    return onLosVerdesFocus((evt) => {
+      if (evt.kind === "target" && evt.source === "scene3d" && evt.id) {
+        setAiTarget({ code: String(evt.id), name: String(evt.label ?? evt.id) });
+      }
+    });
+  }, []);
 
   const centerLat = layersQ.data?.project.center_lat ?? DEFAULT_CENTER.lat;
   const centerLng = layersQ.data?.project.center_lng ?? DEFAULT_CENTER.lng;
