@@ -1,16 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { FieldMapPublic } from "@/components/field/FieldMapPublic";
-import { LosVerdesScene3D } from "@/components/live/LosVerdesScene3D";
-import { LosVerdesEngine3D } from "@/engine3d/LosVerdesEngine3D";
+// Browser-only viewers (maplibre-gl / leaflet / deck.gl) — cargar solo en cliente para evitar
+// que el SSR del worker falle por referencias a `window`/`document` a nivel de módulo.
+const FieldMapPublic = lazy(() =>
+  import("@/components/field/FieldMapPublic").then((m) => ({ default: m.FieldMapPublic })),
+);
+const LosVerdesScene3D = lazy(() =>
+  import("@/components/live/LosVerdesScene3D").then((m) => ({ default: m.LosVerdesScene3D })),
+);
+const LosVerdesEngine3D = lazy(() =>
+  import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+);
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
