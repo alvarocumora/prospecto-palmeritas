@@ -21,6 +21,15 @@ import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/en
 import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
 import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
 import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
+import { QAQCPanel } from "@/engine3d/panels/QAQCPanel";
+import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPanel";
+import { NI43101Panel } from "@/engine3d/panels/NI43101Panel";
+import { AuditTrailPanel } from "@/engine3d/panels/AuditTrailPanel";
+import { EngineTabsDock, type EngineTab } from "@/engine3d/panels/EngineTabsDock";
+import { useQAQC } from "@/engine3d/hooks/useQAQC";
+import { DEFAULT_ESTIMATION, applyEstimation, type EstimationSettings } from "@/engine3d/qaqc/estimationPresets";
+import { auditTrail, computeHash } from "@/engine3d/qaqc/auditTrail";
+import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
