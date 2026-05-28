@@ -4060,6 +4060,412 @@ export type Database = {
           },
         ]
       }
+      engine_ai_interpretations: {
+        Row: {
+          block_model_version_id: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          payload: Json
+          project_id: string
+          summary: string | null
+          uncertainty: number | null
+          upside: number | null
+        }
+        Insert: {
+          block_model_version_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          payload?: Json
+          project_id: string
+          summary?: string | null
+          uncertainty?: number | null
+          upside?: number | null
+        }
+        Update: {
+          block_model_version_id?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          payload?: Json
+          project_id?: string
+          summary?: string | null
+          uncertainty?: number | null
+          upside?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_ai_interpretations_block_model_version_id_fkey"
+            columns: ["block_model_version_id"]
+            isOneToOne: false
+            referencedRelation: "engine_block_model_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "engine_ai_interpretations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_ai_interpretations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          payload: Json
+          project_id: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          payload?: Json
+          project_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          payload?: Json
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_audit_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_audit_events_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_block_model_versions: {
+        Row: {
+          binary_path: string | null
+          block_count: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          input_hash: string | null
+          notes: string | null
+          project_id: string
+          resource_summary: Json
+          settings: Json
+          settings_hash: string | null
+          updated_at: string
+          version_label: string
+        }
+        Insert: {
+          binary_path?: string | null
+          block_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          input_hash?: string | null
+          notes?: string | null
+          project_id: string
+          resource_summary?: Json
+          settings?: Json
+          settings_hash?: string | null
+          updated_at?: string
+          version_label: string
+        }
+        Update: {
+          binary_path?: string | null
+          block_count?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          input_hash?: string | null
+          notes?: string | null
+          project_id?: string
+          resource_summary?: Json
+          settings?: Json
+          settings_hash?: string | null
+          updated_at?: string
+          version_label?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_block_model_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_block_model_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_comments: {
+        Row: {
+          author_id: string
+          body: string
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          mentions: string[]
+          project_id: string
+          resolved_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          body: string
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          mentions?: string[]
+          project_id: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          body?: string
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          mentions?: string[]
+          project_id?: string
+          resolved_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_comments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_comments_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_drill_targets: {
+        Row: {
+          azimuth: number | null
+          collar_x: number
+          collar_y: number
+          collar_z: number | null
+          confidence: number | null
+          created_at: string
+          created_by: string | null
+          depth: number | null
+          dip: number | null
+          estimated_cost: number | null
+          id: string
+          payload: Json
+          priority: string
+          project_id: string
+          scenario: string | null
+          status: string
+          target_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          azimuth?: number | null
+          collar_x: number
+          collar_y: number
+          collar_z?: number | null
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          depth?: number | null
+          dip?: number | null
+          estimated_cost?: number | null
+          id?: string
+          payload?: Json
+          priority: string
+          project_id: string
+          scenario?: string | null
+          status?: string
+          target_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          azimuth?: number | null
+          collar_x?: number
+          collar_y?: number
+          collar_z?: number | null
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          depth?: number | null
+          dip?: number | null
+          estimated_cost?: number | null
+          id?: string
+          payload?: Json
+          priority?: string
+          project_id?: string
+          scenario?: string | null
+          status?: string
+          target_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_drill_targets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_drill_targets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_qaqc_reports: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          critical_count: number
+          id: string
+          issues: Json
+          label: string | null
+          project_id: string
+          summary: Json
+          warning_count: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          critical_count?: number
+          id?: string
+          issues?: Json
+          label?: string | null
+          project_id: string
+          summary?: Json
+          warning_count?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          critical_count?: number
+          id?: string
+          issues?: Json
+          label?: string | null
+          project_id?: string
+          summary?: Json
+          warning_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_qaqc_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_qaqc_reports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      engine_reports_generated: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          format: string
+          id: string
+          kind: string
+          payload: Json | null
+          project_id: string
+          storage_path: string | null
+          title: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          format?: string
+          id?: string
+          kind: string
+          payload?: Json | null
+          project_id: string
+          storage_path?: string | null
+          title?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          format?: string
+          id?: string
+          kind?: string
+          payload?: Json | null
+          project_id?: string
+          storage_path?: string | null
+          title?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engine_reports_generated_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "engine_reports_generated_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       evidence_capture_audit: {
         Row: {
           created_at: string
