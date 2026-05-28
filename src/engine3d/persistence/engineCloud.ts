@@ -48,8 +48,8 @@ export async function saveBlockModelVersion(input: {
       version_label: input.versionLabel,
       input_hash: input.inputHash ?? null,
       settings_hash: input.settingsHash ?? null,
-      settings: input.settings ?? {},
-      resource_summary: input.resourceSummary ?? {},
+      settings: (input.settings ?? {}) as never,
+      resource_summary: (input.resourceSummary ?? {}) as never,
       block_count: input.blockCount ?? null,
       binary_path: input.binaryPath ?? null,
       notes: input.notes ?? null,
@@ -74,8 +74,8 @@ export async function saveQAQCReport(input: {
   const { error } = await supabase.from("engine_qaqc_reports").insert({
     project_id: input.projectId,
     label: input.label ?? null,
-    summary: input.summary,
-    issues: input.issues,
+    summary: input.summary as never,
+    issues: input.issues as never,
     critical_count: input.criticalCount,
     warning_count: input.warningCount,
     created_by: user?.id ?? null,
@@ -96,10 +96,10 @@ export async function saveAIInterpretation(input: {
   const { error } = await supabase.from("engine_ai_interpretations").insert({
     project_id: input.projectId,
     block_model_version_id: input.blockModelVersionId ?? null,
-    summary: input.summary,
+    summary: input.summary as never,
     uncertainty: input.uncertainty,
     upside: input.upside,
-    payload: input.payload,
+    payload: input.payload as never,
     created_by: user?.id ?? null,
   });
   if (error) throw error;
@@ -192,7 +192,7 @@ export async function saveGeneratedReport(input: {
     kind: input.kind,
     title: input.title ?? null,
     format: input.format ?? "json",
-    payload: input.payload ?? null,
+    payload: (input.payload ?? null) as never,
     storage_path: input.storagePath ?? null,
     created_by: user?.id ?? null,
   });
@@ -215,7 +215,7 @@ export async function logEngineAudit(input: {
     action: input.action,
     entity_type: input.entityType ?? null,
     entity_id: input.entityId ?? null,
-    payload: input.payload ?? {},
+    payload: (input.payload ?? {}) as never,
   });
 }
 
