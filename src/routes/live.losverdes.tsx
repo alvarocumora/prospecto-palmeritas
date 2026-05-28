@@ -162,19 +162,35 @@ function LiveLosVerdesPage() {
             Live · Los Verdes · Tilama
           </div>
         </div>
-        <Button
-          size="sm"
-          onClick={handlePdf}
-          disabled={pdfBusy || !reportQ.data}
-          className="bg-gold hover:bg-gold/90 text-background h-7 text-[11px]"
-        >
-          {pdfBusy ? (
-            <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-          ) : (
-            <FileDown className="w-3 h-3 mr-1.5" />
-          )}
-          Informe PDF
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleSyncCatastro}
+            disabled={catBusy}
+            className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
+          >
+            {catBusy ? (
+              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+            ) : (
+              <Layers className="w-3 h-3 mr-1.5" />
+            )}
+            Sincronizar catastro SERNAGEOMIN
+          </Button>
+          <Button
+            size="sm"
+            onClick={handlePdf}
+            disabled={pdfBusy || !reportQ.data}
+            className="bg-gold hover:bg-gold/90 text-background h-7 text-[11px]"
+          >
+            {pdfBusy ? (
+              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+            ) : (
+              <FileDown className="w-3 h-3 mr-1.5" />
+            )}
+            Informe PDF
+          </Button>
+        </div>
       </div>
 
       <div className="p-3 md:p-4 space-y-4 max-w-[1600px] mx-auto">
