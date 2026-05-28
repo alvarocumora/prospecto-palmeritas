@@ -77,7 +77,7 @@ export async function saveQAQCReport(input: {
   const { error } = await supabase.from("engine_qaqc_reports").insert({
     project_id: input.projectId,
     label: input.label ?? null,
-    summary: input.summary,
+    summary: toJson(input.summary),
     issues: input.issues as unknown as Json,
     critical_count: input.criticalCount,
     warning_count: input.warningCount,
