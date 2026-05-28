@@ -404,10 +404,28 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                 </span>
               </div>
               {renderMode === "iso" && iso && (
-                <div>
-                  field {iso.resolution}³ ·{" "}
-                  <span className="text-orange-300">{iso.triangleCount.toLocaleString()}</span> tri
-                </div>
+                <>
+                  <div>
+                    field {iso.resolution}³ ·{" "}
+                    <span className="text-orange-300">{iso.triangleCount.toLocaleString()}</span> tri ·{" "}
+                    <span className={iso.mode === "mc" ? "text-emerald-300" : iso.mode === "blob" ? "text-amber-300" : "text-rose-300"}>
+                      {iso.mode}
+                    </span>
+                  </div>
+                  <div className="text-[9px]">
+                    iso={iso.finalIsovalue.toFixed(2)} · r={Math.round(iso.searchRadius)}m ·{" "}
+                    v[{iso.valueStats.min.toFixed(2)}-{iso.valueStats.max.toFixed(2)}] avg {iso.valueStats.avg.toFixed(2)}
+                  </div>
+                  <div className="text-[9px]">
+                    field [{iso.fieldMin.toFixed(2)}-{iso.fieldMax.toFixed(2)}] · vox {iso.activeVoxels} · cells&gt;iso {iso.cellsAboveIso}
+                    {iso.triedIsovalues.length > 1 && (
+                      <> · tried {iso.triedIsovalues.map((v) => v.toFixed(2)).join("→")}</>
+                    )}
+                  </div>
+                  {iso.mode === "blob" && (
+                    <div className="text-[9px] text-amber-300">fallback blobs: {iso.blobs.length}</div>
+                  )}
+                </>
               )}
               {renderMode === "voxel" && voxels && (
                 <div>
