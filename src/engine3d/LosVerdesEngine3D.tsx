@@ -9,8 +9,8 @@ import { Canvas } from "@react-three/fiber";
 import { MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
-import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain } from "lucide-react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
 import { getDrillholes, type DrillholeSegment } from "@/engine3d/data/drillholes.functions";
@@ -19,6 +19,8 @@ import { useIsosurface, DEFAULT_ISO_PARAMS, type IsosurfaceParams } from "@/engi
 import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainDEM";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
+import { useSection } from "@/engine3d/hooks/useSection";
+import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
 import { AnomalyVoxelLayer } from "@/engine3d/layers/AnomalyVoxelLayer";
 import { AnomalyIsosurfaceLayer } from "@/engine3d/layers/AnomalyIsosurfaceLayer";
 import { AnomalyPointsLayer } from "@/engine3d/layers/AnomalyPointsLayer";
