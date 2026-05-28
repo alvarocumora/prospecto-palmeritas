@@ -78,6 +78,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [sectionTrigger, setSectionTrigger] = useState(0);
   const [showSectionPanel, setShowSectionPanel] = useState(false);
   const [followHoleId, setFollowHoleId] = useState<string | null>(null);
+  const [blockParams, setBlockParams] = useState<BlockModelParams>(DEFAULT_BLOCK_PARAMS);
+  const [blockFilters, setBlockFilters] = useState<BlockFilters>(DEFAULT_BLOCK_FILTERS);
+  const [showBlocks, setShowBlocks] = useState(true);
+  const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [showImportPanel, setShowImportPanel] = useState(false);
+  const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
+  const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
