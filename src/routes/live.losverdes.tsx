@@ -112,7 +112,9 @@ function LiveLosVerdesPage() {
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
+  const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+
 
   useEffect(() => {
     return onLosVerdesFocus((evt) => {
