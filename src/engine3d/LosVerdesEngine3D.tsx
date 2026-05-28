@@ -463,6 +463,26 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           )}
         </div>
 
+        {/* Basemap / GIS */}
+        <BasemapPanel
+          source={basemapSource}
+          onSource={setBasemapSource}
+          opacity={basemapOpacity}
+          onOpacity={setBasemapOpacity}
+          ve={verticalExaggeration}
+          onVe={setVe}
+          showCoords={showCoords}
+          onShowCoords={setShowCoords}
+          showScaleBar={showScaleBar}
+          onShowScaleBar={setShowScaleBar}
+          showNorth={showNorth}
+          onShowNorth={setShowNorth}
+          centerLng={pointsQ.data?.center.lng ?? 0}
+          centerLat={pointsQ.data?.center.lat ?? 0}
+          extentMeters={BASEMAP_EXTENT}
+          status={basemapStatus}
+        />
+
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
           <div className="flex items-center gap-2">
