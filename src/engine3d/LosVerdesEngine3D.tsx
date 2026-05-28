@@ -736,14 +736,16 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
-      <div className="absolute bottom-2 right-2 z-10 bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border">
-        <div className="uppercase tracking-wider text-muted-foreground mb-1">leyenda</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-gradient-to-r from-purple-900 via-orange-500 to-amber-200" /> intensidad geo</div>
-        <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-yellow-400" /> anomalía geofísica</div>
-        <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-cyan-400" /> anomalía satelital</div>
-        <div className="flex items-center gap-2"><span className="w-1.5 h-3 rounded-sm bg-amber-400" /> sondaje</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#6b5a44]" /> terreno DEM</div>
+      <div className="absolute bottom-2 right-2 z-10 bg-black/75 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-border space-y-0.5">
+        <div className="uppercase tracking-wider text-emerald-300 mb-1">debug · canvas mounted</div>
+        <div>cam: [{cameraInitial.join(", ")}]</div>
+        <div>points: {points.length} · holes: {holes.length}</div>
+        <div>iso tri: {iso?.triangleCount ?? 0} · dem tri: {demMesh?.triangleCount ?? 0}</div>
+        <div>blocks: {blockModel?.count ?? 0} · targets: {drillTargets?.targets.length ?? 0}</div>
+        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span></div>
+        {blockError ? <div className="text-red-400">err: {String(blockError).slice(0, 50)}</div> : null}
       </div>
+
 
       <Canvas
         frameloop="demand"
