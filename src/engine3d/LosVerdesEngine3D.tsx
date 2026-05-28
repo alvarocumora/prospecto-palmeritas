@@ -999,7 +999,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         if (!pointsQ.data && !holesQ.data) return null;
         const msgs: string[] = [];
         if (anomaliesSource === "empty" && drillholesSource === "empty") msgs.push("No source data loaded");
-        if (points.length > 0 && (!iso || iso.vertexCount === 0) && !isoBusy)
+        if (points.length > 0 && iso && iso.mode === "blob")
+          msgs.push(`MC empty → blob fallback (iso ${iso.finalIsovalue.toFixed(2)}, fMax ${iso.fieldMax.toFixed(2)})`);
+        if (points.length > 0 && (!iso || (iso.vertexCount === 0 && iso.mode !== "blob")) && !isoBusy)
           msgs.push("Anomalies loaded but MC empty");
         if (drillholesSource === "planned-from-targets")
           msgs.push("Drillholes missing, using planned targets");
