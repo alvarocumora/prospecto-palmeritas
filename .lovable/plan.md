@@ -1,169 +1,44 @@
 
-# Informe Técnico Pre-NI 43-101 / JORC — Alto Los Verdes 5 (Tilama)
+# Láminas 3D estilo Leapfrog / Datamine — Los Verdes 5
 
-Proyecto: **LV-TIL-001 · Distrito Cuprífero Los Verdes – Tilama** (Coquimbo, Cu-Au-Ag).
-Entregable: **página interactiva navegable + export PDF idéntico**, con escena 3D estilo Datamine embebida y secciones pre-NI 43-101 completas. Datos reales del backend + IA Lovable (`google/gemini-2.5-pro`) rellenando vacíos como "modelo preliminar" claramente etiquetado.
+Voy a regenerar el anexo visual del PDF (`Geocapitals-LosVerdes5-PreNI43101_v4.pdf`) reemplazando las láminas 3D actuales por renders al nivel de las referencias que enviaste (Leapfrog Geo + Datamine + Wolfpass scene view).
 
----
+## Láminas a producir
 
-## 1. Datos reales ya disponibles en backend
+1. **L3D-1 · Scene View tipo Wolfpass (sección oblicua con shells de ley)**
+   - DEM Copernicus drapeado con hillshade verde-oscuro semitransparente (terreno "flotante").
+   - Shells anidados de pórfido tipo isosurfaces de ley: núcleo naranja (>0.6 % Cu eq), halo amarillo (0.3–0.6), envoltura verde (0.1–0.3), exterior azul (<0.1).
+   - Vetas como planos translúcidos lila/cian con dip real (75–85°).
+   - Sondajes propuestos como cilindros verticales/inclinados magenta + verde (priorizados).
+   - Eje Z (Elev) lateral con tics +2400 a +3400, grilla de coordenadas UTM en el piso, escala gráfica y rosa de plunge/azimuth.
 
-Verificado para `project_id = 7a499b02-…`:
+2. **L3D-2 · Leapfrog Geological Model (mapa geológico drapeado en 3D)**
+   - Hillshade alta resolución + capas litológicas Fm. Lo Prado / intrusivos / cuaternario con colores estándar de carta geológica.
+   - Sistemas de fallas (Uniseason, Coldgleam, Throt) trazados sobre el terreno con simbología de strike-dip.
+   - Pliegues y contactos como líneas vectoriales nítidas.
+   - Panel lateral simulado con árbol de proyecto (Topografía / Drillholes / Designs / Geophysical Data / Structural Modelling / Geological Model) — sólo decorativo, estilo screenshot.
 
-| Capa | Cantidad | Fuente |
-|------|---------:|--------|
-| Concesiones catastro | 15 | `mining_concessions` |
-| Anomalías satelitales | 45 | `satellite_anomalies` |
-| Vetas modeladas | 6 | `veins` |
-| Exploration targets | 108 | `exploration_targets` |
-| Mag targets | 10 | `mag_targets` |
-| Resource model | 1 | `resource_models` |
-| Sondajes históricos | 0 → **IA preliminar** |
-| Geofísica IP/Mag | 0 → **IA preliminar** |
-| QAQC | 0 → **IA preliminar** |
+3. **L3D-3 · Vein + Block model + Geofísica (diptico tipo IMG_0026)**
+   - Izquierda: panel de veta La Guanaca como wireframe magenta con malla de sondajes verticales cotados (−50, −100, −150, −200, −250 m), plano de sección verde translúcido y traza A-A' punteada azul.
+   - Derecha: ortofoto drapeada con anomalía magnetométrica/gravimétrica como volumen voxelizado (azul→verde→amarillo→rojo) en profundidad, targets como cubos rojos sobre superficie, sondajes propuestos como líneas verdes.
 
-Todo lo marcado "IA preliminar" lleva watermark visible en informe y panel: *"Modelo preliminar generado por IA — no apto para reporte NI 43-101 / JORC público sin campaña de validación"*.
+4. **L3D-4 · Plan minero 3D (vista isométrica)**
+   - Mismo DEM con pit conceptual escalonado (bancos 10 m) en F1, galerías subterráneas como tubos cian en F2, footprint de planta 2 500 t/d y depósito de relaves en F3.
+   - Etiquetas de fase y flujo de mineral con flechas 3D.
 
----
+## Implementación técnica
 
-## 2. Arquitectura del entregable
+- Script Python `/tmp/build_figs_v4.py` usando:
+  - `pyvista` (render off-screen vía xvfb) para escenas 3D reales con shells, mallas y cilindros → exporta PNG 300 dpi.
+  - Fallback `matplotlib` 3D + `Poly3DCollection` para shells anidados si pyvista no compila en sandbox.
+  - `rasterio` + tiles ESRI World Imagery (z14) ya cacheados para drapear textura sobre DEM Copernicus.
+  - `Pillow` para componer leyendas, ejes Z laterales, rosas de orientación y barras de escala estilo Leapfrog.
+- Datos reales del proyecto LV-TIL-001: 6 vetas (strike/dip), 108 targets, 45 anomalías sat, DEM real ya en `scene3d.server`.
+- Composición final con `reportlab` + `pypdf` → merge con el informe base.
+- QA: convertir cada lámina a JPEG y revisar visualmente (overlap, recortes, leyendas legibles) antes de entregar.
 
-```text
-src/routes/_authenticated.reports.losverdes.pre43101.tsx   ← página interactiva
-src/routes/api/reports/losverdes-pdf.ts                    ← endpoint export PDF (server route)
-src/features/reports/pre43101/
-  ├─ Pre43101Shell.tsx          ← layout con TOC sticky + secciones
-  ├─ sections/
-  │   ├─ ExecutiveSummary.tsx   ← §1 Summary
-  │   ├─ PropertyCatastro.tsx   ← §2 Property + 15 concesiones + mapa
-  │   ├─ Geology.tsx            ← §3 Regional + local + alteración
-  │   ├─ Exploration.tsx        ← §4 Sat (45) + Geofísica IA
-  │   ├─ Drilling.tsx           ← §5 Sondajes (IA preliminar)
-  │   ├─ SampleQAQC.tsx         ← §6 QAQC IA preliminar
-  │   ├─ MineralResource.tsx    ← §7 Resource model + 6 vetas
-  │   ├─ Targets3D.tsx          ← §8 Visor 3D Datamine embebido (foco)
-  │   ├─ RiskOpportunities.tsx  ← §9
-  │   └─ Recommendations.tsx    ← §10 Plan + presupuesto + QP
-  ├─ data/usePre43101Data.ts    ← un solo serverFn que devuelve todo
-  ├─ ai/generateNarrative.functions.ts ← IA por sección
-  └─ export/pdfBuilder.ts       ← jspdf + html2canvas para PDF idéntico
-```
+## Entregable
 
-### Visor 3D Datamine embebido
+`Geocapitals-LosVerdes5-PreNI43101_v4.pdf` con las 4 nuevas láminas 3D reemplazando las actuales L3 y L4, manteniendo L1 (ortofoto) y L2 (estructural) sin cambios.
 
-Reutiliza `LosVerdesEngine3D` (motor ya existe con DEM Martini + ESRI drape + isosurface + drillholes + block model + AI targets). En la sección §8 se monta con:
-
-- Modo **Cinematic** por defecto (no Debug)
-- Camera fly-through automático: catastro → anomalías sat → vetas → sondajes → targets
-- Panel lateral con `AITargetTable` (top 10 targets rankeados)
-- Botón **"Snapshot al PDF"** que captura WebGL → canvas → embebe en página correspondiente
-
-### Export PDF
-
-Server route `/api/reports/losverdes-pdf` recibe el `reportId`, renderiza con Puppeteer **no** (no compatible Workers) → usa **`@react-pdf/renderer`** server-side replicando layout, con snapshots del 3D capturados previamente desde el cliente y subidos a Supabase Storage (`reports/losverdes/{reportId}/snap-*.png`).
-
----
-
-## 3. Secciones del informe (estándar NI 43-101 / JORC Table 1)
-
-| § | Sección | Fuente datos |
-|---|---------|--------------|
-| 1 | Summary ejecutivo | IA sintetiza KPIs reales |
-| 2 | Property & catastro | 15 concesiones reales + estado patentes |
-| 3 | Accessibility, climate, infra | IA (Tilama, ruta D-71) |
-| 4 | History | IA + minas vecinas conocidas |
-| 5 | Geological setting | IA + 6 vetas reales |
-| 6 | Deposit types | IA (IOCG / pórfido Cu-Au) |
-| 7 | Exploration | 45 anomalías sat reales + mapa |
-| 8 | Drilling | "Modelo preliminar IA" + 108 targets planificados |
-| 9 | Sample prep, QAQC | "Modelo preliminar IA" |
-| 10 | Data verification | Auto-check vs. backend |
-| 11 | Mineral processing | IA (preliminar) |
-| 12 | Mineral resource estimate | 1 resource model real + 6 vetas |
-| 13 | Adjacent properties | IA + concesiones vecinas |
-| 14 | **Visor 3D Datamine** | LosVerdesEngine3D embebido |
-| 15 | Interpretación y conclusiones | IA con todo el contexto |
-| 16 | Recomendaciones + presupuesto | IA, fases 1-2-3 con USD |
-| 17 | QP statement | Placeholder editable |
-
----
-
-## 4. Capa IA (Lovable AI Gateway)
-
-`generateNarrative.functions.ts` — `createServerFn` por sección, modelo `google/gemini-2.5-pro`, structured output con Zod:
-
-```ts
-Output.object({ schema: z.object({
-  title: z.string(),
-  paragraphs: z.array(z.string()),
-  bullets: z.array(z.string()).optional(),
-  tables: z.array(z.object({ headers: z.array(z.string()), rows: z.array(z.array(z.string())) })).optional(),
-  warnings: z.array(z.string()).optional(), // marca "preliminar"
-}) })
-```
-
-Cache por `(project_id, section, data_hash)` en tabla `report_section_cache` para no re-llamar IA en cada visita. Regenerar bajo demanda con botón.
-
----
-
-## 5. Migración DB
-
-Una sola tabla nueva:
-
-```sql
-CREATE TABLE public.report_section_cache (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  project_id uuid NOT NULL REFERENCES public.projects(id) ON DELETE CASCADE,
-  section text NOT NULL,
-  data_hash text NOT NULL,
-  payload jsonb NOT NULL,
-  model text NOT NULL,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE(project_id, section, data_hash)
-);
--- GRANTs authenticated + service_role, RLS por organization_id via projects join
-```
-
-Bucket Storage `reports` (privado) para PDFs + snapshots 3D.
-
----
-
-## 6. Navegación
-
-- Link nuevo en `/dashboard` → "Informe pre-NI 43-101" (visible solo en proyectos con `commodity` minero).
-- Ruta: `/_authenticated/reports/losverdes/pre43101`
-- Botón flotante **"Descargar PDF"** persistente.
-
----
-
-## 7. Orden de ejecución (un solo turno de build)
-
-1. Migración `report_section_cache` + bucket `reports`
-2. `usePre43101Data` serverFn (agrega los 11 queries de §1 en uno)
-3. `generateNarrative` serverFn IA + cache
-4. `Pre43101Shell` + 10 componentes de sección
-5. Embeber `LosVerdesEngine3D` en `Targets3D.tsx` con fly-through
-6. `pdfBuilder` con `@react-pdf/renderer` (instalar dep)
-7. Server route `/api/reports/losverdes-pdf`
-8. Link en dashboard + ruta TanStack
-
----
-
-## 8. Detalles técnicos
-
-- **No nuevas deps 3D**: el motor ya existe (`LosVerdesEngine3D` + `TerrainMartiniLayer` + `AnomalyIsosurfaceLayer` + `DrillholesLayer` + `BlockModelLayer`).
-- **Nueva dep**: `@react-pdf/renderer` (Worker-compatible, pure JS).
-- **IA**: Lovable AI Gateway con `google/gemini-2.5-pro`, secret `LOVABLE_API_KEY` ya provisionado.
-- **Snapshots 3D**: capturados client-side con `gl.domElement.toDataURL('image/png')` desde el `Canvas` de R3F, subidos vía `supabase.storage.from('reports').upload()`.
-- **i18n**: informe completo en **español** (consistente con producto), con switch ES/EN futuro.
-- **Watermark "preliminar"**: badge rojo en cada sección IA + nota legal al pie del PDF.
-
----
-
-## 9. Fuera de alcance
-
-- Firma digital QP (placeholder editable, sin DocuSign integrado en esta iteración).
-- Estimación de recursos real (se usa el 1 modelo ya existente; no se re-corre kriging).
-- Traducción EN/FR del PDF.
-- Publicación a SERNAGEOMIN o sitio público (informe queda privado al proyecto).
-
+¿Procedo?
