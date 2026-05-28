@@ -108,6 +108,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [activeTab, setActiveTab] = useState<EngineTab>("viewer");
   const [ni43Mode, setNi43Mode] = useState(false);
 
+  // Sprint 5: AI Geologist + Targets + Reports
+  const [aiInterpretation, setAiInterpretation] = useState<AIInterpretation | null>(null);
+  const [scenarioIds, setScenarioIds] = useState<Set<string>>(new Set());
+  const [showTargets3D, setShowTargets3D] = useState(true);
+  const [hoveredTarget, setHoveredTarget] = useState<DrillTarget | null>(null);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
 
