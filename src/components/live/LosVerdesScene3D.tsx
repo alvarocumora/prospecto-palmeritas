@@ -948,6 +948,69 @@ export function LosVerdesScene3D({
     else m.once("idle", apply);
   }, [exag]);
 
+  // Drillholes: rebuild GeoJSON pinned to DEM cada vez que cambian los datos
+  useEffect(() => {
+    const m = mapRef.current;
+    if (!m) return;
+    const apply = () => {
+      const src = m.getSource("drillholes") as maplibregl.GeoJSONSource | undefined;
+      const collarsSrc = m.getSource("drillhole-collars") as maplibregl.GeoJSONSource | undefined;
+      if (!src || !collarsSrc) return;
+      const features: GeoJSON.Feature[] = [];
+      const collarFeatures: GeoJSON.Feature[] = [];
+      for (const h of drillholes) {
+        const elev = m.queryTerrainElevation
+          ? (m.queryTerrainElevation([h.collar_lng, h.collar_lat]) ?? 0)
+          : 0;
+        collarFeatures.push({
+          type: "Feature",
+          geometry: { type: "Point", coordinates: [h.collar_lng, h.collar_lat] },
+          properties: {
+            hole_id: h.hole_id,
+            vein_code: h.vein_code,
+            depth_m: h.depth_m,
+            azimuth_deg: h.azimuth_deg,
+            dip_deg: h.dip_deg,
+            max_cu_pct: h.max_cu_pct,
+            max_au_gpt: h.max_au_gpt,
+          },
+        });
+        for (const seg of h.segments) {
+          const sinDip = Math.sin((h.dip_deg * Math.PI) / 180);
+          const top = Math.max(0, elev - seg.depth_from_m * sinDip);
+          const base = Math.max(0, elev - seg.depth_to_m * sinDip);
+          features.push({
+            type: "Feature",
+            geometry: { type: "Polygon", coordinates: [seg.ring] },
+            properties: {
+              hole_id: h.hole_id,
+              vein_code: h.vein_code,
+              color: seg.color,
+              base,
+              top,
+              from_m: seg.assay.from_m,
+              to_m: seg.assay.to_m,
+              cu_pct: seg.assay.cu_pct,
+              au_gpt: seg.assay.au_gpt,
+              ag_gpt: seg.assay.ag_gpt,
+            },
+          });
+        }
+      }
+      src.setData({ type: "FeatureCollection", features });
+      collarsSrc.setData({ type: "FeatureCollection", features: collarFeatures });
+    };
+    if (m.isStyleLoaded()) {
+      apply();
+      // Re-aplicar cuando el DEM esté listo
+      m.once("idle", apply);
+    } else {
+      m.once("idle", apply);
+    }
+  }, [drillholes]);
+
+
+
   // Cursor crosshair cuando sectionMode activo
   useEffect(() => {
     const m = mapRef.current;
