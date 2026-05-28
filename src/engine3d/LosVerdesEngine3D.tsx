@@ -101,6 +101,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     blockParams.enabled ? points : [],
     blockParams,
   );
+  const { mesh: demMesh, busy: demBusy, loading: demLoading } = useTerrainDEM(
     projectId,
     demEnabled,
     demQuality,
