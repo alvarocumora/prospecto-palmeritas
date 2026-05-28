@@ -166,7 +166,7 @@ function KV({ k, v, cls }: { k: string; v: string | number; cls?: string }) {
   );
 }
 
-function buildReport(args: Props) {
+function buildReport(args: Omit<Props, "onClose">) {
   const generatedAt = Date.now();
   const payload = {
     projectId: args.projectId,
