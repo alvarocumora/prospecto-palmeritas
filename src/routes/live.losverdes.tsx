@@ -254,7 +254,7 @@ function LiveLosVerdesPage() {
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
               {engineMode === "new"
-                ? "Engine 3D · Voxel IDW · Isosurface IA (sprint 1)"
+                ? "Engine 3D · Marching Cubes · IDW · Sondajes (sprint 2)"
                 : "Visor 3D · Esri + DEM · Anomalías · Vetas · Plan"}
             </h2>
             <div className="flex items-center gap-2">
