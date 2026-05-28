@@ -63,7 +63,7 @@ export function DrillholesLayer({
         });
       }
       return new THREE.MeshStandardMaterial({
-        vertexColors: false,
+        vertexColors: true,
         metalness: 0.35,
         roughness: 0.45,
         emissive: new THREE.Color(0x111111),
