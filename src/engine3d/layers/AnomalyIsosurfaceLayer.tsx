@@ -78,16 +78,20 @@ export function AnomalyIsosurfaceLayer({
 
   const material = useMemo(
     () =>
-      new THREE.MeshStandardMaterial({
+      new THREE.MeshPhysicalMaterial({
         vertexColors: true,
         transparent: true,
         opacity,
-        metalness: 0.05,
+        metalness: 0.0,
         roughness: 0.55,
+        transmission: 0.15,
+        thickness: 1.5,
+        clearcoat: 0.35,
+        clearcoatRoughness: 0.4,
         emissive: new THREE.Color(0x140602),
-        emissiveIntensity: 0.35,
+        emissiveIntensity: 0.45,
         side: THREE.DoubleSide,
-        depthWrite: opacity > 0.85,
+        depthWrite: false,
         clippingPlanes: clippingPlanes ?? [],
         clipShadows: true,
       }),
@@ -97,7 +101,7 @@ export function AnomalyIsosurfaceLayer({
 
   useEffect(() => {
     material.opacity = opacity;
-    material.depthWrite = opacity > 0.85;
+    material.depthWrite = false;
     material.clippingPlanes = clippingPlanes ?? [];
     material.needsUpdate = true;
   }, [material, opacity, clippingPlanes]);

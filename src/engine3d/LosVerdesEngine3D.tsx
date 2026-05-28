@@ -55,6 +55,7 @@ import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
 import { BasemapPanel, NorthArrow, ScaleBar } from "@/engine3d/panels/BasemapPanel";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
+import { CinematicEffects } from "@/engine3d/layers/CinematicEffects";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
@@ -133,6 +134,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showNorth, setShowNorth] = useState(true);
   const [basemapStatus, setBasemapStatus] = useState<{ source: BasemapSource; failed: boolean; zoom: number } | null>(null);
   const BASEMAP_EXTENT = 4000;
+
+  // Sprint: Cinematic look (Leapfrog/Datamine style)
+  const [cinematic, setCinematic] = useState(true);
+  const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
+  const [volumeFog, setVolumeFog] = useState(true);
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
@@ -482,6 +488,39 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           extentMeters={BASEMAP_EXTENT}
           status={basemapStatus}
         />
+
+        {/* Cinematic */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="uppercase tracking-wider text-amber-300">Cinematic · Leapfrog look</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCinematic((v) => !v)}
+              className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${cinematic ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+            >
+              {cinematic ? "SSAO+Bloom ON" : "OFF"}
+            </button>
+            <button
+              onClick={() => setVolumeFog((v) => !v)}
+              className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${volumeFog ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+            >
+              Volume Fog
+            </button>
+          </div>
+          <div className="flex gap-1">
+            {(["soft", "medium", "strong"] as const).map((lv) => (
+              <button
+                key={lv}
+                onClick={() => setCineIntensity(lv)}
+                className={`flex-1 px-1.5 py-1 rounded border text-[9px] uppercase tracking-wider ${cineIntensity === lv ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+              >
+                {lv}
+              </button>
+            ))}
+          </div>
+        </div>
+
 
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
@@ -939,11 +978,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           setTimeout(() => invalidate(), 300);
         }}
       >
-        <color attach="background" args={["#1a1a1f"]} />
-        <ambientLight intensity={1.2} />
-        <hemisphereLight args={["#ffffff", "#222233", 0.6]} />
-        <directionalLight position={[1500, 2500, 1500]} intensity={1} />
-        <directionalLight position={[-1500, 1200, -1500]} intensity={0.4} />
+        <color attach="background" args={[cinematic ? "#0a0f18" : "#1a1a1f"]} />
+        {volumeFog && <fog attach="fog" args={[cinematic ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
+        <ambientLight intensity={0.7} />
+        <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />
+        <directionalLight position={[5000, 8000, 3000]} intensity={1.8} color="#fff4e0" />
+        <directionalLight position={[-3000, 2500, -2500]} intensity={0.35} color="#88a0c8" />
 
         {/* Debug helpers — always-on baseline so viewer is never blank */}
         <axesHelper args={[1000]} />
@@ -1042,6 +1082,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
+        <CinematicEffects enabled={cinematic} intensity={cineIntensity} />
       </Canvas>
 
       {showNorth && <NorthArrow />}
