@@ -69,6 +69,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [demQuality, setDemQuality] = useState<TerrainQuality>("med");
   const [demWireframe, setDemWireframe] = useState(false);
   const [hoveredHole, setHoveredHole] = useState<DrillholeSegment | null>(null);
+  const [sectionWidth, setSectionWidth] = useState(25);
+  const [sectionTrigger, setSectionTrigger] = useState(0);
+  const [showSectionPanel, setShowSectionPanel] = useState(false);
+  const [followHoleId, setFollowHoleId] = useState<string | null>(null);
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
