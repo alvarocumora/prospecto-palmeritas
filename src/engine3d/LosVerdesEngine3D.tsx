@@ -396,7 +396,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </div>
           ) : (
             <div className="text-muted-foreground space-y-0.5">
-              <div>{pointsQ.data?.stats.count ?? 0} anomalías · {holes.length} sondajes</div>
+              <div>{pointsQ.data?.stats.count ?? 0} anomalías ({geoCount}geo·{satCount}sat) · {holes.length} sondajes</div>
+              <div className="text-[9px]">
+                src anom: <span className="text-cyan-300">{anomaliesSource}</span> · holes:{" "}
+                <span className={drillholesSource === "planned-from-targets" ? "text-amber-300" : "text-cyan-300"}>
+                  {drillholesSource}
+                </span>
+              </div>
               {renderMode === "iso" && iso && (
                 <div>
                   field {iso.resolution}³ ·{" "}
