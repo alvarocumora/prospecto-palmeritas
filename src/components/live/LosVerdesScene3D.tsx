@@ -163,6 +163,7 @@ export function LosVerdesScene3D({
   targets,
   veins = [],
   phases = [],
+  drillholes = [],
 }: {
   centerLat: number;
   centerLng: number;
@@ -172,6 +173,7 @@ export function LosVerdesScene3D({
   targets: PublicTarget[];
   veins?: VeinPublic[];
   phases?: MinePlanPhasePublic[];
+  drillholes?: LosVerdesDrillhole[];
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MLMap | null>(null);
