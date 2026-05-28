@@ -778,6 +778,8 @@ export function LosVerdesScene3D({
         "mag-halo",
         "veins-line",
         "phases-extr",
+        "drillholes-extr",
+        "drillholes-collars",
       ]) {
         map.on("mouseenter", id, () => (map.getCanvas().style.cursor = "pointer"));
         map.on("mouseleave", id, () => (map.getCanvas().style.cursor = ""));
