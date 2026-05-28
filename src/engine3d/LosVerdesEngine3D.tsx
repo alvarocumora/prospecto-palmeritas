@@ -212,6 +212,8 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [fxError, setFxError] = useState<string | null>(null);
   const [debugRenderMode, setDebugRenderMode] = useState(true);
   const [fitCameraNonce, setFitCameraNonce] = useState(0);
+  const [frameBounds, setFrameBounds] = useState<SceneBounds>(null);
+  const [frameNonce, setFrameNonce] = useState(0);
 
 
   const points = pointsQ.data?.points ?? [];
