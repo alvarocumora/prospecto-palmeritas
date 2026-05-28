@@ -176,6 +176,35 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     4000,
   );
 
+  // Sprint 5: Drill target ranking (worker)
+  const existingCollars = useMemo(
+    () => holes.map((h) => ({ x: h.collar.x, y: h.collar.y, z: h.collar.z })),
+    [holes],
+  );
+  const targetParams = useMemo(() => {
+    const critical = qaqcResult?.summary.critical ?? 0;
+    const penalty = critical > 0 ? Math.max(0.4, 1 - critical * 0.1) : 1;
+    return { ...DEFAULT_TARGET_PARAMS, qaqcPenalty: penalty };
+  }, [qaqcResult]);
+  const { output: drillTargets, busy: targetsBusy } = useDrillTargets(
+    points,
+    existingCollars,
+    targetParams,
+    points.length > 0,
+  );
+
+  // Sprint 5: log drill target generation
+  useEffect(() => {
+    if (drillTargets) {
+      auditTrail.log("blockmodel.build", {
+        kind: "drill.targets",
+        selected: drillTargets.stats.selected,
+        aPriority: drillTargets.stats.aPriority,
+      });
+    }
+  }, [drillTargets]);
+
+
   // Sprint 4: log block model rebuilds + versionado (después de useBlockModel)
   useEffect(() => {
     if (!blockModel) return;
