@@ -135,6 +135,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [basemapStatus, setBasemapStatus] = useState<{ source: BasemapSource; failed: boolean; zoom: number } | null>(null);
   const BASEMAP_EXTENT = 4000;
 
+  // Sprint: Cinematic look (Leapfrog/Datamine style)
+  const [cinematic, setCinematic] = useState(true);
+  const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
+  const [volumeFog, setVolumeFog] = useState(true);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
   const anomaliesSource = pointsQ.data?.source ?? "empty";
