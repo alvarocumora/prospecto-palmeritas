@@ -1041,6 +1041,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         <div>cam: [{cameraInitial.join(", ")}] · fit:
           <span className={autoFit ? "text-emerald-300" : "text-muted-foreground"}> {autoFit ? "auto" : "manual"}</span>
         </div>
+        <div>debug render: <span className={debugRenderMode ? "text-emerald-300" : "text-muted-foreground"}>{debugRenderMode ? "ON" : "off"}</span></div>
         <div>bounds: {sceneBounds
           ? `${sceneBounds.min.map((n) => n.toFixed(0)).join(",")} → ${sceneBounds.max.map((n) => n.toFixed(0)).join(",")}`
           : "—"}
@@ -1076,6 +1077,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           >
             fit
           </button>
+          <button
+            type="button"
+            onClick={forceFitCamera}
+            className="h-5 rounded text-[9px] uppercase border border-amber-400/60 text-amber-300"
+          >
+            force fit
+          </button>
         </div>
 
         {showLayerDebug && (
@@ -1093,49 +1101,51 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
 
       <Canvas
-        frameloop="demand"
+        frameloop={debugRenderMode ? "always" : "demand"}
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         camera={{ position: cameraInitial, fov: 45, near: 0.1, far: 1_000_000, up: [0, 1, 0] }}
         shadows={false}
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "100%", height: "100%", zIndex: 0, position: "relative", border: "1px solid cyan" }}
         onCreated={({ gl, invalidate }) => {
           gl.localClippingEnabled = true;
           setTimeout(() => invalidate(), 300);
         }}
       >
-        <color attach="background" args={[cinematic ? "#0a0f18" : "#1a1a1f"]} />
-        {volumeFog && <fog attach="fog" args={[cinematic ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
-        <ambientLight intensity={0.7} />
-        <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />
-        <directionalLight position={[5000, 8000, 3000]} intensity={1.8} color="#fff4e0" />
-        <directionalLight position={[-3000, 2500, -2500]} intensity={0.35} color="#88a0c8" />
+        <color attach="background" args={[debugRenderMode ? "#05070b" : cinematic ? "#0a0f18" : "#1a1a1f"]} />
+        {fogEnabled && <fog attach="fog" args={[cinematicEnabled ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
+        <ambientLight intensity={debugRenderMode ? 1.35 : 0.7} />
+        {!debugRenderMode && <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />}
+        {!debugRenderMode && <directionalLight position={[5000, 8000, 3000]} intensity={1.8} color="#fff4e0" />}
+        {!debugRenderMode && <directionalLight position={[-3000, 2500, -2500]} intensity={0.35} color="#88a0c8" />}
 
         {/* Debug helpers — always-on baseline so viewer is never blank */}
-        <axesHelper args={[1000]} />
-        {showGrid && <gridHelper args={[4000, 40, 0x666677, 0x333344]} />}
-        <mesh position={[0, 0, 0]}>
-          <sphereGeometry args={[15, 16, 16]} />
-          <meshStandardMaterial color="#ff3344" emissive="#661122" />
+        <axesHelper args={[5000]} renderOrder={1000} />
+        {effectiveShowGrid && <gridHelper args={[8000, 80, 0x88ffff, 0x224444]} />}
+        <mesh position={[0, 0, 0]} renderOrder={1000}>
+          <sphereGeometry args={[150, 20, 20]} />
+          <meshBasicMaterial color="#ff3344" toneMapped={false} depthTest={false} />
         </mesh>
+        <DebugSceneBounds bounds={renderBounds} />
+        <DebugOriginLabel />
 
         <Suspense fallback={null}>
           {noRealData && <SyntheticDemoScene verticalExaggeration={verticalExaggeration} />}
 
-          {visible("dem") && demEnabled && demMesh ? (
+          {visible("dem") && effectiveDemEnabled && demMesh ? (
             <TerrainMartiniLayer
               mesh={demMesh}
-              clippingPlanes={clippingPlanes}
+              clippingPlanes={clippingEnabled}
               wireframe={demWireframe}
             />
           ) : (
-            visible("dem") && showGrid && <TerrainPlane size={4000} />
+            visible("dem") && effectiveShowGrid && <TerrainPlane size={4000} />
           )}
 
           {(() => {
             const center = pointsQ.data?.center;
             if (!center || (center.lng === 0 && center.lat === 0)) return null;
-            if (basemapSource === "none") return null;
+            if (!basemapEnabled) return null;
             return (
               <BasemapLayer
                 source={basemapSource}
@@ -1143,7 +1153,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                 centerLat={center.lat}
                 extentMeters={BASEMAP_EXTENT}
                 opacity={basemapOpacity}
-                demMesh={demEnabled ? demMesh : null}
+                demMesh={effectiveDemEnabled ? demMesh : null}
                 onStatus={setBasemapStatus}
               />
             );
@@ -1151,54 +1161,56 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
 
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
-          {visible("iso") && showPoints && (
-            <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />
+          {visible("iso") && effectiveShowPoints && (
+            <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} unlit={debugRenderMode} />
           )}
-          {visible("iso") && showSurface && renderMode === "iso" && iso && (iso.vertexCount > 0 || iso.mode === "blob") && (
+          {visible("iso") && effectiveShowSurface && renderMode === "iso" && iso && (iso.vertexCount > 0 || iso.mode === "blob") && (
             <AnomalyIsosurfaceLayer
               iso={iso}
               opacity={opacity}
               verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingPlanes}
+              clippingPlanes={clippingEnabled}
             />
           )}
-          {visible("iso") && showSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
+          {visible("iso") && effectiveShowSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
             <AnomalyVoxelLayer
               voxels={voxels}
               opacity={opacity}
               verticalExaggeration={verticalExaggeration}
             />
           )}
-          {visible("holes") && showHoles && holes.length > 0 && (
+          {visible("holes") && effectiveShowHoles && holes.length > 0 && (
             <DrillholesLayer
               holes={holes}
               verticalExaggeration={verticalExaggeration}
               onHover={setHoveredHole}
-              clippingPlanes={clippingPlanes}
+              clippingPlanes={clippingEnabled}
+              unlit={debugRenderMode}
             />
           )}
-          {visible("blocks") && showBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
+          {visible("blocks") && effectiveShowBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
             <BlockModelLayer
               model={blockModel}
               filters={blockFilters}
               verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingPlanes}
+              clippingPlanes={clippingEnabled}
             />
           )}
-          {visible("debug") && showClipHelper && (
+          {visible("debug") && showClipHelper && !debugRenderMode && (
             <ClippingPlaneController params={effectiveClip} size={4500} />
           )}
-          {visible("targets") && showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
+          {visible("targets") && effectiveShowTargets3D && drillTargets && drillTargets.targets.length > 0 && (
             <DrillTargetLayer
               targets={drillTargets.targets}
               verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingPlanes}
+              clippingPlanes={clippingEnabled}
               onHover={setHoveredTarget}
             />
           )}
         </Suspense>
 
-        <AutoFitCamera bounds={sceneBounds} enabled={autoFit} />
+        <AutoFitCamera bounds={renderBounds} enabled={autoFit} trigger={fitCameraNonce} />
+        <ForceCameraFit bounds={renderBounds} trigger={fitCameraNonce} />
         <MapControls
           makeDefault
           enableDamping
@@ -1208,9 +1220,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
-        <InvalidateOnChange deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, sceneBounds]} />
+        <InvalidateOnChange deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, renderBounds, debugRenderMode]} />
         <CinematicEffects
-          enabled={cinematic}
+          enabled={cinematicEnabled}
           intensity={cineIntensity}
           onError={(m) => setFxError(m)}
         />
