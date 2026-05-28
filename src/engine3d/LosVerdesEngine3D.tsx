@@ -55,6 +55,7 @@ import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
 import { BasemapPanel, NorthArrow, ScaleBar } from "@/engine3d/panels/BasemapPanel";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
+import { CinematicEffects } from "@/engine3d/layers/CinematicEffects";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
