@@ -706,13 +706,24 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
-      {showSectionPanel && (
-        <SectionViewPanel
-          result={section.result}
-          busy={section.busy}
-          onClose={() => setShowSectionPanel(false)}
-          onFollowHole={(id) => setFollowHoleId(id)}
-          followHoleId={followHoleId}
+      {showResourcePanel && blockModel && (
+        <ResourceModelPanel
+          model={blockModel}
+          filters={blockFilters}
+          price={econ.price}
+          opex={econ.opex}
+          capex={econ.capex}
+          recovery={econ.recovery}
+          discount={econ.discount}
+          years={econ.years}
+          onClose={() => setShowResourcePanel(false)}
+        />
+      )}
+
+      {showImportPanel && (
+        <DrillholeImportPanel
+          onClose={() => setShowImportPanel(false)}
+          onImport={(b) => setImportedBundle(b)}
         />
       )}
     </div>
@@ -727,3 +738,19 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
     </div>
   );
 }
+
+function ClassChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`flex items-center justify-center gap-1 h-6 rounded text-[9px] uppercase border ${
+        active ? "border-amber-400/60 text-foreground" : "border-border/40 text-muted-foreground opacity-60"
+      }`}
+    >
+      <span className={`w-1.5 h-1.5 rounded-sm ${color}`} />
+      {label}
+    </button>
+  );
+}
+
