@@ -266,13 +266,17 @@ export function LosVerdesScene3D({
 
   useEffect(() => {
     if (!ref.current || mapRef.current) return;
+    const isMobile =
+      typeof window !== "undefined" && window.matchMedia("(max-width: 768px)").matches;
+    const initialPitch = isMobile ? 34 : 60;
+    const initialBearing = isMobile ? -8 : -25;
     const map = new maplibregl.Map({
       container: ref.current,
       style: buildStyle(),
       center: [centerLng, centerLat],
-      zoom: 12.5,
-      pitch: 62,
-      bearing: -25,
+      zoom: isMobile ? 11.1 : 12.5,
+      pitch: initialPitch,
+      bearing: initialBearing,
       maxPitch: 80,
     });
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
@@ -280,6 +284,24 @@ export function LosVerdesScene3D({
     map.addControl(new maplibregl.FullscreenControl(), "top-right");
 
     mapRef.current = map;
+    const handleWindowResize = () => resizeMap();
+
+    const resizeMap = () => {
+      try {
+        map.resize();
+      } catch {
+        /* ignore */
+      }
+    };
+
+    const resizeObserver =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(() => resizeMap())
+        : null;
+    resizeObserver?.observe(ref.current);
+    window.addEventListener("resize", handleWindowResize);
+    const resizeRaf = requestAnimationFrame(resizeMap);
+    const resizeTimer = window.setTimeout(resizeMap, 180);
 
     map.on("load", () => {
       // ---- Anomalías SAT (fill-extrusion anclado al DEM) ----
@@ -878,10 +900,24 @@ export function LosVerdesScene3D({
           (map.getSource("phases") as maplibregl.GeoJSONSource).setData(ph);
         }
       };
+      map.once("idle", () => {
+        resizeMap();
+        map.jumpTo({
+          center: [centerLng, centerLat],
+          zoom: isMobile ? 11.1 : 12.5,
+          pitch: initialPitch,
+          bearing: initialBearing,
+        });
+        pin();
+      });
       map.on("idle", pin);
     });
 
     return () => {
+      window.clearTimeout(resizeTimer);
+      cancelAnimationFrame(resizeRaf);
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", handleWindowResize);
       map.remove();
       mapRef.current = null;
       pinnedRef.current = false;
