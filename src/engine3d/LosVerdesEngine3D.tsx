@@ -945,11 +945,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           setTimeout(() => invalidate(), 300);
         }}
       >
-        <color attach="background" args={["#1a1a1f"]} />
-        <ambientLight intensity={1.2} />
-        <hemisphereLight args={["#ffffff", "#222233", 0.6]} />
-        <directionalLight position={[1500, 2500, 1500]} intensity={1} />
-        <directionalLight position={[-1500, 1200, -1500]} intensity={0.4} />
+        <color attach="background" args={[cinematic ? "#0a0f18" : "#1a1a1f"]} />
+        {volumeFog && <fog attach="fog" args={[cinematic ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
+        <ambientLight intensity={0.7} />
+        <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />
+        <directionalLight position={[5000, 8000, 3000]} intensity={1.8} color="#fff4e0" />
+        <directionalLight position={[-3000, 2500, -2500]} intensity={0.35} color="#88a0c8" />
 
         {/* Debug helpers — always-on baseline so viewer is never blank */}
         <axesHelper args={[1000]} />
