@@ -749,17 +749,27 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         frameloop="demand"
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
-        camera={{ position: cameraInitial, fov: 45, near: 1, far: 50_000, up: [0, 1, 0] }}
+        camera={{ position: cameraInitial, fov: 45, near: 0.1, far: 1_000_000, up: [0, 1, 0] }}
         shadows={false}
-        onCreated={({ gl }) => {
-          gl.localClippingEnabled = true;
+        style={{ width: "100%", height: "100%" }}
+        onCreated={({ gl, invalidate }) => {
+          gl.localClippingEnabled = sectionMode;
+          setTimeout(() => invalidate(), 300);
         }}
       >
-        <color attach="background" args={[0x08090c]} />
-        <fog attach="fog" args={[0x08090c, 3500, 12000]} />
-        <ambientLight intensity={0.55} />
-        <directionalLight position={[1500, 2500, 1500]} intensity={0.95} />
-        <directionalLight position={[-1500, 1200, -1500]} intensity={0.45} />
+        <color attach="background" args={["#1a1a1f"]} />
+        <ambientLight intensity={1.2} />
+        <hemisphereLight args={["#ffffff", "#222233", 0.6]} />
+        <directionalLight position={[1500, 2500, 1500]} intensity={1} />
+        <directionalLight position={[-1500, 1200, -1500]} intensity={0.4} />
+
+        {/* Debug helpers — always-on baseline so viewer is never blank */}
+        <axesHelper args={[1000]} />
+        {showGrid && <gridHelper args={[4000, 40, 0x666677, 0x333344]} />}
+        <mesh position={[0, 0, 0]}>
+          <sphereGeometry args={[15, 16, 16]} />
+          <meshStandardMaterial color="#ff3344" emissive="#661122" />
+        </mesh>
 
         <Suspense fallback={null}>
           {demEnabled && demMesh ? (
@@ -771,6 +781,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           ) : (
             showGrid && <TerrainPlane size={4000} />
           )}
+
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
           {showPoints && <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />}
           {showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
