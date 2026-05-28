@@ -489,6 +489,39 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           status={basemapStatus}
         />
 
+        {/* Cinematic */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="uppercase tracking-wider text-amber-300">Cinematic · Leapfrog look</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCinematic((v) => !v)}
+              className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${cinematic ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+            >
+              {cinematic ? "SSAO+Bloom ON" : "OFF"}
+            </button>
+            <button
+              onClick={() => setVolumeFog((v) => !v)}
+              className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${volumeFog ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+            >
+              Volume Fog
+            </button>
+          </div>
+          <div className="flex gap-1">
+            {(["soft", "medium", "strong"] as const).map((lv) => (
+              <button
+                key={lv}
+                onClick={() => setCineIntensity(lv)}
+                className={`flex-1 px-1.5 py-1 rounded border text-[9px] uppercase tracking-wider ${cineIntensity === lv ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+              >
+                {lv}
+              </button>
+            ))}
+          </div>
+        </div>
+
+
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
           <div className="flex items-center gap-2">
