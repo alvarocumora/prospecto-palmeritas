@@ -410,7 +410,178 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           <ToggleRow label="Wireframe" value={demWireframe} onChange={setDemWireframe} />
         </div>
 
-        {/* Capas */}
+        {/* Block model */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
+          <div className="flex items-center gap-2">
+            <Boxes className="w-3 h-3 text-amber-300" />
+            <span className="uppercase tracking-wider text-amber-300">block model</span>
+          </div>
+          <ToggleRow
+            label="Engine activo"
+            value={blockParams.enabled}
+            onChange={(v) => setBlockParams((p) => ({ ...p, enabled: v }))}
+          />
+          {blockParams.enabled && (
+            <>
+              <div>
+                <Label className="text-[9px] uppercase">Block size · {blockParams.blockSize} m</Label>
+                <Slider
+                  min={10} max={100} step={5}
+                  value={[blockParams.blockSize]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, blockSize: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Commodity</Label>
+                <div className="grid grid-cols-4 gap-1 mt-1">
+                  {(["au", "ag", "cu", "fe"] as const).map((c) => (
+                    <Button
+                      key={c}
+                      size="sm"
+                      variant={blockParams.commodity === c ? "default" : "outline"}
+                      className="h-6 text-[10px] px-1"
+                      onClick={() => setBlockParams((p) => ({ ...p, commodity: c }))}
+                    >
+                      {c.toUpperCase()}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Grade scale · 0..1 → {blockParams.gradeScale} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                </Label>
+                <Slider
+                  min={0.5} max={20} step={0.5}
+                  value={[blockParams.gradeScale]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, gradeScale: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Search radius · {blockParams.searchRadius} m</Label>
+                <Slider
+                  min={20} max={500} step={10}
+                  value={[blockParams.searchRadius]}
+                  onValueChange={([v]) => setBlockParams((p) => ({ ...p, searchRadius: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Cutoff · {blockFilters.cutoff.toFixed(2)} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                </Label>
+                <Slider
+                  min={0} max={Math.max(2, blockParams.gradeScale)} step={0.05}
+                  value={[blockFilters.cutoff]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, cutoff: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Confianza mín · {(blockFilters.minConfidence * 100).toFixed(0)}%</Label>
+                <Slider
+                  min={0} max={1} step={0.05}
+                  value={[blockFilters.minConfidence]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, minConfidence: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">
+                  Depth · {blockFilters.minDepth}–{blockFilters.maxDepth} m
+                </Label>
+                <Slider
+                  min={0} max={1000} step={25}
+                  value={[blockFilters.minDepth, blockFilters.maxDepth]}
+                  onValueChange={([a, b]) => setBlockFilters((f) => ({ ...f, minDepth: a, maxDepth: b }))}
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Color por</Label>
+                <div className="grid grid-cols-3 gap-1 mt-1">
+                  {(["grade", "classification", "confidence"] as const).map((m) => (
+                    <Button
+                      key={m}
+                      size="sm"
+                      variant={blockFilters.colorBy === m ? "default" : "outline"}
+                      className="h-6 text-[10px] px-1"
+                      onClick={() => setBlockFilters((f) => ({ ...f, colorBy: m }))}
+                    >
+                      {m === "classification" ? "class" : m === "confidence" ? "conf" : "grade"}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="text-[9px] uppercase">Opacidad · {blockFilters.opacity.toFixed(2)}</Label>
+                <Slider
+                  min={0.1} max={1} step={0.05}
+                  value={[blockFilters.opacity]}
+                  onValueChange={([v]) => setBlockFilters((f) => ({ ...f, opacity: v }))}
+                  className="mt-1"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-1">
+                <ClassChip
+                  label="MEAS"
+                  active={blockFilters.showMeasured}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showMeasured: !f.showMeasured }))}
+                  color="bg-green-500/70"
+                />
+                <ClassChip
+                  label="IND"
+                  active={blockFilters.showIndicated}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showIndicated: !f.showIndicated }))}
+                  color="bg-yellow-500/70"
+                />
+                <ClassChip
+                  label="INF"
+                  active={blockFilters.showInferred}
+                  onClick={() => setBlockFilters((f) => ({ ...f, showInferred: !f.showInferred }))}
+                  color="bg-red-500/70"
+                />
+              </div>
+              {blockError && (
+                <div className="text-[9px] text-amber-300">{blockError}</div>
+              )}
+              {blockModel && (
+                <div className="text-muted-foreground text-[9px] leading-tight">
+                  {blockModel.count.toLocaleString()} bloques · medias {blockModel.stats.gradeMean.toFixed(2)} ·{" "}
+                  {(blockModel.stats.tonnesTotal / 1_000_000).toFixed(2)} Mt · {blockModel.stats.elapsedMs.toFixed(0)} ms
+                  {blockBusy && " · calc…"}
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-1">
+                <Button
+                  size="sm"
+                  className="h-7 text-[10px]"
+                  disabled={!blockModel}
+                  onClick={() => setShowResourcePanel(true)}
+                >
+                  Resource KPI
+                </Button>
+                <ToggleRow label="Visible" value={showBlocks} onChange={setShowBlocks} />
+              </div>
+            </>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="w-full h-7 text-[10px] mt-1"
+            onClick={() => setShowImportPanel(true)}
+          >
+            <Upload className="w-3 h-3 mr-1" /> Import CSV holes
+          </Button>
+          {importedBundle && (
+            <div className="text-[9px] text-emerald-300">
+              ✓ {importedBundle.collars.length} collars · {importedBundle.assays.length} assays importados
+            </div>
+          )}
+        </div>
+
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-1.5">
           <ToggleRow label={renderMode === "iso" ? "Isosurface" : "Voxel cubes"} value={showSurface} onChange={setShowSurface} />
           <ToggleRow label="Sondajes" value={showHoles} onChange={setShowHoles} />
