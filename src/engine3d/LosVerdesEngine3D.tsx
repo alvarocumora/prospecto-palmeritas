@@ -26,6 +26,14 @@ import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPan
 import { NI43101Panel } from "@/engine3d/panels/NI43101Panel";
 import { AuditTrailPanel } from "@/engine3d/panels/AuditTrailPanel";
 import { EngineTabsDock, type EngineTab } from "@/engine3d/panels/EngineTabsDock";
+import { AIGeologistPanel } from "@/engine3d/panels/AIGeologistPanel";
+import { TargetPlanningPanel } from "@/engine3d/panels/TargetPlanningPanel";
+import { ReportsPanel } from "@/engine3d/panels/ReportsPanel";
+import { DrillTargetLayer } from "@/engine3d/layers/DrillTargetLayer";
+import { runAIGeologist, type AIInterpretation } from "@/engine3d/ai/aiGeologist";
+import { useDrillTargets, DEFAULT_TARGET_PARAMS } from "@/engine3d/hooks/useDrillTargets";
+import { exportTargetsCsv, downloadString, campaignCost as computeCampaignCost } from "@/engine3d/reports/reportGenerator";
+import type { DrillTarget } from "@/engine3d/ai/drillTarget.worker";
 import { useQAQC } from "@/engine3d/hooks/useQAQC";
 import { DEFAULT_ESTIMATION, applyEstimation, type EstimationSettings } from "@/engine3d/qaqc/estimationPresets";
 import { auditTrail, computeHash } from "@/engine3d/qaqc/auditTrail";
@@ -100,6 +108,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [activeTab, setActiveTab] = useState<EngineTab>("viewer");
   const [ni43Mode, setNi43Mode] = useState(false);
 
+  // Sprint 5: AI Geologist + Targets + Reports
+  const [aiInterpretation, setAiInterpretation] = useState<AIInterpretation | null>(null);
+  const [scenarioIds, setScenarioIds] = useState<Set<string>>(new Set());
+  const [showTargets3D, setShowTargets3D] = useState(true);
+  const [hoveredTarget, setHoveredTarget] = useState<DrillTarget | null>(null);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
 
@@ -161,6 +175,35 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     verticalExaggeration,
     4000,
   );
+
+  // Sprint 5: Drill target ranking (worker)
+  const existingCollars = useMemo(
+    () => holes.map((h) => ({ x: h.collar.x, y: h.collar.y, z: h.collar.z })),
+    [holes],
+  );
+  const targetParams = useMemo(() => {
+    const critical = qaqcResult?.summary.critical ?? 0;
+    const penalty = critical > 0 ? Math.max(0.4, 1 - critical * 0.1) : 1;
+    return { ...DEFAULT_TARGET_PARAMS, qaqcPenalty: penalty };
+  }, [qaqcResult]);
+  const { output: drillTargets, busy: targetsBusy } = useDrillTargets(
+    points,
+    existingCollars,
+    targetParams,
+    points.length > 0,
+  );
+
+  // Sprint 5: log drill target generation
+  useEffect(() => {
+    if (drillTargets) {
+      auditTrail.log("blockmodel.build", {
+        kind: "drill.targets",
+        selected: drillTargets.stats.selected,
+        aPriority: drillTargets.stats.aPriority,
+      });
+    }
+  }, [drillTargets]);
+
 
   // Sprint 4: log block model rebuilds + versionado (después de useBlockModel)
   useEffect(() => {
@@ -762,6 +805,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             />
           )}
           {showClipHelper && <ClippingPlaneController params={effectiveClip} size={4500} />}
+          {showTargets3D && drillTargets && drillTargets.targets.length > 0 && (
+            <DrillTargetLayer
+              targets={drillTargets.targets}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingPlanes}
+              onHover={setHoveredTarget}
+            />
+          )}
         </Suspense>
 
         <MapControls
@@ -831,8 +882,24 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         badges={{
           qaqc: qaqcResult?.summary.critical || qaqcResult?.summary.warning || undefined,
           ni43101: ni43Mode ? "ON" : undefined,
+          targets: drillTargets?.stats.aPriority || undefined,
+          ai: aiInterpretation ? aiInterpretation.upside.slice(0, 3).toUpperCase() : undefined,
         }}
       />
+
+      {hoveredTarget && (
+        <div className="absolute bottom-2 left-2 z-20 bg-black/85 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-cyan-500/40 max-w-[260px]">
+          <div className="text-cyan-200 uppercase tracking-wider mb-1">
+            {hoveredTarget.targetId} · {hoveredTarget.priority}
+          </div>
+          <div className="text-muted-foreground space-y-0.5">
+            <div>score: <span className="text-foreground">{(hoveredTarget.score * 100).toFixed(0)}</span></div>
+            <div>depth: <span className="text-foreground">{hoveredTarget.depth.toFixed(0)} m</span></div>
+            <div>cost: <span className="text-foreground">${(hoveredTarget.estimatedCost / 1000).toFixed(0)}k</span></div>
+            <div className="text-[9px] pt-1">{hoveredTarget.rationale[0]}</div>
+          </div>
+        </div>
+      )}
 
       {activeTab === "qaqc" && (
         <QAQCPanel result={qaqcResult} busy={qaqcBusy} onClose={() => setActiveTab("viewer")} />
@@ -861,6 +928,67 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       )}
       {activeTab === "audit" && (
         <AuditTrailPanel onClose={() => setActiveTab("viewer")} />
+      )}
+      {activeTab === "ai" && (
+        <AIGeologistPanel
+          interpretation={aiInterpretation}
+          onRegenerate={() => {
+            const i = runAIGeologist({
+              points,
+              holes,
+              blockModel: blockModel ?? null,
+              qaqc: qaqcResult,
+              bundle: importedBundle,
+            });
+            setAiInterpretation(i);
+            auditTrail.log("ni43101.snapshot", { kind: "ai.interpretation", headline: i.headline, upside: i.upside });
+          }}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "targets" && (
+        <TargetPlanningPanel
+          output={drillTargets}
+          busy={targetsBusy}
+          scenarioIds={scenarioIds}
+          onToggleScenario={(id) => {
+            setScenarioIds((prev) => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id);
+              else next.add(id);
+              return next;
+            });
+            auditTrail.log("preset.save", { kind: "scenario.toggle", targetId: id });
+          }}
+          onExportCsv={(targets) => {
+            downloadString(
+              `drill-plan-${new Date().toISOString().replace(/[:.]/g, "-")}.csv`,
+              exportTargetsCsv(targets),
+              "text/csv",
+            );
+            auditTrail.log("section.export", { kind: "drill.plan.csv", count: targets.length });
+          }}
+          onGenerateInvestorSummary={() => setActiveTab("reports")}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "reports" && (
+        <ReportsPanel
+          input={{
+            projectId,
+            ai: aiInterpretation,
+            blockModel: blockModel ?? null,
+            qaqc: qaqcResult,
+            bundle: importedBundle,
+            targets: drillTargets,
+            scenarioTargets: (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
+            econ,
+            campaignCost: computeCampaignCost(
+              (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
+            ),
+          }}
+          onClose={() => setActiveTab("viewer")}
+        />
       )}
     </div>
   );

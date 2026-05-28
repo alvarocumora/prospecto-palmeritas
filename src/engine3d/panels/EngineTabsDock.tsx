@@ -1,8 +1,18 @@
 // Tabs dock — Sprint 4
 // Barra superior derecha que activa los paneles overlay.
-import { Eye, Scissors, Boxes, AlertTriangle, FileText, History, Settings } from "lucide-react";
+import { Eye, Scissors, Boxes, AlertTriangle, FileText, History, Settings, Brain, Crosshair, FileBarChart } from "lucide-react";
 
-export type EngineTab = "viewer" | "section" | "resource" | "qaqc" | "ni43101" | "audit" | "estimation";
+export type EngineTab =
+  | "viewer"
+  | "section"
+  | "resource"
+  | "qaqc"
+  | "ni43101"
+  | "audit"
+  | "estimation"
+  | "ai"
+  | "targets"
+  | "reports";
 
 const TABS: { id: EngineTab; label: string; icon: typeof Eye; cls: string }[] = [
   { id: "viewer", label: "Viewer", icon: Eye, cls: "text-orange-300" },
@@ -10,6 +20,9 @@ const TABS: { id: EngineTab; label: string; icon: typeof Eye; cls: string }[] = 
   { id: "resource", label: "Resource", icon: Boxes, cls: "text-amber-300" },
   { id: "estimation", label: "Estim.", icon: Settings, cls: "text-emerald-300" },
   { id: "qaqc", label: "QA/QC", icon: AlertTriangle, cls: "text-amber-300" },
+  { id: "ai", label: "AI Geologist", icon: Brain, cls: "text-violet-300" },
+  { id: "targets", label: "Targets", icon: Crosshair, cls: "text-cyan-300" },
+  { id: "reports", label: "Reports", icon: FileBarChart, cls: "text-amber-300" },
   { id: "ni43101", label: "NI 43-101", icon: FileText, cls: "text-gold" },
   { id: "audit", label: "Audit", icon: History, cls: "text-violet-300" },
 ];
