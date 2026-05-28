@@ -1638,3 +1638,62 @@ function LayerRecoveryPanel({
 
 
 
+
+function SceneBBoxPanel({
+  rows,
+  onFrame,
+}: {
+  rows: Array<{ name: string; bounds: SceneBounds }>;
+  onFrame: (b: SceneBounds) => void;
+}) {
+  return (
+    <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-1">
+      <div className="uppercase tracking-wider text-cyan-300">Scene BBox</div>
+      <div className="grid grid-cols-[1fr_auto_auto] gap-x-2 gap-y-0.5 text-[9px]">
+        <div className="text-muted-foreground">layer</div>
+        <div className="text-muted-foreground text-right">size · center</div>
+        <div />
+        {rows.map((r) => {
+          if (!r.bounds) {
+            return (
+              <div key={r.name} className="contents">
+                <div className="text-foreground/80">{r.name}</div>
+                <div className="text-rose-300/70 text-right">— no bounds —</div>
+                <div />
+              </div>
+            );
+          }
+          const [minX, minY, minZ] = r.bounds.min;
+          const [maxX, maxY, maxZ] = r.bounds.max;
+          const sx = maxX - minX, sy = maxY - minY, sz = maxZ - minZ;
+          const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
+          const diag = Math.hypot(sx, sy, sz);
+          const absurd = ![minX, minY, minZ, maxX, maxY, maxZ].every(Number.isFinite)
+            || Math.max(Math.abs(minX), Math.abs(minY), Math.abs(minZ), Math.abs(maxX), Math.abs(maxY), Math.abs(maxZ)) > 1e6
+            || diag < 1;
+          return (
+            <div key={r.name} className="contents">
+              <div className={absurd ? "text-rose-300" : "text-foreground/80"}>{r.name}</div>
+              <div className="text-right text-muted-foreground tabular-nums">
+                <span className={absurd ? "text-rose-300" : "text-emerald-300"}>
+                  {sx.toFixed(0)}×{sy.toFixed(0)}×{sz.toFixed(0)}
+                </span>
+                {" · "}
+                <span className="text-cyan-300/80">
+                  {cx.toFixed(0)},{cy.toFixed(0)},{cz.toFixed(0)}
+                </span>
+              </div>
+              <button
+                onClick={() => onFrame(r.bounds)}
+                className="px-1.5 rounded border border-amber-400/50 text-amber-200 text-[9px] uppercase hover:bg-amber-500/15"
+                title="Frame this layer"
+              >
+                frame
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
