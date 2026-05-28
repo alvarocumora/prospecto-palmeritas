@@ -16,42 +16,55 @@ type ControlsLike = {
   maxDistance?: number;
 };
 
-export function AutoFitCamera({ bounds, enabled = true }: { bounds: SceneBounds; enabled?: boolean }) {
+export function fitCameraToBounds(
+  camera: THREE.Camera,
+  controls: ControlsLike | null,
+  bounds: SceneBounds,
+  invalidate?: () => void,
+) {
+  if (!bounds) return false;
+  const allFinite = [...bounds.min, ...bounds.max].every(Number.isFinite);
+  if (!allFinite) return false;
+
+  const min = new THREE.Vector3(...bounds.min);
+  const max = new THREE.Vector3(...bounds.max);
+  const box = new THREE.Box3(min, max);
+  if (box.isEmpty()) return false;
+
+  const center = new THREE.Vector3();
+  box.getCenter(center);
+  const size = new THREE.Vector3();
+  box.getSize(size);
+  const diagonal = Math.max(size.length(), 100);
+  const radius = diagonal * 1.6;
+
+  const persp = camera as THREE.PerspectiveCamera;
+  persp.position.set(center.x + radius, center.y + radius * 0.75, center.z + radius);
+  persp.near = Math.max(0.1, diagonal / 5000);
+  persp.far = Math.max(50_000, radius * 8);
+  persp.lookAt(center);
+  persp.updateProjectionMatrix();
+
+  if (controls && controls.target) {
+    controls.target.copy(center);
+    if (typeof controls.minDistance === "number") controls.minDistance = Math.min(controls.minDistance, radius * 0.1);
+    if (typeof controls.maxDistance === "number") controls.maxDistance = Math.max(controls.maxDistance, radius * 6);
+    controls.update?.();
+  }
+
+  invalidate?.();
+  return true;
+}
+
+export function AutoFitCamera({ bounds, enabled = true, trigger = 0 }: { bounds: SceneBounds; enabled?: boolean; trigger?: number }) {
   const camera = useThree((s) => s.camera);
   const controls = useThree((s) => s.controls) as ControlsLike | null;
   const invalidate = useThree((s) => s.invalidate);
 
   useEffect(() => {
-    if (!enabled || !bounds) return;
-    const allFinite = [...bounds.min, ...bounds.max].every(Number.isFinite);
-    if (!allFinite) return;
-
-    const min = new THREE.Vector3(...bounds.min);
-    const max = new THREE.Vector3(...bounds.max);
-    const box = new THREE.Box3(min, max);
-    if (box.isEmpty()) return;
-
-    const center = new THREE.Vector3();
-    box.getCenter(center);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    const maxDim = Math.max(size.x, size.y, size.z, 100);
-    const dist = maxDim * 1.6;
-
-    const persp = camera as THREE.PerspectiveCamera;
-    persp.position.set(center.x + dist, center.y + dist * 0.75, center.z + dist);
-    persp.near = Math.max(0.1, maxDim / 5000);
-    persp.far = Math.max(50_000, maxDim * 50);
-    persp.lookAt(center);
-    persp.updateProjectionMatrix();
-
-    if (controls && controls.target) {
-      controls.target.copy(center);
-      if (typeof controls.maxDistance === "number") controls.maxDistance = Math.max(controls.maxDistance, maxDim * 10);
-      controls.update?.();
-    }
-    invalidate();
-  }, [bounds, enabled, camera, controls, invalidate]);
+    if (!enabled) return;
+    fitCameraToBounds(camera, controls, bounds, invalidate);
+  }, [bounds, enabled, trigger, camera, controls, invalidate]);
 
   return null;
 }
