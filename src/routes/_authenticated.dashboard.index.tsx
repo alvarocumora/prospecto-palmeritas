@@ -234,6 +234,7 @@ function DashboardHome() {
           ]}
           links={[
             { to: "/dashboard/ni43101", icon: <FileSignature className="w-3.5 h-3.5" />, label: "NI 43-101" },
+            { to: "/reports/losverdes/pre43101", icon: <FileSignature className="w-3.5 h-3.5" />, label: "Pre-NI 43-101 LV5" },
             { to: "/dashboard/qps", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QPs" },
             { to: "/dashboard/qaqc", icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: "QA/QC" },
             { to: "/dashboard/approvals", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "Aprobaciones" },
