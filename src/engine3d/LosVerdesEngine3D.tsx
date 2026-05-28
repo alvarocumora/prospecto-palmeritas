@@ -95,6 +95,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
   const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
 
+  // Sprint 4: estimation settings + active tab + NI 43-101 mode
+  const [estimation, setEstimation] = useState<EstimationSettings>(DEFAULT_ESTIMATION);
+  const [activeTab, setActiveTab] = useState<EngineTab>("viewer");
+  const [ni43Mode, setNi43Mode] = useState(false);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
 
