@@ -330,6 +330,7 @@ Target a explicar:
       project_id: LOSVERDES_PROJECT_ID,
       anomaly_kind: "exploration_target",
       anomaly_id: target.id,
+      input_hash: `${target.id}:${target.score ?? 0}:${target.stage ?? ""}`,
       model: "google/gemini-2.5-pro",
       summary: output.resumen,
       structural_context: output.contexto_estructural,
