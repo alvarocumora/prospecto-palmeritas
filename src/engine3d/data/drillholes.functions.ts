@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import proj4 from "proj4";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { lngLatToMeters } from "@/engine3d/geospatial/crs";
 
 const InputSchema = z.object({
