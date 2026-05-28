@@ -14,6 +14,7 @@ import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
+import { getLosVerdesDrillholes } from "@/lib/losverdes-ai.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
