@@ -584,7 +584,34 @@ export function LosVerdesScene3D({
         },
       });
 
-      // ---- Popups ----
+      // ---- Sondajes 3D (drillholes): fill-extrusion por tramo, color por ley ----
+      map.addSource("drillholes", {
+        type: "geojson",
+        data: { type: "FeatureCollection", features: [] },
+      });
+      map.addLayer({
+        id: "drillholes-extr",
+        type: "fill-extrusion",
+        source: "drillholes",
+        paint: {
+          "fill-extrusion-color": ["get", "color"],
+          "fill-extrusion-base": ["get", "base"],
+          "fill-extrusion-height": ["get", "top"],
+          "fill-extrusion-opacity": 0.92,
+        },
+      });
+      map.addLayer({
+        id: "drillholes-collars",
+        type: "circle",
+        source: "drillhole-collars",
+        paint: {
+          "circle-radius": 5,
+          "circle-color": "#fde047",
+          "circle-stroke-color": "#0b1220",
+          "circle-stroke-width": 1.5,
+        },
+      });
+
       const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
       map.on("click", "veins-line", (e) => {
         const f = e.features?.[0];
