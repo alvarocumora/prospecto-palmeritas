@@ -41,6 +41,8 @@ import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
+import { AutoFitCamera, computeSceneBounds, type SceneBounds } from "@/engine3d/sections/AutoFitCamera";
+import { SyntheticDemoScene } from "@/engine3d/layers/SyntheticDemoScene";
 import { useSection } from "@/engine3d/hooks/useSection";
 import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
 import { AnomalyVoxelLayer } from "@/engine3d/layers/AnomalyVoxelLayer";
