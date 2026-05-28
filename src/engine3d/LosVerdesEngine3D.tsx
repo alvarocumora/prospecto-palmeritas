@@ -26,6 +26,14 @@ import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPan
 import { NI43101Panel } from "@/engine3d/panels/NI43101Panel";
 import { AuditTrailPanel } from "@/engine3d/panels/AuditTrailPanel";
 import { EngineTabsDock, type EngineTab } from "@/engine3d/panels/EngineTabsDock";
+import { AIGeologistPanel } from "@/engine3d/panels/AIGeologistPanel";
+import { TargetPlanningPanel } from "@/engine3d/panels/TargetPlanningPanel";
+import { ReportsPanel } from "@/engine3d/panels/ReportsPanel";
+import { DrillTargetLayer } from "@/engine3d/layers/DrillTargetLayer";
+import { runAIGeologist, type AIInterpretation } from "@/engine3d/ai/aiGeologist";
+import { useDrillTargets, DEFAULT_TARGET_PARAMS } from "@/engine3d/hooks/useDrillTargets";
+import { exportTargetsCsv, downloadString, campaignCost as computeCampaignCost } from "@/engine3d/reports/reportGenerator";
+import type { DrillTarget } from "@/engine3d/ai/drillTarget.worker";
 import { useQAQC } from "@/engine3d/hooks/useQAQC";
 import { DEFAULT_ESTIMATION, applyEstimation, type EstimationSettings } from "@/engine3d/qaqc/estimationPresets";
 import { auditTrail, computeHash } from "@/engine3d/qaqc/auditTrail";
