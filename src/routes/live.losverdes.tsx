@@ -15,6 +15,7 @@ import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-p
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
+import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
 
 export const Route = createFileRoute("/live/losverdes")({
   head: () => ({
@@ -99,6 +100,8 @@ function LiveLosVerdesPage() {
   });
 
   const [pdfBusy, setPdfBusy] = useState(false);
+  const [catBusy, setCatBusy] = useState(false);
+  const syncCatastro = useServerFn(syncLosVerdes5Catastro);
 
   const centerLat = layersQ.data?.project.center_lat ?? DEFAULT_CENTER.lat;
   const centerLng = layersQ.data?.project.center_lng ?? DEFAULT_CENTER.lng;
@@ -119,6 +122,29 @@ function LiveLosVerdesPage() {
       toast.error("Error generando PDF");
     } finally {
       setPdfBusy(false);
+    }
+  };
+
+  const handleSyncCatastro = async () => {
+    setCatBusy(true);
+    const tid = toast.loading("Descargando catastro SERNAGEOMIN…");
+    try {
+      const r = await syncCatastro({ data: { radiusKm: 15 } });
+      if (!r.ok) {
+        toast.error(`Error: ${r.error ?? "sin detalle"}`, { id: tid });
+        return;
+      }
+      toast.success(
+        `Catastro sincronizado: ${r.matched}/${r.matched + r.unmatched} concesiones enlazadas · ${r.fetched} polígonos descargados`,
+        { id: tid, duration: 6000 },
+      );
+      // Refresca capas y reporte
+      layersQ.refetch();
+      reportQ.refetch();
+    } catch (e) {
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: tid });
+    } finally {
+      setCatBusy(false);
     }
   };
 
