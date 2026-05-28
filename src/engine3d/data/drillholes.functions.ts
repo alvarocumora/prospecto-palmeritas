@@ -29,6 +29,7 @@ export type DrillholeSegment = {
 export type DrillholesDataset = {
   holes: DrillholeSegment[];
   count: number;
+  source: "server" | "planned-from-targets" | "empty";
 };
 
 // EPSG:32719 = WGS84 / UTM zone 19S (Chile central — Los Verdes)
