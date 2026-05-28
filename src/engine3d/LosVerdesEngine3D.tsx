@@ -920,7 +920,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           {visible("iso") && showPoints && (
             <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />
           )}
-          {visible("iso") && showSurface && renderMode === "iso" && iso && iso.vertexCount > 0 && (
+          {visible("iso") && showSurface && renderMode === "iso" && iso && (iso.vertexCount > 0 || iso.mode === "blob") && (
             <AnomalyIsosurfaceLayer
               iso={iso}
               opacity={opacity}
