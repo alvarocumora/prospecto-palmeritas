@@ -648,9 +648,6 @@ export function LosVerdesScene3D({
           .addTo(map);
       });
 
-
-
-      const popup = new maplibregl.Popup({ closeButton: true, offset: 8 });
       map.on("click", "veins-line", (e) => {
         const f = e.features?.[0];
         if (!f) return;
