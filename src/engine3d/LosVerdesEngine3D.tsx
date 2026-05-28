@@ -51,6 +51,9 @@ import { AnomalyPointsLayer } from "@/engine3d/layers/AnomalyPointsLayer";
 import { DrillholesLayer } from "@/engine3d/layers/DrillholesLayer";
 import { TerrainPlane } from "@/engine3d/layers/TerrainPlane";
 import { TerrainMartiniLayer } from "@/engine3d/layers/TerrainMartiniLayer";
+import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
+import { BasemapPanel, NorthArrow, ScaleBar } from "@/engine3d/panels/BasemapPanel";
+import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -121,6 +124,15 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [soloLayer, setSoloLayer] = useState<SoloLayer>("all");
   const [autoFit, setAutoFit] = useState(true);
   const [showLayerDebug, setShowLayerDebug] = useState(false);
+
+  // Sprint: Basemap / GIS
+  const [basemapSource, setBasemapSource] = useState<BasemapSource>("esri");
+  const [basemapOpacity, setBasemapOpacity] = useState(0.85);
+  const [showCoords, setShowCoords] = useState(true);
+  const [showScaleBar, setShowScaleBar] = useState(true);
+  const [showNorth, setShowNorth] = useState(true);
+  const [basemapStatus, setBasemapStatus] = useState<{ source: BasemapSource; failed: boolean; zoom: number } | null>(null);
+  const BASEMAP_EXTENT = 4000;
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
@@ -450,6 +462,26 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </div>
           )}
         </div>
+
+        {/* Basemap / GIS */}
+        <BasemapPanel
+          source={basemapSource}
+          onSource={setBasemapSource}
+          opacity={basemapOpacity}
+          onOpacity={setBasemapOpacity}
+          ve={verticalExaggeration}
+          onVe={setVe}
+          showCoords={showCoords}
+          onShowCoords={setShowCoords}
+          showScaleBar={showScaleBar}
+          onShowScaleBar={setShowScaleBar}
+          showNorth={showNorth}
+          onShowNorth={setShowNorth}
+          centerLng={pointsQ.data?.center.lng ?? 0}
+          centerLat={pointsQ.data?.center.lat ?? 0}
+          extentMeters={BASEMAP_EXTENT}
+          status={basemapStatus}
+        />
 
         {/* Anomalías */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
@@ -934,6 +966,24 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             visible("dem") && showGrid && <TerrainPlane size={4000} />
           )}
 
+          {(() => {
+            const center = pointsQ.data?.center;
+            if (!center || (center.lng === 0 && center.lat === 0)) return null;
+            if (basemapSource === "none") return null;
+            return (
+              <BasemapLayer
+                source={basemapSource}
+                centerLng={center.lng}
+                centerLat={center.lat}
+                extentMeters={BASEMAP_EXTENT}
+                opacity={basemapOpacity}
+                demMesh={demEnabled ? demMesh : null}
+                onStatus={setBasemapStatus}
+              />
+            );
+          })()}
+
+
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
           {visible("iso") && showPoints && (
             <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} />
@@ -993,6 +1043,16 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
       </Canvas>
+
+      {showNorth && <NorthArrow />}
+      {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
+      {showCoords && pointsQ.data?.center && (pointsQ.data.center.lng !== 0 || pointsQ.data.center.lat !== 0) && (
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded px-2 py-1 border border-border text-[10px] font-mono text-cyan-200">
+          {pointsQ.data.center.lat.toFixed(5)}°N · {pointsQ.data.center.lng.toFixed(5)}°E
+        </div>
+      )}
+
+
 
 
       {(() => {
