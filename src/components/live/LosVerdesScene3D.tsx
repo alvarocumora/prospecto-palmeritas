@@ -909,6 +909,9 @@ export function LosVerdesScene3D({
       setVis("vein-planes-outline", layers.veinPlanes);
       setVis("phases-extr", layers.plan);
       setVis("phases-outline", layers.plan);
+      setVis("drillholes-extr", layers.drills);
+      setVis("drillholes-collars", layers.drills);
+
 
       const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
         (c) => commoditiesOn[c],
