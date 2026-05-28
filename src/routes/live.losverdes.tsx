@@ -282,24 +282,38 @@ function LiveLosVerdesPage() {
               </Button>
             </div>
           </div>
-          {engineMode === "new" ? (
-            <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
-          ) : anomsQ.data && layersQ.data ? (
-            <LosVerdesScene3D
-              centerLat={centerLat}
-              centerLng={centerLng}
-              satAnomalies={anomsQ.data.satAnomalies}
-              magTargets={anomsQ.data.magTargets}
-              lineaments={anomsQ.data.lineaments}
-              targets={layersQ.data.targets}
-              veins={miningQ.data?.veins ?? []}
-              phases={miningQ.data?.phases ?? []}
-              drillholes={drillsQ.data?.holes ?? []}
-            />
-          ) : (
+          {!mounted ? (
             <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-              Cargando escena 3D…
+              Inicializando visor 3D…
             </div>
+          ) : (
+            <Suspense
+              fallback={
+                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando escena 3D…
+                </div>
+              }
+            >
+              {engineMode === "new" ? (
+                <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
+              ) : anomsQ.data && layersQ.data ? (
+                <LosVerdesScene3D
+                  centerLat={centerLat}
+                  centerLng={centerLng}
+                  satAnomalies={anomsQ.data.satAnomalies}
+                  magTargets={anomsQ.data.magTargets}
+                  lineaments={anomsQ.data.lineaments}
+                  targets={layersQ.data.targets}
+                  veins={miningQ.data?.veins ?? []}
+                  phases={miningQ.data?.phases ?? []}
+                  drillholes={drillsQ.data?.holes ?? []}
+                />
+              ) : (
+                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                  Cargando escena 3D…
+                </div>
+              )}
+            </Suspense>
           )}
         </section>
 
