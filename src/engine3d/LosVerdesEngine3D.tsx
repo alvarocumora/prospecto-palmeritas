@@ -9,8 +9,8 @@ import { Canvas } from "@react-three/fiber";
 import { MapControls, Stats } from "@react-three/drei";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Suspense, useMemo, useState } from "react";
-import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain } from "lucide-react";
+import { Suspense, useEffect, useMemo, useState } from "react";
+import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
 import { getDrillholes, type DrillholeSegment } from "@/engine3d/data/drillholes.functions";
@@ -19,6 +19,8 @@ import { useIsosurface, DEFAULT_ISO_PARAMS, type IsosurfaceParams } from "@/engi
 import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainDEM";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
+import { useSection } from "@/engine3d/hooks/useSection";
+import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
 import { AnomalyVoxelLayer } from "@/engine3d/layers/AnomalyVoxelLayer";
 import { AnomalyIsosurfaceLayer } from "@/engine3d/layers/AnomalyIsosurfaceLayer";
 import { AnomalyPointsLayer } from "@/engine3d/layers/AnomalyPointsLayer";
@@ -67,6 +69,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [demQuality, setDemQuality] = useState<TerrainQuality>("med");
   const [demWireframe, setDemWireframe] = useState(false);
   const [hoveredHole, setHoveredHole] = useState<DrillholeSegment | null>(null);
+  const [sectionWidth, setSectionWidth] = useState(25);
+  const [sectionTrigger, setSectionTrigger] = useState(0);
+  const [showSectionPanel, setShowSectionPanel] = useState(false);
+  const [followHoleId, setFollowHoleId] = useState<string | null>(null);
 
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
@@ -93,6 +99,60 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     [sectionMode, clipParams],
   );
   const clippingPlanes = useClippingPlanes(effectiveClip);
+
+  // Plano en formato sectionEngine (normal three + constant THREE.Plane: n·p + c = 0)
+  const planeNormal = useMemo(() => {
+    const ax = effectiveClip.axis;
+    let n =
+      ax === "x" ? { x: 1, y: 0, z: 0 } :
+      ax === "y" ? { x: 0, y: 1, z: 0 } :
+      ax === "z" ? { x: 0, y: 0, z: 1 } :
+      { ...(effectiveClip.freeNormal ?? { x: 1, y: 0, z: 0 }) };
+    if (effectiveClip.invert) n = { x: -n.x, y: -n.y, z: -n.z };
+    const len = Math.hypot(n.x, n.y, n.z) || 1;
+    return { x: n.x / len, y: n.y / len, z: n.z / len };
+  }, [effectiveClip.axis, effectiveClip.invert, effectiveClip.freeNormal]);
+  const planeConstant = -effectiveClip.position;
+
+  // Section engine — auto-recalcula al cambiar plano/ancho/datasets o trigger manual
+  const section = useSection({
+    iso,
+    terrain: demMesh ?? null,
+    holes,
+    samples: points,
+    planeNormal,
+    planeConstant,
+    width: sectionWidth,
+    verticalExaggeration,
+    trigger: sectionTrigger,
+  });
+
+  // Follow drillhole: alinea plano de corte al azimut del sondaje (perpendicular a azimut).
+  useEffect(() => {
+    if (!followHoleId) return;
+    const h = holes.find((x) => x.holeId === followHoleId);
+    if (!h) return;
+    const azRad = (h.azimuth * Math.PI) / 180;
+    // dirección horizontal del sondaje en three: (sin(az), 0, -cos(az))
+    // normal del plano que contiene la traza vertical: cross(dir, up) = (cos(az), 0, sin(az))
+    const nx = Math.cos(azRad);
+    const nz = Math.sin(azRad);
+    // collar en three
+    const cx = h.collar.x;
+    const cy = h.collar.z * verticalExaggeration;
+    const cz = -h.collar.y;
+    const position = nx * cx + 0 * cy + nz * cz;
+    setClipParams((p) => ({
+      ...p,
+      enabled: true,
+      axis: "free",
+      freeNormal: { x: nx, y: 0, z: nz },
+      position,
+      invert: false,
+    }));
+    setSectionMode(true);
+    setShowSectionPanel(true);
+  }, [followHoleId, holes, verticalExaggeration]);
 
   const cameraInitial = useMemo<[number, number, number]>(() => [2400, 1800, 2400], []);
   const busy = (renderMode === "iso" ? isoBusy : voxBusy) || demBusy;
@@ -235,6 +295,79 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           <ToggleRow label="Helper visual" value={showClipHelper} onChange={setShowClipHelper} />
         </div>
 
+        {/* Section export / corte 2D */}
+        <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
+          <div className="flex items-center gap-2">
+            <FileDown className="w-3 h-3 text-fuchsia-300" />
+            <span className="uppercase tracking-wider text-fuchsia-300">section view</span>
+          </div>
+          <div>
+            <Label className="text-[9px] uppercase">Corredor · ±{(sectionWidth / 2).toFixed(0)} m</Label>
+            <div className="grid grid-cols-5 gap-1 mt-1">
+              {[5, 10, 25, 50, 100].map((w) => (
+                <Button
+                  key={w}
+                  size="sm"
+                  variant={sectionWidth === w ? "default" : "outline"}
+                  className="h-6 text-[10px] px-1"
+                  onClick={() => setSectionWidth(w)}
+                >
+                  {w}
+                </Button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label className="text-[9px] uppercase">Follow drillhole</Label>
+            <select
+              className="mt-1 w-full bg-black/60 border border-border rounded px-1.5 py-1 text-[10px] font-mono"
+              value={followHoleId ?? ""}
+              onChange={(e) => setFollowHoleId(e.target.value || null)}
+            >
+              <option value="">— ninguno —</option>
+              {holes.map((h) => (
+                <option key={h.holeId} value={h.holeId}>
+                  {h.holeId} · {h.azimuth.toFixed(0)}°/{h.dip.toFixed(0)}°
+                </option>
+              ))}
+            </select>
+          </div>
+          {section.result && (
+            <div className="text-muted-foreground text-[9px] leading-tight">
+              {section.result.stats.holesIntersected} sondajes ·{" "}
+              {section.result.stats.samplesInSlab} muestras ·{" "}
+              {section.result.anomalySegments.length} segs · {section.result.stats.elapsedMs.toFixed(0)} ms
+              {section.busy && " · calculando…"}
+            </div>
+          )}
+          <div className="grid grid-cols-2 gap-1">
+            <Button
+              size="sm"
+              className="h-7 text-[10px]"
+              onClick={() => {
+                setShowSectionPanel(true);
+                setSectionTrigger((n) => n + 1);
+              }}
+              disabled={section.busy}
+            >
+              Generate
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-7 text-[10px]"
+              onClick={() => {
+                setShowSectionPanel(false);
+                setFollowHoleId(null);
+                section.reset();
+              }}
+            >
+              Reset
+            </Button>
+          </div>
+        </div>
+
+
         {/* Terreno DEM */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
           <div className="flex items-center gap-2">
@@ -376,6 +509,16 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             Sin anomalías ni sondajes para este proyecto.
           </div>
         </div>
+      )}
+
+      {showSectionPanel && (
+        <SectionViewPanel
+          result={section.result}
+          busy={section.busy}
+          onClose={() => setShowSectionPanel(false)}
+          onFollowHole={(id) => setFollowHoleId(id)}
+          followHoleId={followHoleId}
+        />
       )}
     </div>
   );
