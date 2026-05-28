@@ -614,16 +614,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           <div className="flex items-center gap-2">
             <span className="uppercase tracking-wider text-amber-300">Cinematic · Leapfrog look</span>
           </div>
+          <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
+            <span className="text-[9px] uppercase tracking-wider text-emerald-300">Debug Render Mode</span>
+            <Switch checked={debugRenderMode} onCheckedChange={setDebugRenderMode} />
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setCinematic((v) => !v)}
               className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${cinematic ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+              disabled={debugRenderMode}
             >
               {cinematic ? "SSAO+Bloom ON" : "OFF"}
             </button>
             <button
               onClick={() => setVolumeFog((v) => !v)}
               className={`px-2 py-1 rounded border text-[9px] uppercase tracking-wider ${volumeFog ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground"}`}
+              disabled={debugRenderMode}
             >
               Volume Fog
             </button>
