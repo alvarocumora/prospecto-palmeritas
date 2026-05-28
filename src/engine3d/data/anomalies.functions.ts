@@ -45,22 +45,22 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
     const [geoRes, satRes] = await Promise.all([
-      supabase
+      supabaseAdmin
         .from("geophysics_anomalies")
         .select("lat,lng,estimated_depth_m,peak_value,confidence_pct,severity")
         .eq("project_id", data.projectId),
-      supabase
+      supabaseAdmin
         .from("satellite_anomalies")
         .select("geometry,score,severity,area_ha,index_code")
         .eq("project_id", data.projectId),
     ]);
 
     const geoRows = (geoRes.data ?? []).filter(
-      (r): r is typeof r & { lat: number; lng: number } =>
+      (r: { lat: number | null; lng: number | null }): r is typeof r & { lat: number; lng: number } =>
         r.lat != null && r.lng != null,
     );
     const satRows = (satRes.data ?? []).filter(
-      (r): r is typeof r & { geometry: unknown } => r.geometry != null,
+      (r: { geometry: unknown }): r is typeof r & { geometry: unknown } => r.geometry != null,
     );
 
     // Extrae centro de cada punto
