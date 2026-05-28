@@ -279,7 +279,11 @@ export const getLosVerdes5Report = createServerFn({ method: "GET" }).handler(
             opex_usd_t: Number(phaseRows[idx].opex_usd_t),
             start_year: Number(phaseRows[idx].start_year),
             duration_years: Number(phaseRows[idx].duration_years),
-            grade_estimate: (phaseRows[idx].grade_estimate as Record<string, unknown>) ?? {},
+            grade_cu_pct:
+              phaseRows[idx].grade_estimate &&
+              typeof (phaseRows[idx].grade_estimate as Record<string, unknown>).cu === "number"
+                ? Number((phaseRows[idx].grade_estimate as Record<string, unknown>).cu)
+                : null,
           }
         : null;
 
