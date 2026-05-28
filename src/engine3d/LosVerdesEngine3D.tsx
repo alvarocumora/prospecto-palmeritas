@@ -309,7 +309,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       <Canvas
         frameloop="demand"
         dpr={[1, 1.5]}
-        gl={{ antialias: true, powerPreference: "high-performance", localClippingEnabled: true }}
+        gl={{ antialias: true, powerPreference: "high-performance" }}
         camera={{ position: cameraInitial, fov: 45, near: 1, far: 50_000, up: [0, 1, 0] }}
         shadows={false}
         onCreated={({ gl }) => {
