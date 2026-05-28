@@ -21,6 +21,15 @@ import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/en
 import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
 import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
 import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
+import { QAQCPanel } from "@/engine3d/panels/QAQCPanel";
+import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPanel";
+import { NI43101Panel } from "@/engine3d/panels/NI43101Panel";
+import { AuditTrailPanel } from "@/engine3d/panels/AuditTrailPanel";
+import { EngineTabsDock, type EngineTab } from "@/engine3d/panels/EngineTabsDock";
+import { useQAQC } from "@/engine3d/hooks/useQAQC";
+import { DEFAULT_ESTIMATION, applyEstimation, type EstimationSettings } from "@/engine3d/qaqc/estimationPresets";
+import { auditTrail, computeHash } from "@/engine3d/qaqc/auditTrail";
+import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
 import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
@@ -86,8 +95,52 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
   const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
 
+  // Sprint 4: estimation settings + active tab + NI 43-101 mode
+  const [estimation, setEstimation] = useState<EstimationSettings>(DEFAULT_ESTIMATION);
+  const [activeTab, setActiveTab] = useState<EngineTab>("viewer");
+  const [ni43Mode, setNi43Mode] = useState(false);
+
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
+
+  // Sprint 4: QA/QC sobre el bundle importado
+  const qaqcInput = useMemo(() => {
+    if (!importedBundle) return null;
+    return {
+      collars: importedBundle.collars,
+      surveys: importedBundle.surveys,
+      assays: importedBundle.assays,
+      lithology: importedBundle.lithology,
+    };
+  }, [importedBundle]);
+  const { result: qaqcResult, busy: qaqcBusy } = useQAQC(qaqcInput);
+
+  // Aplicar estimation settings sobre los blockParams
+  useEffect(() => {
+    setBlockParams((p) => applyEstimation(p, estimation));
+  }, [estimation]);
+
+  // (block model rebuild logging — declarado más abajo, ver useEffect después de useBlockModel)
+
+  // Log QA/QC runs
+  useEffect(() => {
+    if (qaqcResult) {
+      auditTrail.log("qaqc.run", { summary: qaqcResult.summary });
+    }
+  }, [qaqcResult]);
+
+  // Log CSV imports
+  useEffect(() => {
+    if (importedBundle) {
+      auditTrail.log("import.csv", {
+        collars: importedBundle.collars.length,
+        surveys: importedBundle.surveys.length,
+        assays: importedBundle.assays.length,
+        lithology: importedBundle.lithology.length,
+        errors: importedBundle.errors.length,
+      });
+    }
+  }, [importedBundle]);
 
   const { output: iso, busy: isoBusy } = useIsosurface(
     renderMode === "iso" ? points : [],
@@ -108,6 +161,29 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     verticalExaggeration,
     4000,
   );
+
+  // Sprint 4: log block model rebuilds + versionado (después de useBlockModel)
+  useEffect(() => {
+    if (!blockModel) return;
+    const inputHash = computeHash({
+      n: points.length,
+      blockSize: blockModel.blockSize,
+      commodity: blockModel.commodity,
+    });
+    const summary = {
+      blocks: blockModel.count,
+      tonnes: blockModel.stats.tonnesTotal,
+      gradeMean: blockModel.stats.gradeMean,
+      metalContent: blockModel.stats.metalTotal,
+      cutoff: blockFilters.cutoff,
+      measured: blockModel.stats.measured,
+      indicated: blockModel.stats.indicated,
+      inferred: blockModel.stats.inferred,
+    };
+    const v = modelVersions.push({ inputHash, settings: blockParams, summary });
+    auditTrail.log("blockmodel.build", { modelId: v.modelId, summary });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blockModel]);
 
   // Section mode = clipping forzado activo
   const effectiveClip = useMemo<ClipParams>(
@@ -736,6 +812,55 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           onClose={() => setShowImportPanel(false)}
           onImport={(b) => setImportedBundle(b)}
         />
+      )}
+
+      {/* Sprint 4: Tabs dock */}
+      <EngineTabsDock
+        active={activeTab}
+        onChange={(t) => {
+          setActiveTab(t);
+          if (t === "section") setShowSectionPanel(true);
+          if (t === "resource") setShowResourcePanel(true);
+          if (t === "ni43101") setNi43Mode(true);
+          if (t === "viewer") {
+            setShowSectionPanel(false);
+            setShowResourcePanel(false);
+            setNi43Mode(false);
+          }
+        }}
+        badges={{
+          qaqc: qaqcResult?.summary.critical || qaqcResult?.summary.warning || undefined,
+          ni43101: ni43Mode ? "ON" : undefined,
+        }}
+      />
+
+      {activeTab === "qaqc" && (
+        <QAQCPanel result={qaqcResult} busy={qaqcBusy} onClose={() => setActiveTab("viewer")} />
+      )}
+      {activeTab === "estimation" && (
+        <EstimationSettingsPanel
+          value={estimation}
+          onChange={setEstimation}
+          onClose={() => setActiveTab("viewer")}
+        />
+      )}
+      {activeTab === "ni43101" && (
+        <NI43101Panel
+          projectId={projectId}
+          model={blockModel}
+          params={blockParams}
+          estimation={estimation}
+          qaqc={qaqcResult}
+          bundle={importedBundle}
+          econ={econ}
+          onClose={() => {
+            setActiveTab("viewer");
+            setNi43Mode(false);
+          }}
+        />
+      )}
+      {activeTab === "audit" && (
+        <AuditTrailPanel onClose={() => setActiveTab("viewer")} />
       )}
     </div>
   );
