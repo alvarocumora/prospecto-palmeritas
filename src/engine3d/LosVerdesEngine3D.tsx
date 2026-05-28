@@ -18,6 +18,68 @@ function InvalidateOnChange({ deps }: { deps: unknown[] }) {
   return null;
 }
 
+function ForceCameraFit({
+  bounds,
+  trigger,
+}: {
+  bounds: SceneBounds;
+  trigger: number;
+}) {
+  const camera = useThree((s) => s.camera);
+  const controls = useThree((s) => s.controls) as {
+    target: THREE.Vector3;
+    update?: () => void;
+    minDistance?: number;
+    maxDistance?: number;
+  } | null;
+  const invalidate = useThree((s) => s.invalidate);
+
+  useEffect(() => {
+    if (trigger === 0) return;
+    fitCameraToBounds(camera, controls, bounds, invalidate);
+  }, [bounds, camera, controls, invalidate, trigger]);
+
+  return null;
+}
+
+function DebugSceneBounds({ bounds }: { bounds: SceneBounds }) {
+  const box = useMemo(() => {
+    if (!bounds) return null;
+    const size = [
+      Math.max(1, bounds.max[0] - bounds.min[0]),
+      Math.max(1, bounds.max[1] - bounds.min[1]),
+      Math.max(1, bounds.max[2] - bounds.min[2]),
+    ] as const;
+    const center = [
+      (bounds.min[0] + bounds.max[0]) / 2,
+      (bounds.min[1] + bounds.max[1]) / 2,
+      (bounds.min[2] + bounds.max[2]) / 2,
+    ] as const;
+    return { size, center };
+  }, [bounds]);
+
+  if (!box) return null;
+
+  return (
+    <group>
+      <mesh position={box.center} renderOrder={999}>
+        <boxGeometry args={box.size} />
+        <meshBasicMaterial color="#ffffff" wireframe toneMapped={false} depthTest={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function DebugOriginLabel() {
+  return (
+    <Html position={[0, 220, 0]} center sprite zIndexRange={[20, 0]}>
+      <div className="rounded border border-cyan-400/70 bg-black/80 px-2 py-1 text-[10px] font-mono text-cyan-200 shadow-[0_0_12px_rgba(34,211,238,0.35)]">
+        ORIGIN
+      </div>
+    </Html>
+  );
+}
+
 import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown, Boxes, Upload } from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
