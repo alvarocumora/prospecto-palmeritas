@@ -132,7 +132,9 @@ import {
 import { TerrainPlane } from "@/engine3d/layers/TerrainPlane";
 import { TerrainMartiniLayer } from "@/engine3d/layers/TerrainMartiniLayer";
 import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
-import { BasemapPanel, NorthArrow, ScaleBar } from "@/engine3d/panels/BasemapPanel";
+import { BasemapPanel, ScaleBar } from "@/engine3d/panels/BasemapPanel";
+import { CameraOrientationTracker, CompassRose, MiniMap, type CameraOrientation } from "@/engine3d/panels/CompassAndMiniMap";
+import { ShadowApplier } from "@/engine3d/layers/ShadowApplier";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
 import { CinematicEffects } from "@/engine3d/layers/CinematicEffects";
