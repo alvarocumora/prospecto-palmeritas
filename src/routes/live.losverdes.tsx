@@ -83,16 +83,10 @@ function LiveLosVerdesPage() {
   const fetchAnoms = useServerFn(getLosVerdesAnomalies);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchReport = useServerFn(getTilamaReport);
-  const fetchDrillholes = useServerFn(getLosVerdesDrillholes);
 
   const layersQ = useQuery({
     queryKey: ["losverdes", "public-layers"],
     queryFn: () => fetchLayers(),
-    staleTime: 5 * 60_000,
-  });
-  const anomsQ = useQuery({
-    queryKey: ["losverdes", "anomalies"],
-    queryFn: () => fetchAnoms(),
     staleTime: 5 * 60_000,
   });
   const miningQ = useQuery({
@@ -105,17 +99,11 @@ function LiveLosVerdesPage() {
     queryFn: () => fetchReport(),
     staleTime: 60_000,
   });
-  const drillsQ = useQuery({
-    queryKey: ["losverdes", "drillholes"],
-    queryFn: () => fetchDrillholes(),
-    staleTime: 10 * 60_000,
-  });
 
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
   const [genBusy, setGenBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
-  const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
@@ -137,18 +125,13 @@ function LiveLosVerdesPage() {
     }
   };
 
-
-
   useEffect(() => {
     return onLosVerdesFocus((evt) => {
-      if (evt.kind === "target" && evt.source === "scene3d" && evt.id) {
+      if (evt.kind === "target" && evt.id) {
         setAiTarget({ code: String(evt.id), name: String(evt.label ?? evt.id) });
       }
     });
   }, []);
-
-  const centerLat = layersQ.data?.project.center_lat ?? DEFAULT_CENTER.lat;
-  const centerLng = layersQ.data?.project.center_lng ?? DEFAULT_CENTER.lng;
 
   const handlePdf = async () => {
     if (!reportQ.data) return;
@@ -287,22 +270,12 @@ function LiveLosVerdesPage() {
         <section>
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
-              {engineMode === "new"
-                ? "Engine 3D · Marching Cubes · IDW · Sondajes (sprint 2)"
-                : "Visor 3D · Esri + DEM · Anomalías · Vetas · Plan"}
+              Engine 3D · Marching Cubes · IDW · Sondajes
             </h2>
             <div className="flex items-center gap-2">
-              {(layersQ.isLoading || anomsQ.isLoading || miningQ.isLoading) && (
+              {(layersQ.isLoading || miningQ.isLoading) && (
                 <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
               )}
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-7 text-[10px] font-mono"
-                onClick={() => setEngineMode((m) => (m === "new" ? "legacy" : "new"))}
-              >
-                {engineMode === "new" ? "Ver viewer clásico" : "Activar Engine 3D (beta)"}
-              </Button>
             </div>
           </div>
           {!mounted ? (
@@ -317,25 +290,7 @@ function LiveLosVerdesPage() {
                 </div>
               }
             >
-              {engineMode === "new" ? (
-                <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
-              ) : anomsQ.data && layersQ.data ? (
-                <LosVerdesScene3D
-                  centerLat={centerLat}
-                  centerLng={centerLng}
-                  satAnomalies={anomsQ.data.satAnomalies}
-                  magTargets={anomsQ.data.magTargets}
-                  lineaments={anomsQ.data.lineaments}
-                  targets={layersQ.data.targets}
-                  veins={miningQ.data?.veins ?? []}
-                  phases={miningQ.data?.phases ?? []}
-                  drillholes={drillsQ.data?.holes ?? []}
-                />
-              ) : (
-                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-                  Cargando escena 3D…
-                </div>
-              )}
+              <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
             </Suspense>
           )}
         </section>
@@ -459,25 +414,6 @@ function LiveLosVerdesPage() {
           </div>
         )}
 
-        {/* Mapa de campo */}
-        <section>
-          <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold mb-2">
-            Mapa de campo · GPS + Catastro + Capas
-          </h2>
-          {mounted ? (
-            <Suspense
-              fallback={
-                <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-                  Cargando mapa de campo…
-                </div>
-              }
-            >
-              <FieldMapPublic />
-            </Suspense>
-          ) : (
-            <div className="w-full h-[400px] rounded-lg border border-border bg-bg-secondary" />
-          )}
-        </section>
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
           Geocapitals · Informe pre-NI 43-101 · Estimaciones conceptuales, no recursos informados.
