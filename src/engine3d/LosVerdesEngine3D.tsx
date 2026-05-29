@@ -132,7 +132,9 @@ import {
 import { TerrainPlane } from "@/engine3d/layers/TerrainPlane";
 import { TerrainMartiniLayer } from "@/engine3d/layers/TerrainMartiniLayer";
 import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
-import { BasemapPanel, NorthArrow, ScaleBar } from "@/engine3d/panels/BasemapPanel";
+import { BasemapPanel, ScaleBar } from "@/engine3d/panels/BasemapPanel";
+import { CameraOrientationTracker, CompassRose, MiniMap, type CameraOrientation } from "@/engine3d/panels/CompassAndMiniMap";
+import { ShadowApplier } from "@/engine3d/layers/ShadowApplier";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
 import { CinematicEffects } from "@/engine3d/layers/CinematicEffects";
@@ -254,6 +256,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [fitCameraNonce, setFitCameraNonce] = useState(0);
   const [frameBounds, setFrameBounds] = useState<SceneBounds>(null);
   const [frameNonce, setFrameNonce] = useState(0);
+  const [cameraOrientation, setCameraOrientation] = useState<CameraOrientation>({
+    azimuthDeg: 0,
+    cameraXZ: { x: 0, z: 0 },
+    targetXZ: { x: 0, z: 0 },
+  });
+  const [showMiniMap, setShowMiniMap] = useState(true);
 
 
   const points = pointsQ.data?.points ?? [];
@@ -1227,19 +1235,45 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         dpr={[1, 1.5]}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         camera={{ position: cameraInitial, fov: 45, near: 0.1, far: 1_000_000, up: [0, 1, 0] }}
-        shadows={false}
+        shadows={cinematicEnabled && !debugRenderMode ? "soft" : false}
         style={{ width: "100%", height: "100%", zIndex: 0, position: "relative", border: "1px solid cyan" }}
         onCreated={({ gl, invalidate }) => {
           gl.localClippingEnabled = true;
+          // ACES cinematográfico + sRGB
+          gl.toneMapping = THREE.ACESFilmicToneMapping;
+          gl.toneMappingExposure = 1.05;
+          gl.outputColorSpace = THREE.SRGBColorSpace;
           setTimeout(() => invalidate(), 300);
         }}
       >
         <color attach="background" args={[debugRenderMode ? "#05070b" : cinematic ? "#0a0f18" : "#1a1a1f"]} />
         {fogEnabled && <fog attach="fog" args={[cinematicEnabled ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
-        <ambientLight intensity={debugRenderMode ? 1.35 : 0.7} />
+        <ambientLight intensity={debugRenderMode ? 1.35 : 0.45} />
         {!debugRenderMode && <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />}
-        {!debugRenderMode && <directionalLight position={[5000, 8000, 3000]} intensity={1.8} color="#fff4e0" />}
-        {!debugRenderMode && <directionalLight position={[-3000, 2500, -2500]} intensity={0.35} color="#88a0c8" />}
+        {!debugRenderMode && (
+          <directionalLight
+            position={[5000, 8000, 3000]}
+            intensity={2.2}
+            color="#fff4e0"
+            castShadow={cinematicEnabled}
+            shadow-mapSize-width={2048}
+            shadow-mapSize-height={2048}
+            shadow-camera-left={-6000}
+            shadow-camera-right={6000}
+            shadow-camera-top={6000}
+            shadow-camera-bottom={-6000}
+            shadow-camera-near={100}
+            shadow-camera-far={20000}
+            shadow-bias={-0.0005}
+            shadow-normalBias={1.0}
+          />
+        )}
+        {!debugRenderMode && <directionalLight position={[-3000, 2500, -2500]} intensity={0.4} color="#88a0c8" />}
+        <ShadowApplier
+          enabled={cinematicEnabled && !debugRenderMode}
+          deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, synthHoles.length, synthBlocks.length, pitShells.length]}
+        />
+        <CameraOrientationTracker onUpdate={setCameraOrientation} />
 
         {/* Debug helpers — always-on baseline so viewer is never blank */}
         <axesHelper args={[5000]} renderOrder={1000} />
@@ -1376,8 +1410,27 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       </Canvas>
 
 
-      {showNorth && <NorthArrow />}
+      {showNorth && <CompassRose azimuthDeg={cameraOrientation.azimuthDeg} />}
       {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
+      {showMiniMap && (
+        <MiniMap
+          extentMeters={BASEMAP_EXTENT}
+          orientation={cameraOrientation}
+          drillCollars={[
+            ...holes.map((h) => ({ x: h.collar.x, y: h.collar.y })),
+            ...synthHoles.map((h) => ({ x: h.collar.x, y: h.collar.y })),
+          ]}
+          pitShells={pitShells.slice(0, 1).map((s) => {
+            const pts: Array<{ x: number; y: number }> = [];
+            const pos = s.positions ?? [];
+            for (let i = 0; i < pos.length; i += 12) {
+              pts.push({ x: pos[i] ?? 0, y: pos[i + 1] ?? 0 });
+            }
+            return { points: pts };
+          })}
+          label={`${holes.length + synthHoles.length} sondajes`}
+        />
+      )}
       {showCoords && pointsQ.data?.center && (pointsQ.data.center.lng !== 0 || pointsQ.data.center.lat !== 0) && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded px-2 py-1 border border-border text-[10px] font-mono text-cyan-200">
           {pointsQ.data.center.lat.toFixed(5)}°N · {pointsQ.data.center.lng.toFixed(5)}°E
