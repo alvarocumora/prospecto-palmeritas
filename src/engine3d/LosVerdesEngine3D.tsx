@@ -1410,8 +1410,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       </Canvas>
 
 
-      {showNorth && <NorthArrow />}
+      {showNorth && <CompassRose azimuthDeg={cameraOrientation.azimuthDeg} />}
       {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
+      {showMiniMap && (
+        <MiniMap
+          extentMeters={BASEMAP_EXTENT}
+          orientation={cameraOrientation}
+          drillCollars={[
+            ...holes.map((h) => ({ x: h.collar.x, y: h.collar.y })),
+            ...synthHoles.map((h) => ({ x: h.collar.x, y: h.collar.y })),
+          ]}
+          pitShells={pitShells.slice(0, 1).map((s) => ({
+            points: (s.vertices ?? []).filter((_, i) => i % 4 === 0).map((v) => ({ x: v.x, y: v.y })),
+          }))}
+          label={`${holes.length + synthHoles.length} sondajes`}
+        />
+      )}
       {showCoords && pointsQ.data?.center && (pointsQ.data.center.lng !== 0 || pointsQ.data.center.lat !== 0) && (
         <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded px-2 py-1 border border-border text-[10px] font-mono text-cyan-200">
           {pointsQ.data.center.lat.toFixed(5)}°N · {pointsQ.data.center.lng.toFixed(5)}°E
