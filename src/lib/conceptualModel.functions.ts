@@ -58,11 +58,16 @@ export const getSyntheticDrillholes = createServerFn({ method: "POST" })
       .from("synthetic_assays")
       .select("hole_id, from_m, to_m, cu_pct, au_gpt, ag_gpt, mo_pct, lithology, alteration, mineralized")
       .in("hole_id", ids);
-    const byHole = new Map<string, typeof assays.data extends infer T ? (T extends Array<infer U> ? U : never) : never[]>();
-    for (const a of assays.data ?? []) {
-      const arr = (byHole.get(a.hole_id as string) as unknown[] | undefined) ?? [];
+    type AssayRowDb = {
+      hole_id: string; from_m: number; to_m: number;
+      cu_pct: number | null; au_gpt: number | null; ag_gpt: number | null; mo_pct: number | null;
+      lithology: string | null; alteration: string | null; mineralized: boolean;
+    };
+    const byHole = new Map<string, AssayRowDb[]>();
+    for (const a of (assays.data ?? []) as AssayRowDb[]) {
+      const arr = byHole.get(a.hole_id) ?? [];
       arr.push(a);
-      byHole.set(a.hole_id as string, arr as never);
+      byHole.set(a.hole_id, arr);
     }
 
     const out: SyntheticDrillhole[] = holes.data.map((h) => {
