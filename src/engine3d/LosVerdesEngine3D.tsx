@@ -90,6 +90,7 @@ import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainD
 import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/engine3d/hooks/useBlockModel";
 import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
 import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
+import { TonnageGradePanel } from "@/engine3d/panels/TonnageGradePanel";
 import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
 import { QAQCPanel } from "@/engine3d/panels/QAQCPanel";
 import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPanel";
@@ -213,6 +214,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [blockFilters, setBlockFilters] = useState<BlockFilters>(DEFAULT_BLOCK_FILTERS);
   const [showBlocks, setShowBlocks] = useState(true);
   const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [showTonnageGrade, setShowTonnageGrade] = useState(true);
   const [showImportPanel, setShowImportPanel] = useState(false);
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
   const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
@@ -1534,7 +1536,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               />
             </div>
           )}
+          {synthBlocks.length > 0 && (
+            <div className="flex items-center justify-between pt-1 border-t border-border/60">
+              <Label htmlFor="tonnage-grade" className="text-[10px]">Tonnage-grade</Label>
+              <Switch id="tonnage-grade" checked={showTonnageGrade} onCheckedChange={setShowTonnageGrade} />
+            </div>
+          )}
         </div>
+      )}
+
+      {showTonnageGrade && synthBlocks.length > 0 && (
+        <TonnageGradePanel
+          blocks={synthBlocks}
+          cutoff={synthBlockCutoff}
+          onCutoffChange={setSynthBlockCutoff}
+          onClose={() => setShowTonnageGrade(false)}
+        />
       )}
 
       {activeTab === "qaqc" && (
