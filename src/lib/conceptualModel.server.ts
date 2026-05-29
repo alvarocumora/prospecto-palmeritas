@@ -258,7 +258,7 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
 
   const insertedHoles = await supabaseAdmin
     .from("synthetic_drillholes")
-    .insert(holeInserts)
+    .insert(holeInserts as never)
     .select("id, hole_code");
   if (insertedHoles.error) throw new Error(`insert holes: ${insertedHoles.error.message}`);
   const holeIdByCode = new Map<string, string>();
