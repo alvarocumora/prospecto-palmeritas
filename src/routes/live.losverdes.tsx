@@ -15,7 +15,7 @@ const LosVerdesEngine3D = lazy(() =>
 );
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
-import { getLosVerdesPublicLayers, getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
+import { getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
@@ -41,7 +41,7 @@ export const Route = createFileRoute("/live/losverdes")({
   component: LiveLosVerdesPage,
 });
 
-const DEFAULT_CENTER = { lat: -31.95, lng: -71.18 };
+
 
 function fmtUsd(v: number): string {
   if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
@@ -80,7 +80,6 @@ function priorityColor(p: string | null) {
 
 function LiveLosVerdesPage() {
   const fetchLayers = useServerFn(getLosVerdesPublicLayers);
-  const fetchAnoms = useServerFn(getLosVerdesAnomalies);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchReport = useServerFn(getTilamaReport);
 
