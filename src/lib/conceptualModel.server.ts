@@ -83,11 +83,10 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   } = opts;
 
   // 1. Cargar fuentes reales: proyecto, anomalías, vetas, targets
-  const [projRes, satRes, veinsRes, targetsRes] = await Promise.all([
+  const [projRes, satRes, veinsRes] = await Promise.all([
     supabaseAdmin.from("projects").select("center_lng, center_lat").eq("id", projectId).maybeSingle(),
-    supabaseAdmin.from("satellite_anomalies").select("id, centroid_lng, centroid_lat, score, severity, area_ha").eq("project_id", projectId),
+    supabaseAdmin.from("satellite_anomalies").select("id, bbox, score, severity, area_ha").eq("project_id", projectId),
     supabaseAdmin.from("veins").select("id, code, name, strike_deg, dip_deg, dip_dir_deg, thickness_m, depth_top_m, depth_bottom_m, grade_estimate, geometry").eq("project_id", projectId),
-    supabaseAdmin.from("exploration_targets").select("id, code, name, priority, geometry, centroid_lng, centroid_lat").eq("project_id", projectId),
   ]);
 
   if (!projRes.data) throw new Error(`Project ${projectId} not found`);
