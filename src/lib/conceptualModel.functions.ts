@@ -87,10 +87,9 @@ export const getSyntheticDrillholes = createServerFn({ method: "POST" })
       const dz = Math.sin(dipRad);
       const collar = { x: enu.x, y: enu.y, z: cz };
       const toe = { x: enu.x + dx * dep, y: enu.y + dy * dep, z: cz + dz * dep };
-      const rows = (byHole.get(h.id as string) as unknown[]) ?? [];
+      const rows = byHole.get(h.id as string) ?? [];
       const intervals = rows
-        .map((r) => {
-          const rr = r as Record<string, number | string | boolean | null>;
+        .map((rr) => {
           const cu = Number(rr.cu_pct ?? 0);
           const au = Number(rr.au_gpt ?? 0);
           const ag = Number(rr.ag_gpt ?? 0);
@@ -99,8 +98,8 @@ export const getSyntheticDrillholes = createServerFn({ method: "POST" })
             from: Number(rr.from_m), to: Number(rr.to_m),
             cuPct: cu, auGpt: au, agGpt: ag, moPct: mo,
             cuEq: cu + au * 0.6 + ag * 0.008 + mo * 4,
-            lith: (rr.lithology as string | null) ?? null,
-            alt: (rr.alteration as string | null) ?? null,
+            lith: rr.lithology ?? null,
+            alt: rr.alteration ?? null,
             mineralized: Boolean(rr.mineralized),
           };
         })
