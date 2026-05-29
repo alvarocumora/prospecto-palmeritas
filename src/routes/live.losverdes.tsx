@@ -217,6 +217,17 @@ function LiveLosVerdesPage() {
           <Button
             size="sm"
             variant="outline"
+            onClick={handleGenConceptual}
+            disabled={genBusy}
+            className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
+            title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
+          >
+            {genBusy ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
+            Generar modelo conceptual
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
             onClick={handleSyncCatastro}
             disabled={catBusy}
             className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
