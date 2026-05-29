@@ -27,6 +27,7 @@ import { getLosVerdesDrillholes } from "@/lib/losverdes-ai.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
+import { generateConceptualModelFn } from "@/lib/conceptualModel.functions";
 import { onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 export const Route = createFileRoute("/live/losverdes")({
