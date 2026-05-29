@@ -1420,9 +1420,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             ...holes.map((h) => ({ x: h.collar.x, y: h.collar.y })),
             ...synthHoles.map((h) => ({ x: h.collar.x, y: h.collar.y })),
           ]}
-          pitShells={pitShells.slice(0, 1).map((s) => ({
-            points: (s.vertices ?? []).filter((_, i) => i % 4 === 0).map((v) => ({ x: v.x, y: v.y })),
-          }))}
+          pitShells={pitShells.slice(0, 1).map((s) => {
+            const pts: Array<{ x: number; y: number }> = [];
+            const pos = s.positions ?? [];
+            for (let i = 0; i < pos.length; i += 12) {
+              pts.push({ x: pos[i] ?? 0, y: pos[i + 1] ?? 0 });
+            }
+            return { points: pts };
+          })}
           label={`${holes.length + synthHoles.length} sondajes`}
         />
       )}
