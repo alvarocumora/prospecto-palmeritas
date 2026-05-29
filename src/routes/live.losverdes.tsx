@@ -120,11 +120,29 @@ function LiveLosVerdesPage() {
 
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
+  const [genBusy, setGenBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+  const genConceptual = useServerFn(generateConceptualModelFn);
+
+  const handleGenConceptual = async () => {
+    setGenBusy(true);
+    const tid = toast.loading("Generando sondajes + block model + pit shells conceptuales…");
+    try {
+      const r = await genConceptual({ data: { projectId: "7a499b02-ecdf-447b-8956-b106fe4ec087" } });
+      toast.success(
+        `Modelo conceptual generado: ${r.drillholes} sondajes · ${r.assays} assays · ${r.blocks} bloques · ${r.pitShells} pit shells`,
+        { id: tid, duration: 8000 },
+      );
+    } catch (e) {
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: tid });
+    } finally {
+      setGenBusy(false);
+    }
+  };
 
 
 
