@@ -27,6 +27,7 @@ import { getLosVerdesDrillholes } from "@/lib/losverdes-ai.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
+import { generateConceptualModelFn } from "@/lib/conceptualModel.functions";
 import { onLosVerdesFocus } from "@/lib/losverdes-focus";
 
 export const Route = createFileRoute("/live/losverdes")({
@@ -119,11 +120,29 @@ function LiveLosVerdesPage() {
 
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
+  const [genBusy, setGenBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [engineMode, setEngineMode] = useState<"new" | "legacy">("new");
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
+  const genConceptual = useServerFn(generateConceptualModelFn);
+
+  const handleGenConceptual = async () => {
+    setGenBusy(true);
+    const tid = toast.loading("Generando sondajes + block model + pit shells conceptuales…");
+    try {
+      const r = await genConceptual({ data: { projectId: "7a499b02-ecdf-447b-8956-b106fe4ec087" } });
+      toast.success(
+        `Modelo conceptual generado: ${r.drillholes} sondajes · ${r.assays} assays · ${r.blocks} bloques · ${r.pitShells} pit shells`,
+        { id: tid, duration: 8000 },
+      );
+    } catch (e) {
+      toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: tid });
+    } finally {
+      setGenBusy(false);
+    }
+  };
 
 
 
@@ -195,6 +214,17 @@ function LiveLosVerdesPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleGenConceptual}
+            disabled={genBusy}
+            className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
+            title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
+          >
+            {genBusy ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
+            Generar modelo conceptual
+          </Button>
           <Button
             size="sm"
             variant="outline"
