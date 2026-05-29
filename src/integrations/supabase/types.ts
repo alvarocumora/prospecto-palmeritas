@@ -8998,6 +8998,54 @@ export type Database = {
           },
         ]
       }
+      pit_shells: {
+        Row: {
+          bounds: Json | null
+          created_at: string
+          grade_avg_cu_eq: number | null
+          id: string
+          is_conceptual: boolean
+          mesh_indices: Json
+          mesh_positions: Json
+          method: string
+          npv_usd: number | null
+          project_id: string
+          revenue_factor: number
+          strip_ratio: number | null
+          tonnage_mt: number | null
+        }
+        Insert: {
+          bounds?: Json | null
+          created_at?: string
+          grade_avg_cu_eq?: number | null
+          id?: string
+          is_conceptual?: boolean
+          mesh_indices: Json
+          mesh_positions: Json
+          method?: string
+          npv_usd?: number | null
+          project_id: string
+          revenue_factor: number
+          strip_ratio?: number | null
+          tonnage_mt?: number | null
+        }
+        Update: {
+          bounds?: Json | null
+          created_at?: string
+          grade_avg_cu_eq?: number | null
+          id?: string
+          is_conceptual?: boolean
+          mesh_indices?: Json
+          mesh_positions?: Json
+          method?: string
+          npv_usd?: number | null
+          project_id?: string
+          revenue_factor?: number
+          strip_ratio?: number | null
+          tonnage_mt?: number | null
+        }
+        Relationships: []
+      }
       precios_metales: {
         Row: {
           ag_usd_oz: number | null
@@ -11982,6 +12030,161 @@ export type Database = {
           stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      synthetic_assays: {
+        Row: {
+          ag_gpt: number | null
+          alteration: string | null
+          au_gpt: number | null
+          cu_pct: number | null
+          from_m: number
+          hole_id: string
+          id: string
+          lithology: string | null
+          mineralized: boolean
+          mo_pct: number | null
+          to_m: number
+        }
+        Insert: {
+          ag_gpt?: number | null
+          alteration?: string | null
+          au_gpt?: number | null
+          cu_pct?: number | null
+          from_m: number
+          hole_id: string
+          id?: string
+          lithology?: string | null
+          mineralized?: boolean
+          mo_pct?: number | null
+          to_m: number
+        }
+        Update: {
+          ag_gpt?: number | null
+          alteration?: string | null
+          au_gpt?: number | null
+          cu_pct?: number | null
+          from_m?: number
+          hole_id?: string
+          id?: string
+          lithology?: string | null
+          mineralized?: boolean
+          mo_pct?: number | null
+          to_m?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "synthetic_assays_hole_id_fkey"
+            columns: ["hole_id"]
+            isOneToOne: false
+            referencedRelation: "synthetic_drillholes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      synthetic_block_model: {
+        Row: {
+          confidence: number
+          cu_eq_pct: number
+          domain: string | null
+          id: number
+          method: string
+          project_id: string
+          size_x: number
+          size_y: number
+          size_z: number
+          version: number
+          x_utm: number
+          y_utm: number
+          z_m: number
+        }
+        Insert: {
+          confidence?: number
+          cu_eq_pct: number
+          domain?: string | null
+          id?: number
+          method?: string
+          project_id: string
+          size_x?: number
+          size_y?: number
+          size_z?: number
+          version?: number
+          x_utm: number
+          y_utm: number
+          z_m: number
+        }
+        Update: {
+          confidence?: number
+          cu_eq_pct?: number
+          domain?: string | null
+          id?: number
+          method?: string
+          project_id?: string
+          size_x?: number
+          size_y?: number
+          size_z?: number
+          version?: number
+          x_utm?: number
+          y_utm?: number
+          z_m?: number
+        }
+        Relationships: []
+      }
+      synthetic_drillholes: {
+        Row: {
+          azimuth_deg: number
+          collar_x_utm: number
+          collar_y_utm: number
+          collar_z_m: number
+          created_at: string
+          depth_m: number
+          dip_deg: number
+          generated_from_id: string | null
+          generated_from_kind: string | null
+          hole_code: string
+          id: string
+          is_conceptual: boolean
+          meta: Json
+          project_id: string
+          source: string
+          utm_zone: number
+        }
+        Insert: {
+          azimuth_deg: number
+          collar_x_utm: number
+          collar_y_utm: number
+          collar_z_m: number
+          created_at?: string
+          depth_m: number
+          dip_deg: number
+          generated_from_id?: string | null
+          generated_from_kind?: string | null
+          hole_code: string
+          id?: string
+          is_conceptual?: boolean
+          meta?: Json
+          project_id: string
+          source?: string
+          utm_zone?: number
+        }
+        Update: {
+          azimuth_deg?: number
+          collar_x_utm?: number
+          collar_y_utm?: number
+          collar_z_m?: number
+          created_at?: string
+          depth_m?: number
+          dip_deg?: number
+          generated_from_id?: string | null
+          generated_from_kind?: string | null
+          hole_code?: string
+          id?: string
+          is_conceptual?: boolean
+          meta?: Json
+          project_id?: string
+          source?: string
+          utm_zone?: number
         }
         Relationships: []
       }
