@@ -160,6 +160,35 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     staleTime: 60_000,
   });
 
+  // Conceptual / synthetic datasets
+  const fetchSynthHoles = useServerFn(getSyntheticDrillholes);
+  const fetchSynthBlocks = useServerFn(getSyntheticBlockModel);
+  const fetchPitShells = useServerFn(getPitShells);
+  const synthHolesQ = useQuery({
+    queryKey: ["engine3d", "synthHoles", projectId],
+    queryFn: () => fetchSynthHoles({ data: { projectId } }),
+    staleTime: 60_000,
+  });
+  const synthBlocksQ = useQuery({
+    queryKey: ["engine3d", "synthBlocks", projectId],
+    queryFn: () => fetchSynthBlocks({ data: { projectId } }),
+    staleTime: 60_000,
+  });
+  const pitShellsQ = useQuery({
+    queryKey: ["engine3d", "pitShells", projectId],
+    queryFn: () => fetchPitShells({ data: { projectId } }),
+    staleTime: 60_000,
+  });
+  const synthHoles = synthHolesQ.data?.holes ?? [];
+  const synthBlocks = synthBlocksQ.data?.blocks ?? [];
+  const pitShells = pitShellsQ.data?.shells ?? [];
+  const [showSynthHoles, setShowSynthHoles] = useState(true);
+  const [showSynthBlocks, setShowSynthBlocks] = useState(true);
+  const [showPitShells, setShowPitShells] = useState(true);
+  const [synthBlockCutoff, setSynthBlockCutoff] = useState(0.3);
+  const [pitMaxRf, setPitMaxRf] = useState(1.4);
+  const [hoveredSynthHole, setHoveredSynthHole] = useState<SyntheticDrillhole | null>(null);
+
   const [voxelParams, setVoxelParams] = useState<VoxelParams>(DEFAULT_VOXEL_PARAMS);
   const [isoParams, setIsoParams] = useState<IsosurfaceParams>(DEFAULT_ISO_PARAMS);
   const [clipParams, setClipParams] = useState<ClipParams>(DEFAULT_CLIP_PARAMS);
