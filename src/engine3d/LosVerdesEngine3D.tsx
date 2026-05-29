@@ -214,6 +214,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [blockFilters, setBlockFilters] = useState<BlockFilters>(DEFAULT_BLOCK_FILTERS);
   const [showBlocks, setShowBlocks] = useState(true);
   const [showResourcePanel, setShowResourcePanel] = useState(false);
+  const [showTonnageGrade, setShowTonnageGrade] = useState(true);
   const [showImportPanel, setShowImportPanel] = useState(false);
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
   const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
