@@ -1536,7 +1536,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               />
             </div>
           )}
+          {synthBlocks.length > 0 && (
+            <div className="flex items-center justify-between pt-1 border-t border-border/60">
+              <Label htmlFor="tonnage-grade" className="text-[10px]">Tonnage-grade</Label>
+              <Switch id="tonnage-grade" checked={showTonnageGrade} onCheckedChange={setShowTonnageGrade} />
+            </div>
+          )}
         </div>
+      )}
+
+      {showTonnageGrade && synthBlocks.length > 0 && (
+        <TonnageGradePanel
+          blocks={synthBlocks}
+          cutoff={synthBlockCutoff}
+          onCutoffChange={setSynthBlockCutoff}
+          onClose={() => setShowTonnageGrade(false)}
+        />
       )}
 
       {activeTab === "qaqc" && (
