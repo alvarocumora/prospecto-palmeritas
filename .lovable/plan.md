@@ -1,87 +1,68 @@
-# Plan: Auditoría de respaldo de datos + validación de modelos 3D vivos
+# Plan — /live/losverdes nivel Datamine
 
-## 1. Estado real en base de datos (proyecto Los Verdes – Tilama)
+Objetivo: el visor público se vea y se opere como un Datamine/Leapfrog liviano, sin perder la trazabilidad DATO / INTERPRETACIÓN / CONCEPTUAL ya implantada.
 
-Verificado vía SQL sobre el `project_id` real:
+Estado actual:
+- Engine3D ya tiene DEM Martini, isosurface (marching cubes), drillholes instanciados, clipping planes, sections, AI geologist, reports.
+- Data real: 0 sondajes, 0 geofísica, 1 resource model, 190 muestras, 45 anomalías SAT, 108 targets.
+- `/live/losverdes` aún tiene LosVerdesScene3D (MapLibre/deck.gl) en paralelo al Engine3D.
 
-| Capa | Registros | Respaldo |
-|---|---|---|
-| Concesiones mineras | 15 | REAL (geom WGS84) |
-| Vetas mapeadas | 6 | REAL |
-| Anomalías satelitales | 45 | REAL (CLAY, IRON_OXIDE, HYDROTHERMAL, NDVI, LINEAMENTS) |
-| Runs satelitales | 9 (succeeded) | REAL (Sentinel/MPC) |
-| Targets de exploración | 108 (con geom) | REAL |
-| MAG targets | 10 | REAL |
-| **Geofísica (surveys/stations/anomalías)** | **0** | **SIN respaldo** |
-| **Sondajes (drill_holes/core_logs)** | **0** | **SIN respaldo** |
-| **Muestreo (sample_custody)** | **0** | **SIN respaldo** |
-| **scene_3d_cache** | **0** | **No persistido** |
-| **AI anomaly explanations** | **0** | **Sin generar** |
-| ni43101_satellite_evidence_links | 0 | Sin trazabilidad cargada |
+## Fase 1 — Consolidación del visor (limpieza)
+1. Retirar `LosVerdesScene3D` y `FieldMapPublic` del live; dejar Engine3D como único visor con tabs:
+   `Superficie · Sondajes · Block model · Sections · Pit · Reportes`.
+2. Pre-warm en SSR de bounds (centro + zoom) y un loading screen de marca antes de hidratar R3F.
+3. Mantener el badge global "VERSIÓN CONCEPTUAL — sin sondajes ejecutados" + tooltip por capa con su origen.
 
-## 2. Hallazgo crítico del informe v4
+## Fase 2 — Data sintética persistida (etiquetada conceptual)
+Nuevas tablas (schema `geo_conceptual`, sin GRANT a anon excepto lectura):
+- `synthetic_drillholes` (id, project_id, collar_x, collar_y, collar_z_utm, azimuth, dip, depth_m, source: 'ai_target_v1', is_conceptual=true).
+- `synthetic_assays` (hole_id, from_m, to_m, cu_pct, au_gpt, mo_pct, ag_gpt, lithology, alteration, generated_from: anomaly_id|target_id).
+- `synthetic_block_model` (project_id, x, y, z, size_m, cu_eq, confidence, domain).
+- `pit_shells` (project_id, revenue_factor, tonnage, grade_avg, mesh_url) — Lerchs-Grossmann simplificado.
 
-Las láminas L3D-1 a L3D-4 incluyen elementos **conceptuales** que se presentan visualmente como si tuvieran respaldo:
+Generador server (`src/lib/conceptualModel.functions.ts`):
+- Tomar las 45 anomalías + 6 vetas + 108 targets → desurvey ~15-20 sondajes virtuales (azimut perpendicular a la veta, dip 60°, profundidad 200-350 m).
+- Sembrar leyes con distribución log-normal calibrada (Cu 0.3-1.2 %, Au 0.1-0.8 g/t) en intervalos mineralizados, con halo de alteración.
+- Block model IDW (bloques 10×10×5 m) sobre un dominio que envuelva collares; persistir.
+- Pit shell aproximado por Floating Cone (variante didáctica de Lerchs-Grossmann) por revenue factor 0.4/0.6/0.8/1.0.
 
-- **Shells de pórfido (Cu eq %)**: simulados, no hay block model ni assays.
-- **Sondajes "LV-TIL-001" y trazas drillhole**: no existe ningún registro en `drill_holes`.
-- **Voxels MAG/Grav**: no existe ninguna campaña en `geophysics_*`.
-- **Pit conceptual / galerías / planta 2,500 t/d**: ingeniería conceptual sin estudio.
-- **Sección geológica Lo Prado + stock monzonítico**: interpretación, no sondaje.
+## Fase 3 — Capas geocientíficas (nivel Datamine)
+- `DrillholeTraceLayer`: cilindros instanciados + collares + labels HUD, color por lito o por Cu eq, hover muestra el intervalo.
+- `BlockModelLayer` ya existe → conectar a `synthetic_block_model`, filtros por cut-off, dominio, confianza.
+- `TonnageGradeCurve`: panel con curva tonelaje-ley interactiva (cut-off slider que repinta block model).
+- `PitShellLayer`: meshes anidados por revenue factor con transparencia, leyenda tonnage/strip ratio.
+- `SectionViewPanel` ya existe → re-corte: traza de sondajes proyectada ±50 m, vetas en sección, exportar PNG/SVG.
+- `LithologyPolygonEditor`: dibujar polígonos sobre la sección y guardarlos.
 
-Lo que SÍ tiene respaldo real y debe destacarse:
-- Ortofoto + concesiones + 45 anomalías sat (índice + severidad) + 108 targets + 6 vetas + DEM Copernicus.
+## Fase 4 — Acabado cinematográfico
+- Sun position por hora/fecha (CSM shadows en DEM), tone-mapping ACES, bloom suave en anomalías high-confidence.
+- Materiales PBR: roca DEM con normal map procedural, vetas con material metálico-rugoso, anomalías como nubes volumétricas (raymarch shader).
+- Exageración vertical configurable (1× / 1.5× / 2×), brújula 3D, escala gráfica métrica, mini-mapa 2D sincronizado.
+- Animaciones: orbit cinemático al cargar, fly-to en click de target, transición suave entre tabs.
+- HUD pro: leyenda lateral con barras de color, badge de capa activa, panel de cámara (vista plano / N / E / iso / libre).
 
-## 3. Acciones propuestas
+## Fase 5 — UX y reportes
+- Onboarding overlay primera visita (3 pasos).
+- Exportar vista actual a PNG hi-res; cross-section a SVG; block model a CSV; pit shell a OBJ.
+- Botón "Generar one-pager PDF" reutilizando reportGenerator.
 
-### A. Reetiquetar el informe (v5) por nivel de evidencia
-Cada lámina y figura llevará un sello visible:
-- `DATO` (verde) — respaldado por tablas Supabase, con conteo y fuente.
-- `INTERPRETACIÓN` (ámbar) — derivado geológico razonado a partir de datos reales.
-- `CONCEPTUAL` (rojo) — modelo target/ingenieril sin sondaje ni geofísica de campo.
+## Detalles técnicos
+- `useFrame` solo cuando hay animación; resto del tiempo `frameloop="demand"`.
+- Block model: BufferGeometry con instanced mesh; LOD por distancia (decimación a 20×20×10 m lejos).
+- Pit shell: marching cubes sobre cost field (revenue – mining cost) constraint angular 45°.
+- Worker dedicado para desurvey + IDW + floating cone (no bloquear UI al regenerar).
+- Cachear pit shells y block model en `scene_3d_cache` por `(project_id, params_hash)`.
+- Todo lo sintético se marca con badge naranja "CONCEPTUAL · generado por IA" en cada hover/leyenda; el anexo del PDF v5 ya lo cubre conceptualmente.
 
-Aplicación:
-- L1 (ortofoto+concesiones+targets): DATO.
-- L2 (estructural+sección traza): DATO + INTERPRETACIÓN.
-- L3 sección geológica, L3D-1 shells, L3D-2 lito 3D, L3D-3 voxels geofís, L3D-4 plan minero: CONCEPTUAL.
-- "Sondajes LV-TIL-001": eliminar o reetiquetar como **drillhole targets propuestos** (no ejecutados).
+## Entregables verificables
+- `/live/losverdes` muestra Engine3D único con 6 tabs operativas.
+- Al menos 15 sondajes virtuales + block model + 4 pit shells visibles y filtrables.
+- Cross-section editable con polígonos y export PNG/SVG.
+- Visual nivel demo de Leapfrog: sombras solares, materiales PBR, animaciones de cámara.
+- Performance objetivo: 45+ fps en laptop integrada, 60+ fps en GPU dedicada.
 
-### B. Añadir página "Trazabilidad de datos"
-Tabla con: capa, fuente (Sentinel-2 MPC run_id, Copernicus DEM, SERNAGEOMIN concesiones, mapeo veta), fecha, n° registros, link a run en plataforma. Genera honestidad NI 43-101.
-
-### C. Generar respaldo faltante donde sea barato y honesto
-- Poblar `ai_anomaly_explanations` para las 45 anomalías reales vía Lovable AI Gateway (ya hay tabla y el patrón existe). Esto convierte INTERPRETACIÓN en respaldada.
-- Persistir el DEM + drape de la escena en `scene_3d_cache` para versión live reproducible.
-- Crear `exploration_targets` "drillhole proposals" (no sondajes ejecutados) con coordenadas, azimuth/dip planeado, y vincularlos a anomalías vía `ni43101_satellite_evidence_links`.
-
-### D. Validar el visor 3D vivo en la app
-Rutas existentes a revisar:
-- `/_authenticated/dashboard/geology3d` (Geology3DViewer — DEM real + drape Sentinel)
-- `/_authenticated/dashboard/sat3d` (SatToSubsurface3DViewer)
-- `/_authenticated/dashboard/3d-pro`
-- `/live/losverdes` y `/live/tilama` (públicas)
-
-Checks:
-1. Abrir cada ruta en preview, verificar que renderiza con los 15 concesiones, 45 anomalías y 108 targets reales (no mock).
-2. Confirmar que el DEM Copernicus + drape Sentinel responden vía `scene3d.server` con el bbox de Tilama.
-3. Confirmar paridad visual con las láminas del PDF — si la app muestra algo distinto, alinear.
-4. Capturar screenshots de cada visor y embeberlos como "Vista live del modelo 3D" en el informe v5, con QR/URL al deploy publicado.
-
-### E. Compilar informe v5
-- `Geocapitals-LosVerdes5-PreNI43101_v5.pdf` con:
-  - Sello de evidencia en cada lámina.
-  - Página de trazabilidad.
-  - Capturas reales del visor live + link público.
-  - AI explanations adjuntas como anexo por anomalía.
-  - Eliminar/relabel todo lo que se presentaba como sondaje ejecutado.
-
-## Notas técnicas
-- Sin nuevas migraciones requeridas: todas las tablas existen.
-- AI explanations: usar `google/gemini-2.5-flash` (barato, multimodal) vía Lovable AI Gateway, batch de 45.
-- Captura del visor live: usar `browser--screenshot` sobre cada ruta autenticada con sesión de prueba.
-- Entregable final como artifact en `/mnt/documents/`.
-
-## Pregunta al usuario antes de ejecutar
-1. ¿Procedo a **eliminar** los sondajes ficticios "LV-TIL-001" del informe, o prefieres mantenerlos reetiquetados como "propuestas de sondaje" (drill targets)?
-2. ¿Genero las 45 explicaciones IA de anomalías y las persisto en `ai_anomaly_explanations`? (costo bajo, ~30 s)
-3. ¿Capturo el visor live publicado (`prospecto-palmeritas.lovable.app/live/losverdes`) o el preview autenticado?
+## Fuera de alcance (siguiente iteración)
+- Scheduling temporal (fases por año) y NPV.
+- Kriging real (ordinario/indicador) — por ahora IDW + nota.
+- Importador GEMS/Surpac/Datamine real (.dm, .str).
+- Multi-usuario colaborativo en la sección.
