@@ -174,13 +174,18 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
 
   // 2b. Anomalías SAT high-score → sondajes verticales/inclinados
   const sats = (satRes.data ?? [])
-    .map((s) => ({
-      id: s.id as string,
-      lng: Number(s.centroid_lng), lat: Number(s.centroid_lat),
-      score: Number(s.score ?? 0.5),
-      severity: s.severity as string | null,
-      area_ha: Number(s.area_ha ?? 1),
-    }))
+    .map((s) => {
+      const bb = (s.bbox as number[] | null) ?? [];
+      const lng = bb.length >= 4 ? (Number(bb[0]) + Number(bb[2])) / 2 : NaN;
+      const lat = bb.length >= 4 ? (Number(bb[1]) + Number(bb[3])) / 2 : NaN;
+      return {
+        id: s.id as string,
+        lng, lat,
+        score: Number(s.score ?? 0.5),
+        severity: s.severity as string | null,
+        area_ha: Number(s.area_ha ?? 1),
+      };
+    })
     .filter((s) => Number.isFinite(s.lng) && Number.isFinite(s.lat))
     .sort((a, b) => b.score - a.score)
     .slice(0, maxAnomalyHoles);
