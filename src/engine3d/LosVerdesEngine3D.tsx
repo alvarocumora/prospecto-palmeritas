@@ -1479,6 +1479,64 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </div>
       )}
 
+      {hoveredSynthHole && (
+        <div className="absolute bottom-2 left-2 z-20 bg-black/85 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-amber-500/40 max-w-[280px]">
+          <div className="text-amber-200 uppercase tracking-wider mb-1">
+            {hoveredSynthHole.code} · CONCEPTUAL
+          </div>
+          <div className="text-muted-foreground space-y-0.5">
+            <div>depth: <span className="text-foreground">{hoveredSynthHole.depth.toFixed(0)} m</span></div>
+            <div>az/dip: <span className="text-foreground">{hoveredSynthHole.azimuth.toFixed(0)}° / {hoveredSynthHole.dip.toFixed(0)}°</span></div>
+            <div>intervals: <span className="text-foreground">{hoveredSynthHole.intervals.length}</span></div>
+            <div>source: <span className="text-foreground">{hoveredSynthHole.fromKind ?? "—"}</span></div>
+          </div>
+        </div>
+      )}
+
+      {(synthHoles.length > 0 || synthBlocks.length > 0 || pitShells.length > 0) && (
+        <div className="absolute top-2 right-2 z-10 bg-black/75 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-amber-500/40 w-[220px] space-y-1.5">
+          <div className="text-amber-300 uppercase tracking-wider flex items-center gap-1">
+            <Boxes className="w-3 h-3" /> Modelo conceptual
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="synth-holes" className="text-[10px]">Sondajes ({synthHoles.length})</Label>
+            <Switch id="synth-holes" checked={showSynthHoles} onCheckedChange={setShowSynthHoles} />
+          </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="synth-blocks" className="text-[10px]">Block model ({synthBlocks.length})</Label>
+            <Switch id="synth-blocks" checked={showSynthBlocks} onCheckedChange={setShowSynthBlocks} />
+          </div>
+          {showSynthBlocks && synthBlocks.length > 0 && (
+            <div>
+              <div className="text-[9px] text-muted-foreground">cutoff CuEq · {synthBlockCutoff.toFixed(2)}%</div>
+              <Slider
+                value={[synthBlockCutoff]}
+                min={0}
+                max={1.5}
+                step={0.05}
+                onValueChange={(v) => setSynthBlockCutoff(v[0])}
+              />
+            </div>
+          )}
+          <div className="flex items-center justify-between">
+            <Label htmlFor="pit-shells" className="text-[10px]">Pit shells ({pitShells.length})</Label>
+            <Switch id="pit-shells" checked={showPitShells} onCheckedChange={setShowPitShells} />
+          </div>
+          {showPitShells && pitShells.length > 0 && (
+            <div>
+              <div className="text-[9px] text-muted-foreground">max RF · {pitMaxRf.toFixed(2)}</div>
+              <Slider
+                value={[pitMaxRf]}
+                min={0.6}
+                max={1.4}
+                step={0.05}
+                onValueChange={(v) => setPitMaxRf(v[0])}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
       {activeTab === "qaqc" && (
         <QAQCPanel result={qaqcResult} busy={qaqcBusy} onClose={() => setActiveTab("viewer")} />
       )}
