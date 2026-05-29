@@ -119,6 +119,15 @@ import { AnomalyVoxelLayer } from "@/engine3d/layers/AnomalyVoxelLayer";
 import { AnomalyIsosurfaceLayer } from "@/engine3d/layers/AnomalyIsosurfaceLayer";
 import { AnomalyPointsLayer } from "@/engine3d/layers/AnomalyPointsLayer";
 import { DrillholesLayer } from "@/engine3d/layers/DrillholesLayer";
+import { SyntheticDrillholeTraceLayer } from "@/engine3d/layers/SyntheticDrillholeTraceLayer";
+import { SyntheticBlockModelLayer } from "@/engine3d/layers/SyntheticBlockModelLayer";
+import { PitShellLayer } from "@/engine3d/layers/PitShellLayer";
+import {
+  getSyntheticDrillholes,
+  getSyntheticBlockModel,
+  getPitShells,
+  type SyntheticDrillhole,
+} from "@/lib/conceptualModel.functions";
 import { TerrainPlane } from "@/engine3d/layers/TerrainPlane";
 import { TerrainMartiniLayer } from "@/engine3d/layers/TerrainMartiniLayer";
 import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
