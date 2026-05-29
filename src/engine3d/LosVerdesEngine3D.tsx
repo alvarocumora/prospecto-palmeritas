@@ -1327,6 +1327,30 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               onHover={setHoveredTarget}
             />
           )}
+          {visible("holes") && showSynthHoles && !debugRenderMode && synthHoles.length > 0 && (
+            <SyntheticDrillholeTraceLayer
+              holes={synthHoles}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingEnabled}
+              onHover={setHoveredSynthHole}
+            />
+          )}
+          {visible("blocks") && showSynthBlocks && !debugRenderMode && synthBlocks.length > 0 && (
+            <SyntheticBlockModelLayer
+              blocks={synthBlocks}
+              cutoff={synthBlockCutoff}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingEnabled}
+            />
+          )}
+          {visible("blocks") && showPitShells && !debugRenderMode && pitShells.length > 0 && (
+            <PitShellLayer
+              shells={pitShells}
+              verticalExaggeration={verticalExaggeration}
+              clippingPlanes={clippingEnabled}
+              maxRf={pitMaxRf}
+            />
+          )}
         </Suspense>
 
         <AutoFitCamera bounds={renderBounds} enabled={autoFit} trigger={fitCameraNonce} />
