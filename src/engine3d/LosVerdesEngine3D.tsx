@@ -90,6 +90,7 @@ import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainD
 import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/engine3d/hooks/useBlockModel";
 import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
 import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
+import { TonnageGradePanel } from "@/engine3d/panels/TonnageGradePanel";
 import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
 import { QAQCPanel } from "@/engine3d/panels/QAQCPanel";
 import { EstimationSettingsPanel } from "@/engine3d/panels/EstimationSettingsPanel";
