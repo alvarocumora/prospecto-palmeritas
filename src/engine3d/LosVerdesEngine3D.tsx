@@ -1281,7 +1281,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         gl={{ antialias: true, powerPreference: "high-performance" }}
         camera={{ position: cameraInitial, fov: 45, near: 0.1, far: 1_000_000, up: [0, 1, 0] }}
         shadows={cinematicEnabled && !debugRenderMode ? "soft" : false}
-        style={{ width: "100%", height: "100%", zIndex: 0, position: "relative", border: "1px solid cyan" }}
+        style={{ width: "100%", height: "100%", zIndex: 0, position: "relative" }}
         onCreated={({ gl, invalidate }) => {
           gl.localClippingEnabled = true;
           // ACES cinematográfico + sRGB
