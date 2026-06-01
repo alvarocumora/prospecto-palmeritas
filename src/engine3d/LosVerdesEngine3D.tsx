@@ -615,6 +615,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     setFrameNonce((n) => n + 1);
   }, []);
 
+  // Trigger camera autofit cuando bounds reales pasan de null → válidos.
+  // Sin esto, la cámara queda en cameraInitial=[2400,1800,2400] y los assets
+  // (que pueden estar a ±6000 m del origen) quedan fuera del frustum.
+  const hasRealBoundsRef = useState({ done: false })[0];
+  useEffect(() => {
+    if (hasRealBoundsRef.done) return;
+    if (!sceneBounds) return;
+    const sizeX = sceneBounds.max[0] - sceneBounds.min[0];
+    const sizeZ = sceneBounds.max[2] - sceneBounds.min[2];
+    // Asegurar que los bounds sean significativos (no solo el origen)
+    if (Math.max(sizeX, sizeZ) < 100) return;
+    hasRealBoundsRef.done = true;
+    // Disparar fit en el próximo tick para que el Canvas ya haya montado controls
+    setTimeout(() => setFitCameraNonce((n) => n + 1), 300);
+  }, [sceneBounds, hasRealBoundsRef]);
+
 
   return (
     <div
