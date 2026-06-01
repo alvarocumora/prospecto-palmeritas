@@ -1388,7 +1388,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               onHover={setHoveredTarget}
             />
           )}
-          {visible("holes") && showSynthHoles && !debugRenderMode && synthHoles.length > 0 && (
+          {visible("holes") && showSynthHoles && synthHoles.length > 0 && (
             <SyntheticDrillholeTraceLayer
               holes={synthHoles}
               verticalExaggeration={verticalExaggeration}
@@ -1396,7 +1396,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               onHover={setHoveredSynthHole}
             />
           )}
-          {visible("blocks") && showSynthBlocks && !debugRenderMode && synthBlocks.length > 0 && (
+          {visible("blocks") && showSynthBlocks && synthBlocks.length > 0 && (
             <SyntheticBlockModelLayer
               blocks={synthBlocks}
               cutoff={synthBlockCutoff}
@@ -1404,7 +1404,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingEnabled}
             />
           )}
-          {visible("blocks") && showPitShells && !debugRenderMode && pitShells.length > 0 && (
+          {visible("blocks") && showPitShells && pitShells.length > 0 && (
             <PitShellLayer
               shells={pitShells}
               verticalExaggeration={verticalExaggeration}
@@ -1415,7 +1415,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </Suspense>
 
         <AutoFitCamera bounds={renderBounds} enabled={autoFit} trigger={fitCameraNonce} />
-        <ForceCameraFit bounds={renderBounds} trigger={fitCameraNonce} />
         <ForceCameraFit bounds={frameBounds} trigger={frameNonce} />
         <MapControls
           makeDefault
