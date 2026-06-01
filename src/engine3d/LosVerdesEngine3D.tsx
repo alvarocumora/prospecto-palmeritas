@@ -252,7 +252,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
   const [volumeFog, setVolumeFog] = useState(true);
   const [fxError, setFxError] = useState<string | null>(null);
-  const [debugRenderMode, setDebugRenderMode] = useState(true);
+  const [debugRenderMode, setDebugRenderMode] = useState(false);
   const [fitCameraNonce, setFitCameraNonce] = useState(0);
   const [frameBounds, setFrameBounds] = useState<SceneBounds>(null);
   const [frameNonce, setFrameNonce] = useState(0);
