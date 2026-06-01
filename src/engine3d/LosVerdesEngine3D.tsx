@@ -135,6 +135,7 @@ import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
 import { BasemapPanel, ScaleBar } from "@/engine3d/panels/BasemapPanel";
 import { CameraOrientationTracker, CompassRose, MiniMap, type CameraOrientation } from "@/engine3d/panels/CompassAndMiniMap";
 import { CameraViewPresets, type CameraView } from "@/engine3d/panels/CameraViewPresets";
+import { CameraPresetCluster } from "@/engine3d/panels/CameraPresetCluster";
 import { ShadowApplier } from "@/engine3d/layers/ShadowApplier";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
