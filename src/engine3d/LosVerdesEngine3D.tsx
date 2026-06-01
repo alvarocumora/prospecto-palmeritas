@@ -491,6 +491,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   // conceptuales muy abiertos manden la cámara al vacío.
   const coreSceneBounds: SceneBounds = useMemo(() => {
     const holePts: Array<[number, number, number]> = [];
+    const targetPts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
+      t.collar.x,
+      -t.depth * verticalExaggeration,
+      -t.collar.y,
+    ]);
     for (const h of holes) {
       holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
       const azRad = (h.azimuth * Math.PI) / 180;
