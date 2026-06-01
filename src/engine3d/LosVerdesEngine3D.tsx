@@ -1437,6 +1437,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </Suspense>
 
         <AutoFitCamera bounds={renderBounds} enabled={autoFit} trigger={fitCameraNonce} />
+        <CameraViewPresets bounds={renderBounds} view={presetView} nonce={presetNonce} />
         <ForceCameraFit bounds={frameBounds} trigger={frameNonce} />
         <MapControls
           makeDefault
