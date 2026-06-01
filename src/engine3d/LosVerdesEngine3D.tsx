@@ -1316,15 +1316,17 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         />
         <CameraOrientationTracker onUpdate={setCameraOrientation} />
 
-        {/* Debug helpers — always-on baseline so viewer is never blank */}
-        <axesHelper args={[5000]} renderOrder={1000} />
+        {/* Debug helpers — only when debug mode active */}
+        {debugRenderMode && <axesHelper args={[5000]} renderOrder={1000} />}
         {effectiveShowGrid && <gridHelper args={[8000, 80, 0x88ffff, 0x224444]} />}
-        <mesh position={[0, 0, 0]} renderOrder={1000}>
-          <sphereGeometry args={[150, 20, 20]} />
-          <meshBasicMaterial color="#ff3344" toneMapped={false} depthTest={false} />
-        </mesh>
-        <DebugSceneBounds bounds={renderBounds} />
-        <DebugOriginLabel />
+        {debugRenderMode && (
+          <mesh position={[0, 0, 0]} renderOrder={1000}>
+            <sphereGeometry args={[150, 20, 20]} />
+            <meshBasicMaterial color="#ff3344" toneMapped={false} depthTest={false} />
+          </mesh>
+        )}
+        {debugRenderMode && <DebugSceneBounds bounds={renderBounds} />}
+        {debugRenderMode && <DebugOriginLabel />}
 
         <Suspense fallback={null}>
           {noRealData && <SyntheticDemoScene verticalExaggeration={verticalExaggeration} />}
@@ -1407,6 +1409,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           {visible("holes") && showSynthHoles && synthHoles.length > 0 && (
             <SyntheticDrillholeTraceLayer
               holes={synthHoles}
+              radius={3}
               verticalExaggeration={verticalExaggeration}
               clippingPlanes={clippingEnabled}
               onHover={setHoveredSynthHole}
