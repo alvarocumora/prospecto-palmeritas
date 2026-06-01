@@ -486,8 +486,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const visible = (l: "dem" | "holes" | "iso" | "blocks" | "targets" | "debug") =>
     soloLayer === "all" || soloLayer === l;
 
-  // Bounds reales para AutoFit (transformando UTM-like → three: x, z*VE, -y)
-  const sceneBounds: SceneBounds = useMemo(() => {
+  // Bounds core para AutoFit (capas principales visibles del visor).
+  // Priorizamos la escena operativa real para evitar que shells o datasets
+  // conceptuales muy abiertos manden la cámara al vacío.
+  const coreSceneBounds: SceneBounds = useMemo(() => {
     const holePts: Array<[number, number, number]> = [];
     for (const h of holes) {
       holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
@@ -499,7 +501,24 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       const ez = -(h.collar.y + Math.cos(azRad) * Math.cos(dipRad) * len);
       holePts.push([ex, ey, ez]);
     }
+    const rawPoints: Array<[number, number, number]> = points.map((p) => [
+      p.x,
+      p.z * verticalExaggeration,
+      -p.y,
+    ]);
+    return computeSceneBounds([
+      demMesh ? { positions: demMesh.positions } : {},
+      iso ? { positions: iso.positions } : {},
+      blockModel ? { positions: blockModel.positions } : {},
+      { points: rawPoints },
+      { points: holePts },
+      { points: targetPts },
+    ]);
+  }, [demMesh, iso, blockModel, points, holes, drillTargets, verticalExaggeration]);
+
+  const sceneBounds: SceneBounds = useMemo(() => {
     // Synthetic drillholes (collars + toes) — usar la transformación consistente x, z*VE, -y
+    const holePts: Array<[number, number, number]> = [];
     for (const h of synthHoles) {
       holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
       holePts.push([h.toe.x, h.toe.z * verticalExaggeration, -h.toe.y]);
@@ -525,15 +544,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       }
     }
     return computeSceneBounds([
-      demMesh ? { positions: demMesh.positions } : {},
-      iso ? { positions: iso.positions } : {},
-      blockModel ? { positions: blockModel.positions } : {},
+      ...(coreSceneBounds ? [{ points: [coreSceneBounds.min, coreSceneBounds.max] as Array<[number, number, number]> }] : []),
       { points: holePts },
-      { points: targetPts },
       { points: blockPts },
       { points: pitPts },
     ]);
-  }, [demMesh, iso, blockModel, holes, synthHoles, synthBlocks, pitShells, drillTargets, verticalExaggeration]);
+  }, [coreSceneBounds, synthHoles, synthBlocks, pitShells, verticalExaggeration]);
 
   // Fallback synthetic demo cuando no hay datasets reales NI sintéticos persistidos
   const noRealData =
@@ -609,7 +625,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     return computeSceneBounds([{ points: pts }]);
   }, [drillTargets, verticalExaggeration]);
 
-  const renderBounds = debugMinimalScene ? debugSceneBounds : sceneBounds ?? debugSceneBounds;
+  const renderBounds = debugMinimalScene ? debugSceneBounds : coreSceneBounds ?? sceneBounds ?? debugSceneBounds;
   const forceFitCamera = useCallback(() => {
     setFitCameraNonce((n) => n + 1);
   }, []);
