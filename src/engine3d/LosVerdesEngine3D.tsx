@@ -1409,6 +1409,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           {visible("holes") && showSynthHoles && synthHoles.length > 0 && (
             <SyntheticDrillholeTraceLayer
               holes={synthHoles}
+              radius={3}
               verticalExaggeration={verticalExaggeration}
               clippingPlanes={clippingEnabled}
               onHover={setHoveredSynthHole}
