@@ -135,6 +135,7 @@ import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
 import { BasemapPanel, ScaleBar } from "@/engine3d/panels/BasemapPanel";
 import { CameraOrientationTracker, CompassRose, MiniMap, type CameraOrientation } from "@/engine3d/panels/CompassAndMiniMap";
 import { CameraViewPresets, type CameraView } from "@/engine3d/panels/CameraViewPresets";
+import { CameraPresetCluster } from "@/engine3d/panels/CameraPresetCluster";
 import { ShadowApplier } from "@/engine3d/layers/ShadowApplier";
 import type { BasemapSource } from "@/engine3d/terrain/basemapTiles";
 import { DepthAxis } from "@/engine3d/layers/DepthAxis";
@@ -1458,18 +1459,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
 
       {showNorth && <CompassRose azimuthDeg={cameraOrientation.azimuthDeg} />}
-      <div className="absolute top-3 right-3 z-20 flex flex-col gap-1 rounded-md border border-border/40 bg-background/80 p-1 backdrop-blur">
-        <div className="text-[8px] uppercase tracking-wide text-muted-foreground text-center">vista</div>
-        <div className="grid grid-cols-3 gap-1">
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setPresetView("top"); setPresetNonce(n => n + 1); }} title="Planta (top)">⌖</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setPresetView("N"); setPresetNonce(n => n + 1); }} title="Vista Norte">N</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setPresetView("iso"); setPresetNonce(n => n + 1); }} title="Isométrica">◆</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setPresetView("W"); setPresetNonce(n => n + 1); }} title="Vista Oeste">W</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setFitCameraNonce(n => n + 1); }} title="Fit">⛶</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent" onClick={() => { setPresetView("E"); setPresetNonce(n => n + 1); }} title="Vista Este">E</button>
-          <button className="h-6 w-6 rounded text-[10px] font-mono hover:bg-accent col-start-2" onClick={() => { setPresetView("S"); setPresetNonce(n => n + 1); }} title="Vista Sur">S</button>
-        </div>
-      </div>
+      <CameraPresetCluster
+        onPreset={(v) => { setPresetView(v); setPresetNonce((n) => n + 1); }}
+        onFit={() => setFitCameraNonce((n) => n + 1)}
+      />
       {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
       {showMiniMap && (
         <MiniMap
