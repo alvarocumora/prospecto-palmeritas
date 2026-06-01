@@ -1,8 +1,9 @@
-// Worker: convierte un heightmap regular en TIN adaptativo con Martini.
+// Worker: convierte un heightmap regular en malla triangulada ligera.
+// Evitamos la dependencia `martini` en runtime porque en este proyecto
+// rompe la optimización de dependencias del cliente y deja el visor en fallback.
 // Devuelve buffers transferibles (positions, normals, indices) listos para BufferGeometry.
 //
 // Coordenadas de salida: ya en frame "three" (X este, Y altura, Z = -norte).
-import Martini from "martini";
 
 export type MartiniInput = {
   heights: number[];
@@ -22,31 +23,62 @@ export type MartiniOutput = {
   triangleCount: number;
 };
 
+function strideFromErrorMeters(errorMeters: number) {
+  if (errorMeters >= 6) return 4;
+  if (errorMeters >= 2) return 2;
+  return 1;
+}
+
 self.onmessage = (e: MessageEvent<MartiniInput>) => {
   const { heights, size, extentMeters, errorMeters, verticalExaggeration } = e.data;
 
-  // Martini requiere Float32Array de tamaño size*size
   const terrain = new Float32Array(heights);
-  const martini = new Martini(size);
-  const tile = martini.createTile(terrain);
-  const mesh = tile.getMesh(errorMeters);
-
-  const vertices: Uint16Array = mesh.vertices; // [i,j, i,j, ...]
-  const triangles: Uint32Array = mesh.triangles;
-
-  const numVerts = vertices.length / 2;
-  const positions = new Float32Array(numVerts * 3);
   const meterPerPixel = extentMeters / (size - 1);
   const half = extentMeters / 2;
+  const stride = strideFromErrorMeters(errorMeters);
 
-  for (let v = 0; v < numVerts; v++) {
-    const i = vertices[v * 2];
-    const j = vertices[v * 2 + 1];
-    const h = terrain[j * size + i];
-    // Centro local: i → X (este), j → -Z (norte)
-    positions[v * 3]     = i * meterPerPixel - half;
-    positions[v * 3 + 1] = h * verticalExaggeration;
-    positions[v * 3 + 2] = -(j * meterPerPixel - half);
+  const xs: number[] = [];
+  for (let i = 0; i < size; i += stride) xs.push(i);
+  if (xs[xs.length - 1] !== size - 1) xs.push(size - 1);
+
+  const ys: number[] = [];
+  for (let j = 0; j < size; j += stride) ys.push(j);
+  if (ys[ys.length - 1] !== size - 1) ys.push(size - 1);
+
+  const cols = xs.length;
+  const rows = ys.length;
+  const numVerts = cols * rows;
+  const positions = new Float32Array(numVerts * 3);
+
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      const v = r * cols + c;
+      const i = xs[c];
+      const j = ys[r];
+      const h = terrain[j * size + i];
+      positions[v * 3] = i * meterPerPixel - half;
+      positions[v * 3 + 1] = h * verticalExaggeration;
+      positions[v * 3 + 2] = -(j * meterPerPixel - half);
+    }
+  }
+
+  const triangles = new Uint32Array((rows - 1) * (cols - 1) * 6);
+  let t = 0;
+  for (let r = 0; r < rows - 1; r++) {
+    for (let c = 0; c < cols - 1; c++) {
+      const i0 = r * cols + c;
+      const i1 = i0 + 1;
+      const i2 = i0 + cols;
+      const i3 = i2 + 1;
+
+      triangles[t++] = i0;
+      triangles[t++] = i2;
+      triangles[t++] = i1;
+
+      triangles[t++] = i1;
+      triangles[t++] = i2;
+      triangles[t++] = i3;
+    }
   }
 
   // Normales por triángulo, acumuladas en vértices
