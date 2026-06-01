@@ -257,6 +257,8 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [fitCameraNonce, setFitCameraNonce] = useState(0);
   const [frameBounds, setFrameBounds] = useState<SceneBounds>(null);
   const [frameNonce, setFrameNonce] = useState(0);
+  const [presetView, setPresetView] = useState<CameraView>("iso");
+  const [presetNonce, setPresetNonce] = useState(0);
   const [cameraOrientation, setCameraOrientation] = useState<CameraOrientation>({
     azimuthDeg: 0,
     cameraXZ: { x: 0, z: 0 },
