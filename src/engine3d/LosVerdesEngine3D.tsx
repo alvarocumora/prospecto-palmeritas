@@ -252,7 +252,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [cineIntensity, setCineIntensity] = useState<"soft" | "medium" | "strong">("medium");
   const [volumeFog, setVolumeFog] = useState(true);
   const [fxError, setFxError] = useState<string | null>(null);
-  const [debugRenderMode, setDebugRenderMode] = useState(true);
+  const [debugRenderMode, setDebugRenderMode] = useState(false);
   const [fitCameraNonce, setFitCameraNonce] = useState(0);
   const [frameBounds, setFrameBounds] = useState<SceneBounds>(null);
   const [frameNonce, setFrameNonce] = useState(0);
@@ -495,25 +495,50 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       const ez = -(h.collar.y + Math.cos(azRad) * Math.cos(dipRad) * len);
       holePts.push([ex, ey, ez]);
     }
+    // Synthetic drillholes (collars + toes) — usar la transformación consistente x, z*VE, -y
+    for (const h of synthHoles) {
+      holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
+      holePts.push([h.toe.x, h.toe.z * verticalExaggeration, -h.toe.y]);
+    }
     const targetPts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
       t.collar.x,
       -t.depth * verticalExaggeration,
       -t.collar.y,
     ]);
+    // Synthetic block model — centroides
+    const blockPts: Array<[number, number, number]> = synthBlocks.map((b) => [
+      b.x,
+      b.z * verticalExaggeration,
+      -b.y,
+    ]);
+    // Pit shells — positions vienen como [x, y, z] en ENU; mismo mapping
+    const pitPts: Array<[number, number, number]> = [];
+    for (const s of pitShells) {
+      const p = s.positions;
+      const stride = Math.max(3, Math.floor(p.length / 3 / 1000) * 3);
+      for (let i = 0; i + 2 < p.length; i += stride) {
+        pitPts.push([p[i], p[i + 2] * verticalExaggeration, -p[i + 1]]);
+      }
+    }
     return computeSceneBounds([
       demMesh ? { positions: demMesh.positions } : {},
       iso ? { positions: iso.positions } : {},
       blockModel ? { positions: blockModel.positions } : {},
       { points: holePts },
       { points: targetPts },
+      { points: blockPts },
+      { points: pitPts },
     ]);
-  }, [demMesh, iso, blockModel, holes, drillTargets, verticalExaggeration]);
+  }, [demMesh, iso, blockModel, holes, synthHoles, synthBlocks, pitShells, drillTargets, verticalExaggeration]);
 
-  // Fallback synthetic demo cuando no hay datasets reales
+  // Fallback synthetic demo cuando no hay datasets reales NI sintéticos persistidos
   const noRealData =
     !demMesh &&
     (!iso || iso.vertexCount === 0) &&
     holes.length === 0 &&
+    synthHoles.length === 0 &&
+    synthBlocks.length === 0 &&
+    pitShells.length === 0 &&
     (!blockModel || blockModel.count === 0) &&
     (!drillTargets || drillTargets.targets.length === 0);
 
@@ -589,6 +614,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     setFrameBounds(b);
     setFrameNonce((n) => n + 1);
   }, []);
+
+  // Trigger camera autofit cuando bounds reales pasan de null → válidos.
+  // Sin esto, la cámara queda en cameraInitial=[2400,1800,2400] y los assets
+  // (que pueden estar a ±6000 m del origen) quedan fuera del frustum.
+  const hasRealBoundsRef = useState({ done: false })[0];
+  useEffect(() => {
+    if (hasRealBoundsRef.done) return;
+    if (!sceneBounds) return;
+    const sizeX = sceneBounds.max[0] - sceneBounds.min[0];
+    const sizeZ = sceneBounds.max[2] - sceneBounds.min[2];
+    // Asegurar que los bounds sean significativos (no solo el origen)
+    if (Math.max(sizeX, sizeZ) < 100) return;
+    hasRealBoundsRef.done = true;
+    // Disparar fit en el próximo tick para que el Canvas ya haya montado controls
+    setTimeout(() => setFitCameraNonce((n) => n + 1), 300);
+  }, [sceneBounds, hasRealBoundsRef]);
 
 
   return (
@@ -1363,7 +1404,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               onHover={setHoveredTarget}
             />
           )}
-          {visible("holes") && showSynthHoles && !debugRenderMode && synthHoles.length > 0 && (
+          {visible("holes") && showSynthHoles && synthHoles.length > 0 && (
             <SyntheticDrillholeTraceLayer
               holes={synthHoles}
               verticalExaggeration={verticalExaggeration}
@@ -1371,7 +1412,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               onHover={setHoveredSynthHole}
             />
           )}
-          {visible("blocks") && showSynthBlocks && !debugRenderMode && synthBlocks.length > 0 && (
+          {visible("blocks") && showSynthBlocks && synthBlocks.length > 0 && (
             <SyntheticBlockModelLayer
               blocks={synthBlocks}
               cutoff={synthBlockCutoff}
@@ -1379,7 +1420,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               clippingPlanes={clippingEnabled}
             />
           )}
-          {visible("blocks") && showPitShells && !debugRenderMode && pitShells.length > 0 && (
+          {visible("blocks") && showPitShells && pitShells.length > 0 && (
             <PitShellLayer
               shells={pitShells}
               verticalExaggeration={verticalExaggeration}
@@ -1390,7 +1431,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         </Suspense>
 
         <AutoFitCamera bounds={renderBounds} enabled={autoFit} trigger={fitCameraNonce} />
-        <ForceCameraFit bounds={renderBounds} trigger={fitCameraNonce} />
         <ForceCameraFit bounds={frameBounds} trigger={frameNonce} />
         <MapControls
           makeDefault
