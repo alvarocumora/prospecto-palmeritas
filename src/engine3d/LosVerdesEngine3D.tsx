@@ -531,11 +531,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     ]);
   }, [demMesh, iso, blockModel, holes, synthHoles, synthBlocks, pitShells, drillTargets, verticalExaggeration]);
 
-  // Fallback synthetic demo cuando no hay datasets reales
+  // Fallback synthetic demo cuando no hay datasets reales NI sintéticos persistidos
   const noRealData =
     !demMesh &&
     (!iso || iso.vertexCount === 0) &&
     holes.length === 0 &&
+    synthHoles.length === 0 &&
+    synthBlocks.length === 0 &&
+    pitShells.length === 0 &&
     (!blockModel || blockModel.count === 0) &&
     (!drillTargets || drillTargets.targets.length === 0);
 
