@@ -3,54 +3,40 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
+type PropValue = string | number | boolean | null;
+type Props = Record<string, PropValue>;
+
+export type MapFeature = {
+  type: "Feature";
+  id?: string | number;
+  geometry: GeoJSON.Geometry;
+  properties: Props;
+};
+
 export type FC = {
   type: "FeatureCollection";
-  features: Array<{
-    type: "Feature";
-    id?: string | number;
-    geometry: GeoJSON.Geometry;
-    properties: Record<string, unknown>;
-  }>;
+  features: MapFeature[];
 };
 
 export type LosVerdesMapData = {
-  bbox: [number, number, number, number] | null; // [minLng, minLat, maxLng, maxLat]
+  bbox: [number, number, number, number] | null;
   center: [number, number];
   concessions: FC;
   targets: FC;
   satAnomalies: FC;
   magAnomalies: FC;
-  veins: FC;
   counts: {
     concessions: number;
+    concessionsWithGeom: number;
     targets: number;
     satAnomalies: number;
     magAnomalies: number;
-    veins: number;
   };
 };
 
-// Helper: build FeatureCollection from rows with raw GeoJSON strings
-function asFC(rows: Array<{ geom_json: string | null; [k: string]: any }>): FC {
-  const features: FC["features"] = [];
-  for (const r of rows) {
-    if (!r.geom_json) continue;
-    let geometry: GeoJSON.Geometry | null = null;
-    try {
-      geometry = JSON.parse(r.geom_json);
-    } catch {
-      continue;
-    }
-    if (!geometry) continue;
-    const { geom_json: _g, ...props } = r;
-    features.push({ type: "Feature", id: r.id as any, geometry, properties: props });
-  }
-  return { type: "FeatureCollection", features };
-}
-
 export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
   async (): Promise<LosVerdesMapData> => {
-    // 1) Concesiones — usa geometry_geojson (texto) ya en EPSG:4326
+    // 1) Concesiones
     const { data: cons, error: cErr } = await supabaseAdmin
       .from("mining_concessions")
       .select(
@@ -61,7 +47,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     const concessions: FC = {
       type: "FeatureCollection",
-      features: (cons ?? []).flatMap((c: any) => {
+      features: (cons ?? []).flatMap((c: any): MapFeature[] => {
         if (!c.geometry_geojson) return [];
         let geom: GeoJSON.Geometry | null = null;
         try {
@@ -70,31 +56,25 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
           return [];
         }
         if (!geom) return [];
-        return [
-          {
-            type: "Feature" as const,
-            id: c.id,
-            geometry: geom,
-            properties: {
-              layer: "concession",
-              id: c.id,
-              code: c.code,
-              name: c.name,
-              holder: c.holder,
-              concession_type: c.concession_type,
-              status: c.status,
-              area_ha: c.area_ha,
-              region: c.region,
-              commune: c.commune,
-              granted_at: c.granted_at,
-              expires_at: c.expires_at,
-            },
-          },
-        ];
+        const props: Props = {
+          layer: "concession",
+          id: String(c.id),
+          code: c.code ?? null,
+          name: c.name ?? null,
+          holder: c.holder ?? null,
+          concession_type: c.concession_type ?? null,
+          status: c.status ?? null,
+          area_ha: c.area_ha != null ? Number(c.area_ha) : null,
+          region: c.region ?? null,
+          commune: c.commune ?? null,
+          granted_at: c.granted_at ?? null,
+          expires_at: c.expires_at ?? null,
+        };
+        return [{ type: "Feature", id: String(c.id), geometry: geom, properties: props }];
       }),
     };
 
-    // 2) Targets — lat/lng (puntos)
+    // 2) Targets
     const { data: tgts, error: tErr } = await supabaseAdmin
       .from("exploration_targets")
       .select(
@@ -106,76 +86,86 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     const targets: FC = {
       type: "FeatureCollection",
-      features: (tgts ?? []).flatMap((t: any) => {
+      features: (tgts ?? []).flatMap((t: any): MapFeature[] => {
         if (t.lng == null || t.lat == null) return [];
+        const props: Props = {
+          layer: "target",
+          id: String(t.id),
+          code: t.code ?? null,
+          name: t.name ?? null,
+          target_type: t.target_type ?? null,
+          commodity: t.commodity ?? null,
+          elevation_m: t.elevation_m != null ? Number(t.elevation_m) : null,
+          stage: t.stage ?? null,
+          priority: t.priority ?? null,
+          score: t.score != null ? Number(t.score) : null,
+          confidence_pct: t.confidence_pct != null ? Number(t.confidence_pct) : null,
+          rationale: t.rationale ?? null,
+        };
         return [
           {
-            type: "Feature" as const,
-            id: t.id,
-            geometry: { type: "Point" as const, coordinates: [Number(t.lng), Number(t.lat)] },
-            properties: {
-              layer: "target",
-              id: t.id,
-              code: t.code,
-              name: t.name,
-              target_type: t.target_type,
-              commodity: t.commodity,
-              elevation_m: t.elevation_m,
-              stage: t.stage,
-              priority: t.priority,
-              score: t.score,
-              confidence_pct: t.confidence_pct,
-              rationale: t.rationale,
-            },
+            type: "Feature",
+            id: String(t.id),
+            geometry: { type: "Point", coordinates: [Number(t.lng), Number(t.lat)] },
+            properties: props,
           },
         ];
       }),
     };
 
-    // 3) Satellite anomalies — geometría PostGIS (geometry); usar ST_AsGeoJSON
-    const { data: satRows, error: sErr } = await supabaseAdmin.rpc("lv_sat_anomalies_geojson", {
-      p_project: PROJECT_ID,
-    });
-    let satAnomalies: FC = { type: "FeatureCollection", features: [] };
-    if (sErr || !satRows) {
-      // Fallback: leer raw y derivar centroide a partir de bbox si está
-      const { data: raw } = await supabaseAdmin
-        .from("satellite_anomalies")
-        .select("id, index_code, severity, score, bbox")
-        .eq("project_id", PROJECT_ID);
-      satAnomalies = {
-        type: "FeatureCollection",
-        features: (raw ?? []).flatMap((s: any) => {
-          if (!s.bbox) return [];
-          // bbox espera [minLng,minLat,maxLng,maxLat] o GeoJSON
-          let center: [number, number] | null = null;
-          if (Array.isArray(s.bbox) && s.bbox.length >= 4) {
-            center = [(Number(s.bbox[0]) + Number(s.bbox[2])) / 2, (Number(s.bbox[1]) + Number(s.bbox[3])) / 2];
+    // 3) Satellite anomalies — usar bbox centroide (sin PostGIS RPC)
+    const { data: sats, error: sErr } = await supabaseAdmin
+      .from("satellite_anomalies")
+      .select("id, index_code, severity, score, bbox")
+      .eq("project_id", PROJECT_ID);
+    if (sErr) throw new Error(`sat: ${sErr.message}`);
+    const satAnomalies: FC = {
+      type: "FeatureCollection",
+      features: (sats ?? []).flatMap((s: any): MapFeature[] => {
+        // bbox puede venir como array [minLng,minLat,maxLng,maxLat] o como GeoJSON {type,coordinates}
+        let center: [number, number] | null = null;
+        if (Array.isArray(s.bbox) && s.bbox.length >= 4) {
+          const [a, b, c, d] = s.bbox.map(Number);
+          center = [(a + c) / 2, (b + d) / 2];
+        } else if (s.bbox && typeof s.bbox === "object" && s.bbox.coordinates) {
+          const coords = s.bbox.coordinates as any;
+          // intentamos polygon
+          if (Array.isArray(coords?.[0]?.[0])) {
+            let mnx = Infinity,
+              mny = Infinity,
+              mxx = -Infinity,
+              mxy = -Infinity;
+            for (const ring of coords as number[][][]) {
+              for (const [x, y] of ring) {
+                if (x < mnx) mnx = x;
+                if (x > mxx) mxx = x;
+                if (y < mny) mny = y;
+                if (y > mxy) mxy = y;
+              }
+            }
+            center = [(mnx + mxx) / 2, (mny + mxy) / 2];
           }
-          if (!center) return [];
-          return [
-            {
-              type: "Feature" as const,
-              id: s.id,
-              geometry: { type: "Point" as const, coordinates: center },
-              properties: {
-                layer: "sat_anomaly",
-                id: s.id,
-                index_code: s.index_code,
-                severity: s.severity,
-                score: s.score,
-              },
-            },
-          ];
-        }),
-      };
-    } else {
-      satAnomalies = asFC(satRows as any);
-      // anota layer
-      for (const f of satAnomalies.features) (f.properties as any).layer = "sat_anomaly";
-    }
+        }
+        if (!center) return [];
+        const props: Props = {
+          layer: "sat_anomaly",
+          id: String(s.id),
+          index_code: s.index_code ?? null,
+          severity: s.severity ?? null,
+          score: s.score != null ? Number(s.score) : null,
+        };
+        return [
+          {
+            type: "Feature",
+            id: String(s.id),
+            geometry: { type: "Point", coordinates: center },
+            properties: props,
+          },
+        ];
+      }),
+    };
 
-    // 4) Magnetic anomalies — lat/lon directo
+    // 4) Mag anomalies
     const { data: mags, error: mErr } = await supabaseAdmin
       .from("mag_targets")
       .select("id, name, lat, lon, mag_nt, rank, radius_m")
@@ -183,64 +173,53 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     if (mErr) throw new Error(`mag: ${mErr.message}`);
     const magAnomalies: FC = {
       type: "FeatureCollection",
-      features: (mags ?? []).flatMap((m: any) => {
+      features: (mags ?? []).flatMap((m: any): MapFeature[] => {
         if (m.lat == null || m.lon == null) return [];
+        const props: Props = {
+          layer: "mag_anomaly",
+          id: String(m.id),
+          name: m.name ?? null,
+          mag_nt: m.mag_nt != null ? Number(m.mag_nt) : null,
+          rank: m.rank != null ? Number(m.rank) : null,
+          radius_m: m.radius_m != null ? Number(m.radius_m) : null,
+        };
         return [
           {
-            type: "Feature" as const,
-            id: m.id,
-            geometry: { type: "Point" as const, coordinates: [Number(m.lon), Number(m.lat)] },
-            properties: {
-              layer: "mag_anomaly",
-              id: m.id,
-              name: m.name,
-              mag_nt: m.mag_nt,
-              rank: m.rank,
-              radius_m: m.radius_m,
-            },
+            type: "Feature",
+            id: String(m.id),
+            geometry: { type: "Point", coordinates: [Number(m.lon), Number(m.lat)] },
+            properties: props,
           },
         ];
       }),
     };
 
-    // 5) Veins — geometry PostGIS
-    const { data: veinRows, error: vErr } = await supabaseAdmin.rpc("lv_veins_geojson", {
-      p_project: PROJECT_ID,
-    });
-    let veins: FC = { type: "FeatureCollection", features: [] };
-    if (!vErr && veinRows) {
-      veins = asFC(veinRows as any);
-      for (const f of veins.features) (f.properties as any).layer = "vein";
-    }
-
-    // Compute bbox & center
+    // BBox
     const allCoords: Array<[number, number]> = [];
-    const collect = (g: GeoJSON.Geometry | null) => {
-      if (!g) return;
-      const walk = (c: any) => {
-        if (typeof c[0] === "number") allCoords.push([c[0], c[1]]);
-        else for (const x of c) walk(x);
-      };
-      if ("coordinates" in g) walk((g as any).coordinates);
+    const walk = (c: any) => {
+      if (typeof c?.[0] === "number") allCoords.push([c[0], c[1]]);
+      else if (Array.isArray(c)) for (const x of c) walk(x);
     };
-    for (const fc of [concessions, targets, satAnomalies, magAnomalies, veins]) {
-      for (const f of fc.features) collect(f.geometry);
+    for (const fc of [concessions, targets, satAnomalies, magAnomalies]) {
+      for (const f of fc.features) {
+        if ("coordinates" in f.geometry) walk((f.geometry as any).coordinates);
+      }
     }
     let bbox: LosVerdesMapData["bbox"] = null;
     let center: [number, number] = [-71.05, -31.95];
-    if (allCoords.length > 0) {
-      let minLng = Infinity,
-        minLat = Infinity,
-        maxLng = -Infinity,
-        maxLat = -Infinity;
-      for (const [lng, lat] of allCoords) {
-        if (lng < minLng) minLng = lng;
-        if (lng > maxLng) maxLng = lng;
-        if (lat < minLat) minLat = lat;
-        if (lat > maxLat) maxLat = lat;
+    if (allCoords.length) {
+      let mnx = Infinity,
+        mny = Infinity,
+        mxx = -Infinity,
+        mxy = -Infinity;
+      for (const [x, y] of allCoords) {
+        if (x < mnx) mnx = x;
+        if (x > mxx) mxx = x;
+        if (y < mny) mny = y;
+        if (y > mxy) mxy = y;
       }
-      bbox = [minLng, minLat, maxLng, maxLat];
-      center = [(minLng + maxLng) / 2, (minLat + maxLat) / 2];
+      bbox = [mnx, mny, mxx, mxy];
+      center = [(mnx + mxx) / 2, (mny + mxy) / 2];
     }
 
     return {
@@ -250,13 +229,12 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       targets,
       satAnomalies,
       magAnomalies,
-      veins,
       counts: {
-        concessions: concessions.features.length,
+        concessions: cons?.length ?? 0,
+        concessionsWithGeom: concessions.features.length,
         targets: targets.features.length,
         satAnomalies: satAnomalies.features.length,
         magAnomalies: magAnomalies.features.length,
-        veins: veins.features.length,
       },
     };
   },
