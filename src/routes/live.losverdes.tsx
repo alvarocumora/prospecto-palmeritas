@@ -8,8 +8,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-// Visor 3D público real (Sprint B): MapLibre + deck.gl con DEM real,
-// concesiones, anomalías sat/mag, vetas y targets desde Supabase.
+// Visor estratégico 2D (focus exploración + certificación). El 3D queda
+// disponible bajo demanda para no bloquear el flujo principal.
+import { LosVerdesStrategicMap } from "@/components/live/LosVerdesStrategicMap";
 const LosVerdesPublicScene = lazy(() =>
   import("@/components/live/LosVerdesPublicScene").then((m) => ({ default: m.LosVerdesPublicScene })),
 );
