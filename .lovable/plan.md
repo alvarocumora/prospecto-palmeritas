@@ -1,82 +1,80 @@
+# Estado actual del catastro y plan de mejora
 
-# Plan — Visor estratégico Los Verdes (exploración + certificación)
+## 1. Diagnóstico en vivo (ejecutado ahora)
 
-El visor 3D en `/live/losverdes` se está cargando vacío y agrega complejidad sin valor para el caso de uso real: **decisión exploratoria y due-diligence**. Pivote a un visor 2D MapLibre denso en datos, con foco en anomalías, targets y trazabilidad NI 43-101.
+| Endpoint | Estado | Latencia | Observación |
+|---|---|---|---|
+| `catastro.sernageomin.cl/arcgis/.../Concesiones_Mineras/MapServer` (raíz) | HTTP 200 | ~1s | Servidor responde |
+| `…/MapServer/0/query` (capa explotación) | **Timeout** | >15s | No retorna features |
+| `…/MapServer/1/query` (capa exploración) | **Timeout** | >20s | No retorna features |
+| `appsngmaz.sernageomin.cl/catastro_SNGM/home/index` (portal nuevo) | HTTP 200 | ~1s | App ArcGIS JS 4.32 |
+| `services1.arcgis.com/OyjvVdFTl5hfSdX3/.../Marcelo_Layer/FeatureServer/0` (vértices) | **HTTP 200** | 240ms | 2.585.257 puntos WGS84 |
+| `services1.arcgis.com/.../FeatureServer/2` (concesiones) | **HTTP 200** | 315ms | 104.151 polígonos WGS84 |
 
-## Objetivos
+**Conclusión:** SERNAGEOMIN migró su catastro a ArcGIS Online (Esri). El endpoint legacy que usan TODAS nuestras edge functions (`sync-catastro`, `sync-sernageomin`, `match-project-catastro`, `import-concession`) está degradado/abandonado. Por eso el sync del prospecto Tilama no descargó polígonos.
 
-1. Quitar el visor 3D del flujo principal (lo dejamos detrás de un toggle "Beta / 3D" para no perder el trabajo hecho).
-2. Reemplazar el área central por un **mapa 2D MapLibre** con todas las capas reales del proyecto.
-3. Convertir los KPI cards en filtros activos (click → filtra mapa).
-4. Añadir panel lateral de **fichas de target / anomalía** con score, evidencia y exportables.
-5. Mantener botones existentes: Modelo conceptual, Sincronizar SERNAGEOMIN, Informe PDF, KMZ.
+## 2. Cambios de esquema en la nueva API
 
-## Fase 1 — Visor 2D estratégico (este sprint)
+Antiguo (que usamos hoy) → Nuevo:
 
-### 1.1 Mapa base
-- MapLibre GL JS con basemap satelital (Esri World Imagery) + toggle topo (OpenTopoMap) + toggle calles.
-- Centrado en bbox de targets+samples del proyecto Los Verdes.
-- Controles: zoom, escala, coordenadas live (lat/lon + UTM 19S), medición de distancia/área, fullscreen.
+```
+CODIGO / ROL            → NUMERO_ROL + DV_ROL
+TITULAR / NOMBRE_TIT    → TITULAR_NOMBRE (+ TITULAR_RUT, TITULAR_DV, TITULAR_DIVISION)
+AREA_HA / HECTAREAS     → HECTAREAS
+VIGENCIA / ESTADO       → SITUACION_CONCESION (+ ID_SITUACION_CONCESION)
+                          TIPO_CONCESION (+ ID_TIPO_CONCESION)
+(sin equivalente)       → ID_CONCESION (clave estable nacional)
+(sin equivalente)       → COMUNA, DATUM, HUSO, ORIGEN, NRO_INSCRIPCION, FOJAS, ANO_INSCRIPCION
+FECHA expira            → FECHA_VENCIMIENTO
+                          FECHA_ACTUALIZACION (delta sync confiable)
+```
 
-### 1.2 Capas (todas filtrables desde el panel "Capas")
-| Capa | Fuente | Estilo |
-|---|---|---|
-| Concesiones mineras | `mining_concession` (15) | Polígonos cuando exista geometría, pines etiquetados si no |
-| Catastro nacional | `cadastre_national` (radio 15 km) | Polígonos translúcidos por tipo |
-| Targets exploración | `exploration_target` (108) | Círculos coloreados por prioridad, tamaño por score |
-| Anomalías satelitales | `satellite_anomaly` (45) | Donut por severidad (33 alta · 11 media · 1 baja) |
-| Vetas Cu-Au-Ag | `geological_features` (6) | Líneas con color por mineral dominante |
-| Anomalías magnéticas | geofísica (10) | Heatmap |
-| Muestras rock | `rock_samples` (190, UTM 19S→WGS84) | Burbujas por ley Cu (rojo>1%, naranja 0.3-1%, gris <0.3%) |
-| AOI proyecto | envolvente calculada | Polígono dashed |
+Bonus: existe `FeatureServer/0` con 2.5M vértices georreferenciados — útil para validar geometrías y detectar superposiciones a nivel hito.
 
-### 1.3 KPI cards interactivas
-Los cinco cards actuales (Concesiones, Anom. Sat, Targets, Vetas, NPV) se vuelven **chips toggleables**: click filtra el mapa a esa capa exclusivamente; doble click hace fly-to bbox.
+## 3. Plan de acción (4 fases, sin tocar UI hasta fase 4)
 
-### 1.4 Panel lateral derecho — Ficha estratégica
-Al click en cualquier feature del mapa:
-- **Target**: nombre, prioridad, score, distancia a infra, muestras asociadas (top 5 leyes), anomalías cercanas, recomendación AI (`google/gemini-2.5-flash`).
-- **Anomalía**: severidad, índice (NDVI/clay/iron), área, fecha, link a tile Sentinel, targets afectados.
-- **Muestra**: ID, leyes Cu/Au/Mo/Pb/Zn/As, método QA/QC, lote, certificado lab.
-- **Concesión**: rol, hectáreas, vigencia, titular, padrón anual, link SERNAGEOMIN.
-- Botón "Exportar ficha PDF" (1 página, branding Geocapitals).
+### Fase A — Cliente unificado SERNAGEOMIN v2 (backend)
+1. Crear `supabase/functions/_shared/sernageomin.ts` (módulo compartido):
+   - `BASE = https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/Marcelo_Layer/FeatureServer`
+   - `queryConcessions({ where, bbox, since, pageSize })` con paginación `resultOffset`/`resultRecordCount` (límite Esri 2000/req).
+   - `queryVertices({ idConcesion })` para verificación de hitos.
+   - Normalizador `mapAttrs(attrs) → Concession` con el mapping nuevo→canónico (tabla §2).
+   - Retry exponencial + AbortController 20s.
+2. Migrar las 4 edge functions a este cliente. Mantener firma/body actual para no romper callers; deprecar internamente el código legacy.
 
-### 1.5 Modo certificación NI 43-101
-Toggle "Modo certificación" que:
-- Muestra solo muestras con QA/QC válido + lab certificado.
-- Pinta de verde features con cadena de custodia completa; rojo las que faltan evidencia.
-- Genera checklist exportable de gaps (qué falta para NI 43-101 Item 11 / 12).
+### Fase B — Migración de datos persistidos
+1. Migración SQL: añadir columnas `id_concesion bigint`, `tipo_concesion text`, `comuna text`, `fecha_actualizacion_fuente timestamptz`, índice único parcial sobre `(source='sernageomin', id_concesion)`.
+2. Backfill: re-ejecutar `match-project-catastro` v2 sobre todos los proyectos (15 concesiones Tilama incluidas) ahora que el endpoint responde.
+3. `cadastre_national`: cargar polígonos por bbox país y refrescar por `FECHA_ACTUALIZACION > last_sync` (delta diario via pg_cron).
 
-### 1.6 Drawer "Score de prospectividad"
-Cálculo client-side (transparente) sobre features visibles:
-`score = w1·densidadAnomalíasSat + w2·leyMaxCu + w3·proximidadVetas + w4·confianzaCatastro`
-Sliders de pesos + ranking top-10 targets actualizado en vivo. Exporta CSV.
+### Fase C — Capacidades nuevas que el endpoint v2 habilita
+- **Vencimientos reales 12 meses**: query `where FECHA_VENCIMIENTO BETWEEN now() AND now()+1y` → tabla `concession_alerts` con razón `proxima_a_vencer`.
+- **Detección de cambio de titular**: comparar `TITULAR_RUT` entre snapshots → alerta `cambio_titular` (hoy no la detectamos porque sólo comparábamos `holder` por nombre).
+- **Cobertura por comuna**: filtros y dashboard por `COMUNA` (sin geocoding manual).
+- **Búsqueda nacional rápida**: con 104k polígonos paginados podemos indexar todo Chile en `cadastre_national` (≈2-3h primera carga, luego deltas).
+- **Validación de hitos**: cruzar `WGS84_Vertice` (2.5M puntos) contra polígonos importados → flag `geometria_inconsistente`.
 
-## Fase 2 — 3D + IA generativa (siguiente sprint, fuera de scope ahora)
-Mantener `LosVerdesPublicScene` accesible vía `/live/losverdes?engine=3d` o tab oculta "Beta · 3D". No tocar `Geology3DViewer` ni `scene3d.server`.
+### Fase D — Mejoras de plataforma (UI + ops)
+1. **Panel "Estado de fuentes externas"** en `/ops` con health-check live de cada endpoint (verde/ámbar/rojo + latencia + último sync OK).
+2. **Sync log enriquecido**: registrar versión de cliente (`v1-legacy` vs `v2-online`) en `concession_history.metadata`.
+3. **Fallback automático**: si v2 falla, intentar v1 legacy y registrar el degradado.
+4. **Cron diario** (pg_cron, 03:00 CLT) que corre `sync-catastro` v2 para todos los proyectos activos.
+5. **Vista en `/catastro/c/:code`**: mostrar campos nuevos (RUT titular, comuna, fojas, año inscripción, fecha actualización fuente).
 
-## Detalles técnicos
+## 4. Detalles técnicos clave
 
-- **Nuevo componente**: `src/components/live/LosVerdesStrategicMap.tsx` (MapLibre + capas GeoJSON).
-- **Server fn**: `src/lib/losverdes-map.functions.ts` con `getLosVerdesMapData()` que retorna `{ concessions, cadastre, targets, anomalies, veins, magAnoms, samples, aoi }` ya reproyectado a WGS84 (pyproj se hace en server fn vía SQL `ST_Transform` aprovechando PostGIS 3.3.7 ya instalado).
-- **Caché**: `useSuspenseQuery` con `staleTime: 5min`; loader en `live.losverdes.tsx`.
-- **Reemplazo en `live.losverdes.tsx`**: el bloque "3D Scene" (líneas ~333-380) se sustituye por `<LosVerdesStrategicMap />`; el botón "Activar visor 3D" se mueve a un menú "Más vistas" en el header.
-- **Estilos**: tokens semánticos existentes (`--primary`, `--anomaly-high`, etc.); añadir `--mineral-cu`, `--mineral-au`, `--mineral-mo` en `src/styles.css` si faltan.
-- **Sin nuevas tablas, sin nuevas dependencias backend.** En frontend: `maplibre-gl` y `@mapbox/mapbox-gl-draw` (para medición). Ya tenemos `maplibre-gl` en FieldMapPublic, reutilizar.
-- **AI explainer ficha**: server fn `explainFeature.functions.ts` que llama Lovable AI Gateway con contexto del feature; rate-limit 10/min por sesión.
-- **Modo certificación**: helper `src/lib/ni43101-checklist.ts` con reglas declarativas.
+- **Auth**: el FeatureServer v2 es público, no requiere API key.
+- **Rate limit Esri Online**: ~10 req/s por IP; paginar de a 2000 features.
+- **CRS**: ya viene en WGS84, no requiere proj4 server-side (eliminamos dependencia en `match-project-catastro`).
+- **Compatibilidad**: el código v2 vive junto al v1; flag `USE_SNGM_V2=true` en cada edge function permite rollback inmediato.
+- **Riesgo**: el endpoint v2 está en infraestructura Esri de terceros (`services1.arcgis.com`) — mantener el cliente legacy como respaldo dormido.
 
-## Entregables del sprint
+## 5. Entregable de esta iteración (si apruebas)
 
-1. `/live/losverdes` carga mapa 2D útil aún sin GPU/WebGL2.
-2. Click en feature → ficha lateral con datos reales.
-3. Toggle certificación + checklist exportable.
-4. Score panel con ranking top-10.
-5. KMZ y PDF actuales siguen funcionando (no se tocan).
-6. Visor 3D queda accesible pero no bloquea la página.
+Fase A + B mínimas:
+- Nuevo `_shared/sernageomin.ts` con cliente v2.
+- `sync-catastro` y `match-project-catastro` migrados.
+- Migración SQL con columnas nuevas + índice.
+- Re-sync de los 15 concesiones de Tilama → KMZ del prospecto ahora sí con polígonos oficiales.
 
-## Fuera de scope
-
-- Edición/digitalización de features en mapa.
-- Subida de nuevas muestras desde el visor.
-- Cross-section y fusion score AI (Sprint 2 según `mem://plan/3d-ia-disruptivo`).
+Fases C y D quedan como roadmap separado.
