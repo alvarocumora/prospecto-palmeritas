@@ -1,102 +1,74 @@
-# Plan — Visor 3D Los Verdes nivel Leapfrog / Datamine
 
-## Diagnóstico actual
+## Diagnóstico
 
-Aunque el botón "Generar modelo conceptual" persiste correctamente (28 sondajes, 3 566 assays, 203 bloques, 4 pit shells), el `<Canvas>` se ve **completamente negro** en `/live/losverdes`.
+- **Home (`/`)** publica OK en `geocapitals.com` y `prospecto-palmeritas.lovable.app`. No hay caída global.
+- **`/live/losverdes`** en producción renderiza el `errorComponent` ("Something went wrong"). El worker responde 200, así que el fallo es **client-side** dentro de la ruta.
+- Causas probables (en orden de probabilidad):
+  1. El visor `LosVerdesEngine3D` (monolito de 1.962 líneas) tira durante el lazy import o el primer render. En preview se ve además el error `Failed to fetch dynamically imported module: virtual:tanstack-start-client-entry`, típico de un chunk roto.
+  2. Una de las 3 `useQuery` (`getLosVerdesPublicLayers`, `getLosVerdesMining`, `getTilamaReport`) lanza al renderizar el shell antes de que el `errorBoundary` del visor la atrape.
+  3. El worker `martini.worker.ts` o `terrain/dem.functions` se importa a nivel módulo y rompe SSR/edge bundle.
+- No hay logs de error en workerd para esa URL → confirma que es runtime de cliente.
 
-Causas reales identificadas en `src/engine3d/LosVerdesEngine3D.tsx` (1 889 líneas):
+## Plan (3 pasos, escalonados)
 
-1. **Sistema de coordenadas inconsistente.** Los `holes`, `synthHoles`, `blocks`, `pitShells`, `iso` y `demMesh` vienen en sistemas distintos (UTM crudo en metros, ENU local del DEM, world-space del isosurface). Cada capa hace su propia conversión (`x, z*VE, -y`), y el resultado es que los objetos quedan dispersos a decenas de km del origen → fuera del frustum aun con `AutoFitCamera`.
-2. **`AutoFitCamera` + `ForceCameraFit` se pisan entre sí** (3 controladores de cámara activos a la vez sobre `renderBounds` que cambian de identidad cada frame por `useMemo` mal memoizado).
-3. **`debugRenderMode = true` por defecto** apaga DEM, surface, blocks, targets, basemap, fog y postprocess → en modo debug solo deberían verse `axesHelper`, `gridHelper` y la esfera roja, pero el `renderBounds` que recibe la cámara es el `debugSceneBounds` (±4000 m) sobre un escenario donde los assets reales viven a +6 000 km del origen UTM → cámara enfocada al origen, geometría fuera de cuadro.
-4. **Engine monolítico ingobernable.** 1 889 líneas, ~40 `useState`, 12 capas, 8 paneles, mezcla data fetching + UI + 3D + AI + reportes. Es la razón estructural por la que cada fix introduce el siguiente bug.
+### 1) Hotfix de publicación (1 turno)
+Objetivo: que `/live/losverdes` deje de mostrar la pantalla roja y al menos cargue el shell + datos, aun si el canvas 3D queda detrás de un toggle.
 
-## Objetivo
+- Envolver `<LosVerdesEngine3D />` en un `ErrorBoundary` local con fallback "Visor 3D no disponible — recargar".
+- Mover el `lazy(() => import("@/engine3d/LosVerdesEngine3D"))` detrás de un botón "Activar visor 3D" (no auto-cargar al entrar). Así el shell + KPIs + PDF ya funcionan sin depender del monolito.
+- Añadir `errorComponent` y `pendingComponent` propios a la ruta `live.losverdes` para no caer en el boundary genérico del root.
+- Confirmar que ningún `*.functions.ts` importado en el route hace `import` estático de algo que toque `window` (revisar `losverdes-veins`, `tilama`, `livemap-public`, `conceptualModel`).
 
-Reescribir `LosVerdesEngine3D` como **visor profesional minero** con la sensación visual de Leapfrog Geo / Datamine Studio (referencia: imagen adjunta del usuario — terreno satelital drapeado, sólidos geológicos translúcidos coloreados, trazas de sondajes coloreadas por ley, ejes Z + grilla métrica, brújula y barra de escala).
+### 2) Reducir el monolito a un MVP real (3–4 turnos)
+El visor actual tiene 40+ `useState`, 1.962 líneas y muchas capas que ni están en datos reales. MVP mínimo "vendible":
 
-## Arquitectura objetivo
+**Capas obligatorias (todo lo demás se quita o queda flag-off):**
+- DEM Copernicus + drape Sentinel (ya existe en `scene3d.server`).
+- Concesiones SERNAGEOMIN del polígono Tilama (catastro real).
+- Anomalías satelitales WGS84 extruidas (real).
+- Vetas Cu-Au-Ag (real desde `veins` table).
+- Targets de exploración con popup (real).
+- Sondajes reales si existen; **ocultar** "modelo conceptual" detrás de un toggle "Datos sintéticos".
+
+**Extracciones desde el monolito:**
+- `useEngineData` → hook único con las queries (capas, mining, report, targets, holes).
+- `useEngineLayers` → estado de visibilidad (un solo objeto `Record<LayerId, boolean>`).
+- `EngineHUD` → barra de capas + leyenda.
+- `EngineScene` → solo Canvas + capas R3F.
+- Borrar paneles experimentales que no aportan al MVP: AI Geologist, drillTarget worker, isosurface, voxel, qaqc, sections fuera del visor.
+
+### 3) Roadmap MVP "real" (post-hotfix)
 
 ```text
-src/engine3d/
-├── core/
-│   ├── SceneRoot.tsx          ← Canvas + lights + tone mapping + clipping
-│   ├── CameraRig.tsx          ← MapControls + fit-to-bounds único + presets (plan, N, E, iso)
-│   ├── CoordinateFrame.tsx    ← Provider: origen UTM del proyecto, ENU → world
-│   └── useSceneBounds.ts      ← Bounds agregado, debounced, una sola fuente
-├── layers/                    ← Capas puras, todas en world-space ENU
-│   ├── TerrainLayer.tsx       ← DEM Martini + drape Esri/Sentinel (existente, limpiado)
-│   ├── DrillholesLayer.tsx    ← Sondajes reales + sintéticos unificados
-│   ├── BlockModelLayer.tsx    ← Bloques instanciados con cut-off
-│   ├── PitShellLayer.tsx      ← Pit shells con leyenda RF
-│   ├── AnomalyVolumeLayer.tsx ← Isosurface MC (existente)
-│   └── AnnotationsLayer.tsx   ← Vetas, targets, labels
-├── hud/                       ← UI 2D superpuesta
-│   ├── LayerPanel.tsx         ← Toggle de capas + opacidad + cut-off
-│   ├── ToolPanel.tsx          ← Sección, medir, exportar
-│   ├── CameraPresets.tsx      ← Vista plano, N, E, iso, fit
-│   ├── Compass.tsx + ScaleBar.tsx + MiniMap.tsx
-│   └── HoverTooltip.tsx
-└── LosVerdesEngine3D.tsx      ← ~200 líneas: compose hooks + layers + hud
+Sprint A — Estabilidad (esta semana)
+  · Hotfix + ErrorBoundary + lazy on-demand
+  · Telemetría: log de qué capa falló al montar
+  · Smoke test E2E: /live/losverdes carga, KPIs > 0, botón "Activar 3D" renderiza canvas
+
+Sprint B — Datos reales únicos
+  · Cargar DEM + Sentinel del AOI Tilama desde tiles cacheados
+  · Concesiones, anomalías sat, vetas, targets desde Supabase (sin sintéticos)
+  · Quitar / esconder bloques, pit shells e isosurface generados
+
+Sprint C — UX consolidada
+  · Reemplazar el monolito por GeoSceneCanvas (deck.gl ya existente) en modo "surface+subsurface"
+  · Panel lateral único: capas + leyenda + selección
+  · PDF "Informe ejecutivo Tilama" con snapshot de las capas activas
+
+Sprint D — Diferenciación
+  · Fly-to desde anclajes del copilot (ya hay anchorRegistry)
+  · Sección 2D bajo demanda (clip plane simple, sin worker pesado)
+  · Compartir vista por URL (?layers=…&camera=…)
 ```
 
-Reglas de oro de la reescritura:
+## Detalles técnicos relevantes
 
-- **Un único sistema de coordenadas**: ENU local centrado en el proyecto. Todo dato (real o sintético) se transforma a ENU en su `*.functions.ts` server-side, no en cada layer.
-- **Un único controlador de cámara**: `CameraRig` recibe `bounds` y `preset`. Elimina `AutoFitCamera`, `ForceCameraFit×2`, `InvalidateOnChange` superpuestos.
-- **Sin `debugRenderMode`**: la escena por defecto debe verse bien. Reemplazado por `?debug=1` query param que añade ejes + bounds box, sin apagar nada.
-- **Capa de bounds memoizada por referencia estable** (key derivada de longitudes + hash, no por identidad de array).
+- Cambios concentrados en `src/routes/live.losverdes.tsx` (hotfix) y `src/engine3d/LosVerdesEngine3D.tsx` (división).
+- `GeoSceneCanvas` (MapLibre + deck.gl) ya está implementado y es candidato para reemplazar al visor R3F en Sprint C.
+- Las 6 alertas de seguridad recién corregidas no afectan a `/live/losverdes` (las tablas `veins` / `mine_plan_phases` ahora requieren auth; verificar que las funciones `getLosVerdesMining` / `getLosVerdesPublicLayers` se llamen con `supabaseAdmin` o que sean tablas con grant `anon`, sino esto **explica también el error** del visor público y entra como parte del Sprint A).
 
-## Sprints
+## Salida del Sprint A (definición de "publicada y no falla")
 
-### Sprint A — Desbloqueo visual (1 sesión)
-Objetivo: la primera carga muestra terreno, sondajes, vetas, pit shell sin tocar nada.
-
-1. Añadir `CoordinateFrame` y centrar TODOS los assets sobre el centroide del proyecto antes de mandarlos al cliente (mover la transformación a `conceptualModel.functions.ts`, `drillholes.functions.ts`, `anomalies.functions.ts`).
-2. Reemplazar los 3 controladores de cámara por `CameraRig` único con `fitToBounds` ejecutado **una sola vez** cuando bounds pasa de `null` a definido (y al click explícito de "Fit").
-3. Quitar `debugRenderMode = true` por defecto; encender DEM + sondajes sintéticos + pit shells + grid de fábrica.
-4. Verificar en preview: terreno visible, sondajes visibles, pit shells visibles. Captura antes/después.
-
-### Sprint B — Look Leapfrog (1 sesión)
-Objetivo: estética igual a la imagen de referencia.
-
-1. **Terreno**: drape Esri World Imagery sobre DEM Martini (ya existe `BasemapLayer`), exageración Z = 1.5×, sombras ACES suaves del directional light.
-2. **Sondajes**: cilindros instanciados coloreados por **Cu eq del intervalo** (gradiente azul→verde→amarillo→rojo) en vez de por estado. Halo emisivo en collares.
-3. **Pit shells**: mallas semi-transparentes (op 0.25-0.4) con outline por revenue factor, leyenda lateral con tonnage / strip ratio (datos ya existen en `pit_shells`).
-4. **Block model**: bloques instanciados con material PBR, color por Cu eq, cut-off slider repinta sin re-fetch.
-5. **HUD**: brújula 3D reactiva (existe `CompassRose`), barra de escala métrica, mini-mapa 2D con FOV cone (existe `MiniMap`), ejes Z laterales con elevaciones cada 100 m (existe `DepthAxis` — engancharlo).
-6. **Cámara presets** en HUD: Plano, N, E, Iso, Fit (un botón cada uno).
-
-### Sprint C — Interacción profesional (1 sesión)
-Objetivo: usable como Datamine ligero.
-
-1. **Cross-section interactiva**: arrastrar el plano de corte con el mouse (ya existe `ClippingPlaneController`, exponerlo en HUD).
-2. **Hover unificado**: tooltip único que muestra el contenido relevante (collar/assay/bloque/pit) en lugar de 3 tooltips dispersos.
-3. **Click en sondaje** → vuela la cámara y abre tarjeta con los assays (ya hay `followHoleId`, conectarlo a `CameraRig`).
-4. **Export**: PNG hi-res de la vista actual + OBJ del pit shell visible.
-5. **Onboarding**: overlay de 3 pasos la primera visita (highlight: Capas, Sección, Presets).
-
-### Sprint D — Limpieza y QA (0.5 sesión)
-1. Eliminar paneles no usados del Engine: `AIGeologistPanel`, `TargetPlanningPanel`, `ReportsPanel`, `QAQCPanel`, `EstimationSettingsPanel`, `AuditTrailPanel`, `NI43101Panel` se mueven a una **ruta hermana** `/live/losverdes/workspace` (que no es lo que muestra el live público).
-2. La página `/live/losverdes` queda con **un solo HUD ligero**: capas, presets, sección, export.
-3. Test E2E manual: cargar la ruta, verificar que en <2 s se ve terreno+sondajes, click en Fit, click en Sección, toggle Block Model. Captura final adjunta al chat.
-
-## Entregables verificables
-
-- `/live/losverdes` muestra al cargar: terreno satelital drapeado, ≥15 sondajes coloreados, ≥1 pit shell semi-transparente, ejes + brújula + escala.
-- `LosVerdesEngine3D.tsx` reducido a ≤ 250 líneas.
-- 45+ fps en laptop integrada (modo medio), 60+ fps en GPU dedicada.
-- Cero `debugRenderMode`, cero controladores de cámara duplicados.
-- Captura de pantalla adjunta al cierre del Sprint B mostrando paridad visual con la referencia Leapfrog.
-
-## Fuera de alcance (no se toca esta iteración)
-
-- Kriging ordinario real (sigue IDW).
-- Importadores `.dm` / `.str`.
-- Scheduling temporal y NPV por fase.
-- Edición de polígonos de litología sobre sección.
-
-## Riesgos
-
-- Si el DEM Martini sigue cayendo a procedural (no hay GeoTIFF real para Los Verdes), el terreno se verá menos realista que la referencia. Mitigación: usar drape Esri sobre el DEM procedural — visualmente convincente.
-- Cambiar el sistema de coordenadas a ENU puede romper los `clippingPlanes` existentes. Mitigación: convertir `useClippingPlanes` para que reciba bounds en world-space ya transformado.
+- `geocapitals.com/live/losverdes` muestra header + KPIs + tabla + botón PDF sin pantalla roja.
+- Botón "Activar visor 3D" carga el canvas; si falla, muestra mensaje, no pantalla negra.
+- Logs del worker sin 5xx, sin "Unauthorized" en las 3 server functions de la ruta.
