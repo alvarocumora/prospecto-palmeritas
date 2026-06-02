@@ -8,10 +8,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-// Browser-only viewer — cargar solo en cliente para evitar
-// que el SSR del worker falle por referencias a `window`/`document` a nivel de módulo.
-const LosVerdesEngine3D = lazy(() =>
-  import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+// Visor 3D público real (Sprint B): MapLibre + deck.gl con DEM real,
+// concesiones, anomalías sat/mag, vetas y targets desde Supabase.
+const LosVerdesPublicScene = lazy(() =>
+  import("@/components/live/LosVerdesPublicScene").then((m) => ({ default: m.LosVerdesPublicScene })),
 );
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
@@ -370,11 +370,7 @@ function LiveLosVerdesPage() {
                   </div>
                 }
               >
-                <LosVerdesEngine3D
-                  key={engineKey}
-                  projectId="7a499b02-ecdf-447b-8956-b106fe4ec087"
-                  height={640}
-                />
+                <LosVerdesPublicScene key={engineKey} height={640} />
               </Suspense>
             </EngineErrorBoundary>
           )}
