@@ -6,4 +6,30 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+export default defineConfig({
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 2000,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes("node_modules")) return;
+            if (id.includes("three") || id.includes("@react-three")) return "three";
+            if (id.includes("maplibre-gl")) return "maplibre";
+            if (id.includes("@deck.gl") || id.includes("deck.gl")) return "deckgl";
+            if (id.includes("leaflet")) return "leaflet";
+            if (id.includes("recharts") || id.includes("d3-")) return "charts";
+            if (id.includes("jspdf") || id.includes("html2canvas")) return "pdf";
+            if (id.includes("@turf") || id.includes("turf")) return "turf";
+            if (id.includes("geotiff")) return "geotiff";
+            if (id.includes("@radix-ui")) return "radix";
+            if (id.includes("@supabase")) return "supabase";
+            if (id.includes("@tanstack")) return "tanstack";
+            if (id.includes("lucide-react")) return "icons";
+            if (id.includes("proj4") || id.includes("martini")) return "geo";
+          },
+        },
+      },
+    },
+  },
+});
