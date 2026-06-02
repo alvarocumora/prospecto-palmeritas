@@ -8,6 +8,7 @@ import { useServerFn } from "@tanstack/react-start";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { ScatterplotLayer, PolygonLayer, PathLayer } from "@deck.gl/layers";
+import type { Layer } from "@deck.gl/core";
 import { Loader2, Layers as LayersIcon, AlertTriangle } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -142,7 +143,7 @@ export function LosVerdesPublicScene({ height = 640 }: { height?: number }) {
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
 
-    const layers: unknown[] = [];
+    const layers: Layer[] = [];
 
     // Anomalías satelitales — polígonos extruidos por severidad
     if (visible.satAnomalies && anomQ.data?.satAnomalies?.length) {

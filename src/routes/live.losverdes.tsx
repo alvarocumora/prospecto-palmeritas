@@ -370,11 +370,7 @@ function LiveLosVerdesPage() {
                   </div>
                 }
               >
-                <LosVerdesEngine3D
-                  key={engineKey}
-                  projectId="7a499b02-ecdf-447b-8956-b106fe4ec087"
-                  height={640}
-                />
+                <LosVerdesPublicScene key={engineKey} height={640} />
               </Suspense>
             </EngineErrorBoundary>
           )}
