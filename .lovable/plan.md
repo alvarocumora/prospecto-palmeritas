@@ -1,74 +1,58 @@
+## KMZ profesional · Prospecto Tilama / Distrito Cuprífero Los Verdes
 
-## Diagnóstico
+Entregable: un único archivo `.kmz` listo para Google Earth Pro / QGIS / ArcGIS, con leyenda, estilos por atributo, popups HTML completos y carpetas organizadas por capa temática.
 
-- **Home (`/`)** publica OK en `geocapitals.com` y `prospecto-palmeritas.lovable.app`. No hay caída global.
-- **`/live/losverdes`** en producción renderiza el `errorComponent` ("Something went wrong"). El worker responde 200, así que el fallo es **client-side** dentro de la ruta.
-- Causas probables (en orden de probabilidad):
-  1. El visor `LosVerdesEngine3D` (monolito de 1.962 líneas) tira durante el lazy import o el primer render. En preview se ve además el error `Failed to fetch dynamically imported module: virtual:tanstack-start-client-entry`, típico de un chunk roto.
-  2. Una de las 3 `useQuery` (`getLosVerdesPublicLayers`, `getLosVerdesMining`, `getTilamaReport`) lanza al renderizar el shell antes de que el `errorBoundary` del visor la atrape.
-  3. El worker `martini.worker.ts` o `terrain/dem.functions` se importa a nivel módulo y rompe SSR/edge bundle.
-- No hay logs de error en workerd para esa URL → confirma que es runtime de cliente.
+### 1. Sincronización previa de catastro (SERNAGEOMIN)
 
-## Plan (3 pasos, escalonados)
+Antes de generar el KMZ, lanzar la edge function `match-project-catastro` (radio 15 km) contra el proyecto Tilama (`7a499b02-...`). La función:
+- consulta el FeatureServer de SERNAGEOMIN en el bbox del proyecto,
+- hace upsert de polígonos vigentes a `cadastre_national`,
+- intenta matchear cada `mining_concession` local (por ROL o nombre fuzzy) y guarda `metadata.matched_rol` + `geometry_geojson` en `mining_concessions`.
 
-### 1) Hotfix de publicación (1 turno)
-Objetivo: que `/live/losverdes` deje de mostrar la pantalla roja y al menos cargue el shell + datos, aun si el canvas 3D queda detrás de un toggle.
+Si la edge function falla por timeout/red, se reintenta con radio 25 km. Las concesiones que no matcheen quedan como placemark en su centroide aproximado dentro del AOI, claramente etiquetadas "sin polígono oficial".
 
-- Envolver `<LosVerdesEngine3D />` en un `ErrorBoundary` local con fallback "Visor 3D no disponible — recargar".
-- Mover el `lazy(() => import("@/engine3d/LosVerdesEngine3D"))` detrás de un botón "Activar visor 3D" (no auto-cargar al entrar). Así el shell + KPIs + PDF ya funcionan sin depender del monolito.
-- Añadir `errorComponent` y `pendingComponent` propios a la ruta `live.losverdes` para no caer en el boundary genérico del root.
-- Confirmar que ningún `*.functions.ts` importado en el route hace `import` estático de algo que toque `window` (revisar `losverdes-veins`, `tilama`, `livemap-public`, `conceptualModel`).
+### 2. Contenido del KMZ
 
-### 2) Reducir el monolito a un MVP real (3–4 turnos)
-El visor actual tiene 40+ `useState`, 1.962 líneas y muchas capas que ni están en datos reales. MVP mínimo "vendible":
-
-**Capas obligatorias (todo lo demás se quita o queda flag-off):**
-- DEM Copernicus + drape Sentinel (ya existe en `scene3d.server`).
-- Concesiones SERNAGEOMIN del polígono Tilama (catastro real).
-- Anomalías satelitales WGS84 extruidas (real).
-- Vetas Cu-Au-Ag (real desde `veins` table).
-- Targets de exploración con popup (real).
-- Sondajes reales si existen; **ocultar** "modelo conceptual" detrás de un toggle "Datos sintéticos".
-
-**Extracciones desde el monolito:**
-- `useEngineData` → hook único con las queries (capas, mining, report, targets, holes).
-- `useEngineLayers` → estado de visibilidad (un solo objeto `Record<LayerId, boolean>`).
-- `EngineHUD` → barra de capas + leyenda.
-- `EngineScene` → solo Canvas + capas R3F.
-- Borrar paneles experimentales que no aportan al MVP: AI Geologist, drillTarget worker, isosurface, voxel, qaqc, sections fuera del visor.
-
-### 3) Roadmap MVP "real" (post-hotfix)
+Estructura de carpetas dentro del KMZ:
 
 ```text
-Sprint A — Estabilidad (esta semana)
-  · Hotfix + ErrorBoundary + lazy on-demand
-  · Telemetría: log de qué capa falló al montar
-  · Smoke test E2E: /live/losverdes carga, KPIs > 0, botón "Activar 3D" renderiza canvas
-
-Sprint B — Datos reales únicos
-  · Cargar DEM + Sentinel del AOI Tilama desde tiles cacheados
-  · Concesiones, anomalías sat, vetas, targets desde Supabase (sin sintéticos)
-  · Quitar / esconder bloques, pit shells e isosurface generados
-
-Sprint C — UX consolidada
-  · Reemplazar el monolito por GeoSceneCanvas (deck.gl ya existente) en modo "surface+subsurface"
-  · Panel lateral único: capas + leyenda + selección
-  · PDF "Informe ejecutivo Tilama" con snapshot de las capas activas
-
-Sprint D — Diferenciación
-  · Fly-to desde anclajes del copilot (ya hay anchorRegistry)
-  · Sección 2D bajo demanda (clip plane simple, sin worker pesado)
-  · Compartir vista por URL (?layers=…&camera=…)
+Distrito Cuprífero Los Verdes — Tilama
+├── 00 · Resumen ejecutivo (overlay con leyenda + metadatos)
+├── 01 · Concesiones mineras (15)
+│   ├── Grupo Los Verdes (6: Alto LV 1/2/4/5 + LV 4-1-10 + LV 5-1-12)
+│   ├── Norte (Chele Norte, Naranjo N/S, Cumbre Nevado)
+│   └── Sur / Periféricas (Las Palmas, Las Trancas, Los Peumos, Lucas, Mandela)
+├── 02 · Targets de exploración (108)
+│   ├── Critical · High · Medium · Low (por priority)
+├── 03 · Anomalías satelitales (45)
+│   ├── Severidad high / medium / low (color por severity, tamaño por score)
+├── 04 · Muestras rock (190)
+│   ├── Cu alto (>1.5 %) · Cu medio (0.5–1.5 %) · Cu bajo (<0.5 %)
+└── 05 · AOI y referencia (bbox del proyecto, escala, norte)
 ```
 
-## Detalles técnicos relevantes
+### 3. Estilos y simbología
 
-- Cambios concentrados en `src/routes/live.losverdes.tsx` (hotfix) y `src/engine3d/LosVerdesEngine3D.tsx` (división).
-- `GeoSceneCanvas` (MapLibre + deck.gl) ya está implementado y es candidato para reemplazar al visor R3F en Sprint C.
-- Las 6 alertas de seguridad recién corregidas no afectan a `/live/losverdes` (las tablas `veins` / `mine_plan_phases` ahora requieren auth; verificar que las funciones `getLosVerdesMining` / `getLosVerdesPublicLayers` se llamen con `supabaseAdmin` o que sean tablas con grant `anon`, sino esto **explica también el error** del visor público y entra como parte del Sprint A).
+- **Concesiones**: polígono relleno semi-transparente, color por `concession_type` (explotación = ámbar, exploración = celeste), borde 2 px. Etiqueta con nombre + ROL. Popup HTML con titular, hectáreas, estado, fecha constitución, link al expediente SERNAGEOMIN cuando esté en `metadata`.
+- **Targets**: pin estilo "target" con color por prioridad (rojo / dorado / azul / gris). Popup con código, tipo, commodity, etapa, score, rationale y enlace al proyecto en la app.
+- **Anomalías satelitales**: pin tipo donut, color por severidad (rojo / naranjo / verde), opacidad ∝ score. Popup con índice (NDVI/clay/iron), área, fecha de detección.
+- **Muestras rock**: pin circular, color por ley de Cu (rojo >1.5 %, naranjo 0.5–1.5 %, amarillo <0.5 %). Popup con assay completo (Au, Ag, Cu, Mo, Pb, Zn, As, Sb, Hg) + zona + laboratorio.
+- **Leyenda**: `ScreenOverlay` PNG anclado abajo-izquierda con todas las categorías.
 
-## Salida del Sprint A (definición de "publicada y no falla")
+### 4. Reproyección y datos crudos
 
-- `geocapitals.com/live/losverdes` muestra header + KPIs + tabla + botón PDF sin pantalla roja.
-- Botón "Activar visor 3D" carga el canvas; si falla, muestra mensaje, no pantalla negra.
-- Logs del worker sin 5xx, sin "Unauthorized" en las 3 server functions de la ruta.
+- Muestras rock están en UTM 19S (EPSG:32719) → reproyectar a WGS84 (EPSG:4326) con `pyproj` antes de escribir el KML.
+- Todas las geometrías del catastro vienen en WGS84 de SERNAGEOMIN, se usan tal cual.
+- Targets y anomalías ya están en lat/lng WGS84.
+
+### 5. Entregable
+
+- Archivo `/mnt/documents/Tilama_LosVerdes_PROSPECTO_COMPLETO.kmz` mostrado al usuario vía `<presentation-artifact>`.
+- Resumen de qué quedó dentro: cuántos polígonos reales del catastro se obtuvieron, cuántas concesiones quedaron como placemark, totales por capa.
+
+### 6. Detalles técnicos
+
+- Generación con `simplekml` + `pyproj` en `python` del sandbox.
+- Datos extraídos con `psql` (lectura directa autorizada) sin pasar por la app.
+- Edge function `match-project-catastro` ejecutada con `supabase--curl_edge_functions` (POST, body con `projectId`, `radiusKm: 15`, `dryRun: false`); si timeout, fallback a `dryRun: true` para no romper datos y se documenta en el resumen.
+- No se cambia código de la app, no se modifican tablas (solo upsert que ya hace la edge function existente). Sin migraciones.
