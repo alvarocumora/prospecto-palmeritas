@@ -1,8 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { lazy, Suspense, useEffect, useState } from "react";
-import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles } from "lucide-react";
+import { Component, lazy, Suspense, useEffect, useState, type ErrorInfo, type ReactNode } from "react";
+import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles, AlertTriangle, Box } from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,69 @@ export const Route = createFileRoute("/live/losverdes")({
     links: [{ rel: "manifest", href: "/manifest.losverdes.json" }],
   }),
   component: LiveLosVerdesPage,
+  pendingComponent: () => (
+    <div className="min-h-screen bg-bg-app flex items-center justify-center">
+      <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
+        <Loader2 className="w-4 h-4 animate-spin text-gold" />
+        Cargando Los Verdes…
+      </div>
+    </div>
+  ),
+  errorComponent: ({ error, reset }) => (
+    <div className="min-h-screen bg-bg-app flex items-center justify-center p-6">
+      <div className="max-w-md text-center space-y-3">
+        <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
+        <h1 className="text-lg font-semibold text-foreground">No pudimos cargar el visor Los Verdes</h1>
+        <p className="text-xs font-mono text-muted-foreground break-words">
+          {error instanceof Error ? error.message : String(error)}
+        </p>
+        <Button size="sm" onClick={reset} className="bg-gold text-background hover:bg-gold/90">
+          Reintentar
+        </Button>
+      </div>
+    </div>
+  ),
 });
+
+/** ErrorBoundary local para aislar el visor 3D del resto de la página. */
+class EngineErrorBoundary extends Component<
+  { children: ReactNode; onReset?: () => void },
+  { error: Error | null }
+> {
+  state = { error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    console.error("[LosVerdes] Engine3D crashed:", error, info.componentStack);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="w-full h-[640px] rounded-lg border border-amber-500/40 bg-bg-secondary flex items-center justify-center p-6">
+          <div className="max-w-sm text-center space-y-2">
+            <AlertTriangle className="w-6 h-6 text-amber-400 mx-auto" />
+            <div className="text-sm text-foreground">Visor 3D no disponible</div>
+            <div className="text-[10px] font-mono text-muted-foreground break-words">
+              {this.state.error.message}
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                this.setState({ error: null });
+                this.props.onReset?.();
+              }}
+            >
+              Reintentar
+            </Button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 
 
@@ -104,6 +166,9 @@ function LiveLosVerdesPage() {
   const [genBusy, setGenBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [mounted, setMounted] = useState(false);
+  // Visor 3D gated on-demand: evita que un crash del monolito tumbe toda la página.
+  const [engineOn, setEngineOn] = useState(false);
+  const [engineKey, setEngineKey] = useState(0);
   useEffect(() => setMounted(true), []);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
   const genConceptual = useServerFn(generateConceptualModelFn);
@@ -277,20 +342,41 @@ function LiveLosVerdesPage() {
               )}
             </div>
           </div>
-          {!mounted ? (
-            <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-              Inicializando visor 3D…
+          {!mounted || !engineOn ? (
+            <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex flex-col items-center justify-center gap-3 p-6 text-center">
+              <Box className="w-8 h-8 text-gold" />
+              <div className="text-sm text-foreground">Visor 3D Los Verdes</div>
+              <div className="text-[11px] font-mono text-muted-foreground max-w-md">
+                Carga bajo demanda: terreno + concesiones + anomalías satelitales + vetas + targets.
+                El resto de la página (KPIs, catastro, plan minero, PDF) funciona sin necesidad de
+                activarlo.
+              </div>
+              <Button
+                size="sm"
+                onClick={() => setEngineOn(true)}
+                disabled={!mounted}
+                className="bg-gold hover:bg-gold/90 text-background"
+              >
+                {mounted ? "Activar visor 3D" : "Inicializando…"}
+              </Button>
             </div>
           ) : (
-            <Suspense
-              fallback={
-                <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
-                  Cargando escena 3D…
-                </div>
-              }
-            >
-              <LosVerdesEngine3D projectId="7a499b02-ecdf-447b-8956-b106fe4ec087" height={640} />
-            </Suspense>
+            <EngineErrorBoundary onReset={() => setEngineKey((k) => k + 1)}>
+              <Suspense
+                fallback={
+                  <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex items-center justify-center font-mono text-[11px] text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin text-gold mr-2" />
+                    Cargando escena 3D…
+                  </div>
+                }
+              >
+                <LosVerdesEngine3D
+                  key={engineKey}
+                  projectId="7a499b02-ecdf-447b-8956-b106fe4ec087"
+                  height={640}
+                />
+              </Suspense>
+            </EngineErrorBoundary>
           )}
         </section>
 
