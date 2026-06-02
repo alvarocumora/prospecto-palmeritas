@@ -1,86 +1,27 @@
-// Edge Function: match-project-catastro
+// Edge Function: match-project-catastro (v2 — SERNAGEOMIN ArcGIS Online)
 //
-// Descarga TODOS los polígonos vigentes/exploración de SERNAGEOMIN dentro del
-// bounding box del proyecto, los persiste en `cadastre_national` y enlaza por
-// similitud de nombre cada `mining_concessions` del proyecto a su polígono
-// oficial, escribiendo `geometry_geojson`, `area_ha`, `external_id` (ROL),
-// `holder` y `source = 'sernageomin'`.
+// Descarga TODOS los polígonos del FeatureServer v2 dentro del bounding box
+// del proyecto, los persiste en `cadastre_national` y enlaza por similitud
+// de nombre cada `mining_concessions` del proyecto a su polígono oficial.
 //
 // Body: { projectId: string, radiusKm?: number, dryRun?: boolean }
-// Returns: { ok, fetched, matched, unmatched, results: [...] }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { queryConcessions, type CanonicalConcession } from "../_shared/sernageomin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const ARCGIS_BASE =
-  "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer";
-// 0 = Explotación, 1 = Exploración
-const LAYERS = [0, 1] as const;
-
-type ArcFeature = {
-  attributes: Record<string, unknown>;
-  geometry?: { rings?: number[][][] };
-};
-
-function ringsToGeoJson(rings?: number[][][]): GeoJSON.Geometry | null {
-  if (!rings?.length) return null;
-  if (rings.length === 1) return { type: "Polygon", coordinates: rings };
-  return { type: "MultiPolygon", coordinates: rings.map((r) => [r]) };
-}
-
-function pickStr(a: Record<string, unknown>, keys: string[]): string | null {
-  for (const k of keys) {
-    const v = a[k];
-    if (v != null && String(v).trim() !== "") return String(v).trim();
-  }
-  return null;
-}
-function pickNum(a: Record<string, unknown>, keys: string[]): number | null {
-  for (const k of keys) {
-    const v = a[k];
-    if (v == null || v === "") continue;
-    const n = Number(v);
-    if (!Number.isNaN(n)) return n;
-  }
-  return null;
-}
-function parseDate(a: Record<string, unknown>, keys: string[]): string | null {
-  for (const k of keys) {
-    const v = a[k];
-    if (v == null || v === "") continue;
-    if (typeof v === "number") {
-      const d = new Date(v);
-      if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-    }
-    const d = new Date(String(v));
-    if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
-  }
-  return null;
-}
-
-function mapStatus(a: Record<string, unknown>): string {
-  const s = (pickStr(a, ["VIGENCIA", "ESTADO", "SITUACION"]) ?? "").toLowerCase();
-  if (s.includes("vig")) return "vigente";
-  if (s.includes("tram")) return "en_tramite";
-  if (s.includes("venc") || s.includes("cadu")) return "vencida";
-  if (s.includes("cancel")) return "cancelada";
-  return "vigente";
-}
-
-// Normaliza el nombre para comparar: minúsculas, sin acentos, sin signos,
-// colapsa espacios y descarta sufijos comunes como "1-30", "1/12", "5-1-12".
 function normalizeName(raw: string): string {
   return raw
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[\/_.]+/g, " ")
-    .replace(/\b\d+\s*[-]\s*\d+(\s*[-]\s*\d+)?\b/g, " ") // 1-30, 5-1-12
-    .replace(/\b\d+\b/g, " ")                              // numeros sueltos
+    .replace(/\b\d+\s*[-]\s*\d+(\s*[-]\s*\d+)?\b/g, " ")
+    .replace(/\b\d+\b/g, " ")
     .replace(/[^a-z\s]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -93,45 +34,6 @@ function tokenJaccard(a: string, b: string): number {
   let inter = 0;
   for (const t of ta) if (tb.has(t)) inter++;
   return inter / (ta.size + tb.size - inter);
-}
-
-async function fetchLayerInBbox(
-  layer: number,
-  xmin: number,
-  ymin: number,
-  xmax: number,
-  ymax: number,
-): Promise<ArcFeature[]> {
-  const out: ArcFeature[] = [];
-  let offset = 0;
-  // SERNAGEOMIN typical maxRecordCount = 1000
-  while (true) {
-    const params = new URLSearchParams({
-      where: "1=1",
-      geometry: JSON.stringify({ xmin, ymin, xmax, ymax, spatialReference: { wkid: 4326 } }),
-      geometryType: "esriGeometryEnvelope",
-      inSR: "4326",
-      outSR: "4326",
-      spatialRel: "esriSpatialRelIntersects",
-      outFields: "*",
-      returnGeometry: "true",
-      f: "json",
-      resultOffset: String(offset),
-      resultRecordCount: "1000",
-    });
-    const url = `${ARCGIS_BASE}/${layer}/query?${params.toString()}`;
-    const res = await fetch(url);
-    if (!res.ok) {
-      throw new Error(`ArcGIS layer ${layer} HTTP ${res.status}`);
-    }
-    const json = (await res.json()) as { features?: ArcFeature[]; exceededTransferLimit?: boolean };
-    const feats = json.features ?? [];
-    out.push(...feats);
-    if (!json.exceededTransferLimit || feats.length === 0) break;
-    offset += feats.length;
-    if (offset > 20_000) break; // safety
-  }
-  return out;
 }
 
 Deno.serve(async (req) => {
@@ -154,7 +56,6 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // 1) Proyecto + concesiones internas a enlazar
     const { data: proj, error: pErr } = await supabase
       .from("projects")
       .select("id, name, center_lat, center_lng")
@@ -173,7 +74,6 @@ Deno.serve(async (req) => {
       .eq("project_id", projectId);
     const local = localRows ?? [];
 
-    // 2) BBOX (~radiusKm a la redonda)
     const dLat = radiusKm / 111;
     const dLng = radiusKm / (111 * Math.cos((lat * Math.PI) / 180));
     const xmin = lng - dLng;
@@ -181,44 +81,52 @@ Deno.serve(async (req) => {
     const ymin = lat - dLat;
     const ymax = lat + dLat;
 
-    // 3) Descarga SERNAGEOMIN
-    const allFeats: Array<{ feat: ArcFeature; layer: number }> = [];
-    for (const layer of LAYERS) {
-      const feats = await fetchLayerInBbox(layer, xmin, ymin, xmax, ymax);
-      for (const f of feats) allFeats.push({ feat: f, layer });
-    }
+    const remote = await queryConcessions({
+      bbox: { xmin, ymin, xmax, ymax },
+      returnGeometry: true,
+    });
 
     // 4) Persiste en cadastre_national (idempotente via upsert_cadastre_feature)
     let upserted = 0;
-    for (const { feat, layer } of allFeats) {
-      const a = feat.attributes;
-      const geom = ringsToGeoJson(feat.geometry?.rings);
+    for (const c of remote) {
       const externalId =
-        pickStr(a, ["OBJECTID", "OBJECT_ID", "CODIGO", "ROL", "COD_EXPED"]) ??
-        crypto.randomUUID();
-      const origen = layer === 0 ? "EXPLOTACION" : "EXPLORACION";
+        c.id_concesion != null ? String(c.id_concesion) : (c.rol ?? crypto.randomUUID());
+      const origen = c.tipo === "explotacion" ? "EXPLOTACION" : "EXPLORACION";
       const payload = {
-        rol: pickStr(a, ["ROL", "CODIGO", "COD_EXPED"]),
-        name: pickStr(a, ["NOMBRE", "NOM_PERT", "NOM_CONCES"]),
-        tipo: layer === 0 ? "explotacion" : "exploracion",
-        status: mapStatus(a),
-        area_ha: pickNum(a, ["AREA_HA", "HECTAREAS", "SUPERFICIE", "SUP_HA"]),
-        region: pickStr(a, ["REGION", "NOM_REGION"]),
-        commune: pickStr(a, ["COMUNA", "NOM_COMUNA"]),
-        provincia: pickStr(a, ["PROVINCIA", "NOM_PROVIN"]),
-        holder_name: pickStr(a, ["TITULAR", "NOMBRE_TIT", "NOM_TITULA"]),
-        holder_rut: pickStr(a, ["RUT_TIT", "RUT_TITULA", "RUT"]),
-        constituted_at: parseDate(a, ["FEC_INSC", "FECHA_INSC", "FEC_OTORG"]),
-        last_patent_year: pickNum(a, ["ANNO_PATEN", "ANO_PATENT", "AGNO_PAT"]),
-        datum: "WGS84",
-        metadata: { layer, source_attrs: a },
+        rol: c.rol,
+        name: c.name,
+        tipo: c.tipo,
+        status: c.status,
+        area_ha: c.hectareas,
+        region: null,
+        commune: c.comuna,
+        provincia: null,
+        holder_name: c.holder_name,
+        holder_rut: c.holder_rut,
+        constituted_at: null,
+        last_patent_year: c.ano_inscripcion,
+        datum: c.datum ?? "WGS84",
+        metadata: {
+          source_version: "sngm-v2",
+          id_concesion: c.id_concesion,
+          tipo_raw: c.tipo_raw,
+          status_raw: c.status_raw,
+          nro_inscripcion: c.nro_inscripcion,
+          fojas: c.fojas,
+          ano_inscripcion: c.ano_inscripcion,
+          origen: c.origen,
+          huso: c.huso,
+          fecha_vencimiento: c.fecha_vencimiento,
+          fecha_actualizacion: c.fecha_actualizacion,
+          holder_division: c.holder_division,
+        },
       };
       if (!dryRun) {
         const { error: upErr } = await supabase.rpc("upsert_cadastre_feature", {
           _origen: origen,
           _external_id: externalId,
           _payload: payload,
-          _geometry_geojson: geom,
+          _geometry_geojson: c.geometry,
         });
         if (!upErr) upserted++;
       } else {
@@ -226,7 +134,6 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 5) Matching por nombre normalizado + Jaccard de tokens
     type MatchResult = {
       local_code: string;
       local_name: string;
@@ -238,23 +145,9 @@ Deno.serve(async (req) => {
     };
     const results: MatchResult[] = [];
 
-    const candidates = allFeats
-      .map(({ feat, layer }) => {
-        const a = feat.attributes;
-        const name = pickStr(a, ["NOMBRE", "NOM_PERT", "NOM_CONCES"]);
-        if (!name) return null;
-        return {
-          name,
-          norm: normalizeName(name),
-          rol: pickStr(a, ["ROL", "CODIGO", "COD_EXPED"]),
-          holder: pickStr(a, ["TITULAR", "NOMBRE_TIT", "NOM_TITULA"]),
-          area_ha: pickNum(a, ["AREA_HA", "HECTAREAS", "SUPERFICIE", "SUP_HA"]),
-          geom: ringsToGeoJson(feat.geometry?.rings),
-          layer,
-          status: mapStatus(a),
-        };
-      })
-      .filter((c): c is NonNullable<typeof c> => c !== null);
+    const candidates = remote
+      .filter((c) => c.name)
+      .map((c) => ({ ...c, norm: normalizeName(c.name!) }));
 
     let matchedCount = 0;
     for (const l of local) {
@@ -268,25 +161,27 @@ Deno.serve(async (req) => {
         });
         continue;
       }
-      let best: { c: (typeof candidates)[number]; score: number } | null = null;
+      let best: { c: (typeof candidates)[number] & { norm: string }; score: number } | null = null;
       for (const c of candidates) {
         const score = tokenJaccard(target, c.norm);
         if (best == null || score > best.score) best = { c, score };
       }
-      // Umbral: ≥ 0.5 (al menos la mitad de los tokens significativos coinciden)
-      if (best && best.score >= 0.5 && best.c.geom) {
+      if (best && best.score >= 0.5 && best.c.geometry) {
         matchedCount++;
         if (!dryRun) {
           const update: Record<string, unknown> = {
-            geometry_geojson: best.c.geom,
+            geometry_geojson: best.c.geometry,
             source: "sernageomin",
-            datum: "WGS84",
+            datum: best.c.datum ?? "WGS84",
             last_synced_at: new Date().toISOString(),
           };
-          if (best.c.area_ha != null) update.area_ha = best.c.area_ha;
+          if (best.c.hectareas != null) update.area_ha = best.c.hectareas;
           if (best.c.rol) update.external_id = best.c.rol;
-          if (best.c.holder) update.holder = best.c.holder;
+          if (best.c.holder_name) update.holder = best.c.holder_name;
+          if (best.c.holder_rut) update.rut_holder = best.c.holder_rut;
+          if (best.c.comuna) update.commune = best.c.comuna;
           if (best.c.status) update.status = best.c.status;
+          if (best.c.fecha_vencimiento) update.expires_at = best.c.fecha_vencimiento;
           await supabase.from("mining_concessions").update(update).eq("id", l.id);
         }
         results.push({
@@ -317,9 +212,10 @@ Deno.serve(async (req) => {
     return new Response(
       JSON.stringify({
         ok: true,
+        client_version: "v2-online",
         project_id: projectId,
         bbox: { xmin, ymin, xmax, ymax, radius_km: radiusKm },
-        fetched: allFeats.length,
+        fetched: remote.length,
         upserted_to_national: upserted,
         local_concessions: local.length,
         matched: matchedCount,
@@ -337,3 +233,6 @@ Deno.serve(async (req) => {
     });
   }
 });
+
+// Compat: tipo importado para evitar unused warning si se mueve la lógica.
+export type _Unused = CanonicalConcession;

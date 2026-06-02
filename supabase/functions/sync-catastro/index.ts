@@ -1,22 +1,20 @@
-// Edge Function: sync-catastro
-// Syncs all mining_concessions for a project against SERNAGEOMIN ArcGIS.
-// Records snapshots in concession_history with diff. Trigger
-// trg_concession_history_alert auto-creates concession_alerts when a real
-// diff is recorded.
+// Edge Function: sync-catastro (v2 — SERNAGEOMIN ArcGIS Online)
+// Sincroniza todas las mining_concessions de un proyecto contra el nuevo
+// FeatureServer (services1.arcgis.com/.../Marcelo_Layer/FeatureServer/2).
 //
 // Body: { projectId: string }
 // Auth: requires Authorization Bearer (user JWT) — runs with service role.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import {
+  findConcessionByCode,
+  type CanonicalConcession,
+} from "../_shared/sernageomin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-const ARCGIS_BASE =
-  "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer";
-const LAYERS = [0, 1];
 
 type Concession = {
   id: string;
@@ -26,47 +24,29 @@ type Concession = {
   area_ha: number | null;
   expires_at: string | null;
   status: string;
+  metadata: Record<string, unknown> | null;
 };
-
-async function queryArcgis(code: string): Promise<Record<string, unknown> | null> {
-  for (const layer of LAYERS) {
-    const params = new URLSearchParams({
-      where: `CODIGO = '${code.replace(/'/g, "''")}' OR ROL = '${code.replace(/'/g, "''")}'`,
-      outFields: "*",
-      outSR: "4326",
-      f: "json",
-      resultRecordCount: "1",
-    });
-    try {
-      const res = await fetch(`${ARCGIS_BASE}/${layer}/query?${params.toString()}`);
-      if (!res.ok) continue;
-      const json = await res.json();
-      const f = json?.features?.[0];
-      if (f?.attributes) return f.attributes as Record<string, unknown>;
-    } catch {
-      // continue
-    }
-  }
-  return null;
-}
 
 function diffFields(
   before: Concession,
-  attrs: Record<string, unknown>,
+  c: CanonicalConcession,
 ): Record<string, { from: unknown; to: unknown }> {
   const diff: Record<string, { from: unknown; to: unknown }> = {};
-  const newHolder = (attrs.TITULAR ?? attrs.NOMBRE_TIT ?? null) as string | null;
-  const newArea = (attrs.AREA_HA ?? attrs.HECTAREAS ?? null) as number | null;
-  const newStatus = (attrs.VIGENCIA ?? attrs.ESTADO ?? null) as string | null;
-
-  if (newHolder && newHolder !== before.holder) {
-    diff.holder = { from: before.holder, to: newHolder };
+  if (c.holder_name && c.holder_name !== before.holder) {
+    diff.holder = { from: before.holder, to: c.holder_name };
   }
-  if (newArea && Number(newArea) !== Number(before.area_ha)) {
-    diff.area_ha = { from: before.area_ha, to: newArea };
+  if (c.hectareas != null && Number(c.hectareas) !== Number(before.area_ha)) {
+    diff.area_ha = { from: before.area_ha, to: c.hectareas };
   }
-  if (newStatus && newStatus.toLowerCase() !== (before.status ?? "").toLowerCase()) {
-    diff.status = { from: before.status, to: newStatus };
+  if (c.status && c.status !== (before.status ?? "").toLowerCase()) {
+    diff.status = { from: before.status, to: c.status };
+  }
+  if (c.fecha_vencimiento && c.fecha_vencimiento !== before.expires_at) {
+    diff.expires_at = { from: before.expires_at, to: c.fecha_vencimiento };
+  }
+  const prevRut = (before.metadata as { holder_rut?: string } | null)?.holder_rut;
+  if (c.holder_rut && prevRut && c.holder_rut !== prevRut) {
+    diff.holder_rut = { from: prevRut, to: c.holder_rut };
   }
   return diff;
 }
@@ -89,7 +69,7 @@ Deno.serve(async (req) => {
 
     const { data: rows, error } = await supabase
       .from("mining_concessions")
-      .select("id, code, name, holder, area_ha, expires_at, status")
+      .select("id, code, name, holder, area_ha, expires_at, status, metadata")
       .eq("project_id", projectId);
 
     if (error) throw error;
@@ -102,10 +82,9 @@ Deno.serve(async (req) => {
 
     for (const c of concessions) {
       checked++;
-      const attrs = await queryArcgis(c.code);
-      if (!attrs) {
+      const remote = await findConcessionByCode(c.code).catch(() => null);
+      if (!remote) {
         missing++;
-        // Concession disappeared from official source — mark and alert
         if (c.status !== "vencida") {
           await supabase
             .from("mining_concessions")
@@ -124,35 +103,71 @@ Deno.serve(async (req) => {
         continue;
       }
 
-      const diff = diffFields(c, attrs);
+      const diff = diffFields(c, remote);
       const hasDiff = Object.keys(diff).length > 0;
 
-      // Always record snapshot; trigger creates alert when diff is non-null.
+      const snapshot = {
+        client_version: "v2-online",
+        id_concesion: remote.id_concesion,
+        rol: remote.rol,
+        name: remote.name,
+        hectareas: remote.hectareas,
+        status: remote.status,
+        status_raw: remote.status_raw,
+        tipo: remote.tipo,
+        comuna: remote.comuna,
+        holder_name: remote.holder_name,
+        holder_rut: remote.holder_rut,
+        holder_division: remote.holder_division,
+        nro_inscripcion: remote.nro_inscripcion,
+        fojas: remote.fojas,
+        ano_inscripcion: remote.ano_inscripcion,
+        fecha_vencimiento: remote.fecha_vencimiento,
+        fecha_actualizacion: remote.fecha_actualizacion,
+      };
+
       await supabase.from("concession_history").insert({
         concession_id: c.id,
         project_id: projectId,
-        snapshot: attrs,
+        snapshot,
         diff: hasDiff ? diff : null,
         source: "sernageomin",
       });
 
+      const prevMeta = (c.metadata ?? {}) as Record<string, unknown>;
+      const update: Record<string, unknown> = {
+        last_synced_at: new Date().toISOString(),
+        source: "sernageomin",
+        metadata: {
+          ...prevMeta,
+          sngm_v2: {
+            id_concesion: remote.id_concesion,
+            tipo: remote.tipo,
+            comuna: remote.comuna,
+            holder_rut: remote.holder_rut,
+            holder_division: remote.holder_division,
+            nro_inscripcion: remote.nro_inscripcion,
+            fojas: remote.fojas,
+            ano_inscripcion: remote.ano_inscripcion,
+            fecha_actualizacion: remote.fecha_actualizacion,
+          },
+        },
+      };
       if (hasDiff) {
         changed++;
-        const update: Record<string, unknown> = {
-          last_synced_at: new Date().toISOString(),
-        };
         if ("holder" in diff) update.holder = diff.holder.to;
         if ("area_ha" in diff) update.area_ha = diff.area_ha.to;
-        await supabase.from("mining_concessions").update(update).eq("id", c.id);
-      } else {
-        await supabase
-          .from("mining_concessions")
-          .update({ last_synced_at: new Date().toISOString() })
-          .eq("id", c.id);
+        if ("status" in diff) update.status = diff.status.to;
+        if ("expires_at" in diff) update.expires_at = diff.expires_at.to;
       }
+      if (remote.holder_rut) update.rut_holder = remote.holder_rut;
+      if (remote.comuna) update.commune = remote.comuna;
+      if (remote.geometry) update.geometry_geojson = remote.geometry;
+
+      await supabase.from("mining_concessions").update(update).eq("id", c.id);
     }
 
-    // Expiry alerts: <90 days and no recent expiry alert
+    // Expiry alerts: <90 days
     const ninetyDaysMs = 90 * 24 * 60 * 60 * 1000;
     const now = Date.now();
     for (const c of concessions) {
@@ -178,9 +193,17 @@ Deno.serve(async (req) => {
       alertsCreated++;
     }
 
-    return new Response(JSON.stringify({ ok: true, checked, changed, missing, alertsCreated }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        ok: true,
+        client_version: "v2-online",
+        checked,
+        changed,
+        missing,
+        alertsCreated,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return new Response(JSON.stringify({ error: msg }), {
