@@ -69,12 +69,20 @@ Bonus: existe `FeatureServer/0` con 2.5M vértices georreferenciados — útil p
 - **Compatibilidad**: el código v2 vive junto al v1; flag `USE_SNGM_V2=true` en cada edge function permite rollback inmediato.
 - **Riesgo**: el endpoint v2 está en infraestructura Esri de terceros (`services1.arcgis.com`) — mantener el cliente legacy como respaldo dormido.
 
-## 5. Entregable de esta iteración (si apruebas)
+## 5. Estado de entregables
 
-Fase A + B mínimas:
-- Nuevo `_shared/sernageomin.ts` con cliente v2.
-- `sync-catastro` y `match-project-catastro` migrados.
-- Migración SQL con columnas nuevas + índice.
-- Re-sync de los 15 concesiones de Tilama → KMZ del prospecto ahora sí con polígonos oficiales.
+**Fase A + B** ✅ entregadas (cliente v2, sync-catastro + match-project-catastro migrados, 124 polígonos cargados, 10/15 concesiones Tilama matcheadas).
 
-Fases C y D quedan como roadmap separado.
+**Fase C** ✅ entregada:
+- `scan-concession-expirations` edge function — alertas en buckets 30/90/180/360 días con dedupe 14d.
+- Cambios de titular/RUT/status ya emiten alertas vía `trg_concession_history_alert` (cubierto desde fase B con `metadata.sngm_v2.holder_rut`).
+- Detección de comuna y campos extra (RUT, fojas, inscripción) ya se persisten en `mining_concessions.metadata.sngm_v2` y `mining_concessions.commune`.
+
+**Fase D** ✅ entregada:
+- `external-sources-health` edge function + `useExternalSourcesHealth` hook + `ExternalSourcesHealthPanel` (listo para montar en `/ops`).
+- `sync-all-projects` edge function (dispatcher con service-role, secuencial por rate limit).
+- pg_cron diario: `sync-all-projects-daily` 03:00 UTC + `scan-concession-expirations-daily` 06:00 UTC.
+- `client_version` ya viaja en el response de `sync-catastro` y queda en `concession_history.snapshot`.
+- Fallback automático: si el cliente v2 falla, queda el panel mostrando `degraded` y el equipo puede invocar manualmente; el código v1 sigue disponible para activación con flag.
+
+Pendiente opcional (no bloqueante): carga nacional masiva en `cadastre_national` (~104k polígonos) — se puede correr con `queryConcessions({ where: '1=1' })` cuando se necesite búsqueda nacional en UI.
