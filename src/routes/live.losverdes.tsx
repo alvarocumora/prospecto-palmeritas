@@ -8,8 +8,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-// Visor 3D público real (Sprint B): MapLibre + deck.gl con DEM real,
-// concesiones, anomalías sat/mag, vetas y targets desde Supabase.
+// Visor estratégico 2D (focus exploración + certificación). El 3D queda
+// disponible bajo demanda para no bloquear el flujo principal.
+import { LosVerdesStrategicMap } from "@/components/live/LosVerdesStrategicMap";
 const LosVerdesPublicScene = lazy(() =>
   import("@/components/live/LosVerdesPublicScene").then((m) => ({ default: m.LosVerdesPublicScene })),
 );
@@ -330,37 +331,39 @@ function LiveLosVerdesPage() {
           />
         </div>
 
-        {/* 3D Scene */}
+        {/* Visor estratégico 2D — exploración + certificación */}
         <section>
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
-              Engine 3D · Marching Cubes · IDW · Sondajes
+              Visor estratégico · Catastro · Targets · Anomalías
             </h2>
             <div className="flex items-center gap-2">
               {(layersQ.isLoading || miningQ.isLoading) && (
                 <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
               )}
-            </div>
-          </div>
-          {!mounted || !engineOn ? (
-            <div className="w-full h-[640px] rounded-lg border border-border bg-bg-secondary flex flex-col items-center justify-center gap-3 p-6 text-center">
-              <Box className="w-8 h-8 text-gold" />
-              <div className="text-sm text-foreground">Visor 3D Los Verdes</div>
-              <div className="text-[11px] font-mono text-muted-foreground max-w-md">
-                Carga bajo demanda: terreno + concesiones + anomalías satelitales + vetas + targets.
-                El resto de la página (KPIs, catastro, plan minero, PDF) funciona sin necesidad de
-                activarlo.
-              </div>
               <Button
                 size="sm"
-                onClick={() => setEngineOn(true)}
+                variant="outline"
+                onClick={() => setEngineOn((v) => !v)}
                 disabled={!mounted}
-                className="bg-gold hover:bg-gold/90 text-background"
+                className="h-7 text-[11px]"
               >
-                {mounted ? "Activar visor 3D" : "Inicializando…"}
+                <Box className="w-3 h-3 mr-1" />
+                {engineOn ? "Ocultar 3D" : "Ver 3D (beta)"}
               </Button>
             </div>
-          ) : (
+          </div>
+          <LosVerdesStrategicMap height={620} />
+        </section>
+
+        {/* Visor 3D bajo demanda (beta) */}
+        {engineOn && (
+          <section>
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
+                Engine 3D · Marching Cubes · IDW · Sondajes (beta)
+              </h2>
+            </div>
             <EngineErrorBoundary onReset={() => setEngineKey((k) => k + 1)}>
               <Suspense
                 fallback={
@@ -373,8 +376,8 @@ function LiveLosVerdesPage() {
                 <LosVerdesPublicScene key={engineKey} height={640} />
               </Suspense>
             </EngineErrorBoundary>
-          )}
-        </section>
+          </section>
+        )}
 
         {/* Plan + contexto */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
