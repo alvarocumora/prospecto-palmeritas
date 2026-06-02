@@ -17,3 +17,12 @@ verify_jwt = false
 
 [functions.extract-raster-metadata]
 verify_jwt = true
+
+[functions.external-sources-health]
+verify_jwt = false
+
+[functions.sync-all-projects]
+verify_jwt = false
+
+[functions.scan-concession-expirations]
+verify_jwt = false
