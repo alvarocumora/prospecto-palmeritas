@@ -94,7 +94,8 @@ function CatastroMap() {
             <div>Tipo: ${p.TIPO_CONCESION ?? "—"}</div>
             <div>Estado: ${p.SITUACION_CONCESION ?? "—"}</div>
           </div>`;
-      });
+      }) as unknown as Parameters<typeof concesiones.bindPopup>[0]);
+
       concesiones.addTo(map);
 
       cleanup = () => map.remove();
