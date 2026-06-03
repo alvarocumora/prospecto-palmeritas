@@ -79,8 +79,9 @@ function CatastroMap() {
           };
         },
       });
-      concesiones.bindPopup((layer: { feature?: { properties?: Record<string, unknown> } }) => {
-        const p = layer.feature?.properties ?? {};
+      concesiones.bindPopup(((layer: unknown) => {
+        const p = (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ?? {};
+
         const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
         return `
           <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
