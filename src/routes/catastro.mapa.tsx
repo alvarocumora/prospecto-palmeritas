@@ -68,7 +68,7 @@ function CatastroMap() {
         precision: 5,
         simplifyFactor: 0.5,
         where: "1=1",
-        style: (feature: { properties?: Record<string, unknown> } } ) => {
+        style: (feature: { properties?: Record<string, unknown> }) => {
           const tipo = String(feature?.properties?.TIPO_CONCESION ?? "").toLowerCase();
           const explor = tipo.includes("explor");
           return {
