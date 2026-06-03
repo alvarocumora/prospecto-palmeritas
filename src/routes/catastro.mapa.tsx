@@ -40,6 +40,7 @@ function CatastroMap() {
       if (!mapRef.current) return;
       const L = (await import("leaflet")).default;
       await import("leaflet/dist/leaflet.css");
+      const EL = await import("esri-leaflet");
       const map = L.map(mapRef.current, {
         center: [-30, -70.5],
         zoom: 5,
@@ -57,17 +58,51 @@ function CatastroMap() {
         { opacity: 0.9, maxZoom: 19 },
       ).addTo(map);
 
-      // Overlay SERNAGEOMIN vivo (capa 0 = explotación, 1 = exploración)
-      const explot = L.tileLayer(
-        "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer/tile/{z}/{y}/{x}",
-        { opacity: 0.7, maxZoom: 18 },
-      );
-      explot.addTo(map);
+      // Capa viva SERNAGEOMIN v2 (ArcGIS Online — Marcelo_Layer/FeatureServer/2)
+      // Reemplaza al MapServer legacy de catastro.sernageomin.cl (degradado 2026-Q1).
+      const SNGM_V2 =
+        "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/Marcelo_Layer/FeatureServer/2";
+      const concesiones = EL.featureLayer({
+        url: SNGM_V2,
+        minZoom: 9, // evitar pedir 104k polígonos a zoom país
+        precision: 5,
+        simplifyFactor: 0.5,
+        where: "1=1",
+        style: (feature: { properties?: Record<string, unknown> }) => {
+          const tipo = String(feature?.properties?.TIPO_CONCESION ?? "").toLowerCase();
+          const explor = tipo.includes("explor");
+          return {
+            color: explor ? "#22d3ee" : "#f97316",
+            weight: 1,
+            fillColor: explor ? "#22d3ee" : "#f97316",
+            fillOpacity: 0.15,
+          };
+        },
+      });
+      concesiones.bindPopup(((layer: unknown) => {
+        const p = (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ?? {};
+
+        const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
+        return `
+          <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
+            <div style="font-weight:600;font-size:12px">${p.NOMBRE ?? rol}</div>
+            <div>ROL: ${rol}</div>
+            <div>Titular: ${p.TITULAR_NOMBRE ?? "—"}</div>
+            <div>RUT: ${p.TITULAR_RUT ?? "—"}${p.TITULAR_DV ? `-${p.TITULAR_DV}` : ""}</div>
+            <div>Comuna: ${p.COMUNA ?? "—"}</div>
+            <div>Hectáreas: ${p.HECTAREAS ?? "—"}</div>
+            <div>Tipo: ${p.TIPO_CONCESION ?? "—"}</div>
+            <div>Estado: ${p.SITUACION_CONCESION ?? "—"}</div>
+          </div>`;
+      }) as unknown as Parameters<typeof concesiones.bindPopup>[0]);
+
+      concesiones.addTo(map);
 
       cleanup = () => map.remove();
     })();
     return () => cleanup?.();
   }, []);
+
 
   return (
     <PublicCatastroShell>
