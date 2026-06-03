@@ -79,9 +79,10 @@ function CatastroMap() {
           };
         },
       });
-      concesiones.bindPopup(((layer: unknown) => {
-        const p = (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ?? {};
-
+      const popupFn = (layer: unknown) => {
+        const p =
+          (layer as { feature?: { properties?: Record<string, unknown> } }).feature
+            ?.properties ?? {};
         const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
         return `
           <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
@@ -94,7 +95,8 @@ function CatastroMap() {
             <div>Tipo: ${p.TIPO_CONCESION ?? "—"}</div>
             <div>Estado: ${p.SITUACION_CONCESION ?? "—"}</div>
           </div>`;
-      }) as unknown as Parameters<typeof concesiones.bindPopup>[0]);
+      };
+      (concesiones.bindPopup as (fn: (layer: unknown) => string) => void)(popupFn);
 
       concesiones.addTo(map);
 
