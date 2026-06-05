@@ -14,6 +14,9 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
+import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
+import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
@@ -97,6 +100,21 @@ const IndexRoute = IndexRouteImport.update({
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerminalTokenizeRoute = TerminalTokenizeRouteImport.update({
+  id: '/terminal/tokenize',
+  path: '/terminal/tokenize',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerminalMarketRoute = TerminalMarketRouteImport.update({
+  id: '/terminal/market',
+  path: '/terminal/market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
+  id: '/terminal/capital-raise',
+  path: '/terminal/capital-raise',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LiveTilamaRoute = LiveTilamaRouteImport.update({
@@ -460,6 +478,9 @@ export interface FileRoutesByFullPath {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
+  '/terminal/market': typeof TerminalMarketRoute
+  '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -526,6 +547,9 @@ export interface FileRoutesByTo {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
+  '/terminal/market': typeof TerminalMarketRoute
+  '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -594,6 +618,9 @@ export interface FileRoutesById {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
+  '/terminal/market': typeof TerminalMarketRoute
+  '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
@@ -662,6 +689,9 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/terminal/capital-raise'
+    | '/terminal/market'
+    | '/terminal/tokenize'
     | '/catastro/'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -728,6 +758,9 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/terminal/capital-raise'
+    | '/terminal/market'
+    | '/terminal/tokenize'
     | '/catastro'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -795,6 +828,9 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/terminal/capital-raise'
+    | '/terminal/market'
+    | '/terminal/tokenize'
     | '/catastro/'
     | '/_authenticated/dashboard/3d-pro'
     | '/_authenticated/dashboard/admin'
@@ -863,6 +899,9 @@ export interface RootRouteChildren {
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
+  TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
+  TerminalMarketRoute: typeof TerminalMarketRoute
+  TerminalTokenizeRoute: typeof TerminalTokenizeRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
@@ -907,6 +946,27 @@ declare module '@tanstack/react-router' {
       path: '/catastro'
       fullPath: '/catastro/'
       preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terminal/tokenize': {
+      id: '/terminal/tokenize'
+      path: '/terminal/tokenize'
+      fullPath: '/terminal/tokenize'
+      preLoaderRoute: typeof TerminalTokenizeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terminal/market': {
+      id: '/terminal/market'
+      path: '/terminal/market'
+      fullPath: '/terminal/market'
+      preLoaderRoute: typeof TerminalMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terminal/capital-raise': {
+      id: '/terminal/capital-raise'
+      path: '/terminal/capital-raise'
+      fullPath: '/terminal/capital-raise'
+      preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/live/tilama': {
@@ -1506,6 +1566,9 @@ const rootRouteChildren: RootRouteChildren = {
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
+  TerminalCapitalRaiseRoute: TerminalCapitalRaiseRoute,
+  TerminalMarketRoute: TerminalMarketRoute,
+  TerminalTokenizeRoute: TerminalTokenizeRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,

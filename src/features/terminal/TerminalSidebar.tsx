@@ -4,11 +4,11 @@ import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { label: "Overview", to: "/", icon: Map, exact: true },
-  { label: "Market", to: "/terminal/market", icon: TrendingUp },
-  { label: "Portfolio", to: "/", icon: Briefcase, hash: "#portfolio" },
-  { label: "Tokenize", to: "/terminal/tokenize", icon: Coins },
-  { label: "Capital Raise", to: "/terminal/capital-raise", icon: HandCoins },
+  { label: "Overview", to: "/", icon: Map, hash: undefined as string | undefined },
+  { label: "Market", to: "/terminal/market", icon: TrendingUp, hash: undefined as string | undefined },
+  { label: "Portfolio", to: "/", icon: Briefcase, hash: "portfolio" as string | undefined },
+  { label: "Tokenize", to: "/terminal/tokenize", icon: Coins, hash: undefined as string | undefined },
+  { label: "Capital Raise", to: "/terminal/capital-raise", icon: HandCoins, hash: undefined as string | undefined },
 ] as const;
 
 export function TerminalSidebar() {
@@ -23,12 +23,12 @@ export function TerminalSidebar() {
       <nav className="flex-1 py-2">
         {items.map((it) => {
           const Icon = it.icon;
-          const active = it.exact ? pathname === it.to : pathname === it.to;
+          const active = pathname === it.to;
           return (
             <Link
               key={it.label}
               to={it.to}
-              hash={"hash" in it ? it.hash : undefined}
+              hash={it.hash}
               className={cn(
                 "flex items-center gap-2 px-3 py-2 text-[11px] font-mono uppercase tracking-wider transition-colors",
                 "text-muted-foreground hover:text-foreground hover:bg-muted/40",
