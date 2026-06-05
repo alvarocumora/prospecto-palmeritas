@@ -1,88 +1,79 @@
-# Estado actual del catastro y plan de mejora
 
-## 1. Diagnóstico en vivo (ejecutado ahora)
+# Geocapitals Terminal — Plan de implementación
 
-| Endpoint | Estado | Latencia | Observación |
-|---|---|---|---|
-| `catastro.sernageomin.cl/arcgis/.../Concesiones_Mineras/MapServer` (raíz) | HTTP 200 | ~1s | Servidor responde |
-| `…/MapServer/0/query` (capa explotación) | **Timeout** | >15s | No retorna features |
-| `…/MapServer/1/query` (capa exploración) | **Timeout** | >20s | No retorna features |
-| `appsngmaz.sernageomin.cl/catastro_SNGM/home/index` (portal nuevo) | HTTP 200 | ~1s | App ArcGIS JS 4.32 |
-| `services1.arcgis.com/OyjvVdFTl5hfSdX3/.../Marcelo_Layer/FeatureServer/0` (vértices) | **HTTP 200** | 240ms | 2.585.257 puntos WGS84 |
-| `services1.arcgis.com/.../FeatureServer/2` (concesiones) | **HTTP 200** | 315ms | 104.151 polígonos WGS84 |
+Reemplazar la home `/` por una terminal de inversión minera de alta densidad, estilo Bloomberg, usando los tokens semánticos actuales (`bg-background`, `gold`, `muted`, etc.) y datos reales del backend. Fase 1 entrega el shell + Mapa Geológico + Portfolio; Market/Tokenize/Capital Raise quedan como rutas con scaffolding listo para iterar.
 
-**Conclusión:** SERNAGEOMIN migró su catastro a ArcGIS Online (Esri). El endpoint legacy que usan TODAS nuestras edge functions (`sync-catastro`, `sync-sernageomin`, `match-project-catastro`, `import-concession`) está degradado/abandonado. Por eso el sync del prospecto Tilama no descargó polígonos.
+## Alcance Fase 1
 
-## 2. Cambios de esquema en la nueva API
+1. **Shell de terminal** en `/` con:
+   - Sidebar lateral colapsable (Market, Portfolio, Tokenize, Capital Raise, Settings) usando shadcn `Sidebar`.
+   - Header de métricas (ticker tape): precio cobre/oro/litio desde `commodity_prices`, nº proyectos activos, nº concesiones monitoreadas, estado de salud de fuentes externas (reusa `useExternalSourcesHealth`).
+   - Layout grid denso, modo oscuro, respetando tokens (`gold` como acento principal; verde/rojo solo para deltas usando los tokens existentes si están, si no se añade `--color-positive`/`--color-negative` en `styles.css`).
+   - CTA "Iniciar sesión" persistente para anónimos; los datos sensibles se ocultan tras auth.
 
-Antiguo (que usamos hoy) → Nuevo:
+2. **Geological Map View (módulo principal)**
+   - Mapa Leaflet reutilizando el patrón de `catastro.mapa.tsx` (ArcGIS v2 FeatureServer) centrado en Chile.
+   - Capa de **proyectos** desde `projects` (lat/lng) con marcadores tipo HUD; tooltip con commodity, etapa, NPV si existe.
+   - Capa de **concesiones del portafolio** del usuario autenticado.
+   - Panel lateral derecho con lista sincronizada al mapa (hover-to-highlight).
+
+3. **Portfolio**
+   - Tabla shadcn densa con proyectos accesibles al usuario (vía `projects` + `project_members`).
+   - Columnas: proyecto, commodity, etapa, hectáreas concesionadas, alertas abiertas (`concession_alerts`), valor estimado.
+   - Click en fila → drawer lateral con resumen técnico (reusa hooks existentes: `useProjects`, `useProjectMiningConcessions`, `useConcessionAlerts`, `useExecutiveKpis`).
+
+4. **Rutas placeholder** (shells navegables, sin lógica todavía):
+   - `/terminal/market`, `/terminal/tokenize`, `/terminal/capital-raise`.
+   - Cada una con `head()` propio y un "Coming next" usando el mismo grid.
+
+## Datos (server functions nuevas)
+
+Todas como `createServerFn` en `src/lib/terminal.functions.ts`:
+
+- `getTerminalTicker` — últimos precios por commodity desde `commodity_prices` + delta 24h.
+- `getTerminalPortfolio` (con `requireSupabaseAuth`) — proyectos del usuario + KPIs agregados + nº alertas abiertas.
+- `getTerminalMapLayers` (con `requireSupabaseAuth`) — geojson liviano de proyectos y concesiones del portafolio.
+
+Reglas: importar `client.server` solo dentro de `.handler()` cuando se necesite admin; el resto vía middleware autenticado (RLS aplica).
+
+## Estructura de archivos
 
 ```
-CODIGO / ROL            → NUMERO_ROL + DV_ROL
-TITULAR / NOMBRE_TIT    → TITULAR_NOMBRE (+ TITULAR_RUT, TITULAR_DV, TITULAR_DIVISION)
-AREA_HA / HECTAREAS     → HECTAREAS
-VIGENCIA / ESTADO       → SITUACION_CONCESION (+ ID_SITUACION_CONCESION)
-                          TIPO_CONCESION (+ ID_TIPO_CONCESION)
-(sin equivalente)       → ID_CONCESION (clave estable nacional)
-(sin equivalente)       → COMUNA, DATUM, HUSO, ORIGEN, NRO_INSCRIPCION, FOJAS, ANO_INSCRIPCION
-FECHA expira            → FECHA_VENCIMIENTO
-                          FECHA_ACTUALIZACION (delta sync confiable)
+src/
+  routes/
+    index.tsx                          (REESCRITO → TerminalShell)
+    terminal.market.tsx                (placeholder)
+    terminal.tokenize.tsx              (placeholder)
+    terminal.capital-raise.tsx         (placeholder)
+  features/terminal/
+    TerminalShell.tsx                  (sidebar + header + outlet de panel)
+    TerminalSidebar.tsx
+    TickerTape.tsx                     (header de métricas)
+    panels/
+      GeologicalMapPanel.tsx           (mapa + lista sincronizada)
+      PortfolioPanel.tsx               (tabla densa + drawer detalle)
+      ProjectDetailDrawer.tsx
+  lib/
+    terminal.functions.ts              (server fns)
 ```
 
-Bonus: existe `FeatureServer/0` con 2.5M vértices georreferenciados — útil para validar geometrías y detectar superposiciones a nivel hito.
+La landing actual (`hero + features + CTA`) se mueve a `src/routes/about.tsx` para no perder el contenido marketing y mantener SEO.
 
-## 3. Plan de acción (4 fases, sin tocar UI hasta fase 4)
+## Detalles técnicos
 
-### Fase A — Cliente unificado SERNAGEOMIN v2 (backend)
-1. Crear `supabase/functions/_shared/sernageomin.ts` (módulo compartido):
-   - `BASE = https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/Marcelo_Layer/FeatureServer`
-   - `queryConcessions({ where, bbox, since, pageSize })` con paginación `resultOffset`/`resultRecordCount` (límite Esri 2000/req).
-   - `queryVertices({ idConcesion })` para verificación de hitos.
-   - Normalizador `mapAttrs(attrs) → Concession` con el mapping nuevo→canónico (tabla §2).
-   - Retry exponencial + AbortController 20s.
-2. Migrar las 4 edge functions a este cliente. Mantener firma/body actual para no romper callers; deprecar internamente el código legacy.
+- **Auth**: el shell se renderiza para anónimos pero los paneles Portfolio/Mapa muestran un estado "Inicia sesión para ver tus activos" si no hay sesión; no requiere `_authenticated/` porque queremos que la home siga siendo pública e indexable.
+- **SEO**: `head()` con título y descripción de terminal; `og:image` solo aquí (no en `__root.tsx`).
+- **Estilo**: sin colores hardcoded en componentes; se reutiliza la paleta actual (`gold`, `muted`, `border`, `background`). Si hace falta verde/rojo de delta, se añaden tokens en `src/styles.css` en `oklch`.
+- **Densidad**: tipografía `font-mono` para números (ya existe en la landing actual), `text-[10px]`/`text-xs` en headers, separadores 1px, padding compacto (`p-2`/`p-3`).
+- **Runtime error actual** (`virtual:tanstack-start-client-entry`): se valida que tras la reescritura el dev server arranque limpio.
 
-### Fase B — Migración de datos persistidos
-1. Migración SQL: añadir columnas `id_concesion bigint`, `tipo_concesion text`, `comuna text`, `fecha_actualizacion_fuente timestamptz`, índice único parcial sobre `(source='sernageomin', id_concesion)`.
-2. Backfill: re-ejecutar `match-project-catastro` v2 sobre todos los proyectos (15 concesiones Tilama incluidas) ahora que el endpoint responde.
-3. `cadastre_national`: cargar polígonos por bbox país y refrescar por `FECHA_ACTUALIZACION > last_sync` (delta diario via pg_cron).
+## Fuera de alcance (siguiente iteración)
 
-### Fase C — Capacidades nuevas que el endpoint v2 habilita
-- **Vencimientos reales 12 meses**: query `where FECHA_VENCIMIENTO BETWEEN now() AND now()+1y` → tabla `concession_alerts` con razón `proxima_a_vencer`.
-- **Detección de cambio de titular**: comparar `TITULAR_RUT` entre snapshots → alerta `cambio_titular` (hoy no la detectamos porque sólo comparábamos `holder` por nombre).
-- **Cobertura por comuna**: filtros y dashboard por `COMUNA` (sin geocoding manual).
-- **Búsqueda nacional rápida**: con 104k polígonos paginados podemos indexar todo Chile en `cadastre_national` (≈2-3h primera carga, luego deltas).
-- **Validación de hitos**: cruzar `WGS84_Vertice` (2.5M puntos) contra polígonos importados → flag `geometria_inconsistente`.
+- Realtime ticks vía Supabase Realtime.
+- Tokenización on-chain real / smart contracts.
+- Order book de Market.
+- Charts financieros con recharts (se dejan stubs).
 
-### Fase D — Mejoras de plataforma (UI + ops)
-1. **Panel "Estado de fuentes externas"** en `/ops` con health-check live de cada endpoint (verde/ámbar/rojo + latencia + último sync OK).
-2. **Sync log enriquecido**: registrar versión de cliente (`v1-legacy` vs `v2-online`) en `concession_history.metadata`.
-3. **Fallback automático**: si v2 falla, intentar v1 legacy y registrar el degradado.
-4. **Cron diario** (pg_cron, 03:00 CLT) que corre `sync-catastro` v2 para todos los proyectos activos.
-5. **Vista en `/catastro/c/:code`**: mostrar campos nuevos (RUT titular, comuna, fojas, año inscripción, fecha actualización fuente).
+## Entregable
 
-## 4. Detalles técnicos clave
-
-- **Auth**: el FeatureServer v2 es público, no requiere API key.
-- **Rate limit Esri Online**: ~10 req/s por IP; paginar de a 2000 features.
-- **CRS**: ya viene en WGS84, no requiere proj4 server-side (eliminamos dependencia en `match-project-catastro`).
-- **Compatibilidad**: el código v2 vive junto al v1; flag `USE_SNGM_V2=true` en cada edge function permite rollback inmediato.
-- **Riesgo**: el endpoint v2 está en infraestructura Esri de terceros (`services1.arcgis.com`) — mantener el cliente legacy como respaldo dormido.
-
-## 5. Estado de entregables
-
-**Fase A + B** ✅ entregadas (cliente v2, sync-catastro + match-project-catastro migrados, 124 polígonos cargados, 10/15 concesiones Tilama matcheadas).
-
-**Fase C** ✅ entregada:
-- `scan-concession-expirations` edge function — alertas en buckets 30/90/180/360 días con dedupe 14d.
-- Cambios de titular/RUT/status ya emiten alertas vía `trg_concession_history_alert` (cubierto desde fase B con `metadata.sngm_v2.holder_rut`).
-- Detección de comuna y campos extra (RUT, fojas, inscripción) ya se persisten en `mining_concessions.metadata.sngm_v2` y `mining_concessions.commune`.
-
-**Fase D** ✅ entregada:
-- `external-sources-health` edge function + `useExternalSourcesHealth` hook + `ExternalSourcesHealthPanel` (listo para montar en `/ops`).
-- `sync-all-projects` edge function (dispatcher con service-role, secuencial por rate limit).
-- pg_cron diario: `sync-all-projects-daily` 03:00 UTC + `scan-concession-expirations-daily` 06:00 UTC.
-- `client_version` ya viaja en el response de `sync-catastro` y queda en `concession_history.snapshot`.
-- Fallback automático: si el cliente v2 falla, queda el panel mostrando `degraded` y el equipo puede invocar manualmente; el código v1 sigue disponible para activación con flag.
-
-Pendiente opcional (no bloqueante): carga nacional masiva en `cadastre_national` (~104k polígonos) — se puede correr con `queryConcessions({ where: '1=1' })` cuando se necesite búsqueda nacional en UI.
+Al terminar Fase 1, en `/` el usuario ve la Terminal con el Mapa Geológico y, si está autenticado, su Portfolio real. El resto de tabs navega a placeholders coherentes, listos para iterar.
