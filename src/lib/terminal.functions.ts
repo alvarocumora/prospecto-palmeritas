@@ -69,14 +69,22 @@ export const getTerminalPortfolio = createServerFn({ method: "GET" })
       .eq("acknowledged", false);
 
     const { data: concs } = await supabase
-      .from("project_mining_concessions")
+      .from("mining_concessions")
       .select("project_id")
       .in("project_id", ids);
 
     const alertCount = new Map<string, number>();
-    (alerts ?? []).forEach((a) => alertCount.set(a.project_id, (alertCount.get(a.project_id) ?? 0) + 1));
+    (alerts ?? []).forEach((a) => {
+      if (a && "project_id" in a && a.project_id) {
+        alertCount.set(a.project_id, (alertCount.get(a.project_id) ?? 0) + 1);
+      }
+    });
     const concCount = new Map<string, number>();
-    (concs ?? []).forEach((c) => concCount.set(c.project_id, (concCount.get(c.project_id) ?? 0) + 1));
+    (concs ?? []).forEach((c) => {
+      if (c && "project_id" in c && c.project_id) {
+        concCount.set(c.project_id, (concCount.get(c.project_id) ?? 0) + 1);
+      }
+    });
 
     const out: PortfolioProject[] = (projects ?? []).map((p) => ({
       id: p.id,
