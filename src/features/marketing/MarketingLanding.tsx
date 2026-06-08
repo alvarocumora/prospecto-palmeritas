@@ -372,21 +372,29 @@ export function MarketingLanding() {
       {/* Métricas clave */}
       <section className="bg-[var(--brand-navy-deep)] text-white border-y border-white/5">
         <div className="max-w-7xl mx-auto px-5 py-16">
-          <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
             <div>
-              <p className="brand-eyebrow text-[var(--brand-gold)] mb-3">Indicadores en vivo</p>
-              <h2 className="brand-display text-3xl md:text-4xl">Métricas clave de la red Geocapitals</h2>
+              <p className="brand-eyebrow text-[var(--brand-gold)] mb-3">Inteligencia viva del proyecto</p>
+              <h2 className="brand-display text-3xl md:text-4xl">Prospecto Las Palmeras</h2>
+              <p className="mt-2 text-white/60 font-mono text-xs tracking-wider">
+                TRK-ALH-001 · ILLAPEL, REGIÓN DE COQUIMBO · CHILE · Au-Ag
+              </p>
             </div>
-            <p className="text-white/60 text-sm max-w-sm font-mono">
-              Datos consolidados de catastro minero, monitoreo satelital y deal-flow actualizados en tiempo real.
-            </p>
+            <div className="flex items-center gap-2 text-[11px] font-mono text-[var(--brand-gold)]">
+              <span className="w-2 h-2 rounded-full bg-[var(--brand-gold)] animate-pulse" />
+              ÚLTIMA SINCRONIZACIÓN · 26 ABR 2026
+            </div>
           </div>
+          <p className="text-white/60 text-sm max-w-2xl mb-10">
+            Métricas operacionales reales del proyecto piloto: catastro, campaña de perforación y monitoreo satelital
+            multi-índice consolidados en una sola vista.
+          </p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-xl overflow-hidden">
             {[
-              { v: "US$ 1.4B", l: "Capital en evaluación", d: "Pipeline activo 2026", i: Briefcase },
-              { v: "47,210", l: "Concesiones monitoreadas", d: "SERNAGEOMIN + catastro", i: Map },
-              { v: "312 ha/día", l: "Cobertura satelital", d: "Sentinel-2 + radar", i: Satellite },
-              { v: "99.94%", l: "Disponibilidad terminal", d: "SLA institucional", i: Activity },
+              { v: "74", l: "Concesiones mineras", d: "12.807,6 ha bajo control", i: Map },
+              { v: "16", l: "Sondajes en campaña", d: "4.426 m perforados · máx 350 m", i: Database },
+              { v: "12", l: "Anomalías satelitales", d: "4 high · 6 medium · 2 low", i: Satellite },
+              { v: "16/16", l: "Corridas satelitales OK", d: "5 índices · NDVI · IOX · HYD · CLY · STR", i: Activity },
             ].map(({ v, l, d, i: Icon }) => (
               <div key={l} className="bg-[var(--brand-navy-deep)] p-6">
                 <Icon className="w-5 h-5 text-[var(--brand-gold)] mb-4" strokeWidth={1.5} />
@@ -396,8 +404,45 @@ export function MarketingLanding() {
               </div>
             ))}
           </div>
+
+          {/* Detalle anomalías satelitales */}
+          <div className="mt-6 grid md:grid-cols-5 gap-px bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+            {[
+              { code: "HYD", label: "Alteración hidrotermal", n: 2, score: 0.75, area: "7,1 ha" },
+              { code: "IOX", label: "Óxidos de hierro", n: 3, score: 0.69, area: "9,1 ha" },
+              { code: "CLY", label: "Minerales arcillosos", n: 2, score: 0.67, area: "5,0 ha" },
+              { code: "STR", label: "Lineamientos estructurales", n: 3, score: 0.54, area: "—" },
+              { code: "NDVI", label: "Cambio de vegetación", n: 2, score: 0.40, area: "6,1 ha" },
+            ].map((a) => (
+              <div key={a.code} className="bg-[var(--brand-navy-deep)] p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--brand-gold)]/15 text-[var(--brand-gold)]">
+                    {a.code}
+                  </span>
+                  <span className="font-mono text-xs text-white/60">×{a.n}</span>
+                </div>
+                <div className="text-[11px] text-white/70 leading-tight min-h-[28px]">{a.label}</div>
+                <div className="mt-3 flex items-end justify-between text-[10px] font-mono">
+                  <span className="text-white/40">SCORE</span>
+                  <span className="text-white">{a.score.toFixed(2)}</span>
+                </div>
+                <div className="mt-1 h-1 bg-white/10 rounded overflow-hidden">
+                  <div
+                    className="h-full bg-[var(--brand-gold)]"
+                    style={{ width: `${Math.round(a.score * 100)}%` }}
+                  />
+                </div>
+                <div className="mt-2 text-[10px] font-mono text-white/40 flex justify-between">
+                  <span>ÁREA</span>
+                  <span className="text-white/70">{a.area}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
+
+
 
       {/* Módulos del Terminal */}
       <section className="max-w-7xl mx-auto px-5 py-20">
