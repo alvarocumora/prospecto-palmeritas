@@ -4,6 +4,7 @@ import {
   Mountain, Users, Globe2, ShieldCheck, FilePlus2, LineChart, Lock,
   ArrowRight, CheckCircle2, Mail, Linkedin, Link as LinkIcon,
   Coins, Layers, Zap, Gem, FileText, Handshake, TrendingUp,
+  Map, Database, Cpu, Satellite, Building2, Briefcase, Landmark, Activity,
 } from "lucide-react";
 
 type Lang = "es" | "en";
