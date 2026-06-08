@@ -439,3 +439,53 @@
 .leaflet-tooltip.geo-tooltip::before {
   border-top-color: rgba(240, 201, 107, 0.35) !important;
 }
+
+/* ============================================================
+   GEOCAPITALS BRAND — Institutional landing (light scope)
+   Apply by wrapping content in `.brand-light` (or root <main>).
+   Does NOT alter the global dark Operations theme.
+   ============================================================ */
+
+@theme inline {
+  --color-brand-navy: var(--brand-navy);
+  --color-brand-navy-deep: var(--brand-navy-deep);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-soft: var(--brand-blue-soft);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-mute: var(--brand-mute);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-hair: var(--brand-hair);
+}
+
+:root {
+  --brand-navy: oklch(0.27 0.09 260);
+  --brand-navy-deep: oklch(0.18 0.08 260);
+  --brand-blue: oklch(0.55 0.20 255);
+  --brand-blue-soft: oklch(0.96 0.025 255);
+  --brand-gold: oklch(0.78 0.13 78);
+  --brand-ink: oklch(0.18 0.02 260);
+  --brand-mute: oklch(0.50 0.02 260);
+  --brand-surface: oklch(0.995 0.003 260);
+  --brand-hair: oklch(0.90 0.01 260);
+}
+
+.brand-light {
+  color: var(--brand-ink);
+  background-color: var(--brand-surface);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01";
+}
+.brand-light * { border-color: var(--brand-hair); }
+.brand-light .brand-display {
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+.brand-light .brand-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brand-mute);
+}
