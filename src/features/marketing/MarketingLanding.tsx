@@ -4,6 +4,7 @@ import {
   Mountain, Users, Globe2, ShieldCheck, FilePlus2, LineChart, Lock,
   ArrowRight, CheckCircle2, Mail, Linkedin, Link as LinkIcon,
   Coins, Layers, Zap, Gem, FileText, Handshake, TrendingUp,
+  Map, Database, Cpu, Satellite, Building2, Briefcase, Landmark, Activity,
 } from "lucide-react";
 
 type Lang = "es" | "en";
@@ -368,7 +369,191 @@ export function MarketingLanding() {
         </div>
       </section>
 
-      {/* Value band */}
+      {/* Métricas clave */}
+      <section className="bg-[var(--brand-navy-deep)] text-white border-y border-white/5">
+        <div className="max-w-7xl mx-auto px-5 py-16">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
+            <div>
+              <p className="brand-eyebrow text-[var(--brand-gold)] mb-3">Indicadores en vivo</p>
+              <h2 className="brand-display text-3xl md:text-4xl">Métricas clave de la red Geocapitals</h2>
+            </div>
+            <p className="text-white/60 text-sm max-w-sm font-mono">
+              Datos consolidados de catastro minero, monitoreo satelital y deal-flow actualizados en tiempo real.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-white/10 border border-white/10 rounded-xl overflow-hidden">
+            {[
+              { v: "US$ 1.4B", l: "Capital en evaluación", d: "Pipeline activo 2026", i: Briefcase },
+              { v: "47,210", l: "Concesiones monitoreadas", d: "SERNAGEOMIN + catastro", i: Map },
+              { v: "312 ha/día", l: "Cobertura satelital", d: "Sentinel-2 + radar", i: Satellite },
+              { v: "99.94%", l: "Disponibilidad terminal", d: "SLA institucional", i: Activity },
+            ].map(({ v, l, d, i: Icon }) => (
+              <div key={l} className="bg-[var(--brand-navy-deep)] p-6">
+                <Icon className="w-5 h-5 text-[var(--brand-gold)] mb-4" strokeWidth={1.5} />
+                <div className="font-mono text-3xl text-white tracking-tight">{v}</div>
+                <div className="text-[11px] uppercase tracking-wider text-white/80 mt-2 font-display">{l}</div>
+                <div className="text-[11px] text-white/40 mt-1 font-mono">{d}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Módulos del Terminal */}
+      <section className="max-w-7xl mx-auto px-5 py-20">
+        <div className="grid lg:grid-cols-[1fr_2fr] gap-10 mb-12">
+          <div>
+            <p className="brand-eyebrow mb-3">Módulos del Terminal</p>
+            <h2 className="brand-display text-3xl md:text-4xl text-[var(--brand-navy-deep)] leading-tight">
+              Una sola pantalla para evaluar, monitorear y transar activos mineros
+            </h2>
+          </div>
+          <p className="text-[var(--brand-mute)] text-base lg:text-lg lg:pt-4">
+            Geocapitals Terminal integra catastro, geología 3D, cumplimiento y mercados secundarios sobre una capa de datos
+            georreferenciada. Diseñado para Qualified Persons, fondos de inversión y holdings mineros que requieren
+            trazabilidad NI 43-101 y due diligence acelerada.
+          </p>
+        </div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[
+            { i: Map, t: "Mapa geológico", d: "Capas SERNAGEOMIN, concesiones, alertas de superposición y análisis de prospectividad." },
+            { i: Cpu, t: "Visor 3D geocientífico", d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA." },
+            { i: Satellite, t: "Monitoreo satelital", d: "Detección de cambios, deformación InSAR y firmas espectrales sobre tu portafolio." },
+            { i: FileText, t: "NI 43-101 asistido", d: "Borradores automáticos, recursos estimados y QA/QC con audit-trail trazable." },
+            { i: ShieldCheck, t: "Cumplimiento & patentes", d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder." },
+            { i: Landmark, t: "Capital raise & deals", d: "Data room, KYC/AML institucional y matching con inversionistas verificados." },
+          ].map(({ i: Icon, t: title, d }) => (
+            <div
+              key={title}
+              className="group bg-white border border-[var(--brand-hair)] rounded-xl p-6 hover:border-[var(--brand-blue)] hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <span className="grid place-items-center w-11 h-11 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)]">
+                  <Icon className="w-5 h-5" strokeWidth={1.75} />
+                </span>
+                <ArrowRight className="w-4 h-4 text-[var(--brand-mute)] group-hover:text-[var(--brand-blue)] group-hover:translate-x-0.5 transition" />
+              </div>
+              <div className="font-display text-lg text-[var(--brand-navy-deep)]">{title}</div>
+              <p className="text-sm text-[var(--brand-mute)] mt-2 leading-relaxed">{d}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Casos de uso */}
+      <section className="bg-[var(--brand-blue-soft)] border-y border-[var(--brand-hair)]">
+        <div className="max-w-7xl mx-auto px-5 py-20">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <p className="brand-eyebrow mb-3">Casos de uso</p>
+            <h2 className="brand-display text-3xl md:text-4xl text-[var(--brand-navy-deep)]">
+              Diseñado para quienes mueven la industria minera
+            </h2>
+            <p className="text-[var(--brand-mute)] mt-4">
+              Flujos verticales adaptados a cada perfil del ecosistema, con permisos granulares y datos auditables.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              {
+                i: Building2,
+                tag: "Holdings & junior miners",
+                t: "Estructuración y tokenización",
+                items: [
+                  "Inventario completo de concesiones",
+                  "Reportes NI 43-101 listos para inversionistas",
+                  "Tokenización de regalías y royalties",
+                ],
+              },
+              {
+                i: Briefcase,
+                tag: "Fondos & family offices",
+                t: "Due diligence acelerado",
+                items: [
+                  "Screening sobre +47.000 concesiones",
+                  "Modelo económico con sensibilidad de precios",
+                  "Data room cifrado y trazable",
+                ],
+              },
+              {
+                i: Landmark,
+                tag: "Reguladores & QPs",
+                t: "Trazabilidad y cumplimiento",
+                items: [
+                  "Audit-trail por campo y por documento",
+                  "Vencimientos y obligaciones de patentes",
+                  "Firmas electrónicas y workflows de aprobación",
+                ],
+              },
+            ].map(({ i: Icon, tag, t: title, items }) => (
+              <div key={title} className="bg-white border border-[var(--brand-hair)] rounded-2xl p-6 flex flex-col">
+                <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)] mb-5">
+                  <Icon className="w-4 h-4" /> {tag}
+                </div>
+                <div className="font-display text-xl text-[var(--brand-navy-deep)] leading-snug">{title}</div>
+                <ul className="mt-5 space-y-2.5 flex-1">
+                  {items.map((it) => (
+                    <li key={it} className="flex items-start gap-2 text-sm text-[var(--brand-ink)]">
+                      <CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)] shrink-0 mt-0.5" />
+                      <span>{it}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to="/terminal"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm text-[var(--brand-blue)] font-medium hover:gap-2.5 transition-all"
+                >
+                  Ver flujo <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Principal */}
+      <section className="relative overflow-hidden bg-[var(--brand-navy-deep)] text-white">
+        <div
+          className="absolute inset-0 opacity-[0.08] pointer-events-none"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--brand-gold) 1px, transparent 1px), linear-gradient(90deg, var(--brand-gold) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+          }}
+        />
+        <div className="relative max-w-5xl mx-auto px-5 py-24 text-center">
+          <p className="brand-eyebrow text-[var(--brand-gold)] mb-4">Comienza hoy</p>
+          <h2 className="brand-display text-4xl md:text-5xl leading-[1.05] max-w-3xl mx-auto">
+            Eleva tu proyecto al estándar institucional
+          </h2>
+          <p className="mt-5 text-white/70 max-w-2xl mx-auto text-lg">
+            Únete a las compañías mineras y fondos que ya operan sobre Geocapitals para estructurar capital,
+            evaluar activos y cumplir con los estándares globales de reporte.
+          </p>
+          <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              to="/auth"
+              className="inline-flex items-center gap-2 bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] px-6 py-3.5 rounded-md font-semibold text-sm hover:opacity-95 transition"
+            >
+              Solicitar acceso institucional <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              to="/terminal"
+              className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-3.5 rounded-md font-medium text-sm hover:bg-white/10 transition"
+            >
+              Explorar el terminal en vivo
+            </Link>
+          </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-[11px] font-mono uppercase tracking-wider text-white/50">
+            <span className="flex items-center gap-2"><Lock className="w-3.5 h-3.5" /> Cifrado AES-256</span>
+            <span className="flex items-center gap-2"><Database className="w-3.5 h-3.5" /> Datos soberanos</span>
+            <span className="flex items-center gap-2"><ShieldCheck className="w-3.5 h-3.5" /> SOC 2 ready</span>
+            <span className="flex items-center gap-2"><Globe2 className="w-3.5 h-3.5" /> Multi-jurisdicción</span>
+          </div>
+        </div>
+      </section>
+
       <section id="section-3" className="bg-[var(--brand-navy-deep)] text-white">
         <div className="max-w-7xl mx-auto px-5 py-14 flex flex-col md:flex-row items-start md:items-center gap-6">
           <ShieldCheck className="w-12 h-12 text-[var(--brand-gold)] shrink-0" strokeWidth={1.5} />
