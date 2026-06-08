@@ -1,22 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { TerminalShell } from "@/features/terminal/TerminalShell";
+import { MarketingLanding } from "@/features/marketing/MarketingLanding";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Geocapitals Terminal · Mining Investment Desk" },
+      { title: "Geocapitals · Plataforma de inversión en proyectos mineros" },
       {
         name: "description",
         content:
-          "Terminal de inversión minera: mercado de commodities, portafolio de proyectos, catastro y tokenización en una sola pantalla.",
+          "Conectamos proyectos mineros con capital. Plataforma inteligente de inversión y financiamiento para minería en Latinoamérica.",
       },
-      { property: "og:title", content: "Geocapitals Terminal" },
+      { property: "og:title", content: "Geocapitals · Conectamos proyectos mineros con capital" },
       {
         property: "og:description",
-        content: "Bloomberg-style terminal para activos mineros chilenos.",
+        content: "Plataforma inteligente de inversión y financiamiento para minería.",
       },
-      { property: "og:image", content: "/og-image.jpg" },
+      { property: "og:type", content: "website" },
     ],
   }),
-  component: TerminalShell,
+  component: MarketingLanding,
 });

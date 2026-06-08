@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -78,6 +79,11 @@ import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/ap
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
+const TerminalRoute = TerminalRouteImport.update({
+  id: '/terminal',
+  path: '/terminal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -103,19 +109,19 @@ const CatastroIndexRoute = CatastroIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const TerminalTokenizeRoute = TerminalTokenizeRouteImport.update({
-  id: '/terminal/tokenize',
-  path: '/terminal/tokenize',
-  getParentRoute: () => rootRouteImport,
+  id: '/tokenize',
+  path: '/tokenize',
+  getParentRoute: () => TerminalRoute,
 } as any)
 const TerminalMarketRoute = TerminalMarketRouteImport.update({
-  id: '/terminal/market',
-  path: '/terminal/market',
-  getParentRoute: () => rootRouteImport,
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => TerminalRoute,
 } as any)
 const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
-  id: '/terminal/capital-raise',
-  path: '/terminal/capital-raise',
-  getParentRoute: () => rootRouteImport,
+  id: '/capital-raise',
+  path: '/capital-raise',
+  getParentRoute: () => TerminalRoute,
 } as any)
 const LiveTilamaRoute = LiveTilamaRouteImport.update({
   id: '/live/tilama',
@@ -468,6 +474,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -537,6 +544,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -608,6 +616,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -679,6 +688,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/terminal'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -748,6 +758,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/reset-password'
+    | '/terminal'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -818,6 +829,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/reset-password'
+    | '/terminal'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -889,6 +901,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TerminalRoute: typeof TerminalRouteWithChildren
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   DiagMiningEngineRoute: typeof DiagMiningEngineRoute
@@ -899,9 +912,6 @@ export interface RootRouteChildren {
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
-  TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
-  TerminalMarketRoute: typeof TerminalMarketRoute
-  TerminalTokenizeRoute: typeof TerminalTokenizeRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
@@ -913,6 +923,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terminal': {
+      id: '/terminal'
+      path: '/terminal'
+      fullPath: '/terminal'
+      preLoaderRoute: typeof TerminalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -950,24 +967,24 @@ declare module '@tanstack/react-router' {
     }
     '/terminal/tokenize': {
       id: '/terminal/tokenize'
-      path: '/terminal/tokenize'
+      path: '/tokenize'
       fullPath: '/terminal/tokenize'
       preLoaderRoute: typeof TerminalTokenizeRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TerminalRoute
     }
     '/terminal/market': {
       id: '/terminal/market'
-      path: '/terminal/market'
+      path: '/market'
       fullPath: '/terminal/market'
       preLoaderRoute: typeof TerminalMarketRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TerminalRoute
     }
     '/terminal/capital-raise': {
       id: '/terminal/capital-raise'
-      path: '/terminal/capital-raise'
+      path: '/capital-raise'
       fullPath: '/terminal/capital-raise'
       preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof TerminalRoute
     }
     '/live/tilama': {
       id: '/live/tilama'
@@ -1551,11 +1568,28 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface TerminalRouteChildren {
+  TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
+  TerminalMarketRoute: typeof TerminalMarketRoute
+  TerminalTokenizeRoute: typeof TerminalTokenizeRoute
+}
+
+const TerminalRouteChildren: TerminalRouteChildren = {
+  TerminalCapitalRaiseRoute: TerminalCapitalRaiseRoute,
+  TerminalMarketRoute: TerminalMarketRoute,
+  TerminalTokenizeRoute: TerminalTokenizeRoute,
+}
+
+const TerminalRouteWithChildren = TerminalRoute._addFileChildren(
+  TerminalRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TerminalRoute: TerminalRouteWithChildren,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   DiagMiningEngineRoute: DiagMiningEngineRoute,
@@ -1566,9 +1600,6 @@ const rootRouteChildren: RootRouteChildren = {
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
-  TerminalCapitalRaiseRoute: TerminalCapitalRaiseRoute,
-  TerminalMarketRoute: TerminalMarketRoute,
-  TerminalTokenizeRoute: TerminalTokenizeRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
@@ -1581,13 +1612,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
