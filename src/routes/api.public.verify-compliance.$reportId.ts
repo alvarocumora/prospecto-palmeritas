@@ -31,12 +31,6 @@ export const Route = createFileRoute("/api/public/verify-compliance/$reportId")(
           });
         }
 
-        const { data: project } = await sb
-          .from("projects")
-          .select("name, code")
-          .eq("id", report.project_id)
-          .maybeSingle();
-
         const { data: rules } = await sb
           .from("compliance_rules")
           .select("id, standard, rule_code, title, severity")
@@ -88,17 +82,18 @@ export const Route = createFileRoute("/api/public/verify-compliance/$reportId")(
         const threshold = report.compliance_threshold ?? 95;
         const verified = score >= threshold;
 
+        // Public verification endpoint: return ONLY the verification outcome
+        // and aggregate compliance metrics. Do NOT leak project identity
+        // (name/code) or report title — these can identify confidential
+        // mining projects to anyone who guesses a report UUID.
         return new Response(
           JSON.stringify({
             ok: true,
             verified,
             report: {
               id: report.id,
-              title: report.title,
               version: report.version,
               status: report.status,
-              project_name: project?.name,
-              project_code: project?.code,
             },
             compliance: {
               global_score: score,
