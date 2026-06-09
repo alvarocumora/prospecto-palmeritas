@@ -47,6 +47,7 @@ import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
+import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
@@ -283,6 +284,12 @@ const AuthenticatedDashboardPalmerasRoute =
     path: '/dashboard/palmeras',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardOpportunitiesRoute =
+  AuthenticatedDashboardOpportunitiesRouteImport.update({
+    id: '/dashboard/opportunities',
+    path: '/dashboard/opportunities',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardNi43101Route =
   AuthenticatedDashboardNi43101RouteImport.update({
     id: '/dashboard/ni43101',
@@ -513,6 +520,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -583,6 +591,7 @@ export interface FileRoutesByTo {
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -655,6 +664,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/_authenticated/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -727,6 +737,7 @@ export interface FileRouteTypes {
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
+    | '/dashboard/opportunities'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/project-report'
@@ -797,6 +808,7 @@ export interface FileRouteTypes {
     | '/dashboard/map'
     | '/dashboard/marketplace'
     | '/dashboard/ni43101'
+    | '/dashboard/opportunities'
     | '/dashboard/palmeras'
     | '/dashboard/profile'
     | '/dashboard/project-report'
@@ -868,6 +880,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/ni43101'
+    | '/_authenticated/dashboard/opportunities'
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/project-report'
@@ -1189,6 +1202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/opportunities': {
+      id: '/_authenticated/dashboard/opportunities'
+      path: '/dashboard/opportunities'
+      fullPath: '/dashboard/opportunities'
+      preLoaderRoute: typeof AuthenticatedDashboardOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/ni43101': {
       id: '/_authenticated/dashboard/ni43101'
       path: '/dashboard/ni43101'
@@ -1494,6 +1514,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
+  AuthenticatedDashboardOpportunitiesRoute: typeof AuthenticatedDashboardOpportunitiesRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectReportRoute: typeof AuthenticatedDashboardProjectReportRoute
@@ -1542,6 +1563,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
   AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
+  AuthenticatedDashboardOpportunitiesRoute:
+    AuthenticatedDashboardOpportunitiesRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectReportRoute:

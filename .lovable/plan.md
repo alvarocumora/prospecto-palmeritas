@@ -1,129 +1,93 @@
+# Plan: Plataforma de inversión minera con datos reales + IA de oportunidades
 
-# Rediseño Geocapitals — Landing institucional + Sistema UI
+## Diagnóstico
 
-Adoptar la identidad visual del infográfico adjunto (navy corporativo `#0B2A5B`, blanco, azul vivo `#1E6BE6`, dorado fino como acento) para transmitir confianza tipo banca de inversión / Bloomberg + JP Morgan, y reemplazar el "Terminal" actual de `/` por una **landing institucional bilingüe**. El Terminal se preserva en `/terminal`.
+Datos reales disponibles en la DB:
 
-## 1. Objetivos
+- **4 proyectos reales**: La Cornellana, Las Palmeras, Gianfranco, Los Verdes – Tilama
+- **117 concesiones** propias + **11.064 concesiones nacionales** (catastro)
+- **4.111 yacimientos** (`mineral_deposits`), **209 targets**, **104 anomalías satelitales**, **24 titulares**
+- **5 deals** activos, **100 inversionistas ( yo y mis sociedades )**
+- Tablas IA ya existentes: `ai_recommendation_traces`, `ai_anomaly_explanations`, `ai_document_embeddings`, `engine_drill_targets`, `prospectivity_cells`/`runs`
 
-- Landing `/` enfocada en captar **dueños de proyectos** e **inversionistas** (no operativa).
-- Sistema de diseño unificado (tokens + componentes) reutilizable en Terminal, MissionControl, Dashboards y reportes NI 43-101.
-- Bilingüe ES/EN nativo (no traducción posterior).
-- Mantener stack actual (TanStack Start + Tailwind v4 + shadcn) sin romper rutas existentes.
+Hoy la landing y varios KPIs muestran texto estático. Existe infraestructura (Lovable AI, PostGIS, edge funcs, scene3d) pero falta el módulo de **inteligencia de oportunidades** que cruce catastro + yacimientos + anomalías + titulares y rankee deals.
 
-## 2. Sistema de Diseño (fundación)
+## Fase 1 — Sustituir contenido estático por datos reales (1 día)
 
-### Tokens nuevos en `src/styles.css`
-```text
---brand-navy:        oklch(0.22 0.08 260)   /* #0B2A5B */
---brand-navy-deep:   oklch(0.16 0.07 260)   /* footer/header */
---brand-blue:        oklch(0.55 0.20 255)   /* #1E6BE6 CTA */
---brand-blue-soft:   oklch(0.95 0.04 255)   /* fondos secciones */
---brand-gold:        oklch(0.78 0.13 78)    /* acento fino, líneas */
---brand-ink:         oklch(0.18 0.02 260)   /* texto principal */
---brand-mute:        oklch(0.50 0.02 260)
---surface-card:      oklch(0.99 0.005 260)
---border-hair:       oklch(0.90 0.01 260)
+1. **ServerFn `getPlatformStats**` (`src/lib/platformStats.functions.ts`, público, usa `supabaseAdmin`):
+  - proyectos activos, concesiones gestionadas, hectáreas, países, targets generados, anomalías detectadas, deals en pipeline.
+2. **Landing `MarketingLanding.tsx**`:
+  - Sección "Nuestra red global" + "Métricas clave" leen de `getPlatformStats` vía `useQuery`.
+  - Carrusel "Proyectos destacados" con los 4 proyectos reales (commodity, región, status, hectáreas, target principal).
+3. **Dashboard index** (`_authenticated.dashboard.index.tsx`): KPIs vivos (último target IA, última anomalía, deals abiertos, alertas catastro).
+
+## Fase 2 — Motor IA de Oportunidades sobre Catastro (3-4 días)
+
+Objetivo: que un inversor pinche "Oportunidades" y vea un ranking en vivo de concesiones del catastro nacional con score IA, justificación y acción ("contactar titular", "preparar oferta", "publicar deal").
+
+### 2.1 Tabla `cadastre_opportunities`
+
 ```
-- Tema **light por defecto** (la landing es light; Terminal sigue dark).
-- Variante `data-theme="terminal"` mantiene tokens oscuros actuales.
-
-### Tipografía
-- Display: **Manrope** (700/800) — titulares institucionales.
-- Body: **Inter** (400/500).
-- Mono: **JetBrains Mono** — métricas (+124, +312, KPIs).
-- Cargar vía `@import` en `styles.css`, sin `<link>` extra.
-
-### Componentes nuevos (`src/components/brand/`)
-- `BrandHeader` — nav sticky con logo G, menú (Proyectos · Inversionistas · Empresas · Recursos), switch ES/EN, "Iniciar sesión", "Registrarse" (botón azul).
-- `BrandFooter` — navy profundo, contacto, redes, legal, ISO/seguridad.
-- `SectionBand` — banda navy full-width con 4 íconos+títulos (Quality Projects, Global Investors, etc.).
-- `FeatureRow` — fila ícono circular azul + título + bajada (para "Publica tu proyecto", etc.).
-- `ProcessCircle` — diagrama circular Publica → Conecta → Negocia → Cierra (SVG).
-- `StatBlock` — `+124` mono grande + label uppercase.
-- `BilingualHeading` — H1 con bloque ES y EN lado a lado (replica el hero del infográfico).
-- `CheckList` — bullets con check azul (Para Inversionistas).
-- `CtaCard` / `LangToggle` / `QrJoinBlock`.
-
-### Tipos visuales
-- Esquinas suaves `rounded-2xl`, sombras muy sutiles (`shadow-[0_1px_2px_rgba(11,42,91,0.06)]`), líneas hair 1px en `--border-hair`, sin glassmorphism.
-- Íconos: `lucide-react` en círculo azul sólido o navy con icono blanco.
-
-## 3. Landing nueva `/` (estructura)
-
-```text
-1. BrandHeader (logo + nav + ES/EN + CTAs)
-2. Hero bilingüe
-   - Izq: H1 ES "Conectamos proyectos mineros con capital" + bajada
-   - Centro/Der: H1 EN equivalente
-   - Imagen mockup del Terminal (laptop) a la derecha (screenshot del /terminal)
-3. SectionBand navy: 4 pilares (Quality / Investors / Opportunities / Secure)
-4. Dos columnas "Para propietarios" / "For project owners" con 4 FeatureRow c/u y ProcessCircle al centro
-5. Tipos de proyectos (Metales preciosos, base, litio, energía) + Red global (+124 / +312 / 18 países) — StatBlocks mono
-6. Banda navy "Creamos valor para todos / We create value for everyone"
-7. Dos tarjetas "Para inversionistas" / "For investors" con CheckList + ilustración globo
-8. CTA final: QR + "Únete a Geocapitals hoy" + contacto
-9. BrandFooter navy
+id, concession_id (fk cadastre_national), score numeric(5,2),
+commodity_hint text[], deposit_proximity_km numeric, nearest_deposit_id,
+anomaly_overlap_count int, holder_id, holder_risk_score numeric,
+patent_status text, expiry_risk text, ai_thesis text, ai_action text,
+features jsonb, computed_at timestamptz, model text
 ```
 
-Todo el contenido **estático y SSR** para SEO.
+RLS: lectura `authenticated`, escritura solo `service_role`. Grants estándar.
 
-## 4. Rutas / IA
+### 2.2 ServerFn `scoreCadastreOpportunities` (admin, super_admin only)
 
-- `src/routes/index.tsx` → **nueva landing** (`<MarketingLanding />`).
-- `src/routes/terminal.tsx` (nueva) + mover Terminal actual a `/terminal` (shell ya existe).
-- `src/routes/proyectos.tsx`, `inversionistas.tsx`, `empresas.tsx`, `recursos.tsx` → placeholders con mismo sistema (head propio por SEO).
-- Header CTA "Iniciar sesión" → `/auth`, "Registrarse" → `/auth?mode=signup`.
-- Botón "Abrir Terminal" visible solo si `user` autenticado.
+Pipeline en lotes (cron pg_cron diario + trigger manual):
 
-## 5. Bilingüe (sin i18n library en fase 1)
+1. Para cada concesión: PostGIS `ST_Distance` al yacimiento más cercano + count de `satellite_anomalies` que intersectan + estado de patente + edad titular + overlaps.
+2. Construye `features` numéricos.
+3. Score heurístico inicial (ponderado) + **explicación LLM** vía Lovable AI Gateway (`google/gemini-3-flash-preview`) que devuelve `ai_thesis` (2-3 frases) y `ai_action` (CTA).
+4. Persiste en `cadastre_opportunities` + `ai_recommendation_traces`.
 
-- Hero, bandas y secciones renderizan ES y EN en columnas paralelas (igual que infográfico).
-- `LangToggle` controla `data-lang="es|en"` en `<html>` y CSS oculta el bloque inactivo en viewports < lg (mobile muestra solo idioma activo).
-- Persistencia en `localStorage` + atributo `lang` dinámico para SEO.
+### 2.3 Ruta `_authenticated.dashboard.opportunities.tsx`
 
-## 6. SEO
+- Tabla rankeada (score, commodity, región, distancia a yacimiento, anomalías, titular, patente, tesis IA).
+- Filtros: commodity, región, score mínimo, riesgo expiración, distancia.
+- Panel lateral con mapa MapLibre mostrando la concesión + yacimientos y anomalías cercanas (reutiliza capas existentes).
+- Acciones: "Crear deal desde concesión", "Añadir a watchlist", "Contactar titular" (usa `concession_holders` + `investor_contacts`).
 
-- `head()` en `/`: title "Geocapitals — Plataforma de inversión en proyectos mineros", description bilingüe, `og:image` = render del hero (se genera con imagegen en build), JSON-LD `Organization` + `WebSite`.
-- Sitemap actualizado con nuevas rutas.
-- Canonical solo en hojas.
+### 2.4 Geo-Copilot conversacional
 
-## 7. Migración Terminal
+- Reutiliza `geo_copilot_conversations`. Nuevo serverFn `askOpportunityCopilot` que recibe pregunta en español ("muéstrame concesiones de cobre en Atacama con anomalía satelital cerca de Codelco") → traduce a filtros SQL + responde con citas a oportunidades.
 
-- Mover `TerminalShell` a ruta `/terminal` (sin cambios funcionales).
-- Header del Terminal usa los mismos tokens nuevos en modo dark (`data-theme="terminal"`).
-- Tokens `signal-green` / `signal-red` se conservan.
+## Fase 3 — Marketplace y matching inversor (2 días)
 
-## 8. Assets
+1. **Sembrar `investors**` con 8-12 perfiles institucionales reales/plausibles (juniors, fondos, smelters) — vía herramienta `insert`.
+2. `**deal_investor_pipeline` matching**: serverFn `suggestInvestorsForDeal` que cruza `investor_profiles.preferred_commodities/regions/ticket` con el deal.
+3. **Página `dashboard.marketplace**`: ya existe — añadir tab "Sugeridos por IA" con el output de matching.
 
-- Logo G: generar SVG inline (círculo azul con G blanca) en `src/components/brand/BrandMark.tsx` — fiel al infográfico.
-- Ilustraciones (globo, lingotes, cristal litio): SVG inline livianos en `src/components/brand/illustrations/`.
-- Screenshot Terminal para hero: generar con `imagegen` (mockup laptop con UI del Terminal real).
+## Fase 4 — Loop de aprendizaje y diferenciación (1-2 días)
 
-## 9. Archivos a crear/editar
+- Captura feedback (👍/👎) en cada recomendación → `ai_recommendation_traces.feedback`.
+- Re-entrenamiento ligero semanal de pesos heurísticos (job pg_cron) usando feedback acumulado.
+- Badge "IA Verified" en deals cuyo target subyacente tenga score > 80 y QP firmado.
 
-**Crear**
-- `src/components/brand/BrandHeader.tsx`, `BrandFooter.tsx`, `BrandMark.tsx`, `LangToggle.tsx`
-- `src/components/brand/SectionBand.tsx`, `FeatureRow.tsx`, `ProcessCircle.tsx`, `StatBlock.tsx`, `BilingualHeading.tsx`, `CheckList.tsx`, `CtaCard.tsx`, `QrJoinBlock.tsx`
-- `src/components/brand/illustrations/{Globe,Bullion,LithiumCrystal,EnergyIcon}.tsx`
-- `src/features/marketing/MarketingLanding.tsx`
-- `src/features/marketing/sections/{Hero,Pillars,ForOwners,ForInvestors,ProjectTypes,GlobalNetwork,ValueBand,Cta}.tsx`
-- `src/lib/i18n/landing.ts` (diccionario ES/EN tipado)
-- `src/routes/terminal.tsx` (nueva ruta para Terminal)
-- `src/routes/proyectos.tsx`, `inversionistas.tsx`, `empresas.tsx`, `recursos.tsx`
+## Detalles técnicos
 
-**Editar**
-- `src/styles.css` — tokens + fonts
-- `src/routes/index.tsx` — render `MarketingLanding`
-- `src/routes/__root.tsx` — atributo `lang` dinámico
-- (auto) `src/routeTree.gen.ts`
+- **Stack**: TanStack Start (`createServerFn` + `requireSupabaseAuth` para lecturas autenticadas; admin client para scoring batch). Sin edge functions nuevas — todo dentro de serverFn / server route.
+- **IA**: Lovable AI Gateway, modelo por defecto `google/gemini-3-flash-preview`; structured output con Zod para `{thesis, action, confidence}`.
+- **Geo**: PostGIS ya instalado (`ST_DWithin`, índices GIST en `geom`).
+- **Cron**: `pg_cron` invoca `/api/public/cron/score-opportunities` (firmado con `WEBHOOK_SECRET`).
+- **Seguridad**: RLS estricta (ya hardenizada esta semana); nada del scoring se expone a `anon`.
+- **Migraciones**: 1 sola — `cadastre_opportunities` + grants + RLS + índices + job pg_cron.
 
-## 10. Fuera de alcance Fase 1
+## Entregables al cerrar
 
-- i18n completo con `i18next` (se evalúa si crece a 3+ idiomas).
-- Animaciones complejas (solo fade/slide sutiles con Tailwind).
-- Blog/Recursos con contenido real (queda como placeholder).
-- Cambios en MissionControl o dashboards autenticados (heredarán tokens automáticamente).
+1. Landing y dashboard mostrando solo datos vivos del proyecto.
+2. Módulo "Oportunidades IA" con ranking en vivo de las 11k concesiones del catastro nacional.
+3. Geo-Copilot que responde en español sobre oportunidades.
+4. Marketplace con matching inversor↔deal sugerido por IA.
+5. Bucle de feedback persistido para mejorar el modelo.
 
-## 11. Entregable
+## Preguntas antes de construir
 
-`/` renderiza la landing institucional bilingüe fiel al infográfico, con sistema de marca reutilizable. Terminal sigue accesible en `/terminal`. Sin regresiones en rutas autenticadas.
+1. ¿Arranco por **Fase 1 + Fase 2** (datos reales + Oportunidades IA) en esta iteración y dejamos marketplace/feedback para la siguiente?
+2. ¿OK sembrar 8-12 perfiles de inversionistas plausibles (con disclaimer "demo") para que el marketplace no aparezca vacío, o prefieres dejarlo vacío hasta tener inversionistas reales?
+3. ¿El scoring debe correr sobre **todo el catastro nacional (11k)** o limitarlo a regiones con yacimientos conocidos (Atacama, Antofagasta, Coquimbo) para controlar costo IA?

@@ -295,14 +295,16 @@ function DashboardHome() {
             Cambiar proyecto →
           </Link>
         </div>
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+        <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
           <Shortcut to="/dashboard/map" icon={<MapIcon className="w-4 h-4 text-gold" />} title="Mapa táctico" />
           <Shortcut to="/dashboard/geology3d" icon={<Box className="w-4 h-4 text-signal-violet" />} title="Visor 3D" />
           <Shortcut to="/dashboard/catastro" icon={<Crosshair className="w-4 h-4 text-teal" />} title="Catastro" />
+          <Shortcut to="/dashboard/opportunities" icon={<Sparkles className="w-4 h-4 text-yellow-500" />} title="Oportunidades IA" />
           <Shortcut to="/dashboard/estimation" icon={<Layers className="w-4 h-4 text-copper" />} title="Estimación" />
           <Shortcut to="/dashboard/hse" icon={<ShieldCheck className="w-4 h-4 text-info" />} title="HSE" />
           <Shortcut to="/dashboard/team" icon={<Sparkles className="w-4 h-4 text-gold" />} title="Equipo" />
         </div>
+
       </section>
     </div>
   );

@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getPlatformStats } from "@/lib/platformStats.functions";
 import {
   Mountain, Users, Globe2, ShieldCheck, FilePlus2, LineChart, Lock,
   ArrowRight, CheckCircle2, Mail, Linkedin, Link as LinkIcon,
@@ -146,6 +149,23 @@ function BrandMark({ className = "" }: { className?: string }) {
 export function MarketingLanding() {
   const [lang, setLang] = useLang();
   const c = t[lang];
+  const statsFn = useServerFn(getPlatformStats);
+  const { data: live } = useQuery({
+    queryKey: ["platform-stats"],
+    queryFn: () => statsFn(),
+    staleTime: 60_000,
+  });
+  const liveStats = live
+    ? [
+        { v: live.projects.toString(), l: lang === "es" ? "Proyectos activos" : "Active projects" },
+        { v: live.concessionsManaged.toLocaleString(), l: lang === "es" ? "Concesiones gestionadas" : "Managed concessions" },
+        { v: live.cadastreNationalCount.toLocaleString(), l: lang === "es" ? "Concesiones en catastro" : "Cadastre records" },
+        { v: live.mineralDeposits.toLocaleString(), l: lang === "es" ? "Yacimientos indexados" : "Indexed deposits" },
+        { v: live.explorationTargets.toString(), l: lang === "es" ? "Targets generados" : "Targets generated" },
+        { v: live.satelliteAnomalies.toString(), l: lang === "es" ? "Anomalías satelitales" : "Satellite anomalies" },
+      ]
+    : c.stats.map((s) => ({ v: s.v, l: s.l }));
+
 
   return (
     <div className="brand-light min-h-screen">
@@ -358,7 +378,7 @@ export function MarketingLanding() {
           <div>
             <p className="brand-eyebrow mb-4">{c.netH}</p>
             <div className="grid grid-cols-3 gap-4">
-              {c.stats.map((s) => (
+              {liveStats.map((s) => (
                 <div key={s.l} className="bg-white rounded-xl border border-[var(--brand-hair)] p-5">
                   <div className="font-mono text-3xl text-[var(--brand-navy-deep)]">{s.v}</div>
                   <div className="text-[10px] uppercase tracking-wider text-[var(--brand-mute)] mt-2">{s.l}</div>
@@ -366,6 +386,7 @@ export function MarketingLanding() {
               ))}
             </div>
           </div>
+
         </div>
       </section>
 

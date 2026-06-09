@@ -958,6 +958,105 @@ export type Database = {
         }
         Relationships: []
       }
+      cadastre_opportunities: {
+        Row: {
+          ai_action: string | null
+          ai_confidence: number | null
+          ai_thesis: string | null
+          anomaly_overlap_count: number
+          area_ha: number | null
+          commodity_hint: string[]
+          commune: string | null
+          computed_at: string
+          concession_id: string
+          created_at: string
+          deposit_proximity_km: number | null
+          expiry_risk: string | null
+          features: Json
+          holder_name: string | null
+          holder_risk_score: number | null
+          holder_rut: string | null
+          id: string
+          model: string | null
+          nearest_deposit_commodity: string | null
+          nearest_deposit_id: string | null
+          nearest_deposit_name: string | null
+          patent_status: string | null
+          region: string | null
+          score: number
+          updated_at: string
+        }
+        Insert: {
+          ai_action?: string | null
+          ai_confidence?: number | null
+          ai_thesis?: string | null
+          anomaly_overlap_count?: number
+          area_ha?: number | null
+          commodity_hint?: string[]
+          commune?: string | null
+          computed_at?: string
+          concession_id: string
+          created_at?: string
+          deposit_proximity_km?: number | null
+          expiry_risk?: string | null
+          features?: Json
+          holder_name?: string | null
+          holder_risk_score?: number | null
+          holder_rut?: string | null
+          id?: string
+          model?: string | null
+          nearest_deposit_commodity?: string | null
+          nearest_deposit_id?: string | null
+          nearest_deposit_name?: string | null
+          patent_status?: string | null
+          region?: string | null
+          score?: number
+          updated_at?: string
+        }
+        Update: {
+          ai_action?: string | null
+          ai_confidence?: number | null
+          ai_thesis?: string | null
+          anomaly_overlap_count?: number
+          area_ha?: number | null
+          commodity_hint?: string[]
+          commune?: string | null
+          computed_at?: string
+          concession_id?: string
+          created_at?: string
+          deposit_proximity_km?: number | null
+          expiry_risk?: string | null
+          features?: Json
+          holder_name?: string | null
+          holder_risk_score?: number | null
+          holder_rut?: string | null
+          id?: string
+          model?: string | null
+          nearest_deposit_commodity?: string | null
+          nearest_deposit_id?: string | null
+          nearest_deposit_name?: string | null
+          patent_status?: string | null
+          region?: string | null
+          score?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadastre_opportunities_concession_id_fkey"
+            columns: ["concession_id"]
+            isOneToOne: true
+            referencedRelation: "cadastre_national"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cadastre_opportunities_nearest_deposit_id_fkey"
+            columns: ["nearest_deposit_id"]
+            isOneToOne: false
+            referencedRelation: "mineral_deposits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cadastre_sync_runs: {
         Row: {
           archived: number
@@ -13231,6 +13330,26 @@ export type Database = {
       schedule_compliance_evaluations: { Args: never; Returns: number }
       schedule_gold_spot_fetch: { Args: never; Returns: string }
       schedule_satellite_polling: { Args: never; Returns: number }
+      score_cadastre_candidates: {
+        Args: { _limit?: number; _min_area?: number; _region?: string }
+        Returns: {
+          anomaly_count: number
+          area_ha: number
+          commune: string
+          deposit_commodity: string
+          deposit_id: string
+          deposit_name: string
+          dist_km: number
+          holder_count: number
+          holder_name: string
+          holder_rut: string
+          id: string
+          last_patent_year: number
+          name: string
+          region: string
+          status: string
+        }[]
+      }
       search_cadastre: {
         Args: {
           _bbox?: unknown
