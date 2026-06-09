@@ -378,7 +378,7 @@ export function MarketingLanding() {
           <div>
             <p className="brand-eyebrow mb-4">{c.netH}</p>
             <div className="grid grid-cols-3 gap-4">
-              {c.stats.map((s) => (
+              {liveStats.map((s) => (
                 <div key={s.l} className="bg-white rounded-xl border border-[var(--brand-hair)] p-5">
                   <div className="font-mono text-3xl text-[var(--brand-navy-deep)]">{s.v}</div>
                   <div className="text-[10px] uppercase tracking-wider text-[var(--brand-mute)] mt-2">{s.l}</div>
@@ -386,6 +386,7 @@ export function MarketingLanding() {
               ))}
             </div>
           </div>
+
         </div>
       </section>
 
