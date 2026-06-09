@@ -632,9 +632,9 @@ export function MarketingLanding() {
           <h3 className="brand-display text-2xl text-[var(--brand-navy-deep)]">{c.joinH}</h3>
           <p className="text-[var(--brand-mute)] mt-2">{c.joinP}</p>
           <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--brand-ink)]">
-            <span className="inline-flex items-center gap-2"><LinkIcon className="w-4 h-4 text-[var(--brand-blue)]" /> geocapitals.com</span>
-            <span className="inline-flex items-center gap-2"><Mail className="w-4 h-4 text-[var(--brand-blue)]" /> info@geocapitals.com</span>
-            <span className="inline-flex items-center gap-2"><Linkedin className="w-4 h-4 text-[var(--brand-blue)]" /> /company/geocapitals</span>
+            <span className="inline-flex items-center gap-2"><LinkIcon className="w-4 h-4 text-[var(--brand-blue)]" /><span>geocapitals.com</span></span>
+            <span className="inline-flex items-center gap-2"><Mail className="w-4 h-4 text-[var(--brand-blue)]" /><span>info@geocapitals.com</span></span>
+            <span className="inline-flex items-center gap-2"><Linkedin className="w-4 h-4 text-[var(--brand-blue)]" /><span>/company/geocapitals</span></span>
           </div>
         </div>
         <Link
