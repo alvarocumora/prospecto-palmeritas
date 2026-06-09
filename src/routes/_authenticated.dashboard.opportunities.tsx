@@ -4,10 +4,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Sparkles, MapPin, Gauge, AlertTriangle, Layers, Send, Loader2,
-  ArrowUpRight, RefreshCw, Brain,
+  ArrowUpRight, RefreshCw, Brain, Map as MapIcon, Table as TableIcon,
 } from "lucide-react";
 import { listOpportunities, scoreCadastreOpportunities } from "@/lib/cadastreOpportunities.functions";
 import { askOpportunityCopilot } from "@/lib/opportunityCopilot.functions";
+import { OpportunitiesMap } from "@/features/opportunities/OpportunitiesMap";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/opportunities")({
   head: () => ({ meta: [{ title: "Oportunidades IA — Geocapitals" }] }),
