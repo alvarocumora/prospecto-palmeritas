@@ -122,70 +122,14 @@ export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Consulta con PostGIS: trae candidatos + features pre-computados en SQL
-    const sql = `
-      WITH base AS (
-        SELECT c.id, c.name, c.region, c.commune, c.area_ha, c.holder_name, c.holder_rut,
-               c.last_patent_year, c.status, c.geom
-        FROM public.cadastre_national c
-        WHERE c.archived_at IS NULL
-          AND c.geom IS NOT NULL
-          ${data.region ? "AND c.region = $2" : ""}
-          ${data.minAreaHa ? "AND c.area_ha >= $3" : ""}
-        ORDER BY c.area_ha DESC NULLS LAST
-        LIMIT $1
-      ),
-      nearest AS (
-        SELECT b.id AS concession_id,
-               d.id AS deposit_id,
-               d.name AS deposit_name,
-               d.primary_commodity AS commodity,
-               ST_Distance(b.geom::geography, d.geom::geography)/1000.0 AS dist_km
-        FROM base b
-        CROSS JOIN LATERAL (
-          SELECT md.id, md.name, md.primary_commodity, md.geom
-          FROM public.mineral_deposits md
-          WHERE md.geom IS NOT NULL
-          ORDER BY md.geom <-> b.geom
-          LIMIT 1
-        ) d
-      ),
-      anomalies AS (
-        SELECT b.id AS concession_id, COUNT(*) AS cnt
-        FROM base b
-        JOIN public.satellite_anomalies sa
-          ON ST_Intersects(b.geom, ST_SetSRID(ST_GeomFromGeoJSON(sa.geometry::text), 4326))
-        GROUP BY b.id
-      ),
-      holders AS (
-        SELECT b.holder_rut, COUNT(*) AS holder_count
-        FROM public.cadastre_national b
-        WHERE b.holder_rut IS NOT NULL
-        GROUP BY b.holder_rut
-      )
-      SELECT b.id, b.name, b.region, b.commune, b.area_ha, b.holder_name, b.holder_rut,
-             b.last_patent_year, b.status,
-             n.deposit_id, n.deposit_name, n.commodity AS deposit_commodity, n.dist_km,
-             COALESCE(a.cnt, 0) AS anomaly_count,
-             COALESCE(h.holder_count, 1) AS holder_count
-      FROM base b
-      LEFT JOIN nearest n ON n.concession_id = b.id
-      LEFT JOIN anomalies a ON a.concession_id = b.id
-      LEFT JOIN holders h ON h.holder_rut = b.holder_rut;
-    `;
-
-    const params: any[] = [data.limit];
-    if (data.region) params.push(data.region);
-    if (data.minAreaHa) params.push(data.minAreaHa);
-
-    const { data: rows, error } = await supabaseAdmin.rpc("exec_sql_select", {
-      _sql: sql,
-      _params: params,
-    } as any);
+    const { data: rows, error } = await (supabaseAdmin.rpc as any)("score_cadastre_candidates", {
+      _limit: data.limit,
+      _region: data.region ?? null,
+      _min_area: data.minAreaHa ?? null,
+    });
 
     let candidates: any[] = [];
     if (error || !rows) {
-      // Fallback: sin RPC, leer con un SELECT más sencillo (sin PostGIS lateral) y completar JS
       const { data: simple } = await supabaseAdmin
         .from("cadastre_national")
         .select("id,name,region,commune,area_ha,holder_name,holder_rut,last_patent_year,status")
