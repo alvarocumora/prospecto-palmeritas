@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getPlatformStats } from "@/lib/platformStats.functions";
 import {
   Mountain, Users, Globe2, ShieldCheck, FilePlus2, LineChart, Lock,
   ArrowRight, CheckCircle2, Mail, Linkedin, Link as LinkIcon,
