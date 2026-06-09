@@ -29,10 +29,13 @@ export const getPublicProjectTargets = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<PublicTargetsPayload> => {
     const { data: project, error: projErr } = await supabaseAdmin
       .from("projects")
-      .select("id, code, name")
+      .select("id, code, name, is_public_map")
       .eq("id", data.projectId)
       .single();
     if (projErr || !project) throw new Error("Proyecto no encontrado");
+    if (!project.is_public_map) {
+      throw new Error("Este proyecto no está disponible para vista pública");
+    }
 
     const { data: targets, error: tErr } = await supabaseAdmin
       .from("exploration_targets")
@@ -45,7 +48,7 @@ export const getPublicProjectTargets = createServerFn({ method: "GET" })
     if (tErr) throw new Error(tErr.message);
 
     return {
-      project: project as PublicTargetsPayload["project"],
+      project: { id: project.id, code: project.code, name: project.name },
       targets: (targets ?? []) as PublicTarget[],
     };
   });
