@@ -3,6 +3,7 @@
 // reales del catastro SERNAGEOMIN.
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const TILAMA_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
@@ -25,8 +26,15 @@ export type SyncCatastroResult = {
 };
 
 export const syncLosVerdes5Catastro = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: { radiusKm?: number; dryRun?: boolean } | undefined) => input ?? {})
-  .handler(async ({ data }): Promise<SyncCatastroResult> => {
+  .handler(async ({ data, context }): Promise<SyncCatastroResult> => {
+    const { data: isAdmin, error: roleErr } = await supabaseAdmin.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
+    if (roleErr || !isAdmin) {
+      throw new Response("Forbidden: super admin only", { status: 403 });
+    }
     const { data: result, error } = await supabaseAdmin.functions.invoke(
       "match-project-catastro",
       {
