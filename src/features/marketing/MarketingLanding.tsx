@@ -149,6 +149,23 @@ function BrandMark({ className = "" }: { className?: string }) {
 export function MarketingLanding() {
   const [lang, setLang] = useLang();
   const c = t[lang];
+  const statsFn = useServerFn(getPlatformStats);
+  const { data: live } = useQuery({
+    queryKey: ["platform-stats"],
+    queryFn: () => statsFn(),
+    staleTime: 60_000,
+  });
+  const liveStats = live
+    ? [
+        { v: live.projects.toString(), l: lang === "es" ? "Proyectos activos" : "Active projects" },
+        { v: live.concessionsManaged.toLocaleString(), l: lang === "es" ? "Concesiones gestionadas" : "Managed concessions" },
+        { v: live.cadastreNationalCount.toLocaleString(), l: lang === "es" ? "Concesiones en catastro" : "Cadastre records" },
+        { v: live.mineralDeposits.toLocaleString(), l: lang === "es" ? "Yacimientos indexados" : "Indexed deposits" },
+        { v: live.explorationTargets.toString(), l: lang === "es" ? "Targets generados" : "Targets generated" },
+        { v: live.satelliteAnomalies.toString(), l: lang === "es" ? "Anomalías satelitales" : "Satellite anomalies" },
+      ]
+    : c.stats.map((s) => ({ v: s.v, l: s.l }));
+
 
   return (
     <div className="brand-light min-h-screen">
