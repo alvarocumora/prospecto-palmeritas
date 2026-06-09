@@ -31,8 +31,11 @@ function OpportunitiesPage() {
   const [expiryRisk, setExpiryRisk] = useState("");
   const [maxDist, setMaxDist] = useState<number | "">("");
   const [question, setQuestion] = useState("");
+  const [view, setView] = useState<"map" | "table">("map");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const queryKey = ["opportunities", { region, commodity, minScore, expiryRisk, maxDist }];
+
   const opps = useQuery({
     queryKey,
     queryFn: () =>
