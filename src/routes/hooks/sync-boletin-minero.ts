@@ -105,7 +105,7 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
     handlers: {
       POST: async ({ request }) => {
         const authHeader = request.headers.get("authorization");
-        const token = authHeader?.replace("Bearer ", "");
+        const token = authHeader?.replace("Bearer ", "")?.trim();
         if (!token) {
           return new Response(JSON.stringify({ error: "Missing auth" }), {
             status: 401,
@@ -114,22 +114,35 @@ export const Route = createFileRoute("/hooks/sync-boletin-minero")({
         }
 
         const SUPABASE_URL = process.env.SUPABASE_URL;
-        if (!SUPABASE_URL) {
-          return new Response(JSON.stringify({ error: "SUPABASE_URL not configured" }), {
+        const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!SUPABASE_URL || !SERVICE_KEY) {
+          return new Response(JSON.stringify({ error: "server_misconfigured" }), {
             status: 500,
             headers: { "Content-Type": "application/json" },
           });
         }
 
-        // Use service role to bypass RLS for ingestion (cron is unauthenticated context)
-        const SERVICE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        const adminClient = SERVICE_KEY
-          ? createClient(SUPABASE_URL, SERVICE_KEY, {
-              auth: { autoRefreshToken: false, persistSession: false },
-            })
-          : createClient(SUPABASE_URL, token, {
-              auth: { autoRefreshToken: false, persistSession: false },
-            });
+        const adminClient = createClient(SUPABASE_URL, SERVICE_KEY, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        });
+
+        // Validate the bearer JWT and require super_admin role.
+        const { data: userData, error: userErr } = await adminClient.auth.getUser(token);
+        if (userErr || !userData?.user) {
+          return new Response(JSON.stringify({ error: "invalid_token" }), {
+            status: 401,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
+        const { data: isAdmin, error: roleErr } = await adminClient.rpc("is_super_admin", {
+          _user_id: userData.user.id,
+        });
+        if (roleErr || !isAdmin) {
+          return new Response(JSON.stringify({ error: "forbidden" }), {
+            status: 403,
+            headers: { "Content-Type": "application/json" },
+          });
+        }
 
         try {
           // 1. Scrape boletinminero.cl index page for latest publications.

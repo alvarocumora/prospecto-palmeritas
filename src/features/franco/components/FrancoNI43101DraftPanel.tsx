@@ -14,20 +14,30 @@ import {
 const PROJECT_TITLE = "Prospecto Franco (Gianfranco)";
 const REGION = "Valparaíso, Chile";
 
+function esc(s: string | number | null | undefined): string {
+  const str = s === null || s === undefined ? "—" : String(s);
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildHtml(d: FrancoCadastreCross): string {
   const exact = d.rows.filter((r) => r.matchKind === "EXACT");
   const rowsHtml = d.rows
     .map(
       (r) => `<tr>
-        <td>${r.kmlName}</td>
-        <td>${r.concessionCode ?? "—"}</td>
-        <td>${r.concessionName ?? "—"}</td>
-        <td>${r.holder ?? "—"}</td>
+        <td>${esc(r.kmlName)}</td>
+        <td>${esc(r.concessionCode)}</td>
+        <td>${esc(r.concessionName)}</td>
+        <td>${esc(r.holder)}</td>
         <td style="text-align:right">${r.areaHaDb?.toFixed(2) ?? "—"}</td>
         <td style="text-align:right">${r.overlapHa.toFixed(2)}</td>
         <td style="text-align:right">${r.pctOfKml.toFixed(1)}%</td>
-        <td>${r.matchKind}</td>
-        <td>${r.status ?? "—"}</td>
+        <td>${esc(r.matchKind)}</td>
+        <td>${esc(r.status)}</td>
       </tr>`,
     )
     .join("\n");

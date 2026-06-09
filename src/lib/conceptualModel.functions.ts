@@ -2,6 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { generateConceptualModel } from "./conceptualModel.server";
 import proj4 from "proj4";
 import { lngLatToMeters } from "@/engine3d/geospatial/crs";
@@ -10,10 +11,19 @@ proj4.defs("EPSG:32719", "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_de
 
 const ProjectInput = z.object({ projectId: z.string().uuid() });
 
+async function assertSuperAdmin(userId: string) {
+  const { data, error } = await supabaseAdmin.rpc("is_super_admin", { _user_id: userId });
+  if (error || !data) {
+    throw new Response("Forbidden: super admin only", { status: 403 });
+  }
+}
+
 // ─── Generador (one-shot) ───────────────────────────────────────────────────
 export const generateConceptualModelFn = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => ProjectInput.parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
+    await assertSuperAdmin(context.userId);
     const report = await generateConceptualModel({ projectId: data.projectId });
     return report;
   });
