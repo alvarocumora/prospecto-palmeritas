@@ -6,6 +6,7 @@ import { getPlatformStats } from "@/lib/platformStats.functions";
 import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
 import { ContactForm } from "@/features/marketing/ContactForm";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
+import { useLocale } from "@/features/marketing/i18n";
 import {
   Mountain, Users, Globe2, ShieldCheck, FilePlus2, LineChart, Lock,
   ArrowRight, CheckCircle2,
