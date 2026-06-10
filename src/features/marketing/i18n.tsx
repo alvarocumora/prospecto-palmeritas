@@ -30,6 +30,11 @@ export const STRINGS: Dict = {
   cta_explore: { es: "Explorar oportunidades", en: "Explore opportunities" },
   open_terminal: { es: "Abrir en Terminal", en: "Open in Terminal" },
   map_chip_live: { es: "GEOCAPITALS · LIVE MAP · CHILE", en: "GEOCAPITALS · LIVE MAP · CHILE" },
+  map_mode_listings: { es: "Listados", en: "Listings" },
+  map_mode_potential: { es: "Potencial", en: "Potential" },
+  map_listings_hint: { es: "Proyectos disponibles para inversión", en: "Projects open for investment" },
+  map_potential_hint: { es: "Concesiones, anomalías y yacimientos", en: "Concessions, anomalies & deposits" },
+  map_browse_deals: { es: "Ver oportunidades", en: "Browse opportunities" },
 };
 
 type Ctx = {
