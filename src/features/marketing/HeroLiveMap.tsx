@@ -191,9 +191,14 @@ export function HeroLiveMap() {
           )}
         </div>
 
-        <div className="px-4 py-2.5 flex items-center justify-between text-[10px] font-mono text-[var(--brand-mute)] border-t border-[var(--brand-hair)]">
+        <div className="px-4 py-2.5 flex items-center justify-between gap-3 text-[10px] font-mono text-[var(--brand-mute)] border-t border-[var(--brand-hair)]">
           <span>PostGIS · Sentinel-2 · Esri Imagery</span>
-          <span>Actualizado al vuelo</span>
+          <Link
+            to="/terminal"
+            className="inline-flex items-center gap-1.5 text-[var(--brand-blue)] hover:gap-2 transition-all font-medium normal-case tracking-normal"
+          >
+            Abrir en Terminal <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
       </div>
     </div>
