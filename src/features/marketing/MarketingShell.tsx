@@ -1,28 +1,63 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
+import { useLocale, type Locale } from "@/features/marketing/i18n";
+import logoMark from "@/assets/geocapitals-mark.png";
 
 const NAV = [
-  { to: "/proyectos", label: "Proyectos" },
-  { to: "/inversionistas", label: "Inversionistas" },
-  { to: "/empresas", label: "Empresas" },
-  { to: "/recursos", label: "Recursos" },
-  { to: "/contacto", label: "Contacto" },
+  { to: "/proyectos", key: "nav_projects" as const },
+  { to: "/inversionistas", key: "nav_investors" as const },
+  { to: "/empresas", key: "nav_companies" as const },
+  { to: "/recursos", key: "nav_resources" as const },
+  { to: "/contacto", key: "nav_contact" as const },
 ] as const;
 
-export function BrandMark({ className = "" }: { className?: string }) {
+export function BrandMark({ className = "", dark = false }: { className?: string; dark?: boolean }) {
   return (
-    <Link to="/" className={`inline-flex items-center gap-2 ${className}`}>
-      <span className="grid place-items-center w-9 h-9 rounded-full bg-[var(--brand-blue)] text-white font-display text-lg leading-none font-bold">
-        G
-      </span>
-      <span className="font-display text-[19px] tracking-tight text-[var(--brand-navy-deep)] font-bold">
+    <Link to="/" className={`inline-flex items-center gap-2.5 ${className}`}>
+      <img
+        src={logoMark}
+        alt="Geocapitals"
+        width={36}
+        height={36}
+        className="h-9 w-9 object-contain"
+      />
+      <span
+        className={`font-display text-[19px] tracking-[0.14em] font-bold ${
+          dark ? "text-white" : "text-[var(--brand-navy-deep)]"
+        }`}
+      >
         GEOCAPITALS
       </span>
     </Link>
   );
 }
 
+function LangToggle() {
+  const { locale, setLocale } = useLocale();
+  const Btn = ({ value, label }: { value: Locale; label: string }) => (
+    <button
+      type="button"
+      onClick={() => setLocale(value)}
+      aria-pressed={locale === value}
+      className={`px-2 py-0.5 rounded text-[11px] font-mono uppercase tracking-wider transition ${
+        locale === value
+          ? "bg-[var(--brand-navy-deep)] text-white"
+          : "text-[var(--brand-mute)] hover:text-[var(--brand-navy-deep)]"
+      }`}
+    >
+      {label}
+    </button>
+  );
+  return (
+    <div className="inline-flex items-center gap-0.5 border border-[var(--brand-hair)] rounded-md p-0.5 bg-white">
+      <Btn value="es" label="ES" />
+      <Btn value="en" label="EN" />
+    </div>
+  );
+}
+
 export function MarketingHeader() {
+  const { t } = useLocale();
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-[var(--brand-hair)]">
       <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
@@ -35,19 +70,20 @@ export function MarketingHeader() {
               className="hover:text-[var(--brand-blue)] transition-colors"
               activeProps={{ className: "text-[var(--brand-blue)] font-medium" }}
             >
-              {n.label}
+              {t(n.key)}
             </Link>
           ))}
         </nav>
         <div className="flex-1" />
-        <Link to="/auth" className="text-sm text-[var(--brand-ink)] hover:text-[var(--brand-blue)]">
-          Iniciar sesión
+        <LangToggle />
+        <Link to="/auth" className="text-sm text-[var(--brand-ink)] hover:text-[var(--brand-blue)] hidden sm:inline">
+          {t("cta_login")}
         </Link>
         <Link
           to="/auth"
           className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 transition"
         >
-          Registrarse <ArrowRight className="w-3.5 h-3.5" />
+          {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </div>
     </header>
