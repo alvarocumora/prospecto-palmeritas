@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Satellite, Radar, Activity, ArrowRight } from "lucide-react";
 import { getLandingMapData } from "@/lib/landingMap.functions";
+import { useLocale } from "@/features/marketing/i18n";
 
 const STYLE: any = {
   version: 8,
@@ -27,6 +28,7 @@ const FALLBACK_CENTER: [number, number] = [-70.4, -29.5];
 const FALLBACK_ZOOM = 4.4;
 
 export function HeroLiveMap() {
+  const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
   const styleReadyRef = useRef(false);
@@ -197,7 +199,7 @@ export function HeroLiveMap() {
             to="/terminal"
             className="inline-flex items-center gap-1.5 text-[var(--brand-blue)] hover:gap-2 transition-all font-medium normal-case tracking-normal"
           >
-            Abrir en Terminal <ArrowRight className="w-3 h-3" />
+            {t("open_terminal")} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
