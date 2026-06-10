@@ -3,7 +3,8 @@ import maplibregl, { Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Satellite, Radar, Activity } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Satellite, Radar, Activity, ArrowRight } from "lucide-react";
 import { getLandingMapData } from "@/lib/landingMap.functions";
 
 const STYLE: any = {
