@@ -70,9 +70,18 @@ export function MarketingFooter() {
             Catastro, geología 3D, monitoreo satelital, NI 43-101 y deals en una sola plataforma.
           </p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-white/70">
-            <span className="inline-flex items-center gap-2"><Mail className="w-4 h-4 text-[var(--brand-gold)]" /> info@geocapitals.com</span>
-            <span className="inline-flex items-center gap-2"><Linkedin className="w-4 h-4 text-[var(--brand-gold)]" /> /company/geocapitals</span>
-            <span className="inline-flex items-center gap-2"><LinkIcon className="w-4 h-4 text-[var(--brand-gold)]" /> geocapitals.com</span>
+            <a href="mailto:info@geocapitals.com" className="inline-flex items-center gap-2 hover:text-white">
+              <Mail className="w-4 h-4 text-[var(--brand-gold)]" />
+              <span>info@geocapitals.com</span>
+            </a>
+            <a href="https://www.linkedin.com/company/geocapitals" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white">
+              <Linkedin className="w-4 h-4 text-[var(--brand-gold)]" />
+              <span>/company/geocapitals</span>
+            </a>
+            <a href="https://geocapitals.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 hover:text-white">
+              <LinkIcon className="w-4 h-4 text-[var(--brand-gold)]" />
+              <span>geocapitals.com</span>
+            </a>
           </div>
         </div>
 
