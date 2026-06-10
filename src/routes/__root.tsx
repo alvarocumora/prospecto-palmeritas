@@ -3,6 +3,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
+import { LocaleProvider } from "@/features/marketing/i18n";
 import { queryClient } from "@/lib/queryClient";
 
 import appCss from "../styles.css?url";
