@@ -489,3 +489,32 @@
   text-transform: uppercase;
   color: var(--brand-mute);
 }
+
+/* Inputs marca-light (forms públicos) */
+.brand-light .brand-input,
+.brand-input {
+  width: 100%;
+  background: #fff;
+  border: 1px solid var(--brand-hair);
+  border-radius: 6px;
+  padding: 9px 12px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--brand-ink);
+  outline: none;
+  transition: border-color 120ms ease, box-shadow 120ms ease;
+}
+.brand-input:focus {
+  border-color: var(--brand-blue);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 18%, transparent);
+}
+
+/* Animaciones del giro del proceso */
+@keyframes brand-spin { to { transform: rotate(360deg); } }
+@keyframes brand-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-blue) 35%, transparent); }
+  50% { box-shadow: 0 0 0 14px color-mix(in oklab, var(--brand-blue) 0%, transparent); }
+}
+.brand-spin-slow { animation: brand-spin 40s linear infinite; transform-origin: center; }
+.brand-pulse { animation: brand-pulse 2.4s ease-in-out infinite; }
+
