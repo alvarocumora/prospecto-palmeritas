@@ -22,6 +22,7 @@ const PROCESS_STEPS = [
 ] as const;
 
 export function MarketingLanding() {
+  const { t } = useLocale();
   // Highlight secuencial del giro del proceso
   const [activeStep, setActiveStep] = useState(0);
   useEffect(() => {
