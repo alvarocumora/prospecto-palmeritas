@@ -11,6 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RecursosRouteImport } from './routes/recursos'
+import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as InversionistasRouteImport } from './routes/inversionistas'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
@@ -88,6 +93,31 @@ const TerminalRoute = TerminalRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecursosRoute = RecursosRouteImport.update({
+  id: '/recursos',
+  path: '/recursos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProyectosRoute = ProyectosRouteImport.update({
+  id: '/proyectos',
+  path: '/proyectos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InversionistasRoute = InversionistasRouteImport.update({
+  id: '/inversionistas',
+  path: '/inversionistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -480,6 +510,11 @@ const AuthenticatedDashboardCatastroHoldersIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contacto': typeof ContactoRoute
+  '/empresas': typeof EmpresasRoute
+  '/inversionistas': typeof InversionistasRoute
+  '/proyectos': typeof ProyectosRoute
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -551,6 +586,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/contacto': typeof ContactoRoute
+  '/empresas': typeof EmpresasRoute
+  '/inversionistas': typeof InversionistasRoute
+  '/proyectos': typeof ProyectosRoute
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -624,6 +664,11 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/auth': typeof AuthRoute
+  '/contacto': typeof ContactoRoute
+  '/empresas': typeof EmpresasRoute
+  '/inversionistas': typeof InversionistasRoute
+  '/proyectos': typeof ProyectosRoute
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -697,6 +742,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/contacto'
+    | '/empresas'
+    | '/inversionistas'
+    | '/proyectos'
+    | '/recursos'
     | '/reset-password'
     | '/terminal'
     | '/catastro/mapa'
@@ -768,6 +818,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/contacto'
+    | '/empresas'
+    | '/inversionistas'
+    | '/proyectos'
+    | '/recursos'
     | '/reset-password'
     | '/terminal'
     | '/catastro/mapa'
@@ -840,6 +895,11 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/contacto'
+    | '/empresas'
+    | '/inversionistas'
+    | '/proyectos'
+    | '/recursos'
     | '/reset-password'
     | '/terminal'
     | '/catastro/mapa'
@@ -913,6 +973,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AuthRoute: typeof AuthRoute
+  ContactoRoute: typeof ContactoRoute
+  EmpresasRoute: typeof EmpresasRoute
+  InversionistasRoute: typeof InversionistasRoute
+  ProyectosRoute: typeof ProyectosRoute
+  RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TerminalRoute: typeof TerminalRouteWithChildren
   CatastroMapaRoute: typeof CatastroMapaRoute
@@ -948,6 +1013,41 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recursos': {
+      id: '/recursos'
+      path: '/recursos'
+      fullPath: '/recursos'
+      preLoaderRoute: typeof RecursosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proyectos': {
+      id: '/proyectos'
+      path: '/proyectos'
+      fullPath: '/proyectos'
+      preLoaderRoute: typeof ProyectosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inversionistas': {
+      id: '/inversionistas'
+      path: '/inversionistas'
+      fullPath: '/inversionistas'
+      preLoaderRoute: typeof InversionistasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -1611,6 +1711,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AuthRoute: AuthRoute,
+  ContactoRoute: ContactoRoute,
+  EmpresasRoute: EmpresasRoute,
+  InversionistasRoute: InversionistasRoute,
+  ProyectosRoute: ProyectosRoute,
+  RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TerminalRoute: TerminalRouteWithChildren,
   CatastroMapaRoute: CatastroMapaRoute,
