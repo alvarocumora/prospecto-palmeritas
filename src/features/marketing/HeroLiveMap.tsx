@@ -199,7 +199,7 @@ export function HeroLiveMap() {
             to="/terminal"
             className="inline-flex items-center gap-1.5 text-[var(--brand-blue)] hover:gap-2 transition-all font-medium normal-case tracking-normal"
           >
-            Abrir en Terminal <ArrowRight className="w-3 h-3" />
+            {t("open_terminal")} <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       </div>
