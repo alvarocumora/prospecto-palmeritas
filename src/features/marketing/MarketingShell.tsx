@@ -95,11 +95,9 @@ export function MarketingFooter() {
     <footer className="bg-[var(--brand-navy-deep)] text-white/70">
       <div className="max-w-7xl mx-auto px-5 py-10 grid md:grid-cols-4 gap-8 text-sm">
         <div className="md:col-span-2">
-          <span className="inline-flex items-center gap-2">
-            <span className="grid place-items-center w-9 h-9 rounded-full bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] font-display text-lg font-bold">
-              G
-            </span>
-            <span className="font-display text-[18px] tracking-tight text-white font-bold">GEOCAPITALS</span>
+          <span className="inline-flex items-center gap-2.5">
+            <img src={logoMark} alt="Geocapitals" width={36} height={36} className="h-9 w-9 object-contain" />
+            <span className="font-display text-[18px] tracking-[0.14em] text-white font-bold">GEOCAPITALS</span>
           </span>
           <p className="mt-3 text-white/60 max-w-md text-[13px]">
             Infraestructura digital donde la exploración minera se encuentra con el capital institucional.
