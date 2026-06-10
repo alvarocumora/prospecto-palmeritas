@@ -6,6 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Satellite, Radar, Activity, ArrowRight } from "lucide-react";
 import { getLandingMapData } from "@/lib/landingMap.functions";
+import { useLocale } from "@/features/marketing/i18n";
 
 const STYLE: any = {
   version: 8,
