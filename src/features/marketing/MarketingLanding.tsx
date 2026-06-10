@@ -60,13 +60,12 @@ export function MarketingLanding() {
       <section className="relative overflow-hidden border-b border-[var(--brand-hair)]">
         <div className="max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           <div>
-            <p className="brand-eyebrow mb-5">Plataforma inteligente de inversión y financiamiento</p>
+            <p className="brand-eyebrow mb-5">{t("hero_eyebrow")}</p>
             <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-[var(--brand-navy-deep)]">
-              Conectamos proyectos mineros con capital
+              {t("hero_title")}
             </h1>
             <p className="mt-6 text-lg text-[var(--brand-mute)] max-w-xl">
-              La infraestructura digital donde proyectos de minería se encuentran con inversionistas calificados de todo
-              el mundo — sobre catastro, satélite y NI 43-101 en vivo.
+              {t("hero_sub")}
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -74,13 +73,13 @@ export function MarketingLanding() {
                 hash="publicar"
                 className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95"
               >
-                Publica tu proyecto <ArrowRight className="w-4 h-4" />
+                {t("cta_publish")} <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 to="/terminal"
                 className="inline-flex items-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium hover:bg-[var(--brand-blue-soft)]"
               >
-                Explorar oportunidades
+                {t("cta_explore")}
               </Link>
             </div>
             <div className="mt-10 flex items-center gap-8 text-xs font-mono text-[var(--brand-mute)] flex-wrap">
