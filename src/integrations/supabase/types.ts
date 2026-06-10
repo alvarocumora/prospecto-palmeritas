@@ -13299,6 +13299,10 @@ export type Database = {
         Returns: number
       }
       normalize_rut: { Args: { _rut: string }; Returns: string }
+      opportunities_geo: {
+        Args: { _limit?: number; _min_score?: number; _region?: string }
+        Returns: Json
+      }
       record_ai_trace: {
         Args: {
           _context_sources?: Json

@@ -1,93 +1,65 @@
-# Plan: Plataforma de inversión minera con datos reales + IA de oportunidades
+# Mapa Interactivo en Oportunidades IA
 
-## Diagnóstico
+Añadir un visor espacial MapLibre a `/_authenticated/dashboard/opportunities` para explorar concesiones rankeadas junto con anomalías satelitales, depósitos cercanos y targets de exploración. Sin nuevas dependencias (ya tenemos `maplibre-gl`).
 
-Datos reales disponibles en la DB:
+## 1. ServerFn nueva: `getOpportunitiesGeo`
 
-- **4 proyectos reales**: La Cornellana, Las Palmeras, Gianfranco, Los Verdes – Tilama
-- **117 concesiones** propias + **11.064 concesiones nacionales** (catastro)
-- **4.111 yacimientos** (`mineral_deposits`), **209 targets**, **104 anomalías satelitales**, **24 titulares**
-- **5 deals** activos, **100 inversionistas ( yo y mis sociedades )**
-- Tablas IA ya existentes: `ai_recommendation_traces`, `ai_anomaly_explanations`, `ai_document_embeddings`, `engine_drill_targets`, `prospectivity_cells`/`runs`
+Archivo: `src/lib/cadastreOpportunities.functions.ts` (añadir export).
 
-Hoy la landing y varios KPIs muestran texto estático. Existe infraestructura (Lovable AI, PostGIS, edge funcs, scene3d) pero falta el módulo de **inteligencia de oportunidades** que cruce catastro + yacimientos + anomalías + titulares y rankee deals.
+- Input: `{ limit?: number; minScore?: number; region?: string; bbox?: [w,s,e,n] }`.
+- Usa `supabaseAdmin` + RPC SQL con PostGIS (`ST_AsGeoJSON`, `ST_Centroid`, `ST_Intersects`) para devolver **GeoJSON FeatureCollections** ya proyectadas a EPSG:4326:
+  - `concessions`: top N de `cadastre_opportunities` join `cadastre_national` → polígonos + props (`score`, `commodity_hint`, `holder_name`, `ai_thesis`, `ai_action`, `id`).
+  - `anomalies`: `satellite_anomalies` que intersecten el bbox/concesiones (puntos o polígonos).
+  - `deposits`: `mineral_deposits` con `lat/lon` dentro del bbox (puntos).
+  - `targets`: `exploration_targets` con `geometry_geojson` dentro del bbox.
+- Limites duros (500 features por capa) para proteger payload.
+- Protegida con `requireSupabaseAuth`.
 
-## Fase 1 — Sustituir contenido estático por datos reales (1 día)
+Crear migration con función SECURITY DEFINER `opportunities_geo(_limit int, _min_score numeric, _region text, _bbox geometry)` que devuelva un JSON con las 4 colecciones — evita 4 round-trips.
 
-1. **ServerFn `getPlatformStats**` (`src/lib/platformStats.functions.ts`, público, usa `supabaseAdmin`):
-  - proyectos activos, concesiones gestionadas, hectáreas, países, targets generados, anomalías detectadas, deals en pipeline.
-2. **Landing `MarketingLanding.tsx**`:
-  - Sección "Nuestra red global" + "Métricas clave" leen de `getPlatformStats` vía `useQuery`.
-  - Carrusel "Proyectos destacados" con los 4 proyectos reales (commodity, región, status, hectáreas, target principal).
-3. **Dashboard index** (`_authenticated.dashboard.index.tsx`): KPIs vivos (último target IA, última anomalía, deals abiertos, alertas catastro).
+## 2. Componente `OpportunitiesMap`
 
-## Fase 2 — Motor IA de Oportunidades sobre Catastro (3-4 días)
+Archivo nuevo: `src/features/opportunities/OpportunitiesMap.tsx`.
 
-Objetivo: que un inversor pinche "Oportunidades" y vea un ranking en vivo de concesiones del catastro nacional con score IA, justificación y acción ("contactar titular", "preparar oferta", "publicar deal").
+- MapLibre GL con estilo base claro (mismo proveedor que usan `LosVerdesStrategicMap` / `Map3DView` — reutilizar helper de estilo si existe).
+- Capas (toggles arriba a la derecha):
+  - **Concesiones** (fill + line, color por `score` rampa verde→ámbar→rojo).
+  - **Anomalías satelitales** (círculos magenta semi-transp).
+  - **Depósitos** (triángulos azules con label commodity).
+  - **Targets de exploración** (estrellas naranjas).
+- Interacción:
+  - Hover → cursor pointer + outline.
+  - Click en concesión → popup con score, commodity, holder, `ai_thesis` (truncado) y botón **"Ver detalle"** que hace scroll y resalta la fila correspondiente en la tabla existente.
+  - Click en fila de la tabla → `flyTo` al centroide de esa concesión.
+- Auto-fit a bounds del top-N en la primera carga; recarga datos cuando cambia filtro `region` / `minScore` (mismo estado que la tabla).
+- Leyenda fija inferior-izquierda; control de zoom y escala MapLibre estándar.
 
-### 2.1 Tabla `cadastre_opportunities`
+## 3. Integración en la ruta
 
+Editar `src/routes/_authenticated.dashboard.opportunities.tsx`:
+
+- Añadir tabs `Mapa | Tabla | Copiloto` (Shadcn `Tabs`) — la tabla y el copiloto actuales se mantienen sin cambios funcionales.
+- Sincronizar selección: estado compartido `selectedConcessionId` entre mapa y tabla.
+- En tab "Mapa", layout dividido (mapa 70% / panel lateral derecho con top-10 oportunidades clickeables 30%) en desktop; full-width con drawer en mobile.
+
+## 4. Detalles técnicos
+
+- Token-free basemap: usar el mismo estilo claro ya configurado en `LosVerdesStrategicMap` (helper compartido). Si no existe, inline `https://tiles.openfreemap.org/styles/positron`.
+- Carga vía TanStack Query `queryOptions({ queryKey: ['opp-geo', filters], queryFn: () => fetchOppGeo({ data: filters }) })`, `staleTime: 60_000`.
+- Limpieza de capas/sources en `useEffect` cleanup para evitar leaks al cambiar de tab.
+- Manejo de error y empty-state ("Sin oportunidades en el área. Ajusta filtros o recomputa ranking").
+
+## Archivos a tocar / crear
+
+```text
++ src/features/opportunities/OpportunitiesMap.tsx       (nuevo)
++ supabase/migrations/<ts>_opportunities_geo_fn.sql     (nuevo, RPC PostGIS)
+~ src/lib/cadastreOpportunities.functions.ts            (añade getOpportunitiesGeo)
+~ src/routes/_authenticated.dashboard.opportunities.tsx (tabs + estado compartido)
 ```
-id, concession_id (fk cadastre_national), score numeric(5,2),
-commodity_hint text[], deposit_proximity_km numeric, nearest_deposit_id,
-anomaly_overlap_count int, holder_id, holder_risk_score numeric,
-patent_status text, expiry_risk text, ai_thesis text, ai_action text,
-features jsonb, computed_at timestamptz, model text
-```
 
-RLS: lectura `authenticated`, escritura solo `service_role`. Grants estándar.
+## Fuera de alcance (siguiente iteración)
 
-### 2.2 ServerFn `scoreCadastreOpportunities` (admin, super_admin only)
-
-Pipeline en lotes (cron pg_cron diario + trigger manual):
-
-1. Para cada concesión: PostGIS `ST_Distance` al yacimiento más cercano + count de `satellite_anomalies` que intersectan + estado de patente + edad titular + overlaps.
-2. Construye `features` numéricos.
-3. Score heurístico inicial (ponderado) + **explicación LLM** vía Lovable AI Gateway (`google/gemini-3-flash-preview`) que devuelve `ai_thesis` (2-3 frases) y `ai_action` (CTA).
-4. Persiste en `cadastre_opportunities` + `ai_recommendation_traces`.
-
-### 2.3 Ruta `_authenticated.dashboard.opportunities.tsx`
-
-- Tabla rankeada (score, commodity, región, distancia a yacimiento, anomalías, titular, patente, tesis IA).
-- Filtros: commodity, región, score mínimo, riesgo expiración, distancia.
-- Panel lateral con mapa MapLibre mostrando la concesión + yacimientos y anomalías cercanas (reutiliza capas existentes).
-- Acciones: "Crear deal desde concesión", "Añadir a watchlist", "Contactar titular" (usa `concession_holders` + `investor_contacts`).
-
-### 2.4 Geo-Copilot conversacional
-
-- Reutiliza `geo_copilot_conversations`. Nuevo serverFn `askOpportunityCopilot` que recibe pregunta en español ("muéstrame concesiones de cobre en Atacama con anomalía satelital cerca de Codelco") → traduce a filtros SQL + responde con citas a oportunidades.
-
-## Fase 3 — Marketplace y matching inversor (2 días)
-
-1. **Sembrar `investors**` con 8-12 perfiles institucionales reales/plausibles (juniors, fondos, smelters) — vía herramienta `insert`.
-2. `**deal_investor_pipeline` matching**: serverFn `suggestInvestorsForDeal` que cruza `investor_profiles.preferred_commodities/regions/ticket` con el deal.
-3. **Página `dashboard.marketplace**`: ya existe — añadir tab "Sugeridos por IA" con el output de matching.
-
-## Fase 4 — Loop de aprendizaje y diferenciación (1-2 días)
-
-- Captura feedback (👍/👎) en cada recomendación → `ai_recommendation_traces.feedback`.
-- Re-entrenamiento ligero semanal de pesos heurísticos (job pg_cron) usando feedback acumulado.
-- Badge "IA Verified" en deals cuyo target subyacente tenga score > 80 y QP firmado.
-
-## Detalles técnicos
-
-- **Stack**: TanStack Start (`createServerFn` + `requireSupabaseAuth` para lecturas autenticadas; admin client para scoring batch). Sin edge functions nuevas — todo dentro de serverFn / server route.
-- **IA**: Lovable AI Gateway, modelo por defecto `google/gemini-3-flash-preview`; structured output con Zod para `{thesis, action, confidence}`.
-- **Geo**: PostGIS ya instalado (`ST_DWithin`, índices GIST en `geom`).
-- **Cron**: `pg_cron` invoca `/api/public/cron/score-opportunities` (firmado con `WEBHOOK_SECRET`).
-- **Seguridad**: RLS estricta (ya hardenizada esta semana); nada del scoring se expone a `anon`.
-- **Migraciones**: 1 sola — `cadastre_opportunities` + grants + RLS + índices + job pg_cron.
-
-## Entregables al cerrar
-
-1. Landing y dashboard mostrando solo datos vivos del proyecto.
-2. Módulo "Oportunidades IA" con ranking en vivo de las 11k concesiones del catastro nacional.
-3. Geo-Copilot que responde en español sobre oportunidades.
-4. Marketplace con matching inversor↔deal sugerido por IA.
-5. Bucle de feedback persistido para mejorar el modelo.
-
-## Preguntas antes de construir
-
-1. ¿Arranco por **Fase 1 + Fase 2** (datos reales + Oportunidades IA) en esta iteración y dejamos marketplace/feedback para la siguiente?
-2. ¿OK sembrar 8-12 perfiles de inversionistas plausibles (con disclaimer "demo") para que el marketplace no aparezca vacío, o prefieres dejarlo vacío hasta tener inversionistas reales?
-3. ¿El scoring debe correr sobre **todo el catastro nacional (11k)** o limitarlo a regiones con yacimientos conocidos (Atacama, Antofagasta, Coquimbo) para controlar costo IA?
+- 3D / extrusión de score → ya cubierto por `Geology3DViewer`, se enlazará con un botón "Ver en 3D".
+- Edición de polígonos / dibujo de AOI.
+- Clustering de anomalías (lo añadimos si el dataset supera ~2k puntos visibles).

@@ -263,3 +263,31 @@ export const listOpportunities = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { items: rows ?? [] };
   });
+
+// Devuelve GeoJSON listo para MapLibre: concesiones rankeadas + anomalías + yacimientos + targets.
+const GeoInput = z.object({
+  limit: z.number().int().min(1).max(500).default(200),
+  minScore: z.number().min(0).max(100).default(0),
+  region: z.string().optional(),
+});
+
+export const getOpportunitiesGeo = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => GeoInput.parse(d ?? {}))
+  .handler(async ({ data, context }) => {
+    const { data: result, error } = await (context.supabase.rpc as any)("opportunities_geo", {
+      _limit: data.limit,
+      _min_score: data.minScore,
+      _region: data.region ?? null,
+    });
+    if (error) throw new Error(error.message);
+    const r = (result ?? {}) as any;
+    return {
+      concessions: r.concessions ?? { type: "FeatureCollection", features: [] },
+      anomalies: r.anomalies ?? { type: "FeatureCollection", features: [] },
+      deposits: r.deposits ?? { type: "FeatureCollection", features: [] },
+      targets: r.targets ?? { type: "FeatureCollection", features: [] },
+      bbox: (r.bbox as [number, number, number, number] | null) ?? null,
+    };
+  });
+

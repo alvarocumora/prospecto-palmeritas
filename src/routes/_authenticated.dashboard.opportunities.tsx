@@ -4,10 +4,12 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   Sparkles, MapPin, Gauge, AlertTriangle, Layers, Send, Loader2,
-  ArrowUpRight, RefreshCw, Brain,
+  ArrowUpRight, RefreshCw, Brain, Map as MapIcon, Table as TableIcon,
 } from "lucide-react";
 import { listOpportunities, scoreCadastreOpportunities } from "@/lib/cadastreOpportunities.functions";
 import { askOpportunityCopilot } from "@/lib/opportunityCopilot.functions";
+import { OpportunitiesMap } from "@/features/opportunities/OpportunitiesMap";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/opportunities")({
   head: () => ({ meta: [{ title: "Oportunidades IA — Geocapitals" }] }),
@@ -29,8 +31,11 @@ function OpportunitiesPage() {
   const [expiryRisk, setExpiryRisk] = useState("");
   const [maxDist, setMaxDist] = useState<number | "">("");
   const [question, setQuestion] = useState("");
+  const [view, setView] = useState<"map" | "table">("map");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const queryKey = ["opportunities", { region, commodity, minScore, expiryRisk, maxDist }];
+
   const opps = useQuery({
     queryKey,
     queryFn: () =>
@@ -159,15 +164,68 @@ function OpportunitiesPage() {
         />
       </section>
 
-      {/* Tabla */}
+      {/* View tabs */}
       <section className="rounded-xl border bg-card overflow-hidden">
-        <div className="px-5 py-3 border-b flex items-center justify-between">
-          <h2 className="font-semibold flex items-center gap-2">
+        <div className="px-5 py-3 border-b flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-1 rounded-lg bg-muted p-1">
+            <button
+              onClick={() => setView("map")}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                view === "map" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <MapIcon className="h-3.5 w-3.5" /> Mapa
+            </button>
+            <button
+              onClick={() => setView("table")}
+              className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                view === "table" ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <TableIcon className="h-3.5 w-3.5" /> Tabla
+            </button>
+          </div>
+          <h2 className="font-semibold flex items-center gap-2 text-sm">
             <Layers className="h-4 w-4" /> Ranking de oportunidades
           </h2>
           <span className="text-xs text-muted-foreground">{opps.data?.items.length ?? 0} resultados</span>
         </div>
-        {opps.isLoading ? (
+
+        {view === "map" ? (
+          <div className="p-3">
+            <OpportunitiesMap
+              region={region}
+              minScore={minScore}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+            {selectedId && opps.data?.items && (() => {
+              const sel = opps.data.items.find((o: any) => o.concession_id === selectedId);
+              if (!sel) return null;
+              return (
+                <div className="mt-3 rounded-lg border bg-muted/30 p-3 text-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <div className="font-semibold">{sel.holder_name ?? "Concesión"} · score {sel.score}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {sel.region ?? ""}{sel.commune ? ` · ${sel.commune}` : ""} · {sel.area_ha ? `${Number(sel.area_ha).toFixed(0)} ha` : ""}
+                      </div>
+                      {sel.ai_thesis && <p className="text-xs mt-2 max-w-2xl">{sel.ai_thesis}</p>}
+                      {sel.ai_action && (
+                        <p className="text-xs mt-1 text-blue-700 inline-flex items-center gap-1">
+                          <ArrowUpRight className="h-3 w-3" /> {sel.ai_action}
+                        </p>
+                      )}
+                    </div>
+                    <button onClick={() => setSelectedId(null)} className="text-xs text-muted-foreground hover:text-foreground">
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        ) : opps.isLoading ? (
           <div className="p-8 text-center text-sm text-muted-foreground">
             <Loader2 className="h-5 w-5 animate-spin inline mr-2" /> Cargando…
           </div>
@@ -193,7 +251,13 @@ function OpportunitiesPage() {
               </thead>
               <tbody>
                 {opps.data.items.map((o: any) => (
-                  <tr key={o.id} className="border-t hover:bg-muted/20">
+                  <tr
+                    key={o.id}
+                    onClick={() => { setSelectedId(o.concession_id); setView("map"); }}
+                    className={`border-t cursor-pointer transition ${
+                      selectedId === o.concession_id ? "bg-amber-500/10" : "hover:bg-muted/20"
+                    }`}
+                  >
                     <td className="px-3 py-2">
                       <span
                         className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
@@ -253,6 +317,7 @@ function OpportunitiesPage() {
           </div>
         )}
       </section>
+
 
       <p className="text-xs text-muted-foreground text-center">
         <AlertTriangle className="h-3 w-3 inline mr-1" />
