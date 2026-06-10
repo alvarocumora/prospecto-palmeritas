@@ -28,6 +28,7 @@ const FALLBACK_CENTER: [number, number] = [-70.4, -29.5];
 const FALLBACK_ZOOM = 4.4;
 
 export function HeroLiveMap() {
+  const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
   const styleReadyRef = useRef(false);
