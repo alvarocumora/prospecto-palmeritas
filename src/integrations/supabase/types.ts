@@ -13221,6 +13221,27 @@ export type Database = {
           status: string
         }[]
       }
+      get_my_investor_profile: {
+        Args: never
+        Returns: {
+          accepted_standards: string[]
+          commodities: string[]
+          company_name: string
+          country: string
+          created_at: string
+          full_name: string
+          id: string
+          investor_type: string
+          notes: string
+          phone: string
+          review_status: string
+          ticket_max_usd: number
+          ticket_min_usd: number
+          updated_at: string
+          user_id: string
+          website: string
+        }[]
+      }
       get_org_plan: {
         Args: { _org_id: string }
         Returns: {
@@ -13344,6 +13365,25 @@ export type Database = {
           registration_body: string
           updated_at: string
           user_id: string
+        }[]
+      }
+      list_term_sheet_shares: {
+        Args: { _project_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          invitee_email: string
+          label: string
+          last_viewed_at: string
+          max_uses: number
+          project_id: string
+          revoked: boolean
+          revoked_at: string
+          revoked_by: string
+          slug: string
+          view_count: number
         }[]
       }
       lv_user_can_access_project: {
