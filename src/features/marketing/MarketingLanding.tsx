@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPlatformStats } from "@/lib/platformStats.functions";
 import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
-import { ContactForm } from "@/features/marketing/ContactForm";
+
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
 import {
@@ -69,8 +69,7 @@ export function MarketingLanding() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                to="/proyectos"
-                hash="publicar"
+                to="/contacto"
                 className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95"
               >
                 {t("cta_publish")} <ArrowRight className="w-4 h-4" />
@@ -413,26 +412,6 @@ export function MarketingLanding() {
             <span className="flex items-center gap-2"><Globe2 className="w-3.5 h-3.5" /> Multi-jurisdicción</span>
           </div>
         </div>
-      </section>
-
-      {/* Contacto embebido */}
-      <section id="contacto" className="max-w-7xl mx-auto px-5 py-20 grid lg:grid-cols-[1fr_1.2fr] gap-12 items-start">
-        <div>
-          <p className="brand-eyebrow mb-3">Hablemos</p>
-          <h2 className="brand-display text-3xl md:text-4xl text-[var(--brand-navy-deep)] leading-tight">
-            ¿Listo para integrar tu proyecto o desplegar capital?
-          </h2>
-          <p className="mt-4 text-[var(--brand-mute)] max-w-md">
-            Déjanos un mensaje y agendamos una sesión de 30 minutos con un Qualified Person del equipo. Respondemos en
-            menos de 24 horas hábiles.
-          </p>
-          <div className="mt-6 space-y-2 text-sm text-[var(--brand-ink)]">
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)]" /> Demo guiada de la plataforma</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)]" /> Evaluación inicial de tu proyecto</div>
-            <div className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)]" /> NDA bajo solicitud</div>
-          </div>
-        </div>
-        <ContactForm source="landing-home" compact />
       </section>
 
       <MarketingFooter />
