@@ -120,12 +120,11 @@ export function MarketingFooter() {
         </div>
 
         <div>
-          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-gold)] mb-3">Producto</div>
+          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-gold)] mb-3">Plataforma</div>
           <ul className="space-y-2">
-            <li><Link to="/proyectos" className="hover:text-white">Proyectos</Link></li>
-            <li><Link to="/inversionistas" className="hover:text-white">Inversionistas</Link></li>
-            <li><Link to="/empresas" className="hover:text-white">Empresas</Link></li>
-            <li><Link to="/terminal" className="hover:text-white">Terminal</Link></li>
+            <li><Link to="/terminal" className="hover:text-white">Terminal en vivo</Link></li>
+            <li><Link to="/catastro" className="hover:text-white">Catastro público</Link></li>
+            <li><Link to="/auth" className="hover:text-white">Iniciar sesión</Link></li>
           </ul>
         </div>
         <div>
@@ -133,7 +132,7 @@ export function MarketingFooter() {
           <ul className="space-y-2">
             <li><Link to="/recursos" className="hover:text-white">Recursos</Link></li>
             <li><Link to="/contacto" className="hover:text-white">Contacto</Link></li>
-            <li><Link to="/auth" className="hover:text-white">Iniciar sesión</Link></li>
+            <li><a href="mailto:info@geocapitals.com" className="hover:text-white">info@geocapitals.com</a></li>
           </ul>
         </div>
       </div>
