@@ -1,105 +1,110 @@
-# Landing + Shell unificado de Geocapitals
+# Auditoría + Plan de mejoras — Landing, Inversionistas y Shell
 
-Objetivo: el landing muestra un mapa real (no mock estático), el "giro" del proceso se siente vivo, el dashboard interior comparte el mismo lenguaje visual (un solo shell), las rutas/botones/contacto del landing dejan de ser anclas rotas, y todo queda documentado en un único MD maestro.
+## 1. Hallazgos clave de la auditoría y aún no funciona en la ruta pública y dominio muestra error 500 
 
-## 1. Hero del landing: mapa real en vez de mock
+### A. Shell fragmentado (3 sistemas conviviendo)
 
-Archivo: `src/features/marketing/MarketingLanding.tsx` (reemplaza el "Hero card mock" actual, líneas ~240-274).
 
-- Nuevo componente `src/features/marketing/HeroLiveMap.tsx`:
-  - MapLibre con basemap Esri satélite (mismo helper que `OpportunitiesMap` y `LosVerdesStrategicMap`), centrado en Chile minero (-70.5, -27.5, zoom 4.6), interactivo pero con `cooperativeGestures` para que no robe scroll.
-  - Carga vía nueva serverFn pública `getLandingMapData` (`src/lib/landingMap.functions.ts`, usa `supabaseAdmin` dentro del handler — sin `requireSupabaseAuth` para que el landing público funcione en SSR):
-    - top 25 `cadastre_opportunities` con `score >= 50` → polígonos coloreados por score.
-    - top 80 `mineral_deposits` (puntos) y top 80 `satellite_anomalies` (puntos).
-    - solo columnas seguras (nombre, score, commodity, región) — sin PII.
-  - Overlay encima del mapa: tarjeta translúcida con las 3 métricas clave (proyectos, anomalías, targets) y dos badges flotantes ("LIVE · Chile" pulse dorado, "Powered by PostGIS").
-  - Leyenda compacta abajo-izquierda y botón **"Abrir en Terminal"** → `/terminal`.
-- Manejo de error/empty: si la serverFn falla o el dataset está vacío, cae al mock actual (no romper SSR).
+| Zona                                                                        | Shell                                               | Tokens                                     | Problema                                     |
+| --------------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------ | -------------------------------------------- |
+| `/`, `/proyectos`, `/inversionistas`, `/empresas`, `/recursos`, `/contacto` | `MarketingShell` (header blanco + footer navy)      | `--brand-*`                                | OK, coherente                                |
+| `/terminal`, `/terminal.market`, etc.                                       | `TerminalShell` propio (top bar + ticker + sidebar) | `bg-background`, `text-foreground`, `gold` | Otro sistema visual sin puente con marketing |
+| `/dashboard/*` (45 rutas)                                                   | Cada una con su layout interno                      | Mezcla shadcn + brand                      | Sin top-bar/breadcrumb unificado             |
+| `/catastro/*`, `/live/*`                                                    | Shells parciales                                    | Mezcla                                     | Sin header común                             |
 
-## 2. "Giro" del proceso: rueda viva
 
-Archivo: misma página, sección "For owners + process" (líneas ~314-342).
+### B. Landing map (HeroLiveMap)
 
-- Mantener la rueda SVG pero:
-  - Animar rotación continua lenta del círculo punteado (`@keyframes brand-spin 40s linear infinite`).
-  - Los 4 nodos (Publica · Conecta · Negocia · Cierra) **no** rotan; en su lugar reciben un highlight secuencial cada 3s (paso activo en `--brand-blue`, resto en gris) controlado por `useState` + `setInterval`.
-  - El nodo central pasa de "G" estático a marca pulsante: anillo `bg-[var(--brand-blue-soft)]` + halo `box-shadow` que respira (`@keyframes brand-pulse 2.4s ease-in-out infinite`).
-  - Línea de conexión animada entre nodo central y nodo activo (SVG `stroke-dasharray` animado).
-- Definir `@keyframes brand-spin` y `brand-pulse` en `src/styles.css` dentro del bloque `brand-light`.
+- Toggle Listings/Potential bien, pero el mapa sólo ocupa la mitad derecha del hero; en mobile (440px) queda chico y los pills se tapan.
+- Click en marker Listings abre popup pero **no enlaza a detalle del deal** (`/proyectos` genérico).
+- Sin filtros rápidos (commodity, país, ticket).
+- Sin "feed" lateral con los listados visibles (mapa+lista sincronizados como Bloomberg/Zillow).
+- Mode "Potential" muestra score sin leyenda numérica clara.
 
-## 3. Rutas + botones + contacto del landing
+### C. `/inversionistas`
 
-El header tiene `#section-0..3` (anclas rotas) y el bloque de contacto solo muestra texto. Lo arreglamos:
+- Página estática: 4 cards de beneficios + tickets + 2 CTAs + ContactForm.
+- **No muestra deal-flow real** (los `property_listings` ya existen y los carga el mapa, pero esta página no los lista).
+- Sin tabla/cards de oportunidades, sin filtros, sin "match" por preferencias.
+- CTA "Ver terminal" lleva al terminal vacío para no autenticados.
 
-- **Header nav** apunta a rutas reales:
-  - "Proyectos" → `/proyectos` (nueva)
-  - "Inversionistas" → `/inversionistas` (nueva)
-  - "Empresas" → `/empresas` (nueva)
-  - "Recursos" → `/recursos` (nueva)
-- Nuevas páginas (todas con `head()` propio, scroll a top, mismo shell visual):
-  - `src/routes/proyectos.tsx` — grid de proyectos públicos (lee `live.*` existentes: Palmeras, Los Verdes, Tilama, Franco) + CTA "Publica el tuyo" → `/auth`.
-  - `src/routes/inversionistas.tsx` — propuesta de valor para fondos + form (lead capture) que llama serverFn `submitInvestorLead`.
-  - `src/routes/empresas.tsx` — pricing/planes institucionales (3 tiers, redirige a `/contacto`).
-  - `src/routes/recursos.tsx` — links a los MD públicos (`/recursos/onepager`, NI 43-101 demo, whitepaper).
-  - `src/routes/contacto.tsx` — form real (`nombre, email, organización, mensaje, tipo: owner|investor|qp`) que llama serverFn `submitContactMessage` y crea fila en una tabla nueva `contact_messages` con RLS (insert público anónimo, select solo `is_super_admin`).
-- Migration para `public.contact_messages` (id, name, email, org, role, message, source, created_at) + GRANTs + RLS (`INSERT TO anon, authenticated`; `SELECT` vía `has_role(auth.uid(),'super_admin')`).
-- Reemplazar las anclas (`href="#section-N"`) por `<Link to>` y los IDs `section-*` por anclas semánticas reales o eliminarlos.
-- Sección "Join" inferior del landing: el bloque actual con `info@geocapitals.com` se vuelve un mini-form embebido (mismo componente que `/contacto`) + el botón "Sign up" pasa al lado derecho de un layout limpio.
-- CTAs del hero:
-  - "Publica tu proyecto" → `/proyectos#publicar` (con anchor real)
-  - "Explorar oportunidades" → `/terminal` (ya existe, lo mantenemos)
+### D. Inconsistencias menores
 
-## 4. Shell unificado interior + exterior
+- `MarketingLanding` tiene sección "Contacto embebido" con `id="contacto"` Y existe ruta `/contacto`: duplicación.
+- Hero CTA "Publica" usa `hash="publicar"` en `/proyectos` sin ancla destino.
+- Ticker `Geocapitals Terminal` en TerminalShell usa color `text-gold` y el resto de marketing usa `--brand-gold`: mismo color, dos nombres.
+- Wheel del proceso (`brand-spin-slow`) sólo visible `lg:block` → mobile pierde el "giro" del que habla la marca.
+- Footer marketing repite enlaces que también están en header; "Iniciar sesión" en footer va a `/auth` (signup mezclado).
 
-Hoy el dashboard interior no comparte tokens con el landing (interior usa `bg-background`/`foreground` shadcn, exterior usa `--brand-*`). Los unificamos sin romper componentes shadcn:
+---
 
-- En `src/styles.css`, dentro de `:root` y `.dark`, **mapear** los tokens shadcn al brand:
-  - `--background` → blanco roto del landing, `--foreground` → `--brand-ink`, `--primary` → `--brand-blue`, `--secondary` → `--brand-navy-deep`, `--accent` → `--brand-gold`, `--border` → `--brand-hair`, `--ring` → `--brand-blue`, `--card`/`--popover` siguen blancos.
-  - Tipografías: `--font-display: "Space Grotesk"`, `--font-sans: "Inter"`, `--font-mono: "JetBrains Mono"` (ya cargadas en `__root.tsx`).
-- Nuevo componente `src/components/layout/AppShell.tsx` que envuelve TODO `_authenticated/dashboard.*`:
-  - Header sticky idéntico al del landing (BrandMark + nav del módulo + lang/user) sobre fondo `bg-white/90 backdrop-blur` con `border-[var(--brand-hair)]`.
-  - Sidebar/aside opcional (collapse en mobile) reutilizable.
-  - Footer compacto en `bg-[var(--brand-navy-deep)]` igual al landing.
-- Aplicar `AppShell` a `_authenticated.tsx` (layout pathless), de forma que todas las páginas internas hereden la cabecera/footer sin reescribir cada ruta. Los componentes shadcn dentro siguen funcionando porque los tokens se mantienen.
-- Resultado: usuario abre landing → entra a `/auth` → cae en `/dashboard` y el header/colores/tipografía son los mismos. Sin "ruptura" entre exterior e interior.
+## 2. Plan de mejoras (4 frentes, orden de ejecución)
 
-## 5. Un solo MD maestro
+### Frente 1 — Shell unificado (base del sistema)
 
-Hoy hay 5 docs (`plan.md`, `DIAGNOSTICO_SAAS_ARQUITECTURA.md`, `PLAN_MEJORA_ARQUITECTURA_PLATAFORMA.md`, `ROADMAP_MVP_GEOCAPITALS.md`, `STATUS.md`). Los consolidamos:
+Objetivo: una sola gramática visual para Marketing, Terminal y Dashboard.
 
-- Crear `GEOCAPITALS.md` (raíz) como **única fuente de verdad** con secciones:
-  1. **Producto y propuesta** (qué es Geocapitals, audiencia).
-  2. **Arquitectura** (TanStack Start, Lovable Cloud, PostGIS, AI Gateway, 35 funciones, 135 tablas).
-  3. **Sistema de diseño** (paleta `--brand-*` en oklch, fuentes Space Grotesk + Inter + JetBrains Mono, tokens shadcn mapeados, escalas, sombras, `brand-display`/`brand-eyebrow`).
-  4. **Shell unificado** (header/sidebar/footer compartidos landing↔dashboard).
-  5. **Mapa de rutas públicas** (`/`, `/proyectos`, `/inversionistas`, `/empresas`, `/recursos`, `/contacto`, `/terminal`, `/auth`, `/catastro`, `/live.*`) y **rutas autenticadas** (resumen del árbol `_authenticated/dashboard.*`).
-  6. **Inventario de botones y CTAs** del landing — qué hace cada uno, a dónde lleva, qué evento dispara.
-  7. **Contacto y captación** (formulario, tabla `contact_messages`, política de respuesta, integraciones futuras).
-  8. **Pendientes** (lo que queda fuera de este sprint).
-- Marcar los 5 docs viejos como deprecados con un banner al inicio que apunta a `GEOCAPITALS.md`, o moverlos a `.lovable/archive/` si el usuario lo prefiere (en este sprint los movemos a `docs/legacy/`).
+1. Crear `src/components/shell/AppShell.tsx` con tres variantes:
+  - `variant="marketing"` → header blanco translúcido + footer navy (actual `MarketingShell`).
+  - `variant="terminal"` → top bar oscura compacta + ticker opcional + sidebar opcional.
+  - `variant="workspace"` → top bar + breadcrumb + slot lateral (para `/dashboard/*`).
+2. Unificar tokens en `src/styles.css`: alias `--gold` → `--brand-gold`, `--background-app` único; eliminar duplicados.
+3. `BrandMark`, `LangToggle`, `UserMenu` extraídos a `src/components/shell/` y reutilizados por las 3 variantes.
+4. Reemplazar `MarketingShell` y `TerminalShell` por wrappers delgados sobre `AppShell`.
+5. Añadir mismo `<head>` defaults (favicon, viewport, OG fallbacks) vía un helper `withMeta()` reutilizado por todas las rutas.
 
-## Archivos a tocar / crear
+### Frente 2 — Landing map rediseñado (más útil, más vivo)
 
-```text
-+ src/features/marketing/HeroLiveMap.tsx          (nuevo, MapLibre)
-+ src/lib/landingMap.functions.ts                 (serverFn pública, supabaseAdmin)
-+ src/lib/contactMessages.functions.ts            (submitContactMessage + submitInvestorLead)
-+ src/routes/proyectos.tsx                        (nueva)
-+ src/routes/inversionistas.tsx                   (nueva)
-+ src/routes/empresas.tsx                         (nueva)
-+ src/routes/recursos.tsx                         (nueva)
-+ src/routes/contacto.tsx                         (nueva, form real)
-+ src/components/layout/AppShell.tsx              (header+footer compartidos)
-+ supabase/migrations/<ts>_contact_messages.sql   (tabla + RLS + GRANT)
-+ GEOCAPITALS.md                                  (doc maestro único)
-~ src/features/marketing/MarketingLanding.tsx     (hero map + giro animado + nav real + contacto)
-~ src/styles.css                                  (tokens shadcn ↔ --brand-*, keyframes brand-spin/pulse)
-~ src/routes/_authenticated.tsx                   (envolver con AppShell)
-~ docs/legacy/                                    (mover los 5 MD viejos con banner deprecated)
-```
+Objetivo: que el mapa sea el corazón del landing, no un adorno.
 
-## Fuera de alcance
+1. Subir hero map a **layout split 60/40**: mapa a la izquierda (más grande), copy a la derecha. En mobile, mapa primero a pantalla casi completa.
+2. Añadir **panel lateral "Live deals"** sincronizado con el mapa: lista los listings visibles en el viewport; hover → highlight marker; click → drawer con detalle (precio, modalidad, ha, commodity, owner anonimizado) y CTA "Solicitar acceso a data room".
+3. Filtros rápidos sobre el mapa: chips de commodity (Au, Cu, Li, Ag…), país (CL/PE/AR), modalidad (Sale/JV/Royalty), ticket (slider USD).
+4. Popups con link a `/inversionistas?listing=<id>` (deep-link al drawer en la página de inversores).
+5. Leyenda de score con escala 0-100 + tooltip explicativo en modo Potential.
+6. Wheel del proceso: convertir a una franja horizontal compacta debajo del mapa, visible en mobile.
 
-- Rediseño visual completo del dashboard (solo unificamos header/footer/tokens; los módulos internos mantienen su layout actual).
-- Internacionalización de las nuevas rutas (`/proyectos`, etc.) — quedan en español; toggle ES/EN se mantiene solo en `/`.
-- Envío real de email desde el form de contacto (queda como fila en DB + notificación in-app; integración SMTP la dejamos para el próximo sprint).
+### Frente 3 — `/inversionistas` con deal-flow real
+
+Objetivo: dejar de ser brochure y convertirse en la vitrina real de oportunidades.
+
+1. Sección **"Oportunidades activas"** arriba: grid de cards reutilizando `ListingCard` (ya existe en `src/modules/deals/ui/`).
+  - Server fn nueva `getPublicListings()` que devuelve listings publicados (sin PII del owner).
+  - Filtros: commodity, modalidad, país, ticket, área (ha).
+  - Empty state honesto si no hay data.
+2. **Mini-mapa embebido** (variante de HeroLiveMap en modo "listings" sólo, sin toggle) sincronizado con los filtros de la lista.
+3. Drawer de detalle reutilizando `ListingDetailDrawer` con CTA "Solicitar acceso al data room" → crea registro en `contact_messages` con `source=listing:<id>`.
+4. Conservar benefits + tickets institucionales como segunda sección (after-the-fold).
+5. Deep-link `/inversionistas?listing=<id>` abre drawer al cargar.
+
+### Frente 4 — Limpieza de rutas, botones y contacto
+
+1. Eliminar sección "Contacto embebido" del landing y reemplazar por un CTA limpio que linkee a `/contacto` (single source of truth). Mantener un único formulario.
+2. Resolver `hash="publicar"`: añadir sección `#publicar` real en `/proyectos` o cambiar CTA a `/contacto?intent=publicar`.
+3. Footer: dejar sólo links que NO están en header (Recursos, Contacto, Legal). Quitar duplicados.
+4. Botones "Sign in" / "Iniciar sesión" / "Solicitar acceso" → 2 acciones nombradas consistentemente: `Iniciar sesión` (login) y `Solicitar acceso` (signup institucional con form, no `/auth` directo).
+5. Auditar todos los `<Link>` del landing y de `/inversionistas` con un test simple (`src/test/landing-links.test.ts`) que importe el `routeTree.gen.ts` y verifique que cada `to=` existe.
+6. Actualizar `GEOCAPITALS.md` con la nueva arquitectura del shell + mapa de rutas + decisiones de diseño.
+
+---
+
+## 3. Detalles técnicos
+
+- **AppShell**: TanStack `<Outlet/>` adentro; props `variant`, `topBar?`, `sidebar?`, `ticker?`, `head?`. No reescribe rutas, sólo envuelve el contenido del componente.
+- **getPublicListings server fn**: `src/lib/publicListings.functions.ts`, sin auth, filtra `is_published=true`, devuelve campos seguros. Reusa supabaseAdmin dentro del handler.
+- **Sync mapa↔lista**: estado en el padre `<InvestorsPage>` con `bounds` + `filters`; pasa a ambos hijos.
+- **Drawer deep-link**: usar `useSearch()` de TanStack Router (`?listing=<uuid>`); validar con Zod.
+- **Tests**: vitest, sólo el link-checker y un smoke de render del AppShell con cada variante.
+
+## 4. Entregables por orden
+
+1. PR/cambio 1: AppShell + tokens unificados + migración de Marketing/Terminal shells.
+2. PR/cambio 2: HeroLiveMap rediseñado (split + panel + filtros + deep-link).
+3. PR/cambio 3: `/inversionistas` deal-flow real (server fn + lista + mini-mapa + drawer).
+4. PR/cambio 4: limpieza de contacto/footer/CTAs + link-checker + actualización `GEOCAPITALS.md`.
+
+## 5. Fuera de alcance (explícito)
+
+- Sin tocar `/dashboard/*` salvo envolverlo con `AppShell variant="workspace"` (sin rediseñar paneles internos).
+- Sin cambios en RLS ni en edge functions existentes; las funciones nuevas son read-only.
+- Sin cambios al sistema bilingüe ya activo (sólo se traducen strings nuevos).
