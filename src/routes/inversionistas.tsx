@@ -1,15 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, ShieldCheck, Database, LineChart, Lock, ArrowRight } from "lucide-react";
+import { z } from "zod";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { ContactForm } from "@/features/marketing/ContactForm";
+import { DealFlow } from "@/features/marketing/DealFlow";
+
+const searchSchema = z.object({
+  listing: z.string().uuid().optional(),
+});
 
 export const Route = createFileRoute("/inversionistas")({
+  validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
       { title: "Inversionistas — Geocapitals" },
-      { name: "description", content: "Acceso institucional a proyectos mineros verificados, due diligence acelerado y data rooms cifrados." },
+      { name: "description", content: "Deal-flow minero verificado: oportunidades activas, due diligence acelerado y data rooms cifrados." },
       { property: "og:title", content: "Inversionistas — Geocapitals" },
-      { property: "og:description", content: "Diversifica con exposición a minería bajo estándares NI 43-101." },
+      { property: "og:description", content: "Acceso institucional a proyectos mineros con trazabilidad NI 43-101." },
     ],
   }),
   component: InvPage,
@@ -23,14 +30,32 @@ const BENEFITS = [
 ];
 
 function InvPage() {
+  const { listing } = Route.useSearch();
   return (
     <MarketingPage
       eyebrow="Inversionistas"
-      title="Capital institucional para minería moderna"
-      intro="Accede a un universo curado de proyectos mineros, con due diligence acelerado y trazabilidad NI 43-101 sobre una capa de datos georreferenciada."
+      title="Deal-flow minero verificado, en una sola pantalla"
+      intro="Accede a oportunidades activas en venta, joint venture y royalty con due diligence acelerado y trazabilidad NI 43-101 sobre una capa de datos georreferenciada."
     >
-      <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12">
+      {/* Deal flow ARRIBA — el corazón de la página */}
+      <div className="mb-16">
+        <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
+          <div>
+            <p className="brand-eyebrow mb-2">Oportunidades activas</p>
+            <h2 className="font-display text-2xl text-[var(--brand-navy-deep)]">Proyectos publicados</h2>
+          </div>
+          <Link to="/contacto" className="text-sm text-[var(--brand-blue)] inline-flex items-center gap-1.5 hover:gap-2 transition-all font-medium">
+            Solicitar acceso institucional <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <DealFlow initialListingId={listing} />
+      </div>
+
+      {/* Beneficios + ContactForm side-by-side */}
+      <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 pt-10 border-t border-[var(--brand-hair)]">
         <div>
+          <p className="brand-eyebrow mb-3">Por qué Geocapitals</p>
+          <h2 className="font-display text-2xl text-[var(--brand-navy-deep)] mb-6">Capital institucional para minería moderna</h2>
           <ul className="grid sm:grid-cols-2 gap-5">
             {BENEFITS.map(({ i: Icon, t, d }) => (
               <li key={t} className="rounded-xl border border-[var(--brand-hair)] bg-white p-5">
@@ -43,8 +68,8 @@ function InvPage() {
             ))}
           </ul>
 
-          <div className="mt-10 rounded-xl border border-[var(--brand-hair)] bg-[var(--brand-blue-soft)] p-6">
-            <p className="brand-eyebrow mb-2">Tickets institucionales</p>
+          <div className="mt-8 rounded-xl border border-[var(--brand-hair)] bg-[var(--brand-blue-soft)] p-6">
+            <p className="brand-eyebrow mb-3">Tickets institucionales</p>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
                 { v: "USD 250K+", l: "Equity en juniors" },
@@ -59,15 +84,12 @@ function InvPage() {
             </div>
           </div>
 
-          <div className="mt-10 flex flex-wrap items-center gap-3">
+          <div className="mt-8 flex flex-wrap items-center gap-3">
             <Link to="/terminal" className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium">
-              Ver el terminal <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link to="/auth" className="inline-flex items-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium hover:bg-[var(--brand-blue-soft)]">
-              Solicitar acceso
+              Explorar terminal en vivo <ArrowRight className="w-4 h-4" />
             </Link>
             <span className="inline-flex items-center gap-2 text-[11px] font-mono text-[var(--brand-mute)]">
-              <Lock className="w-3.5 h-3.5" /> Cifrado AES-256
+              <Lock className="w-3.5 h-3.5" /> Cifrado AES-256 · KYC / AML
             </span>
           </div>
         </div>
