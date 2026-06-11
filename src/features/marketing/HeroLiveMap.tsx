@@ -45,8 +45,10 @@ export function HeroLiveMap() {
   const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
-  const popupRef = useRef<Popup | null>(null);
+  const popupRef = useRef<MLPopup | null>(null);
+  const mlRef = useRef<typeof import("maplibre-gl") | null>(null);
   const styleReadyRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<Mode>("listings");
 
   const fetchMap = useServerFn(getLandingMapData);
@@ -54,32 +56,40 @@ export function HeroLiveMap() {
     queryKey: ["landing-map"],
     queryFn: () => fetchMap(),
     staleTime: 5 * 60_000,
+    enabled: mounted,
   });
 
-  // init map
+  // init map (client-only, lazy)
   useEffect(() => {
+    let cancelled = false;
+    setMounted(true);
     if (!containerRef.current || mapRef.current) return;
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: STYLE,
-      center: FALLBACK_CENTER,
-      zoom: FALLBACK_ZOOM,
-      attributionControl: { compact: true },
-      cooperativeGestures: true,
-      interactive: true,
-      pitchWithRotate: false,
+    loadMaplibre().then((ml) => {
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      mlRef.current = ml;
+      const map = new ml.Map({
+        container: containerRef.current,
+        style: STYLE,
+        center: FALLBACK_CENTER,
+        zoom: FALLBACK_ZOOM,
+        attributionControl: { compact: true },
+        cooperativeGestures: true,
+        interactive: true,
+        pitchWithRotate: false,
+      });
+      map.addControl(
+        new ml.NavigationControl({ visualizePitch: false, showCompass: false }),
+        "top-right",
+      );
+      map.on("load", () => {
+        styleReadyRef.current = true;
+      });
+      mapRef.current = map;
     });
-    map.addControl(
-      new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }),
-      "top-right",
-    );
-    map.on("load", () => {
-      styleReadyRef.current = true;
-    });
-    mapRef.current = map;
     return () => {
+      cancelled = true;
       popupRef.current?.remove();
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
       styleReadyRef.current = false;
     };
