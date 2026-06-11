@@ -79,7 +79,8 @@ export function useQualifiedPersons() {
         { data: rData, error: rErr },
         { data: sData, error: sErr },
       ] = await Promise.all([
-        supabase.from("qualified_persons").select("*").order("full_name"),
+        // Directorio seguro: sin firma, CV, licencia ni historial CDV de terceros
+        supabase.rpc("list_qualified_persons_directory"),
         supabase
           .from("technical_reports")
           .select("*")
@@ -94,7 +95,15 @@ export function useQualifiedPersons() {
       if (qpErr) throw qpErr;
       if (rErr) throw rErr;
       if (sErr) throw sErr;
-      setQps((qpData ?? []) as QualifiedPerson[]);
+      const dirRows = (qpData ?? []) as Array<Partial<QualifiedPerson>>;
+      setQps(
+        dirRows.map((r) => ({
+          license_no: "",
+          cv_url: null,
+          signature_url: null,
+          ...r,
+        })) as QualifiedPerson[],
+      );
       setReports((rData ?? []) as TechnicalReport[]);
       setSections((sData ?? []) as ReportSection[]);
       setError(null);

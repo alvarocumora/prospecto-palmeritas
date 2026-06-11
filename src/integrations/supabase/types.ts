@@ -13328,6 +13328,24 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      list_qualified_persons_directory: {
+        Args: never
+        Returns: {
+          accreditation_grade: string
+          accreditation_type: string
+          bio: string
+          competency_areas: string[]
+          country: string
+          created_at: string
+          full_name: string
+          id: string
+          is_verified: boolean
+          profession: string
+          registration_body: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       lv_user_can_access_project: {
         Args: { _project_id: string }
         Returns: boolean
