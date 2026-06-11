@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPlatformStats } from "@/lib/platformStats.functions";
 import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
-import { ContactForm } from "@/features/marketing/ContactForm";
+
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
 import {
