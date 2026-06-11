@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { Map as MLMap, Popup } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import type { Map as MLMap, Popup as MLPopup } from "maplibre-gl";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Satellite, Radar, Activity, ArrowRight, Briefcase, Sparkles } from "lucide-react";
 import { getLandingMapData } from "@/lib/landingMap.functions";
 import { useLocale } from "@/features/marketing/i18n";
+
+// maplibre-gl touches `window` at import time — load it only in the browser.
+let _maplibre: typeof import("maplibre-gl") | null = null;
+async function loadMaplibre() {
+  if (_maplibre) return _maplibre;
+  const [mod] = await Promise.all([
+    import("maplibre-gl"),
+    import("maplibre-gl/dist/maplibre-gl.css"),
+  ]);
+  _maplibre = mod.default ? (mod as any) : mod;
+  return _maplibre!;
+}
 
 const STYLE: any = {
   version: 8,
@@ -34,8 +45,10 @@ export function HeroLiveMap() {
   const { t } = useLocale();
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
-  const popupRef = useRef<Popup | null>(null);
+  const popupRef = useRef<MLPopup | null>(null);
+  const mlRef = useRef<typeof import("maplibre-gl") | null>(null);
   const styleReadyRef = useRef(false);
+  const [mounted, setMounted] = useState(false);
   const [mode, setMode] = useState<Mode>("listings");
 
   const fetchMap = useServerFn(getLandingMapData);
@@ -43,32 +56,40 @@ export function HeroLiveMap() {
     queryKey: ["landing-map"],
     queryFn: () => fetchMap(),
     staleTime: 5 * 60_000,
+    enabled: mounted,
   });
 
-  // init map
+  // init map (client-only, lazy)
   useEffect(() => {
+    let cancelled = false;
+    setMounted(true);
     if (!containerRef.current || mapRef.current) return;
-    const map = new maplibregl.Map({
-      container: containerRef.current,
-      style: STYLE,
-      center: FALLBACK_CENTER,
-      zoom: FALLBACK_ZOOM,
-      attributionControl: { compact: true },
-      cooperativeGestures: true,
-      interactive: true,
-      pitchWithRotate: false,
+    loadMaplibre().then((ml) => {
+      if (cancelled || !containerRef.current || mapRef.current) return;
+      mlRef.current = ml;
+      const map = new ml.Map({
+        container: containerRef.current,
+        style: STYLE,
+        center: FALLBACK_CENTER,
+        zoom: FALLBACK_ZOOM,
+        attributionControl: { compact: true },
+        cooperativeGestures: true,
+        interactive: true,
+        pitchWithRotate: false,
+      });
+      map.addControl(
+        new ml.NavigationControl({ visualizePitch: false, showCompass: false }),
+        "top-right",
+      );
+      map.on("load", () => {
+        styleReadyRef.current = true;
+      });
+      mapRef.current = map;
     });
-    map.addControl(
-      new maplibregl.NavigationControl({ visualizePitch: false, showCompass: false }),
-      "top-right",
-    );
-    map.on("load", () => {
-      styleReadyRef.current = true;
-    });
-    mapRef.current = map;
     return () => {
+      cancelled = true;
       popupRef.current?.remove();
-      map.remove();
+      mapRef.current?.remove();
       mapRef.current = null;
       styleReadyRef.current = false;
     };
@@ -196,7 +217,7 @@ export function HeroLiveMap() {
               <div style="font-size:12px;color:#0b2a5b;margin-top:4px"><b>${price}</b></div>
             </div>`;
           popupRef.current?.remove();
-          popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 12 })
+          popupRef.current = new mlRef.current!.Popup({ closeButton: true, offset: 12 })
             .setLngLat((f.geometry as any).coordinates)
             .setHTML(html)
             .addTo(map);
