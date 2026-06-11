@@ -217,7 +217,7 @@ export function HeroLiveMap() {
               <div style="font-size:12px;color:#0b2a5b;margin-top:4px"><b>${price}</b></div>
             </div>`;
           popupRef.current?.remove();
-          popupRef.current = new maplibregl.Popup({ closeButton: true, offset: 12 })
+          popupRef.current = new mlRef.current!.Popup({ closeButton: true, offset: 12 })
             .setLngLat((f.geometry as any).coordinates)
             .setHTML(html)
             .addTo(map);
