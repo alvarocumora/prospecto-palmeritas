@@ -1,12 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { Map as MLMap, Popup } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
+import type { Map as MLMap, Popup as MLPopup } from "maplibre-gl";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { Satellite, Radar, Activity, ArrowRight, Briefcase, Sparkles } from "lucide-react";
 import { getLandingMapData } from "@/lib/landingMap.functions";
 import { useLocale } from "@/features/marketing/i18n";
+
+// maplibre-gl touches `window` at import time — load it only in the browser.
+let _maplibre: typeof import("maplibre-gl") | null = null;
+async function loadMaplibre() {
+  if (_maplibre) return _maplibre;
+  const [mod] = await Promise.all([
+    import("maplibre-gl"),
+    import("maplibre-gl/dist/maplibre-gl.css"),
+  ]);
+  _maplibre = mod.default ? (mod as any) : mod;
+  return _maplibre!;
+}
 
 const STYLE: any = {
   version: 8,
