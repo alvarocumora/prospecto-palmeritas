@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
@@ -90,6 +91,11 @@ import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/ap
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerminalRoute = TerminalRouteImport.update({
   id: '/terminal',
   path: '/terminal',
@@ -550,6 +556,7 @@ export interface FileRoutesByFullPath {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -631,6 +638,7 @@ export interface FileRoutesByTo {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -714,6 +722,7 @@ export interface FileRoutesById {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
@@ -797,6 +806,7 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -878,6 +888,7 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -960,6 +971,7 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
@@ -1043,6 +1055,7 @@ export interface RootRouteChildren {
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TerminalRoute: typeof TerminalRouteWithChildren
+  UnsubscribeRoute: typeof UnsubscribeRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   DiagMiningEngineRoute: typeof DiagMiningEngineRoute
@@ -1069,6 +1082,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terminal': {
       id: '/terminal'
       path: '/terminal'
@@ -1821,6 +1841,7 @@ const rootRouteChildren: RootRouteChildren = {
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TerminalRoute: TerminalRouteWithChildren,
+  UnsubscribeRoute: UnsubscribeRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   DiagMiningEngineRoute: DiagMiningEngineRoute,
