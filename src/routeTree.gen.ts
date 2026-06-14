@@ -84,6 +84,8 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
+import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
+import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
 import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -509,6 +511,18 @@ const ApiPublicVerifyComplianceReportIdRoute =
     path: '/api/public/verify-compliance/$reportId',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicNotificationsSatelliteAnomaliesRoute =
+  ApiPublicNotificationsSatelliteAnomaliesRouteImport.update({
+    id: '/api/public/notifications/satellite-anomalies',
+    path: '/api/public/notifications/satellite-anomalies',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNotificationsCatastroExpirationsRoute =
+  ApiPublicNotificationsCatastroExpirationsRouteImport.update({
+    id: '/api/public/notifications/catastro-expirations',
+    path: '/api/public/notifications/catastro-expirations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedReportsLosverdesPre43101Route =
   AuthenticatedReportsLosverdesPre43101RouteImport.update({
     id: '/reports/losverdes/pre43101',
@@ -620,6 +634,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -702,6 +718,8 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -786,6 +804,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
@@ -870,6 +890,8 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -952,6 +974,8 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -1035,6 +1059,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
@@ -1073,6 +1099,8 @@ export interface RootRouteChildren {
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
+  ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
+  ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
@@ -1607,6 +1635,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/notifications/satellite-anomalies': {
+      id: '/api/public/notifications/satellite-anomalies'
+      path: '/api/public/notifications/satellite-anomalies'
+      fullPath: '/api/public/notifications/satellite-anomalies'
+      preLoaderRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/notifications/catastro-expirations': {
+      id: '/api/public/notifications/catastro-expirations'
+      path: '/api/public/notifications/catastro-expirations'
+      fullPath: '/api/public/notifications/catastro-expirations'
+      preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/reports/losverdes/pre43101': {
       id: '/_authenticated/reports/losverdes/pre43101'
       path: '/reports/losverdes/pre43101'
@@ -1859,6 +1901,10 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroCCodeRoute: CatastroCCodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
+  ApiPublicNotificationsCatastroExpirationsRoute:
+    ApiPublicNotificationsCatastroExpirationsRoute,
+  ApiPublicNotificationsSatelliteAnomaliesRoute:
+    ApiPublicNotificationsSatelliteAnomaliesRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
