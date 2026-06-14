@@ -5,17 +5,34 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { loadEnv } from "vite";
+import path from "node:path";
+
+// Load server env vars (no VITE_ prefix) into process.env so server routes can read them.
+const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
+for (const [k, v] of Object.entries(env)) {
+  if (!process.env[k]) process.env[k] = v;
+}
+
+const entitiesDir = path.resolve(process.cwd(), "node_modules/entities");
 
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
   vite: {
+    resolve: {
+      alias: [
+        { find: /^entities\/lib\/decode\.js$/, replacement: path.join(entitiesDir, "lib/decode.js") },
+        { find: /^entities\/lib\/encode\.js$/, replacement: path.join(entitiesDir, "lib/encode.js") },
+        { find: /^entities$/, replacement: entitiesDir },
+      ],
+    },
     build: {
       chunkSizeWarningLimit: 2000,
       rollupOptions: {
         output: {
-          manualChunks(id) {
+          manualChunks(id: string) {
             if (!id.includes("node_modules")) return;
             if (id.includes("three") || id.includes("@react-three")) return "three";
             if (id.includes("maplibre-gl")) return "maplibre";
