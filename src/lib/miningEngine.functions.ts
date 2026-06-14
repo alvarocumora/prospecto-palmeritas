@@ -168,8 +168,7 @@ export const sectionProject = createServerFn({ method: "POST" })
         return {
           hole_id: t.hole_id,
           hole_code: meta?.hole_id ?? null,
-          points:
-            (t.points as Array<{ md: number; x: number; y: number; z: number }>) ?? [],
+          points: (t.points as Array<{ md: number; x: number; y: number; z: number }>) ?? [],
         };
       });
     }
@@ -571,7 +570,10 @@ export const testWireframeEndpoint = createServerFn({ method: "POST" })
       .from("drill_core_logs")
       .select("hole_id,depth_from,depth_to,au_gpt")
       .not("au_gpt", "is", null)
-      .in("hole_id", holes.map((h) => h.id))
+      .in(
+        "hole_id",
+        holes.map((h) => h.id),
+      )
       .limit(5000);
     if (lErr) throw new Error(lErr.message);
     if (!logs?.length) return { ok: false, error: "Sin logs Au" };
@@ -672,7 +674,6 @@ export const testWireframeEndpoint = createServerFn({ method: "POST" })
     };
   });
 
-
 // ---------------------------------------------------------------------------
 // computeHoleTrajectory: desurvey + persistencia en drill_hole_trajectories.
 // Si el hole tiene <2 survey shots, sintetiza dos desde collar (az/dip) hasta
@@ -686,9 +687,7 @@ export const computeHoleTrajectory = createServerFn({ method: "POST" })
 
     const { data: hole, error: hErr } = await supabase
       .from("drill_holes")
-      .select(
-        "id,hole_id,easting,northing,elevation,azimuth,dip,planned_depth,actual_depth",
-      )
+      .select("id,hole_id,easting,northing,elevation,azimuth,dip,planned_depth,actual_depth")
       .eq("id", data.holeId)
       .maybeSingle();
     if (hErr) throw new Error(hErr.message);
@@ -734,18 +733,16 @@ export const computeHoleTrajectory = createServerFn({ method: "POST" })
       step: 5,
     });
 
-    const { error: uErr } = await supabase
-      .from("drill_hole_trajectories")
-      .upsert(
-        {
-          hole_id: hole.id,
-          points: result.points,
-          total_length: result.total_length,
-          engine_version: "mining-engine@0.1.0",
-          computed_at: new Date().toISOString(),
-        },
-        { onConflict: "hole_id" },
-      );
+    const { error: uErr } = await supabase.from("drill_hole_trajectories").upsert(
+      {
+        hole_id: hole.id,
+        points: result.points,
+        total_length: result.total_length,
+        engine_version: "mining-engine@0.1.0",
+        computed_at: new Date().toISOString(),
+      },
+      { onConflict: "hole_id" },
+    );
     if (uErr) throw new Error(uErr.message);
 
     return {
@@ -769,9 +766,7 @@ export const computeProjectTrajectories = createServerFn({ method: "POST" })
 
     const { data: holes, error } = await supabase
       .from("drill_holes")
-      .select(
-        "id,hole_id,easting,northing,elevation,azimuth,dip,planned_depth,actual_depth",
-      )
+      .select("id,hole_id,easting,northing,elevation,azimuth,dip,planned_depth,actual_depth")
       .eq("project_id", data.projectId);
     if (error) throw new Error(error.message);
 

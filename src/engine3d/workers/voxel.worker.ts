@@ -11,17 +11,17 @@
 export type VoxelInput = {
   points: Array<{ x: number; y: number; z: number; v: number }>;
   resolution: number; // celdas por eje, ej 48
-  isovalue: number;   // 0..1
-  power: number;      // IDW power, típico 2
-  margin: number;     // metros de margen alrededor del bbox
+  isovalue: number; // 0..1
+  power: number; // IDW power, típico 2
+  margin: number; // metros de margen alrededor del bbox
   /** búsqueda de vecinos máximo (k). 0 = todos */
   kNearest: number;
 };
 
 export type VoxelOutput = {
   positions: Float32Array; // [x,y,z,...] N*3
-  values: Float32Array;    // [v,...] N
-  cellSize: number;        // metros por celda (promedio xy)
+  values: Float32Array; // [v,...] N
+  cellSize: number; // metros por celda (promedio xy)
   cellSizeZ: number;
   bounds: { minX: number; minY: number; minZ: number; maxX: number; maxY: number; maxZ: number };
   cellCount: number;
@@ -29,9 +29,13 @@ export type VoxelOutput = {
 };
 
 function idwAt(
-  px: number, py: number, pz: number,
-  points: Float32Array, n: number,
-  power: number, k: number,
+  px: number,
+  py: number,
+  pz: number,
+  points: Float32Array,
+  n: number,
+  power: number,
+  k: number,
 ): number {
   // points layout: [x,y,z,v, x,y,z,v, ...]
   if (k === 0 || k >= n) {
@@ -67,11 +71,16 @@ function idwAt(
     let min = i;
     for (let j = i + 1; j < n; j++) if (dists[j] < dists[min]) min = j;
     if (min !== i) {
-      const td = dists[i]; dists[i] = dists[min]; dists[min] = td;
-      const ti = idx[i]; idx[i] = idx[min]; idx[min] = ti;
+      const td = dists[i];
+      dists[i] = dists[min];
+      dists[min] = td;
+      const ti = idx[i];
+      idx[i] = idx[min];
+      idx[min] = ti;
     }
   }
-  let num = 0; let den = 0;
+  let num = 0;
+  let den = 0;
   for (let i = 0; i < k; i++) {
     const d2 = dists[i];
     if (d2 < 1) return points[idx[i] * 4 + 3];
@@ -100,8 +109,12 @@ function buildVoxels(input: VoxelInput): VoxelOutput {
 
   // Empaqueta puntos
   const flat = new Float32Array(n * 4);
-  let minX = Infinity, minY = Infinity, minZ = Infinity;
-  let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    minZ = Infinity;
+  let maxX = -Infinity,
+    maxY = -Infinity,
+    maxZ = -Infinity;
   for (let i = 0; i < n; i++) {
     const p = points[i];
     flat[i * 4] = p.x;
@@ -115,11 +128,17 @@ function buildVoxels(input: VoxelInput): VoxelOutput {
     if (p.y > maxY) maxY = p.y;
     if (p.z > maxZ) maxZ = p.z;
   }
-  minX -= margin; maxX += margin;
-  minY -= margin; maxY += margin;
-  minZ -= margin * 0.3; maxZ += margin * 0.3;
+  minX -= margin;
+  maxX += margin;
+  minY -= margin;
+  maxY += margin;
+  minZ -= margin * 0.3;
+  maxZ += margin * 0.3;
   // Asegura un rango Z razonable
-  if (maxZ - minZ < 50) { minZ -= 50; maxZ += 10; }
+  if (maxZ - minZ < 50) {
+    minZ -= 50;
+    maxZ += 10;
+  }
 
   const sx = (maxX - minX) / resolution;
   const sy = (maxY - minY) / resolution;

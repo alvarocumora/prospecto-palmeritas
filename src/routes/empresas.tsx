@@ -6,9 +6,16 @@ export const Route = createFileRoute("/empresas")({
   head: () => ({
     meta: [
       { title: "Empresas — Geocapitals" },
-      { name: "description", content: "Planes institucionales para holdings mineros, juniors y consultoras. Catastro, geología 3D, satélite y NI 43-101." },
+      {
+        name: "description",
+        content:
+          "Planes institucionales para holdings mineros, juniors y consultoras. Catastro, geología 3D, satélite y NI 43-101.",
+      },
       { property: "og:title", content: "Empresas — Geocapitals" },
-      { property: "og:description", content: "Despliega Geocapitals en tu equipo geocientífico y de capital markets." },
+      {
+        property: "og:description",
+        content: "Despliega Geocapitals en tu equipo geocientífico y de capital markets.",
+      },
     ],
   }),
   component: EmpresasPage,
@@ -72,25 +79,36 @@ function EmpresasPage() {
                 : "bg-white border-[var(--brand-hair)]"
             }`}
           >
-            <div className={`text-[10px] font-mono uppercase tracking-wider mb-3 ${
-              p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
-            }`}>
+            <div
+              className={`text-[10px] font-mono uppercase tracking-wider mb-3 ${
+                p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
+              }`}
+            >
               {p.tag}
             </div>
-            <div className={`font-display text-2xl ${p.highlight ? "text-white" : "text-[var(--brand-navy-deep)]"}`}>
+            <div
+              className={`font-display text-2xl ${p.highlight ? "text-white" : "text-[var(--brand-navy-deep)]"}`}
+            >
               {p.name}
             </div>
-            <div className={`mt-1 text-sm ${p.highlight ? "text-white/70" : "text-[var(--brand-mute)]"}`}>
+            <div
+              className={`mt-1 text-sm ${p.highlight ? "text-white/70" : "text-[var(--brand-mute)]"}`}
+            >
               {p.price}
             </div>
             <ul className="mt-6 space-y-2.5 flex-1">
               {p.items.map((it) => (
-                <li key={it} className={`flex items-start gap-2 text-sm ${
-                  p.highlight ? "text-white/85" : "text-[var(--brand-ink)]"
-                }`}>
-                  <CheckCircle2 className={`w-4 h-4 shrink-0 mt-0.5 ${
-                    p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
-                  }`} />
+                <li
+                  key={it}
+                  className={`flex items-start gap-2 text-sm ${
+                    p.highlight ? "text-white/85" : "text-[var(--brand-ink)]"
+                  }`}
+                >
+                  <CheckCircle2
+                    className={`w-4 h-4 shrink-0 mt-0.5 ${
+                      p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
+                    }`}
+                  />
                   <span>{it}</span>
                 </li>
               ))}
@@ -110,7 +128,10 @@ function EmpresasPage() {
       </div>
 
       <p className="mt-10 text-center text-sm text-[var(--brand-mute)]">
-        ¿Necesitas algo distinto? <Link to="/contacto" className="text-[var(--brand-blue)] font-medium">Conversemos.</Link>
+        ¿Necesitas algo distinto?{" "}
+        <Link to="/contacto" className="text-[var(--brand-blue)] font-medium">
+          Conversemos.
+        </Link>
       </p>
     </MarketingPage>
   );

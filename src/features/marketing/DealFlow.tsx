@@ -55,7 +55,7 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
     });
   }, [listings, filters]);
 
-  const open = openId ? listings.find((l) => l.id === openId) ?? null : null;
+  const open = openId ? (listings.find((l) => l.id === openId) ?? null) : null;
 
   return (
     <section>
@@ -71,7 +71,12 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
             className="brand-input pl-9"
           />
         </div>
-        <Select value={filters.commodity} onChange={(v) => setFilters({ ...filters, commodity: v })} label="Commodity" options={commodities} />
+        <Select
+          value={filters.commodity}
+          onChange={(v) => setFilters({ ...filters, commodity: v })}
+          label="Commodity"
+          options={commodities}
+        />
         <Select
           value={filters.modality}
           onChange={(v) => setFilters({ ...filters, modality: v })}
@@ -79,7 +84,12 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
           options={modalities}
           renderLabel={(v) => MODALITY_LABEL[v] ?? v}
         />
-        <Select value={filters.country} onChange={(v) => setFilters({ ...filters, country: v })} label="País" options={countries} />
+        <Select
+          value={filters.country}
+          onChange={(v) => setFilters({ ...filters, country: v })}
+          label="País"
+          options={countries}
+        />
         {(filters.q || filters.commodity || filters.modality || filters.country) && (
           <button
             type="button"
@@ -98,7 +108,10 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
       {isLoading ? (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-xl border border-[var(--brand-hair)] bg-white h-[320px] animate-pulse" />
+            <div
+              key={i}
+              className="rounded-xl border border-[var(--brand-hair)] bg-white h-[320px] animate-pulse"
+            />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -114,14 +127,20 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
       <PublicListingDrawer
         listing={open}
         open={!!open}
-        onOpenChange={(v) => { if (!v) setOpenId(null); }}
+        onOpenChange={(v) => {
+          if (!v) setOpenId(null);
+        }}
       />
     </section>
   );
 }
 
 function Select({
-  value, onChange, label, options, renderLabel,
+  value,
+  onChange,
+  label,
+  options,
+  renderLabel,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -138,7 +157,9 @@ function Select({
     >
       <option value="">{label}: Todos</option>
       {options.map((o) => (
-        <option key={o} value={o}>{renderLabel ? renderLabel(o) : o}</option>
+        <option key={o} value={o}>
+          {renderLabel ? renderLabel(o) : o}
+        </option>
       ))}
     </select>
   );
@@ -157,7 +178,10 @@ function EmptyState({ hasListings, onClear }: { hasListings: boolean; onClear: (
           : "Estamos onboardeando proyectos. Solicita acceso institucional para recibir oportunidades en privado antes del listado público."}
       </p>
       {hasListings && (
-        <button onClick={onClear} className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--brand-blue)] font-medium hover:underline">
+        <button
+          onClick={onClear}
+          className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--brand-blue)] font-medium hover:underline"
+        >
           Limpiar filtros
         </button>
       )}

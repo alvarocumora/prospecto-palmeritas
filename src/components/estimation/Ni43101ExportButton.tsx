@@ -117,10 +117,7 @@ export function Ni43101ExportButton({
       ensure(120);
       title("2. Resultados de Estimación", 13);
       kv("Compósitos", String(model.composites_count ?? 0));
-      kv(
-        "Bloques estimados",
-        `${model.blocks_estimated ?? 0} / ${model.blocks_total ?? 0}`,
-      );
+      kv("Bloques estimados", `${model.blocks_estimated ?? 0} / ${model.blocks_total ?? 0}`);
       kv("Tonelaje total", fmtT(model.tonnage_total));
       kv("Tonelaje > cutoff", fmtT(model.tonnage_above_cutoff));
       kv(

@@ -32,10 +32,7 @@ export function TonnageGradePanel({
   onClose,
   density = 2.7,
 }: Props) {
-  const maxCuEq = useMemo(
-    () => Math.max(0.1, ...blocks.map((b) => b.cuEq)),
-    [blocks],
-  );
+  const maxCuEq = useMemo(() => Math.max(0.1, ...blocks.map((b) => b.cuEq)), [blocks]);
 
   const curve = useMemo<CurvePoint[]>(() => {
     if (blocks.length === 0) return [];
@@ -66,8 +63,7 @@ export function TonnageGradePanel({
   }, [blocks, maxCuEq, density]);
 
   const current = useMemo<CurvePoint>(() => {
-    if (blocks.length === 0)
-      return { cutoff, tonnesMt: 0, gradeAvg: 0, metalKt: 0, blocks: 0 };
+    if (blocks.length === 0) return { cutoff, tonnesMt: 0, gradeAvg: 0, metalKt: 0, blocks: 0 };
     let tonnes = 0;
     let gradeWeighted = 0;
     let count = 0;
@@ -96,15 +92,22 @@ export function TonnageGradePanel({
   const innerH = H - PAD.t - PAD.b;
   const maxTonnes = Math.max(1, ...curve.map((c) => c.tonnesMt));
   const maxGrade = Math.max(0.5, ...curve.map((c) => c.gradeAvg));
-  const xScale = (co: number) => PAD.l + (co / Math.max(0.01, curve[curve.length - 1]?.cutoff ?? 1)) * innerW;
+  const xScale = (co: number) =>
+    PAD.l + (co / Math.max(0.01, curve[curve.length - 1]?.cutoff ?? 1)) * innerW;
   const yT = (t: number) => PAD.t + innerH - (t / maxTonnes) * innerH;
   const yG = (g: number) => PAD.t + innerH - (g / maxGrade) * innerH;
 
   const pathT = curve
-    .map((c, i) => `${i === 0 ? "M" : "L"} ${xScale(c.cutoff).toFixed(1)} ${yT(c.tonnesMt).toFixed(1)}`)
+    .map(
+      (c, i) =>
+        `${i === 0 ? "M" : "L"} ${xScale(c.cutoff).toFixed(1)} ${yT(c.tonnesMt).toFixed(1)}`,
+    )
     .join(" ");
   const pathG = curve
-    .map((c, i) => `${i === 0 ? "M" : "L"} ${xScale(c.cutoff).toFixed(1)} ${yG(c.gradeAvg).toFixed(1)}`)
+    .map(
+      (c, i) =>
+        `${i === 0 ? "M" : "L"} ${xScale(c.cutoff).toFixed(1)} ${yG(c.gradeAvg).toFixed(1)}`,
+    )
     .join(" ");
   const cursorX = xScale(cutoff);
 
@@ -131,13 +134,44 @@ export function TonnageGradePanel({
           <>
             <svg width={W} height={H} className="w-full h-auto block">
               {/* axes */}
-              <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={PAD.t + innerH} stroke="#3b82f6" strokeWidth={1} opacity={0.6} />
-              <line x1={W - PAD.r} y1={PAD.t} x2={W - PAD.r} y2={PAD.t + innerH} stroke="#f59e0b" strokeWidth={1} opacity={0.6} />
-              <line x1={PAD.l} y1={PAD.t + innerH} x2={W - PAD.r} y2={PAD.t + innerH} stroke="#475569" strokeWidth={1} />
+              <line
+                x1={PAD.l}
+                y1={PAD.t}
+                x2={PAD.l}
+                y2={PAD.t + innerH}
+                stroke="#3b82f6"
+                strokeWidth={1}
+                opacity={0.6}
+              />
+              <line
+                x1={W - PAD.r}
+                y1={PAD.t}
+                x2={W - PAD.r}
+                y2={PAD.t + innerH}
+                stroke="#f59e0b"
+                strokeWidth={1}
+                opacity={0.6}
+              />
+              <line
+                x1={PAD.l}
+                y1={PAD.t + innerH}
+                x2={W - PAD.r}
+                y2={PAD.t + innerH}
+                stroke="#475569"
+                strokeWidth={1}
+              />
 
               {/* grid */}
               {[0.25, 0.5, 0.75].map((f) => (
-                <line key={f} x1={PAD.l} x2={W - PAD.r} y1={PAD.t + innerH * f} y2={PAD.t + innerH * f} stroke="#1e293b" strokeDasharray="2 3" />
+                <line
+                  key={f}
+                  x1={PAD.l}
+                  x2={W - PAD.r}
+                  y1={PAD.t + innerH * f}
+                  y2={PAD.t + innerH * f}
+                  stroke="#1e293b"
+                  strokeDasharray="2 3"
+                />
               ))}
 
               {/* curves */}
@@ -145,21 +179,63 @@ export function TonnageGradePanel({
               <path d={pathG} stroke="#f59e0b" strokeWidth={2} fill="none" />
 
               {/* cursor */}
-              <line x1={cursorX} x2={cursorX} y1={PAD.t} y2={PAD.t + innerH} stroke="#22d3ee" strokeWidth={1.5} strokeDasharray="3 3" />
-              <circle cx={cursorX} cy={yT(current.tonnesMt)} r={3.5} fill="#3b82f6" stroke="#fff" strokeWidth={1} />
-              <circle cx={cursorX} cy={yG(current.gradeAvg)} r={3.5} fill="#f59e0b" stroke="#fff" strokeWidth={1} />
+              <line
+                x1={cursorX}
+                x2={cursorX}
+                y1={PAD.t}
+                y2={PAD.t + innerH}
+                stroke="#22d3ee"
+                strokeWidth={1.5}
+                strokeDasharray="3 3"
+              />
+              <circle
+                cx={cursorX}
+                cy={yT(current.tonnesMt)}
+                r={3.5}
+                fill="#3b82f6"
+                stroke="#fff"
+                strokeWidth={1}
+              />
+              <circle
+                cx={cursorX}
+                cy={yG(current.gradeAvg)}
+                r={3.5}
+                fill="#f59e0b"
+                stroke="#fff"
+                strokeWidth={1}
+              />
 
               {/* labels */}
-              <text x={PAD.l - 4} y={PAD.t + 8} fill="#3b82f6" fontSize={9} textAnchor="end" fontFamily="monospace">
+              <text
+                x={PAD.l - 4}
+                y={PAD.t + 8}
+                fill="#3b82f6"
+                fontSize={9}
+                textAnchor="end"
+                fontFamily="monospace"
+              >
                 {maxTonnes.toFixed(0)} Mt
               </text>
-              <text x={W - PAD.r + 4} y={PAD.t + 8} fill="#f59e0b" fontSize={9} fontFamily="monospace">
+              <text
+                x={W - PAD.r + 4}
+                y={PAD.t + 8}
+                fill="#f59e0b"
+                fontSize={9}
+                fontFamily="monospace"
+              >
                 {maxGrade.toFixed(2)}%
               </text>
               <text x={PAD.l} y={H - 6} fill="#94a3b8" fontSize={9} fontFamily="monospace">
                 0
               </text>
-              <text x={W - PAD.r} y={H - 6} fill="#94a3b8" fontSize={9} textAnchor="end" fontFamily="monospace">
+              <text
+                x={W - PAD.r}
+                y={H - 6}
+                fill="#94a3b8"
+                fontSize={9}
+                textAnchor="end"
+                fontFamily="monospace"
+              >
                 cut-off CuEq %
               </text>
             </svg>
@@ -179,9 +255,24 @@ export function TonnageGradePanel({
             </div>
 
             <div className="grid grid-cols-4 gap-2 pt-1">
-              <Metric label="Tonnage" value={`${current.tonnesMt.toFixed(1)}`} unit="Mt" color="text-blue-300" />
-              <Metric label="Grade" value={`${current.gradeAvg.toFixed(2)}`} unit="% CuEq" color="text-amber-300" />
-              <Metric label="Metal" value={`${current.metalKt.toFixed(1)}`} unit="kt CuEq" color="text-emerald-300" />
+              <Metric
+                label="Tonnage"
+                value={`${current.tonnesMt.toFixed(1)}`}
+                unit="Mt"
+                color="text-blue-300"
+              />
+              <Metric
+                label="Grade"
+                value={`${current.gradeAvg.toFixed(2)}`}
+                unit="% CuEq"
+                color="text-amber-300"
+              />
+              <Metric
+                label="Metal"
+                value={`${current.metalKt.toFixed(1)}`}
+                unit="kt CuEq"
+                color="text-emerald-300"
+              />
               <Metric label="Blocks" value={`${current.blocks}`} unit="" color="text-foreground" />
             </div>
           </>
@@ -191,7 +282,17 @@ export function TonnageGradePanel({
   );
 }
 
-function Metric({ label, value, unit, color }: { label: string; value: string; unit: string; color: string }) {
+function Metric({
+  label,
+  value,
+  unit,
+  color,
+}: {
+  label: string;
+  value: string;
+  unit: string;
+  color: string;
+}) {
   return (
     <div className="bg-black/40 rounded px-2 py-1 border border-border/60">
       <div className="text-[9px] uppercase tracking-wider text-muted-foreground">{label}</div>

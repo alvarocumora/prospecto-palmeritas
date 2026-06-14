@@ -343,13 +343,9 @@ function DrillingModule() {
         />
       )}
 
-      {surveysHole && (
-        <SurveysDialog hole={surveysHole} onClose={() => setSurveysHole(null)} />
-      )}
+      {surveysHole && <SurveysDialog hole={surveysHole} onClose={() => setSurveysHole(null)} />}
 
-      {compHole && (
-        <CompositeDialog hole={compHole} onClose={() => setCompHole(null)} />
-      )}
+      {compHole && <CompositeDialog hole={compHole} onClose={() => setCompHole(null)} />}
     </div>
   );
 }

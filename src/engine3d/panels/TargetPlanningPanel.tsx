@@ -74,7 +74,8 @@ export function TargetPlanningPanel({
           </span>
           {output && (
             <span className="text-[10px] text-muted-foreground ml-2">
-              {output.stats.selected}/{output.stats.candidates} · A:{output.stats.aPriority} B:{output.stats.bPriority} C:{output.stats.cPriority}
+              {output.stats.selected}/{output.stats.candidates} · A:{output.stats.aPriority} B:
+              {output.stats.bPriority} C:{output.stats.cPriority}
             </span>
           )}
         </div>
@@ -91,7 +92,9 @@ export function TargetPlanningPanel({
               <button
                 key={p}
                 className={`h-6 text-[10px] rounded border ${
-                  priorityFilter[p] ? PRIORITY_BG[p] : "border-border/40 text-muted-foreground opacity-50"
+                  priorityFilter[p]
+                    ? PRIORITY_BG[p]
+                    : "border-border/40 text-muted-foreground opacity-50"
                 }`}
                 onClick={() => setPriorityFilter((s) => ({ ...s, [p]: !s[p] }))}
               >
@@ -102,21 +105,46 @@ export function TargetPlanningPanel({
         </div>
         <div>
           <Label className="text-[9px] uppercase">Max depth · {maxDepth} m</Label>
-          <Slider min={100} max={800} step={50} value={[maxDepth]} onValueChange={([v]) => setMaxDepth(v)} className="mt-2" />
+          <Slider
+            min={100}
+            max={800}
+            step={50}
+            value={[maxDepth]}
+            onValueChange={([v]) => setMaxDepth(v)}
+            className="mt-2"
+          />
         </div>
         <div>
           <Label className="text-[9px] uppercase">Max cost · ${(maxCost / 1000).toFixed(0)}k</Label>
-          <Slider min={50_000} max={5_000_000} step={50_000} value={[maxCost]} onValueChange={([v]) => setMaxCost(v)} className="mt-2" />
+          <Slider
+            min={50_000}
+            max={5_000_000}
+            step={50_000}
+            value={[maxCost]}
+            onValueChange={([v]) => setMaxCost(v)}
+            className="mt-2"
+          />
         </div>
         <div>
-          <Label className="text-[9px] uppercase">Min confianza · {(minConfidence * 100).toFixed(0)}%</Label>
-          <Slider min={0} max={1} step={0.05} value={[minConfidence]} onValueChange={([v]) => setMinConfidence(v)} className="mt-2" />
+          <Label className="text-[9px] uppercase">
+            Min confianza · {(minConfidence * 100).toFixed(0)}%
+          </Label>
+          <Slider
+            min={0}
+            max={1}
+            step={0.05}
+            value={[minConfidence]}
+            onValueChange={([v]) => setMinConfidence(v)}
+            className="mt-2"
+          />
         </div>
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">
         {busy && (
-          <div className="text-center text-[10px] text-amber-300 font-mono py-2">Calculando targets…</div>
+          <div className="text-center text-[10px] text-amber-300 font-mono py-2">
+            Calculando targets…
+          </div>
         )}
         {!busy && filtered.length === 0 && (
           <div className="text-center text-[10px] text-muted-foreground font-mono py-6">
@@ -145,22 +173,30 @@ export function TargetPlanningPanel({
                 <tr key={t.targetId} className="border-b border-border/40 hover:bg-white/5">
                   <td className="px-2 py-1 text-foreground">{t.targetId}</td>
                   <td className="px-2 py-1">
-                    <span className={`px-1.5 py-0.5 rounded text-[9px] border ${PRIORITY_BG[t.priority]}`}>
+                    <span
+                      className={`px-1.5 py-0.5 rounded text-[9px] border ${PRIORITY_BG[t.priority]}`}
+                    >
                       {t.priority}
                     </span>
                   </td>
                   <td className="text-right px-2 py-1">{(t.score * 100).toFixed(0)}</td>
                   <td className="text-right px-2 py-1">{(t.confidence * 100).toFixed(0)}%</td>
                   <td className="text-right px-2 py-1">{t.depth.toFixed(0)} m</td>
-                  <td className="text-right px-2 py-1">{t.azimuth.toFixed(0)}/{t.dip.toFixed(0)}</td>
+                  <td className="text-right px-2 py-1">
+                    {t.azimuth.toFixed(0)}/{t.dip.toFixed(0)}
+                  </td>
                   <td className="text-right px-2 py-1 text-muted-foreground">{t.expectedZone}</td>
                   <td className="text-right px-2 py-1">${(t.estimatedCost / 1000).toFixed(0)}k</td>
-                  <td className="text-right px-2 py-1 text-muted-foreground">{t.spacingGap.toFixed(0)}m</td>
+                  <td className="text-right px-2 py-1 text-muted-foreground">
+                    {t.spacingGap.toFixed(0)}m
+                  </td>
                   <td className="text-center px-2 py-1">
                     <button
                       onClick={() => onToggleScenario(t.targetId)}
                       className={`p-0.5 rounded ${
-                        inScenario ? "text-red-300 hover:bg-red-500/20" : "text-emerald-300 hover:bg-emerald-500/20"
+                        inScenario
+                          ? "text-red-300 hover:bg-red-500/20"
+                          : "text-emerald-300 hover:bg-emerald-500/20"
                       }`}
                       title={inScenario ? "Remove from scenario" : "Add to scenario"}
                     >

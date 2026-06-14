@@ -5,10 +5,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import { Loader2, X, RotateCcw } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  getLosVerdes3DScene,
-  type Scene3DResponse,
-} from "@/lib/livemap-public.functions";
+import { getLosVerdes3DScene, type Scene3DResponse } from "@/lib/livemap-public.functions";
 
 type Props = { onClose: () => void };
 
@@ -298,9 +295,7 @@ export default function Structures3DViewer({ onClose }: Props) {
         className="flex items-center justify-between gap-2 px-3 py-2 border-b border-border bg-bg-panel"
         style={{ paddingTop: "max(8px, env(safe-area-inset-top))" }}
       >
-        <div className="font-mono text-xs text-gold font-bold">
-          Proyección 3D · Los Verdes
-        </div>
+        <div className="font-mono text-xs text-gold font-bold">Proyección 3D · Los Verdes</div>
         <div className="flex items-center gap-1">
           <button
             onClick={resetView}

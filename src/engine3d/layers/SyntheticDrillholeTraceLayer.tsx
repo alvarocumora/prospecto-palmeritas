@@ -77,10 +77,7 @@ export function SyntheticDrillholeTraceLayer({
       }),
     [holes],
   );
-  const maxCuEq = useMemo(
-    () => Math.max(0.5, ...avgCuEq, 1.2),
-    [avgCuEq],
-  );
+  const maxCuEq = useMemo(() => Math.max(0.5, ...avgCuEq, 1.2), [avgCuEq]);
 
   useEffect(() => {
     const mesh = meshRef.current;

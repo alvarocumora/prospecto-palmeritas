@@ -15,18 +15,21 @@ function heatColor(t: number, target: THREE.Color) {
   const x = Math.min(1, Math.max(0, t));
   if (x < 0.4) {
     const k = x / 0.4;
-    target.setRGB(0.18 + 0.55 * k, 0.04 + 0.08 * k, 0.30 - 0.18 * k);
+    target.setRGB(0.18 + 0.55 * k, 0.04 + 0.08 * k, 0.3 - 0.18 * k);
   } else if (x < 0.75) {
     const k = (x - 0.4) / 0.35;
-    target.setRGB(0.73 + 0.22 * k, 0.12 + 0.55 * k, 0.10);
+    target.setRGB(0.73 + 0.22 * k, 0.12 + 0.55 * k, 0.1);
   } else {
     const k = (x - 0.75) / 0.25;
-    target.setRGB(0.95, 0.67 + 0.30 * k, 0.10 + 0.85 * k);
+    target.setRGB(0.95, 0.67 + 0.3 * k, 0.1 + 0.85 * k);
   }
 }
 
 export function AnomalyIsosurfaceLayer({
-  iso, opacity, verticalExaggeration = 1, clippingPlanes,
+  iso,
+  opacity,
+  verticalExaggeration = 1,
+  clippingPlanes,
 }: Props) {
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -38,23 +41,23 @@ export function AnomalyIsosurfaceLayer({
 
     const positions = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      const x = iso.positions[i*3];
-      const y = iso.positions[i*3+1];
-      const z = iso.positions[i*3+2] * verticalExaggeration;
-      positions[i*3]   = x;
-      positions[i*3+1] = z;
-      positions[i*3+2] = -y;
+      const x = iso.positions[i * 3];
+      const y = iso.positions[i * 3 + 1];
+      const z = iso.positions[i * 3 + 2] * verticalExaggeration;
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = z;
+      positions[i * 3 + 2] = -y;
     }
 
     // Normales: remap correspondiente (rotación equivalente)
     const normals = new Float32Array(n * 3);
     for (let i = 0; i < n; i++) {
-      const nx = iso.normals[i*3];
-      const ny = iso.normals[i*3+1];
-      const nz = iso.normals[i*3+2];
-      normals[i*3]   = nx;
-      normals[i*3+1] = nz;
-      normals[i*3+2] = -ny;
+      const nx = iso.normals[i * 3];
+      const ny = iso.normals[i * 3 + 1];
+      const nz = iso.normals[i * 3 + 2];
+      normals[i * 3] = nx;
+      normals[i * 3 + 1] = nz;
+      normals[i * 3 + 2] = -ny;
     }
 
     // Colores por valor
@@ -65,12 +68,14 @@ export function AnomalyIsosurfaceLayer({
     for (let i = 0; i < n; i++) {
       const v = (iso.values[i] - iso.fieldMin) / range;
       heatColor(v, c);
-      colors[i*3] = c.r; colors[i*3+1] = c.g; colors[i*3+2] = c.b;
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
     }
 
     geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geom.setAttribute("normal",   new THREE.BufferAttribute(normals,   3));
-    geom.setAttribute("color",    new THREE.BufferAttribute(colors,    3));
+    geom.setAttribute("normal", new THREE.BufferAttribute(normals, 3));
+    geom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
     geom.setIndex(new THREE.BufferAttribute(iso.indices, 1));
     geom.computeBoundingSphere();
     return geom;
@@ -106,9 +111,12 @@ export function AnomalyIsosurfaceLayer({
     material.needsUpdate = true;
   }, [material, opacity, clippingPlanes]);
 
-  useEffect(() => () => {
-    geometry.dispose();
-  }, [geometry]);
+  useEffect(
+    () => () => {
+      geometry.dispose();
+    },
+    [geometry],
+  );
 
   if (iso.vertexCount === 0) {
     // Fallback blob mode: render gaussian spheres around top anomalies
@@ -119,10 +127,7 @@ export function AnomalyIsosurfaceLayer({
             const col = new THREE.Color();
             heatColor(b.v, col);
             return (
-              <mesh
-                key={i}
-                position={[b.x, b.z * verticalExaggeration, -b.y]}
-              >
+              <mesh key={i} position={[b.x, b.z * verticalExaggeration, -b.y]}>
                 <sphereGeometry args={[b.r, 24, 16]} />
                 <meshStandardMaterial
                   color={col}
@@ -145,6 +150,12 @@ export function AnomalyIsosurfaceLayer({
   }
 
   return (
-    <mesh ref={meshRef} geometry={geometry} material={material} castShadow={false} receiveShadow={false} />
+    <mesh
+      ref={meshRef}
+      geometry={geometry}
+      material={material}
+      castShadow={false}
+      receiveShadow={false}
+    />
   );
 }

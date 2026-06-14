@@ -6,15 +6,7 @@ import type { AnomalyRow, SatIndexCode } from "@/hooks/useProjectSatelliteAnomal
 
 const xmlEscape = (s: string) =>
   s.replace(/[<>&"']/g, (c) =>
-    c === "<"
-      ? "&lt;"
-      : c === ">"
-        ? "&gt;"
-        : c === "&"
-          ? "&amp;"
-          : c === '"'
-            ? "&quot;"
-            : "&apos;",
+    c === "<" ? "&lt;" : c === ">" ? "&gt;" : c === "&" ? "&amp;" : c === '"' ? "&quot;" : "&apos;",
   );
 
 const INDEX_KML_COLOR: Record<SatIndexCode, string> = {
@@ -110,14 +102,10 @@ export function buildKml(opts: {
       let kmlGeom = "";
       try {
         if (geom.type === "Polygon") {
-          const ring = geom.coordinates[0]
-            .map((c) => `${c[0]},${c[1]},0`)
-            .join(" ");
+          const ring = geom.coordinates[0].map((c) => `${c[0]},${c[1]},0`).join(" ");
           kmlGeom = `<Polygon><outerBoundaryIs><LinearRing><coordinates>${ring}</coordinates></LinearRing></outerBoundaryIs></Polygon>`;
         } else if (geom.type === "LineString") {
-          const coords = geom.coordinates
-            .map((c) => `${c[0]},${c[1]},0`)
-            .join(" ");
+          const coords = geom.coordinates.map((c) => `${c[0]},${c[1]},0`).join(" ");
           kmlGeom = `<LineString><coordinates>${coords}</coordinates></LineString>`;
         } else if (geom.type === "Point") {
           const c = geom.coordinates;

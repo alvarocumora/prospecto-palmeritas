@@ -23,19 +23,19 @@ export type ArcFeature = {
 
 // Esquema canónico interno, normalizado desde los campos del FeatureServer v2.
 export type CanonicalConcession = {
-  id_concesion: number | null;       // ID estable nacional (nuevo en v2)
-  rol: string | null;                // NUMERO_ROL[-DV_ROL]
+  id_concesion: number | null; // ID estable nacional (nuevo en v2)
+  rol: string | null; // NUMERO_ROL[-DV_ROL]
   numero_rol: number | null;
   dv_rol: string | null;
   name: string | null;
   hectareas: number | null;
-  status: string;                    // vigente|en_tramite|vencida|cancelada
+  status: string; // vigente|en_tramite|vencida|cancelada
   status_raw: string | null;
-  tipo: string;                      // explotacion|exploracion
+  tipo: string; // explotacion|exploracion
   tipo_raw: string | null;
   comuna: string | null;
   holder_name: string | null;
-  holder_rut: string | null;         // RUT-DV formateado
+  holder_rut: string | null; // RUT-DV formateado
   holder_division: string | null;
   nro_inscripcion: number | null;
   fojas: number | null;
@@ -43,7 +43,7 @@ export type CanonicalConcession = {
   origen: string | null;
   datum: string | null;
   huso: number | null;
-  fecha_vencimiento: string | null;  // YYYY-MM-DD
+  fecha_vencimiento: string | null; // YYYY-MM-DD
   fecha_actualizacion: string | null; // ISO timestamp (delta sync)
   fecha_creacion: string | null;
   geometry: GeoJSON.Geometry | null;
@@ -191,9 +191,7 @@ export type ConcessionQuery = {
   maxFeatures?: number;
 };
 
-export async function queryConcessions(
-  q: ConcessionQuery,
-): Promise<CanonicalConcession[]> {
+export async function queryConcessions(q: ConcessionQuery): Promise<CanonicalConcession[]> {
   const out: CanonicalConcession[] = [];
   let offset = 0;
   const max = q.maxFeatures ?? 20_000;
@@ -223,9 +221,7 @@ export async function queryConcessions(
 }
 
 // Busca una concesión por ROL o nombre. Devuelve la primera coincidencia.
-export async function findConcessionByCode(
-  code: string,
-): Promise<CanonicalConcession | null> {
+export async function findConcessionByCode(code: string): Promise<CanonicalConcession | null> {
   const safe = code.replace(/'/g, "''");
   // Probar como NUMERO_ROL puro (extraer dígitos)
   const digits = code.replace(/\D+/g, "");
@@ -258,7 +254,9 @@ export async function healthCheck(): Promise<{
   const t0 = Date.now();
   try {
     const params = new URLSearchParams({ where: "1=1", returnCountOnly: "true", f: "json" });
-    const res = await fetchWithTimeout(`${SNGM_BASE}/${LAYER_CONCESION}/query?${params.toString()}`);
+    const res = await fetchWithTimeout(
+      `${SNGM_BASE}/${LAYER_CONCESION}/query?${params.toString()}`,
+    );
     const json = (await res.json()) as { count?: number };
     return { ok: res.ok, total: json.count ?? null, latencyMs: Date.now() - t0 };
   } catch (e) {

@@ -29,10 +29,21 @@ export function AuditTrailPanel({ onClose }: Props) {
           <History className="w-3.5 h-3.5" /> Audit trail · {events.length} eventos
         </div>
         <div className="flex gap-1">
-          <Button size="sm" variant="outline" className="h-6 text-[10px]" onClick={downloadJson} disabled={!events.length}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-6 text-[10px]"
+            onClick={downloadJson}
+            disabled={!events.length}
+          >
             <Download className="w-3 h-3 mr-1" /> Export
           </Button>
-          <Button size="sm" variant="outline" className="h-6 text-[10px] text-red-400" onClick={() => auditTrail.clear()}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-6 text-[10px] text-red-400"
+            onClick={() => auditTrail.clear()}
+          >
             <Trash2 className="w-3 h-3 mr-1" /> Clear
           </Button>
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={onClose}>
@@ -48,7 +59,9 @@ export function AuditTrailPanel({ onClose }: Props) {
           <div key={e.id} className="border border-border/60 rounded px-2 py-1.5 bg-black/40">
             <div className="flex items-center justify-between">
               <span className="text-violet-300 uppercase text-[10px]">{e.type}</span>
-              <span className="text-muted-foreground text-[9px]">{new Date(e.timestamp).toLocaleString()}</span>
+              <span className="text-muted-foreground text-[9px]">
+                {new Date(e.timestamp).toLocaleString()}
+              </span>
             </div>
             <div className="text-[9px] text-emerald-300">scenario: {e.scenarioId}</div>
             <pre className="text-[9px] text-muted-foreground mt-1 whitespace-pre-wrap break-all max-h-24 overflow-y-auto">

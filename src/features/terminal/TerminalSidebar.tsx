@@ -5,10 +5,25 @@ import { cn } from "@/lib/utils";
 
 const items = [
   { label: "Overview", to: "/", icon: Map, hash: undefined as string | undefined },
-  { label: "Market", to: "/terminal/market", icon: TrendingUp, hash: undefined as string | undefined },
+  {
+    label: "Market",
+    to: "/terminal/market",
+    icon: TrendingUp,
+    hash: undefined as string | undefined,
+  },
   { label: "Portfolio", to: "/", icon: Briefcase, hash: "portfolio" as string | undefined },
-  { label: "Tokenize", to: "/terminal/tokenize", icon: Coins, hash: undefined as string | undefined },
-  { label: "Capital Raise", to: "/terminal/capital-raise", icon: HandCoins, hash: undefined as string | undefined },
+  {
+    label: "Tokenize",
+    to: "/terminal/tokenize",
+    icon: Coins,
+    hash: undefined as string | undefined,
+  },
+  {
+    label: "Capital Raise",
+    to: "/terminal/capital-raise",
+    icon: HandCoins,
+    hash: undefined as string | undefined,
+  },
 ] as const;
 
 export function TerminalSidebar() {

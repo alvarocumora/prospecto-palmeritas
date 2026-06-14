@@ -11,7 +11,7 @@ let serverEntryPromise: Promise<ServerEntry> | undefined;
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {
     serverEntryPromise = import("@tanstack/react-start/server-entry").then(
-      (m) => ((m as unknown as { default?: ServerEntry }).default ?? (m as unknown as ServerEntry)),
+      (m) => (m as unknown as { default?: ServerEntry }).default ?? (m as unknown as ServerEntry),
     );
   }
   return serverEntryPromise;
@@ -62,12 +62,17 @@ async function normalizeCatastrophicSsrResponse(
   // Multiple log shapes to maximize chance of reaching the log pipeline.
   console.error("[geo-ssr-500]", request.url, err);
   try {
-    console.error("[geo-ssr-500-json]", JSON.stringify({
-      url: request.url,
-      body: body.slice(0, 500),
-      ...summarizeError(err),
-    }));
-  } catch {}
+    console.error(
+      "[geo-ssr-500-json]",
+      JSON.stringify({
+        url: request.url,
+        body: body.slice(0, 500),
+        ...summarizeError(err),
+      }),
+    );
+  } catch {
+    /* logging must never throw */
+  }
 
   return new Response(renderErrorPage(), {
     status: 500,
@@ -84,11 +89,16 @@ export default {
     } catch (error) {
       console.error("[geo-ssr-throw]", request.url, error);
       try {
-        console.error("[geo-ssr-throw-json]", JSON.stringify({
-          url: request.url,
-          ...summarizeError(error),
-        }));
-      } catch {}
+        console.error(
+          "[geo-ssr-throw-json]",
+          JSON.stringify({
+            url: request.url,
+            ...summarizeError(error),
+          }),
+        );
+      } catch {
+        /* logging must never throw */
+      }
       return new Response(renderErrorPage(), {
         status: 500,
         headers: diagHeaders(error, "wrapper-catch"),

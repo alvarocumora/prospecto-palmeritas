@@ -101,10 +101,6 @@ export function SyntheticBlockModelLayer({
 
   if (blocks.length === 0) return null;
   return (
-    <instancedMesh
-      ref={meshRef}
-      args={[geometry, material, blocks.length]}
-      frustumCulled={false}
-    />
+    <instancedMesh ref={meshRef} args={[geometry, material, blocks.length]} frustumCulled={false} />
   );
 }

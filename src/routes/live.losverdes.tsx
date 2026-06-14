@@ -1,8 +1,27 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Component, lazy, Suspense, useEffect, useState, type ErrorInfo, type ReactNode } from "react";
-import { MapPin, FileDown, Loader2, Layers, Target, Satellite, Pickaxe, Sparkles, AlertTriangle, Box } from "lucide-react";
+import {
+  Component,
+  lazy,
+  Suspense,
+  useEffect,
+  useState,
+  type ErrorInfo,
+  type ReactNode,
+} from "react";
+import {
+  MapPin,
+  FileDown,
+  Loader2,
+  Layers,
+  Target,
+  Satellite,
+  Pickaxe,
+  Sparkles,
+  AlertTriangle,
+  Box,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -12,7 +31,9 @@ import { Card } from "@/components/ui/card";
 // disponible bajo demanda para no bloquear el flujo principal.
 import { LosVerdesStrategicMap } from "@/components/live/LosVerdesStrategicMap";
 const LosVerdesPublicScene = lazy(() =>
-  import("@/components/live/LosVerdesPublicScene").then((m) => ({ default: m.LosVerdesPublicScene })),
+  import("@/components/live/LosVerdesPublicScene").then((m) => ({
+    default: m.LosVerdesPublicScene,
+  })),
 );
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
@@ -52,7 +73,9 @@ export const Route = createFileRoute("/live/losverdes")({
     <div className="min-h-screen bg-bg-app flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-3">
         <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
-        <h1 className="text-lg font-semibold text-foreground">No pudimos cargar el visor Los Verdes</h1>
+        <h1 className="text-lg font-semibold text-foreground">
+          No pudimos cargar el visor Los Verdes
+        </h1>
         <p className="text-xs font-mono text-muted-foreground break-words">
           {error instanceof Error ? error.message : String(error)}
         </p>
@@ -103,8 +126,6 @@ class EngineErrorBoundary extends Component<
     return this.props.children;
   }
 }
-
-
 
 function fmtUsd(v: number): string {
   if (v >= 1e9) return `$${(v / 1e9).toFixed(2)}B`;
@@ -178,7 +199,9 @@ function LiveLosVerdesPage() {
     setGenBusy(true);
     const tid = toast.loading("Generando sondajes + block model + pit shells conceptuales…");
     try {
-      const r = await genConceptual({ data: { projectId: "7a499b02-ecdf-447b-8956-b106fe4ec087" } });
+      const r = await genConceptual({
+        data: { projectId: "7a499b02-ecdf-447b-8956-b106fe4ec087" },
+      });
       toast.success(
         `Modelo conceptual generado: ${r.drillholes} sondajes · ${r.assays} assays · ${r.blocks} bloques · ${r.pitShells} pit shells`,
         { id: tid, duration: 8000 },
@@ -263,7 +286,11 @@ function LiveLosVerdesPage() {
             className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
             title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
           >
-            {genBusy ? <Loader2 className="w-3 h-3 mr-1.5 animate-spin" /> : <Sparkles className="w-3 h-3 mr-1.5" />}
+            {genBusy ? (
+              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+            ) : (
+              <Sparkles className="w-3 h-3 mr-1.5" />
+            )}
             Generar modelo conceptual
           </Button>
           <Button
@@ -497,7 +524,6 @@ function LiveLosVerdesPage() {
             </Panel>
           </div>
         )}
-
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
           Geocapitals · Informe pre-NI 43-101 · Estimaciones conceptuales, no recursos informados.

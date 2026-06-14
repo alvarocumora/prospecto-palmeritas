@@ -26,13 +26,7 @@ const SUGGESTIONS: Record<GeoSceneMode, string[]> = {
   ],
 };
 
-export function SceneCopilot({
-  mode,
-  variant,
-}: {
-  mode: GeoSceneMode;
-  variant: GeoSceneVariant;
-}) {
+export function SceneCopilot({ mode, variant }: { mode: GeoSceneMode; variant: GeoSceneVariant }) {
   const { active } = useProjects();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -59,9 +53,7 @@ export function SceneCopilot({
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant") {
-          return prev.map((m, i) =>
-            i === prev.length - 1 ? { ...m, content: acc } : m,
-          );
+          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: acc } : m));
         }
         return [...prev, { role: "assistant", content: acc }];
       });
@@ -161,7 +153,8 @@ export function SceneCopilot({
             {messages.length === 0 && (
               <div className="text-xs text-muted-foreground font-mono space-y-2">
                 <p className="text-gold">
-                  Pregunta sobre la escena 3D activa. Contexto del proyecto inyectado automáticamente.
+                  Pregunta sobre la escena 3D activa. Contexto del proyecto inyectado
+                  automáticamente.
                 </p>
                 <div className="grid grid-cols-1 gap-1.5 pt-1">
                   {sugs.map((q) => (

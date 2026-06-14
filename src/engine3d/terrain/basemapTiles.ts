@@ -7,9 +7,15 @@ export type BasemapSource = "esri" | "osm" | "topo" | "none";
 export type TileGrid = {
   canvas: HTMLCanvasElement;
   /** bbox real cubierta por el canvas (en lng/lat). */
-  lngMin: number; lngMax: number; latMin: number; latMax: number;
+  lngMin: number;
+  lngMax: number;
+  latMin: number;
+  latMax: number;
   /** bbox en metros ENU relativos al centro del proyecto. */
-  enuMinX: number; enuMaxX: number; enuMinY: number; enuMaxY: number;
+  enuMinX: number;
+  enuMaxX: number;
+  enuMinY: number;
+  enuMaxY: number;
   zoom: number;
   source: BasemapSource;
   failed: boolean;
@@ -25,9 +31,7 @@ function lngLatToTile(lng: number, lat: number, z: number) {
   const n = 2 ** z;
   const x = Math.floor(((lng + 180) / 360) * n);
   const latRad = (lat * Math.PI) / 180;
-  const y = Math.floor(
-    ((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n,
-  );
+  const y = Math.floor(((1 - Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) / 2) * n);
   return { x, y };
 }
 
@@ -38,10 +42,7 @@ function tileToLngLat(x: number, y: number, z: number) {
   return { lng, lat: (latRad * 180) / Math.PI };
 }
 
-function lngLatToEnu(
-  lng: number, lat: number,
-  centerLng: number, centerLat: number,
-) {
+function lngLatToEnu(lng: number, lat: number, centerLng: number, centerLat: number) {
   const R = 6378137;
   const dLat = ((lat - centerLat) * Math.PI) / 180;
   const dLng = ((lng - centerLng) * Math.PI) / 180;
@@ -80,9 +81,8 @@ export async function buildBasemapTexture(
   const z = pickZoom(extentMeters, centerLat);
   // Esquinas geográficas del cuadro del proyecto
   const R = 6378137;
-  const dLat = (extentMeters / 2) / R * (180 / Math.PI);
-  const dLng = (extentMeters / 2) /
-    (R * Math.cos((centerLat * Math.PI) / 180)) * (180 / Math.PI);
+  const dLat = (extentMeters / 2 / R) * (180 / Math.PI);
+  const dLng = (extentMeters / 2 / (R * Math.cos((centerLat * Math.PI) / 180))) * (180 / Math.PI);
 
   const minLng = centerLng - dLng;
   const maxLng = centerLng + dLng;
@@ -150,10 +150,14 @@ export async function buildBasemapTexture(
 
   return {
     canvas,
-    lngMin: cLngMin, lngMax: cLngMax,
-    latMin: cLatMin, latMax: cLatMax,
-    enuMinX: sw.x, enuMaxX: ne.x,
-    enuMinY: sw.y, enuMaxY: ne.y,
+    lngMin: cLngMin,
+    lngMax: cLngMax,
+    latMin: cLatMin,
+    latMax: cLatMax,
+    enuMinX: sw.x,
+    enuMaxX: ne.x,
+    enuMinY: sw.y,
+    enuMaxY: ne.y,
     zoom: z,
     source,
     failed,

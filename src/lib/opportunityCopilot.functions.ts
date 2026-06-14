@@ -1,6 +1,7 @@
 // Geo-Copilot de Oportunidades: pregunta en español → filtros JSON → consulta SQL → respuesta narrativa
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Tables } from "@/integrations/supabase/types";
 import { z } from "zod";
 
 const AskInput = z.object({
@@ -45,7 +46,7 @@ async function narrate(
   apiKey: string,
   question: string,
   filters: Filters,
-  rows: any[],
+  rows: Tables<"cadastre_opportunities">[],
 ): Promise<string> {
   try {
     const top = rows.slice(0, 8).map((r) => ({
@@ -75,7 +76,8 @@ async function narrate(
         ],
       }),
     });
-    if (!res.ok) return "No pude generar narrativa, pero los resultados están listados a continuación.";
+    if (!res.ok)
+      return "No pude generar narrativa, pero los resultados están listados a continuación.";
     const json = await res.json();
     return String(json.choices?.[0]?.message?.content ?? "").slice(0, 1500);
   } catch {

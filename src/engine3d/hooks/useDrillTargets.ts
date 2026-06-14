@@ -40,10 +40,9 @@ export function useDrillTargets(
     }
     setBusy(true);
     setError(null);
-    const worker = new Worker(
-      new URL("@/engine3d/ai/drillTarget.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const worker = new Worker(new URL("@/engine3d/ai/drillTarget.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = worker;
     worker.onmessage = (ev: MessageEvent<DrillTargetOutput>) => {
       setOutput(ev.data);

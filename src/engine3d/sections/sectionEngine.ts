@@ -93,10 +93,7 @@ export function enuToThree(x: number, y: number, z: number, ve: number): Vec3Lit
 }
 
 /** Remapea positions de iso (ENU) a coords three con exageración vertical. */
-export function isoEnuToThree(
-  positions: Float32Array,
-  ve: number,
-): Float32Array {
+export function isoEnuToThree(positions: Float32Array, ve: number): Float32Array {
   const n = positions.length / 3;
   const out = new Float32Array(positions.length);
   for (let i = 0; i < n; i++) {
@@ -137,43 +134,49 @@ function planeDist(p: Vec3Lite, n: Vec3Lite, c: number): number {
   return p.x * n.x + p.y * n.y + p.z * n.z + c;
 }
 
-function intersectEdge(
-  pa: Vec3Lite, pb: Vec3Lite, da: number, db: number,
-): Vec3Lite | null {
+function intersectEdge(pa: Vec3Lite, pb: Vec3Lite, da: number, db: number): Vec3Lite | null {
   if ((da > 0 && db > 0) || (da < 0 && db < 0)) return null;
   if (da === db) return null;
   const t = da / (da - db);
   if (t < 0 || t > 1) return null;
-  return v3(
-    pa.x + t * (pb.x - pa.x),
-    pa.y + t * (pb.y - pa.y),
-    pa.z + t * (pb.z - pa.z),
-  );
+  return v3(pa.x + t * (pb.x - pa.x), pa.y + t * (pb.y - pa.y), pa.z + t * (pb.z - pa.z));
 }
 
 function meshPlaneSegments(
   mesh: SectionMeshInput,
-  n: Vec3Lite, c: number,
+  n: Vec3Lite,
+  c: number,
   frame: SectionFrame,
 ): { segs: Section2DSegment[]; triCount: number } {
   const segs: Section2DSegment[] = [];
   const { positions, indices } = mesh;
   const triCount = indices.length / 3;
-  const a = v3(0, 0, 0), b = v3(0, 0, 0), cc = v3(0, 0, 0);
+  const a = v3(0, 0, 0),
+    b = v3(0, 0, 0),
+    cc = v3(0, 0, 0);
   for (let i = 0; i < triCount; i++) {
     const ia = indices[i * 3] * 3;
     const ib = indices[i * 3 + 1] * 3;
     const ic = indices[i * 3 + 2] * 3;
-    a.x = positions[ia];     a.y = positions[ia + 1]; a.z = positions[ia + 2];
-    b.x = positions[ib];     b.y = positions[ib + 1]; b.z = positions[ib + 2];
-    cc.x = positions[ic];    cc.y = positions[ic + 1]; cc.z = positions[ic + 2];
+    a.x = positions[ia];
+    a.y = positions[ia + 1];
+    a.z = positions[ia + 2];
+    b.x = positions[ib];
+    b.y = positions[ib + 1];
+    b.z = positions[ib + 2];
+    cc.x = positions[ic];
+    cc.y = positions[ic + 1];
+    cc.z = positions[ic + 2];
     const da = planeDist(a, n, c);
     const db = planeDist(b, n, c);
     const dc = planeDist(cc, n, c);
     const cuts: Vec3Lite[] = [];
-    let p = intersectEdge(a, b, da, db); if (p) cuts.push(p);
-    p = intersectEdge(b, cc, db, dc);    if (p) cuts.push(p);
-    p = intersectEdge(cc, a, dc, da);    if (p) cuts.push(p);
+    let p = intersectEdge(a, b, da, db);
+    if (p) cuts.push(p);
+    p = intersectEdge(b, cc, db, dc);
+    if (p) cuts.push(p);
+    p = intersectEdge(cc, a, dc, da);
+    if (p) cuts.push(p);
     if (cuts.length === 2) {
       segs.push({ a: project2D(cuts[0], frame), b: project2D(cuts[1], frame) });
     }
@@ -182,16 +185,14 @@ function meshPlaneSegments(
 }
 
 export function computeSection(input: SectionInput): SectionResult {
-  const t0 = (typeof performance !== "undefined" ? performance.now() : Date.now());
+  const t0 = typeof performance !== "undefined" ? performance.now() : Date.now();
   const n = norm(input.planeNormal);
   const c = input.planeConstant;
   const frame = buildFrame(n, c);
   const ve = input.verticalExaggeration;
   const halfWidth = Math.max(0, input.width / 2);
 
-  const isoOut = input.iso
-    ? meshPlaneSegments(input.iso, n, c, frame)
-    : { segs: [], triCount: 0 };
+  const isoOut = input.iso ? meshPlaneSegments(input.iso, n, c, frame) : { segs: [], triCount: 0 };
   const terrainOut = input.terrain
     ? meshPlaneSegments(input.terrain, n, c, frame)
     : { segs: [], triCount: 0 };
@@ -209,11 +210,7 @@ export function computeSection(input: SectionInput): SectionResult {
     let intersect: Section2DPoint | undefined;
     if (crosses && dA !== dB) {
       const t = dA / (dA - dB);
-      const ipt = v3(
-        A.x + t * (B.x - A.x),
-        A.y + t * (B.y - A.y),
-        A.z + t * (B.z - A.z),
-      );
+      const ipt = v3(A.x + t * (B.x - A.x), A.y + t * (B.y - A.y), A.z + t * (B.z - A.z));
       intersect = project2D(ipt, frame);
     }
     drillholes.push({
@@ -240,16 +237,35 @@ export function computeSection(input: SectionInput): SectionResult {
     samples.push({ u: p2.u, v: p2.v, value: p.v, kind: p.kind, distToPlane: d });
   }
 
-  let uMin = Infinity, uMax = -Infinity, vMin = Infinity, vMax = -Infinity;
+  let uMin = Infinity,
+    uMax = -Infinity,
+    vMin = Infinity,
+    vMax = -Infinity;
   const acc = (p: Section2DPoint) => {
-    if (p.u < uMin) uMin = p.u; if (p.u > uMax) uMax = p.u;
-    if (p.v < vMin) vMin = p.v; if (p.v > vMax) vMax = p.v;
+    if (p.u < uMin) uMin = p.u;
+    if (p.u > uMax) uMax = p.u;
+    if (p.v < vMin) vMin = p.v;
+    if (p.v > vMax) vMax = p.v;
   };
-  for (const s of isoOut.segs) { acc(s.a); acc(s.b); }
-  for (const s of terrainOut.segs) { acc(s.a); acc(s.b); }
-  for (const dh of drillholes) { acc(dh.collar2D); acc(dh.toe2D); }
+  for (const s of isoOut.segs) {
+    acc(s.a);
+    acc(s.b);
+  }
+  for (const s of terrainOut.segs) {
+    acc(s.a);
+    acc(s.b);
+  }
+  for (const dh of drillholes) {
+    acc(dh.collar2D);
+    acc(dh.toe2D);
+  }
   for (const sp of samples) acc(sp);
-  if (uMin === Infinity) { uMin = -200; uMax = 200; vMin = -200; vMax = 200; }
+  if (uMin === Infinity) {
+    uMin = -200;
+    uMax = 200;
+    vMin = -200;
+    vMax = 200;
+  }
 
   const elapsedMs = (typeof performance !== "undefined" ? performance.now() : Date.now()) - t0;
 

@@ -41,8 +41,7 @@ type BlockEcon = {
 
 // IRR por bisección sobre cashflows anuales (year 0 = capex)
 function computeIRR(cashflows: number[]): number | null {
-  const npv = (r: number) =>
-    cashflows.reduce((acc, cf, t) => acc + cf / Math.pow(1 + r, t), 0);
+  const npv = (r: number) => cashflows.reduce((acc, cf, t) => acc + cf / Math.pow(1 + r, t), 0);
   let lo = -0.99,
     hi = 5,
     npvLo = npv(lo),
@@ -65,9 +64,7 @@ function computeIRR(cashflows: number[]): number | null {
 
 export const scheduleScenario = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ scenarioId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ scenarioId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const t0 = Date.now();
@@ -126,8 +123,7 @@ export const scheduleScenario = createServerFn({ method: "POST" })
       if (rows.length < chunk) break;
       from += chunk;
     }
-    if (!econ.length)
-      throw new Error("Sin bloques in-pit. Corre 'Optimizar pit' primero.");
+    if (!econ.length) throw new Error("Sin bloques in-pit. Corre 'Optimizar pit' primero.");
 
     const tBlock =
       model.block_size_x * model.block_size_y * model.block_size_z * model.density_t_m3;
@@ -292,9 +288,7 @@ export const testSchedule = createServerFn({ method: "POST" })
 // Carga bloques in_pit con economía para visualización 3D
 export const fetchPitBlocks = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ scenarioId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ scenarioId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
 
@@ -339,9 +333,7 @@ export const fetchPitBlocks = createServerFn({ method: "POST" })
     for (;;) {
       const { data: rows, error } = await supabase
         .from("resource_block_economics")
-        .select(
-          "block_id,in_pit,is_ore,margin_usd_t,insitu_value_usd,resource_blocks(x,y,z,grade)",
-        )
+        .select("block_id,in_pit,is_ore,margin_usd_t,insitu_value_usd,resource_blocks(x,y,z,grade)")
         .eq("scenario_id", data.scenarioId)
         .eq("in_pit", true)
         .range(from, from + chunk - 1);

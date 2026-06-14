@@ -59,7 +59,9 @@ function validate(input: QAQCInput): QAQCResult {
   for (const c of collars) {
     if (!c.hole_id) {
       issues.push({
-        id: mkId(), severity: "critical", dataset: "collar",
+        id: mkId(),
+        severity: "critical",
+        dataset: "collar",
         message: "Collar sin hole_id",
         suggestedFix: "Asegúrate de que cada fila tenga columna hole_id",
       });
@@ -67,7 +69,10 @@ function validate(input: QAQCInput): QAQCResult {
     }
     if (!Number.isFinite(c.x) || !Number.isFinite(c.y) || !Number.isFinite(c.z)) {
       issues.push({
-        id: mkId(), severity: "critical", dataset: "collar", holeId: c.hole_id,
+        id: mkId(),
+        severity: "critical",
+        dataset: "collar",
+        holeId: c.hole_id,
         message: `Collar ${c.hole_id} con coordenadas inválidas (x/y/z)`,
         suggestedFix: "Verifica columnas easting/northing/elevation",
       });
@@ -77,7 +82,10 @@ function validate(input: QAQCInput): QAQCResult {
   for (const [id, n] of collarIds) {
     if (n > 1) {
       issues.push({
-        id: mkId(), severity: "critical", dataset: "collar", holeId: id,
+        id: mkId(),
+        severity: "critical",
+        dataset: "collar",
+        holeId: id,
         message: `Hole ID duplicado en collar: ${id} (${n} filas)`,
         suggestedFix: "Mantener un único collar por hole_id",
       });
@@ -100,27 +108,39 @@ function validate(input: QAQCInput): QAQCResult {
   for (const s of surveys) {
     if (!collarIds.has(s.hole_id)) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "survey", holeId: s.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "survey",
+        holeId: s.hole_id,
         message: `Survey referencia hole_id sin collar: ${s.hole_id}`,
         suggestedFix: "Importa el collar correspondiente",
       });
     }
     if (s.depth < 0) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "survey", holeId: s.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "survey",
+        holeId: s.hole_id,
         message: `Survey con depth negativo: ${s.depth} m`,
       });
     }
     if (s.azimuth < 0 || s.azimuth > 360) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "survey", holeId: s.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "survey",
+        holeId: s.hole_id,
         message: `Azimuth fuera de rango [0-360]: ${s.azimuth}`,
         suggestedFix: "Normalizar a azimuth = (az + 360) % 360",
       });
     }
     if (s.dip < -90 || s.dip > 90) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "survey", holeId: s.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "survey",
+        holeId: s.hole_id,
         message: `Dip fuera de rango [-90, 90]: ${s.dip}`,
       });
     }
@@ -133,7 +153,10 @@ function validate(input: QAQCInput): QAQCResult {
     if (sorted.length === 0) continue;
     if (sorted[0].depth > 5) {
       issues.push({
-        id: mkId(), severity: "info", dataset: "survey", holeId: id,
+        id: mkId(),
+        severity: "info",
+        dataset: "survey",
+        holeId: id,
         message: `Primer survey de ${id} a ${sorted[0].depth} m (>5 m de boca)`,
         suggestedFix: "Agregar survey de collar (depth=0)",
       });
@@ -145,14 +168,20 @@ function validate(input: QAQCInput): QAQCResult {
   for (const a of assays) {
     if (!collarIds.has(a.hole_id)) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "assay", holeId: a.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "assay",
+        holeId: a.hole_id,
         interval: { from: a.from, to: a.to },
         message: `Assay referencia hole_id sin collar: ${a.hole_id}`,
       });
     }
     if (!Number.isFinite(a.from) || !Number.isFinite(a.to) || a.to <= a.from) {
       issues.push({
-        id: mkId(), severity: "critical", dataset: "assay", holeId: a.hole_id,
+        id: mkId(),
+        severity: "critical",
+        dataset: "assay",
+        holeId: a.hole_id,
         interval: { from: a.from, to: a.to },
         message: `Assay con intervalo inválido: from=${a.from} to=${a.to}`,
         suggestedFix: "Garantiza to > from y ambos finitos",
@@ -161,7 +190,10 @@ function validate(input: QAQCInput): QAQCResult {
     }
     if (a.grade < 0) {
       issues.push({
-        id: mkId(), severity: "critical", dataset: "assay", holeId: a.hole_id,
+        id: mkId(),
+        severity: "critical",
+        dataset: "assay",
+        holeId: a.hole_id,
         interval: { from: a.from, to: a.to },
         message: `Grade negativo: ${a.grade}`,
         suggestedFix: "Reemplazar por 0 o NULL si es bajo límite de detección",
@@ -179,14 +211,20 @@ function validate(input: QAQCInput): QAQCResult {
       const cur = sorted[i];
       if (cur.from < prev.to - 1e-6) {
         issues.push({
-          id: mkId(), severity: "critical", dataset: "assay", holeId: id,
+          id: mkId(),
+          severity: "critical",
+          dataset: "assay",
+          holeId: id,
           interval: { from: cur.from, to: cur.to },
           message: `Solape de intervalos: ${prev.from}-${prev.to} con ${cur.from}-${cur.to}`,
           suggestedFix: "Revisar duplicados o errores de digitación",
         });
       } else if (cur.from > prev.to + 0.01) {
         issues.push({
-          id: mkId(), severity: "info", dataset: "assay", holeId: id,
+          id: mkId(),
+          severity: "info",
+          dataset: "assay",
+          holeId: id,
           interval: { from: prev.to, to: cur.from },
           message: `Gap en assays: ${prev.to.toFixed(2)}-${cur.from.toFixed(2)} m (${(cur.from - prev.to).toFixed(2)} m sin muestreo)`,
         });
@@ -195,7 +233,10 @@ function validate(input: QAQCInput): QAQCResult {
     const totalDepth = maxDepthByHole.get(id) ?? 0;
     if (sorted.length && sorted[sorted.length - 1].to > totalDepth + 1) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "assay", holeId: id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "assay",
+        holeId: id,
         message: `Assay excede profundidad de hole: ${sorted[sorted.length - 1].to} > ${totalDepth}`,
       });
     }
@@ -205,7 +246,10 @@ function validate(input: QAQCInput): QAQCResult {
   for (const l of lithology) {
     if (!Number.isFinite(l.from) || !Number.isFinite(l.to) || l.to <= l.from) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "lithology", holeId: l.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "lithology",
+        holeId: l.hole_id,
         interval: { from: l.from, to: l.to },
         message: `Lithology con intervalo inválido: ${l.from}-${l.to}`,
       });
@@ -214,7 +258,10 @@ function validate(input: QAQCInput): QAQCResult {
     const td = maxDepthByHole.get(l.hole_id) ?? 0;
     if (l.to > td + 1) {
       issues.push({
-        id: mkId(), severity: "warning", dataset: "lithology", holeId: l.hole_id,
+        id: mkId(),
+        severity: "warning",
+        dataset: "lithology",
+        holeId: l.hole_id,
         interval: { from: l.from, to: l.to },
         message: `Lithology fuera de profundidad de hole (${l.to} > ${td})`,
       });
@@ -224,19 +271,25 @@ function validate(input: QAQCInput): QAQCResult {
   // ─── GLOBAL ────────────────────────────────────────────────
   if (collars.length === 0) {
     issues.push({
-      id: mkId(), severity: "critical", dataset: "global",
+      id: mkId(),
+      severity: "critical",
+      dataset: "global",
       message: "Sin collars cargados — no se puede georeferenciar",
     });
   }
   if (assays.length === 0) {
     issues.push({
-      id: mkId(), severity: "warning", dataset: "global",
+      id: mkId(),
+      severity: "warning",
+      dataset: "global",
       message: "Sin assays cargados — estimación de recursos no disponible",
     });
   }
 
   // ─── SUMMARY ───────────────────────────────────────────────
-  let crit = 0, warn = 0, info = 0;
+  let crit = 0,
+    warn = 0,
+    info = 0;
   for (const i of issues) {
     if (i.severity === "critical") crit++;
     else if (i.severity === "warning") warn++;

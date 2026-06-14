@@ -157,8 +157,7 @@ export function useDrillTrajectoriesLayer(
   function realPath(_h: Hole, pts: RealTrajectory["points"]): Vec3[] {
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
     return pts.map(
-      (p) =>
-        [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
+      (p) => [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
     );
   }
 
@@ -168,9 +167,10 @@ export function useDrillTrajectoriesLayer(
         const total = Number(h.actual_depth ?? h.planned_depth ?? 100);
         const collar = holeCollarLngLat(h, centerLng, centerLat);
         const realPts = real.get(h.hole_id);
-        const path = realPts && realPts.length >= 2
-          ? realPath(h, realPts)
-          : holeSegment(h, centerLng, centerLat, 0, total);
+        const path =
+          realPts && realPts.length >= 2
+            ? realPath(h, realPts)
+            : holeSegment(h, centerLng, centerLat, 0, total);
         return {
           code: h.hole_id,
           path,

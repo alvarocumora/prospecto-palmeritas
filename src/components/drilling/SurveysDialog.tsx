@@ -10,13 +10,7 @@ import type { DrillHole } from "@/hooks/useDrilling";
 
 type Survey = { id: string; depth: number; azimuth: number; dip: number };
 
-export function SurveysDialog({
-  hole,
-  onClose,
-}: {
-  hole: DrillHole;
-  onClose: () => void;
-}) {
+export function SurveysDialog({ hole, onClose }: { hole: DrillHole; onClose: () => void }) {
   const [rows, setRows] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
   const [computing, setComputing] = useState(false);
@@ -109,8 +103,8 @@ export function SurveysDialog({
         </DialogHeader>
 
         <div className="text-xs text-text-secondary">
-          Collar: E {hole.easting ?? "—"} · N {hole.northing ?? "—"} · Z{" "}
-          {hole.elevation ?? "—"} · Az {hole.azimuth ?? "—"}° · Dip {hole.dip ?? "—"}°
+          Collar: E {hole.easting ?? "—"} · N {hole.northing ?? "—"} · Z {hole.elevation ?? "—"} ·
+          Az {hole.azimuth ?? "—"}° · Dip {hole.dip ?? "—"}°
         </div>
 
         <div className="border border-border rounded overflow-hidden">

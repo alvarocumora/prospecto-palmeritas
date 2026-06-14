@@ -160,9 +160,7 @@ function Section({
         : "border-border bg-muted/30";
   return (
     <div className={`rounded-lg border ${border} p-3`}>
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">
-        {title}
-      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-1">{title}</div>
       {children}
     </div>
   );
@@ -179,9 +177,7 @@ function BulletList({
 }) {
   return (
     <div className="rounded-lg border border-border bg-muted/30 p-3">
-      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
-        {title}
-      </div>
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">{title}</div>
       <ul className="space-y-1.5">
         {items.map((it, i) => (
           <li key={i} className="flex items-start gap-2 text-sm leading-snug">

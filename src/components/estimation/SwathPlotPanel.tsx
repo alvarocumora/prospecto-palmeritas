@@ -68,7 +68,8 @@ export function SwathPlotPanel({ modelId, unit }: { modelId: string; unit: strin
 
       {query.data && query.data.bands.length === 0 && (
         <div className="text-[10px] font-mono text-text-dim">
-          Sin datos suficientes — re-estima el modelo o verifica que existan compósitos georreferenciados.
+          Sin datos suficientes — re-estima el modelo o verifica que existan compósitos
+          georreferenciados.
         </div>
       )}
 

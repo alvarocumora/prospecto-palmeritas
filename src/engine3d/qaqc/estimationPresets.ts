@@ -76,10 +76,7 @@ export function deletePreset(id: string) {
 }
 
 /** Aplica estimation settings sobre BlockModelParams existentes (partial overlay). */
-export function applyEstimation(
-  base: BlockModelParams,
-  est: EstimationSettings,
-): BlockModelParams {
+export function applyEstimation(base: BlockModelParams, est: EstimationSettings): BlockModelParams {
   return {
     ...base,
     power: est.idwPower,

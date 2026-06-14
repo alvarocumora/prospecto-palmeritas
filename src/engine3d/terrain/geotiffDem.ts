@@ -39,7 +39,10 @@ export async function loadGeoTiffDem(file: File): Promise<DemHeightmap> {
     for (let i = 0; i < data.length; i++) if (data[i] === noData) data[i] = NaN;
   }
   return {
-    width, height, data, bbox,
+    width,
+    height,
+    data,
+    bbox,
     resolution,
     noData: noData ?? undefined,
   };
@@ -53,7 +56,8 @@ export function heightmapToMartiniGrid(
   const size = targetSize;
   const out = new Float32Array(size * size);
   // Bilinear resample
-  let min = Infinity, max = -Infinity;
+  let min = Infinity,
+    max = -Infinity;
   for (let y = 0; y < size; y++) {
     const v = (y / (size - 1)) * (dem.height - 1);
     const y0 = Math.floor(v);

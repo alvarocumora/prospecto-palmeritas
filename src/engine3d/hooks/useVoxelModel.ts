@@ -27,10 +27,9 @@ export function useVoxelModel(points: AnomalyPoint[], params: VoxelParams) {
 
   // Crea/destruye worker
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/workers/voxel.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/workers/voxel.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();

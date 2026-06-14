@@ -32,8 +32,14 @@ export const STRINGS: Dict = {
   map_chip_live: { es: "GEOCAPITALS · LIVE MAP · CHILE", en: "GEOCAPITALS · LIVE MAP · CHILE" },
   map_mode_listings: { es: "Listados", en: "Listings" },
   map_mode_potential: { es: "Potencial", en: "Potential" },
-  map_listings_hint: { es: "Proyectos disponibles para inversión", en: "Projects open for investment" },
-  map_potential_hint: { es: "Concesiones, anomalías y yacimientos", en: "Concessions, anomalies & deposits" },
+  map_listings_hint: {
+    es: "Proyectos disponibles para inversión",
+    en: "Projects open for investment",
+  },
+  map_potential_hint: {
+    es: "Concesiones, anomalías y yacimientos",
+    en: "Concessions, anomalies & deposits",
+  },
   map_browse_deals: { es: "Ver oportunidades", en: "Browse opportunities" },
 };
 
@@ -53,20 +59,24 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved === "es" || saved === "en") setLocaleState(saved);
-    } catch {}
+    } catch {
+      /* localStorage unavailable */
+    }
   }, []);
 
   const setLocale = (l: Locale) => {
     setLocaleState(l);
-    try { localStorage.setItem(STORAGE_KEY, l); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, l);
+    } catch {
+      /* localStorage unavailable */
+    }
   };
 
   const t = (key: keyof typeof STRINGS) => STRINGS[key]?.[locale] ?? String(key);
 
   return (
-    <LocaleContext.Provider value={{ locale, setLocale, t }}>
-      {children}
-    </LocaleContext.Provider>
+    <LocaleContext.Provider value={{ locale, setLocale, t }}>{children}</LocaleContext.Provider>
   );
 }
 

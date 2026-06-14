@@ -7,11 +7,8 @@ export function useRunSatelliteAnalysisOnTargets() {
   const qc = useQueryClient();
   const run = useServerFn(runSatelliteAnalysisOnTargets);
   return useMutation({
-    mutationFn: (vars: {
-      projectId: string;
-      targetIds: string[];
-      indexCodes: SatIndexCode[];
-    }) => run({ data: vars }),
+    mutationFn: (vars: { projectId: string; targetIds: string[]; indexCodes: SatIndexCode[] }) =>
+      run({ data: vars }),
     onSuccess: (_d, vars) => {
       qc.invalidateQueries({ queryKey: ["satellite_anomalies", vars.projectId] });
       qc.invalidateQueries({ queryKey: ["satellite_runs", vars.projectId] });

@@ -15,24 +15,21 @@ export function AnomalyPointsLayer({
 }) {
   const ref = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => new THREE.SphereGeometry(15, 12, 8), []);
-  const material = useMemo(
-    () => {
-      if (unlit) {
-        return new THREE.MeshBasicMaterial({
-          vertexColors: true,
-          toneMapped: false,
-        });
-      }
-      return new THREE.MeshStandardMaterial({
+  const material = useMemo(() => {
+    if (unlit) {
+      return new THREE.MeshBasicMaterial({
         vertexColors: true,
-        emissive: new THREE.Color(0xffffff),
-        emissiveIntensity: 0.4,
-        metalness: 0.4,
-        roughness: 0.35,
+        toneMapped: false,
       });
-    },
-    [unlit],
-  );
+    }
+    return new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      emissive: new THREE.Color(0xffffff),
+      emissiveIntensity: 0.4,
+      metalness: 0.4,
+      roughness: 0.35,
+    });
+  }, [unlit]);
 
   useEffect(() => {
     const mesh = ref.current;
@@ -54,5 +51,7 @@ export function AnomalyPointsLayer({
   }, [points, verticalExaggeration]);
 
   if (points.length === 0) return null;
-  return <instancedMesh ref={ref} args={[geometry, material, points.length]} frustumCulled={false} />;
+  return (
+    <instancedMesh ref={ref} args={[geometry, material, points.length]} frustumCulled={false} />
+  );
 }

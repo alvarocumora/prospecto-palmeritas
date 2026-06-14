@@ -22,7 +22,8 @@ export function ShadowApplier({ enabled, deps }: Props) {
       // El terreno es enorme y plano → recibe sombras
       // Los drillholes y shells finos castean para definir relieve
       const name = mesh.name || "";
-      const isTerrain = name.includes("terrain") || name.includes("dem") || name.includes("basemap");
+      const isTerrain =
+        name.includes("terrain") || name.includes("dem") || name.includes("basemap");
       mesh.castShadow = !isTerrain;
       mesh.receiveShadow = true;
       // PBR boost: si el material es Standard/Physical, sube envMapIntensity

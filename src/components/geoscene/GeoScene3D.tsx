@@ -2,17 +2,8 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { Loader2, Sparkles, Crosshair, X, Layers, Box } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
-import {
-  MODE_LABELS,
-  type GeoSceneEngine,
-  type GeoSceneMode,
-  type GeoSceneProps,
-} from "./types";
-import {
-  ANCHOR_LABEL,
-  SCENE_FOCUS_EVENT,
-  type SceneFocusDetail,
-} from "./anchors";
+import { MODE_LABELS, type GeoSceneEngine, type GeoSceneMode, type GeoSceneProps } from "./types";
+import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchors";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -117,22 +108,17 @@ export function GeoScene3D({
           {engine === "legacy" && mode === "subsurface" && variant !== "mag" && (
             <SatToSubsurface3DViewer />
           )}
-          {engine === "legacy" && mode === "subsurface" && variant === "mag" && (
-            <MagAnomaly3DPro />
-          )}
+          {engine === "legacy" && mode === "subsurface" && variant === "mag" && <MagAnomaly3DPro />}
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
-
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (
         <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-bg-secondary/95 backdrop-blur border border-gold/60 rounded px-2.5 py-1.5 shadow-lg">
           <Crosshair className="w-3.5 h-3.5 text-gold animate-pulse" />
           <div className="text-[11px] font-mono">
-            <span className="text-muted-foreground uppercase mr-1">
-              {ANCHOR_LABEL[focus.kind]}
-            </span>
+            <span className="text-muted-foreground uppercase mr-1">{ANCHOR_LABEL[focus.kind]}</span>
             <span className="text-gold font-semibold">{focus.code}</span>
           </div>
           <button
@@ -171,8 +157,8 @@ function ResourceModeStub() {
           Resource mode
         </div>
         <div className="text-sm text-foreground">
-          Selecciona un modelo de recursos desde Estimación para visualizar bloques,
-          leyes y pit shells aquí.
+          Selecciona un modelo de recursos desde Estimación para visualizar bloques, leyes y pit
+          shells aquí.
         </div>
         <a
           href="/dashboard/estimation"

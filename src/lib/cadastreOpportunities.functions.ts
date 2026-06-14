@@ -4,7 +4,29 @@
 // - Genera tesis y acción con Lovable AI Gateway.
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Json, TablesInsert } from "@/integrations/supabase/types";
+import type { FeatureCollection } from "geojson";
 import { z } from "zod";
+
+const EMPTY_FC: FeatureCollection = { type: "FeatureCollection", features: [] };
+
+type CandidateRow = {
+  id: string;
+  name: string | null;
+  region: string | null;
+  commune: string | null;
+  area_ha: number | null;
+  holder_name: string | null;
+  holder_rut: string | null;
+  last_patent_year: number | null;
+  status: string | null;
+  deposit_id: string | null;
+  deposit_name: string | null;
+  deposit_commodity: string | null;
+  dist_km: number | null;
+  anomaly_count: number | null;
+  holder_count: number | null;
+};
 
 const ScoreInput = z.object({
   limit: z.number().int().min(1).max(2000).default(200),
@@ -49,13 +71,14 @@ function heuristicScore(f: Feature): { score: number; commodityHint: string[] } 
   // Concentración titular (0-10 pts) — mientras más concesiones tiene el titular, más serio
   s += Math.min(10, Math.floor(f.holder_concentration / 5));
 
-  const commodityHint = f.nearest_deposit_commodity
-    ? [f.nearest_deposit_commodity]
-    : [];
+  const commodityHint = f.nearest_deposit_commodity ? [f.nearest_deposit_commodity] : [];
   return { score: Math.min(100, Math.round(s * 100) / 100), commodityHint };
 }
 
-function computeExpiryRisk(lastPatentYear: number | null, status: string | null): {
+function computeExpiryRisk(
+  lastPatentYear: number | null,
+  status: string | null,
+): {
   patent_status: string;
   expiry_risk: string;
   patent_age_years: number | null;
@@ -73,7 +96,13 @@ function computeExpiryRisk(lastPatentYear: number | null, status: string | null)
 
 async function explainWithAI(
   apiKey: string,
-  payload: { name: string; region: string | null; holder: string | null; features: Feature; score: number },
+  payload: {
+    name: string;
+    region: string | null;
+    holder: string | null;
+    features: Feature;
+    score: number;
+  },
 ): Promise<{ thesis: string; action: string; confidence: number } | null> {
   try {
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -117,18 +146,20 @@ export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ScoreInput.parse(d))
   .handler(async ({ data, context }) => {
     // Solo super_admin
-    const { data: isAdmin } = await context.supabase.rpc("is_super_admin", { _user_id: context.userId });
+    const { data: isAdmin } = await context.supabase.rpc("is_super_admin", {
+      _user_id: context.userId,
+    });
     if (!isAdmin) throw new Error("Solo super_admin puede ejecutar el scoring");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: rows, error } = await (supabaseAdmin.rpc as any)("score_cadastre_candidates", {
+    const { data: rows, error } = await supabaseAdmin.rpc("score_cadastre_candidates", {
       _limit: data.limit,
-      _region: data.region ?? null,
-      _min_area: data.minAreaHa ?? null,
+      _region: data.region ?? undefined,
+      _min_area: data.minAreaHa ?? undefined,
     });
 
-    let candidates: any[] = [];
+    let candidates: CandidateRow[] = [];
     if (error || !rows) {
       const { data: simple } = await supabaseAdmin
         .from("cadastre_national")
@@ -146,14 +177,14 @@ export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
         holder_count: 1,
       }));
     } else {
-      candidates = rows as any[];
+      candidates = rows as CandidateRow[];
     }
 
     const apiKey = process.env.LOVABLE_API_KEY;
     let aiOk = 0;
     let aiSkipped = 0;
 
-    const upserts: any[] = [];
+    const upserts: TablesInsert<"cadastre_opportunities">[] = [];
     for (const c of candidates) {
       const expiry = computeExpiryRisk(c.last_patent_year, c.status);
       const feat: Feature = {
@@ -212,7 +243,7 @@ export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
         ai_thesis: thesis,
         ai_action: action,
         ai_confidence: confidence,
-        features: feat as any,
+        features: feat as unknown as Json,
         model: thesis ? "google/gemini-3-flash-preview" : null,
         computed_at: new Date().toISOString(),
       });
@@ -229,7 +260,7 @@ export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
       processed: upserts.length,
       aiExplained: aiOk,
       aiSkipped,
-      topScore: Math.max(0, ...upserts.map((u) => u.score)),
+      topScore: Math.max(0, ...upserts.map((u) => u.score ?? 0)),
     };
   });
 
@@ -275,19 +306,24 @@ export const getOpportunitiesGeo = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => GeoInput.parse(d ?? {}))
   .handler(async ({ data, context }) => {
-    const { data: result, error } = await (context.supabase.rpc as any)("opportunities_geo", {
+    const { data: result, error } = await context.supabase.rpc("opportunities_geo", {
       _limit: data.limit,
       _min_score: data.minScore,
-      _region: data.region ?? null,
+      _region: data.region ?? undefined,
     });
     if (error) throw new Error(error.message);
-    const r = (result ?? {}) as any;
+    const r = (result ?? {}) as {
+      concessions?: FeatureCollection;
+      anomalies?: FeatureCollection;
+      deposits?: FeatureCollection;
+      targets?: FeatureCollection;
+      bbox?: [number, number, number, number] | null;
+    };
     return {
-      concessions: r.concessions ?? { type: "FeatureCollection", features: [] },
-      anomalies: r.anomalies ?? { type: "FeatureCollection", features: [] },
-      deposits: r.deposits ?? { type: "FeatureCollection", features: [] },
-      targets: r.targets ?? { type: "FeatureCollection", features: [] },
-      bbox: (r.bbox as [number, number, number, number] | null) ?? null,
+      concessions: r.concessions ?? EMPTY_FC,
+      anomalies: r.anomalies ?? EMPTY_FC,
+      deposits: r.deposits ?? EMPTY_FC,
+      targets: r.targets ?? EMPTY_FC,
+      bbox: r.bbox ?? null,
     };
   });
-

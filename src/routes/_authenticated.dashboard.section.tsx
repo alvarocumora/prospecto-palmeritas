@@ -240,7 +240,8 @@ function SectionCanvas({ data }: { data: SectionData }) {
         ?.filter((p) => p.kind === "block")
         .map((p, i) => {
           const g = typeof p.grade === "number" ? p.grade : null;
-          const fill = g == null ? "#3b3b4f" : g >= 1 ? "#facc15" : g >= 0.3 ? "#f59e0b" : "#6b7080";
+          const fill =
+            g == null ? "#3b3b4f" : g >= 1 ? "#facc15" : g >= 0.3 ? "#f59e0b" : "#6b7080";
           return (
             <rect
               key={`b${i}`}
@@ -265,12 +266,7 @@ function SectionCanvas({ data }: { data: SectionData }) {
             {/* Collar */}
             {t.points[0] && (
               <>
-                <circle
-                  cx={sx(t.points[0].s)}
-                  cy={sy(t.points[0].h)}
-                  r={3}
-                  fill="#3ed5ff"
-                />
+                <circle cx={sx(t.points[0].s)} cy={sy(t.points[0].h)} r={3} fill="#3ed5ff" />
                 <text
                   x={sx(t.points[0].s) + 6}
                   y={sy(t.points[0].h) - 4}

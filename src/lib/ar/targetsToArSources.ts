@@ -3,7 +3,9 @@ import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 
 export function targetsToArSources(targets: ExplorationTarget[]): ArExplorationSource[] {
   return targets
-    .filter((t): t is ExplorationTarget & { lat: number; lng: number } => t.lat != null && t.lng != null)
+    .filter(
+      (t): t is ExplorationTarget & { lat: number; lng: number } => t.lat != null && t.lng != null,
+    )
     .map((t) => ({
       id: t.id,
       type: "target",

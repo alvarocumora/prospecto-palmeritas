@@ -26,7 +26,12 @@ type Props = {
   } | null;
 };
 
-export function VersionSelectorPanel({ projectId, activeVersionId, onSelect, buildSnapshot }: Props) {
+export function VersionSelectorPanel({
+  projectId,
+  activeVersionId,
+  onSelect,
+  buildSnapshot,
+}: Props) {
   const qc = useQueryClient();
   const { can } = useEngineRole();
   const [label, setLabel] = useState("");
@@ -103,9 +108,7 @@ export function VersionSelectorPanel({ projectId, activeVersionId, onSelect, bui
           >
             <div className="flex justify-between items-center">
               <span className="font-mono">{v.version_label}</span>
-              <span className="text-[9px] text-muted-foreground">
-                {v.block_count ?? 0} blk
-              </span>
+              <span className="text-[9px] text-muted-foreground">{v.block_count ?? 0} blk</span>
             </div>
             <div className="text-[9px] text-muted-foreground">
               {new Date(v.created_at).toLocaleString()}

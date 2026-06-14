@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Map as MLMap, Popup as MLPopup } from "maplibre-gl";
+import type {
+  Map as MLMap,
+  Popup as MLPopup,
+  StyleSpecification,
+  GeoJSONSource,
+} from "maplibre-gl";
+import type { FeatureCollection } from "geojson";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -15,11 +21,11 @@ async function loadMaplibre() {
     import("maplibre-gl"),
     import("maplibre-gl/dist/maplibre-gl.css"),
   ]);
-  _maplibre = mod.default ? (mod as any) : mod;
+  _maplibre = mod.default ? (mod as unknown as typeof import("maplibre-gl")) : mod;
   return _maplibre!;
 }
 
-const STYLE: any = {
+const STYLE: StyleSpecification = {
   version: 8,
   glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
   sources: {
@@ -37,7 +43,7 @@ const STYLE: any = {
 
 const FALLBACK_CENTER: [number, number] = [-70.4, -29.5];
 const FALLBACK_ZOOM = 4.4;
-const EMPTY_FC = { type: "FeatureCollection", features: [] } as any;
+const EMPTY_FC: FeatureCollection = { type: "FeatureCollection", features: [] };
 
 type Mode = "listings" | "potential";
 
@@ -101,8 +107,8 @@ export function HeroLiveMap() {
     if (!map || !data) return;
 
     const apply = () => {
-      const ensureSrc = (id: string, fc: any) => {
-        const src = map.getSource(id) as any;
+      const ensureSrc = (id: string, fc: FeatureCollection) => {
+        const src = map.getSource(id) as GeoJSONSource | undefined;
         if (src) src.setData(fc);
         else map.addSource(id, { type: "geojson", data: fc });
       };
@@ -119,8 +125,15 @@ export function HeroLiveMap() {
           source: "hl-conc",
           paint: {
             "fill-color": [
-              "interpolate", ["linear"], ["coalesce", ["get", "score"], 0],
-              0, "#94a3b8", 60, "#f59e0b", 80, "#10b981",
+              "interpolate",
+              ["linear"],
+              ["coalesce", ["get", "score"], 0],
+              0,
+              "#94a3b8",
+              60,
+              "#f59e0b",
+              80,
+              "#10b981",
             ],
             "fill-opacity": 0.55,
           },
@@ -167,15 +180,16 @@ export function HeroLiveMap() {
           type: "circle",
           source: "hl-list",
           paint: {
-            "circle-radius": [
-              "interpolate", ["linear"], ["zoom"],
-              3, 5, 6, 9, 10, 14,
-            ],
+            "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 5, 6, 9, 10, 14],
             "circle-color": [
-              "match", ["get", "modality"],
-              "sale", "#10b981",
-              "jv", "#fcd34d",
-              "royalty", "#60a5fa",
+              "match",
+              ["get", "modality"],
+              "sale",
+              "#10b981",
+              "jv",
+              "#fcd34d",
+              "royalty",
+              "#60a5fa",
               "#fcd34d",
             ],
             "circle-stroke-color": "#0b2a5b",
@@ -183,17 +197,20 @@ export function HeroLiveMap() {
             "circle-opacity": 0.95,
           },
         });
-        map.addLayer({
-          id: "hl-list-halo",
-          type: "circle",
-          source: "hl-list",
-          paint: {
-            "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 10, 6, 18, 10, 26],
-            "circle-color": "#fcd34d",
-            "circle-opacity": 0.15,
-            "circle-blur": 0.6,
+        map.addLayer(
+          {
+            id: "hl-list-halo",
+            type: "circle",
+            source: "hl-list",
+            paint: {
+              "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 10, 6, 18, 10, 26],
+              "circle-color": "#fcd34d",
+              "circle-opacity": 0.15,
+              "circle-blur": 0.6,
+            },
           },
-        }, "hl-list-pt");
+          "hl-list-pt",
+        );
 
         // hover popup
         map.on("mouseenter", "hl-list-pt", () => (map.getCanvas().style.cursor = "pointer"));
@@ -204,7 +221,14 @@ export function HeroLiveMap() {
         map.on("click", "hl-list-pt", (e) => {
           const f = e.features?.[0];
           if (!f) return;
-          const p: any = f.properties ?? {};
+          const p = (f.properties ?? {}) as {
+            asking_price_usd?: number | string | null;
+            modality?: string;
+            commodity?: string;
+            title?: string;
+            region?: string;
+            area_ha?: number | string | null;
+          };
           const price =
             p.asking_price_usd != null && p.asking_price_usd !== ""
               ? `US$ ${Number(p.asking_price_usd).toLocaleString("en-US")}`
@@ -218,7 +242,7 @@ export function HeroLiveMap() {
             </div>`;
           popupRef.current?.remove();
           popupRef.current = new mlRef.current!.Popup({ closeButton: true, offset: 12 })
-            .setLngLat((f.geometry as any).coordinates)
+            .setLngLat((f.geometry as unknown as { coordinates: [number, number] }).coordinates)
             .setHTML(html)
             .addTo(map);
         });
@@ -249,24 +273,35 @@ export function HeroLiveMap() {
       if (bb) {
         const [w, s, e, n] = bb;
         try {
-          map.fitBounds([[w, s], [e, n]], {
-            padding: 60,
-            duration: 700,
-            maxZoom: listingsOn ? 6.5 : 7,
-          });
-        } catch {}
+          map.fitBounds(
+            [
+              [w, s],
+              [e, n],
+            ],
+            {
+              padding: 60,
+              duration: 700,
+              maxZoom: listingsOn ? 6.5 : 7,
+            },
+          );
+        } catch {
+          /* ignore fitBounds errors */
+        }
       }
     };
     if (styleReadyRef.current) applyMode();
     else map.once("load", applyMode);
   }, [mode, data]);
 
-  const counts = useMemo(() => ({
-    listings: data?.listings?.features?.length ?? 0,
-    concessions: data?.concessions?.features?.length ?? 0,
-    anomalies: data?.anomalies?.features?.length ?? 0,
-    deposits: data?.deposits?.features?.length ?? 0,
-  }), [data]);
+  const counts = useMemo(
+    () => ({
+      listings: data?.listings?.features?.length ?? 0,
+      concessions: data?.concessions?.features?.length ?? 0,
+      anomalies: data?.anomalies?.features?.length ?? 0,
+      deposits: data?.deposits?.features?.length ?? 0,
+    }),
+    [data],
+  );
 
   return (
     <div className="relative">
@@ -312,16 +347,37 @@ export function HeroLiveMap() {
           <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur rounded-md border border-[var(--brand-hair)] px-3 py-2 text-[10px] font-mono text-[var(--brand-navy-deep)] space-y-1 shadow-sm">
             {mode === "listings" ? (
               <>
-                <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white" /> Venta</div>
-                <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" /> Joint Venture</div>
-                <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-blue-400 border border-white" /> Royalty</div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-white" />{" "}
+                  Venta
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" />{" "}
+                  Joint Venture
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-blue-400 border border-white" />{" "}
+                  Royalty
+                </div>
               </>
             ) : (
               <>
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-emerald-500/70 border border-white" /> Concesión score alto</div>
-                <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-amber-500/70 border border-white" /> Score medio</div>
-                <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-fuchsia-400 border border-white" /> Anomalía satelital</div>
-                <div className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" /> Yacimiento conocido</div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-emerald-500/70 border border-white" />{" "}
+                  Concesión score alto
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm bg-amber-500/70 border border-white" /> Score
+                  medio
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-fuchsia-400 border border-white" />{" "}
+                  Anomalía satelital
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" />{" "}
+                  Yacimiento conocido
+                </div>
               </>
             )}
           </div>
@@ -329,12 +385,24 @@ export function HeroLiveMap() {
           {/* stat pills */}
           <div className="absolute top-3 right-3 flex gap-2">
             {mode === "listings" ? (
-              <Pill icon={<Briefcase className="w-3 h-3" />} label={`${counts.listings} listados`} />
+              <Pill
+                icon={<Briefcase className="w-3 h-3" />}
+                label={`${counts.listings} listados`}
+              />
             ) : (
               <>
-                <Pill icon={<Radar className="w-3 h-3" />} label={`${counts.concessions} concesiones`} />
-                <Pill icon={<Satellite className="w-3 h-3" />} label={`${counts.anomalies} anomalías`} />
-                <Pill icon={<Activity className="w-3 h-3" />} label={`${counts.deposits} yacimientos`} />
+                <Pill
+                  icon={<Radar className="w-3 h-3" />}
+                  label={`${counts.concessions} concesiones`}
+                />
+                <Pill
+                  icon={<Satellite className="w-3 h-3" />}
+                  label={`${counts.anomalies} anomalías`}
+                />
+                <Pill
+                  icon={<Activity className="w-3 h-3" />}
+                  label={`${counts.deposits} yacimientos`}
+                />
               </>
             )}
           </div>
@@ -407,7 +475,15 @@ function ModeBtn({
 }
 
 function escapeHtml(s: string) {
-  return String(s ?? "").replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
-  }[c]!));
+  return String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c]!,
+  );
 }

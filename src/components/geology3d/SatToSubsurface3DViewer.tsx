@@ -72,11 +72,16 @@ const INDEX_LABEL: Record<SatIndexCode, string> = {
 const SEVERITY_ALPHA = { low: 100, medium: 170, high: 230 } as const;
 
 function centroidOfGeometry(geom: GeoJSON.Geometry): [number, number] | null {
-  let sx = 0, sy = 0, n = 0;
+  let sx = 0,
+    sy = 0,
+    n = 0;
   const walk = (c: unknown): void => {
     if (!Array.isArray(c)) return;
     if (typeof c[0] === "number" && typeof c[1] === "number") {
-      sx += c[0] as number; sy += c[1] as number; n += 1; return;
+      sx += c[0] as number;
+      sy += c[1] as number;
+      n += 1;
+      return;
     }
     for (const item of c) walk(item);
   };
@@ -113,8 +118,7 @@ type Props = { className?: string };
 export function SatToSubsurface3DViewer({ className }: Props) {
   const { active } = useProjects();
   const projectId = active?.id ?? null;
-  const { data: anomGrouped, isLoading: anomLoading } =
-    useProjectSatelliteAnomalies(projectId);
+  const { data: anomGrouped, isLoading: anomLoading } = useProjectSatelliteAnomalies(projectId);
   const { targets } = useExplorationTargets(projectId);
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -185,16 +189,24 @@ export function SatToSubsurface3DViewer({ className }: Props) {
   useEffect(() => {
     const m = mapRef.current;
     if (!m || !styleReady) return;
-    try { m.setTerrain({ source: "terrain", exaggeration }); } catch { /* ignore */ }
+    try {
+      m.setTerrain({ source: "terrain", exaggeration });
+    } catch {
+      /* ignore */
+    }
   }, [exaggeration, styleReady]);
 
   // ---------- COLUMNAS de anomalías ----------
   const columnData = useMemo(() => {
     if (!anomGrouped || !showColumns) return [];
     const out: Array<{
-      position: [number, number]; depth: number;
+      position: [number, number];
+      depth: number;
       color: [number, number, number, number];
-      name: string; index: SatIndexCode; severity: string; score: number;
+      name: string;
+      index: SatIndexCode;
+      severity: string;
+      score: number;
     }> = [];
     (Object.keys(anomGrouped) as SatIndexCode[]).forEach((idx) => {
       if (!enabled[idx]) return;
@@ -208,10 +220,13 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         const rgb = INDEX_COLOR[idx];
         const alpha = SEVERITY_ALPHA[a.severity] ?? 180;
         out.push({
-          position: c, depth,
+          position: c,
+          depth,
           color: [...rgb, alpha] as [number, number, number, number],
           name: a.notes ?? INDEX_LABEL[idx],
-          index: idx, severity: a.severity, score,
+          index: idx,
+          severity: a.severity,
+          score,
         });
       }
     });
@@ -226,7 +241,9 @@ export function SatToSubsurface3DViewer({ className }: Props) {
     const horizOffsetM = veinDepthM / Math.tan(dipRad);
     const polys: Array<{
       polygon: [number, number, number][];
-      name: string; score: number; color: [number, number, number, number];
+      name: string;
+      score: number;
+      color: [number, number, number, number];
     }> = [];
     for (const a of anomGrouped.STRUCTURAL_LINEAMENTS) {
       const segs = extractSegments(a.geometry);
@@ -238,8 +255,8 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         const len = Math.hypot(dx, dy);
         if (len < 1e-7) continue;
         // perpendicular unitario (en grados, sin corregir longitud aún)
-        let nx = -dy / len;
-        let ny = dx / len;
+        const nx = -dy / len;
+        const ny = dx / len;
         // convertir offset en metros a grados sobre la dirección perpendicular
         const { dLat, dLng } = metersToDegrees(horizOffsetM, midLat);
         // escalar nx/ny (que están en "grados normalizados" tras dividir por len de grados)
@@ -275,8 +292,12 @@ export function SatToSubsurface3DViewer({ className }: Props) {
       (a: AnomalyRow) => (a.score ?? 0) >= 65,
     );
     const out: Array<{
-      position: [number, number]; depth: number; radius: number;
-      color: [number, number, number, number]; name: string; score: number;
+      position: [number, number];
+      depth: number;
+      radius: number;
+      color: [number, number, number, number];
+      name: string;
+      score: number;
     }> = [];
     for (const a of hydros) {
       const c = centroidOfGeometry(a.geometry);
@@ -285,7 +306,9 @@ export function SatToSubsurface3DViewer({ className }: Props) {
       const radius = 120 + score * 2.5; // 200–370 m
       const depth = porphyryDepthM * (0.6 + score / 250);
       out.push({
-        position: c, depth, radius,
+        position: c,
+        depth,
+        radius,
         color: [180, 60, 200, 150],
         name: a.notes ?? "Raíz porfídica inferida",
         score,
@@ -301,16 +324,20 @@ export function SatToSubsurface3DViewer({ className }: Props) {
     const horiz = drillLengthM * Math.cos(dipRad);
     const vert = drillLengthM * Math.sin(dipRad);
     const out: Array<{
-      path: [number, number, number][]; color: [number, number, number]; name: string;
+      path: [number, number, number][];
+      color: [number, number, number];
+      name: string;
     }> = [];
     for (const t of targets) {
       if (t.lat == null || t.lng == null) continue;
       // dirección perpendicular al norte aproximado (azimut 90° E)
       const { dLng } = metersToDegrees(horiz, t.lat);
       const color: [number, number, number] =
-        t.priority === "critical" ? [230, 60, 60]
-        : t.priority === "high" ? [240, 180, 60]
-        : [120, 180, 240];
+        t.priority === "critical"
+          ? [230, 60, 60]
+          : t.priority === "high"
+            ? [240, 180, 60]
+            : [120, 180, 240];
       out.push({
         path: [
           [t.lng, t.lat, 0],
@@ -352,10 +379,13 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         position: [t.lng!, t.lat!] as [number, number],
         radius: 40 + (t.score ?? 50) * 1.5,
         color:
-          t.priority === "critical" ? [220, 60, 60]
-          : t.priority === "high" ? [240, 180, 60]
-          : t.priority === "medium" ? [80, 160, 220]
-          : [160, 160, 160],
+          t.priority === "critical"
+            ? [220, 60, 60]
+            : t.priority === "high"
+              ? [240, 180, 60]
+              : t.priority === "medium"
+                ? [80, 160, 220]
+                : [160, 160, 160],
         name: `${t.code} · ${t.name}`,
         score: t.score,
       }));
@@ -445,7 +475,8 @@ export function SatToSubsurface3DViewer({ className }: Props) {
           lineWidthMinPixels: 2,
           getPosition: (d: (typeof targetData)[number]) => d.position,
           getRadius: (d: (typeof targetData)[number]) => d.radius,
-          getFillColor: (d: (typeof targetData)[number]) => [...d.color, 180] as [number, number, number, number],
+          getFillColor: (d: (typeof targetData)[number]) =>
+            [...d.color, 180] as [number, number, number, number],
           getLineColor: [255, 255, 255, 255],
         }),
       ],
@@ -458,20 +489,34 @@ export function SatToSubsurface3DViewer({ className }: Props) {
           style: { background: "rgba(20,20,20,0.92)", color: "#fff", borderRadius: "4px" },
         });
         if (layer.id === "sat-columns-3d") {
-          const o = object as { name: string; index: SatIndexCode; severity: string; score: number; depth: number };
-          return wrap(`<b>${INDEX_LABEL[o.index]}</b><br/>${o.severity} · score ${o.score.toFixed(0)}<br/>Prof. inferida: ${o.depth.toFixed(0)} m<br/><i>${o.name}</i>`);
+          const o = object as {
+            name: string;
+            index: SatIndexCode;
+            severity: string;
+            score: number;
+            depth: number;
+          };
+          return wrap(
+            `<b>${INDEX_LABEL[o.index]}</b><br/>${o.severity} · score ${o.score.toFixed(0)}<br/>Prof. inferida: ${o.depth.toFixed(0)} m<br/><i>${o.name}</i>`,
+          );
         }
         if (layer.id === "vein-planes") {
           const o = object as { name: string; score: number };
-          return wrap(`<b>Veta</b> (dip ${dipDeg}°, prof. ${veinDepthM} m)<br/>${o.name}<br/>score ${o.score.toFixed(0)}`);
+          return wrap(
+            `<b>Veta</b> (dip ${dipDeg}°, prof. ${veinDepthM} m)<br/>${o.name}<br/>score ${o.score.toFixed(0)}`,
+          );
         }
         if (layer.id === "porphyry-bodies") {
           const o = object as { name: string; score: number; depth: number; radius: number };
-          return wrap(`<b>Pórfido (raíz)</b><br/>${o.name}<br/>radio ${o.radius.toFixed(0)} m · prof. ${o.depth.toFixed(0)} m · score ${o.score.toFixed(0)}`);
+          return wrap(
+            `<b>Pórfido (raíz)</b><br/>${o.name}<br/>radio ${o.radius.toFixed(0)} m · prof. ${o.depth.toFixed(0)} m · score ${o.score.toFixed(0)}`,
+          );
         }
         if (layer.id === "drill-plan") {
           const o = object as { name: string };
-          return wrap(`<b>Sondaje propuesto</b><br/>${o.name}<br/>${drillLengthM} m @ ${drillDipDeg}°`);
+          return wrap(
+            `<b>Sondaje propuesto</b><br/>${o.name}<br/>${drillLengthM} m @ ${drillDipDeg}°`,
+          );
         }
         if (layer.id === "open-pit-footprint") {
           const o = object as { name: string };
@@ -484,7 +529,18 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         return null;
       },
     });
-  }, [columnData, veinPolygons, porphyryData, drillPaths, pitPolygons, targetData, dipDeg, veinDepthM, drillLengthM, drillDipDeg]);
+  }, [
+    columnData,
+    veinPolygons,
+    porphyryData,
+    drillPaths,
+    pitPolygons,
+    targetData,
+    dipDeg,
+    veinDepthM,
+    drillLengthM,
+    drillDipDeg,
+  ]);
 
   return (
     <div className={`relative ${className ?? "absolute inset-0"}`}>
@@ -501,24 +557,62 @@ export function SatToSubsurface3DViewer({ className }: Props) {
           </div>
         ) : (
           <div className="text-[10px] font-mono text-muted-foreground">
-            {columnData.length} anomalías · {veinPolygons.length} vetas · {porphyryData.length} pórfidos · proyecto {active?.code ?? "—"}
+            {columnData.length} anomalías · {veinPolygons.length} vetas · {porphyryData.length}{" "}
+            pórfidos · proyecto {active?.code ?? "—"}
           </div>
         )}
 
         {/* Sliders globales */}
-        <Slider label="Exageración relieve" value={exaggeration} min={0} max={5} step={0.1} suffix="×" onChange={setExaggeration} />
-        <Slider label="Escala prof. anomalías" value={depthScale} min={0.2} max={3} step={0.1} suffix="×" onChange={setDepthScale} />
+        <Slider
+          label="Exageración relieve"
+          value={exaggeration}
+          min={0}
+          max={5}
+          step={0.1}
+          suffix="×"
+          onChange={setExaggeration}
+        />
+        <Slider
+          label="Escala prof. anomalías"
+          value={depthScale}
+          min={0.2}
+          max={3}
+          step={0.1}
+          suffix="×"
+          onChange={setDepthScale}
+        />
 
         {/* Vetas */}
         <div className="pt-1.5 border-t border-border space-y-1.5">
           <label className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={showVeins} onChange={(e) => setShowVeins(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showVeins}
+              onChange={(e) => setShowVeins(e.target.checked)}
+              className="accent-gold"
+            />
             <Mountain className="w-3 h-3" /> Vetas (desde lineamientos)
           </label>
           {showVeins && (
             <>
-              <Slider label="Buzamiento" value={dipDeg} min={30} max={90} step={1} suffix="°" onChange={setDipDeg} />
-              <Slider label="Profundidad veta" value={veinDepthM} min={100} max={1200} step={50} suffix=" m" onChange={setVeinDepthM} />
+              <Slider
+                label="Buzamiento"
+                value={dipDeg}
+                min={30}
+                max={90}
+                step={1}
+                suffix="°"
+                onChange={setDipDeg}
+              />
+              <Slider
+                label="Profundidad veta"
+                value={veinDepthM}
+                min={100}
+                max={1200}
+                step={50}
+                suffix=" m"
+                onChange={setVeinDepthM}
+              />
             </>
           )}
         </div>
@@ -526,28 +620,67 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         {/* Pórfidos */}
         <div className="pt-1.5 border-t border-border space-y-1.5">
           <label className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={showPorphyry} onChange={(e) => setShowPorphyry(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showPorphyry}
+              onChange={(e) => setShowPorphyry(e.target.checked)}
+              className="accent-gold"
+            />
             <Box className="w-3 h-3" /> Pórfidos (raíces inferidas)
           </label>
           {showPorphyry && (
-            <Slider label="Prof. máx. pórfido" value={porphyryDepthM} min={400} max={2500} step={100} suffix=" m" onChange={setPorphyryDepthM} />
+            <Slider
+              label="Prof. máx. pórfido"
+              value={porphyryDepthM}
+              min={400}
+              max={2500}
+              step={100}
+              suffix=" m"
+              onChange={setPorphyryDepthM}
+            />
           )}
         </div>
 
         {/* Plan de sondajes + rajo */}
         <div className="pt-1.5 border-t border-border space-y-1.5">
           <label className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={showDrillPlan} onChange={(e) => setShowDrillPlan(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showDrillPlan}
+              onChange={(e) => setShowDrillPlan(e.target.checked)}
+              className="accent-gold"
+            />
             <Pickaxe className="w-3 h-3" /> Sondajes propuestos
           </label>
           {showDrillPlan && (
             <>
-              <Slider label="Largo sondaje" value={drillLengthM} min={100} max={1500} step={50} suffix=" m" onChange={setDrillLengthM} />
-              <Slider label="Inclinación sondaje" value={drillDipDeg} min={45} max={90} step={1} suffix="°" onChange={setDrillDipDeg} />
+              <Slider
+                label="Largo sondaje"
+                value={drillLengthM}
+                min={100}
+                max={1500}
+                step={50}
+                suffix=" m"
+                onChange={setDrillLengthM}
+              />
+              <Slider
+                label="Inclinación sondaje"
+                value={drillDipDeg}
+                min={45}
+                max={90}
+                step={1}
+                suffix="°"
+                onChange={setDrillDipDeg}
+              />
             </>
           )}
           <label className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={showPit} onChange={(e) => setShowPit(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showPit}
+              onChange={(e) => setShowPit(e.target.checked)}
+              className="accent-gold"
+            />
             <Crosshair className="w-3 h-3" /> Footprint rajo conceptual
           </label>
         </div>
@@ -555,30 +688,51 @@ export function SatToSubsurface3DViewer({ className }: Props) {
         {/* Capas satelitales */}
         <div className="pt-1.5 border-t border-border space-y-1.5">
           <label className="flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={showColumns} onChange={(e) => setShowColumns(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showColumns}
+              onChange={(e) => setShowColumns(e.target.checked)}
+              className="accent-gold"
+            />
             <Layers className="w-3 h-3" /> Columnas anomalías
           </label>
           {(Object.keys(INDEX_LABEL) as SatIndexCode[]).map((idx) => {
             const count = anomGrouped?.[idx]?.length ?? 0;
             const rgb = INDEX_COLOR[idx];
             return (
-              <label key={idx} className="flex items-center gap-1.5 text-[11px] font-mono text-foreground cursor-pointer pl-3">
-                <input type="checkbox" checked={enabled[idx]} onChange={(e) => setEnabled((s) => ({ ...s, [idx]: e.target.checked }))} className="accent-gold" />
-                <span className="inline-block w-2.5 h-2.5 rounded-sm" style={{ background: `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` }} />
+              <label
+                key={idx}
+                className="flex items-center gap-1.5 text-[11px] font-mono text-foreground cursor-pointer pl-3"
+              >
+                <input
+                  type="checkbox"
+                  checked={enabled[idx]}
+                  onChange={(e) => setEnabled((s) => ({ ...s, [idx]: e.target.checked }))}
+                  className="accent-gold"
+                />
+                <span
+                  className="inline-block w-2.5 h-2.5 rounded-sm"
+                  style={{ background: `rgb(${rgb[0]},${rgb[1]},${rgb[2]})` }}
+                />
                 {INDEX_LABEL[idx]} ({count})
               </label>
             );
           })}
           <label className="flex items-center gap-1.5 text-[11px] font-mono text-foreground cursor-pointer pt-1 border-t border-border/50">
-            <input type="checkbox" checked={showTargets} onChange={(e) => setShowTargets(e.target.checked)} className="accent-gold" />
+            <input
+              type="checkbox"
+              checked={showTargets}
+              onChange={(e) => setShowTargets(e.target.checked)}
+              className="accent-gold"
+            />
             Targets superficie ({targets.length})
           </label>
         </div>
 
         <div className="pt-1 text-[9px] font-mono text-muted-foreground leading-snug">
-          Vetas se proyectan desde lineamientos satelitales con el buzamiento configurado.
-          Pórfidos se infieren desde anomalías hidrotermales score ≥ 65. Sondajes propuestos
-          parten desde cada target con la inclinación seleccionada. Drag = rotar · Shift+drag = pan.
+          Vetas se proyectan desde lineamientos satelitales con el buzamiento configurado. Pórfidos
+          se infieren desde anomalías hidrotermales score ≥ 65. Sondajes propuestos parten desde
+          cada target con la inclinación seleccionada. Drag = rotar · Shift+drag = pan.
         </div>
       </div>
     </div>
@@ -586,19 +740,37 @@ export function SatToSubsurface3DViewer({ className }: Props) {
 }
 
 function Slider({
-  label, value, min, max, step, suffix, onChange,
+  label,
+  value,
+  min,
+  max,
+  step,
+  suffix,
+  onChange,
 }: {
-  label: string; value: number; min: number; max: number; step: number; suffix: string;
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  step: number;
+  suffix: string;
   onChange: (v: number) => void;
 }) {
   return (
     <div>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground mb-1">
         <span>{label}</span>
-        <span className="text-foreground">{value.toFixed(step < 1 ? 1 : 0)}{suffix}</span>
+        <span className="text-foreground">
+          {value.toFixed(step < 1 ? 1 : 0)}
+          {suffix}
+        </span>
       </div>
       <input
-        type="range" min={min} max={max} step={step} value={value}
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
         className="w-full accent-gold h-1"
       />

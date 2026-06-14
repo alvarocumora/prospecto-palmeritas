@@ -14,7 +14,13 @@ type Props = {
 };
 
 export function SectionRenderer({
-  sectionNumber, narrative, loading, preliminary, onRegenerate, cached, fallbackTitle,
+  sectionNumber,
+  narrative,
+  loading,
+  preliminary,
+  onRegenerate,
+  cached,
+  fallbackTitle,
 }: Props) {
   return (
     <section className="space-y-4 scroll-mt-20" id={`sec-${sectionNumber}`}>
@@ -60,24 +66,36 @@ export function SectionRenderer({
           ))}
           {narrative.bullets && narrative.bullets.length > 0 && (
             <ul className="list-disc pl-5 space-y-1">
-              {narrative.bullets.map((b, i) => <li key={i}>{b}</li>)}
+              {narrative.bullets.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
             </ul>
           )}
           {narrative.tables?.map((t, ti) => (
             <div key={ti} className="overflow-x-auto rounded-md border border-border">
-              {t.caption && <div className="px-3 py-1.5 text-xs font-medium bg-muted/40 border-b border-border">{t.caption}</div>}
+              {t.caption && (
+                <div className="px-3 py-1.5 text-xs font-medium bg-muted/40 border-b border-border">
+                  {t.caption}
+                </div>
+              )}
               <table className="w-full text-xs">
                 <thead className="bg-muted/30">
                   <tr>
                     {t.headers.map((h, hi) => (
-                      <th key={hi} className="px-3 py-2 text-left font-medium">{h}</th>
+                      <th key={hi} className="px-3 py-2 text-left font-medium">
+                        {h}
+                      </th>
                     ))}
                   </tr>
                 </thead>
                 <tbody>
                   {t.rows.map((row, ri) => (
                     <tr key={ri} className="border-t border-border">
-                      {row.map((c, ci) => <td key={ci} className="px-3 py-1.5">{c}</td>)}
+                      {row.map((c, ci) => (
+                        <td key={ci} className="px-3 py-1.5">
+                          {c}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>

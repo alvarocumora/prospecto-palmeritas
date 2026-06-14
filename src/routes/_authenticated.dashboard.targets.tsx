@@ -118,9 +118,7 @@ function TargetsPage() {
         ? await snapshotElement(rankingWrapRef.current)
         : null;
 
-      const holders = new Set(
-        (concessions ?? []).map((c) => c.holder ?? "").filter(Boolean),
-      );
+      const holders = new Set((concessions ?? []).map((c) => c.holder ?? "").filter(Boolean));
       const concAreaHa = (concessions ?? []).reduce((s, c) => s + Number(c.area_ha ?? 0), 0);
       const anomCounts: Record<string, number> = {};
       if (anomaliesByIndex) {

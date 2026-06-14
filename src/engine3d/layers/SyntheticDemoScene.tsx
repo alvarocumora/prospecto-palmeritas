@@ -3,7 +3,11 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 
-export function SyntheticDemoScene({ verticalExaggeration = 1 }: { verticalExaggeration?: number }) {
+export function SyntheticDemoScene({
+  verticalExaggeration = 1,
+}: {
+  verticalExaggeration?: number;
+}) {
   const terrainGeo = useMemo(() => {
     const g = new THREE.PlaneGeometry(2000, 2000, 60, 60);
     const pos = g.attributes.position as THREE.BufferAttribute;

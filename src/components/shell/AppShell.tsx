@@ -81,9 +81,7 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
     );
   };
   const container =
-    tone === "dark"
-      ? "border-white/15 bg-white/5"
-      : "border-[var(--brand-hair)] bg-white";
+    tone === "dark" ? "border-white/15 bg-white/5" : "border-[var(--brand-hair)] bg-white";
   return (
     <div className={`inline-flex items-center gap-0.5 border rounded-md p-0.5 ${container}`}>
       <Btn value="es" label="ES" />
@@ -139,8 +137,8 @@ export function MarketingFooter() {
           <BrandMark dark />
           <p className="mt-3 text-white/60 max-w-md text-[13px]">
             Infraestructura digital donde la exploración minera se encuentra con el capital
-            institucional. Catastro, geología 3D, monitoreo satelital, NI 43-101 y deals en una
-            sola plataforma.
+            institucional. Catastro, geología 3D, monitoreo satelital, NI 43-101 y deals en una sola
+            plataforma.
           </p>
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-white/70">
             <a

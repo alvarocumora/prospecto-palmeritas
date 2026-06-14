@@ -47,8 +47,10 @@ export function fitCameraToBounds(
 
   if (controls && controls.target) {
     controls.target.copy(center);
-    if (typeof controls.minDistance === "number") controls.minDistance = Math.min(controls.minDistance, radius * 0.1);
-    if (typeof controls.maxDistance === "number") controls.maxDistance = Math.max(controls.maxDistance, radius * 6);
+    if (typeof controls.minDistance === "number")
+      controls.minDistance = Math.min(controls.minDistance, radius * 0.1);
+    if (typeof controls.maxDistance === "number")
+      controls.maxDistance = Math.max(controls.maxDistance, radius * 6);
     controls.update?.();
   }
 
@@ -56,7 +58,15 @@ export function fitCameraToBounds(
   return true;
 }
 
-export function AutoFitCamera({ bounds, enabled = true, trigger = 0 }: { bounds: SceneBounds; enabled?: boolean; trigger?: number }) {
+export function AutoFitCamera({
+  bounds,
+  enabled = true,
+  trigger = 0,
+}: {
+  bounds: SceneBounds;
+  enabled?: boolean;
+  trigger?: number;
+}) {
   const camera = useThree((s) => s.camera);
   const controls = useThree((s) => s.controls) as ControlsLike | null;
   const invalidate = useThree((s) => s.invalidate);
@@ -73,8 +83,12 @@ export function AutoFitCamera({ bounds, enabled = true, trigger = 0 }: { bounds:
 export function computeSceneBounds(
   sources: Array<{ positions?: ArrayLike<number>; points?: Array<[number, number, number]> }>,
 ): SceneBounds {
-  let minX = Infinity, minY = Infinity, minZ = Infinity;
-  let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    minZ = Infinity;
+  let maxX = -Infinity,
+    maxY = -Infinity,
+    maxZ = -Infinity;
   let count = 0;
 
   const accept = (x: number, y: number, z: number) => {

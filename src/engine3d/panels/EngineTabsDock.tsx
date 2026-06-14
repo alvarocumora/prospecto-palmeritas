@@ -1,6 +1,17 @@
 // Tabs dock — Sprint 4
 // Barra superior derecha que activa los paneles overlay.
-import { Eye, Scissors, Boxes, AlertTriangle, FileText, History, Settings, Brain, Crosshair, FileBarChart } from "lucide-react";
+import {
+  Eye,
+  Scissors,
+  Boxes,
+  AlertTriangle,
+  FileText,
+  History,
+  Settings,
+  Brain,
+  Crosshair,
+  FileBarChart,
+} from "lucide-react";
 
 export type EngineTab =
   | "viewer"

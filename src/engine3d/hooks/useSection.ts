@@ -96,20 +96,22 @@ export function useSection(args: UseSectionArgs) {
       });
     }
   }, [
-    isoMesh, terrainMesh,
-    args.holes, args.samples,
-    args.planeNormal.x, args.planeNormal.y, args.planeNormal.z,
-    args.planeConstant, args.width, args.verticalExaggeration,
+    isoMesh,
+    terrainMesh,
+    args.holes,
+    args.samples,
+    args.planeNormal.x,
+    args.planeNormal.y,
+    args.planeNormal.z,
+    args.planeConstant,
+    args.width,
+    args.verticalExaggeration,
   ]);
 
   // Recalcula al cambiar dependencias clave o cuando se incrementa trigger.
   useEffect(() => {
     compute();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    compute,
-    args.trigger,
-  ]);
+  }, [compute, args.trigger]);
 
   const reset = useCallback(() => {
     reqRef.current++;

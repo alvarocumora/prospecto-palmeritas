@@ -22,9 +22,7 @@ import {
 } from "@/lib/magRevalidation.functions";
 import { toast } from "sonner";
 
-export const Route = createFileRoute(
-  "/_authenticated/dashboard/mag-revalidations",
-)({
+export const Route = createFileRoute("/_authenticated/dashboard/mag-revalidations")({
   component: MagRevalidationsPage,
 });
 
@@ -88,10 +86,7 @@ function MagRevalidationsPage() {
             Re-consulta EMAG2v3 (NOAA NCEI) y compara con la corrida anterior.
           </p>
         </div>
-        <Button
-          onClick={() => revalidate.mutate()}
-          disabled={!projectId || revalidate.isPending}
-        >
+        <Button onClick={() => revalidate.mutate()} disabled={!projectId || revalidate.isPending}>
           {revalidate.isPending ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (
@@ -124,9 +119,7 @@ function MagRevalidationsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           <Card className="p-4 lg:col-span-2">
             <h2 className="font-semibold mb-3">Historial de corridas</h2>
-            {runsQ.isLoading && (
-              <Loader2 className="size-4 animate-spin" />
-            )}
+            {runsQ.isLoading && <Loader2 className="size-4 animate-spin" />}
             {runsQ.data?.runs.length === 0 && (
               <p className="text-sm text-muted-foreground">
                 Aún no hay corridas. Presiona "Re-validar ahora".
@@ -153,12 +146,8 @@ function MagRevalidationsPage() {
                     </Badge>
                     <Badge className="bg-green-600">+{r.added_count}</Badge>
                     <Badge variant="destructive">-{r.removed_count}</Badge>
-                    <Badge className="bg-amber-600">
-                      ↔ {r.moved_count}
-                    </Badge>
-                    <Badge className="bg-blue-600">
-                      Δ {r.mag_changed_count}
-                    </Badge>
+                    <Badge className="bg-amber-600">↔ {r.moved_count}</Badge>
+                    <Badge className="bg-blue-600">Δ {r.mag_changed_count}</Badge>
                   </div>
                   {r.mean_shift_m != null && (
                     <div className="text-xs text-muted-foreground mt-1">
@@ -178,13 +167,9 @@ function MagRevalidationsPage() {
               Diferencias de la corrida
             </h2>
             {!selectedRun && (
-              <p className="text-sm text-muted-foreground">
-                Selecciona una corrida del historial.
-              </p>
+              <p className="text-sm text-muted-foreground">Selecciona una corrida del historial.</p>
             )}
-            {selectedRun && diffsQ.isLoading && (
-              <Loader2 className="size-4 animate-spin" />
-            )}
+            {selectedRun && diffsQ.isLoading && <Loader2 className="size-4 animate-spin" />}
             {selectedRun && diffsQ.data && (
               <div className="overflow-auto max-h-[600px]">
                 <Table>
@@ -203,9 +188,7 @@ function MagRevalidationsPage() {
                         <TableCell>
                           <ChangeBadge type={d.change_type} />
                         </TableCell>
-                        <TableCell className="font-mono text-xs">
-                          {d.name ?? "—"}
-                        </TableCell>
+                        <TableCell className="font-mono text-xs">{d.name ?? "—"}</TableCell>
                         <TableCell className="text-xs">
                           {d.prev_rank ?? "—"} → {d.new_rank ?? "—"}
                         </TableCell>
@@ -214,8 +197,7 @@ function MagRevalidationsPage() {
                         </TableCell>
                         <TableCell className="text-xs">
                           {d.mag_delta_nt != null
-                            ? (d.mag_delta_nt > 0 ? "+" : "") +
-                              d.mag_delta_nt.toFixed(1)
+                            ? (d.mag_delta_nt > 0 ? "+" : "") + d.mag_delta_nt.toFixed(1)
                             : "—"}
                         </TableCell>
                       </TableRow>

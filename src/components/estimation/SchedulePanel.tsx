@@ -97,10 +97,7 @@ export function SchedulePanel({
               value={result.irr_pct == null ? "—" : `${result.irr_pct.toFixed(1)}%`}
               highlight={(result.irr_pct ?? 0) > 15}
             />
-            <Kpi
-              label="Payback"
-              value={result.payback_years ? `${result.payback_years} a` : "—"}
-            />
+            <Kpi label="Payback" value={result.payback_years ? `${result.payback_years} a` : "—"} />
             <Kpi label="Mine life" value={`${result.mine_life_years} a`} />
             <Kpi label="Revenue tot." value={fmtUsd(result.total_revenue_usd)} />
             <Kpi label="OPEX tot." value={fmtUsd(result.total_opex_usd)} />
@@ -127,9 +124,7 @@ export function SchedulePanel({
                     title={`Año ${y.year}: CF ${fmtUsd(y.cashflow_usd)} · NPV ${fmtUsd(y.discounted_cashflow_usd)} · Ore ${fmtT(y.ore_tonnes)}`}
                   >
                     <div
-                      className={
-                        pos ? "w-full bg-signal-cyan/70" : "w-full bg-signal-red/70"
-                      }
+                      className={pos ? "w-full bg-signal-cyan/70" : "w-full bg-signal-red/70"}
                       style={{ height: `${h}px` }}
                     />
                     <div className="text-[8px] text-text-dim mt-0.5">{y.year}</div>
@@ -182,15 +177,7 @@ export function SchedulePanel({
   );
 }
 
-function Kpi({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
+function Kpi({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex flex-col">
       <span className="text-text-dim uppercase tracking-wide text-[9px]">{label}</span>

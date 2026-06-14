@@ -179,9 +179,7 @@ export function PitShell3DViewer({ scenarioId }: { scenarioId: string }) {
   }
 
   if (error) {
-    return (
-      <div className="p-4 text-signal-red text-xs font-mono">{error}</div>
-    );
+    return <div className="p-4 text-signal-red text-xs font-mono">{error}</div>;
   }
 
   if (!blocks.length) {

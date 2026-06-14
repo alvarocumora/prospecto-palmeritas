@@ -173,7 +173,8 @@ function buildBlockModel(p: BlockModelInput): Omit<BlockModelOutput, "stats"> & 
         const nearD = Math.sqrt(near);
         nearestDist[idx] = nearD;
         // Confidence: closer + more samples = higher
-        const cConf = Math.min(1, use.length / p.maxSamples) * (1 - Math.min(1, nearD / p.searchRadius));
+        const cConf =
+          Math.min(1, use.length / p.maxSamples) * (1 - Math.min(1, nearD / p.searchRadius));
         confidence[idx] = cConf;
 
         if (nearD <= p.classMeasuredR) {

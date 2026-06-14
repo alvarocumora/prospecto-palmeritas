@@ -4,8 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const EMAG2_BASE =
-  "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
+const EMAG2_BASE = "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
 
 const BBoxSchema = z.object({
   minLon: z.number().min(-180).max(180),
@@ -16,10 +15,7 @@ const BBoxSchema = z.object({
 
 type Sample = { lon: number; lat: number; v: number };
 
-async function sampleEmag2(
-  bbox: z.infer<typeof BBoxSchema>,
-  gridN: number,
-): Promise<Sample[]> {
+async function sampleEmag2(bbox: z.infer<typeof BBoxSchema>, gridN: number): Promise<Sample[]> {
   // Use exportImage with f=json + pixelType to get raw values would require LERC decoding.
   // Simpler: use /getSamples with a multipoint geometry.
   const points: [number, number][] = [];
@@ -59,11 +55,7 @@ async function sampleEmag2(
     .filter((s) => Number.isFinite(s.v));
 }
 
-function detectLocalMaxima(
-  samples: Sample[],
-  gridN: number,
-  topK: number,
-): Sample[] {
+function detectLocalMaxima(samples: Sample[], gridN: number, topK: number): Sample[] {
   // Build 2D grid indexed by [j*gridN + i]; flag a cell as a local max if its |v|
   // strictly exceeds the |v| of its 8 neighbours.
   const grid: (Sample | undefined)[] = new Array(gridN * gridN);
@@ -119,9 +111,7 @@ export const detectMagTargets = createServerFn({ method: "POST" })
     const min = Math.min(...vals);
     const max = Math.max(...vals);
     const mean = vals.reduce((a, b) => a + b, 0) / vals.length;
-    const std = Math.sqrt(
-      vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length,
-    );
+    const std = Math.sqrt(vals.reduce((a, b) => a + (b - mean) ** 2, 0) / vals.length);
     const peaks = detectLocalMaxima(samples, data.gridN, data.topK);
 
     let persisted = 0;
@@ -163,9 +153,7 @@ export const detectMagTargets = createServerFn({ method: "POST" })
 
 export const listMagTargets = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ projectId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ projectId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase

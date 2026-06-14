@@ -81,12 +81,11 @@ export function GeoSceneCanvas({ mode }: Props) {
     subsurfaceMode,
   );
   // Trayectorias 3D + intercepts coloreados por Au — el verdadero subsuelo.
-  const { layers: trajectoryLayers, holeCount, interceptCount } = useDrillTrajectoriesLayer(
-    active?.id ?? null,
-    centerLng,
-    centerLat,
-    subsurfaceMode,
-  );
+  const {
+    layers: trajectoryLayers,
+    holeCount,
+    interceptCount,
+  } = useDrillTrajectoriesLayer(active?.id ?? null, centerLng, centerLat, subsurfaceMode);
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
     active?.id ?? null,
     subsurfaceMode,

@@ -29,7 +29,15 @@ const OZ_PER_GRAM = 1 / 31.1035;
 const LB_PER_TONNE = 2204.6226;
 
 export function ResourceModelPanel({
-  model, filters, price, opex, capex, recovery, discount, years, onClose,
+  model,
+  filters,
+  price,
+  opex,
+  capex,
+  recovery,
+  discount,
+  years,
+  onClose,
 }: Props) {
   const kpis = useMemo(() => {
     const { grades, tonnages, metals, classification, confidence, positions } = model;
@@ -37,9 +45,15 @@ export function ResourceModelPanel({
     let metalSum = 0;
     let gradeSumW = 0;
     let countOver = 0;
-    let nMeas = 0, nInd = 0, nInf = 0;
-    let tMeas = 0, tInd = 0, tInf = 0;
-    let mMeas = 0, mInd = 0, mInf = 0;
+    let nMeas = 0,
+      nInd = 0,
+      nInf = 0;
+    let tMeas = 0,
+      tInd = 0,
+      tInf = 0;
+    let mMeas = 0,
+      mInd = 0,
+      mInf = 0;
     for (let i = 0; i < model.count; i++) {
       const cls = classification[i];
       const grade = grades[i];
@@ -57,9 +71,19 @@ export function ResourceModelPanel({
       metalSum += metals[i];
       gradeSumW += grade * tonnages[i];
       countOver++;
-      if (cls === 0) { nMeas++; tMeas += tonnages[i]; mMeas += metals[i]; }
-      else if (cls === 1) { nInd++; tInd += tonnages[i]; mInd += metals[i]; }
-      else if (cls === 2) { nInf++; tInf += tonnages[i]; mInf += metals[i]; }
+      if (cls === 0) {
+        nMeas++;
+        tMeas += tonnages[i];
+        mMeas += metals[i];
+      } else if (cls === 1) {
+        nInd++;
+        tInd += tonnages[i];
+        mInd += metals[i];
+      } else if (cls === 2) {
+        nInf++;
+        tInf += tonnages[i];
+        mInf += metals[i];
+      }
     }
     const meanGrade = tonnes > 0 ? gradeSumW / tonnes : 0;
     const volume = countOver * model.blockSize.x * model.blockSize.y * model.blockSize.z;
@@ -88,8 +112,17 @@ export function ResourceModelPanel({
     const npv = cashflow / Math.pow(1 + discount, mid);
 
     return {
-      tonnes, volume, meanGrade, countOver, metalLabel, metalSumRaw: metalSum,
-      revenue, opexTotal, capex, cashflow, npv,
+      tonnes,
+      volume,
+      meanGrade,
+      countOver,
+      metalLabel,
+      metalSumRaw: metalSum,
+      revenue,
+      opexTotal,
+      capex,
+      cashflow,
+      npv,
       meas: { n: nMeas, t: tMeas, m: mMeas },
       ind: { n: nInd, t: tInd, m: mInd },
       inf: { n: nInf, t: tInf, m: mInf },

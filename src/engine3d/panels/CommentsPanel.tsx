@@ -58,7 +58,10 @@ export function CommentsPanel({ projectId, entityType, entityId, title, onClose 
           </span>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground text-[10px]">
+          <button
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground text-[10px]"
+          >
             ✕
           </button>
         )}

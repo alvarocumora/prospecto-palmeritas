@@ -25,10 +25,7 @@ const SEVERITY_OPACITY: Record<string, number> = {
   high: 0.48,
 };
 
-export function buildSatAnomalyOverlay(
-  L: LeafletNS,
-  anomalies: AnomalyRow[],
-): LayerGroup {
+export function buildSatAnomalyOverlay(L: LeafletNS, anomalies: AnomalyRow[]): LayerGroup {
   const group = L.layerGroup();
   for (const a of anomalies) {
     if (!a.geometry) continue;

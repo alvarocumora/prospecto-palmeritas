@@ -4,8 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
-const EMAG2_BASE =
-  "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
+const EMAG2_BASE = "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
 
 const BBoxSchema = z.object({
   minLon: z.number().min(-180).max(180),
@@ -26,10 +25,7 @@ type ExistingTarget = {
   bbox: unknown;
 };
 
-async function sampleEmag2(
-  bbox: z.infer<typeof BBoxSchema>,
-  gridN: number,
-): Promise<Sample[]> {
+async function sampleEmag2(bbox: z.infer<typeof BBoxSchema>, gridN: number): Promise<Sample[]> {
   const points: [number, number][] = [];
   const dx = (bbox.maxLon - bbox.minLon) / (gridN - 1);
   const dy = (bbox.maxLat - bbox.minLat) / (gridN - 1);
@@ -39,10 +35,7 @@ async function sampleEmag2(
     }
   }
   const url = new URL(`${EMAG2_BASE}/getSamples`);
-  url.searchParams.set(
-    "geometry",
-    JSON.stringify({ points, spatialReference: { wkid: 4326 } }),
-  );
+  url.searchParams.set("geometry", JSON.stringify({ points, spatialReference: { wkid: 4326 } }));
   url.searchParams.set("geometryType", "esriGeometryMultipoint");
   url.searchParams.set("returnFirstValueOnly", "true");
   url.searchParams.set("interpolation", "RSP_BilinearInterpolation");
@@ -65,11 +58,7 @@ async function sampleEmag2(
     .filter((s) => Number.isFinite(s.v));
 }
 
-function detectLocalMaxima(
-  samples: Sample[],
-  gridN: number,
-  topK: number,
-): Peak[] {
+function detectLocalMaxima(samples: Sample[], gridN: number, topK: number): Peak[] {
   const grid: (Sample | undefined)[] = new Array(gridN * gridN);
   for (let k = 0; k < samples.length && k < gridN * gridN; k++) grid[k] = samples[k];
   const peaks: Peak[] = [];
@@ -260,8 +249,7 @@ export const revalidateMagTargets = createServerFn({ method: "POST" })
     const magDeltas = diffRows
       .filter((r) => r.mag_delta_nt != null)
       .map((r) => Math.abs(r.mag_delta_nt as number));
-    const mean = (xs: number[]) =>
-      xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
+    const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
     const maxOf = (xs: number[]) => (xs.length ? Math.max(...xs) : null);
 
     const vals = samples.map((s) => s.v);
@@ -391,9 +379,7 @@ export const listMagRevalidations = createServerFn({ method: "POST" })
 
 export const getMagRevalidationDiffs = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ revalidationId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ revalidationId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const { data: rows, error } = await supabase

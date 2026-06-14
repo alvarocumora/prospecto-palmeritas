@@ -142,12 +142,7 @@ type Econ = ReturnType<typeof blockEconomics>;
 // Floating-cone: para cada bloque ore-positivo (top→bottom), construye su
 // cono de remoción (bloques arriba dentro del slope) y, si el valor neto del
 // cono es positivo, los marca como in_pit. Itera hasta convergencia.
-function floatingCone(
-  blocks: Block[],
-  econ: Econ[],
-  m: Model,
-  slopeDeg: number,
-): boolean[] {
+function floatingCone(blocks: Block[], econ: Econ[], m: Model, slopeDeg: number): boolean[] {
   const n = blocks.length;
   const inPit = new Array<boolean>(n).fill(false);
   const tan = Math.tan((slopeDeg * Math.PI) / 180);
@@ -225,9 +220,7 @@ function floatingCone(
 
 export const optimizePit = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) =>
-    z.object({ scenarioId: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input) => z.object({ scenarioId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
     const t0 = Date.now();

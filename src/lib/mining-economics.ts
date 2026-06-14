@@ -7,10 +7,10 @@ export type EnamiPlant = {
   name: string;
   city: string;
   region: string;
-  distance_km: number;          // distancia camino desde Tilama / Los Verdes 5
-  maquila_usd_t: number;         // tarifa de tratamiento (USD por tonelada seca de mineral)
-  refining_usd_t_fino: number;   // costo de refinación (USD por tonelada de Cu fino)
-  payable_pct: number;           // % pagable del Cu fino
+  distance_km: number; // distancia camino desde Tilama / Los Verdes 5
+  maquila_usd_t: number; // tarifa de tratamiento (USD por tonelada seca de mineral)
+  refining_usd_t_fino: number; // costo de refinación (USD por tonelada de Cu fino)
+  payable_pct: number; // % pagable del Cu fino
   notes: string;
 };
 
@@ -51,15 +51,15 @@ export const ENAMI_PLANTS: EnamiPlant[] = [
 ];
 
 export const ECON_DEFAULTS = {
-  lme_cu_usd_t: 9200,            // ~4.17 USD/lb
-  truck_rate_usd_t_km: 0.18,     // camión 30 t, ruta pavimentada Coquimbo
-  drilling_usd_t: 1.8,           // perforación tronadura
-  blasting_usd_t: 1.4,           // explosivo + accesorios (factor 0.35 kg/t)
-  loading_usd_t: 1.6,            // carguío cargador frontal 3 m³
-  crushing_usd_t: 4.5,           // chancado primario móvil mandíbula
-  internal_haul_usd_t: 1.2,      // transporte mina-acopio
-  admin_usd_t: 2.0,              // overhead administración / supervisión
-  contingency_pct: 0.15,         // 15 % contingencia sobre opex directo
+  lme_cu_usd_t: 9200, // ~4.17 USD/lb
+  truck_rate_usd_t_km: 0.18, // camión 30 t, ruta pavimentada Coquimbo
+  drilling_usd_t: 1.8, // perforación tronadura
+  blasting_usd_t: 1.4, // explosivo + accesorios (factor 0.35 kg/t)
+  loading_usd_t: 1.6, // carguío cargador frontal 3 m³
+  crushing_usd_t: 4.5, // chancado primario móvil mandíbula
+  internal_haul_usd_t: 1.2, // transporte mina-acopio
+  admin_usd_t: 2.0, // overhead administración / supervisión
+  contingency_pct: 0.15, // 15 % contingencia sobre opex directo
   density_tm3: 2.7,
   cutoff_cu_pct: 0.8,
   recovery_pct: 85,
@@ -78,22 +78,26 @@ export type EnamiSettlement = {
   plant: EnamiPlant;
   tonnes: number;
   gradeCuPct: number;
-  cuFinoTon: number;             // tCu fino pagable
-  lmeRevenueUsd: number;         // valor bruto Cu fino (LME × tCu pagable)
-  maquilaUsd: number;            // costo maquila
-  refiningUsd: number;           // costo refinación
-  transportUsd: number;          // costo transporte camión
-  miningOpexUsd: number;         // opex mina + chancado
-  netToProducerUsd: number;      // pago neto al productor
-  marginUsdPerTon: number;       // USD/t mineral chancable
-  payableRatio: number;          // 0..1 — fracción del bruto que llega al productor
+  cuFinoTon: number; // tCu fino pagable
+  lmeRevenueUsd: number; // valor bruto Cu fino (LME × tCu pagable)
+  maquilaUsd: number; // costo maquila
+  refiningUsd: number; // costo refinación
+  transportUsd: number; // costo transporte camión
+  miningOpexUsd: number; // opex mina + chancado
+  netToProducerUsd: number; // pago neto al productor
+  marginUsdPerTon: number; // USD/t mineral chancable
+  payableRatio: number; // 0..1 — fracción del bruto que llega al productor
 };
 
 export function miningOpexPerTon(): number {
   const d = ECON_DEFAULTS;
   const direct =
-    d.drilling_usd_t + d.blasting_usd_t + d.loading_usd_t + d.crushing_usd_t +
-    d.internal_haul_usd_t + d.admin_usd_t;
+    d.drilling_usd_t +
+    d.blasting_usd_t +
+    d.loading_usd_t +
+    d.crushing_usd_t +
+    d.internal_haul_usd_t +
+    d.admin_usd_t;
   return direct * (1 + d.contingency_pct);
 }
 
@@ -143,15 +147,16 @@ export function compareEnamiPlants(
   gradeCuPct: number,
   lme_usd_t = ECON_DEFAULTS.lme_cu_usd_t,
 ): EnamiSettlement[] {
-  return ENAMI_PLANTS.map((p) => settleAtPlant(tonnes, gradeCuPct, p, lme_usd_t))
-    .sort((a, b) => b.netToProducerUsd - a.netToProducerUsd);
+  return ENAMI_PLANTS.map((p) => settleAtPlant(tonnes, gradeCuPct, p, lme_usd_t)).sort(
+    (a, b) => b.netToProducerUsd - a.netToProducerUsd,
+  );
 }
 
 export type FrenteCubicacion = {
   tonnes: number;
   cuFinoTon: number;
   inSituValueUsd: number;
-  monthsAt5kt: number;            // duración estimada @ 5.000 t/mes
+  monthsAt5kt: number; // duración estimada @ 5.000 t/mes
 };
 
 export function cubicacionFrente(
@@ -173,10 +178,7 @@ export function cubicacionFrente(
 
 export function npv(cashflowsMonthly: number[], annualRate = ECON_DEFAULTS.discount_rate): number {
   const monthlyRate = Math.pow(1 + annualRate, 1 / 12) - 1;
-  return cashflowsMonthly.reduce(
-    (acc, cf, i) => acc + cf / Math.pow(1 + monthlyRate, i + 1),
-    0,
-  );
+  return cashflowsMonthly.reduce((acc, cf, i) => acc + cf / Math.pow(1 + monthlyRate, i + 1), 0);
 }
 
 export function irr(cashflowsMonthly: number[]): number | null {

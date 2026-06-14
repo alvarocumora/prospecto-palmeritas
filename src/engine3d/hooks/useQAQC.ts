@@ -10,10 +10,9 @@ export function useQAQC(input: QAQCInput | null) {
   const reqRef = useRef(0);
 
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/qaqc/qaqc.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/qaqc/qaqc.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();
@@ -51,10 +50,9 @@ export function useCompositing(input: CompositingInput | null) {
   const reqRef = useRef(0);
 
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/qaqc/compositing.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/qaqc/compositing.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();

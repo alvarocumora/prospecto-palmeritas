@@ -1,9 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import maplibregl, { Map as MLMap, type MapGeoJSONFeature, type LngLatLike } from "maplibre-gl";
+import maplibregl, {
+  Map as MLMap,
+  type MapGeoJSONFeature,
+  type LngLatLike,
+  type StyleSpecification,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
-import { Loader2, Satellite, Target, Pickaxe, Layers as LayersIcon, MapPin, Sparkles, ShieldCheck, X } from "lucide-react";
+import {
+  Loader2,
+  Satellite,
+  Target,
+  Pickaxe,
+  Layers as LayersIcon,
+  MapPin,
+  Sparkles,
+  ShieldCheck,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -76,14 +91,16 @@ const SEVERITY_COLOR: Record<string, string> = {
   low: "#94a3b8",
 };
 
-function fmt(n: number | null | undefined, d = 1) {
+function fmt(n: number | string | boolean | null | undefined, d = 1) {
   if (n == null) return "—";
   return Number(n).toFixed(d);
 }
 
+type FeatureProps = Record<string, string | number | boolean | null>;
+
 type SelectedFeature = {
   layer: string;
-  props: Record<string, any>;
+  props: FeatureProps;
   lngLat: [number, number];
 };
 
@@ -113,7 +130,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     if (!containerRef.current || mapRef.current) return;
     const map = new maplibregl.Map({
       container: containerRef.current,
-      style: BASEMAPS[basemap].style as any,
+      style: BASEMAPS[basemap].style as StyleSpecification,
       center: [-71.05, -31.95],
       zoom: 11,
       attributionControl: { compact: true },
@@ -139,7 +156,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     const map = mapRef.current;
     if (!map) return;
     setMapReady(false);
-    map.setStyle(BASEMAPS[basemap].style as any);
+    map.setStyle(BASEMAPS[basemap].style as StyleSpecification);
     const onLoad = () => setMapReady(true);
     map.once("styledata", onLoad);
   }, [basemap]);
@@ -150,7 +167,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     if (!map || !mapReady || !dataQ.data) return;
     const d = dataQ.data;
 
-    const addOrUpdate = (id: string, data: any) => {
+    const addOrUpdate = (id: string, data: LosVerdesMapData["concessions"]) => {
       const src = map.getSource(id) as maplibregl.GeoJSONSource | undefined;
       if (src) src.setData(data);
       else map.addSource(id, { type: "geojson", data });
@@ -290,9 +307,9 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
       const feats = map.queryRenderedFeatures(e.point, { layers: clickLayers });
       if (!feats.length) return;
       const f = feats[0] as MapGeoJSONFeature;
-      const props = f.properties as Record<string, any>;
+      const props = f.properties as FeatureProps;
       setSelected({
-        layer: props.layer ?? "feature",
+        layer: (props.layer as string) ?? "feature",
         props,
         lngLat: [e.lngLat.lng, e.lngLat.lat],
       });
@@ -324,7 +341,8 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     const map = mapRef.current;
     if (!map || !mapReady) return;
     const toggle = (layerId: string, on: boolean) => {
-      if (map.getLayer(layerId)) map.setLayoutProperty(layerId, "visibility", on ? "visible" : "none");
+      if (map.getLayer(layerId))
+        map.setLayoutProperty(layerId, "visibility", on ? "visible" : "none");
     };
     toggle("lyr-concessions-fill", visible.concessions);
     toggle("lyr-concessions-line", visible.concessions);
@@ -353,7 +371,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     const feats = dataQ.data.targets.features;
     let ok = 0;
     for (const f of feats) {
-      const c = (f.properties as any).confidence_pct ?? 0;
+      const c = (f.properties as FeatureProps).confidence_pct ?? 0;
       if (Number(c) >= 60) ok++;
     }
     return { total: feats.length, ok, gap: feats.length - ok };
@@ -380,7 +398,9 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
             key={k}
             onClick={() => setBasemap(k)}
             className={`text-[10px] font-mono uppercase px-2 py-1 rounded transition-colors ${
-              basemap === k ? "bg-gold text-background" : "text-muted-foreground hover:text-foreground"
+              basemap === k
+                ? "bg-gold text-background"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {BASEMAPS[k].label}
@@ -502,8 +522,7 @@ function LayerToggle({
 function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose: () => void }) {
   const { layer, props, lngLat } = feature;
 
-  const title =
-    props.name ?? props.code ?? props.index_code ?? `${layer}`;
+  const title = props.name ?? props.code ?? props.index_code ?? `${layer}`;
   const subtitle =
     layer === "target"
       ? `${props.target_type ?? "target"} · ${props.commodity ?? "—"}`
@@ -534,7 +553,7 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
             {props.priority && (
               <Badge
                 style={{
-                  backgroundColor: PRIORITY_COLOR[props.priority] ?? "#94a3b8",
+                  backgroundColor: PRIORITY_COLOR[props.priority as string] ?? "#94a3b8",
                   color: "#0b0a09",
                 }}
                 className="text-[10px]"
@@ -569,7 +588,7 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
             label="Vigencia"
             value={
               props.expires_at
-                ? new Date(props.expires_at).toLocaleDateString("es-CL")
+                ? new Date(props.expires_at as string).toLocaleDateString("es-CL")
                 : "—"
             }
           />
@@ -580,7 +599,7 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
         <div className="space-y-2">
           <Badge
             style={{
-              backgroundColor: SEVERITY_COLOR[props.severity] ?? "#94a3b8",
+              backgroundColor: SEVERITY_COLOR[props.severity as string] ?? "#94a3b8",
               color: "#0b0a09",
             }}
             className="text-[10px]"

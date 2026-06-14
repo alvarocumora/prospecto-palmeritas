@@ -38,7 +38,8 @@ export function useGeophysAnomaliesLayer(projectId: string | null, visible = tru
       .eq("project_id", projectId)
       .neq("status", "dismissed")
       .then(({ data }) => {
-        if (!cancelled) setRows(((data ?? []) as Row[]).filter((r) => r.lat != null && r.lng != null));
+        if (!cancelled)
+          setRows(((data ?? []) as Row[]).filter((r) => r.lat != null && r.lng != null));
       });
     return () => {
       cancelled = true;

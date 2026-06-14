@@ -11,10 +11,10 @@ import { EDGE_TABLE, TRI_TABLE, EDGE_CORNERS, CORNER_OFFSETS } from "./mcTables"
 export type IsoInput = {
   points: Array<{ x: number; y: number; z: number; v: number }>;
   resolution: number; // celdas por eje (típico 48-72)
-  isovalue: number;   // 0..1
-  power: number;      // IDW power
-  margin: number;     // metros margen bbox
-  kNearest: number;   // 0 = todos
+  isovalue: number; // 0..1
+  power: number; // IDW power
+  margin: number; // metros margen bbox
+  kNearest: number; // 0 = todos
   /** Radio IDW en metros. 0 = auto (25-35% diagonal bbox). */
   searchRadius?: number;
 };
@@ -51,22 +51,29 @@ export type IsoOutput = {
 };
 
 function idwAt(
-  px: number, py: number, pz: number,
-  pts: Float32Array, n: number,
-  power: number, k: number,
+  px: number,
+  py: number,
+  pz: number,
+  pts: Float32Array,
+  n: number,
+  power: number,
+  k: number,
   radius2: number,
 ): number {
   // Considera todos los puntos dentro de radius (o si k=0). Si k>0, top-k.
   if (k === 0 || k >= n) {
-    let num = 0, den = 0;
+    let num = 0,
+      den = 0;
     for (let i = 0; i < n; i++) {
       const off = i * 4;
-      const dx = pts[off] - px, dy = pts[off+1] - py, dz = pts[off+2] - pz;
-      const d2 = dx*dx + dy*dy + dz*dz;
+      const dx = pts[off] - px,
+        dy = pts[off + 1] - py,
+        dz = pts[off + 2] - pz;
+      const d2 = dx * dx + dy * dy + dz * dz;
       if (d2 > radius2) continue;
-      if (d2 < 1) return pts[off+3];
-      const w = 1 / Math.pow(d2, power/2);
-      num += w * pts[off+3];
+      if (d2 < 1) return pts[off + 3];
+      const w = 1 / Math.pow(d2, power / 2);
+      num += w * pts[off + 3];
       den += w;
     }
     return den > 0 ? num / den : 0;
@@ -74,38 +81,49 @@ function idwAt(
   const dists = new Float32Array(n);
   const idx = new Int32Array(n);
   for (let i = 0; i < n; i++) {
-    const off = i*4;
-    const dx = pts[off]-px, dy = pts[off+1]-py, dz = pts[off+2]-pz;
-    dists[i] = dx*dx+dy*dy+dz*dz;
+    const off = i * 4;
+    const dx = pts[off] - px,
+      dy = pts[off + 1] - py,
+      dz = pts[off + 2] - pz;
+    dists[i] = dx * dx + dy * dy + dz * dz;
     idx[i] = i;
   }
   const kk = Math.min(k, n);
   for (let i = 0; i < kk; i++) {
     let m = i;
-    for (let j = i+1; j < n; j++) if (dists[j] < dists[m]) m = j;
+    for (let j = i + 1; j < n; j++) if (dists[j] < dists[m]) m = j;
     if (m !== i) {
-      const td = dists[i]; dists[i] = dists[m]; dists[m] = td;
-      const ti = idx[i]; idx[i] = idx[m]; idx[m] = ti;
+      const td = dists[i];
+      dists[i] = dists[m];
+      dists[m] = td;
+      const ti = idx[i];
+      idx[i] = idx[m];
+      idx[m] = ti;
     }
   }
-  let num = 0, den = 0;
+  let num = 0,
+    den = 0;
   for (let i = 0; i < kk; i++) {
     const d2 = dists[i];
     if (d2 > radius2) break;
-    if (d2 < 1) return pts[idx[i]*4+3];
-    const w = 1 / Math.pow(d2, power/2);
-    num += w * pts[idx[i]*4+3];
+    if (d2 < 1) return pts[idx[i] * 4 + 3];
+    const w = 1 / Math.pow(d2, power / 2);
+    num += w * pts[idx[i] * 4 + 3];
     den += w;
   }
-  return den > 0 ? num/den : 0;
+  return den > 0 ? num / den : 0;
 }
 
 function marchingCubes(
   field: Float32Array,
   res: number,
   iso: number,
-  minX: number, minY: number, minZ: number,
-  sx: number, sy: number, sz: number,
+  minX: number,
+  minY: number,
+  minZ: number,
+  sx: number,
+  sy: number,
+  sz: number,
 ): {
   positions: Float32Array;
   normals: Float32Array;
@@ -123,16 +141,26 @@ function marchingCubes(
   for (let k = 0; k < res - 1; k++) {
     for (let j = 0; j < res - 1; j++) {
       for (let i = 0; i < res - 1; i++) {
-        const v0 = sample(i,   j,   k);
-        const v1 = sample(i+1, j,   k);
-        const v2 = sample(i+1, j+1, k);
-        const v3 = sample(i,   j+1, k);
-        const v4 = sample(i,   j,   k+1);
-        const v5 = sample(i+1, j,   k+1);
-        const v6 = sample(i+1, j+1, k+1);
-        const v7 = sample(i,   j+1, k+1);
+        const v0 = sample(i, j, k);
+        const v1 = sample(i + 1, j, k);
+        const v2 = sample(i + 1, j + 1, k);
+        const v3 = sample(i, j + 1, k);
+        const v4 = sample(i, j, k + 1);
+        const v5 = sample(i + 1, j, k + 1);
+        const v6 = sample(i + 1, j + 1, k + 1);
+        const v7 = sample(i, j + 1, k + 1);
 
-        if (v0>=iso||v1>=iso||v2>=iso||v3>=iso||v4>=iso||v5>=iso||v6>=iso||v7>=iso) cellsAbove++;
+        if (
+          v0 >= iso ||
+          v1 >= iso ||
+          v2 >= iso ||
+          v3 >= iso ||
+          v4 >= iso ||
+          v5 >= iso ||
+          v6 >= iso ||
+          v7 >= iso
+        )
+          cellsAbove++;
 
         let ci = 0;
         if (v0 < iso) ci |= 1;
@@ -147,7 +175,7 @@ function marchingCubes(
         const edges = EDGE_TABLE[ci];
         if (edges === 0) continue;
 
-        const corners: number[] = [v0,v1,v2,v3,v4,v5,v6,v7];
+        const corners: number[] = [v0, v1, v2, v3, v4, v5, v6, v7];
         const cornerCoord = (idx: number): [number, number, number] => {
           const o = CORNER_OFFSETS[idx];
           return [i + o[0], j + o[1], k + o[2]];
@@ -177,8 +205,12 @@ function marchingCubes(
             if (Math.abs(denom) > 1e-6) t = (iso - va) / denom;
             t = Math.max(0, Math.min(1, t));
 
-            const ax = minX + ca[0] * sx, ay = minY + ca[1] * sy, az = minZ + ca[2] * sz;
-            const bx = minX + cb[0] * sx, by = minY + cb[1] * sy, bz = minZ + cb[2] * sz;
+            const ax = minX + ca[0] * sx,
+              ay = minY + ca[1] * sy,
+              az = minZ + ca[2] * sz;
+            const bx = minX + cb[0] * sx,
+              by = minY + cb[1] * sy,
+              bz = minZ + cb[2] * sz;
             const px = ax + t * (bx - ax);
             const py = ay + t * (by - ay);
             const pz = az + t * (bz - az);
@@ -211,28 +243,50 @@ function marchingCubes(
   const normals = new Float32Array(positions.length);
   const triCount = indices.length / 3;
   for (let i = 0; i < triCount; i++) {
-    const ia = indices[i*3] * 3;
-    const ib = indices[i*3+1] * 3;
-    const ic = indices[i*3+2] * 3;
-    const ax = positions[ia], ay = positions[ia+1], az = positions[ia+2];
-    const bx = positions[ib], by = positions[ib+1], bz = positions[ib+2];
-    const cx = positions[ic], cy = positions[ic+1], cz = positions[ic+2];
-    const ex = bx-ax, ey = by-ay, ez = bz-az;
-    const fx = cx-ax, fy = cy-ay, fz = cz-az;
-    const nx = ey*fz - ez*fy;
-    const ny = ez*fx - ex*fz;
-    const nz = ex*fy - ey*fx;
-    normals[ia]   += nx; normals[ia+1] += ny; normals[ia+2] += nz;
-    normals[ib]   += nx; normals[ib+1] += ny; normals[ib+2] += nz;
-    normals[ic]   += nx; normals[ic+1] += ny; normals[ic+2] += nz;
+    const ia = indices[i * 3] * 3;
+    const ib = indices[i * 3 + 1] * 3;
+    const ic = indices[i * 3 + 2] * 3;
+    const ax = positions[ia],
+      ay = positions[ia + 1],
+      az = positions[ia + 2];
+    const bx = positions[ib],
+      by = positions[ib + 1],
+      bz = positions[ib + 2];
+    const cx = positions[ic],
+      cy = positions[ic + 1],
+      cz = positions[ic + 2];
+    const ex = bx - ax,
+      ey = by - ay,
+      ez = bz - az;
+    const fx = cx - ax,
+      fy = cy - ay,
+      fz = cz - az;
+    const nx = ey * fz - ez * fy;
+    const ny = ez * fx - ex * fz;
+    const nz = ex * fy - ey * fx;
+    normals[ia] += nx;
+    normals[ia + 1] += ny;
+    normals[ia + 2] += nz;
+    normals[ib] += nx;
+    normals[ib + 1] += ny;
+    normals[ib + 2] += nz;
+    normals[ic] += nx;
+    normals[ic + 1] += ny;
+    normals[ic + 2] += nz;
   }
   for (let i = 0; i < normals.length; i += 3) {
-    const x = normals[i], y = normals[i+1], z = normals[i+2];
+    const x = normals[i],
+      y = normals[i + 1],
+      z = normals[i + 2];
     const len = Math.hypot(x, y, z);
     if (len > 1e-8) {
-      normals[i] = x/len; normals[i+1] = y/len; normals[i+2] = z/len;
+      normals[i] = x / len;
+      normals[i + 1] = y / len;
+      normals[i + 2] = z / len;
     } else {
-      normals[i] = 0; normals[i+1] = 1; normals[i+2] = 0;
+      normals[i] = 0;
+      normals[i + 1] = 1;
+      normals[i + 2] = 0;
     }
   }
 
@@ -245,11 +299,12 @@ function emptyOutput(res: number): IsoOutput {
     normals: new Float32Array(0),
     values: new Float32Array(0),
     indices: new Uint32Array(0),
-    bounds: { minX:0,minY:0,minZ:0,maxX:0,maxY:0,maxZ:0 },
+    bounds: { minX: 0, minY: 0, minZ: 0, maxX: 0, maxY: 0, maxZ: 0 },
     resolution: res,
     vertexCount: 0,
     triangleCount: 0,
-    fieldMin: 0, fieldMax: 0,
+    fieldMin: 0,
+    fieldMax: 0,
     mode: "empty",
     finalIsovalue: 0,
     triedIsovalues: [],
@@ -269,7 +324,9 @@ function buildIsosurface(input: IsoInput): IsoOutput {
   if (n === 0) return emptyOutput(res);
 
   // 1) Normalización de valores → [0..1]
-  let vMin = Infinity, vMax = -Infinity, vSum = 0;
+  let vMin = Infinity,
+    vMax = -Infinity,
+    vSum = 0;
   for (let i = 0; i < n; i++) {
     const v = points[i].v;
     if (v < vMin) vMin = v;
@@ -288,12 +345,19 @@ function buildIsosurface(input: IsoInput): IsoOutput {
   } else {
     for (let i = 0; i < n; i++) {
       const t = (points[i].v - vMin) / rawRange;
-      normalized[i] = { x: points[i].x, y: points[i].y, z: points[i].z, v: Math.max(0, Math.min(1, t)) };
+      normalized[i] = {
+        x: points[i].x,
+        y: points[i].y,
+        z: points[i].z,
+        v: Math.max(0, Math.min(1, t)),
+      };
     }
   }
 
   // Stats post-normalización
-  let nMin = Infinity, nMax = -Infinity, nSum = 0;
+  let nMin = Infinity,
+    nMax = -Infinity,
+    nSum = 0;
   for (let i = 0; i < n; i++) {
     const v = normalized[i].v;
     if (v < nMin) nMin = v;
@@ -306,18 +370,35 @@ function buildIsosurface(input: IsoInput): IsoOutput {
 
   // 2) BBox + radio adaptativo
   const flat = new Float32Array(n * 4);
-  let minX = Infinity, minY = Infinity, minZ = Infinity;
-  let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    minZ = Infinity;
+  let maxX = -Infinity,
+    maxY = -Infinity,
+    maxZ = -Infinity;
   for (let i = 0; i < n; i++) {
     const p = normalized[i];
-    flat[i*4] = p.x; flat[i*4+1] = p.y; flat[i*4+2] = p.z; flat[i*4+3] = p.v;
-    if (p.x < minX) minX = p.x; if (p.y < minY) minY = p.y; if (p.z < minZ) minZ = p.z;
-    if (p.x > maxX) maxX = p.x; if (p.y > maxY) maxY = p.y; if (p.z > maxZ) maxZ = p.z;
+    flat[i * 4] = p.x;
+    flat[i * 4 + 1] = p.y;
+    flat[i * 4 + 2] = p.z;
+    flat[i * 4 + 3] = p.v;
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.z < minZ) minZ = p.z;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+    if (p.z > maxZ) maxZ = p.z;
   }
-  minX -= margin; maxX += margin;
-  minY -= margin; maxY += margin;
-  minZ -= margin * 0.3; maxZ += margin * 0.3;
-  if (maxZ - minZ < 50) { minZ -= 50; maxZ += 10; }
+  minX -= margin;
+  maxX += margin;
+  minY -= margin;
+  maxY += margin;
+  minZ -= margin * 0.3;
+  maxZ += margin * 0.3;
+  if (maxZ - minZ < 50) {
+    minZ -= 50;
+    maxZ += 10;
+  }
 
   const sx = (maxX - minX) / (res - 1);
   const sy = (maxY - minY) / (res - 1);
@@ -325,18 +406,21 @@ function buildIsosurface(input: IsoInput): IsoOutput {
 
   const diag = Math.hypot(maxX - minX, maxY - minY, maxZ - minZ);
   // Radio por defecto: 30% de la diagonal (cubre 25-35%)
-  let searchRadius = input.searchRadius && input.searchRadius > 0
-    ? input.searchRadius
-    : Math.max(diag * 0.30, 200);
+  let searchRadius =
+    input.searchRadius && input.searchRadius > 0 ? input.searchRadius : Math.max(diag * 0.3, 200);
 
   // 3) Generar campo escalar; si el campo es demasiado vacío, expandir radio.
   const field = new Float32Array(res * res * res);
-  let fMin = Infinity, fMax = -Infinity, activeVoxels = 0;
+  let fMin = Infinity,
+    fMax = -Infinity,
+    activeVoxels = 0;
   const ACTIVE_EPS = 0.01;
 
   const buildField = (radius: number) => {
     const r2 = radius * radius;
-    fMin = Infinity; fMax = -Infinity; activeVoxels = 0;
+    fMin = Infinity;
+    fMax = -Infinity;
+    activeVoxels = 0;
     for (let k = 0; k < res; k++) {
       const z = minZ + k * sz;
       for (let j = 0; j < res; j++) {
@@ -361,7 +445,11 @@ function buildIsosurface(input: IsoInput): IsoOutput {
     searchRadius *= 1.5;
     expansions++;
     buildField(searchRadius);
-    console.log("[iso.worker] field too sparse, expanding radius", { searchRadius, fMax, activeVoxels });
+    console.log("[iso.worker] field too sparse, expanding radius", {
+      searchRadius,
+      fMax,
+      activeVoxels,
+    });
   }
 
   // 4) Marching Cubes con retry adaptativo
@@ -379,7 +467,12 @@ function buildIsosurface(input: IsoInput): IsoOutput {
     finalIsovalue = candidates[i];
     triedIsovalues.push(candidates[i]);
     mc = marchingCubes(field, res, finalIsovalue, minX, minY, minZ, sx, sy, sz);
-    console.log("[iso.worker] retrying with isovalue", finalIsovalue, "→ tris", mc.indices.length / 3);
+    console.log(
+      "[iso.worker] retrying with isovalue",
+      finalIsovalue,
+      "→ tris",
+      mc.indices.length / 3,
+    );
   }
 
   const bounds = { minX, minY, minZ, maxX, maxY, maxZ };
@@ -390,10 +483,12 @@ function buildIsosurface(input: IsoInput): IsoOutput {
       normals: mc.normals,
       values: mc.values,
       indices: mc.indices,
-      bounds, resolution: res,
+      bounds,
+      resolution: res,
       vertexCount: mc.positions.length / 3,
       triangleCount: mc.indices.length / 3,
-      fieldMin: fMin, fieldMax: fMax,
+      fieldMin: fMin,
+      fieldMax: fMax,
       mode: "mc",
       finalIsovalue,
       triedIsovalues,
@@ -412,22 +507,30 @@ function buildIsosurface(input: IsoInput): IsoOutput {
     .slice(0, Math.min(10, n));
   const baseRadius = Math.max(diag * 0.05, 80);
   const blobs: IsoBlob[] = ranked.map((p) => ({
-    x: p.x, y: p.y, z: p.z,
+    x: p.x,
+    y: p.y,
+    z: p.z,
     r: baseRadius * (0.6 + 0.6 * p.v),
     v: p.v,
   }));
 
-  console.log("[iso.worker] MC empty, fallback to blobs", { blobs: blobs.length, fMax, finalIsovalue });
+  console.log("[iso.worker] MC empty, fallback to blobs", {
+    blobs: blobs.length,
+    fMax,
+    finalIsovalue,
+  });
 
   return {
     positions: new Float32Array(0),
     normals: new Float32Array(0),
     values: new Float32Array(0),
     indices: new Uint32Array(0),
-    bounds, resolution: res,
+    bounds,
+    resolution: res,
     vertexCount: 0,
     triangleCount: 0,
-    fieldMin: fMin, fieldMax: fMax,
+    fieldMin: fMin,
+    fieldMax: fMax,
     mode: "blob",
     finalIsovalue,
     triedIsovalues,

@@ -78,9 +78,7 @@ export const getTilamaReport = createServerFn({ method: "GET" }).handler(
     const [proj, sat, conc, tgt] = await Promise.all([
       supabaseAdmin
         .from("projects")
-        .select(
-          "id, code, name, description, commodity, region, country, center_lat, center_lng",
-        )
+        .select("id, code, name, description, commodity, region, country, center_lat, center_lng")
         .eq("id", TILAMA_PROJECT_ID)
         .single(),
       supabaseAdmin
@@ -124,7 +122,8 @@ export const getTilamaReport = createServerFn({ method: "GET" }).handler(
         concessionsTotal: concRows.length,
         concessionsHa: concRows.reduce((s, c) => s + Number(c.area_ha ?? 0), 0),
         targetsTotal: tgtRows.length,
-        targetsCritical: tgtRows.filter((t) => (t.priority ?? "").toLowerCase() === "critical").length,
+        targetsCritical: tgtRows.filter((t) => (t.priority ?? "").toLowerCase() === "critical")
+          .length,
         targetsHigh: tgtRows.filter((t) => (t.priority ?? "").toLowerCase() === "high").length,
       },
     };

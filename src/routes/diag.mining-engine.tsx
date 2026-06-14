@@ -102,8 +102,8 @@ function DiagMiningEngine() {
         </div>
         <p className="text-xs text-muted-foreground">
           Elige el proyecto con más logs Au, construye samples (indicator Au ≥ 0.3 g/t), llama a
-          Railway /wireframe-rbf (scipy + scikit-image), persiste en{" "}
-          <code>geology_wireframes</code> y verifica la re-lectura.
+          Railway /wireframe-rbf (scipy + scikit-image), persiste en <code>geology_wireframes</code>{" "}
+          y verifica la re-lectura.
         </p>
         {wireframe.error && (
           <pre className="text-destructive text-xs">{String(wireframe.error)}</pre>

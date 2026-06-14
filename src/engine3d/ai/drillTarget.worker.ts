@@ -109,7 +109,8 @@ function rankTargets(p: DrillTargetInput): Omit<DrillTargetOutput, "stats"> & {
     const targetDepth = Math.max(80, Math.min(600, s.depthAbs + 80));
     const expectedZone: ExpectedZone =
       s.depthAbs < 150 ? "shallow" : s.depthAbs < 350 ? "medium" : "deep";
-    const drillCost = (targetDepth * (p.costPerMeter + p.assayPerMeter) + p.mobilization) * p.overheadMult;
+    const drillCost =
+      (targetDepth * (p.costPerMeter + p.assayPerMeter) + p.mobilization) * p.overheadMult;
     const priority: Priority = s.score > 0.7 ? "A" : s.score > 0.5 ? "B" : "C";
 
     const rationale: string[] = [];

@@ -7,10 +7,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import {
-  createLovableAiGatewayProvider,
-  getLovableApiKeyOrThrow,
-} from "@/lib/ai-gateway.server";
+import { createLovableAiGatewayProvider, getLovableApiKeyOrThrow } from "@/lib/ai-gateway.server";
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
@@ -124,118 +121,110 @@ function buildSegmentRing(
   ];
 }
 
-export const getLosVerdesDrillholes = createServerFn({ method: "GET" }).handler(
-  async () => {
-    const { data: veins, error } = await supabaseAdmin
-      .from("veins")
-      .select(
-        "id, code, name, commodity, strike_deg, dip_deg, dip_dir_deg, geometry, depth_top_m, depth_bottom_m, grade_estimate",
-      )
-      .eq("project_id", LOSVERDES_PROJECT_ID);
-    if (error) throw new Error(error.message);
+export const getLosVerdesDrillholes = createServerFn({ method: "GET" }).handler(async () => {
+  const { data: veins, error } = await supabaseAdmin
+    .from("veins")
+    .select(
+      "id, code, name, commodity, strike_deg, dip_deg, dip_dir_deg, geometry, depth_top_m, depth_bottom_m, grade_estimate",
+    )
+    .eq("project_id", LOSVERDES_PROJECT_ID);
+  if (error) throw new Error(error.message);
 
-    const holes: LosVerdesDrillhole[] = [];
-    let holeNum = 1;
-    for (const v of veins ?? []) {
-      type VeinGeom = { type: "LineString"; coordinates: [number, number][] } | null;
-      const geom = v.geometry as VeinGeom;
-      const coords = geom?.coordinates ?? [];
-      if (coords.length < 2) continue;
-      const dipDir = Number(v.dip_dir_deg ?? 90);
-      const dip = Number(v.dip_deg ?? 75);
-      const depthBottom = Number(v.depth_bottom_m ?? 200);
-      const ge = (v.grade_estimate as Record<string, number> | null) ?? {};
-      const baseCu = Number(ge.cu_pct ?? 1.2);
-      const baseAu = Number(ge.au_gpt ?? 0.4);
-      const baseAg = Number(ge.ag_gpt ?? 12);
+  const holes: LosVerdesDrillhole[] = [];
+  let holeNum = 1;
+  for (const v of veins ?? []) {
+    type VeinGeom = { type: "LineString"; coordinates: [number, number][] } | null;
+    const geom = v.geometry as VeinGeom;
+    const coords = geom?.coordinates ?? [];
+    if (coords.length < 2) continue;
+    const dipDir = Number(v.dip_dir_deg ?? 90);
+    const dip = Number(v.dip_deg ?? 75);
+    const depthBottom = Number(v.depth_bottom_m ?? 200);
+    const ge = (v.grade_estimate as Record<string, number> | null) ?? {};
+    const baseCu = Number(ge.cu_pct ?? 1.2);
+    const baseAu = Number(ge.au_gpt ?? 0.4);
+    const baseAg = Number(ge.ag_gpt ?? 12);
 
-      const rand = mulberry32(
-        Array.from(v.code).reduce((a: number, c: string) => a + c.charCodeAt(0), 0),
+    const rand = mulberry32(
+      Array.from(v.code).reduce((a: number, c: string) => a + c.charCodeAt(0), 0),
+    );
+
+    // 2 sondajes por veta, distribuidos a 25% y 65% de la traza
+    for (const tParam of [0.25, 0.65]) {
+      const segIdx = Math.min(coords.length - 2, Math.floor(tParam * (coords.length - 1)));
+      const f = tParam * (coords.length - 1) - segIdx;
+      const [lng0, lat0] = coords[segIdx];
+      const [lng1, lat1] = coords[segIdx + 1];
+      // collar sobre la traza con leve desplazamiento al hangingwall (dip_dir + 180°)
+      const traceLng = lng0 + (lng1 - lng0) * f;
+      const traceLat = lat0 + (lat1 - lat0) * f;
+      const offsetM = 25 + rand() * 15;
+      const offsetAz = (dipDir + 180) % 360; // hacia el techo de la veta
+      const [dLng, dLat] = metersToDeg(
+        Math.sin((offsetAz * Math.PI) / 180) * offsetM,
+        Math.cos((offsetAz * Math.PI) / 180) * offsetM,
+        traceLat,
       );
-
-      // 2 sondajes por veta, distribuidos a 25% y 65% de la traza
-      for (const tParam of [0.25, 0.65]) {
-        const segIdx = Math.min(
-          coords.length - 2,
-          Math.floor(tParam * (coords.length - 1)),
+      const collarLng = traceLng + dLng;
+      const collarLat = traceLat + dLat;
+      const azimuth = dipDir; // hacia la veta
+      const depth = Math.max(120, Math.min(420, depthBottom * (0.7 + rand() * 0.4)));
+      const step = 20;
+      const segs: DrillholeSegment[] = [];
+      let maxCu = 0;
+      let maxAu = 0;
+      for (let from = 0; from < depth; from += step) {
+        const to = Math.min(depth, from + step);
+        // intersecta veta cuando la profundidad ~ 40-65% del sondaje
+        const mid = (from + to) / 2;
+        const distNorm = Math.abs(mid / depth - 0.5);
+        const inOreZone = distNorm < 0.18;
+        const noise = (rand() - 0.5) * 0.6;
+        const cu = Math.max(
+          0,
+          inOreZone ? baseCu * (1.2 + rand() * 1.5) + noise : 0.02 + rand() * 0.15,
         );
-        const f = tParam * (coords.length - 1) - segIdx;
-        const [lng0, lat0] = coords[segIdx];
-        const [lng1, lat1] = coords[segIdx + 1];
-        // collar sobre la traza con leve desplazamiento al hangingwall (dip_dir + 180°)
-        const traceLng = lng0 + (lng1 - lng0) * f;
-        const traceLat = lat0 + (lat1 - lat0) * f;
-        const offsetM = 25 + rand() * 15;
-        const offsetAz = (dipDir + 180) % 360; // hacia el techo de la veta
-        const [dLng, dLat] = metersToDeg(
-          Math.sin((offsetAz * Math.PI) / 180) * offsetM,
-          Math.cos((offsetAz * Math.PI) / 180) * offsetM,
-          traceLat,
+        const au = Math.max(
+          0,
+          inOreZone ? baseAu * (1.0 + rand() * 1.8) + noise * 0.2 : 0.01 + rand() * 0.05,
         );
-        const collarLng = traceLng + dLng;
-        const collarLat = traceLat + dLat;
-        const azimuth = dipDir; // hacia la veta
-        const depth = Math.max(120, Math.min(420, depthBottom * (0.7 + rand() * 0.4)));
-        const step = 20;
-        const segs: DrillholeSegment[] = [];
-        let maxCu = 0;
-        let maxAu = 0;
-        for (let from = 0; from < depth; from += step) {
-          const to = Math.min(depth, from + step);
-          // intersecta veta cuando la profundidad ~ 40-65% del sondaje
-          const mid = (from + to) / 2;
-          const distNorm = Math.abs(mid / depth - 0.5);
-          const inOreZone = distNorm < 0.18;
-          const noise = (rand() - 0.5) * 0.6;
-          const cu = Math.max(
-            0,
-            inOreZone ? baseCu * (1.2 + rand() * 1.5) + noise : 0.02 + rand() * 0.15,
-          );
-          const au = Math.max(
-            0,
-            inOreZone ? baseAu * (1.0 + rand() * 1.8) + noise * 0.2 : 0.01 + rand() * 0.05,
-          );
-          const ag = Math.max(
-            0,
-            inOreZone ? baseAg * (1.0 + rand() * 1.5) : 0.5 + rand() * 2,
-          );
-          const assay: DrillholeAssay = {
-            from_m: from,
-            to_m: to,
-            cu_pct: Number(cu.toFixed(3)),
-            au_gpt: Number(au.toFixed(2)),
-            ag_gpt: Number(ag.toFixed(1)),
-          };
-          maxCu = Math.max(maxCu, cu);
-          maxAu = Math.max(maxAu, au);
-          segs.push({
-            ring: buildSegmentRing(collarLng, collarLat, azimuth, dip, from, to),
-            depth_from_m: from,
-            depth_to_m: to,
-            color: gradeColor(cu, au),
-            assay,
-          });
-        }
-        const holeId = `LV-${String(holeNum).padStart(3, "0")}`;
-        holeNum++;
-        holes.push({
-          id: `${v.id}-${holeId}`,
-          hole_id: holeId,
-          collar_lng: collarLng,
-          collar_lat: collarLat,
-          azimuth_deg: azimuth,
-          dip_deg: dip,
-          depth_m: Math.round(depth),
-          vein_code: v.code,
-          segments: segs,
-          max_cu_pct: Number(maxCu.toFixed(3)),
-          max_au_gpt: Number(maxAu.toFixed(2)),
+        const ag = Math.max(0, inOreZone ? baseAg * (1.0 + rand() * 1.5) : 0.5 + rand() * 2);
+        const assay: DrillholeAssay = {
+          from_m: from,
+          to_m: to,
+          cu_pct: Number(cu.toFixed(3)),
+          au_gpt: Number(au.toFixed(2)),
+          ag_gpt: Number(ag.toFixed(1)),
+        };
+        maxCu = Math.max(maxCu, cu);
+        maxAu = Math.max(maxAu, au);
+        segs.push({
+          ring: buildSegmentRing(collarLng, collarLat, azimuth, dip, from, to),
+          depth_from_m: from,
+          depth_to_m: to,
+          color: gradeColor(cu, au),
+          assay,
         });
       }
+      const holeId = `LV-${String(holeNum).padStart(3, "0")}`;
+      holeNum++;
+      holes.push({
+        id: `${v.id}-${holeId}`,
+        hole_id: holeId,
+        collar_lng: collarLng,
+        collar_lat: collarLat,
+        azimuth_deg: azimuth,
+        dip_deg: dip,
+        depth_m: Math.round(depth),
+        vein_code: v.code,
+        segments: segs,
+        max_cu_pct: Number(maxCu.toFixed(3)),
+        max_au_gpt: Number(maxAu.toFixed(2)),
+      });
     }
-    return { holes, generatedAt: new Date().toISOString(), source: "computed" as const };
-  },
-);
+  }
+  return { holes, generatedAt: new Date().toISOString(), source: "computed" as const };
+});
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Target Explainer (Gemini 2.5 Pro vía Lovable AI Gateway)
@@ -253,9 +242,7 @@ const ExplanationSchema = z.object({
   evidencia_satelital: z
     .string()
     .describe("Qué indica la firma satelital (alteración, índices ASTER/Sentinel)."),
-  contexto_estructural: z
-    .string()
-    .describe("Relación con lineamientos y fallas del distrito."),
+  contexto_estructural: z.string().describe("Relación con lineamientos y fallas del distrito."),
   fortalezas: z.array(z.string()).max(5),
   riesgos: z.array(z.string()).max(5),
   proximos_pasos: z

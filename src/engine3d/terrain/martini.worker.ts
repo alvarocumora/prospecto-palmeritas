@@ -84,29 +84,49 @@ self.onmessage = (e: MessageEvent<MartiniInput>) => {
   // Normales por triángulo, acumuladas en vértices
   const normals = new Float32Array(numVerts * 3);
   const triCount = triangles.length / 3;
-  const a = new Float32Array(3), b = new Float32Array(3), n = new Float32Array(3);
+  const a = new Float32Array(3),
+    b = new Float32Array(3),
+    n = new Float32Array(3);
 
   for (let t = 0; t < triCount; t++) {
     const i0 = triangles[t * 3];
     const i1 = triangles[t * 3 + 1];
     const i2 = triangles[t * 3 + 2];
-    const ax = positions[i0 * 3],     ay = positions[i0 * 3 + 1],     az = positions[i0 * 3 + 2];
-    const bx = positions[i1 * 3] - ax, by = positions[i1 * 3 + 1] - ay, bz = positions[i1 * 3 + 2] - az;
-    const cx = positions[i2 * 3] - ax, cy = positions[i2 * 3 + 1] - ay, cz = positions[i2 * 3 + 2] - az;
-    a[0] = bx; a[1] = by; a[2] = bz;
-    b[0] = cx; b[1] = cy; b[2] = cz;
+    const ax = positions[i0 * 3],
+      ay = positions[i0 * 3 + 1],
+      az = positions[i0 * 3 + 2];
+    const bx = positions[i1 * 3] - ax,
+      by = positions[i1 * 3 + 1] - ay,
+      bz = positions[i1 * 3 + 2] - az;
+    const cx = positions[i2 * 3] - ax,
+      cy = positions[i2 * 3 + 1] - ay,
+      cz = positions[i2 * 3 + 2] - az;
+    a[0] = bx;
+    a[1] = by;
+    a[2] = bz;
+    b[0] = cx;
+    b[1] = cy;
+    b[2] = cz;
     n[0] = a[1] * b[2] - a[2] * b[1];
     n[1] = a[2] * b[0] - a[0] * b[2];
     n[2] = a[0] * b[1] - a[1] * b[0];
-    normals[i0 * 3]     += n[0]; normals[i0 * 3 + 1] += n[1]; normals[i0 * 3 + 2] += n[2];
-    normals[i1 * 3]     += n[0]; normals[i1 * 3 + 1] += n[1]; normals[i1 * 3 + 2] += n[2];
-    normals[i2 * 3]     += n[0]; normals[i2 * 3 + 1] += n[1]; normals[i2 * 3 + 2] += n[2];
+    normals[i0 * 3] += n[0];
+    normals[i0 * 3 + 1] += n[1];
+    normals[i0 * 3 + 2] += n[2];
+    normals[i1 * 3] += n[0];
+    normals[i1 * 3 + 1] += n[1];
+    normals[i1 * 3 + 2] += n[2];
+    normals[i2 * 3] += n[0];
+    normals[i2 * 3 + 1] += n[1];
+    normals[i2 * 3 + 2] += n[2];
   }
   // Normalizar
   for (let v = 0; v < numVerts; v++) {
-    const nx = normals[v * 3], ny = normals[v * 3 + 1], nz = normals[v * 3 + 2];
+    const nx = normals[v * 3],
+      ny = normals[v * 3 + 1],
+      nz = normals[v * 3 + 2];
     const len = Math.hypot(nx, ny, nz) || 1;
-    normals[v * 3]     = nx / len;
+    normals[v * 3] = nx / len;
     normals[v * 3 + 1] = ny / len;
     normals[v * 3 + 2] = nz / len;
   }

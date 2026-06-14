@@ -56,52 +56,87 @@ export function AIGeologistPanel({ interpretation, onRegenerate, onClose }: Prop
           </div>
 
           <div className="grid grid-cols-3 gap-2">
-            <KpiBox label="Upside" value={interpretation.upside.toUpperCase()} cls={UPSIDE_COLOR[interpretation.upside]} />
-            <KpiBox label="Incertidumbre" value={interpretation.uncertainty.toUpperCase()} cls={UNCERTAINTY_COLOR[interpretation.uncertainty]} />
-            <KpiBox label="Sondajes" value={`${interpretation.stats.drillholes} (${interpretation.stats.aiHoles} IA)`} cls="text-foreground" />
+            <KpiBox
+              label="Upside"
+              value={interpretation.upside.toUpperCase()}
+              cls={UPSIDE_COLOR[interpretation.upside]}
+            />
+            <KpiBox
+              label="Incertidumbre"
+              value={interpretation.uncertainty.toUpperCase()}
+              cls={UNCERTAINTY_COLOR[interpretation.uncertainty]}
+            />
+            <KpiBox
+              label="Sondajes"
+              value={`${interpretation.stats.drillholes} (${interpretation.stats.aiHoles} IA)`}
+              cls="text-foreground"
+            />
           </div>
 
-          <Section icon={<Brain className="w-3 h-3 text-violet-300" />} title="Interpretación geológica">
+          <Section
+            icon={<Brain className="w-3 h-3 text-violet-300" />}
+            title="Interpretación geológica"
+          >
             <ul className="list-disc list-inside space-y-1 text-foreground/85">
-              {interpretation.interpretation.map((t, i) => <li key={i}>{t}</li>)}
+              {interpretation.interpretation.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
             </ul>
           </Section>
 
-          <Section icon={<TrendingUp className="w-3 h-3 text-emerald-300" />} title="Drivers de upside">
+          <Section
+            icon={<TrendingUp className="w-3 h-3 text-emerald-300" />}
+            title="Drivers de upside"
+          >
             {interpretation.upsideDrivers.length === 0 ? (
               <div className="text-muted-foreground">Sin drivers fuertes detectados.</div>
             ) : (
               <ul className="list-disc list-inside space-y-1 text-emerald-200/85">
-                {interpretation.upsideDrivers.map((t, i) => <li key={i}>{t}</li>)}
+                {interpretation.upsideDrivers.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
               </ul>
             )}
           </Section>
 
-          <Section icon={<AlertTriangle className="w-3 h-3 text-amber-300" />} title="Drivers de incertidumbre">
+          <Section
+            icon={<AlertTriangle className="w-3 h-3 text-amber-300" />}
+            title="Drivers de incertidumbre"
+          >
             {interpretation.uncertaintyDrivers.length === 0 ? (
               <div className="text-muted-foreground">Sin drivers materiales de incertidumbre.</div>
             ) : (
               <ul className="list-disc list-inside space-y-1 text-amber-200/85">
-                {interpretation.uncertaintyDrivers.map((t, i) => <li key={i}>{t}</li>)}
+                {interpretation.uncertaintyDrivers.map((t, i) => (
+                  <li key={i}>{t}</li>
+                ))}
               </ul>
             )}
           </Section>
 
           <Section icon={<AlertTriangle className="w-3 h-3 text-red-300" />} title="Riesgos">
             <ul className="list-disc list-inside space-y-1 text-red-200/85">
-              {interpretation.risks.map((t, i) => <li key={i}>{t}</li>)}
+              {interpretation.risks.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
             </ul>
           </Section>
 
-          <Section icon={<ListChecks className="w-3 h-3 text-cyan-300" />} title="Próximos pasos recomendados">
+          <Section
+            icon={<ListChecks className="w-3 h-3 text-cyan-300" />}
+            title="Próximos pasos recomendados"
+          >
             <ul className="list-disc list-inside space-y-1 text-cyan-200/85">
-              {interpretation.nextSteps.map((t, i) => <li key={i}>{t}</li>)}
+              {interpretation.nextSteps.map((t, i) => (
+                <li key={i}>{t}</li>
+              ))}
             </ul>
           </Section>
 
           <div className="text-[9px] text-muted-foreground pt-2 border-t border-border">
-            Interpretación generada por heurística determinista sobre la data disponible. No reemplaza
-            un Qualified Person (NI 43-101). Toda recomendación debe validarse con campo y QA/QC.
+            Interpretación generada por heurística determinista sobre la data disponible. No
+            reemplaza un Qualified Person (NI 43-101). Toda recomendación debe validarse con campo y
+            QA/QC.
           </div>
         </div>
       )}
@@ -118,7 +153,15 @@ function KpiBox({ label, value, cls }: { label: string; value: string; cls: stri
   );
 }
 
-function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function Section({
+  icon,
+  title,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div>
       <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-muted-foreground mb-1">

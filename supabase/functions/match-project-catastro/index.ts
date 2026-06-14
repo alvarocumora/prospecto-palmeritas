@@ -19,7 +19,7 @@ function normalizeName(raw: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[\/_.]+/g, " ")
+    .replace(/[/_.]+/g, " ")
     .replace(/\b\d+\s*[-]\s*\d+(\s*[-]\s*\d+)?\b/g, " ")
     .replace(/\b\d+\b/g, " ")
     .replace(/[^a-z\s]/g, " ")
@@ -199,12 +199,11 @@ Deno.serve(async (req) => {
           matched: false,
           score: best ? Number(best.score.toFixed(3)) : 0,
           matched_name: best?.c.name ?? null,
-          reason:
-            !best
-              ? "sin candidatos en bbox"
-              : best.score < 0.5
-                ? "similitud baja (<0.5)"
-                : "candidato sin geometría",
+          reason: !best
+            ? "sin candidatos en bbox"
+            : best.score < 0.5
+              ? "similitud baja (<0.5)"
+              : "candidato sin geometría",
         });
       }
     }

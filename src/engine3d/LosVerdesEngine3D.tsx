@@ -14,17 +14,13 @@ import * as THREE from "three";
 
 function InvalidateOnChange({ deps }: { deps: unknown[] }) {
   const invalidate = useThree((s) => s.invalidate);
-  useEffect(() => { invalidate(); }, deps); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    invalidate();
+  }, deps); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
 
-function ForceCameraFit({
-  bounds,
-  trigger,
-}: {
-  bounds: SceneBounds;
-  trigger: number;
-}) {
+function ForceCameraFit({ bounds, trigger }: { bounds: SceneBounds; trigger: number }) {
   const camera = useThree((s) => s.camera);
   const controls = useThree((s) => s.controls) as {
     target: THREE.Vector3;
@@ -80,15 +76,40 @@ function DebugOriginLabel() {
   );
 }
 
-import { Loader2, Settings2, Layers as LayersIcon, Scissors, Mountain, FileDown, Boxes, Upload } from "lucide-react";
+import {
+  Loader2,
+  Settings2,
+  Layers as LayersIcon,
+  Scissors,
+  Mountain,
+  FileDown,
+  Boxes,
+  Upload,
+} from "lucide-react";
 
 import { getAnomalyPoints } from "@/engine3d/data/anomalies.functions";
 import { getDrillholes, type DrillholeSegment } from "@/engine3d/data/drillholes.functions";
-import { useVoxelModel, DEFAULT_VOXEL_PARAMS, type VoxelParams } from "@/engine3d/hooks/useVoxelModel";
-import { useIsosurface, DEFAULT_ISO_PARAMS, type IsosurfaceParams } from "@/engine3d/hooks/useIsosurface";
+import {
+  useVoxelModel,
+  DEFAULT_VOXEL_PARAMS,
+  type VoxelParams,
+} from "@/engine3d/hooks/useVoxelModel";
+import {
+  useIsosurface,
+  DEFAULT_ISO_PARAMS,
+  type IsosurfaceParams,
+} from "@/engine3d/hooks/useIsosurface";
 import { useTerrainDEM, type TerrainQuality } from "@/engine3d/hooks/useTerrainDEM";
-import { useBlockModel, DEFAULT_BLOCK_PARAMS, type BlockModelParams } from "@/engine3d/hooks/useBlockModel";
-import { BlockModelLayer, DEFAULT_BLOCK_FILTERS, type BlockFilters } from "@/engine3d/layers/BlockModelLayer";
+import {
+  useBlockModel,
+  DEFAULT_BLOCK_PARAMS,
+  type BlockModelParams,
+} from "@/engine3d/hooks/useBlockModel";
+import {
+  BlockModelLayer,
+  DEFAULT_BLOCK_FILTERS,
+  type BlockFilters,
+} from "@/engine3d/layers/BlockModelLayer";
 import { ResourceModelPanel } from "@/engine3d/panels/ResourceModelPanel";
 import { TonnageGradePanel } from "@/engine3d/panels/TonnageGradePanel";
 import { DrillholeImportPanel } from "@/engine3d/panels/DrillholeImportPanel";
@@ -103,16 +124,34 @@ import { ReportsPanel } from "@/engine3d/panels/ReportsPanel";
 import { DrillTargetLayer } from "@/engine3d/layers/DrillTargetLayer";
 import { runAIGeologist, type AIInterpretation } from "@/engine3d/ai/aiGeologist";
 import { useDrillTargets, DEFAULT_TARGET_PARAMS } from "@/engine3d/hooks/useDrillTargets";
-import { exportTargetsCsv, downloadString, campaignCost as computeCampaignCost } from "@/engine3d/reports/reportGenerator";
+import {
+  exportTargetsCsv,
+  downloadString,
+  campaignCost as computeCampaignCost,
+} from "@/engine3d/reports/reportGenerator";
 import type { DrillTarget } from "@/engine3d/ai/drillTarget.worker";
 import { useQAQC } from "@/engine3d/hooks/useQAQC";
-import { DEFAULT_ESTIMATION, applyEstimation, type EstimationSettings } from "@/engine3d/qaqc/estimationPresets";
+import {
+  DEFAULT_ESTIMATION,
+  applyEstimation,
+  type EstimationSettings,
+} from "@/engine3d/qaqc/estimationPresets";
 import { auditTrail, computeHash } from "@/engine3d/qaqc/auditTrail";
 import { modelVersions } from "@/engine3d/qaqc/modelVersions";
 import type { ParsedDrillholeBundle } from "@/engine3d/data/csvDrillholes";
-import { useClippingPlanes, DEFAULT_CLIP_PARAMS, type ClipParams, type ClipAxis } from "@/engine3d/sections/useClippingPlanes";
+import {
+  useClippingPlanes,
+  DEFAULT_CLIP_PARAMS,
+  type ClipParams,
+  type ClipAxis,
+} from "@/engine3d/sections/useClippingPlanes";
 import { ClippingPlaneController } from "@/engine3d/sections/ClippingPlaneController";
-import { AutoFitCamera, computeSceneBounds, fitCameraToBounds, type SceneBounds } from "@/engine3d/sections/AutoFitCamera";
+import {
+  AutoFitCamera,
+  computeSceneBounds,
+  fitCameraToBounds,
+  type SceneBounds,
+} from "@/engine3d/sections/AutoFitCamera";
 import { SyntheticDemoScene } from "@/engine3d/layers/SyntheticDemoScene";
 import { useSection } from "@/engine3d/hooks/useSection";
 import { SectionViewPanel } from "@/engine3d/sections/SectionViewPanel";
@@ -133,7 +172,12 @@ import { TerrainPlane } from "@/engine3d/layers/TerrainPlane";
 import { TerrainMartiniLayer } from "@/engine3d/layers/TerrainMartiniLayer";
 import { BasemapLayer } from "@/engine3d/layers/BasemapLayer";
 import { BasemapPanel, ScaleBar } from "@/engine3d/panels/BasemapPanel";
-import { CameraOrientationTracker, CompassRose, MiniMap, type CameraOrientation } from "@/engine3d/panels/CompassAndMiniMap";
+import {
+  CameraOrientationTracker,
+  CompassRose,
+  MiniMap,
+  type CameraOrientation,
+} from "@/engine3d/panels/CompassAndMiniMap";
 import { CameraViewPresets, type CameraView } from "@/engine3d/panels/CameraViewPresets";
 import { CameraPresetCluster } from "@/engine3d/panels/CameraPresetCluster";
 import { ShadowApplier } from "@/engine3d/layers/ShadowApplier";
@@ -221,7 +265,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showTonnageGrade, setShowTonnageGrade] = useState(true);
   const [showImportPanel, setShowImportPanel] = useState(false);
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
-  const [econ, setEcon] = useState({ price: 2400, opex: 25, capex: 50_000_000, recovery: 85, discount: 0.08, years: 8 });
+  const [econ, setEcon] = useState({
+    price: 2400,
+    opex: 25,
+    capex: 50_000_000,
+    recovery: 85,
+    discount: 0.08,
+    years: 8,
+  });
 
   // Sprint 4: estimation settings + active tab + NI 43-101 mode
   const [estimation, setEstimation] = useState<EstimationSettings>(DEFAULT_ESTIMATION);
@@ -246,7 +297,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showCoords, setShowCoords] = useState(true);
   const [showScaleBar, setShowScaleBar] = useState(true);
   const [showNorth, setShowNorth] = useState(true);
-  const [basemapStatus, setBasemapStatus] = useState<{ source: BasemapSource; failed: boolean; zoom: number } | null>(null);
+  const [basemapStatus, setBasemapStatus] = useState<{
+    source: BasemapSource;
+    failed: boolean;
+    zoom: number;
+  } | null>(null);
   const BASEMAP_EXTENT = 4000;
 
   // Sprint: Cinematic look (Leapfrog/Datamine style)
@@ -267,7 +322,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   });
   const [showMiniMap, setShowMiniMap] = useState(true);
 
-
   const points = pointsQ.data?.points ?? [];
   const holes = holesQ.data?.holes ?? [];
   const anomaliesSource = pointsQ.data?.source ?? "empty";
@@ -278,7 +332,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   // Sprint 6 data-binding diagnostics
   useEffect(() => {
     if (!pointsQ.data && !holesQ.data) return;
-    // eslint-disable-next-line no-console
+
     console.log("[engine3d] datasets", {
       projectId,
       anomaliesGeophysical: geoCount,
@@ -288,10 +342,17 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       drillholesSource,
       anomaliesSource,
     });
-  }, [pointsQ.data, holesQ.data, projectId, geoCount, satCount, points.length, holes.length, anomaliesSource, drillholesSource]);
-
-
-
+  }, [
+    pointsQ.data,
+    holesQ.data,
+    projectId,
+    geoCount,
+    satCount,
+    points.length,
+    holes.length,
+    anomaliesSource,
+    drillholesSource,
+  ]);
 
   // Sprint 4: QA/QC sobre el bundle importado
   const qaqcInput = useMemo(() => {
@@ -340,17 +401,16 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     renderMode === "voxel" ? points : [],
     voxelParams,
   );
-  const { output: blockModel, busy: blockBusy, error: blockError } = useBlockModel(
-    blockParams.enabled ? points : [],
-    blockParams,
-  );
-  const { mesh: demMesh, busy: demBusy, loading: demLoading } = useTerrainDEM(
-    projectId,
-    demEnabled,
-    demQuality,
-    verticalExaggeration,
-    4000,
-  );
+  const {
+    output: blockModel,
+    busy: blockBusy,
+    error: blockError,
+  } = useBlockModel(blockParams.enabled ? points : [], blockParams);
+  const {
+    mesh: demMesh,
+    busy: demBusy,
+    loading: demLoading,
+  } = useTerrainDEM(projectId, demEnabled, demQuality, verticalExaggeration, 4000);
 
   // Sprint 5: Drill target ranking (worker)
   const existingCollars = useMemo(
@@ -379,7 +439,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       });
     }
   }, [drillTargets]);
-
 
   // Sprint 4: log block model rebuilds + versionado (después de useBlockModel)
   useEffect(() => {
@@ -415,10 +474,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const planeNormal = useMemo(() => {
     const ax = effectiveClip.axis;
     let n =
-      ax === "x" ? { x: 1, y: 0, z: 0 } :
-      ax === "y" ? { x: 0, y: 1, z: 0 } :
-      ax === "z" ? { x: 0, y: 0, z: 1 } :
-      { ...(effectiveClip.freeNormal ?? { x: 1, y: 0, z: 0 }) };
+      ax === "x"
+        ? { x: 1, y: 0, z: 0 }
+        : ax === "y"
+          ? { x: 0, y: 1, z: 0 }
+          : ax === "z"
+            ? { x: 0, y: 0, z: 1 }
+            : { ...(effectiveClip.freeNormal ?? { x: 1, y: 0, z: 0 }) };
     if (effectiveClip.invert) n = { x: -n.x, y: -n.y, z: -n.z };
     const len = Math.hypot(n.x, n.y, n.z) || 1;
     return { x: n.x / len, y: n.y / len, z: n.z / len };
@@ -549,7 +611,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       }
     }
     return computeSceneBounds([
-      ...(coreSceneBounds ? [{ points: [coreSceneBounds.min, coreSceneBounds.max] as Array<[number, number, number]> }] : []),
+      ...(coreSceneBounds
+        ? [
+            {
+              points: [coreSceneBounds.min, coreSceneBounds.max] as Array<[number, number, number]>,
+            },
+          ]
+        : []),
       { points: holePts },
       { points: blockPts },
       { points: pitPts },
@@ -601,10 +669,33 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const debugSceneBounds: SceneBounds = useMemo(() => {
     const helper = 4000;
     return computeSceneBounds([
-      { points: [[-helper, -helper * 0.25, -helper], [helper, helper * 0.25, helper]] },
-      ...(sceneBounds ? [{ points: [sceneBounds.min, sceneBounds.max] as Array<[number, number, number]> }] : []),
-      ...(pointCloudBounds ? [{ points: [pointCloudBounds.min, pointCloudBounds.max] as Array<[number, number, number]> }] : []),
-      ...(plannedHoleBounds ? [{ points: [plannedHoleBounds.min, plannedHoleBounds.max] as Array<[number, number, number]> }] : []),
+      {
+        points: [
+          [-helper, -helper * 0.25, -helper],
+          [helper, helper * 0.25, helper],
+        ],
+      },
+      ...(sceneBounds
+        ? [{ points: [sceneBounds.min, sceneBounds.max] as Array<[number, number, number]> }]
+        : []),
+      ...(pointCloudBounds
+        ? [
+            {
+              points: [pointCloudBounds.min, pointCloudBounds.max] as Array<
+                [number, number, number]
+              >,
+            },
+          ]
+        : []),
+      ...(plannedHoleBounds
+        ? [
+            {
+              points: [plannedHoleBounds.min, plannedHoleBounds.max] as Array<
+                [number, number, number]
+              >,
+            },
+          ]
+        : []),
     ]);
   }, [sceneBounds, pointCloudBounds, plannedHoleBounds]);
 
@@ -630,7 +721,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     return computeSceneBounds([{ points: pts }]);
   }, [drillTargets, verticalExaggeration]);
 
-  const renderBounds = debugMinimalScene ? debugSceneBounds : coreSceneBounds ?? sceneBounds ?? debugSceneBounds;
+  const renderBounds = debugMinimalScene
+    ? debugSceneBounds
+    : (coreSceneBounds ?? sceneBounds ?? debugSceneBounds);
   const forceFitCamera = useCallback(() => {
     setFitCameraNonce((n) => n + 1);
   }, []);
@@ -656,7 +749,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     setTimeout(() => setFitCameraNonce((n) => n + 1), 300);
   }, [sceneBounds, hasRealBoundsRef]);
 
-
   return (
     <div
       className="relative w-full rounded-lg border border-border overflow-hidden bg-[#08090c]"
@@ -677,10 +769,17 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </div>
           ) : (
             <div className="text-muted-foreground space-y-0.5">
-              <div>{pointsQ.data?.stats.count ?? 0} anomalías ({geoCount}geo·{satCount}sat) · {holes.length} sondajes</div>
+              <div>
+                {pointsQ.data?.stats.count ?? 0} anomalías ({geoCount}geo·{satCount}sat) ·{" "}
+                {holes.length} sondajes
+              </div>
               <div className="text-[9px]">
                 src anom: <span className="text-cyan-300">{anomaliesSource}</span> · holes:{" "}
-                <span className={drillholesSource === "planned-from-targets" ? "text-amber-300" : "text-cyan-300"}>
+                <span
+                  className={
+                    drillholesSource === "planned-from-targets" ? "text-amber-300" : "text-cyan-300"
+                  }
+                >
                   {drillholesSource}
                 </span>
               </div>
@@ -688,23 +787,36 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                 <>
                   <div>
                     field {iso.resolution}³ ·{" "}
-                    <span className="text-orange-300">{iso.triangleCount.toLocaleString()}</span> tri ·{" "}
-                    <span className={iso.mode === "mc" ? "text-emerald-300" : iso.mode === "blob" ? "text-amber-300" : "text-rose-300"}>
+                    <span className="text-orange-300">{iso.triangleCount.toLocaleString()}</span>{" "}
+                    tri ·{" "}
+                    <span
+                      className={
+                        iso.mode === "mc"
+                          ? "text-emerald-300"
+                          : iso.mode === "blob"
+                            ? "text-amber-300"
+                            : "text-rose-300"
+                      }
+                    >
                       {iso.mode}
                     </span>
                   </div>
                   <div className="text-[9px]">
-                    iso={iso.finalIsovalue.toFixed(2)} · r={Math.round(iso.searchRadius)}m ·{" "}
-                    v[{iso.valueStats.min.toFixed(2)}-{iso.valueStats.max.toFixed(2)}] avg {iso.valueStats.avg.toFixed(2)}
+                    iso={iso.finalIsovalue.toFixed(2)} · r={Math.round(iso.searchRadius)}m · v[
+                    {iso.valueStats.min.toFixed(2)}-{iso.valueStats.max.toFixed(2)}] avg{" "}
+                    {iso.valueStats.avg.toFixed(2)}
                   </div>
                   <div className="text-[9px]">
-                    field [{iso.fieldMin.toFixed(2)}-{iso.fieldMax.toFixed(2)}] · vox {iso.activeVoxels} · cells&gt;iso {iso.cellsAboveIso}
+                    field [{iso.fieldMin.toFixed(2)}-{iso.fieldMax.toFixed(2)}] · vox{" "}
+                    {iso.activeVoxels} · cells&gt;iso {iso.cellsAboveIso}
                     {iso.triedIsovalues.length > 1 && (
                       <> · tried {iso.triedIsovalues.map((v) => v.toFixed(2)).join("→")}</>
                     )}
                   </div>
                   {iso.mode === "blob" && (
-                    <div className="text-[9px] text-amber-300">fallback blobs: {iso.blobs.length}</div>
+                    <div className="text-[9px] text-amber-300">
+                      fallback blobs: {iso.blobs.length}
+                    </div>
                   )}
                 </>
               )}
@@ -717,9 +829,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               {demMesh && (
                 <div>
                   DEM {demQuality} ·{" "}
-                  <span className="text-emerald-300">
-                    {demMesh.triangleCount.toLocaleString()}
-                  </span>{" "}
+                  <span className="text-emerald-300">{demMesh.triangleCount.toLocaleString()}</span>{" "}
                   tri
                 </div>
               )}
@@ -755,10 +865,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         {/* Cinematic */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2">
           <div className="flex items-center gap-2">
-            <span className="uppercase tracking-wider text-amber-300">Cinematic · Leapfrog look</span>
+            <span className="uppercase tracking-wider text-amber-300">
+              Cinematic · Leapfrog look
+            </span>
           </div>
           <div className="flex items-center justify-between gap-2 border-b border-border/40 pb-2">
-            <span className="text-[9px] uppercase tracking-wider text-emerald-300">Debug Render Mode</span>
+            <span className="text-[9px] uppercase tracking-wider text-emerald-300">
+              Debug Render Mode
+            </span>
             <Switch checked={debugRenderMode} onCheckedChange={setDebugRenderMode} />
           </div>
           <div className="flex items-center gap-2">
@@ -797,7 +911,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             points: effectiveShowPoints && points.length > 0,
             holes: effectiveShowHoles && holes.length > 0,
             dem: effectiveDemEnabled && !!demMesh,
-            basemap: basemapEnabled && !(basemapStatus?.failed),
+            basemap: basemapEnabled && !basemapStatus?.failed,
             iso: effectiveShowSurface && !!iso && iso.triangleCount > 0,
             blocks: effectiveShowBlocks && !!blockModel && blockModel.count > 0,
             fx: cinematicEnabled && !fxError,
@@ -814,15 +928,31 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           onForceFit={forceFitCamera}
           onTest={(layer) => {
             switch (layer) {
-              case "points": setShowPoints(true); break;
-              case "holes": setShowHoles(true); break;
-              case "dem": setDemEnabled(true); setDebugRenderMode(false); break;
-              case "esri": setBasemapSource("esri"); setDebugRenderMode(false); break;
-              case "iso": setShowSurface(true); setDebugRenderMode(false); break;
+              case "points":
+                setShowPoints(true);
+                break;
+              case "holes":
+                setShowHoles(true);
+                break;
+              case "dem":
+                setDemEnabled(true);
+                setDebugRenderMode(false);
+                break;
+              case "esri":
+                setBasemapSource("esri");
+                setDebugRenderMode(false);
+                break;
+              case "iso":
+                setShowSurface(true);
+                setDebugRenderMode(false);
+                break;
               case "all":
-                setShowPoints(true); setShowHoles(true);
-                setDemEnabled(true); setBasemapSource("esri");
-                setShowSurface(true); setShowBlocks(true);
+                setShowPoints(true);
+                setShowHoles(true);
+                setDemEnabled(true);
+                setBasemapSource("esri");
+                setShowSurface(true);
+                setShowBlocks(true);
                 setDebugRenderMode(false);
                 break;
             }
@@ -852,19 +982,49 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           </div>
           <div>
             <Label className="text-[9px] uppercase">Isovalue · {isovalue.toFixed(2)}</Label>
-            <Slider min={0.1} max={0.95} step={0.05} value={[isovalue]} onValueChange={([v]) => setIsovalue(v)} className="mt-1" />
+            <Slider
+              min={0.1}
+              max={0.95}
+              step={0.05}
+              value={[isovalue]}
+              onValueChange={([v]) => setIsovalue(v)}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label className="text-[9px] uppercase">Resolución · {resolution}³</Label>
-            <Slider min={16} max={renderMode === "iso" ? 96 : 72} step={renderMode === "iso" ? 8 : 4} value={[resolution]} onValueChange={([v]) => setResolution(v)} className="mt-1" />
+            <Slider
+              min={16}
+              max={renderMode === "iso" ? 96 : 72}
+              step={renderMode === "iso" ? 8 : 4}
+              value={[resolution]}
+              onValueChange={([v]) => setResolution(v)}
+              className="mt-1"
+            />
           </div>
           <div>
             <Label className="text-[9px] uppercase">Opacidad · {opacity.toFixed(2)}</Label>
-            <Slider min={0.1} max={1} step={0.05} value={[opacity]} onValueChange={([v]) => setOpacity(v)} className="mt-1" />
+            <Slider
+              min={0.1}
+              max={1}
+              step={0.05}
+              value={[opacity]}
+              onValueChange={([v]) => setOpacity(v)}
+              className="mt-1"
+            />
           </div>
           <div>
-            <Label className="text-[9px] uppercase">Exag. vertical · {verticalExaggeration.toFixed(1)}×</Label>
-            <Slider min={0.5} max={5} step={0.5} value={[verticalExaggeration]} onValueChange={([v]) => setVe(v)} className="mt-1" />
+            <Label className="text-[9px] uppercase">
+              Exag. vertical · {verticalExaggeration.toFixed(1)}×
+            </Label>
+            <Slider
+              min={0.5}
+              max={5}
+              step={0.5}
+              value={[verticalExaggeration]}
+              onValueChange={([v]) => setVe(v)}
+              className="mt-1"
+            />
           </div>
         </div>
 
@@ -924,7 +1084,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             <span className="uppercase tracking-wider text-fuchsia-300">section view</span>
           </div>
           <div>
-            <Label className="text-[9px] uppercase">Corredor · ±{(sectionWidth / 2).toFixed(0)} m</Label>
+            <Label className="text-[9px] uppercase">
+              Corredor · ±{(sectionWidth / 2).toFixed(0)} m
+            </Label>
             <div className="grid grid-cols-5 gap-1 mt-1">
               {[5, 10, 25, 50, 100].map((w) => (
                 <Button
@@ -958,7 +1120,8 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             <div className="text-muted-foreground text-[9px] leading-tight">
               {section.result.stats.holesIntersected} sondajes ·{" "}
               {section.result.stats.samplesInSlab} muestras ·{" "}
-              {section.result.anomalySegments.length} segs · {section.result.stats.elapsedMs.toFixed(0)} ms
+              {section.result.anomalySegments.length} segs ·{" "}
+              {section.result.stats.elapsedMs.toFixed(0)} ms
               {section.busy && " · calculando…"}
             </div>
           )}
@@ -988,7 +1151,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </Button>
           </div>
         </div>
-
 
         {/* Terreno DEM */}
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-2.5">
@@ -1030,9 +1192,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           {blockParams.enabled && (
             <>
               <div>
-                <Label className="text-[9px] uppercase">Block size · {blockParams.blockSize} m</Label>
+                <Label className="text-[9px] uppercase">
+                  Block size · {blockParams.blockSize} m
+                </Label>
                 <Slider
-                  min={10} max={100} step={5}
+                  min={10}
+                  max={100}
+                  step={5}
                   value={[blockParams.blockSize]}
                   onValueChange={([v]) => setBlockParams((p) => ({ ...p, blockSize: v }))}
                   className="mt-1"
@@ -1056,19 +1222,26 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               </div>
               <div>
                 <Label className="text-[9px] uppercase">
-                  Grade scale · 0..1 → {blockParams.gradeScale} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                  Grade scale · 0..1 → {blockParams.gradeScale}{" "}
+                  {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
                 </Label>
                 <Slider
-                  min={0.5} max={20} step={0.5}
+                  min={0.5}
+                  max={20}
+                  step={0.5}
                   value={[blockParams.gradeScale]}
                   onValueChange={([v]) => setBlockParams((p) => ({ ...p, gradeScale: v }))}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label className="text-[9px] uppercase">Search radius · {blockParams.searchRadius} m</Label>
+                <Label className="text-[9px] uppercase">
+                  Search radius · {blockParams.searchRadius} m
+                </Label>
                 <Slider
-                  min={20} max={500} step={10}
+                  min={20}
+                  max={500}
+                  step={10}
                   value={[blockParams.searchRadius]}
                   onValueChange={([v]) => setBlockParams((p) => ({ ...p, searchRadius: v }))}
                   className="mt-1"
@@ -1076,19 +1249,26 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               </div>
               <div>
                 <Label className="text-[9px] uppercase">
-                  Cutoff · {blockFilters.cutoff.toFixed(2)} {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
+                  Cutoff · {blockFilters.cutoff.toFixed(2)}{" "}
+                  {blockParams.commodity === "au" || blockParams.commodity === "ag" ? "g/t" : "%"}
                 </Label>
                 <Slider
-                  min={0} max={Math.max(2, blockParams.gradeScale)} step={0.05}
+                  min={0}
+                  max={Math.max(2, blockParams.gradeScale)}
+                  step={0.05}
                   value={[blockFilters.cutoff]}
                   onValueChange={([v]) => setBlockFilters((f) => ({ ...f, cutoff: v }))}
                   className="mt-1"
                 />
               </div>
               <div>
-                <Label className="text-[9px] uppercase">Confianza mín · {(blockFilters.minConfidence * 100).toFixed(0)}%</Label>
+                <Label className="text-[9px] uppercase">
+                  Confianza mín · {(blockFilters.minConfidence * 100).toFixed(0)}%
+                </Label>
                 <Slider
-                  min={0} max={1} step={0.05}
+                  min={0}
+                  max={1}
+                  step={0.05}
                   value={[blockFilters.minConfidence]}
                   onValueChange={([v]) => setBlockFilters((f) => ({ ...f, minConfidence: v }))}
                   className="mt-1"
@@ -1099,9 +1279,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                   Depth · {blockFilters.minDepth}–{blockFilters.maxDepth} m
                 </Label>
                 <Slider
-                  min={0} max={1000} step={25}
+                  min={0}
+                  max={1000}
+                  step={25}
                   value={[blockFilters.minDepth, blockFilters.maxDepth]}
-                  onValueChange={([a, b]) => setBlockFilters((f) => ({ ...f, minDepth: a, maxDepth: b }))}
+                  onValueChange={([a, b]) =>
+                    setBlockFilters((f) => ({ ...f, minDepth: a, maxDepth: b }))
+                  }
                   className="mt-1"
                 />
               </div>
@@ -1122,9 +1306,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                 </div>
               </div>
               <div>
-                <Label className="text-[9px] uppercase">Opacidad · {blockFilters.opacity.toFixed(2)}</Label>
+                <Label className="text-[9px] uppercase">
+                  Opacidad · {blockFilters.opacity.toFixed(2)}
+                </Label>
                 <Slider
-                  min={0.1} max={1} step={0.05}
+                  min={0.1}
+                  max={1}
+                  step={0.05}
                   value={[blockFilters.opacity]}
                   onValueChange={([v]) => setBlockFilters((f) => ({ ...f, opacity: v }))}
                   className="mt-1"
@@ -1140,7 +1328,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                 <ClassChip
                   label="IND"
                   active={blockFilters.showIndicated}
-                  onClick={() => setBlockFilters((f) => ({ ...f, showIndicated: !f.showIndicated }))}
+                  onClick={() =>
+                    setBlockFilters((f) => ({ ...f, showIndicated: !f.showIndicated }))
+                  }
                   color="bg-yellow-500/70"
                 />
                 <ClassChip
@@ -1150,13 +1340,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
                   color="bg-red-500/70"
                 />
               </div>
-              {blockError && (
-                <div className="text-[9px] text-amber-300">{blockError}</div>
-              )}
+              {blockError && <div className="text-[9px] text-amber-300">{blockError}</div>}
               {blockModel && (
                 <div className="text-muted-foreground text-[9px] leading-tight">
-                  {blockModel.count.toLocaleString()} bloques · medias {blockModel.stats.gradeMean.toFixed(2)} ·{" "}
-                  {(blockModel.stats.tonnesTotal / 1_000_000).toFixed(2)} Mt · {blockModel.stats.elapsedMs.toFixed(0)} ms
+                  {blockModel.count.toLocaleString()} bloques · medias{" "}
+                  {blockModel.stats.gradeMean.toFixed(2)} ·{" "}
+                  {(blockModel.stats.tonnesTotal / 1_000_000).toFixed(2)} Mt ·{" "}
+                  {blockModel.stats.elapsedMs.toFixed(0)} ms
                   {blockBusy && " · calc…"}
                 </div>
               )}
@@ -1183,13 +1373,18 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           </Button>
           {importedBundle && (
             <div className="text-[9px] text-emerald-300">
-              ✓ {importedBundle.collars.length} collars · {importedBundle.assays.length} assays importados
+              ✓ {importedBundle.collars.length} collars · {importedBundle.assays.length} assays
+              importados
             </div>
           )}
         </div>
 
         <div className="bg-black/70 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono text-foreground/90 border border-border space-y-1.5">
-          <ToggleRow label={renderMode === "iso" ? "Isosurface" : "Voxel cubes"} value={showSurface} onChange={setShowSurface} />
+          <ToggleRow
+            label={renderMode === "iso" ? "Isosurface" : "Voxel cubes"}
+            value={showSurface}
+            onChange={setShowSurface}
+          />
           <ToggleRow label="Sondajes" value={showHoles} onChange={setShowHoles} />
           <ToggleRow label="Puntos crudos" value={showPoints} onChange={setShowPoints} />
           <ToggleRow label="Grid fallback" value={showGrid} onChange={setShowGrid} />
@@ -1214,10 +1409,20 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         <div className="absolute top-2 right-2 z-10 bg-black/85 backdrop-blur rounded-md px-3 py-2 text-[10px] font-mono border border-gold/40 max-w-[240px]">
           <div className="text-gold uppercase tracking-wider mb-1">{hoveredHole.holeId}</div>
           <div className="text-muted-foreground space-y-0.5">
-            <div>azimuth: <span className="text-foreground">{hoveredHole.azimuth.toFixed(0)}°</span></div>
-            <div>dip: <span className="text-foreground">{hoveredHole.dip.toFixed(0)}°</span></div>
-            <div>profundidad: <span className="text-foreground">{hoveredHole.depth.toFixed(0)} m</span></div>
-            {hoveredHole.status && <div>estado: <span className="text-foreground">{hoveredHole.status}</span></div>}
+            <div>
+              azimuth: <span className="text-foreground">{hoveredHole.azimuth.toFixed(0)}°</span>
+            </div>
+            <div>
+              dip: <span className="text-foreground">{hoveredHole.dip.toFixed(0)}°</span>
+            </div>
+            <div>
+              profundidad: <span className="text-foreground">{hoveredHole.depth.toFixed(0)} m</span>
+            </div>
+            {hoveredHole.status && (
+              <div>
+                estado: <span className="text-foreground">{hoveredHole.status}</span>
+              </div>
+            )}
             {hoveredHole.isAi && <div className="text-cyan-300">target IA</div>}
           </div>
         </div>
@@ -1234,21 +1439,44 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             {showLayerDebug ? "hide" : "layers"}
           </button>
         </div>
-        <div>cam: [{cameraInitial.join(", ")}] · fit:
-          <span className={autoFit ? "text-emerald-300" : "text-muted-foreground"}> {autoFit ? "auto" : "manual"}</span>
+        <div>
+          cam: [{cameraInitial.join(", ")}] · fit:
+          <span className={autoFit ? "text-emerald-300" : "text-muted-foreground"}>
+            {" "}
+            {autoFit ? "auto" : "manual"}
+          </span>
         </div>
-        <div>debug render: <span className={debugRenderMode ? "text-emerald-300" : "text-muted-foreground"}>{debugRenderMode ? "ON" : "off"}</span></div>
-        <div>bounds: {sceneBounds
-          ? `${sceneBounds.min.map((n) => n.toFixed(0)).join(",")} → ${sceneBounds.max.map((n) => n.toFixed(0)).join(",")}`
-          : "—"}
+        <div>
+          debug render:{" "}
+          <span className={debugRenderMode ? "text-emerald-300" : "text-muted-foreground"}>
+            {debugRenderMode ? "ON" : "off"}
+          </span>
         </div>
-        <div>points: {points.length} · holes: {holes.length}</div>
-        <div>iso tri: {iso?.triangleCount ?? 0} · dem tri: {demMesh?.triangleCount ?? 0}</div>
-        <div>blocks: {blockModel?.count ?? 0} · targets: {drillTargets?.targets.length ?? 0}</div>
-        <div>clip: <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>{effectiveClip.enabled ? "ON" : "off"}</span>
+        <div>
+          bounds:{" "}
+          {sceneBounds
+            ? `${sceneBounds.min.map((n) => n.toFixed(0)).join(",")} → ${sceneBounds.max.map((n) => n.toFixed(0)).join(",")}`
+            : "—"}
+        </div>
+        <div>
+          points: {points.length} · holes: {holes.length}
+        </div>
+        <div>
+          iso tri: {iso?.triangleCount ?? 0} · dem tri: {demMesh?.triangleCount ?? 0}
+        </div>
+        <div>
+          blocks: {blockModel?.count ?? 0} · targets: {drillTargets?.targets.length ?? 0}
+        </div>
+        <div>
+          clip:{" "}
+          <span className={effectiveClip.enabled ? "text-amber-300" : "text-muted-foreground"}>
+            {effectiveClip.enabled ? "ON" : "off"}
+          </span>
           {noRealData && <span className="ml-2 text-amber-300">· DEMO</span>}
         </div>
-        {blockError ? <div className="text-red-400">err: {String(blockError).slice(0, 50)}</div> : null}
+        {blockError ? (
+          <div className="text-red-400">err: {String(blockError).slice(0, 50)}</div>
+        ) : null}
 
         {/* Solo layer chips */}
         <div className="pt-1 border-t border-border/40 grid grid-cols-4 gap-1">
@@ -1258,7 +1486,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               type="button"
               onClick={() => setSoloLayer(k)}
               className={`h-5 rounded text-[9px] uppercase border ${
-                soloLayer === k ? "border-emerald-400/60 text-emerald-300" : "border-border/40 text-muted-foreground"
+                soloLayer === k
+                  ? "border-emerald-400/60 text-emerald-300"
+                  : "border-border/40 text-muted-foreground"
               }`}
             >
               {k}
@@ -1268,7 +1498,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             type="button"
             onClick={() => setAutoFit((v) => !v)}
             className={`h-5 rounded text-[9px] uppercase border ${
-              autoFit ? "border-cyan-400/60 text-cyan-300" : "border-border/40 text-muted-foreground"
+              autoFit
+                ? "border-cyan-400/60 text-cyan-300"
+                : "border-border/40 text-muted-foreground"
             }`}
           >
             fit
@@ -1284,17 +1516,51 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
 
         {showLayerDebug && (
           <div className="pt-1 border-t border-border/40 space-y-0.5 text-[9px]">
-            <LayerRow name="DEM" mounted={!!demMesh} visible={visible("dem") && demEnabled} count={demMesh?.triangleCount ?? 0} extra={demBusy ? "busy" : "ok"} />
-            <LayerRow name="Isosurface" mounted={!!iso} visible={visible("iso") && showSurface} count={iso?.triangleCount ?? 0} extra={isoBusy ? "busy" : `op ${opacity.toFixed(2)}`} />
-            <LayerRow name="Drillholes" mounted={holes.length > 0} visible={visible("holes") && showHoles} count={holes.length} extra="instanced" />
-            <LayerRow name="Block Model" mounted={!!blockModel} visible={visible("blocks") && showBlocks && blockParams.enabled} count={blockModel?.count ?? 0} extra={blockBusy ? "busy" : `cut ${blockFilters.cutoff}`} />
-            <LayerRow name="Targets" mounted={!!drillTargets} visible={visible("targets") && showTargets3D} count={drillTargets?.targets.length ?? 0} extra={targetsBusy ? "busy" : `A ${drillTargets?.stats.aPriority ?? 0}`} />
-            <LayerRow name="Clip Helper" mounted={true} visible={visible("debug") && showClipHelper} count={clippingPlanes.length} extra={effectiveClip.enabled ? "active" : "idle"} />
+            <LayerRow
+              name="DEM"
+              mounted={!!demMesh}
+              visible={visible("dem") && demEnabled}
+              count={demMesh?.triangleCount ?? 0}
+              extra={demBusy ? "busy" : "ok"}
+            />
+            <LayerRow
+              name="Isosurface"
+              mounted={!!iso}
+              visible={visible("iso") && showSurface}
+              count={iso?.triangleCount ?? 0}
+              extra={isoBusy ? "busy" : `op ${opacity.toFixed(2)}`}
+            />
+            <LayerRow
+              name="Drillholes"
+              mounted={holes.length > 0}
+              visible={visible("holes") && showHoles}
+              count={holes.length}
+              extra="instanced"
+            />
+            <LayerRow
+              name="Block Model"
+              mounted={!!blockModel}
+              visible={visible("blocks") && showBlocks && blockParams.enabled}
+              count={blockModel?.count ?? 0}
+              extra={blockBusy ? "busy" : `cut ${blockFilters.cutoff}`}
+            />
+            <LayerRow
+              name="Targets"
+              mounted={!!drillTargets}
+              visible={visible("targets") && showTargets3D}
+              count={drillTargets?.targets.length ?? 0}
+              extra={targetsBusy ? "busy" : `A ${drillTargets?.stats.aPriority ?? 0}`}
+            />
+            <LayerRow
+              name="Clip Helper"
+              mounted={true}
+              visible={visible("debug") && showClipHelper}
+              count={clippingPlanes.length}
+              extra={effectiveClip.enabled ? "active" : "idle"}
+            />
           </div>
         )}
       </div>
-
-
 
       <Canvas
         frameloop={debugRenderMode ? "always" : "demand"}
@@ -1312,8 +1578,13 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           setTimeout(() => invalidate(), 300);
         }}
       >
-        <color attach="background" args={[debugRenderMode ? "#05070b" : cinematic ? "#0a0f18" : "#1a1a1f"]} />
-        {fogEnabled && <fog attach="fog" args={[cinematicEnabled ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />}
+        <color
+          attach="background"
+          args={[debugRenderMode ? "#05070b" : cinematic ? "#0a0f18" : "#1a1a1f"]}
+        />
+        {fogEnabled && (
+          <fog attach="fog" args={[cinematicEnabled ? "#0a0f18" : "#1a1a1f", 3500, 18000]} />
+        )}
         <ambientLight intensity={debugRenderMode ? 1.35 : 0.45} />
         {!debugRenderMode && <hemisphereLight args={["#cfd9e8", "#1b1b1b", 1.0]} />}
         {!debugRenderMode && (
@@ -1334,10 +1605,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             shadow-normalBias={1.0}
           />
         )}
-        {!debugRenderMode && <directionalLight position={[-3000, 2500, -2500]} intensity={0.4} color="#88a0c8" />}
+        {!debugRenderMode && (
+          <directionalLight position={[-3000, 2500, -2500]} intensity={0.4} color="#88a0c8" />
+        )}
         <ShadowApplier
           enabled={cinematicEnabled && !debugRenderMode}
-          deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, synthHoles.length, synthBlocks.length, pitShells.length]}
+          deps={[
+            demMesh,
+            iso,
+            blockModel,
+            holes.length,
+            points.length,
+            drillTargets,
+            synthHoles.length,
+            synthBlocks.length,
+            pitShells.length,
+          ]}
         />
         <CameraOrientationTracker onUpdate={setCameraOrientation} />
 
@@ -1383,26 +1666,37 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             );
           })()}
 
-
           <DepthAxis maxDepth={400} verticalExaggeration={verticalExaggeration} />
           {visible("iso") && effectiveShowPoints && (
-            <AnomalyPointsLayer points={points} verticalExaggeration={verticalExaggeration} unlit={debugRenderMode} />
-          )}
-          {visible("iso") && effectiveShowSurface && renderMode === "iso" && iso && (iso.vertexCount > 0 || iso.mode === "blob") && (
-            <AnomalyIsosurfaceLayer
-              iso={iso}
-              opacity={opacity}
+            <AnomalyPointsLayer
+              points={points}
               verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingEnabled}
+              unlit={debugRenderMode}
             />
           )}
-          {visible("iso") && effectiveShowSurface && renderMode === "voxel" && voxels && voxels.activeCount > 0 && (
-            <AnomalyVoxelLayer
-              voxels={voxels}
-              opacity={opacity}
-              verticalExaggeration={verticalExaggeration}
-            />
-          )}
+          {visible("iso") &&
+            effectiveShowSurface &&
+            renderMode === "iso" &&
+            iso &&
+            (iso.vertexCount > 0 || iso.mode === "blob") && (
+              <AnomalyIsosurfaceLayer
+                iso={iso}
+                opacity={opacity}
+                verticalExaggeration={verticalExaggeration}
+                clippingPlanes={clippingEnabled}
+              />
+            )}
+          {visible("iso") &&
+            effectiveShowSurface &&
+            renderMode === "voxel" &&
+            voxels &&
+            voxels.activeCount > 0 && (
+              <AnomalyVoxelLayer
+                voxels={voxels}
+                opacity={opacity}
+                verticalExaggeration={verticalExaggeration}
+              />
+            )}
           {visible("holes") && effectiveShowHoles && holes.length > 0 && (
             <DrillholesLayer
               holes={holes}
@@ -1412,25 +1706,32 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               unlit={debugRenderMode}
             />
           )}
-          {visible("blocks") && effectiveShowBlocks && blockParams.enabled && blockModel && blockModel.count > 0 && (
-            <BlockModelLayer
-              model={blockModel}
-              filters={blockFilters}
-              verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingEnabled}
-            />
-          )}
+          {visible("blocks") &&
+            effectiveShowBlocks &&
+            blockParams.enabled &&
+            blockModel &&
+            blockModel.count > 0 && (
+              <BlockModelLayer
+                model={blockModel}
+                filters={blockFilters}
+                verticalExaggeration={verticalExaggeration}
+                clippingPlanes={clippingEnabled}
+              />
+            )}
           {visible("debug") && showClipHelper && !debugRenderMode && (
             <ClippingPlaneController params={effectiveClip} size={4500} />
           )}
-          {visible("targets") && effectiveShowTargets3D && drillTargets && drillTargets.targets.length > 0 && (
-            <DrillTargetLayer
-              targets={drillTargets.targets}
-              verticalExaggeration={verticalExaggeration}
-              clippingPlanes={clippingEnabled}
-              onHover={setHoveredTarget}
-            />
-          )}
+          {visible("targets") &&
+            effectiveShowTargets3D &&
+            drillTargets &&
+            drillTargets.targets.length > 0 && (
+              <DrillTargetLayer
+                targets={drillTargets.targets}
+                verticalExaggeration={verticalExaggeration}
+                clippingPlanes={clippingEnabled}
+                onHover={setHoveredTarget}
+              />
+            )}
           {visible("holes") && showSynthHoles && synthHoles.length > 0 && (
             <SyntheticDrillholeTraceLayer
               holes={synthHoles}
@@ -1470,7 +1771,18 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           maxPolarAngle={Math.PI / 2.05}
         />
         {showStats && <Stats className="!left-auto !right-2 !top-2" />}
-        <InvalidateOnChange deps={[demMesh, iso, blockModel, holes.length, points.length, drillTargets, renderBounds, debugRenderMode]} />
+        <InvalidateOnChange
+          deps={[
+            demMesh,
+            iso,
+            blockModel,
+            holes.length,
+            points.length,
+            drillTargets,
+            renderBounds,
+            debugRenderMode,
+          ]}
+        />
         <CinematicEffects
           enabled={cinematicEnabled}
           intensity={cineIntensity}
@@ -1478,10 +1790,12 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
         />
       </Canvas>
 
-
       {showNorth && <CompassRose azimuthDeg={cameraOrientation.azimuthDeg} />}
       <CameraPresetCluster
-        onPreset={(v) => { setPresetView(v); setPresetNonce((n) => n + 1); }}
+        onPreset={(v) => {
+          setPresetView(v);
+          setPresetNonce((n) => n + 1);
+        }}
         onFit={() => setFitCameraNonce((n) => n + 1)}
       />
       {showScaleBar && <ScaleBar extentMeters={BASEMAP_EXTENT} />}
@@ -1504,22 +1818,28 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           label={`${holes.length + synthHoles.length} sondajes`}
         />
       )}
-      {showCoords && pointsQ.data?.center && (pointsQ.data.center.lng !== 0 || pointsQ.data.center.lat !== 0) && (
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded px-2 py-1 border border-border text-[10px] font-mono text-cyan-200">
-          {pointsQ.data.center.lat.toFixed(5)}°N · {pointsQ.data.center.lng.toFixed(5)}°E
-        </div>
-      )}
-
-
-
+      {showCoords &&
+        pointsQ.data?.center &&
+        (pointsQ.data.center.lng !== 0 || pointsQ.data.center.lat !== 0) && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 bg-black/60 backdrop-blur rounded px-2 py-1 border border-border text-[10px] font-mono text-cyan-200">
+            {pointsQ.data.center.lat.toFixed(5)}°N · {pointsQ.data.center.lng.toFixed(5)}°E
+          </div>
+        )}
 
       {(() => {
         if (!pointsQ.data && !holesQ.data) return null;
         const msgs: string[] = [];
-        if (anomaliesSource === "empty" && drillholesSource === "empty") msgs.push("No source data loaded");
+        if (anomaliesSource === "empty" && drillholesSource === "empty")
+          msgs.push("No source data loaded");
         if (points.length > 0 && iso && iso.mode === "blob")
-          msgs.push(`MC empty → blob fallback (iso ${iso.finalIsovalue.toFixed(2)}, fMax ${iso.fieldMax.toFixed(2)})`);
-        if (points.length > 0 && (!iso || (iso.vertexCount === 0 && iso.mode !== "blob")) && !isoBusy)
+          msgs.push(
+            `MC empty → blob fallback (iso ${iso.finalIsovalue.toFixed(2)}, fMax ${iso.fieldMax.toFixed(2)})`,
+          );
+        if (
+          points.length > 0 &&
+          (!iso || (iso.vertexCount === 0 && iso.mode !== "blob")) &&
+          !isoBusy
+        )
           msgs.push("Anomalies loaded but MC empty");
         if (drillholesSource === "planned-from-targets")
           msgs.push("Drillholes missing, using planned targets");
@@ -1548,7 +1868,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           followHoleId={followHoleId}
         />
       )}
-
 
       {showResourcePanel && blockModel && (
         <ResourceModelPanel
@@ -1599,9 +1918,19 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             {hoveredTarget.targetId} · {hoveredTarget.priority}
           </div>
           <div className="text-muted-foreground space-y-0.5">
-            <div>score: <span className="text-foreground">{(hoveredTarget.score * 100).toFixed(0)}</span></div>
-            <div>depth: <span className="text-foreground">{hoveredTarget.depth.toFixed(0)} m</span></div>
-            <div>cost: <span className="text-foreground">${(hoveredTarget.estimatedCost / 1000).toFixed(0)}k</span></div>
+            <div>
+              score:{" "}
+              <span className="text-foreground">{(hoveredTarget.score * 100).toFixed(0)}</span>
+            </div>
+            <div>
+              depth: <span className="text-foreground">{hoveredTarget.depth.toFixed(0)} m</span>
+            </div>
+            <div>
+              cost:{" "}
+              <span className="text-foreground">
+                ${(hoveredTarget.estimatedCost / 1000).toFixed(0)}k
+              </span>
+            </div>
             <div className="text-[9px] pt-1">{hoveredTarget.rationale[0]}</div>
           </div>
         </div>
@@ -1613,10 +1942,22 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             {hoveredSynthHole.code} · CONCEPTUAL
           </div>
           <div className="text-muted-foreground space-y-0.5">
-            <div>depth: <span className="text-foreground">{hoveredSynthHole.depth.toFixed(0)} m</span></div>
-            <div>az/dip: <span className="text-foreground">{hoveredSynthHole.azimuth.toFixed(0)}° / {hoveredSynthHole.dip.toFixed(0)}°</span></div>
-            <div>intervals: <span className="text-foreground">{hoveredSynthHole.intervals.length}</span></div>
-            <div>source: <span className="text-foreground">{hoveredSynthHole.fromKind ?? "—"}</span></div>
+            <div>
+              depth: <span className="text-foreground">{hoveredSynthHole.depth.toFixed(0)} m</span>
+            </div>
+            <div>
+              az/dip:{" "}
+              <span className="text-foreground">
+                {hoveredSynthHole.azimuth.toFixed(0)}° / {hoveredSynthHole.dip.toFixed(0)}°
+              </span>
+            </div>
+            <div>
+              intervals:{" "}
+              <span className="text-foreground">{hoveredSynthHole.intervals.length}</span>
+            </div>
+            <div>
+              source: <span className="text-foreground">{hoveredSynthHole.fromKind ?? "—"}</span>
+            </div>
           </div>
         </div>
       )}
@@ -1627,16 +1968,26 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             <Boxes className="w-3 h-3" /> Modelo conceptual
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="synth-holes" className="text-[10px]">Sondajes ({synthHoles.length})</Label>
+            <Label htmlFor="synth-holes" className="text-[10px]">
+              Sondajes ({synthHoles.length})
+            </Label>
             <Switch id="synth-holes" checked={showSynthHoles} onCheckedChange={setShowSynthHoles} />
           </div>
           <div className="flex items-center justify-between">
-            <Label htmlFor="synth-blocks" className="text-[10px]">Block model ({synthBlocks.length})</Label>
-            <Switch id="synth-blocks" checked={showSynthBlocks} onCheckedChange={setShowSynthBlocks} />
+            <Label htmlFor="synth-blocks" className="text-[10px]">
+              Block model ({synthBlocks.length})
+            </Label>
+            <Switch
+              id="synth-blocks"
+              checked={showSynthBlocks}
+              onCheckedChange={setShowSynthBlocks}
+            />
           </div>
           {showSynthBlocks && synthBlocks.length > 0 && (
             <div>
-              <div className="text-[9px] text-muted-foreground">cutoff CuEq · {synthBlockCutoff.toFixed(2)}%</div>
+              <div className="text-[9px] text-muted-foreground">
+                cutoff CuEq · {synthBlockCutoff.toFixed(2)}%
+              </div>
               <Slider
                 value={[synthBlockCutoff]}
                 min={0}
@@ -1647,7 +1998,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             </div>
           )}
           <div className="flex items-center justify-between">
-            <Label htmlFor="pit-shells" className="text-[10px]">Pit shells ({pitShells.length})</Label>
+            <Label htmlFor="pit-shells" className="text-[10px]">
+              Pit shells ({pitShells.length})
+            </Label>
             <Switch id="pit-shells" checked={showPitShells} onCheckedChange={setShowPitShells} />
           </div>
           {showPitShells && pitShells.length > 0 && (
@@ -1664,8 +2017,14 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           )}
           {synthBlocks.length > 0 && (
             <div className="flex items-center justify-between pt-1 border-t border-border/60">
-              <Label htmlFor="tonnage-grade" className="text-[10px]">Tonnage-grade</Label>
-              <Switch id="tonnage-grade" checked={showTonnageGrade} onCheckedChange={setShowTonnageGrade} />
+              <Label htmlFor="tonnage-grade" className="text-[10px]">
+                Tonnage-grade
+              </Label>
+              <Switch
+                id="tonnage-grade"
+                checked={showTonnageGrade}
+                onCheckedChange={setShowTonnageGrade}
+              />
             </div>
           )}
         </div>
@@ -1705,9 +2064,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
           }}
         />
       )}
-      {activeTab === "audit" && (
-        <AuditTrailPanel onClose={() => setActiveTab("viewer")} />
-      )}
+      {activeTab === "audit" && <AuditTrailPanel onClose={() => setActiveTab("viewer")} />}
       {activeTab === "ai" && (
         <AIGeologistPanel
           interpretation={aiInterpretation}
@@ -1720,7 +2077,11 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
               bundle: importedBundle,
             });
             setAiInterpretation(i);
-            auditTrail.log("ni43101.snapshot", { kind: "ai.interpretation", headline: i.headline, upside: i.upside });
+            auditTrail.log("ni43101.snapshot", {
+              kind: "ai.interpretation",
+              headline: i.headline,
+              upside: i.upside,
+            });
           }}
           onClose={() => setActiveTab("viewer")}
         />
@@ -1760,7 +2121,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
             qaqc: qaqcResult,
             bundle: importedBundle,
             targets: drillTargets,
-            scenarioTargets: (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
+            scenarioTargets: (drillTargets?.targets ?? []).filter((t) =>
+              scenarioIds.has(t.targetId),
+            ),
             econ,
             campaignCost: computeCampaignCost(
               (drillTargets?.targets ?? []).filter((t) => scenarioIds.has(t.targetId)),
@@ -1773,7 +2136,15 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   );
 }
 
-function ToggleRow({ label, value, onChange }: { label: string; value: boolean; onChange: (v: boolean) => void }) {
+function ToggleRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
     <div className="flex items-center justify-between gap-2">
       <span className="text-[10px]">{label}</span>
@@ -1782,13 +2153,25 @@ function ToggleRow({ label, value, onChange }: { label: string; value: boolean; 
   );
 }
 
-function ClassChip({ label, active, onClick, color }: { label: string; active: boolean; onClick: () => void; color: string }) {
+function ClassChip({
+  label,
+  active,
+  onClick,
+  color,
+}: {
+  label: string;
+  active: boolean;
+  onClick: () => void;
+  color: string;
+}) {
   return (
     <button
       type="button"
       onClick={onClick}
       className={`flex items-center justify-center gap-1 h-6 rounded text-[9px] uppercase border ${
-        active ? "border-amber-400/60 text-foreground" : "border-border/40 text-muted-foreground opacity-60"
+        active
+          ? "border-amber-400/60 text-foreground"
+          : "border-border/40 text-muted-foreground opacity-60"
       }`}
     >
       <span className={`w-1.5 h-1.5 rounded-sm ${color}`} />
@@ -1797,20 +2180,35 @@ function ClassChip({ label, active, onClick, color }: { label: string; active: b
   );
 }
 
-function LayerRow({ name, mounted, visible, count, extra }: { name: string; mounted: boolean; visible: boolean; count: number; extra?: string }) {
+function LayerRow({
+  name,
+  mounted,
+  visible,
+  count,
+  extra,
+}: {
+  name: string;
+  mounted: boolean;
+  visible: boolean;
+  count: number;
+  extra?: string;
+}) {
   return (
     <div className="flex items-center justify-between gap-2 font-mono">
       <span className="text-foreground/80">{name}</span>
       <span className="flex gap-1.5 items-center">
-        <span className={mounted ? "text-emerald-300" : "text-muted-foreground"}>{mounted ? "●" : "○"}</span>
-        <span className={visible ? "text-cyan-300" : "text-muted-foreground"}>{visible ? "vis" : "hid"}</span>
+        <span className={mounted ? "text-emerald-300" : "text-muted-foreground"}>
+          {mounted ? "●" : "○"}
+        </span>
+        <span className={visible ? "text-cyan-300" : "text-muted-foreground"}>
+          {visible ? "vis" : "hid"}
+        </span>
         <span className="text-amber-300">{count.toLocaleString()}</span>
         {extra && <span className="text-muted-foreground">{extra}</span>}
       </span>
     </div>
   );
 }
-
 
 type LayerKey = "debug" | "points" | "holes" | "dem" | "basemap" | "iso" | "blocks" | "fx";
 type TestKey = "points" | "holes" | "dem" | "esri" | "iso" | "all";
@@ -1862,7 +2260,11 @@ function LayerRecoveryPanel({
               <span className="text-foreground/80">{r.label}</span>
               <span className="flex flex-col items-end">
                 <span className={ok ? "text-emerald-300" : "text-rose-300"}>{ok ? "✓" : "✗"}</span>
-                {err && <span className="text-[8px] text-rose-300/80 max-w-[160px] truncate" title={err}>{err}</span>}
+                {err && (
+                  <span className="text-[8px] text-rose-300/80 max-w-[160px] truncate" title={err}>
+                    {err}
+                  </span>
+                )}
               </span>
             </div>
           );
@@ -1890,7 +2292,11 @@ function LayerRecoveryPanel({
           onClick={() => onSetDebug(false)}
           disabled={!canSwitchToCinematic}
           className={`px-1.5 py-1 rounded border text-[9px] uppercase tracking-wider ${canSwitchToCinematic ? "border-amber-400/70 bg-amber-500/15 text-amber-200" : "border-border bg-black/40 text-muted-foreground cursor-not-allowed"}`}
-          title={canSwitchToCinematic ? "Switch to cinematic mode" : "Wait until points + holes + camera fit OK"}
+          title={
+            canSwitchToCinematic
+              ? "Switch to cinematic mode"
+              : "Wait until points + holes + camera fit OK"
+          }
         >
           Go Cinematic
         </button>
@@ -1898,9 +2304,6 @@ function LayerRecoveryPanel({
     </div>
   );
 }
-
-
-
 
 function SceneBBoxPanel({
   rows,
@@ -1928,12 +2331,24 @@ function SceneBBoxPanel({
           }
           const [minX, minY, minZ] = r.bounds.min;
           const [maxX, maxY, maxZ] = r.bounds.max;
-          const sx = maxX - minX, sy = maxY - minY, sz = maxZ - minZ;
-          const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2, cz = (minZ + maxZ) / 2;
+          const sx = maxX - minX,
+            sy = maxY - minY,
+            sz = maxZ - minZ;
+          const cx = (minX + maxX) / 2,
+            cy = (minY + maxY) / 2,
+            cz = (minZ + maxZ) / 2;
           const diag = Math.hypot(sx, sy, sz);
-          const absurd = ![minX, minY, minZ, maxX, maxY, maxZ].every(Number.isFinite)
-            || Math.max(Math.abs(minX), Math.abs(minY), Math.abs(minZ), Math.abs(maxX), Math.abs(maxY), Math.abs(maxZ)) > 1e6
-            || diag < 1;
+          const absurd =
+            ![minX, minY, minZ, maxX, maxY, maxZ].every(Number.isFinite) ||
+            Math.max(
+              Math.abs(minX),
+              Math.abs(minY),
+              Math.abs(minZ),
+              Math.abs(maxX),
+              Math.abs(maxY),
+              Math.abs(maxZ),
+            ) > 1e6 ||
+            diag < 1;
           return (
             <div key={r.name} className="contents">
               <div className={absurd ? "text-rose-300" : "text-foreground/80"}>{r.name}</div>

@@ -17,15 +17,18 @@ export const listMyWatchlist = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const codes = (items ?? []).map((i) => i.concession_code);
-    let concessions: Record<string, {
-      code: string;
-      holder: string | null;
-      name: string | null;
-      region: string | null;
-      commune: string | null;
-      status: string | null;
-      area_ha: number | null;
-    }> = {};
+    let concessions: Record<
+      string,
+      {
+        code: string;
+        holder: string | null;
+        name: string | null;
+        region: string | null;
+        commune: string | null;
+        status: string | null;
+        area_ha: number | null;
+      }
+    > = {};
     if (codes.length > 0) {
       const { data: rows } = await supabaseAdmin
         .from("public_concessions_cache")
@@ -34,8 +37,7 @@ export const listMyWatchlist = createServerFn({ method: "GET" })
       concessions = Object.fromEntries((rows ?? []).map((r) => [r.code, r]));
     }
 
-    const { data: limits } = await supabaseAdmin
-      .rpc("catastro_plan_limits", { _user_id: userId });
+    const { data: limits } = await supabaseAdmin.rpc("catastro_plan_limits", { _user_id: userId });
     const limit = limits?.[0] ?? { plan: "free", max_watches: 3 };
 
     return {
@@ -69,8 +71,7 @@ export const addToWatchlist = createServerFn({ method: "POST" })
       .from("catastro_watchlist")
       .select("id", { count: "exact", head: true });
 
-    const { data: limits } = await supabaseAdmin
-      .rpc("catastro_plan_limits", { _user_id: userId });
+    const { data: limits } = await supabaseAdmin.rpc("catastro_plan_limits", { _user_id: userId });
     const max = limits?.[0]?.max_watches ?? 3;
 
     if ((count ?? 0) >= max) {
@@ -99,14 +100,9 @@ export const addToWatchlist = createServerFn({ method: "POST" })
 // ============================================================
 export const removeFromWatchlist = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase
-      .from("catastro_watchlist")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await context.supabase.from("catastro_watchlist").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -131,9 +127,7 @@ export const listMyAlerts = createServerFn({ method: "GET" })
 // ============================================================
 export const markAlertRead = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
-    z.object({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase
       .from("catastro_alerts")

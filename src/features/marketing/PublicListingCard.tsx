@@ -37,7 +37,9 @@ export function PublicListingCard({
             <Mountain className="w-10 h-10 text-[var(--brand-blue)]/30" />
           </div>
         )}
-        <div className={`absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider ${tint.bg} ${tint.fg} border border-white/60`}>
+        <div
+          className={`absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-mono uppercase tracking-wider ${tint.bg} ${tint.fg} border border-white/60`}
+        >
           {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality}
         </div>
         {listing.is_featured && (
@@ -65,7 +67,9 @@ export function PublicListingCard({
               {[listing.region, listing.country].filter(Boolean).join(", ")}
             </span>
             {listing.area_ha != null && (
-              <span className="ml-auto whitespace-nowrap">{listing.area_ha.toLocaleString("es-CL")} ha</span>
+              <span className="ml-auto whitespace-nowrap">
+                {listing.area_ha.toLocaleString("es-CL")} ha
+              </span>
             )}
           </div>
         )}

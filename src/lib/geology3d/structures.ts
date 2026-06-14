@@ -71,12 +71,9 @@ export function structureToSceneObject(structure: Geology3DStructure) {
     bounds,
     color: structure.color ?? "#cccccc",
     opacity: structure.opacity ?? 0.7,
-    strikeDeg:
-      structure.strikeDeg ?? estimateStructureStrike(structure.vertices),
+    strikeDeg: structure.strikeDeg ?? estimateStructureStrike(structure.vertices),
     dipDeg: structure.dipDeg ?? null,
-    depthFromM:
-      structure.depthFromM != null ? normalizeDepth(structure.depthFromM) : null,
-    depthToM:
-      structure.depthToM != null ? normalizeDepth(structure.depthToM) : null,
+    depthFromM: structure.depthFromM != null ? normalizeDepth(structure.depthFromM) : null,
+    depthToM: structure.depthToM != null ? normalizeDepth(structure.depthToM) : null,
   };
 }

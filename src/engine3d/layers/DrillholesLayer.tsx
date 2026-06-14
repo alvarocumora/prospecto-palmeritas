@@ -26,7 +26,7 @@ function colorForHole(h: DrillholeSegment, target: THREE.Color) {
       return;
     case "in_progress":
     case "drilling":
-      target.setRGB(0.95, 0.45, 0.20); // orange
+      target.setRGB(0.95, 0.45, 0.2); // orange
       return;
     case "planned":
       target.setRGB(0.55, 0.55, 0.65); // grey
@@ -53,26 +53,23 @@ export function DrillholesLayer({
     [radius],
   );
 
-  const material = useMemo(
-    () => {
-      if (unlit) {
-        return new THREE.MeshBasicMaterial({
-          vertexColors: true,
-          clippingPlanes: clippingPlanes ?? [],
-          toneMapped: false,
-        });
-      }
-      return new THREE.MeshStandardMaterial({
+  const material = useMemo(() => {
+    if (unlit) {
+      return new THREE.MeshBasicMaterial({
         vertexColors: true,
-        metalness: 0.35,
-        roughness: 0.45,
-        emissive: new THREE.Color(0x111111),
-        emissiveIntensity: 0.2,
         clippingPlanes: clippingPlanes ?? [],
+        toneMapped: false,
       });
-    },
-    [clippingPlanes, unlit],
-  );
+    }
+    return new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      metalness: 0.35,
+      roughness: 0.45,
+      emissive: new THREE.Color(0x111111),
+      emissiveIntensity: 0.2,
+      clippingPlanes: clippingPlanes ?? [],
+    });
+  }, [clippingPlanes, unlit]);
 
   useEffect(() => {
     material.clippingPlanes = clippingPlanes ?? [];
@@ -90,8 +87,12 @@ export function DrillholesLayer({
     for (let i = 0; i < count; i++) {
       const h = holes[i];
       // ENU(x,y,z) → three(x, z*ve, -y)
-      const cx = h.collar.x, cy = -h.collar.y, cz = h.collar.z * verticalExaggeration;
-      const tx = h.toe.x,    ty = -h.toe.y,    tz = h.toe.z * verticalExaggeration;
+      const cx = h.collar.x,
+        cy = -h.collar.y,
+        cz = h.collar.z * verticalExaggeration;
+      const tx = h.toe.x,
+        ty = -h.toe.y,
+        tz = h.toe.z * verticalExaggeration;
       const midX = (cx + tx) / 2;
       const midY = (cz + tz) / 2;
       const midZ = (cy + ty) / 2;

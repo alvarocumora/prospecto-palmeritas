@@ -6,10 +6,7 @@
 // Auth: requires Authorization Bearer (user JWT) — runs with service role.
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
-import {
-  findConcessionByCode,
-  type CanonicalConcession,
-} from "../_shared/sernageomin.ts";
+import { findConcessionByCode, type CanonicalConcession } from "../_shared/sernageomin.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",

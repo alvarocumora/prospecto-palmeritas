@@ -51,10 +51,9 @@ export function useBlockModel(points: AnomalyPoint[], params: BlockModelParams) 
   const reqRef = useRef(0);
 
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/workers/blockModel.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/workers/blockModel.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();
@@ -64,8 +63,12 @@ export function useBlockModel(points: AnomalyPoint[], params: BlockModelParams) 
 
   const bbox = useMemo(() => {
     if (!params.enabled || points.length === 0) return null;
-    let minX = Infinity, minY = Infinity, minZ = Infinity;
-    let maxX = -Infinity, maxY = -Infinity, maxZ = -Infinity;
+    let minX = Infinity,
+      minY = Infinity,
+      minZ = Infinity;
+    let maxX = -Infinity,
+      maxY = -Infinity,
+      maxZ = -Infinity;
     for (const p of points) {
       if (p.x < minX) minX = p.x;
       if (p.x > maxX) maxX = p.x;
@@ -76,9 +79,12 @@ export function useBlockModel(points: AnomalyPoint[], params: BlockModelParams) 
     }
     const m = params.margin;
     return {
-      minX: minX - m, maxX: maxX + m,
-      minY: minY - m, maxY: maxY + m,
-      minZ: minZ - m, maxZ: maxZ + m,
+      minX: minX - m,
+      maxX: maxX + m,
+      minY: minY - m,
+      maxY: maxY + m,
+      minZ: minZ - m,
+      maxZ: maxZ + m,
     };
   }, [points, params.enabled, params.margin]);
 
@@ -125,10 +131,20 @@ export function useBlockModel(points: AnomalyPoint[], params: BlockModelParams) 
     w.postMessage(msg);
     return () => w.removeEventListener("message", handler);
   }, [
-    points, bbox,
-    params.enabled, params.blockSize, params.power, params.searchRadius,
-    params.minSamples, params.maxSamples, params.density, params.gradeScale,
-    params.commodity, params.classMeasuredR, params.classIndicatedR, params.maxBlocks,
+    points,
+    bbox,
+    params.enabled,
+    params.blockSize,
+    params.power,
+    params.searchRadius,
+    params.minSamples,
+    params.maxSamples,
+    params.density,
+    params.gradeScale,
+    params.commodity,
+    params.classMeasuredR,
+    params.classIndicatedR,
+    params.maxBlocks,
   ]);
 
   return { output, busy, error };

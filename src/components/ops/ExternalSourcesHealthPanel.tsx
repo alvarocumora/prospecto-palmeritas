@@ -3,8 +3,14 @@ import { useExternalSourcesHealth } from "@/hooks/useExternalSourcesHealth";
 import { CheckCircle2, AlertTriangle, XCircle, Loader2 } from "lucide-react";
 
 const OVERALL_STYLES = {
-  healthy: { label: "OPERATIVO", cls: "text-signal-green border-signal-green/40 bg-signal-green/10" },
-  degraded: { label: "DEGRADADO", cls: "text-signal-amber border-signal-amber/40 bg-signal-amber/10" },
+  healthy: {
+    label: "OPERATIVO",
+    cls: "text-signal-green border-signal-green/40 bg-signal-green/10",
+  },
+  degraded: {
+    label: "DEGRADADO",
+    cls: "text-signal-amber border-signal-amber/40 bg-signal-amber/10",
+  },
   down: { label: "CAÍDO", cls: "text-destructive border-destructive/40 bg-destructive/10" },
 } as const;
 

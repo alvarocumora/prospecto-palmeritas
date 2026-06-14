@@ -1,8 +1,9 @@
 // Server functions públicas para el mapa del landing.
 // Sin requireSupabaseAuth: corren durante SSR y para visitantes anónimos.
 import { createServerFn } from "@tanstack/react-start";
+import type { Feature, Geometry } from "geojson";
 
-type FC = { type: "FeatureCollection"; features: any[] };
+type FC = { type: "FeatureCollection"; features: Feature[] };
 type GeoPayload = {
   concessions: FC;
   anomalies: FC;
@@ -19,21 +20,21 @@ const EMPTY_FC: FC = { type: "FeatureCollection", features: [] };
 // Centroides aproximados por región (fallback cuando no hay project center).
 const REGION_CENTROID: Record<string, [number, number]> = {
   "Arica y Parinacota": [-69.59, -18.48],
-  "Tarapacá": [-69.6, -20.2],
-  "Antofagasta": [-69.0, -23.65],
-  "Atacama": [-69.9, -27.5],
-  "Coquimbo": [-70.95, -30.5],
-  "Valparaíso": [-71.5, -32.8],
-  "Metropolitana": [-70.65, -33.45],
+  Tarapacá: [-69.6, -20.2],
+  Antofagasta: [-69.0, -23.65],
+  Atacama: [-69.9, -27.5],
+  Coquimbo: [-70.95, -30.5],
+  Valparaíso: [-71.5, -32.8],
+  Metropolitana: [-70.65, -33.45],
   "O'Higgins": [-70.95, -34.55],
-  "Maule": [-71.4, -35.5],
-  "Ñuble": [-71.8, -36.6],
-  "Biobío": [-72.6, -37.0],
-  "Araucanía": [-72.4, -38.7],
+  Maule: [-71.4, -35.5],
+  Ñuble: [-71.8, -36.6],
+  Biobío: [-72.6, -37.0],
+  Araucanía: [-72.4, -38.7],
   "Los Ríos": [-72.9, -39.85],
   "Los Lagos": [-72.7, -41.5],
-  "Aysén": [-72.0, -45.5],
-  "Magallanes": [-71.0, -53.0],
+  Aysén: [-72.0, -45.5],
+  Magallanes: [-71.0, -53.0],
 };
 
 function jitter(lng: number, lat: number, seed: string): [number, number] {
@@ -45,16 +46,24 @@ function jitter(lng: number, lat: number, seed: string): [number, number] {
 }
 
 function bboxFromFC(fc: FC): [number, number, number, number] | null {
-  let mnx = Infinity, mny = Infinity, mxx = -Infinity, mxy = -Infinity;
-  const walk = (c: any) => {
-    if (typeof c?.[0] === "number") {
+  let mnx = Infinity,
+    mny = Infinity,
+    mxx = -Infinity,
+    mxy = -Infinity;
+  const walk = (c: unknown) => {
+    if (!Array.isArray(c)) return;
+    if (typeof c[0] === "number") {
       if (c[0] < mnx) mnx = c[0];
       if (c[0] > mxx) mxx = c[0];
       if (c[1] < mny) mny = c[1];
       if (c[1] > mxy) mxy = c[1];
-    } else if (Array.isArray(c)) for (const x of c) walk(x);
+    } else {
+      for (const x of c) walk(x);
+    }
   };
-  for (const f of fc.features) if (f?.geometry && "coordinates" in f.geometry) walk((f.geometry as any).coordinates);
+  for (const f of fc.features)
+    if (f?.geometry && "coordinates" in f.geometry)
+      walk((f.geometry as { coordinates: unknown }).coordinates);
   if (!isFinite(mnx)) return null;
   return [mnx, mny, mxx, mxy];
 }
@@ -74,17 +83,20 @@ export const getLandingMapData = createServerFn({ method: "GET" }).handler(
         .eq("is_published", true)
         .limit(200);
 
-      const feats = (rows ?? []).flatMap((r: any) => {
-        let geom: any = null;
+      const feats = (rows ?? []).flatMap((r): Feature[] => {
+        let geom: Geometry | null = null;
         // Prefer explicit geometry; else point from project center; else region centroid.
         if (r.geometry_geojson) {
           geom =
             typeof r.geometry_geojson === "string"
-              ? safeParse(r.geometry_geojson)
-              : r.geometry_geojson;
+              ? (safeParse(r.geometry_geojson) as Geometry | null)
+              : (r.geometry_geojson as unknown as Geometry);
         }
         if (!geom) {
-          const pc = r.projects;
+          const pc = r.projects as unknown as {
+            center_lat: number | null;
+            center_lng: number | null;
+          } | null;
           let lng: number | null = null;
           let lat: number | null = null;
           if (pc?.center_lat != null && pc?.center_lng != null) {
@@ -135,12 +147,18 @@ export const getLandingMapData = createServerFn({ method: "GET" }).handler(
         _region: null as unknown as string,
       });
       if (error) throw error;
-      const payload = (data ?? {}) as any;
-      concessions = (payload.concessions as FC) ?? EMPTY_FC;
-      anomalies = (payload.anomalies as FC) ?? EMPTY_FC;
-      deposits = (payload.deposits as FC) ?? EMPTY_FC;
-      targets = (payload.targets as FC) ?? EMPTY_FC;
-      bbox = (payload.bbox as [number, number, number, number]) ?? null;
+      const payload = (data ?? {}) as {
+        concessions?: FC;
+        anomalies?: FC;
+        deposits?: FC;
+        targets?: FC;
+        bbox?: [number, number, number, number];
+      };
+      concessions = payload.concessions ?? EMPTY_FC;
+      anomalies = payload.anomalies ?? EMPTY_FC;
+      deposits = payload.deposits ?? EMPTY_FC;
+      targets = payload.targets ?? EMPTY_FC;
+      bbox = payload.bbox ?? null;
     } catch (_e) {
       /* ignore */
     }
@@ -159,5 +177,9 @@ export const getLandingMapData = createServerFn({ method: "GET" }).handler(
 );
 
 function safeParse(s: string) {
-  try { return JSON.parse(s); } catch { return null; }
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
 }

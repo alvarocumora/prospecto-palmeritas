@@ -1,6 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import maplibregl, { Map as MLMap, Popup } from "maplibre-gl";
+import maplibregl, {
+  Map as MLMap,
+  Popup,
+  type GeoJSONSource,
+  type StyleSpecification,
+} from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { FeatureCollection } from "geojson";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, Layers as LayersIcon, MapPin } from "lucide-react";
@@ -13,7 +19,7 @@ type Props = {
   onSelect: (id: string | null) => void;
 };
 
-const STYLE: any = {
+const STYLE: StyleSpecification = {
   version: 8,
   sources: {
     esri: {
@@ -35,7 +41,12 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
   const mapRef = useRef<MLMap | null>(null);
   const popupRef = useRef<Popup | null>(null);
   const [styleReady, setStyleReady] = useState(false);
-  const [layers, setLayers] = useState({ concessions: true, anomalies: true, deposits: true, targets: true });
+  const [layers, setLayers] = useState({
+    concessions: true,
+    anomalies: true,
+    deposits: true,
+    targets: true,
+  });
 
   const fetchGeo = useServerFn(getOpportunitiesGeo);
   const geo = useQuery({
@@ -70,8 +81,8 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
     const map = mapRef.current;
     if (!map || !styleReady || !geo.data) return;
 
-    const ensureSource = (id: string, data: any) => {
-      const src = map.getSource(id) as any;
+    const ensureSource = (id: string, data: FeatureCollection) => {
+      const src = map.getSource(id) as GeoJSONSource | undefined;
       if (src) src.setData(data);
       else map.addSource(id, { type: "geojson", data });
     };
@@ -88,14 +99,21 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
         source: "opp-concessions",
         paint: {
           "fill-color": [
-            "interpolate", ["linear"], ["get", "score"],
-            0, "#64748b", 35, "#94a3b8", 50, "#f59e0b", 70, "#10b981", 85, "#059669",
+            "interpolate",
+            ["linear"],
+            ["get", "score"],
+            0,
+            "#64748b",
+            35,
+            "#94a3b8",
+            50,
+            "#f59e0b",
+            70,
+            "#10b981",
+            85,
+            "#059669",
           ],
-          "fill-opacity": [
-            "case",
-            ["==", ["get", "concession_id"], selectedId ?? ""], 0.75,
-            0.45,
-          ],
+          "fill-opacity": ["case", ["==", ["get", "concession_id"], selectedId ?? ""], 0.75, 0.45],
         },
       });
       map.addLayer({
@@ -105,14 +123,11 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
         paint: {
           "line-color": [
             "case",
-            ["==", ["get", "concession_id"], selectedId ?? ""], "#fbbf24",
+            ["==", ["get", "concession_id"], selectedId ?? ""],
+            "#fbbf24",
             "#0f172a",
           ],
-          "line-width": [
-            "case",
-            ["==", ["get", "concession_id"], selectedId ?? ""], 3,
-            1,
-          ],
+          "line-width": ["case", ["==", ["get", "concession_id"], selectedId ?? ""], 3, 1],
         },
       });
     }
@@ -191,35 +206,41 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
     if (map.getLayer("opp-concessions-fill")) {
       map.setPaintProperty("opp-concessions-fill", "fill-opacity", [
         "case",
-        ["==", ["get", "concession_id"], selectedId ?? ""], 0.8,
+        ["==", ["get", "concession_id"], selectedId ?? ""],
+        0.8,
         0.45,
       ]);
       map.setPaintProperty("opp-concessions-line", "line-color", [
         "case",
-        ["==", ["get", "concession_id"], selectedId ?? ""], "#fbbf24",
+        ["==", ["get", "concession_id"], selectedId ?? ""],
+        "#fbbf24",
         "#0f172a",
       ]);
       map.setPaintProperty("opp-concessions-line", "line-width", [
         "case",
-        ["==", ["get", "concession_id"], selectedId ?? ""], 3,
+        ["==", ["get", "concession_id"], selectedId ?? ""],
+        3,
         1,
       ]);
     }
     // Fly to selected feature
     if (selectedId && geo.data) {
       const feat = geo.data.concessions.features.find(
-        (f: any) => f.properties?.concession_id === selectedId,
+        (f) => f.properties?.concession_id === selectedId,
       );
-      if (feat) {
+      if (feat && "coordinates" in feat.geometry) {
         try {
           const b = new maplibregl.LngLatBounds();
-          const walk = (coords: any) => {
+          const walk = (coords: unknown) => {
+            if (!Array.isArray(coords)) return;
             if (typeof coords[0] === "number") b.extend(coords as [number, number]);
             else coords.forEach(walk);
           };
-          walk(feat.geometry.coordinates);
+          walk((feat.geometry as { coordinates: unknown }).coordinates);
           map.fitBounds(b, { padding: 120, duration: 600, maxZoom: 13 });
-        } catch {}
+        } catch {
+          /* ignore invalid geometry */
+        }
       }
     }
   }, [selectedId, styleReady, geo.data]);
@@ -234,7 +255,18 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
       });
       if (!feats.length) return;
       const f = feats[0];
-      const p = f.properties as any;
+      const p = (f.properties ?? {}) as {
+        concession_id: string;
+        name?: string;
+        region?: string;
+        commune?: string;
+        score?: number;
+        expiry_risk?: string;
+        holder_name?: string;
+        deposit_proximity_km?: number;
+        anomaly_overlap_count?: number;
+        ai_thesis?: string;
+      };
       onSelect(p.concession_id);
       popupRef.current?.remove();
       popupRef.current = new maplibregl.Popup({ offset: 8, maxWidth: "320px" })
@@ -273,12 +305,14 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
         <div className="flex items-center gap-1 font-semibold text-[11px] uppercase text-muted-foreground">
           <LayersIcon className="h-3 w-3" /> Capas
         </div>
-        {([
-          ["concessions", "Concesiones", "#10b981"],
-          ["anomalies", "Anomalías sat", "#ec4899"],
-          ["deposits", "Yacimientos", "#3b82f6"],
-          ["targets", "Targets exploración", "#f97316"],
-        ] as const).map(([k, label, color]) => (
+        {(
+          [
+            ["concessions", "Concesiones", "#10b981"],
+            ["anomalies", "Anomalías sat", "#ec4899"],
+            ["deposits", "Yacimientos", "#3b82f6"],
+            ["targets", "Targets exploración", "#f97316"],
+          ] as const
+        ).map(([k, label, color]) => (
           <label key={k} className="flex items-center justify-between gap-2 cursor-pointer">
             <span className="flex items-center gap-2">
               <span className="inline-block w-3 h-3 rounded-sm" style={{ background: color }} />
@@ -286,7 +320,7 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
             </span>
             <input
               type="checkbox"
-              checked={(layers as any)[k]}
+              checked={layers[k]}
               onChange={(e) => setLayers((s) => ({ ...s, [k]: e.target.checked }))}
               className="accent-blue-600"
             />
@@ -294,8 +328,8 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
         ))}
         {geo.data && (
           <div className="pt-2 border-t text-[10px] text-muted-foreground">
-            {geo.data.concessions.features.length} conc · {geo.data.anomalies.features.length} anom ·{" "}
-            {geo.data.deposits.features.length} yac · {geo.data.targets.features.length} targets
+            {geo.data.concessions.features.length} conc · {geo.data.anomalies.features.length} anom
+            · {geo.data.deposits.features.length} yac · {geo.data.targets.features.length} targets
           </div>
         )}
       </div>
@@ -312,7 +346,8 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
           <span className="inline-block w-4 h-3" style={{ background: "#059669" }} />
         </div>
         <div className="flex justify-between text-[10px] text-muted-foreground w-16">
-          <span>0</span><span>100</span>
+          <span>0</span>
+          <span>100</span>
         </div>
       </div>
 

@@ -26,10 +26,9 @@ export function useIsosurface(points: AnomalyPoint[], params: IsosurfaceParams) 
   const reqRef = useRef(0);
 
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/workers/isosurface.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/workers/isosurface.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();
