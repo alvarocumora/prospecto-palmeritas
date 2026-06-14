@@ -9,8 +9,7 @@ export const Route = createFileRoute("/api/public/notifications/catastro-expirat
       POST: async ({ request }) => {
         const expectedKey =
           process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "";
-        const apiKey =
-          request.headers.get("apikey") ?? request.headers.get("x-api-key") ?? "";
+        const apiKey = request.headers.get("apikey") ?? request.headers.get("x-api-key") ?? "";
         if (!expectedKey || apiKey !== expectedKey) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }
@@ -61,7 +60,9 @@ export const Route = createFileRoute("/api/public/notifications/catastro-expirat
             .from("profiles")
             .select("user_id, email, display_name")
             .in("user_id", userIds);
-          const project = (c as any).projects as { name?: string; code?: string } | null;
+          const project =
+            (c as unknown as { projects?: { name?: string; code?: string } | null }).projects ??
+            null;
           for (const p of profs ?? []) {
             if (!p.email) continue;
             const r = await sendInternalEmail({

@@ -3,12 +3,14 @@
 ## 1. Estado actual (auditoría)
 
 ### Despliegue — CRÍTICO
+
 - **Producción HTTP 500 en TODAS las rutas** (`/`, `/inversionistas` ambas 500). El wrapper anti-h3 sirve correctamente el fallback HTML branded ("Servicio temporalmente no disponible") → la capa 2 funciona, pero la causa raíz NO está resuelta.
 - **Logs vacíos**: `server-function-logs` no devuelve nada en la última hora → o nadie está pegando, o el wrapper aún no está logueando el error capturado a stdout visible para ClickHouse.
 - **Vite dev**: sin errores recientes en el log del sandbox.
 - **Conclusión**: el sitio publicado está caído end-to-end. Hay que diagnosticar la causa real (no solo el síntoma) antes que cualquier feature investor.
 
 ### Tamaño y orden del código
+
 - **75 rutas**, **71 hooks**, **64 archivos en `src/lib/`** (mezclando `.functions.ts`, `.server.ts`, helpers puros, exportadores PDF, AI clients).
 - **Archivos monstruo** (>800 líneas):
   - `LosVerdesEngine3D.tsx` 1962
@@ -25,6 +27,7 @@
 ## 2. Plan en 3 fases
 
 ### Fase A — Estabilizar despliegue (HOY, bloqueante)
+
 Objetivo: producción devuelve 200 en `/`, `/inversionistas`, `/terminal`, `/auth` y rutas core.
 
 1. **Forzar logging del error real**: en `src/server.ts`, antes del fallback, escribir `console.error` con stringify completo del payload h3 swallowed + `consumeLastCapturedError()` + URL + headers. Garantizar que sale a stdout (ClickHouse worker logs).
@@ -39,9 +42,11 @@ Objetivo: producción devuelve 200 en `/`, `/inversionistas`, `/terminal`, `/aut
 6. **Smoke test**: `/`, `/inversionistas`, `/terminal`, `/auth`, `/contacto`, `/catastro`, `/dashboard` (con cookie) — todas 200.
 
 ### Fase B — Orden estructural de código (1 sprint)
+
 Objetivo: navegabilidad clara, separación pública/privada/investor, lib agrupada.
 
 1. **Reagrupar `src/routes/`** por dominio físico (TanStack soporta carpetas):
+
    ```text
    src/routes/
      (marketing)/        → index, inversionistas, empresas, proyectos, recursos, contacto
@@ -53,9 +58,11 @@ Objetivo: navegabilidad clara, separación pública/privada/investor, lib agrupa
        admin/            → admin.*, approvals, audit
      api/public/         → ya existe
    ```
+
    Sin cambio de URLs (los grupos `(name)` no afectan path). Reduce ruido en el explorer.
 
 2. **Reagrupar `src/lib/`**:
+
    ```text
    src/lib/
      catastro/      → catastroPublic, catastroWatchlist, franco-cadastre
@@ -68,6 +75,7 @@ Objetivo: navegabilidad clara, separación pública/privada/investor, lib agrupa
      pdf/           → ya existe
      core/          → error-capture, error-page, observability
    ```
+
    Mover por dominio, actualizar imports con find/replace, sin cambio de lógica.
 
 3. **Romper archivos > 800 líneas** que tocaremos en Fase C:
@@ -82,6 +90,7 @@ Objetivo: navegabilidad clara, separación pública/privada/investor, lib agrupa
 6. **Memoria del proyecto**: actualizar `mem://index.md` con la nueva geografía de carpetas.
 
 ### Fase C — Hardening de despliegue continuo (paralelo a B)
+
 1. **CI gate**: `ci.yml` ya existe; agregar paso `bun run build` + `curl` post-publish a `/` y `/inversionistas` esperando 200; falla si 500.
 2. **Health route**: `src/routes/api/public/health.ts` que no toca DB, devuelve `{ok:true,commit}`. Stable para uptime monitor externo.
 3. **Server-fn protegidas en loaders públicos**: auditar los 64 `.functions.ts` y confirmar que ninguno con `requireSupabaseAuth` se invoca desde loader de ruta pública (causa 401 en SSR/build:dev).
@@ -97,16 +106,18 @@ Objetivo: navegabilidad clara, separación pública/privada/investor, lib agrupa
 - **Sin tocar**: `integrations/supabase/*` (auto-gen), `engine3d/*` (estable), 3D viewers existentes.
 
 ## 4. Riesgos
+
 - **A.3**: si el error real es un módulo Node-only (sharp, child_process), puede requerir reemplazar paquete; el log dirá cuál.
 - **B**: mover 75 rutas/64 libs genera muchos diffs; hacerlo por dominio reduce blast radius.
 - **C.3-5**: auditoría de 64 functions es ~30 min de grep; barato y rentable.
 
 ## 5. Entregables
-| Fase | Output | Tiempo |
-|---|---|---|
-| A | Producción 200 + root cause documentada | hoy |
-| B | Carpetas reorganizadas + AppShell único + mem actualizada | 3-4 días |
-| C | CI gate verde + health endpoint + 0 leaks server-only | 1-2 días, paralelo |
+
+| Fase | Output                                                    | Tiempo             |
+| ---- | --------------------------------------------------------- | ------------------ |
+| A    | Producción 200 + root cause documentada                   | hoy                |
+| B    | Carpetas reorganizadas + AppShell único + mem actualizada | 3-4 días           |
+| C    | CI gate verde + health endpoint + 0 leaks server-only     | 1-2 días, paralelo |
 
 Tras Fase A entrego ya el sitio estable; con A+B+C la plataforma queda lista para sumar el plan investor (sprints separados).
 

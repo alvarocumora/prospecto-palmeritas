@@ -1,16 +1,15 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import {
   Body,
   Container,
   Head,
-  Heading,
   Html,
   Preview,
   Section,
   Text,
   Hr,
   Button,
-  Link,
 } from "@react-email/components";
 
 export const colors = {
@@ -142,7 +141,11 @@ export function EmailLayout({
   );
 }
 
-export function KeyValueBlock({ rows }: { rows: Array<[string, string | number | null | undefined]> }) {
+export function KeyValueBlock({
+  rows,
+}: {
+  rows: Array<[string, string | number | null | undefined]>;
+}) {
   return (
     <Section style={styles.kv}>
       {rows.map(([k, v], i) => (

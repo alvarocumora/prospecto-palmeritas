@@ -9,8 +9,7 @@ export const Route = createFileRoute("/api/public/notifications/satellite-anomal
       POST: async ({ request }) => {
         const expectedKey =
           process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? "";
-        const apiKey =
-          request.headers.get("apikey") ?? request.headers.get("x-api-key") ?? "";
+        const apiKey = request.headers.get("apikey") ?? request.headers.get("x-api-key") ?? "";
         if (!expectedKey || apiKey !== expectedKey) {
           return Response.json({ error: "unauthorized" }, { status: 401 });
         }

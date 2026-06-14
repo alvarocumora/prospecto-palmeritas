@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -28,8 +29,9 @@ const Email = ({
   >
     <Heading style={styles.h1}>Estado de catastro — {projectName ?? "tu proyecto"}</Heading>
     <Text style={styles.p}>
-      Estimado/a {recipientName ?? "inversionista"}, este es el resumen mensual del estado de catastro
-      minero del proyecto. La pertenencia es la base legal del activo; mantenerla al día es prioritario.
+      Estimado/a {recipientName ?? "inversionista"}, este es el resumen mensual del estado de
+      catastro minero del proyecto. La pertenencia es la base legal del activo; mantenerla al día es
+      prioritario.
     </Text>
     <KeyValueBlock
       rows={[

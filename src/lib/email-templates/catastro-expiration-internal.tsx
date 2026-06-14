@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -33,9 +34,10 @@ const Email = ({
   concessionId,
 }: Props) => {
   const level: "danger" | "warn" = (daysRemaining ?? 0) <= 15 ? "danger" : "warn";
-  const label = (daysRemaining ?? 0) < 0
-    ? `VENCIDA HACE ${Math.abs(daysRemaining ?? 0)} DÍAS`
-    : `VENCE EN ${daysRemaining} DÍAS`;
+  const label =
+    (daysRemaining ?? 0) < 0
+      ? `VENCIDA HACE ${Math.abs(daysRemaining ?? 0)} DÍAS`
+      : `VENCE EN ${daysRemaining} DÍAS`;
   return (
     <EmailLayout
       preview={`Concesión ${concessionCode ?? ""} ${label.toLowerCase()}`}
@@ -44,8 +46,7 @@ const Email = ({
       ctaLabel="Abrir en el dashboard"
     >
       <Heading style={styles.h1}>
-        {badge(level, label)}{" "}
-        <span style={{ marginLeft: 6 }}>Acción requerida en catastro</span>
+        {badge(level, label)} <span style={{ marginLeft: 6 }}>Acción requerida en catastro</span>
       </Heading>
       <Text style={styles.p}>
         Hola{recipientName ? ` ${recipientName}` : ""}, la siguiente concesión del proyecto{" "}
@@ -59,7 +60,10 @@ const Email = ({
           ["Región", region],
           ["Superficie", areaHa ? `${areaHa} ha` : "—"],
           ["Vence", expiresAt],
-          ["Patente estimada", patentAmountClp ? `CLP ${patentAmountClp.toLocaleString("es-CL")}` : "—"],
+          [
+            "Patente estimada",
+            patentAmountClp ? `CLP ${patentAmountClp.toLocaleString("es-CL")}` : "—",
+          ],
         ]}
       />
       <Text style={styles.muted}>

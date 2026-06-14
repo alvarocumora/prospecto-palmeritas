@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -31,8 +32,8 @@ const Email = ({ inviterName, projectName, organization, shareUrl, expiresAt }: 
       ]}
     />
     <Text style={styles.muted}>
-      Este enlace es personal e intransferible y queda registrado en el log de acceso del data
-      room. Para más información, responde a este correo.
+      Este enlace es personal e intransferible y queda registrado en el log de acceso del data room.
+      Para más información, responde a este correo.
     </Text>
   </EmailLayout>
 );

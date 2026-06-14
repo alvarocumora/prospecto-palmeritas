@@ -58,7 +58,7 @@ export const getPre43101Data = createServerFn({ method: "POST" })
         .from("mag_targets")
         .select("id,name,lat,lon,mag_nt,rank,radius_m,source")
         .eq("project_id", pid)
-        .order("rank", { ascending: false })
+        .order("rank", { ascending: true })
         .limit(50),
       supabase
         .from("resource_models")

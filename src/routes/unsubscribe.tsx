@@ -16,9 +16,7 @@ type State =
 function UnsubscribePage() {
   const [state, setState] = useState<State>({ kind: "loading" });
   const token =
-    typeof window !== "undefined"
-      ? new URLSearchParams(window.location.search).get("token")
-      : null;
+    typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("token") : null;
 
   useEffect(() => {
     if (!token) {
@@ -93,9 +91,7 @@ function UnsubscribePage() {
         {state.kind === "invalid" && (
           <>
             <h1 className="text-xl font-semibold mb-2">Enlace no válido</h1>
-            <p className="text-sm text-muted-foreground">
-              El enlace ya expiró o no es correcto.
-            </p>
+            <p className="text-sm text-muted-foreground">El enlace ya expiró o no es correcto.</p>
           </>
         )}
         {state.kind === "error" && (

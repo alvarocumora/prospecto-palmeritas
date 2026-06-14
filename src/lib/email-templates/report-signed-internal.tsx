@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -38,8 +39,8 @@ const Email = ({
     </Heading>
     <Text style={styles.p}>
       Hola{recipientName ? ` ${recipientName}` : ""}, el reporte técnico del proyecto{" "}
-      <strong>{projectName ?? "—"}</strong> cambió de estado. Revisa el detalle y comparte con QPs
-      o stakeholders según corresponda.
+      <strong>{projectName ?? "—"}</strong> cambió de estado. Revisa el detalle y comparte con QPs o
+      stakeholders según corresponda.
     </Text>
     <KeyValueBlock
       rows={[
