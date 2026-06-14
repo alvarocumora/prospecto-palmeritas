@@ -77,6 +77,7 @@ import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
@@ -464,6 +465,12 @@ const AuthenticatedDashboard3dProRoute =
     path: '/dashboard/3d-pro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicVerifyComplianceReportIdRoute =
   ApiPublicVerifyComplianceReportIdRouteImport.update({
     id: '/api/public/verify-compliance/$reportId',
@@ -579,6 +586,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -655,6 +663,7 @@ export interface FileRoutesByTo {
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -733,6 +742,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -811,6 +821,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
+    | '/lovable/email/queue/process'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -887,6 +898,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
+    | '/lovable/email/queue/process'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -964,6 +976,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/reports/losverdes/pre43101'
     | '/api/public/verify-compliance/$reportId'
+    | '/lovable/email/queue/process'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -996,6 +1009,7 @@ export interface RootRouteChildren {
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
+  LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   ApiPublicLiveMapLosverdesVerifyRoute: typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 
@@ -1477,6 +1491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboard3dProRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/verify-compliance/$reportId': {
       id: '/api/public/verify-compliance/$reportId'
       path: '/api/public/verify-compliance/$reportId'
@@ -1735,6 +1756,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
+  LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   ApiPublicLiveMapLosverdesVerifyRoute: ApiPublicLiveMapLosverdesVerifyRoute,
 }
 export const routeTree = rootRouteImport
