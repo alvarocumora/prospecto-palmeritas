@@ -28,11 +28,20 @@ export async function exportReportToPDF(opts: {
   pdf.text(opts.projectName, margin, 60, { maxWidth: pageW - 2 * margin });
   pdf.setFontSize(11);
   pdf.setTextColor(180, 200, 230);
-  pdf.text(`Generado el ${new Date().toLocaleDateString("es-CL", { year: "numeric", month: "long", day: "numeric" })}`, margin, 80);
+  pdf.text(
+    `Generado el ${new Date().toLocaleDateString("es-CL", { year: "numeric", month: "long", day: "numeric" })}`,
+    margin,
+    80,
+  );
   pdf.text("Geocapitals — Mining Intelligence Platform", margin, pageH - 20);
   pdf.setFontSize(8);
   pdf.setTextColor(255, 180, 180);
-  pdf.text("Documento confidencial. Modelo preliminar — requiere validación por Qualified Person (QP).", margin, pageH - 12, { maxWidth: pageW - 2 * margin });
+  pdf.text(
+    "Documento confidencial. Modelo preliminar — requiere validación por Qualified Person (QP).",
+    margin,
+    pageH - 12,
+    { maxWidth: pageW - 2 * margin },
+  );
 
   // Secciones
   for (const sec of Array.from(sections)) {

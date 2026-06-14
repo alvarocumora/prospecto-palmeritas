@@ -20,9 +20,7 @@ function normalizeRelativeBearing(viewerHeading: number | null | undefined, bear
 }
 
 function compactDistance(distanceM: number) {
-  return distanceM >= 1000
-    ? `${(distanceM / 1000).toFixed(1)} km`
-    : `${Math.round(distanceM)} m`;
+  return distanceM >= 1000 ? `${(distanceM / 1000).toFixed(1)} km` : `${Math.round(distanceM)} m`;
 }
 
 function compactLabel(label: string, distanceM: number) {

@@ -83,19 +83,61 @@ function DashboardHome() {
     tone: "danger" | "warn";
   }> = [];
   if ((k?.alertsUnread ?? 0) > 0)
-    tasks.push({ to: "/dashboard/catastro", icon: <Bell className="w-3.5 h-3.5" />, label: "Alertas catastro", count: k!.alertsUnread, tone: "danger" });
+    tasks.push({
+      to: "/dashboard/catastro",
+      icon: <Bell className="w-3.5 h-3.5" />,
+      label: "Alertas catastro",
+      count: k!.alertsUnread,
+      tone: "danger",
+    });
   if ((k?.patentsDue ?? 0) > 0)
-    tasks.push({ to: "/dashboard/catastro", icon: <Coins className="w-3.5 h-3.5" />, label: "Patentes por pagar", count: k!.patentsDue, tone: "warn" });
+    tasks.push({
+      to: "/dashboard/catastro",
+      icon: <Coins className="w-3.5 h-3.5" />,
+      label: "Patentes por pagar",
+      count: k!.patentsDue,
+      tone: "warn",
+    });
   if ((k?.concessionsExpiring90d ?? 0) > 0)
-    tasks.push({ to: "/dashboard/catastro", icon: <FileWarning className="w-3.5 h-3.5" />, label: "Concesiones venciendo 90d", count: k!.concessionsExpiring90d, tone: "warn" });
+    tasks.push({
+      to: "/dashboard/catastro",
+      icon: <FileWarning className="w-3.5 h-3.5" />,
+      label: "Concesiones venciendo 90d",
+      count: k!.concessionsExpiring90d,
+      tone: "warn",
+    });
   if ((k?.overlapsOpen ?? 0) > 0)
-    tasks.push({ to: "/dashboard/catastro", icon: <Layers className="w-3.5 h-3.5" />, label: "Overlaps sin resolver", count: k!.overlapsOpen, tone: "warn" });
+    tasks.push({
+      to: "/dashboard/catastro",
+      icon: <Layers className="w-3.5 h-3.5" />,
+      label: "Overlaps sin resolver",
+      count: k!.overlapsOpen,
+      tone: "warn",
+    });
   if ((k?.pendingReview ?? 0) > 0)
-    tasks.push({ to: "/dashboard/approvals", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "Pendientes aprobación", count: k!.pendingReview, tone: "warn" });
+    tasks.push({
+      to: "/dashboard/approvals",
+      icon: <ShieldCheck className="w-3.5 h-3.5" />,
+      label: "Pendientes aprobación",
+      count: k!.pendingReview,
+      tone: "warn",
+    });
   if ((k?.bulletinsUnread ?? 0) > 0)
-    tasks.push({ to: "/dashboard/boletin", icon: <Radio className="w-3.5 h-3.5" />, label: "Boletín minero", count: k!.bulletinsUnread, tone: "warn" });
+    tasks.push({
+      to: "/dashboard/boletin",
+      icon: <Radio className="w-3.5 h-3.5" />,
+      label: "Boletín minero",
+      count: k!.bulletinsUnread,
+      tone: "warn",
+    });
   if ((k?.qaqcFailRate ?? 0) > 10)
-    tasks.push({ to: "/dashboard/qaqc", icon: <AlertTriangle className="w-3.5 h-3.5" />, label: `QA/QC fail ${k!.qaqcFailRate!.toFixed(1)}%`, count: k!.qaqcTotal, tone: "danger" });
+    tasks.push({
+      to: "/dashboard/qaqc",
+      icon: <AlertTriangle className="w-3.5 h-3.5" />,
+      label: `QA/QC fail ${k!.qaqcFailRate!.toFixed(1)}%`,
+      count: k!.qaqcTotal,
+      tone: "danger",
+    });
 
   return (
     <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
@@ -124,7 +166,11 @@ function DashboardHome() {
             />
             <VitalBadge
               label="QPS"
-              value={loading ? "…" : `${fmt(k?.approvedRecords)}/${fmt((k?.approvedRecords ?? 0) + (k?.pendingReview ?? 0))}`}
+              value={
+                loading
+                  ? "…"
+                  : `${fmt(k?.approvedRecords)}/${fmt((k?.approvedRecords ?? 0) + (k?.pendingReview ?? 0))}`
+              }
               tone={k?.pendingReview ? "warn" : "ok"}
             />
             <VitalBadge
@@ -190,13 +236,32 @@ function DashboardHome() {
           stats={[
             { label: "Targets activos", value: loading ? "…" : fmt(k?.activeTargets) },
             { label: "Campañas", value: loading ? "…" : fmt(k?.activeCampaigns) },
-            { label: "Au prom", value: loading ? "…" : k?.auWeightedAvg ? `${k.auWeightedAvg.toFixed(2)} g/t` : "—" },
+            {
+              label: "Au prom",
+              value: loading ? "…" : k?.auWeightedAvg ? `${k.auWeightedAvg.toFixed(2)} g/t` : "—",
+            },
           ]}
           links={[
-            { to: "/dashboard/targets", icon: <TargetIcon className="w-3.5 h-3.5" />, label: "Targets" },
-            { to: "/dashboard/satellite-intel", icon: <Satellite className="w-3.5 h-3.5" />, label: "Satelital" },
-            { to: "/dashboard/geophysics", icon: <Activity className="w-3.5 h-3.5" />, label: "Geofísica" },
-            { to: "/dashboard/catastro", icon: <Crosshair className="w-3.5 h-3.5" />, label: "Catastro" },
+            {
+              to: "/dashboard/targets",
+              icon: <TargetIcon className="w-3.5 h-3.5" />,
+              label: "Targets",
+            },
+            {
+              to: "/dashboard/satellite-intel",
+              icon: <Satellite className="w-3.5 h-3.5" />,
+              label: "Satelital",
+            },
+            {
+              to: "/dashboard/geophysics",
+              icon: <Activity className="w-3.5 h-3.5" />,
+              label: "Geofísica",
+            },
+            {
+              to: "/dashboard/catastro",
+              icon: <Crosshair className="w-3.5 h-3.5" />,
+              label: "Catastro",
+            },
           ]}
           primary={{ to: "/dashboard/targets", label: "Abrir Explore" }}
         />
@@ -213,10 +278,26 @@ function DashboardHome() {
             { label: "Muestras", value: loading ? "…" : fmt(k?.totalSamples) },
           ]}
           links={[
-            { to: "/dashboard/geology3d", icon: <Box className="w-3.5 h-3.5" />, label: "Visor 3D" },
-            { to: "/dashboard/drilling", icon: <Drill className="w-3.5 h-3.5" />, label: "Sondajes" },
-            { to: "/dashboard/sampling", icon: <TestTube2 className="w-3.5 h-3.5" />, label: "Muestreo" },
-            { to: "/dashboard/estimation", icon: <Layers className="w-3.5 h-3.5" />, label: "Estimación" },
+            {
+              to: "/dashboard/geology3d",
+              icon: <Box className="w-3.5 h-3.5" />,
+              label: "Visor 3D",
+            },
+            {
+              to: "/dashboard/drilling",
+              icon: <Drill className="w-3.5 h-3.5" />,
+              label: "Sondajes",
+            },
+            {
+              to: "/dashboard/sampling",
+              icon: <TestTube2 className="w-3.5 h-3.5" />,
+              label: "Muestreo",
+            },
+            {
+              to: "/dashboard/estimation",
+              icon: <Layers className="w-3.5 h-3.5" />,
+              label: "Estimación",
+            },
           ]}
           primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
         />
@@ -230,14 +311,37 @@ function DashboardHome() {
           stats={[
             { label: "Aprobados", value: loading ? "…" : fmt(k?.approvedRecords) },
             { label: "En revisión", value: loading ? "…" : fmt(k?.pendingReview) },
-            { label: "QA/QC", value: loading ? "…" : k?.qaqcFailRate != null ? `${(100 - k.qaqcFailRate).toFixed(1)}%` : "—" },
+            {
+              label: "QA/QC",
+              value: loading
+                ? "…"
+                : k?.qaqcFailRate != null
+                  ? `${(100 - k.qaqcFailRate).toFixed(1)}%`
+                  : "—",
+            },
           ]}
           links={[
-            { to: "/dashboard/ni43101", icon: <FileSignature className="w-3.5 h-3.5" />, label: "NI 43-101" },
-            { to: "/reports/losverdes/pre43101", icon: <FileSignature className="w-3.5 h-3.5" />, label: "Pre-NI 43-101 LV5" },
+            {
+              to: "/dashboard/ni43101",
+              icon: <FileSignature className="w-3.5 h-3.5" />,
+              label: "NI 43-101",
+            },
+            {
+              to: "/reports/losverdes/pre43101",
+              icon: <FileSignature className="w-3.5 h-3.5" />,
+              label: "Pre-NI 43-101 LV5",
+            },
             { to: "/dashboard/qps", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QPs" },
-            { to: "/dashboard/qaqc", icon: <CheckCircle2 className="w-3.5 h-3.5" />, label: "QA/QC" },
-            { to: "/dashboard/approvals", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "Aprobaciones" },
+            {
+              to: "/dashboard/qaqc",
+              icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+              label: "QA/QC",
+            },
+            {
+              to: "/dashboard/approvals",
+              icon: <ShieldCheck className="w-3.5 h-3.5" />,
+              label: "Aprobaciones",
+            },
           ]}
           primary={{ to: "/dashboard/ni43101", label: "Abrir certificación" }}
         />
@@ -254,10 +358,22 @@ function DashboardHome() {
             { label: "Fusion", value: fusion.score == null ? "—" : `${fusion.score}/100` },
           ]}
           links={[
-            { to: "/dashboard/marketplace", icon: <TrendingUp className="w-3.5 h-3.5" />, label: "Marketplace" },
+            {
+              to: "/dashboard/marketplace",
+              icon: <TrendingUp className="w-3.5 h-3.5" />,
+              label: "Marketplace",
+            },
             { to: "/dashboard/deals", icon: <Handshake className="w-3.5 h-3.5" />, label: "Deals" },
-            { to: "/dashboard/finance", icon: <Coins className="w-3.5 h-3.5" />, label: "Finanzas" },
-            { to: "/dashboard/reports", icon: <FileSignature className="w-3.5 h-3.5" />, label: "Reportes" },
+            {
+              to: "/dashboard/finance",
+              icon: <Coins className="w-3.5 h-3.5" />,
+              label: "Finanzas",
+            },
+            {
+              to: "/dashboard/reports",
+              icon: <FileSignature className="w-3.5 h-3.5" />,
+              label: "Reportes",
+            },
           ]}
           primary={{ to: "/dashboard/marketplace", label: "Abrir deal room" }}
         />
@@ -284,27 +400,56 @@ function DashboardHome() {
         </div>
       </section>
 
-
       {/* Atajos rápidos */}
       <section>
         <div className="flex items-center justify-between mb-2">
           <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
             Atajos
           </h2>
-          <Link to="/dashboard/projects" className="text-[10px] font-mono text-gold hover:underline">
+          <Link
+            to="/dashboard/projects"
+            className="text-[10px] font-mono text-gold hover:underline"
+          >
             Cambiar proyecto →
           </Link>
         </div>
         <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
-          <Shortcut to="/dashboard/map" icon={<MapIcon className="w-4 h-4 text-gold" />} title="Mapa táctico" />
-          <Shortcut to="/dashboard/geology3d" icon={<Box className="w-4 h-4 text-signal-violet" />} title="Visor 3D" />
-          <Shortcut to="/dashboard/catastro" icon={<Crosshair className="w-4 h-4 text-teal" />} title="Catastro" />
-          <Shortcut to="/dashboard/opportunities" icon={<Sparkles className="w-4 h-4 text-yellow-500" />} title="Oportunidades IA" />
-          <Shortcut to="/dashboard/estimation" icon={<Layers className="w-4 h-4 text-copper" />} title="Estimación" />
-          <Shortcut to="/dashboard/hse" icon={<ShieldCheck className="w-4 h-4 text-info" />} title="HSE" />
-          <Shortcut to="/dashboard/team" icon={<Sparkles className="w-4 h-4 text-gold" />} title="Equipo" />
+          <Shortcut
+            to="/dashboard/map"
+            icon={<MapIcon className="w-4 h-4 text-gold" />}
+            title="Mapa táctico"
+          />
+          <Shortcut
+            to="/dashboard/geology3d"
+            icon={<Box className="w-4 h-4 text-signal-violet" />}
+            title="Visor 3D"
+          />
+          <Shortcut
+            to="/dashboard/catastro"
+            icon={<Crosshair className="w-4 h-4 text-teal" />}
+            title="Catastro"
+          />
+          <Shortcut
+            to="/dashboard/opportunities"
+            icon={<Sparkles className="w-4 h-4 text-yellow-500" />}
+            title="Oportunidades IA"
+          />
+          <Shortcut
+            to="/dashboard/estimation"
+            icon={<Layers className="w-4 h-4 text-copper" />}
+            title="Estimación"
+          />
+          <Shortcut
+            to="/dashboard/hse"
+            icon={<ShieldCheck className="w-4 h-4 text-info" />}
+            title="HSE"
+          />
+          <Shortcut
+            to="/dashboard/team"
+            icon={<Sparkles className="w-4 h-4 text-gold" />}
+            title="Equipo"
+          />
         </div>
-
       </section>
     </div>
   );
@@ -332,7 +477,8 @@ function computeFusionScore(k: ReturnType<typeof useExecutiveKpis>["kpis"]) {
   }
   if (n === 0) return { score: null, tone: "muted" as const };
   const score = Math.round((s / n) * 100);
-  const tone = score >= 70 ? ("ok" as const) : score >= 40 ? ("warn" as const) : ("danger" as const);
+  const tone =
+    score >= 70 ? ("ok" as const) : score >= 40 ? ("warn" as const) : ("danger" as const);
   return { score, tone };
 }
 
@@ -364,10 +510,26 @@ function VitalBadge({
 }
 
 const TONE_STYLES = {
-  cyan: { ring: "border-signal-cyan/30 hover:border-signal-cyan/60", ico: "text-signal-cyan bg-signal-cyan/10", num: "text-signal-cyan" },
-  violet: { ring: "border-signal-violet/30 hover:border-signal-violet/60", ico: "text-signal-violet bg-signal-violet/10", num: "text-signal-violet" },
-  gold: { ring: "border-gold/30 hover:border-gold/60", ico: "text-gold bg-gold/10", num: "text-gold" },
-  teal: { ring: "border-teal/30 hover:border-teal/60", ico: "text-teal bg-teal/10", num: "text-teal" },
+  cyan: {
+    ring: "border-signal-cyan/30 hover:border-signal-cyan/60",
+    ico: "text-signal-cyan bg-signal-cyan/10",
+    num: "text-signal-cyan",
+  },
+  violet: {
+    ring: "border-signal-violet/30 hover:border-signal-violet/60",
+    ico: "text-signal-violet bg-signal-violet/10",
+    num: "text-signal-violet",
+  },
+  gold: {
+    ring: "border-gold/30 hover:border-gold/60",
+    ico: "text-gold bg-gold/10",
+    num: "text-gold",
+  },
+  teal: {
+    ring: "border-teal/30 hover:border-teal/60",
+    ico: "text-teal bg-teal/10",
+    num: "text-teal",
+  },
 } as const;
 
 function Pillar({

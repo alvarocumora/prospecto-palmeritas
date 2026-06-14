@@ -57,15 +57,23 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
     ]);
 
     const geoRows = (geoRes.data ?? []).filter(
-      (r: { lat: number | null; lng: number | null }): r is typeof r & { lat: number; lng: number } =>
-        r.lat != null && r.lng != null,
+      (r: {
+        lat: number | null;
+        lng: number | null;
+      }): r is typeof r & { lat: number; lng: number } => r.lat != null && r.lng != null,
     );
     const satRows = (satRes.data ?? []).filter(
       (r: { geometry: unknown }): r is typeof r & { geometry: unknown } => r.geometry != null,
     );
 
     // Extrae centro de cada punto
-    const allLngLat: Array<{ lng: number; lat: number; v: number; depth: number; kind: "geophysics" | "satellite" }> = [];
+    const allLngLat: Array<{
+      lng: number;
+      lat: number;
+      v: number;
+      depth: number;
+      kind: "geophysics" | "satellite";
+    }> = [];
 
     for (const row of geoRows) {
       const v = clamp01(
@@ -75,7 +83,8 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
             ? Number(row.confidence_pct) / 100
             : sevToVal(row.severity),
       );
-      const depth = row.estimated_depth_m != null ? Math.max(0, Number(row.estimated_depth_m)) : 150;
+      const depth =
+        row.estimated_depth_m != null ? Math.max(0, Number(row.estimated_depth_m)) : 150;
       allLngLat.push({ lng: Number(row.lng), lat: Number(row.lat), v, depth, kind: "geophysics" });
     }
 
@@ -125,7 +134,13 @@ export const getAnomalyPoints = createServerFn({ method: "POST" })
       points,
       bbox,
       center,
-      stats: { count: points.length, vMin: Math.min(...vs), vMax: Math.max(...vs), geo: geoCount, sat: satCount },
+      stats: {
+        count: points.length,
+        vMin: Math.min(...vs),
+        vMax: Math.max(...vs),
+        geo: geoCount,
+        sat: satCount,
+      },
       source: "server",
     } satisfies AnomalyDataset;
   });

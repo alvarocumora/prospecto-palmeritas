@@ -42,32 +42,22 @@ import type { ArProjectedObject } from "@/types/ar";
 
 type LeafletNS = typeof import("leaflet");
 
-function haversineMeters(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
+function haversineMeters(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const R = 6371000;
   const dLat = ((b.lat - a.lat) * Math.PI) / 180;
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const la1 = (a.lat * Math.PI) / 180;
   const la2 = (b.lat * Math.PI) / 180;
-  const x =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
+  const x = Math.sin(dLat / 2) ** 2 + Math.cos(la1) * Math.cos(la2) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.min(1, Math.sqrt(x)));
 }
-function bearingDeg(
-  a: { lat: number; lng: number },
-  b: { lat: number; lng: number },
-): number {
+function bearingDeg(a: { lat: number; lng: number }, b: { lat: number; lng: number }): number {
   const la1 = (a.lat * Math.PI) / 180;
   const la2 = (b.lat * Math.PI) / 180;
   const dLng = ((b.lng - a.lng) * Math.PI) / 180;
   const y = Math.sin(dLng) * Math.cos(la2);
-  const x =
-    Math.cos(la1) * Math.sin(la2) -
-    Math.sin(la1) * Math.cos(la2) * Math.cos(dLng);
-  return (((Math.atan2(y, x) * 180) / Math.PI) + 360) % 360;
+  const x = Math.cos(la1) * Math.sin(la2) - Math.sin(la1) * Math.cos(la2) * Math.cos(dLng);
+  return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360;
 }
 
 export function FieldMap() {
@@ -264,9 +254,7 @@ export function FieldMap() {
       satLayerRef.current = null;
     }
     if (!showSatAnoms || !satGrouped) return;
-    const filtered = SAT_INDEX_CODES.flatMap((idx) =>
-      satEnabled[idx] ? satGrouped[idx] : [],
-    );
+    const filtered = SAT_INDEX_CODES.flatMap((idx) => (satEnabled[idx] ? satGrouped[idx] : []));
     if (filtered.length === 0) return;
     const group = buildSatAnomalyOverlay(L, filtered);
     group.addTo(map);
@@ -278,8 +266,7 @@ export function FieldMap() {
     if (!arOpen) return;
     const handler = (e: DeviceOrientationEvent) => {
       // webkitCompassHeading on iOS; alpha is CCW from north on others
-      const wk = (e as unknown as { webkitCompassHeading?: number })
-        .webkitCompassHeading;
+      const wk = (e as unknown as { webkitCompassHeading?: number }).webkitCompassHeading;
       if (typeof wk === "number") {
         setArHeading(wk);
       } else if (e.alpha != null) {
@@ -309,8 +296,7 @@ export function FieldMap() {
       const pt = { lat: t.lat, lng: t.lng };
       const d = haversineMeters(me, pt);
       const b = bearingDeg(me, pt);
-      const rel =
-        arHeading != null ? (((b - arHeading + 540) % 360) - 180) : null;
+      const rel = arHeading != null ? ((b - arHeading + 540) % 360) - 180 : null;
       items.push({
         id: t.id,
         type: "target",
@@ -333,18 +319,12 @@ export function FieldMap() {
   const handleExportGpx = () => {
     if (!active) return;
     const xml = buildGpx({ projectName: active.name, pois, targets });
-    downloadBlob(
-      xml,
-      `${active.code}_terreno_${Date.now()}.gpx`,
-      "application/gpx+xml",
-    );
+    downloadBlob(xml, `${active.code}_terreno_${Date.now()}.gpx`, "application/gpx+xml");
     toast.success("GPX descargado");
   };
   const handleExportKml = () => {
     if (!active) return;
-    const allAnoms = satGrouped
-      ? SAT_INDEX_CODES.flatMap((idx) => satGrouped[idx])
-      : [];
+    const allAnoms = satGrouped ? SAT_INDEX_CODES.flatMap((idx) => satGrouped[idx]) : [];
     const xml = buildKml({
       projectName: active.name,
       pois,
@@ -358,8 +338,6 @@ export function FieldMap() {
     );
     toast.success("KML descargado (abre con Google Earth)");
   };
-
-
 
   // GPS marker
   useEffect(() => {
@@ -561,9 +539,7 @@ export function FieldMap() {
                 <input
                   type="checkbox"
                   checked={satEnabled[idx]}
-                  onChange={(e) =>
-                    setSatEnabled((s) => ({ ...s, [idx]: e.target.checked }))
-                  }
+                  onChange={(e) => setSatEnabled((s) => ({ ...s, [idx]: e.target.checked }))}
                   disabled={!showSatAnoms}
                   className="accent-gold"
                 />
@@ -660,9 +636,7 @@ export function FieldMap() {
           </div>
           <ArRadarOverlay objects={arObjects} headingDeg={arHeading} />
           {!position && (
-            <div className="text-[11px] font-mono text-muted-foreground">
-              Esperando señal GPS…
-            </div>
+            <div className="text-[11px] font-mono text-muted-foreground">Esperando señal GPS…</div>
           )}
         </div>
       )}

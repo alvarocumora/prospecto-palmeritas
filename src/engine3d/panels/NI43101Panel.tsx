@@ -19,21 +19,41 @@ type Props = {
   estimation: EstimationSettings;
   qaqc: QAQCResult | null;
   bundle: ParsedDrillholeBundle | null;
-  econ: { price: number; opex: number; capex: number; recovery: number; discount: number; years: number };
+  econ: {
+    price: number;
+    opex: number;
+    capex: number;
+    recovery: number;
+    discount: number;
+    years: number;
+  };
   onClose: () => void;
 };
 
-export function NI43101Panel({ projectId, model, params, estimation, qaqc, bundle, econ, onClose }: Props) {
-  const report = useMemo(() => buildReport({ projectId, model, params, estimation, qaqc, bundle, econ }), [
-    projectId, model, params, estimation, qaqc, bundle, econ,
-  ]);
+export function NI43101Panel({
+  projectId,
+  model,
+  params,
+  estimation,
+  qaqc,
+  bundle,
+  econ,
+  onClose,
+}: Props) {
+  const report = useMemo(
+    () => buildReport({ projectId, model, params, estimation, qaqc, bundle, econ }),
+    [projectId, model, params, estimation, qaqc, bundle, econ],
+  );
 
   function snapshot() {
     const event = auditTrail.log("ni43101.snapshot", { hash: report.hash, projectId });
     const versions = modelVersions.list();
-    const blob = new Blob([JSON.stringify({ ...report, scenarioId: event.scenarioId, versions }, null, 2)], {
-      type: "application/json",
-    });
+    const blob = new Blob(
+      [JSON.stringify({ ...report, scenarioId: event.scenarioId, versions }, null, 2)],
+      {
+        type: "application/json",
+      },
+    );
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -70,7 +90,11 @@ export function NI43101Panel({ projectId, model, params, estimation, qaqc, bundl
         <Section title="2. QA/QC summary">
           {qaqc ? (
             <>
-              <KV k="Critical issues" v={qaqc.summary.critical} cls={qaqc.summary.critical > 0 ? "text-red-300" : "text-emerald-300"} />
+              <KV
+                k="Critical issues"
+                v={qaqc.summary.critical}
+                cls={qaqc.summary.critical > 0 ? "text-red-300" : "text-emerald-300"}
+              />
               <KV k="Warnings" v={qaqc.summary.warning} />
               <KV k="Info" v={qaqc.summary.info} />
               <KV k="QA/QC hash" v={qaqc.summary.hash} />
@@ -85,16 +109,19 @@ export function NI43101Panel({ projectId, model, params, estimation, qaqc, bundl
           <KV k="IDW power" v={estimation.idwPower} />
           <KV k="Search radius" v={`${estimation.searchRadius} m`} />
           <KV k="Min / Max samples" v={`${estimation.minSamples} / ${estimation.maxSamples}`} />
-          <KV k="Anisotropía" v={`rx ${estimation.anisotropy.rx} · ry ${estimation.anisotropy.ry} · rz ${estimation.anisotropy.rz}`} />
+          <KV
+            k="Anisotropía"
+            v={`rx ${estimation.anisotropy.rx} · ry ${estimation.anisotropy.ry} · rz ${estimation.anisotropy.rz}`}
+          />
           <KV k="Block size" v={`${params.blockSize} m`} />
           <KV k="Density default" v={`${estimation.defaultDensity} t/m³`} />
         </Section>
 
         <Section title="4. Classification logic">
           <div className="text-[10px] text-muted-foreground leading-relaxed">
-            Measured: distancia al sample más cercano ≤ {params.classMeasuredR} m.
-            Indicated: ≤ {params.classIndicatedR} m. Inferred: dentro del search radius pero superior al umbral indicated.
-            Bloques sin samples dentro del radio se clasifican como waste / unestimated.
+            Measured: distancia al sample más cercano ≤ {params.classMeasuredR} m. Indicated: ≤{" "}
+            {params.classIndicatedR} m. Inferred: dentro del search radius pero superior al umbral
+            indicated. Bloques sin samples dentro del radio se clasifican como waste / unestimated.
           </div>
         </Section>
 
@@ -105,7 +132,10 @@ export function NI43101Panel({ projectId, model, params, estimation, qaqc, bundl
               <KV k="Grade promedio" v={model.stats.gradeMean.toFixed(3)} />
               <KV k="Tonnes totales" v={`${(model.stats.tonnesTotal / 1e6).toFixed(2)} Mt`} />
               <KV k="Metal contenido" v={model.stats.metalTotal.toExponential(3)} />
-              <KV k="Measured / Indicated / Inferred" v={`${model.stats.measured} / ${model.stats.indicated} / ${model.stats.inferred}`} />
+              <KV
+                k="Measured / Indicated / Inferred"
+                v={`${model.stats.measured} / ${model.stats.indicated} / ${model.stats.inferred}`}
+              />
             </>
           ) : (
             <div className="text-muted-foreground">Block model no construido.</div>
@@ -123,20 +153,32 @@ export function NI43101Panel({ projectId, model, params, estimation, qaqc, bundl
 
         <Section title="7. Assumptions & limitations">
           <ul className="text-[10px] text-muted-foreground leading-relaxed list-disc pl-4 space-y-1">
-            <li>Estimación preliminar para fines exploratorios — no constituye un reporte NI 43-101 firmado.</li>
-            <li>Modelo de bloques generado vía IDW; no se aplican variogramas, kriging ni validación cruzada.</li>
+            <li>
+              Estimación preliminar para fines exploratorios — no constituye un reporte NI 43-101
+              firmado.
+            </li>
+            <li>
+              Modelo de bloques generado vía IDW; no se aplican variogramas, kriging ni validación
+              cruzada.
+            </li>
             <li>Densidad asignada por default; se recomienda medición directa por litología.</li>
-            <li>Económicos calculados con flujo lineal simplificado, sin sustaining capex, regalías ni impuestos.</li>
-            <li>Datos satelitales / geofísicos integrados como guía exploratoria; no sustituyen sondajes.</li>
+            <li>
+              Económicos calculados con flujo lineal simplificado, sin sustaining capex, regalías ni
+              impuestos.
+            </li>
+            <li>
+              Datos satelitales / geofísicos integrados como guía exploratoria; no sustituyen
+              sondajes.
+            </li>
           </ul>
         </Section>
 
         <Section title="8. Cautionary statement">
           <div className="text-[10px] text-amber-300 leading-relaxed border border-amber-500/40 bg-amber-500/10 rounded p-2">
-            Este reporte es un MODELO PRELIMINAR generado automáticamente. No reemplaza un Technical Report
-            firmado por un Qualified Person (QP) conforme al National Instrument 43-101. Los resultados deben
-            ser revisados, validados y firmados por un QP independiente antes de ser usados para decisiones
-            de inversión, divulgación pública o financiamiento.
+            Este reporte es un MODELO PRELIMINAR generado automáticamente. No reemplaza un Technical
+            Report firmado por un Qualified Person (QP) conforme al National Instrument 43-101. Los
+            resultados deben ser revisados, validados y firmados por un QP independiente antes de
+            ser usados para decisiones de inversión, divulgación pública o financiamiento.
           </div>
         </Section>
 
@@ -161,7 +203,9 @@ function KV({ k, v, cls }: { k: string; v: string | number; cls?: string }) {
   return (
     <div className="flex justify-between text-[10px]">
       <span className="text-muted-foreground">{k}</span>
-      <span className={cls ?? "text-foreground"}>{typeof v === "number" ? v.toLocaleString() : v}</span>
+      <span className={cls ?? "text-foreground"}>
+        {typeof v === "number" ? v.toLocaleString() : v}
+      </span>
     </div>
   );
 }

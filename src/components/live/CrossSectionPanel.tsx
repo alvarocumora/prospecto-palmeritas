@@ -53,10 +53,7 @@ export function CrossSectionPanel({
     ...phaseHits.map((p) => p.base_m),
     Math.min(...elevs),
   );
-  const elevMax = Math.max(
-    ...elevs,
-    ...phaseHits.map((p) => p.top_m),
-  );
+  const elevMax = Math.max(...elevs, ...phaseHits.map((p) => p.top_m));
   const yMin = Math.floor((depthMin - 30) / 50) * 50;
   const yMax = Math.ceil((elevMax + 30) / 50) * 50;
 
@@ -64,10 +61,7 @@ export function CrossSectionPanel({
   const y = (e: number) => padT + (1 - (e - yMin) / (yMax - yMin)) * innerH;
 
   const profilePath =
-    "M " +
-    samples
-      .map((s) => `${x(s.dist_m).toFixed(1)},${y(s.elev_m).toFixed(1)}`)
-      .join(" L ");
+    "M " + samples.map((s) => `${x(s.dist_m).toFixed(1)},${y(s.elev_m).toFixed(1)}`).join(" L ");
   const fillPath =
     profilePath +
     ` L ${x(totalDist).toFixed(1)},${y(yMin).toFixed(1)}` +
@@ -103,14 +97,7 @@ export function CrossSectionPanel({
           {/* Grid + ticks Y */}
           {yTicks.map((v) => (
             <g key={v}>
-              <line
-                x1={padL}
-                x2={W - padR}
-                y1={y(v)}
-                y2={y(v)}
-                stroke="#1e293b"
-                strokeWidth={1}
-              />
+              <line x1={padL} x2={W - padR} y1={y(v)} y2={y(v)} stroke="#1e293b" strokeWidth={1} />
               <text
                 x={padL - 4}
                 y={y(v) + 3}
@@ -185,13 +172,7 @@ export function CrossSectionPanel({
           })}
 
           {/* Eje X */}
-          <line
-            x1={padL}
-            x2={W - padR}
-            y1={H - padB}
-            y2={H - padB}
-            stroke="#475569"
-          />
+          <line x1={padL} x2={W - padR} y1={H - padB} y2={H - padB} stroke="#475569" />
           {[0, 0.25, 0.5, 0.75, 1].map((t) => {
             const dx = padL + t * innerW;
             const d = totalDist * t;
@@ -212,7 +193,13 @@ export function CrossSectionPanel({
             );
           })}
           {/* Etiquetas A / B */}
-          <text x={padL} y={padT + 8} fontSize={10} fill="#fde047" fontFamily="ui-monospace,monospace">
+          <text
+            x={padL}
+            y={padT + 8}
+            fontSize={10}
+            fill="#fde047"
+            fontFamily="ui-monospace,monospace"
+          >
             A
           </text>
           <text
@@ -234,7 +221,10 @@ export function CrossSectionPanel({
               <div className="text-muted-foreground italic">Sin intersecciones.</div>
             )}
             {veinHits.map((v, i) => (
-              <div key={i} className="flex items-center justify-between gap-1 border-b border-border/40 py-0.5">
+              <div
+                key={i}
+                className="flex items-center justify-between gap-1 border-b border-border/40 py-0.5"
+              >
                 <span className="flex items-center gap-1 min-w-0">
                   <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: v.color }} />
                   <span className="truncate text-foreground">{v.vein_code}</span>
@@ -251,10 +241,15 @@ export function CrossSectionPanel({
               <div className="text-muted-foreground italic">Sin intersecciones.</div>
             )}
             {phaseHits.map((p, i) => (
-              <div key={i} className="flex items-center justify-between gap-1 border-b border-border/40 py-0.5">
+              <div
+                key={i}
+                className="flex items-center justify-between gap-1 border-b border-border/40 py-0.5"
+              >
                 <span className="flex items-center gap-1 min-w-0">
                   <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: p.color }} />
-                  <span className="truncate text-foreground">F{p.phase_no} {p.method}</span>
+                  <span className="truncate text-foreground">
+                    F{p.phase_no} {p.method}
+                  </span>
                 </span>
                 <span className="text-muted-foreground tabular-nums shrink-0">
                   {((p.dist_m_out - p.dist_m_in) / 1000).toFixed(2)}km

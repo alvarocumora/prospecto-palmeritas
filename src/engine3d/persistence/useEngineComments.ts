@@ -25,8 +25,11 @@ export function useEngineComments(
   });
 
   const addM = useMutation({
-    mutationFn: (input: { body: string; status?: EngineCommentRow["status"]; mentions?: string[] }) =>
-      addComment({ projectId, entityType, entityId, ...input }),
+    mutationFn: (input: {
+      body: string;
+      status?: EngineCommentRow["status"];
+      mentions?: string[];
+    }) => addComment({ projectId, entityType, entityId, ...input }),
     onSuccess: () => qc.invalidateQueries({ queryKey: key }),
   });
 

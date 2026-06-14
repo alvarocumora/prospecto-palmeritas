@@ -16,9 +16,15 @@ export function ClippingPlaneController({ params, size = 5000 }: Props) {
   const { quaternion, position } = useMemo(() => {
     let n: THREE.Vector3;
     switch (params.axis) {
-      case "x": n = new THREE.Vector3(1, 0, 0); break;
-      case "y": n = new THREE.Vector3(0, 1, 0); break;
-      case "z": n = new THREE.Vector3(0, 0, 1); break;
+      case "x":
+        n = new THREE.Vector3(1, 0, 0);
+        break;
+      case "y":
+        n = new THREE.Vector3(0, 1, 0);
+        break;
+      case "z":
+        n = new THREE.Vector3(0, 0, 1);
+        break;
       default:
         n = new THREE.Vector3(
           params.freeNormal?.x ?? 1,
@@ -45,10 +51,7 @@ export function ClippingPlaneController({ params, size = 5000 }: Props) {
           depthWrite={false}
         />
       </mesh>
-      <gridHelper
-        args={[size, 20, 0xffc04a, 0x7a5418]}
-        rotation={[0, 0, 0]}
-      />
+      <gridHelper args={[size, 20, 0xffc04a, 0x7a5418]} rotation={[0, 0, 0]} />
     </group>
   );
 }

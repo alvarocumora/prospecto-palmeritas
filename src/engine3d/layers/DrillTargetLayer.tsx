@@ -18,7 +18,12 @@ type Props = {
   onHover?: (t: DrillTarget | null) => void;
 };
 
-export function DrillTargetLayer({ targets, verticalExaggeration, clippingPlanes, onHover }: Props) {
+export function DrillTargetLayer({
+  targets,
+  verticalExaggeration,
+  clippingPlanes,
+  onHover,
+}: Props) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
   const geometry = useMemo(() => new THREE.CylinderGeometry(4, 4, 1, 12, 1, true), []);
   const material = useMemo(
@@ -56,7 +61,7 @@ export function DrillTargetLayer({ targets, verticalExaggeration, clippingPlanes
       const dz = -Math.cos(azRad) * Math.cos(dipRad);
       const len = t.depth;
       const cx = t.collar.x + (dx * len) / 2;
-      const cy = (t.collar.z + dy * len) / 2 * verticalExaggeration;
+      const cy = ((t.collar.z + dy * len) / 2) * verticalExaggeration;
       const cz = -t.collar.y + (dz * len) / 2;
       dummy.position.set(cx, cy, cz);
       // orientar cilindro: Y local apunta a dirección

@@ -71,14 +71,8 @@ const SUGGESTIONS_BY_MODULE: Record<string, string[]> = {
     "¿Qué sondaje conviene extender y hasta qué profundidad?",
     "Top 5 intercepts Au y su contexto litológico",
   ],
-  Catastro: [
-    "¿Qué concesiones vencen en 90 días?",
-    "Resume overlaps activos en el AOI",
-  ],
-  Geofísica: [
-    "¿Qué anomalías mag merecen ground-truthing?",
-    "Correlación mag ↔ targets activos",
-  ],
+  Catastro: ["¿Qué concesiones vencen en 90 días?", "Resume overlaps activos en el AOI"],
+  Geofísica: ["¿Qué anomalías mag merecen ground-truthing?", "Correlación mag ↔ targets activos"],
   "QA/QC": ["¿Cuál es el fail rate por batch?", "Listar duplicados con desviación >20%"],
   HSE: ["¿Qué permisos vencen en 60 días?", "Incidentes abiertos por severidad"],
   Muestreo: ["Geoquímica: fingerprint dominante del AOI", "Top assays Au del último mes"],

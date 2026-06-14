@@ -13,8 +13,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/project-report")
       { title: "Reporte de proyecto — Geocapitals" },
       {
         name: "description",
-        content:
-          "Reporte interactivo del proyecto activo (Trackmin GeoIntel · Pre NI 43-101).",
+        content: "Reporte interactivo del proyecto activo (Trackmin GeoIntel · Pre NI 43-101).",
       },
     ],
   }),
@@ -25,9 +24,7 @@ function ProjectReportPage() {
   const { active, loading } = useProjects();
 
   if (loading) {
-    return (
-      <div className="p-8 text-xs font-mono text-muted-foreground">Cargando proyecto…</div>
-    );
+    return <div className="p-8 text-xs font-mono text-muted-foreground">Cargando proyecto…</div>;
   }
 
   if (!active) {
@@ -60,9 +57,7 @@ function ProjectReportPage() {
     return (
       <div className="h-[calc(100vh-4rem)] w-full p-4 flex flex-col">
         <header className="mb-3">
-          <h1 className="text-xl font-mono text-gold">
-            Los Verdes 5 · Página 5 interactiva
-          </h1>
+          <h1 className="text-xl font-mono text-gold">Los Verdes 5 · Página 5 interactiva</h1>
           <p className="text-xs font-mono text-muted-foreground">
             Esquema litoestratigráfico Hoja Illapel 1:250.000 sobre ESRI World Imagery.
           </p>
@@ -78,8 +73,8 @@ function ProjectReportPage() {
     <div className="p-8 max-w-2xl mx-auto">
       <h1 className="text-xl font-mono text-gold mb-2">{active.name}</h1>
       <p className="text-sm text-muted-foreground mb-4">
-        Aún no hay un reporte interactivo para este proyecto. Usa los módulos de Mission
-        Control (Targets, Estimación, NI 43-101) para construir uno.
+        Aún no hay un reporte interactivo para este proyecto. Usa los módulos de Mission Control
+        (Targets, Estimación, NI 43-101) para construir uno.
       </p>
       <Link
         to="/dashboard"

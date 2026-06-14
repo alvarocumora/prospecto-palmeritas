@@ -43,7 +43,9 @@ export async function saveBlockModelVersion(input: {
   binaryPath?: string;
   notes?: string;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data, error } = await supabase
     .from("engine_block_model_versions")
     .insert({
@@ -73,7 +75,9 @@ export async function saveQAQCReport(input: {
   criticalCount: number;
   warningCount: number;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { error } = await supabase.from("engine_qaqc_reports").insert({
     project_id: input.projectId,
     label: input.label ?? null,
@@ -95,7 +99,9 @@ export async function saveAIInterpretation(input: {
   upside: number;
   payload: Record<string, unknown>;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { error } = await supabase.from("engine_ai_interpretations").insert({
     project_id: input.projectId,
     block_model_version_id: input.blockModelVersionId ?? null,
@@ -159,7 +165,9 @@ export async function saveDrillTargetsBatch(
   }>,
 ) {
   if (targets.length === 0) return;
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const rows = targets.map((t) => ({
     project_id: projectId,
     target_code: t.target_code ?? null,
@@ -189,7 +197,9 @@ export async function saveGeneratedReport(input: {
   payload?: Record<string, unknown>;
   storagePath?: string;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { error } = await supabase.from("engine_reports_generated").insert({
     project_id: input.projectId,
     kind: input.kind,
@@ -210,7 +220,9 @@ export async function logEngineAudit(input: {
   entityId?: string;
   payload?: Record<string, unknown>;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) return;
   await supabase.from("engine_audit_events").insert({
     project_id: input.projectId,
@@ -267,7 +279,9 @@ export async function addComment(input: {
   mentions?: string[];
   status?: EngineCommentRow["status"];
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) throw new Error("not authenticated");
   const { error } = await supabase.from("engine_comments").insert({
     project_id: input.projectId,
@@ -281,10 +295,7 @@ export async function addComment(input: {
   if (error) throw error;
 }
 
-export async function updateCommentStatus(
-  commentId: string,
-  status: EngineCommentRow["status"],
-) {
+export async function updateCommentStatus(commentId: string, status: EngineCommentRow["status"]) {
   const { error } = await supabase
     .from("engine_comments")
     .update({

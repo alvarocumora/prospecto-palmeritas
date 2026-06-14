@@ -120,9 +120,7 @@ export const searchConcessions = createServerFn({ method: "POST" })
     const limit = data.limit ?? 25;
     let query = supabaseAdmin
       .from("public_concessions_cache")
-      .select(
-        "code, concession_type, name, holder, rut, area_ha, status, region, commune",
-      )
+      .select("code, concession_type, name, holder, rut, area_ha, status, region, commune")
       .limit(limit);
 
     // text matching across multiple fields

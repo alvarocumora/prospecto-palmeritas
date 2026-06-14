@@ -11,13 +11,13 @@ Microservicio Python (FastAPI) para cómputo geocientífico que no puede correr 
 
 ## Endpoints
 
-| Método | Path           | Descripción                                       |
-| ------ | -------------- | ------------------------------------------------- |
-| GET    | `/health`      | Liveness probe                                    |
-| POST   | `/desurvey`    | Minimum-curvature desurvey de un sondaje          |
-| POST   | `/composite`   | Compositing por longitud fija *(stub)*            |
-| POST   | `/variogram`   | Variograma experimental *(stub)*                  |
-| POST   | `/krige`       | Ordinary Kriging 3D *(stub, requiere pygslib)*    |
+| Método | Path         | Descripción                                    |
+| ------ | ------------ | ---------------------------------------------- |
+| GET    | `/health`    | Liveness probe                                 |
+| POST   | `/desurvey`  | Minimum-curvature desurvey de un sondaje       |
+| POST   | `/composite` | Compositing por longitud fija _(stub)_         |
+| POST   | `/variogram` | Variograma experimental _(stub)_               |
+| POST   | `/krige`     | Ordinary Kriging 3D _(stub, requiere pygslib)_ |
 
 ## Ejecutar local
 

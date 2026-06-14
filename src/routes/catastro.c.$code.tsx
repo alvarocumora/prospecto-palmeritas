@@ -69,9 +69,7 @@ function ConcessionPage() {
               <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
                 Concesión {c.concession_type}
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold leading-tight">
-                {c.name ?? c.code}
-              </h1>
+              <h1 className="text-2xl sm:text-3xl font-bold leading-tight">{c.name ?? c.code}</h1>
               <div className="text-xs font-mono text-muted-foreground mt-1">{c.code}</div>
             </div>
             <span

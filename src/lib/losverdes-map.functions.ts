@@ -47,11 +47,14 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     const concessions: FC = {
       type: "FeatureCollection",
-      features: (cons ?? []).flatMap((c: any): MapFeature[] => {
+      features: (cons ?? []).flatMap((c): MapFeature[] => {
         if (!c.geometry_geojson) return [];
         let geom: GeoJSON.Geometry | null = null;
         try {
-          geom = typeof c.geometry_geojson === "string" ? JSON.parse(c.geometry_geojson) : c.geometry_geojson;
+          geom =
+            typeof c.geometry_geojson === "string"
+              ? JSON.parse(c.geometry_geojson)
+              : (c.geometry_geojson as unknown as GeoJSON.Geometry);
         } catch {
           return [];
         }
@@ -86,7 +89,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     const targets: FC = {
       type: "FeatureCollection",
-      features: (tgts ?? []).flatMap((t: any): MapFeature[] => {
+      features: (tgts ?? []).flatMap((t): MapFeature[] => {
         if (t.lng == null || t.lat == null) return [];
         const props: Props = {
           layer: "target",
@@ -121,14 +124,15 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     if (sErr) throw new Error(`sat: ${sErr.message}`);
     const satAnomalies: FC = {
       type: "FeatureCollection",
-      features: (sats ?? []).flatMap((s: any): MapFeature[] => {
+      features: (sats ?? []).flatMap((s): MapFeature[] => {
         // bbox puede venir como array [minLng,minLat,maxLng,maxLat] o como GeoJSON {type,coordinates}
         let center: [number, number] | null = null;
-        if (Array.isArray(s.bbox) && s.bbox.length >= 4) {
-          const [a, b, c, d] = s.bbox.map(Number);
+        const bb = s.bbox;
+        if (Array.isArray(bb) && bb.length >= 4) {
+          const [a, b, c, d] = (bb as number[]).map(Number);
           center = [(a + c) / 2, (b + d) / 2];
-        } else if (s.bbox && typeof s.bbox === "object" && s.bbox.coordinates) {
-          const coords = s.bbox.coordinates as any;
+        } else if (bb && typeof bb === "object" && "coordinates" in bb) {
+          const coords = (bb as { coordinates?: number[][][] }).coordinates;
           // intentamos polygon
           if (Array.isArray(coords?.[0]?.[0])) {
             let mnx = Infinity,
@@ -173,7 +177,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     if (mErr) throw new Error(`mag: ${mErr.message}`);
     const magAnomalies: FC = {
       type: "FeatureCollection",
-      features: (mags ?? []).flatMap((m: any): MapFeature[] => {
+      features: (mags ?? []).flatMap((m): MapFeature[] => {
         if (m.lat == null || m.lon == null) return [];
         const props: Props = {
           layer: "mag_anomaly",
@@ -196,13 +200,14 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     // BBox
     const allCoords: Array<[number, number]> = [];
-    const walk = (c: any) => {
-      if (typeof c?.[0] === "number") allCoords.push([c[0], c[1]]);
-      else if (Array.isArray(c)) for (const x of c) walk(x);
+    const walk = (c: unknown) => {
+      if (!Array.isArray(c)) return;
+      if (typeof c[0] === "number") allCoords.push([c[0], c[1]]);
+      else for (const x of c) walk(x);
     };
     for (const fc of [concessions, targets, satAnomalies, magAnomalies]) {
       for (const f of fc.features) {
-        if ("coordinates" in f.geometry) walk((f.geometry as any).coordinates);
+        if ("coordinates" in f.geometry) walk((f.geometry as { coordinates: unknown }).coordinates);
       }
     }
     let bbox: LosVerdesMapData["bbox"] = null;

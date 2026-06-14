@@ -20,11 +20,16 @@ const NarrativeSchema = z.object({
   title: z.string(),
   paragraphs: z.array(z.string()).min(1).max(8),
   bullets: z.array(z.string()).max(12).optional(),
-  tables: z.array(z.object({
-    caption: z.string().optional(),
-    headers: z.array(z.string()),
-    rows: z.array(z.array(z.string())),
-  })).max(3).optional(),
+  tables: z
+    .array(
+      z.object({
+        caption: z.string().optional(),
+        headers: z.array(z.string()),
+        rows: z.array(z.array(z.string())),
+      }),
+    )
+    .max(3)
+    .optional(),
   warnings: z.array(z.string()).max(5).optional(),
 });
 
@@ -82,13 +87,16 @@ export const generateSectionNarrative = createServerFn({ method: "POST" })
     }
 
     // Persist cache (best-effort)
-    await supabase.from("report_section_cache").upsert({
-      project_id: data.projectId,
-      section: data.sectionId,
-      data_hash: data.dataHash,
-      payload: narrative as never,
-      model: "google/gemini-2.5-pro",
-    }, { onConflict: "project_id,section,data_hash" });
+    await supabase.from("report_section_cache").upsert(
+      {
+        project_id: data.projectId,
+        section: data.sectionId,
+        data_hash: data.dataHash,
+        payload: narrative as never,
+        model: "google/gemini-2.5-pro",
+      },
+      { onConflict: "project_id,section,data_hash" },
+    );
 
     return { narrative, cached: false };
   });

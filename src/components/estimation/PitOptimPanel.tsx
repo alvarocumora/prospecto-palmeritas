@@ -10,12 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Mountain, Loader2, TrendingUp, Box as BoxIcon } from "lucide-react";
 import { toast } from "sonner";
 import { SchedulePanel } from "./SchedulePanel";
@@ -141,7 +136,10 @@ export function PitOptimPanel({
 
             {result && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-2 text-[10px] font-mono pt-2 border-t border-border">
-                <Kpi label="Bloques in-pit" value={`${result.blocks_in_pit}/${result.blocks_total}`} />
+                <Kpi
+                  label="Bloques in-pit"
+                  value={`${result.blocks_in_pit}/${result.blocks_total}`}
+                />
                 <Kpi label="Bloques ore" value={String(result.blocks_ore)} />
                 <Kpi label="Slope" value={`${Number(result.slope_angle_deg).toFixed(0)}°`} />
                 <Kpi label="Ore" value={fmtT(result.ore_tonnes)} highlight />
@@ -156,10 +154,7 @@ export function PitOptimPanel({
                   value={`${result.mean_grade.toFixed(commodity === "au" || commodity === "ag" ? 2 : 3)} ${unit}`}
                 />
                 <Kpi label="Metal pagable" value={result.metal_payable.toFixed(0)} />
-                <Kpi
-                  label="NSR bruto"
-                  value={fmtUsd(result.gross_revenue_usd)}
-                />
+                <Kpi label="NSR bruto" value={fmtUsd(result.gross_revenue_usd)} />
                 <div className="col-span-2 md:col-span-3 border-t border-border pt-2 flex items-center justify-between">
                   <span className="text-text-dim uppercase">Valor neto del pit</span>
                   <b
@@ -209,24 +204,14 @@ export function PitOptimPanel({
               Pit shell 3D
             </DialogTitle>
           </DialogHeader>
-          <div className="p-3">
-            {selected && <PitShell3DViewer scenarioId={selected} />}
-          </div>
+          <div className="p-3">{selected && <PitShell3DViewer scenarioId={selected} />}</div>
         </DialogContent>
       </Dialog>
     </details>
   );
 }
 
-function Kpi({
-  label,
-  value,
-  highlight,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
+function Kpi({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className="flex flex-col">
       <span className="text-text-dim uppercase tracking-wide text-[9px]">{label}</span>

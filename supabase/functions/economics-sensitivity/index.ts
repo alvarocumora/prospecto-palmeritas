@@ -238,11 +238,22 @@ Deno.serve(async (req) => {
     const blks = blocks as Block[];
 
     const base = runCase(blks, s, m);
-    const variations: any[] = [];
+    const variations: Array<{
+      param: string;
+      label: string;
+      base_value: number;
+      low_value: number;
+      high_value: number;
+      low_npv: number;
+      high_npv: number;
+      low_irr: number;
+      high_irr: number;
+      swing: number;
+    }> = [];
     const d = delta_pct / 100;
     for (const p of params) {
       if (!(p in s)) continue;
-      const baseVal = Number((s as any)[p]);
+      const baseVal = Number((s as Record<string, unknown>)[p]);
       if (!Number.isFinite(baseVal) || baseVal === 0) continue;
       const sLow: Scenario = { ...s, [p]: baseVal * (1 - d) } as Scenario;
       const sHigh: Scenario = { ...s, [p]: baseVal * (1 + d) } as Scenario;
@@ -263,10 +274,9 @@ Deno.serve(async (req) => {
     }
     variations.sort((a, b) => b.swing - a.swing);
 
-    return new Response(
-      JSON.stringify({ ok: true, base, variations, delta_pct }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-    );
+    return new Response(JSON.stringify({ ok: true, base, variations, delta_pct }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return new Response(JSON.stringify({ ok: false, error: msg }), {

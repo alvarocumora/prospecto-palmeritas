@@ -1355,15 +1355,29 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
       .eq("project_id", data.projectId)
       .in("id", data.targetIds);
     if (targetsErr) return { ok: false, error: targetsErr.message, runs: [], anomaliesByIndex: {} };
-    const targets = (targetsData ?? []).filter(
-      (t) => t.lat != null && t.lng != null,
-    ) as { id: string; code: string; name: string; lat: number; lng: number; score: number | null; priority: string }[];
+    const targets = (targetsData ?? []).filter((t) => t.lat != null && t.lng != null) as {
+      id: string;
+      code: string;
+      name: string;
+      lat: number;
+      lng: number;
+      score: number | null;
+      priority: string;
+    }[];
     if (targets.length === 0) {
-      return { ok: false, error: "Ningún target con coordenadas válidas", runs: [], anomaliesByIndex: {} };
+      return {
+        ok: false,
+        error: "Ningún target con coordenadas válidas",
+        runs: [],
+        anomaliesByIndex: {},
+      };
     }
 
     // 2. Global AOI
-    let minLng = Infinity, minLat = Infinity, maxLng = -Infinity, maxLat = -Infinity;
+    let minLng = Infinity,
+      minLat = Infinity,
+      maxLng = -Infinity,
+      maxLat = -Infinity;
     for (const t of targets) {
       const bb = bboxAround(Number(t.lat), Number(t.lng), 1.5);
       if (bb[0] < minLng) minLng = bb[0];
@@ -1403,8 +1417,10 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
       const features = (result.features ?? []) as StacFeature[];
       for (const f of features) {
         const props = (f.properties ?? {}) as Record<string, unknown>;
-        const cloud = typeof props["eo:cloud_cover"] === "number" ? (props["eo:cloud_cover"] as number) : 100;
-        const dt = (props["datetime"] as string) ?? (props["start_datetime"] as string) ?? now.toISOString();
+        const cloud =
+          typeof props["eo:cloud_cover"] === "number" ? (props["eo:cloud_cover"] as number) : 100;
+        const dt =
+          (props["datetime"] as string) ?? (props["start_datetime"] as string) ?? now.toISOString();
         const selfHref = (f.links ?? []).find((l) => l?.rel === "self")?.href ?? null;
         if (!bestScene || cloud < bestScene.cloud) {
           bestScene = { id: String(f.id ?? ""), cloud, href: selfHref, date: dt };
@@ -1456,9 +1472,18 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
         .select("id, index_code, external_scene_id")
         .single();
       if (runErr || !runRow) {
-        return { ok: false, error: runErr?.message ?? "Failed to create run", runs: runsOut, anomaliesByIndex };
+        return {
+          ok: false,
+          error: runErr?.message ?? "Failed to create run",
+          runs: runsOut,
+          anomaliesByIndex,
+        };
       }
-      runsOut.push({ id: runRow.id, index_code: runRow.index_code, external_scene_id: runRow.external_scene_id });
+      runsOut.push({
+        id: runRow.id,
+        index_code: runRow.index_code,
+        external_scene_id: runRow.external_scene_id,
+      });
 
       // Score heurístico por target
       const w = INDEX_WEIGHT[indexCode];
@@ -1468,7 +1493,8 @@ export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
         const hash = [...(t.id + indexCode)].reduce((s, c) => (s * 33 + c.charCodeAt(0)) % 997, 0);
         const jitter = (hash % 100) / 500; // 0–0.2
         const score = Math.max(0.05, Math.min(0.99, targetScore * w * scenePenalty + jitter));
-        const severity: "low" | "medium" | "high" = score >= 0.7 ? "high" : score >= 0.4 ? "medium" : "low";
+        const severity: "low" | "medium" | "high" =
+          score >= 0.7 ? "high" : score >= 0.4 ? "medium" : "low";
         const poly = bufferPolygon(Number(t.lat), Number(t.lng), 250);
         const areaHa = Number((Math.PI * 0.25 * 0.25 * 100).toFixed(2)); // ~19.6 ha aprox
         return {

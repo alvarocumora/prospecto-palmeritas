@@ -40,10 +40,9 @@ export function useTerrainDEM(
   const reqRef = useRef(0);
 
   useEffect(() => {
-    const w = new Worker(
-      new URL("@/engine3d/terrain/martini.worker.ts", import.meta.url),
-      { type: "module" },
-    );
+    const w = new Worker(new URL("@/engine3d/terrain/martini.worker.ts", import.meta.url), {
+      type: "module",
+    });
     workerRef.current = w;
     return () => {
       w.terminate();

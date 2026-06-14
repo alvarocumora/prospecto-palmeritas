@@ -37,9 +37,7 @@ Deno.serve(async (req) => {
 
   const [v2Concesion, v2Vertice, legacy] = await Promise.all([
     healthCheck(),
-    probe(
-      `${SNGM_BASE}/${LAYER_VERTICE}/query?where=1%3D1&returnCountOnly=true&f=json`,
-    ),
+    probe(`${SNGM_BASE}/${LAYER_VERTICE}/query?where=1%3D1&returnCountOnly=true&f=json`),
     probe(LEGACY_URL),
   ]);
 

@@ -53,7 +53,9 @@ export function ArRadarOverlay({
         <div className="divide-y divide-border/60">
           {nearest.map((o) => (
             <div key={`${o.type}:${o.id}`} className="px-3 py-2 flex items-start gap-3">
-              <div className="text-lg leading-none pt-0.5">{relativeDirection(o.relativeBearingDeg)}</div>
+              <div className="text-lg leading-none pt-0.5">
+                {relativeDirection(o.relativeBearingDeg)}
+              </div>
 
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2 flex-wrap">
@@ -69,9 +71,7 @@ export function ArRadarOverlay({
                   )}
                 </div>
 
-                <div className="mt-1 text-sm font-medium text-foreground truncate">
-                  {o.label}
-                </div>
+                <div className="mt-1 text-sm font-medium text-foreground truncate">{o.label}</div>
 
                 <div className="mt-1 flex items-center gap-3 text-[10px] font-mono text-muted-foreground flex-wrap">
                   <span>{Math.round(o.distanceM)} m</span>

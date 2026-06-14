@@ -86,7 +86,10 @@ export const modelVersions = {
   list(): ModelVersion[] {
     return read();
   },
-  compare(aId: string, bId: string): {
+  compare(
+    aId: string,
+    bId: string,
+  ): {
     a: ModelVersion;
     b: ModelVersion;
     delta: ResourceSummary;

@@ -6,7 +6,11 @@ export const Route = createFileRoute("/proyectos")({
   head: () => ({
     meta: [
       { title: "Proyectos — Geocapitals" },
-      { name: "description", content: "Proyectos mineros gestionados sobre Geocapitals. Catastro, sondajes, satélite y NI 43-101 en una sola vista." },
+      {
+        name: "description",
+        content:
+          "Proyectos mineros gestionados sobre Geocapitals. Catastro, sondajes, satélite y NI 43-101 en una sola vista.",
+      },
       { property: "og:title", content: "Proyectos mineros — Geocapitals" },
       { property: "og:description", content: "Activos reales operando en la plataforma." },
     ],
@@ -29,7 +33,11 @@ const SHOWCASE = [
     region: "Petorca · Valparaíso",
     commodity: "Cu-Mo",
     to: "/live/losverdes",
-    bullets: ["AOI 3D + satélite multi-índice", "Targets generados por IA", "Compliance NI 43-101 en curso"],
+    bullets: [
+      "AOI 3D + satélite multi-índice",
+      "Targets generados por IA",
+      "Compliance NI 43-101 en curso",
+    ],
   },
   {
     code: "TILAMA",
@@ -37,7 +45,11 @@ const SHOWCASE = [
     region: "Choapa · Coquimbo",
     commodity: "Cu-Au",
     to: "/live/tilama",
-    bullets: ["Catastro + boletines vigilados", "Geofísica MAG correlacionada", "Pre-feasibility activa"],
+    bullets: [
+      "Catastro + boletines vigilados",
+      "Geofísica MAG correlacionada",
+      "Pre-feasibility activa",
+    ],
   },
   {
     code: "FRANCO",
@@ -45,7 +57,11 @@ const SHOWCASE = [
     region: "Atacama",
     commodity: "Au",
     to: "/live/franco",
-    bullets: ["Borrador NI 43-101 asistido", "Datos de campo geo-referenciados", "Data room institucional"],
+    bullets: [
+      "Borrador NI 43-101 asistido",
+      "Datos de campo geo-referenciados",
+      "Data room institucional",
+    ],
   },
 ];
 
@@ -64,11 +80,15 @@ function ProyectosPage() {
             className="group rounded-2xl border border-[var(--brand-hair)] bg-white p-6 hover:border-[var(--brand-blue)] hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)]">{p.code}</span>
+              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)]">
+                {p.code}
+              </span>
               <ArrowRight className="w-4 h-4 text-[var(--brand-mute)] group-hover:text-[var(--brand-blue)] group-hover:translate-x-0.5 transition" />
             </div>
             <div className="mt-3 font-display text-xl text-[var(--brand-navy-deep)]">{p.name}</div>
-            <div className="text-sm text-[var(--brand-mute)] mt-1">{p.region} · {p.commodity}</div>
+            <div className="text-sm text-[var(--brand-mute)] mt-1">
+              {p.region} · {p.commodity}
+            </div>
             <ul className="mt-5 space-y-1.5 text-[13px] text-[var(--brand-ink)]">
               {p.bullets.map((b) => (
                 <li key={b} className="flex items-center gap-2">
@@ -83,23 +103,39 @@ function ProyectosPage() {
       <section className="mt-20 rounded-2xl bg-[var(--brand-navy-deep)] text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
         <div>
           <p className="brand-eyebrow text-[var(--brand-gold)] mb-2">Publica tu proyecto</p>
-          <h2 className="brand-display text-2xl md:text-3xl">Eleva tu activo al estándar institucional</h2>
+          <h2 className="brand-display text-2xl md:text-3xl">
+            Eleva tu activo al estándar institucional
+          </h2>
           <p className="mt-3 text-white/70 max-w-xl">
-            Crea un perfil profesional, conecta tu catastro, sube tu data room y recibe interés de inversionistas
-            calificados. Onboarding asistido por nuestro equipo.
+            Crea un perfil profesional, conecta tu catastro, sube tu data room y recibe interés de
+            inversionistas calificados. Onboarding asistido por nuestro equipo.
           </p>
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono uppercase tracking-wider text-white/60">
-            <span className="flex items-center gap-2"><Mountain className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Catastro</span>
-            <span className="flex items-center gap-2"><Activity className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Geofísica</span>
-            <span className="flex items-center gap-2"><Satellite className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Satélite</span>
-            <span className="flex items-center gap-2"><FileText className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> NI 43-101</span>
+            <span className="flex items-center gap-2">
+              <Mountain className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Catastro
+            </span>
+            <span className="flex items-center gap-2">
+              <Activity className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Geofísica
+            </span>
+            <span className="flex items-center gap-2">
+              <Satellite className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Satélite
+            </span>
+            <span className="flex items-center gap-2">
+              <FileText className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> NI 43-101
+            </span>
           </div>
         </div>
         <div className="flex flex-col gap-2.5">
-          <Link to="/auth" className="inline-flex items-center justify-center gap-2 bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] px-5 py-3 rounded-md font-semibold text-sm">
+          <Link
+            to="/auth"
+            className="inline-flex items-center justify-center gap-2 bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] px-5 py-3 rounded-md font-semibold text-sm"
+          >
             Crear cuenta <ArrowRight className="w-4 h-4" />
           </Link>
-          <Link to="/contacto" className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-5 py-3 rounded-md text-sm hover:bg-white/10">
+          <Link
+            to="/contacto"
+            className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-5 py-3 rounded-md text-sm hover:bg-white/10"
+          >
             Habla con nosotros
           </Link>
         </div>

@@ -55,9 +55,9 @@ function CatastroLanding() {
               <span className="text-primary"> al alcance profesional.</span>
             </h1>
             <p className="text-base sm:text-lg text-muted-foreground mb-8 max-w-2xl leading-relaxed">
-              Busca cualquier concesión por titular, RUT o código. Monitorea cambios y
-              vencimientos. Genera reportes de due-diligence sobre tu AOI. Una herramienta
-              construida por geólogos para operadores mineros.
+              Busca cualquier concesión por titular, RUT o código. Monitorea cambios y vencimientos.
+              Genera reportes de due-diligence sobre tu AOI. Una herramienta construida por geólogos
+              para operadores mineros.
             </p>
 
             {/* Buscador */}

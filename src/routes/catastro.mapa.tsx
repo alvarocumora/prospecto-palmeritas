@@ -18,7 +18,8 @@ export const Route = createFileRoute("/catastro/mapa")({
       { property: "og:title", content: "Mapa Nacional Catastro Minero · Geocapitals" },
       {
         property: "og:description",
-        content: "Visualiza todas las concesiones mineras vigentes en Chile sobre cartografía Esri.",
+        content:
+          "Visualiza todas las concesiones mineras vigentes en Chile sobre cartografía Esri.",
       },
       { rel: "canonical", href: "/catastro/mapa" },
     ],
@@ -81,8 +82,8 @@ function CatastroMap() {
       });
       const popupFn = (layer: unknown) => {
         const p =
-          (layer as { feature?: { properties?: Record<string, unknown> } }).feature
-            ?.properties ?? {};
+          (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ??
+          {};
         const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
         return `
           <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
@@ -104,7 +105,6 @@ function CatastroMap() {
     })();
     return () => cleanup?.();
   }, []);
-
 
   return (
     <PublicCatastroShell>

@@ -51,8 +51,5 @@ export function useClippingPlanes(params: ClipParams): THREE.Plane[] {
     planeRef.current.set(n, -params.position);
   }, [params.axis, params.position, params.invert, params.freeNormal]);
 
-  return useMemo(
-    () => (params.enabled ? [planeRef.current] : []),
-    [params.enabled, params.axis, params.position, params.invert, params.freeNormal],
-  );
+  return useMemo(() => (params.enabled ? [planeRef.current] : []), [params.enabled]);
 }

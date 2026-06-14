@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -26,8 +27,7 @@ const Email = ({
   runId,
   projectId,
 }: Props) => {
-  const level =
-    topSeverity === "high" ? "danger" : topSeverity === "medium" ? "warn" : "info";
+  const level = topSeverity === "high" ? "danger" : topSeverity === "medium" ? "warn" : "info";
   return (
     <EmailLayout
       preview={`${anomalyCount ?? 0} anomalías satelitales nuevas en ${projectName ?? ""}`}

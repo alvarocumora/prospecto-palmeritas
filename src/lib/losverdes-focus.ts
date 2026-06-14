@@ -15,9 +15,7 @@ export const LOSVERDES_FOCUS_EVENT = "losverdes:focus";
 
 export function emitLosVerdesFocus(detail: LosVerdesFocusDetail) {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(
-    new CustomEvent<LosVerdesFocusDetail>(LOSVERDES_FOCUS_EVENT, { detail }),
-  );
+  window.dispatchEvent(new CustomEvent<LosVerdesFocusDetail>(LOSVERDES_FOCUS_EVENT, { detail }));
 }
 
 export function onLosVerdesFocus(handler: (d: LosVerdesFocusDetail) => void) {

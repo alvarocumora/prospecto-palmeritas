@@ -18,7 +18,9 @@ export function centroid(coords: LngLat[]): LngLat {
 }
 
 /** Centroide de un Polygon GeoJSON (anillo exterior). */
-export function polygonCentroid(poly: { coordinates: LngLat[][] } | null | undefined): LngLat | null {
+export function polygonCentroid(
+  poly: { coordinates: LngLat[][] } | null | undefined,
+): LngLat | null {
   const ring = poly?.coordinates?.[0];
   if (!ring || ring.length < 3) return null;
   return centroid(ring);
@@ -60,11 +62,7 @@ export function veinDipFootprint(input: {
   if (!isFinite(horiz) || horiz <= 0) return null;
   const az = dip_dir_deg ?? 0;
   const offsetTrace = trace.map((pt) => offsetLngLat(pt, horiz, az));
-  const ring: LngLat[] = [
-    ...trace,
-    ...[...offsetTrace].reverse(),
-    trace[0],
-  ];
+  const ring: LngLat[] = [...trace, ...[...offsetTrace].reverse(), trace[0]];
   return [ring];
 }
 
@@ -75,9 +73,7 @@ export function haversineMeters(a: LngLat, b: LngLat): number {
   const dLng = ((b[0] - a[0]) * Math.PI) / 180;
   const lat1 = (a[1] * Math.PI) / 180;
   const lat2 = (b[1] * Math.PI) / 180;
-  const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return R * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h));
 }
 
@@ -87,14 +83,15 @@ export function lerpLngLat(a: LngLat, b: LngLat, t: number): LngLat {
 }
 
 /** Intersección de dos segmentos en plano lng/lat. Devuelve punto o null. */
-export function segmentIntersect(
-  p1: LngLat,
-  p2: LngLat,
-  p3: LngLat,
-  p4: LngLat,
-): LngLat | null {
-  const x1 = p1[0], y1 = p1[1], x2 = p2[0], y2 = p2[1];
-  const x3 = p3[0], y3 = p3[1], x4 = p4[0], y4 = p4[1];
+export function segmentIntersect(p1: LngLat, p2: LngLat, p3: LngLat, p4: LngLat): LngLat | null {
+  const x1 = p1[0],
+    y1 = p1[1],
+    x2 = p2[0],
+    y2 = p2[1];
+  const x3 = p3[0],
+    y3 = p3[1],
+    x4 = p4[0],
+    y4 = p4[1];
   const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
   if (Math.abs(den) < 1e-12) return null;
   const t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
@@ -104,11 +101,7 @@ export function segmentIntersect(
 }
 
 /** Intersecciones entre un segmento y un polígono (anillo exterior). */
-export function segmentRingIntersections(
-  a: LngLat,
-  b: LngLat,
-  ring: LngLat[],
-): LngLat[] {
+export function segmentRingIntersections(a: LngLat, b: LngLat, ring: LngLat[]): LngLat[] {
   const out: LngLat[] = [];
   for (let i = 0; i < ring.length - 1; i++) {
     const hit = segmentIntersect(a, b, ring[i], ring[i + 1]);

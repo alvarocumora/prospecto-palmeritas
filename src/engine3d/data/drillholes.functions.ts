@@ -38,7 +38,8 @@ proj4.defs("EPSG:32719", "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_de
 function inferUtmZoneFromEasting(easting: number, northing: number): string {
   // Por defecto 19S para proyectos chilenos. Si vemos northings > 5e6 y eastings 100k-900k → UTM válido.
   // Se podría expandir según ubicación.
-  void easting; void northing;
+  void easting;
+  void northing;
   return "EPSG:32719";
 }
 
@@ -53,7 +54,9 @@ export const getDrillholes = createServerFn({ method: "POST" })
         .maybeSingle(),
       supabaseAdmin
         .from("drill_holes")
-        .select("hole_id, easting, northing, elevation, azimuth, dip, actual_depth, planned_depth, status, is_ai")
+        .select(
+          "hole_id, easting, northing, elevation, azimuth, dip, actual_depth, planned_depth, status, is_ai",
+        )
         .eq("project_id", data.projectId),
     ]);
 
@@ -102,10 +105,8 @@ export const getDrillholes = createServerFn({ method: "POST" })
       if (trows.length === 0) {
         return { holes: [], count: 0, source: "empty" } satisfies DrillholesDataset;
       }
-      const centerLng =
-        projectCenterLng ?? trows.reduce((s, r) => s + r.lng, 0) / trows.length;
-      const centerLat =
-        projectCenterLat ?? trows.reduce((s, r) => s + r.lat, 0) / trows.length;
+      const centerLng = projectCenterLng ?? trows.reduce((s, r) => s + r.lng, 0) / trows.length;
+      const centerLat = projectCenterLat ?? trows.reduce((s, r) => s + r.lat, 0) / trows.length;
       const elevs = trows.map((r) => Number(r.elevation_m ?? 0));
       const refElev = elevs.reduce((a, b) => a + b, 0) / Math.max(1, elevs.length);
       const holes: DrillholeSegment[] = trows.map((r, i) => {
@@ -124,7 +125,11 @@ export const getDrillholes = createServerFn({ method: "POST" })
           isAi: true,
         };
       });
-      return { holes, count: holes.length, source: "planned-from-targets" } satisfies DrillholesDataset;
+      return {
+        holes,
+        count: holes.length,
+        source: "planned-from-targets",
+      } satisfies DrillholesDataset;
     }
 
     // Centro: usa el del proyecto si existe; si no, deriva del promedio de collares (UTM→lng/lat)
@@ -140,8 +145,7 @@ export const getDrillholes = createServerFn({ method: "POST" })
       projectCenterLat ?? rowsLngLat.reduce((s, r) => s + r.lat, 0) / rowsLngLat.length;
 
     const elevations = rows.map((r) => Number(r.elevation ?? 0));
-    const refElev =
-      elevations.reduce((a, b) => a + b, 0) / Math.max(1, elevations.length);
+    const refElev = elevations.reduce((a, b) => a + b, 0) / Math.max(1, elevations.length);
 
     const holes: DrillholeSegment[] = rowsLngLat.map((r) => {
       const { x, y } = lngLatToMeters(r.lng, r.lat, centerLng, centerLat);

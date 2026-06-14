@@ -72,7 +72,9 @@ export function PortfolioPanel({ projects, loading, authed, selectedId, onSelect
               >
                 <td className="px-3 py-1.5 text-gold">{p.code}</td>
                 <td className="px-2 py-1.5 text-foreground truncate max-w-[160px]">{p.name}</td>
-                <td className="px-2 py-1.5 text-muted-foreground uppercase">{p.commodity ?? "—"}</td>
+                <td className="px-2 py-1.5 text-muted-foreground uppercase">
+                  {p.commodity ?? "—"}
+                </td>
                 <td className="px-2 py-1.5 text-right text-foreground">
                   <span className="inline-flex items-center gap-1 justify-end">
                     <Layers className="w-3 h-3 text-muted-foreground" />

@@ -1,11 +1,7 @@
 // Anomaly heatmap + structural lineaments layers for the public field map.
 // leaflet.heat is imported dynamically so it only ships when toggled on.
 import type { LayerGroup, Map as LeafletMap } from "leaflet";
-import type {
-  Lineament,
-  MagAnomalyPoint,
-  SatAnomalyPoint,
-} from "@/lib/livemap-public.functions";
+import type { Lineament, MagAnomalyPoint, SatAnomalyPoint } from "@/lib/livemap-public.functions";
 
 type LeafletNS = typeof import("leaflet");
 type HeatLayer = LayerGroup & {

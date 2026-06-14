@@ -24,8 +24,12 @@ export function Geology3DSceneSummary({ structures }: Geology3DSceneSummaryProps
     <section className="rounded-lg border border-border bg-card p-4 space-y-4">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">Geology 3D Scene</div>
-          <h3 className="mt-1 text-lg font-semibold text-foreground">Estructuras listas para render</h3>
+          <div className="font-mono text-xs uppercase tracking-wider text-muted-foreground">
+            Geology 3D Scene
+          </div>
+          <h3 className="mt-1 text-lg font-semibold text-foreground">
+            Estructuras listas para render
+          </h3>
         </div>
         <div className="rounded-md border border-border bg-background px-3 py-2 text-right">
           <div className="font-mono text-xs uppercase text-muted-foreground">Objects</div>
@@ -41,7 +45,9 @@ export function Geology3DSceneSummary({ structures }: Geology3DSceneSummaryProps
                 <div className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
                   {object.type.replaceAll("_", " ")}
                 </div>
-                <h4 className="mt-1 truncate text-sm font-semibold text-foreground">{object.name}</h4>
+                <h4 className="mt-1 truncate text-sm font-semibold text-foreground">
+                  {object.name}
+                </h4>
               </div>
               <span
                 className="h-4 w-4 rounded-full border border-border shrink-0"

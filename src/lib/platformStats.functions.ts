@@ -1,6 +1,11 @@
 // KPIs vivos de la plataforma — públicos (landing) y autenticados (dashboard).
 // Sin requireSupabaseAuth: se ejecuta durante SSR/prerender de la landing.
 import { createServerFn } from "@tanstack/react-start";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/integrations/supabase/types";
+
+type DbClient = SupabaseClient<Database>;
+type TableName = keyof Database["public"]["Tables"];
 
 export type PlatformStats = {
   projects: number;
@@ -25,10 +30,8 @@ export type PlatformStats = {
   updatedAt: string;
 };
 
-async function countTable(supabase: any, table: string, filter?: (q: any) => any): Promise<number> {
-  let q = supabase.from(table).select("id", { count: "exact", head: true });
-  if (filter) q = filter(q);
-  const { count, error } = await q;
+async function countTable(supabase: DbClient, table: TableName): Promise<number> {
+  const { count, error } = await supabase.from(table).select("id", { count: "exact", head: true });
   if (error) return 0;
   return count ?? 0;
 }
@@ -36,37 +39,32 @@ async function countTable(supabase: any, table: string, filter?: (q: any) => any
 export const getPlatformStats = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const [
-    projectsRes,
-    concessions,
-    cadNat,
-    deposits,
-    targets,
-    anomalies,
-    deals,
-    opps,
-  ] = await Promise.all([
-    supabaseAdmin
-      .from("projects")
-      .select("id,name,country,region,status,commodity")
-      .limit(8),
-    supabaseAdmin.from("mining_concessions").select("area_ha", { count: "exact" }),
-    countTable(supabaseAdmin, "cadastre_national", (q) => q.is("archived_at", null)),
-    countTable(supabaseAdmin, "mineral_deposits"),
-    countTable(supabaseAdmin, "exploration_targets"),
-    countTable(supabaseAdmin, "satellite_anomalies"),
-    countTable(supabaseAdmin, "deals"),
-    supabaseAdmin
-      .from("cadastre_opportunities")
-      .select("score", { count: "exact" })
-      .order("score", { ascending: false })
-      .limit(1),
-  ]);
+  const [projectsRes, concessions, cadNat, deposits, targets, anomalies, deals, opps] =
+    await Promise.all([
+      supabaseAdmin.from("projects").select("id,name,country,region,status,commodity").limit(8),
+      supabaseAdmin.from("mining_concessions").select("area_ha", { count: "exact" }),
+      (async () => {
+        const { count, error } = await supabaseAdmin
+          .from("cadastre_national")
+          .select("id", { count: "exact", head: true })
+          .is("archived_at", null);
+        return error ? 0 : (count ?? 0);
+      })(),
+      countTable(supabaseAdmin, "mineral_deposits"),
+      countTable(supabaseAdmin, "exploration_targets"),
+      countTable(supabaseAdmin, "satellite_anomalies"),
+      countTable(supabaseAdmin, "deals"),
+      supabaseAdmin
+        .from("cadastre_opportunities")
+        .select("score", { count: "exact" })
+        .order("score", { ascending: false })
+        .limit(1),
+    ]);
 
   const projectRows = projectsRes.data ?? [];
   const concessionRows = (concessions.data as Array<{ area_ha: number | null }> | null) ?? [];
   const hectares = concessionRows.reduce((acc, r) => acc + (Number(r.area_ha) || 0), 0);
-  const countries = new Set(projectRows.map((p: any) => p.country).filter(Boolean)).size;
+  const countries = new Set(projectRows.map((p) => p.country).filter(Boolean)).size;
   const topOpp = (opps.data as Array<{ score: number }> | null)?.[0]?.score ?? null;
 
   const stats: PlatformStats = {
@@ -81,7 +79,7 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
     dealsOpen: deals,
     opportunitiesScored: opps.count ?? 0,
     topOpportunityScore: topOpp,
-    featuredProjects: projectRows.map((p: any) => ({
+    featuredProjects: projectRows.map((p) => ({
       id: p.id,
       name: p.name,
       country: p.country,

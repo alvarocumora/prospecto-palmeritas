@@ -13,7 +13,11 @@ type Props = {
 
 const SEV_META: Record<IssueSeverity, { color: string; bg: string; icon: typeof AlertOctagon }> = {
   critical: { color: "text-red-300", bg: "bg-red-500/15 border-red-500/30", icon: AlertOctagon },
-  warning: { color: "text-amber-300", bg: "bg-amber-500/15 border-amber-500/30", icon: AlertTriangle },
+  warning: {
+    color: "text-amber-300",
+    bg: "bg-amber-500/15 border-amber-500/30",
+    icon: AlertTriangle,
+  },
   info: { color: "text-sky-300", bg: "bg-sky-500/15 border-sky-500/30", icon: Info },
 };
 
@@ -23,8 +27,8 @@ export function QAQCPanel({ result, busy, onClose }: Props) {
 
   const issues = useMemo(() => {
     if (!result) return [];
-    return result.issues.filter((i) =>
-      (sev === "all" || i.severity === sev) && (ds === "all" || i.dataset === ds),
+    return result.issues.filter(
+      (i) => (sev === "all" || i.severity === sev) && (ds === "all" || i.dataset === ds),
     );
   }, [result, sev, ds]);
 
@@ -46,7 +50,13 @@ export function QAQCPanel({ result, busy, onClose }: Props) {
           <AlertTriangle className="w-3.5 h-3.5" /> QA/QC · validación de sondajes
         </div>
         <div className="flex gap-1">
-          <Button size="sm" variant="outline" className="h-6 text-[10px]" onClick={downloadJson} disabled={!result}>
+          <Button
+            size="sm"
+            variant="outline"
+            className="h-6 text-[10px]"
+            onClick={downloadJson}
+            disabled={!result}
+          >
             <Download className="w-3 h-3 mr-1" /> JSON
           </Button>
           <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={onClose}>

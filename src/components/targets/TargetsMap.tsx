@@ -529,9 +529,7 @@ export function TargetsMap({
                   style={(feat): PathOptions => {
                     const type = feat?.properties?.concession_type ?? "explotacion";
                     const cssVar =
-                      type === "exploracion"
-                        ? "--catastro-exploracion"
-                        : "--catastro-explotacion";
+                      type === "exploracion" ? "--catastro-exploracion" : "--catastro-explotacion";
                     return {
                       color: `var(${cssVar})`,
                       weight: 1.5,

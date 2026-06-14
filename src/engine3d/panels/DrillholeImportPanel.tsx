@@ -15,10 +15,16 @@ type Props = {
 
 export function DrillholeImportPanel({ onImport, onClose }: Props) {
   const [texts, setTexts] = useState<Record<Kind, string | null>>({
-    collar: null, survey: null, assay: null, lithology: null,
+    collar: null,
+    survey: null,
+    assay: null,
+    lithology: null,
   });
   const [filenames, setFilenames] = useState<Record<Kind, string | null>>({
-    collar: null, survey: null, assay: null, lithology: null,
+    collar: null,
+    survey: null,
+    assay: null,
+    lithology: null,
   });
   const [bundle, setBundle] = useState<ParsedDrillholeBundle | null>(null);
 
@@ -69,11 +75,17 @@ export function DrillholeImportPanel({ onImport, onClose }: Props) {
         </div>
         <div className="p-4 space-y-3">
           {(["collar", "survey", "assay", "lithology"] as Kind[]).map((k) => (
-            <div key={k} className="flex items-center justify-between gap-3 border border-border/60 rounded p-2">
+            <div
+              key={k}
+              className="flex items-center justify-between gap-3 border border-border/60 rounded p-2"
+            >
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 <FileText className="w-3 h-3 text-muted-foreground shrink-0" />
                 <div className="min-w-0">
-                  <div className="uppercase text-foreground">{k}{k === "collar" && " *"}</div>
+                  <div className="uppercase text-foreground">
+                    {k}
+                    {k === "collar" && " *"}
+                  </div>
                   <div className="text-muted-foreground truncate text-[10px]">
                     {filenames[k] ?? "sin archivo"}
                   </div>
@@ -86,7 +98,12 @@ export function DrillholeImportPanel({ onImport, onClose }: Props) {
                 className="hidden"
                 onChange={(e) => onFile(k, e.target.files?.[0] ?? null)}
               />
-              <Button size="sm" variant="outline" className="h-7 text-[10px]" onClick={() => refs[k].current?.click()}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-[10px]"
+                onClick={() => refs[k].current?.click()}
+              >
                 Select
               </Button>
             </div>
@@ -125,7 +142,8 @@ export function DrillholeImportPanel({ onImport, onClose }: Props) {
             </Button>
           </div>
           <div className="text-[9px] text-muted-foreground italic">
-            Formato: hole_id, x/easting, y/northing, z/elevation (collar); hole_id, depth, azimuth, dip (survey); hole_id, from, to, grade (assay).
+            Formato: hole_id, x/easting, y/northing, z/elevation (collar); hole_id, depth, azimuth,
+            dip (survey); hole_id, from, to, grade (assay).
           </div>
         </div>
       </div>

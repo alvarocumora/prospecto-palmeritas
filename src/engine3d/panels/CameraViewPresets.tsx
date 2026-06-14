@@ -39,13 +39,25 @@ export function CameraViewPresets({ view, bounds, nonce }: Props) {
     const persp = camera as THREE.PerspectiveCamera;
     // En three: X=East, Y=Up, Z=South (porque mapeamos ENU.y → -Z)
     switch (view) {
-      case "N": persp.position.set(center.x, center.y + r * 0.15, center.z - r); break;
-      case "S": persp.position.set(center.x, center.y + r * 0.15, center.z + r); break;
-      case "E": persp.position.set(center.x + r, center.y + r * 0.15, center.z); break;
-      case "W": persp.position.set(center.x - r, center.y + r * 0.15, center.z); break;
-      case "top": persp.position.set(center.x, center.y + r * 1.2, center.z + 0.001); break;
+      case "N":
+        persp.position.set(center.x, center.y + r * 0.15, center.z - r);
+        break;
+      case "S":
+        persp.position.set(center.x, center.y + r * 0.15, center.z + r);
+        break;
+      case "E":
+        persp.position.set(center.x + r, center.y + r * 0.15, center.z);
+        break;
+      case "W":
+        persp.position.set(center.x - r, center.y + r * 0.15, center.z);
+        break;
+      case "top":
+        persp.position.set(center.x, center.y + r * 1.2, center.z + 0.001);
+        break;
       case "iso":
-      default: persp.position.set(center.x + r * 0.8, center.y + r * 0.7, center.z + r * 0.8); break;
+      default:
+        persp.position.set(center.x + r * 0.8, center.y + r * 0.7, center.z + r * 0.8);
+        break;
     }
     persp.near = Math.max(0.1, r / 5000);
     persp.far = Math.max(50_000, r * 8);

@@ -38,11 +38,17 @@ export function SatelliteAnalysisProgress({ progress, expectedRuns, expectedAnom
       <Progress value={displayed} className="h-1.5" />
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-muted-foreground">
         <span>
-          Índices <span className="text-foreground">{runsDone}/{expectedRuns}</span>
+          Índices{" "}
+          <span className="text-foreground">
+            {runsDone}/{expectedRuns}
+          </span>
         </span>
         <span>·</span>
         <span>
-          Anomalías <span className="text-foreground">{anomaliesDone}/{expectedAnomalies}</span>
+          Anomalías{" "}
+          <span className="text-foreground">
+            {anomaliesDone}/{expectedAnomalies}
+          </span>
         </span>
         {currentIndex && (
           <>

@@ -18,6 +18,7 @@ export type BlockFilters = {
   colorBy: "grade" | "classification" | "confidence";
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const DEFAULT_BLOCK_FILTERS: BlockFilters = {
   cutoff: 0.3,
   minDepth: 0,

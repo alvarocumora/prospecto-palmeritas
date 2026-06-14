@@ -29,7 +29,11 @@ export function ReportsPanel({ input, onClose }: Props) {
   const handleExport = (format: "json" | "html") => {
     const ts = new Date().toISOString().replace(/[:.]/g, "-");
     if (format === "json") {
-      downloadString(`mining-report-${ts}.json`, JSON.stringify(report, null, 2), "application/json");
+      downloadString(
+        `mining-report-${ts}.json`,
+        JSON.stringify(report, null, 2),
+        "application/json",
+      );
     } else {
       downloadString(`mining-report-${ts}.html`, renderReportHtml(report), "text/html");
     }
@@ -46,7 +50,12 @@ export function ReportsPanel({ input, onClose }: Props) {
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="ghost" className="h-7 text-[10px]" onClick={() => setGeneratedAt(new Date().toISOString())}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 text-[10px]"
+            onClick={() => setGeneratedAt(new Date().toISOString())}
+          >
             Refresh
           </Button>
           <button className="text-muted-foreground hover:text-foreground" onClick={onClose}>
@@ -61,16 +70,25 @@ export function ReportsPanel({ input, onClose }: Props) {
         </div>
         {report.sections.map((s) => (
           <section key={s.id}>
-            <div className="text-[11px] uppercase tracking-wider text-amber-200 mb-1">{s.title}</div>
+            <div className="text-[11px] uppercase tracking-wider text-amber-200 mb-1">
+              {s.title}
+            </div>
             <ul className="list-disc list-inside space-y-0.5 text-foreground/85 pl-1">
-              {s.body.map((b, i) => <li key={i}>{b}</li>)}
+              {s.body.map((b, i) => (
+                <li key={i}>{b}</li>
+              ))}
             </ul>
           </section>
         ))}
       </div>
 
       <div className="border-t border-border p-3 bg-black/40 flex gap-2">
-        <Button size="sm" variant="outline" className="flex-1 h-7 text-[10px]" onClick={() => handleExport("json")}>
+        <Button
+          size="sm"
+          variant="outline"
+          className="flex-1 h-7 text-[10px]"
+          onClick={() => handleExport("json")}
+        >
           <Code2 className="w-3 h-3 mr-1" /> Export JSON
         </Button>
         <Button size="sm" className="flex-1 h-7 text-[10px]" onClick={() => handleExport("html")}>

@@ -88,7 +88,9 @@ export function GeologicalMapPanel({ projects, selectedId, onSelect }: Props) {
     });
 
     if (valid.length > 0) {
-      const bounds = L.latLngBounds(valid.map((p) => [p.center_lat!, p.center_lng!] as [number, number]));
+      const bounds = L.latLngBounds(
+        valid.map((p) => [p.center_lat!, p.center_lng!] as [number, number]),
+      );
       map.fitBounds(bounds.pad(0.4), { maxZoom: 9, animate: false });
     }
   }, [projects, selectedId, onSelect]);

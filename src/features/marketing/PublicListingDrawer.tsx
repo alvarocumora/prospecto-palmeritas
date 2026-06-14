@@ -34,34 +34,55 @@ function Body({ listing }: { listing: PublicListing }) {
     <div className="flex flex-col">
       <div className="relative aspect-[16/9] bg-[var(--brand-blue-soft)] overflow-hidden">
         {listing.cover_image_url ? (
-          <img src={listing.cover_image_url} alt={listing.title} className="w-full h-full object-cover" />
+          <img
+            src={listing.cover_image_url}
+            alt={listing.title}
+            className="w-full h-full object-cover"
+          />
         ) : (
-          <div className="w-full h-full grid place-items-center"><Mountain className="w-14 h-14 text-[var(--brand-blue)]/30" /></div>
+          <div className="w-full h-full grid place-items-center">
+            <Mountain className="w-14 h-14 text-[var(--brand-blue)]/30" />
+          </div>
         )}
         <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-[var(--brand-navy-deep)] text-[10px] font-mono uppercase tracking-wider border border-[var(--brand-hair)]">
-          {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality} · {STAGE_LABEL[listing.stage ?? ""] ?? listing.stage}
+          {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality} ·{" "}
+          {STAGE_LABEL[listing.stage ?? ""] ?? listing.stage}
         </div>
       </div>
 
       <div className="p-5 md:p-7">
         <SheetHeader>
           <SheetTitle asChild>
-            <h2 className="font-display text-2xl text-[var(--brand-navy-deep)] text-left">{listing.title}</h2>
+            <h2 className="font-display text-2xl text-[var(--brand-navy-deep)] text-left">
+              {listing.title}
+            </h2>
           </SheetTitle>
         </SheetHeader>
         {listing.code && (
-          <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[var(--brand-mute)]">{listing.code}</div>
+          <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[var(--brand-mute)]">
+            {listing.code}
+          </div>
         )}
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          <Kpi label="Precio / Términos" v={
-            listing.modality === "royalty" && listing.royalty_pct != null
-              ? `${listing.royalty_pct}% NSR`
-              : fmtUSD(listing.asking_price_usd)
-          } />
+          <Kpi
+            label="Precio / Términos"
+            v={
+              listing.modality === "royalty" && listing.royalty_pct != null
+                ? `${listing.royalty_pct}% NSR`
+                : fmtUSD(listing.asking_price_usd)
+            }
+          />
           <Kpi label="Commodity" v={listing.commodity ?? "—"} />
-          <Kpi label="Superficie" v={listing.area_ha != null ? `${listing.area_ha.toLocaleString("es-CL")} ha` : "—"} />
-          <Kpi label="Ubicación" v={[listing.region, listing.country].filter(Boolean).join(", ") || "—"} icon={<MapPin className="w-3.5 h-3.5" />} />
+          <Kpi
+            label="Superficie"
+            v={listing.area_ha != null ? `${listing.area_ha.toLocaleString("es-CL")} ha` : "—"}
+          />
+          <Kpi
+            label="Ubicación"
+            v={[listing.region, listing.country].filter(Boolean).join(", ") || "—"}
+            icon={<MapPin className="w-3.5 h-3.5" />}
+          />
         </div>
 
         {listing.summary && (
@@ -94,9 +115,12 @@ function Kpi({ label, v, icon }: { label: string; v: string; icon?: React.ReactN
   return (
     <div className="rounded-lg border border-[var(--brand-hair)] bg-[var(--brand-blue-soft)]/40 p-3">
       <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand-mute)] flex items-center gap-1">
-        {icon}{label}
+        {icon}
+        {label}
       </div>
-      <div className="mt-1 font-mono text-[14px] text-[var(--brand-navy-deep)] font-semibold truncate">{v}</div>
+      <div className="mt-1 font-mono text-[14px] text-[var(--brand-navy-deep)] font-semibold truncate">
+        {v}
+      </div>
     </div>
   );
 }
@@ -126,7 +150,9 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
         <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
         <div>
           <div className="font-display text-[15px] text-emerald-900">Solicitud enviada</div>
-          <p className="text-sm text-emerald-800/80 mt-1">Te contactaremos en menos de 24 h para coordinar acceso al data room.</p>
+          <p className="text-sm text-emerald-800/80 mt-1">
+            Te contactaremos en menos de 24 h para coordinar acceso al data room.
+          </p>
         </div>
       </div>
     );
@@ -134,29 +160,66 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
 
   return (
     <form
-      onSubmit={(e) => { e.preventDefault(); mut.mutate(); }}
+      onSubmit={(e) => {
+        e.preventDefault();
+        mut.mutate();
+      }}
       className="mt-7 rounded-xl border border-[var(--brand-hair)] bg-white p-5 space-y-3"
     >
       <div className="flex items-center gap-2">
         <Lock className="w-4 h-4 text-[var(--brand-blue)]" />
-        <div className="font-display text-[15px] text-[var(--brand-navy-deep)]">Solicitar acceso al data room</div>
+        <div className="font-display text-[15px] text-[var(--brand-navy-deep)]">
+          Solicitar acceso al data room
+        </div>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
-        <input required minLength={2} maxLength={200} className="brand-input" placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} />
-        <input required type="email" maxLength={320} className="brand-input" placeholder="Email corporativo" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input
+          required
+          minLength={2}
+          maxLength={200}
+          className="brand-input"
+          placeholder="Nombre"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+        <input
+          required
+          type="email"
+          maxLength={320}
+          className="brand-input"
+          placeholder="Email corporativo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
-      <input maxLength={200} className="brand-input" placeholder="Organización / Fondo (opcional)" value={org} onChange={(e) => setOrg(e.target.value)} />
+      <input
+        maxLength={200}
+        className="brand-input"
+        placeholder="Organización / Fondo (opcional)"
+        value={org}
+        onChange={(e) => setOrg(e.target.value)}
+      />
       {mut.isError && (
-        <div className="text-sm text-red-600">{(mut.error as Error)?.message ?? "Error al enviar."}</div>
+        <div className="text-sm text-red-600">
+          {(mut.error as Error)?.message ?? "Error al enviar."}
+        </div>
       )}
       <button
         type="submit"
         disabled={mut.isPending}
         className="w-full inline-flex items-center justify-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
       >
-        {mut.isPending ? "Enviando…" : (<>Solicitar acceso <ArrowRight className="w-4 h-4" /></>)}
+        {mut.isPending ? (
+          "Enviando…"
+        ) : (
+          <>
+            Solicitar acceso <ArrowRight className="w-4 h-4" />
+          </>
+        )}
       </button>
-      <p className="text-[11px] font-mono text-[var(--brand-mute)] text-center">Bajo NDA · Verificación KYC institucional.</p>
+      <p className="text-[11px] font-mono text-[var(--brand-mute)] text-center">
+        Bajo NDA · Verificación KYC institucional.
+      </p>
     </form>
   );
 }

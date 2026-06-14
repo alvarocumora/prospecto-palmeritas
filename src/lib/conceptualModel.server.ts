@@ -14,7 +14,8 @@ proj4.defs("EPSG:32719", "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_de
 // PRNG determinístico para repetibilidad
 function mulberry32(a: number) {
   return function () {
-    a |= 0; a = (a + 0x6d2b79f5) | 0;
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
     let t = a;
     t = Math.imul(t ^ (t >>> 15), t | 1);
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
@@ -22,7 +23,8 @@ function mulberry32(a: number) {
   };
 }
 function gauss(rng: () => number): number {
-  const u = Math.max(1e-9, rng()), v = rng();
+  const u = Math.max(1e-9, rng()),
+    v = rng();
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 
@@ -30,13 +32,13 @@ type LngLat = [number, number];
 
 export type GenerateOpts = {
   projectId: string;
-  holesPerVein?: number;       // default 3
-  maxAnomalyHoles?: number;    // default 10
-  depthMin?: number;           // 180
-  depthMax?: number;           // 350
-  blockSize?: number;          // 15 (m)
-  blockSizeZ?: number;         // 10 (m)
-  domainPadM?: number;         // 200 m padding alrededor de collares
+  holesPerVein?: number; // default 3
+  maxAnomalyHoles?: number; // default 10
+  depthMin?: number; // 180
+  depthMax?: number; // 350
+  blockSize?: number; // 15 (m)
+  blockSizeZ?: number; // 10 (m)
+  domainPadM?: number; // 200 m padding alrededor de collares
 };
 
 export type GenerateReport = {
@@ -50,7 +52,7 @@ export type GenerateReport = {
 };
 
 const COMMODITY_PRICE_USD_PER_PCT_TONNE = {
-  cu: 75,   // ~USD por % Cu por tonelada (estimación gruesa con precio 9000 USD/t y recovery 90%)
+  cu: 75, // ~USD por % Cu por tonelada (estimación gruesa con precio 9000 USD/t y recovery 90%)
   au_gpt: 50, // USD por g/t Au por tonelada (~$60/g recovery 0.8)
   ag_gpt: 0.6,
 };
@@ -84,37 +86,59 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
 
   // 1. Cargar fuentes reales: proyecto, anomalías, vetas, targets
   const [projRes, satRes, veinsRes] = await Promise.all([
-    supabaseAdmin.from("projects").select("center_lng, center_lat").eq("id", projectId).maybeSingle(),
-    supabaseAdmin.from("satellite_anomalies").select("id, bbox, score, severity, area_ha").eq("project_id", projectId),
-    supabaseAdmin.from("veins").select("id, code, name, strike_deg, dip_deg, dip_dir_deg, thickness_m, depth_top_m, depth_bottom_m, grade_estimate, geometry").eq("project_id", projectId),
+    supabaseAdmin
+      .from("projects")
+      .select("center_lng, center_lat")
+      .eq("id", projectId)
+      .maybeSingle(),
+    supabaseAdmin
+      .from("satellite_anomalies")
+      .select("id, bbox, score, severity, area_ha")
+      .eq("project_id", projectId),
+    supabaseAdmin
+      .from("veins")
+      .select(
+        "id, code, name, strike_deg, dip_deg, dip_dir_deg, thickness_m, depth_top_m, depth_bottom_m, grade_estimate, geometry",
+      )
+      .eq("project_id", projectId),
   ]);
 
   if (!projRes.data) throw new Error(`Project ${projectId} not found`);
   const centerLng = Number(projRes.data.center_lng);
   const centerLat = Number(projRes.data.center_lat);
-  const [centerX, centerY] = toUtm(centerLng, centerLat);
+  const [_centerX, _centerY] = toUtm(centerLng, centerLat);
   const seed = projectId.split("-").reduce((a, p) => a + parseInt(p.slice(0, 4) || "0", 16), 0);
   const rng = mulberry32(seed);
 
   // 2. Generar collares de sondajes
   type Hole = {
     code: string;
-    x: number; y: number; z: number; // UTM
-    az: number; dip: number; depth: number;
+    x: number;
+    y: number;
+    z: number; // UTM
+    az: number;
+    dip: number;
+    depth: number;
     fromKind: "vein" | "anomaly" | "target";
     fromId: string;
     mineralizedFromM: number;
     mineralizedToM: number;
-    targetCu: number;   // ley máxima esperada (%)
-    targetAu: number;   // g/t
-    halfWidth: number;  // espesor (m) de la zona mineralizada
+    targetCu: number; // ley máxima esperada (%)
+    targetAu: number; // g/t
+    halfWidth: number; // espesor (m) de la zona mineralizada
   };
   const holes: Hole[] = [];
 
   const veins = (veinsRes.data ?? []) as Array<{
-    id: string; code: string; name: string;
-    strike_deg: number | null; dip_deg: number | null; dip_dir_deg: number | null;
-    thickness_m: number | null; depth_top_m: number | null; depth_bottom_m: number | null;
+    id: string;
+    code: string;
+    name: string;
+    strike_deg: number | null;
+    dip_deg: number | null;
+    dip_dir_deg: number | null;
+    thickness_m: number | null;
+    depth_top_m: number | null;
+    depth_bottom_m: number | null;
     grade_estimate: Record<string, number> | null;
     geometry: { type: string; coordinates: LngLat[] } | null;
   }>;
@@ -127,7 +151,7 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     const coords = v.geometry.coordinates;
     const strike = v.strike_deg ?? 0;
     const dip = -(v.dip_deg ?? 60); // dip positivo en BD → trayectoria hacia abajo
-    const dipDir = v.dip_dir_deg ?? (strike + 90); // dirección de buzamiento
+    const dipDir = v.dip_dir_deg ?? strike + 90; // dirección de buzamiento
     const thickness = v.thickness_m ?? 2;
     const depthTop = v.depth_top_m ?? 30;
     const depthBot = v.depth_bottom_m ?? 200;
@@ -154,18 +178,23 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
       const collarZ = 1200 + (rng() - 0.5) * 80; // elev aprox Tilama (~1200 m snm)
       const depth = depthMin + rng() * (depthMax - depthMin);
       // intersección estimada con la veta
-      const interFrom = depthTop / Math.sin(Math.abs(dip) * Math.PI / 180);
-      const interTo = Math.min(depth, depthBot / Math.sin(Math.abs(dip) * Math.PI / 180));
+      const interFrom = depthTop / Math.sin((Math.abs(dip) * Math.PI) / 180);
+      const interTo = Math.min(depth, depthBot / Math.sin((Math.abs(dip) * Math.PI) / 180));
 
       holes.push({
         code: `LV-VEIN-${String(holeIdx).padStart(3, "0")}`,
-        x: hx + ox, y: hy + oy, z: collarZ,
-        az: dipDir, dip,
+        x: hx + ox,
+        y: hy + oy,
+        z: collarZ,
+        az: dipDir,
+        dip,
         depth,
-        fromKind: "vein", fromId: v.id,
+        fromKind: "vein",
+        fromId: v.id,
         mineralizedFromM: Math.max(10, interFrom - thickness),
         mineralizedToM: Math.min(depth - 5, interTo + thickness),
-        targetCu: gradeCu, targetAu: gradeAu,
+        targetCu: gradeCu,
+        targetAu: gradeAu,
         halfWidth: thickness * 1.2,
       });
       holeIdx++;
@@ -180,7 +209,8 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
       const lat = bb.length >= 4 ? (Number(bb[1]) + Number(bb[3])) / 2 : NaN;
       return {
         id: s.id as string,
-        lng, lat,
+        lng,
+        lat,
         score: Number(s.score ?? 0.5),
         severity: s.severity as string | null,
         area_ha: Number(s.area_ha ?? 1),
@@ -203,10 +233,14 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     const mineralizedEnd = mineralizedStart + 40 + rng() * 80;
     holes.push({
       code: `LV-SAT-${String(holeIdx).padStart(3, "0")}`,
-      x: hx, y: hy, z: collarZ,
-      az, dip: dipAng,
+      x: hx,
+      y: hy,
+      z: collarZ,
+      az,
+      dip: dipAng,
       depth,
-      fromKind: "anomaly", fromId: s.id,
+      fromKind: "anomaly",
+      fromId: s.id,
       mineralizedFromM: mineralizedStart,
       mineralizedToM: Math.min(depth - 5, mineralizedEnd),
       targetCu: Math.max(0.15, targetCu),
@@ -216,13 +250,21 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     holeIdx++;
   }
 
-  if (holes.length === 0) throw new Error("No source data (veins/anomalies) to seed conceptual model");
+  if (holes.length === 0)
+    throw new Error("No source data (veins/anomalies) to seed conceptual model");
 
   // 3. Desurvey + assays
   type AssayRow = {
-    hole_id: string; from_m: number; to_m: number;
-    cu_pct: number; au_gpt: number; ag_gpt: number; mo_pct: number;
-    lithology: string; alteration: string; mineralized: boolean;
+    hole_id: string;
+    from_m: number;
+    to_m: number;
+    cu_pct: number;
+    au_gpt: number;
+    ag_gpt: number;
+    mo_pct: number;
+    lithology: string;
+    alteration: string;
+    mineralized: boolean;
   };
   type DesurveyPoint = { x: number; y: number; z: number; cuEq: number; conf: number };
   const allDesurveyPoints: DesurveyPoint[] = [];
@@ -230,9 +272,16 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     id?: string;
     project_id: string;
     hole_code: string;
-    collar_x_utm: number; collar_y_utm: number; collar_z_m: number;
-    utm_zone: number; azimuth_deg: number; dip_deg: number; depth_m: number;
-    source: string; generated_from_kind: string; generated_from_id: string;
+    collar_x_utm: number;
+    collar_y_utm: number;
+    collar_z_m: number;
+    utm_zone: number;
+    azimuth_deg: number;
+    dip_deg: number;
+    depth_m: number;
+    source: string;
+    generated_from_kind: string;
+    generated_from_id: string;
     is_conceptual: boolean;
     meta: Record<string, unknown>;
   }> = [];
@@ -246,8 +295,13 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     holeInserts.push({
       project_id: projectId,
       hole_code: h.code,
-      collar_x_utm: h.x, collar_y_utm: h.y, collar_z_m: h.z,
-      utm_zone: 19, azimuth_deg: h.az, dip_deg: h.dip, depth_m: h.depth,
+      collar_x_utm: h.x,
+      collar_y_utm: h.y,
+      collar_z_m: h.z,
+      utm_zone: 19,
+      azimuth_deg: h.az,
+      dip_deg: h.dip,
+      depth_m: h.depth,
       source: "ai_target_v1",
       generated_from_kind: h.fromKind,
       generated_from_id: h.fromId,
@@ -292,20 +346,33 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
 
       // ley log-normal con caída suave
       const noise = Math.exp(gauss(rng) * 0.35);
-      const cu = isMin ? Math.max(0.02, h.targetCu * t * noise) : 0.005 + Math.abs(gauss(rng)) * 0.02;
-      const au = isMin ? Math.max(0.01, h.targetAu * t * noise * (0.7 + rng() * 0.6)) : 0.005 + Math.abs(gauss(rng)) * 0.02;
+      const cu = isMin
+        ? Math.max(0.02, h.targetCu * t * noise)
+        : 0.005 + Math.abs(gauss(rng)) * 0.02;
+      const au = isMin
+        ? Math.max(0.01, h.targetAu * t * noise * (0.7 + rng() * 0.6))
+        : 0.005 + Math.abs(gauss(rng)) * 0.02;
       const ag = isMin ? cu * (4 + rng() * 8) : Math.abs(gauss(rng)) * 0.5;
       const mo = isMin ? cu * 0.02 * (0.5 + rng()) : 0;
 
-      const lithology = isMin ? (h.fromKind === "vein" ? "Andesita silicificada" : "Pórfido cuarzo-diorítico") : "Andesita propilítica";
+      const lithology = isMin
+        ? h.fromKind === "vein"
+          ? "Andesita silicificada"
+          : "Pórfido cuarzo-diorítico"
+        : "Andesita propilítica";
       const alteration = isMin ? (rng() > 0.4 ? "Sericita-cuarzo" : "K-silicato") : "Propilítica";
 
       assayRows.push({
         hole_id: dbId,
-        from_m: fromM, to_m: toM,
-        cu_pct: +cu.toFixed(3), au_gpt: +au.toFixed(3),
-        ag_gpt: +ag.toFixed(2), mo_pct: +mo.toFixed(3),
-        lithology, alteration, mineralized: isMin,
+        from_m: fromM,
+        to_m: toM,
+        cu_pct: +cu.toFixed(3),
+        au_gpt: +au.toFixed(3),
+        ag_gpt: +ag.toFixed(2),
+        mo_pct: +mo.toFixed(3),
+        lithology,
+        alteration,
+        mineralized: isMin,
       });
 
       if (isMin) {
@@ -326,8 +393,11 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   // 4. IDW block model
   if (allDesurveyPoints.length === 0) {
     return {
-      projectId, drillholes: holes.length, assays: assayRows.length,
-      blocks: 0, pitShells: 0,
+      projectId,
+      drillholes: holes.length,
+      assays: assayRows.length,
+      blocks: 0,
+      pitShells: 0,
       bounds: { minX: 0, maxX: 0, minY: 0, maxY: 0, minZ: 0, maxZ: 0 },
       centerLngLat: { lng: centerLng, lat: centerLat },
     };
@@ -354,9 +424,17 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   const SEARCH = 80;
   const blockRows: Array<{
     project_id: string;
-    x_utm: number; y_utm: number; z_m: number;
-    size_x: number; size_y: number; size_z: number;
-    cu_eq_pct: number; confidence: number; domain: string; method: string; version: number;
+    x_utm: number;
+    y_utm: number;
+    z_m: number;
+    size_x: number;
+    size_y: number;
+    size_z: number;
+    cu_eq_pct: number;
+    confidence: number;
+    domain: string;
+    method: string;
+    version: number;
   }> = [];
 
   // Index espacial simple por celda 80m
@@ -369,7 +447,8 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
     const gz = Math.floor(p.z / cellSize);
     const k = cellKey(gx, gy, gz);
     const arr = grid.get(k) ?? [];
-    arr.push(p); grid.set(k, arr);
+    arr.push(p);
+    grid.set(k, arr);
   }
 
   for (let i = 0; i < nx; i++) {
@@ -379,7 +458,9 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
         const cy = minY + (j + 0.5) * sy;
         const cz = minZ + (k + 0.5) * sz;
         // recolectar puntos vecinos
-        const gx0 = Math.floor(cx / cellSize), gy0 = Math.floor(cy / cellSize), gz0 = Math.floor(cz / cellSize);
+        const gx0 = Math.floor(cx / cellSize),
+          gy0 = Math.floor(cy / cellSize),
+          gz0 = Math.floor(cz / cellSize);
         const nbrs: DesurveyPoint[] = [];
         for (let dx = -1; dx <= 1; dx++)
           for (let dy = -1; dy <= 1; dy++)
@@ -389,10 +470,20 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
             }
         if (nbrs.length === 0) continue;
         // ordenar por distancia y tomar 8
-        nbrs.sort((a, b) => ((a.x - cx) ** 2 + (a.y - cy) ** 2 + (a.z - cz) ** 2) - ((b.x - cx) ** 2 + (b.y - cy) ** 2 + (b.z - cz) ** 2));
-        const top = nbrs.slice(0, 8).filter((p) => (p.x - cx) ** 2 + (p.y - cy) ** 2 + (p.z - cz) ** 2 < SEARCH * SEARCH);
+        nbrs.sort(
+          (a, b) =>
+            (a.x - cx) ** 2 +
+            (a.y - cy) ** 2 +
+            (a.z - cz) ** 2 -
+            ((b.x - cx) ** 2 + (b.y - cy) ** 2 + (b.z - cz) ** 2),
+        );
+        const top = nbrs
+          .slice(0, 8)
+          .filter((p) => (p.x - cx) ** 2 + (p.y - cy) ** 2 + (p.z - cz) ** 2 < SEARCH * SEARCH);
         if (top.length === 0) continue;
-        let num = 0, den = 0, confSum = 0;
+        let num = 0,
+          den = 0,
+          confSum = 0;
         for (const p of top) {
           const d2 = (p.x - cx) ** 2 + (p.y - cy) ** 2 + (p.z - cz) ** 2;
           const w = 1 / (d2 + 1);
@@ -405,8 +496,12 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
         const conf = Math.min(1, (confSum / den) * Math.min(1, top.length / 4));
         blockRows.push({
           project_id: projectId,
-          x_utm: cx, y_utm: cy, z_m: cz,
-          size_x: sx, size_y: sy, size_z: sz,
+          x_utm: cx,
+          y_utm: cy,
+          z_m: cz,
+          size_x: sx,
+          size_y: sy,
+          size_z: sz,
           cu_eq_pct: +cuEq.toFixed(4),
           confidence: +conf.toFixed(3),
           domain: cuEq > 0.6 ? "high-grade" : cuEq > 0.3 ? "mineralized" : "halo",
@@ -427,7 +522,14 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   // 5. Pit shells (floating cone simplificado por revenue factor)
   // Para cada bloque "ore" (cuEq > cutoff * RF), expandir cono 45° hacia arriba.
   // Aproximación: shell = mínimo Z(i,j) sobre todos los conos.
-  type Shell = { rf: number; pitTop: number[][]; tonnage: number; gradeAvg: number; strip: number; npv: number };
+  type Shell = {
+    rf: number;
+    pitTop: number[][];
+    tonnage: number;
+    gradeAvg: number;
+    strip: number;
+    npv: number;
+  };
   const shells: Shell[] = [];
   const DENSITY = 2.7; // t/m3
   const blockVol = sx * sy * sz; // m3
@@ -437,7 +539,9 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   for (const rf of [0.4, 0.6, 0.8, 1.0]) {
     const cutoff = CUTOFF_CU_EQ / rf;
     const pitTop: number[][] = Array.from({ length: nx }, () => Array(ny).fill(maxZ));
-    let oreTon = 0, gradeSum = 0, wasteTon = 0;
+    let oreTon = 0,
+      gradeSum = 0,
+      wasteTon = 0;
     // sort blocks descending cuEq
     for (const b of blockRows) {
       if (b.cu_eq_pct < cutoff) continue;
@@ -449,7 +553,8 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
       const maxRange = Math.ceil((maxZ - topZ) / Math.min(sx, sy));
       for (let di = -maxRange; di <= maxRange; di++) {
         for (let dj = -maxRange; dj <= maxRange; dj++) {
-          const ii = i + di, jj = j + dj;
+          const ii = i + di,
+            jj = j + dj;
           if (ii < 0 || ii >= nx || jj < 0 || jj >= ny) continue;
           const horiz = Math.sqrt((di * sx) ** 2 + (dj * sy) ** 2);
           const reqZ = topZ + horiz; // 45°
@@ -496,12 +601,18 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
         const zb = positions[b * 3 + 2];
         const zc = positions[c * 3 + 2];
         const zd = positions[d * 3 + 2];
-        if (za >= maxZ - 0.001 && zb >= maxZ - 0.001 && zc >= maxZ - 0.001 && zd >= maxZ - 0.001) continue;
+        if (za >= maxZ - 0.001 && zb >= maxZ - 0.001 && zc >= maxZ - 0.001 && zd >= maxZ - 0.001)
+          continue;
         indices.push(a, b, c, a, c, d);
       }
     }
     shells.push({
-      rf, pitTop, tonnage: tonMt, gradeAvg, strip, npv,
+      rf,
+      pitTop,
+      tonnage: tonMt,
+      gradeAvg,
+      strip,
+      npv,
     });
     const r = await supabaseAdmin.from("pit_shells").insert({
       project_id: projectId,

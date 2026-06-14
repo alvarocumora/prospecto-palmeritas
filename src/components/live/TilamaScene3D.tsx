@@ -6,11 +6,7 @@
 import { useEffect, useRef } from "react";
 import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import type {
-  TilamaConcession,
-  TilamaSatAnomaly,
-  TilamaTarget,
-} from "@/lib/tilama.functions";
+import type { TilamaConcession, TilamaSatAnomaly, TilamaTarget } from "@/lib/tilama.functions";
 
 const BASE_STYLE: maplibregl.StyleSpecification = {
   version: 8,
@@ -109,9 +105,12 @@ export function TilamaScene3D({
           "fill-extrusion-color": [
             "match",
             ["get", "severity"],
-            "high", "#ef4444",
-            "medium", "#f59e0b",
-            "low", "#eab308",
+            "high",
+            "#ef4444",
+            "medium",
+            "#f59e0b",
+            "low",
+            "#eab308",
             "#f59e0b",
           ],
           "fill-extrusion-height": ["get", "height"],
@@ -173,10 +172,7 @@ export function TilamaScene3D({
         type: "circle",
         source: "targets",
         paint: {
-          "circle-radius": [
-            "interpolate", ["linear"], ["get", "score"],
-            0, 4, 50, 6, 100, 10,
-          ],
+          "circle-radius": ["interpolate", ["linear"], ["get", "score"], 0, 4, 50, 6, 100, 10],
           "circle-color": ["get", "color"],
           "circle-stroke-color": "#ffffff",
           "circle-stroke-width": 1.2,
@@ -229,10 +225,18 @@ export function TilamaScene3D({
         <div>DEM real · Anomalías extruidas · Catastro</div>
       </div>
       <div className="absolute bottom-3 left-3 bg-bg-secondary/95 backdrop-blur border border-border rounded px-3 py-2 text-[10px] font-mono z-10 space-y-1">
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Anomalía alta</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Anomalía media</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-sm border border-[#22d3ee]" /> Concesión minera</div>
-        <div className="flex items-center gap-2"><span className="w-3 h-3 rounded-full bg-[#dc2626]" /> Target crítico</div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#ef4444]" /> Anomalía alta
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm bg-[#f59e0b]" /> Anomalía media
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-sm border border-[#22d3ee]" /> Concesión minera
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="w-3 h-3 rounded-full bg-[#dc2626]" /> Target crítico
+        </div>
       </div>
     </div>
   );

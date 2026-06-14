@@ -12,6 +12,11 @@ vi.mock("@/components/geology3d/SatToSubsurface3DViewer", () => ({
 vi.mock("@/features/mag3d/MagAnomaly3DPro", () => ({
   MagAnomaly3DPro: () => <div data-testid="mag-viewer" />,
 }));
+// SceneCopilot pulls in useProjects/useAuth which need providers the smoke test
+// does not set up; stub it so we only exercise the GeoScene3D shell.
+vi.mock("./SceneCopilot", () => ({
+  SceneCopilot: () => <div data-testid="scene-copilot" />,
+}));
 
 describe("GeoScene3D", () => {
   it("renders mode tabs by default", () => {

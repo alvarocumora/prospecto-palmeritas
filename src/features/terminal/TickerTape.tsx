@@ -18,7 +18,9 @@ export function TickerTape() {
     <div className="h-10 border-b border-border bg-background/95 flex items-center overflow-x-auto">
       <div className="flex items-center divide-x divide-border h-full">
         {items.length === 0 && (
-          <span className="px-3 text-[10px] font-mono text-muted-foreground">cargando mercado…</span>
+          <span className="px-3 text-[10px] font-mono text-muted-foreground">
+            cargando mercado…
+          </span>
         )}
         {items.map((t) => {
           const positive = t.change_pct >= 0;
@@ -37,7 +39,11 @@ export function TickerTape() {
                   positive ? "text-signal-green" : "text-signal-red",
                 )}
               >
-                {positive ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                {positive ? (
+                  <ArrowUpRight className="w-3 h-3" />
+                ) : (
+                  <ArrowDownRight className="w-3 h-3" />
+                )}
                 {positive ? "+" : ""}
                 {t.change_pct.toFixed(2)}%
               </span>

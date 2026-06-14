@@ -22,10 +22,7 @@ function generateToken(): string {
     .join("");
 }
 
-async function ensureUnsubscribeToken(
-  admin: SupabaseClient,
-  email: string,
-): Promise<string> {
+async function ensureUnsubscribeToken(admin: SupabaseClient, email: string): Promise<string> {
   const { data: existing } = await admin
     .from("email_unsubscribe_tokens")
     .select("token, used_at")
@@ -33,9 +30,7 @@ async function ensureUnsubscribeToken(
     .maybeSingle();
   if (existing?.token && !existing.used_at) return existing.token;
   const token = generateToken();
-  await admin
-    .from("email_unsubscribe_tokens")
-    .upsert({ email, token }, { onConflict: "email" });
+  await admin.from("email_unsubscribe_tokens").upsert({ email, token }, { onConflict: "email" });
   const { data: stored } = await admin
     .from("email_unsubscribe_tokens")
     .select("token")
@@ -56,7 +51,9 @@ interface SendArgs {
  * Use from cron routes, server functions, or trusted server-side callers.
  * Skips already-sent (idempotencyKey) and suppressed addresses.
  */
-export async function sendInternalEmail(args: SendArgs): Promise<
+export async function sendInternalEmail(
+  args: SendArgs,
+): Promise<
   | { ok: true; messageId: string; queued: true }
   | { ok: true; queued: false; reason: string }
   | { ok: false; error: string }

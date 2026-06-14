@@ -12,13 +12,15 @@ type Props = {
   onError?: (msg: string) => void;
 };
 
-class FxBoundary extends Component<{ children: ReactNode; onError?: (msg: string) => void }, { failed: boolean }> {
+class FxBoundary extends Component<
+  { children: ReactNode; onError?: (msg: string) => void },
+  { failed: boolean }
+> {
   state = { failed: false };
   static getDerivedStateFromError() {
     return { failed: true };
   }
   componentDidCatch(err: Error) {
-    // eslint-disable-next-line no-console
     console.warn("[CinematicEffects] disabled — postprocessing crashed:", err?.message);
     this.props.onError?.(err?.message ?? "postprocessing error");
   }
@@ -51,7 +53,9 @@ function Inner({ intensity }: { intensity: "soft" | "medium" | "strong" }) {
           worldProximityThreshold={6}
           worldProximityFalloff={2}
         />
-      ) : <></>}
+      ) : (
+        <></>
+      )}
       <Bloom
         luminanceThreshold={0.35}
         luminanceSmoothing={0.8}

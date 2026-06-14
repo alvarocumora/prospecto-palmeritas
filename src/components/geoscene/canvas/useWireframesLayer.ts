@@ -61,8 +61,7 @@ export function useWireframesLayer(
           positions: { value: positions, size: 3 },
           indices: { value: indices, size: 1 },
         };
-        const color =
-          COMMODITY_COLOR[(w.commodity ?? "").toLowerCase()] ?? COMMODITY_COLOR.default;
+        const color = COMMODITY_COLOR[(w.commodity ?? "").toLowerCase()] ?? COMMODITY_COLOR.default;
         return { id: w.id, name: w.name, mesh, color };
       });
   }, [wireframes, centerLng, centerLat, visible]);

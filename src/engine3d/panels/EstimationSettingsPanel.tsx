@@ -63,22 +63,58 @@ export function EstimationSettingsPanel({ value, onChange, onClose }: Props) {
 
       <div className="flex-1 overflow-y-auto px-3 py-3 grid grid-cols-2 gap-x-4 gap-y-3">
         <Field label={`IDW power · ${value.idwPower.toFixed(2)}`}>
-          <Slider min={0.5} max={6} step={0.1} value={[value.idwPower]} onValueChange={([v]) => patch("idwPower", v)} />
+          <Slider
+            min={0.5}
+            max={6}
+            step={0.1}
+            value={[value.idwPower]}
+            onValueChange={([v]) => patch("idwPower", v)}
+          />
         </Field>
         <Field label={`Search radius · ${value.searchRadius} m`}>
-          <Slider min={20} max={500} step={10} value={[value.searchRadius]} onValueChange={([v]) => patch("searchRadius", v)} />
+          <Slider
+            min={20}
+            max={500}
+            step={10}
+            value={[value.searchRadius]}
+            onValueChange={([v]) => patch("searchRadius", v)}
+          />
         </Field>
         <Field label={`Min samples · ${value.minSamples}`}>
-          <Slider min={1} max={10} step={1} value={[value.minSamples]} onValueChange={([v]) => patch("minSamples", v)} />
+          <Slider
+            min={1}
+            max={10}
+            step={1}
+            value={[value.minSamples]}
+            onValueChange={([v]) => patch("minSamples", v)}
+          />
         </Field>
         <Field label={`Max samples · ${value.maxSamples}`}>
-          <Slider min={2} max={30} step={1} value={[value.maxSamples]} onValueChange={([v]) => patch("maxSamples", v)} />
+          <Slider
+            min={2}
+            max={30}
+            step={1}
+            value={[value.maxSamples]}
+            onValueChange={([v]) => patch("maxSamples", v)}
+          />
         </Field>
         <Field label={`Cutoff · ${value.cutoff.toFixed(2)}`}>
-          <Slider min={0} max={10} step={0.05} value={[value.cutoff]} onValueChange={([v]) => patch("cutoff", v)} />
+          <Slider
+            min={0}
+            max={10}
+            step={0.05}
+            value={[value.cutoff]}
+            onValueChange={([v]) => patch("cutoff", v)}
+          />
         </Field>
         <Field label={`Densidad default · ${value.defaultDensity.toFixed(2)} t/m³`}>
-          <Slider min={1.5} max={5} step={0.05} value={[value.defaultDensity]} onValueChange={([v]) => patch("defaultDensity", v)} />
+          <Slider
+            min={1.5}
+            max={5}
+            step={0.05}
+            value={[value.defaultDensity]}
+            onValueChange={([v]) => patch("defaultDensity", v)}
+          />
         </Field>
 
         <div className="col-span-2">
@@ -86,9 +122,13 @@ export function EstimationSettingsPanel({ value, onChange, onClose }: Props) {
           <div className="grid grid-cols-3 gap-2 mt-1">
             {(["rx", "ry", "rz"] as const).map((k) => (
               <div key={k}>
-                <div className="text-[9px] text-muted-foreground">{k} · {value.anisotropy[k].toFixed(2)}</div>
+                <div className="text-[9px] text-muted-foreground">
+                  {k} · {value.anisotropy[k].toFixed(2)}
+                </div>
                 <Slider
-                  min={0.1} max={3} step={0.05}
+                  min={0.1}
+                  max={3}
+                  step={0.05}
                   value={[value.anisotropy[k]]}
                   onValueChange={([v]) => patch("anisotropy", { ...value.anisotropy, [k]: v })}
                 />
@@ -129,7 +169,12 @@ export function EstimationSettingsPanel({ value, onChange, onClose }: Props) {
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
-            <Button size="sm" className="h-7 text-[10px]" onClick={handleSave} disabled={!name.trim()}>
+            <Button
+              size="sm"
+              className="h-7 text-[10px]"
+              onClick={handleSave}
+              disabled={!name.trim()}
+            >
               <Save className="w-3 h-3 mr-1" /> Save
             </Button>
             <Button
@@ -146,18 +191,32 @@ export function EstimationSettingsPanel({ value, onChange, onClose }: Props) {
               <div className="text-muted-foreground text-[10px]">Sin presets guardados.</div>
             )}
             {presets.map((p) => (
-              <div key={p.id} className="flex items-center justify-between border border-border/60 rounded px-2 py-1">
+              <div
+                key={p.id}
+                className="flex items-center justify-between border border-border/60 rounded px-2 py-1"
+              >
                 <div>
                   <div className="text-foreground text-[11px]">{p.name}</div>
                   <div className="text-muted-foreground text-[9px]">
-                    {new Date(p.createdAt).toLocaleString()} · IDW {p.settings.idwPower} · R {p.settings.searchRadius}m
+                    {new Date(p.createdAt).toLocaleString()} · IDW {p.settings.idwPower} · R{" "}
+                    {p.settings.searchRadius}m
                   </div>
                 </div>
                 <div className="flex gap-1">
-                  <Button size="sm" variant="outline" className="h-6 text-[10px]" onClick={() => handleLoad(p)}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-6 text-[10px]"
+                    onClick={() => handleLoad(p)}
+                  >
                     <FolderOpen className="w-3 h-3 mr-1" /> Load
                   </Button>
-                  <Button size="sm" variant="ghost" className="h-6 w-6 p-0 text-red-400" onClick={() => handleDelete(p.id)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="h-6 w-6 p-0 text-red-400"
+                    onClick={() => handleDelete(p.id)}
+                  >
                     <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>

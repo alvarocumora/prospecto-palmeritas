@@ -25,15 +25,24 @@ type Props = {
 };
 
 export function BasemapLayer({
-  source, centerLng, centerLat, extentMeters,
-  opacity, demMesh, yOffset = 0.5, onStatus,
+  source,
+  centerLng,
+  centerLat,
+  extentMeters,
+  opacity,
+  demMesh,
+  yOffset = 0.5,
+  onStatus,
 }: Props) {
   const [grid, setGrid] = useState<TileGrid | null>(null);
   const [loading, setLoading] = useState(false);
   const failedFallbackRef = useRef(false);
 
   useEffect(() => {
-    if (source === "none") { setGrid(null); return; }
+    if (source === "none") {
+      setGrid(null);
+      return;
+    }
     let cancelled = false;
     setLoading(true);
     failedFallbackRef.current = false;
@@ -52,7 +61,9 @@ export function BasemapLayer({
       setLoading(false);
       if (g) onStatus?.({ source: g.source, failed: g.failed, zoom: g.zoom });
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [source, centerLng, centerLat, extentMeters, onStatus]);
 
   const texture = useMemo(() => {
@@ -66,7 +77,12 @@ export function BasemapLayer({
     return tex;
   }, [grid]);
 
-  useEffect(() => () => { texture?.dispose(); }, [texture]);
+  useEffect(
+    () => () => {
+      texture?.dispose();
+    },
+    [texture],
+  );
 
   // Geometría: drape sobre DEM si existe, si no plano horizontal
   const geometry = useMemo(() => {
@@ -82,12 +98,12 @@ export function BasemapLayer({
       const n = pos.length / 3;
       const uvs = new Float32Array(n * 2);
       for (let i = 0; i < n; i++) {
-        const wx = pos[i*3];
-        const wz = pos[i*3+2];
+        const wx = pos[i * 3];
+        const wz = pos[i * 3 + 2];
         const enuX = wx;
         const enuY = -wz;
-        uvs[i*2]   = (enuX - grid.enuMinX) / cw;
-        uvs[i*2+1] = (enuY - grid.enuMinY) / ch;
+        uvs[i * 2] = (enuX - grid.enuMinX) / cw;
+        uvs[i * 2 + 1] = (enuY - grid.enuMinY) / ch;
       }
       g.setAttribute("position", new THREE.BufferAttribute(pos.slice(0), 3));
       g.setAttribute("normal", new THREE.BufferAttribute(demMesh.normals.slice(0), 3));
@@ -115,7 +131,12 @@ export function BasemapLayer({
     return g;
   }, [grid, demMesh, extentMeters]);
 
-  useEffect(() => () => { geometry?.dispose(); }, [geometry]);
+  useEffect(
+    () => () => {
+      geometry?.dispose();
+    },
+    [geometry],
+  );
 
   if (!grid || !texture || !geometry) {
     if (loading) {

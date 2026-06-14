@@ -13,7 +13,13 @@ const ROLES: { v: Role; label: string }[] = [
   { v: "other", label: "Otro" },
 ];
 
-export function ContactForm({ source = "landing", compact = false }: { source?: string; compact?: boolean }) {
+export function ContactForm({
+  source = "landing",
+  compact = false,
+}: {
+  source?: string;
+  compact?: boolean;
+}) {
   const submit = useServerFn(submitContactMessage);
   const [form, setForm] = useState({
     name: "",
@@ -51,7 +57,9 @@ export function ContactForm({ source = "landing", compact = false }: { source?: 
       <div className={compact ? "grid sm:grid-cols-2 gap-3" : "grid sm:grid-cols-2 gap-4"}>
         <Field label="Nombre">
           <input
-            required minLength={2} maxLength={200}
+            required
+            minLength={2}
+            maxLength={200}
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="brand-input"
@@ -60,7 +68,9 @@ export function ContactForm({ source = "landing", compact = false }: { source?: 
         </Field>
         <Field label="Email">
           <input
-            required type="email" maxLength={320}
+            required
+            type="email"
+            maxLength={320}
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="brand-input"
@@ -83,14 +93,19 @@ export function ContactForm({ source = "landing", compact = false }: { source?: 
             className="brand-input"
           >
             {ROLES.map((r) => (
-              <option key={r.v} value={r.v}>{r.label}</option>
+              <option key={r.v} value={r.v}>
+                {r.label}
+              </option>
             ))}
           </select>
         </Field>
       </div>
       <Field label="Mensaje">
         <textarea
-          required minLength={5} maxLength={4000} rows={compact ? 3 : 5}
+          required
+          minLength={5}
+          maxLength={4000}
+          rows={compact ? 3 : 5}
           value={form.message}
           onChange={(e) => setForm({ ...form, message: e.target.value })}
           className="brand-input resize-y"
@@ -113,7 +128,11 @@ export function ContactForm({ source = "landing", compact = false }: { source?: 
           disabled={mut.isPending}
           className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
         >
-          {mut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+          {mut.isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <ArrowRight className="w-4 h-4" />
+          )}
           Enviar mensaje
         </button>
       </div>

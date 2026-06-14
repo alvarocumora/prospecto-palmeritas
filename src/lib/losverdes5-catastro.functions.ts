@@ -35,16 +35,13 @@ export const syncLosVerdes5Catastro = createServerFn({ method: "POST" })
     if (roleErr || !isAdmin) {
       throw new Response("Forbidden: super admin only", { status: 403 });
     }
-    const { data: result, error } = await supabaseAdmin.functions.invoke(
-      "match-project-catastro",
-      {
-        body: {
-          projectId: TILAMA_PROJECT_ID,
-          radiusKm: data.radiusKm ?? 15,
-          dryRun: data.dryRun ?? false,
-        },
+    const { data: result, error } = await supabaseAdmin.functions.invoke("match-project-catastro", {
+      body: {
+        projectId: TILAMA_PROJECT_ID,
+        radiusKm: data.radiusKm ?? 15,
+        dryRun: data.dryRun ?? false,
       },
-    );
+    });
     if (error) {
       return {
         ok: false,

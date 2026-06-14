@@ -71,7 +71,10 @@ function avgNearestNeighborSpacing(holes: DrillholeSegment[]): number | null {
 
 function bboxAreaKm2(points: AnomalyPoint[]): number | null {
   if (points.length < 3) return null;
-  let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    maxX = -Infinity,
+    minY = Infinity,
+    maxY = -Infinity;
   for (const p of points) {
     if (p.x < minX) minX = p.x;
     if (p.x > maxX) maxX = p.x;
@@ -108,7 +111,9 @@ export function runAIGeologist(input: AIGeologistInput): AIInterpretation {
   }
   if (spacing && spacing > 200) {
     uScore += 2;
-    uncertaintyDrivers.push(`Espaciamiento medio ${spacing.toFixed(0)} m sobre malla recomendada (<150 m).`);
+    uncertaintyDrivers.push(
+      `Espaciamiento medio ${spacing.toFixed(0)} m sobre malla recomendada (<150 m).`,
+    );
   }
   if (critical > 0) {
     uScore += 3;
@@ -140,11 +145,15 @@ export function runAIGeologist(input: AIGeologistInput): AIInterpretation {
   }
   if (blockModel && blockModel.stats.gradeMean > 0.5) {
     upScore += 2;
-    upsideDrivers.push(`Ley media estimada ${blockModel.stats.gradeMean.toFixed(2)} sobre cutoff típico.`);
+    upsideDrivers.push(
+      `Ley media estimada ${blockModel.stats.gradeMean.toFixed(2)} sobre cutoff típico.`,
+    );
   }
   if (blockModel && blockModel.stats.metalTotal > 0) {
     upScore += 1;
-    upsideDrivers.push(`Metal contenido estimado: ${blockModel.stats.metalTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${blockModel.commodity}.`);
+    upsideDrivers.push(
+      `Metal contenido estimado: ${blockModel.stats.metalTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })} ${blockModel.commodity}.`,
+    );
   }
   if (area && area > 5) {
     upScore += 1;
@@ -155,11 +164,16 @@ export function runAIGeologist(input: AIGeologistInput): AIInterpretation {
 
   // Risks
   const risks: string[] = [];
-  if (critical > 0) risks.push(`QA/QC crítico: ${critical} issue(s) deben resolverse antes de reportar recursos.`);
-  if (spacing && spacing > 300) risks.push("Espaciamiento insuficiente: clasificación Measured no defendible.");
-  if (bundle && bundle.errors.length > 0) risks.push(`Errores de importación: ${bundle.errors.length} filas rechazadas.`);
+  if (critical > 0)
+    risks.push(`QA/QC crítico: ${critical} issue(s) deben resolverse antes de reportar recursos.`);
+  if (spacing && spacing > 300)
+    risks.push("Espaciamiento insuficiente: clasificación Measured no defendible.");
+  if (bundle && bundle.errors.length > 0)
+    risks.push(`Errores de importación: ${bundle.errors.length} filas rechazadas.`);
   if (aiHoles > 0 && holes.length > 0 && aiHoles / holes.length > 0.5) {
-    risks.push("Más del 50% de los sondajes son targets propuestos por IA — falta validación física.");
+    risks.push(
+      "Más del 50% de los sondajes son targets propuestos por IA — falta validación física.",
+    );
   }
   if (!blockModel) risks.push("Sin modelo de bloques activo — economía y NPV son indicativos.");
   if (risks.length === 0) risks.push("Sin riesgos materiales detectados en la corrida actual.");
@@ -167,11 +181,20 @@ export function runAIGeologist(input: AIGeologistInput): AIInterpretation {
   // Next steps
   const nextSteps: string[] = [];
   if (critical > 0) nextSteps.push("1. Resolver issues críticos de QA/QC.");
-  if (spacing && spacing > 150) nextSteps.push(`2. Cerrar malla de sondajes a ≤150 m (actual ${spacing.toFixed(0)} m).`);
-  if (blockModel && inferred > indicated * 2) nextSteps.push("3. Convertir Inferred → Indicated con sondajes infill en clusters de alto grade.");
-  if (geo > 0 && holes.length < 20) nextSteps.push("4. Priorizar drilling sobre anomalías geofísicas de mayor intensidad.");
-  if (upside === "exceptional" || upside === "high") nextSteps.push("5. Preparar borrador NI 43-101 preliminar y campaña de delineación.");
-  if (nextSteps.length === 0) nextSteps.push("Mantener monitoreo de anomalías satelitales y validar con campaña geofísica adicional.");
+  if (spacing && spacing > 150)
+    nextSteps.push(`2. Cerrar malla de sondajes a ≤150 m (actual ${spacing.toFixed(0)} m).`);
+  if (blockModel && inferred > indicated * 2)
+    nextSteps.push(
+      "3. Convertir Inferred → Indicated con sondajes infill en clusters de alto grade.",
+    );
+  if (geo > 0 && holes.length < 20)
+    nextSteps.push("4. Priorizar drilling sobre anomalías geofísicas de mayor intensidad.");
+  if (upside === "exceptional" || upside === "high")
+    nextSteps.push("5. Preparar borrador NI 43-101 preliminar y campaña de delineación.");
+  if (nextSteps.length === 0)
+    nextSteps.push(
+      "Mantener monitoreo de anomalías satelitales y validar con campaña geofísica adicional.",
+    );
 
   // Interpretation narrative
   const interpretation: string[] = [];
@@ -183,7 +206,9 @@ export function runAIGeologist(input: AIGeologistInput): AIInterpretation {
       `El modelo de bloques arroja ${blockModel.count.toLocaleString()} bloques, ley media ${blockModel.stats.gradeMean.toFixed(2)} y tonelaje total ${(blockModel.stats.tonnesTotal / 1_000_000).toFixed(2)} Mt (clasificación M/I/I: ${measured}/${indicated}/${inferred}).`,
     );
   } else {
-    interpretation.push("Sin block model activo: la cuantificación de recursos no está disponible en esta corrida.");
+    interpretation.push(
+      "Sin block model activo: la cuantificación de recursos no está disponible en esta corrida.",
+    );
   }
   if (holes.length > 0) {
     interpretation.push(

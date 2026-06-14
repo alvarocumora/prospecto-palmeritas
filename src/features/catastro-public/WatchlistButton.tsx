@@ -47,7 +47,10 @@ export function WatchlistButton({ code }: { code: string }) {
 
   if (loading) {
     return (
-      <button disabled className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border text-xs font-mono text-muted-foreground">
+      <button
+        disabled
+        className="inline-flex items-center gap-2 px-3 py-2 rounded-md border border-border text-xs font-mono text-muted-foreground"
+      >
         <Loader2 className="w-3.5 h-3.5 animate-spin" />
       </button>
     );
@@ -85,7 +88,11 @@ export function WatchlistButton({ code }: { code: string }) {
         disabled={busy}
         className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-emerald-500/10 border border-emerald-500/40 text-xs font-mono text-emerald-500 hover:bg-emerald-500/20"
       >
-        {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <BellOff className="w-3.5 h-3.5" />}
+        {busy ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <BellOff className="w-3.5 h-3.5" />
+        )}
         Monitoreando · quitar
       </button>
     );

@@ -12,7 +12,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { type Map as MLMap } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Layers, Mountain, Activity, Bookmark, Crosshair, Search, RotateCcw, Slice } from "lucide-react";
+import {
+  Layers,
+  Mountain,
+  Activity,
+  Bookmark,
+  Crosshair,
+  Search,
+  RotateCcw,
+  Slice,
+} from "lucide-react";
 import type {
   PublicTarget,
   SatAnomalyPoint,
@@ -215,8 +224,12 @@ export function LosVerdesScene3D({
   } | null>(null);
   const sectionModeRef = useRef(false);
   const sectionPtsRef = useRef<[number, number][]>([]);
-  useEffect(() => { sectionModeRef.current = sectionMode; }, [sectionMode]);
-  useEffect(() => { sectionPtsRef.current = sectionPts; }, [sectionPts]);
+  useEffect(() => {
+    sectionModeRef.current = sectionMode;
+  }, [sectionMode]);
+  useEffect(() => {
+    sectionPtsRef.current = sectionPts;
+  }, [sectionPts]);
 
   // KPIs de volumen aproximado: area_ha * altura(score) → m³
   const kpis = useMemo(() => {
@@ -241,7 +254,8 @@ export function LosVerdesScene3D({
   // Lista combinada para búsqueda
   const searchHits = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return [] as Array<{ kind: "veta" | "target"; label: string; lng: number; lat: number }>;
+    if (!q)
+      return [] as Array<{ kind: "veta" | "target"; label: string; lng: number; lat: number }>;
     const out: Array<{ kind: "veta" | "target"; label: string; lng: number; lat: number }> = [];
     for (const v of veins) {
       const lbl = `${v.code} ${v.name}`.toLowerCase();
@@ -295,9 +309,7 @@ export function LosVerdesScene3D({
     };
 
     const resizeObserver =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(() => resizeMap())
-        : null;
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(() => resizeMap()) : null;
     resizeObserver?.observe(ref.current);
     window.addEventListener("resize", handleWindowResize);
     const resizeRaf = requestAnimationFrame(resizeMap);
@@ -835,9 +847,8 @@ export function LosVerdesScene3D({
       map.on("click", (e) => {
         if (!sectionModeRef.current) return;
         const cur = sectionPtsRef.current;
-        const next: [number, number][] = cur.length >= 2
-          ? [[e.lngLat.lng, e.lngLat.lat]]
-          : [...cur, [e.lngLat.lng, e.lngLat.lat]];
+        const next: [number, number][] =
+          cur.length >= 2 ? [[e.lngLat.lng, e.lngLat.lat]] : [...cur, [e.lngLat.lng, e.lngLat.lat]];
         setSectionPts(next);
       });
 
@@ -868,7 +879,11 @@ export function LosVerdesScene3D({
             const lat = Number(f.properties?.centroid_lat);
             const elev = map.queryTerrainElevation([lng, lat]) ?? 0;
             const th = Number(f.properties?.thickness ?? 200);
-            f.properties = { ...f.properties, base: Math.max(0, elev), top: Math.max(0, elev) + th };
+            f.properties = {
+              ...f.properties,
+              base: Math.max(0, elev),
+              top: Math.max(0, elev) + th,
+            };
           }
           (map.getSource("sat-anom") as maplibregl.GeoJSONSource).setData(sat);
         }
@@ -948,7 +963,6 @@ export function LosVerdesScene3D({
       setVis("drillholes-extr", layers.drills);
       setVis("drillholes-collars", layers.drills);
 
-
       const enabled = (COMMODITY_TOKENS as readonly CommodityToken[]).filter(
         (c) => commoditiesOn[c],
       );
@@ -957,7 +971,11 @@ export function LosVerdesScene3D({
             "any",
             ...enabled.map(
               (c) =>
-                ["==", ["get", `has_${c.toLowerCase()}`], true] as maplibregl.ExpressionSpecification,
+                [
+                  "==",
+                  ["get", `has_${c.toLowerCase()}`],
+                  true,
+                ] as maplibregl.ExpressionSpecification,
             ),
           ]
         : ["==", ["literal", 1], ["literal", 0]];
@@ -1045,8 +1063,6 @@ export function LosVerdesScene3D({
     }
   }, [drillholes]);
 
-
-
   // Cursor crosshair cuando sectionMode activo
   useEffect(() => {
     const m = mapRef.current;
@@ -1092,7 +1108,8 @@ export function LosVerdesScene3D({
     }
 
     // Función distancia a lo largo de A-B para un punto cualquiera (proyección).
-    const dx = B[0] - A[0], dy = B[1] - A[1];
+    const dx = B[0] - A[0],
+      dy = B[1] - A[1];
     const len2 = dx * dx + dy * dy || 1;
     const projDist = (pt: [number, number]) => {
       const t = ((pt[0] - A[0]) * dx + (pt[1] - A[1]) * dy) / len2;
@@ -1109,8 +1126,14 @@ export function LosVerdesScene3D({
         const p1 = trace[i] as [number, number];
         const p2 = trace[i + 1] as [number, number];
         // segmentIntersect reusado
-        const x1 = A[0], y1 = A[1], x2 = B[0], y2 = B[1];
-        const x3 = p1[0], y3 = p1[1], x4 = p2[0], y4 = p2[1];
+        const x1 = A[0],
+          y1 = A[1],
+          x2 = B[0],
+          y2 = B[1];
+        const x3 = p1[0],
+          y3 = p1[1],
+          x4 = p2[0],
+          y4 = p2[1];
         const den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
         if (Math.abs(den) < 1e-12) continue;
         const tA = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
@@ -1143,14 +1166,19 @@ export function LosVerdesScene3D({
       if (ints.length < 2) continue;
       const dists = ints.map(projDist).sort((a, b) => a - b);
       const c = polygonCentroid(p.area_polygon);
-      const elev = c && m.queryTerrainElevation
-        ? (m.queryTerrainElevation({ lng: c[0], lat: c[1] }) ?? 0)
-        : 0;
+      const elev =
+        c && m.queryTerrainElevation ? (m.queryTerrainElevation({ lng: c[0], lat: c[1] }) ?? 0) : 0;
       const th = Math.max(5, Number(p.avg_thickness_m ?? 30));
       const method = p.method ?? "open_pit";
-      let base = elev, top = elev + th;
-      if (method === "open_pit") { base = elev - th; top = elev; }
-      else if (method === "underground") { base = elev - (th + 50); top = elev - 50; }
+      let base = elev,
+        top = elev + th;
+      if (method === "open_pit") {
+        base = elev - th;
+        top = elev;
+      } else if (method === "underground") {
+        base = elev - (th + 50);
+        top = elev - 50;
+      }
       phaseHits.push({
         phase_no: p.phase_no,
         name: p.name,
@@ -1341,7 +1369,10 @@ export function LosVerdesScene3D({
           onClick={() => {
             setSectionMode((v) => {
               const next = !v;
-              if (!next) { setSectionPts([]); setSectionData(null); }
+              if (!next) {
+                setSectionPts([]);
+                setSectionData(null);
+              }
               return next;
             });
           }}
@@ -1361,7 +1392,11 @@ export function LosVerdesScene3D({
           samples={sectionData.samples}
           veinHits={sectionData.veinHits}
           phaseHits={sectionData.phaseHits}
-          onClose={() => { setSectionPts([]); setSectionData(null); setSectionMode(false); }}
+          onClose={() => {
+            setSectionPts([]);
+            setSectionData(null);
+            setSectionMode(false);
+          }}
         />
       )}
 

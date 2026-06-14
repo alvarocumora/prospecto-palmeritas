@@ -269,7 +269,8 @@ export function downloadString(filename: string, content: string, mime: string) 
 }
 
 export function exportTargetsCsv(targets: DrillTarget[]): string {
-  const header = "targetId,priority,score,confidence,depth,azimuth,dip,collar_x,collar_y,zone,cost_usd,rationale";
+  const header =
+    "targetId,priority,score,confidence,depth,azimuth,dip,collar_x,collar_y,zone,cost_usd,rationale";
   const rows = targets.map((t) =>
     [
       t.targetId,

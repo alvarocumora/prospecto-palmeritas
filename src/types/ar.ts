@@ -1,4 +1,9 @@
-export type ArExplorationObjectType = "target" | "magnetic_anomaly" | "satellite_anomaly" | "alteration" | "structure";
+export type ArExplorationObjectType =
+  | "target"
+  | "magnetic_anomaly"
+  | "satellite_anomaly"
+  | "alteration"
+  | "structure";
 
 export type ArExplorationSource = {
   id: string;

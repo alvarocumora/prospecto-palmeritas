@@ -2,12 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { compositeHole } from "@/lib/miningEngine.functions";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { DrillHole } from "@/hooks/useDrilling";
 import { Loader2 } from "lucide-react";
 
@@ -64,9 +59,7 @@ export function CompositeDialog({ hole, onClose }: Props) {
           </button>
         </div>
 
-        {error && (
-          <div className="text-destructive text-sm">{String(error)}</div>
-        )}
+        {error && <div className="text-destructive text-sm">{String(error)}</div>}
 
         {data && (
           <div className="space-y-2">
@@ -90,9 +83,7 @@ export function CompositeDialog({ hole, onClose }: Props) {
                     <tr key={i} className="border-t">
                       <td className="px-2 py-1">{c.from.toFixed(2)}</td>
                       <td className="px-2 py-1">{c.to.toFixed(2)}</td>
-                      <td className="px-2 py-1 text-right">
-                        {(c.recovery * 100).toFixed(0)}%
-                      </td>
+                      <td className="px-2 py-1 text-right">{(c.recovery * 100).toFixed(0)}%</td>
                       <td className="px-2 py-1 text-right">{fmt(c.values.au_gpt)}</td>
                       <td className="px-2 py-1 text-right">{fmt(c.values.ag_gpt)}</td>
                       <td className="px-2 py-1 text-right">{fmt(c.values.cu_pct)}</td>

@@ -156,24 +156,47 @@ export function WireframeStudio({ model }: { model: ResourceModel }) {
           />
         </Field>
         <Field label={`Iso · ${iso.toFixed(2)}`}>
-          <Slider min={0.1} max={0.9} step={0.05} value={[iso]} onValueChange={(v) => setIso(v[0])} />
+          <Slider
+            min={0.1}
+            max={0.9}
+            step={0.05}
+            value={[iso]}
+            onValueChange={(v) => setIso(v[0])}
+          />
         </Field>
         <Field label={`Suavizado · ${smooth.toFixed(1)}`}>
-          <Slider min={0} max={50} step={0.5} value={[smooth]} onValueChange={(v) => setSmooth(v[0])} />
+          <Slider
+            min={0}
+            max={50}
+            step={0.5}
+            value={[smooth]}
+            onValueChange={(v) => setSmooth(v[0])}
+          />
         </Field>
         <Field label={`Grid · ${gridN}³`}>
-          <Slider min={16} max={64} step={4} value={[gridN]} onValueChange={(v) => setGridN(v[0])} />
+          <Slider
+            min={16}
+            max={64}
+            step={4}
+            value={[gridN]}
+            onValueChange={(v) => setGridN(v[0])}
+          />
         </Field>
 
         <div className="text-text-dim space-y-0.5 pt-2 border-t border-border">
           <div>Compósitos: {samples.length}</div>
-          <div>≥ cutoff: <b className="text-foreground">{oreCount}</b></div>
+          <div>
+            ≥ cutoff: <b className="text-foreground">{oreCount}</b>
+          </div>
           {mesh && (
             <>
               <div>Vértices: {mesh.vertices?.length ?? 0}</div>
               <div>Caras: {mesh.faces?.length ?? 0}</div>
               {mesh.volume_m3 != null && (
-                <div>Vol. ≥iso: <b className="text-foreground">{(mesh.volume_m3 / 1e6).toFixed(2)} Mm³</b></div>
+                <div>
+                  Vol. ≥iso:{" "}
+                  <b className="text-foreground">{(mesh.volume_m3 / 1e6).toFixed(2)} Mm³</b>
+                </div>
               )}
             </>
           )}
@@ -212,10 +235,7 @@ export function WireframeStudio({ model }: { model: ResourceModel }) {
           <div className="pt-2 border-t border-border space-y-1">
             <div className="text-text-dim uppercase">Guardadas ({existing.length})</div>
             {existing.slice(0, 8).map((w) => (
-              <div
-                key={w.id}
-                className="flex items-center justify-between gap-2 text-[9px]"
-              >
+              <div key={w.id} className="flex items-center justify-between gap-2 text-[9px]">
                 <span className="truncate">{w.name}</span>
                 <button
                   onClick={() => {
@@ -272,14 +292,21 @@ function MeshViewer({ mesh, loading }: { mesh: MeshResult | null; loading: boole
     if (mesh && mesh.vertices && mesh.vertices.length > 0 && mesh.faces && mesh.faces.length > 0) {
       const verts = mesh.vertices;
       // Centroide
-      let cx = 0, cy = 0, cz = 0;
+      let cx = 0,
+        cy = 0,
+        cz = 0;
       for (const v of verts) {
-        cx += v[0]; cy += v[1]; cz += v[2];
+        cx += v[0];
+        cy += v[1];
+        cz += v[2];
       }
-      cx /= verts.length; cy /= verts.length; cz /= verts.length;
+      cx /= verts.length;
+      cy /= verts.length;
+      cz /= verts.length;
 
       const positions = new Float32Array(verts.length * 3);
-      let minE = Infinity, maxE = -Infinity;
+      let minE = Infinity,
+        maxE = -Infinity;
       for (let i = 0; i < verts.length; i++) {
         const v = verts[i];
         positions[i * 3] = v[0] - cx;

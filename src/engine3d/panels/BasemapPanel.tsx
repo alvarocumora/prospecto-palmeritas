@@ -31,10 +31,22 @@ const SOURCES: { id: BasemapSource; label: string }[] = [
 ];
 
 export function BasemapPanel({
-  source, onSource, opacity, onOpacity, ve, onVe,
-  showCoords, onShowCoords, showScaleBar, onShowScaleBar,
-  showNorth, onShowNorth,
-  centerLng, centerLat, extentMeters, status,
+  source,
+  onSource,
+  opacity,
+  onOpacity,
+  ve,
+  onVe,
+  showCoords,
+  onShowCoords,
+  showScaleBar,
+  onShowScaleBar,
+  showNorth,
+  onShowNorth,
+  centerLng,
+  centerLat,
+  extentMeters,
+  status,
 }: Props) {
   const noCenter = centerLng === 0 && centerLat === 0;
   return (
@@ -61,7 +73,9 @@ export function BasemapPanel({
       </div>
 
       {noCenter && (
-        <div className="text-amber-300 text-[9px]">⚠ Sin centro geográfico — basemap desactivado.</div>
+        <div className="text-amber-300 text-[9px]">
+          ⚠ Sin centro geográfico — basemap desactivado.
+        </div>
       )}
 
       {status && (
@@ -75,7 +89,10 @@ export function BasemapPanel({
         opacidad basemap · {opacity.toFixed(2)}
       </label>
       <input
-        type="range" min={0} max={1} step={0.05}
+        type="range"
+        min={0}
+        max={1}
+        step={0.05}
         value={opacity}
         onChange={(e) => onOpacity(parseFloat(e.target.value))}
         className="w-full accent-cyan-400"
@@ -85,7 +102,10 @@ export function BasemapPanel({
         exageración vertical · {ve.toFixed(1)}×
       </label>
       <input
-        type="range" min={1} max={6} step={0.5}
+        type="range"
+        min={1}
+        max={6}
+        step={0.5}
         value={ve}
         onChange={(e) => onVe(parseFloat(e.target.value))}
         className="w-full accent-cyan-400"
@@ -104,12 +124,22 @@ export function BasemapPanel({
   );
 }
 
-function Toggle({ label, active, onChange }: { label: string; active: boolean; onChange: (b: boolean) => void }) {
+function Toggle({
+  label,
+  active,
+  onChange,
+}: {
+  label: string;
+  active: boolean;
+  onChange: (b: boolean) => void;
+}) {
   return (
     <button
       onClick={() => onChange(!active)}
       className={`px-1.5 py-1 rounded border text-[9px] uppercase tracking-wider ${
-        active ? "border-cyan-400/70 bg-cyan-500/15 text-cyan-200" : "border-border bg-black/40 text-muted-foreground"
+        active
+          ? "border-cyan-400/70 bg-cyan-500/15 text-cyan-200"
+          : "border-border bg-black/40 text-muted-foreground"
       }`}
     >
       {label}

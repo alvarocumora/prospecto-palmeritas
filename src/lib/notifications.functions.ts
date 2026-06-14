@@ -47,14 +47,15 @@ export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
       .maybeSingle();
 
     const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
-    const project = (inv as any).projects as
-      | { name?: string; code?: string; organizations?: { name?: string } }
-      | null;
+    const project =
+      (
+        inv as unknown as {
+          projects?: { name?: string; code?: string; organizations?: { name?: string } } | null;
+        }
+      ).projects ?? null;
 
     const templateName =
-      data.audience === "investor"
-        ? "project-invitation-investor"
-        : "project-invitation-internal";
+      data.audience === "investor" ? "project-invitation-investor" : "project-invitation-internal";
 
     const res = await sendInternalEmail({
       templateName,
@@ -132,7 +133,7 @@ export const sendReportSignedEmail = createServerFn({ method: "POST" })
       recipients = (profs ?? []).map((p) => p.email).filter(Boolean) as string[];
     }
 
-    const project = (report as any).projects as { name?: string } | null;
+    const project = (report as unknown as { projects?: { name?: string } | null }).projects ?? null;
     const templateName =
       data.audience === "investor" ? "report-signed-investor" : "report-signed-internal";
 

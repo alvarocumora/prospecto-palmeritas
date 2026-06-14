@@ -34,8 +34,14 @@ function WatchlistPage() {
   const markRead = useServerFn(markAlertRead);
   const qc = useQueryClient();
 
-  const wl = useQuery({ queryKey: ["catastro-watchlist"], queryFn: () => list({ data: undefined }) });
-  const al = useQuery({ queryKey: ["catastro-alerts"], queryFn: () => alerts({ data: undefined }) });
+  const wl = useQuery({
+    queryKey: ["catastro-watchlist"],
+    queryFn: () => list({ data: undefined }),
+  });
+  const al = useQuery({
+    queryKey: ["catastro-alerts"],
+    queryFn: () => alerts({ data: undefined }),
+  });
 
   const removeMut = useMutation({
     mutationFn: (id: string) => remove({ data: { id } }),
@@ -75,23 +81,36 @@ function WatchlistPage() {
             Concesiones monitoreadas
           </h2>
           {wl.isLoading ? (
-            <div className="py-12 flex justify-center"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+            <div className="py-12 flex justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
           ) : !wl.data?.items.length ? (
             <div className="border border-dashed border-border rounded-md p-8 text-center text-xs font-mono text-muted-foreground">
               No monitoreas ninguna concesión todavía.{" "}
-              <Link to="/catastro/mapa" className="text-primary underline">Buscar en el mapa</Link>
+              <Link to="/catastro/mapa" className="text-primary underline">
+                Buscar en el mapa
+              </Link>
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 gap-3">
               {wl.data.items.map((item) => {
                 const c = wl.data.concessions[item.concession_code];
                 return (
-                  <div key={item.id} className="border border-border rounded-md p-4 bg-bg-secondary/20">
+                  <div
+                    key={item.id}
+                    className="border border-border rounded-md p-4 bg-bg-secondary/20"
+                  >
                     <div className="flex items-start justify-between gap-3 mb-2">
                       <div className="min-w-0">
-                        <div className="text-[10px] font-mono uppercase text-muted-foreground">{item.concession_code}</div>
-                        <div className="text-sm font-semibold truncate">{c?.name ?? item.concession_code}</div>
-                        <div className="text-xs text-muted-foreground truncate">{c?.holder ?? "—"}</div>
+                        <div className="text-[10px] font-mono uppercase text-muted-foreground">
+                          {item.concession_code}
+                        </div>
+                        <div className="text-sm font-semibold truncate">
+                          {c?.name ?? item.concession_code}
+                        </div>
+                        <div className="text-xs text-muted-foreground truncate">
+                          {c?.holder ?? "—"}
+                        </div>
                       </div>
                       <button
                         onClick={() => removeMut.mutate(item.id)}
@@ -133,10 +152,13 @@ function WatchlistPage() {
             <Bell className="w-3.5 h-3.5" /> Alertas recientes
           </h2>
           {al.isLoading ? (
-            <div className="py-8 flex justify-center"><Loader2 className="w-5 h-5 animate-spin text-muted-foreground" /></div>
+            <div className="py-8 flex justify-center">
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            </div>
           ) : !al.data?.alerts.length ? (
             <div className="border border-dashed border-border rounded-md p-6 text-center text-xs font-mono text-muted-foreground">
-              Sin alertas. Te notificaremos cuando detectemos cambios en tus concesiones monitoreadas.
+              Sin alertas. Te notificaremos cuando detectemos cambios en tus concesiones
+              monitoreadas.
             </div>
           ) : (
             <ul className="space-y-2">
@@ -144,17 +166,25 @@ function WatchlistPage() {
                 <li
                   key={a.id}
                   className={`border rounded-md p-3 flex items-start gap-3 ${
-                    a.read_at ? "border-border bg-bg-secondary/10 opacity-70" : "border-primary/40 bg-primary/5"
+                    a.read_at
+                      ? "border-border bg-bg-secondary/10 opacity-70"
+                      : "border-primary/40 bg-primary/5"
                   }`}
                 >
                   <AlertTriangle
                     className={`w-4 h-4 mt-0.5 shrink-0 ${
-                      a.severity === "critical" ? "text-destructive" : a.severity === "warning" ? "text-amber-500" : "text-primary"
+                      a.severity === "critical"
+                        ? "text-destructive"
+                        : a.severity === "warning"
+                          ? "text-amber-500"
+                          : "text-primary"
                     }`}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-semibold">{a.title}</div>
-                    {a.message && <div className="text-xs text-muted-foreground mt-0.5">{a.message}</div>}
+                    {a.message && (
+                      <div className="text-xs text-muted-foreground mt-0.5">{a.message}</div>
+                    )}
                     <div className="text-[10px] font-mono text-muted-foreground mt-1">
                       {a.concession_code} · {new Date(a.created_at).toLocaleString("es-CL")}
                     </div>

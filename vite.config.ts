@@ -23,8 +23,14 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: [
-        { find: /^entities\/lib\/decode\.js$/, replacement: path.join(entitiesDir, "lib/decode.js") },
-        { find: /^entities\/lib\/encode\.js$/, replacement: path.join(entitiesDir, "lib/encode.js") },
+        {
+          find: /^entities\/lib\/decode\.js$/,
+          replacement: path.join(entitiesDir, "lib/decode.js"),
+        },
+        {
+          find: /^entities\/lib\/encode\.js$/,
+          replacement: path.join(entitiesDir, "lib/encode.js"),
+        },
         { find: /^entities$/, replacement: entitiesDir },
       ],
     },

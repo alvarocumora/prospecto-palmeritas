@@ -147,7 +147,6 @@ export function EconomicScenariosPanel({ modelId, modelName, commodity, writable
         scenarios={scenarios}
       />
 
-
       {loading ? (
         <div className="text-text-dim text-[10px] font-mono">Cargando…</div>
       ) : scenarios.length === 0 ? (

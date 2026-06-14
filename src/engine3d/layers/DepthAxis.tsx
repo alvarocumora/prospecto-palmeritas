@@ -3,7 +3,13 @@ import { useMemo } from "react";
 import * as THREE from "three";
 import { Text } from "@react-three/drei";
 
-export function DepthAxis({ maxDepth = 400, verticalExaggeration = 1 }: { maxDepth?: number; verticalExaggeration?: number }) {
+export function DepthAxis({
+  maxDepth = 400,
+  verticalExaggeration = 1,
+}: {
+  maxDepth?: number;
+  verticalExaggeration?: number;
+}) {
   const lineGeo = useMemo(() => {
     const points = [
       new THREE.Vector3(0, 0, 0),

@@ -13,12 +13,12 @@ export type Frente = {
   priority: "alta" | "media" | "exploración";
   center: { lat: number; lng: number };
   bbox: { latMin: number; latMax: number; lngMin: number; lngMax: number };
-  highlightSamples: string[];        // códigos TOO destacados desde la imagen
+  highlightSamples: string[]; // códigos TOO destacados desde la imagen
   expectedGradeRange: [number, number]; // % Cu
   method: "open_pit" | "underground" | "pirquen_mecanizado";
-  areaHa: number;                    // área del polígono superficial
-  thicknessM: number;                // potencia explotable media
-  color: string;                     // hex para el render
+  areaHa: number; // área del polígono superficial
+  thicknessM: number; // potencia explotable media
+  color: string; // hex para el render
 };
 
 export const FRENTES: Frente[] = [
@@ -27,8 +27,8 @@ export const FRENTES: Frente[] = [
     name: "Frente 1 — La Guanaca",
     shortName: "La Guanaca",
     priority: "alta",
-    center: { lat: -32.0440, lng: -71.1156 },
-    bbox: { latMin: -32.050, latMax: -32.038, lngMin: -71.122, lngMax: -71.108 },
+    center: { lat: -32.044, lng: -71.1156 },
+    bbox: { latMin: -32.05, latMax: -32.038, lngMin: -71.122, lngMax: -71.108 },
     highlightSamples: ["TOO-126", "TOO-156", "TOO-155"],
     expectedGradeRange: [1.76, 4.34],
     method: "underground",
@@ -41,8 +41,8 @@ export const FRENTES: Frente[] = [
     name: "Frente 2 — Los Verdes (Acceso Actual)",
     shortName: "Los Verdes",
     priority: "media",
-    center: { lat: -32.0490, lng: -71.1050 },
-    bbox: { latMin: -32.055, latMax: -32.044, lngMin: -71.110, lngMax: -71.098 },
+    center: { lat: -32.049, lng: -71.105 },
+    bbox: { latMin: -32.055, latMax: -32.044, lngMin: -71.11, lngMax: -71.098 },
     highlightSamples: ["TOO-124", "TOO-105", "TOO-103"],
     expectedGradeRange: [0.38, 1.07],
     method: "open_pit",
@@ -55,7 +55,7 @@ export const FRENTES: Frente[] = [
     name: "Frente 3 — Castellana (Zona Norte)",
     shortName: "Castellana",
     priority: "alta",
-    center: { lat: -32.0270, lng: -71.0986 },
+    center: { lat: -32.027, lng: -71.0986 },
     bbox: { latMin: -32.032, latMax: -32.022, lngMin: -71.105, lngMax: -71.092 },
     highlightSamples: ["TOO-210", "TOO-183", "TOO-184"],
     expectedGradeRange: [3.24, 6.83],
@@ -158,7 +158,9 @@ function inBbox(lat: number, lng: number, b: Frente["bbox"]): boolean {
 
 function bboxCenter(geom: GeoJSON.Geometry | null): [number, number] | null {
   if (!geom) return null;
-  let lat = 0, lng = 0, n = 0;
+  let lat = 0,
+    lng = 0,
+    n = 0;
   const walk = (coords: unknown): void => {
     if (Array.isArray(coords)) {
       if (typeof coords[0] === "number" && typeof coords[1] === "number") {
@@ -191,11 +193,15 @@ export const getLosVerdes5Report = createServerFn({ method: "GET" }).handler(
         .limit(30),
       supabaseAdmin
         .from("veins")
-        .select("code, name, commodity, strike_deg, dip_deg, thickness_m, length_m, depth_top_m, depth_bottom_m, geometry")
+        .select(
+          "code, name, commodity, strike_deg, dip_deg, thickness_m, length_m, depth_top_m, depth_bottom_m, geometry",
+        )
         .eq("project_id", TILAMA_PROJECT_ID),
       supabaseAdmin
         .from("mine_plan_phases")
-        .select("phase_no, name, method, avg_thickness_m, density_tm3, cutoff_grade, recovery_pct, capex_usd, opex_usd_t, start_year, duration_years, grade_estimate, area_polygon")
+        .select(
+          "phase_no, name, method, avg_thickness_m, density_tm3, cutoff_grade, recovery_pct, capex_usd, opex_usd_t, start_year, duration_years, grade_estimate, area_polygon",
+        )
         .eq("project_id", TILAMA_PROJECT_ID)
         .order("phase_no"),
       supabaseAdmin
@@ -235,9 +241,8 @@ export const getLosVerdes5Report = createServerFn({ method: "GET" }).handler(
         .slice(0, 12);
 
       // Vetas asociadas por prefijo de código
-      const veinPrefix = f.code === "LA_GUANACA" ? "V-LG"
-        : f.code === "CASTELLANA" ? "V-CS"
-        : "V-TM";
+      const veinPrefix =
+        f.code === "LA_GUANACA" ? "V-LG" : f.code === "CASTELLANA" ? "V-CS" : "V-TM";
       const veinList = veinRows
         .filter((v) => String(v.code ?? "").startsWith(veinPrefix))
         .map((v) => ({

@@ -27,9 +27,7 @@ export function ModeTabs({
             type="button"
             onClick={() => onChange(m)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono transition-colors border-l border-border first:border-l-0 ${
-              active
-                ? "bg-gold text-background"
-                : "text-foreground hover:bg-accent"
+              active ? "bg-gold text-background" : "text-foreground hover:bg-accent"
             }`}
             title={meta.sub}
           >

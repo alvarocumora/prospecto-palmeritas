@@ -30,7 +30,12 @@ function niceStep(range: number, target = 6): number {
 }
 
 export function SectionViewPanel({
-  result, busy, onClose, onFollowHole, followHoleId, height = 460,
+  result,
+  busy,
+  onClose,
+  onFollowHole,
+  followHoleId,
+  height = 460,
 }: Props) {
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -39,8 +44,10 @@ export function SectionViewPanel({
     const { uMin, uMax, vMin, vMax } = result.bounds;
     const padU = Math.max(20, (uMax - uMin) * 0.05);
     const padV = Math.max(20, (vMax - vMin) * 0.1);
-    const u0 = uMin - padU, u1 = uMax + padU;
-    const v0 = vMin - padV, v1 = vMax + padV;
+    const u0 = uMin - padU,
+      u1 = uMax + padU;
+    const v0 = vMin - padV,
+      v1 = vMax + padV;
     const innerW = SVG_W - PAD.l - PAD.r;
     const innerH = SVG_H - PAD.t - PAD.b;
     const sx = innerW / Math.max(1e-3, u1 - u0);
@@ -72,17 +79,29 @@ export function SectionViewPanel({
           <span>Section View</span>
           {result && (
             <span className="text-muted-foreground normal-case tracking-normal">
-              · {result.frame.kind === "vertical" ? "vertical" : "plan"} · ±{(result.width / 2).toFixed(0)} m ·{" "}
-              {result.stats.holesIntersected} sondajes · {result.stats.samplesInSlab} muestras ·{" "}
-              {result.stats.elapsedMs.toFixed(0)} ms
+              · {result.frame.kind === "vertical" ? "vertical" : "plan"} · ±
+              {(result.width / 2).toFixed(0)} m · {result.stats.holesIntersected} sondajes ·{" "}
+              {result.stats.samplesInSlab} muestras · {result.stats.elapsedMs.toFixed(0)} ms
             </span>
           )}
         </div>
         <div className="flex items-center gap-1">
-          <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={handlePNG} disabled={!result}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-[10px]"
+            onClick={handlePNG}
+            disabled={!result}
+          >
             <ImageIcon className="w-3 h-3 mr-1" /> PNG
           </Button>
-          <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={handleCSV} disabled={!result}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-6 px-2 text-[10px]"
+            onClick={handleCSV}
+            disabled={!result}
+          >
             <FileSpreadsheet className="w-3 h-3 mr-1" /> CSV
           </Button>
           <Button size="sm" variant="ghost" className="h-6 px-2 text-[10px]" onClick={onClose}>
@@ -116,9 +135,13 @@ export function SectionViewPanel({
             {result.terrainProfile.map((s, i) => (
               <line
                 key={`t-${i}`}
-                x1={layout.toX(s.a.u)} y1={layout.toY(s.a.v)}
-                x2={layout.toX(s.b.u)} y2={layout.toY(s.b.v)}
-                stroke="#94a374" strokeWidth={1.2} strokeLinecap="round"
+                x1={layout.toX(s.a.u)}
+                y1={layout.toY(s.a.v)}
+                x2={layout.toX(s.b.u)}
+                y2={layout.toY(s.b.v)}
+                stroke="#94a374"
+                strokeWidth={1.2}
+                strokeLinecap="round"
               />
             ))}
 
@@ -126,9 +149,14 @@ export function SectionViewPanel({
             {result.anomalySegments.map((s, i) => (
               <line
                 key={`a-${i}`}
-                x1={layout.toX(s.a.u)} y1={layout.toY(s.a.v)}
-                x2={layout.toX(s.b.u)} y2={layout.toY(s.b.v)}
-                stroke="#ff8a3d" strokeWidth={1.4} strokeLinecap="round" opacity={0.85}
+                x1={layout.toX(s.a.u)}
+                y1={layout.toY(s.a.v)}
+                x2={layout.toX(s.b.u)}
+                y2={layout.toY(s.b.v)}
+                stroke="#ff8a3d"
+                strokeWidth={1.4}
+                strokeLinecap="round"
+                opacity={0.85}
               />
             ))}
 
@@ -136,7 +164,8 @@ export function SectionViewPanel({
             {result.samples.map((p, i) => (
               <circle
                 key={`s-${i}`}
-                cx={layout.toX(p.u)} cy={layout.toY(p.v)}
+                cx={layout.toX(p.u)}
+                cy={layout.toY(p.v)}
                 r={2.4}
                 fill={p.kind === "geophysics" ? "#facc15" : "#22d3ee"}
                 opacity={0.7}
@@ -146,11 +175,14 @@ export function SectionViewPanel({
             {/* Drillholes */}
             {result.drillholes.map((h) => {
               const c = { x: layout.toX(h.collar2D.u), y: layout.toY(h.collar2D.v) };
-              const t = { x: layout.toX(h.toe2D.u),    y: layout.toY(h.toe2D.v) };
-              const color = h.isAi ? "#67e8f9"
-                : (h.status ?? "").toLowerCase().includes("complet") ? "#fbbf24"
-                : (h.status ?? "").toLowerCase().includes("plan") ? "#9ca3af"
-                : "#fb923c";
+              const t = { x: layout.toX(h.toe2D.u), y: layout.toY(h.toe2D.v) };
+              const color = h.isAi
+                ? "#67e8f9"
+                : (h.status ?? "").toLowerCase().includes("complet")
+                  ? "#fbbf24"
+                  : (h.status ?? "").toLowerCase().includes("plan")
+                    ? "#9ca3af"
+                    : "#fb923c";
               const focused = followHoleId && h.holeId === followHoleId;
               const handleClick = () => onFollowHole?.(h.holeId);
               const ipt = h.intersect
@@ -159,26 +191,45 @@ export function SectionViewPanel({
               return (
                 <g key={`h-${h.holeId}`} style={{ cursor: "pointer" }} onClick={handleClick}>
                   <line
-                    x1={c.x} y1={c.y} x2={t.x} y2={t.y}
-                    stroke={color} strokeWidth={focused ? 2.8 : 1.6}
+                    x1={c.x}
+                    y1={c.y}
+                    x2={t.x}
+                    y2={t.y}
+                    stroke={color}
+                    strokeWidth={focused ? 2.8 : 1.6}
                     strokeLinecap="round"
                     opacity={focused ? 1 : 0.92}
                   />
                   <circle cx={c.x} cy={c.y} r={2.5} fill={color} />
                   {ipt && (
-                    <circle cx={ipt.x} cy={ipt.y} r={4} fill="none" stroke={color} strokeWidth={1.4} />
+                    <circle
+                      cx={ipt.x}
+                      cy={ipt.y}
+                      r={4}
+                      fill="none"
+                      stroke={color}
+                      strokeWidth={1.4}
+                    />
                   )}
                   {(ipt || focused) && (
                     <g transform={`translate(${(ipt?.x ?? c.x) + 6}, ${(ipt?.y ?? c.y) - 6})`}>
-                      <rect x={0} y={-10} width={Math.max(60, h.holeId.length * 6 + 8)} height={26}
-                        rx={3} ry={3}
-                        fill="rgba(8,9,12,0.85)" stroke={color} strokeWidth={0.5}
+                      <rect
+                        x={0}
+                        y={-10}
+                        width={Math.max(60, h.holeId.length * 6 + 8)}
+                        height={26}
+                        rx={3}
+                        ry={3}
+                        fill="rgba(8,9,12,0.85)"
+                        stroke={color}
+                        strokeWidth={0.5}
                       />
                       <text x={4} y={2} fontFamily="monospace" fontSize="9" fill={color}>
                         {h.holeId}
                       </text>
                       <text x={4} y={12} fontFamily="monospace" fontSize="8" fill="#cbd5e1">
-                        {h.depth.toFixed(0)}m · {h.status ?? "—"}{h.isAi ? " · AI" : ""}
+                        {h.depth.toFixed(0)}m · {h.status ?? "—"}
+                        {h.isAi ? " · AI" : ""}
                       </text>
                     </g>
                   )}
@@ -188,12 +239,22 @@ export function SectionViewPanel({
 
             {/* Plane center marker */}
             <line
-              x1={layout.toX(0)} y1={PAD.t} x2={layout.toX(0)} y2={SVG_H - PAD.b}
-              stroke="#475569" strokeWidth={0.5} strokeDasharray="3 3"
+              x1={layout.toX(0)}
+              y1={PAD.t}
+              x2={layout.toX(0)}
+              y2={SVG_H - PAD.b}
+              stroke="#475569"
+              strokeWidth={0.5}
+              strokeDasharray="3 3"
             />
             <line
-              x1={PAD.l} y1={layout.toY(0)} x2={SVG_W - PAD.r} y2={layout.toY(0)}
-              stroke="#475569" strokeWidth={0.5} strokeDasharray="3 3"
+              x1={PAD.l}
+              y1={layout.toY(0)}
+              x2={SVG_W - PAD.r}
+              y2={layout.toY(0)}
+              stroke="#475569"
+              strokeWidth={0.5}
+              strokeDasharray="3 3"
             />
 
             {/* Legend */}
@@ -215,24 +276,26 @@ function LegendRow({ y, color, label }: { y: number; color: string; label: strin
   return (
     <g transform={`translate(8, ${y})`}>
       <rect x={0} y={-4} width={10} height={3} fill={color} />
-      <text x={16} y={0} fontFamily="monospace" fontSize="9" fill="#e5e7eb">{label}</text>
+      <text x={16} y={0} fontFamily="monospace" fontSize="9" fill="#e5e7eb">
+        {label}
+      </text>
     </g>
   );
 }
 
 type LayoutCtx = {
-  u0: number; u1: number; v0: number; v1: number;
-  s: number; innerW: number; innerH: number;
-  toX: (u: number) => number; toY: (v: number) => number;
+  u0: number;
+  u1: number;
+  v0: number;
+  v1: number;
+  s: number;
+  innerW: number;
+  innerH: number;
+  toX: (u: number) => number;
+  toY: (v: number) => number;
 };
 
-function SectionGrid({
-  layout,
-  kind,
-}: {
-  layout: LayoutCtx;
-  kind: "vertical" | "plan";
-}) {
+function SectionGrid({ layout, kind }: { layout: LayoutCtx; kind: "vertical" | "plan" }) {
   const stepU = niceStep(layout.u1 - layout.u0);
   const stepV = niceStep(layout.v1 - layout.v0);
   const uTicks: number[] = [];
@@ -245,33 +308,86 @@ function SectionGrid({
   return (
     <g>
       {uTicks.map((u, i) => (
-        <line key={`gu-${i}`} x1={layout.toX(u)} y1={PAD.t} x2={layout.toX(u)} y2={SVG_H - PAD.b}
-          stroke="#1f2937" strokeWidth={0.5} />
+        <line
+          key={`gu-${i}`}
+          x1={layout.toX(u)}
+          y1={PAD.t}
+          x2={layout.toX(u)}
+          y2={SVG_H - PAD.b}
+          stroke="#1f2937"
+          strokeWidth={0.5}
+        />
       ))}
       {vTicks.map((v, i) => (
-        <line key={`gv-${i}`} x1={PAD.l} y1={layout.toY(v)} x2={SVG_W - PAD.r} y2={layout.toY(v)}
-          stroke="#1f2937" strokeWidth={0.5} />
+        <line
+          key={`gv-${i}`}
+          x1={PAD.l}
+          y1={layout.toY(v)}
+          x2={SVG_W - PAD.r}
+          y2={layout.toY(v)}
+          stroke="#1f2937"
+          strokeWidth={0.5}
+        />
       ))}
-      <line x1={PAD.l} y1={SVG_H - PAD.b} x2={SVG_W - PAD.r} y2={SVG_H - PAD.b} stroke="#475569" strokeWidth={0.8} />
-      <line x1={PAD.l} y1={PAD.t} x2={PAD.l} y2={SVG_H - PAD.b} stroke="#475569" strokeWidth={0.8} />
+      <line
+        x1={PAD.l}
+        y1={SVG_H - PAD.b}
+        x2={SVG_W - PAD.r}
+        y2={SVG_H - PAD.b}
+        stroke="#475569"
+        strokeWidth={0.8}
+      />
+      <line
+        x1={PAD.l}
+        y1={PAD.t}
+        x2={PAD.l}
+        y2={SVG_H - PAD.b}
+        stroke="#475569"
+        strokeWidth={0.8}
+      />
       {uTicks.map((u, i) => (
-        <text key={`tu-${i}`} x={layout.toX(u)} y={SVG_H - PAD.b + 12}
-          fontFamily="monospace" fontSize="9" fill="#94a3b8" textAnchor="middle">
+        <text
+          key={`tu-${i}`}
+          x={layout.toX(u)}
+          y={SVG_H - PAD.b + 12}
+          fontFamily="monospace"
+          fontSize="9"
+          fill="#94a3b8"
+          textAnchor="middle"
+        >
           {Math.round(u)}
         </text>
       ))}
       {vTicks.map((v, i) => (
-        <text key={`tv-${i}`} x={PAD.l - 6} y={layout.toY(v) + 3}
-          fontFamily="monospace" fontSize="9" fill="#94a3b8" textAnchor="end">
+        <text
+          key={`tv-${i}`}
+          x={PAD.l - 6}
+          y={layout.toY(v) + 3}
+          fontFamily="monospace"
+          fontSize="9"
+          fill="#94a3b8"
+          textAnchor="end"
+        >
           {Math.round(v)}
         </text>
       ))}
-      <text x={(PAD.l + SVG_W - PAD.r) / 2} y={SVG_H - 6} fontFamily="monospace" fontSize="10"
-        fill="#cbd5e1" textAnchor="middle">
+      <text
+        x={(PAD.l + SVG_W - PAD.r) / 2}
+        y={SVG_H - 6}
+        fontFamily="monospace"
+        fontSize="10"
+        fill="#cbd5e1"
+        textAnchor="middle"
+      >
         u · {kind === "vertical" ? "distancia horizontal (m)" : "este (m)"}
       </text>
-      <text transform={`translate(14, ${(PAD.t + SVG_H - PAD.b) / 2}) rotate(-90)`}
-        fontFamily="monospace" fontSize="10" fill="#cbd5e1" textAnchor="middle">
+      <text
+        transform={`translate(14, ${(PAD.t + SVG_H - PAD.b) / 2}) rotate(-90)`}
+        fontFamily="monospace"
+        fontSize="10"
+        fill="#cbd5e1"
+        textAnchor="middle"
+      >
         v · {kind === "vertical" ? "elevación (m)" : "norte (m)"}
       </text>
     </g>

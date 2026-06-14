@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, LayersControl, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, LayersControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   ILLAPEL_CENTER,
@@ -96,12 +96,10 @@ export function Lv5Page5Preview() {
       {/* Leyenda */}
       <aside className="w-full lg:w-72 shrink-0 space-y-4 text-xs font-mono">
         <div className="rounded-lg border border-gold/30 p-3 bg-card/40">
-          <h3 className="text-gold uppercase tracking-wider mb-2">
-            Página 5 · Esquema geológico
-          </h3>
+          <h3 className="text-gold uppercase tracking-wider mb-2">Página 5 · Esquema geológico</h3>
           <p className="text-muted-foreground leading-relaxed">
-            Vista interactiva equivalente a la carta SERNAGEOMIN renderizada en el PDF
-            v3.1: unidades de la Hoja Illapel 1:250.000 sobre imagen satelital ESRI.
+            Vista interactiva equivalente a la carta SERNAGEOMIN renderizada en el PDF v3.1:
+            unidades de la Hoja Illapel 1:250.000 sobre imagen satelital ESRI.
           </p>
         </div>
 

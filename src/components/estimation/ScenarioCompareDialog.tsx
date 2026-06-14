@@ -1,11 +1,6 @@
 import { useState } from "react";
 import type { EconomicScenario } from "@/hooks/useEconomicScenarios";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { GitCompare } from "lucide-react";
@@ -44,7 +39,9 @@ export function ScenarioCompareDialog({
       prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(0, 5),
     );
 
-  const rows: Array<[string, (s: EconomicScenario) => string, (s: EconomicScenario) => number | null]> = [
+  const rows: Array<
+    [string, (s: EconomicScenario) => string, (s: EconomicScenario) => number | null]
+  > = [
     ["NPV", (s) => fmtUsd(s.npv_usd), (s) => s.npv_usd],
     ["IRR", (s) => (s.irr_pct != null ? `${s.irr_pct.toFixed(1)}%` : "—"), (s) => s.irr_pct],
     ["EBITDA", (s) => fmtUsd(s.ebitda_usd), (s) => s.ebitda_usd],
@@ -53,7 +50,11 @@ export function ScenarioCompareDialog({
     ["Strip", (s) => (s.strip_ratio != null ? s.strip_ratio.toFixed(2) : "—"), () => null],
     ["Vida (a)", (s) => `${s.mine_life_years ?? "—"}`, () => null],
     ["Payback (a)", (s) => `${s.payback_years ?? "—"}`, () => null],
-    ["Cutoff", (s) => (s.nsr_cutoff_usd_t != null ? `$${s.nsr_cutoff_usd_t.toFixed(1)}/t` : "—"), () => null],
+    [
+      "Cutoff",
+      (s) => (s.nsr_cutoff_usd_t != null ? `$${s.nsr_cutoff_usd_t.toFixed(1)}/t` : "—"),
+      () => null,
+    ],
     ["Precio", (s) => `$${s.commodity_price_usd.toFixed(2)}`, () => null],
     ["Recovery", (s) => `${s.recovery_pct}%`, () => null],
     ["Capex", (s) => fmtUsd(s.capex_usd), () => null],

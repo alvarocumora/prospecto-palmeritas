@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";

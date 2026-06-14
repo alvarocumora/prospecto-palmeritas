@@ -10,8 +10,20 @@ import Papa from "papaparse";
 
 export type CollarRow = { hole_id: string; x: number; y: number; z: number };
 export type SurveyRow = { hole_id: string; depth: number; azimuth: number; dip: number };
-export type AssayRow = { hole_id: string; from: number; to: number; grade: number; element?: string };
-export type LithRow = { hole_id: string; from: number; to: number; lith_code: string; color?: string };
+export type AssayRow = {
+  hole_id: string;
+  from: number;
+  to: number;
+  grade: number;
+  element?: string;
+};
+export type LithRow = {
+  hole_id: string;
+  from: number;
+  to: number;
+  lith_code: string;
+  color?: string;
+};
 
 export type ParsedDrillholeBundle = {
   collars: CollarRow[];
@@ -24,18 +36,45 @@ export type ParsedDrillholeBundle = {
 type CsvKind = "collar" | "survey" | "assay" | "lithology";
 
 const FIELD_ALIASES: Record<string, string> = {
-  hole_id: "hole_id", holeid: "hole_id", hole: "hole_id", bhid: "hole_id", id: "hole_id",
-  x: "x", easting: "x", east: "x",
-  y: "y", northing: "y", north: "y",
-  z: "z", elevation: "z", elev: "z", rl: "z",
-  depth: "depth", md: "depth", from_depth: "depth",
-  azimuth: "azimuth", azi: "azimuth", az: "azimuth",
-  dip: "dip", inclination: "dip", inc: "dip",
-  from: "from", from_m: "from",
-  to: "to", to_m: "to",
-  grade: "grade", value: "grade", au: "grade", cu: "grade", ag: "grade",
-  element: "element", el: "element",
-  lith_code: "lith_code", lith: "lith_code", litho: "lith_code", code: "lith_code",
+  hole_id: "hole_id",
+  holeid: "hole_id",
+  hole: "hole_id",
+  bhid: "hole_id",
+  id: "hole_id",
+  x: "x",
+  easting: "x",
+  east: "x",
+  y: "y",
+  northing: "y",
+  north: "y",
+  z: "z",
+  elevation: "z",
+  elev: "z",
+  rl: "z",
+  depth: "depth",
+  md: "depth",
+  from_depth: "depth",
+  azimuth: "azimuth",
+  azi: "azimuth",
+  az: "azimuth",
+  dip: "dip",
+  inclination: "dip",
+  inc: "dip",
+  from: "from",
+  from_m: "from",
+  to: "to",
+  to_m: "to",
+  grade: "grade",
+  value: "grade",
+  au: "grade",
+  cu: "grade",
+  ag: "grade",
+  element: "element",
+  el: "element",
+  lith_code: "lith_code",
+  lith: "lith_code",
+  litho: "lith_code",
+  code: "lith_code",
   color: "color",
 };
 
@@ -54,7 +93,10 @@ function num(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-export function parseCsvText(text: string, kind: CsvKind): { rows: Record<string, unknown>[]; errors: string[] } {
+export function parseCsvText(
+  text: string,
+  kind: CsvKind,
+): { rows: Record<string, unknown>[]; errors: string[] } {
   const errors: string[] = [];
   const parsed = Papa.parse<Record<string, unknown>>(text, {
     header: true,
@@ -84,7 +126,9 @@ export function buildBundle(input: {
     errors.push(...e);
     for (const r of rows) {
       const hole_id = String(r.hole_id ?? "").trim();
-      const x = num(r.x), y = num(r.y), z = num(r.z);
+      const x = num(r.x),
+        y = num(r.y),
+        z = num(r.z);
       if (!hole_id || x == null || y == null || z == null) continue;
       collars.push({ hole_id, x, y, z });
     }
@@ -94,7 +138,9 @@ export function buildBundle(input: {
     errors.push(...e);
     for (const r of rows) {
       const hole_id = String(r.hole_id ?? "").trim();
-      const depth = num(r.depth), azimuth = num(r.azimuth), dip = num(r.dip);
+      const depth = num(r.depth),
+        azimuth = num(r.azimuth),
+        dip = num(r.dip);
       if (!hole_id || depth == null || azimuth == null || dip == null) continue;
       surveys.push({ hole_id, depth, azimuth, dip });
     }
@@ -104,7 +150,9 @@ export function buildBundle(input: {
     errors.push(...e);
     for (const r of rows) {
       const hole_id = String(r.hole_id ?? "").trim();
-      const from = num(r.from), to = num(r.to), grade = num(r.grade);
+      const from = num(r.from),
+        to = num(r.to),
+        grade = num(r.grade);
       if (!hole_id || from == null || to == null || grade == null) continue;
       assays.push({ hole_id, from, to, grade, element: r.element ? String(r.element) : undefined });
     }
@@ -114,10 +162,13 @@ export function buildBundle(input: {
     errors.push(...e);
     for (const r of rows) {
       const hole_id = String(r.hole_id ?? "").trim();
-      const from = num(r.from), to = num(r.to);
+      const from = num(r.from),
+        to = num(r.to);
       if (!hole_id || from == null || to == null) continue;
       lithology.push({
-        hole_id, from, to,
+        hole_id,
+        from,
+        to,
         lith_code: String(r.lith_code ?? "u"),
         color: r.color ? String(r.color) : undefined,
       });
@@ -132,9 +183,7 @@ export function interpAzDip(
   holeId: string,
   depth: number,
 ): { azimuth: number; dip: number } {
-  const list = surveys
-    .filter((s) => s.hole_id === holeId)
-    .sort((a, b) => a.depth - b.depth);
+  const list = surveys.filter((s) => s.hole_id === holeId).sort((a, b) => a.depth - b.depth);
   if (list.length === 0) return { azimuth: 0, dip: -90 };
   if (depth <= list[0].depth) return { azimuth: list[0].azimuth, dip: list[0].dip };
   if (depth >= list[list.length - 1].depth) {
@@ -162,8 +211,17 @@ export function desurveyHole(
   totalDepth: number,
   step = 5,
 ): Array<{ depth: number; x: number; y: number; z: number; azimuth: number; dip: number }> {
-  const out: Array<{ depth: number; x: number; y: number; z: number; azimuth: number; dip: number }> = [];
-  let cx = collar.x, cy = collar.y, cz = collar.z;
+  const out: Array<{
+    depth: number;
+    x: number;
+    y: number;
+    z: number;
+    azimuth: number;
+    dip: number;
+  }> = [];
+  let cx = collar.x,
+    cy = collar.y,
+    cz = collar.z;
   let d = 0;
   out.push({ depth: 0, x: cx, y: cy, z: cz, azimuth: 0, dip: -90 });
   while (d < totalDepth) {

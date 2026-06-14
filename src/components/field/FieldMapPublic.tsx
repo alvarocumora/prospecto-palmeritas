@@ -1,8 +1,26 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import "leaflet/dist/leaflet.css";
-import type { GeoJSON as LeafletGeoJSON, LayerGroup, Map as LeafletMap, Marker, Circle } from "leaflet";
-import { Crosshair, MapPin, Loader2, RefreshCw, WifiOff, Download, Trash2, Box, Flame, Zap, Layers } from "lucide-react";
+import type {
+  GeoJSON as LeafletGeoJSON,
+  LayerGroup,
+  Map as LeafletMap,
+  Marker,
+  Circle,
+} from "leaflet";
+import {
+  Crosshair,
+  MapPin,
+  Loader2,
+  RefreshCw,
+  WifiOff,
+  Download,
+  Trash2,
+  Box,
+  Flame,
+  Zap,
+  Layers,
+} from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -223,7 +241,9 @@ export function FieldMapPublic() {
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
         { maxZoom: 19, attribution: "Tiles &copy; Esri" },
       );
-      L.control.layers({ Satélite: sat, Topográfico: topo }, {}, { position: "topright" }).addTo(map);
+      L.control
+        .layers({ Satélite: sat, Topográfico: topo }, {}, { position: "topright" })
+        .addTo(map);
       mapRef.current = map;
       setMapReady(true);
     })();
@@ -355,7 +375,12 @@ export function FieldMapPublic() {
     heatLayerRef.current = null;
     if (!showHeatmap || !anomalies) return;
     (async () => {
-      const layer = await buildAnomalyHeatLayer(L, map, anomalies.magTargets, anomalies.satAnomalies);
+      const layer = await buildAnomalyHeatLayer(
+        L,
+        map,
+        anomalies.magTargets,
+        anomalies.satAnomalies,
+      );
       if (!active) {
         removeLayer(map, layer);
         return;
@@ -421,7 +446,8 @@ export function FieldMapPublic() {
               .replace(/[\u0300-\u036f]/g, "")
               .replace(/\s+/g, " ")
               .trim();
-            const match = name && norms.some((n) => n && (name === n || name.includes(n) || n.includes(name)));
+            const match =
+              name && norms.some((n) => n && (name === n || name.includes(n) || n.includes(name)));
             if (match && "setStyle" in sub) {
               (sub as unknown as { setStyle: (s: Record<string, unknown>) => void }).setStyle({
                 color: "#facc15",
@@ -461,9 +487,6 @@ export function FieldMapPublic() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showCatastro, mapReady, center, projectConcessionNorm]);
-
-
-
 
   // POI layer
   useEffect(() => {
@@ -601,10 +624,14 @@ export function FieldMapPublic() {
       {/* Top bar */}
       <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none z-[1000]">
         <div className="pointer-events-auto inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[11px] text-foreground">
-          <span className={`w-2 h-2 rounded-full ${online ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`} />
+          <span
+            className={`w-2 h-2 rounded-full ${online ? "bg-emerald-500" : "bg-amber-500"} animate-pulse`}
+          />
           {online ? "ONLINE" : "OFFLINE"}
           {loadingData && <Loader2 className="w-3 h-3 animate-spin ml-1" />}
-          <span className="text-muted-foreground">· {targets.length} targets · {pois.length} notas</span>
+          <span className="text-muted-foreground">
+            · {targets.length} targets · {pois.length} notas
+          </span>
         </div>
         <div className="pointer-events-auto flex items-center gap-1.5">
           <InstallPwaButton />
@@ -620,7 +647,11 @@ export function FieldMapPublic() {
           <Flame className="w-3 h-3 inline mr-1" />
           Heatmap
         </ChipBtn>
-        <ChipBtn active={showLineaments} color="#facc15" onClick={() => setShowLineaments((v) => !v)}>
+        <ChipBtn
+          active={showLineaments}
+          color="#facc15"
+          onClick={() => setShowLineaments((v) => !v)}
+        >
           <Zap className="w-3 h-3 inline mr-1" />
           Vetas
         </ChipBtn>
@@ -651,13 +682,18 @@ export function FieldMapPublic() {
                 "linear-gradient(90deg,#1e3a8a 0%,#0ea5e9 30%,#facc15 50%,#fb923c 70%,#dc2626 100%)",
             }}
           />
-          <div className="flex justify-between mt-1"><span>baja</span><span>alta</span></div>
+          <div className="flex justify-between mt-1">
+            <span>baja</span>
+            <span>alta</span>
+          </div>
         </div>
       )}
 
       {/* Catastro mini-legend */}
       {showCatastro && (
-        <div className={`absolute ${showHeatmap ? "bottom-36" : "bottom-20"} left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground`}>
+        <div
+          className={`absolute ${showHeatmap ? "bottom-36" : "bottom-20"} left-3 z-[1000] p-2 rounded-md bg-bg-panel/90 backdrop-blur border border-border font-mono text-[10px] text-muted-foreground`}
+        >
           <div className="text-gold font-bold mb-1">Catastro SERNAGEOMIN</div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
             {(Object.keys(CATASTRO_STYLE) as CatastroOrigen[]).map((o) => (
@@ -684,15 +720,15 @@ export function FieldMapPublic() {
         </div>
       )}
 
-
-
       {/* Bottom controls */}
       <div className="absolute bottom-4 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setFollow((v) => !v)}
             className={`min-h-[44px] px-3 rounded-md border font-mono text-xs ${
-              follow ? "bg-blue-500/15 border-blue-500 text-blue-400" : "bg-bg-panel/90 border-border text-muted-foreground"
+              follow
+                ? "bg-blue-500/15 border-blue-500 text-blue-400"
+                : "bg-bg-panel/90 border-border text-muted-foreground"
             }`}
           >
             <Crosshair className="w-3.5 h-3.5 inline mr-1" />
@@ -758,11 +794,13 @@ export function FieldMapPublic() {
       )}
 
       {show3D && (
-        <Suspense fallback={
-          <div className="fixed inset-0 z-[3000] bg-bg-app flex items-center justify-center text-muted-foreground font-mono text-xs gap-2">
-            <Loader2 className="w-4 h-4 animate-spin" /> Cargando 3D…
-          </div>
-        }>
+        <Suspense
+          fallback={
+            <div className="fixed inset-0 z-[3000] bg-bg-app flex items-center justify-center text-muted-foreground font-mono text-xs gap-2">
+              <Loader2 className="w-4 h-4 animate-spin" /> Cargando 3D…
+            </div>
+          }
+        >
           <Structures3DViewer onClose={() => setShow3D(false)} />
         </Suspense>
       )}
@@ -824,7 +862,11 @@ function NoteSheet({
       >
         <div className="flex items-center justify-between">
           <h3 className="font-mono text-sm font-bold text-gold">Nueva nota de campo</h3>
-          <button type="button" onClick={onClose} className="text-muted-foreground text-xs font-mono">
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-muted-foreground text-xs font-mono"
+          >
             Cerrar
           </button>
         </div>
@@ -867,7 +909,9 @@ function NoteSheet({
           />
         </div>
         <div>
-          <label className="block text-xs font-mono text-muted-foreground mb-1">Foto (opcional)</label>
+          <label className="block text-xs font-mono text-muted-foreground mb-1">
+            Foto (opcional)
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -885,7 +929,8 @@ function NoteSheet({
           Guardar nota
         </button>
         <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
-          <Trash2 className="w-3 h-3" /> Las notas se guardan en tu dispositivo. Usa "Exportar" para descargarlas como GeoJSON.
+          <Trash2 className="w-3 h-3" /> Las notas se guardan en tu dispositivo. Usa "Exportar" para
+          descargarlas como GeoJSON.
         </div>
       </form>
     </div>

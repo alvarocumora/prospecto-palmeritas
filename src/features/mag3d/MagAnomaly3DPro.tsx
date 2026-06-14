@@ -53,14 +53,10 @@ export function MagAnomaly3DPro() {
   const magLayerRef = useRef<L.ImageOverlay | null>(null);
   const targetsLayerRef = useRef<L.LayerGroup | null>(null);
   const [magOpacity, setMagOpacity] = useState(0.55);
-  const [showSat, setShowSat] = useState(true);
 
   const { data: targetsData } = useQuery({
     queryKey: ["mag_targets", projectId],
-    queryFn: () =>
-      projectId
-        ? listFn({ data: { projectId } })
-        : Promise.resolve({ targets: [] }),
+    queryFn: () => (projectId ? listFn({ data: { projectId } }) : Promise.resolve({ targets: [] })),
     enabled: !!projectId,
   });
 
@@ -120,6 +116,7 @@ export function MagAnomaly3DPro() {
       map.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update opacity
@@ -216,12 +213,10 @@ export function MagAnomaly3DPro() {
               {detectMut.data.stats.std.toFixed(1)} nT
             </div>
             <div>
-              rango [{detectMut.data.stats.min.toFixed(0)},{" "}
-              {detectMut.data.stats.max.toFixed(0)}] nT
+              rango [{detectMut.data.stats.min.toFixed(0)}, {detectMut.data.stats.max.toFixed(0)}]
+              nT
             </div>
-            <div className="text-gold">
-              {detectMut.data.persisted} targets guardados
-            </div>
+            <div className="text-gold">{detectMut.data.persisted} targets guardados</div>
           </div>
         )}
 
@@ -238,10 +233,7 @@ export function MagAnomaly3DPro() {
             <Satellite className="h-3 w-3" />
             <span>ESRI World Imagery + EMAG2v3 NOAA NCEI</span>
           </div>
-          <Link
-            to="/dashboard/geology3d"
-            className="mt-1 inline-block text-gold hover:underline"
-          >
+          <Link to="/dashboard/geology3d" className="mt-1 inline-block text-gold hover:underline">
             → Ver modelo 3D estructural
           </Link>
         </div>

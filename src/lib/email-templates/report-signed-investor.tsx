@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import * as React from "react";
 import { Heading, Text } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
@@ -32,8 +33,8 @@ const Email = ({
       Reporte {reportType?.toUpperCase() ?? ""} firmado — {projectName ?? ""}
     </Heading>
     <Text style={styles.p}>
-      Estimado/a {recipientName ?? "inversionista"}, el reporte técnico del proyecto fue firmado
-      por la Persona Calificada (QP) y está disponible para tu revisión. Cumple con los estándares
+      Estimado/a {recipientName ?? "inversionista"}, el reporte técnico del proyecto fue firmado por
+      la Persona Calificada (QP) y está disponible para tu revisión. Cumple con los estándares
       regulatorios aplicables y respalda la valoración del activo.
     </Text>
     <KeyValueBlock

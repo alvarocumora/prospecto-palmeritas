@@ -39,7 +39,13 @@ function stableStringify(obj: unknown): string {
   if (obj === null || typeof obj !== "object") return JSON.stringify(obj);
   if (Array.isArray(obj)) return "[" + obj.map(stableStringify).join(",") + "]";
   const keys = Object.keys(obj as object).sort();
-  return "{" + keys.map((k) => JSON.stringify(k) + ":" + stableStringify((obj as Record<string, unknown>)[k])).join(",") + "}";
+  return (
+    "{" +
+    keys
+      .map((k) => JSON.stringify(k) + ":" + stableStringify((obj as Record<string, unknown>)[k]))
+      .join(",") +
+    "}"
+  );
 }
 
 export function computeHash(payload: unknown): string {

@@ -13,12 +13,12 @@ Integra **catastro, exploración geocientífica, monitoreo satelital, NI 43-101 
 
 **Audiencia:**
 
-| Perfil | Caso de uso |
-|---|---|
-| Holdings y juniors | Estructurar activos, levantar capital, NI 43-101 |
-| Fondos / family offices | Due diligence acelerado, screening de +47.000 concesiones |
-| Qualified Persons / consultoras | Trazabilidad, firma electrónica, audit-trail |
-| Reguladores | Compliance, vencimientos, expedientes |
+| Perfil                          | Caso de uso                                               |
+| ------------------------------- | --------------------------------------------------------- |
+| Holdings y juniors              | Estructurar activos, levantar capital, NI 43-101          |
+| Fondos / family offices         | Due diligence acelerado, screening de +47.000 concesiones |
+| Qualified Persons / consultoras | Trazabilidad, firma electrónica, audit-trail              |
+| Reguladores                     | Compliance, vencimientos, expedientes                     |
 
 ---
 
@@ -39,24 +39,24 @@ Integra **catastro, exploración geocientífica, monitoreo satelital, NI 43-101 
 
 Geocapitals tiene **dos shells deliberadamente distintos** que comparten marca:
 
-| Contexto | Scope CSS | Fondo | Cuándo |
-|---|---|---|---|
-| **Marketing / público** | `.brand-light` | Blanco roto, navy/blue/gold | `/`, `/proyectos`, `/inversionistas`, `/empresas`, `/recursos`, `/contacto`, `/terminal*` |
-| **Operations Console** | tokens shadcn dark | `#06080A` (void) | `/_authenticated/dashboard/*` |
+| Contexto                | Scope CSS          | Fondo                       | Cuándo                                                                                    |
+| ----------------------- | ------------------ | --------------------------- | ----------------------------------------------------------------------------------------- |
+| **Marketing / público** | `.brand-light`     | Blanco roto, navy/blue/gold | `/`, `/proyectos`, `/inversionistas`, `/empresas`, `/recursos`, `/contacto`, `/terminal*` |
+| **Operations Console**  | tokens shadcn dark | `#06080A` (void)            | `/_authenticated/dashboard/*`                                                             |
 
 Los unifica la marca (logo G + nombre GEOCAPITALS), las fuentes y el lenguaje cromático secundario (gold + navy).
 
 ### 3.2 Paleta `--brand-*` (marketing)
 
 ```css
---brand-navy:      oklch(0.27 0.09 260);
+--brand-navy: oklch(0.27 0.09 260);
 --brand-navy-deep: oklch(0.18 0.08 260);
---brand-blue:      oklch(0.55 0.20 255);  /* primario CTA */
+--brand-blue: oklch(0.55 0.2 255); /* primario CTA */
 --brand-blue-soft: oklch(0.96 0.025 255); /* fondo suave */
---brand-gold:      oklch(0.78 0.13 78);   /* acento marca */
---brand-ink:       oklch(0.18 0.02 260);
---brand-mute:      oklch(0.50 0.02 260);
---brand-hair:      oklch(0.90 0.01 260);  /* bordes */
+--brand-gold: oklch(0.78 0.13 78); /* acento marca */
+--brand-ink: oklch(0.18 0.02 260);
+--brand-mute: oklch(0.5 0.02 260);
+--brand-hair: oklch(0.9 0.01 260); /* bordes */
 ```
 
 ### 3.3 Tipografía
@@ -122,23 +122,23 @@ Definido en `src/routes/_authenticated.tsx`. Todos los módulos del dashboard (`
 
 ### 5.1 Públicas (sin auth)
 
-| Ruta | Descripción | head() propio |
-|---|---|---|
-| `/` | Landing con mapa en vivo, giro animado, contacto | ✓ |
-| `/proyectos` | Showcase de proyectos reales + CTA publicar | ✓ |
-| `/inversionistas` | Propuesta de valor para fondos + form lead | ✓ |
-| `/empresas` | Planes institucionales (Explorer · Operator · Institutional) | ✓ |
-| `/recursos` | Guías, whitepapers, demos | ✓ |
-| `/contacto` | Formulario completo + info de contacto | ✓ |
-| `/auth` | Login / signup | ✓ |
-| `/reset-password` | Recuperar contraseña | ✓ |
-| `/terminal` · `/terminal.market` · `/terminal.capital-raise` · `/terminal.tokenize` | Pre-vista pública del terminal | ✓ |
-| `/catastro` · `/catastro.mapa` · `/catastro.precios` · `/catastro.c.$code` · `/catastro.app.watchlist` | Vistas públicas del catastro | ✓ |
-| `/live/palmeras` · `/live/losverdes` · `/live/tilama` · `/live/franco` | Vistas en vivo de proyectos demo | ✓ |
-| `/diag/mining-engine` | Diagnóstico ingeniería minera | ✓ |
-| `/invitations/$token` | Aceptar invitación a organización | ✓ |
-| `/share/targets/$projectId` | Compartir targets vía link público | ✓ |
-| `/api/public/*` | Webhooks y APIs públicas (sync catastro, verify compliance, live map) | n/a |
+| Ruta                                                                                                   | Descripción                                                           | head() propio |
+| ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- | ------------- |
+| `/`                                                                                                    | Landing con mapa en vivo, giro animado, contacto                      | ✓             |
+| `/proyectos`                                                                                           | Showcase de proyectos reales + CTA publicar                           | ✓             |
+| `/inversionistas`                                                                                      | Propuesta de valor para fondos + form lead                            | ✓             |
+| `/empresas`                                                                                            | Planes institucionales (Explorer · Operator · Institutional)          | ✓             |
+| `/recursos`                                                                                            | Guías, whitepapers, demos                                             | ✓             |
+| `/contacto`                                                                                            | Formulario completo + info de contacto                                | ✓             |
+| `/auth`                                                                                                | Login / signup                                                        | ✓             |
+| `/reset-password`                                                                                      | Recuperar contraseña                                                  | ✓             |
+| `/terminal` · `/terminal.market` · `/terminal.capital-raise` · `/terminal.tokenize`                    | Pre-vista pública del terminal                                        | ✓             |
+| `/catastro` · `/catastro.mapa` · `/catastro.precios` · `/catastro.c.$code` · `/catastro.app.watchlist` | Vistas públicas del catastro                                          | ✓             |
+| `/live/palmeras` · `/live/losverdes` · `/live/tilama` · `/live/franco`                                 | Vistas en vivo de proyectos demo                                      | ✓             |
+| `/diag/mining-engine`                                                                                  | Diagnóstico ingeniería minera                                         | ✓             |
+| `/invitations/$token`                                                                                  | Aceptar invitación a organización                                     | ✓             |
+| `/share/targets/$projectId`                                                                            | Compartir targets vía link público                                    | ✓             |
+| `/api/public/*`                                                                                        | Webhooks y APIs públicas (sync catastro, verify compliance, live map) | n/a           |
 
 ### 5.2 Autenticadas (`/_authenticated/dashboard/*`)
 
@@ -161,25 +161,25 @@ Otros: `3d-pro`, `geology3d`, `field-map`, `map`, `command-center`, `opportuniti
 
 ## 6. Inventario de botones y CTAs del landing `/`
 
-| Sección | Botón / link | Destino | Función |
-|---|---|---|---|
-| Header | BrandMark | `/` | Volver al inicio |
-| Header | Nav (Proyectos / Inversionistas / Empresas / Recursos / Contacto) | `/proyectos`, etc. | Rutas reales con head propio |
-| Header | "Iniciar sesión" | `/auth` | Login |
-| Header | "Registrarse" | `/auth` | Signup |
-| Hero | "Publica tu proyecto" | `/proyectos#publicar` | CTA dueño |
-| Hero | "Explorar oportunidades" | `/terminal` | Pre-vista terminal |
-| Hero · Live map | Navegación interactiva | (mapa) | Pan/zoom + bbox auto-fit |
-| Proceso (giro) | Nodos visuales (Publica · Conecta · Negocia · Cierra) | (decorativo) | Highlight secuencial cada 3s |
-| Para inversionistas | "Explorar oportunidades" | `/inversionistas` | Página dedicada |
-| Palmeras | "Ver vista en vivo" | `/live/palmeras` | Vista demo en vivo |
-| Casos de uso · Holdings | "Ver más" | `/empresas` | Pricing |
-| Casos de uso · Fondos | "Ver más" | `/inversionistas` | Lead capture |
-| Casos de uso · QPs | "Ver más" | `/recursos` | Documentación |
-| CTA principal | "Solicitar acceso institucional" | `/auth` | Signup |
-| CTA principal | "Explorar el terminal en vivo" | `/terminal` | Demo terminal |
-| Contacto embebido | Form (nombre/email/org/perfil/mensaje) | `submitContactMessage` → `contact_messages` | Lead a DB |
-| Footer | Links producto/compañía | varias | Navegación secundaria |
+| Sección                 | Botón / link                                                      | Destino                                     | Función                      |
+| ----------------------- | ----------------------------------------------------------------- | ------------------------------------------- | ---------------------------- |
+| Header                  | BrandMark                                                         | `/`                                         | Volver al inicio             |
+| Header                  | Nav (Proyectos / Inversionistas / Empresas / Recursos / Contacto) | `/proyectos`, etc.                          | Rutas reales con head propio |
+| Header                  | "Iniciar sesión"                                                  | `/auth`                                     | Login                        |
+| Header                  | "Registrarse"                                                     | `/auth`                                     | Signup                       |
+| Hero                    | "Publica tu proyecto"                                             | `/proyectos#publicar`                       | CTA dueño                    |
+| Hero                    | "Explorar oportunidades"                                          | `/terminal`                                 | Pre-vista terminal           |
+| Hero · Live map         | Navegación interactiva                                            | (mapa)                                      | Pan/zoom + bbox auto-fit     |
+| Proceso (giro)          | Nodos visuales (Publica · Conecta · Negocia · Cierra)             | (decorativo)                                | Highlight secuencial cada 3s |
+| Para inversionistas     | "Explorar oportunidades"                                          | `/inversionistas`                           | Página dedicada              |
+| Palmeras                | "Ver vista en vivo"                                               | `/live/palmeras`                            | Vista demo en vivo           |
+| Casos de uso · Holdings | "Ver más"                                                         | `/empresas`                                 | Pricing                      |
+| Casos de uso · Fondos   | "Ver más"                                                         | `/inversionistas`                           | Lead capture                 |
+| Casos de uso · QPs      | "Ver más"                                                         | `/recursos`                                 | Documentación                |
+| CTA principal           | "Solicitar acceso institucional"                                  | `/auth`                                     | Signup                       |
+| CTA principal           | "Explorar el terminal en vivo"                                    | `/terminal`                                 | Demo terminal                |
+| Contacto embebido       | Form (nombre/email/org/perfil/mensaje)                            | `submitContactMessage` → `contact_messages` | Lead a DB                    |
+| Footer                  | Links producto/compañía                                           | varias                                      | Navegación secundaria        |
 
 ---
 
@@ -187,18 +187,18 @@ Otros: `3d-pro`, `geology3d`, `field-map`, `map`, `command-center`, `opportuniti
 
 ### 7.1 Tabla `public.contact_messages`
 
-| Campo | Tipo | Notas |
-|---|---|---|
-| `id` | uuid PK | |
-| `name` | text NOT NULL | 1-200 chars |
-| `email` | text NOT NULL | 3-320 chars |
-| `organization` | text | ≤200 chars |
-| `role` | text | `owner` / `investor` / `qp` / `other` |
-| `message` | text NOT NULL | 5-4000 chars |
-| `source` | text | `landing`, `landing-home`, `contact-page`, `inversionistas` |
-| `user_agent` | text | reservado |
-| `status` | text | `new` / `read` / `answered` / `spam` |
-| `created_at` | timestamptz | default `now()` |
+| Campo          | Tipo          | Notas                                                       |
+| -------------- | ------------- | ----------------------------------------------------------- |
+| `id`           | uuid PK       |                                                             |
+| `name`         | text NOT NULL | 1-200 chars                                                 |
+| `email`        | text NOT NULL | 3-320 chars                                                 |
+| `organization` | text          | ≤200 chars                                                  |
+| `role`         | text          | `owner` / `investor` / `qp` / `other`                       |
+| `message`      | text NOT NULL | 5-4000 chars                                                |
+| `source`       | text          | `landing`, `landing-home`, `contact-page`, `inversionistas` |
+| `user_agent`   | text          | reservado                                                   |
+| `status`       | text          | `new` / `read` / `answered` / `spam`                        |
+| `created_at`   | timestamptz   | default `now()`                                             |
 
 ### 7.2 RLS
 
