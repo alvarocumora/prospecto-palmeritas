@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type CSSProperties } from "react";
 
 /**
  * Scroll-reveal wrapper. Adds `.reveal-in` when the element first enters the
@@ -9,19 +9,17 @@ import { useEffect, useRef, useState, type ElementType, type ReactNode } from "r
  */
 export function Reveal({
   children,
-  as: Tag = "div",
   delay = 0,
   className = "",
   once = true,
 }: {
   children: ReactNode;
-  as?: ElementType;
   /** Stagger delay in milliseconds. */
   delay?: number;
   className?: string;
   once?: boolean;
 }) {
-  const ref = useRef<HTMLElement | null>(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -54,12 +52,12 @@ export function Reveal({
   }, [once]);
 
   return (
-    <Tag
+    <div
       ref={ref}
       className={`reveal${visible ? " reveal-in" : ""} ${className}`.trim()}
-      style={delay ? ({ "--reveal-delay": `${delay}ms` } as React.CSSProperties) : undefined}
+      style={delay ? ({ "--reveal-delay": `${delay}ms` } as CSSProperties) : undefined}
     >
       {children}
-    </Tag>
+    </div>
   );
 }

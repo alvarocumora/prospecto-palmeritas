@@ -116,59 +116,74 @@ export function MarketingHeader() {
     };
   }, [open]);
 
+  // Cierra el menú al cruzar al breakpoint desktop (md): de lo contrario el panel
+  // queda oculto por CSS pero `open` sigue true y el body-lock no se libera.
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return;
+    const mq = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
   return (
-    <header
-      className={`sticky top-0 z-50 bg-white/85 backdrop-blur-md transition-shadow ${
-        scrolled
-          ? "border-b border-[var(--brand-hair)] shadow-[0_8px_24px_-18px_rgba(11,42,91,0.45)]"
-          : "border-b border-transparent"
-      }`}
-    >
-      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
-        <BrandMark />
-        <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--brand-ink)]/80 ml-6">
-          {NAV.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              className="relative py-1 hover:text-[var(--brand-blue)] transition-colors after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-[var(--brand-blue)] after:transition-[width] hover:after:w-full"
-              activeProps={{
-                className: "text-[var(--brand-blue)] font-medium after:w-full",
-              }}
-            >
-              {t(n.key)}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex-1" />
-        <LangToggle />
-        <Link
-          to="/auth"
-          className="text-sm text-[var(--brand-ink)] hover:text-[var(--brand-blue)] hidden sm:inline"
-        >
-          {t("cta_login")}
-        </Link>
-        <Link
-          to="/auth"
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 hover:shadow-[0_10px_24px_-12px_var(--brand-blue)] transition"
-        >
-          {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+    <>
+      <header
+        className={`sticky top-0 z-50 bg-white/85 backdrop-blur-md transition-shadow ${
+          scrolled
+            ? "border-b border-[var(--brand-hair)] shadow-[0_8px_24px_-18px_rgba(11,42,91,0.45)]"
+            : "border-b border-transparent"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
+          <BrandMark />
+          <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--brand-ink)]/80 ml-6">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                className="relative py-1 hover:text-[var(--brand-blue)] transition-colors after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-[var(--brand-blue)] after:transition-[width] hover:after:w-full"
+                activeProps={{
+                  className: "text-[var(--brand-blue)] font-medium after:w-full",
+                }}
+              >
+                {t(n.key)}
+              </Link>
+            ))}
+          </nav>
+          <div className="flex-1" />
+          <LangToggle />
+          <Link
+            to="/auth"
+            className="text-sm text-[var(--brand-ink)] hover:text-[var(--brand-blue)] hidden sm:inline"
+          >
+            {t("cta_login")}
+          </Link>
+          <Link
+            to="/auth"
+            className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 hover:shadow-[0_10px_24px_-12px_var(--brand-blue)] transition"
+          >
+            {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
 
-        {/* Botón hamburguesa — solo móvil */}
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
-          aria-expanded={open}
-          aria-controls="mobile-nav"
-          className="md:hidden grid place-items-center w-10 h-10 -mr-2 rounded-md text-[var(--brand-navy-deep)] hover:bg-[var(--brand-blue-soft)] transition"
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
+          {/* Botón hamburguesa — solo móvil */}
+          <button
+            type="button"
+            onClick={() => setOpen((o) => !o)}
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            aria-expanded={open}
+            aria-controls="mobile-nav"
+            className="md:hidden grid place-items-center w-10 h-10 -mr-2 rounded-md text-[var(--brand-navy-deep)] hover:bg-[var(--brand-blue-soft)] transition"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </header>
 
-      {/* Panel de navegación móvil */}
+      {/* Panel de navegación móvil — fuera del <header> con backdrop-blur para que
+          su posición `fixed` se mida contra el viewport y no contra el header. */}
       {open && (
         <div
           id="mobile-nav"
@@ -206,7 +221,7 @@ export function MarketingHeader() {
           </nav>
         </div>
       )}
-    </header>
+    </>
   );
 }
 
