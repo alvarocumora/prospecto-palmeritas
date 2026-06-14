@@ -12,7 +12,6 @@ import {
   Loader2,
   Satellite,
   Target,
-  Pickaxe,
   Layers as LayersIcon,
   MapPin,
   Sparkles,

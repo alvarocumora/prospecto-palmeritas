@@ -53,7 +53,6 @@ export function MagAnomaly3DPro() {
   const magLayerRef = useRef<L.ImageOverlay | null>(null);
   const targetsLayerRef = useRef<L.LayerGroup | null>(null);
   const [magOpacity, setMagOpacity] = useState(0.55);
-  const [showSat, setShowSat] = useState(true);
 
   const { data: targetsData } = useQuery({
     queryKey: ["mag_targets", projectId],
@@ -117,6 +116,7 @@ export function MagAnomaly3DPro() {
       map.remove();
       mapRef.current = null;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Update opacity

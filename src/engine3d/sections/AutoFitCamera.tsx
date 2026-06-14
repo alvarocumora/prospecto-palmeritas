@@ -16,6 +16,7 @@ type ControlsLike = {
   maxDistance?: number;
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function fitCameraToBounds(
   camera: THREE.Camera,
   controls: ControlsLike | null,
@@ -80,6 +81,7 @@ export function AutoFitCamera({
 }
 
 /** Calcula bounds a partir de arrays heterogéneos, ignorando NaN/Infinity. */
+// eslint-disable-next-line react-refresh/only-export-components
 export function computeSceneBounds(
   sources: Array<{ positions?: ArrayLike<number>; points?: Array<[number, number, number]> }>,
 ): SceneBounds {

@@ -95,6 +95,7 @@ export function useSection(args: UseSectionArgs) {
         }
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isoMesh,
     terrainMesh,

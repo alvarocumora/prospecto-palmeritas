@@ -106,7 +106,7 @@ export async function generateConceptualModel(opts: GenerateOpts): Promise<Gener
   if (!projRes.data) throw new Error(`Project ${projectId} not found`);
   const centerLng = Number(projRes.data.center_lng);
   const centerLat = Number(projRes.data.center_lat);
-  const [centerX, centerY] = toUtm(centerLng, centerLat);
+  const [_centerX, _centerY] = toUtm(centerLng, centerLat);
   const seed = projectId.split("-").reduce((a, p) => a + parseInt(p.slice(0, 4) || "0", 16), 0);
   const rng = mulberry32(seed);
 

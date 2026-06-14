@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { MapContainer, TileLayer, GeoJSON, LayersControl, Tooltip } from "react-leaflet";
+import { MapContainer, TileLayer, GeoJSON, LayersControl } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import {
   ILLAPEL_CENTER,

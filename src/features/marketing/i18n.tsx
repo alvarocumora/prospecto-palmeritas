@@ -6,6 +6,7 @@ const STORAGE_KEY = "geocapitals.locale";
 
 type Dict = Record<string, { es: string; en: string }>;
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const STRINGS: Dict = {
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_investors: { es: "Inversionistas", en: "Investors" },
@@ -80,6 +81,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useLocale(): Ctx {
   const ctx = useContext(LocaleContext);
   if (!ctx) {

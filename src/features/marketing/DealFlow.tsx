@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getPublicListings, type PublicListing } from "@/lib/publicListings.functions";
+import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingCard } from "./PublicListingCard";
 import { PublicListingDrawer } from "./PublicListingDrawer";
 import { Search, SlidersHorizontal, Inbox } from "lucide-react";
@@ -23,7 +23,7 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
     queryFn: () => fetchListings(),
     staleTime: 60_000,
   });
-  const listings = data?.listings ?? [];
+  const listings = useMemo(() => data?.listings ?? [], [data?.listings]);
 
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [openId, setOpenId] = useState<string | null>(initialListingId ?? null);

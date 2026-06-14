@@ -59,7 +59,7 @@ function detectLocalMaxima(samples: Sample[], gridN: number, topK: number): Samp
   // Build 2D grid indexed by [j*gridN + i]; flag a cell as a local max if its |v|
   // strictly exceeds the |v| of its 8 neighbours.
   const grid: (Sample | undefined)[] = new Array(gridN * gridN);
-  for (const s of samples) {
+  for (const _s of samples) {
     // re-derive i,j from coordinates by nearest-neighbour search would be costly;
     // assume samples came back in the same order we sent them (ArcGIS preserves order).
   }

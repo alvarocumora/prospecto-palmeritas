@@ -228,9 +228,9 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     queryFn: () => fetchPitShells({ data: { projectId } }),
     staleTime: 60_000,
   });
-  const synthHoles = synthHolesQ.data?.holes ?? [];
-  const synthBlocks = synthBlocksQ.data?.blocks ?? [];
-  const pitShells = pitShellsQ.data?.shells ?? [];
+  const synthHoles = useMemo(() => synthHolesQ.data?.holes ?? [], [synthHolesQ.data]);
+  const synthBlocks = useMemo(() => synthBlocksQ.data?.blocks ?? [], [synthBlocksQ.data]);
+  const pitShells = useMemo(() => pitShellsQ.data?.shells ?? [], [pitShellsQ.data]);
   const [showSynthHoles, setShowSynthHoles] = useState(true);
   const [showSynthBlocks, setShowSynthBlocks] = useState(true);
   const [showPitShells, setShowPitShells] = useState(true);
@@ -265,7 +265,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   const [showTonnageGrade, setShowTonnageGrade] = useState(true);
   const [showImportPanel, setShowImportPanel] = useState(false);
   const [importedBundle, setImportedBundle] = useState<ParsedDrillholeBundle | null>(null);
-  const [econ, setEcon] = useState({
+  const [econ, _setEcon] = useState({
     price: 2400,
     opex: 25,
     capex: 50_000_000,
@@ -282,7 +282,7 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
   // Sprint 5: AI Geologist + Targets + Reports
   const [aiInterpretation, setAiInterpretation] = useState<AIInterpretation | null>(null);
   const [scenarioIds, setScenarioIds] = useState<Set<string>>(new Set());
-  const [showTargets3D, setShowTargets3D] = useState(true);
+  const [showTargets3D, _setShowTargets3D] = useState(true);
   const [hoveredTarget, setHoveredTarget] = useState<DrillTarget | null>(null);
 
   // Sprint visibility: solo + autofit + debug panel
@@ -320,10 +320,10 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
     cameraXZ: { x: 0, z: 0 },
     targetXZ: { x: 0, z: 0 },
   });
-  const [showMiniMap, setShowMiniMap] = useState(true);
+  const [showMiniMap, _setShowMiniMap] = useState(true);
 
-  const points = pointsQ.data?.points ?? [];
-  const holes = holesQ.data?.holes ?? [];
+  const points = useMemo(() => pointsQ.data?.points ?? [], [pointsQ.data]);
+  const holes = useMemo(() => holesQ.data?.holes ?? [], [holesQ.data]);
   const anomaliesSource = pointsQ.data?.source ?? "empty";
   const drillholesSource = holesQ.data?.source ?? "empty";
   const geoCount = pointsQ.data?.stats.geo ?? 0;
@@ -590,11 +590,6 @@ export function LosVerdesEngine3D({ projectId, height = 640, renderMode = "iso" 
       holePts.push([h.collar.x, h.collar.z * verticalExaggeration, -h.collar.y]);
       holePts.push([h.toe.x, h.toe.z * verticalExaggeration, -h.toe.y]);
     }
-    const targetPts: Array<[number, number, number]> = (drillTargets?.targets ?? []).map((t) => [
-      t.collar.x,
-      -t.depth * verticalExaggeration,
-      -t.collar.y,
-    ]);
     // Synthetic block model — centroides
     const blockPts: Array<[number, number, number]> = synthBlocks.map((b) => [
       b.x,

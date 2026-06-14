@@ -183,7 +183,7 @@ export function OpportunitiesMap({ region, minScore, selectedId, onSelect }: Pro
         { padding: 40, duration: 600, maxZoom: 11 },
       );
     }
-  }, [geo.data, styleReady]);
+  }, [geo.data, styleReady, selectedId]);
 
   // Layer toggles
   useEffect(() => {

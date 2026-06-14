@@ -1,11 +1,11 @@
 // Shell del informe Pre-NI 43-101. TOC sticky + secciones IA + visor 3D embebido.
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Download, FileText, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getPre43101Data, type Pre43101Data } from "../data/pre43101Data.functions";
+import { getPre43101Data } from "../data/pre43101Data.functions";
 import { generateSectionNarrative, type SectionNarrative } from "../ai/generateNarrative.functions";
 import { SECTIONS } from "../sectionsCatalog";
 import { SectionRenderer } from "./SectionRenderer";
