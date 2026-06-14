@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Mail, Linkedin, Link as LinkIcon, Menu, X } from "lucide-react";
 import { useLocale, type Locale } from "@/features/marketing/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import logoMark from "@/assets/geocapitals-mark.png";
@@ -94,8 +95,35 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
 
 export function MarketingHeader() {
   const { t } = useLocale();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // Sombra sutil al hacer scroll para separar el header del contenido.
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Bloquea el scroll del body mientras el menú móvil está abierto.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
+
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-[var(--brand-hair)]">
+    <header
+      className={`sticky top-0 z-50 bg-white/85 backdrop-blur-md transition-shadow ${
+        scrolled
+          ? "border-b border-[var(--brand-hair)] shadow-[0_8px_24px_-18px_rgba(11,42,91,0.45)]"
+          : "border-b border-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
         <BrandMark />
         <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--brand-ink)]/80 ml-6">
@@ -103,8 +131,10 @@ export function MarketingHeader() {
             <Link
               key={n.to}
               to={n.to}
-              className="hover:text-[var(--brand-blue)] transition-colors"
-              activeProps={{ className: "text-[var(--brand-blue)] font-medium" }}
+              className="relative py-1 hover:text-[var(--brand-blue)] transition-colors after:absolute after:left-0 after:-bottom-0.5 after:h-0.5 after:w-0 after:bg-[var(--brand-blue)] after:transition-[width] hover:after:w-full"
+              activeProps={{
+                className: "text-[var(--brand-blue)] font-medium after:w-full",
+              }}
             >
               {t(n.key)}
             </Link>
@@ -120,11 +150,62 @@ export function MarketingHeader() {
         </Link>
         <Link
           to="/auth"
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 transition"
+          className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 hover:shadow-[0_10px_24px_-12px_var(--brand-blue)] transition"
         >
           {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
         </Link>
+
+        {/* Botón hamburguesa — solo móvil */}
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={open}
+          aria-controls="mobile-nav"
+          className="md:hidden grid place-items-center w-10 h-10 -mr-2 rounded-md text-[var(--brand-navy-deep)] hover:bg-[var(--brand-blue-soft)] transition"
+        >
+          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
+
+      {/* Panel de navegación móvil */}
+      {open && (
+        <div
+          id="mobile-nav"
+          className="md:hidden fixed inset-x-0 top-16 bottom-0 z-40 bg-white border-t border-[var(--brand-hair)] overflow-y-auto"
+        >
+          <nav className="px-5 py-4 flex flex-col">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                onClick={() => setOpen(false)}
+                className="py-3.5 text-[15px] text-[var(--brand-ink)] border-b border-[var(--brand-hair)] flex items-center justify-between hover:text-[var(--brand-blue)] transition-colors"
+                activeProps={{ className: "text-[var(--brand-blue)] font-medium" }}
+              >
+                {t(n.key)}
+                <ArrowRight className="w-4 h-4 text-[var(--brand-mute)]" />
+              </Link>
+            ))}
+            <div className="mt-6 flex flex-col gap-3">
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium"
+              >
+                {t("cta_signup")} <ArrowRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/auth"
+                onClick={() => setOpen(false)}
+                className="inline-flex items-center justify-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium"
+              >
+                {t("cta_login")}
+              </Link>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
@@ -324,8 +405,18 @@ export function MarketingPage({
   return (
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
-      <section className="border-b border-[var(--brand-hair)] bg-gradient-to-b from-[var(--brand-blue-soft)]/60 to-white">
-        <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
+      <section className="relative overflow-hidden border-b border-[var(--brand-hair)] bg-gradient-to-b from-[var(--brand-blue-soft)]/60 to-white">
+        {/* Grid decorativo sutil */}
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.5] pointer-events-none [mask-image:linear-gradient(to_bottom,black,transparent)]"
+          style={{
+            backgroundImage:
+              "linear-gradient(var(--brand-hair) 1px, transparent 1px), linear-gradient(90deg, var(--brand-hair) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+          }}
+        />
+        <div className="relative max-w-7xl mx-auto px-5 py-14 lg:py-20">
           {eyebrow && <p className="brand-eyebrow mb-4">{eyebrow}</p>}
           <h1 className="brand-display text-4xl md:text-5xl text-[var(--brand-navy-deep)] max-w-3xl leading-tight">
             {title}

@@ -7,6 +7,8 @@ import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
 
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
+import { Reveal } from "@/components/ui/Reveal";
+import { useReducedMotion } from "@/hooks/useReducedMotion";
 import {
   Mountain,
   Users,
@@ -43,12 +45,14 @@ const PROCESS_STEPS = [
 
 export function MarketingLanding() {
   const { t } = useLocale();
+  const reduceMotion = useReducedMotion();
   // Highlight secuencial del giro del proceso
   const [activeStep, setActiveStep] = useState(0);
   useEffect(() => {
-    const t = setInterval(() => setActiveStep((s) => (s + 1) % PROCESS_STEPS.length), 3000);
-    return () => clearInterval(t);
-  }, []);
+    if (reduceMotion) return; // no auto-avanzar si el usuario prefiere menos movimiento
+    const id = setInterval(() => setActiveStep((s) => (s + 1) % PROCESS_STEPS.length), 3000);
+    return () => clearInterval(id);
+  }, [reduceMotion]);
 
   const statsFn = useServerFn(getPlatformStats);
   const { data: live } = useQuery({
@@ -78,23 +82,32 @@ export function MarketingLanding() {
 
       {/* Hero */}
       <section className="relative overflow-hidden border-b border-[var(--brand-hair)]">
-        <div className="max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
-          <div>
+        {/* Halo de marca de fondo */}
+        <div
+          aria-hidden
+          className="absolute -top-32 -left-24 w-[34rem] h-[34rem] rounded-full pointer-events-none blur-3xl opacity-[0.18]"
+          style={{
+            background: "radial-gradient(circle, var(--brand-blue) 0%, transparent 65%)",
+          }}
+        />
+        <div className="relative max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+          <Reveal>
             <p className="brand-eyebrow mb-5">{t("hero_eyebrow")}</p>
-            <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-[var(--brand-navy-deep)]">
+            <h1 className="brand-display brand-gradient-text text-[44px] sm:text-[56px] leading-[1.05]">
               {t("hero_title")}
             </h1>
             <p className="mt-6 text-lg text-[var(--brand-mute)] max-w-xl">{t("hero_sub")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 to="/contacto"
-                className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95"
+                className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95 hover:shadow-[0_14px_30px_-12px_var(--brand-blue)] transition group"
               >
-                {t("cta_publish")} <ArrowRight className="w-4 h-4" />
+                {t("cta_publish")}{" "}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
               <Link
                 to="/terminal"
-                className="inline-flex items-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium hover:bg-[var(--brand-blue-soft)]"
+                className="inline-flex items-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium hover:bg-[var(--brand-blue-soft)] transition"
               >
                 {t("cta_explore")}
               </Link>
@@ -110,10 +123,12 @@ export function MarketingLanding() {
                 <Globe2 className="w-4 h-4 text-[var(--brand-blue)]" /> 18 países
               </span>
             </div>
-          </div>
+          </Reveal>
 
           {/* Hero LIVE MAP */}
-          <HeroLiveMap />
+          <Reveal delay={120}>
+            <HeroLiveMap />
+          </Reveal>
         </div>
       </section>
 
@@ -291,16 +306,17 @@ export function MarketingLanding() {
                 { i: Layers, t: "Metales base" },
                 { i: Zap, t: "Litio y minerales críticos" },
                 { i: Gem, t: "Energía y otros" },
-              ].map(({ i: Icon, t: title }) => (
-                <div
+              ].map(({ i: Icon, t: title }, idx) => (
+                <Reveal
                   key={title}
-                  className="bg-white rounded-xl border border-[var(--brand-hair)] p-4 text-center"
+                  delay={idx * 60}
+                  className="brand-lift bg-white rounded-xl border border-[var(--brand-hair)] p-4 text-center hover:border-[var(--brand-blue)]"
                 >
                   <Icon className="w-7 h-7 text-[var(--brand-blue)] mx-auto" strokeWidth={1.5} />
                   <div className="mt-2 text-xs font-medium text-[var(--brand-navy-deep)] leading-tight">
                     {title}
                   </div>
-                </div>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -422,20 +438,21 @@ export function MarketingLanding() {
               t: "Capital raise & deals",
               d: "Data room, KYC/AML institucional y matching con inversionistas verificados.",
             },
-          ].map(({ i: Icon, t: title, d }) => (
-            <div
+          ].map(({ i: Icon, t: title, d }, idx) => (
+            <Reveal
               key={title}
-              className="group bg-white border border-[var(--brand-hair)] rounded-xl p-6 hover:border-[var(--brand-blue)] hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition"
+              delay={idx * 60}
+              className="group brand-lift bg-white border border-[var(--brand-hair)] rounded-xl p-6 hover:border-[var(--brand-blue)]"
             >
               <div className="flex items-center justify-between mb-5">
-                <span className="grid place-items-center w-11 h-11 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)]">
+                <span className="grid place-items-center w-11 h-11 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)] group-hover:bg-[var(--brand-blue)] group-hover:text-white transition-colors">
                   <Icon className="w-5 h-5" strokeWidth={1.75} />
                 </span>
                 <ArrowRight className="w-4 h-4 text-[var(--brand-mute)] group-hover:text-[var(--brand-blue)] group-hover:translate-x-0.5 transition" />
               </div>
               <div className="font-display text-lg text-[var(--brand-navy-deep)]">{title}</div>
               <p className="text-sm text-[var(--brand-mute)] mt-2 leading-relaxed">{d}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -489,10 +506,11 @@ export function MarketingLanding() {
                 ],
                 to: "/recursos",
               },
-            ].map(({ i: Icon, tag, t: title, items, to }) => (
-              <div
+            ].map(({ i: Icon, tag, t: title, items, to }, idx) => (
+              <Reveal
                 key={title}
-                className="bg-white border border-[var(--brand-hair)] rounded-2xl p-6 flex flex-col"
+                delay={idx * 80}
+                className="brand-lift bg-white border border-[var(--brand-hair)] rounded-2xl p-6 flex flex-col hover:border-[var(--brand-blue)]"
               >
                 <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)] mb-5">
                   <Icon className="w-4 h-4" /> {tag}
@@ -514,7 +532,7 @@ export function MarketingLanding() {
                 >
                   Ver más <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
