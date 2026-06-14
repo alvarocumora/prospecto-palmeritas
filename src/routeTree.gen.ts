@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
@@ -30,11 +31,13 @@ import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DiagMiningEngineRouteImport } from './routes/diag.mining-engine'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
@@ -77,8 +80,12 @@ import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
+import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
+import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
+import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
 import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -86,6 +93,11 @@ import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/ap
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TerminalRoute = TerminalRouteImport.update({
   id: '/terminal',
   path: '/terminal',
@@ -190,6 +202,11 @@ const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
   path: '/hooks/sync-boletin-minero',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DiagMiningEngineRoute = DiagMiningEngineRouteImport.update({
   id: '/diag/mining-engine',
   path: '/diag/mining-engine',
@@ -214,6 +231,11 @@ const AuthenticatedDashboardIndexRoute =
 const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
   id: '/share/targets/$projectId',
   path: '/share/targets/$projectId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
@@ -465,6 +487,18 @@ const AuthenticatedDashboard3dProRoute =
     path: '/dashboard/3d-pro',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const LovableEmailTransactionalPreviewRoute =
+  LovableEmailTransactionalPreviewRouteImport.update({
+    id: '/lovable/email/transactional/preview',
+    path: '/lovable/email/transactional/preview',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -475,6 +509,18 @@ const ApiPublicVerifyComplianceReportIdRoute =
   ApiPublicVerifyComplianceReportIdRouteImport.update({
     id: '/api/public/verify-compliance/$reportId',
     path: '/api/public/verify-compliance/$reportId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNotificationsSatelliteAnomaliesRoute =
+  ApiPublicNotificationsSatelliteAnomaliesRouteImport.update({
+    id: '/api/public/notifications/satellite-anomalies',
+    path: '/api/public/notifications/satellite-anomalies',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNotificationsCatastroExpirationsRoute =
+  ApiPublicNotificationsCatastroExpirationsRouteImport.update({
+    id: '/api/public/notifications/catastro-expirations',
+    path: '/api/public/notifications/catastro-expirations',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedReportsLosverdesPre43101Route =
@@ -524,9 +570,11 @@ export interface FileRoutesByFullPath {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -580,13 +628,18 @@ export interface FileRoutesByFullPath {
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -601,9 +654,11 @@ export interface FileRoutesByTo {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -657,13 +712,18 @@ export interface FileRoutesByTo {
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -680,9 +740,11 @@ export interface FileRoutesById {
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
+  '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/diag/mining-engine': typeof DiagMiningEngineRoute
+  '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -736,13 +798,18 @@ export interface FileRoutesById {
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
+  '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
+  '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
+  '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
+  '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -759,9 +826,11 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
+    | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -815,13 +884,18 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard/'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -836,9 +910,11 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
+    | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -892,13 +968,18 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -914,9 +995,11 @@ export interface FileRouteTypes {
     | '/recursos'
     | '/reset-password'
     | '/terminal'
+    | '/unsubscribe'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/diag/mining-engine'
+    | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -970,13 +1053,18 @@ export interface FileRouteTypes {
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/reports/losverdes/pre43101'
+    | '/api/public/notifications/catastro-expirations'
+    | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/lovable/email/queue/process'
+    | '/lovable/email/transactional/preview'
+    | '/lovable/email/transactional/send'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -993,9 +1081,11 @@ export interface RootRouteChildren {
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TerminalRoute: typeof TerminalRouteWithChildren
+  UnsubscribeRoute: typeof UnsubscribeRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   DiagMiningEngineRoute: typeof DiagMiningEngineRoute
+  EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
@@ -1007,14 +1097,26 @@ export interface RootRouteChildren {
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
+  LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
+  ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
+  ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
+  LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
+  LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
   ApiPublicLiveMapLosverdesVerifyRoute: typeof ApiPublicLiveMapLosverdesVerifyRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/terminal': {
       id: '/terminal'
       path: '/terminal'
@@ -1162,6 +1264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/diag/mining-engine': {
       id: '/diag/mining-engine'
       path: '/diag/mining-engine'
@@ -1195,6 +1304,13 @@ declare module '@tanstack/react-router' {
       path: '/share/targets/$projectId'
       fullPath: '/share/targets/$projectId'
       preLoaderRoute: typeof ShareTargetsProjectIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/c/$code': {
@@ -1491,6 +1607,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboard3dProRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/transactional/preview': {
+      id: '/lovable/email/transactional/preview'
+      path: '/lovable/email/transactional/preview'
+      fullPath: '/lovable/email/transactional/preview'
+      preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -1503,6 +1633,20 @@ declare module '@tanstack/react-router' {
       path: '/api/public/verify-compliance/$reportId'
       fullPath: '/api/public/verify-compliance/$reportId'
       preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/notifications/satellite-anomalies': {
+      id: '/api/public/notifications/satellite-anomalies'
+      path: '/api/public/notifications/satellite-anomalies'
+      fullPath: '/api/public/notifications/satellite-anomalies'
+      preLoaderRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/notifications/catastro-expirations': {
+      id: '/api/public/notifications/catastro-expirations'
+      path: '/api/public/notifications/catastro-expirations'
+      fullPath: '/api/public/notifications/catastro-expirations'
+      preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/reports/losverdes/pre43101': {
@@ -1739,9 +1883,11 @@ const rootRouteChildren: RootRouteChildren = {
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TerminalRoute: TerminalRouteWithChildren,
+  UnsubscribeRoute: UnsubscribeRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   DiagMiningEngineRoute: DiagMiningEngineRoute,
+  EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
@@ -1753,10 +1899,17 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,
+  LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
+  ApiPublicNotificationsCatastroExpirationsRoute:
+    ApiPublicNotificationsCatastroExpirationsRoute,
+  ApiPublicNotificationsSatelliteAnomaliesRoute:
+    ApiPublicNotificationsSatelliteAnomaliesRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
+  LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
+  LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
   ApiPublicLiveMapLosverdesVerifyRoute: ApiPublicLiveMapLosverdesVerifyRoute,
 }
 export const routeTree = rootRouteImport
