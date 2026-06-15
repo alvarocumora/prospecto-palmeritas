@@ -519,7 +519,7 @@
   --im-gray: oklch(0.52 0.012 285); /* #6B6B7B sutil */
   --im-cobalt: oklch(0.47 0.17 267); /* #2B4ACB acento */
   --im-cobalt-deep: oklch(0.4 0.16 267); /* hover / pressed */
-  --im-cobalt-wash: oklch(0.95 0.03 267); /* fondo de realce suave */
+  --im-cobalt-wash: oklch(0.93 0.04 267); /* realce suave / acento sobre fondo oscuro */
   --im-line: oklch(0.91 0.008 85); /* #E3E0D8 línea */
   --im-line-strong: oklch(0.85 0.01 85); /* línea marcada */
 
@@ -558,7 +558,23 @@
   --brand-info: var(--im-cobalt);
 }
 
+/* Re-skin Institutional Modernist (Fase 2, piloto).
+   Los primitivos legacy --brand-* se REMAPEAN a la paleta --im-* SOLO dentro
+   del scope `.brand-light`, de modo que las ~196 referencias `var(--brand-*)`
+   de la landing adoptan el lenguaje nuevo sin editar cada archivo, y NADA
+   fuera del scope cambia. El oro se retira: pasa a un acento cobalto pálido,
+   legible sobre las bandas de tinta oscura. */
 .brand-light {
+  --brand-navy: var(--im-ink);
+  --brand-navy-deep: var(--im-ink);
+  --brand-blue: var(--im-cobalt);
+  --brand-blue-soft: var(--im-cobalt-wash);
+  --brand-gold: var(--im-cobalt-wash);
+  --brand-ink: var(--im-ink);
+  --brand-mute: var(--im-gray);
+  --brand-surface: var(--im-paper);
+  --brand-hair: var(--im-line);
+
   color: var(--brand-ink);
   background-color: var(--brand-surface);
   font-family: var(--font-sans);
@@ -567,10 +583,11 @@
 .brand-light * {
   border-color: var(--brand-hair);
 }
+/* Display editorial: serif con peso moderado y jerarquía por escala */
 .brand-light .brand-display {
-  font-family: "Inter", system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .brand-light .brand-eyebrow {
   font-family: var(--font-mono);

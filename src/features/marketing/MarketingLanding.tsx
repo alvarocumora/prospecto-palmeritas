@@ -7,6 +7,7 @@ import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
 
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
+import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
 import {
   Mountain,
   Users,
@@ -80,24 +81,20 @@ export function MarketingLanding() {
       <section className="relative overflow-hidden border-b border-[var(--brand-hair)]">
         <div className="max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           <div>
-            <p className="brand-eyebrow mb-5">{t("hero_eyebrow")}</p>
+            <Eyebrow className="mb-5">{t("hero_eyebrow")}</Eyebrow>
             <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-[var(--brand-navy-deep)]">
               {t("hero_title")}
             </h1>
             <p className="mt-6 text-lg text-[var(--brand-mute)] max-w-xl">{t("hero_sub")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/contacto"
-                className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95"
-              >
-                {t("cta_publish")} <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/terminal"
-                className="inline-flex items-center gap-2 border border-[var(--brand-navy)] text-[var(--brand-navy)] px-5 py-3 rounded-md text-sm font-medium hover:bg-[var(--brand-blue-soft)]"
-              >
-                {t("cta_explore")}
-              </Link>
+              <BrandButton asChild size="lg">
+                <Link to="/contacto">
+                  {t("cta_publish")} <ArrowRight className="w-4 h-4" />
+                </Link>
+              </BrandButton>
+              <BrandButton asChild variant="outline" size="lg">
+                <Link to="/terminal">{t("cta_explore")}</Link>
+              </BrandButton>
             </div>
             <div className="mt-10 flex items-center gap-8 text-xs font-mono text-[var(--brand-mute)] flex-wrap">
               <span className="flex items-center gap-2">
@@ -305,18 +302,10 @@ export function MarketingLanding() {
             </div>
           </div>
           <div>
-            <p className="brand-eyebrow mb-4">Nuestra red global · datos en vivo</p>
+            <Eyebrow className="mb-4">Nuestra red global · datos en vivo</Eyebrow>
             <div className="grid grid-cols-3 gap-4">
               {liveStats.map((s) => (
-                <div
-                  key={s.l}
-                  className="bg-white rounded-xl border border-[var(--brand-hair)] p-5"
-                >
-                  <div className="font-mono text-3xl text-[var(--brand-navy-deep)]">{s.v}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-[var(--brand-mute)] mt-2">
-                    {s.l}
-                  </div>
-                </div>
+                <Stat key={s.l} value={s.v} label={s.l} />
               ))}
             </div>
           </div>
@@ -423,10 +412,7 @@ export function MarketingLanding() {
               d: "Data room, KYC/AML institucional y matching con inversionistas verificados.",
             },
           ].map(({ i: Icon, t: title, d }) => (
-            <div
-              key={title}
-              className="group bg-white border border-[var(--brand-hair)] rounded-xl p-6 hover:border-[var(--brand-blue)] hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition"
-            >
+            <BrandCard key={title} interactive className="group">
               <div className="flex items-center justify-between mb-5">
                 <span className="grid place-items-center w-11 h-11 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)]">
                   <Icon className="w-5 h-5" strokeWidth={1.75} />
@@ -435,7 +421,7 @@ export function MarketingLanding() {
               </div>
               <div className="font-display text-lg text-[var(--brand-navy-deep)]">{title}</div>
               <p className="text-sm text-[var(--brand-mute)] mt-2 leading-relaxed">{d}</p>
-            </div>
+            </BrandCard>
           ))}
         </div>
       </section>
@@ -443,16 +429,13 @@ export function MarketingLanding() {
       {/* Casos de uso */}
       <section className="bg-[var(--brand-blue-soft)] border-y border-[var(--brand-hair)]">
         <div className="max-w-7xl mx-auto px-5 py-20">
-          <div className="text-center max-w-2xl mx-auto mb-14">
-            <p className="brand-eyebrow mb-3">Casos de uso</p>
-            <h2 className="brand-display text-3xl md:text-4xl text-[var(--brand-navy-deep)]">
-              Diseñado para quienes mueven la industria minera
-            </h2>
-            <p className="text-[var(--brand-mute)] mt-4">
-              Flujos verticales adaptados a cada perfil del ecosistema, con permisos granulares y
-              datos auditables.
-            </p>
-          </div>
+          <SectionHeading
+            align="center"
+            className="max-w-2xl mx-auto mb-14"
+            eyebrow="Casos de uso"
+            title="Diseñado para quienes mueven la industria minera"
+            description="Flujos verticales adaptados a cada perfil del ecosistema, con permisos granulares y datos auditables."
+          />
 
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -540,12 +523,11 @@ export function MarketingLanding() {
             capital, evaluar activos y cumplir con los estándares globales de reporte.
           </p>
           <div className="mt-9 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              to="/auth"
-              className="inline-flex items-center gap-2 bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] px-6 py-3.5 rounded-md font-semibold text-sm hover:opacity-95 transition"
-            >
-              Solicitar acceso institucional <ArrowRight className="w-4 h-4" />
-            </Link>
+            <BrandButton asChild size="lg">
+              <Link to="/auth">
+                Solicitar acceso institucional <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
             <Link
               to="/terminal"
               className="inline-flex items-center gap-2 border border-white/30 text-white px-6 py-3.5 rounded-md font-medium text-sm hover:bg-white/10 transition"
