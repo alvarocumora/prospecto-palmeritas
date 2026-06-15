@@ -447,6 +447,7 @@
    ============================================================ */
 
 @theme inline {
+  /* Primitivos de marca (paleta cruda) */
   --color-brand-navy: var(--brand-navy);
   --color-brand-navy-deep: var(--brand-navy-deep);
   --color-brand-blue: var(--brand-blue);
@@ -456,9 +457,32 @@
   --color-brand-mute: var(--brand-mute);
   --color-brand-surface: var(--brand-surface);
   --color-brand-hair: var(--brand-hair);
+
+  /* ── Capa semántica unificada (Design System Fase 1) ───────────────────
+     Roles theme-aware. Nombres elegidos para NO colisionar con los tokens
+     shadcn (background/foreground/muted/border/accent) del Operations
+     Console, de modo que ambos coexistan durante la migración.
+     Ver docs/design-system.md. */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-content-subtle: var(--content-subtle);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent-brand: var(--accent-brand);
+  --color-accent-brand-contrast: var(--accent-brand-contrast);
+
+  /* Señales funcionales con afinado institucional (light) */
+  --color-brand-success: var(--brand-success);
+  --color-brand-warn: var(--brand-warn);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-info: var(--brand-info);
 }
 
 :root {
+  /* Primitivos institucionales */
   --brand-navy: oklch(0.27 0.09 260);
   --brand-navy-deep: oklch(0.18 0.08 260);
   --brand-blue: oklch(0.55 0.2 255);
@@ -468,6 +492,24 @@
   --brand-mute: oklch(0.5 0.02 260);
   --brand-surface: oklch(0.995 0.003 260);
   --brand-hair: oklch(0.9 0.01 260);
+
+  /* Semánticos institucionales (Capa 2). Aditivos: ningún componente los
+     consume todavía, por lo que no hay cambio visual hasta la migración. */
+  --surface: var(--brand-surface); /* fondo de página */
+  --surface-2: oklch(0.975 0.004 260); /* panel */
+  --surface-3: oklch(1 0 0); /* card / elevado */
+  --content: var(--brand-ink); /* texto primario */
+  --content-muted: var(--brand-mute); /* texto secundario */
+  --content-subtle: oklch(0.62 0.015 260); /* texto terciario / hints */
+  --hairline: var(--brand-hair); /* líneas */
+  --hairline-strong: oklch(0.84 0.012 260); /* líneas marcadas */
+  --accent-brand: var(--brand-blue); /* acción primaria */
+  --accent-brand-contrast: oklch(1 0 0); /* texto sobre accent */
+
+  --brand-success: oklch(0.62 0.15 150);
+  --brand-warn: oklch(0.74 0.15 75);
+  --brand-danger: oklch(0.58 0.21 25);
+  --brand-info: var(--brand-blue);
 }
 
 .brand-light {
