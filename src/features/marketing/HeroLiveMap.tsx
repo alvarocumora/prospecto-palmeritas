@@ -305,23 +305,23 @@ export function HeroLiveMap() {
 
   return (
     <div className="relative">
-      <div className="absolute -inset-6 bg-gradient-to-br from-[var(--brand-blue-soft)] to-transparent rounded-3xl -z-10" />
-      <div className="rounded-2xl border border-[var(--brand-hair)] bg-white shadow-[0_30px_60px_-30px_rgba(11,42,91,0.25)] overflow-hidden">
-        <div className="h-9 bg-[var(--brand-navy-deep)] flex items-center px-3 gap-1.5">
+      <div className="absolute -inset-6 bg-gradient-to-br from-accent-brand-subtle to-transparent rounded-3xl -z-10" />
+      <div className="rounded-2xl border border-hairline bg-white shadow-[0_30px_60px_-30px_rgba(11,42,91,0.25)] overflow-hidden">
+        <div className="h-9 bg-surface-inverse flex items-center px-3 gap-1.5">
           <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
           <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
           <span className="w-2.5 h-2.5 rounded-full bg-white/20" />
           <span className="ml-3 text-[10px] font-mono text-white/60 tracking-widest">
             {t("map_chip_live")}
           </span>
-          <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono text-[var(--brand-gold)]">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--brand-gold)] animate-pulse" />
+          <span className="ml-auto inline-flex items-center gap-1.5 text-[10px] font-mono text-accent-brand-subtle">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent-brand-subtle animate-pulse" />
             LIVE
           </span>
         </div>
 
         {/* Mode toggle */}
-        <div className="flex items-stretch border-b border-[var(--brand-hair)] bg-[var(--brand-blue-soft)]/40">
+        <div className="flex items-stretch border-b border-hairline bg-accent-brand-subtle/40">
           <ModeBtn
             active={mode === "listings"}
             onClick={() => setMode("listings")}
@@ -341,10 +341,10 @@ export function HeroLiveMap() {
         </div>
 
         <div className="relative">
-          <div ref={containerRef} className="h-[420px] w-full bg-[var(--brand-navy-deep)]" />
+          <div ref={containerRef} className="h-[420px] w-full bg-surface-inverse" />
 
           {/* legend */}
-          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur rounded-md border border-[var(--brand-hair)] px-3 py-2 text-[10px] font-mono text-[var(--brand-navy-deep)] space-y-1 shadow-sm">
+          <div className="absolute bottom-3 left-3 bg-white/95 backdrop-blur rounded-md border border-hairline px-3 py-2 text-[10px] font-mono text-content space-y-1 shadow-sm">
             {mode === "listings" ? (
               <>
                 <div className="flex items-center gap-2">
@@ -352,7 +352,7 @@ export function HeroLiveMap() {
                   Venta
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" />{" "}
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-content" />{" "}
                   Joint Venture
                 </div>
                 <div className="flex items-center gap-2">
@@ -375,7 +375,7 @@ export function HeroLiveMap() {
                   Anomalía satelital
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-[var(--brand-navy-deep)]" />{" "}
+                  <span className="w-2.5 h-2.5 rounded-full bg-amber-300 border border-content" />{" "}
                   Yacimiento conocido
                 </div>
               </>
@@ -408,18 +408,18 @@ export function HeroLiveMap() {
           </div>
         </div>
 
-        <div className="px-4 py-2.5 flex items-center justify-between gap-3 text-[10px] font-mono text-[var(--brand-mute)] border-t border-[var(--brand-hair)]">
+        <div className="px-4 py-2.5 flex items-center justify-between gap-3 text-[10px] font-mono text-content-subtle border-t border-hairline">
           <span>PostGIS · Sentinel-2 · Esri Imagery</span>
           <div className="flex items-center gap-4">
             <Link
               to="/proyectos"
-              className="inline-flex items-center gap-1.5 text-[var(--brand-blue)] hover:gap-2 transition-all font-medium normal-case tracking-normal"
+              className="inline-flex items-center gap-1.5 text-accent-brand hover:gap-2 transition-all font-medium normal-case tracking-normal"
             >
               {t("map_browse_deals")} <ArrowRight className="w-3 h-3" />
             </Link>
             <Link
               to="/terminal"
-              className="inline-flex items-center gap-1.5 text-[var(--brand-blue)] hover:gap-2 transition-all font-medium normal-case tracking-normal"
+              className="inline-flex items-center gap-1.5 text-accent-brand hover:gap-2 transition-all font-medium normal-case tracking-normal"
             >
               {t("open_terminal")} <ArrowRight className="w-3 h-3" />
             </Link>
@@ -432,7 +432,7 @@ export function HeroLiveMap() {
 
 function Pill({ icon, label }: { icon: React.ReactNode; label: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur border border-[var(--brand-hair)] rounded-full px-2.5 py-1 text-[10px] font-mono text-[var(--brand-navy-deep)] shadow-sm">
+    <span className="inline-flex items-center gap-1.5 bg-white/95 backdrop-blur border border-hairline rounded-full px-2.5 py-1 text-[10px] font-mono text-content shadow-sm">
       {icon}
       {label}
     </span>
@@ -460,8 +460,8 @@ function ModeBtn({
       onClick={onClick}
       className={`flex-1 px-4 py-2.5 text-left transition-colors ${
         active
-          ? "bg-white text-[var(--brand-navy-deep)] shadow-[inset_0_-2px_0_0_var(--brand-gold)]"
-          : "text-[var(--brand-mute)] hover:bg-white/60"
+          ? "bg-white text-content shadow-[inset_0_-2px_0_0_var(--accent-brand-subtle)]"
+          : "text-content-subtle hover:bg-white/60"
       }`}
     >
       <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wider">

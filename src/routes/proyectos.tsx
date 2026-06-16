@@ -78,22 +78,22 @@ function ProyectosPage() {
           <Link
             key={p.code}
             to={p.to}
-            className="group rounded-2xl border border-[var(--brand-hair)] bg-white p-6 hover:border-[var(--brand-blue)] hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
+            className="group rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
           >
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)]">
+              <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
                 {p.code}
               </span>
-              <ArrowRight className="w-4 h-4 text-[var(--brand-mute)] group-hover:text-[var(--brand-blue)] group-hover:translate-x-0.5 transition" />
+              <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
             </div>
-            <div className="mt-3 font-display text-xl text-[var(--brand-navy-deep)]">{p.name}</div>
-            <div className="text-sm text-[var(--brand-mute)] mt-1">
+            <div className="mt-3 font-display text-xl text-content">{p.name}</div>
+            <div className="text-sm text-content-subtle mt-1">
               {p.region} · {p.commodity}
             </div>
-            <ul className="mt-5 space-y-1.5 text-[13px] text-[var(--brand-ink)]">
+            <ul className="mt-5 space-y-1.5 text-[13px] text-content">
               {p.bullets.map((b) => (
                 <li key={b} className="flex items-center gap-2">
-                  <span className="w-1 h-1 rounded-full bg-[var(--brand-blue)]" /> {b}
+                  <span className="w-1 h-1 rounded-full bg-accent-brand" /> {b}
                 </li>
               ))}
             </ul>
@@ -101,7 +101,7 @@ function ProyectosPage() {
         ))}
       </div>
 
-      <section className="mt-20 rounded-2xl bg-[var(--brand-navy-deep)] text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+      <section className="mt-20 rounded-2xl bg-surface-inverse text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
         <div>
           <Eyebrow className="mb-2 text-white/60">Publica tu proyecto</Eyebrow>
           <h2 className="brand-display text-2xl md:text-3xl">
@@ -113,16 +113,16 @@ function ProyectosPage() {
           </p>
           <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono uppercase tracking-wider text-white/60">
             <span className="flex items-center gap-2">
-              <Mountain className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Catastro
+              <Mountain className="w-3.5 h-3.5 text-accent-brand-subtle" /> Catastro
             </span>
             <span className="flex items-center gap-2">
-              <Activity className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Geofísica
+              <Activity className="w-3.5 h-3.5 text-accent-brand-subtle" /> Geofísica
             </span>
             <span className="flex items-center gap-2">
-              <Satellite className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> Satélite
+              <Satellite className="w-3.5 h-3.5 text-accent-brand-subtle" /> Satélite
             </span>
             <span className="flex items-center gap-2">
-              <FileText className="w-3.5 h-3.5 text-[var(--brand-gold)]" /> NI 43-101
+              <FileText className="w-3.5 h-3.5 text-accent-brand-subtle" /> NI 43-101
             </span>
           </div>
         </div>

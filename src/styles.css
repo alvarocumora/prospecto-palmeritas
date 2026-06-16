@@ -492,6 +492,7 @@
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
   --color-surface-3: var(--surface-3);
+  --color-surface-inverse: var(--surface-inverse);
   --color-content: var(--content);
   --color-content-muted: var(--content-muted);
   --color-content-subtle: var(--content-subtle);
@@ -499,6 +500,7 @@
   --color-hairline-strong: var(--hairline-strong);
   --color-accent-brand: var(--accent-brand);
   --color-accent-brand-contrast: var(--accent-brand-contrast);
+  --color-accent-brand-subtle: var(--accent-brand-subtle);
 
   /* Señales funcionales con afinado institucional (light) */
   --color-brand-success: var(--brand-success);
@@ -543,6 +545,7 @@
   --surface: var(--im-paper); /* fondo de página */
   --surface-2: var(--im-paper-2); /* panel */
   --surface-3: var(--im-card); /* card / elevado */
+  --surface-inverse: var(--im-ink); /* banda oscura (CTA, footer, pilares) */
   --content: var(--im-ink); /* texto primario */
   --content-muted: var(--im-ink-soft); /* texto secundario */
   --content-subtle: var(--im-gray); /* texto terciario / hints */
@@ -550,6 +553,7 @@
   --hairline-strong: var(--im-line-strong); /* líneas marcadas */
   --accent-brand: var(--im-cobalt); /* acción primaria */
   --accent-brand-contrast: oklch(1 0 0); /* texto sobre accent */
+  --accent-brand-subtle: var(--im-cobalt-wash); /* realce pálido / acento sobre tinta */
 
   /* Señales funcionales afinadas para fondo papel cálido (no saturadas) */
   --brand-success: oklch(0.55 0.13 150);
