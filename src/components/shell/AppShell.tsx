@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
-import { BrandButton } from "@/components/brand";
+import { BrandButton, Eyebrow } from "@/components/brand";
 import { useLocale, type Locale } from "@/features/marketing/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import logoMark from "@/assets/geocapitals-mark.png";
@@ -326,7 +326,7 @@ export function MarketingPage({
       <MarketingHeader />
       <section className="border-b border-[var(--brand-hair)] bg-gradient-to-b from-[var(--brand-blue-soft)]/60 to-white">
         <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
-          {eyebrow && <p className="brand-eyebrow mb-4">{eyebrow}</p>}
+          {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
           <h1 className="brand-display text-4xl md:text-5xl text-[var(--brand-navy-deep)] max-w-3xl leading-tight">
             {title}
           </h1>

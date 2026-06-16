@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { FileText, BookOpen, Compass, Database } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { BrandButton, Eyebrow } from "@/components/brand";
 
 export const Route = createFileRoute("/recursos")({
   head: () => ({
@@ -75,7 +76,7 @@ function RecursosPage() {
       </div>
 
       <div className="mt-12 rounded-2xl border border-dashed border-[var(--brand-hair)] bg-[var(--brand-blue-soft)] p-8 text-center">
-        <p className="brand-eyebrow mb-2">¿Buscas algo específico?</p>
+        <Eyebrow className="mb-2">¿Buscas algo específico?</Eyebrow>
         <h3 className="brand-display text-2xl text-[var(--brand-navy-deep)]">
           Pídelo a nuestro equipo
         </h3>
@@ -83,12 +84,9 @@ function RecursosPage() {
           Whitepapers personalizados, casos de uso por jurisdicción y onepagers institucionales bajo
           NDA.
         </p>
-        <Link
-          to="/contacto"
-          className="mt-5 inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium"
-        >
-          Solicitar documento
-        </Link>
+        <BrandButton asChild className="mt-5">
+          <Link to="/contacto">Solicitar documento</Link>
+        </BrandButton>
       </div>
     </MarketingPage>
   );

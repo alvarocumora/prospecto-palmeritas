@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { BrandButton } from "@/components/brand";
 
 type Role = "owner" | "investor" | "qp" | "other";
 
@@ -123,18 +124,14 @@ export function ContactForm({
         <p className="text-[11px] font-mono text-[var(--brand-mute)]">
           Tus datos se procesan bajo NDA implícito.
         </p>
-        <button
-          type="submit"
-          disabled={mut.isPending}
-          className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
-        >
+        <BrandButton type="submit" size="sm" disabled={mut.isPending}>
           {mut.isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <ArrowRight className="w-4 h-4" />
           )}
           Enviar mensaje
-        </button>
+        </BrandButton>
       </div>
     </form>
   );

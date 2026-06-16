@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, Mountain, Activity, Satellite, FileText } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { BrandButton, Eyebrow } from "@/components/brand";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -102,7 +103,7 @@ function ProyectosPage() {
 
       <section className="mt-20 rounded-2xl bg-[var(--brand-navy-deep)] text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
         <div>
-          <p className="brand-eyebrow text-[var(--brand-gold)] mb-2">Publica tu proyecto</p>
+          <Eyebrow className="mb-2 text-white/60">Publica tu proyecto</Eyebrow>
           <h2 className="brand-display text-2xl md:text-3xl">
             Eleva tu activo al estándar institucional
           </h2>
@@ -126,12 +127,11 @@ function ProyectosPage() {
           </div>
         </div>
         <div className="flex flex-col gap-2.5">
-          <Link
-            to="/auth"
-            className="inline-flex items-center justify-center gap-2 bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] px-5 py-3 rounded-md font-semibold text-sm"
-          >
-            Crear cuenta <ArrowRight className="w-4 h-4" />
-          </Link>
+          <BrandButton asChild>
+            <Link to="/auth">
+              Crear cuenta <ArrowRight className="w-4 h-4" />
+            </Link>
+          </BrandButton>
           <Link
             to="/contacto"
             className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-5 py-3 rounded-md text-sm hover:bg-white/10"
