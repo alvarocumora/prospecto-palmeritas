@@ -4,6 +4,7 @@ import { z } from "zod";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { ContactForm } from "@/features/marketing/ContactForm";
 import { DealFlow } from "@/features/marketing/DealFlow";
+import { BrandButton, Eyebrow } from "@/components/brand";
 
 const searchSchema = z.object({
   listing: z.string().uuid().optional(),
@@ -64,8 +65,8 @@ function InvPage() {
       <div className="mb-16">
         <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
           <div>
-            <p className="brand-eyebrow mb-2">Oportunidades activas</p>
-            <h2 className="font-display text-2xl text-[var(--brand-navy-deep)]">
+            <Eyebrow className="mb-2">Oportunidades activas</Eyebrow>
+            <h2 className="brand-display text-2xl text-[var(--brand-navy-deep)]">
               Proyectos publicados
             </h2>
           </div>
@@ -82,8 +83,8 @@ function InvPage() {
       {/* Beneficios + ContactForm side-by-side */}
       <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 pt-10 border-t border-[var(--brand-hair)]">
         <div>
-          <p className="brand-eyebrow mb-3">Por qué Geocapitals</p>
-          <h2 className="font-display text-2xl text-[var(--brand-navy-deep)] mb-6">
+          <Eyebrow className="mb-3">Por qué Geocapitals</Eyebrow>
+          <h2 className="brand-display text-2xl text-[var(--brand-navy-deep)] mb-6">
             Capital institucional para minería moderna
           </h2>
           <ul className="grid sm:grid-cols-2 gap-5">
@@ -99,7 +100,7 @@ function InvPage() {
           </ul>
 
           <div className="mt-8 rounded-xl border border-[var(--brand-hair)] bg-[var(--brand-blue-soft)] p-6">
-            <p className="brand-eyebrow mb-3">Tickets institucionales</p>
+            <Eyebrow className="mb-3">Tickets institucionales</Eyebrow>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
                 { v: "USD 250K+", l: "Equity en juniors" },
@@ -117,12 +118,11 @@ function InvPage() {
           </div>
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
-            <Link
-              to="/terminal"
-              className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-3 rounded-md text-sm font-medium"
-            >
-              Explorar terminal en vivo <ArrowRight className="w-4 h-4" />
-            </Link>
+            <BrandButton asChild>
+              <Link to="/terminal">
+                Explorar terminal en vivo <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
             <span className="inline-flex items-center gap-2 text-[11px] font-mono text-[var(--brand-mute)]">
               <Lock className="w-3.5 h-3.5" /> Cifrado AES-256 · KYC / AML
             </span>
@@ -130,7 +130,7 @@ function InvPage() {
         </div>
 
         <aside>
-          <p className="brand-eyebrow mb-3">Solicita acceso institucional</p>
+          <Eyebrow className="mb-3">Solicita acceso institucional</Eyebrow>
           <ContactForm source="inversionistas" compact />
         </aside>
       </div>

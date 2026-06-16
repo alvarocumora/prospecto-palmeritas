@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { BrandButton } from "@/components/brand";
 
 export const Route = createFileRoute("/empresas")({
   head: () => ({
@@ -113,16 +114,11 @@ function EmpresasPage() {
                 </li>
               ))}
             </ul>
-            <Link
-              to="/contacto"
-              className={`mt-6 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium ${
-                p.highlight
-                  ? "bg-[var(--brand-gold)] text-[var(--brand-navy-deep)]"
-                  : "bg-[var(--brand-blue)] text-white"
-              }`}
-            >
-              {p.cta} <ArrowRight className="w-4 h-4" />
-            </Link>
+            <BrandButton asChild size="sm" className="mt-6">
+              <Link to="/contacto">
+                {p.cta} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
           </div>
         ))}
       </div>

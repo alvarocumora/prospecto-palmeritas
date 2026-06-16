@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
+import { BrandButton, Eyebrow } from "@/components/brand";
 import { useLocale, type Locale } from "@/features/marketing/i18n";
 import { useAuth } from "@/hooks/useAuth";
 import logoMark from "@/assets/geocapitals-mark.png";
@@ -118,12 +119,11 @@ export function MarketingHeader() {
         >
           {t("cta_login")}
         </Link>
-        <Link
-          to="/auth"
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm bg-[var(--brand-blue)] text-white px-4 py-2 rounded-md hover:opacity-95 transition"
-        >
-          {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
+        <BrandButton asChild size="sm" className="hidden sm:inline-flex">
+          <Link to="/auth">
+            {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </BrandButton>
       </div>
     </header>
   );
@@ -326,7 +326,7 @@ export function MarketingPage({
       <MarketingHeader />
       <section className="border-b border-[var(--brand-hair)] bg-gradient-to-b from-[var(--brand-blue-soft)]/60 to-white">
         <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
-          {eyebrow && <p className="brand-eyebrow mb-4">{eyebrow}</p>}
+          {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
           <h1 className="brand-display text-4xl md:text-5xl text-[var(--brand-navy-deep)] max-w-3xl leading-tight">
             {title}
           </h1>
