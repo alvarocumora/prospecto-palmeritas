@@ -78,14 +78,14 @@ export function MarketingLanding() {
       <MarketingHeader />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-[var(--brand-hair)]">
+      <section className="relative overflow-hidden border-b border-hairline">
         <div className="max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           <div>
             <Eyebrow className="mb-5">{t("hero_eyebrow")}</Eyebrow>
-            <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-[var(--brand-navy-deep)]">
+            <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-content">
               {t("hero_title")}
             </h1>
-            <p className="mt-6 text-lg text-[var(--brand-mute)] max-w-xl">{t("hero_sub")}</p>
+            <p className="mt-6 text-lg text-content-subtle max-w-xl">{t("hero_sub")}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <BrandButton asChild size="lg">
                 <Link to="/contacto">
@@ -96,15 +96,15 @@ export function MarketingLanding() {
                 <Link to="/terminal">{t("cta_explore")}</Link>
               </BrandButton>
             </div>
-            <div className="mt-10 flex items-center gap-8 text-xs font-mono text-[var(--brand-mute)] flex-wrap">
+            <div className="mt-10 flex items-center gap-8 text-xs font-mono text-content-subtle flex-wrap">
               <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-[var(--brand-blue)]" /> KYC / AML
+                <ShieldCheck className="w-4 h-4 text-accent-brand" /> KYC / AML
               </span>
               <span className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-[var(--brand-blue)]" /> NI 43-101
+                <FileText className="w-4 h-4 text-accent-brand" /> NI 43-101
               </span>
               <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4 text-[var(--brand-blue)]" /> 18 países
+                <Globe2 className="w-4 h-4 text-accent-brand" /> 18 países
               </span>
             </div>
           </div>
@@ -115,7 +115,7 @@ export function MarketingLanding() {
       </section>
 
       {/* Pillars band */}
-      <section className="bg-[var(--brand-navy-deep)] text-white">
+      <section className="bg-surface-inverse text-white">
         <div className="max-w-7xl mx-auto px-5 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
           {[
             { i: Mountain, t: "Proyectos de calidad", s: "Verificados y calificados" },
@@ -124,7 +124,7 @@ export function MarketingLanding() {
             { i: ShieldCheck, t: "Proceso seguro", s: "Transparente y auditable" },
           ].map(({ i: Icon, t: title, s }) => (
             <div key={title} className="flex items-start gap-3">
-              <Icon className="w-7 h-7 text-[var(--brand-gold)] shrink-0" strokeWidth={1.5} />
+              <Icon className="w-7 h-7 text-accent-brand-subtle shrink-0" strokeWidth={1.5} />
               <div>
                 <div className="font-display text-[15px] uppercase tracking-wide">{title}</div>
                 <div className="text-xs text-white/60 mt-0.5">{s}</div>
@@ -137,10 +137,8 @@ export function MarketingLanding() {
       {/* For owners + process wheel + investors */}
       <section className="max-w-7xl mx-auto px-5 py-20 grid lg:grid-cols-[1fr_320px_1fr] gap-10 items-start">
         <div>
-          <h2 className="brand-display text-3xl text-[var(--brand-navy-deep)]">
-            Para propietarios de proyectos
-          </h2>
-          <p className="mt-3 text-[var(--brand-mute)] max-w-md">
+          <h2 className="brand-display text-3xl text-content">Para propietarios de proyectos</h2>
+          <p className="mt-3 text-content-subtle max-w-md">
             Publica tu proyecto y conéctate con inversionistas calificados de todo el mundo.
           </p>
           <ul className="mt-8 space-y-6">
@@ -167,14 +165,12 @@ export function MarketingLanding() {
               },
             ].map(({ i: Icon, t: title, s }) => (
               <li key={title} className="flex gap-4">
-                <span className="grid place-items-center w-10 h-10 rounded-full bg-[var(--brand-blue)] text-white shrink-0">
+                <span className="grid place-items-center w-10 h-10 rounded-full bg-accent-brand text-white shrink-0">
                   <Icon className="w-5 h-5" strokeWidth={2} />
                 </span>
                 <div>
-                  <div className="font-display text-[15px] text-[var(--brand-navy-deep)]">
-                    {title}
-                  </div>
-                  <div className="text-sm text-[var(--brand-mute)] mt-1">{s}</div>
+                  <div className="font-display text-[15px] text-content">{title}</div>
+                  <div className="text-sm text-content-subtle mt-1">{s}</div>
                 </div>
               </li>
             ))}
@@ -189,7 +185,7 @@ export function MarketingLanding() {
               cy="160"
               r="120"
               fill="none"
-              stroke="var(--brand-hair)"
+              stroke="var(--hairline)"
               strokeWidth="1"
               strokeDasharray="4 6"
             />
@@ -198,7 +194,7 @@ export function MarketingLanding() {
               cy="160"
               r="120"
               fill="none"
-              stroke="var(--brand-blue)"
+              stroke="var(--accent-brand)"
               strokeWidth="1.2"
               strokeDasharray="20 320"
               strokeDashoffset={-(activeStep * 213)}
@@ -206,8 +202,8 @@ export function MarketingLanding() {
             />
           </svg>
           <div className="absolute inset-0 grid place-items-center">
-            <div className="grid place-items-center w-24 h-24 rounded-full bg-[var(--brand-blue-soft)] border border-[var(--brand-blue)]/30 brand-pulse">
-              <span className="font-display text-4xl text-[var(--brand-blue)] font-bold">G</span>
+            <div className="grid place-items-center w-24 h-24 rounded-full bg-accent-brand-subtle border border-accent-brand/30 brand-pulse">
+              <span className="font-display text-4xl text-accent-brand font-bold">G</span>
             </div>
           </div>
           {PROCESS_STEPS.map((step, i) => {
@@ -225,19 +221,17 @@ export function MarketingLanding() {
                 <span
                   className={`grid place-items-center w-14 h-14 rounded-full border shadow-sm transition-all duration-500 ${
                     active
-                      ? "bg-[var(--brand-blue)] border-[var(--brand-blue)] scale-110"
-                      : "bg-white border-[var(--brand-hair)]"
+                      ? "bg-accent-brand border-accent-brand scale-110"
+                      : "bg-white border-hairline"
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 transition-colors ${active ? "text-white" : "text-[var(--brand-blue)]"}`}
+                    className={`w-5 h-5 transition-colors ${active ? "text-white" : "text-accent-brand"}`}
                   />
                 </span>
                 <span
                   className={`mt-1.5 text-[10px] font-mono uppercase tracking-wider text-center max-w-[80px] transition-colors ${
-                    active
-                      ? "text-[var(--brand-navy-deep)] font-semibold"
-                      : "text-[var(--brand-mute)]"
+                    active ? "text-content font-semibold" : "text-content-subtle"
                   }`}
                 >
                   {step.label}
@@ -248,10 +242,8 @@ export function MarketingLanding() {
         </div>
 
         <div>
-          <h2 className="brand-display text-3xl text-[var(--brand-navy-deep)]">
-            Para inversionistas
-          </h2>
-          <p className="mt-3 text-[var(--brand-mute)] max-w-md">
+          <h2 className="brand-display text-3xl text-content">Para inversionistas</h2>
+          <p className="mt-3 text-content-subtle max-w-md">
             Encuentra oportunidades únicas y diversifica tu portafolio con acceso a proyectos
             verificados.
           </p>
@@ -262,15 +254,15 @@ export function MarketingLanding() {
               "Herramientas de análisis y filtrado",
               "Comunicación directa y segura",
             ].map((it) => (
-              <li key={it} className="flex items-start gap-2.5 text-[15px] text-[var(--brand-ink)]">
-                <CheckCircle2 className="w-5 h-5 text-[var(--brand-blue)] shrink-0 mt-0.5" />
+              <li key={it} className="flex items-start gap-2.5 text-[15px] text-content">
+                <CheckCircle2 className="w-5 h-5 text-accent-brand shrink-0 mt-0.5" />
                 {it}
               </li>
             ))}
           </ul>
           <Link
             to="/inversionistas"
-            className="mt-8 inline-flex items-center gap-2 text-[var(--brand-blue)] font-medium hover:underline"
+            className="mt-8 inline-flex items-center gap-2 text-accent-brand font-medium hover:underline"
           >
             Explorar oportunidades <ArrowRight className="w-4 h-4" />
           </Link>
@@ -278,7 +270,7 @@ export function MarketingLanding() {
       </section>
 
       {/* Types + global network */}
-      <section className="bg-[var(--brand-blue-soft)] border-y border-[var(--brand-hair)]">
+      <section className="bg-accent-brand-subtle border-y border-hairline">
         <div className="max-w-7xl mx-auto px-5 py-16 grid lg:grid-cols-2 gap-12">
           <div>
             <p className="brand-eyebrow mb-4">Tipos de proyectos</p>
@@ -291,12 +283,10 @@ export function MarketingLanding() {
               ].map(({ i: Icon, t: title }) => (
                 <div
                   key={title}
-                  className="bg-white rounded-xl border border-[var(--brand-hair)] p-4 text-center"
+                  className="bg-white rounded-xl border border-hairline p-4 text-center"
                 >
-                  <Icon className="w-7 h-7 text-[var(--brand-blue)] mx-auto" strokeWidth={1.5} />
-                  <div className="mt-2 text-xs font-medium text-[var(--brand-navy-deep)] leading-tight">
-                    {title}
-                  </div>
+                  <Icon className="w-7 h-7 text-accent-brand mx-auto" strokeWidth={1.5} />
+                  <div className="mt-2 text-xs font-medium text-content leading-tight">{title}</div>
                 </div>
               ))}
             </div>
@@ -313,11 +303,11 @@ export function MarketingLanding() {
       </section>
 
       {/* Métricas piloto Palmeras */}
-      <section className="bg-[var(--brand-navy-deep)] text-white border-y border-white/5">
+      <section className="bg-surface-inverse text-white border-y border-white/5">
         <div className="max-w-7xl mx-auto px-5 py-16">
           <div className="flex items-end justify-between flex-wrap gap-4 mb-4">
             <div>
-              <p className="brand-eyebrow text-[var(--brand-gold)] mb-3">
+              <p className="brand-eyebrow text-accent-brand-subtle mb-3">
                 Inteligencia viva del proyecto
               </p>
               <h2 className="brand-display text-3xl md:text-4xl">Prospecto Las Palmeras</h2>
@@ -327,7 +317,7 @@ export function MarketingLanding() {
             </div>
             <Link
               to="/live/palmeras"
-              className="inline-flex items-center gap-2 border border-[var(--brand-gold)]/40 text-[var(--brand-gold)] px-4 py-2 rounded-md text-xs font-mono uppercase tracking-wider hover:bg-[var(--brand-gold)]/10"
+              className="inline-flex items-center gap-2 border border-accent-brand-subtle/40 text-accent-brand-subtle px-4 py-2 rounded-md text-xs font-mono uppercase tracking-wider hover:bg-accent-brand-subtle/10"
             >
               Ver vista en vivo <ArrowRight className="w-3.5 h-3.5" />
             </Link>
@@ -349,8 +339,8 @@ export function MarketingLanding() {
                 i: Activity,
               },
             ].map(({ v, l, d, i: Icon }) => (
-              <div key={l} className="bg-[var(--brand-navy-deep)] p-6">
-                <Icon className="w-5 h-5 text-[var(--brand-gold)] mb-4" strokeWidth={1.5} />
+              <div key={l} className="bg-surface-inverse p-6">
+                <Icon className="w-5 h-5 text-accent-brand-subtle mb-4" strokeWidth={1.5} />
                 <div className="font-mono text-3xl text-white tracking-tight">{v}</div>
                 <div className="text-[11px] uppercase tracking-wider text-white/80 mt-2 font-display">
                   {l}
@@ -367,11 +357,11 @@ export function MarketingLanding() {
         <div className="grid lg:grid-cols-[1fr_2fr] gap-10 mb-12">
           <div>
             <p className="brand-eyebrow mb-3">Módulos del Terminal</p>
-            <h2 className="brand-display text-3xl md:text-4xl text-[var(--brand-navy-deep)] leading-tight">
+            <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
               Una sola pantalla para evaluar, monitorear y transar activos mineros
             </h2>
           </div>
-          <p className="text-[var(--brand-mute)] text-base lg:text-lg lg:pt-4">
+          <p className="text-content-subtle text-base lg:text-lg lg:pt-4">
             Geocapitals Terminal integra catastro, geología 3D, cumplimiento y mercados secundarios
             sobre una capa de datos georreferenciada. Diseñado para Qualified Persons, fondos de
             inversión y holdings mineros que requieren trazabilidad NI 43-101 y due diligence
@@ -414,20 +404,20 @@ export function MarketingLanding() {
           ].map(({ i: Icon, t: title, d }) => (
             <BrandCard key={title} interactive className="group">
               <div className="flex items-center justify-between mb-5">
-                <span className="grid place-items-center w-11 h-11 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)]">
+                <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand">
                   <Icon className="w-5 h-5" strokeWidth={1.75} />
                 </span>
-                <ArrowRight className="w-4 h-4 text-[var(--brand-mute)] group-hover:text-[var(--brand-blue)] group-hover:translate-x-0.5 transition" />
+                <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
               </div>
-              <div className="font-display text-lg text-[var(--brand-navy-deep)]">{title}</div>
-              <p className="text-sm text-[var(--brand-mute)] mt-2 leading-relaxed">{d}</p>
+              <div className="font-display text-lg text-content">{title}</div>
+              <p className="text-sm text-content-subtle mt-2 leading-relaxed">{d}</p>
             </BrandCard>
           ))}
         </div>
       </section>
 
       {/* Casos de uso */}
-      <section className="bg-[var(--brand-blue-soft)] border-y border-[var(--brand-hair)]">
+      <section className="bg-accent-brand-subtle border-y border-hairline">
         <div className="max-w-7xl mx-auto px-5 py-20">
           <SectionHeading
             align="center"
@@ -475,25 +465,23 @@ export function MarketingLanding() {
             ].map(({ i: Icon, tag, t: title, items, to }) => (
               <div
                 key={title}
-                className="bg-white border border-[var(--brand-hair)] rounded-2xl p-6 flex flex-col"
+                className="bg-white border border-hairline rounded-2xl p-6 flex flex-col"
               >
-                <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-[var(--brand-blue)] mb-5">
+                <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-accent-brand mb-5">
                   <Icon className="w-4 h-4" /> {tag}
                 </div>
-                <div className="font-display text-xl text-[var(--brand-navy-deep)] leading-snug">
-                  {title}
-                </div>
+                <div className="font-display text-xl text-content leading-snug">{title}</div>
                 <ul className="mt-5 space-y-2.5 flex-1">
                   {items.map((it) => (
-                    <li key={it} className="flex items-start gap-2 text-sm text-[var(--brand-ink)]">
-                      <CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)] shrink-0 mt-0.5" />
+                    <li key={it} className="flex items-start gap-2 text-sm text-content">
+                      <CheckCircle2 className="w-4 h-4 text-accent-brand shrink-0 mt-0.5" />
                       <span>{it}</span>
                     </li>
                   ))}
                 </ul>
                 <Link
                   to={to}
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm text-[var(--brand-blue)] font-medium hover:gap-2.5 transition-all"
+                  className="mt-6 inline-flex items-center gap-1.5 text-sm text-accent-brand font-medium hover:gap-2.5 transition-all"
                 >
                   Ver más <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -504,17 +492,17 @@ export function MarketingLanding() {
       </section>
 
       {/* CTA Principal */}
-      <section className="relative overflow-hidden bg-[var(--brand-navy-deep)] text-white">
+      <section className="relative overflow-hidden bg-surface-inverse text-white">
         <div
           className="absolute inset-0 opacity-[0.08] pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(var(--brand-gold) 1px, transparent 1px), linear-gradient(90deg, var(--brand-gold) 1px, transparent 1px)",
+              "linear-gradient(var(--accent-brand-subtle) 1px, transparent 1px), linear-gradient(90deg, var(--accent-brand-subtle) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
           }}
         />
         <div className="relative max-w-5xl mx-auto px-5 py-24 text-center">
-          <p className="brand-eyebrow text-[var(--brand-gold)] mb-4">Comienza hoy</p>
+          <p className="brand-eyebrow text-accent-brand-subtle mb-4">Comienza hoy</p>
           <h2 className="brand-display text-4xl md:text-5xl leading-[1.05] max-w-3xl mx-auto">
             Eleva tu proyecto al estándar institucional
           </h2>

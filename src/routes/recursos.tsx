@@ -60,27 +60,25 @@ function RecursosPage() {
           <Link
             key={t}
             to={to}
-            className="group rounded-2xl border border-[var(--brand-hair)] bg-white p-6 hover:border-[var(--brand-blue)] transition flex gap-4"
+            className="group rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand transition flex gap-4"
           >
-            <span className="grid place-items-center w-12 h-12 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)] shrink-0">
+            <span className="grid place-items-center w-12 h-12 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0">
               <Icon className="w-6 h-6" strokeWidth={1.5} />
             </span>
             <div>
-              <div className="font-display text-lg text-[var(--brand-navy-deep)] group-hover:text-[var(--brand-blue)]">
+              <div className="font-display text-lg text-content group-hover:text-accent-brand">
                 {t}
               </div>
-              <p className="text-sm text-[var(--brand-mute)] mt-1.5 leading-relaxed">{d}</p>
+              <p className="text-sm text-content-subtle mt-1.5 leading-relaxed">{d}</p>
             </div>
           </Link>
         ))}
       </div>
 
-      <div className="mt-12 rounded-2xl border border-dashed border-[var(--brand-hair)] bg-[var(--brand-blue-soft)] p-8 text-center">
+      <div className="mt-12 rounded-2xl border border-dashed border-hairline bg-accent-brand-subtle p-8 text-center">
         <Eyebrow className="mb-2">¿Buscas algo específico?</Eyebrow>
-        <h3 className="brand-display text-2xl text-[var(--brand-navy-deep)]">
-          Pídelo a nuestro equipo
-        </h3>
-        <p className="text-[var(--brand-mute)] mt-2">
+        <h3 className="brand-display text-2xl text-content">Pídelo a nuestro equipo</h3>
+        <p className="text-content-subtle mt-2">
           Whitepapers personalizados, casos de uso por jurisdicción y onepagers institucionales bajo
           NDA.
         </p>
