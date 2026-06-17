@@ -11,7 +11,7 @@ import logoMark from "@/assets/geocapitals-mark.png";
  *   - marketing : header blanco + footer navy (sitio público)
  *   - terminal  : top utility bar oscuro + ticker (terminal investor)
  *   - workspace : top bar minimal para /dashboard/* (wrapping only)
- * Todos comparten: BrandMark, LangToggle, tokens --brand-*.
+ * Todos comparten: BrandMark, LangToggle y la capa de tokens semánticos.
  * ============================================================ */
 
 const NAV = [
@@ -46,7 +46,7 @@ export function BrandMark({
       {showText && (
         <span
           className={`font-display text-[19px] tracking-[0.14em] font-bold ${
-            dark ? "text-white" : "text-[var(--brand-navy-deep)]"
+            dark ? "text-white" : "text-content"
           }`}
         >
           GEOCAPITALS
@@ -60,14 +60,9 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
   const { locale, setLocale } = useLocale();
   const Btn = ({ value, label }: { value: Locale; label: string }) => {
     const active = locale === value;
-    const activeCls =
-      tone === "dark"
-        ? "bg-[var(--brand-gold)] text-[var(--brand-navy-deep)]"
-        : "bg-[var(--brand-navy-deep)] text-white";
+    const activeCls = tone === "dark" ? "bg-gold text-background" : "bg-surface-inverse text-white";
     const idleCls =
-      tone === "dark"
-        ? "text-white/60 hover:text-white"
-        : "text-[var(--brand-mute)] hover:text-[var(--brand-navy-deep)]";
+      tone === "dark" ? "text-white/60 hover:text-white" : "text-content-subtle hover:text-content";
     return (
       <button
         type="button"
@@ -81,8 +76,7 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
       </button>
     );
   };
-  const container =
-    tone === "dark" ? "border-white/15 bg-white/5" : "border-[var(--brand-hair)] bg-white";
+  const container = tone === "dark" ? "border-white/15 bg-white/5" : "border-hairline bg-white";
   return (
     <div className={`inline-flex items-center gap-0.5 border rounded-md p-0.5 ${container}`}>
       <Btn value="es" label="ES" />
@@ -96,16 +90,16 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
 export function MarketingHeader() {
   const { t } = useLocale();
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-[var(--brand-hair)]">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-hairline">
       <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
         <BrandMark />
-        <nav className="hidden md:flex items-center gap-6 text-sm text-[var(--brand-ink)]/80 ml-6">
+        <nav className="hidden md:flex items-center gap-6 text-sm text-content/80 ml-6">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="hover:text-[var(--brand-blue)] transition-colors"
-              activeProps={{ className: "text-[var(--brand-blue)] font-medium" }}
+              className="hover:text-accent-brand transition-colors"
+              activeProps={{ className: "text-accent-brand font-medium" }}
             >
               {t(n.key)}
             </Link>
@@ -113,10 +107,7 @@ export function MarketingHeader() {
         </nav>
         <div className="flex-1" />
         <LangToggle />
-        <Link
-          to="/auth"
-          className="text-sm text-[var(--brand-ink)] hover:text-[var(--brand-blue)] hidden sm:inline"
-        >
+        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden sm:inline">
           {t("cta_login")}
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">
@@ -131,7 +122,7 @@ export function MarketingHeader() {
 
 export function MarketingFooter() {
   return (
-    <footer className="bg-[var(--brand-navy-deep)] text-white/70">
+    <footer className="bg-surface-inverse text-white/70">
       <div className="max-w-7xl mx-auto px-5 py-10 grid md:grid-cols-4 gap-8 text-sm">
         <div className="md:col-span-2">
           <BrandMark dark />
@@ -145,7 +136,7 @@ export function MarketingFooter() {
               href="mailto:info@geocapitals.com"
               className="inline-flex items-center gap-2 hover:text-white"
             >
-              <Mail className="w-4 h-4 text-[var(--brand-gold)]" />
+              <Mail className="w-4 h-4 text-accent-brand-subtle" />
               <span>info@geocapitals.com</span>
             </a>
             <a
@@ -154,7 +145,7 @@ export function MarketingFooter() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 hover:text-white"
             >
-              <Linkedin className="w-4 h-4 text-[var(--brand-gold)]" />
+              <Linkedin className="w-4 h-4 text-accent-brand-subtle" />
               <span>/company/geocapitals</span>
             </a>
             <a
@@ -163,14 +154,14 @@ export function MarketingFooter() {
               rel="noreferrer"
               className="inline-flex items-center gap-2 hover:text-white"
             >
-              <LinkIcon className="w-4 h-4 text-[var(--brand-gold)]" />
+              <LinkIcon className="w-4 h-4 text-accent-brand-subtle" />
               <span>geocapitals.com</span>
             </a>
           </div>
         </div>
 
         <div>
-          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-gold)] mb-3">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-accent-brand-subtle mb-3">
             Plataforma
           </div>
           <ul className="space-y-2">
@@ -192,7 +183,7 @@ export function MarketingFooter() {
           </ul>
         </div>
         <div>
-          <div className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-gold)] mb-3">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-accent-brand-subtle mb-3">
             Compañía
           </div>
           <ul className="space-y-2">
@@ -240,7 +231,7 @@ export function TerminalTopBar({
     <div className="h-10 border-b border-border flex items-center px-3 gap-4 bg-card/40">
       <Link to="/" className="inline-flex items-center gap-2">
         <BrandMark size={18} showText={false} />
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[var(--brand-gold)]">
+        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">
           {eyebrow}
         </span>
       </Link>
@@ -261,7 +252,7 @@ export function TerminalTopBar({
         ) : (
           <Link
             to="/auth"
-            className="text-[11px] font-mono px-2 py-1 rounded bg-[var(--brand-gold)] text-[var(--brand-navy-deep)] hover:opacity-90"
+            className="text-[11px] font-mono px-2 py-1 rounded bg-gold text-background hover:opacity-90"
           >
             Sign in
           </Link>
@@ -324,13 +315,13 @@ export function MarketingPage({
   return (
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
-      <section className="border-b border-[var(--brand-hair)] bg-gradient-to-b from-[var(--brand-blue-soft)]/60 to-white">
+      <section className="border-b border-hairline bg-gradient-to-b from-accent-brand-subtle/60 to-white">
         <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
           {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
-          <h1 className="brand-display text-4xl md:text-5xl text-[var(--brand-navy-deep)] max-w-3xl leading-tight">
+          <h1 className="brand-display text-4xl md:text-5xl text-content max-w-3xl leading-tight">
             {title}
           </h1>
-          {intro && <p className="mt-4 text-lg text-[var(--brand-mute)] max-w-2xl">{intro}</p>}
+          {intro && <p className="mt-4 text-lg text-content-subtle max-w-2xl">{intro}</p>}
         </div>
       </section>
       <main className="flex-1">

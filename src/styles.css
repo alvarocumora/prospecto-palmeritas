@@ -465,18 +465,6 @@
   --color-im-line: var(--im-line);
   --color-im-line-strong: var(--im-line-strong);
 
-  /* Primitivos de marca legacy (navy/oro) — se conservan porque la landing
-     actual (.brand-light) todavía los consume; se retiran al migrar (Fase 2). */
-  --color-brand-navy: var(--brand-navy);
-  --color-brand-navy-deep: var(--brand-navy-deep);
-  --color-brand-blue: var(--brand-blue);
-  --color-brand-blue-soft: var(--brand-blue-soft);
-  --color-brand-gold: var(--brand-gold);
-  --color-brand-ink: var(--brand-ink);
-  --color-brand-mute: var(--brand-mute);
-  --color-brand-surface: var(--brand-surface);
-  --color-brand-hair: var(--brand-hair);
-
   /* Escala de radio del rediseño (radio medio, generoso). Aditiva: ningún
      componente la consume todavía. El Operations Console mantiene su 2px. */
   --radius-brand-sm: 6px;
@@ -525,19 +513,6 @@
   --im-line: oklch(0.91 0.008 85); /* #E3E0D8 línea */
   --im-line-strong: oklch(0.85 0.01 85); /* línea marcada */
 
-  /* Primitivos de marca legacy (navy/oro). Aún consumidos por la landing
-     `.brand-light`; se retiran al migrarla en Fase 2. No tocar sus valores
-     para no desplazar lo que ya está en producción. */
-  --brand-navy: oklch(0.27 0.09 260);
-  --brand-navy-deep: oklch(0.18 0.08 260);
-  --brand-blue: oklch(0.55 0.2 255);
-  --brand-blue-soft: oklch(0.96 0.025 255);
-  --brand-gold: oklch(0.78 0.13 78);
-  --brand-ink: oklch(0.18 0.02 260);
-  --brand-mute: oklch(0.5 0.02 260);
-  --brand-surface: oklch(0.995 0.003 260);
-  --brand-hair: oklch(0.9 0.01 260);
-
   /* ── Capa semántica (Capa 2) — el contrato del rediseño ─────────────────
      Apunta a la paleta Institutional Modernist. Aditivo: ningún componente
      consume estos roles todavía, por lo que NO hay cambio visual hasta la
@@ -562,30 +537,17 @@
   --brand-info: var(--im-cobalt);
 }
 
-/* Re-skin Institutional Modernist (Fase 2, piloto).
-   Los primitivos legacy --brand-* se REMAPEAN a la paleta --im-* SOLO dentro
-   del scope `.brand-light`, de modo que las ~196 referencias `var(--brand-*)`
-   de la landing adoptan el lenguaje nuevo sin editar cada archivo, y NADA
-   fuera del scope cambia. El oro se retira: pasa a un acento cobalto pálido,
-   legible sobre las bandas de tinta oscura. */
+/* Scope del sitio público (Institutional Modernist).
+   Consume directamente la capa semántica; los primitivos --brand-* legacy ya
+   no existen (migración completada en Fase 2c/2d). */
 .brand-light {
-  --brand-navy: var(--im-ink);
-  --brand-navy-deep: var(--im-ink);
-  --brand-blue: var(--im-cobalt);
-  --brand-blue-soft: var(--im-cobalt-wash);
-  --brand-gold: var(--im-cobalt-wash);
-  --brand-ink: var(--im-ink);
-  --brand-mute: var(--im-gray);
-  --brand-surface: var(--im-paper);
-  --brand-hair: var(--im-line);
-
-  color: var(--brand-ink);
-  background-color: var(--brand-surface);
+  color: var(--content);
+  background-color: var(--surface);
   font-family: var(--font-sans);
   font-feature-settings: "ss01";
 }
 .brand-light * {
-  border-color: var(--brand-hair);
+  border-color: var(--hairline);
 }
 /* Display editorial: serif con peso moderado y jerarquía por escala */
 .brand-light .brand-display {
@@ -598,7 +560,7 @@
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--brand-mute);
+  color: var(--content-subtle);
 }
 
 /* Inputs marca-light (forms públicos) */
@@ -606,20 +568,20 @@
 .brand-input {
   width: 100%;
   background: #fff;
-  border: 1px solid var(--brand-hair);
+  border: 1px solid var(--hairline);
   border-radius: 6px;
   padding: 9px 12px;
   font-family: var(--font-sans);
   font-size: 14px;
-  color: var(--brand-ink);
+  color: var(--content);
   outline: none;
   transition:
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
 .brand-input:focus {
-  border-color: var(--brand-blue);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 18%, transparent);
+  border-color: var(--accent-brand);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-brand) 18%, transparent);
 }
 
 /* Animaciones del giro del proceso */
@@ -631,10 +593,10 @@
 @keyframes brand-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-blue) 35%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-brand) 35%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 14px color-mix(in oklab, var(--brand-blue) 0%, transparent);
+    box-shadow: 0 0 0 14px color-mix(in oklab, var(--accent-brand) 0%, transparent);
   }
 }
 .brand-spin-slow {
