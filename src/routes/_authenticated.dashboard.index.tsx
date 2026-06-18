@@ -43,26 +43,28 @@ function DashboardHome() {
 
   if (projects.length === 0) {
     return (
-      <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
-        <header className="mb-6">
-          <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
-            Mission Control
-          </div>
-          <h1 className="text-2xl md:text-3xl font-bold mt-1">Hola, {name}.</h1>
-          <p className="text-sm text-muted-foreground mt-2">
-            Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
-          </p>
-        </header>
-        <Link
-          to="/dashboard/projects"
-          className="block rounded border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-8 text-center"
-        >
-          <Plus className="w-8 h-8 text-gold mx-auto mb-3" />
-          <div className="font-mono font-semibold text-foreground">Crear primer proyecto</div>
-          <div className="text-xs text-muted-foreground mt-1">
-            Define código, ubicación y commodity
-          </div>
-        </Link>
+      <div data-theme="im-light" className="min-h-full bg-background text-foreground">
+        <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
+          <header className="mb-6">
+            <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+              Mission Control
+            </div>
+            <h1 className="text-2xl md:text-3xl font-bold mt-1">Hola, {name}.</h1>
+            <p className="text-sm text-muted-foreground mt-2">
+              Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
+            </p>
+          </header>
+          <Link
+            to="/dashboard/projects"
+            className="block rounded border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-8 text-center"
+          >
+            <Plus className="w-8 h-8 text-gold mx-auto mb-3" />
+            <div className="font-mono font-semibold text-foreground">Crear primer proyecto</div>
+            <div className="text-xs text-muted-foreground mt-1">
+              Define código, ubicación y commodity
+            </div>
+          </Link>
+        </div>
       </div>
     );
   }
@@ -140,317 +142,323 @@ function DashboardHome() {
     });
 
   return (
-    <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
-      {/* Header con signos vitales del proyecto */}
-      <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
-        <div className="flex items-start justify-between gap-3 flex-wrap">
-          <div className="min-w-0">
-            <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center gap-1.5">
-              <Sparkles className="w-3 h-3 text-gold" /> Mission Control · Geocapitals OS
+    <div data-theme="im-light" className="min-h-full bg-background text-foreground">
+      <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
+        {/* Header con signos vitales del proyecto */}
+        <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
+          <div className="flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0">
+              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="w-3 h-3 text-gold" /> Mission Control · Geocapitals OS
+              </div>
+              <h1 className="text-xl md:text-2xl font-bold mt-1 truncate">
+                {active?.name ?? "Sin proyecto activo"}
+              </h1>
+              <p className="text-xs text-muted-foreground mt-1 font-mono">
+                {active?.code ?? "—"}
+                {active?.commodity && <span> · {active.commodity}</span>}
+                {active?.country && <span> · {active.country}</span>}
+                <span className="text-hint"> · piloto {name}</span>
+              </p>
             </div>
-            <h1 className="text-xl md:text-2xl font-bold mt-1 truncate">
-              {active?.name ?? "Sin proyecto activo"}
-            </h1>
-            <p className="text-xs text-muted-foreground mt-1 font-mono">
-              {active?.code ?? "—"}
-              {active?.commodity && <span> · {active.commodity}</span>}
-              {active?.country && <span> · {active.country}</span>}
-              <span className="text-hint"> · piloto {name}</span>
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <VitalBadge
+                label="Fusion Score"
+                value={fusion.score == null ? "—" : `${fusion.score}`}
+                tone={fusion.tone}
+              />
+              <VitalBadge
+                label="QPS"
+                value={
+                  loading
+                    ? "…"
+                    : `${fmt(k?.approvedRecords)}/${fmt((k?.approvedRecords ?? 0) + (k?.pendingReview ?? 0))}`
+                }
+                tone={k?.pendingReview ? "warn" : "ok"}
+              />
+              <VitalBadge
+                label="Activos"
+                value={loading ? "…" : `${fmt(k?.activeTargets)} tgts`}
+                tone="info"
+              />
+            </div>
           </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <VitalBadge
-              label="Fusion Score"
-              value={fusion.score == null ? "—" : `${fusion.score}`}
-              tone={fusion.tone}
-            />
-            <VitalBadge
-              label="QPS"
-              value={
-                loading
+
+          {/* Acciones requeridas */}
+          {tasks.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-border/60">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                <Bell className="w-3 h-3 text-gold" /> Acciones requeridas{" "}
+                <span className="text-gold">({tasks.length})</span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+                {tasks.map((t, i) => (
+                  <Link
+                    key={i}
+                    to={t.to}
+                    className={`group rounded border p-2 flex items-center gap-2 transition-colors ${
+                      t.tone === "danger"
+                        ? "border-destructive/40 bg-destructive/5 hover:bg-destructive/10"
+                        : "border-gold/30 bg-gold/5 hover:bg-gold/10"
+                    }`}
+                  >
+                    <span className={t.tone === "danger" ? "text-destructive" : "text-gold"}>
+                      {t.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[9px] font-mono uppercase text-muted-foreground truncate">
+                        {t.label}
+                      </div>
+                      <div
+                        className={`text-sm font-mono font-bold ${t.tone === "danger" ? "text-destructive" : "text-gold"}`}
+                      >
+                        {t.count}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+          {tasks.length === 0 && !loading && (
+            <div className="mt-3 text-xs text-muted-foreground flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-teal" />
+              Sin acciones pendientes · operación al día
+            </div>
+          )}
+        </header>
+
+        {/* 4 PILARES — Explore · Model · Certify · Deal */}
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <Pillar
+            tone="cyan"
+            icon={<Satellite className="w-5 h-5" />}
+            number="01"
+            title="Explore"
+            subtitle="Descubrir el yacimiento"
+            stats={[
+              { label: "Targets activos", value: loading ? "…" : fmt(k?.activeTargets) },
+              { label: "Campañas", value: loading ? "…" : fmt(k?.activeCampaigns) },
+              {
+                label: "Au prom",
+                value: loading ? "…" : k?.auWeightedAvg ? `${k.auWeightedAvg.toFixed(2)} g/t` : "—",
+              },
+            ]}
+            links={[
+              {
+                to: "/dashboard/targets",
+                icon: <TargetIcon className="w-3.5 h-3.5" />,
+                label: "Targets",
+              },
+              {
+                to: "/dashboard/satellite-intel",
+                icon: <Satellite className="w-3.5 h-3.5" />,
+                label: "Satelital",
+              },
+              {
+                to: "/dashboard/geophysics",
+                icon: <Activity className="w-3.5 h-3.5" />,
+                label: "Geofísica",
+              },
+              {
+                to: "/dashboard/catastro",
+                icon: <Crosshair className="w-3.5 h-3.5" />,
+                label: "Catastro",
+              },
+            ]}
+            primary={{ to: "/dashboard/targets", label: "Abrir Explore" }}
+          />
+
+          <Pillar
+            tone="violet"
+            icon={<Mountain className="w-5 h-5" />}
+            number="02"
+            title="Model"
+            subtitle="3D real · superficie y subsuelo"
+            stats={[
+              { label: "Sondajes", value: loading ? "…" : fmt(k?.totalHoles) },
+              { label: "m perforados", value: loading ? "…" : fmt(k?.totalMetersDrilled) },
+              { label: "Muestras", value: loading ? "…" : fmt(k?.totalSamples) },
+            ]}
+            links={[
+              {
+                to: "/dashboard/geology3d",
+                icon: <Box className="w-3.5 h-3.5" />,
+                label: "Visor 3D",
+              },
+              {
+                to: "/dashboard/drilling",
+                icon: <Drill className="w-3.5 h-3.5" />,
+                label: "Sondajes",
+              },
+              {
+                to: "/dashboard/sampling",
+                icon: <TestTube2 className="w-3.5 h-3.5" />,
+                label: "Muestreo",
+              },
+              {
+                to: "/dashboard/estimation",
+                icon: <Layers className="w-3.5 h-3.5" />,
+                label: "Estimación",
+              },
+            ]}
+            primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
+          />
+
+          <Pillar
+            tone="gold"
+            icon={<FileSignature className="w-5 h-5" />}
+            number="03"
+            title="Certify"
+            subtitle="NI 43-101 · QP · firma criptográfica"
+            stats={[
+              { label: "Aprobados", value: loading ? "…" : fmt(k?.approvedRecords) },
+              { label: "En revisión", value: loading ? "…" : fmt(k?.pendingReview) },
+              {
+                label: "QA/QC",
+                value: loading
                   ? "…"
-                  : `${fmt(k?.approvedRecords)}/${fmt((k?.approvedRecords ?? 0) + (k?.pendingReview ?? 0))}`
-              }
-              tone={k?.pendingReview ? "warn" : "ok"}
-            />
-            <VitalBadge
-              label="Activos"
-              value={loading ? "…" : `${fmt(k?.activeTargets)} tgts`}
-              tone="info"
-            />
-          </div>
-        </div>
+                  : k?.qaqcFailRate != null
+                    ? `${(100 - k.qaqcFailRate).toFixed(1)}%`
+                    : "—",
+              },
+            ]}
+            links={[
+              {
+                to: "/dashboard/ni43101",
+                icon: <FileSignature className="w-3.5 h-3.5" />,
+                label: "NI 43-101",
+              },
+              {
+                to: "/reports/losverdes/pre43101",
+                icon: <FileSignature className="w-3.5 h-3.5" />,
+                label: "Pre-NI 43-101 LV5",
+              },
+              { to: "/dashboard/qps", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QPs" },
+              {
+                to: "/dashboard/qaqc",
+                icon: <CheckCircle2 className="w-3.5 h-3.5" />,
+                label: "QA/QC",
+              },
+              {
+                to: "/dashboard/approvals",
+                icon: <ShieldCheck className="w-3.5 h-3.5" />,
+                label: "Aprobaciones",
+              },
+            ]}
+            primary={{ to: "/dashboard/ni43101", label: "Abrir certificación" }}
+          />
 
-        {/* Acciones requeridas */}
-        {tasks.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-border/60">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-              <Bell className="w-3 h-3 text-gold" /> Acciones requeridas{" "}
-              <span className="text-gold">({tasks.length})</span>
+          <Pillar
+            tone="teal"
+            icon={<Handshake className="w-5 h-5" />}
+            number="04"
+            title="Deal"
+            subtitle="Inversionistas · marketplace · data room"
+            stats={[
+              { label: "Concesiones", value: loading ? "…" : fmt(k?.concessionsTotal) },
+              { label: "Vigentes", value: loading ? "…" : fmt(k?.concessionsVigentes) },
+              { label: "Fusion", value: fusion.score == null ? "—" : `${fusion.score}/100` },
+            ]}
+            links={[
+              {
+                to: "/dashboard/marketplace",
+                icon: <TrendingUp className="w-3.5 h-3.5" />,
+                label: "Marketplace",
+              },
+              {
+                to: "/dashboard/deals",
+                icon: <Handshake className="w-3.5 h-3.5" />,
+                label: "Deals",
+              },
+              {
+                to: "/dashboard/finance",
+                icon: <Coins className="w-3.5 h-3.5" />,
+                label: "Finanzas",
+              },
+              {
+                to: "/dashboard/reports",
+                icon: <FileSignature className="w-3.5 h-3.5" />,
+                label: "Reportes",
+              },
+            ]}
+            primary={{ to: "/dashboard/marketplace", label: "Abrir deal room" }}
+          />
+        </section>
+
+        {/* Visor 3D canónico embebido — corazón visual de Mission Control */}
+        <section className="rounded border border-border bg-bg-secondary overflow-hidden">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
+            <div className="flex items-center gap-2">
+              <Box className="w-4 h-4 text-signal-violet" />
+              <h2 className="text-[11px] font-mono uppercase tracking-wider text-foreground">
+                GeoScene3D · visor canónico
+              </h2>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
-              {tasks.map((t, i) => (
-                <Link
-                  key={i}
-                  to={t.to}
-                  className={`group rounded border p-2 flex items-center gap-2 transition-colors ${
-                    t.tone === "danger"
-                      ? "border-destructive/40 bg-destructive/5 hover:bg-destructive/10"
-                      : "border-gold/30 bg-gold/5 hover:bg-gold/10"
-                  }`}
-                >
-                  <span className={t.tone === "danger" ? "text-destructive" : "text-gold"}>
-                    {t.icon}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[9px] font-mono uppercase text-muted-foreground truncate">
-                      {t.label}
-                    </div>
-                    <div
-                      className={`text-sm font-mono font-bold ${t.tone === "danger" ? "text-destructive" : "text-gold"}`}
-                    >
-                      {t.count}
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
+            <Link
+              to="/dashboard/geology3d"
+              className="text-[10px] font-mono text-gold hover:underline"
+            >
+              Pantalla completa →
+            </Link>
           </div>
-        )}
-        {tasks.length === 0 && !loading && (
-          <div className="mt-3 text-xs text-muted-foreground flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-teal" />
-            Sin acciones pendientes · operación al día
+          <div data-surface="canvas" className="h-[480px] relative">
+            <GeoScene3D />
           </div>
-        )}
-      </header>
+        </section>
 
-      {/* 4 PILARES — Explore · Model · Certify · Deal */}
-      <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        <Pillar
-          tone="cyan"
-          icon={<Satellite className="w-5 h-5" />}
-          number="01"
-          title="Explore"
-          subtitle="Descubrir el yacimiento"
-          stats={[
-            { label: "Targets activos", value: loading ? "…" : fmt(k?.activeTargets) },
-            { label: "Campañas", value: loading ? "…" : fmt(k?.activeCampaigns) },
-            {
-              label: "Au prom",
-              value: loading ? "…" : k?.auWeightedAvg ? `${k.auWeightedAvg.toFixed(2)} g/t` : "—",
-            },
-          ]}
-          links={[
-            {
-              to: "/dashboard/targets",
-              icon: <TargetIcon className="w-3.5 h-3.5" />,
-              label: "Targets",
-            },
-            {
-              to: "/dashboard/satellite-intel",
-              icon: <Satellite className="w-3.5 h-3.5" />,
-              label: "Satelital",
-            },
-            {
-              to: "/dashboard/geophysics",
-              icon: <Activity className="w-3.5 h-3.5" />,
-              label: "Geofísica",
-            },
-            {
-              to: "/dashboard/catastro",
-              icon: <Crosshair className="w-3.5 h-3.5" />,
-              label: "Catastro",
-            },
-          ]}
-          primary={{ to: "/dashboard/targets", label: "Abrir Explore" }}
-        />
-
-        <Pillar
-          tone="violet"
-          icon={<Mountain className="w-5 h-5" />}
-          number="02"
-          title="Model"
-          subtitle="3D real · superficie y subsuelo"
-          stats={[
-            { label: "Sondajes", value: loading ? "…" : fmt(k?.totalHoles) },
-            { label: "m perforados", value: loading ? "…" : fmt(k?.totalMetersDrilled) },
-            { label: "Muestras", value: loading ? "…" : fmt(k?.totalSamples) },
-          ]}
-          links={[
-            {
-              to: "/dashboard/geology3d",
-              icon: <Box className="w-3.5 h-3.5" />,
-              label: "Visor 3D",
-            },
-            {
-              to: "/dashboard/drilling",
-              icon: <Drill className="w-3.5 h-3.5" />,
-              label: "Sondajes",
-            },
-            {
-              to: "/dashboard/sampling",
-              icon: <TestTube2 className="w-3.5 h-3.5" />,
-              label: "Muestreo",
-            },
-            {
-              to: "/dashboard/estimation",
-              icon: <Layers className="w-3.5 h-3.5" />,
-              label: "Estimación",
-            },
-          ]}
-          primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
-        />
-
-        <Pillar
-          tone="gold"
-          icon={<FileSignature className="w-5 h-5" />}
-          number="03"
-          title="Certify"
-          subtitle="NI 43-101 · QP · firma criptográfica"
-          stats={[
-            { label: "Aprobados", value: loading ? "…" : fmt(k?.approvedRecords) },
-            { label: "En revisión", value: loading ? "…" : fmt(k?.pendingReview) },
-            {
-              label: "QA/QC",
-              value: loading
-                ? "…"
-                : k?.qaqcFailRate != null
-                  ? `${(100 - k.qaqcFailRate).toFixed(1)}%`
-                  : "—",
-            },
-          ]}
-          links={[
-            {
-              to: "/dashboard/ni43101",
-              icon: <FileSignature className="w-3.5 h-3.5" />,
-              label: "NI 43-101",
-            },
-            {
-              to: "/reports/losverdes/pre43101",
-              icon: <FileSignature className="w-3.5 h-3.5" />,
-              label: "Pre-NI 43-101 LV5",
-            },
-            { to: "/dashboard/qps", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QPs" },
-            {
-              to: "/dashboard/qaqc",
-              icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-              label: "QA/QC",
-            },
-            {
-              to: "/dashboard/approvals",
-              icon: <ShieldCheck className="w-3.5 h-3.5" />,
-              label: "Aprobaciones",
-            },
-          ]}
-          primary={{ to: "/dashboard/ni43101", label: "Abrir certificación" }}
-        />
-
-        <Pillar
-          tone="teal"
-          icon={<Handshake className="w-5 h-5" />}
-          number="04"
-          title="Deal"
-          subtitle="Inversionistas · marketplace · data room"
-          stats={[
-            { label: "Concesiones", value: loading ? "…" : fmt(k?.concessionsTotal) },
-            { label: "Vigentes", value: loading ? "…" : fmt(k?.concessionsVigentes) },
-            { label: "Fusion", value: fusion.score == null ? "—" : `${fusion.score}/100` },
-          ]}
-          links={[
-            {
-              to: "/dashboard/marketplace",
-              icon: <TrendingUp className="w-3.5 h-3.5" />,
-              label: "Marketplace",
-            },
-            { to: "/dashboard/deals", icon: <Handshake className="w-3.5 h-3.5" />, label: "Deals" },
-            {
-              to: "/dashboard/finance",
-              icon: <Coins className="w-3.5 h-3.5" />,
-              label: "Finanzas",
-            },
-            {
-              to: "/dashboard/reports",
-              icon: <FileSignature className="w-3.5 h-3.5" />,
-              label: "Reportes",
-            },
-          ]}
-          primary={{ to: "/dashboard/marketplace", label: "Abrir deal room" }}
-        />
-      </section>
-
-      {/* Visor 3D canónico embebido — corazón visual de Mission Control */}
-      <section className="rounded border border-border bg-bg-secondary overflow-hidden">
-        <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-          <div className="flex items-center gap-2">
-            <Box className="w-4 h-4 text-signal-violet" />
-            <h2 className="text-[11px] font-mono uppercase tracking-wider text-foreground">
-              GeoScene3D · visor canónico
+        {/* Atajos rápidos */}
+        <section>
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              Atajos
             </h2>
+            <Link
+              to="/dashboard/projects"
+              className="text-[10px] font-mono text-gold hover:underline"
+            >
+              Cambiar proyecto →
+            </Link>
           </div>
-          <Link
-            to="/dashboard/geology3d"
-            className="text-[10px] font-mono text-gold hover:underline"
-          >
-            Pantalla completa →
-          </Link>
-        </div>
-        <div className="h-[480px] relative">
-          <GeoScene3D />
-        </div>
-      </section>
-
-      {/* Atajos rápidos */}
-      <section>
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-            Atajos
-          </h2>
-          <Link
-            to="/dashboard/projects"
-            className="text-[10px] font-mono text-gold hover:underline"
-          >
-            Cambiar proyecto →
-          </Link>
-        </div>
-        <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
-          <Shortcut
-            to="/dashboard/map"
-            icon={<MapIcon className="w-4 h-4 text-gold" />}
-            title="Mapa táctico"
-          />
-          <Shortcut
-            to="/dashboard/geology3d"
-            icon={<Box className="w-4 h-4 text-signal-violet" />}
-            title="Visor 3D"
-          />
-          <Shortcut
-            to="/dashboard/catastro"
-            icon={<Crosshair className="w-4 h-4 text-teal" />}
-            title="Catastro"
-          />
-          <Shortcut
-            to="/dashboard/opportunities"
-            icon={<Sparkles className="w-4 h-4 text-yellow-500" />}
-            title="Oportunidades IA"
-          />
-          <Shortcut
-            to="/dashboard/estimation"
-            icon={<Layers className="w-4 h-4 text-copper" />}
-            title="Estimación"
-          />
-          <Shortcut
-            to="/dashboard/hse"
-            icon={<ShieldCheck className="w-4 h-4 text-info" />}
-            title="HSE"
-          />
-          <Shortcut
-            to="/dashboard/team"
-            icon={<Sparkles className="w-4 h-4 text-gold" />}
-            title="Equipo"
-          />
-        </div>
-      </section>
+          <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+            <Shortcut
+              to="/dashboard/map"
+              icon={<MapIcon className="w-4 h-4 text-gold" />}
+              title="Mapa táctico"
+            />
+            <Shortcut
+              to="/dashboard/geology3d"
+              icon={<Box className="w-4 h-4 text-signal-violet" />}
+              title="Visor 3D"
+            />
+            <Shortcut
+              to="/dashboard/catastro"
+              icon={<Crosshair className="w-4 h-4 text-teal" />}
+              title="Catastro"
+            />
+            <Shortcut
+              to="/dashboard/opportunities"
+              icon={<Sparkles className="w-4 h-4 text-yellow-500" />}
+              title="Oportunidades IA"
+            />
+            <Shortcut
+              to="/dashboard/estimation"
+              icon={<Layers className="w-4 h-4 text-copper" />}
+              title="Estimación"
+            />
+            <Shortcut
+              to="/dashboard/hse"
+              icon={<ShieldCheck className="w-4 h-4 text-info" />}
+              title="HSE"
+            />
+            <Shortcut
+              to="/dashboard/team"
+              icon={<Sparkles className="w-4 h-4 text-gold" />}
+              title="Equipo"
+            />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
