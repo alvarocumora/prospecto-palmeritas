@@ -25,12 +25,13 @@ export default defineConfig({
       alias: [
         {
           find: /^entities\/lib\/decode\.js$/,
-          replacement: path.join(entitiesDir, "lib/decode.js"),
+          replacement: path.join(entitiesDir, "decode.js"),
         },
         {
           find: /^entities\/lib\/encode\.js$/,
-          replacement: path.join(entitiesDir, "lib/encode.js"),
+          replacement: path.join(entitiesDir, "escape.js"),
         },
+
         { find: /^entities$/, replacement: entitiesDir },
       ],
     },
