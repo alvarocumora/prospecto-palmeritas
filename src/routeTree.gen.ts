@@ -41,6 +41,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
@@ -251,6 +252,11 @@ const CatastroAppWatchlistRoute = CatastroAppWatchlistRouteImport.update({
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
   id: '/api/public/sync-catastro',
   path: '/api/public/sync-catastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedDashboardValidationRoute =
@@ -625,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -709,6 +716,7 @@ export interface FileRoutesByTo {
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -795,6 +803,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -881,6 +890,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
+    | '/api/public/health'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -965,6 +975,7 @@ export interface FileRouteTypes {
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/validation'
+    | '/api/public/health'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -1050,6 +1061,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
+    | '/api/public/health'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -1094,6 +1106,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
@@ -1332,6 +1345,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/sync-catastro'
       fullPath: '/api/public/sync-catastro'
       preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/validation': {
@@ -1896,6 +1916,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
   CatastroIndexRoute: CatastroIndexRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,
@@ -1915,3 +1936,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
