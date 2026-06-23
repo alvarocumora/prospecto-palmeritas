@@ -23,15 +23,14 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: [
+        // htmlparser2 (transitive via react-email) hardcodes `entities/lib/decode.js`,
+        // but `entities@6` exposes it at the package root. Alias to the real path.
         {
           find: /^entities\/lib\/decode\.js$/,
-          replacement: path.join(entitiesDir, "lib/decode.js"),
-        },
-        {
-          find: /^entities\/lib\/encode\.js$/,
-          replacement: path.join(entitiesDir, "lib/encode.js"),
+          replacement: path.join(entitiesDir, "decode.js"),
         },
         { find: /^entities$/, replacement: entitiesDir },
+
       ],
     },
     build: {
