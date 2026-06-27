@@ -243,6 +243,9 @@ function DashboardHome() {
             accountType={profile.account_type as "investor" | "mining_owner" | "geocapitals_team"}
             kpis={k ?? null}
             loading={loading}
+            refreshing={refreshing}
+            lastUpdated={lastUpdated}
+            onRefresh={refresh}
           />
         )}
 
