@@ -238,6 +238,14 @@ function DashboardHome() {
           )}
         </header>
 
+        {profile?.account_type && (
+          <RoleSegmentedPanel
+            accountType={profile.account_type as "investor" | "mining_owner" | "geocapitals_team"}
+            kpis={k ?? null}
+            loading={loading}
+          />
+        )}
+
         {/* 4 PILARES — Explore · Model · Certify · Deal */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <Pillar
