@@ -141,9 +141,12 @@ function DashboardHome() {
       tone: "danger",
     });
 
+  const showOnboarding = !profile?.account_type;
+
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
       <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
+        {showOnboarding && <OnboardingWizard />}
         {/* Header con signos vitales del proyecto */}
         <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
           <div className="flex items-start justify-between gap-3 flex-wrap">

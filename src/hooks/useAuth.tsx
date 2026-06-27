@@ -9,6 +9,7 @@ type Profile = {
   email: string | null;
   avatar_url: string | null;
   organization: string | null;
+  account_type: "investor" | "mining_owner" | "geocapitals_team" | null;
 };
 
 type AuthContextValue = {
@@ -31,10 +32,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = async (uid: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("id,user_id,display_name,email,avatar_url,organization")
+      .select("id,user_id,display_name,email,avatar_url,organization,account_type")
       .eq("user_id", uid)
       .maybeSingle();
-    setProfile(data ?? null);
+    setProfile((data as Profile | null) ?? null);
   };
 
   useEffect(() => {
