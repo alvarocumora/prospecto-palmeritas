@@ -55,6 +55,11 @@ function DashboardHome() {
               Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
             </p>
           </header>
+          {!profile?.account_type && (
+            <div className="mb-6">
+              <OnboardingWizard />
+            </div>
+          )}
           <Link
             to="/dashboard/projects"
             className="block rounded border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-8 text-center"
