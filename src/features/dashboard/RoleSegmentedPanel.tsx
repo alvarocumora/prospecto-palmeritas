@@ -2,7 +2,7 @@
 // vital y los 4 pilares en el Mission Control. Cada variante usa datos
 // reales del hook useExecutiveKpis sin pedir nuevas queries.
 import { Link } from "@tanstack/react-router";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Briefcase,
   Mountain,
@@ -24,8 +24,21 @@ import {
   Satellite,
   Box,
   Activity,
+  RefreshCw,
 } from "lucide-react";
 import type { ExecutiveKpis } from "@/hooks/useExecutiveKpis";
+
+function formatRelative(date: Date | null): string {
+  if (!date) return "—";
+  const diff = Math.max(0, Math.floor((Date.now() - date.getTime()) / 1000));
+  if (diff < 5) return "ahora";
+  if (diff < 60) return `hace ${diff}s`;
+  const m = Math.floor(diff / 60);
+  if (m < 60) return `hace ${m}m`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `hace ${h}h`;
+  return date.toLocaleString();
+}
 
 type AccountType = "investor" | "mining_owner" | "geocapitals_team";
 
