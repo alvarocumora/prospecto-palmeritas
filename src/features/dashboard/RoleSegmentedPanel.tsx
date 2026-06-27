@@ -119,6 +119,32 @@ export function RoleSegmentedPanel({
   const meta = META[accountType];
   const Icon = meta.icon;
 
+export function RoleSegmentedPanel({
+  accountType,
+  kpis,
+  loading,
+  refreshing = false,
+  lastUpdated = null,
+  onRefresh,
+}: {
+  accountType: AccountType;
+  kpis: ExecutiveKpis | null;
+  loading: boolean;
+  refreshing?: boolean;
+  lastUpdated?: Date | null;
+  onRefresh?: () => void | Promise<void>;
+}) {
+  const meta = META[accountType];
+  const Icon = meta.icon;
+
+  // Re-render cada 30s para mantener vivo el "hace Xm".
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const id = window.setInterval(() => setTick((n) => n + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, [lastUpdated]);
+
   return (
     <section className="rounded border border-border bg-bg-secondary p-4 md:p-5">
       <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
@@ -134,12 +160,26 @@ export function RoleSegmentedPanel({
             <p className="text-xs text-muted-foreground mt-0.5">{meta.subtitle}</p>
           </div>
         </div>
-        <Link
-          to={meta.primary.to}
-          className={`text-[11px] font-mono uppercase px-3 py-1.5 rounded border ${TONE[meta.tone]} hover:opacity-90`}
-        >
-          {meta.primary.label} <ArrowRight className="w-3 h-3 inline ml-1" />
-        </Link>
+        <div className="flex items-center gap-2">
+          {onRefresh && (
+            <button
+              type="button"
+              onClick={() => void onRefresh()}
+              disabled={refreshing || loading}
+              title={`Datos actualizados ${formatRelative(lastUpdated)}`}
+              className="inline-flex items-center gap-1.5 text-[11px] font-mono uppercase px-2.5 py-1.5 rounded border border-border bg-bg-panel hover:border-gold/50 hover:text-gold disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <RefreshCw className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`} />
+              <span className="hidden sm:inline">{formatRelative(lastUpdated)}</span>
+            </button>
+          )}
+          <Link
+            to={meta.primary.to}
+            className={`text-[11px] font-mono uppercase px-3 py-1.5 rounded border ${TONE[meta.tone]} hover:opacity-90`}
+          >
+            {meta.primary.label} <ArrowRight className="w-3 h-3 inline ml-1" />
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
