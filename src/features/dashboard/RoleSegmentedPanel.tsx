@@ -107,17 +107,6 @@ function QuickLink({
 const fmt = (n: number | null | undefined, d = 0) =>
   n == null ? "—" : n.toLocaleString(undefined, { maximumFractionDigits: d });
 
-export function RoleSegmentedPanel({
-  accountType,
-  kpis,
-  loading,
-}: {
-  accountType: AccountType;
-  kpis: ExecutiveKpis | null;
-  loading: boolean;
-}) {
-  const meta = META[accountType];
-  const Icon = meta.icon;
 
 export function RoleSegmentedPanel({
   accountType,
