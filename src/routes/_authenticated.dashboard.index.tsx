@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { RoleSegmentedPanel } from "@/features/dashboard/RoleSegmentedPanel";
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
 import { GeoScene3D } from "@/components/geoscene";
