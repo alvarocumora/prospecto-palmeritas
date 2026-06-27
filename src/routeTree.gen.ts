@@ -41,6 +41,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
+import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
@@ -252,6 +253,11 @@ const CatastroAppWatchlistRoute = CatastroAppWatchlistRouteImport.update({
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
   id: '/api/public/sync-catastro',
   path: '/api/public/sync-catastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
+  id: '/api/public/stats',
+  path: '/api/public/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
@@ -632,6 +638,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -717,6 +724,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -804,6 +812,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
@@ -891,6 +900,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/stats'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -976,6 +986,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/stats'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -1062,6 +1073,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/stats'
     | '/api/public/sync-catastro'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
@@ -1107,6 +1119,7 @@ export interface RootRouteChildren {
   LiveTilamaRoute: typeof LiveTilamaRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicStatsRoute: typeof ApiPublicStatsRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
@@ -1345,6 +1358,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/sync-catastro'
       fullPath: '/api/public/sync-catastro'
       preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stats': {
+      id: '/api/public/stats'
+      path: '/api/public/stats'
+      fullPath: '/api/public/stats'
+      preLoaderRoute: typeof ApiPublicStatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -1917,6 +1937,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveTilamaRoute: LiveTilamaRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicStatsRoute: ApiPublicStatsRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,

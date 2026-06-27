@@ -1,105 +1,89 @@
-# Plan — Estabilización + UI/UX unificada + Back↔Front
 
-## Paso 0 · Desbloquear el build (crítico, primero)
+# Plan: Onboarding real + Landing + Dashboard segmentado
 
-El último build falla con:
-```
-[commonjs--resolver] Could not load /dev-server/node_modules/entities/lib/decode.js: ENOENT
-```
-
-Causa: en `vite.config.ts` se añadieron aliases `entities/lib/decode.js` y `entities/lib/encode.js` apuntando a `node_modules/entities/lib/...`, pero `entities@6` tiene esos archivos en la raíz del paquete (`node_modules/entities/decode.js`), no en `lib/`. Mientras esto no se arregle, nada se despliega.
-
-Acción: corregir los dos `replacement` en `vite.config.ts` para que apunten a `entities/decode.js` y `entities/encode.js` (y verificar con `bun run build:dev` antes de seguir).
+Objetivo: abrir la puerta a clientes reales (inversionistas, equipos técnicos, holders) con un flujo self-serve, una landing que muestra datos vivos, y un dashboard que cambia según el rol — todo conectado al backend ya existente (135 tablas, 35 edge functions, hooks reales).
 
 ---
 
-## Fase A · Rutas públicas estables (1 día)
+## Fase 1 — Completar rutas públicas (medio día)
 
-Objetivo: `/`, `/inversionistas`, `/terminal`, `/catastro`, `/contacto`, `/auth` devuelven 200 reales (no fallback) en producción.
+Auditar y asegurar que estas rutas devuelven 200 con SSR, sin tocar `requireSupabaseAuth` en loaders públicos:
 
-1. Tras Paso 0, redeploy y `curl -sI` a las 6 rutas. Si alguna sigue 500, leer `stack_modern--server-function-logs` (el wrapper de `src/server.ts` ya loguea `[geo-ssr-500]` con stack).
-2. Auditar loaders de las rutas públicas: ninguno debe llamar serverFn con `requireSupabaseAuth` (causa 401 en SSR/build:dev). Mover esas llamadas a `useQuery` en componente.
-3. Auditar `process.env.*` a nivel de módulo en todos los `.functions.ts` y rutas `/api/public/*` — mover dentro de `.handler()`.
-4. Auditar imports top-level de `@/integrations/supabase/client.server` fuera de `*.server.ts` — mover a `await import()` dentro del handler.
-5. Crear `src/routes/api/public/health.ts` → `{ok:true, commit, ts}` sin tocar DB (para uptime monitor + CI gate).
-6. Endurecer `.github/workflows/ci.yml`: paso `bun run build:dev` + `curl` post-deploy a `/` esperando 200; falla el pipeline si 500.
+- `/` (landing) · `/inversionistas` · `/empresas` · `/recursos` · `/contacto` · `/proyectos` · `/terminal` · `/catastro` · `/auth` · `/unsubscribe`
+- `/api/public/health` ya existe — añadir `/api/public/stats` (server route con publishable key + `TO anon` SELECT) que devuelve: nº concesiones monitoreadas, anomalías satelitales últimos 30d, deals activos, proyectos públicos.
+- Crear `notFoundComponent` y `errorComponent` consistentes en cada ruta pública.
 
----
+## Fase 2 — Landing con datos reales (1 día)
 
-## Fase B · Unificar UI/UX bajo un AppShell único (2-3 días)
+Reemplazar contadores hardcoded del `HeroLiveMap` y `MarketingLanding` por datos vivos del nuevo `/api/public/stats`:
 
-Decisión del usuario: mantener estética actual (dark Bloomberg-terminal), solo unificar.
+- **Hero counters**: "X concesiones monitoreadas · Y anomalías detectadas esta semana · Z deals activos" (refresh cada 60s vía `useQuery`).
+- **Sección "Cómo funciona" por audiencia** — 3 tabs con CTAs diferenciados:
+  - *Inversionista* → "Ver deal flow" → `/inversionistas` → CTA "Crear cuenta gratis"
+  - *Equipo técnico* → "Ver workspace de proyecto" → demo Palmeras/Franco → CTA "Empezar proyecto"
+  - *Holder* → "Monitorear mis concesiones" → `/catastro` → CTA "Activar alertas"
+- **Un solo CTA dominante** sticky en header: "Crear cuenta gratis" → `/auth?mode=signup`.
+- **Proof points reales**: cards con métricas Palmeras (Cu/Mo), Franco (Au), LV5 (Illapel) extraídas de `projects` públicos.
 
-1. Definir contrato `src/components/shell/AppShell.tsx` (ya en memoria) con slots: `header`, `sidebar?`, `subnav?`, `main`, `footer?`, props de densidad y ancho. Tokens semánticos de `src/styles.css` (sin colores hardcoded).
-2. Refactor de las 4 shells existentes para heredar de AppShell sin perder identidad:
-   - `MarketingShell` (público + landing)
-   - `TerminalShell` (Bloomberg-style)
-   - `DashboardShell` (operador interno, hoy implícito en rutas `_authenticated.dashboard.*`)
-   - `PortalShell` (NUEVO, vacío por ahora, para investor)
-3. Unificar primitives compartidas: header, footer, breadcrumbs, page-title, empty-state, error-state, loading-skeleton, KPI card, data-table. Todas en `src/components/shell/` consumiendo solo tokens.
-4. Pasada de QA visual: spacing, tipografía (mono + sans del proyecto), focus states, dark contrast AA. Capturas Playwright a `/`, `/terminal`, `/dashboard`, `/inversionistas`.
-5. Sin cambios de URL ni de lógica de negocio en esta fase.
+## Fase 3 — Self-serve signup + perfil (1 día)
 
----
+- `/auth` ya soporta email + Google (Lovable Cloud). Verificar que Google esté configurado vía `configure_social_auth`.
+- Trigger DB: al crear `auth.users`, auto-insertar fila en `profiles` con `onboarding_status='pending'` y rol por defecto `viewer` en `app_roles`.
+- Wizard post-signup en `/dashboard` (primer login):
+  1. "¿Cuál es tu perfil?" → investor / technical / holder / explorer (guarda en `profiles.profile_type`)
+  2. "¿Cuál es tu objetivo?" (opciones por perfil)
+  3. "Conecta tu primer dato" (investor: watchlist · technical: crea/únete a proyecto · holder: importa RUT/folio)
+- Persiste progreso en `onboarding_status` (ya existe la tabla).
 
-## Fase C · Auditoría back↔front (entregable: matriz)
+## Fase 4 — Dashboard general segmentado (2 días)
 
-Generar `docs/audit/backend-frontend-matrix.md` con una fila por hook/feature:
+Refactor `/dashboard` (ruta `_authenticated/dashboard`) en un layout único `AppShell variant="workspace"` con 3 zonas:
 
-| Hook / feature | Tabla(s) Supabase | Estado | Notas |
-|---|---|---|---|
-| `useProjects` | `projects`, `project_members` | real | RLS ok |
-| `useGeologyData` | `geological_features`, `lithology_units` | parcial | falta wire de wireframes |
-| `TrackminDashboard.kpis` | — | mock | hardcoded en `data/overview.ts` |
-| … | … | … | … |
+**Header KPIs ejecutivos reales** — via `useExecutiveKpis` ya existente:
+- Proyectos activos · Alertas catastro sin leer · Anomalías sat nuevas · Deals en pipeline · Vencimientos próximos 90d
 
-Cobertura:
-- 71 hooks en `src/hooks/`
-- 64 archivos en `src/lib/` (functions + helpers)
-- 35 edge functions Supabase
-- 135 tablas
+**Onboarding checklist** (colapsa cuando `onboarding_status='completed'`):
+- ☐ Perfil completo · ☐ Primer proyecto / watchlist · ☐ Equipo invitado · ☐ Primera alerta configurada · ☐ Primer reporte / data room
 
-Salida: tabla completa + lista priorizada de "wire-ups pendientes" (lo que está mock y debería ser real) ordenada por impacto investor (catastro, satelital, NI 43-101, deals, data room). No se cablea nada en esta fase — solo el reporte.
+**Acceso rápido por rol** — cards distintas según `profile_type`:
+- **Investor** → Deal flow (`deals` activos), Watchlist catastro, Data rooms con acceso, Reportes NI 43-101 firmados recientes
+- **Technical/Geologist** → Proyecto activo (último visitado), Drill holes pendientes QAQC, Targets sin validar, Anomalías sat del AOI
+- **Holder** → Mis concesiones (`concession_holders`), Patentes próximas a vencer, Bulletin alerts, Court cases abiertos
+- **Admin/PM** → Equipo + invitaciones pendientes, Audit log reciente, Compliance score, Subscription status
 
----
+**Feed de actividad** (últimos 7 días) — query unificada sobre `audit_log` + `catastro_alerts` + `satellite_anomalies` + `signature_audit_trail` + `project_invitations`.
 
-## Fase D · Reorganización de carpetas (paralelizable con C)
+## Fase 5 — Conexión back↔front sin mocks (paralelo)
 
-Sin cambio de URLs (TanStack soporta carpetas `(group)`).
+Auditar y reemplazar mocks en las pantallas que el onboarding tocará primero:
+- `OpportunitiesMap` → `usePropertyListings` real
+- `TerminalShell` → `useExecutiveKpis` + `useCommodityPrices`
+- `PalmerasDashboard` overview → `useProjectMiningConcessions` + `useProjectSatelliteAnomalies`
+- Reporte: `docs/audit/back-front-coverage.md` con tabla `hook · tabla · pantalla · estado (real/mock/parcial)`.
 
-`src/routes/`:
-```
-(marketing)/     → index, inversionistas, empresas, proyectos, recursos, contacto
-(public-tools)/  → catastro.*, live.*, share.*
-auth.tsx
-_authenticated/
-  dashboard/     → ~40 archivos actuales (operador)
-  portal/        → (vacío, futuro investor)
-  admin/         → admin.*, approvals, audit
-api/public/      → ya existe
-```
+## Fase 6 — Verificación
 
-`src/lib/`:
-```
-catastro/   losverdes/   satellite/   livemap/   ni43101/
-mining/     ai/          pdf/         core/      email/
-notifications/   (ya existe)
-```
-
-Mover por dominio, un commit por dominio, find/replace de imports.
-
-Al final: actualizar `mem://index.md` con la nueva geografía.
+- Playwright headless: `/`, `/auth` signup flow, `/dashboard` con cuenta nueva (3 perfiles), `/dashboard` con cuenta poblada.
+- `bun run build:dev` verde.
+- Lighthouse landing > 90 performance / SEO.
 
 ---
 
-## Entregables y orden
+## Detalles técnicos
 
-| # | Entregable | Tiempo | Bloquea |
-|---|---|---|---|
-| 0 | Fix `entities` aliases en `vite.config.ts` | 5 min | TODO |
-| A | Rutas públicas 200 + health endpoint + CI gate | 1 día | publish |
-| B | AppShell único + 4 shells refactorizadas | 2-3 días | — |
-| C | Matriz back↔front (reporte) | 1 día (paralelo a B) | wire-ups futuros |
-| D | Carpetas reorganizadas + mem actualizada | 1-2 días (paralelo a B/C) | — |
+- **No nuevas tablas mayores** — usar `profiles.profile_type` (añadir columna) + `onboarding_status` existente.
+- **Migration mínima**: 1) `profiles.profile_type text`, 2) trigger `handle_new_user` que inserta profile + onboarding_status + rol viewer, 3) `/api/public/stats` requiere políticas `TO anon SELECT` solo en agregados (vistas materializadas si hace falta).
+- **Dashboard re-usa `AppShell variant="workspace"`** ya existente — no se crea shell nuevo.
+- **Hooks ya existen** para todos los KPIs — `useExecutiveKpis`, `useConcessionAlerts`, `useUnreadCatastroAlerts`, `useProjects`, `useProjectRole`, `useOnboardingStatus` (crear si falta).
+- **Lovable AI Gateway** para el wizard "sugerir próximos pasos" en onboarding (opcional, Fase 4+).
 
-Tras aprobar este plan ejecuto Paso 0 + Fase A en el primer turno (es lo que desbloquea el despliegue). B, C, D siguen como sprints separados.
+## Orden de ejecución sugerido
+
+1. Fase 1 (rutas + `/api/public/stats`) — desbloquea landing.
+2. Fase 2 (landing) — desbloquea signups.
+3. Fase 3 (signup + wizard) — desbloquea dashboard segmentado.
+4. Fase 4 (dashboard) — entrega de valor al cliente.
+5. Fase 5 (auditoría/mocks) en paralelo desde día 2.
+6. Fase 6 al final.
+
+Estimación total: **5–6 días** de trabajo enfocado.
