@@ -40,7 +40,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 function DashboardHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
-  const { kpis, loading } = useExecutiveKpis();
+  const { kpis, loading, refreshing, lastUpdated, refresh } = useExecutiveKpis();
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "operador";
 
   if (projects.length === 0) {
