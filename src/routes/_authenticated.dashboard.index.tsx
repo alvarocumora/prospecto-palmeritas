@@ -59,9 +59,9 @@ function DashboardHome() {
               Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
             </p>
           </header>
-          {!profile?.account_type && (
+          {needsOnboarding && (
             <div className="mb-6">
-              <OnboardingWizard />
+              <OnboardingWizard onComplete={refreshOnboarding} />
             </div>
           )}
           <Link
