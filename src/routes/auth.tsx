@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
+import { z } from "zod";
 import { Loader2, MapPin, Layers, Mountain } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +8,13 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
 
+const authSearch = z.object({
+  intent: z.enum(["investor", "owner", "team"]).optional(),
+  mode: z.enum(["login", "signup"]).optional(),
+});
+
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s) => authSearch.parse(s),
   head: () => ({
     meta: [
       { title: "Iniciar sesión — Geocapitals" },
@@ -26,15 +33,13 @@ type Mode = "login" | "signup";
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const [mode, setMode] = useState<Mode>("login");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(search.mode ?? (search.intent ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Si ya hay sesión activa, redirigir al dashboard automáticamente.
-  // Esto cubre tanto el caso "usuario ya logueado entra a /auth" como
-  // "acaba de iniciar sesión y onAuthStateChange propagó el user".
   useEffect(() => {
     if (!authLoading && user) {
       navigate({ to: "/dashboard" });
@@ -46,12 +51,15 @@ function AuthPage() {
     setLoading(true);
     try {
       if (mode === "signup") {
+        const intentMeta = search.intent
+          ? { signup_intent: search.intent, account_type_hint: search.intent === "investor" ? "investor" : search.intent === "owner" ? "mining_owner" : "geocapitals_team" }
+          : {};
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { display_name: displayName || email.split("@")[0] },
+            data: { display_name: displayName || email.split("@")[0], ...intentMeta },
           },
         });
         if (error) throw error;
