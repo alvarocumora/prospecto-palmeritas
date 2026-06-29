@@ -157,3 +157,68 @@ export const notifyInvestorSubmitted = createServerFn({ method: "POST" })
     });
     return { ok: true as const };
   });
+
+/** Historial y estado de inversiones del usuario actual (perfil KYC + liquidaciones + inquiries). */
+export const getMyInvestmentHistory = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+
+    const [profileRes, settlementsRes, inquiriesRes] = await Promise.all([
+      supabase
+        .from("investor_profiles")
+        .select("review_status, reviewed_at, rejection_reason, terms_accepted_at, created_at, full_name, company_name")
+        .eq("user_id", userId)
+        .maybeSingle(),
+      supabase
+        .from("deal_settlements")
+        .select(
+          "id, listing_id, amount_usd, amount_clp, success_fee_pct, status, wire_reference, received_at, recorded_at, created_at, notes",
+        )
+        .eq("investor_user_id", userId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("property_deal_inquiries")
+        .select("id, listing_id, status, message, nda_signed_at, closed_at, closed_reason, created_at, updated_at")
+        .eq("inquirer_user_id", userId)
+        .order("created_at", { ascending: false }),
+    ]);
+
+    if (profileRes.error) throw new Error(profileRes.error.message);
+    if (settlementsRes.error) throw new Error(settlementsRes.error.message);
+    if (inquiriesRes.error) throw new Error(inquiriesRes.error.message);
+
+    const settlements = settlementsRes.data ?? [];
+    const listingIds = Array.from(
+      new Set([
+        ...settlements.map((s) => s.listing_id).filter(Boolean),
+        ...(inquiriesRes.data ?? []).map((i) => i.listing_id).filter(Boolean),
+      ]),
+    );
+    let listings: Record<string, { title: string; commodity: string | null; country: string | null }> = {};
+    if (listingIds.length) {
+      const { data: ls } = await supabase
+        .from("property_listings")
+        .select("id, title, commodity, country")
+        .in("id", listingIds);
+      listings = Object.fromEntries(
+        (ls ?? []).map((l) => [l.id, { title: l.title, commodity: l.commodity, country: l.country }]),
+      );
+    }
+
+    const totalPaidUsd = settlements
+      .filter((s) => s.status === "paid" || s.status === "received")
+      .reduce((acc, s) => acc + Number(s.amount_usd ?? 0), 0);
+    const totalCommittedUsd = settlements.reduce((acc, s) => acc + Number(s.amount_usd ?? 0), 0);
+
+    return {
+      profile: profileRes.data,
+      settlements: settlements.map((s) => ({ ...s, listing: listings[s.listing_id] ?? null })),
+      inquiries: (inquiriesRes.data ?? []).map((i) => ({ ...i, listing: listings[i.listing_id] ?? null })),
+      totals: {
+        paidUsd: totalPaidUsd,
+        committedUsd: totalCommittedUsd,
+        count: settlements.length,
+      },
+    };
+  });
