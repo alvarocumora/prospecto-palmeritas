@@ -216,8 +216,8 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
 
     return {
       profile: profileRes.data,
-      settlements: settlements.map((s) => ({ ...s, listing: listings[s.listing_id] ?? null })),
-      inquiries: (inquiriesRes.data ?? []).map((i) => ({ ...i, listing: listings[i.listing_id] ?? null })),
+      settlements: settlements.map((s) => ({ ...s, listing: s.listing_id ? listings[s.listing_id] ?? null : null })),
+      inquiries: inquiries.map((i) => ({ ...i, listing: i.listing_id ? listings[i.listing_id] ?? null : null })),
       totals: {
         paidUsd: totalPaidUsd,
         committedUsd: totalCommittedUsd,
