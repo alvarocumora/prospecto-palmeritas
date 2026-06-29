@@ -6,7 +6,7 @@ import { sendInternalEmail } from "@/lib/email/send-internal.server";
 const IdInput = z.object({ userId: z.string().uuid() });
 const RejectInput = z.object({ userId: z.string().uuid(), reason: z.string().min(3).max(500) });
 
-async function assertStaff(supabase: ReturnType<typeof requireSupabaseAuth> extends never ? never : any, userId: string) {
+async function assertStaff(supabase: any, userId: string): Promise<void> {
   const { data, error } = await supabase.rpc("is_geocapitals_staff", { _user_id: userId });
   if (error) throw new Error(error.message);
   if (!data) throw new Error("No autorizado");

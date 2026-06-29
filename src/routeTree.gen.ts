@@ -91,6 +91,7 @@ import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from '.
 import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
@@ -553,6 +554,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const AuthenticatedDashboardAdminInvestorsRoute =
+  AuthenticatedDashboardAdminInvestorsRouteImport.update({
+    id: '/investors',
+    path: '/investors',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const ApiPublicLiveMapLosverdesVerifyRoute =
   ApiPublicLiveMapLosverdesVerifyRouteImport.update({
     id: '/api/public/live-map/losverdes/verify',
@@ -599,7 +606,7 @@ export interface FileRoutesByFullPath {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -645,6 +652,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -685,7 +693,7 @@ export interface FileRoutesByTo {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -731,6 +739,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -773,7 +782,7 @@ export interface FileRoutesById {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -819,6 +828,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -907,6 +917,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard/'
+    | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
@@ -993,6 +1004,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard'
+    | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
@@ -1080,6 +1092,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/investors'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/reports/losverdes/pre43101'
@@ -1710,6 +1723,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/_authenticated/dashboard/admin/investors': {
+      id: '/_authenticated/dashboard/admin/investors'
+      path: '/investors'
+      fullPath: '/dashboard/admin/investors'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminInvestorsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/api/public/live-map/losverdes/verify': {
       id: '/api/public/live-map/losverdes/verify'
       path: '/api/public/live-map/losverdes/verify'
@@ -1733,6 +1753,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminInvestorsRoute: typeof AuthenticatedDashboardAdminInvestorsRoute
+}
+
+const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
+  {
+    AuthenticatedDashboardAdminInvestorsRoute:
+      AuthenticatedDashboardAdminInvestorsRoute,
+  }
+
+const AuthenticatedDashboardAdminRouteWithChildren =
+  AuthenticatedDashboardAdminRoute._addFileChildren(
+    AuthenticatedDashboardAdminRouteChildren,
+  )
 
 interface AuthenticatedDashboardCatastroRouteChildren {
   AuthenticatedDashboardCatastroHoldersIdRoute: typeof AuthenticatedDashboardCatastroHoldersIdRoute
@@ -1796,7 +1831,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
-  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
@@ -1840,7 +1875,8 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboard3dProRoute: AuthenticatedDashboard3dProRoute,
-  AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+  AuthenticatedDashboardAdminRoute:
+    AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
