@@ -161,7 +161,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             commodities: inv.commodities,
             accepted_standards: inv.accepted_standards,
             website: inv.website || null,
-            review_status: "pending",
+            review_status: "pending_review",
           },
           { onConflict: "user_id" },
         );
