@@ -3203,6 +3203,81 @@ export type Database = {
           },
         ]
       }
+      deal_settlements: {
+        Row: {
+          amount_clp: number | null
+          amount_usd: number | null
+          created_at: string
+          id: string
+          inquiry_id: string | null
+          investor_company: string | null
+          investor_user_id: string | null
+          listing_id: string | null
+          notes: string | null
+          received_at: string | null
+          recorded_at: string
+          recorded_by: string
+          status: string
+          stripe_invoice_id: string | null
+          success_fee_pct: number | null
+          updated_at: string
+          wire_reference: string | null
+        }
+        Insert: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          created_at?: string
+          id?: string
+          inquiry_id?: string | null
+          investor_company?: string | null
+          investor_user_id?: string | null
+          listing_id?: string | null
+          notes?: string | null
+          received_at?: string | null
+          recorded_at?: string
+          recorded_by: string
+          status?: string
+          stripe_invoice_id?: string | null
+          success_fee_pct?: number | null
+          updated_at?: string
+          wire_reference?: string | null
+        }
+        Update: {
+          amount_clp?: number | null
+          amount_usd?: number | null
+          created_at?: string
+          id?: string
+          inquiry_id?: string | null
+          investor_company?: string | null
+          investor_user_id?: string | null
+          listing_id?: string | null
+          notes?: string | null
+          received_at?: string | null
+          recorded_at?: string
+          recorded_by?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          success_fee_pct?: number | null
+          updated_at?: string
+          wire_reference?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_settlements_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "property_deal_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_settlements_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_target_markets: {
         Row: {
           deal_id: string
@@ -6681,6 +6756,7 @@ export type Database = {
           review_status: Database["public"]["Enums"]["review_status"]
           reviewed_at: string | null
           reviewed_by: string | null
+          terms_accepted_at: string | null
           ticket_max_usd: number | null
           ticket_min_usd: number | null
           updated_at: string
@@ -6702,6 +6778,7 @@ export type Database = {
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          terms_accepted_at?: string | null
           ticket_max_usd?: number | null
           ticket_min_usd?: number | null
           updated_at?: string
@@ -6723,6 +6800,7 @@ export type Database = {
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          terms_accepted_at?: string | null
           ticket_max_usd?: number | null
           ticket_min_usd?: number | null
           updated_at?: string
@@ -13455,6 +13533,7 @@ export type Database = {
         Args: { _delta?: number; _metric: string; _org_id: string }
         Returns: undefined
       }
+      is_geocapitals_staff: { Args: { _user_id: string }; Returns: boolean }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean

@@ -16,6 +16,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { toast } from "sonner";
+import { notifyInvestorSubmitted } from "@/lib/investors.functions";
 
 type AccountType = "investor" | "mining_owner" | "geocapitals_team";
 
@@ -74,6 +75,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     commodities: ["Au"] as string[],
     accepted_standards: ["NI 43-101"] as string[],
     website: "",
+    terms_accepted: false,
   });
 
   // Owner form
@@ -149,6 +151,11 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           setSaving(false);
           return;
         }
+        if (!inv.terms_accepted) {
+          toast.error("Debes aceptar los términos y la política de privacidad.");
+          setSaving(false);
+          return;
+        }
         const { error } = await supabase.from("investor_profiles").upsert(
           {
             user_id: user.id,
@@ -162,6 +169,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             accepted_standards: inv.accepted_standards,
             website: inv.website || null,
             review_status: "pending_review",
+            terms_accepted_at: new Date().toISOString(),
           },
           { onConflict: "user_id" },
         );
@@ -170,6 +178,12 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           .from("profiles")
           .update({ display_name: inv.full_name.trim(), organization: inv.company_name.trim(), country: inv.country })
           .eq("user_id", user.id);
+        // Dispara welcome + lead interno (no bloqueante)
+        try {
+          await notifyInvestorSubmitted();
+        } catch (e) {
+          console.warn("notifyInvestorSubmitted failed", e);
+        }
         await finish({ investor_profile_submitted: true });
       } else if (selected === "mining_owner") {
         if (!own.organization.trim()) {
@@ -302,6 +316,20 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             <Field label="Sitio web" full>
               <Input value={inv.website} onChange={(v) => setInv({ ...inv, website: v })} placeholder="https://" />
             </Field>
+            <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={inv.terms_accepted}
+                onChange={(e) => setInv({ ...inv, terms_accepted: e.target.checked })}
+                className="mt-0.5 accent-gold"
+              />
+              <span>
+                Acepto los <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">Términos</a>,
+                la <a href="/legal/privacidad" target="_blank" className="text-gold hover:underline">Política de privacidad</a>{" "}
+                y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de éxito post-cierre y
+                no custodia fondos.
+              </span>
+            </label>
           </div>
         )}
 

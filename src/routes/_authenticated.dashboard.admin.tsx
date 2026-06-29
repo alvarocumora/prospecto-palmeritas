@@ -99,6 +99,12 @@ function AdminPage() {
             <Icon className="w-3.5 h-3.5" /> {label}
           </button>
         ))}
+        <a
+          href="/dashboard/admin/investors"
+          className="px-3 py-2 text-xs font-mono inline-flex items-center gap-1.5 border-b-2 border-transparent text-muted-foreground hover:text-gold whitespace-nowrap"
+        >
+          <ShieldAlert className="w-3.5 h-3.5" /> Inversionistas (KYC)
+        </a>
       </nav>
 
       {tab === "overview" && <Overview />}

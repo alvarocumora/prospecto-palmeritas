@@ -28,6 +28,8 @@ import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
+import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
+import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
@@ -91,6 +93,7 @@ import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from '.
 import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './routes/_authenticated.reports.losverdes.pre43101'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
@@ -187,6 +190,16 @@ const LiveLosverdesRoute = LiveLosverdesRouteImport.update({
 const LiveFrancoRoute = LiveFrancoRouteImport.update({
   id: '/live/franco',
   path: '/live/franco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTerminosRoute = LegalTerminosRouteImport.update({
+  id: '/legal/terminos',
+  path: '/legal/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacidadRoute = LegalPrivacidadRouteImport.update({
+  id: '/legal/privacidad',
+  path: '/legal/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
@@ -553,6 +566,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const AuthenticatedDashboardAdminInvestorsRoute =
+  AuthenticatedDashboardAdminInvestorsRouteImport.update({
+    id: '/investors',
+    path: '/investors',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const ApiPublicLiveMapLosverdesVerifyRoute =
   ApiPublicLiveMapLosverdesVerifyRouteImport.update({
     id: '/api/public/live-map/losverdes/verify',
@@ -590,6 +609,8 @@ export interface FileRoutesByFullPath {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -599,7 +620,7 @@ export interface FileRoutesByFullPath {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -645,6 +666,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -676,6 +698,8 @@ export interface FileRoutesByTo {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -685,7 +709,7 @@ export interface FileRoutesByTo {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro': typeof CatastroIndexRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -731,6 +755,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -764,6 +789,8 @@ export interface FileRoutesById {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
+  '/legal/privacidad': typeof LegalPrivacidadRoute
+  '/legal/terminos': typeof LegalTerminosRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -773,7 +800,7 @@ export interface FileRoutesById {
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
-  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRoute
+  '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -819,6 +846,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/reports/losverdes/pre43101': typeof AuthenticatedReportsLosverdesPre43101Route
@@ -852,6 +880,8 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -907,6 +937,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard/'
+    | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
@@ -938,6 +969,8 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -993,6 +1026,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard'
+    | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
     | '/reports/losverdes/pre43101'
@@ -1025,6 +1059,8 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
+    | '/legal/privacidad'
+    | '/legal/terminos'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -1080,6 +1116,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/investors'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/reports/losverdes/pre43101'
@@ -1113,6 +1150,8 @@ export interface RootRouteChildren {
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
+  LegalPrivacidadRoute: typeof LegalPrivacidadRoute
+  LegalTerminosRoute: typeof LegalTerminosRoute
   LiveFrancoRoute: typeof LiveFrancoRoute
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
@@ -1267,6 +1306,20 @@ declare module '@tanstack/react-router' {
       path: '/live/franco'
       fullPath: '/live/franco'
       preLoaderRoute: typeof LiveFrancoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terminos': {
+      id: '/legal/terminos'
+      path: '/legal/terminos'
+      fullPath: '/legal/terminos'
+      preLoaderRoute: typeof LegalTerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacidad': {
+      id: '/legal/privacidad'
+      path: '/legal/privacidad'
+      fullPath: '/legal/privacidad'
+      preLoaderRoute: typeof LegalPrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invitations/$token': {
@@ -1710,6 +1763,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/_authenticated/dashboard/admin/investors': {
+      id: '/_authenticated/dashboard/admin/investors'
+      path: '/investors'
+      fullPath: '/dashboard/admin/investors'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminInvestorsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/api/public/live-map/losverdes/verify': {
       id: '/api/public/live-map/losverdes/verify'
       path: '/api/public/live-map/losverdes/verify'
@@ -1733,6 +1793,21 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminInvestorsRoute: typeof AuthenticatedDashboardAdminInvestorsRoute
+}
+
+const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
+  {
+    AuthenticatedDashboardAdminInvestorsRoute:
+      AuthenticatedDashboardAdminInvestorsRoute,
+  }
+
+const AuthenticatedDashboardAdminRouteWithChildren =
+  AuthenticatedDashboardAdminRoute._addFileChildren(
+    AuthenticatedDashboardAdminRouteChildren,
+  )
 
 interface AuthenticatedDashboardCatastroRouteChildren {
   AuthenticatedDashboardCatastroHoldersIdRoute: typeof AuthenticatedDashboardCatastroHoldersIdRoute
@@ -1796,7 +1871,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
-  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRoute
+  AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
@@ -1840,7 +1915,8 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboard3dProRoute: AuthenticatedDashboard3dProRoute,
-  AuthenticatedDashboardAdminRoute: AuthenticatedDashboardAdminRoute,
+  AuthenticatedDashboardAdminRoute:
+    AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
@@ -1931,6 +2007,8 @@ const rootRouteChildren: RootRouteChildren = {
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
+  LegalPrivacidadRoute: LegalPrivacidadRoute,
+  LegalTerminosRoute: LegalTerminosRoute,
   LiveFrancoRoute: LiveFrancoRoute,
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
