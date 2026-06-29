@@ -202,6 +202,14 @@ function AuthPage() {
             </p>
           </div>
 
+          {search.intent === "investor" && (
+            <div className="rounded border border-gold/40 bg-gold/5 px-3 py-2 text-[11px] text-gold font-mono text-center">
+              ✦ Acceso institucional · KYC/AML post registro
+            </div>
+          )}
+
+
+
           <div className="rounded-lg border border-border bg-bg-secondary/60 backdrop-blur-sm p-6 space-y-4 shadow-2xl">
             <div className="flex gap-1 text-xs font-mono p-1 bg-background rounded-md border border-border">
               <button
