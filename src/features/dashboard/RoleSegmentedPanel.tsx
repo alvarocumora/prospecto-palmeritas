@@ -25,6 +25,7 @@ import {
   Box,
   Activity,
   RefreshCw,
+  Wallet,
 } from "lucide-react";
 import type { ExecutiveKpis } from "@/hooks/useExecutiveKpis";
 
