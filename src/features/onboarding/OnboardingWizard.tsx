@@ -316,6 +316,20 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             <Field label="Sitio web" full>
               <Input value={inv.website} onChange={(v) => setInv({ ...inv, website: v })} placeholder="https://" />
             </Field>
+            <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={inv.terms_accepted}
+                onChange={(e) => setInv({ ...inv, terms_accepted: e.target.checked })}
+                className="mt-0.5 accent-gold"
+              />
+              <span>
+                Acepto los <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">Términos</a>,
+                la <a href="/legal/privacidad" target="_blank" className="text-gold hover:underline">Política de privacidad</a>{" "}
+                y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de éxito post-cierre y
+                no custodia fondos.
+              </span>
+            </label>
           </div>
         )}
 
