@@ -16,6 +16,7 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { toast } from "sonner";
+import { notifyInvestorSubmitted } from "@/lib/investors.functions";
 
 type AccountType = "investor" | "mining_owner" | "geocapitals_team";
 
