@@ -229,6 +229,12 @@ const META: Record<
         desc: "Tesis automáticas sobre catastro + satelital.",
       },
       {
+        to: "/dashboard/investments",
+        icon: <Wallet className="w-3.5 h-3.5" />,
+        label: "Mis inversiones",
+        desc: "Historial, estados de pago y montos.",
+      },
+      {
         to: "/dashboard/reports",
         icon: <FileSignature className="w-3.5 h-3.5" />,
         label: "Reportes firmados",
