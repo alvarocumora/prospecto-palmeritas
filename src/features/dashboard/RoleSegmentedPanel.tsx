@@ -25,6 +25,7 @@ import {
   Box,
   Activity,
   RefreshCw,
+  Wallet,
 } from "lucide-react";
 import type { ExecutiveKpis } from "@/hooks/useExecutiveKpis";
 
@@ -226,6 +227,12 @@ const META: Record<
         icon: <Sparkles className="w-3.5 h-3.5" />,
         label: "Oportunidades IA",
         desc: "Tesis automáticas sobre catastro + satelital.",
+      },
+      {
+        to: "/dashboard/investments",
+        icon: <Wallet className="w-3.5 h-3.5" />,
+        label: "Mis inversiones",
+        desc: "Historial, estados de pago y montos.",
       },
       {
         to: "/dashboard/reports",
