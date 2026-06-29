@@ -1,89 +1,106 @@
 
-# Plan: Onboarding real + Landing + Dashboard segmentado
+# Plan "Completar app" — 1 semana al go-live
 
-Objetivo: abrir la puerta a clientes reales (inversionistas, equipos técnicos, holders) con un flujo self-serve, una landing que muestra datos vivos, y un dashboard que cambia según el rol — todo conectado al backend ya existente (135 tablas, 35 edge functions, hooks reales).
-
----
-
-## Fase 1 — Completar rutas públicas (medio día)
-
-Auditar y asegurar que estas rutas devuelven 200 con SSR, sin tocar `requireSupabaseAuth` en loaders públicos:
-
-- `/` (landing) · `/inversionistas` · `/empresas` · `/recursos` · `/contacto` · `/proyectos` · `/terminal` · `/catastro` · `/auth` · `/unsubscribe`
-- `/api/public/health` ya existe — añadir `/api/public/stats` (server route con publishable key + `TO anon` SELECT) que devuelve: nº concesiones monitoreadas, anomalías satelitales últimos 30d, deals activos, proyectos públicos.
-- Crear `notFoundComponent` y `errorComponent` consistentes en cada ruta pública.
-
-## Fase 2 — Landing con datos reales (1 día)
-
-Reemplazar contadores hardcoded del `HeroLiveMap` y `MarketingLanding` por datos vivos del nuevo `/api/public/stats`:
-
-- **Hero counters**: "X concesiones monitoreadas · Y anomalías detectadas esta semana · Z deals activos" (refresh cada 60s vía `useQuery`).
-- **Sección "Cómo funciona" por audiencia** — 3 tabs con CTAs diferenciados:
-  - *Inversionista* → "Ver deal flow" → `/inversionistas` → CTA "Crear cuenta gratis"
-  - *Equipo técnico* → "Ver workspace de proyecto" → demo Palmeras/Franco → CTA "Empezar proyecto"
-  - *Holder* → "Monitorear mis concesiones" → `/catastro` → CTA "Activar alertas"
-- **Un solo CTA dominante** sticky en header: "Crear cuenta gratis" → `/auth?mode=signup`.
-- **Proof points reales**: cards con métricas Palmeras (Cu/Mo), Franco (Au), LV5 (Illapel) extraídas de `projects` públicos.
-
-## Fase 3 — Self-serve signup + perfil (1 día)
-
-- `/auth` ya soporta email + Google (Lovable Cloud). Verificar que Google esté configurado vía `configure_social_auth`.
-- Trigger DB: al crear `auth.users`, auto-insertar fila en `profiles` con `onboarding_status='pending'` y rol por defecto `viewer` en `app_roles`.
-- Wizard post-signup en `/dashboard` (primer login):
-  1. "¿Cuál es tu perfil?" → investor / technical / holder / explorer (guarda en `profiles.profile_type`)
-  2. "¿Cuál es tu objetivo?" (opciones por perfil)
-  3. "Conecta tu primer dato" (investor: watchlist · technical: crea/únete a proyecto · holder: importa RUT/folio)
-- Persiste progreso en `onboarding_status` (ya existe la tabla).
-
-## Fase 4 — Dashboard general segmentado (2 días)
-
-Refactor `/dashboard` (ruta `_authenticated/dashboard`) en un layout único `AppShell variant="workspace"` con 3 zonas:
-
-**Header KPIs ejecutivos reales** — via `useExecutiveKpis` ya existente:
-- Proyectos activos · Alertas catastro sin leer · Anomalías sat nuevas · Deals en pipeline · Vencimientos próximos 90d
-
-**Onboarding checklist** (colapsa cuando `onboarding_status='completed'`):
-- ☐ Perfil completo · ☐ Primer proyecto / watchlist · ☐ Equipo invitado · ☐ Primera alerta configurada · ☐ Primer reporte / data room
-
-**Acceso rápido por rol** — cards distintas según `profile_type`:
-- **Investor** → Deal flow (`deals` activos), Watchlist catastro, Data rooms con acceso, Reportes NI 43-101 firmados recientes
-- **Technical/Geologist** → Proyecto activo (último visitado), Drill holes pendientes QAQC, Targets sin validar, Anomalías sat del AOI
-- **Holder** → Mis concesiones (`concession_holders`), Patentes próximas a vencer, Bulletin alerts, Court cases abiertos
-- **Admin/PM** → Equipo + invitaciones pendientes, Audit log reciente, Compliance score, Subscription status
-
-**Feed de actividad** (últimos 7 días) — query unificada sobre `audit_log` + `catastro_alerts` + `satellite_anomalies` + `signature_audit_trail` + `project_invitations`.
-
-## Fase 5 — Conexión back↔front sin mocks (paralelo)
-
-Auditar y reemplazar mocks en las pantallas que el onboarding tocará primero:
-- `OpportunitiesMap` → `usePropertyListings` real
-- `TerminalShell` → `useExecutiveKpis` + `useCommodityPrices`
-- `PalmerasDashboard` overview → `useProjectMiningConcessions` + `useProjectSatelliteAnomalies`
-- Reporte: `docs/audit/back-front-coverage.md` con tabla `hook · tabla · pantalla · estado (real/mock/parcial)`.
-
-## Fase 6 — Verificación
-
-- Playwright headless: `/`, `/auth` signup flow, `/dashboard` con cuenta nueva (3 perfiles), `/dashboard` con cuenta poblada.
-- `bun run build:dev` verde.
-- Lighthouse landing > 90 performance / SEO.
+Objetivo: dominio estable, usuarios reales entrando, perfilados por rol, viendo deal flow real y módulos técnicos con datos conectados. Sin pendientes que bloqueen ventas.
 
 ---
 
-## Detalles técnicos
+## Día 1 · Go-live técnico (estabilidad y dominio)
 
-- **No nuevas tablas mayores** — usar `profiles.profile_type` (añadir columna) + `onboarding_status` existente.
-- **Migration mínima**: 1) `profiles.profile_type text`, 2) trigger `handle_new_user` que inserta profile + onboarding_status + rol viewer, 3) `/api/public/stats` requiere políticas `TO anon SELECT` solo en agregados (vistas materializadas si hace falta).
-- **Dashboard re-usa `AppShell variant="workspace"`** ya existente — no se crea shell nuevo.
-- **Hooks ya existen** para todos los KPIs — `useExecutiveKpis`, `useConcessionAlerts`, `useUnreadCatastroAlerts`, `useProjects`, `useProjectRole`, `useOnboardingStatus` (crear si falta).
-- **Lovable AI Gateway** para el wizard "sugerir próximos pasos" en onboarding (opcional, Fase 4+).
+1. **SSR + dominio**
+   - Verificar `geocapitals.com` sirve `MarketingLanding` (no 500). Probar `/`, `/proyectos`, `/inversionistas`, `/contacto`, `/auth`.
+   - Smoke con Playwright (headless) sobre las 6 rutas públicas + `/api/public/health` + `/api/public/stats`.
+   - Si aparece 500, leer `src/server.ts` + logs y aislar módulo culpable.
 
-## Orden de ejecución sugerido
+2. **Seguridad pre-publish**
+   - `security--run_security_scan`. Resolver findings nuevos; ignorar con justificación solo PII de registro público (RUT catastro nacional).
+   - Confirmar Google OAuth + email/password activos. `redirect_uri = window.location.origin`.
 
-1. Fase 1 (rutas + `/api/public/stats`) — desbloquea landing.
-2. Fase 2 (landing) — desbloquea signups.
-3. Fase 3 (signup + wizard) — desbloquea dashboard segmentado.
-4. Fase 4 (dashboard) — entrega de valor al cliente.
-5. Fase 5 (auditoría/mocks) en paralelo desde día 2.
-6. Fase 6 al final.
+3. **Observabilidad mínima**
+   - Endpoint `/api/public/health` ya existe → añadir uptime check externo (cron pg_cron → log a `job_logs`).
+   - Activar `email_send_log` para ver envíos reales.
 
-Estimación total: **5–6 días** de trabajo enfocado.
+**Entregable**: dominio verde, scan limpio, login funcionando.
+
+---
+
+## Día 2 · Onboarding real y perfiles
+
+1. **Wizard completo** (`OnboardingWizard`)
+   - Paso 1: tipo de cuenta (ya existe).
+   - Paso 2 condicional:
+     - *Investor*: ticket, commodities, jurisdicciones → `investor_profiles`.
+     - *Mining owner*: RUT/nombre titular, # concesiones aproximadas → crea `holders` + opción "importar de catastro nacional por RUT".
+     - *Geocapitals team*: rol técnico (geólogo/QP/admin) → `app_roles`.
+   - Paso 3: invitar equipo / saltar.
+   - Marcar `onboarding_status.completed_at`.
+
+2. **Email transaccional**
+   - Templates ya existen. Cablear: bienvenida al completar wizard, invitación a proyecto, reset password.
+   - Verificar DNS de `notify.geocapitals.com`.
+
+**Entregable**: nuevo usuario llega → wizard → dashboard con su rol cargado.
+
+---
+
+## Día 3 · Dashboard segmentado con datos reales
+
+Auditar `useExecutiveKpis` y `RoleSegmentedPanel` para que cada KPI tenga query real (hoy varios son 0/placeholder):
+
+- **Investor**: `property_listings` activos, `deal_investor_pipeline` propio, `investor_shared_views` recibidas, watchlist.
+- **Mining owner**: `mining_concessions` propias + `concession_alerts` + `concession_patents` vencimientos + `bulletin_alerts`.
+- **Geocapitals team**: `drill_holes` activos, `qaqc_results` últimos 30d, `engine_drill_targets` por aprobar, `technical_reports` en draft.
+
+Cada card → link a su módulo, vacío con CTA "crear primero".
+
+---
+
+## Día 4 · Deal Flow real end-to-end
+
+1. **Marketplace público** (`/inversionistas`)
+   - `getPublicListings` server fn ya existe → asegurar que devuelve `property_listings` con `is_public=true`.
+   - Drawer con: resumen, ubicación, commodities, modalidad, precio, documentos públicos.
+   - CTA "Solicitar acceso al data room" → crea `property_deal_inquiries`.
+
+2. **Flujo dueño → publicación**
+   - `/dashboard/marketplace` (owner): wizard 4 pasos crear `property_listing` (proyecto, comerciales, docs, publicar).
+   - Toggle `is_public`.
+
+3. **Flujo investor → data room**
+   - Inbox de inquiries para el owner, aprobar → genera `data_room_access_grants` con expiración.
+   - Email automático con link firmado.
+
+---
+
+## Día 5 · Módulos técnicos conectados + QA final
+
+1. **Catastro**: confirmar `sync-catastro` cron activo; banner si hay `concession_alerts` no leídos.
+2. **Satelital**: `OpportunitiesMap` ya consume `opportunities_geo` real → asegurar que jobs `satellite_analysis_jobs` corren y popula `satellite_anomalies`.
+3. **Sondajes/QA-QC/3D**: smoke en proyecto demo (Los Verdes) → carga sin error.
+4. **NI 43-101**: `Pre43101` accesible desde proyecto, lista secciones.
+
+**QA final**:
+- Playwright recorre: signup → wizard → dashboard → ver listing público → solicitar data room → owner aprueba → email recibido.
+- `security--run_security_scan` final.
+- `preview_ui--publish` con metadata verificada.
+
+---
+
+## Detalles técnicos (referencia)
+
+- Server fns nuevos: `submitOnboardingStep2`, `createListingDraft`, `publishListing`, `requestDataRoomAccess`, `grantDataRoomAccess`.
+- Server route público nuevo: `/api/public/listings` (read-only, `TO anon` SELECT con columnas seguras).
+- Tablas tocadas: `investor_profiles`, `holders`, `app_roles`, `property_listings`, `property_deal_inquiries`, `data_room_access_grants`, `onboarding_status`.
+- Migraciones: GRANT explícito en cada nueva, RLS por `auth.uid()` o `has_role()`, sin nuevos roles en `profiles`.
+- Emails: usar `send-internal.server.ts` existente, idempotencia por key.
+
+---
+
+## Lo que NO entra esta semana (siguiente sprint)
+
+- Firma electrónica avanzada de NDAs (usar checkbox legal por ahora).
+- Pagos / suscripciones.
+- App móvil nativa.
+- Multi-idioma EN completo (ya hay toggle base).
+
+¿Avanzo con Día 1 (estabilidad + scan) en cuanto apruebes?
