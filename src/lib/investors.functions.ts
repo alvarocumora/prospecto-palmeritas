@@ -189,11 +189,14 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
     if (inquiriesRes.error) throw new Error(inquiriesRes.error.message);
 
     const settlements = settlementsRes.data ?? [];
+    const inquiries = inquiriesRes.data ?? [];
     const listingIds = Array.from(
-      new Set([
-        ...settlements.map((s) => s.listing_id).filter(Boolean),
-        ...(inquiriesRes.data ?? []).map((i) => i.listing_id).filter(Boolean),
-      ]),
+      new Set(
+        [
+          ...settlements.map((s) => s.listing_id),
+          ...inquiries.map((i) => i.listing_id),
+        ].filter((x): x is string => typeof x === "string" && x.length > 0),
+      ),
     );
     let listings: Record<string, { title: string; commodity: string | null; country: string | null }> = {};
     if (listingIds.length) {
