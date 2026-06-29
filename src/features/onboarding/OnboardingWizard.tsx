@@ -74,6 +74,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     commodities: ["Au"] as string[],
     accepted_standards: ["NI 43-101"] as string[],
     website: "",
+    terms_accepted: false,
   });
 
   // Owner form
@@ -149,6 +150,11 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           setSaving(false);
           return;
         }
+        if (!inv.terms_accepted) {
+          toast.error("Debes aceptar los términos y la política de privacidad.");
+          setSaving(false);
+          return;
+        }
         const { error } = await supabase.from("investor_profiles").upsert(
           {
             user_id: user.id,
@@ -162,6 +168,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             accepted_standards: inv.accepted_standards,
             website: inv.website || null,
             review_status: "pending_review",
+            terms_accepted_at: new Date().toISOString(),
           },
           { onConflict: "user_id" },
         );
@@ -170,6 +177,12 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           .from("profiles")
           .update({ display_name: inv.full_name.trim(), organization: inv.company_name.trim(), country: inv.country })
           .eq("user_id", user.id);
+        // Dispara welcome + lead interno (no bloqueante)
+        try {
+          await notifyInvestorSubmitted();
+        } catch (e) {
+          console.warn("notifyInvestorSubmitted failed", e);
+        }
         await finish({ investor_profile_submitted: true });
       } else if (selected === "mining_owner") {
         if (!own.organization.trim()) {
