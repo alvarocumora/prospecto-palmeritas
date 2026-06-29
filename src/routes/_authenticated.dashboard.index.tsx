@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { RoleSegmentedPanel } from "@/features/dashboard/RoleSegmentedPanel";
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
@@ -41,7 +42,9 @@ function DashboardHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
   const { kpis, loading, refreshing, lastUpdated, refresh } = useExecutiveKpis();
+  const { isComplete: onboardingComplete, refresh: refreshOnboarding } = useOnboardingStatus();
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "operador";
+  const needsOnboarding = !profile?.account_type || !onboardingComplete;
 
   if (projects.length === 0) {
     return (
@@ -56,9 +59,9 @@ function DashboardHome() {
               Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
             </p>
           </header>
-          {!profile?.account_type && (
+          {needsOnboarding && (
             <div className="mb-6">
-              <OnboardingWizard />
+              <OnboardingWizard onComplete={refreshOnboarding} />
             </div>
           )}
           <Link
@@ -148,12 +151,12 @@ function DashboardHome() {
       tone: "danger",
     });
 
-  const showOnboarding = !profile?.account_type;
+  const showOnboarding = needsOnboarding;
 
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
       <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
-        {showOnboarding && <OnboardingWizard />}
+        {showOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
         {/* Header con signos vitales del proyecto */}
         <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
           <div className="flex items-start justify-between gap-3 flex-wrap">
