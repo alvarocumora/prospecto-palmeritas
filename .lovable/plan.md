@@ -1,106 +1,95 @@
 
-# Plan "Completar app" — 1 semana al go-live
+# Plan: Sistema de Inversión listo para clientes (Fase 1 — Captura calificada)
 
-Objetivo: dominio estable, usuarios reales entrando, perfilados por rol, viendo deal flow real y módulos técnicos con datos conectados. Sin pendientes que bloqueen ventas.
+Decidiste **capturar leads calificados ahora** y dejar el cobro online para fase 2. Este plan deja la plataforma en estado "abierta al público" con un funnel completo: inversor llega al landing → se registra → completa perfil de inversión → ve deals reales → solicita acceso a data room / NDA → tu equipo aprueba y agenda → cuando cierras offline, marcas el deal y registras el wire en Stripe Chile manualmente (fase 2).
 
----
+## 1. Funnel público de inversor (frontend)
 
-## Día 1 · Go-live técnico (estabilidad y dominio)
+- **Landing `/inversionistas`**: CTA primario "Acceder a deals verificados" → `/auth?intent=investor`. Mostrar 3 deals destacados reales desde `property_listings` (ya existe `getPublicListings`) con badge "NI 43-101" cuando aplique.
+- **Signup dedicado**: `/auth` ya existe; agregar query `?intent=investor` que pre-selecciona `account_type=investor` y salta el paso 1 del `OnboardingWizard`.
+- **Wizard paso 2 (investor)**: ya captura full_name, company, country, ticket min/max, commodities, standards aceptados, website, review_status='pending_review'. Confirmar copy + tooltips de "qué hacemos con tus datos".
+- **Estado "pending_review"**: tras enviar, el inversor ve un dashboard "limitado" — puede explorar marketplace pero los botones de data room / contacto muestran "Tu cuenta está en revisión (24 h hábiles)".
 
-1. **SSR + dominio**
-   - Verificar `geocapitals.com` sirve `MarketingLanding` (no 500). Probar `/`, `/proyectos`, `/inversionistas`, `/contacto`, `/auth`.
-   - Smoke con Playwright (headless) sobre las 6 rutas públicas + `/api/public/health` + `/api/public/stats`.
-   - Si aparece 500, leer `src/server.ts` + logs y aislar módulo culpable.
+## 2. Aprobación interna (geocapitals_team)
 
-2. **Seguridad pre-publish**
-   - `security--run_security_scan`. Resolver findings nuevos; ignorar con justificación solo PII de registro público (RUT catastro nacional).
-   - Confirmar Google OAuth + email/password activos. `redirect_uri = window.location.origin`.
+- Nueva ruta `/_authenticated/dashboard/admin/investors` visible solo si `has_role(uid,'admin')` o `account_type='geocapitals_team'`.
+- Lista de `investor_profiles` con filtro por `review_status`, columnas: nombre, empresa, país, ticket, commodities, website, fecha.
+- Acciones: **Aprobar** (review_status='approved' + email "bienvenido, ya tienes acceso") · **Rechazar** (con motivo, NO se expone al inversor; solo queda en log interno) · **Pedir info** (email template).
+- Notificación interna al equipo cuando entra un nuevo `pending_review` (template ya scaffoldeado: extender `internal-new-lead`).
 
-3. **Observabilidad mínima**
-   - Endpoint `/api/public/health` ya existe → añadir uptime check externo (cron pg_cron → log a `job_logs`).
-   - Activar `email_send_log` para ver envíos reales.
+## 3. Deal flow operativo
 
-**Entregable**: dominio verde, scan limpio, login funcionando.
+- **Marketplace público (`/proyectos`)**: ya muestra listings; añadir filtros por commodity/región/modalidad y badge de score.
+- **Ficha de deal `/proyectos/$id`** (pública con datos resumidos, completa si está aprobado):
+  - Resumen ejecutivo, mapa, ley/tonelaje declarado, modalidad (Venta/JV/Royalty), commodity, región, status legal de concesión (semáforo desde `cadastre_national`).
+  - CTA "Solicitar acceso al data room" → crea fila en `property_deal_inquiries` con estado `requested`.
+  - Si `review_status != 'approved'` → CTA bloqueado con modal "Completa tu verificación".
+- **Drawer de inquiry**: el dueño del deal (mining_owner) ve la solicitud en su dashboard → aprueba → se crea `data_room_access_grants` por 14 días → email al inversor con link directo.
 
----
+## 4. Métrica y compliance mínima
 
-## Día 2 · Onboarding real y perfiles
+- **Audit trail**: cada acceso a data room y cada descarga ya queda en `data_room_access_logs` (no exponer PII al inversor; visible solo a owner/admin).
+- **Términos legales**: checkbox obligatorio en wizard "Acepto Términos y Política de Privacidad" + páginas `/legal/terminos` y `/legal/privacidad` (placeholders editables).
+- **NDA simple electrónico**: usar `signature_envelopes` ya existente; el inversor firma click-wrap antes de descargar archivos del data room.
 
-1. **Wizard completo** (`OnboardingWizard`)
-   - Paso 1: tipo de cuenta (ya existe).
-   - Paso 2 condicional:
-     - *Investor*: ticket, commodities, jurisdicciones → `investor_profiles`.
-     - *Mining owner*: RUT/nombre titular, # concesiones aproximadas → crea `holders` + opción "importar de catastro nacional por RUT".
-     - *Geocapitals team*: rol técnico (geólogo/QP/admin) → `app_roles`.
-   - Paso 3: invitar equipo / saltar.
-   - Marcar `onboarding_status.completed_at`.
+## 5. Pagos — preparar fase 2 (no implementar checkout aún)
 
-2. **Email transaccional**
-   - Templates ya existen. Cablear: bienvenida al completar wizard, invitación a proyecto, reset password.
-   - Verificar DNS de `notify.geocapitals.com`.
+- Conectar **Stripe Chile** vía connector ahora (sin exponer botones) → permite emitir invoices manuales para success fee cuando cierres un deal offline.
+- Tabla `deal_settlements` (nueva): deal_id, investor_id, amount_clp/usd, success_fee_pct, status (`pending_wire` | `received` | `paid_out`), stripe_invoice_id, wire_reference, recorded_by, recorded_at.
+- UI admin "Registrar wire recibido" — solo lectura para inversores/owners.
 
-**Entregable**: nuevo usuario llega → wizard → dashboard con su rol cargado.
+## 6. Notificaciones reales (ya hay infra)
 
----
+Templates a añadir/editar en `src/lib/email-templates/`:
+- `investor-welcome-pending` — al registrarse.
+- `investor-approved` — cuando admin aprueba.
+- `investor-data-room-granted` — link + expira en X días.
+- `internal-new-investor-lead` — al equipo Geocapitals.
+- `owner-new-inquiry` — al mining_owner cuando llega solicitud.
 
-## Día 3 · Dashboard segmentado con datos reales
+## 7. Go-live checklist
 
-Auditar `useExecutiveKpis` y `RoleSegmentedPanel` para que cada KPI tenga query real (hoy varios son 0/placeholder):
+1. Confirmar dominio `geocapitals.com` 200 OK y `/api/public/health` verde.
+2. Política de Privacidad + Términos publicados (aunque sean v1).
+3. Al menos 3 deals reales cargados en `property_listings` con coords y modalidad.
+4. Cuenta admin creada y `RoleSegmentedPanel` muestra panel team correctamente.
+5. Probar funnel completo end-to-end con Playwright: signup investor → wizard → marketplace → inquiry → admin aprueba → email llega.
+6. Publicar y compartir link.
 
-- **Investor**: `property_listings` activos, `deal_investor_pipeline` propio, `investor_shared_views` recibidas, watchlist.
-- **Mining owner**: `mining_concessions` propias + `concession_alerts` + `concession_patents` vencimientos + `bulletin_alerts`.
-- **Geocapitals team**: `drill_holes` activos, `qaqc_results` últimos 30d, `engine_drill_targets` por aprobar, `technical_reports` en draft.
+## Detalles técnicos
 
-Cada card → link a su módulo, vacío con CTA "crear primero".
+```text
+DB:
+  + tabla deal_settlements (admin-only RLS)
+  + columna investor_profiles.terms_accepted_at timestamptz
+  + RPC admin_list_investors_pending() SECURITY DEFINER + has_role check
 
----
+Rutas nuevas:
+  src/routes/_authenticated.dashboard.admin.investors.tsx
+  src/routes/_authenticated.dashboard.admin.settlements.tsx
+  src/routes/proyectos.$listingId.tsx     (ficha pública)
+  src/routes/legal.terminos.tsx
+  src/routes/legal.privacidad.tsx
 
-## Día 4 · Deal Flow real end-to-end
+Server fns:
+  src/lib/investors.functions.ts  (listPending, approve, reject, requestInfo)
+  src/lib/deals.functions.ts      (requestDataRoom, grantAccess, recordSettlement)
 
-1. **Marketplace público** (`/inversionistas`)
-   - `getPublicListings` server fn ya existe → asegurar que devuelve `property_listings` con `is_public=true`.
-   - Drawer con: resumen, ubicación, commodities, modalidad, precio, documentos públicos.
-   - CTA "Solicitar acceso al data room" → crea `property_deal_inquiries`.
+Emails:
+  5 templates nuevos en src/lib/email-templates/ + registry update
+  Triggers: server fns invocan sendTransactionalEmail con idempotencyKey
 
-2. **Flujo dueño → publicación**
-   - `/dashboard/marketplace` (owner): wizard 4 pasos crear `property_listing` (proyecto, comerciales, docs, publicar).
-   - Toggle `is_public`.
+Conectores:
+  standard_connectors--connect stripe   (solo provisión; sin checkout aún)
+```
 
-3. **Flujo investor → data room**
-   - Inbox de inquiries para el owner, aprobar → genera `data_room_access_grants` con expiración.
-   - Email automático con link firmado.
+## Orden de ejecución (1 sesión de build)
 
----
+1. Migración: `deal_settlements` + `terms_accepted_at` + grants/RLS.
+2. Server fns + ruta admin de inversores.
+3. Ficha pública de deal + flujo de inquiry + data room grant.
+4. 5 templates de email + wiring en server fns.
+5. Páginas legales + checkbox en wizard.
+6. Smoke test Playwright end-to-end + publicar.
 
-## Día 5 · Módulos técnicos conectados + QA final
-
-1. **Catastro**: confirmar `sync-catastro` cron activo; banner si hay `concession_alerts` no leídos.
-2. **Satelital**: `OpportunitiesMap` ya consume `opportunities_geo` real → asegurar que jobs `satellite_analysis_jobs` corren y popula `satellite_anomalies`.
-3. **Sondajes/QA-QC/3D**: smoke en proyecto demo (Los Verdes) → carga sin error.
-4. **NI 43-101**: `Pre43101` accesible desde proyecto, lista secciones.
-
-**QA final**:
-- Playwright recorre: signup → wizard → dashboard → ver listing público → solicitar data room → owner aprueba → email recibido.
-- `security--run_security_scan` final.
-- `preview_ui--publish` con metadata verificada.
-
----
-
-## Detalles técnicos (referencia)
-
-- Server fns nuevos: `submitOnboardingStep2`, `createListingDraft`, `publishListing`, `requestDataRoomAccess`, `grantDataRoomAccess`.
-- Server route público nuevo: `/api/public/listings` (read-only, `TO anon` SELECT con columnas seguras).
-- Tablas tocadas: `investor_profiles`, `holders`, `app_roles`, `property_listings`, `property_deal_inquiries`, `data_room_access_grants`, `onboarding_status`.
-- Migraciones: GRANT explícito en cada nueva, RLS por `auth.uid()` o `has_role()`, sin nuevos roles en `profiles`.
-- Emails: usar `send-internal.server.ts` existente, idempotencia por key.
-
----
-
-## Lo que NO entra esta semana (siguiente sprint)
-
-- Firma electrónica avanzada de NDAs (usar checkbox legal por ahora).
-- Pagos / suscripciones.
-- App móvil nativa.
-- Multi-idioma EN completo (ya hay toggle base).
-
-¿Avanzo con Día 1 (estabilidad + scan) en cuanto apruebes?
+¿Apruebo este plan y arranco con el paso 1, o quieres ajustar alguna parte (por ejemplo, sumar KYC ligero ya, o adelantar Stripe Checkout para suscripción del terminal)?
