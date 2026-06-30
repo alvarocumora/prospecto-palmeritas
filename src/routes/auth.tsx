@@ -367,3 +367,49 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
     </div>
   );
 }
+
+function PasswordStrengthMeter({
+  score,
+  label,
+  checks,
+}: {
+  score: 0 | 1 | 2 | 3 | 4;
+  label: string;
+  checks: { len: boolean; upper: boolean; lower: boolean; digit: boolean; symbol: boolean };
+}) {
+  const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-emerald-500"];
+  const items: Array<[keyof typeof checks, string]> = [
+    ["len", "8+ caracteres"],
+    ["upper", "Mayúscula"],
+    ["lower", "Minúscula"],
+    ["digit", "Número"],
+    ["symbol", "Símbolo"],
+  ];
+  return (
+    <div className="space-y-1.5">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className={`h-1 flex-1 rounded ${i <= score ? colors[score] : "bg-border"}`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span className="text-muted-foreground">Fortaleza: <span className="text-foreground">{label}</span></span>
+      </div>
+      <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+        {items.map(([k, lbl]) => (
+          <li key={k} className="flex items-center gap-1 text-[10px] font-mono">
+            {checks[k] ? (
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+            ) : (
+              <X className="w-3 h-3 text-muted-foreground/50" />
+            )}
+            <span className={checks[k] ? "text-foreground" : "text-muted-foreground/70"}>{lbl}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
