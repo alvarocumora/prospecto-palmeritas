@@ -40,6 +40,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
+  const pwStrength = evaluatePassword(password);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -47,8 +50,26 @@ function AuthPage() {
     }
   }, [authLoading, user, navigate]);
 
+  const handleResendConfirm = async () => {
+    if (!email) return toast.error("Ingresa tu email primero");
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    });
+    setResending(false);
+    if (error) toast.error(translateAuthError(error).message);
+    else toast.success("Email de confirmación reenviado. Revisa tu bandeja.");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setNeedsConfirm(false);
+    if (mode === "signup" && pwStrength.score < 2) {
+      toast.error("Contraseña muy débil. Usa al menos 8 caracteres con mayúscula y número.");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -66,25 +87,26 @@ function AuthPage() {
         if (error) throw error;
         if (!data.session) {
           toast.success("Cuenta creada. Revisa tu email para confirmar.");
+          setNeedsConfirm(true);
           setMode("login");
           return;
         }
         toast.success("Cuenta creada. Redirigiendo…");
-        // El useEffect de arriba navega cuando user esté disponible.
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (!data.session) throw new Error("No se pudo iniciar sesión");
         toast.success("Bienvenido");
-        // El useEffect navega cuando AuthProvider propague el user.
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error de autenticación";
-      toast.error(msg);
+      const t = translateAuthError(err);
+      toast.error(t.message);
+      if (t.code === "email_not_confirmed") setNeedsConfirm(true);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleReset = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
