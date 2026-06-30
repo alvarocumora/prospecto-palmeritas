@@ -2,8 +2,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import type { PublicListing } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
-import { CheckCircle2, MapPin, Mountain, ArrowRight, Lock } from "lucide-react";
+import { CheckCircle2, MapPin, Mountain, ArrowRight, Lock, ExternalLink } from "lucide-react";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
@@ -102,6 +103,16 @@ function Body({ listing }: { listing: PublicListing }) {
             </ul>
           </div>
         )}
+
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link
+            to="/proyectos/$listingId"
+            params={{ listingId: listing.id }}
+            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
+          >
+            Ver ficha completa & simulador <ExternalLink className="w-3.5 h-3.5" />
+          </Link>
+        </div>
 
         <RequestAccess listing={listing} />
       </div>
