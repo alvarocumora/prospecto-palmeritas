@@ -295,6 +295,13 @@ function AuthPage() {
                   maxLength={100}
                 />
               </Field>
+              {mode === "signup" && password.length > 0 && (
+                <PasswordStrengthMeter
+                  score={pwStrength.score}
+                  label={pwStrength.label}
+                  checks={pwStrength.checks}
+                />
+              )}
               <button
                 type="submit"
                 disabled={loading}
@@ -304,6 +311,18 @@ function AuthPage() {
                 {mode === "login" ? "Entrar al proyecto" : "Crear cuenta"}
               </button>
             </form>
+
+            {needsConfirm && (
+              <button
+                type="button"
+                onClick={handleResendConfirm}
+                disabled={resending}
+                className="w-full inline-flex items-center justify-center gap-2 text-xs text-gold font-mono border border-gold/40 rounded px-3 py-2 hover:bg-gold/10 disabled:opacity-60"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {resending ? "Reenviando…" : "Reenviar email de confirmación"}
+              </button>
+            )}
 
             {mode === "login" && (
               <button
@@ -315,6 +334,7 @@ function AuthPage() {
               </button>
             )}
           </div>
+
 
           <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Catastro · Geofísica · Sondajes · QA/QC
