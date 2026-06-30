@@ -1,95 +1,111 @@
+## Objetivo
+Endurecer los 4 flujos críticos que determinan la conversión inversor → operación: **Auth**, **Dashboard**, **Ficha de Proyecto** y **Simulación de Inversión**. Sin tocar lógica de negocio existente más allá de lo necesario para conectarla a UI real.
 
-# Plan: Sistema de Inversión listo para clientes (Fase 1 — Captura calificada)
+---
 
-Decidiste **capturar leads calificados ahora** y dejar el cobro online para fase 2. Este plan deja la plataforma en estado "abierta al público" con un funnel completo: inversor llega al landing → se registra → completa perfil de inversión → ve deals reales → solicita acceso a data room / NDA → tu equipo aprueba y agenda → cuando cierras offline, marcas el deal y registras el wire en Stripe Chile manualmente (fase 2).
+## 1. Auth — reducir fricción y errores silenciosos
 
-## 1. Funnel público de inversor (frontend)
+**Problemas detectados hoy:**
+- `signup` con `emailRedirectTo` a `/dashboard` pero sin manejar el callback de confirmación → usuarios caen en `/auth` confundidos.
+- No hay validación de fortaleza de password en cliente (HIBP solo server-side).
+- `intent=investor` solo cambia copy; no se propaga a `onboarding_status` para saltar pasos.
+- `/reset-password` existe pero no maneja el caso `type=recovery` explícito.
+- Errores Supabase se muestran tal cual ("Invalid login credentials") sin traducción ES.
 
-- **Landing `/inversionistas`**: CTA primario "Acceder a deals verificados" → `/auth?intent=investor`. Mostrar 3 deals destacados reales desde `property_listings` (ya existe `getPublicListings`) con badge "NI 43-101" cuando aplique.
-- **Signup dedicado**: `/auth` ya existe; agregar query `?intent=investor` que pre-selecciona `account_type=investor` y salta el paso 1 del `OnboardingWizard`.
-- **Wizard paso 2 (investor)**: ya captura full_name, company, country, ticket min/max, commodities, standards aceptados, website, review_status='pending_review'. Confirmar copy + tooltips de "qué hacemos con tus datos".
-- **Estado "pending_review"**: tras enviar, el inversor ve un dashboard "limitado" — puede explorar marketplace pero los botones de data room / contacto muestran "Tu cuenta está en revisión (24 h hábiles)".
+**Cambios:**
+- Mapa de errores ES en `auth.tsx` (credenciales inválidas, email no confirmado, rate limit).
+- Indicador visual de fortaleza de contraseña + checklist (8+, mayúscula, número).
+- Propagar `intent` a metadata del user y leerlo en `OnboardingWizard` para preseleccionar `account_type`.
+- Reforzar `/reset-password`: detectar `type=recovery` en hash, manejar token expirado.
+- Botón "Reenviar email de confirmación" cuando el login falla por `email_not_confirmed`.
+- Google OAuth como segundo método (botón en formulario).
 
-## 2. Aprobación interna (geocapitals_team)
+---
 
-- Nueva ruta `/_authenticated/dashboard/admin/investors` visible solo si `has_role(uid,'admin')` o `account_type='geocapitals_team'`.
-- Lista de `investor_profiles` con filtro por `review_status`, columnas: nombre, empresa, país, ticket, commodities, website, fecha.
-- Acciones: **Aprobar** (review_status='approved' + email "bienvenido, ya tienes acceso") · **Rechazar** (con motivo, NO se expone al inversor; solo queda en log interno) · **Pedir info** (email template).
-- Notificación interna al equipo cuando entra un nuevo `pending_review` (template ya scaffoldeado: extender `internal-new-lead`).
+## 2. Dashboard — KPIs reales + estado vacío útil
 
-## 3. Deal flow operativo
+**Problemas:**
+- `RoleSegmentedPanel` carga aunque no haya datos → cards vacías sin CTA.
+- `useExecutiveKpis` no diferencia "loading" de "0 datos reales".
+- No hay vista de "último estado" / actividad reciente por rol.
+- Falta breadcrumb de progreso del onboarding ("Te faltan 2 pasos").
 
-- **Marketplace público (`/proyectos`)**: ya muestra listings; añadir filtros por commodity/región/modalidad y badge de score.
-- **Ficha de deal `/proyectos/$id`** (pública con datos resumidos, completa si está aprobado):
-  - Resumen ejecutivo, mapa, ley/tonelaje declarado, modalidad (Venta/JV/Royalty), commodity, región, status legal de concesión (semáforo desde `cadastre_national`).
-  - CTA "Solicitar acceso al data room" → crea fila en `property_deal_inquiries` con estado `requested`.
-  - Si `review_status != 'approved'` → CTA bloqueado con modal "Completa tu verificación".
-- **Drawer de inquiry**: el dueño del deal (mining_owner) ve la solicitud en su dashboard → aprueba → se crea `data_room_access_grants` por 14 días → email al inversor con link directo.
+**Cambios:**
+- Empty-states por card con CTA específico (ej. owner sin concesiones → "Importar desde catastro").
+- Banner persistente de onboarding incompleto con % de progreso (lee `useOnboardingStatus`).
+- Feed unificado de actividad reciente (últimos 10 eventos: NDA firmado, alerta catastro, settlement, anomalía).
+- Skeleton loaders consistentes (hoy hay mezcla de spinners y nada).
+- Quick-actions sticky superiores por rol (investor: "Ver deal flow" + "Mis inversiones"; owner: "Nuevo proyecto" + "Publicar deal"; team: "Aprobar KYC").
 
-## 4. Métrica y compliance mínima
+---
 
-- **Audit trail**: cada acceso a data room y cada descarga ya queda en `data_room_access_logs` (no exponer PII al inversor; visible solo a owner/admin).
-- **Términos legales**: checkbox obligatorio en wizard "Acepto Términos y Política de Privacidad" + páginas `/legal/terminos` y `/legal/privacidad` (placeholders editables).
-- **NDA simple electrónico**: usar `signature_envelopes` ya existente; el inversor firma click-wrap antes de descargar archivos del data room.
+## 3. Ficha de Proyecto — vista pública compartible + privada técnica
 
-## 5. Pagos — preparar fase 2 (no implementar checkout aún)
+**Problemas:**
+- `PublicListingDrawer` (drawer lateral) limita la información mostrada y no es enlazable directamente como URL para mandar a un inversor.
+- No hay ruta canónica `/proyectos/$id` SSR-friendly con OG image.
+- Métricas técnicas (drilling meters, samples, anomalías) no se muestran en la ficha pública.
 
-- Conectar **Stripe Chile** vía connector ahora (sin exponer botones) → permite emitir invoices manuales para success fee cuando cierres un deal offline.
-- Tabla `deal_settlements` (nueva): deal_id, investor_id, amount_clp/usd, success_fee_pct, status (`pending_wire` | `received` | `paid_out`), stripe_invoice_id, wire_reference, recorded_by, recorded_at.
-- UI admin "Registrar wire recibido" — solo lectura para inversores/owners.
+**Cambios:**
+- Nueva ruta `/proyectos/$listingId` con `head()` dinámico (OG title/description/image desde `property_listings`).
+- Layout 2 columnas: izq = mapa + galería; der = ficha (modalidad, ticket, commodity, etapa, ubicación, qualified person, documentos públicos).
+- Sección "Datos verificados" con badges (NI 43-101, QP firmado, satellite anomalies, drilling), cada uno con tooltip de fuente.
+- CTA principal: "Solicitar data room" → si no auth, redirige a `/auth?intent=investor&listing={id}`; si auth, abre modal de NDA.
+- Sección "Comparables" si existen en `deal_comparables`.
+- El drawer actual se mantiene para vista rápida desde `/inversionistas`, pero con link "Ver ficha completa".
 
-## 6. Notificaciones reales (ya hay infra)
+---
 
-Templates a añadir/editar en `src/lib/email-templates/`:
-- `investor-welcome-pending` — al registrarse.
-- `investor-approved` — cuando admin aprueba.
-- `investor-data-room-granted` — link + expira en X días.
-- `internal-new-investor-lead` — al equipo Geocapitals.
-- `owner-new-inquiry` — al mining_owner cuando llega solicitud.
+## 4. Simulación de Inversión — calculadora previa al NDA
 
-## 7. Go-live checklist
+**Estado actual:** no existe. Inversor ve ticket mínimo pero no puede modelar retorno.
 
-1. Confirmar dominio `geocapitals.com` 200 OK y `/api/public/health` verde.
-2. Política de Privacidad + Términos publicados (aunque sean v1).
-3. Al menos 3 deals reales cargados en `property_listings` con coords y modalidad.
-4. Cuenta admin creada y `RoleSegmentedPanel` muestra panel team correctamente.
-5. Probar funnel completo end-to-end con Playwright: signup investor → wizard → marketplace → inquiry → admin aprueba → email llega.
-6. Publicar y compartir link.
+**Cambios:**
+- Componente `InvestmentSimulator` embebido en ficha pública del proyecto.
+- Inputs: monto a invertir (slider entre ticket mínimo y máximo configurado), horizonte (años), escenario (conservador/base/optimista).
+- Cálculo con `economic_scenarios` del proyecto si existe; fallback a parámetros del listing (TIR estimada, múltiplo, royalty %).
+- Outputs: retorno estimado, múltiplo, breakdown anual (tabla + sparkline), sensibilidad al precio del commodity (`commodity_prices`).
+- Disclaimer legal explícito ("simulación referencial, no constituye oferta").
+- Botón "Guardar simulación y solicitar acceso" → persiste en `property_deal_inquiries` con el monto simulado para que el equipo Geocapitals vea el interés cuantificado.
+- Server fn `simulateInvestment` para cálculos sensibles (no exponer fórmulas en cliente).
+
+---
 
 ## Detalles técnicos
 
-```text
-DB:
-  + tabla deal_settlements (admin-only RLS)
-  + columna investor_profiles.terms_accepted_at timestamptz
-  + RPC admin_list_investors_pending() SECURITY DEFINER + has_role check
+**Archivos nuevos:**
+- `src/routes/proyectos.$listingId.tsx` — ficha pública SSR.
+- `src/features/listings/ProjectSheet.tsx` — layout ficha.
+- `src/features/listings/InvestmentSimulator.tsx` — calculadora.
+- `src/lib/simulator.functions.ts` — `simulateInvestment` (server fn pública con rate-limit por IP).
+- `src/lib/auth-errors.ts` — diccionario ES de errores Supabase.
 
-Rutas nuevas:
-  src/routes/_authenticated.dashboard.admin.investors.tsx
-  src/routes/_authenticated.dashboard.admin.settlements.tsx
-  src/routes/proyectos.$listingId.tsx     (ficha pública)
-  src/routes/legal.terminos.tsx
-  src/routes/legal.privacidad.tsx
+**Archivos modificados:**
+- `src/routes/auth.tsx` — UX errores, fortaleza password, Google, reenvío confirmación.
+- `src/routes/reset-password.tsx` — manejo `type=recovery`.
+- `src/features/dashboard/RoleSegmentedPanel.tsx` — empty-states + feed.
+- `src/hooks/useExecutiveKpis.ts` — distinguir loading/empty.
+- `src/features/marketing/DealFlow.tsx` / `PublicListingCard.tsx` — añadir link a ficha completa.
+- `src/features/onboarding/OnboardingWizard.tsx` — leer intent desde user metadata.
 
-Server fns:
-  src/lib/investors.functions.ts  (listPending, approve, reject, requestInfo)
-  src/lib/deals.functions.ts      (requestDataRoom, grantAccess, recordSettlement)
+**Backend:**
+- Migración: `property_deal_inquiries` añadir columna `simulated_amount_usd numeric` + `simulation_payload jsonb`.
+- RPC `get_public_listing_full(listing_id)` — devuelve listing + comparables + scenarios + métricas técnicas agregadas con `TO anon` controlado.
+- Sin cambios a RLS de tablas sensibles (técnicas se exponen agregadas, no granulares).
 
-Emails:
-  5 templates nuevos en src/lib/email-templates/ + registry update
-  Triggers: server fns invocan sendTransactionalEmail con idempotencyKey
+**Sin tocar:**
+- Sistema de KYC/admin de inversores (ya implementado).
+- Tablas de cadastro, satellite, drilling (solo lectura agregada vía RPC).
+- Edge functions existentes.
 
-Conectores:
-  standard_connectors--connect stripe   (solo provisión; sin checkout aún)
-```
+---
 
-## Orden de ejecución (1 sesión de build)
+## Orden de implementación
+1. Auth (1 jornada) — desbloquea todo lo demás.
+2. Ficha pública `/proyectos/$id` + RPC (1.5 jornadas) — necesaria para el simulador.
+3. Simulador + inquiry con monto (1 jornada).
+4. Dashboard empty-states + feed (1 jornada).
 
-1. Migración: `deal_settlements` + `terms_accepted_at` + grants/RLS.
-2. Server fns + ruta admin de inversores.
-3. Ficha pública de deal + flujo de inquiry + data room grant.
-4. 5 templates de email + wiring en server fns.
-5. Páginas legales + checkbox en wizard.
-6. Smoke test Playwright end-to-end + publicar.
+Total estimado: 4–5 jornadas.
 
-¿Apruebo este plan y arranco con el paso 1, o quieres ajustar alguna parte (por ejemplo, sumar KYC ligero ya, o adelantar Stripe Checkout para suscripción del terminal)?
+¿Avanzo con este alcance o ajustamos prioridades (p.ej. simulador primero, auth después)?
