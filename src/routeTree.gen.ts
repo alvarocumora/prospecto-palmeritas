@@ -24,6 +24,7 @@ import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
+import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
@@ -172,6 +173,11 @@ const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
   id: '/capital-raise',
   path: '/capital-raise',
   getParentRoute: () => TerminalRoute,
+} as any)
+const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
+  id: '/$listingId',
+  path: '/$listingId',
+  getParentRoute: () => ProyectosRoute,
 } as any)
 const LiveTilamaRoute = LiveTilamaRouteImport.update({
   id: '/live/tilama',
@@ -604,7 +610,7 @@ export interface FileRoutesByFullPath {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
@@ -622,6 +628,7 @@ export interface FileRoutesByFullPath {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -694,7 +701,7 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
@@ -712,6 +719,7 @@ export interface FileRoutesByTo {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -786,7 +794,7 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/proyectos': typeof ProyectosRoute
+  '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/terminal': typeof TerminalRouteWithChildren
@@ -804,6 +812,7 @@ export interface FileRoutesById {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -896,6 +905,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -986,6 +996,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -1077,6 +1088,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -1151,7 +1163,7 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   InversionistasRoute: typeof InversionistasRoute
-  ProyectosRoute: typeof ProyectosRoute
+  ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   TerminalRoute: typeof TerminalRouteWithChildren
@@ -1292,6 +1304,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/terminal/capital-raise'
       preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
       parentRoute: typeof TerminalRoute
+    }
+    '/proyectos/$listingId': {
+      id: '/proyectos/$listingId'
+      path: '/$listingId'
+      fullPath: '/proyectos/$listingId'
+      preLoaderRoute: typeof ProyectosListingIdRouteImport
+      parentRoute: typeof ProyectosRoute
     }
     '/live/tilama': {
       id: '/live/tilama'
@@ -1995,6 +2014,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface ProyectosRouteChildren {
+  ProyectosListingIdRoute: typeof ProyectosListingIdRoute
+}
+
+const ProyectosRouteChildren: ProyectosRouteChildren = {
+  ProyectosListingIdRoute: ProyectosListingIdRoute,
+}
+
+const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
+  ProyectosRouteChildren,
+)
+
 interface TerminalRouteChildren {
   TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
   TerminalMarketRoute: typeof TerminalMarketRoute
@@ -2018,7 +2049,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   InversionistasRoute: InversionistasRoute,
-  ProyectosRoute: ProyectosRoute,
+  ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   TerminalRoute: TerminalRouteWithChildren,

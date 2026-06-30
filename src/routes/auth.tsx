@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { z } from "zod";
-import { Loader2, MapPin, Layers, Mountain } from "lucide-react";
+import { Loader2, MapPin, Layers, Mountain, CheckCircle2, X, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
+import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
 
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
@@ -39,6 +40,9 @@ function AuthPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
+  const pwStrength = evaluatePassword(password);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -46,8 +50,26 @@ function AuthPage() {
     }
   }, [authLoading, user, navigate]);
 
+  const handleResendConfirm = async () => {
+    if (!email) return toast.error("Ingresa tu email primero");
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    });
+    setResending(false);
+    if (error) toast.error(translateAuthError(error).message);
+    else toast.success("Email de confirmación reenviado. Revisa tu bandeja.");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setNeedsConfirm(false);
+    if (mode === "signup" && pwStrength.score < 2) {
+      toast.error("Contraseña muy débil. Usa al menos 8 caracteres con mayúscula y número.");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -65,25 +87,26 @@ function AuthPage() {
         if (error) throw error;
         if (!data.session) {
           toast.success("Cuenta creada. Revisa tu email para confirmar.");
+          setNeedsConfirm(true);
           setMode("login");
           return;
         }
         toast.success("Cuenta creada. Redirigiendo…");
-        // El useEffect de arriba navega cuando user esté disponible.
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (!data.session) throw new Error("No se pudo iniciar sesión");
         toast.success("Bienvenido");
-        // El useEffect navega cuando AuthProvider propague el user.
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error de autenticación";
-      toast.error(msg);
+      const t = translateAuthError(err);
+      toast.error(t.message);
+      if (t.code === "email_not_confirmed") setNeedsConfirm(true);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleReset = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
@@ -272,6 +295,13 @@ function AuthPage() {
                   maxLength={100}
                 />
               </Field>
+              {mode === "signup" && password.length > 0 && (
+                <PasswordStrengthMeter
+                  score={pwStrength.score}
+                  label={pwStrength.label}
+                  checks={pwStrength.checks}
+                />
+              )}
               <button
                 type="submit"
                 disabled={loading}
@@ -281,6 +311,18 @@ function AuthPage() {
                 {mode === "login" ? "Entrar al proyecto" : "Crear cuenta"}
               </button>
             </form>
+
+            {needsConfirm && (
+              <button
+                type="button"
+                onClick={handleResendConfirm}
+                disabled={resending}
+                className="w-full inline-flex items-center justify-center gap-2 text-xs text-gold font-mono border border-gold/40 rounded px-3 py-2 hover:bg-gold/10 disabled:opacity-60"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {resending ? "Reenviando…" : "Reenviar email de confirmación"}
+              </button>
+            )}
 
             {mode === "login" && (
               <button
@@ -292,6 +334,7 @@ function AuthPage() {
               </button>
             )}
           </div>
+
 
           <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Catastro · Geofísica · Sondajes · QA/QC
@@ -321,6 +364,52 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
         <span className="font-mono text-[9px] uppercase tracking-widest">{label}</span>
       </div>
       <div className="font-mono text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function PasswordStrengthMeter({
+  score,
+  label,
+  checks,
+}: {
+  score: 0 | 1 | 2 | 3 | 4;
+  label: string;
+  checks: { len: boolean; upper: boolean; lower: boolean; digit: boolean; symbol: boolean };
+}) {
+  const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-emerald-500"];
+  const items: Array<[keyof typeof checks, string]> = [
+    ["len", "8+ caracteres"],
+    ["upper", "Mayúscula"],
+    ["lower", "Minúscula"],
+    ["digit", "Número"],
+    ["symbol", "Símbolo"],
+  ];
+  return (
+    <div className="space-y-1.5">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className={`h-1 flex-1 rounded ${i <= score ? colors[score] : "bg-border"}`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span className="text-muted-foreground">Fortaleza: <span className="text-foreground">{label}</span></span>
+      </div>
+      <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+        {items.map(([k, lbl]) => (
+          <li key={k} className="flex items-center gap-1 text-[10px] font-mono">
+            {checks[k] ? (
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+            ) : (
+              <X className="w-3 h-3 text-muted-foreground/50" />
+            )}
+            <span className={checks[k] ? "text-foreground" : "text-muted-foreground/70"}>{lbl}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
