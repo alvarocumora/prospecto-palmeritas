@@ -5,6 +5,7 @@ import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { getListingDetail, type ListingDetail } from "@/lib/listingDetail.functions";
 import { InvestmentSimulator } from "@/features/listings/InvestmentSimulator";
 import { fmtUSD } from "@/modules/deals/domain/format";
+import { queryClient } from "@/lib/queryClient";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 
 const detailQuery = (id: string) =>
@@ -15,8 +16,8 @@ const detailQuery = (id: string) =>
   });
 
 export const Route = createFileRoute("/proyectos/$listingId")({
-  loader: async ({ params, context }) => {
-    const data = await context.queryClient.ensureQueryData(detailQuery(params.listingId));
+  loader: async ({ params }) => {
+    const data = await queryClient.ensureQueryData(detailQuery(params.listingId));
     if (!data) throw notFound();
     return { listing: data };
   },
