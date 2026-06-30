@@ -1,12 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
 import { z } from "zod";
-import { Loader2, MapPin, Layers, Mountain } from "lucide-react";
+import { Loader2, MapPin, Layers, Mountain, CheckCircle2, X, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
+import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
 
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
