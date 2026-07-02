@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminalRouteImport } from './routes/terminal'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
@@ -108,6 +109,11 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
 const TerminalRoute = TerminalRouteImport.update({
   id: '/terminal',
   path: '/terminal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -613,6 +619,7 @@ export interface FileRoutesByFullPath {
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -704,6 +711,7 @@ export interface FileRoutesByTo {
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -797,6 +805,7 @@ export interface FileRoutesById {
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -890,6 +899,7 @@ export interface FileRouteTypes {
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
     | '/catastro/mapa'
@@ -981,6 +991,7 @@ export interface FileRouteTypes {
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
     | '/catastro/mapa'
@@ -1073,6 +1084,7 @@ export interface FileRouteTypes {
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
     | '/catastro/mapa'
@@ -1166,6 +1178,7 @@ export interface RootRouteChildren {
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminalRoute: typeof TerminalRouteWithChildren
   UnsubscribeRoute: typeof UnsubscribeRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
@@ -1212,6 +1225,13 @@ declare module '@tanstack/react-router' {
       path: '/terminal'
       fullPath: '/terminal'
       preLoaderRoute: typeof TerminalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -2052,6 +2072,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminalRoute: TerminalRouteWithChildren,
   UnsubscribeRoute: UnsubscribeRoute,
   CatastroMapaRoute: CatastroMapaRoute,
