@@ -40,8 +40,8 @@ export const Route = createFileRoute("/sitemap.xml")({
           );
           const { data } = await supabase
             .from("property_listings")
-            .select("id, updated_at, status")
-            .eq("status", "active")
+            .select("id, updated_at, is_published")
+            .eq("is_published", true)
             .order("updated_at", { ascending: false })
             .limit(500);
           for (const row of data ?? []) {
