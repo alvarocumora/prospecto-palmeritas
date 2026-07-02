@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /reset-password
+Disallow: /invitations/
+Disallow: /share/
+Disallow: /diag/
+
+Sitemap: https://geocapitals.com/sitemap.xml
