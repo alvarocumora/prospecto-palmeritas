@@ -114,7 +114,7 @@ export const Route = createFileRoute("/marketplace/$lotId")({
 });
 
 function LotDetailPage() {
-  const lot = Route.useLoaderData();
+  const lot = Route.useLoaderData() as import("@/lib/marketplace.functions").CommodityLotDetail;
   const { user } = useAuth();
   const navigate = useNavigate();
   const inquiryFn = useServerFn(createCommodityInquiry);
