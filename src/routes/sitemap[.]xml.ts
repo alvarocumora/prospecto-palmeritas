@@ -15,6 +15,7 @@ interface SitemapEntry {
 const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/proyectos", changefreq: "daily", priority: "0.9" },
+  { path: "/marketplace", changefreq: "daily", priority: "0.9" },
   { path: "/inversionistas", changefreq: "weekly", priority: "0.8" },
   { path: "/empresas", changefreq: "weekly", priority: "0.8" },
   { path: "/recursos", changefreq: "monthly", priority: "0.6" },
@@ -50,6 +51,21 @@ export const Route = createFileRoute("/sitemap.xml")({
               lastmod: row.updated_at ? new Date(row.updated_at).toISOString() : undefined,
               changefreq: "weekly",
               priority: "0.8",
+            });
+          }
+          const { data: lots } = await supabase
+            .from("commodity_lots")
+            .select("id, updated_at, status, is_verified")
+            .eq("status", "published")
+            .eq("is_verified", true)
+            .order("updated_at", { ascending: false })
+            .limit(500);
+          for (const row of lots ?? []) {
+            entries.push({
+              path: `/marketplace/${row.id}`,
+              lastmod: row.updated_at ? new Date(row.updated_at).toISOString() : undefined,
+              changefreq: "weekly",
+              priority: "0.7",
             });
           }
         } catch {

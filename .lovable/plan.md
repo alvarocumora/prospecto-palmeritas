@@ -1,70 +1,100 @@
-# Terminar Geocapitals para producción
+## Visión
 
-Iteración enfocada en dejar la plataforma lista para clientes reales en `geocapitals.com`, capturando leads (sin cobros aún).
+Geocapitals evoluciona a **plataforma dual**: (1) inversión en proyectos mineros (ya existe) + (2) **marketplace de commodities certificados** (concentrados Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio) desde Chile, Perú, Brasil, Colombia, Venezuela y África. La web comunica esta visión con nuevo hero dual, ruta `/marketplace` funcional y sección "Vision & Geografías".
 
-## Fase 1 — Hardening seguridad y datos
+## Fase 1 — Backend del marketplace (MVP funcional)
 
-- Correr `security--run_security_scan` + `supabase--linter` y arreglar todo lo crítico (RLS faltante, GRANTs, funciones sin `search_path`, políticas permisivas).
-- Revisar tablas nuevas de esta semana (`property_deal_inquiries`, `deal_settlements`, `investor_profiles`, `onboarding_status`) y confirmar:
-  - RLS habilitado + `GRANT` correctos por rol.
-  - Ninguna política deja escapar PII a `anon`.
-  - Función `has_role` sigue siendo la única fuente de verdad para admin.
-- Activar **Password HIBP Check** vía `supabase--configure_auth`.
-- Confirmar que `_authenticated/route.tsx` protege todas las rutas privadas y que ninguna loader pública llama a serverFns con `requireSupabaseAuth`.
+Nueva migración con estas tablas (todas con RLS + GRANTs):
 
-## Fase 2 — Estabilizar flujos críticos
+**`commodity_lots`** — lote publicado por un seller verificado
+- `seller_user_id`, `organization_id`, `project_id?` (link opcional a proyecto)
+- `commodity` (enum: `cu_concentrate`, `zn_concentrate`, `pb_concentrate`, `cu_cathode`, `au_dore`, `ag_dore`, `au_bullion`, `rare_earths`, `li_carbonate`, `li_spodumene`, `fe_ore`, `sn_concentrate`, `mo_concentrate`)
+- `form` (concentrate, cathode, doré, bullion, oxide, carbonate), `grade_pct`, `moisture_pct`, `deleterious_json`
+- `tonnage_available_t`, `lot_size_t`, `frequency` (spot, monthly, quarterly, annual offtake)
+- `country` (CL, PE, BR, CO, VE, AR, EC, BO, ZA, DRC, ZM, GH, MA, NA), `region`, `port_of_loading`
+- `incoterm` (FOB, CIF, CFR, EXW, DAP), `payment_terms`
+- `price_basis` (LME, LBMA, London PM Fix, negotiated), `premium_discount_usd_t`, `asking_price_usd?`
+- `certifications_json` (ISO 9001, ISO 14001, LBMA Good Delivery, RJC, ICMM, Fairmined, EITI, CoC)
+- `assay_report_url?`, `chain_of_custody_json`, `cover_image_url?`, `summary`
+- `status` (draft, pending_verification, published, under_negotiation, sold, archived)
+- `is_verified` bool (aprobado por admin), `verified_at`, `verified_by`
+- `views_count`, `inquiry_count`
 
-Objetivo: cero pantallas rotas en móvil (viewport actual del usuario: 440×799).
+**`commodity_certifications`** — catálogo de estándares (ISO 9001, LBMA, RJC, Fairmined, ICMM, EITI, ISO 14001, ISO 45001)
+- `code`, `name`, `issuer`, `description`, `logo_url`, `verify_url_template`
+- Público read-only (`TO anon SELECT`)
 
-1. **Auth** (`/auth`, `/reset-password`)
-   - QA end-to-end: signup email, login, reset, resend confirmation, intent=investor.
-   - Añadir botón "Continuar con Google" usando `lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin })`.
-   - Loading states en submit; deshabilitar botón mientras corre.
+**`commodity_lot_certifications`** — join lot↔certification con `certificate_number`, `issued_at`, `expires_at`, `verification_url`
 
-2. **Dashboard** (`/dashboard`)
-   - Empty states por card con CTA claro cuando no hay proyectos/deals.
-   - Skeleton loader unificado (evitar layout shift).
-   - Banner de onboarding solo si `account_type && !completed`.
-   - Sticky quick-actions responsive en móvil.
+**`commodity_inquiries`** — buyer/trader solicita muestra/oferta
+- `lot_id`, `buyer_user_id`, `buyer_role` (trader, refinery, offtaker, industrial_end_user, investor)
+- `intended_use`, `target_volume_t`, `target_price_usd_t`, `message`, `nda_signed_at?`
+- `status` (new, contacted, sample_requested, offer_sent, negotiating, closed_won, closed_lost)
 
-3. **Ficha de proyecto** (`/proyectos/$listingId`)
-   - Verificar SSR + metadata dinámica (title, description, og:image desde imagen del listing).
-   - Ajustar 2-columnas → 1-columna en móvil (revisar overflow del mapa/gallery).
-   - Botón "Solicitar data room" con estados: idle / requesting / requested / needs-auth.
+**`buyer_profiles`** — perfil ampliado del comprador
+- `user_id`, `company_name`, `country_hq`, `entity_type` (trader, refinery, smelter, fund, industrial, family_office)
+- `annual_volume_usd`, `commodities_of_interest[]`, `geographies_of_interest[]`
+- `kyc_status` (pending, verified, rejected), `kyc_verified_at`
 
-4. **Simulador de inversión** (`InvestmentSimulator`)
-   - Validar rangos (ticket mínimo/máximo, horizonte).
-   - "Guardar simulación" → toast de confirmación + email interno al equipo.
-   - Usuarios no autenticados: redirect a `/auth?intent=investor&returnTo=…`.
+**Reglas RLS**:
+- `commodity_lots`: SELECT público solo cuando `status='published' AND is_verified=true`; owner ve sus drafts; admin ve todo.
+- `commodity_inquiries`: buyer ve las suyas, seller ve las de sus lots.
+- `buyer_profiles`: owner ve/edita el suyo; seller del lot ve datos básicos solo si hay inquiry.
+- `commodity_certifications`: read-only público.
 
-5. **Portal inversionista** (`/dashboard/investments`)
-   - Estados vacíos ("Aún no tienes operaciones") con CTA a `/oportunidades`.
-   - Mobile: tabla settlements → cards.
+**Seeds**: 6-10 lotes demo verificados repartidos en Chile (Cu concentrate + Au doré), Perú (Zn concentrate), Brasil (Fe ore + tierras raras), Colombia (Au bullion Fairmined), Venezuela (Fe/Au), Sudáfrica (Cu cathode), RDC (Co/Cu).
 
-## Fase 3 — SEO, metadata y dominio
+## Fase 2 — Web pública: nuevo hero + ruta marketplace
 
-- `__root.tsx`: título, description, og:site_name, viewport, JSON-LD Organization. **Sin** `og:image` global.
-- Cada ruta pública con `head()` propio: `/`, `/oportunidades`, `/proyectos/$listingId`, `/inversionistas`, `/legal/privacidad`, `/legal/terminos`, `/auth`.
-- `og:image` por listing derivado del loader.
-- `canonical` + `og:url` self-referencing con `https://geocapitals.com`.
-- Crear `src/routes/sitemap[.]xml.ts` con rutas estáticas + listings publicados (query a `property_listings`).
-- Crear/actualizar `public/robots.txt` con `Sitemap: https://geocapitals.com/sitemap.xml`.
-- Correr `seo_chat--trigger_scan` al final y marcar findings resueltos.
+### 2.1 Home rehecha (`src/features/marketing/MarketingLanding.tsx`)
+Nuevo **hero dual** con dos "caminos" desde el H1:
+- H1: *"Capital y commodities para la nueva minería de Latinoamérica y África"*
+- Dos tarjetas grandes bajo el hero: **"Invierte en proyectos"** → `/inversionistas`, **"Compra & vende commodities certificados"** → `/marketplace`.
+- Franja de logos de certificaciones (LBMA, RJC, Fairmined, ISO, ICMM, EITI).
+- Mapa/tira de banderas de geografías cubiertas (CL, PE, BR, CO, VE, AR, ZA, DRC, GH, MA).
+- Sección "Cómo funciona" con dos columnas paralelas: flujo proyecto vs flujo commodity.
+- CTA final dual (crear cuenta como inversionista / seller / buyer).
 
-## Fase 4 — Publicar
+### 2.2 Nueva ruta `/marketplace` (`src/routes/marketplace.tsx`)
+- `head()` con title, description, og:*, canonical `https://geocapitals.com/marketplace`, JSON-LD `Marketplace`.
+- Hero corto + filtros (commodity, forma, país, certificación, incoterm).
+- Grid de lotes verificados (loader llama server fn público `listPublishedCommodityLots`).
+- Sidebar de "Geografías" y "Certificaciones" con conteos.
+- CTA para sellers ("Publica tu lote") y para buyers ("Solicita acceso KYC").
 
-- Re-correr security scan; bloquear publish si hay críticos abiertos.
-- `preview_ui--publish` a `geocapitals.com` (dominio ya conectado).
-- Recordar al usuario que backend deploya inmediato pero frontend requiere click de "Update" en el diálogo de publish para promover cambios futuros.
+### 2.3 Nueva ruta `/marketplace/$lotId` (`src/routes/marketplace.$lotId.tsx`)
+- Ficha del lote: origen, ley, tonelaje, certificaciones con verificación, chain of custody, incoterm, precio, imágenes.
+- `head()` dinámico con og:image = `cover_image_url` del lote.
+- Botón "Solicitar oferta" → si logueado abre drawer con formulario que inserta `commodity_inquiries`; si no, redirige a `/auth?intent=buyer`.
+- Server fn autenticado `createCommodityInquiry` (usa `requireSupabaseAuth`).
+
+### 2.4 Nueva ruta `/vision` (opcional, solo si sobra ámbito) — omitida en esta fase; el contenido de visión vive en la home rehecha.
+
+## Fase 3 — Dashboard: entradas para seller y buyer
+
+- **Sección "Mis lotes"** (`/_authenticated/dashboard/marketplace/lotes`): CRUD básico de `commodity_lots` con estados draft/pending/published.
+- **Sección "Mis solicitudes"** (buyer): lista de `commodity_inquiries` con estado.
+- **Bandeja seller "Inquiries recibidas"**: lista de inquiries sobre sus lots, con cambio de estado.
+- Card en dashboard-home: "Publica tu primer lote" / "Explora el marketplace" según rol.
+
+## Fase 4 — SEO + Publicación
+
+- Actualizar `sitemap.xml` para incluir `/marketplace` y `/marketplace/$lotId` de lotes publicados.
+- Meta tags específicos por commodity/país en la ficha.
+- Correr `supabase--linter` + `security--run_security_scan`, arreglar findings.
+- Publicar a `geocapitals.com`.
+
+## Detalles técnicos
+
+- Server functions públicas (`.functions.ts`) para listar/filtrar lotes usando **server publishable client** (`SUPABASE_PUBLISHABLE_KEY`, sin admin) con policy `TO anon` para lotes verificados y publicados.
+- Server function autenticada `createCommodityInquiry` con `requireSupabaseAuth`.
+- Ninguna transacción de pago en esta fase — solo lead capture + NDA opcional.
+- Todos los `CREATE TABLE` con GRANTs explícitos (SELECT anon solo donde la policy lo permite).
+- i18n mínimo: español por defecto, textos preparados para inglés más adelante.
 
 ## Fuera de alcance
 
-- Stripe / cobros reales (se hará en próxima iteración).
-- Nuevas features de motor 3D / satelital / NI 43‑101.
-- Cambios de diseño / rebrand.
-
-## Notas técnicas
-
-- Todos los server functions nuevos siguen patrón `createServerFn` + `requireSupabaseAuth` cuando aplique; los públicos usan cliente publishable con políticas `TO anon` estrictas.
-- Migraciones nuevas: solo si linter/scan lo exige (probablemente ninguna estructural, sí posibles `ALTER FUNCTION … SET search_path`).
-- No tocar `src/integrations/supabase/*` autogenerados ni `routeTree.gen.ts`.
+- Pagos, escrow, firma electrónica de contratos.
+- Módulo 3D / satelital / NI 43-101 (ya existentes).
+- Cotización en vivo LME/LBMA (solo referencia textual del `price_basis`).
+- App móvil.

@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as ContactoRouteImport } from './routes/contacto'
@@ -26,6 +27,7 @@ import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
+import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
@@ -131,6 +133,11 @@ const ProyectosRoute = ProyectosRouteImport.update({
   path: '/proyectos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InversionistasRoute = InversionistasRouteImport.update({
   id: '/inversionistas',
   path: '/inversionistas',
@@ -184,6 +191,11 @@ const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
   id: '/$listingId',
   path: '/$listingId',
   getParentRoute: () => ProyectosRoute,
+} as any)
+const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
+  id: '/$lotId',
+  path: '/$lotId',
+  getParentRoute: () => MarketplaceRoute,
 } as any)
 const LiveTilamaRoute = LiveTilamaRouteImport.update({
   id: '/live/tilama',
@@ -616,6 +628,7 @@ export interface FileRoutesByFullPath {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -635,6 +648,7 @@ export interface FileRoutesByFullPath {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -708,6 +722,7 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -727,6 +742,7 @@ export interface FileRoutesByTo {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -802,6 +818,7 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -821,6 +838,7 @@ export interface FileRoutesById {
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
+  '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -896,6 +914,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
+    | '/marketplace'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -915,6 +934,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/marketplace/$lotId'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -988,6 +1008,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
+    | '/marketplace'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1007,6 +1028,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/marketplace/$lotId'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1081,6 +1103,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
+    | '/marketplace'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1100,6 +1123,7 @@ export interface FileRouteTypes {
     | '/live/losverdes'
     | '/live/palmeras'
     | '/live/tilama'
+    | '/marketplace/$lotId'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1175,6 +1199,7 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   InversionistasRoute: typeof InversionistasRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1255,6 +1280,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProyectosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/inversionistas': {
       id: '/inversionistas'
       path: '/inversionistas'
@@ -1331,6 +1363,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/proyectos/$listingId'
       preLoaderRoute: typeof ProyectosListingIdRouteImport
       parentRoute: typeof ProyectosRoute
+    }
+    '/marketplace/$lotId': {
+      id: '/marketplace/$lotId'
+      path: '/$lotId'
+      fullPath: '/marketplace/$lotId'
+      preLoaderRoute: typeof MarketplaceLotIdRouteImport
+      parentRoute: typeof MarketplaceRoute
     }
     '/live/tilama': {
       id: '/live/tilama'
@@ -2034,6 +2073,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface MarketplaceRouteChildren {
+  MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceLotIdRoute: MarketplaceLotIdRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 interface ProyectosRouteChildren {
   ProyectosListingIdRoute: typeof ProyectosListingIdRoute
 }
@@ -2069,6 +2120,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   InversionistasRoute: InversionistasRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
@@ -2110,13 +2162,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

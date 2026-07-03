@@ -114,6 +114,77 @@ export function MarketingLanding() {
         </div>
       </section>
 
+      {/* Dual paths: proyectos + marketplace */}
+      <section className="border-b border-hairline bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-14">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <Eyebrow className="mb-3">Dos caminos, una plataforma</Eyebrow>
+            <h2 className="brand-display text-3xl md:text-4xl text-content">
+              Del yacimiento al mercado, con capital y trazabilidad
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            <Link
+              to="/inversionistas"
+              className="group rounded-2xl border border-hairline bg-accent-brand-subtle p-8 hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand text-white">
+                  <Landmark className="w-6 h-6" strokeWidth={1.75} />
+                </span>
+                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                  Inversión en proyectos
+                </div>
+              </div>
+              <div className="mt-5 font-display text-2xl text-content leading-snug">
+                Deal-flow minero verificado — equity, royalties y offtake
+              </div>
+              <p className="mt-3 text-sm text-content-subtle">
+                Accede a proyectos calificados con reporte NI 43-101, catastro trazable, data room
+                cifrado y modelo económico listo para comité.
+              </p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand font-medium text-sm">
+                Ver oportunidades <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+            <Link
+              to="/marketplace"
+              className="group rounded-2xl border border-hairline bg-surface-inverse text-white p-8 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.6)] transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand-subtle text-accent-brand">
+                  <Gem className="w-6 h-6" strokeWidth={1.75} />
+                </span>
+                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand-subtle">
+                  Marketplace de commodities
+                </div>
+              </div>
+              <div className="mt-5 font-display text-2xl leading-snug">
+                Compra & vende commodities certificados de LatAm y África
+              </div>
+              <p className="mt-3 text-sm text-white/70">
+                Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto —
+                con certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-mono uppercase tracking-wider text-white/60">
+                <span>🇨🇱 Chile</span>
+                <span>🇵🇪 Perú</span>
+                <span>🇧🇷 Brasil</span>
+                <span>🇨🇴 Colombia</span>
+                <span>🇻🇪 Venezuela</span>
+                <span>🇿🇦 Sudáfrica</span>
+                <span>🇨🇩 R.D. Congo</span>
+              </div>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand-subtle font-medium text-sm">
+                Explorar lotes <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
+
       {/* Pillars band */}
       <section className="bg-surface-inverse text-white">
         <div className="max-w-7xl mx-auto px-5 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">

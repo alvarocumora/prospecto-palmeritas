@@ -9,6 +9,7 @@ type Dict = Record<string, { es: string; en: string }>;
 // eslint-disable-next-line react-refresh/only-export-components
 export const STRINGS: Dict = {
   nav_projects: { es: "Proyectos", en: "Projects" },
+  nav_marketplace: { es: "Marketplace", en: "Marketplace" },
   nav_investors: { es: "Inversionistas", en: "Investors" },
   nav_companies: { es: "Empresas", en: "Companies" },
   nav_resources: { es: "Resources", en: "Resources" },
@@ -16,16 +17,16 @@ export const STRINGS: Dict = {
   cta_login: { es: "Iniciar sesión", en: "Sign in" },
   cta_signup: { es: "Registrarse", en: "Sign up" },
   hero_eyebrow: {
-    es: "Plataforma inteligente de inversión y financiamiento",
-    en: "Intelligent mining investment & financing platform",
+    es: "Capital + commodities · LatAm & África",
+    en: "Capital + commodities · LatAm & Africa",
   },
   hero_title: {
-    es: "Conectamos proyectos mineros con capital",
-    en: "Where mining projects meet global capital",
+    es: "Capital y commodities para la nueva minería de LatAm y África",
+    en: "Capital and commodities for the new mining of LatAm and Africa",
   },
   hero_sub: {
-    es: "La infraestructura digital donde proyectos de minería se encuentran con inversionistas calificados de todo el mundo — sobre catastro, satélite y NI 43-101 en vivo.",
-    en: "The digital infrastructure where mining projects meet qualified investors worldwide — built on live cadastre, satellite intelligence and NI 43-101.",
+    es: "Una plataforma dual: invierte en proyectos mineros verificados y transa concentrados, cátodos, doré, tierras raras y litio certificados desde Chile, Perú, Brasil, Colombia, Venezuela y África.",
+    en: "A dual platform: invest in verified mining projects and trade certified concentrates, cathodes, doré, rare earths and lithium from Chile, Peru, Brazil, Colombia, Venezuela and Africa.",
   },
   cta_publish: { es: "Publica tu proyecto", en: "Publish your project" },
   cta_explore: { es: "Explorar oportunidades", en: "Explore opportunities" },

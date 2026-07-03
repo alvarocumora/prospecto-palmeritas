@@ -817,6 +817,60 @@ export type Database = {
           },
         ]
       }
+      buyer_profiles: {
+        Row: {
+          annual_volume_usd: number | null
+          commodities_of_interest: string[] | null
+          company_name: string | null
+          contact_phone: string | null
+          country_hq: string | null
+          created_at: string
+          entity_type: string | null
+          geographies_of_interest: string[] | null
+          id: string
+          kyc_notes: string | null
+          kyc_status: Database["public"]["Enums"]["commodity_kyc_status"]
+          kyc_verified_at: string | null
+          updated_at: string
+          user_id: string
+          website: string | null
+        }
+        Insert: {
+          annual_volume_usd?: number | null
+          commodities_of_interest?: string[] | null
+          company_name?: string | null
+          contact_phone?: string | null
+          country_hq?: string | null
+          created_at?: string
+          entity_type?: string | null
+          geographies_of_interest?: string[] | null
+          id?: string
+          kyc_notes?: string | null
+          kyc_status?: Database["public"]["Enums"]["commodity_kyc_status"]
+          kyc_verified_at?: string | null
+          updated_at?: string
+          user_id: string
+          website?: string | null
+        }
+        Update: {
+          annual_volume_usd?: number | null
+          commodities_of_interest?: string[] | null
+          company_name?: string | null
+          contact_phone?: string | null
+          country_hq?: string | null
+          created_at?: string
+          entity_type?: string | null
+          geographies_of_interest?: string[] | null
+          id?: string
+          kyc_notes?: string | null
+          kyc_status?: Database["public"]["Enums"]["commodity_kyc_status"]
+          kyc_verified_at?: string | null
+          updated_at?: string
+          user_id?: string
+          website?: string | null
+        }
+        Relationships: []
+      }
       cadastre_change_log: {
         Row: {
           after: Json | null
@@ -1533,6 +1587,300 @@ export type Database = {
             columns: ["qualified_person_id"]
             isOneToOne: false
             referencedRelation: "qualified_persons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commodity_certifications: {
+        Row: {
+          category: string | null
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          issuer: string | null
+          logo_url: string | null
+          name: string
+          updated_at: string
+          verify_url_template: string | null
+        }
+        Insert: {
+          category?: string | null
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          issuer?: string | null
+          logo_url?: string | null
+          name: string
+          updated_at?: string
+          verify_url_template?: string | null
+        }
+        Update: {
+          category?: string | null
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          issuer?: string | null
+          logo_url?: string | null
+          name?: string
+          updated_at?: string
+          verify_url_template?: string | null
+        }
+        Relationships: []
+      }
+      commodity_inquiries: {
+        Row: {
+          buyer_role: Database["public"]["Enums"]["commodity_buyer_role"]
+          buyer_user_id: string
+          company_name: string | null
+          created_at: string
+          id: string
+          intended_use: string | null
+          lot_id: string
+          message: string | null
+          nda_signed_at: string | null
+          seller_notes: string | null
+          status: Database["public"]["Enums"]["commodity_inquiry_status"]
+          target_price_usd_t: number | null
+          target_volume_t: number | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_role?: Database["public"]["Enums"]["commodity_buyer_role"]
+          buyer_user_id: string
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          intended_use?: string | null
+          lot_id: string
+          message?: string | null
+          nda_signed_at?: string | null
+          seller_notes?: string | null
+          status?: Database["public"]["Enums"]["commodity_inquiry_status"]
+          target_price_usd_t?: number | null
+          target_volume_t?: number | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_role?: Database["public"]["Enums"]["commodity_buyer_role"]
+          buyer_user_id?: string
+          company_name?: string | null
+          created_at?: string
+          id?: string
+          intended_use?: string | null
+          lot_id?: string
+          message?: string | null
+          nda_signed_at?: string | null
+          seller_notes?: string | null
+          status?: Database["public"]["Enums"]["commodity_inquiry_status"]
+          target_price_usd_t?: number | null
+          target_volume_t?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_inquiries_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commodity_lot_certifications: {
+        Row: {
+          certificate_number: string | null
+          certification_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          issued_at: string | null
+          lot_id: string
+          verification_url: string | null
+        }
+        Insert: {
+          certificate_number?: string | null
+          certification_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          lot_id: string
+          verification_url?: string | null
+        }
+        Update: {
+          certificate_number?: string | null
+          certification_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          issued_at?: string | null
+          lot_id?: string
+          verification_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_lot_certifications_certification_id_fkey"
+            columns: ["certification_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_certifications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commodity_lot_certifications_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      commodity_lots: {
+        Row: {
+          asking_price_usd: number | null
+          assay_report_url: string | null
+          certifications_json: Json | null
+          chain_of_custody_json: Json | null
+          commodity: Database["public"]["Enums"]["commodity_kind"]
+          country: string
+          cover_image_url: string | null
+          created_at: string
+          currency: string | null
+          deleterious_json: Json | null
+          description: string | null
+          form: Database["public"]["Enums"]["commodity_form"]
+          frequency: Database["public"]["Enums"]["commodity_frequency"] | null
+          grade_pct: number | null
+          grade_unit: string | null
+          id: string
+          incoterm: Database["public"]["Enums"]["commodity_incoterm"] | null
+          inquiry_count: number
+          is_verified: boolean
+          lot_size_t: number | null
+          moisture_pct: number | null
+          organization_id: string | null
+          origin_geojson: Json | null
+          payment_terms: string | null
+          port_of_loading: string | null
+          premium_discount_usd_t: number | null
+          price_basis: string | null
+          project_id: string | null
+          region: string | null
+          seller_user_id: string
+          slug: string | null
+          status: Database["public"]["Enums"]["commodity_lot_status"]
+          summary: string | null
+          title: string
+          tonnage_available_t: number | null
+          updated_at: string
+          verified_at: string | null
+          verified_by: string | null
+          views_count: number
+        }
+        Insert: {
+          asking_price_usd?: number | null
+          assay_report_url?: string | null
+          certifications_json?: Json | null
+          chain_of_custody_json?: Json | null
+          commodity: Database["public"]["Enums"]["commodity_kind"]
+          country: string
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string | null
+          deleterious_json?: Json | null
+          description?: string | null
+          form: Database["public"]["Enums"]["commodity_form"]
+          frequency?: Database["public"]["Enums"]["commodity_frequency"] | null
+          grade_pct?: number | null
+          grade_unit?: string | null
+          id?: string
+          incoterm?: Database["public"]["Enums"]["commodity_incoterm"] | null
+          inquiry_count?: number
+          is_verified?: boolean
+          lot_size_t?: number | null
+          moisture_pct?: number | null
+          organization_id?: string | null
+          origin_geojson?: Json | null
+          payment_terms?: string | null
+          port_of_loading?: string | null
+          premium_discount_usd_t?: number | null
+          price_basis?: string | null
+          project_id?: string | null
+          region?: string | null
+          seller_user_id: string
+          slug?: string | null
+          status?: Database["public"]["Enums"]["commodity_lot_status"]
+          summary?: string | null
+          title: string
+          tonnage_available_t?: number | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          views_count?: number
+        }
+        Update: {
+          asking_price_usd?: number | null
+          assay_report_url?: string | null
+          certifications_json?: Json | null
+          chain_of_custody_json?: Json | null
+          commodity?: Database["public"]["Enums"]["commodity_kind"]
+          country?: string
+          cover_image_url?: string | null
+          created_at?: string
+          currency?: string | null
+          deleterious_json?: Json | null
+          description?: string | null
+          form?: Database["public"]["Enums"]["commodity_form"]
+          frequency?: Database["public"]["Enums"]["commodity_frequency"] | null
+          grade_pct?: number | null
+          grade_unit?: string | null
+          id?: string
+          incoterm?: Database["public"]["Enums"]["commodity_incoterm"] | null
+          inquiry_count?: number
+          is_verified?: boolean
+          lot_size_t?: number | null
+          moisture_pct?: number | null
+          organization_id?: string | null
+          origin_geojson?: Json | null
+          payment_terms?: string | null
+          port_of_loading?: string | null
+          premium_discount_usd_t?: number | null
+          price_basis?: string | null
+          project_id?: string | null
+          region?: string | null
+          seller_user_id?: string
+          slug?: string | null
+          status?: Database["public"]["Enums"]["commodity_lot_status"]
+          summary?: string | null
+          title?: string
+          tonnage_available_t?: number | null
+          updated_at?: string
+          verified_at?: string | null
+          verified_by?: string | null
+          views_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_lots_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commodity_lots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "commodity_lots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -13498,6 +13846,13 @@ export type Database = {
         }[]
       }
       get_user_plan: { Args: { _user_id: string }; Returns: string }
+      has_app_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       has_data_room_access: {
         Args: { _data_room_id: string; _user_id: string }
         Returns: boolean
@@ -13738,6 +14093,63 @@ export type Database = {
         | "silicic_cap"
         | "unclassified"
       app_role: "super_admin" | "support"
+      commodity_buyer_role:
+        | "trader"
+        | "refinery"
+        | "smelter"
+        | "offtaker"
+        | "industrial_end_user"
+        | "investor"
+        | "other"
+      commodity_form:
+        | "concentrate"
+        | "cathode"
+        | "dore"
+        | "bullion"
+        | "oxide"
+        | "carbonate"
+        | "sulphate"
+        | "ore"
+        | "hydroxide"
+      commodity_frequency:
+        | "spot"
+        | "monthly"
+        | "quarterly"
+        | "semiannual"
+        | "annual_offtake"
+      commodity_incoterm: "FOB" | "CIF" | "CFR" | "EXW" | "DAP" | "DDP" | "FCA"
+      commodity_inquiry_status:
+        | "new"
+        | "contacted"
+        | "sample_requested"
+        | "offer_sent"
+        | "negotiating"
+        | "closed_won"
+        | "closed_lost"
+      commodity_kind:
+        | "cu_concentrate"
+        | "zn_concentrate"
+        | "pb_concentrate"
+        | "cu_cathode"
+        | "au_dore"
+        | "ag_dore"
+        | "au_bullion"
+        | "rare_earths"
+        | "li_carbonate"
+        | "li_spodumene"
+        | "fe_ore"
+        | "sn_concentrate"
+        | "mo_concentrate"
+        | "co_hydroxide"
+        | "ni_sulphate"
+      commodity_kyc_status: "pending" | "verified" | "rejected"
+      commodity_lot_status:
+        | "draft"
+        | "pending_verification"
+        | "published"
+        | "under_negotiation"
+        | "sold"
+        | "archived"
       compliance_standard:
         | "ni43101"
         | "jorc2012"
@@ -13935,6 +14347,69 @@ export const Constants = {
         "unclassified",
       ],
       app_role: ["super_admin", "support"],
+      commodity_buyer_role: [
+        "trader",
+        "refinery",
+        "smelter",
+        "offtaker",
+        "industrial_end_user",
+        "investor",
+        "other",
+      ],
+      commodity_form: [
+        "concentrate",
+        "cathode",
+        "dore",
+        "bullion",
+        "oxide",
+        "carbonate",
+        "sulphate",
+        "ore",
+        "hydroxide",
+      ],
+      commodity_frequency: [
+        "spot",
+        "monthly",
+        "quarterly",
+        "semiannual",
+        "annual_offtake",
+      ],
+      commodity_incoterm: ["FOB", "CIF", "CFR", "EXW", "DAP", "DDP", "FCA"],
+      commodity_inquiry_status: [
+        "new",
+        "contacted",
+        "sample_requested",
+        "offer_sent",
+        "negotiating",
+        "closed_won",
+        "closed_lost",
+      ],
+      commodity_kind: [
+        "cu_concentrate",
+        "zn_concentrate",
+        "pb_concentrate",
+        "cu_cathode",
+        "au_dore",
+        "ag_dore",
+        "au_bullion",
+        "rare_earths",
+        "li_carbonate",
+        "li_spodumene",
+        "fe_ore",
+        "sn_concentrate",
+        "mo_concentrate",
+        "co_hydroxide",
+        "ni_sulphate",
+      ],
+      commodity_kyc_status: ["pending", "verified", "rejected"],
+      commodity_lot_status: [
+        "draft",
+        "pending_verification",
+        "published",
+        "under_negotiation",
+        "sold",
+        "archived",
+      ],
       compliance_standard: [
         "ni43101",
         "jorc2012",
