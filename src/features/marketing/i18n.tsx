@@ -9,6 +9,7 @@ type Dict = Record<string, { es: string; en: string }>;
 // eslint-disable-next-line react-refresh/only-export-components
 export const STRINGS: Dict = {
   nav_projects: { es: "Proyectos", en: "Projects" },
+  nav_marketplace: { es: "Marketplace", en: "Marketplace" },
   nav_investors: { es: "Inversionistas", en: "Investors" },
   nav_companies: { es: "Empresas", en: "Companies" },
   nav_resources: { es: "Resources", en: "Resources" },
