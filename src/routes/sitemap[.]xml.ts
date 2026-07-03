@@ -53,6 +53,21 @@ export const Route = createFileRoute("/sitemap.xml")({
               priority: "0.8",
             });
           }
+          const { data: lots } = await supabase
+            .from("commodity_lots")
+            .select("id, updated_at, status, is_verified")
+            .eq("status", "published")
+            .eq("is_verified", true)
+            .order("updated_at", { ascending: false })
+            .limit(500);
+          for (const row of lots ?? []) {
+            entries.push({
+              path: `/marketplace/${row.id}`,
+              lastmod: row.updated_at ? new Date(row.updated_at).toISOString() : undefined,
+              changefreq: "weekly",
+              priority: "0.7",
+            });
+          }
         } catch {
           // On failure, still emit the static sitemap.
         }
