@@ -515,44 +515,72 @@ export function MarketingLanding() {
               i: Map,
               t: "Mapa geológico",
               d: "Capas SERNAGEOMIN, concesiones, alertas de superposición y análisis de prospectividad.",
-            },
-            {
-              i: Cpu,
-              t: "Visor 3D geocientífico",
-              d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA.",
+              to: "/catastro/mapa" as const,
             },
             {
               i: Satellite,
               t: "Monitoreo satelital",
               d: "Detección de cambios, deformación InSAR y firmas espectrales sobre tu portafolio.",
-            },
-            {
-              i: FileText,
-              t: "NI 43-101 asistido",
-              d: "Borradores automáticos, recursos estimados y QA/QC con audit-trail trazable.",
-            },
-            {
-              i: ShieldCheck,
-              t: "Cumplimiento & patentes",
-              d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder.",
+              to: "/satelital" as const,
             },
             {
               i: Landmark,
               t: "Capital raise & deals",
               d: "Data room, KYC/AML institucional y matching con inversionistas verificados.",
+              to: "/oportunidades" as const,
             },
-          ].map(({ i: Icon, t: title, d }) => (
-            <BrandCard key={title} interactive className="group">
-              <div className="flex items-center justify-between mb-5">
-                <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand">
-                  <Icon className="w-5 h-5" strokeWidth={1.75} />
-                </span>
-                <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
-              </div>
-              <div className="font-display text-lg text-content">{title}</div>
-              <p className="text-sm text-content-subtle mt-2 leading-relaxed">{d}</p>
-            </BrandCard>
-          ))}
+            {
+              i: Cpu,
+              t: "Visor 3D geocientífico",
+              d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA.",
+              to: null,
+            },
+            {
+              i: FileText,
+              t: "NI 43-101 asistido",
+              d: "Borradores automáticos, recursos estimados y QA/QC con audit-trail trazable.",
+              to: null,
+            },
+            {
+              i: ShieldCheck,
+              t: "Cumplimiento & patentes",
+              d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder.",
+              to: null,
+            },
+          ].map(({ i: Icon, t: title, d, to }) => {
+            const inner = (
+              <>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand">
+                    <Icon className="w-5 h-5" strokeWidth={1.75} />
+                  </span>
+                  {to ? (
+                    <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+                  ) : (
+                    <span className="text-[10px] uppercase tracking-wide text-content-subtle border border-hairline rounded-full px-2 py-0.5">
+                      Próximamente
+                    </span>
+                  )}
+                </div>
+                <div className="font-display text-lg text-content">{title}</div>
+                <p className="text-sm text-content-subtle mt-2 leading-relaxed">{d}</p>
+              </>
+            );
+            if (to) {
+              return (
+                <Link key={title} to={to} className="block group">
+                  <BrandCard interactive className="h-full group-hover:border-accent-brand/40 transition">
+                    {inner}
+                  </BrandCard>
+                </Link>
+              );
+            }
+            return (
+              <BrandCard key={title} className="group opacity-80">
+                {inner}
+              </BrandCard>
+            );
+          })}
         </div>
       </section>
 
