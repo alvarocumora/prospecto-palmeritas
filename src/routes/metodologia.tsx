@@ -147,6 +147,50 @@ function MetodologiaPage() {
         </p>
       </section>
 
+      {/* Verificación de inversionistas (KYC) */}
+      <section className="mt-16">
+        <h2 className="brand-display text-2xl md:text-3xl text-content mb-3">
+          Verificación de inversionistas (KYC)
+        </h2>
+        <p className="text-sm text-content-subtle leading-relaxed max-w-3xl mb-6">
+          El acceso a los data rooms bajo NDA requiere un perfil de inversionista aprobado. El
+          proceso tiene tres pasos y el estado de tu perfil es visible en todo momento:
+        </p>
+        <div className="grid sm:grid-cols-3 gap-4">
+          {[
+            {
+              n: "1",
+              t: "Registro",
+              d: "Creas tu cuenta y completas el perfil de inversionista: tipo, jurisdicción, rango de ticket y commodities de interés.",
+            },
+            {
+              n: "2",
+              t: "Revisión",
+              d: "Nuestro equipo revisa la información y la documentación de respaldo. El estado queda «en revisión» hasta resolverse.",
+            },
+            {
+              n: "3",
+              t: "Aprobación",
+              d: "Con el perfil aprobado puedes solicitar acceso a data rooms, recibir el memorando de cada oportunidad y firmar NDAs.",
+            },
+          ].map(({ n, t, d }) => (
+            <div key={n} className="rounded-xl border border-hairline bg-white p-5">
+              <div className="font-mono text-xs text-accent-brand mb-2">Paso {n}</div>
+              <div className="font-display text-[15px] text-content mb-2">{t}</div>
+              <p className="text-sm text-content-subtle leading-relaxed">{d}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6">
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 bg-accent-brand text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-90 transition"
+          >
+            Iniciar verificación de inversionista <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+      </section>
+
       {/* Disclaimer + CTA */}
       <section className="mt-10 flex items-start gap-3 text-sm text-content-subtle">
         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
