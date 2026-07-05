@@ -13889,6 +13889,10 @@ export type Database = {
         Args: { _delta?: number; _metric: string; _org_id: string }
         Returns: undefined
       }
+      is_demo_public_project: {
+        Args: { _project_id: string }
+        Returns: boolean
+      }
       is_geocapitals_staff: { Args: { _user_id: string }; Returns: boolean }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
