@@ -24,7 +24,10 @@ export const SNGM_SERVICES_ROOT =
 export const SNGM_CONCESIONES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/2`;
 export const SNGM_VERTICES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/0`;
 export const SNGM_CONCESIONES_ELIMINADAS_URL = `${SNGM_SERVICES_ROOT}/Marceloeliminadas/FeatureServer/0`;
-export const SNGM_YACIMIENTOS_URL = `${SNGM_SERVICES_ROOT}/ACCESO_YACIMIENTOS/FeatureServer/0`;
+/** Faenas e instalaciones mineras (130 puntos: empresa, faena, recurso). */
+export const SNGM_YACIMIENTOS_URL = `${SNGM_SERVICES_ROOT}/ACCESO_YACIMIENTOS/FeatureServer/1`;
+/** Geología 1:10.000 (642 polígonos: UNIDAD, Clase_Geol). Nombre con í percent-encoded. */
+export const SNGM_GEOLOGIA_10K_URL = `${SNGM_SERVICES_ROOT}/Geolog%C3%ADa_10k/FeatureServer/0`;
 
 /**
  * Tipos legacy de la plataforma → filtro v2. En derecho minero chileno la
@@ -77,6 +80,37 @@ export async function sngmQueryGeoJSON(
     const fc = (await res.json()) as GeoJSON.FeatureCollection & { error?: unknown };
     if ("error" in fc && fc.error) return null;
     return fc;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Identify por click: atributos del primer feature que intersecta el punto
+ * (reemplaza al WMS GetFeatureInfo del host legacy caído).
+ */
+export async function sngmIdentify(
+  layerUrl: string,
+  lng: number,
+  lat: number,
+): Promise<Record<string, unknown> | null> {
+  const params = new URLSearchParams({
+    where: "1=1",
+    outFields: "*",
+    geometry: `${lng},${lat}`,
+    geometryType: "esriGeometryPoint",
+    inSR: "4326",
+    spatialRel: "esriSpatialRelIntersects",
+    returnGeometry: "false",
+    resultRecordCount: "1",
+    f: "geojson",
+  });
+  try {
+    const res = await fetch(`${layerUrl}/query?${params.toString()}`);
+    if (!res.ok) return null;
+    const fc = (await res.json()) as GeoJSON.FeatureCollection & { error?: unknown };
+    if ("error" in fc && fc.error) return null;
+    return (fc.features?.[0]?.properties as Record<string, unknown>) ?? null;
   } catch {
     return null;
   }

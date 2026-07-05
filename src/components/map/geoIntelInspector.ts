@@ -1,6 +1,11 @@
 import type { Map as LeafletMap } from "leaflet";
 import type { LeafletNS } from "./types";
-import { wmsGetFeatureInfo } from "./sernageominLayers";
+import {
+  SNGM_GEOLOGIA_10K_URL,
+  SNGM_YACIMIENTOS_URL,
+  sngmIdentify,
+  sngmQueryGeoJSON,
+} from "@/lib/sngm";
 import type { ExplorationTarget } from "@/hooks/useExplorationTargets";
 
 /**
@@ -41,38 +46,32 @@ async function fetchElevation(lat: number, lng: number): Promise<number | null> 
   }
 }
 
-async function fetchSernageominLitho(map: LeafletMap, lat: number, lng: number) {
-  const size = map.getSize();
-  const point = map.latLngToContainerPoint({ lat, lng } as never);
-  const b = map.getBounds();
-  const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
-  return wmsGetFeatureInfo({
-    baseUrl:
-      "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
-    layer: "0",
-    bbox,
-    width: size.x,
-    height: size.y,
-    x: point.x,
-    y: point.y,
-  });
+// Identify por query ArcGIS (el WMS GetFeatureInfo legacy está caído — ver sngm.ts)
+async function fetchSernageominLitho(_map: LeafletMap, lat: number, lng: number) {
+  return sngmIdentify(SNGM_GEOLOGIA_10K_URL, lng, lat);
 }
 
 async function fetchSernageominYacimientos(map: LeafletMap, lat: number, lng: number) {
-  const size = map.getSize();
-  const point = map.latLngToContainerPoint({ lat, lng } as never);
+  // Faenas son puntos: identify exacto casi nunca acierta — buscar en el bbox visible
   const b = map.getBounds();
-  const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
-  return wmsGetFeatureInfo({
-    baseUrl:
-      "https://catastro.sernageomin.cl/arcgis/services/Mineria/Yacimientos/MapServer/WMSServer",
-    layer: "0",
-    bbox,
-    width: size.x,
-    height: size.y,
-    x: point.x,
-    y: point.y,
+  const fc = await sngmQueryGeoJSON(SNGM_YACIMIENTOS_URL, {
+    bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
+    limit: 25,
+    returnGeometry: true,
   });
+  if (!fc?.features?.length) return null;
+  // La faena más cercana al click
+  let best: { props: Record<string, unknown>; km: number } | null = null;
+  for (const f of fc.features) {
+    const g = f.geometry;
+    if (g?.type !== "Point") continue;
+    const [flng, flat] = g.coordinates as [number, number];
+    const km = haversineKm([lat, lng], [flat, flng]);
+    if (!best || km < best.km)
+      best = { props: (f.properties ?? {}) as Record<string, unknown>, km };
+  }
+  if (!best) return null;
+  return { ...best.props, DIST_KM: best.km.toFixed(1) } as Record<string, unknown>;
 }
 
 function nearestTarget(targets: ExplorationTarget[], lat: number, lng: number) {
@@ -154,17 +153,18 @@ export function wireGeoIntelClickPopup(
       );
     }
 
-    // Yacimiento conocido
+    // Faena minera más cercana en el encuadre (SNGM v2)
     if (yac && Object.keys(yac).length > 0) {
-      const name = (yac.NOMBRE ?? yac.NAME ?? yac.YACIMIENTO ?? "Yacimiento") as string;
-      const sub = (yac.SUSTANCIA ?? yac.METAL ?? yac.PRODUCTO ?? "") as string;
-      const estado = (yac.ESTADO ?? yac.STATUS ?? "") as string;
+      const name = (yac.NOMBRE_FAE ?? yac.NOMBRE_INS ?? yac.NOMBRE ?? "Faena minera") as string;
+      const sub = (yac.RECURSO_MI ?? yac.RECURSO_PR ?? yac.SUSTANCIA ?? "") as string;
+      const empresa = (yac.NOMBRE_EMP ?? "") as string;
+      const dist = (yac.DIST_KM ?? "") as string;
       sections.push(
         `<div style="border-top:1px solid #3a322c;padding-top:6px;margin-top:4px;">
-          <div style="color:#F0C96B;font-weight:600;">⛏️ ${name}</div>
-          ${sub ? `<div style="color:#C8B8A8;">Sustancia: ${sub}</div>` : ""}
-          ${estado ? `<div style="color:#C8B8A8;">Estado: ${estado}</div>` : ""}
-          <div style="color:#A89080;font-size:9px;">SERNAGEOMIN Yacimientos</div>
+          <div style="color:#F0C96B;font-weight:600;">⛏️ ${name}${dist ? ` <span style="color:#A89080;font-weight:400;">(${dist} km)</span>` : ""}</div>
+          ${sub ? `<div style="color:#C8B8A8;">Recurso: ${sub}</div>` : ""}
+          ${empresa ? `<div style="color:#C8B8A8;">Empresa: ${empresa}</div>` : ""}
+          <div style="color:#A89080;font-size:9px;">SERNAGEOMIN · Faenas mineras</div>
         </div>`,
       );
     }

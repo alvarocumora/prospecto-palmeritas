@@ -183,37 +183,22 @@ export function wireMacrostratClickPopup(
       )
       .openOn(map);
 
-    // 1) SERNAGEOMIN GetFeatureInfo (Chile) — siempre primero
+    // 1) SERNAGEOMIN identify (Chile) — siempre primero.
+    // El WMS legacy está caído: se consulta la Geología 1:10k v2 (sngm.ts).
     let chileHtml = "";
     try {
-      const { wmsGetFeatureInfo } = await import("./sernageominLayers");
-      const size = map.getSize();
-      const point = map.latLngToContainerPoint(e.latlng);
-      const b = map.getBounds();
-      const bbox = `${b.getSouth()},${b.getWest()},${b.getNorth()},${b.getEast()}`;
-      const props = await wmsGetFeatureInfo({
-        baseUrl:
-          "https://catastro.sernageomin.cl/arcgis/services/Geologia/Geologia_Base_1M/MapServer/WMSServer",
-        layer: "0",
-        bbox,
-        width: size.x,
-        height: size.y,
-        x: point.x,
-        y: point.y,
-      });
+      const { sngmIdentify, SNGM_GEOLOGIA_10K_URL } = await import("@/lib/sngm");
+      const props = await sngmIdentify(SNGM_GEOLOGIA_10K_URL, lng, lat);
       if (props && Object.keys(props).length > 0) {
-        const name = (props.NOMBRE_UNIDAD ??
-          props.UNIDAD ??
+        const name = (props.UNIDAD ??
+          props.NOMBRE_UNIDAD ??
           props.NAME ??
-          props.LITOLOGIA ??
           "Unidad geológica chilena") as string;
-        const edad = (props.EDAD ?? props.AGE ?? props.PERIODO ?? "—") as string;
-        const lito = (props.LITOLOGIA ?? props.ROCK_TYPE ?? "—") as string;
+        const clase = (props.Clase_Geol ?? props.LITOLOGIA ?? props.ROCK_TYPE ?? "—") as string;
         chileHtml = `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:280px;">
           <strong style="color:#F0C96B;">${name}</strong><br/>
-          Edad: ${edad}<br/>
-          Litología: ${lito}
-          <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Carta Geológica 1:1.000.000 · ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
+          Clase: ${clase}
+          <div style="margin-top:6px;padding-top:6px;border-top:1px solid #3a322c;color:#A89080;font-size:10px;">📎 SERNAGEOMIN · Geología 1:10.000 · ${lat.toFixed(4)}, ${lng.toFixed(4)}</div>
         </div>`;
       }
     } catch {
