@@ -8,6 +8,7 @@ import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingDrawer } from "@/features/marketing/PublicListingDrawer";
+import { ProjectCover } from "@/features/marketing/ProjectCover";
 import type { PublicListing } from "@/lib/publicListings.functions";
 
 const MAX_ON_LANDING = 6;
