@@ -142,8 +142,10 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <LocaleProvider>
-          <Outlet />
-          <Toaster />
+          <CurrencyProvider>
+            <Outlet />
+            <Toaster />
+          </CurrencyProvider>
         </LocaleProvider>
       </AuthProvider>
     </QueryClientProvider>
