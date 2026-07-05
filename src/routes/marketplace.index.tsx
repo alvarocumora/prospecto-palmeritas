@@ -40,7 +40,7 @@ const searchSchema = z.object({
   cert: z.string().optional(),
 });
 
-export const Route = createFileRoute("/marketplace")({
+export const Route = createFileRoute("/marketplace/")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
