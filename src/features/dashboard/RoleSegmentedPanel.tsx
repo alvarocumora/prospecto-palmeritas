@@ -108,7 +108,6 @@ function QuickLink({
 const fmt = (n: number | null | undefined, d = 0) =>
   n == null ? "—" : n.toLocaleString(undefined, { maximumFractionDigits: d });
 
-
 export function RoleSegmentedPanel({
   accountType,
   kpis,
@@ -269,7 +268,7 @@ const META: Record<
         desc: "Alertas oficiales sobre tus AOIs.",
       },
       {
-        to: "/dashboard/marketplace",
+        to: "/dashboard/listings",
         icon: <Handshake className="w-3.5 h-3.5" />,
         label: "Publicar deal",
         desc: "Sale, JV o royalty con data room.",
@@ -404,7 +403,9 @@ function renderKpis(accountType: AccountType, k: ExecutiveKpis | null, loading: 
       />
       <Kpi
         label="QA/QC OK"
-        value={loading ? "…" : k?.qaqcFailRate != null ? `${(100 - k.qaqcFailRate).toFixed(1)}%` : "—"}
+        value={
+          loading ? "…" : k?.qaqcFailRate != null ? `${(100 - k.qaqcFailRate).toFixed(1)}%` : "—"
+        }
         hint={`${v(k?.qaqcTotal)} controles`}
         tone={(k?.qaqcFailRate ?? 0) > 10 ? "danger" : "teal"}
         icon={<ShieldCheck className="w-3 h-3" />}

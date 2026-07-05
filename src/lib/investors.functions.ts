@@ -16,7 +16,11 @@ async function assertStaff(supabase: any, userId: string): Promise<void> {
 export const listInvestorProfiles = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ status: z.enum(["pending_review", "approved", "rejected", "all"]).default("pending_review") }).parse(d),
+    z
+      .object({
+        status: z.enum(["pending_review", "approved", "rejected", "all"]).default("pending_review"),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -76,7 +80,10 @@ export const approveInvestor = createServerFn({ method: "POST" })
       await sendInternalEmail({
         templateName: "investor-approved",
         recipientEmail: p.email,
-        templateData: { fullName: prof?.full_name ?? "", reviewerName: reviewer?.display_name ?? "Equipo Geocapitals" },
+        templateData: {
+          fullName: prof?.full_name ?? "",
+          reviewerName: reviewer?.display_name ?? "Equipo Geocapitals",
+        },
         idempotencyKey: `investor-approved:${data.userId}`,
       });
     }
@@ -91,7 +98,7 @@ export const rejectInvestor = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertStaff(supabase, userId);
     const now = new Date().toISOString();
-    const { error } = await supabase
+    const { data: prof, error } = await supabase
       .from("investor_profiles")
       .update({
         review_status: "rejected",
@@ -99,8 +106,26 @@ export const rejectInvestor = createServerFn({ method: "POST" })
         reviewed_at: now,
         reviewed_by: userId,
       })
-      .eq("user_id", data.userId);
+      .eq("user_id", data.userId)
+      .select("full_name")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+
+    // Notificar el rechazo con el motivo — un rechazo silencioso destruye
+    // la confianza más que el rechazo mismo.
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("email")
+      .eq("user_id", data.userId)
+      .maybeSingle();
+    if (p?.email) {
+      await sendInternalEmail({
+        templateName: "investor-rejected",
+        recipientEmail: p.email,
+        templateData: { fullName: prof?.full_name ?? "", reason: data.reason },
+        idempotencyKey: `investor-rejected:${data.userId}:${now}`,
+      });
+    }
     return { ok: true as const };
   });
 
@@ -123,7 +148,8 @@ export const notifyInvestorSubmitted = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!prof || !p?.email) return { ok: false as const, error: "missing-profile" };
 
-    const fmtUsd = (n: number | null | undefined) => (n ? `USD ${(n / 1000).toLocaleString()}K` : "—");
+    const fmtUsd = (n: number | null | undefined) =>
+      n ? `USD ${(n / 1000).toLocaleString()}K` : "—";
     const ticketRange = `${fmtUsd(prof.ticket_min_usd)} – ${fmtUsd(prof.ticket_max_usd)}`;
     const commodities = (prof.commodities ?? []).join(", ");
     const standards = (prof.accepted_standards ?? []).join(", ");
@@ -167,7 +193,9 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
     const [profileRes, settlementsRes, inquiriesRes] = await Promise.all([
       supabase
         .from("investor_profiles")
-        .select("review_status, reviewed_at, rejection_reason, terms_accepted_at, created_at, full_name, company_name")
+        .select(
+          "review_status, reviewed_at, rejection_reason, terms_accepted_at, created_at, full_name, company_name",
+        )
         .eq("user_id", userId)
         .maybeSingle(),
       supabase
@@ -179,7 +207,9 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false }),
       supabase
         .from("property_deal_inquiries")
-        .select("id, listing_id, status, message, nda_signed_at, closed_at, closed_reason, created_at, updated_at")
+        .select(
+          "id, listing_id, status, message, nda_signed_at, closed_at, closed_reason, created_at, updated_at",
+        )
         .eq("inquirer_user_id", userId)
         .order("created_at", { ascending: false }),
     ]);
@@ -192,20 +222,25 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
     const inquiries = inquiriesRes.data ?? [];
     const listingIds = Array.from(
       new Set(
-        [
-          ...settlements.map((s) => s.listing_id),
-          ...inquiries.map((i) => i.listing_id),
-        ].filter((x): x is string => typeof x === "string" && x.length > 0),
+        [...settlements.map((s) => s.listing_id), ...inquiries.map((i) => i.listing_id)].filter(
+          (x): x is string => typeof x === "string" && x.length > 0,
+        ),
       ),
     );
-    let listings: Record<string, { title: string; commodity: string | null; country: string | null }> = {};
+    let listings: Record<
+      string,
+      { title: string; commodity: string | null; country: string | null }
+    > = {};
     if (listingIds.length) {
       const { data: ls } = await supabase
         .from("property_listings")
         .select("id, title, commodity, country")
         .in("id", listingIds);
       listings = Object.fromEntries(
-        (ls ?? []).map((l) => [l.id, { title: l.title, commodity: l.commodity, country: l.country }]),
+        (ls ?? []).map((l) => [
+          l.id,
+          { title: l.title, commodity: l.commodity, country: l.country },
+        ]),
       );
     }
 
@@ -216,8 +251,14 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
 
     return {
       profile: profileRes.data,
-      settlements: settlements.map((s) => ({ ...s, listing: s.listing_id ? listings[s.listing_id] ?? null : null })),
-      inquiries: inquiries.map((i) => ({ ...i, listing: i.listing_id ? listings[i.listing_id] ?? null : null })),
+      settlements: settlements.map((s) => ({
+        ...s,
+        listing: s.listing_id ? (listings[s.listing_id] ?? null) : null,
+      })),
+      inquiries: inquiries.map((i) => ({
+        ...i,
+        listing: i.listing_id ? (listings[i.listing_id] ?? null) : null,
+      })),
       totals: {
         paidUsd: totalPaidUsd,
         committedUsd: totalCommittedUsd,

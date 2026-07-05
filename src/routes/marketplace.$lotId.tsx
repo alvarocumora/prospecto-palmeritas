@@ -15,10 +15,7 @@ import {
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  getCommodityLotDetail,
-  createCommodityInquiry,
-} from "@/lib/marketplace.functions";
+import { getCommodityLotDetail, createCommodityInquiry } from "@/lib/marketplace.functions";
 import {
   commodityLabel,
   commodityColor,
@@ -45,7 +42,8 @@ export const Route = createFileRoute("/marketplace/$lotId")({
       };
     }
     const title = `${lot.title} — Geocapitals Marketplace`;
-    const desc = lot.summary ??
+    const desc =
+      lot.summary ??
       `${commodityLabel(lot.commodity)} desde ${countryName(lot.country)} · ${formatTonnes(lot.tonnage_available_t)} disponible · Incoterm ${lot.incoterm ?? "—"}.`;
     const meta: Array<Record<string, string>> = [
       { title },
@@ -145,9 +143,7 @@ function LotDetailPage() {
           company_name: form.company_name || undefined,
           intended_use: form.intended_use || undefined,
           target_volume_t: form.target_volume_t ? Number(form.target_volume_t) : undefined,
-          target_price_usd_t: form.target_price_usd_t
-            ? Number(form.target_price_usd_t)
-            : undefined,
+          target_price_usd_t: form.target_price_usd_t ? Number(form.target_price_usd_t) : undefined,
           message: form.message || undefined,
         },
       });
@@ -196,17 +192,19 @@ function LotDetailPage() {
               {lot.region && ` · ${lot.region}`}
             </span>
             {lot.is_verified && (
-              <span className="text-[10px] font-mono uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 text-emerald-700">
+              <Link
+                to="/metodologia"
+                title="Lote con certificaciones y cadena de custodia revisadas por el equipo. Ver metodología."
+                className="text-[10px] font-mono uppercase tracking-wider inline-flex items-center gap-1 px-2 py-1 rounded bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition"
+              >
                 <ShieldCheck className="w-3 h-3" /> Verificado
-              </span>
+              </Link>
             )}
           </div>
           <h1 className="mt-3 brand-display text-3xl md:text-4xl text-content max-w-3xl leading-tight">
             {lot.title}
           </h1>
-          {lot.summary && (
-            <p className="mt-3 text-content-subtle max-w-2xl">{lot.summary}</p>
-          )}
+          {lot.summary && <p className="mt-3 text-content-subtle max-w-2xl">{lot.summary}</p>}
         </div>
       </section>
 
@@ -218,10 +216,7 @@ function LotDetailPage() {
               <Eyebrow className="mb-3">Ficha técnica</Eyebrow>
               <div className="grid sm:grid-cols-2 gap-3">
                 <TechRow k="Forma" v={formLabel(lot.form)} />
-                <TechRow
-                  k="Ley"
-                  v={lot.grade_pct != null ? `${Number(lot.grade_pct)} %` : "—"}
-                />
+                <TechRow k="Ley" v={lot.grade_pct != null ? `${Number(lot.grade_pct)} %` : "—"} />
                 <TechRow
                   k="Humedad"
                   v={lot.moisture_pct != null ? `${Number(lot.moisture_pct)} %` : "—"}
@@ -298,9 +293,7 @@ function LotDetailPage() {
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
                 Solicitar oferta
               </div>
-              <div className="mt-1 font-display text-xl text-content">
-                Contactar al seller
-              </div>
+              <div className="mt-1 font-display text-xl text-content">Contactar al seller</div>
               <p className="mt-2 text-sm text-content-subtle">
                 Envía tu interés, volumen objetivo y uso previsto. El seller responderá con
                 condiciones y muestra bajo NDA.
@@ -409,15 +402,7 @@ function LotDetailPage() {
   );
 }
 
-function TechRow({
-  k,
-  v,
-  icon: Icon,
-}: {
-  k: string;
-  v: string;
-  icon?: typeof Anchor;
-}) {
+function TechRow({ k, v, icon: Icon }: { k: string; v: string; icon?: typeof Anchor }) {
   return (
     <div className="flex items-center justify-between gap-3 rounded-lg border border-hairline bg-white px-4 py-3">
       <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle flex items-center gap-1.5">
