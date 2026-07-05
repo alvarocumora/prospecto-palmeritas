@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Suspense, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, Html } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import * as THREE from "three";
 import {
   Box as BoxIcon,
@@ -15,12 +16,24 @@ import {
   MousePointer2,
   RotateCw,
   ZoomIn,
+  Satellite,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { Eyebrow, SectionHeading } from "@/components/brand";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 
+type Visor3DSearch = {
+  project?: string;
+  anomaly?: string;
+  insar?: string;
+};
+
 export const Route = createFileRoute("/visor-3d")({
+  validateSearch: (search: Record<string, unknown>): Visor3DSearch => ({
+    project: typeof search.project === "string" ? search.project : undefined,
+    anomaly: typeof search.anomaly === "string" ? search.anomaly : undefined,
+    insar: typeof search.insar === "string" ? search.insar : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Visor 3D minero — Geocapitals" },
