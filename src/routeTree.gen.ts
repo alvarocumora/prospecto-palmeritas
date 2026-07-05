@@ -76,6 +76,7 @@ import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
+import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
 import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
@@ -107,6 +108,7 @@ import { Route as AuthenticatedReportsLosverdesPre43101RouteImport } from './rou
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
+import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
@@ -468,6 +470,12 @@ const AuthenticatedDashboardLv5Page5Route =
     path: '/dashboard/lv5-page5',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardListingsRoute =
+  AuthenticatedDashboardListingsRouteImport.update({
+    id: '/dashboard/listings',
+    path: '/dashboard/listings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardInvestmentsRoute =
   AuthenticatedDashboardInvestmentsRouteImport.update({
     id: '/dashboard/investments',
@@ -654,6 +662,12 @@ const AuthenticatedDashboardAdminInvestorsRoute =
     path: '/investors',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const AuthenticatedDashboardAdminInboxRoute =
+  AuthenticatedDashboardAdminInboxRouteImport.update({
+    id: '/inbox',
+    path: '/inbox',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
 const ApiPublicLiveMapLosverdesVerifyRoute =
   ApiPublicLiveMapLosverdesVerifyRouteImport.update({
     id: '/api/public/live-map/losverdes/verify',
@@ -733,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/listings': typeof AuthenticatedDashboardListingsRoute
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
@@ -761,6 +776,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -835,6 +851,7 @@ export interface FileRoutesByTo {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/listings': typeof AuthenticatedDashboardListingsRoute
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
@@ -863,6 +880,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
+  '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -939,6 +957,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/_authenticated/dashboard/listings': typeof AuthenticatedDashboardListingsRoute
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
@@ -967,6 +986,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
+  '/_authenticated/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -1043,6 +1063,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
@@ -1071,6 +1092,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard/'
+    | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
@@ -1145,6 +1167,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
@@ -1173,6 +1196,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/dashboard'
+    | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/targets/ai-brief'
@@ -1248,6 +1272,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/investments'
+    | '/_authenticated/dashboard/listings'
     | '/_authenticated/dashboard/lv5-page5'
     | '/_authenticated/dashboard/mag-revalidations'
     | '/_authenticated/dashboard/map'
@@ -1276,6 +1301,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
+    | '/_authenticated/dashboard/admin/inbox'
     | '/_authenticated/dashboard/admin/investors'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/targets/ai-brief'
@@ -1814,6 +1840,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardLv5Page5RouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/listings': {
+      id: '/_authenticated/dashboard/listings'
+      path: '/dashboard/listings'
+      fullPath: '/dashboard/listings'
+      preLoaderRoute: typeof AuthenticatedDashboardListingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/investments': {
       id: '/_authenticated/dashboard/investments'
       path: '/dashboard/investments'
@@ -2031,6 +2064,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminInvestorsRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/_authenticated/dashboard/admin/inbox': {
+      id: '/_authenticated/dashboard/admin/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/admin/inbox'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminInboxRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
     '/api/public/live-map/losverdes/verify': {
       id: '/api/public/live-map/losverdes/verify'
       path: '/api/public/live-map/losverdes/verify'
@@ -2056,11 +2096,14 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedDashboardAdminRouteChildren {
+  AuthenticatedDashboardAdminInboxRoute: typeof AuthenticatedDashboardAdminInboxRoute
   AuthenticatedDashboardAdminInvestorsRoute: typeof AuthenticatedDashboardAdminInvestorsRoute
 }
 
 const AuthenticatedDashboardAdminRouteChildren: AuthenticatedDashboardAdminRouteChildren =
   {
+    AuthenticatedDashboardAdminInboxRoute:
+      AuthenticatedDashboardAdminInboxRoute,
     AuthenticatedDashboardAdminInvestorsRoute:
       AuthenticatedDashboardAdminInvestorsRoute,
   }
@@ -2151,6 +2194,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardInvestmentsRoute: typeof AuthenticatedDashboardInvestmentsRoute
+  AuthenticatedDashboardListingsRoute: typeof AuthenticatedDashboardListingsRoute
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
   AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
@@ -2201,6 +2245,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
   AuthenticatedDashboardInvestmentsRoute:
     AuthenticatedDashboardInvestmentsRoute,
+  AuthenticatedDashboardListingsRoute: AuthenticatedDashboardListingsRoute,
   AuthenticatedDashboardLv5Page5Route: AuthenticatedDashboardLv5Page5Route,
   AuthenticatedDashboardMagRevalidationsRoute:
     AuthenticatedDashboardMagRevalidationsRoute,

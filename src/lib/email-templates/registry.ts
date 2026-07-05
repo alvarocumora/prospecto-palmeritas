@@ -11,6 +11,9 @@ import { template as reportSignedInvestor } from "./report-signed-investor";
 import { template as investorWelcome } from "./investor-welcome";
 import { template as investorApproved } from "./investor-approved";
 import { template as investorLeadInternal } from "./investor-lead-internal";
+import { template as investorRejected } from "./investor-rejected";
+import { template as contactMessageInternal } from "./contact-message-internal";
+import { template as commodityInquiryInternal } from "./commodity-inquiry-internal";
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
@@ -37,4 +40,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "investor-welcome": investorWelcome,
   "investor-approved": investorApproved,
   "investor-lead-internal": investorLeadInternal,
+  "investor-rejected": investorRejected,
+  "contact-message-internal": contactMessageInternal,
+  "commodity-inquiry-internal": commodityInquiryInternal,
 };

@@ -16,17 +16,44 @@ export const submitContactMessage = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => ContactSchema.parse(input))
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("contact_messages").insert({
-      name: data.name.trim(),
-      email: data.email.trim().toLowerCase(),
-      organization: data.organization?.trim() || null,
-      role: data.role,
-      message: data.message.trim(),
-      source: data.source || "landing",
-    });
+    const { data: inserted, error } = await supabaseAdmin
+      .from("contact_messages")
+      .insert({
+        name: data.name.trim(),
+        email: data.email.trim().toLowerCase(),
+        organization: data.organization?.trim() || null,
+        role: data.role,
+        message: data.message.trim(),
+        source: data.source || "landing",
+      })
+      .select("id")
+      .single();
     if (error) {
       console.error("[contact] insert failed", error);
       throw new Error("No pudimos registrar tu mensaje. Intenta nuevamente.");
     }
+
+    // Notificar al equipo — un lead que nadie lee es un lead perdido.
+    // idempotencyKey por fila para no deduplicar mensajes distintos del mismo remitente.
+    try {
+      const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+      await sendInternalEmail({
+        templateName: "contact-message-internal",
+        recipientEmail: "team@geocapitals.com",
+        idempotencyKey: `contact-message:${inserted.id}`,
+        templateData: {
+          name: data.name.trim(),
+          email: data.email.trim().toLowerCase(),
+          organization: data.organization?.trim() || undefined,
+          role: data.role,
+          source: data.source || "landing",
+          message: data.message.trim(),
+        },
+      });
+    } catch (e) {
+      // El insert ya está persistido; el email es best-effort.
+      console.error("[contact] notify failed", e);
+    }
+
     return { ok: true as const };
   });

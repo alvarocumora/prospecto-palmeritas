@@ -47,11 +47,9 @@ export type CommodityCertification = {
 };
 
 function serverPublicClient() {
-  return createClient<Database>(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
-    { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-  );
+  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
 }
 
 // ---------- Public: list published lots ----------
@@ -76,7 +74,9 @@ export const listPublishedCommodityLots = createServerFn({ method: "GET" })
       .eq("status", "published")
       .eq("is_verified", true)
       .order("created_at", { ascending: false })
-      .limit(data.limit ?? 40);
+      // El filtro de certificación se aplica en memoria: pedir de más para no
+      // truncar resultados antes de filtrar.
+      .limit(data.certification ? 200 : (data.limit ?? 40));
 
     if (data.commodity) q = q.eq("commodity", data.commodity as never);
     if (data.form) q = q.eq("form", data.form as never);
@@ -90,12 +90,16 @@ export const listPublishedCommodityLots = createServerFn({ method: "GET" })
     }
     let list = (rows ?? []).map((r) => ({
       ...(r as unknown as CommodityLotRow),
-      certifications_json: Array.isArray((r as { certifications_json: unknown }).certifications_json)
+      certifications_json: Array.isArray(
+        (r as { certifications_json: unknown }).certifications_json,
+      )
         ? ((r as { certifications_json: unknown[] }).certifications_json as string[])
         : null,
     })) as CommodityLotRow[];
     if (data.certification) {
-      list = list.filter((r) => (r.certifications_json ?? []).includes(data.certification as string));
+      list = list
+        .filter((r) => (r.certifications_json ?? []).includes(data.certification as string))
+        .slice(0, data.limit ?? 40);
     }
     return list;
   });
@@ -156,7 +160,9 @@ export const getCommodityLotDetail = createServerFn({ method: "GET" })
 
     const base = {
       ...(lot as unknown as CommodityLotRow),
-      certifications_json: Array.isArray((lot as { certifications_json: unknown }).certifications_json)
+      certifications_json: Array.isArray(
+        (lot as { certifications_json: unknown }).certifications_json,
+      )
         ? ((lot as { certifications_json: unknown[] }).certifications_json as string[])
         : null,
     };
@@ -219,5 +225,35 @@ export const createCommodityInquiry = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+
+    // Notificar al equipo: la UI promete que "el seller te contactará", así que
+    // la consulta no puede quedarse muda en la tabla.
+    try {
+      const [{ sendInternalEmail }, lotRes, profRes] = await Promise.all([
+        import("@/lib/email/send-internal.server"),
+        supabase.from("commodity_lots").select("title").eq("id", data.lot_id).maybeSingle(),
+        supabase.from("profiles").select("email").eq("user_id", userId).maybeSingle(),
+      ]);
+      await sendInternalEmail({
+        templateName: "commodity-inquiry-internal",
+        recipientEmail: "team@geocapitals.com",
+        idempotencyKey: `commodity-inquiry:${row.id}`,
+        templateData: {
+          lotTitle: lotRes.data?.title ?? undefined,
+          lotId: data.lot_id,
+          buyerEmail: profRes.data?.email ?? undefined,
+          companyName: data.company_name ?? undefined,
+          buyerRole: data.buyer_role,
+          targetVolume: data.target_volume_t != null ? `${data.target_volume_t} t` : undefined,
+          targetPrice:
+            data.target_price_usd_t != null ? `US$ ${data.target_price_usd_t}/t` : undefined,
+          intendedUse: data.intended_use ?? undefined,
+          message: data.message ?? undefined,
+        },
+      });
+    } catch (e) {
+      console.error("[commodityInquiry] notify failed", e);
+    }
+
     return { id: row.id, ok: true };
   });
