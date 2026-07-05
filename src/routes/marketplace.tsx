@@ -170,7 +170,19 @@ function MarketplacePage() {
       <div className="grid lg:grid-cols-[1fr_280px] gap-8">
         <div>
           {isLoading && (
-            <div className="text-sm text-content-subtle font-mono">Cargando lotes…</div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="rounded-2xl border border-hairline bg-white p-5 animate-pulse space-y-3"
+                >
+                  <div className="h-4 bg-slate-100 rounded w-1/3" />
+                  <div className="h-5 bg-slate-100 rounded w-4/5" />
+                  <div className="h-3 bg-slate-100 rounded w-1/2" />
+                  <div className="h-12 bg-slate-100 rounded" />
+                </div>
+              ))}
+            </div>
           )}
           {!isLoading && lots.length === 0 && (
             <div className="rounded-2xl border border-dashed border-hairline p-10 text-center">

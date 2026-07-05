@@ -5,7 +5,6 @@ import {
   CheckCircle2,
   Globe,
   Inbox,
-  Loader2,
   Mail,
   Package,
   RefreshCw,
@@ -558,8 +557,17 @@ function TabFrame({
         </button>
       </div>
       {loading ? (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground p-8 justify-center">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cargando…
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded border border-border bg-bg-panel p-4 animate-pulse space-y-2"
+            >
+              <div className="h-4 rounded bg-foreground/10 w-2/3" />
+              <div className="h-3 rounded bg-foreground/10 w-1/2" />
+              <div className="h-3 rounded bg-foreground/10 w-3/4" />
+            </div>
+          ))}
         </div>
       ) : empty ? (
         <div className="rounded border border-border bg-bg-panel p-8 text-center text-sm text-muted-foreground">
