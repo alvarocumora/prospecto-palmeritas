@@ -262,14 +262,44 @@ export function MarketingLanding() {
                 Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto — con
                 certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
               </p>
-              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-mono uppercase tracking-wider text-white/60">
-                <span>🇨🇱 Chile</span>
-                <span>🇵🇪 Perú</span>
-                <span>🇧🇷 Brasil</span>
-                <span>🇨🇴 Colombia</span>
-                <span>🇻🇪 Venezuela</span>
-                <span>🇿🇦 Sudáfrica</span>
-                <span>🇨🇩 R.D. Congo</span>
+              <div className="mt-5 flex flex-wrap gap-1.5">
+                {[
+                  ["CL", "Chile"],
+                  ["PE", "Perú"],
+                  ["BR", "Brasil"],
+                  ["CO", "Colombia"],
+                  ["VE", "Venezuela"],
+                  ["ZA", "Sudáfrica"],
+                  ["CD", "R.D. Congo"],
+                ].map(([code, name]) => (
+                  <span
+                    key={code}
+                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/15 bg-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-white/80"
+                  >
+                    <span
+                      aria-hidden
+                      className="inline-block w-2.5 h-2.5 rounded-sm"
+                      style={{
+                        background:
+                          code === "CL"
+                            ? "#d52b1e"
+                            : code === "PE"
+                              ? "#d91023"
+                              : code === "BR"
+                                ? "#009c3b"
+                                : code === "CO"
+                                  ? "#fcd116"
+                                  : code === "VE"
+                                    ? "#ffcc00"
+                                    : code === "ZA"
+                                      ? "#007749"
+                                      : "#007fff",
+                      }}
+                    />
+                    <span className="font-semibold">{code}</span>
+                    <span className="text-white/60 normal-case tracking-normal">{name}</span>
+                  </span>
+                ))}
               </div>
               <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand-subtle font-medium text-sm">
                 Explorar lotes <ArrowRight className="w-4 h-4" />
