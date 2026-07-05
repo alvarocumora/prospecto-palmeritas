@@ -9,6 +9,8 @@ import { MarketingHeader, MarketingFooter } from "@/features/marketing/Marketing
 import { useLocale } from "@/features/marketing/i18n";
 import { InvestableProjects } from "@/features/marketing/InvestableProjects";
 import { InvestmentSimulator } from "@/features/marketing/InvestmentSimulator";
+import { CommodityTicker } from "@/features/marketing/CommodityTicker";
+import { PlatformPreview } from "@/features/marketing/PlatformPreview";
 import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
 import {
   Mountain,
@@ -116,6 +118,9 @@ export function MarketingLanding() {
         </div>
       </section>
 
+      {/* Commodity price ticker */}
+      <CommodityTicker />
+
       {/* Dual paths: proyectos + marketplace */}
       <section className="border-b border-hairline bg-white">
         <div className="max-w-7xl mx-auto px-5 py-14">
@@ -165,8 +170,8 @@ export function MarketingLanding() {
                 Compra & vende commodities certificados de LatAm y África
               </div>
               <p className="mt-3 text-sm text-white/70">
-                Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto —
-                con certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
+                Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto — con
+                certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
               </p>
               <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-mono uppercase tracking-wider text-white/60">
                 <span>🇨🇱 Chile</span>
@@ -195,9 +200,9 @@ export function MarketingLanding() {
                 Oportunidades geolocalizadas con retorno esperado por geografía
               </h2>
               <p className="mt-4 text-content-subtle">
-                Explora proyectos publicados agrupados por región y simula el retorno según
-                ticket, plazo y TIR esperada por país. Deal-flow verificado con etapas desde
-                greenfield hasta producción.
+                Explora proyectos publicados agrupados por región y simula el retorno según ticket,
+                plazo y TIR esperada por país. Deal-flow verificado con etapas desde greenfield
+                hasta producción.
               </p>
             </div>
             <BrandButton asChild variant="outline">
@@ -571,7 +576,10 @@ export function MarketingLanding() {
             if (to) {
               return (
                 <Link key={title} to={to} className="block group">
-                  <BrandCard interactive className="h-full group-hover:border-accent-brand/40 transition">
+                  <BrandCard
+                    interactive
+                    className="h-full group-hover:border-accent-brand/40 transition"
+                  >
                     {inner}
                   </BrandCard>
                 </Link>
@@ -585,6 +593,9 @@ export function MarketingLanding() {
           })}
         </div>
       </section>
+
+      {/* Terminal preview mock */}
+      <PlatformPreview />
 
       {/* Proyectos disponibles para invertir */}
       <InvestableProjects />
