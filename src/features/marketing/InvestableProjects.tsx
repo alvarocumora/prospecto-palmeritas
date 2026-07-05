@@ -182,16 +182,14 @@ function FeaturedProjectCard({
       className="group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full"
     >
       {/* Cover */}
-      <div
-        className={`aspect-video bg-gradient-to-br ${tint.from} relative flex items-center justify-center`}
-      >
+      <div className="aspect-video relative overflow-hidden">
         {p.cover_image_url ? (
           <img src={p.cover_image_url} alt={p.title} className="w-full h-full object-cover" />
         ) : (
-          <Mountain className={`w-10 h-10 opacity-25 ${tint.icon}`} />
+          <ProjectCover seed={p.id} commodity={p.commodity} region={p.region ?? p.country} />
         )}
-        <div className="absolute inset-0 flex items-start justify-between p-2.5">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm text-[10px] font-mono uppercase tracking-wider text-content border border-hairline/60">
+        <div className="absolute inset-0 flex items-start justify-between p-2.5 pointer-events-none">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-mono uppercase tracking-wider text-white border border-white/15">
             {modality}
           </span>
           {p.is_featured && (
@@ -200,9 +198,11 @@ function FeaturedProjectCard({
             </span>
           )}
         </div>
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
-          <span className={`text-xs font-mono font-semibold ${tint.icon}`}>{p.commodity}</span>
-          <span className="text-[10px] font-mono text-content/50">· {stage}</span>
+        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 pointer-events-none">
+          <span className="text-xs font-mono font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            {p.commodity}
+          </span>
+          <span className="text-[10px] font-mono text-white/70">· {stage}</span>
         </div>
       </div>
 
