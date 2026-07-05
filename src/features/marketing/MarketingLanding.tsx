@@ -335,47 +335,104 @@ export function MarketingLanding() {
             {[
               {
                 country: "Chile",
-                flag: "🇨🇱",
+                codes: ["CL"],
                 irr: "22%",
                 focus: "Cu · Au · Ag · Li",
                 note: "Franja andina · catastro Sernageomin trazable",
+                trend: [12, 15, 14, 18, 17, 21, 20, 24, 26, 25, 28, 30],
+                spark: "#2b4acb",
               },
               {
                 country: "Perú",
-                flag: "🇵🇪",
+                codes: ["PE"],
                 irr: "24%",
                 focus: "Cu · Zn · Au polimetálico",
                 note: "Distritos brownfield con infraestructura",
+                trend: [8, 12, 10, 14, 18, 16, 20, 22, 21, 25, 27, 30],
+                spark: "#d91023",
               },
               {
                 country: "Brasil · Colombia",
-                flag: "🇧🇷 🇨🇴",
+                codes: ["BR", "CO"],
                 irr: "20–26%",
                 focus: "Fe · Au · Tierras raras",
                 note: "Proyectos con certificación ambiental",
+                trend: [14, 13, 16, 15, 19, 18, 22, 20, 24, 23, 27, 29],
+                spark: "#009c3b",
               },
-            ].map((r) => (
-              <Link
-                key={r.country}
-                to="/oportunidades"
-                className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl">{r.flag}</span>
-                  <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
-                    TIR ref. {r.irr}
+            ].map((r) => {
+              const max = Math.max(...r.trend);
+              const min = Math.min(...r.trend);
+              const pts = r.trend
+                .map((v, i) => {
+                  const x = (i / (r.trend.length - 1)) * 100;
+                  const y = 32 - ((v - min) / (max - min || 1)) * 28;
+                  return `${x.toFixed(1)},${y.toFixed(1)}`;
+                })
+                .join(" ");
+              return (
+                <Link
+                  key={r.country}
+                  to="/oportunidades"
+                  className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition relative overflow-hidden"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      {r.codes.map((c) => (
+                        <FlagChip key={c} code={c} />
+                      ))}
+                    </div>
+                    <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                      TIR ref. {r.irr}
+                    </span>
+                  </div>
+                  <div className="mt-3 font-display text-lg text-content">{r.country}</div>
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mt-1">
+                    {r.focus}
+                  </div>
+                  <p className="mt-3 text-sm text-content-subtle">{r.note}</p>
+
+                  {/* Sparkline animado */}
+                  <div className="mt-4 h-9 relative">
+                    <svg viewBox="0 0 100 32" preserveAspectRatio="none" className="w-full h-full">
+                      <defs>
+                        <linearGradient id={`sp-${r.codes[0]}`} x1="0" x2="0" y1="0" y2="1">
+                          <stop offset="0%" stopColor={r.spark} stopOpacity="0.35" />
+                          <stop offset="100%" stopColor={r.spark} stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
+                      <polyline
+                        fill={`url(#sp-${r.codes[0]})`}
+                        stroke="none"
+                        points={`0,32 ${pts} 100,32`}
+                      />
+                      <polyline
+                        fill="none"
+                        stroke={r.spark}
+                        strokeWidth="1.4"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        points={pts}
+                        style={{
+                          strokeDasharray: 240,
+                          strokeDashoffset: 240,
+                          animation: "sp-draw 1.6s ease-out forwards",
+                        }}
+                      />
+                    </svg>
+                    <span
+                      className="absolute right-0 top-0 text-[9px] font-mono text-content-subtle uppercase tracking-wider"
+                    >
+                      12M
+                    </span>
+                  </div>
+
+                  <span className="mt-4 inline-flex items-center gap-1.5 text-accent-brand text-sm font-medium group-hover:gap-2 transition-all">
+                    Simular retorno <ArrowRight className="w-4 h-4" />
                   </span>
-                </div>
-                <div className="mt-3 font-display text-lg text-content">{r.country}</div>
-                <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mt-1">
-                  {r.focus}
-                </div>
-                <p className="mt-3 text-sm text-content-subtle">{r.note}</p>
-                <span className="mt-4 inline-flex items-center gap-1.5 text-accent-brand text-sm font-medium group-hover:gap-2 transition-all">
-                  Simular retorno <ArrowRight className="w-4 h-4" />
-                </span>
-              </Link>
-            ))}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
