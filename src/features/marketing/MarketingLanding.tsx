@@ -887,6 +887,12 @@ export function MarketingLanding() {
         </div>
       </section>
 
+      {/* Testimonios & prueba social */}
+      <TestimonialsBento />
+
+      {/* FAQ */}
+      <FaqAccordion />
+
       {/* CTA Principal */}
       <section className="relative overflow-hidden bg-surface-inverse text-white">
         <div
