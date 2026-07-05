@@ -162,9 +162,10 @@ const FILTERS = [
 function matchFilter(p: FeaturedProject, key: string) {
   if (key === "all") return true;
   const c = p.commodity ?? "";
-  if (key === "precious") return /Au|Ag/.test(c);
-  if (key === "base") return /Cu/.test(c);
-  if (key === "critical") return /Li|Co|Ni|Mo/.test(c);
+  // Anchor to start so "Cu-Au" doesn't match "precious" and "Au-Cu" doesn't match "base"
+  if (key === "precious") return /^Au|^Ag/.test(c);
+  if (key === "base") return /^Cu/.test(c);
+  if (key === "critical") return /^Li|^Co|^Ni|^Mo/.test(c);
   return true;
 }
 
@@ -206,6 +207,7 @@ export function InvestableProjects() {
         {FILTERS.map((f) => (
           <button
             key={f.key}
+            type="button"
             onClick={() => setActiveFilter(f.key)}
             className={`px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider transition-colors border ${
               activeFilter === f.key

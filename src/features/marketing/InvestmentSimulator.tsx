@@ -46,6 +46,7 @@ const META: Record<
     gradeUnit: string;
     priceMin: number;
     priceMax: number;
+    priceStep: number;
     gradeMin: number;
     gradeMax: number;
     gradeStep: number;
@@ -57,6 +58,7 @@ const META: Record<
     gradeUnit: "g/t",
     priceMin: 1500,
     priceMax: 4000,
+    priceStep: 25,
     gradeMin: 0.3,
     gradeMax: 8,
     gradeStep: 0.1,
@@ -67,6 +69,7 @@ const META: Record<
     gradeUnit: "% Cu",
     priceMin: 2,
     priceMax: 8,
+    priceStep: 0.05,
     gradeMin: 0.2,
     gradeMax: 3,
     gradeStep: 0.05,
@@ -77,6 +80,7 @@ const META: Record<
     gradeUnit: "% Li",
     priceMin: 5000,
     priceMax: 40000,
+    priceStep: 500,
     gradeMin: 0.1,
     gradeMax: 2,
     gradeStep: 0.05,
@@ -176,7 +180,7 @@ function SimSlider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1.5 appearance-none rounded-full cursor-pointer"
+        className="w-full cursor-pointer"
         style={{ accentColor: "var(--accent-brand)" }}
       />
     </div>
@@ -358,6 +362,7 @@ export function InvestmentSimulator() {
             <button
               key={c}
               onClick={() => handleCommodity(c)}
+              type="button"
               className={`px-5 py-2.5 rounded-lg border font-mono text-sm font-semibold transition-all ${
                 commodity === c
                   ? "bg-accent-brand text-white border-accent-brand shadow-sm"
@@ -380,7 +385,7 @@ export function InvestmentSimulator() {
               value={price}
               min={meta.priceMin}
               max={meta.priceMax}
-              step={(meta.priceMax - meta.priceMin) / 200}
+              step={meta.priceStep}
               onChange={setPrice}
               format={(v) => `${v.toLocaleString("es-CL")} ${meta.priceUnit}`}
             />
