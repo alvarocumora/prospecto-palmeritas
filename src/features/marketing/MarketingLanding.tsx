@@ -533,7 +533,7 @@ export function MarketingLanding() {
               i: Cpu,
               t: "Visor 3D geocientífico",
               d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA.",
-              to: null,
+              to: "/visor-3d" as const,
             },
             {
               i: FileText,
