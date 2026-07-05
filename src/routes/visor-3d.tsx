@@ -89,6 +89,7 @@ type SiteData = {
     color: string;
     notes: string | null;
     detected_at: string | null;
+    georeferenced: boolean;
   }>;
   criticalCount: number;
   avgVelocity: number;
@@ -119,12 +120,37 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
     const z = -(ny - 0.5) * SCENE_HALF * 1.2;
     const y = terrainHeight(x, z);
 
+    // Escala geográfica → escena: metros reales comprimidos para mantener la nube
+    // legible alrededor del marcador (clamp a MAX_R).
+    const METERS_PER_DEG_LAT = 111_320;
+    const GEO_SCALE = 0.08; // 1 m real = 0.08 unidades de escena
+    const MAX_R = 260;
+    const cLat = project.center_lat;
+    const cLng = project.center_lng;
+    const cosLat = Math.cos(((cLat ?? -30) * Math.PI) / 180);
+
     const anomalies = project.anomalies.slice(0, 40).map((a, idx) => {
-      const angle = (idx / Math.max(project.anomalies.length, 1)) * Math.PI * 2;
-      const radius = 40 + ((a.score ?? 0.3) * 90 + (idx % 5) * 12);
-      const ox = Math.cos(angle) * radius;
-      const oz = Math.sin(angle) * radius;
       const sev = (a.severity ?? "low").toLowerCase();
+      let ox: number;
+      let oz: number;
+
+      if (a.lat != null && a.lng != null && cLat != null && cLng != null) {
+        // Posición real relativa al centro del proyecto
+        ox = (a.lng - cLng) * METERS_PER_DEG_LAT * cosLat * GEO_SCALE;
+        oz = -(a.lat - cLat) * METERS_PER_DEG_LAT * GEO_SCALE;
+        const r = Math.hypot(ox, oz);
+        if (r > MAX_R) {
+          ox = (ox / r) * MAX_R;
+          oz = (oz / r) * MAX_R;
+        }
+      } else {
+        // Fallback decorativo cuando la anomalía no tiene geometría
+        const angle = (idx / Math.max(project.anomalies.length, 1)) * Math.PI * 2;
+        const radius = 40 + ((a.score ?? 0.3) * 90 + (idx % 5) * 12);
+        ox = Math.cos(angle) * radius;
+        oz = Math.sin(angle) * radius;
+      }
+
       return {
         id: a.id,
         offset: [ox, 25 + (a.score ?? 0.3) * 90, oz] as [number, number, number],
@@ -133,6 +159,7 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
         color: SEV_COLOR[sev] ?? "#94a3b8",
         notes: a.notes,
         detected_at: a.detected_at,
+        georeferenced: a.lat != null && a.lng != null,
       };
     });
 
@@ -157,11 +184,7 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
 }
 
 function terrainHeight(x: number, z: number) {
-  return (
-    Math.sin(x / 220) * 55 +
-    Math.cos(z / 260) * 65 +
-    Math.sin((x + z) / 180) * 30
-  );
+  return Math.sin(x / 220) * 55 + Math.cos(z / 260) * 65 + Math.sin((x + z) / 180) * 30;
 }
 
 // ---- Componentes 3D ---------------------------------------------------------
@@ -182,12 +205,7 @@ function Terrain() {
 
   return (
     <mesh geometry={geo} receiveShadow>
-      <meshStandardMaterial
-        color="#3a2f24"
-        roughness={0.95}
-        metalness={0.05}
-        wireframe={false}
-      />
+      <meshStandardMaterial color="#3a2f24" roughness={0.95} metalness={0.05} wireframe={false} />
     </mesh>
   );
 }
@@ -297,11 +315,7 @@ function Site({
       </mesh>
 
       {/* Label */}
-      <Html
-        position={[0, 140, 0]}
-        center
-        style={{ pointerEvents: "none", userSelect: "none" }}
-      >
+      <Html position={[0, 140, 0]} center style={{ pointerEvents: "none", userSelect: "none" }}>
         <div className="whitespace-nowrap rounded-full border border-white/20 bg-black/70 px-3 py-1 text-[11px] font-medium text-white backdrop-blur">
           {site.project.name}
         </div>
@@ -327,13 +341,7 @@ function Site({
   );
 }
 
-function CameraFocus({
-  target,
-  zoom,
-}: {
-  target: [number, number, number] | null;
-  zoom: number;
-}) {
+function CameraFocus({ target, zoom }: { target: [number, number, number] | null; zoom: number }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera } = useThree();
   const desiredTarget = useRef(new THREE.Vector3());
@@ -378,7 +386,6 @@ function CameraFocus({
 
 // ---- Página -----------------------------------------------------------------
 
-
 function Visor3DPage() {
   const search = Route.useSearch();
   const fetchSat = useServerFn(getPublicSatellite);
@@ -404,8 +411,7 @@ function Visor3DPage() {
 
   const selectedSite = sites.find((s) => s.project.id === selectedSiteId) ?? sites[0];
   const selectedAnomaly = selectedSite?.anomalies.find((a) => a.id === selectedAnomalyId) ?? null;
-  const selectedInsar =
-    selectedSite?.project.insar.find((i) => i.id === selectedInsarId) ?? null;
+  const selectedInsar = selectedSite?.project.insar.find((i) => i.id === selectedInsarId) ?? null;
 
   const totalAnomalies = projects.reduce((s, p) => s + p.anomalies.length, 0);
   const criticalCount = projects.reduce(
@@ -433,8 +439,8 @@ function Visor3DPage() {
           </h1>
           <p className="text-content-subtle text-lg max-w-2xl">
             Escena interactiva con terreno, sondajes y anomalías satelitales reales de tres
-            proyectos demo en Chile. Zoom con la rueda, rotación con clic izquierdo, panorámica
-            con clic derecho y selección directa sobre cualquier elemento.
+            proyectos demo en Chile. Zoom con la rueda, rotación con clic izquierdo, panorámica con
+            clic derecho y selección directa sobre cualquier elemento.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-3xl">
@@ -450,7 +456,7 @@ function Visor3DPage() {
         <SectionHeading
           eyebrow="Escena 3D"
           title="Terreno, sondajes y anomalías en un solo canvas"
-          description="Los sitios y sus anomalías provienen de la base de datos productiva de Geocapitals. La geometría de terreno y sondajes es demostrativa."
+          description="Los sitios y sus anomalías provienen de la base de datos productiva de Geocapitals; las anomalías con geometría se posicionan por sus coordenadas reales relativas al centro del proyecto. El terreno y los sondajes son demostrativos."
           className="mb-6"
         />
 
@@ -556,21 +562,13 @@ function Visor3DPage() {
             {selectedSite && (
               <>
                 <div className="grid grid-cols-2 gap-3">
-                  <MiniStat
-                    label="Commodity"
-                    value={selectedSite.project.commodity ?? "—"}
-                  />
-                  <MiniStat
-                    label="Anomalías"
-                    value={selectedSite.project.anomalies.length}
-                  />
+                  <MiniStat label="Commodity" value={selectedSite.project.commodity ?? "—"} />
+                  <MiniStat label="Anomalías" value={selectedSite.project.anomalies.length} />
                   <MiniStat label="Críticas" value={selectedSite.criticalCount} />
                   <MiniStat
                     label="Velocidad InSAR"
                     value={
-                      selectedSite.avgVelocity
-                        ? `${selectedSite.avgVelocity.toFixed(1)} mm/a`
-                        : "—"
+                      selectedSite.avgVelocity ? `${selectedSite.avgVelocity.toFixed(1)} mm/a` : "—"
                     }
                   />
                 </div>
@@ -594,6 +592,11 @@ function Visor3DPage() {
                         <span className="text-[11px] text-content-subtle font-mono">
                           score {selectedAnomaly.score.toFixed(2)}
                         </span>
+                      </div>
+                      <div className="text-[10px] font-mono text-content-subtle">
+                        {selectedAnomaly.georeferenced
+                          ? "📍 Posición georreferenciada"
+                          : "Posición ilustrativa (sin geometría)"}
                       </div>
                       {selectedAnomaly.detected_at && (
                         <div className="text-[11px] text-content-subtle">
@@ -636,12 +639,24 @@ function Visor3DPage() {
                   </div>
                 )}
 
-                <Link
-                  to="/satelital"
-                  className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-brand hover:underline"
-                >
-                  <Satellite className="w-3 h-3" /> Volver a filtros satelitales
-                </Link>
+                <div className="flex flex-col gap-1.5">
+                  <Link
+                    to="/satelital"
+                    search={{ project: selectedSite.project.id }}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-brand hover:underline"
+                  >
+                    <Satellite className="w-3 h-3" /> Ver datos satelitales del sitio
+                  </Link>
+                  {selectedSite.project.listing_id && (
+                    <Link
+                      to="/proyectos/$listingId"
+                      params={{ listingId: selectedSite.project.listing_id }}
+                      className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-brand hover:underline"
+                    >
+                      <ArrowRight className="w-3 h-3" /> Ficha de inversión del proyecto
+                    </Link>
+                  )}
+                </div>
               </>
             )}
 
@@ -730,13 +745,7 @@ function MiniStat({ label, value }: { label: string; value: string | number }) {
   );
 }
 
-function ControlHint({
-  icon: Icon,
-  label,
-}: {
-  icon: typeof MapPin;
-  label: string;
-}) {
+function ControlHint({ icon: Icon, label }: { icon: typeof MapPin; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-black/60 border border-white/10 px-2.5 py-1 backdrop-blur">
       <Icon className="w-3 h-3" strokeWidth={2} /> {label}

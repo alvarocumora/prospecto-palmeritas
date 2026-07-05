@@ -1,7 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowRight, Mountain, Activity, Satellite, FileText } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  ArrowRight,
+  Mountain,
+  Activity,
+  Satellite,
+  FileText,
+  MapPin,
+  Box as BoxIcon,
+} from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
+import { getPublicListings } from "@/lib/publicListings.functions";
+import { fmtUSD } from "@/modules/deals/domain/format";
+import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -67,6 +80,14 @@ const SHOWCASE = [
 ];
 
 function ProyectosPage() {
+  const fetchListings = useServerFn(getPublicListings);
+  const { data, isLoading } = useQuery({
+    queryKey: ["public-listings"],
+    queryFn: () => fetchListings(),
+    staleTime: 60_000,
+  });
+  const listings = data?.listings ?? [];
+
   return (
     <MarketingPage
       eyebrow="Proyectos"
@@ -100,6 +121,115 @@ function ProyectosPage() {
           </Link>
         ))}
       </div>
+
+      {/* Herramientas de inteligencia geológica */}
+      <section className="mt-14 grid sm:grid-cols-2 gap-4">
+        <Link
+          to="/satelital"
+          className="group rounded-xl border border-hairline bg-white p-5 flex items-center gap-4 hover:border-accent-brand transition"
+        >
+          <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0">
+            <Satellite className="w-5 h-5" strokeWidth={1.75} />
+          </span>
+          <div className="flex-1">
+            <div className="font-display text-[15px] text-content">Monitoreo satelital</div>
+            <div className="text-xs text-content-subtle mt-0.5">
+              Anomalías multiespectrales e InSAR sobre los proyectos demo
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+        </Link>
+        <Link
+          to="/visor-3d"
+          className="group rounded-xl border border-hairline bg-white p-5 flex items-center gap-4 hover:border-accent-brand transition"
+        >
+          <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0">
+            <BoxIcon className="w-5 h-5" strokeWidth={1.75} />
+          </span>
+          <div className="flex-1">
+            <div className="font-display text-[15px] text-content">Visor 3D geocientífico</div>
+            <div className="text-xs text-content-subtle mt-0.5">
+              Terreno, sondajes y anomalías georreferenciadas en 3D
+            </div>
+          </div>
+          <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+        </Link>
+      </section>
+
+      {/* Oportunidades publicadas (datos reales) */}
+      <section className="mt-20">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+          <div>
+            <Eyebrow className="mb-2">Oportunidades publicadas</Eyebrow>
+            <h2 className="brand-display text-2xl md:text-3xl text-content">
+              Deal flow abierto a inversionistas
+            </h2>
+          </div>
+          <BrandButton asChild variant="outline">
+            <Link to="/inversionistas">
+              Ver deal flow completo <ArrowRight className="w-4 h-4" />
+            </Link>
+          </BrandButton>
+        </div>
+
+        {isLoading ? (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-hairline bg-white p-5 animate-pulse space-y-3"
+              >
+                <div className="h-3 bg-slate-100 rounded w-1/3" />
+                <div className="h-4 bg-slate-100 rounded w-3/4" />
+                <div className="h-3 bg-slate-100 rounded w-1/2" />
+                <div className="h-10 bg-slate-100 rounded" />
+              </div>
+            ))}
+          </div>
+        ) : listings.length === 0 ? (
+          <p className="text-sm text-content-subtle italic">
+            No hay oportunidades publicadas en este momento.
+          </p>
+        ) : (
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {listings.slice(0, 6).map((l) => (
+              <Link
+                key={l.id}
+                to="/proyectos/$listingId"
+                params={{ listingId: l.id }}
+                className="group rounded-xl border border-hairline bg-white p-5 flex flex-col hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
+                  <span className="text-accent-brand">
+                    {MODALITY_LABEL[l.modality ?? ""] ?? l.modality ?? "—"}
+                  </span>
+                  <span className="text-content-subtle">
+                    {STAGE_LABEL[l.stage ?? ""] ?? l.stage ?? ""}
+                  </span>
+                </div>
+                <div className="mt-2.5 font-display text-lg text-content leading-snug group-hover:text-accent-brand transition-colors line-clamp-2">
+                  {l.title}
+                </div>
+                <div className="mt-1.5 flex items-center gap-1 text-[11px] font-mono text-content-subtle">
+                  <MapPin className="w-3 h-3 shrink-0" />
+                  <span className="truncate">
+                    {[l.region, l.country].filter(Boolean).join(", ") || "—"}
+                  </span>
+                  {l.commodity && <span className="ml-auto">{l.commodity}</span>}
+                </div>
+                <div className="mt-4 pt-3 border-t border-hairline flex items-center justify-between">
+                  <span className="font-mono text-sm font-semibold text-content">
+                    {l.modality === "royalty" && l.royalty_pct != null
+                      ? `${l.royalty_pct}% NSR`
+                      : fmtUSD(l.asking_price_usd)}
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </section>
 
       <section className="mt-20 rounded-2xl bg-surface-inverse text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
         <div>

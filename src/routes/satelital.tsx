@@ -20,7 +20,14 @@ import { MarketingHeader, MarketingFooter } from "@/features/marketing/Marketing
 import { BrandCard, Eyebrow, SectionHeading } from "@/components/brand";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 
+type SatelitalSearch = {
+  project?: string;
+};
+
 export const Route = createFileRoute("/satelital")({
+  validateSearch: (search: Record<string, unknown>): SatelitalSearch => ({
+    project: typeof search.project === "string" ? search.project : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Monitoreo satelital minero — Geocapitals" },
@@ -100,6 +107,7 @@ const emptyFilters: Filters = {
 };
 
 function SatelitalPage() {
+  const search = Route.useSearch();
   const fetchSat = useServerFn(getPublicSatellite);
   const { data } = useQuery({
     queryKey: ["public-satellite"],
@@ -108,7 +116,10 @@ function SatelitalPage() {
   });
   const projects: PublicSatProject[] = data ?? [];
 
-  const [filters, setFilters] = useState<Filters>(emptyFilters);
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...emptyFilters,
+    projectId: search.project ?? "",
+  }));
 
   const indexCodes = useMemo(() => {
     const s = new Set<string>();
@@ -149,8 +160,7 @@ function SatelitalPage() {
   const totalAnomalies = filteredProjects.reduce((s, p) => s + p.anomalies.length, 0);
   const totalInsar = filteredProjects.reduce((s, p) => s + p.insar.length, 0);
   const criticalCount = filteredProjects.reduce(
-    (s, p) =>
-      s + p.anomalies.filter((a) => (a.severity ?? "").toLowerCase() === "critical").length,
+    (s, p) => s + p.anomalies.filter((a) => (a.severity ?? "").toLowerCase() === "critical").length,
     0,
   );
 
@@ -181,8 +191,8 @@ function SatelitalPage() {
           </h1>
           <p className="text-content-subtle text-lg max-w-2xl">
             Geocapitals procesa Sentinel-1/2 y Copernicus sobre tu portafolio minero para detectar
-            cambios superficiales, subsidencia y firmas espectrales asociadas a mineralización. Filtra
-            por proyecto, tipo o fecha para ver detalles.
+            cambios superficiales, subsidencia y firmas espectrales asociadas a mineralización.
+            Filtra por proyecto, tipo o fecha para ver detalles.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-10 max-w-3xl">
@@ -228,9 +238,7 @@ function SatelitalPage() {
             <FilterField label="Severidad">
               <select
                 value={filters.severity}
-                onChange={(e) =>
-                  setFilters((f) => ({ ...f, severity: e.target.value as SevKey }))
-                }
+                onChange={(e) => setFilters((f) => ({ ...f, severity: e.target.value as SevKey }))}
                 className="w-full text-sm rounded-md border border-hairline bg-surface px-2 py-1.5"
               >
                 <option value="all">Todas</option>
@@ -349,6 +357,104 @@ function StatBox({
   );
 }
 
+const SEV_HEX: Record<string, string> = {
+  critical: "#ef4444",
+  high: "#f97316",
+  medium: "#f59e0b",
+  low: "#10b981",
+};
+
+/** Distribución de severidades como barra apilada horizontal. */
+function SeverityDistribution({ anomalies }: { anomalies: PublicSatProject["anomalies"] }) {
+  const counts = SEVERITIES.map((sev) => ({
+    sev,
+    n: anomalies.filter((a) => (a.severity ?? "").toLowerCase() === sev).length,
+  })).filter((c) => c.n > 0);
+  const total = counts.reduce((s, c) => s + c.n, 0);
+  if (total === 0) return null;
+
+  return (
+    <div className="mb-4">
+      <div className="flex h-2 rounded-full overflow-hidden border border-hairline">
+        {counts.map((c) => (
+          <div
+            key={c.sev}
+            style={{ width: `${(c.n / total) * 100}%`, background: SEV_HEX[c.sev] }}
+            title={`${c.sev}: ${c.n}`}
+          />
+        ))}
+      </div>
+      <div className="flex gap-4 mt-1.5 flex-wrap">
+        {counts.map((c) => (
+          <span
+            key={c.sev}
+            className="inline-flex items-center gap-1.5 text-[10px] font-mono text-content-subtle"
+          >
+            <span className="w-2 h-2 rounded-full" style={{ background: SEV_HEX[c.sev] }} />
+            {c.sev} · {c.n}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Velocidades InSAR como barras firmadas (subsidencia negativa / alzamiento positivo). */
+function InsarVelocityChart({ insar }: { insar: PublicSatProject["insar"] }) {
+  const pts = insar
+    .filter((i) => i.velocity_mm_year != null)
+    .slice(0, 24)
+    .map((i) => ({ id: i.id, v: Number(i.velocity_mm_year), sev: i.alert_severity }));
+  if (pts.length < 2) return null;
+
+  const W = 400;
+  const H = 72;
+  const maxAbs = Math.max(...pts.map((p) => Math.abs(p.v)), 1);
+  const colW = W / pts.length;
+  const barW = Math.max(3, colW * 0.62);
+  const zeroY = H / 2;
+
+  return (
+    <div className="mb-4">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-1.5">
+        Velocidad InSAR por punto (mm/año)
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Velocidades InSAR">
+        <line
+          x1="0"
+          x2={W}
+          y1={zeroY}
+          y2={zeroY}
+          style={{ stroke: "var(--hairline-strong)" }}
+          strokeWidth="1"
+        />
+        {pts.map((p, i) => {
+          const h = Math.max(1.5, (Math.abs(p.v) / maxAbs) * (H / 2 - 4));
+          const y = p.v >= 0 ? zeroY - h : zeroY;
+          const sev = (p.sev ?? "low").toLowerCase();
+          return (
+            <rect
+              key={p.id}
+              x={i * colW + (colW - barW) / 2}
+              y={y}
+              width={barW}
+              height={h}
+              rx="1"
+              fill={SEV_HEX[sev] ?? "#94a3b8"}
+              opacity="0.85"
+            />
+          );
+        })}
+      </svg>
+      <div className="flex justify-between text-[9px] font-mono text-content-subtle mt-0.5">
+        <span>↑ alzamiento</span>
+        <span>máx |{maxAbs.toFixed(1)}| mm/a</span>
+        <span>↓ subsidencia</span>
+      </div>
+    </div>
+  );
+}
+
 function ProjectPanel({ project }: { project: PublicSatProject }) {
   const [open, setOpen] = useState(true);
   const insarAvgVelocity =
@@ -394,11 +500,33 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
       </button>
 
       {open && (
+        <div className="flex items-center gap-2 mb-5 flex-wrap">
+          <Link
+            to="/visor-3d"
+            search={{ project: project.id }}
+            className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-accent-brand text-accent-brand hover:bg-accent-brand-subtle transition"
+          >
+            <BoxIcon className="w-3 h-3" /> Ver sitio en 3D
+          </Link>
+          {project.listing_id && (
+            <Link
+              to="/proyectos/$listingId"
+              params={{ listingId: project.listing_id }}
+              className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-hairline text-content-subtle hover:border-accent-brand hover:text-accent-brand transition"
+            >
+              <ArrowRight className="w-3 h-3" /> Ficha de inversión
+            </Link>
+          )}
+        </div>
+      )}
+
+      {open && (
         <div className="grid lg:grid-cols-2 gap-6">
           <div>
             <div className="text-xs font-medium text-content-subtle uppercase tracking-wide mb-3">
               Anomalías ({project.anomalies.length})
             </div>
+            <SeverityDistribution anomalies={project.anomalies} />
             {project.anomalies.length === 0 ? (
               <p className="text-sm text-content-subtle italic">Sin resultados.</p>
             ) : (
@@ -428,6 +556,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
             <div className="text-xs font-medium text-content-subtle uppercase tracking-wide mb-3">
               InSAR ({project.insar.length})
             </div>
+            <InsarVelocityChart insar={project.insar} />
             {project.insar.length === 0 ? (
               <p className="text-sm text-content-subtle italic">Sin resultados.</p>
             ) : (
@@ -498,10 +627,7 @@ function AnomalyRow({
             <DetailRow label="ID" value={<span className="font-mono">{a.id}</span>} />
             <DetailRow label="Índice" value={a.index_code ?? "—"} />
             <DetailRow label="Severidad" value={a.severity ?? "—"} />
-            <DetailRow
-              label="Score"
-              value={a.score != null ? Number(a.score).toFixed(4) : "—"}
-            />
+            <DetailRow label="Score" value={a.score != null ? Number(a.score).toFixed(4) : "—"} />
             <DetailRow
               label="Área"
               value={a.area_ha != null ? `${Number(a.area_ha).toFixed(2)} ha` : "—"}
@@ -527,13 +653,7 @@ function AnomalyRow({
   );
 }
 
-function InsarRow({
-  i,
-  projectId,
-}: {
-  i: PublicSatProject["insar"][number];
-  projectId: string;
-}) {
+function InsarRow({ i, projectId }: { i: PublicSatProject["insar"][number]; projectId: string }) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -567,7 +687,9 @@ function InsarRow({
             <DetailRow label="Fuente" value={i.source ?? "—"} />
             <DetailRow
               label="Fecha ref."
-              value={i.reference_date ? new Date(i.reference_date).toLocaleDateString("es-CL") : "—"}
+              value={
+                i.reference_date ? new Date(i.reference_date).toLocaleDateString("es-CL") : "—"
+              }
             />
             <DetailRow
               label="Fecha fin"
@@ -575,7 +697,9 @@ function InsarRow({
             />
             <DetailRow
               label="Velocidad"
-              value={i.velocity_mm_year != null ? `${Number(i.velocity_mm_year).toFixed(2)} mm/y` : "—"}
+              value={
+                i.velocity_mm_year != null ? `${Number(i.velocity_mm_year).toFixed(2)} mm/y` : "—"
+              }
             />
             <DetailRow
               label="Desp. acumulado"
