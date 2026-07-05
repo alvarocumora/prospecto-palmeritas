@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Filter,
   X,
+  Box as BoxIcon,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandCard, Eyebrow, SectionHeading } from "@/components/brand";
