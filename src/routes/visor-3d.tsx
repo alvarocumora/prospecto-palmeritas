@@ -40,7 +40,7 @@ export const Route = createFileRoute("/visor-3d")({
       {
         name: "description",
         content:
-          "Visor 3D interactivo con terreno, sondajes y anomalías satelitales reales sobre proyectos mineros demo en Chile. Zoom, rotación y selección directa.",
+          "Visor 3D interactivo con terreno, sondajes reales y anomalías satelitales georreferenciadas sobre los proyectos mineros de Geocapitals. Zoom, rotación y selección directa.",
       },
       { property: "og:title", content: "Visor 3D minero — Geocapitals" },
       {
@@ -90,6 +90,15 @@ type SiteData = {
     notes: string | null;
     detected_at: string | null;
     georeferenced: boolean;
+  }>;
+  holes: Array<{
+    id: string;
+    hole_id: string;
+    offset: [number, number]; // x, z en unidades de escena
+    depth: number; // unidades de escena
+    azimuth: number; // grados
+    dip: number; // grados (negativo = bajo la horizontal)
+    status: string;
   }>;
   criticalCount: number;
   avgVelocity: number;
@@ -163,6 +172,35 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
       };
     });
 
+    // Sondajes reales: offsets desde el collar medio (UTM ya está en metros)
+    const withCoords = project.drillholes.filter((h) => h.easting != null && h.northing != null);
+    const meanE = withCoords.length
+      ? withCoords.reduce((s, h) => s + (h.easting ?? 0), 0) / withCoords.length
+      : 0;
+    const meanN = withCoords.length
+      ? withCoords.reduce((s, h) => s + (h.northing ?? 0), 0) / withCoords.length
+      : 0;
+    const DEPTH_SCALE = 0.5; // 1 m de sondaje = 0.5 unidades de escena
+
+    const holes = withCoords.map((h) => {
+      let hx = ((h.easting ?? 0) - meanE) * GEO_SCALE;
+      let hz = -((h.northing ?? 0) - meanN) * GEO_SCALE;
+      const r = Math.hypot(hx, hz);
+      if (r > MAX_R) {
+        hx = (hx / r) * MAX_R;
+        hz = (hz / r) * MAX_R;
+      }
+      return {
+        id: h.id,
+        hole_id: h.hole_id,
+        offset: [hx, hz] as [number, number],
+        depth: Math.max(20, (h.depth ?? 150) * DEPTH_SCALE),
+        azimuth: h.azimuth ?? 0,
+        dip: h.dip ?? -90,
+        status: h.status,
+      };
+    });
+
     const criticalCount = project.anomalies.filter(
       (a) => (a.severity ?? "").toLowerCase() === "critical",
     ).length;
@@ -177,6 +215,7 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
       project,
       position: [x, y, z],
       anomalies,
+      holes,
       criticalCount,
       avgVelocity,
     };
@@ -210,14 +249,50 @@ function Terrain() {
   );
 }
 
-function DrillHole({ position }: { position: [number, number, number] }) {
-  const depth = 250;
+const HOLE_STATUS_COLOR: Record<string, string> = {
+  completed: "#c1a266",
+  in_progress: "#60a5fa",
+  planned: "#64748b",
+};
+
+function DrillHole({
+  position,
+  depth = 250,
+  azimuth = 0,
+  dip = -90,
+  status = "completed",
+}: {
+  position: [number, number, number];
+  depth?: number;
+  azimuth?: number;
+  dip?: number;
+  status?: string;
+}) {
+  // Dirección del pozo: azimuth (grados desde el norte, horario) + dip
+  // (negativo = bajo la horizontal). Norte = -Z en la escena.
+  const quat = useMemo(() => {
+    const azRad = (azimuth * Math.PI) / 180;
+    const dipRad = (Math.min(Math.abs(dip), 90) * Math.PI) / 180;
+    const dir = new THREE.Vector3(
+      Math.sin(azRad) * Math.cos(dipRad),
+      -Math.sin(dipRad),
+      -Math.cos(azRad) * Math.cos(dipRad),
+    ).normalize();
+    return new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir);
+  }, [azimuth, dip]);
+
+  const color = HOLE_STATUS_COLOR[status] ?? HOLE_STATUS_COLOR.completed;
+
   return (
     <group position={position}>
-      <mesh position={[0, -depth / 2 + 4, 0]}>
-        <cylinderGeometry args={[3, 3, depth, 12]} />
-        <meshStandardMaterial color="#c1a266" metalness={0.4} roughness={0.4} />
-      </mesh>
+      {/* Traza inclinada: el cilindro cuelga desde el collar según azimuth/dip */}
+      <group quaternion={quat}>
+        <mesh position={[0, -depth / 2, 0]}>
+          <cylinderGeometry args={[3, 3, depth, 12]} />
+          <meshStandardMaterial color={color} metalness={0.4} roughness={0.4} />
+        </mesh>
+      </group>
+      {/* Collar en superficie */}
       <mesh position={[0, 12, 0]}>
         <coneGeometry args={[10, 24, 16]} />
         <meshStandardMaterial color="#f6c453" emissive="#3a2a10" />
@@ -321,10 +396,25 @@ function Site({
         </div>
       </Html>
 
-      {/* Synthetic drill holes around the site */}
-      <DrillHole position={[45, 0, 30]} />
-      <DrillHole position={[-40, 0, 50]} />
-      <DrillHole position={[10, 0, -55]} />
+      {/* Sondajes: reales si el proyecto tiene collares; demo si no */}
+      {site.holes.length > 0 ? (
+        site.holes.map((h) => (
+          <DrillHole
+            key={h.id}
+            position={[h.offset[0], 0, h.offset[1]]}
+            depth={h.depth}
+            azimuth={h.azimuth}
+            dip={h.dip}
+            status={h.status}
+          />
+        ))
+      ) : (
+        <>
+          <DrillHole position={[45, 0, 30]} />
+          <DrillHole position={[-40, 0, 50]} />
+          <DrillHole position={[10, 0, -55]} />
+        </>
+      )}
 
       {/* Anomaly cloud */}
       {site.anomalies.map((a) => (
@@ -418,6 +508,7 @@ function Visor3DPage() {
     (s, p) => s + p.anomalies.filter((a) => (a.severity ?? "").toLowerCase() === "critical").length,
     0,
   );
+  const totalHoles = sites.reduce((s, site) => s + site.holes.length, 0);
 
   return (
     <main className="min-h-screen bg-surface">
@@ -438,16 +529,20 @@ function Visor3DPage() {
             Explora el subsuelo minero en 3D
           </h1>
           <p className="text-content-subtle text-lg max-w-2xl">
-            Escena interactiva con terreno, sondajes y anomalías satelitales reales de tres
-            proyectos demo en Chile. Zoom con la rueda, rotación con clic izquierdo, panorámica con
-            clic derecho y selección directa sobre cualquier elemento.
+            Escena interactiva con terreno, sondajes reales y anomalías satelitales de los proyectos
+            monitoreados en la plataforma. Zoom con la rueda, rotación con clic izquierdo,
+            panorámica con clic derecho y selección directa sobre cualquier elemento.
           </p>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-3xl">
             <StatBox icon={MapPin} label="Sitios" value={sites.length} />
             <StatBox icon={AlertTriangle} label="Anomalías" value={totalAnomalies} />
             <StatBox icon={AlertTriangle} label="Críticas" value={criticalCount} tone="danger" />
-            <StatBox icon={Activity} label="Sondajes demo" value={sites.length * 3} />
+            <StatBox
+              icon={Activity}
+              label={totalHoles > 0 ? "Sondajes" : "Sondajes demo"}
+              value={totalHoles > 0 ? totalHoles : sites.length * 3}
+            />
           </div>
         </div>
       </section>
@@ -456,7 +551,7 @@ function Visor3DPage() {
         <SectionHeading
           eyebrow="Escena 3D"
           title="Terreno, sondajes y anomalías en un solo canvas"
-          description="Los sitios y sus anomalías provienen de la base de datos productiva de Geocapitals; las anomalías con geometría se posicionan por sus coordenadas reales relativas al centro del proyecto. El terreno y los sondajes son demostrativos."
+          description="Sitios, anomalías y sondajes provienen de la base de datos productiva de Geocapitals: las anomalías con geometría y los collares de sondaje se posicionan por sus coordenadas reales, con trazas inclinadas según azimuth y dip. El terreno es demostrativo."
           className="mb-6"
         />
 
@@ -565,6 +660,10 @@ function Visor3DPage() {
                   <MiniStat label="Commodity" value={selectedSite.project.commodity ?? "—"} />
                   <MiniStat label="Anomalías" value={selectedSite.project.anomalies.length} />
                   <MiniStat label="Críticas" value={selectedSite.criticalCount} />
+                  <MiniStat
+                    label="Sondajes"
+                    value={selectedSite.holes.length > 0 ? selectedSite.holes.length : "demo"}
+                  />
                   <MiniStat
                     label="Velocidad InSAR"
                     value={
