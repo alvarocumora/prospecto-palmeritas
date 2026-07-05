@@ -1,8 +1,8 @@
-// Búsqueda de concesiones SERNAGEOMIN por CODIGO o ROL.
-// Consulta el ArcGIS REST público en la capa 0 (explotación) y 1 (exploración).
+// Búsqueda de concesiones SERNAGEOMIN v2 por nombre, titular o rol.
+// El MapServer legacy (CODIGO/ROL, capas 0/1) está caído — se consulta la
+// capa única Marcelo_Layer/2 filtrando por TIPO_CONCESION (ver src/lib/sngm.ts).
 
-const ARCGIS_BASE =
-  "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer";
+import { SNGM_CONCESIONES_URL, sngmQueryGeoJSON, sngmSanitizeTerm } from "@/lib/sngm";
 
 export type CatastroHit = {
   layer: 0 | 1;
@@ -12,49 +12,37 @@ export type CatastroHit = {
 };
 
 /**
- * Busca por CODIGO o ROL en ambas capas. Devuelve hasta `limit` resultados.
- * Sanitiza el input contra inyección SQL básica del WHERE de ArcGIS.
+ * Busca por NOMBRE, TITULAR_NOMBRE o NUMERO_ROL. Devuelve hasta `limit`
+ * resultados. Sanitiza el input contra inyección SQL básica del WHERE.
  */
 export async function searchCatastroByCode(rawTerm: string, limit = 10): Promise<CatastroHit[]> {
-  const term = rawTerm.trim();
-  if (!term) return [];
-  // Solo letras, números, espacio, guion, punto, slash — campos típicos de
-  // CODIGO/ROL chilenos. Bloquea comillas y operadores SQL.
-  if (!/^[A-Za-z0-9 \-./]{1,64}$/.test(term)) {
+  const safe = sngmSanitizeTerm(rawTerm);
+  if (safe === null) {
+    if (!rawTerm.trim()) return [];
     throw new Error("Término inválido. Usa solo letras, números, guión, punto o /.");
   }
 
-  const safe = term.replace(/'/g, "''");
-  // LIKE permite búsqueda parcial; UPPER hace case-insensitive.
-  const where = `UPPER(CODIGO) LIKE UPPER('%${safe}%') OR UPPER(ROL) LIKE UPPER('%${safe}%')`;
+  const clauses = [
+    `UPPER(NOMBRE) LIKE UPPER('%${safe}%')`,
+    `UPPER(TITULAR_NOMBRE) LIKE UPPER('%${safe}%')`,
+  ];
+  // Si el término es numérico también puede ser el rol de la concesión
+  if (/^\d+$/.test(safe)) clauses.push(`NUMERO_ROL = ${safe}`);
+  const where = clauses.join(" OR ");
 
-  const params = new URLSearchParams({
-    where,
-    outFields: "*",
-    outSR: "4326",
-    f: "geojson",
-    resultRecordCount: String(limit),
-  });
-
+  const fc = await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, { where, limit });
   const out: CatastroHit[] = [];
-  for (const layer of [0, 1] as const) {
-    try {
-      const res = await fetch(`${ARCGIS_BASE}/${layer}/query?${params}`);
-      if (!res.ok) continue;
-      const fc = (await res.json()) as GeoJSON.FeatureCollection;
-      for (const f of fc.features ?? []) {
-        if (!f.geometry) continue;
-        out.push({
-          layer,
-          layerLabel: layer === 0 ? "Explotación" : "Exploración",
-          properties: (f.properties ?? {}) as Record<string, unknown>,
-          geometry: f.geometry,
-        });
-        if (out.length >= limit) return out;
-      }
-    } catch {
-      // continuar con la siguiente capa
-    }
+  for (const f of fc?.features ?? []) {
+    if (!f.geometry) continue;
+    const props = (f.properties ?? {}) as Record<string, unknown>;
+    const isExplotacion = String(props.TIPO_CONCESION ?? "").toUpperCase() === "EXPLOTACION";
+    out.push({
+      layer: isExplotacion ? 0 : 1,
+      layerLabel: isExplotacion ? "Explotación" : "Exploración",
+      properties: props,
+      geometry: f.geometry,
+    });
+    if (out.length >= limit) break;
   }
   return out;
 }
@@ -69,12 +57,15 @@ export function summarizeHit(hit: CatastroHit) {
     }
     return null;
   };
+  const rolNum = f("NUMERO_ROL");
+  const rolDv = f("DV_ROL");
+  const rol = rolNum != null ? `${rolNum}${rolDv != null ? `-${rolDv}` : ""}` : (f("ROL") ?? "—");
   return {
-    codigo: (f("CODIGO") ?? "—") as string,
-    rol: (f("ROL") ?? "—") as string,
+    codigo: (f("CODIGO") ?? rol ?? "—") as string,
+    rol: rol as string,
     nombre: (f("NOMBRE") ?? "—") as string,
-    titular: (f("TITULAR", "NOMBRE_TIT") ?? "—") as string,
-    areaHa: f("AREA_HA", "HECTAREAS") as number | null,
-    vigencia: (f("VIGENCIA", "ESTADO") ?? "—") as string,
+    titular: (f("TITULAR_NOMBRE", "TITULAR", "NOMBRE_TIT") ?? "—") as string,
+    areaHa: f("HECTAREAS", "AREA_HA") as number | null,
+    vigencia: (f("SITUACION_CONCESION", "VIGENCIA", "ESTADO") ?? "—") as string,
   };
 }

@@ -1,37 +1,27 @@
 import type { LeafletNS, AnyFC } from "./types";
 import type { GeoJSON as LeafletGeoJSON, Layer } from "leaflet";
+import {
+  SNGM_CONCESIONES_URL,
+  SNGM_WHERE_BY_TIPO,
+  sngmQueryGeoJSON,
+  type ConcesionTipo,
+} from "@/lib/sngm";
 
 /**
- * Capa nacional de concesiones mineras de Chile (SERNAGEOMIN).
+ * Capa nacional de concesiones mineras de Chile (SERNAGEOMIN v2, ArcGIS Online).
  *
  * Estilo inspirado en propiedadminera.cl:
- *   - Verde: explotación vigente
- *   - Azul: exploración vigente
- *   - Amarillo: en trámite
- *   - Magenta: vencida o en remate
+ *   - Verde: explotación vigente (CONSTITUIDA)
+ *   - Azul: exploración vigente (CONSTITUIDA)
+ *   - Amarillo: mensura (explotación EN TRAMITE)
+ *   - Magenta: manifestación (exploración EN TRAMITE)
  *
- * Usa el endpoint ArcGIS REST de SERNAGEOMIN para obtener atributos reales
- * (titular, RUT, comuna, región, área, datum, vigencia) en GeoJSON, en vez
- * de un WMS visual sin atributos.
- *
- * NOTA: el servicio MapServer de SERNAGEOMIN expone capas 0..3:
- *   0 = Concesiones de Explotación
- *   1 = Concesiones de Exploración
- *   2 = Mensuras
- *   3 = Manifestaciones
+ * El servicio legacy catastro.sernageomin.cl (capas 0..3) está caído; los
+ * cuatro tipos se derivan ahora de TIPO_CONCESION × SITUACION_CONCESION sobre
+ * la capa única Marcelo_Layer/2 (ver src/lib/sngm.ts).
  */
 
-const ARCGIS_BASE =
-  "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer";
-
-export type ConcesionTipo = "explotacion" | "exploracion" | "mensura" | "manifestacion";
-
-const LAYER_BY_TIPO: Record<ConcesionTipo, number> = {
-  explotacion: 0,
-  exploracion: 1,
-  mensura: 2,
-  manifestacion: 3,
-};
+export type { ConcesionTipo };
 
 export const CONCESION_COLORS: Record<ConcesionTipo, string> = {
   explotacion: "#16a34a", // verde
@@ -63,7 +53,7 @@ export type ConcesionAttrs = {
   raw: Record<string, unknown>;
 };
 
-/** Map ArcGIS attributes (heterogeneous between layers) to a normalized shape. */
+/** Map ArcGIS attributes (v2 con fallback a aliases legacy) to a normalized shape. */
 function normalizeAttrs(props: Record<string, unknown>, tipo: ConcesionTipo): ConcesionAttrs {
   const pick = (...keys: string[]): string | null => {
     for (const k of keys) {
@@ -78,19 +68,24 @@ function normalizeAttrs(props: Record<string, unknown>, tipo: ConcesionTipo): Co
     const n = Number(v.replace(/[^\d.,-]/g, "").replace(",", "."));
     return Number.isFinite(n) ? n : null;
   };
+  const rolNum = pick("NUMERO_ROL");
+  const rolDv = pick("DV_ROL");
+  const rol = rolNum ? `${rolNum}${rolDv ? `-${rolDv}` : ""}` : pick("ROL");
+  const rutNum = pick("TITULAR_RUT", "RUT", "RUT_TITULA");
+  const rutDv = pick("TITULAR_DV");
   return {
     tipo,
-    titular: pick("TITULAR", "NOMBRE_TIT", "NOM_TITULA"),
-    rut: pick("RUT", "RUT_TITULA"),
+    titular: pick("TITULAR_NOMBRE", "TITULAR", "NOMBRE_TIT", "NOM_TITULA"),
+    rut: rutNum ? `${rutNum}${rutDv ? `-${rutDv}` : ""}` : null,
     nombre: pick("NOMBRE", "NOM_PERTEN", "NOM_CONCES"),
-    codigo: pick("CODIGO", "ROL", "COD_PERTEN"),
+    codigo: rol ?? pick("CODIGO", "COD_PERTEN"),
     comuna: pick("COMUNA", "NOM_COMUNA"),
     provincia: pick("PROVINCIA", "NOM_PROV"),
     region: pick("REGION", "NOM_REGION"),
-    area_ha: pickNum("AREA_HA", "HECTAREAS", "SUPERFICIE"),
+    area_ha: pickNum("HECTAREAS", "AREA_HA", "SUPERFICIE"),
     datum: pick("DATUM"),
-    vigencia: pick("VIGENCIA", "ESTADO", "FECHA_VIG"),
-    rol: pick("ROL"),
+    vigencia: pick("SITUACION_CONCESION", "VIGENCIA", "ESTADO", "FECHA_VENCIMIENTO"),
+    rol,
     raw: props,
   };
 }
@@ -107,7 +102,7 @@ function popupHtml(a: ConcesionAttrs): string {
     ["Región", a.region],
     ["Área (ha)", a.area_ha != null ? a.area_ha.toLocaleString("es-CL") : null],
     ["Datum", a.datum],
-    ["Vigencia", a.vigencia],
+    ["Situación", a.vigencia],
   ];
   const body = rows
     .filter(([, v]) => v != null && v !== "")
@@ -126,7 +121,7 @@ function popupHtml(a: ConcesionAttrs): string {
         <strong style="font-size:12px">${a.nombre ?? a.codigo ?? "Concesión"}</strong>
       </div>
       ${body}
-      <div style="margin-top:6px;font-size:10px;opacity:.55">Fuente: SERNAGEOMIN · Catastro Minero</div>
+      <div style="margin-top:6px;font-size:10px;opacity:.55">Fuente: SERNAGEOMIN · Catastro Minero v2</div>
     </div>`;
 }
 
@@ -138,28 +133,12 @@ export async function fetchConcesionesGeoJSON(
   bbox: [number, number, number, number],
   maxRecords = 1000,
 ): Promise<AnyFC | null> {
-  const layer = LAYER_BY_TIPO[tipo];
-  const [minX, minY, maxX, maxY] = bbox;
-  const params = new URLSearchParams({
-    where: "1=1",
-    outFields: "*",
-    geometry: `${minX},${minY},${maxX},${maxY}`,
-    geometryType: "esriGeometryEnvelope",
-    inSR: "4326",
-    spatialRel: "esriSpatialRelIntersects",
-    outSR: "4326",
-    f: "geojson",
-    resultRecordCount: String(maxRecords),
+  const fc = await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
+    where: SNGM_WHERE_BY_TIPO[tipo],
+    bbox,
+    limit: maxRecords,
   });
-  try {
-    const res = await fetch(`${ARCGIS_BASE}/${layer}/query?${params.toString()}`);
-    if (!res.ok) return null;
-    const fc = (await res.json()) as AnyFC & { error?: unknown };
-    if ("error" in fc) return null;
-    return fc;
-  } catch {
-    return null;
-  }
+  return (fc as AnyFC | null) ?? null;
 }
 
 /**

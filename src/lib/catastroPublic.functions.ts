@@ -35,14 +35,9 @@ export type PublicHolder = {
 };
 
 // ============================================================
-// Helpers ArcGIS (fallback en vivo)
+// Helpers ArcGIS (fallback en vivo — SERNAGEOMIN v2, ver src/lib/sngm.ts)
 // ============================================================
-const ARCGIS_BASE =
-  "https://catastro.sernageomin.cl/arcgis/rest/services/Concesiones_Mineras/Concesiones_Mineras/MapServer";
-const LAYERS: Array<{ id: number; type: PublicConcession["concession_type"] }> = [
-  { id: 0, type: "explotacion" },
-  { id: 1, type: "exploracion" },
-];
+import { SNGM_CONCESIONES_URL, sngmQueryGeoJSON, sngmSanitizeTerm } from "@/lib/sngm";
 
 function pick(props: Record<string, unknown>, ...keys: string[]): string | null {
   for (const k of keys) {
@@ -59,47 +54,42 @@ function pickNum(props: Record<string, unknown>, ...keys: string[]): number | nu
 }
 
 async function fetchArcgisByCode(code: string): Promise<PublicConcession | null> {
-  for (const layer of LAYERS) {
-    const params = new URLSearchParams({
-      where: `CODIGO = '${code.replace(/'/g, "''")}' OR ROL = '${code.replace(/'/g, "''")}'`,
-      outFields: "*",
-      outSR: "4326",
-      f: "geojson",
-      resultRecordCount: "1",
-    });
-    try {
-      const res = await fetch(`${ARCGIS_BASE}/${layer.id}/query?${params.toString()}`);
-      if (!res.ok) continue;
-      const fc = (await res.json()) as {
-        features?: Array<{ properties: Record<string, unknown>; geometry: unknown }>;
-      };
-      const f = fc.features?.[0];
-      if (!f) continue;
-      const p = f.properties ?? {};
-      return {
-        code,
-        concession_type: layer.type,
-        name: pick(p, "NOMBRE", "NOM_PERTEN", "NOM_CONCES"),
-        holder: pick(p, "TITULAR", "NOMBRE_TIT", "NOM_TITULA"),
-        rut: pick(p, "RUT", "RUT_TITULA"),
-        area_ha: pickNum(p, "AREA_HA", "HECTAREAS", "SUPERFICIE"),
-        status: pick(p, "VIGENCIA", "ESTADO"),
-        region: pick(p, "REGION", "NOM_REGION"),
-        commune: pick(p, "COMUNA", "NOM_COMUNA"),
-        province: pick(p, "PROVINCIA", "NOM_PROV"),
-        expires_at: null,
-        granted_at: null,
-        centroid_lat: null,
-        centroid_lng: null,
-        geometry: (f.geometry ?? null) as GeoJSON.Geometry | null,
-        source: "sernageomin",
-        last_synced_at: null,
-      };
-    } catch {
-      // continue
-    }
-  }
-  return null;
+  const safe = sngmSanitizeTerm(code);
+  if (!safe) return null;
+  // El "código" legacy corresponde en v2 al rol (numérico) o al nombre.
+  const clauses = [`UPPER(NOMBRE) LIKE UPPER('%${safe}%')`];
+  if (/^\d+$/.test(safe)) clauses.unshift(`NUMERO_ROL = ${safe}`);
+
+  const fc = await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
+    where: clauses.join(" OR "),
+    limit: 1,
+  });
+  const f = fc?.features?.[0];
+  if (!f) return null;
+  const p = (f.properties ?? {}) as Record<string, unknown>;
+  const tipo =
+    String(p.TIPO_CONCESION ?? "").toUpperCase() === "EXPLOTACION" ? "explotacion" : "exploracion";
+  const rutNum = pick(p, "TITULAR_RUT");
+  const rutDv = pick(p, "TITULAR_DV");
+  return {
+    code,
+    concession_type: tipo,
+    name: pick(p, "NOMBRE"),
+    holder: pick(p, "TITULAR_NOMBRE"),
+    rut: rutNum ? `${rutNum}${rutDv ? `-${rutDv}` : ""}` : null,
+    area_ha: pickNum(p, "HECTAREAS"),
+    status: pick(p, "SITUACION_CONCESION"),
+    region: pick(p, "REGION"),
+    commune: pick(p, "COMUNA"),
+    province: pick(p, "PROVINCIA"),
+    expires_at: pick(p, "FECHA_VENCIMIENTO"),
+    granted_at: null,
+    centroid_lat: null,
+    centroid_lng: null,
+    geometry: (f.geometry ?? null) as GeoJSON.Geometry | null,
+    source: "sernageomin",
+    last_synced_at: null,
+  };
 }
 
 // ============================================================
