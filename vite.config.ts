@@ -22,6 +22,7 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    plugins: [mcpPlugin()],
     resolve: {
       alias: [
         // htmlparser2 (transitive via react-email) hardcodes `entities/lib/decode.js`,
