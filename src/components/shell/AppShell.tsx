@@ -92,14 +92,14 @@ export function MarketingHeader() {
   const { t } = useLocale();
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-hairline">
-      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
+      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-4">
         <BrandMark />
-        <nav className="hidden md:flex items-center gap-6 text-sm text-content/80 ml-6">
+        <nav className="hidden lg:flex items-center gap-5 text-sm text-content/80 ml-4">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="hover:text-accent-brand transition-colors"
+              className="hover:text-accent-brand transition-colors whitespace-nowrap"
               activeProps={{ className: "text-accent-brand font-medium" }}
             >
               {t(n.key)}
