@@ -1,11 +1,14 @@
 // Server function: devuelve un heightmap regular (Float32) para alimentar Martini.
 //
-// Por ahora genera un DEM procedural realista (multi-octava) centrado en el
-// proyecto. Cuando exista un endpoint GeoTIFF de Copernicus/SRTM, este archivo
-// es el único que cambia: parsear con @loaders.gl/geotiff y devolver el mismo
-// shape (heightmap cuadrado tamaño 2^n+1).
+// Fuente primaria: Copernicus DEM GLO-30 (COG público en AWS Open Data,
+// resolución ~30 m, sin API key) leído con range-requests vía `geotiff`.
+// Fallback: DEM procedural multi-octava determinístico por projectId, para
+// proyectos sin coordenadas o si el tile remoto no responde.
 import { createServerFn } from "@tanstack/react-start";
+import { createClient } from "@supabase/supabase-js";
+import { fromUrl } from "geotiff";
 import { z } from "zod";
+import type { Database } from "@/integrations/supabase/types";
 
 const InputSchema = z.object({
   projectId: z.string().uuid(),
@@ -22,9 +25,86 @@ export type DemTile = {
   extentMeters: number;
   minH: number;
   maxH: number;
+  /** "copernicus" = GLO-30 real; "synthetic" = fallback procedural. */
+  source: "copernicus" | "synthetic";
 };
 
-// Hash 2D rápido (deterministic noise)
+// Cache en memoria del proceso: los DEM son estáticos.
+const demCache = new Map<string, DemTile>();
+
+// ── Copernicus GLO-30 (AWS Open Data) ─────────────────────────────────────────
+
+function copernicusTileUrl(lat: number, lng: number): string {
+  const latFloor = Math.floor(lat);
+  const lngFloor = Math.floor(lng);
+  const ns = latFloor >= 0 ? "N" : "S";
+  const ew = lngFloor >= 0 ? "E" : "W";
+  const latStr = String(Math.abs(latFloor)).padStart(2, "0");
+  const lngStr = String(Math.abs(lngFloor)).padStart(3, "0");
+  const name = `Copernicus_DSM_COG_10_${ns}${latStr}_00_${ew}${lngStr}_00_DEM`;
+  return `https://copernicus-dem-30m.s3.amazonaws.com/${name}/${name}.tif`;
+}
+
+async function fetchCopernicusDem(
+  lat: number,
+  lng: number,
+  size: number,
+  extentMeters: number,
+): Promise<DemTile | null> {
+  try {
+    const tiff = await fromUrl(copernicusTileUrl(lat, lng));
+    const image = await tiff.getImage();
+    const [west, south, east, north] = image.getBoundingBox();
+    const imgW = image.getWidth();
+    const imgH = image.getHeight();
+
+    // bbox del parche solicitado en grados
+    const halfLat = extentMeters / 2 / 111_320;
+    const halfLng = extentMeters / 2 / (111_320 * Math.cos((lat * Math.PI) / 180));
+
+    const px = (x: number) => ((x - west) / (east - west)) * imgW;
+    const py = (y: number) => ((north - y) / (north - south)) * imgH;
+
+    // Ventana clampeada al tile (si el parche cruza el borde de 1°, se recorta)
+    const x0 = Math.max(0, Math.floor(px(lng - halfLng)));
+    const x1 = Math.min(imgW, Math.ceil(px(lng + halfLng)));
+    const y0 = Math.max(0, Math.floor(py(lat + halfLat)));
+    const y1 = Math.min(imgH, Math.ceil(py(lat - halfLat)));
+    if (x1 - x0 < 8 || y1 - y0 < 8) return null;
+
+    const rasters = await image.readRasters({
+      window: [x0, y0, x1, y1],
+      width: size,
+      height: size,
+      resampleMethod: "bilinear",
+      samples: [0],
+      fillValue: 0,
+    });
+    const band = rasters[0];
+    if (typeof band === "number" || band.length !== size * size) return null;
+
+    // Alturas relativas al centro del parche
+    const centerH = Number(band[Math.floor(size / 2) * size + Math.floor(size / 2)]) || 0;
+    const heights: number[] = new Array(size * size);
+    let minH = Infinity,
+      maxH = -Infinity;
+    for (let i = 0; i < size * size; i++) {
+      const h = (Number(band[i]) || 0) - centerH;
+      heights[i] = h;
+      if (h < minH) minH = h;
+      if (h > maxH) maxH = h;
+    }
+    // Sanity check: un DEM real en zona cordillerana no debería ser plano perfecto
+    if (!Number.isFinite(minH) || !Number.isFinite(maxH)) return null;
+
+    return { heights, size, extentMeters, minH, maxH, source: "copernicus" };
+  } catch {
+    return null;
+  }
+}
+
+// ── Fallback procedural (determinístico por projectId) ────────────────────────
+
 function hash2(x: number, y: number, seed: number): number {
   const h = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453;
   return h - Math.floor(h);
@@ -54,44 +134,75 @@ function fbm(x: number, y: number, seed: number, octaves = 5): number {
   return v;
 }
 
+function syntheticDem(projectId: string, size: number, extentMeters: number): DemTile {
+  // Determinístico por projectId para que el DEM sea estable entre sesiones.
+  const seedBase = Array.from(projectId).reduce((s, c) => (s * 31 + c.charCodeAt(0)) | 0, 7);
+  const seed = (seedBase % 10000) / 100;
+
+  const heights: number[] = new Array(size * size);
+  let minH = Infinity,
+    maxH = -Infinity;
+
+  // Cordillera/relieve cordillerano sintético: ridge noise + valle central
+  for (let j = 0; j < size; j++) {
+    for (let i = 0; i < size; i++) {
+      const u = i / (size - 1);
+      const v = j / (size - 1);
+      const r1 = 1 - Math.abs(2 * fbm(u * 3, v * 3, seed) - 1);
+      const r2 = fbm(u * 6, v * 6, seed + 100) * 0.5;
+      const cx = u - 0.5,
+        cy = v - 0.5;
+      const dist = Math.sqrt(cx * cx + cy * cy);
+      const macro = Math.exp(-dist * 1.8) * 0.7 + 0.3;
+      const h = (r1 * 0.7 + r2 * 0.3) * macro * 600 - 50;
+      heights[j * size + i] = h;
+      if (h < minH) minH = h;
+      if (h > maxH) maxH = h;
+    }
+  }
+
+  return { heights, size, extentMeters, minH, maxH, source: "synthetic" };
+}
+
+// ── Server function ───────────────────────────────────────────────────────────
+
 export const getDemTile = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }) => {
-    // Determinístico por projectId para que el DEM sea estable entre sesiones.
-    const seedBase = Array.from(data.projectId).reduce((s, c) => (s * 31 + c.charCodeAt(0)) | 0, 7);
-    const seed = (seedBase % 10000) / 100;
-
     const size = data.size ?? 257;
     const extent = data.extentMeters ?? 4000;
-    const heights: number[] = new Array(size * size);
-    let minH = Infinity,
-      maxH = -Infinity;
+    const cacheKey = `${data.projectId}:${size}:${extent}`;
+    const cached = demCache.get(cacheKey);
+    if (cached) return cached;
 
-    // Cordillera/relieve cordillerano sintético: ridge noise + valle central
-    for (let j = 0; j < size; j++) {
-      for (let i = 0; i < size; i++) {
-        const u = i / (size - 1);
-        const v = j / (size - 1);
-        // Ridge noise
-        const r1 = 1 - Math.abs(2 * fbm(u * 3, v * 3, seed) - 1);
-        const r2 = fbm(u * 6, v * 6, seed + 100) * 0.5;
-        // Forma cordillera centrada
-        const cx = u - 0.5,
-          cy = v - 0.5;
-        const dist = Math.sqrt(cx * cx + cy * cy);
-        const macro = Math.exp(-dist * 1.8) * 0.7 + 0.3;
-        const h = (r1 * 0.7 + r2 * 0.3) * macro * 600 - 50;
-        heights[j * size + i] = h;
-        if (h < minH) minH = h;
-        if (h > maxH) maxH = h;
+    // Centro del proyecto → tile Copernicus
+    let center: { lat: number; lng: number } | null = null;
+    try {
+      const supabase = createClient<Database>(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_PUBLISHABLE_KEY!,
+        { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+      );
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("center_lat, center_lng")
+        .eq("id", data.projectId)
+        .maybeSingle();
+      if (proj?.center_lat != null && proj?.center_lng != null) {
+        center = { lat: Number(proj.center_lat), lng: Number(proj.center_lng) };
       }
+    } catch {
+      center = null;
     }
 
-    return {
-      heights,
-      size,
-      extentMeters: extent,
-      minH,
-      maxH,
-    } satisfies DemTile;
+    let tile: DemTile | null = null;
+    if (center) {
+      tile = await fetchCopernicusDem(center.lat, center.lng, size, extent);
+    }
+    if (!tile) {
+      tile = syntheticDem(data.projectId, size, extent);
+    }
+
+    demCache.set(cacheKey, tile);
+    return tile;
   });

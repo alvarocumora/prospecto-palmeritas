@@ -80,7 +80,7 @@ function Visor3DError({ error }: { error: Error }) {
 const SCENE_HALF = 900; // metros equivalentes en la escena
 const METERS_PER_DEG_LAT = 111_320;
 const GEO_SCALE = 0.08; // 1 m real = 0.08 unidades de escena (horizontal)
-const VERT_SCALE = 0.05; // exageración vertical del DEM
+const VERT_SCALE = GEO_SCALE; // vertical 1:1 con la horizontal (DEM real Copernicus)
 const MAX_R = 260; // radio máximo de la nube alrededor del marcador
 const DEM_EXTENT_M = 6500; // lado del tile DEM por sitio
 const DEM_SIZE = 129; // grid 2^n + 1
@@ -302,6 +302,7 @@ function DrillHole({
   status = "completed",
   intervals = [],
   selected = false,
+  auCutoff = null,
   onClick,
 }: {
   position: [number, number, number];
@@ -312,6 +313,7 @@ function DrillHole({
   status?: string;
   intervals?: HoleIntervals;
   selected?: boolean;
+  auCutoff?: number | null;
   onClick?: () => void;
 }) {
   // Dirección del pozo: azimuth (grados desde el norte, horario) + dip
@@ -355,15 +357,24 @@ function DrillHole({
           intervals.map((iv, k) => {
             const segLen = Math.max((iv.to - iv.from) * mScale, 1.5);
             const segCenter = -(iv.from + (iv.to - iv.from) / 2) * mScale;
+            // Ley de corte: los tramos bajo el cutoff se atenúan
+            const belowCutoff = auCutoff != null && (iv.au_gpt ?? 0) < auCutoff;
+            const aboveCutoff = auCutoff != null && (iv.au_gpt ?? 0) >= auCutoff;
             return (
               <mesh key={k} position={[0, segCenter, 0]} {...handlers}>
-                <cylinderGeometry args={[3.2, 3.2, segLen, 10]} />
+                <cylinderGeometry
+                  args={[aboveCutoff ? 4.5 : 3.2, aboveCutoff ? 4.5 : 3.2, segLen, 10]}
+                />
                 <meshStandardMaterial
-                  color={lithoColor(iv.lithology)}
-                  emissive={selected ? lithoColor(iv.lithology) : "#000000"}
-                  emissiveIntensity={selected ? 0.35 : 0}
+                  color={belowCutoff ? "#3a3a3a" : lithoColor(iv.lithology)}
+                  emissive={
+                    aboveCutoff ? "#f6c453" : selected ? lithoColor(iv.lithology) : "#000000"
+                  }
+                  emissiveIntensity={aboveCutoff ? 0.6 : selected ? 0.35 : 0}
                   metalness={0.3}
                   roughness={0.5}
+                  transparent={belowCutoff}
+                  opacity={belowCutoff ? 0.18 : 1}
                 />
               </mesh>
             );
@@ -450,6 +461,7 @@ function Site({
   selectedAnomalyId,
   onSelectHole,
   selectedHoleId,
+  auCutoff,
 }: {
   site: SiteData;
   selected: boolean;
@@ -458,6 +470,7 @@ function Site({
   selectedAnomalyId: string | null;
   onSelectHole: (id: string) => void;
   selectedHoleId: string | null;
+  auCutoff: number | null;
 }) {
   const [x, y, z] = site.position;
 
@@ -506,6 +519,7 @@ function Site({
             status={h.status}
             intervals={h.intervals}
             selected={selectedHoleId === h.id}
+            auCutoff={auCutoff}
             onClick={() => onSelectHole(h.id)}
           />
         ))
@@ -592,6 +606,7 @@ function Visor3DPage() {
   const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(null);
   const [selectedInsarId, setSelectedInsarId] = useState<string | null>(null);
   const [selectedHoleId, setSelectedHoleId] = useState<string | null>(null);
+  const [auCutoff, setAuCutoff] = useState<number | null>(null);
 
   // Terreno DEM por sitio (pipeline por proyecto, cache indefinido)
   const fetchDem = useServerFn(getDemTile);
@@ -748,6 +763,7 @@ function Visor3DPage() {
                         setSelectedAnomalyId(null);
                         setSelectedInsarId(null);
                       }}
+                      auCutoff={auCutoff}
                     />
                   ))}
                 </Suspense>
@@ -782,6 +798,23 @@ function Visor3DPage() {
               <ControlHint icon={RotateCw} label="Clic + arrastrar: rotar" />
               <ControlHint icon={MousePointer2} label="Clic en marcador o esfera: seleccionar" />
             </div>
+
+            {selectedSite && demById.get(selectedSite.project.id) && (
+              <div className="absolute top-3 right-3 z-10">
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-mono backdrop-blur ${
+                    demById.get(selectedSite.project.id)!.source === "copernicus"
+                      ? "bg-emerald-500/15 border-emerald-400/40 text-emerald-300"
+                      : "bg-black/60 border-white/10 text-white/60"
+                  }`}
+                >
+                  <Satellite className="w-3 h-3" />
+                  {demById.get(selectedSite.project.id)!.source === "copernicus"
+                    ? "Terreno real · Copernicus GLO-30 · escala 1:1"
+                    : "Terreno demostrativo"}
+                </span>
+              </div>
+            )}
           </div>
 
           <aside className="rounded-xl border border-hairline bg-surface p-5 space-y-4 h-fit">
@@ -955,6 +988,33 @@ function Visor3DPage() {
                 </div>
               </>
             )}
+
+            <div className="pt-4 border-t border-hairline">
+              <div className="text-[11px] uppercase tracking-wide text-content-subtle mb-2">
+                Ley de corte Au (resalta tramos)
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {[
+                  { label: "Todos", v: null },
+                  { label: "≥0.5 g/t", v: 0.5 },
+                  { label: "≥1.0 g/t", v: 1.0 },
+                  { label: "≥2.0 g/t", v: 2.0 },
+                ].map(({ label, v }) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => setAuCutoff(v)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-mono border transition ${
+                      auCutoff === v
+                        ? "bg-accent-brand text-white border-accent-brand"
+                        : "border-hairline text-content-subtle hover:border-accent-brand hover:text-accent-brand"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="pt-4 border-t border-hairline">
               <div className="text-[11px] uppercase tracking-wide text-content-subtle mb-2">

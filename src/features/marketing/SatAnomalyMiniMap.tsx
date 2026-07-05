@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { Map as MLMap, StyleSpecification } from "maplibre-gl";
+import type { Map as MLMap, Popup as MLPopup, StyleSpecification } from "maplibre-gl";
 import type { FeatureCollection } from "geojson";
 
 // maplibre-gl toca `window` al importarse — cargar solo en el navegador.
@@ -42,7 +42,24 @@ export type MiniMapAnomaly = {
   lat: number | null;
   severity: string | null;
   index_code: string | null;
+  score?: number | null;
+  area_ha?: number | null;
+  detected_at?: string | null;
 };
+
+function escapeHtml(s: string) {
+  return String(s ?? "").replace(
+    /[&<>"']/g,
+    (c) =>
+      ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;",
+      })[c]!,
+  );
+}
 
 export function SatAnomalyMiniMap({
   center,
@@ -53,6 +70,7 @@ export function SatAnomalyMiniMap({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
+  const popupRef = useRef<MLPopup | null>(null);
 
   const points = anomalies.filter((a) => a.lng != null && a.lat != null);
 
@@ -87,6 +105,9 @@ export function SatAnomalyMiniMap({
             properties: {
               severity: (a.severity ?? "low").toLowerCase(),
               index_code: a.index_code ?? "",
+              score: a.score ?? null,
+              area_ha: a.area_ha ?? null,
+              detected_at: a.detected_at ?? null,
             },
           })),
         };
@@ -135,6 +156,47 @@ export function SatAnomalyMiniMap({
           },
         });
 
+        // Popup al click con detalle de la anomalía
+        map.on("mouseenter", "anomalies-pt", () => {
+          map.getCanvas().style.cursor = "pointer";
+        });
+        map.on("mouseleave", "anomalies-pt", () => {
+          map.getCanvas().style.cursor = "";
+        });
+        map.on("click", "anomalies-pt", (e) => {
+          const f = e.features?.[0];
+          if (!f) return;
+          const p = (f.properties ?? {}) as {
+            severity?: string;
+            index_code?: string;
+            score?: number | string | null;
+            area_ha?: number | string | null;
+            detected_at?: string | null;
+          };
+          const sev = (p.severity ?? "low").toLowerCase();
+          const rows = [
+            p.score != null && p.score !== "" ? `Score <b>${Number(p.score).toFixed(2)}</b>` : null,
+            p.area_ha != null && p.area_ha !== ""
+              ? `Área ${Number(p.area_ha).toFixed(1)} ha`
+              : null,
+            p.detected_at ? new Date(p.detected_at).toLocaleDateString("es-CL") : null,
+          ].filter(Boolean);
+          const html = `
+            <div style="font-family:ui-sans-serif,system-ui;min-width:150px">
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                <span style="width:8px;height:8px;border-radius:99px;background:${SEV_HEX[sev] ?? "#94a3b8"}"></span>
+                <span style="font-size:11px;font-weight:600;color:#0b2a5b">${escapeHtml(p.index_code || "Anomalía")}</span>
+                <span style="font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.06em">${escapeHtml(sev)}</span>
+              </div>
+              <div style="font-size:11px;color:#334155">${rows.map((r) => String(r)).join(" · ")}</div>
+            </div>`;
+          popupRef.current?.remove();
+          popupRef.current = new ml.Popup({ closeButton: true, offset: 10 })
+            .setLngLat((f.geometry as unknown as { coordinates: [number, number] }).coordinates)
+            .setHTML(html)
+            .addTo(map);
+        });
+
         // Encuadre: puntos si hay, si no el centro del proyecto
         if (points.length > 1) {
           const lngs = points.map((p) => p.lng!);
@@ -158,6 +220,8 @@ export function SatAnomalyMiniMap({
 
     return () => {
       cancelled = true;
+      popupRef.current?.remove();
+      popupRef.current = null;
       mapRef.current?.remove();
       mapRef.current = null;
     };
