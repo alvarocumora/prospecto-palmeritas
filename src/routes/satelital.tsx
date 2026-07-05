@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandCard, Eyebrow, SectionHeading } from "@/components/brand";
+import { SatAnomalyMiniMap } from "@/features/marketing/SatAnomalyMiniMap";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 
 type SatelitalSearch = {
@@ -590,6 +591,17 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
             </Link>
           )}
         </div>
+      )}
+
+      {open && (
+        <SatAnomalyMiniMap
+          center={
+            project.center_lng != null && project.center_lat != null
+              ? [project.center_lng, project.center_lat]
+              : null
+          }
+          anomalies={project.anomalies}
+        />
       )}
 
       {open && (
