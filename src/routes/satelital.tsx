@@ -65,7 +65,13 @@ function sevBadge(sev: string | null) {
 }
 
 function SatelitalPage() {
-  const { data: projects } = useSuspenseQuery(satelliteQueryOptions);
+  const fetchSat = useServerFn(getPublicSatellite);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["public-satellite"],
+    queryFn: () => fetchSat(),
+    staleTime: 60_000,
+  });
+  const projects: PublicSatProject[] = data ?? [];
 
   const totalAnomalies = projects.reduce((s, p) => s + p.anomalies.length, 0);
   const totalInsar = projects.reduce((s, p) => s + p.insar.length, 0);
@@ -86,7 +92,9 @@ function SatelitalPage() {
           >
             <ArrowLeft className="w-4 h-4" /> Volver
           </Link>
-          <Eyebrow icon={Satellite}>Monitoreo satelital</Eyebrow>
+          <Eyebrow className="mb-3 inline-flex items-center gap-1.5">
+            <Satellite className="w-3.5 h-3.5" /> Monitoreo satelital
+          </Eyebrow>
           <h1 className="brand-display text-4xl md:text-5xl text-content mt-3 mb-4 max-w-3xl leading-tight">
             Anomalías multiespectrales y deformación InSAR en tiempo casi real
           </h1>
