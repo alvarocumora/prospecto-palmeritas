@@ -12,10 +12,19 @@ import {
   Layers,
   Package,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
+import { CommodityCover } from "@/features/marketing/CommodityCover";
+import { Reveal } from "@/features/marketing/Reveal";
 import { useAuth } from "@/hooks/useAuth";
-import { getCommodityLotDetail, createCommodityInquiry } from "@/lib/marketplace.functions";
+import {
+  getCommodityLotDetail,
+  createCommodityInquiry,
+  listPublishedCommodityLots,
+  type CommodityLotRow,
+} from "@/lib/marketplace.functions";
+import { getMetalPrices, type MetalQuote } from "@/lib/commodityPrices.functions";
 import {
   commodityLabel,
   commodityColor,
@@ -169,6 +178,28 @@ function LotDetailPage() {
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
 
+      {/* Portada generativa del material */}
+      <div className="relative h-40 md:h-52 overflow-hidden border-b border-hairline">
+        <CommodityCover
+          seed={lot.id}
+          commodity={lot.commodity}
+          form={lot.form}
+          className="absolute inset-0"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+        <div className="absolute bottom-4 left-0 right-0">
+          <div className="max-w-7xl mx-auto px-5 flex items-end justify-between gap-3 flex-wrap">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/70">
+              Marketplace · {formLabel(lot.form)}
+            </span>
+            <span className="text-[11px] font-mono text-white/80">
+              {countryFlag(lot.country)} {countryName(lot.country)}
+              {lot.port_of_loading && ` · ${lot.port_of_loading}`}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <section className="border-b border-hairline bg-gradient-to-b from-accent-brand-subtle/60 to-white">
         <div className="max-w-7xl mx-auto px-5 py-10">
           <Link
@@ -285,10 +316,21 @@ function LotDetailPage() {
                 ))}
               </div>
             </section>
+
+            {/* Lotes relacionados */}
+            <RelatedLots commodity={lot.commodity} excludeId={lot.id} />
           </div>
 
           {/* Sidebar CTA */}
           <aside className="lg:sticky lg:top-24 h-fit space-y-4">
+            <PriceReferencePanel
+              commodity={lot.commodity}
+              priceBasis={lot.price_basis}
+              premiumDiscount={
+                lot.premium_discount_usd_t != null ? Number(lot.premium_discount_usd_t) : null
+              }
+              askingPrice={lot.asking_price_usd != null ? Number(lot.asking_price_usd) : null}
+            />
             <div className="rounded-2xl border border-hairline bg-white p-6">
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
                 Solicitar oferta
@@ -495,5 +537,138 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+// ── Precio de referencia spot ─────────────────────────────────────────────────
+
+/** Mapea el commodity del lote al símbolo spot disponible (gold-api). */
+function quoteCodeFor(commodity: string | null): string | null {
+  if (!commodity) return null;
+  if (commodity.startsWith("au_")) return "XAU";
+  if (commodity.startsWith("ag_")) return "XAG";
+  if (commodity.startsWith("cu_")) return "HG";
+  return null;
+}
+
+function PriceReferencePanel({
+  commodity,
+  priceBasis,
+  premiumDiscount,
+  askingPrice,
+}: {
+  commodity: string | null;
+  priceBasis: string | null;
+  premiumDiscount: number | null;
+  askingPrice: number | null;
+}) {
+  const pricesFn = useServerFn(getMetalPrices);
+  const code = quoteCodeFor(commodity);
+  const { data } = useQuery({
+    queryKey: ["metal-prices"],
+    queryFn: () => pricesFn(),
+    staleTime: 5 * 60_000,
+    enabled: code != null,
+  });
+  const quote: MetalQuote | undefined = data?.quotes.find((q) => q.code === code);
+
+  if (!code && premiumDiscount == null && !priceBasis && askingPrice == null) return null;
+
+  return (
+    <div className="rounded-2xl border border-hairline bg-surface-inverse text-white p-6">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-white/50">
+        Contexto de precio
+      </div>
+      {quote ? (
+        <div className="mt-2 flex items-baseline gap-2">
+          <span className="font-mono text-2xl font-semibold">{quote.price}</span>
+          <span className="text-[10px] font-mono text-white/40">{quote.unit} · spot</span>
+        </div>
+      ) : (
+        code == null &&
+        priceBasis && <div className="mt-2 font-mono text-sm text-white/80">Base: {priceBasis}</div>
+      )}
+      <div className="mt-3 space-y-1.5 text-[12px] font-mono">
+        {priceBasis && quote && (
+          <div className="flex justify-between gap-3">
+            <span className="text-white/50">Base contrato</span>
+            <span className="text-white/90">{priceBasis}</span>
+          </div>
+        )}
+        {premiumDiscount != null && (
+          <div className="flex justify-between gap-3">
+            <span className="text-white/50">Premium / Discount</span>
+            <span className={premiumDiscount >= 0 ? "text-emerald-400" : "text-red-400"}>
+              {premiumDiscount > 0 ? "+" : ""}
+              {premiumDiscount} USD/t
+            </span>
+          </div>
+        )}
+        {askingPrice != null && (
+          <div className="flex justify-between gap-3">
+            <span className="text-white/50">Precio fijo pedido</span>
+            <span className="text-white/90">US$ {askingPrice.toLocaleString("en-US")}</span>
+          </div>
+        )}
+      </div>
+      <p className="mt-4 text-[10px] font-mono text-white/35 leading-relaxed">
+        Referencia informativa
+        {quote
+          ? ` · actualizada ${new Date(quote.updatedAt).toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" })}`
+          : ""}
+        . El precio final se negocia directamente con el seller.
+      </p>
+    </div>
+  );
+}
+
+// ── Lotes relacionados ────────────────────────────────────────────────────────
+
+function RelatedLots({ commodity, excludeId }: { commodity: string | null; excludeId: string }) {
+  const listFn = useServerFn(listPublishedCommodityLots);
+  const { data } = useQuery({
+    queryKey: ["related-lots", commodity],
+    queryFn: () => listFn({ data: { commodity: commodity ?? undefined, limit: 4 } }),
+    staleTime: 60_000,
+    enabled: !!commodity,
+  });
+  const related = ((data ?? []) as CommodityLotRow[]).filter((l) => l.id !== excludeId).slice(0, 3);
+  if (related.length === 0) return null;
+
+  return (
+    <section>
+      <Eyebrow className="mb-3">Otros lotes de {commodityLabel(commodity)}</Eyebrow>
+      <div className="grid sm:grid-cols-3 gap-3">
+        {related.map((l, idx) => (
+          <Reveal key={l.id} delay={idx * 60}>
+            <Link
+              to="/marketplace/$lotId"
+              params={{ lotId: l.id }}
+              className="group rounded-xl border border-hairline bg-white overflow-hidden block h-full hover-lift hover:border-accent-brand transition"
+            >
+              <div className="relative h-16 overflow-hidden">
+                <div className="cover-zoom absolute inset-0">
+                  <CommodityCover
+                    seed={l.id}
+                    commodity={l.commodity}
+                    form={l.form}
+                    className="w-full h-full"
+                  />
+                </div>
+              </div>
+              <div className="p-3">
+                <div className="text-[13px] font-display text-content leading-snug line-clamp-2">
+                  {l.title}
+                </div>
+                <div className="mt-1 text-[10px] font-mono text-content-subtle">
+                  {countryFlag(l.country)} {formatTonnes(l.tonnage_available_t)} ·{" "}
+                  {l.incoterm ?? "—"}
+                </div>
+              </div>
+            </Link>
+          </Reveal>
+        ))}
+      </div>
+    </section>
   );
 }

@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { Reveal } from "@/features/marketing/Reveal";
+import { CommodityCover } from "@/features/marketing/CommodityCover";
+import { getMetalPrices } from "@/lib/commodityPrices.functions";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import {
   listPublishedCommodityLots,
@@ -25,8 +27,6 @@ import {
   COMMODITIES,
   INCOTERMS,
   commodityLabel,
-  commodityShort,
-  commodityColor,
   countryFlag,
   countryName,
   formLabel,
@@ -124,6 +124,9 @@ function MarketplacePage() {
       title="Commodities mineros certificados, listos para transar"
       intro="Concentrados, cátodos, doré, bullion, tierras raras y litio con trazabilidad de origen y certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO — desde Chile, Perú, Brasil, Colombia, Venezuela y África."
     >
+      {/* Cotizaciones spot en vivo */}
+      <MetalQuotesStrip />
+
       {/* Filtros */}
       <div className="rounded-2xl border border-hairline bg-white p-5 mb-8">
         <div className="flex items-center gap-2 mb-4">
@@ -307,61 +310,104 @@ function LotCard({ lot }: { lot: CommodityLotRow }) {
     <Link
       to="/marketplace/$lotId"
       params={{ lotId: lot.id }}
-      className="group rounded-2xl border border-hairline bg-white p-5 h-full hover-lift hover:border-accent-brand hover:shadow-[0_18px_36px_-24px_rgba(11,42,91,0.35)] transition block"
+      className="group rounded-2xl border border-hairline bg-white h-full overflow-hidden hover-lift hover:border-accent-brand hover:shadow-[0_18px_36px_-24px_rgba(11,42,91,0.35)] transition block"
     >
-      <div className="flex items-center justify-between">
-        <span
-          className="text-[10px] font-mono uppercase tracking-wider px-2 py-1 rounded"
-          style={{
-            background: `${commodityColor(lot.commodity)}22`,
-            color: commodityColor(lot.commodity),
-          }}
-        >
-          {commodityShort(lot.commodity)}
-        </span>
-        <span className="text-[11px] font-mono text-content-subtle">
+      {/* Portada generativa por material */}
+      <div className="relative h-24 overflow-hidden">
+        <div className="cover-zoom absolute inset-0">
+          <CommodityCover
+            seed={lot.id}
+            commodity={lot.commodity}
+            form={lot.form}
+            className="w-full h-full"
+          />
+        </div>
+        <span className="absolute top-2.5 right-2.5 text-[11px] font-mono text-white/90 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
           {countryFlag(lot.country)} {countryName(lot.country)}
         </span>
-      </div>
-      <div className="mt-3 font-display text-[17px] text-content leading-snug line-clamp-2">
-        {lot.title}
-      </div>
-      <div className="mt-1 text-xs text-content-subtle">
-        {formLabel(lot.form)}
-        {lot.grade_pct != null && ` · ${Number(lot.grade_pct)}%`}
-        {lot.port_of_loading && ` · ${lot.port_of_loading}`}
+        {lot.is_verified && (
+          <span className="absolute bottom-2.5 right-2.5 inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider text-emerald-300 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
+            <ShieldCheck className="w-2.5 h-2.5" /> Verificado
+          </span>
+        )}
       </div>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 text-[11px]">
-        <div>
-          <div className="text-content-subtle font-mono uppercase tracking-wider">Disponible</div>
-          <div className="text-content font-mono">{formatTonnes(lot.tonnage_available_t)}</div>
+      <div className="p-5 pt-4">
+        <div className="font-display text-[17px] text-content leading-snug line-clamp-2">
+          {lot.title}
         </div>
-        <div>
-          <div className="text-content-subtle font-mono uppercase tracking-wider">Incoterm</div>
-          <div className="text-content font-mono">{lot.incoterm ?? "—"}</div>
+        <div className="mt-1 text-xs text-content-subtle">
+          {formLabel(lot.form)}
+          {lot.grade_pct != null && ` · ${Number(lot.grade_pct)}%`}
+          {lot.port_of_loading && ` · ${lot.port_of_loading}`}
         </div>
-      </div>
 
-      {certs.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-1">
-          {certs.slice(0, 4).map((c) => (
-            <span
-              key={c}
-              className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent-brand-subtle text-accent-brand inline-flex items-center gap-1"
-            >
-              <Award className="w-2.5 h-2.5" />
-              {c.replace(/_/g, " ")}
-            </span>
-          ))}
+        <div className="mt-4 grid grid-cols-2 gap-2 text-[11px]">
+          <div>
+            <div className="text-content-subtle font-mono uppercase tracking-wider">Disponible</div>
+            <div className="text-content font-mono">{formatTonnes(lot.tonnage_available_t)}</div>
+          </div>
+          <div>
+            <div className="text-content-subtle font-mono uppercase tracking-wider">Incoterm</div>
+            <div className="text-content font-mono">{lot.incoterm ?? "—"}</div>
+          </div>
         </div>
-      )}
 
-      <div className="mt-4 flex items-center justify-between pt-4 border-t border-hairline">
-        <span className="text-[11px] font-mono text-content-subtle">Ver ficha</span>
-        <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+        {certs.length > 0 && (
+          <div className="mt-4 flex flex-wrap gap-1">
+            {certs.slice(0, 4).map((c) => (
+              <span
+                key={c}
+                className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded bg-accent-brand-subtle text-accent-brand inline-flex items-center gap-1"
+              >
+                <Award className="w-2.5 h-2.5" />
+                {c.replace(/_/g, " ")}
+              </span>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-4 flex items-center justify-between pt-4 border-t border-hairline">
+          <span className="text-[11px] font-mono text-content-subtle">Ver ficha</span>
+          <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+        </div>
       </div>
     </Link>
+  );
+}
+
+/** Franja de cotizaciones spot en vivo (gold-api + USD/CLP). */
+function MetalQuotesStrip() {
+  const pricesFn = useServerFn(getMetalPrices);
+  const { data } = useQuery({
+    queryKey: ["metal-prices"],
+    queryFn: () => pricesFn(),
+    staleTime: 5 * 60_000,
+  });
+  if (!data?.quotes?.length) return null;
+  return (
+    <div className="rounded-xl border border-hairline bg-surface-inverse text-white px-4 py-2.5 mb-6 flex items-center gap-x-6 gap-y-1 flex-wrap">
+      <span className="text-[9px] font-mono uppercase tracking-widest text-white/40">
+        Spot en vivo
+      </span>
+      {data.quotes.map((q) => (
+        <span key={q.code} className="inline-flex items-baseline gap-1.5">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-white/80">
+            {q.code}
+          </span>
+          <span className="text-[13px] font-mono font-semibold">{q.price}</span>
+          <span className="text-[9px] font-mono text-white/35">{q.unit}</span>
+        </span>
+      ))}
+      {data.fx.usdClp != null && (
+        <span className="inline-flex items-baseline gap-1.5 ml-auto">
+          <span className="text-[10px] font-mono font-bold tracking-widest text-white/80">
+            USD/CLP
+          </span>
+          <span className="text-[13px] font-mono font-semibold">{data.fx.usdClp.toFixed(0)}</span>
+        </span>
+      )}
+    </div>
   );
 }
 
