@@ -93,6 +93,20 @@ export function MarketingLanding() {
 
       {/* Hero — cinematic industrialism */}
       <section className="relative overflow-hidden bg-[#05070a] text-slate-200 border-b border-white/5">
+        {/* Photographic base layer */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.35]"
+          style={{ backgroundImage: `url(${heroMining})` }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(5,7,10,0.55) 0%, rgba(5,7,10,0.75) 55%, rgba(5,7,10,0.95) 100%)",
+          }}
+        />
         {/* Ambient glows */}
         <div
           className="pointer-events-none absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full blur-[120px]"
