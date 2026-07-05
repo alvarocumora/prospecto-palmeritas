@@ -69,7 +69,8 @@ function InvPage() {
             <h2 className="brand-display text-2xl text-content">Proyectos publicados</h2>
           </div>
           <Link
-            to="/contacto"
+            to="/auth"
+            search={{ intent: "investor" } as never}
             className="text-sm text-accent-brand inline-flex items-center gap-1.5 hover:gap-2 transition-all font-medium"
           >
             Solicitar acceso institucional <ArrowRight className="w-4 h-4" />
@@ -117,8 +118,8 @@ function InvPage() {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <BrandButton asChild>
-              <Link to="/terminal">
-                Explorar terminal en vivo <ArrowRight className="w-4 h-4" />
+              <Link to="/auth" search={{ intent: "investor" } as never}>
+                Crear cuenta de inversionista <ArrowRight className="w-4 h-4" />
               </Link>
             </BrandButton>
             <span className="inline-flex items-center gap-2 text-[11px] font-mono text-content-subtle">

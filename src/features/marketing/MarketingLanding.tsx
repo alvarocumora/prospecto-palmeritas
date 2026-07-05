@@ -121,6 +121,146 @@ export function MarketingLanding() {
       {/* Commodity price ticker */}
       <CommodityTicker />
 
+      {/* Dual paths: proyectos + marketplace */}
+      <section className="border-b border-hairline bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-14">
+          <div className="text-center max-w-2xl mx-auto mb-10">
+            <Eyebrow className="mb-3">Dos caminos, una plataforma</Eyebrow>
+            <h2 className="brand-display text-3xl md:text-4xl text-content">
+              Del yacimiento al mercado, con capital y trazabilidad
+            </h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            <Link
+              to="/inversionistas"
+              className="group rounded-2xl border border-hairline bg-accent-brand-subtle p-8 hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand text-white">
+                  <Landmark className="w-6 h-6" strokeWidth={1.75} />
+                </span>
+                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                  Inversión en proyectos
+                </div>
+              </div>
+              <div className="mt-5 font-display text-2xl text-content leading-snug">
+                Deal-flow minero verificado — equity, royalties y offtake
+              </div>
+              <p className="mt-3 text-sm text-content-subtle">
+                Accede a proyectos calificados con reporte NI 43-101, catastro trazable, data room
+                cifrado y modelo económico listo para comité.
+              </p>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand font-medium text-sm">
+                Ver oportunidades <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+            <Link
+              to="/marketplace"
+              className="group rounded-2xl border border-hairline bg-surface-inverse text-white p-8 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.6)] transition"
+            >
+              <div className="flex items-center gap-3">
+                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand-subtle text-accent-brand">
+                  <Gem className="w-6 h-6" strokeWidth={1.75} />
+                </span>
+                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand-subtle">
+                  Marketplace de commodities
+                </div>
+              </div>
+              <div className="mt-5 font-display text-2xl leading-snug">
+                Compra & vende commodities certificados de LatAm y África
+              </div>
+              <p className="mt-3 text-sm text-white/70">
+                Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto — con
+                certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
+              </p>
+              <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-mono uppercase tracking-wider text-white/60">
+                <span>🇨🇱 Chile</span>
+                <span>🇵🇪 Perú</span>
+                <span>🇧🇷 Brasil</span>
+                <span>🇨🇴 Colombia</span>
+                <span>🇻🇪 Venezuela</span>
+                <span>🇿🇦 Sudáfrica</span>
+                <span>🇨🇩 R.D. Congo</span>
+              </div>
+              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand-subtle font-medium text-sm">
+                Explorar lotes <ArrowRight className="w-4 h-4" />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Inversión por región */}
+      <section className="border-b border-hairline">
+        <div className="max-w-7xl mx-auto px-5 py-16 lg:py-20">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+            <div className="max-w-2xl">
+              <Eyebrow className="mb-3">Inversión por región</Eyebrow>
+              <h2 className="brand-display text-3xl md:text-4xl text-content">
+                Oportunidades geolocalizadas con retorno esperado por geografía
+              </h2>
+              <p className="mt-4 text-content-subtle">
+                Explora proyectos publicados agrupados por región y simula el retorno según ticket,
+                plazo y TIR esperada por país. Deal-flow verificado con etapas desde greenfield
+                hasta producción.
+              </p>
+            </div>
+            <BrandButton asChild variant="outline">
+              <Link to="/oportunidades">
+                Ver oportunidades por región <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                country: "Chile",
+                flag: "🇨🇱",
+                irr: "22%",
+                focus: "Cu · Au · Ag · Li",
+                note: "Franja andina · catastro Sernageomin trazable",
+              },
+              {
+                country: "Perú",
+                flag: "🇵🇪",
+                irr: "24%",
+                focus: "Cu · Zn · Au polimetálico",
+                note: "Distritos brownfield con infraestructura",
+              },
+              {
+                country: "Brasil · Colombia",
+                flag: "🇧🇷 🇨🇴",
+                irr: "20–26%",
+                focus: "Fe · Au · Tierras raras",
+                note: "Proyectos con certificación ambiental",
+              },
+            ].map((r) => (
+              <Link
+                key={r.country}
+                to="/oportunidades"
+                className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{r.flag}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                    TIR ref. {r.irr}
+                  </span>
+                </div>
+                <div className="mt-3 font-display text-lg text-content">{r.country}</div>
+                <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mt-1">
+                  {r.focus}
+                </div>
+                <p className="mt-3 text-sm text-content-subtle">{r.note}</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-accent-brand text-sm font-medium group-hover:gap-2 transition-all">
+                  Simular retorno <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Pillars band */}
       <section className="bg-surface-inverse text-white">
         <div className="max-w-7xl mx-auto px-5 py-10 grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -382,44 +522,75 @@ export function MarketingLanding() {
               i: Map,
               t: "Mapa geológico",
               d: "Capas SERNAGEOMIN, concesiones, alertas de superposición y análisis de prospectividad.",
-            },
-            {
-              i: Cpu,
-              t: "Visor 3D geocientífico",
-              d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA.",
+              to: "/catastro/mapa" as const,
             },
             {
               i: Satellite,
               t: "Monitoreo satelital",
               d: "Detección de cambios, deformación InSAR y firmas espectrales sobre tu portafolio.",
-            },
-            {
-              i: FileText,
-              t: "NI 43-101 asistido",
-              d: "Borradores automáticos, recursos estimados y QA/QC con audit-trail trazable.",
-            },
-            {
-              i: ShieldCheck,
-              t: "Cumplimiento & patentes",
-              d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder.",
+              to: "/satelital" as const,
             },
             {
               i: Landmark,
               t: "Capital raise & deals",
               d: "Data room, KYC/AML institucional y matching con inversionistas verificados.",
+              to: "/oportunidades" as const,
             },
-          ].map(({ i: Icon, t: title, d }) => (
-            <BrandCard key={title} interactive className="group">
-              <div className="flex items-center justify-between mb-5">
-                <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand">
-                  <Icon className="w-5 h-5" strokeWidth={1.75} />
-                </span>
-                <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
-              </div>
-              <div className="font-display text-lg text-content">{title}</div>
-              <p className="text-sm text-content-subtle mt-2 leading-relaxed">{d}</p>
-            </BrandCard>
-          ))}
+            {
+              i: Cpu,
+              t: "Visor 3D geocientífico",
+              d: "DEM Copernicus + drape Sentinel, anomalías geofísicas y target generator con IA.",
+              to: "/visor-3d" as const,
+            },
+            {
+              i: FileText,
+              t: "NI 43-101 asistido",
+              d: "Borradores automáticos, recursos estimados y QA/QC con audit-trail trazable.",
+              to: null,
+            },
+            {
+              i: ShieldCheck,
+              t: "Cumplimiento & patentes",
+              d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder.",
+              to: null,
+            },
+          ].map(({ i: Icon, t: title, d, to }) => {
+            const inner = (
+              <>
+                <div className="flex items-center justify-between mb-5">
+                  <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand">
+                    <Icon className="w-5 h-5" strokeWidth={1.75} />
+                  </span>
+                  {to ? (
+                    <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+                  ) : (
+                    <span className="text-[10px] uppercase tracking-wide text-content-subtle border border-hairline rounded-full px-2 py-0.5">
+                      Próximamente
+                    </span>
+                  )}
+                </div>
+                <div className="font-display text-lg text-content">{title}</div>
+                <p className="text-sm text-content-subtle mt-2 leading-relaxed">{d}</p>
+              </>
+            );
+            if (to) {
+              return (
+                <Link key={title} to={to} className="block group">
+                  <BrandCard
+                    interactive
+                    className="h-full group-hover:border-accent-brand/40 transition"
+                  >
+                    {inner}
+                  </BrandCard>
+                </Link>
+              );
+            }
+            return (
+              <BrandCard key={title} className="group opacity-80">
+                {inner}
+              </BrandCard>
+            );
+          })}
         </div>
       </section>
 

@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Mail, Linkedin, Link as LinkIcon, Menu, X } from "lucide-react";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { useLocale, type Locale } from "@/features/marketing/i18n";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,6 +17,7 @@ import logoMark from "@/assets/geocapitals-mark.png";
 
 const NAV = [
   { to: "/proyectos", key: "nav_projects" as const },
+  { to: "/marketplace", key: "nav_marketplace" as const },
   { to: "/inversionistas", key: "nav_investors" as const },
   { to: "/empresas", key: "nav_companies" as const },
   { to: "/recursos", key: "nav_resources" as const },
@@ -89,16 +91,17 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
 
 export function MarketingHeader() {
   const { t } = useLocale();
+  const [menuOpen, setMenuOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-hairline">
-      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-6">
+      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-4">
         <BrandMark />
-        <nav className="hidden md:flex items-center gap-6 text-sm text-content/80 ml-6">
+        <nav className="hidden lg:flex items-center gap-5 text-sm text-content/80 ml-4">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="hover:text-accent-brand transition-colors"
+              className="hover:text-accent-brand transition-colors whitespace-nowrap"
               activeProps={{ className: "text-accent-brand font-medium" }}
             >
               {t(n.key)}
@@ -106,8 +109,8 @@ export function MarketingHeader() {
           ))}
         </nav>
         <div className="flex-1" />
-        <LangToggle />
-        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden sm:inline">
+        <div className="hidden sm:inline-flex"><LangToggle /></div>
+        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline">
           {t("cta_login")}
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">
@@ -115,10 +118,52 @@ export function MarketingHeader() {
             {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </BrandButton>
+        <button
+          type="button"
+          onClick={() => setMenuOpen((v) => !v)}
+          aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={menuOpen}
+          className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-hairline text-content hover:border-accent-brand"
+        >
+          {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        </button>
       </div>
+      {menuOpen && (
+        <div className="lg:hidden border-t border-hairline bg-white">
+          <nav className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm">
+            {NAV.map((n) => (
+              <Link
+                key={n.to}
+                to={n.to}
+                onClick={() => setMenuOpen(false)}
+                className="py-2.5 border-b border-hairline last:border-0 text-content hover:text-accent-brand"
+                activeProps={{ className: "text-accent-brand font-medium" }}
+              >
+                {t(n.key)}
+              </Link>
+            ))}
+            <div className="pt-3 flex items-center gap-3 sm:hidden">
+              <LangToggle />
+              <Link
+                to="/auth"
+                onClick={() => setMenuOpen(false)}
+                className="text-sm text-content hover:text-accent-brand"
+              >
+                {t("cta_login")}
+              </Link>
+              <BrandButton asChild size="sm">
+                <Link to="/auth" onClick={() => setMenuOpen(false)}>
+                  {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </BrandButton>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }
+
 
 export function MarketingFooter() {
   return (

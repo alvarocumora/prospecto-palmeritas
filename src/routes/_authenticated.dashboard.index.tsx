@@ -1,5 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
+import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { RoleSegmentedPanel } from "@/features/dashboard/RoleSegmentedPanel";
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
 import { GeoScene3D } from "@/components/geoscene";
@@ -38,8 +41,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/")({
 function DashboardHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
-  const { kpis, loading } = useExecutiveKpis();
+  const { kpis, loading, refreshing, lastUpdated, refresh } = useExecutiveKpis();
+  const { isComplete: onboardingComplete, refresh: refreshOnboarding } = useOnboardingStatus();
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "operador";
+  const needsOnboarding = !profile?.account_type || !onboardingComplete;
 
   if (projects.length === 0) {
     return (
@@ -54,6 +59,11 @@ function DashboardHome() {
               Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
             </p>
           </header>
+          {needsOnboarding && (
+            <div className="mb-6">
+              <OnboardingWizard onComplete={refreshOnboarding} />
+            </div>
+          )}
           <Link
             to="/dashboard/projects"
             className="block rounded border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-8 text-center"
@@ -141,9 +151,25 @@ function DashboardHome() {
       tone: "danger",
     });
 
+  const showOnboarding = needsOnboarding;
+
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
       <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
+        {showOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
+        {!showOnboarding && profile?.account_type && !onboardingComplete && (
+          <div className="rounded border border-gold/30 bg-gold/5 px-4 py-3 flex items-center justify-between gap-3">
+            <div className="text-xs">
+              <span className="font-mono uppercase text-gold tracking-wider">Onboarding</span>
+              <span className="ml-2 text-muted-foreground">
+                Completa tu perfil para desbloquear todas las funciones.
+              </span>
+            </div>
+            <Link to="/dashboard/profile" className="text-xs font-mono text-gold hover:underline">
+              Continuar →
+            </Link>
+          </div>
+        )}
         {/* Header con signos vitales del proyecto */}
         <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
           <div className="flex items-start justify-between gap-3 flex-wrap">
@@ -227,6 +253,17 @@ function DashboardHome() {
             </div>
           )}
         </header>
+
+        {profile?.account_type && (
+          <RoleSegmentedPanel
+            accountType={profile.account_type as "investor" | "mining_owner" | "geocapitals_team"}
+            kpis={k ?? null}
+            loading={loading}
+            refreshing={refreshing}
+            lastUpdated={lastUpdated}
+            onRefresh={refresh}
+          />
+        )}
 
         {/* 4 PILARES — Explore · Model · Certify · Deal */}
         <section className="grid grid-cols-1 md:grid-cols-2 gap-3">

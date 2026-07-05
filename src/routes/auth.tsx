@@ -1,13 +1,22 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
-import { Loader2, MapPin, Layers, Mountain } from "lucide-react";
+import { z } from "zod";
+import { Loader2, MapPin, Layers, Mountain, CheckCircle2, X, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
+import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
+
+const authSearch = z.object({
+  intent: z.enum(["investor", "owner", "team"]).optional(),
+  mode: z.enum(["login", "signup"]).optional(),
+});
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s) => authSearch.parse(s),
   head: () => ({
     meta: [
       { title: "Iniciar sesión — Geocapitals" },
@@ -26,56 +35,79 @@ type Mode = "login" | "signup";
 function AuthPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const [mode, setMode] = useState<Mode>("login");
+  const search = Route.useSearch();
+  const [mode, setMode] = useState<Mode>(search.mode ?? (search.intent ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [needsConfirm, setNeedsConfirm] = useState(false);
+  const [resending, setResending] = useState(false);
+  const pwStrength = evaluatePassword(password);
 
-  // Si ya hay sesión activa, redirigir al dashboard automáticamente.
-  // Esto cubre tanto el caso "usuario ya logueado entra a /auth" como
-  // "acaba de iniciar sesión y onAuthStateChange propagó el user".
   useEffect(() => {
     if (!authLoading && user) {
       navigate({ to: "/dashboard" });
     }
   }, [authLoading, user, navigate]);
 
+  const handleResendConfirm = async () => {
+    if (!email) return toast.error("Ingresa tu email primero");
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+    });
+    setResending(false);
+    if (error) toast.error(translateAuthError(error).message);
+    else toast.success("Email de confirmación reenviado. Revisa tu bandeja.");
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    setNeedsConfirm(false);
+    if (mode === "signup" && pwStrength.score < 2) {
+      toast.error("Contraseña muy débil. Usa al menos 8 caracteres con mayúscula y número.");
+      return;
+    }
     setLoading(true);
     try {
       if (mode === "signup") {
+        const intentMeta = search.intent
+          ? { signup_intent: search.intent, account_type_hint: search.intent === "investor" ? "investor" : search.intent === "owner" ? "mining_owner" : "geocapitals_team" }
+          : {};
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/dashboard`,
-            data: { display_name: displayName || email.split("@")[0] },
+            data: { display_name: displayName || email.split("@")[0], ...intentMeta },
           },
         });
         if (error) throw error;
         if (!data.session) {
           toast.success("Cuenta creada. Revisa tu email para confirmar.");
+          setNeedsConfirm(true);
           setMode("login");
           return;
         }
         toast.success("Cuenta creada. Redirigiendo…");
-        // El useEffect de arriba navega cuando user esté disponible.
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (!data.session) throw new Error("No se pudo iniciar sesión");
         toast.success("Bienvenido");
-        // El useEffect navega cuando AuthProvider propague el user.
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Error de autenticación";
-      toast.error(msg);
+      const t = translateAuthError(err);
+      toast.error(t.message);
+      if (t.code === "email_not_confirmed") setNeedsConfirm(true);
     } finally {
       setLoading(false);
     }
   };
+
 
   const handleReset = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
@@ -194,6 +226,14 @@ function AuthPage() {
             </p>
           </div>
 
+          {search.intent === "investor" && (
+            <div className="rounded border border-gold/40 bg-gold/5 px-3 py-2 text-[11px] text-gold font-mono text-center">
+              ✦ Acceso institucional · KYC/AML post registro
+            </div>
+          )}
+
+
+
           <div className="rounded-lg border border-border bg-bg-secondary/60 backdrop-blur-sm p-6 space-y-4 shadow-2xl">
             <div className="flex gap-1 text-xs font-mono p-1 bg-background rounded-md border border-border">
               <button
@@ -218,6 +258,40 @@ function AuthPage() {
               >
                 Crear cuenta
               </button>
+            </div>
+
+            <button
+              type="button"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const result = await lovable.auth.signInWithOAuth("google", {
+                    redirect_uri: window.location.origin,
+                  });
+                  if (result.error) throw result.error;
+                  if (result.redirected) return;
+                } catch (err) {
+                  toast.error(translateAuthError(err).message);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded border border-border bg-background hover:border-gold text-foreground text-sm font-medium transition-colors disabled:opacity-50"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" aria-hidden="true">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Continuar con Google
+            </button>
+
+            <div className="relative flex items-center gap-2 text-[10px] font-mono text-muted-foreground uppercase tracking-widest">
+              <div className="h-px flex-1 bg-border" />
+              <span>o</span>
+              <div className="h-px flex-1 bg-border" />
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-3">
@@ -256,6 +330,13 @@ function AuthPage() {
                   maxLength={100}
                 />
               </Field>
+              {mode === "signup" && password.length > 0 && (
+                <PasswordStrengthMeter
+                  score={pwStrength.score}
+                  label={pwStrength.label}
+                  checks={pwStrength.checks}
+                />
+              )}
               <button
                 type="submit"
                 disabled={loading}
@@ -265,6 +346,18 @@ function AuthPage() {
                 {mode === "login" ? "Entrar al proyecto" : "Crear cuenta"}
               </button>
             </form>
+
+            {needsConfirm && (
+              <button
+                type="button"
+                onClick={handleResendConfirm}
+                disabled={resending}
+                className="w-full inline-flex items-center justify-center gap-2 text-xs text-gold font-mono border border-gold/40 rounded px-3 py-2 hover:bg-gold/10 disabled:opacity-60"
+              >
+                <Mail className="w-3.5 h-3.5" />
+                {resending ? "Reenviando…" : "Reenviar email de confirmación"}
+              </button>
+            )}
 
             {mode === "login" && (
               <button
@@ -276,6 +369,7 @@ function AuthPage() {
               </button>
             )}
           </div>
+
 
           <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
             Catastro · Geofísica · Sondajes · QA/QC
@@ -305,6 +399,52 @@ function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; va
         <span className="font-mono text-[9px] uppercase tracking-widest">{label}</span>
       </div>
       <div className="font-mono text-sm font-semibold text-foreground">{value}</div>
+    </div>
+  );
+}
+
+function PasswordStrengthMeter({
+  score,
+  label,
+  checks,
+}: {
+  score: 0 | 1 | 2 | 3 | 4;
+  label: string;
+  checks: { len: boolean; upper: boolean; lower: boolean; digit: boolean; symbol: boolean };
+}) {
+  const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-emerald-500"];
+  const items: Array<[keyof typeof checks, string]> = [
+    ["len", "8+ caracteres"],
+    ["upper", "Mayúscula"],
+    ["lower", "Minúscula"],
+    ["digit", "Número"],
+    ["symbol", "Símbolo"],
+  ];
+  return (
+    <div className="space-y-1.5">
+      <div className="flex gap-1">
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className={`h-1 flex-1 rounded ${i <= score ? colors[score] : "bg-border"}`}
+          />
+        ))}
+      </div>
+      <div className="flex items-center justify-between text-[10px] font-mono">
+        <span className="text-muted-foreground">Fortaleza: <span className="text-foreground">{label}</span></span>
+      </div>
+      <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
+        {items.map(([k, lbl]) => (
+          <li key={k} className="flex items-center gap-1 text-[10px] font-mono">
+            {checks[k] ? (
+              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+            ) : (
+              <X className="w-3 h-3 text-muted-foreground/50" />
+            )}
+            <span className={checks[k] ? "text-foreground" : "text-muted-foreground/70"}>{lbl}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
