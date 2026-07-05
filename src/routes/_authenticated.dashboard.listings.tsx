@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Eye, Loader2, Plus, RefreshCw } from "lucide-react";
+import { ArrowLeft, Eye, FolderOpen, Loader2, Plus, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
+import { DataRoomManager } from "@/features/listings/DataRoomManager";
 import {
   createPropertyListing,
   listMyListings,
@@ -45,6 +46,7 @@ function MyListingsPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [openDataRoom, setOpenDataRoom] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -299,15 +301,26 @@ function MyListingsPage() {
                   <Eye className="w-3 h-3" /> {r.views_count}
                 </span>
               </div>
-              {r.is_published && (
-                <Link
-                  to="/proyectos/$listingId"
-                  params={{ listingId: r.id }}
-                  className="mt-3 inline-block text-[11px] font-mono text-gold hover:underline"
+              <div className="mt-3 flex items-center gap-4">
+                {r.is_published && (
+                  <Link
+                    to="/proyectos/$listingId"
+                    params={{ listingId: r.id }}
+                    className="text-[11px] font-mono text-gold hover:underline"
+                  >
+                    Ver ficha pública →
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setOpenDataRoom((cur) => (cur === r.id ? null : r.id))}
+                  className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold transition-colors"
                 >
-                  Ver ficha pública →
-                </Link>
-              )}
+                  <FolderOpen className="w-3 h-3" />
+                  {openDataRoom === r.id ? "Cerrar data room" : "Data room"}
+                </button>
+              </div>
+              {openDataRoom === r.id && <DataRoomManager listingId={r.id} />}
             </article>
           ))}
         </div>
