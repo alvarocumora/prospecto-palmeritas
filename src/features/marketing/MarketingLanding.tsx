@@ -19,6 +19,9 @@ import { LogoMarquee } from "@/features/marketing/LogoMarquee";
 import { TestimonialsBento } from "@/features/marketing/TestimonialsBento";
 import { FaqAccordion } from "@/features/marketing/FaqAccordion";
 import { HeroTopoBackground } from "@/features/marketing/HeroTopoBackground";
+import heroMining from "@/assets/hero-mining.jpg";
+import featureCatastro from "@/assets/feature-catastro.jpg";
+import featureGeophysics from "@/assets/feature-geophysics.jpg";
 import {
   Mountain,
   Users,
