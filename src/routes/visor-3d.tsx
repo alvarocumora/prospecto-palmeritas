@@ -610,6 +610,38 @@ function Visor3DPage() {
                     </div>
                   )}
                 </div>
+
+                {selectedInsar && (
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wide text-content-subtle mb-2">
+                      InSAR seleccionado
+                    </div>
+                    <div className="rounded-lg border border-accent-brand/60 bg-accent-brand-subtle/40 p-3 space-y-1">
+                      <div className="text-xs font-medium text-content">
+                        {selectedInsar.asset_name ?? "Adquisición InSAR"}
+                      </div>
+                      <div className="text-[11px] text-content-subtle">
+                        {selectedInsar.source ?? "—"} ·{" "}
+                        {selectedInsar.velocity_mm_year != null
+                          ? `${Number(selectedInsar.velocity_mm_year).toFixed(1)} mm/a`
+                          : "—"}
+                      </div>
+                      {selectedInsar.cumulative_displacement_mm != null && (
+                        <div className="text-[11px] text-content-subtle">
+                          Desp. acumulado{" "}
+                          {Number(selectedInsar.cumulative_displacement_mm).toFixed(1)} mm
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <Link
+                  to="/satelital"
+                  className="inline-flex items-center gap-1.5 text-[11px] font-medium text-accent-brand hover:underline"
+                >
+                  <Satellite className="w-3 h-3" /> Volver a filtros satelitales
+                </Link>
               </>
             )}
 
