@@ -416,7 +416,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
                   </thead>
                   <tbody>
                     {project.anomalies.map((a) => (
-                      <AnomalyRow key={a.id} a={a} />
+                      <AnomalyRow key={a.id} a={a} projectId={project.id} />
                     ))}
                   </tbody>
                 </table>
@@ -445,7 +445,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
                   </thead>
                   <tbody>
                     {project.insar.map((i) => (
-                      <InsarRow key={i.id} i={i} />
+                      <InsarRow key={i.id} i={i} projectId={project.id} />
                     ))}
                   </tbody>
                 </table>
