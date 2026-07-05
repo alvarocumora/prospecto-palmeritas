@@ -170,8 +170,6 @@ function FeaturedProjectCard({
   project: PublicListing;
   onOpen: (listing: PublicListing) => void;
 }) {
-  const base = commodityBase(p.commodity);
-  const tint = COMMODITY_TINT[p.commodity ?? ""] ?? COMMODITY_TINT[base] ?? DEFAULT_TINT;
   const modality = MODALITY_LABEL[p.modality ?? ""] ?? p.modality ?? "";
   const stage = STAGE_LABEL[p.stage ?? ""] ?? p.stage ?? "";
 
