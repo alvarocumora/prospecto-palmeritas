@@ -22,7 +22,7 @@ export function PublicListingCard({
   return (
     <button
       onClick={onOpen}
-      className="group text-left rounded-xl border border-hairline bg-white overflow-hidden flex flex-col hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition"
+      className="group text-left rounded-xl border border-hairline bg-white overflow-hidden flex flex-col h-full hover-lift hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition"
     >
       <div className="aspect-[16/9] bg-accent-brand-subtle relative overflow-hidden">
         {listing.cover_image_url ? (

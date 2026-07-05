@@ -292,7 +292,10 @@ function AuthenticatedLayout() {
         className={cn("relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]")}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
-        <Outlet />
+        {/* key por ruta: cada vista entra con un fade-up sutil */}
+        <div key={location.pathname} className="animate-fade-up">
+          <Outlet />
+        </div>
       </main>
 
       <StatusBar />
