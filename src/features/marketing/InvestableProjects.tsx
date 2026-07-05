@@ -29,21 +29,6 @@ function matchFilter(p: PublicListing, key: string) {
   return true;
 }
 
-const COMMODITY_TINT: Record<string, { from: string; icon: string }> = {
-  Au: { from: "from-amber-50 to-yellow-100", icon: "text-amber-500" },
-  "Au-Ag": { from: "from-amber-50 to-yellow-100", icon: "text-amber-500" },
-  "Au-Cu": { from: "from-amber-50 to-orange-100", icon: "text-amber-500" },
-  Ag: { from: "from-slate-50 to-gray-100", icon: "text-slate-400" },
-  Cu: { from: "from-orange-50 to-amber-100", icon: "text-orange-500" },
-  "Cu-Au": { from: "from-orange-50 to-amber-100", icon: "text-orange-500" },
-  Li: { from: "from-teal-50 to-emerald-100", icon: "text-teal-500" },
-};
-
-const DEFAULT_TINT = { from: "from-slate-50 to-gray-100", icon: "text-slate-400" };
-
-function commodityBase(commodity: string | null): string {
-  return (commodity ?? "").split("-")[0] ?? "";
-}
 
 export function InvestableProjects() {
   const [activeFilter, setActiveFilter] = useState("all");
