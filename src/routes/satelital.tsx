@@ -34,13 +34,13 @@ export const Route = createFileRoute("/satelital")({
       {
         name: "description",
         content:
-          "Detección de anomalías multiespectrales y deformación InSAR sobre proyectos mineros demo en Chile. Datos Sentinel y Copernicus procesados en Geocapitals Terminal.",
+          "Detección de anomalías multiespectrales y deformación InSAR sobre los proyectos mineros monitoreados en Geocapitals. Datos Sentinel y Copernicus procesados en el Terminal.",
       },
       { property: "og:title", content: "Monitoreo satelital minero — Geocapitals" },
       {
         property: "og:description",
         content:
-          "Anomalías satelitales, InSAR y series temporales sobre 3 proyectos mineros chilenos.",
+          "Anomalías satelitales, InSAR y series temporales sobre los proyectos mineros de la plataforma.",
       },
       { property: "og:url", content: "https://geocapitals.com/satelital" },
       { property: "og:type", content: "website" },
@@ -455,6 +455,78 @@ function InsarVelocityChart({ insar }: { insar: PublicSatProject["insar"] }) {
   );
 }
 
+/** Serie temporal de desplazamiento acumulado (línea sobre fechas de referencia). */
+function InsarTimeSeriesChart({ insar }: { insar: PublicSatProject["insar"] }) {
+  const pts = insar
+    .filter((i) => i.reference_date && i.cumulative_displacement_mm != null)
+    .map((i) => ({
+      t: new Date(i.reference_date!).getTime(),
+      v: Number(i.cumulative_displacement_mm),
+    }))
+    .sort((a, b) => a.t - b.t);
+  if (pts.length < 3) return null;
+
+  const W = 400;
+  const H = 80;
+  const PAD = 6;
+  const t0 = pts[0].t;
+  const t1 = pts[pts.length - 1].t;
+  const spanT = Math.max(t1 - t0, 1);
+  const vMin = Math.min(...pts.map((p) => p.v), 0);
+  const vMax = Math.max(...pts.map((p) => p.v), 0);
+  const spanV = Math.max(vMax - vMin, 1);
+
+  const px = (t: number) => PAD + ((t - t0) / spanT) * (W - PAD * 2);
+  const py = (v: number) => PAD + (1 - (v - vMin) / spanV) * (H - PAD * 2);
+  const poly = pts.map((p) => `${px(p.t).toFixed(1)},${py(p.v).toFixed(1)}`).join(" ");
+  const zeroY = py(0);
+  const fmtDate = (t: number) =>
+    new Date(t).toLocaleDateString("es-CL", { month: "short", year: "2-digit" });
+
+  return (
+    <div className="mb-4">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-1.5">
+        Desplazamiento acumulado (mm) · serie temporal
+      </div>
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="w-full"
+        role="img"
+        aria-label="Serie temporal de desplazamiento acumulado"
+      >
+        {zeroY >= PAD && zeroY <= H - PAD && (
+          <line
+            x1={PAD}
+            x2={W - PAD}
+            y1={zeroY}
+            y2={zeroY}
+            style={{ stroke: "var(--hairline-strong)" }}
+            strokeWidth="1"
+            strokeDasharray="3 3"
+          />
+        )}
+        <polyline
+          points={poly}
+          fill="none"
+          style={{ stroke: "var(--accent-brand)" }}
+          strokeWidth="1.5"
+          strokeLinejoin="round"
+        />
+        {pts.map((p, i) => (
+          <circle key={i} cx={px(p.t)} cy={py(p.v)} r="2" style={{ fill: "var(--accent-brand)" }} />
+        ))}
+      </svg>
+      <div className="flex justify-between text-[9px] font-mono text-content-subtle mt-0.5">
+        <span>{fmtDate(t0)}</span>
+        <span>
+          {vMin.toFixed(0)} a {vMax.toFixed(0)} mm
+        </span>
+        <span>{fmtDate(t1)}</span>
+      </div>
+    </div>
+  );
+}
+
 function ProjectPanel({ project }: { project: PublicSatProject }) {
   const [open, setOpen] = useState(true);
   const insarAvgVelocity =
@@ -557,6 +629,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
               InSAR ({project.insar.length})
             </div>
             <InsarVelocityChart insar={project.insar} />
+            <InsarTimeSeriesChart insar={project.insar} />
             {project.insar.length === 0 ? (
               <p className="text-sm text-content-subtle italic">Sin resultados.</p>
             ) : (
