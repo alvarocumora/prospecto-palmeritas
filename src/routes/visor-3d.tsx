@@ -423,6 +423,7 @@ function Visor3DPage() {
                 onPointerMissed={() => {
                   setSelectedSiteId(null);
                   setSelectedAnomalyId(null);
+                  setSelectedInsarId(null);
                 }}
               >
                 <color attach="background" args={["#0b0e12"]} />
@@ -444,10 +445,12 @@ function Visor3DPage() {
                       onSelectSite={() => {
                         setSelectedSiteId(site.project.id);
                         setSelectedAnomalyId(null);
+                        setSelectedInsarId(null);
                       }}
                       onSelectAnomaly={(id) => {
                         setSelectedSiteId(site.project.id);
                         setSelectedAnomalyId(id);
+                        setSelectedInsarId(null);
                       }}
                     />
                   ))}
@@ -455,12 +458,19 @@ function Visor3DPage() {
 
                 <gridHelper args={[SCENE_HALF * 2.4, 24, "#233046", "#151b26"]} />
 
-                <OrbitControls
-                  enableDamping
-                  dampingFactor={0.08}
-                  minDistance={120}
-                  maxDistance={2400}
-                  maxPolarAngle={Math.PI / 2.05}
+                <CameraFocus
+                  target={
+                    selectedAnomaly && selectedSite
+                      ? [
+                          selectedSite.position[0] + selectedAnomaly.offset[0],
+                          selectedSite.position[1] + selectedAnomaly.offset[1],
+                          selectedSite.position[2] + selectedAnomaly.offset[2],
+                        ]
+                      : selectedSite
+                        ? selectedSite.position
+                        : null
+                  }
+                  zoom={selectedAnomaly ? 260 : 700}
                 />
               </Canvas>
             )}
