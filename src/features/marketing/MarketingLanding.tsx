@@ -9,6 +9,8 @@ import { MarketingHeader, MarketingFooter } from "@/features/marketing/Marketing
 import { useLocale } from "@/features/marketing/i18n";
 import { InvestableProjects } from "@/features/marketing/InvestableProjects";
 import { InvestmentSimulator } from "@/features/marketing/InvestmentSimulator";
+import { CommodityTicker } from "@/features/marketing/CommodityTicker";
+import { PlatformPreview } from "@/features/marketing/PlatformPreview";
 import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
 import {
   Mountain,
@@ -115,6 +117,9 @@ export function MarketingLanding() {
           <HeroLiveMap />
         </div>
       </section>
+
+      {/* Commodity price ticker */}
+      <CommodityTicker />
 
       {/* Pillars band */}
       <section className="bg-surface-inverse text-white">
@@ -417,6 +422,9 @@ export function MarketingLanding() {
           ))}
         </div>
       </section>
+
+      {/* Terminal preview mock */}
+      <PlatformPreview />
 
       {/* Proyectos disponibles para invertir */}
       <InvestableProjects />
