@@ -20,13 +20,13 @@ import { Route as ProyectosRouteImport } from './routes/proyectos'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
@@ -169,11 +169,6 @@ const McpRoute = McpRouteImport.update({
   path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InversionistasRoute = InversionistasRouteImport.update({
   id: '/inversionistas',
   path: '/inversionistas',
@@ -203,6 +198,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
@@ -229,9 +229,9 @@ const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
   getParentRoute: () => ProyectosRoute,
 } as any)
 const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
-  id: '/$lotId',
-  path: '/$lotId',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/$lotId',
+  path: '/marketplace/$lotId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LiveTilamaRoute = LiveTilamaRouteImport.update({
   id: '/live/tilama',
@@ -700,7 +700,6 @@ export interface FileRoutesByFullPath {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
@@ -733,6 +732,7 @@ export interface FileRoutesByFullPath {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
@@ -805,7 +805,6 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
@@ -838,6 +837,7 @@ export interface FileRoutesByTo {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro': typeof CatastroIndexRoute
+  '/marketplace': typeof MarketplaceIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
@@ -912,7 +912,6 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
@@ -945,6 +944,7 @@ export interface FileRoutesById {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/catastro/': typeof CatastroIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
@@ -1019,7 +1019,6 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
-    | '/marketplace'
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
@@ -1052,6 +1051,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/catastro/'
+    | '/marketplace/'
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -1124,7 +1124,6 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
-    | '/marketplace'
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
@@ -1157,6 +1156,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/catastro'
+    | '/marketplace'
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
@@ -1230,7 +1230,6 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/inversionistas'
-    | '/marketplace'
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
@@ -1263,6 +1262,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/catastro/'
+    | '/marketplace/'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/dashboard/3d-pro'
     | '/_authenticated/dashboard/admin'
@@ -1337,7 +1337,6 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   InversionistasRoute: typeof InversionistasRoute
-  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
@@ -1364,7 +1363,9 @@ export interface RootRouteChildren {
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
+  MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
@@ -1461,13 +1462,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/inversionistas': {
       id: '/inversionistas'
       path: '/inversionistas'
@@ -1510,6 +1504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/catastro/': {
       id: '/catastro/'
       path: '/catastro'
@@ -1547,10 +1548,10 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/$lotId': {
       id: '/marketplace/$lotId'
-      path: '/$lotId'
+      path: '/marketplace/$lotId'
       fullPath: '/marketplace/$lotId'
       preLoaderRoute: typeof MarketplaceLotIdRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/live/tilama': {
       id: '/live/tilama'
@@ -2304,18 +2305,6 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface MarketplaceRouteChildren {
-  MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
-}
-
-const MarketplaceRouteChildren: MarketplaceRouteChildren = {
-  MarketplaceLotIdRoute: MarketplaceLotIdRoute,
-}
-
-const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
-  MarketplaceRouteChildren,
-)
-
 interface ProyectosRouteChildren {
   ProyectosListingIdRoute: typeof ProyectosListingIdRoute
 }
@@ -2351,7 +2340,6 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   InversionistasRoute: InversionistasRoute,
-  MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
@@ -2379,7 +2367,9 @@ const rootRouteChildren: RootRouteChildren = {
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
+  MarketplaceLotIdRoute: MarketplaceLotIdRoute,
   CatastroIndexRoute: CatastroIndexRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
