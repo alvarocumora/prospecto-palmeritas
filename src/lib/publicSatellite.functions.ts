@@ -44,6 +44,14 @@ export type PublicSatProject = {
     dip: number | null;
     depth: number | null;
     status: string;
+    intervals: Array<{
+      from: number;
+      to: number;
+      lithology: string | null;
+      au_gpt: number | null;
+      ag_gpt: number | null;
+      cu_pct: number | null;
+    }>;
   }>;
 };
 
@@ -144,6 +152,51 @@ export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
           .limit(400),
       ]);
 
+    // Intervalos de litología/leyes para los sondajes visibles (cap por hole)
+    const cappedHoleIds = projectIds
+      .flatMap((pid) =>
+        (holes ?? [])
+          .filter((h) => h.project_id === pid)
+          .slice(0, MAX_HOLES_PER_PROJECT)
+          .map((h) => h.id),
+      )
+      .slice(0, 150);
+
+    const { data: coreLogs } = cappedHoleIds.length
+      ? await supabase
+          .from("drill_core_logs")
+          .select("hole_id, depth_from, depth_to, lithology, au_gpt, ag_gpt, cu_pct")
+          .in("hole_id", cappedHoleIds)
+          .order("depth_from", { ascending: true })
+          .limit(1500)
+      : { data: [] as never[] };
+
+    const intervalsByHole = new Map<
+      string,
+      Array<{
+        from: number;
+        to: number;
+        lithology: string | null;
+        au_gpt: number | null;
+        ag_gpt: number | null;
+        cu_pct: number | null;
+      }>
+    >();
+    for (const log of coreLogs ?? []) {
+      const arr = intervalsByHole.get(log.hole_id) ?? [];
+      if (arr.length < 24) {
+        arr.push({
+          from: Number(log.depth_from),
+          to: Number(log.depth_to),
+          lithology: log.lithology,
+          au_gpt: log.au_gpt != null ? Number(log.au_gpt) : null,
+          ag_gpt: log.ag_gpt != null ? Number(log.ag_gpt) : null,
+          cu_pct: log.cu_pct != null ? Number(log.cu_pct) : null,
+        });
+      }
+      intervalsByHole.set(log.hole_id, arr);
+    }
+
     // Solo proyectos con al menos algo que mostrar (anomalías, InSAR o sondajes),
     // demo IDs siempre incluidos.
     const hasData = (pid: string) =>
@@ -186,6 +239,7 @@ export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
             dip: h.dip,
             depth: h.actual_depth ?? h.planned_depth,
             status: h.status,
+            intervals: intervalsByHole.get(h.id) ?? [],
           })),
       }));
   },

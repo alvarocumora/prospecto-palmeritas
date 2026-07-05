@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -21,6 +21,7 @@ import {
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { Eyebrow, SectionHeading } from "@/components/brand";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
+import { getDemTile, type DemTile } from "@/engine3d/terrain/dem.functions";
 
 type Visor3DSearch = {
   project?: string;
@@ -77,6 +78,12 @@ function Visor3DError({ error }: { error: Error }) {
 // ---- Geometría de escena ----------------------------------------------------
 
 const SCENE_HALF = 900; // metros equivalentes en la escena
+const METERS_PER_DEG_LAT = 111_320;
+const GEO_SCALE = 0.08; // 1 m real = 0.08 unidades de escena (horizontal)
+const VERT_SCALE = 0.05; // exageración vertical del DEM
+const MAX_R = 260; // radio máximo de la nube alrededor del marcador
+const DEM_EXTENT_M = 6500; // lado del tile DEM por sitio
+const DEM_SIZE = 129; // grid 2^n + 1
 
 type SiteData = {
   project: PublicSatProject;
@@ -96,9 +103,11 @@ type SiteData = {
     hole_id: string;
     offset: [number, number]; // x, z en unidades de escena
     depth: number; // unidades de escena
+    depth_m: number; // metros reales
     azimuth: number; // grados
     dip: number; // grados (negativo = bajo la horizontal)
     status: string;
+    intervals: PublicSatProject["drillholes"][number]["intervals"];
   }>;
   criticalCount: number;
   avgVelocity: number;
@@ -127,13 +136,10 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
     const ny = ((project.center_lat ?? 0) - minLat) / spanLat;
     const x = (nx - 0.5) * SCENE_HALF * 1.2;
     const z = -(ny - 0.5) * SCENE_HALF * 1.2;
-    const y = terrainHeight(x, z);
+    // Cada sitio se ancla a y=0: su parche DEM se desplaza para que el centro
+    // del tile quede a esa altura.
+    const y = 0;
 
-    // Escala geográfica → escena: metros reales comprimidos para mantener la nube
-    // legible alrededor del marcador (clamp a MAX_R).
-    const METERS_PER_DEG_LAT = 111_320;
-    const GEO_SCALE = 0.08; // 1 m real = 0.08 unidades de escena
-    const MAX_R = 260;
     const cLat = project.center_lat;
     const cLng = project.center_lng;
     const cosLat = Math.cos(((cLat ?? -30) * Math.PI) / 180);
@@ -190,14 +196,17 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
         hx = (hx / r) * MAX_R;
         hz = (hz / r) * MAX_R;
       }
+      const depth_m = h.depth ?? 150;
       return {
         id: h.id,
         hole_id: h.hole_id,
         offset: [hx, hz] as [number, number],
-        depth: Math.max(20, (h.depth ?? 150) * DEPTH_SCALE),
+        depth: Math.max(20, depth_m * DEPTH_SCALE),
+        depth_m,
         azimuth: h.azimuth ?? 0,
         dip: h.dip ?? -90,
         status: h.status,
+        intervals: h.intervals,
       };
     });
 
@@ -222,31 +231,58 @@ function projectsToSites(projects: PublicSatProject[]): SiteData[] {
   });
 }
 
-function terrainHeight(x: number, z: number) {
-  return Math.sin(x / 220) * 55 + Math.cos(z / 260) * 65 + Math.sin((x + z) / 180) * 30;
-}
-
 // ---- Componentes 3D ---------------------------------------------------------
 
-function Terrain() {
+/** Plano base oscuro bajo los parches DEM. */
+function GroundPlane() {
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2, 0]} receiveShadow>
+      <planeGeometry args={[SCENE_HALF * 3, SCENE_HALF * 3]} />
+      <meshStandardMaterial color="#14100c" roughness={1} metalness={0} />
+    </mesh>
+  );
+}
+
+/** Parche de terreno DEM centrado en un sitio (alturas relativas al centro). */
+function TerrainPatch({ dem, position }: { dem: DemTile; position: [number, number] }) {
   const geo = useMemo(() => {
-    const g = new THREE.PlaneGeometry(SCENE_HALF * 2.4, SCENE_HALF * 2.4, 80, 80);
+    const size = dem.size;
+    const w = dem.extentMeters * GEO_SCALE;
+    const g = new THREE.PlaneGeometry(w, w, size - 1, size - 1);
+    const centerH = dem.heights[Math.floor(size / 2) * size + Math.floor(size / 2)] ?? 0;
     const pos = g.attributes.position as THREE.BufferAttribute;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      const y = pos.getY(i);
-      pos.setZ(i, terrainHeight(x, y));
+    for (let idx = 0; idx < size * size; idx++) {
+      pos.setZ(idx, (dem.heights[idx] - centerH) * VERT_SCALE);
     }
     g.computeVertexNormals();
     g.rotateX(-Math.PI / 2);
     return g;
-  }, []);
+  }, [dem]);
 
   return (
-    <mesh geometry={geo} receiveShadow>
-      <meshStandardMaterial color="#3a2f24" roughness={0.95} metalness={0.05} wireframe={false} />
+    <mesh geometry={geo} position={[position[0], 0, position[1]]} receiveShadow>
+      <meshStandardMaterial color="#3a2f24" roughness={0.95} metalness={0.05} />
     </mesh>
   );
+}
+
+// Paleta determinística de litologías (hash del nombre → color estable)
+const LITHO_PALETTE = [
+  "#8b5cf6",
+  "#06b6d4",
+  "#84cc16",
+  "#f43f5e",
+  "#eab308",
+  "#3b82f6",
+  "#f97316",
+  "#14b8a6",
+];
+
+function lithoColor(name: string | null): string {
+  if (!name) return "#c1a266";
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
+  return LITHO_PALETTE[Math.abs(h) % LITHO_PALETTE.length];
 }
 
 const HOLE_STATUS_COLOR: Record<string, string> = {
@@ -255,18 +291,28 @@ const HOLE_STATUS_COLOR: Record<string, string> = {
   planned: "#64748b",
 };
 
+type HoleIntervals = PublicSatProject["drillholes"][number]["intervals"];
+
 function DrillHole({
   position,
   depth = 250,
+  depthM = 250,
   azimuth = 0,
   dip = -90,
   status = "completed",
+  intervals = [],
+  selected = false,
+  onClick,
 }: {
   position: [number, number, number];
   depth?: number;
+  depthM?: number;
   azimuth?: number;
   dip?: number;
   status?: string;
+  intervals?: HoleIntervals;
+  selected?: boolean;
+  onClick?: () => void;
 }) {
   // Dirección del pozo: azimuth (grados desde el norte, horario) + dip
   // (negativo = bajo la horizontal). Norte = -Z en la escena.
@@ -282,20 +328,67 @@ function DrillHole({
   }, [azimuth, dip]);
 
   const color = HOLE_STATUS_COLOR[status] ?? HOLE_STATUS_COLOR.completed;
+  // Escala: unidades de escena por metro de pozo
+  const mScale = depth / Math.max(depthM, 1);
+
+  const handlers = onClick
+    ? {
+        onClick: (e: { stopPropagation: () => void }) => {
+          e.stopPropagation();
+          onClick();
+        },
+        onPointerOver: (e: { stopPropagation: () => void }) => {
+          e.stopPropagation();
+          document.body.style.cursor = "pointer";
+        },
+        onPointerOut: () => {
+          document.body.style.cursor = "default";
+        },
+      }
+    : {};
 
   return (
     <group position={position}>
-      {/* Traza inclinada: el cilindro cuelga desde el collar según azimuth/dip */}
+      {/* Traza inclinada: cuelga desde el collar según azimuth/dip */}
       <group quaternion={quat}>
-        <mesh position={[0, -depth / 2, 0]}>
-          <cylinderGeometry args={[3, 3, depth, 12]} />
-          <meshStandardMaterial color={color} metalness={0.4} roughness={0.4} />
-        </mesh>
+        {intervals.length > 0 ? (
+          intervals.map((iv, k) => {
+            const segLen = Math.max((iv.to - iv.from) * mScale, 1.5);
+            const segCenter = -(iv.from + (iv.to - iv.from) / 2) * mScale;
+            return (
+              <mesh key={k} position={[0, segCenter, 0]} {...handlers}>
+                <cylinderGeometry args={[3.2, 3.2, segLen, 10]} />
+                <meshStandardMaterial
+                  color={lithoColor(iv.lithology)}
+                  emissive={selected ? lithoColor(iv.lithology) : "#000000"}
+                  emissiveIntensity={selected ? 0.35 : 0}
+                  metalness={0.3}
+                  roughness={0.5}
+                />
+              </mesh>
+            );
+          })
+        ) : (
+          <mesh position={[0, -depth / 2, 0]} {...handlers}>
+            <cylinderGeometry args={[3, 3, depth, 12]} />
+            <meshStandardMaterial
+              color={color}
+              emissive={selected ? color : "#000000"}
+              emissiveIntensity={selected ? 0.5 : 0}
+              metalness={0.4}
+              roughness={0.4}
+            />
+          </mesh>
+        )}
       </group>
       {/* Collar en superficie */}
-      <mesh position={[0, 12, 0]}>
+      <mesh position={[0, 12, 0]} {...handlers}>
         <coneGeometry args={[10, 24, 16]} />
-        <meshStandardMaterial color="#f6c453" emissive="#3a2a10" />
+        <meshStandardMaterial
+          color={selected ? "#fbbf24" : "#f6c453"}
+          emissive={selected ? "#f59e0b" : "#3a2a10"}
+          emissiveIntensity={selected ? 0.8 : 1}
+        />
       </mesh>
     </group>
   );
@@ -355,12 +448,16 @@ function Site({
   onSelectSite,
   onSelectAnomaly,
   selectedAnomalyId,
+  onSelectHole,
+  selectedHoleId,
 }: {
   site: SiteData;
   selected: boolean;
   onSelectSite: () => void;
   onSelectAnomaly: (id: string) => void;
   selectedAnomalyId: string | null;
+  onSelectHole: (id: string) => void;
+  selectedHoleId: string | null;
 }) {
   const [x, y, z] = site.position;
 
@@ -403,9 +500,13 @@ function Site({
             key={h.id}
             position={[h.offset[0], 0, h.offset[1]]}
             depth={h.depth}
+            depthM={h.depth_m}
             azimuth={h.azimuth}
             dip={h.dip}
             status={h.status}
+            intervals={h.intervals}
+            selected={selectedHoleId === h.id}
+            onClick={() => onSelectHole(h.id)}
           />
         ))
       ) : (
@@ -490,6 +591,27 @@ function Visor3DPage() {
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(null);
   const [selectedInsarId, setSelectedInsarId] = useState<string | null>(null);
+  const [selectedHoleId, setSelectedHoleId] = useState<string | null>(null);
+
+  // Terreno DEM por sitio (pipeline por proyecto, cache indefinido)
+  const fetchDem = useServerFn(getDemTile);
+  const demQueries = useQueries({
+    queries: projects.map((p) => ({
+      queryKey: ["dem-tile", p.id],
+      queryFn: () =>
+        fetchDem({ data: { projectId: p.id, size: DEM_SIZE, extentMeters: DEM_EXTENT_M } }),
+      staleTime: Infinity,
+    })),
+  });
+  const demById = useMemo(() => {
+    const m = new Map<string, DemTile>();
+    projects.forEach((p, i) => {
+      const d = demQueries[i]?.data;
+      if (d) m.set(p.id, d);
+    });
+    return m;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projects, ...demQueries.map((q) => q.data)]);
 
   // Sync from URL search params once data arrives (or when params change)
   useEffect(() => {
@@ -502,6 +624,7 @@ function Visor3DPage() {
   const selectedSite = sites.find((s) => s.project.id === selectedSiteId) ?? sites[0];
   const selectedAnomaly = selectedSite?.anomalies.find((a) => a.id === selectedAnomalyId) ?? null;
   const selectedInsar = selectedSite?.project.insar.find((i) => i.id === selectedInsarId) ?? null;
+  const selectedHole = selectedSite?.holes.find((h) => h.id === selectedHoleId) ?? null;
 
   const totalAnomalies = projects.reduce((s, p) => s + p.anomalies.length, 0);
   const criticalCount = projects.reduce(
@@ -551,7 +674,7 @@ function Visor3DPage() {
         <SectionHeading
           eyebrow="Escena 3D"
           title="Terreno, sondajes y anomalías en un solo canvas"
-          description="Sitios, anomalías y sondajes provienen de la base de datos productiva de Geocapitals: las anomalías con geometría y los collares de sondaje se posicionan por sus coordenadas reales, con trazas inclinadas según azimuth y dip. El terreno es demostrativo."
+          description="Sitios, anomalías, sondajes e intervalos de litología provienen de la base de datos productiva de Geocapitals; los collares se posicionan por coordenadas UTM reales con trazas inclinadas por azimuth/dip y coloreadas por litología. El terreno usa el pipeline DEM por proyecto (relieve demostrativo hasta conectar Copernicus)."
           className="mb-6"
         />
 
@@ -575,6 +698,7 @@ function Visor3DPage() {
                   setSelectedSiteId(null);
                   setSelectedAnomalyId(null);
                   setSelectedInsarId(null);
+                  setSelectedHoleId(null);
                 }}
               >
                 <color attach="background" args={["#0b0e12"]} />
@@ -584,7 +708,17 @@ function Visor3DPage() {
                 <hemisphereLight args={["#3a4a6a", "#1a1410", 0.35]} />
 
                 <Suspense fallback={null}>
-                  <Terrain />
+                  <GroundPlane />
+                  {sites.map((site) => {
+                    const dem = demById.get(site.project.id);
+                    return dem ? (
+                      <TerrainPatch
+                        key={`dem-${site.project.id}`}
+                        dem={dem}
+                        position={[site.position[0], site.position[2]]}
+                      />
+                    ) : null;
+                  })}
                   {sites.map((site) => (
                     <Site
                       key={site.project.id}
@@ -593,14 +727,25 @@ function Visor3DPage() {
                       selectedAnomalyId={
                         selectedSite?.project.id === site.project.id ? selectedAnomalyId : null
                       }
+                      selectedHoleId={
+                        selectedSite?.project.id === site.project.id ? selectedHoleId : null
+                      }
                       onSelectSite={() => {
                         setSelectedSiteId(site.project.id);
                         setSelectedAnomalyId(null);
                         setSelectedInsarId(null);
+                        setSelectedHoleId(null);
                       }}
                       onSelectAnomaly={(id) => {
                         setSelectedSiteId(site.project.id);
                         setSelectedAnomalyId(id);
+                        setSelectedInsarId(null);
+                        setSelectedHoleId(null);
+                      }}
+                      onSelectHole={(id) => {
+                        setSelectedSiteId(site.project.id);
+                        setSelectedHoleId(id);
+                        setSelectedAnomalyId(null);
                         setSelectedInsarId(null);
                       }}
                     />
@@ -617,11 +762,17 @@ function Visor3DPage() {
                           selectedSite.position[1] + selectedAnomaly.offset[1],
                           selectedSite.position[2] + selectedAnomaly.offset[2],
                         ]
-                      : selectedSite
-                        ? selectedSite.position
-                        : null
+                      : selectedHole && selectedSite
+                        ? [
+                            selectedSite.position[0] + selectedHole.offset[0],
+                            selectedSite.position[1] - selectedHole.depth / 2,
+                            selectedSite.position[2] + selectedHole.offset[1],
+                          ]
+                        : selectedSite
+                          ? selectedSite.position
+                          : null
                   }
-                  zoom={selectedAnomaly ? 260 : 700}
+                  zoom={selectedAnomaly ? 260 : selectedHole ? 220 : 700}
                 />
               </Canvas>
             )}
@@ -712,6 +863,52 @@ function Visor3DPage() {
                     </div>
                   )}
                 </div>
+
+                {selectedHole && (
+                  <div>
+                    <div className="text-[11px] uppercase tracking-wide text-content-subtle mb-2">
+                      Sondaje seleccionado
+                    </div>
+                    <div className="rounded-lg border border-hairline p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-mono font-semibold text-content">
+                          {selectedHole.hole_id}
+                        </span>
+                        <span className="text-[10px] font-mono text-content-subtle">
+                          {selectedHole.depth_m.toFixed(0)} m · az {selectedHole.azimuth}° · dip{" "}
+                          {selectedHole.dip}°
+                        </span>
+                      </div>
+                      {selectedHole.intervals.length > 0 ? (
+                        <div className="max-h-48 overflow-y-auto space-y-1 pr-1">
+                          {selectedHole.intervals.map((iv, k) => (
+                            <div key={k} className="flex items-center gap-2 text-[11px] font-mono">
+                              <span
+                                className="w-2.5 h-2.5 rounded-sm shrink-0"
+                                style={{ background: lithoColor(iv.lithology) }}
+                              />
+                              <span className="text-content-subtle w-20 shrink-0">
+                                {iv.from.toFixed(0)}–{iv.to.toFixed(0)} m
+                              </span>
+                              <span className="text-content truncate flex-1">
+                                {iv.lithology ?? "s/litología"}
+                              </span>
+                              {iv.au_gpt != null && (
+                                <span className="text-amber-600 shrink-0">
+                                  {iv.au_gpt.toFixed(2)} g/t Au
+                                </span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="text-[11px] text-content-subtle">
+                          Sin intervalos logueados para este pozo.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
 
                 {selectedInsar && (
                   <div>
