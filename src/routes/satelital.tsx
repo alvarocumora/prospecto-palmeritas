@@ -527,7 +527,13 @@ function AnomalyRow({
   );
 }
 
-function InsarRow({ i }: { i: PublicSatProject["insar"][number] }) {
+function InsarRow({
+  i,
+  projectId,
+}: {
+  i: PublicSatProject["insar"][number];
+  projectId: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
