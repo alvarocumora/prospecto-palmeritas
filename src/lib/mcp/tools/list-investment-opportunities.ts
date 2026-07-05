@@ -26,7 +26,7 @@ export default defineTool({
       .select(
         "id,title,code,commodity,country,region,area_ha,stage,modality,asking_price_usd,royalty_pct,summary,is_featured,views_count,created_at",
       )
-      .eq("status", "published")
+      .eq("is_published", true)
       .order("is_featured", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(input.limit ?? 25);
