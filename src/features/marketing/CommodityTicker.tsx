@@ -1,19 +1,29 @@
 import { TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getMetalPrices, type MetalQuote } from "@/lib/commodityPrices.functions";
 
-const ITEMS = [
-  { code: "XAU", name: "Oro", price: "3,247.80", unit: "USD/oz", chg: "+1.24%", up: true },
-  { code: "XAG", name: "Plata", price: "32.45", unit: "USD/oz", chg: "+0.87%", up: true },
-  { code: "HG", name: "Cobre", price: "4.680", unit: "USD/lb", chg: "-0.33%", up: false },
-  { code: "LI", name: "Li₂CO₃", price: "12,400", unit: "USD/t", chg: "+2.15%", up: true },
-  { code: "CO", name: "Cobalto", price: "26,800", unit: "USD/t", chg: "-1.02%", up: false },
-  { code: "NI", name: "Níquel", price: "15,970", unit: "USD/t", chg: "+0.44%", up: true },
-  { code: "ZN", name: "Zinc", price: "2,890", unit: "USD/t", chg: "-0.18%", up: false },
-  { code: "MO", name: "Molibdeno", price: "18.40", unit: "USD/lb", chg: "+0.66%", up: true },
-  { code: "MN", name: "Manganeso", price: "1,940", unit: "USD/t", chg: "+0.22%", up: true },
-  { code: "FE", name: "Hierro (Fe 62%)", price: "98.50", unit: "USD/t", chg: "-0.55%", up: false },
+const FALLBACK: MetalQuote[] = [
+  { code: "XAU", name: "Oro", price: "—", unit: "USD/oz", chg: "0.00%", up: true },
+  { code: "XAG", name: "Plata", price: "—", unit: "USD/oz", chg: "0.00%", up: true },
+  { code: "HG", name: "Cobre", price: "—", unit: "USD/lb", chg: "0.00%", up: true },
+  { code: "XPT", name: "Platino", price: "—", unit: "USD/oz", chg: "0.00%", up: true },
+  { code: "XPD", name: "Paladio", price: "—", unit: "USD/oz", chg: "0.00%", up: true },
 ];
 
 export function CommodityTicker() {
+  const fetchPrices = useServerFn(getMetalPrices);
+  const { data } = useQuery({
+    queryKey: ["marketing", "metal-prices"],
+    queryFn: () => fetchPrices(),
+    staleTime: 5 * 60 * 1000,
+    refetchInterval: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const items = data?.quotes && data.quotes.length > 0 ? data.quotes : FALLBACK;
+  const isLive = Boolean(data?.quotes && data.quotes.length > 0);
+
   return (
     <div className="border-y border-hairline bg-surface-inverse overflow-hidden">
       <style>{`
@@ -26,18 +36,16 @@ export function CommodityTicker() {
       `}</style>
 
       <div className="flex items-center">
-        {/* left badge */}
         <div className="shrink-0 border-r border-white/10 px-3 py-2 flex items-center gap-1.5 bg-white/5 z-10">
-          <Activity className="w-3 h-3 text-accent-brand-subtle" />
+          <Activity className={`w-3 h-3 ${isLive ? "text-emerald-400" : "text-accent-brand-subtle"}`} />
           <span className="text-[9px] font-mono uppercase tracking-widest text-white/50 whitespace-nowrap">
-            Precios referencia
+            {isLive ? "Precios en vivo" : "Cargando precios…"}
           </span>
         </div>
 
-        {/* scrolling track */}
         <div className="overflow-hidden flex-1 min-w-0">
           <div className="ticker-track flex whitespace-nowrap">
-            {[...ITEMS, ...ITEMS].map((item, i) => (
+            {[...items, ...items].map((item, i) => (
               <span
                 key={i}
                 className="inline-flex items-center gap-2 px-5 py-2.5 border-r border-white/5 shrink-0"
