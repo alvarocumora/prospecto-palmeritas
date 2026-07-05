@@ -19,7 +19,8 @@ import {
   Satellite,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
-import { Eyebrow, SectionHeading } from "@/components/brand";
+import { Eyebrow, SectionHeading, VerificationBadge } from "@/components/brand";
+import { projectVerification } from "@/lib/verification";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 import { getDemTile, type DemTile } from "@/engine3d/terrain/dem.functions";
 
@@ -827,8 +828,14 @@ function Visor3DPage() {
                   <div className="brand-display text-lg text-content leading-tight">
                     {selectedSite.project.name}
                   </div>
-                  <div className="text-xs text-content-subtle mt-1">
-                    {selectedSite.project.region ?? "—"} · {selectedSite.project.country ?? "—"}
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className="text-xs text-content-subtle">
+                      {selectedSite.project.region ?? "—"} · {selectedSite.project.country ?? "—"}
+                    </span>
+                    <VerificationBadge
+                      level={projectVerification(selectedSite.project.id)}
+                      compact
+                    />
                   </div>
                 </>
               ) : (

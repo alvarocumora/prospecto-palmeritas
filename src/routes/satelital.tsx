@@ -17,9 +17,10 @@ import {
   Box as BoxIcon,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
-import { BrandCard, Eyebrow, SectionHeading } from "@/components/brand";
+import { BrandCard, Eyebrow, SectionHeading, VerificationBadge } from "@/components/brand";
 import { SatAnomalyMiniMap } from "@/features/marketing/SatAnomalyMiniMap";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
+import { projectVerification } from "@/lib/verification";
 
 type SatelitalSearch = {
   project?: string;
@@ -559,7 +560,10 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
               {project.region && <span>· {project.region}</span>}
               {project.commodity && <span>· {project.commodity}</span>}
             </div>
-            <h3 className="brand-display text-2xl text-content">{project.name}</h3>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h3 className="brand-display text-2xl text-content">{project.name}</h3>
+              <VerificationBadge level={projectVerification(project.id)} linked={false} />
+            </div>
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">

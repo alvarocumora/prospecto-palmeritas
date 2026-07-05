@@ -21,6 +21,7 @@ export type PublicListing = {
   is_featured: boolean;
   has_geometry: boolean;
   centroid: [number, number] | null;
+  project_id: string | null;
 };
 
 const REGION_CENTROID: Record<string, [number, number]> = {
@@ -78,7 +79,7 @@ export const getPublicListings = createServerFn({ method: "GET" }).handler(
       const { data, error } = await supabaseAdmin
         .from("property_listings")
         .select(
-          "id,title,code,commodity,country,region,area_ha,stage,modality,asking_price_usd,royalty_pct,summary,cover_image_url,data_available,views_count,is_featured,geometry_geojson,projects:projects(center_lat,center_lng)",
+          "id,title,code,commodity,country,region,area_ha,stage,modality,asking_price_usd,royalty_pct,summary,cover_image_url,data_available,views_count,is_featured,project_id,geometry_geojson,projects:projects(center_lat,center_lng)",
         )
         .eq("is_published", true)
         .order("is_featured", { ascending: false })
@@ -126,6 +127,7 @@ export const getPublicListings = createServerFn({ method: "GET" }).handler(
           is_featured: !!r.is_featured,
           has_geometry: !!r.geometry_geojson,
           centroid,
+          project_id: r.project_id ?? null,
         };
       });
 
