@@ -24,6 +24,7 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/catastro", changefreq: "weekly", priority: "0.7" },
   { path: "/catastro/mapa", changefreq: "weekly", priority: "0.7" },
   { path: "/catastro/precios", changefreq: "daily", priority: "0.6" },
+  { path: "/satelital", changefreq: "weekly", priority: "0.75" },
   { path: "/legal/privacidad", changefreq: "yearly", priority: "0.3" },
   { path: "/legal/terminos", changefreq: "yearly", priority: "0.3" },
 ];
