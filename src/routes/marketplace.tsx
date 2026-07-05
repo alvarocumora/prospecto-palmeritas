@@ -160,10 +160,7 @@ function MarketplacePage() {
             label="Certificación"
             value={filters.certification}
             onChange={(v) => setFilters((f) => ({ ...f, certification: v }))}
-            options={[
-              { v: "", l: "Cualquiera" },
-              ...certs.map((c) => ({ v: c.code, l: c.name })),
-            ]}
+            options={[{ v: "", l: "Cualquiera" }, ...certs.map((c) => ({ v: c.code, l: c.name }))]}
           />
         </div>
       </div>
@@ -220,15 +217,17 @@ function MarketplacePage() {
               verificada.
             </p>
             <BrandButton asChild className="mt-4 w-full">
-              <Link to="/contacto">Solicitar acceso seller</Link>
+              <Link to="/dashboard/commodity-lots">Publicar mi lote</Link>
             </BrandButton>
+            <p className="mt-2 text-[11px] font-mono text-content-subtle text-center">
+              Requiere cuenta · verificación antes de publicar
+            </p>
           </div>
 
           <div className="rounded-2xl border border-hairline bg-surface-inverse text-white p-5">
             <Eyebrow className="mb-2 text-white/60">KYC comprador</Eyebrow>
             <p className="text-sm text-white/70">
-              Trader, refinería o industrial? Solicita acceso institucional con onboarding
-              KYC/AML.
+              Trader, refinería o industrial? Solicita acceso institucional con onboarding KYC/AML.
             </p>
             <Link
               to="/auth"

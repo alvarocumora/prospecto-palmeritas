@@ -22,26 +22,31 @@ import {
   listDealInquiries,
   listAllListings,
   setListingPublished,
+  listAllCommodityLots,
+  setCommodityLotStatus,
   type ContactMessageRow,
   type CommodityInquiryRow,
   type DealInquiryRow,
   type AdminListingRow,
+  type AdminCommodityLotRow,
 } from "@/lib/adminInbox.functions";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { fmtUSD } from "@/modules/deals/domain/format";
+import { commodityLabel, formLabel, formatTonnes } from "@/lib/commodityLabels";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/inbox")({
   head: () => ({ meta: [{ title: "Admin · Bandeja de entrada — Geocapitals" }] }),
   component: AdminInboxPage,
 });
 
-type Tab = "contacto" | "marketplace" | "deals" | "listings";
+type Tab = "contacto" | "marketplace" | "deals" | "listings" | "lotes";
 
 const TABS: Array<{ key: Tab; label: string; icon: typeof Mail }> = [
   { key: "contacto", label: "Contacto", icon: Mail },
   { key: "marketplace", label: "Marketplace", icon: Package },
   { key: "deals", label: "Deals", icon: Briefcase },
   { key: "listings", label: "Listings", icon: Globe },
+  { key: "lotes", label: "Lotes", icon: Package },
 ];
 
 function AdminInboxPage() {
@@ -85,6 +90,7 @@ function AdminInboxPage() {
       {tab === "marketplace" && <MarketplaceTab />}
       {tab === "deals" && <DealsTab />}
       {tab === "listings" && <ListingsTab />}
+      {tab === "lotes" && <LotsTab />}
     </div>
   );
 }
@@ -416,6 +422,108 @@ function ListingsTab() {
             </button>
           </article>
         ))}
+      </div>
+    </TabFrame>
+  );
+}
+
+// ── Tab: verificación de lotes de commodities ─────────────────────────────────
+
+const LOT_STATUS_META: Record<string, { label: string; cls: string }> = {
+  draft: { label: "Borrador", cls: "border-border text-muted-foreground" },
+  pending_verification: { label: "En verificación", cls: "border-warn/40 bg-warn/10 text-warn" },
+  published: { label: "Publicado", cls: "border-teal/40 bg-teal/10 text-teal" },
+  under_negotiation: { label: "En negociación", cls: "border-gold/40 bg-gold/10 text-gold" },
+  sold: { label: "Vendido", cls: "border-border text-muted-foreground" },
+  archived: { label: "Archivado", cls: "border-border text-muted-foreground" },
+};
+
+function LotsTab() {
+  const [rows, setRows] = useState<AdminCommodityLotRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [acting, setActing] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      setRows(await listAllCommodityLots());
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error cargando lotes");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const act = async (r: AdminCommodityLotRow, action: "publish" | "archive") => {
+    setActing(r.id);
+    try {
+      await setCommodityLotStatus({ data: { lotId: r.id, action } });
+      toast.success(action === "publish" ? `Publicado: ${r.title}` : `Archivado: ${r.title}`);
+      await load();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setActing(null);
+    }
+  };
+
+  return (
+    <TabFrame
+      loading={loading}
+      empty={rows.length === 0}
+      emptyText="Sin lotes registrados."
+      onReload={load}
+    >
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        {rows.map((r) => {
+          const st = LOT_STATUS_META[r.status] ?? { label: r.status, cls: "border-border" };
+          return (
+            <article key={r.id} className="rounded border border-border bg-bg-panel p-4">
+              <header className="flex items-start justify-between gap-2 mb-2">
+                <h3 className="font-semibold text-foreground leading-snug">{r.title}</h3>
+                <span
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded border shrink-0 ${st.cls}`}
+                >
+                  {st.label}
+                </span>
+              </header>
+              <div className="text-xs text-muted-foreground mb-2">
+                {commodityLabel(r.commodity)} · {formLabel(r.form)} ·{" "}
+                {[r.region, r.country].filter(Boolean).join(", ")}
+                {r.grade_pct != null && ` · ${r.grade_pct}%`}
+                {r.incoterm && ` · ${r.incoterm}`}
+              </div>
+              <div className="text-xs font-mono text-muted-foreground mb-3">
+                {r.seller_email ?? "—"} · {formatTonnes(r.tonnage_available_t)} ·{" "}
+                {new Date(r.created_at).toLocaleDateString("es-CL")}
+              </div>
+              <div className="flex gap-2">
+                {r.status !== "published" && (
+                  <button
+                    disabled={acting === r.id}
+                    onClick={() => void act(r, "publish")}
+                    className="inline-flex items-center gap-1.5 rounded bg-teal text-black px-3 py-1.5 text-xs font-mono font-semibold hover:bg-teal/90 disabled:opacity-50"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Verificar y publicar
+                  </button>
+                )}
+                {r.status !== "archived" && (
+                  <button
+                    disabled={acting === r.id}
+                    onClick={() => void act(r, "archive")}
+                    className="inline-flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-xs font-mono hover:border-danger hover:text-danger disabled:opacity-50"
+                  >
+                    <EyeOff className="w-3.5 h-3.5" /> Archivar
+                  </button>
+                )}
+              </div>
+            </article>
+          );
+        })}
       </div>
     </TabFrame>
   );

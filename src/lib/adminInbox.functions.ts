@@ -266,3 +266,84 @@ export const setListingPublished = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+// ── Verificación y publicación de lotes de commodities ────────────────────────
+
+export type AdminCommodityLotRow = {
+  id: string;
+  created_at: string;
+  title: string;
+  commodity: string;
+  form: string;
+  country: string;
+  region: string | null;
+  grade_pct: number | null;
+  tonnage_available_t: number | null;
+  incoterm: string | null;
+  status: string;
+  is_verified: boolean;
+  seller_email: string | null;
+};
+
+export const listAllCommodityLots = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const sb = await admin();
+    const { data: rows, error } = await sb
+      .from("commodity_lots")
+      .select(
+        "id, created_at, title, commodity, form, country, region, grade_pct, tonnage_available_t, incoterm, status, is_verified, seller_user_id",
+      )
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    const sellerIds = Array.from(new Set((rows ?? []).map((r) => r.seller_user_id)));
+    const { data: profs } = sellerIds.length
+      ? await sb.from("profiles").select("user_id, email").in("user_id", sellerIds)
+      : { data: [] as Array<{ user_id: string; email: string | null }> };
+    const emailOf = new Map((profs ?? []).map((p) => [p.user_id, p.email]));
+
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      title: r.title,
+      commodity: r.commodity,
+      form: r.form,
+      country: r.country,
+      region: r.region,
+      grade_pct: r.grade_pct != null ? Number(r.grade_pct) : null,
+      tonnage_available_t: r.tonnage_available_t != null ? Number(r.tonnage_available_t) : null,
+      incoterm: r.incoterm,
+      status: r.status,
+      is_verified: !!r.is_verified,
+      seller_email: emailOf.get(r.seller_user_id) ?? null,
+    })) as AdminCommodityLotRow[];
+  });
+
+/**
+ * publish: verifica y publica (is_verified=true + status=published).
+ * archive: retira el lote del marketplace.
+ */
+export const setCommodityLotStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z.object({ lotId: z.string().uuid(), action: z.enum(["publish", "archive"]) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const sb = await admin();
+    const patch =
+      data.action === "publish"
+        ? {
+            status: "published" as const,
+            is_verified: true,
+            verified_at: new Date().toISOString(),
+            verified_by: context.userId,
+          }
+        : { status: "archived" as const };
+    const { error } = await sb.from("commodity_lots").update(patch).eq("id", data.lotId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });
