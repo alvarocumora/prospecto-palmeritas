@@ -154,13 +154,14 @@ function CashFlowChart({ cashflows }: { cashflows: number[] }) {
         strokeWidth="1"
       />
 
-      {/* Barras */}
+      {/* Barras — crecen desde la línea cero al montar */}
       {cashflows.map((cf, i) => {
         const h = Math.max(2, scale(cf));
         const y = cf >= 0 ? zeroY - h : zeroY;
         return (
           <rect
             key={i}
+            className="chart-bar"
             x={bx(i)}
             y={y}
             width={barW}
@@ -169,14 +170,18 @@ function CashFlowChart({ cashflows }: { cashflows: number[] }) {
             style={{
               fill: cf >= 0 ? "var(--accent-brand)" : "var(--brand-danger)",
               opacity: 0.85,
+              transformOrigin: `${bx(i) + barW / 2}px ${zeroY}px`,
+              animationDelay: `${Math.min(i, 12) * 45}ms`,
             }}
           />
         );
       })}
 
-      {/* Línea acumulada */}
+      {/* Línea acumulada — se dibuja tras las barras */}
       {cumulative.length > 1 && (
         <polyline
+          className="chart-line"
+          pathLength={1}
           points={cumulative.map((v, i) => `${bx(i) + barW / 2},${cumY(v)}`).join(" ")}
           style={{
             fill: "none",

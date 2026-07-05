@@ -116,7 +116,6 @@ export function MarketingLanding() {
             {/* Live badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-8 backdrop-blur">
               <span className="relative flex h-2 w-2">
-
                 <span
                   className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
                   style={{ background: "var(--accent-brand)" }}
@@ -173,7 +172,8 @@ export function MarketingLanding() {
             {/* Trust strip */}
             <div className="mt-12 pt-6 border-t border-white/5 flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
               <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC / AML
+                <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
+                AML
               </span>
               <span className="flex items-center gap-2">
                 <FileText className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> NI 43-101
@@ -193,10 +193,7 @@ export function MarketingLanding() {
               ].map((k, i) => (
                 <div key={i} className="bg-[#05070a] px-4 py-4">
                   <div className="font-mono text-2xl text-white tracking-tight">
-                    <AnimatedCounter
-                      value={k.v}
-                      format={k.compact ? "compact" : "int"}
-                    />
+                    <AnimatedCounter value={k.v} format={k.compact ? "compact" : "int"} />
                   </div>
                   <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
                     {k.l}
@@ -205,7 +202,6 @@ export function MarketingLanding() {
               ))}
             </div>
           </div>
-
 
           {/* Live map wrapped in HUD frame */}
           <div className="relative">
@@ -246,98 +242,102 @@ export function MarketingLanding() {
       {/* Dual paths: proyectos + marketplace */}
       <section className="border-b border-hairline bg-white">
         <div className="max-w-7xl mx-auto px-5 py-14">
-          <div className="text-center max-w-2xl mx-auto mb-10">
+          <Reveal className="text-center max-w-2xl mx-auto mb-10">
             <Eyebrow className="mb-3">Dos caminos, una plataforma</Eyebrow>
             <h2 className="brand-display text-3xl md:text-4xl text-content">
               Del yacimiento al mercado, con capital y trazabilidad
             </h2>
-          </div>
+          </Reveal>
           <div className="grid md:grid-cols-2 gap-5">
-            <Link
-              to="/inversionistas"
-              className="group rounded-2xl border border-hairline bg-accent-brand-subtle p-8 hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
-            >
-              <div className="flex items-center gap-3">
-                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand text-white">
-                  <Landmark className="w-6 h-6" strokeWidth={1.75} />
-                </span>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
-                  Inversión en proyectos
-                </div>
-              </div>
-              <div className="mt-5 font-display text-2xl text-content leading-snug">
-                Deal-flow minero verificado — equity, royalties y offtake
-              </div>
-              <p className="mt-3 text-sm text-content-subtle">
-                Accede a proyectos calificados con reporte NI 43-101, catastro trazable, data room
-                cifrado y modelo económico listo para comité.
-              </p>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand font-medium text-sm">
-                Ver oportunidades <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
-            <Link
-              to="/marketplace"
-              className="group rounded-2xl border border-hairline bg-surface-inverse text-white p-8 hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.6)] transition"
-            >
-              <div className="flex items-center gap-3">
-                <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand-subtle text-accent-brand">
-                  <Gem className="w-6 h-6" strokeWidth={1.75} />
-                </span>
-                <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand-subtle">
-                  Marketplace de commodities
-                </div>
-              </div>
-              <div className="mt-5 font-display text-2xl leading-snug">
-                Compra & vende commodities certificados de LatAm y África
-              </div>
-              <p className="mt-3 text-sm text-white/70">
-                Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto — con
-                certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
-              </p>
-              <div className="mt-5 flex flex-wrap gap-1.5">
-                {[
-                  ["CL", "Chile"],
-                  ["PE", "Perú"],
-                  ["BR", "Brasil"],
-                  ["CO", "Colombia"],
-                  ["VE", "Venezuela"],
-                  ["ZA", "Sudáfrica"],
-                  ["CD", "R.D. Congo"],
-                ].map(([code, name]) => (
-                  <span
-                    key={code}
-                    className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/15 bg-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-white/80"
-                  >
-                    <span
-                      aria-hidden
-                      className="inline-block w-2.5 h-2.5 rounded-sm"
-                      style={{
-                        background:
-                          code === "CL"
-                            ? "#d52b1e"
-                            : code === "PE"
-                              ? "#d91023"
-                              : code === "BR"
-                                ? "#009c3b"
-                                : code === "CO"
-                                  ? "#fcd116"
-                                  : code === "VE"
-                                    ? "#ffcc00"
-                                    : code === "ZA"
-                                      ? "#007749"
-                                      : "#007fff",
-                      }}
-                    />
-                    <span className="font-semibold">{code}</span>
-                    <span className="text-white/60 normal-case tracking-normal">{name}</span>
+            <Reveal delay={80}>
+              <Link
+                to="/inversionistas"
+                className="group h-full block rounded-2xl border border-hairline bg-accent-brand-subtle p-8 hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand text-white">
+                    <Landmark className="w-6 h-6" strokeWidth={1.75} />
                   </span>
-                ))}
-              </div>
-              <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand-subtle font-medium text-sm">
-                Explorar lotes <ArrowRight className="w-4 h-4" />
-              </span>
-            </Link>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                    Inversión en proyectos
+                  </div>
+                </div>
+                <div className="mt-5 font-display text-2xl text-content leading-snug">
+                  Deal-flow minero verificado — equity, royalties y offtake
+                </div>
+                <p className="mt-3 text-sm text-content-subtle">
+                  Accede a proyectos calificados con reporte NI 43-101, catastro trazable, data room
+                  cifrado y modelo económico listo para comité.
+                </p>
+                <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand font-medium text-sm">
+                  Ver oportunidades <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </Reveal>
+            <Reveal delay={180}>
+              <Link
+                to="/marketplace"
+                className="group h-full block rounded-2xl border border-hairline bg-surface-inverse text-white p-8 hover-lift hover:shadow-[0_18px_40px_-24px_rgba(0,0,0,0.6)] transition"
+              >
+                <div className="flex items-center gap-3">
+                  <span className="grid place-items-center w-12 h-12 rounded-xl bg-accent-brand-subtle text-accent-brand">
+                    <Gem className="w-6 h-6" strokeWidth={1.75} />
+                  </span>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand-subtle">
+                    Marketplace de commodities
+                  </div>
+                </div>
+                <div className="mt-5 font-display text-2xl leading-snug">
+                  Compra & vende commodities certificados de LatAm y África
+                </div>
+                <p className="mt-3 text-sm text-white/70">
+                  Concentrados de Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio y cobalto —
+                  con certificación LBMA, RJC, Fairmined, ICMM, IRMA e ISO.
+                </p>
+                <div className="mt-5 flex flex-wrap gap-1.5">
+                  {[
+                    ["CL", "Chile"],
+                    ["PE", "Perú"],
+                    ["BR", "Brasil"],
+                    ["CO", "Colombia"],
+                    ["VE", "Venezuela"],
+                    ["ZA", "Sudáfrica"],
+                    ["CD", "R.D. Congo"],
+                  ].map(([code, name]) => (
+                    <span
+                      key={code}
+                      className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-white/15 bg-white/[0.06] text-[10px] font-mono uppercase tracking-wider text-white/80"
+                    >
+                      <span
+                        aria-hidden
+                        className="inline-block w-2.5 h-2.5 rounded-sm"
+                        style={{
+                          background:
+                            code === "CL"
+                              ? "#d52b1e"
+                              : code === "PE"
+                                ? "#d91023"
+                                : code === "BR"
+                                  ? "#009c3b"
+                                  : code === "CO"
+                                    ? "#fcd116"
+                                    : code === "VE"
+                                      ? "#ffcc00"
+                                      : code === "ZA"
+                                        ? "#007749"
+                                        : "#007fff",
+                        }}
+                      />
+                      <span className="font-semibold">{code}</span>
+                      <span className="text-white/60 normal-case tracking-normal">{name}</span>
+                    </span>
+                  ))}
+                </div>
+                <span className="mt-5 inline-flex items-center gap-1.5 text-accent-brand-subtle font-medium text-sm">
+                  Explorar lotes <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            </Reveal>
           </div>
         </div>
       </section>
@@ -453,9 +453,7 @@ export function MarketingLanding() {
                         }}
                       />
                     </svg>
-                    <span
-                      className="absolute right-0 top-0 text-[9px] font-mono text-content-subtle uppercase tracking-wider"
-                    >
+                    <span className="absolute right-0 top-0 text-[9px] font-mono text-content-subtle uppercase tracking-wider">
                       12M
                     </span>
                   </div>
@@ -694,15 +692,19 @@ export function MarketingLanding() {
                 d: "5 índices · NDVI · IOX · HYD · CLY · STR",
                 i: Activity,
               },
-            ].map(({ v, l, d, i: Icon }) => (
-              <div key={l} className="bg-surface-inverse p-6">
-                <Icon className="w-5 h-5 text-accent-brand-subtle mb-4" strokeWidth={1.5} />
-                <div className="font-mono text-3xl text-white tracking-tight">{v}</div>
-                <div className="text-[11px] uppercase tracking-wider text-white/80 mt-2 font-display">
-                  {l}
+            ].map(({ v, l, d, i: Icon }, idx) => (
+              <Reveal key={l} delay={idx * 90} className="bg-surface-inverse">
+                <div className="p-6">
+                  <Icon className="w-5 h-5 text-accent-brand-subtle mb-4" strokeWidth={1.5} />
+                  <div className="font-mono text-3xl text-white tracking-tight">
+                    {/^\d+$/.test(v) ? <AnimatedCounter value={Number(v)} format="int" /> : v}
+                  </div>
+                  <div className="text-[11px] uppercase tracking-wider text-white/80 mt-2 font-display">
+                    {l}
+                  </div>
+                  <div className="text-[11px] text-white/40 mt-1 font-mono">{d}</div>
                 </div>
-                <div className="text-[11px] text-white/40 mt-1 font-mono">{d}</div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -763,7 +765,7 @@ export function MarketingLanding() {
               d: "Vencimientos, expedientes y obligaciones legales por proyecto y por holder.",
               to: null,
             },
-          ].map(({ i: Icon, t: title, d, to }) => {
+          ].map(({ i: Icon, t: title, d, to }, idx) => {
             const inner = (
               <>
                 <div className="flex items-center justify-between mb-5">
@@ -784,20 +786,22 @@ export function MarketingLanding() {
             );
             if (to) {
               return (
-                <Link key={title} to={to} className="block group">
-                  <BrandCard
-                    interactive
-                    className="h-full group-hover:border-accent-brand/40 transition"
-                  >
-                    {inner}
-                  </BrandCard>
-                </Link>
+                <Reveal key={title} delay={idx * 70}>
+                  <Link to={to} className="block group h-full">
+                    <BrandCard
+                      interactive
+                      className="h-full hover-lift group-hover:border-accent-brand/40 transition"
+                    >
+                      {inner}
+                    </BrandCard>
+                  </Link>
+                </Reveal>
               );
             }
             return (
-              <BrandCard key={title} className="group opacity-80">
-                {inner}
-              </BrandCard>
+              <Reveal key={title} delay={idx * 70}>
+                <BrandCard className="group h-full opacity-80">{inner}</BrandCard>
+              </Reveal>
             );
           })}
         </div>
@@ -858,30 +862,29 @@ export function MarketingLanding() {
                 ],
                 to: "/recursos",
               },
-            ].map(({ i: Icon, tag, t: title, items, to }) => (
-              <div
-                key={title}
-                className="bg-white border border-hairline rounded-2xl p-6 flex flex-col"
-              >
-                <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-accent-brand mb-5">
-                  <Icon className="w-4 h-4" /> {tag}
+            ].map(({ i: Icon, tag, t: title, items, to }, idx) => (
+              <Reveal key={title} delay={idx * 90}>
+                <div className="bg-white border border-hairline rounded-2xl p-6 flex flex-col h-full hover-lift hover:border-accent-brand/40 hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.3)]">
+                  <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-accent-brand mb-5">
+                    <Icon className="w-4 h-4" /> {tag}
+                  </div>
+                  <div className="font-display text-xl text-content leading-snug">{title}</div>
+                  <ul className="mt-5 space-y-2.5 flex-1">
+                    {items.map((it) => (
+                      <li key={it} className="flex items-start gap-2 text-sm text-content">
+                        <CheckCircle2 className="w-4 h-4 text-accent-brand shrink-0 mt-0.5" />
+                        <span>{it}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    to={to}
+                    className="mt-6 inline-flex items-center gap-1.5 text-sm text-accent-brand font-medium hover:gap-2.5 transition-all"
+                  >
+                    Ver más <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
-                <div className="font-display text-xl text-content leading-snug">{title}</div>
-                <ul className="mt-5 space-y-2.5 flex-1">
-                  {items.map((it) => (
-                    <li key={it} className="flex items-start gap-2 text-sm text-content">
-                      <CheckCircle2 className="w-4 h-4 text-accent-brand shrink-0 mt-0.5" />
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  to={to}
-                  className="mt-6 inline-flex items-center gap-1.5 text-sm text-accent-brand font-medium hover:gap-2.5 transition-all"
-                >
-                  Ver más <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
