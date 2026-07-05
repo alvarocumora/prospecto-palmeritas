@@ -8,6 +8,7 @@ import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingDrawer } from "@/features/marketing/PublicListingDrawer";
+import { ProjectCover } from "@/features/marketing/ProjectCover";
 import type { PublicListing } from "@/lib/publicListings.functions";
 
 const MAX_ON_LANDING = 6;
@@ -28,21 +29,6 @@ function matchFilter(p: PublicListing, key: string) {
   return true;
 }
 
-const COMMODITY_TINT: Record<string, { from: string; icon: string }> = {
-  Au: { from: "from-amber-50 to-yellow-100", icon: "text-amber-500" },
-  "Au-Ag": { from: "from-amber-50 to-yellow-100", icon: "text-amber-500" },
-  "Au-Cu": { from: "from-amber-50 to-orange-100", icon: "text-amber-500" },
-  Ag: { from: "from-slate-50 to-gray-100", icon: "text-slate-400" },
-  Cu: { from: "from-orange-50 to-amber-100", icon: "text-orange-500" },
-  "Cu-Au": { from: "from-orange-50 to-amber-100", icon: "text-orange-500" },
-  Li: { from: "from-teal-50 to-emerald-100", icon: "text-teal-500" },
-};
-
-const DEFAULT_TINT = { from: "from-slate-50 to-gray-100", icon: "text-slate-400" };
-
-function commodityBase(commodity: string | null): string {
-  return (commodity ?? "").split("-")[0] ?? "";
-}
 
 export function InvestableProjects() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -169,8 +155,6 @@ function FeaturedProjectCard({
   project: PublicListing;
   onOpen: (listing: PublicListing) => void;
 }) {
-  const base = commodityBase(p.commodity);
-  const tint = COMMODITY_TINT[p.commodity ?? ""] ?? COMMODITY_TINT[base] ?? DEFAULT_TINT;
   const modality = MODALITY_LABEL[p.modality ?? ""] ?? p.modality ?? "";
   const stage = STAGE_LABEL[p.stage ?? ""] ?? p.stage ?? "";
 
@@ -181,16 +165,14 @@ function FeaturedProjectCard({
       className="group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full"
     >
       {/* Cover */}
-      <div
-        className={`aspect-video bg-gradient-to-br ${tint.from} relative flex items-center justify-center`}
-      >
+      <div className="aspect-video relative overflow-hidden">
         {p.cover_image_url ? (
           <img src={p.cover_image_url} alt={p.title} className="w-full h-full object-cover" />
         ) : (
-          <Mountain className={`w-10 h-10 opacity-25 ${tint.icon}`} />
+          <ProjectCover seed={p.id} commodity={p.commodity} region={p.region ?? p.country} />
         )}
-        <div className="absolute inset-0 flex items-start justify-between p-2.5">
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/80 backdrop-blur-sm text-[10px] font-mono uppercase tracking-wider text-content border border-hairline/60">
+        <div className="absolute inset-0 flex items-start justify-between p-2.5 pointer-events-none">
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-mono uppercase tracking-wider text-white border border-white/15">
             {modality}
           </span>
           {p.is_featured && (
@@ -199,9 +181,11 @@ function FeaturedProjectCard({
             </span>
           )}
         </div>
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5">
-          <span className={`text-xs font-mono font-semibold ${tint.icon}`}>{p.commodity}</span>
-          <span className="text-[10px] font-mono text-content/50">· {stage}</span>
+        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 pointer-events-none">
+          <span className="text-xs font-mono font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+            {p.commodity}
+          </span>
+          <span className="text-[10px] font-mono text-white/70">· {stage}</span>
         </div>
       </div>
 

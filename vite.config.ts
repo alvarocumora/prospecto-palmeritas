@@ -51,7 +51,7 @@ export default defineConfig({
             if (id.includes("geotiff")) return "geotiff";
             if (id.includes("@radix-ui")) return "radix";
             if (id.includes("@supabase")) return "supabase";
-            if (id.includes("@tanstack")) return "tanstack";
+            // Do NOT split @tanstack — breaks SSR bundle (createRequestHandler ReferenceError)
             if (id.includes("lucide-react")) return "icons";
             if (id.includes("proj4") || id.includes("martini")) return "geo";
           },
