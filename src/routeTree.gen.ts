@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Visor3dRouteImport } from './routes/visor-3d'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TerminalRouteImport } from './routes/terminal'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -109,6 +110,11 @@ import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/ap
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
+const Visor3dRoute = Visor3dRouteImport.update({
+  id: '/visor-3d',
+  path: '/visor-3d',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
@@ -677,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -777,6 +784,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -879,6 +887,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terminal': typeof TerminalRouteWithChildren
   '/unsubscribe': typeof UnsubscribeRoute
+  '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
@@ -981,6 +990,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
+    | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
@@ -1081,6 +1091,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
+    | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
@@ -1182,6 +1193,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terminal'
     | '/unsubscribe'
+    | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
@@ -1284,6 +1296,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TerminalRoute: typeof TerminalRouteWithChildren
   UnsubscribeRoute: typeof UnsubscribeRoute
+  Visor3dRoute: typeof Visor3dRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
@@ -1319,6 +1332,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visor-3d': {
+      id: '/visor-3d'
+      path: '/visor-3d'
+      fullPath: '/visor-3d'
+      preLoaderRoute: typeof Visor3dRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/unsubscribe': {
       id: '/unsubscribe'
       path: '/unsubscribe'
@@ -2253,6 +2273,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TerminalRoute: TerminalRouteWithChildren,
   UnsubscribeRoute: UnsubscribeRoute,
+  Visor3dRoute: Visor3dRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
