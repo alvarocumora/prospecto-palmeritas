@@ -182,7 +182,30 @@ export function MarketingLanding() {
                 <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> 18 países
               </span>
             </div>
+
+            {/* KPI live bar */}
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden">
+              {[
+                { v: live?.projects ?? 124, l: "Proyectos activos" },
+                { v: live?.concessionsManaged ?? 47000, l: "Concesiones", compact: true },
+                { v: live?.satelliteAnomalies ?? 312, l: "Anomalías detectadas" },
+                { v: 18, l: "Países" },
+              ].map((k, i) => (
+                <div key={i} className="bg-[#05070a] px-4 py-4">
+                  <div className="font-mono text-2xl text-white tracking-tight">
+                    <AnimatedCounter
+                      value={k.v}
+                      format={k.compact ? "compact" : "int"}
+                    />
+                  </div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
+                    {k.l}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
 
           {/* Live map wrapped in HUD frame */}
           <div className="relative">
