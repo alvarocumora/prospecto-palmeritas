@@ -81,40 +81,128 @@ export function MarketingLanding() {
     <div className="brand-light min-h-screen">
       <MarketingHeader />
 
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-hairline">
-        <div className="max-w-7xl mx-auto px-5 py-16 lg:py-24 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+      {/* Hero — cinematic industrialism */}
+      <section className="relative overflow-hidden bg-[#05070a] text-slate-200 border-b border-white/5">
+        {/* Ambient glows */}
+        <div
+          className="pointer-events-none absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full blur-[120px]"
+          style={{ background: "color-mix(in oklab, var(--accent-brand) 22%, transparent)" }}
+        />
+        <div
+          className="pointer-events-none absolute top-1/2 -left-40 w-[380px] h-[380px] rounded-full blur-[100px]"
+          style={{ background: "color-mix(in oklab, var(--gold) 12%, transparent)" }}
+        />
+        {/* Grid texture */}
+        <div
+          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
+            backgroundSize: "48px 48px",
+            maskImage:
+              "radial-gradient(ellipse at 60% 40%, black 0%, transparent 70%)",
+          }}
+        />
+
+        <div className="relative max-w-7xl mx-auto px-5 py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           <div>
-            <Eyebrow className="mb-5">{t("hero_eyebrow")}</Eyebrow>
-            <h1 className="brand-display text-[44px] sm:text-[56px] leading-[1.05] text-content">
-              {t("hero_title")}
-            </h1>
-            <p className="mt-6 text-lg text-content-subtle max-w-xl">{t("hero_sub")}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <BrandButton asChild size="lg">
-                <Link to="/contacto">
-                  {t("cta_publish")} <ArrowRight className="w-4 h-4" />
-                </Link>
-              </BrandButton>
-              <BrandButton asChild variant="outline" size="lg">
-                <Link to="/terminal">{t("cta_explore")}</Link>
-              </BrandButton>
+            {/* Live badge */}
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-8 backdrop-blur">
+              <span className="relative flex h-2 w-2">
+                <span
+                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                  style={{ background: "var(--accent-brand)" }}
+                />
+                <span
+                  className="relative inline-flex rounded-full h-2 w-2"
+                  style={{ background: "var(--accent-brand)" }}
+                />
+              </span>
+              <span>{t("hero_eyebrow")}</span>
             </div>
-            <div className="mt-10 flex items-center gap-8 text-xs font-mono text-content-subtle flex-wrap">
+
+            <h1 className="brand-display text-[48px] sm:text-[64px] lg:text-[76px] leading-[0.95] tracking-tight text-white">
+              {t("hero_title").split(" ").slice(0, 2).join(" ")}{" "}
+              <span className="italic font-normal text-slate-400">
+                {t("hero_title").split(" ").slice(2, 4).join(" ")}
+              </span>{" "}
+              <span
+                className="bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(90deg, #ffffff 0%, #ffffff 40%, rgba(148,163,184,0.55) 100%)",
+                }}
+              >
+                {t("hero_title").split(" ").slice(4).join(" ")}
+              </span>
+            </h1>
+
+            <p className="mt-7 text-lg text-slate-400 max-w-xl font-light leading-relaxed">
+              {t("hero_sub")}
+            </p>
+
+            <div className="mt-9 flex flex-wrap items-center gap-5">
+              <Link
+                to="/contacto"
+                className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
+              >
+                {t("cta_publish")}
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+              <Link
+                to="/terminal"
+                className="group flex items-center gap-3 text-[11px] font-semibold tracking-[0.22em] uppercase text-slate-300 hover:text-white transition-colors"
+              >
+                <span className="w-11 h-11 rounded-full border border-white/15 grid place-items-center group-hover:border-white group-hover:bg-white/5 transition-all">
+                  <svg className="w-3.5 h-3.5 fill-current translate-x-[1px]" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+                <span>{t("cta_explore")}</span>
+              </Link>
+            </div>
+
+            {/* Trust strip */}
+            <div className="mt-12 pt-6 border-t border-white/5 flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
               <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-accent-brand" /> KYC / AML
+                <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC / AML
               </span>
               <span className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-accent-brand" /> NI 43-101
+                <FileText className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> NI 43-101
               </span>
               <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4 text-accent-brand" /> 18 países
+                <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> 18 países
               </span>
             </div>
           </div>
 
-          {/* Hero LIVE MAP */}
-          <HeroLiveMap />
+          {/* Live map wrapped in HUD frame */}
+          <div className="relative">
+            {/* Corner brackets */}
+            <div className="pointer-events-none absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-white/40 z-20" />
+            <div className="pointer-events-none absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-white/40 z-20" />
+            <div className="pointer-events-none absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-white/40 z-20" />
+            <div className="pointer-events-none absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-white/40 z-20" />
+
+            {/* HUD label */}
+            <div className="pointer-events-none absolute -top-6 left-0 z-20 font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 flex items-center gap-3">
+              <span
+                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
+                style={{ background: "var(--gold)" }}
+              />
+              <span>SCANNING · LATAM_S14 · CONFIDENCE 98.4%</span>
+            </div>
+            <div className="pointer-events-none absolute -bottom-6 right-0 z-20 font-mono text-[10px] tracking-widest text-slate-600">
+              -14.2350° S / 51.9253° W
+            </div>
+
+            <div
+              className="relative rounded-none overflow-hidden border border-white/10 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
+              style={{ background: "#0b1220" }}
+            >
+              <HeroLiveMap />
+            </div>
+          </div>
         </div>
       </section>
 
