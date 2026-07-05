@@ -240,6 +240,9 @@ export function MarketingLanding() {
       {/* Commodity price ticker */}
       <CommodityTicker />
 
+      {/* Prueba social — estándares soportados */}
+      <LogoMarquee />
+
       {/* Dual paths: proyectos + marketplace */}
       <section className="border-b border-hairline bg-white">
         <div className="max-w-7xl mx-auto px-5 py-14">
