@@ -7,6 +7,8 @@ import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
 
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
+import { InvestableProjects } from "@/features/marketing/InvestableProjects";
+import { InvestmentSimulator } from "@/features/marketing/InvestmentSimulator";
 import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
 import {
   Mountain,
@@ -415,6 +417,12 @@ export function MarketingLanding() {
           ))}
         </div>
       </section>
+
+      {/* Proyectos disponibles para invertir */}
+      <InvestableProjects />
+
+      {/* Simulador de retornos */}
+      <InvestmentSimulator />
 
       {/* Casos de uso */}
       <section className="bg-accent-brand-subtle border-y border-hairline">
