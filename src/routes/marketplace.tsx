@@ -312,16 +312,26 @@ function LotCard({ lot }: { lot: CommodityLotRow }) {
       params={{ lotId: lot.id }}
       className="group rounded-2xl border border-hairline bg-white h-full overflow-hidden hover-lift hover:border-accent-brand hover:shadow-[0_18px_36px_-24px_rgba(11,42,91,0.35)] transition block"
     >
-      {/* Portada generativa por material */}
-      <div className="relative h-24 overflow-hidden">
-        <div className="cover-zoom absolute inset-0">
-          <CommodityCover
-            seed={lot.id}
-            commodity={lot.commodity}
-            form={lot.form}
-            className="w-full h-full"
+      {/* Portada: imagen real si existe, si no patrón generativo */}
+      <div className="relative h-32 overflow-hidden bg-slate-100">
+        {lot.cover_image_url ? (
+          <img
+            src={lot.cover_image_url}
+            alt={lot.title}
+            loading="lazy"
+            className="cover-zoom absolute inset-0 w-full h-full object-cover"
           />
-        </div>
+        ) : (
+          <div className="cover-zoom absolute inset-0">
+            <CommodityCover
+              seed={lot.id}
+              commodity={lot.commodity}
+              form={lot.form}
+              className="w-full h-full"
+            />
+          </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent pointer-events-none" />
         <span className="absolute top-2.5 right-2.5 text-[11px] font-mono text-white/90 bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-full">
           {countryFlag(lot.country)} {countryName(lot.country)}
         </span>
