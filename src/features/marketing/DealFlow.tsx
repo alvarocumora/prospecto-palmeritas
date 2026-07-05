@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingCard } from "./PublicListingCard";
+import { Reveal } from "./Reveal";
 import { PublicListingDrawer } from "./PublicListingDrawer";
 import { Search, SlidersHorizontal, Inbox } from "lucide-react";
 import { MODALITY_LABEL } from "@/modules/deals/domain/constants";
@@ -118,8 +119,10 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
         <EmptyState hasListings={listings.length > 0} onClear={() => setFilters(EMPTY_FILTERS)} />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map((l) => (
-            <PublicListingCard key={l.id} listing={l} onOpen={() => setOpenId(l.id)} />
+          {filtered.map((l, idx) => (
+            <Reveal key={l.id} delay={Math.min(idx, 5) * 60}>
+              <PublicListingCard listing={l} onOpen={() => setOpenId(l.id)} />
+            </Reveal>
           ))}
         </div>
       )}

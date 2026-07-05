@@ -13,6 +13,7 @@ import {
   Filter as FilterIcon,
 } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { Reveal } from "@/features/marketing/Reveal";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import {
   listPublishedCommodityLots,
@@ -186,8 +187,10 @@ function MarketplacePage() {
             </div>
           )}
           <div className="grid sm:grid-cols-2 gap-4">
-            {lots.map((lot) => (
-              <LotCard key={lot.id} lot={lot} />
+            {lots.map((lot, idx) => (
+              <Reveal key={lot.id} delay={Math.min(idx, 5) * 60}>
+                <LotCard lot={lot} />
+              </Reveal>
             ))}
           </div>
         </div>
@@ -292,7 +295,7 @@ function LotCard({ lot }: { lot: CommodityLotRow }) {
     <Link
       to="/marketplace/$lotId"
       params={{ lotId: lot.id }}
-      className="group rounded-2xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_18px_36px_-24px_rgba(11,42,91,0.35)] transition block"
+      className="group rounded-2xl border border-hairline bg-white p-5 h-full hover-lift hover:border-accent-brand hover:shadow-[0_18px_36px_-24px_rgba(11,42,91,0.35)] transition block"
     >
       <div className="flex items-center justify-between">
         <span
