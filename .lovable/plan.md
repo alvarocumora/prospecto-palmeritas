@@ -1,62 +1,78 @@
-## Diagnóstico: por qué los cards "no linkean a nada"
+# Plan — Homepage con más densidad visual y narrativa
 
-Los 6 cards en `MarketingLanding.tsx` (líneas 512-556) se renderizan como `<BrandCard>` **sin prop `to` ni `<Link>` envolvente**. No es un 404 del router: es que el elemento nunca fue un link. La flecha `→` es decorativa.
+El homepage actual tiene un hero fuerte pero cae en secciones planas: cards estáticas, mucho whitespace vacío entre bloques, poca jerarquía visual y ninguna prueba social real. Este plan añade **densidad, movimiento sutil y contenido nuevo** sin romper el lenguaje Institutional Modernist / Industrialism ya acordado.
 
-### Estado real por módulo
+## Cambios por sección
 
-| # | Card | Ruta pública destino | Existe hoy | Datos reales disponibles |
-|---|---|---|---|---|
-| 1 | Mapa geológico | `/catastro/mapa` | ✅ Sí | ✅ `mining_concessions`, `cadastre_national` cargados |
-| 2 | Visor 3D geocientífico | `/visor-3d` | ❌ No | ✅ `scene3d.server` (DEM Copernicus + Sentinel) ya funciona en `_authenticated/dashboard/geology3d` |
-| 3 | Monitoreo satelital | `/satelital` | ❌ No | ✅ `satellite_layers`, `insar_displacement`, `satellite_anomalies` con datos demo Palmeritas/Franco |
-| 4 | NI 43-101 asistido | `/ni43101` | ❌ No | ✅ `technical_reports`, `ni43101_section_catalogue`, reporte demo Los Verdes |
-| 5 | Cumplimiento & patentes | `/cumplimiento` | ❌ No | ✅ `compliance_rules`, `compliance_evaluations`, `mining_bulletins` |
-| 6 | Capital raise & deals | `/oportunidades` | ✅ Sí | ✅ `property_listings` featured + `deals` |
+### 1. Hero — anclar con métricas vivas
+- Añadir una **barra de KPIs animados** (count-up) justo bajo los CTAs: proyectos activos, capital gestionado, países, anomalías detectadas. Datos ya existen vía `getPlatformStats`.
+- Fondo: reemplazar el grid estático por **líneas topográficas SVG animadas** (drift lento) + partículas de "escaneo satelital" en el mapa.
+- Añadir badge lateral "Última anomalía detectada · hace 3 min" con feed real de `satellite_anomalies`.
 
-Conclusión: **4 de 6 destinos no existen como ruta pública** (viven detrás de `_authenticated/dashboard/*`). Los datos ya están en la BD — falta la capa pública que los muestre a un visitante sin login.
+### 2. Nueva sección — Logos & prueba social
+Banda inmediatamente después del hero: logos de socios/geólogos calificados / medios ("Sernageomin", "NI 43-101 registered", universidades, prensa). Marquee horizontal lento en escala de grises.
 
-## Plan por sprints (público sin login)
+### 3. Dual paths (Inversionistas / Marketplace)
+- Añadir **preview visual** dentro de cada card: mini-chart de deal-flow para Inversionistas, mini-grid de commodities con precios live para Marketplace.
+- Hover: revelar 3 métricas rápidas con transición.
 
-Cada sprint = un turno cerrado. Recomiendo el orden por menor esfuerzo / mayor "wow".
+### 4. Nueva sección — "Cómo funciona" con visual paso a paso
+Reemplazar el actual highlight rotatorio plano por un **timeline horizontal interactivo** con:
+- Ilustraciones SVG por paso (Publica → Conecta → Negocia → Cierra).
+- Screenshot/mockup real de la plataforma a la derecha que cambia según el paso activo.
+- Progreso animado con línea que se llena.
 
-### Sprint 0 — Cablear los 2 que ya existen (30 min)
-- Añadir `Link` a los cards 1 y 6 → `/catastro/mapa` y `/oportunidades`.
-- Añadir estado "próximamente" a los otros 4 con hover claro (mientras se construyen).
-- Cierra la queja inmediata: ningún card queda muerto.
+### 5. Regiones — mapa protagonista
+- Reemplazar las 3 cards tipo "sparkline" por un **mapa LatAm interactivo** con hotspots pulsantes por país. Hover muestra IRR, focus y ticket promedio en un panel lateral.
+- Mantener FlagChips como leyenda.
 
-### Sprint 1 — `/satelital` (demo Palmeritas)
-Vista pública que renderiza:
-- Mapa MapLibre con `satellite_layers` (WMS/COG STAC) del proyecto demo.
-- Panel InSAR con serie temporal de `insar_displacement`.
-- Tabla de `satellite_anomalies` con severidad y confidence.
-Fetcher: `createServerFn` público leyendo con `SUPABASE_PUBLISHABLE_KEY` + policy `TO anon` filtrada por `project_id = <demo>`.
+### 6. Nueva sección — Testimonios / casos
+Grid tipo bento (2 grandes + 3 chicos) con:
+- Cita de inversionista/geólogo (real o placeholder marcado).
+- Foto/avatar + rol + proyecto.
+- Un caso con métrica destacada tipo "USD 4.2M levantados en 90 días".
 
-### Sprint 2 — `/visor-3d` (Los Verdes)
-- Reutilizar `Geology3DViewer` existente en modo read-only.
-- Nuevo server fn público `getPublicScene3d({ projectId })` que llama a `scene3d.server` con project demo hardcoded.
-- Sin controles de edición (solo cámara + capas visibles).
+### 7. Nueva sección — Data & tecnología
+Bloque oscuro (variante hero) mostrando el stack diferenciador:
+- Visor 3D (loop de video/GIF corto del engine3d ya existente).
+- Detección satelital (SatAnomalyMiniMap ya está).
+- IA geológica (badge + snippet).
+Layout asimétrico 60/40 con cifras grandes tipo "12M km² escaneados".
 
-### Sprint 3 — `/ni43101` (Los Verdes pre-43101)
-- Vista pública del reporte demo Los Verdes: TOC (`ni43101_section_catalogue`) + secciones renderizadas + evidencia satelital linkeada.
-- Ya existe `/_authenticated/reports/losverdes.pre43101` — clonar a versión pública con banner "muestra".
+### 8. FAQ colapsable
+Accordion con 6-8 preguntas frecuentes (inversión mínima, países, custodia, KYC, cómo publica un titular, etc.). Cierra la fricción antes del CTA final.
 
-### Sprint 4 — `/cumplimiento`
-- Lista pública de `mining_bulletins` recientes por región + buscador simple.
-- Reglas `compliance_rules` como catálogo educativo.
-- CTA a login para "ver mis proyectos evaluados".
+### 9. CTA final — full-bleed
+Reemplazar el footer-cta plano por sección full-width con:
+- Fondo dark + textura topográfica.
+- Titular grande editorial + dos CTAs contrastados.
+- Contador "324 inversionistas activos esta semana" en tiempo real.
 
-## Datos técnicos
+## Sistema transversal
+- **Motion**: usar Motion for React con `useInView` para revelar cada sección al scroll (fade + translateY 12px, respetando `prefers-reduced-motion`).
+- **Tokens**: sin nuevos colores; usar `--accent-brand`, `--gold`, `--content-*`, `--hairline`. Nada hardcoded nuevo.
+- **Componentes reutilizables** nuevos en `src/features/marketing/`:
+  - `AnimatedCounter.tsx`
+  - `LogoMarquee.tsx`
+  - `HowItWorksTimeline.tsx`
+  - `RegionHotspotMap.tsx`
+  - `TestimonialsBento.tsx`
+  - `TechStackShowcase.tsx`
+  - `FaqAccordion.tsx`
+  - `FinalCta.tsx`
+- **Reveal** on scroll compartido: extender el `Reveal` mencionado en el design-system doc o crear uno mínimo si no existe.
 
-- **RLS**: cada tabla necesita una policy `TO anon` estrecha, filtrada al `project_id` o `holder_id` del caso demo. No abrir toda la tabla.
-- **Fetchers**: `createServerFn` públicos en `src/lib/*.functions.ts` usando cliente publishable server-side (no `supabaseAdmin`, no `requireSupabaseAuth`).
-- **Loaders**: patrón canónico `ensureQueryData` + `useSuspenseQuery`. `errorComponent` + `notFoundComponent` obligatorios.
-- **SEO**: cada ruta con `head()` propio (title, description, og:title, og:description, og:image cuando aplique).
-- **Sitemap**: agregar las 4 rutas nuevas a `src/routes/sitemap[.]xml.ts`.
-- **i18n**: añadir claves ES/EN en `src/features/marketing/i18n.tsx` para los CTAs.
-- **AppShell nav**: opcional — añadir "Módulos" con dropdown a los 6 públicos.
+## Orden de implementación (para acotar riesgo)
+1. Hero KPIs animados + topografía SVG.
+2. LogoMarquee + FinalCta (impacto rápido, bajo riesgo).
+3. HowItWorksTimeline (reemplaza bloque plano existente).
+4. TestimonialsBento + FaqAccordion (llenan el vacío principal).
+5. RegionHotspotMap (reemplaza cards actuales).
+6. TechStackShowcase (cierra la narrativa técnica).
+7. Reveal-on-scroll aplicado a todo.
 
-## Recomendación
-
-Ejecutar **Sprint 0 ya mismo** (los cards dejan de estar muertos hoy) y luego decides si seguimos por Sprint 1 (satelital, el más visualmente potente para inversionistas) o por otro orden.
-
-¿Arranco con Sprint 0 + Sprint 1 en el próximo turno?
+## Fuera de alcance
+- No se toca lógica de negocio ni hooks de datos existentes salvo lectura de `platformStats` y `satellite_anomalies`.
+- No se cambia el header/footer.
+- No se rediseña Marketplace ni páginas internas.
+- No se añaden dependencias pesadas (mapa se hace con SVG, no MapLibre extra).
