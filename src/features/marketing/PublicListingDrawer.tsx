@@ -1,4 +1,6 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { VerificationBadge } from "@/components/brand";
+import { projectVerification } from "@/lib/verification";
 import type { PublicListing } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
@@ -57,11 +59,14 @@ function Body({ listing }: { listing: PublicListing }) {
             <h2 className="font-display text-2xl text-content text-left">{listing.title}</h2>
           </SheetTitle>
         </SheetHeader>
-        {listing.code && (
-          <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
-            {listing.code}
-          </div>
-        )}
+        <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
+          {listing.code && (
+            <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle">
+              {listing.code}
+            </span>
+          )}
+          <VerificationBadge level={projectVerification(listing.project_id)} />
+        </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
           <Kpi

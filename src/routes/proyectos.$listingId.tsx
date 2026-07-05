@@ -16,6 +16,8 @@ import {
   Box as BoxIcon,
 } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { VerificationBadge } from "@/components/brand";
+import { projectVerification } from "@/lib/verification";
 import { getListingDetail, type ListingDetail } from "@/lib/listingDetail.functions";
 import { InvestmentSimulator } from "@/features/listings/InvestmentSimulator";
 import { fmtUSD } from "@/modules/deals/domain/format";
@@ -117,9 +119,12 @@ function ListingDetailPage() {
             )}
           </div>
 
-          {/* Datos verificados */}
+          {/* Datos del proyecto — el sello indica el nivel real de verificación */}
           <section className="rounded-xl border border-hairline bg-white p-5">
-            <div className="brand-eyebrow mb-3">Datos verificados</div>
+            <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+              <div className="brand-eyebrow">Datos del proyecto</div>
+              <VerificationBadge level={projectVerification(l.project_id)} />
+            </div>
             <div className="grid sm:grid-cols-2 gap-3">
               <Metric
                 icon={<Database />}

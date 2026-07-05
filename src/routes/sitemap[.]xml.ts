@@ -28,6 +28,7 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/visor-3d", changefreq: "weekly", priority: "0.75" },
   { path: "/legal/privacidad", changefreq: "yearly", priority: "0.3" },
   { path: "/legal/terminos", changefreq: "yearly", priority: "0.3" },
+  { path: "/metodologia", changefreq: "monthly", priority: "0.5" },
 ];
 
 export const Route = createFileRoute("/sitemap.xml")({

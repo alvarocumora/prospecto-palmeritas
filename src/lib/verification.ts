@@ -1,0 +1,52 @@
+// Capa de confianza: clasificación honesta del origen de los datos.
+//
+// Tres niveles, en orden de garantía creciente:
+//  - "demo"        → proyecto de muestra usado para demostrar la plataforma.
+//  - "traceable"   → datos reales cargados en la base productiva (catastro,
+//                    sondajes, satélite) con trazabilidad de origen, pero aún
+//                    sin firma de una Qualified Person.
+//  - "qp_verified" → revisado y firmado por una Qualified Person registrada
+//                    (NI 43-101 / JORC). Reservado: se puebla cuando exista el
+//                    convenio con QP firmante (Fase 1 del roadmap).
+
+export type VerificationLevel = "demo" | "traceable" | "qp_verified";
+
+/** Proyectos de muestra: se etiquetan "demo" en toda la superficie pública. */
+export const DEMO_PROJECT_IDS: readonly string[] = [
+  "7a499b02-ecdf-447b-8956-b106fe4ec087",
+  "e5360f13-1647-4e44-bb13-c0614e6f39fe",
+  "8dc8e288-b22c-4bd4-9626-bb7fb85d1745",
+];
+
+/** Proyectos con firma QP. Vacío hasta cerrar el convenio con la Qualified Person. */
+export const QP_VERIFIED_PROJECT_IDS: readonly string[] = [];
+
+export function projectVerification(projectId: string | null | undefined): VerificationLevel {
+  if (projectId && QP_VERIFIED_PROJECT_IDS.includes(projectId)) return "qp_verified";
+  if (projectId && DEMO_PROJECT_IDS.includes(projectId)) return "demo";
+  return "traceable";
+}
+
+export const VERIFICATION_META: Record<
+  VerificationLevel,
+  { label: string; short: string; description: string }
+> = {
+  demo: {
+    label: "Datos demo",
+    short: "Demo",
+    description:
+      "Proyecto de muestra para demostrar las capacidades de la plataforma. No representa una oportunidad de inversión activa.",
+  },
+  traceable: {
+    label: "Datos trazables",
+    short: "Trazable",
+    description:
+      "Información real cargada en la base de datos productiva con trazabilidad de origen (catastro, sondajes, satélite). Pendiente de revisión por Qualified Person.",
+  },
+  qp_verified: {
+    label: "Verificado QP",
+    short: "QP ✓",
+    description:
+      "Datos revisados y firmados por una Qualified Person registrada bajo estándar NI 43-101 / JORC.",
+  },
+};

@@ -18,6 +18,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
+import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
@@ -153,6 +154,11 @@ const ProyectosRoute = ProyectosRouteImport.update({
 const OportunidadesRoute = OportunidadesRouteImport.update({
   id: '/oportunidades',
   path: '/oportunidades',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MetodologiaRoute = MetodologiaRouteImport.update({
+  id: '/metodologia',
+  path: '/metodologia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const McpRoute = McpRouteImport.update({
@@ -675,6 +681,7 @@ export interface FileRoutesByFullPath {
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
+  '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
@@ -776,6 +783,7 @@ export interface FileRoutesByTo {
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
+  '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
@@ -879,6 +887,7 @@ export interface FileRoutesById {
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/mcp': typeof McpRoute
+  '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
@@ -982,6 +991,7 @@ export interface FileRouteTypes {
     | '/inversionistas'
     | '/marketplace'
     | '/mcp'
+    | '/metodologia'
     | '/oportunidades'
     | '/proyectos'
     | '/recursos'
@@ -1083,6 +1093,7 @@ export interface FileRouteTypes {
     | '/inversionistas'
     | '/marketplace'
     | '/mcp'
+    | '/metodologia'
     | '/oportunidades'
     | '/proyectos'
     | '/recursos'
@@ -1185,6 +1196,7 @@ export interface FileRouteTypes {
     | '/inversionistas'
     | '/marketplace'
     | '/mcp'
+    | '/metodologia'
     | '/oportunidades'
     | '/proyectos'
     | '/recursos'
@@ -1288,6 +1300,7 @@ export interface RootRouteChildren {
   InversionistasRoute: typeof InversionistasRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   McpRoute: typeof McpRoute
+  MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
@@ -1393,6 +1406,13 @@ declare module '@tanstack/react-router' {
       path: '/oportunidades'
       fullPath: '/oportunidades'
       preLoaderRoute: typeof OportunidadesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/metodologia': {
+      id: '/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof MetodologiaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mcp': {
@@ -2265,6 +2285,7 @@ const rootRouteChildren: RootRouteChildren = {
   InversionistasRoute: InversionistasRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   McpRoute: McpRoute,
+  MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,

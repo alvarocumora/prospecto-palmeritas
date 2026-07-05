@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { AlertCircle, BarChart3, Clock, DollarSign, TrendingUp } from "lucide-react";
 import { SectionHeading, Stat } from "@/components/brand";
 
@@ -544,7 +545,10 @@ export function InvestmentSimulator() {
               <span>
                 Simulación ilustrativa. Throughput fijo 1 Mt/año. No incluye impuestos, regalías ni
                 G&amp;A.{" "}
-                <strong className="text-content">No constituye asesoría de inversión.</strong>
+                <strong className="text-content">No constituye asesoría de inversión.</strong>{" "}
+                <Link to="/metodologia" className="text-accent-brand hover:underline">
+                  Ver metodología
+                </Link>
               </span>
             </div>
           </div>

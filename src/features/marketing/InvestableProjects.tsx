@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, MapPin, Mountain, Clock, Sparkles, Filter } from "lucide-react";
-import { BrandButton, SectionHeading } from "@/components/brand";
+import { BrandButton, SectionHeading, VerificationBadge } from "@/components/brand";
+import { projectVerification } from "@/lib/verification";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
@@ -28,7 +29,6 @@ function matchFilter(p: PublicListing, key: string) {
   if (key === "critical") return /^Li|^Co|^Ni|^Mo/.test(c);
   return true;
 }
-
 
 export function InvestableProjects() {
   const [activeFilter, setActiveFilter] = useState("all");
@@ -58,8 +58,8 @@ export function InvestableProjects() {
       <div className="flex flex-col lg:flex-row lg:items-end gap-6 mb-10">
         <SectionHeading
           eyebrow="Proyectos disponibles para invertir"
-          title="Oportunidades verificadas en minería activa"
-          description="Proyectos con información técnica auditada, modelo económico y múltiples modalidades de entrada para inversionistas."
+          title="Oportunidades con datos trazables en minería activa"
+          description="Cada proyecto lleva un sello visible con su nivel de verificación — demo, trazable o verificado QP — junto a modelo económico y múltiples modalidades de entrada."
           className="flex-1"
         />
         <BrandButton asChild variant="outline" className="shrink-0">
@@ -181,11 +181,17 @@ function FeaturedProjectCard({
             </span>
           )}
         </div>
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 pointer-events-none">
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center gap-1.5 pointer-events-none">
           <span className="text-xs font-mono font-semibold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             {p.commodity}
           </span>
           <span className="text-[10px] font-mono text-white/70">· {stage}</span>
+          <VerificationBadge
+            level={projectVerification(p.project_id)}
+            compact
+            linked={false}
+            className="ml-auto !bg-white/90 backdrop-blur-sm"
+          />
         </div>
       </div>
 
