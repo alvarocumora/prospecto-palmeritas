@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { Search, Layers, Building2 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
+import { SNGM_CONCESIONES_URL } from "@/lib/sngm";
 
 export const Route = createFileRoute("/catastro/mapa")({
   head: () => ({
@@ -27,9 +28,16 @@ export const Route = createFileRoute("/catastro/mapa")({
   component: CatastroMap,
 });
 
+// La capa nacional tiene ~103.000 polígonos: solo se piden al servidor desde
+// este zoom. Bajo ese nivel mostramos un aviso en vez de un mapa "vacío".
+const LAYER_MIN_ZOOM = 9;
+
 function CatastroMap() {
   const mapRef = useRef<HTMLDivElement>(null);
   const [q, setQ] = useState("");
+  const [needsZoom, setNeedsZoom] = useState(false);
+  const [layerLoading, setLayerLoading] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
   const search = useServerFn(searchConcessions);
   const mutation = useMutation({
     mutationFn: (term: string) => search({ data: { q: term, limit: 20 } }),
@@ -39,53 +47,53 @@ function CatastroMap() {
     let cleanup: (() => void) | undefined;
     (async () => {
       if (!mapRef.current) return;
-      const L = (await import("leaflet")).default;
-      await import("leaflet/dist/leaflet.css");
-      const EL = await import("esri-leaflet");
-      const map = L.map(mapRef.current, {
-        center: [-30, -70.5],
-        zoom: 5,
-        zoomControl: true,
-      });
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        {
-          attribution: "Esri · SERNAGEOMIN",
-          maxZoom: 19,
-        },
-      ).addTo(map);
-      L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
-        { opacity: 0.9, maxZoom: 19 },
-      ).addTo(map);
+      try {
+        const L = (await import("leaflet")).default;
+        await import("leaflet/dist/leaflet.css");
+        const EL = await import("esri-leaflet");
+        // Abrir sobre el núcleo minero de Coquimbo (Illapel) a zoom con datos,
+        // en vez de todo Chile en zoom 5 donde la capa aún no carga.
+        const map = L.map(mapRef.current, {
+          center: [-31.63, -71.17],
+          zoom: 11,
+          zoomControl: true,
+        });
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+          {
+            attribution: "Esri · SERNAGEOMIN",
+            maxZoom: 19,
+          },
+        ).addTo(map);
+        L.tileLayer(
+          "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+          { opacity: 0.9, maxZoom: 19 },
+        ).addTo(map);
 
-      // Capa viva SERNAGEOMIN v2 (ArcGIS Online — Marcelo_Layer/FeatureServer/2)
-      // Reemplaza al MapServer legacy de catastro.sernageomin.cl (degradado 2026-Q1).
-      const SNGM_V2 =
-        "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/Marcelo_Layer/FeatureServer/2";
-      const concesiones = EL.featureLayer({
-        url: SNGM_V2,
-        minZoom: 9, // evitar pedir 104k polígonos a zoom país
-        precision: 5,
-        simplifyFactor: 0.5,
-        where: "1=1",
-        style: (feature: { properties?: Record<string, unknown> }) => {
-          const tipo = String(feature?.properties?.TIPO_CONCESION ?? "").toLowerCase();
-          const explor = tipo.includes("explor");
-          return {
-            color: explor ? "#22d3ee" : "#f97316",
-            weight: 1,
-            fillColor: explor ? "#22d3ee" : "#f97316",
-            fillOpacity: 0.15,
-          };
-        },
-      });
-      const popupFn = (layer: unknown) => {
-        const p =
-          (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ??
-          {};
-        const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
-        return `
+        // Capa viva SERNAGEOMIN v2 (ArcGIS Online) — ver src/lib/sngm.ts
+        const concesiones = EL.featureLayer({
+          url: SNGM_CONCESIONES_URL,
+          minZoom: LAYER_MIN_ZOOM,
+          precision: 5,
+          simplifyFactor: 0.5,
+          where: "1=1",
+          style: (feature: { properties?: Record<string, unknown> }) => {
+            const tipo = String(feature?.properties?.TIPO_CONCESION ?? "").toLowerCase();
+            const explor = tipo.includes("explor");
+            return {
+              color: explor ? "#22d3ee" : "#f97316",
+              weight: 1,
+              fillColor: explor ? "#22d3ee" : "#f97316",
+              fillOpacity: 0.15,
+            };
+          },
+        });
+        const popupFn = (layer: unknown) => {
+          const p =
+            (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ??
+            {};
+          const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
+          return `
           <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
             <div style="font-weight:600;font-size:12px">${p.NOMBRE ?? rol}</div>
             <div>ROL: ${rol}</div>
@@ -96,12 +104,29 @@ function CatastroMap() {
             <div>Tipo: ${p.TIPO_CONCESION ?? "—"}</div>
             <div>Estado: ${p.SITUACION_CONCESION ?? "—"}</div>
           </div>`;
-      };
-      (concesiones.bindPopup as (fn: (layer: unknown) => string) => void)(popupFn);
+        };
+        (concesiones.bindPopup as (fn: (layer: unknown) => string) => void)(popupFn);
 
-      concesiones.addTo(map);
+        // Estado visible: aviso de zoom, spinner de carga y errores del servicio
+        const syncZoomHint = () => setNeedsZoom(map.getZoom() < LAYER_MIN_ZOOM);
+        map.on("zoomend", syncZoomHint);
+        syncZoomHint();
+        concesiones.on("loading", () => setLayerLoading(true));
+        concesiones.on("load", () => setLayerLoading(false));
+        concesiones.on("requesterror", (e: unknown) => {
+          setLayerLoading(false);
+          const msg = (e as { error?: { message?: string } })?.error?.message ?? "error de red";
+          setMapError(`SERNAGEOMIN no respondió: ${msg}. Reintenta al mover el mapa.`);
+        });
+        concesiones.on("requestsuccess", () => setMapError(null));
 
-      cleanup = () => map.remove();
+        concesiones.addTo(map);
+
+        cleanup = () => map.remove();
+      } catch (e) {
+        console.error("[catastro.mapa] init failed", e);
+        setMapError(e instanceof Error ? e.message : "No se pudo inicializar el mapa.");
+      }
     })();
     return () => cleanup?.();
   }, []);
@@ -175,8 +200,40 @@ function CatastroMap() {
         {/* Mapa */}
         <div className="relative">
           <div ref={mapRef} className="absolute inset-0" />
-          <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-1.5 rounded bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur">
-            Capa SERNAGEOMIN · Esri World Imagery
+
+          {/* Aviso: bajo el zoom mínimo la capa no se solicita */}
+          {needsZoom && !mapError && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-2 rounded bg-background/95 border border-border text-[11px] font-mono text-foreground backdrop-blur shadow">
+              Acércate (zoom {LAYER_MIN_ZOOM}+) para cargar las concesiones — la capa nacional tiene
+              ~103.000 polígonos
+            </div>
+          )}
+
+          {/* Cargando features */}
+          {layerLoading && !needsZoom && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-1.5 rounded bg-background/95 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur">
+              Cargando concesiones SERNAGEOMIN…
+            </div>
+          )}
+
+          {/* Error del servicio */}
+          {mapError && (
+            <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[400] max-w-md px-3 py-2 rounded bg-background/95 border border-danger/50 text-[11px] font-mono text-danger backdrop-blur shadow">
+              {mapError}
+            </div>
+          )}
+
+          {/* Leyenda + atribución */}
+          <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-1.5 rounded bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur space-y-1">
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-2.5 rounded-sm border border-cyan-400 bg-cyan-400/20" />
+              Exploración
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className="inline-block w-3 h-2.5 rounded-sm border border-orange-500 bg-orange-500/20" />
+              Explotación
+            </div>
+            <div>Capa viva SERNAGEOMIN v2 · Esri World Imagery</div>
           </div>
         </div>
       </div>
