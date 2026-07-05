@@ -178,21 +178,29 @@ function LotDetailPage() {
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
 
-      {/* Portada generativa del material */}
-      <div className="relative h-40 md:h-52 overflow-hidden border-b border-hairline">
-        <CommodityCover
-          seed={lot.id}
-          commodity={lot.commodity}
-          form={lot.form}
-          className="absolute inset-0"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
+      {/* Portada: imagen real si existe */}
+      <div className="relative h-56 md:h-72 overflow-hidden border-b border-hairline bg-slate-100">
+        {lot.cover_image_url ? (
+          <img
+            src={lot.cover_image_url}
+            alt={lot.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <CommodityCover
+            seed={lot.id}
+            commodity={lot.commodity}
+            form={lot.form}
+            className="absolute inset-0"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
         <div className="absolute bottom-4 left-0 right-0">
           <div className="max-w-7xl mx-auto px-5 flex items-end justify-between gap-3 flex-wrap">
-            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/70">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/80">
               Marketplace · {formLabel(lot.form)}
             </span>
-            <span className="text-[11px] font-mono text-white/80">
+            <span className="text-[11px] font-mono text-white/90">
               {countryFlag(lot.country)} {countryName(lot.country)}
               {lot.port_of_loading && ` · ${lot.port_of_loading}`}
             </span>
