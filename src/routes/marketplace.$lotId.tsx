@@ -316,7 +316,7 @@ function LotDetailPage() {
                       )}
                       {c.expires_at && (
                         <div className="text-[11px] font-mono text-content-subtle">
-                          Vence {new Date(c.expires_at).toLocaleDateString("es-CL")}
+                          Vence {formatDateUTC(c.expires_at)}
                         </div>
                       )}
                     </div>
