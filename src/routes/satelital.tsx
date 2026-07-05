@@ -590,6 +590,15 @@ function InsarRow({
               value={i.coherence != null ? Number(i.coherence).toFixed(3) : "—"}
             />
             <DetailRow label="Alerta" value={i.alert_severity ?? "—"} />
+            <div className="pt-2">
+              <Link
+                to="/visor-3d"
+                search={{ project: projectId, insar: i.id }}
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-accent-brand text-accent-brand hover:bg-accent-brand-subtle transition"
+              >
+                <BoxIcon className="w-3 h-3" /> Ver en 3D
+              </Link>
+            </div>
           </td>
         </tr>
       )}
