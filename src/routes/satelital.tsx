@@ -1,18 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Satellite, Activity, AlertTriangle, MapPin, ArrowLeft, ArrowRight, Radio } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandCard, Eyebrow, SectionHeading } from "@/components/brand";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 
-const satelliteQueryOptions = queryOptions({
-  queryKey: ["public-satellite"],
-  queryFn: () => getPublicSatellite(),
-  staleTime: 60_000,
-});
-
 export const Route = createFileRoute("/satelital")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(satelliteQueryOptions),
   head: () => ({
     meta: [
       { title: "Monitoreo satelital minero — Geocapitals" },
