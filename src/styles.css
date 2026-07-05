@@ -703,3 +703,33 @@
     stroke-dashoffset: 0 !important;
   }
 }
+
+/* Marquee horizontal para banda de estándares */
+@keyframes marquee-x {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.marquee-track {
+  animation: marquee-x 42s linear infinite;
+  width: max-content;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Deriva sutil del fondo topográfico del hero */
+@keyframes topo-drift {
+  0%   { transform: translate3d(0, 0, 0) scale(1); }
+  50%  { transform: translate3d(-1.5%, -1%, 0) scale(1.03); }
+  100% { transform: translate3d(0, 0, 0) scale(1); }
+}
+.topo-drift {
+  animation: topo-drift 32s ease-in-out infinite;
+  transform-origin: 55% 45%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track,
+  .topo-drift {
+    animation: none !important;
+  }
+}
+

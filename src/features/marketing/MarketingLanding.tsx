@@ -13,6 +13,12 @@ import { InvestmentSimulator } from "@/features/marketing/InvestmentSimulator";
 import { CommodityTicker } from "@/features/marketing/CommodityTicker";
 import { PlatformPreview } from "@/features/marketing/PlatformPreview";
 import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
+import { Reveal } from "@/features/marketing/Reveal";
+import { AnimatedCounter } from "@/features/marketing/AnimatedCounter";
+import { LogoMarquee } from "@/features/marketing/LogoMarquee";
+import { TestimonialsBento } from "@/features/marketing/TestimonialsBento";
+import { FaqAccordion } from "@/features/marketing/FaqAccordion";
+import { HeroTopoBackground } from "@/features/marketing/HeroTopoBackground";
 import {
   Mountain,
   Users,
@@ -93,23 +99,24 @@ export function MarketingLanding() {
           className="pointer-events-none absolute top-1/2 -left-40 w-[380px] h-[380px] rounded-full blur-[100px]"
           style={{ background: "color-mix(in oklab, var(--gold) 12%, transparent)" }}
         />
-        {/* Grid texture */}
+        {/* Grid texture + topografía animada */}
         <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
+          className="pointer-events-none absolute inset-0 opacity-[0.05]"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.5) 1px, transparent 1px)",
             backgroundSize: "48px 48px",
-            maskImage:
-              "radial-gradient(ellipse at 60% 40%, black 0%, transparent 70%)",
+            maskImage: "radial-gradient(ellipse at 60% 40%, black 0%, transparent 70%)",
           }}
         />
+        <HeroTopoBackground />
 
         <div className="relative max-w-7xl mx-auto px-5 py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
           <div>
             {/* Live badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-8 backdrop-blur">
               <span className="relative flex h-2 w-2">
+
                 <span
                   className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
                   style={{ background: "var(--accent-brand)" }}
@@ -175,7 +182,30 @@ export function MarketingLanding() {
                 <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> 18 países
               </span>
             </div>
+
+            {/* KPI live bar */}
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden">
+              {[
+                { v: live?.projects ?? 124, l: "Proyectos activos" },
+                { v: live?.concessionsManaged ?? 47000, l: "Concesiones", compact: true },
+                { v: live?.satelliteAnomalies ?? 312, l: "Anomalías detectadas" },
+                { v: 18, l: "Países" },
+              ].map((k, i) => (
+                <div key={i} className="bg-[#05070a] px-4 py-4">
+                  <div className="font-mono text-2xl text-white tracking-tight">
+                    <AnimatedCounter
+                      value={k.v}
+                      format={k.compact ? "compact" : "int"}
+                    />
+                  </div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
+                    {k.l}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
+
 
           {/* Live map wrapped in HUD frame */}
           <div className="relative">
@@ -209,6 +239,9 @@ export function MarketingLanding() {
 
       {/* Commodity price ticker */}
       <CommodityTicker />
+
+      {/* Prueba social — estándares soportados */}
+      <LogoMarquee />
 
       {/* Dual paths: proyectos + marketplace */}
       <section className="border-b border-hairline bg-white">
@@ -853,6 +886,12 @@ export function MarketingLanding() {
           </div>
         </div>
       </section>
+
+      {/* Testimonios & prueba social */}
+      <TestimonialsBento />
+
+      {/* FAQ */}
+      <FaqAccordion />
 
       {/* CTA Principal */}
       <section className="relative overflow-hidden bg-surface-inverse text-white">
