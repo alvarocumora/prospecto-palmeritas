@@ -327,7 +327,57 @@ function Site({
   );
 }
 
+function CameraFocus({
+  target,
+  zoom,
+}: {
+  target: [number, number, number] | null;
+  zoom: number;
+}) {
+  const controlsRef = useRef<OrbitControlsImpl>(null);
+  const { camera } = useThree();
+  const desiredTarget = useRef(new THREE.Vector3());
+  const desiredPos = useRef(new THREE.Vector3());
+  const hasTarget = useRef(false);
+
+  useEffect(() => {
+    if (!target) {
+      hasTarget.current = false;
+      return;
+    }
+    desiredTarget.current.set(target[0], target[1], target[2]);
+    // Camera offset relative to target: elevated & pulled back
+    desiredPos.current.set(target[0] + zoom * 0.9, target[1] + zoom * 0.7, target[2] + zoom);
+    hasTarget.current = true;
+  }, [target, zoom]);
+
+  useFrame(() => {
+    if (!hasTarget.current || !controlsRef.current) return;
+    controlsRef.current.target.lerp(desiredTarget.current, 0.08);
+    camera.position.lerp(desiredPos.current, 0.08);
+    controlsRef.current.update();
+    if (
+      controlsRef.current.target.distanceTo(desiredTarget.current) < 0.5 &&
+      camera.position.distanceTo(desiredPos.current) < 0.5
+    ) {
+      hasTarget.current = false;
+    }
+  });
+
+  return (
+    <OrbitControls
+      ref={controlsRef}
+      enableDamping
+      dampingFactor={0.08}
+      minDistance={120}
+      maxDistance={2400}
+      maxPolarAngle={Math.PI / 2.05}
+    />
+  );
+}
+
 // ---- Página -----------------------------------------------------------------
+
 
 function Visor3DPage() {
   const search = Route.useSearch();
