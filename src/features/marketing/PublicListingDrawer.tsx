@@ -21,7 +21,7 @@ export function PublicListingDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="bg-white text-[var(--brand-ink)] sm:max-w-xl w-full overflow-y-auto p-0 border-l border-[var(--brand-hair)]"
+        className="bg-white text-content sm:max-w-xl w-full overflow-y-auto p-0 border-l border-hairline"
       >
         {listing && <Body listing={listing} />}
       </SheetContent>
@@ -32,7 +32,7 @@ export function PublicListingDrawer({
 function Body({ listing }: { listing: PublicListing }) {
   return (
     <div className="flex flex-col">
-      <div className="relative aspect-[16/9] bg-[var(--brand-blue-soft)] overflow-hidden">
+      <div className="relative aspect-[16/9] bg-accent-brand-subtle overflow-hidden">
         {listing.cover_image_url ? (
           <img
             src={listing.cover_image_url}
@@ -41,10 +41,10 @@ function Body({ listing }: { listing: PublicListing }) {
           />
         ) : (
           <div className="w-full h-full grid place-items-center">
-            <Mountain className="w-14 h-14 text-[var(--brand-blue)]/30" />
+            <Mountain className="w-14 h-14 text-accent-brand/30" />
           </div>
         )}
-        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-[var(--brand-navy-deep)] text-[10px] font-mono uppercase tracking-wider border border-[var(--brand-hair)]">
+        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-content text-[10px] font-mono uppercase tracking-wider border border-hairline">
           {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality} ·{" "}
           {STAGE_LABEL[listing.stage ?? ""] ?? listing.stage}
         </div>
@@ -53,13 +53,11 @@ function Body({ listing }: { listing: PublicListing }) {
       <div className="p-5 md:p-7">
         <SheetHeader>
           <SheetTitle asChild>
-            <h2 className="font-display text-2xl text-[var(--brand-navy-deep)] text-left">
-              {listing.title}
-            </h2>
+            <h2 className="font-display text-2xl text-content text-left">{listing.title}</h2>
           </SheetTitle>
         </SheetHeader>
         {listing.code && (
-          <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-[var(--brand-mute)]">
+          <div className="mt-1 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
             {listing.code}
           </div>
         )}
@@ -88,7 +86,7 @@ function Body({ listing }: { listing: PublicListing }) {
         {listing.summary && (
           <div className="mt-6">
             <div className="brand-eyebrow mb-2">Resumen</div>
-            <p className="text-sm text-[var(--brand-ink)] leading-relaxed">{listing.summary}</p>
+            <p className="text-sm text-content leading-relaxed">{listing.summary}</p>
           </div>
         )}
 
@@ -97,8 +95,8 @@ function Body({ listing }: { listing: PublicListing }) {
             <div className="brand-eyebrow mb-3">Data disponible</div>
             <ul className="grid grid-cols-2 gap-2">
               {listing.data_available.map((d) => (
-                <li key={d} className="flex items-center gap-2 text-sm text-[var(--brand-ink)]">
-                  <CheckCircle2 className="w-4 h-4 text-[var(--brand-blue)]" /> {d}
+                <li key={d} className="flex items-center gap-2 text-sm text-content">
+                  <CheckCircle2 className="w-4 h-4 text-accent-brand" /> {d}
                 </li>
               ))}
             </ul>
@@ -113,14 +111,12 @@ function Body({ listing }: { listing: PublicListing }) {
 
 function Kpi({ label, v, icon }: { label: string; v: string; icon?: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-[var(--brand-hair)] bg-[var(--brand-blue-soft)]/40 p-3">
-      <div className="text-[10px] font-mono uppercase tracking-wider text-[var(--brand-mute)] flex items-center gap-1">
+    <div className="rounded-lg border border-hairline bg-accent-brand-subtle/40 p-3">
+      <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle flex items-center gap-1">
         {icon}
         {label}
       </div>
-      <div className="mt-1 font-mono text-[14px] text-[var(--brand-navy-deep)] font-semibold truncate">
-        {v}
-      </div>
+      <div className="mt-1 font-mono text-[14px] text-content font-semibold truncate">{v}</div>
     </div>
   );
 }
@@ -164,13 +160,11 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
         e.preventDefault();
         mut.mutate();
       }}
-      className="mt-7 rounded-xl border border-[var(--brand-hair)] bg-white p-5 space-y-3"
+      className="mt-7 rounded-xl border border-hairline bg-white p-5 space-y-3"
     >
       <div className="flex items-center gap-2">
-        <Lock className="w-4 h-4 text-[var(--brand-blue)]" />
-        <div className="font-display text-[15px] text-[var(--brand-navy-deep)]">
-          Solicitar acceso al data room
-        </div>
+        <Lock className="w-4 h-4 text-accent-brand" />
+        <div className="font-display text-[15px] text-content">Solicitar acceso al data room</div>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <input
@@ -207,7 +201,7 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
       <button
         type="submit"
         disabled={mut.isPending}
-        className="w-full inline-flex items-center justify-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
+        className="w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
       >
         {mut.isPending ? (
           "Enviando…"
@@ -217,7 +211,7 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
           </>
         )}
       </button>
-      <p className="text-[11px] font-mono text-[var(--brand-mute)] text-center">
+      <p className="text-[11px] font-mono text-content-subtle text-center">
         Bajo NDA · Verificación KYC institucional.
       </p>
     </form>

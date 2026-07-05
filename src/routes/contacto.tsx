@@ -69,14 +69,14 @@ function InfoCard({
   lines: string[];
 }) {
   return (
-    <div className="rounded-xl border border-[var(--brand-hair)] bg-white p-5">
+    <div className="rounded-xl border border-hairline bg-white p-5">
       <div className="flex items-center gap-3">
-        <span className="grid place-items-center w-10 h-10 rounded-lg bg-[var(--brand-blue-soft)] text-[var(--brand-blue)]">
+        <span className="grid place-items-center w-10 h-10 rounded-lg bg-accent-brand-subtle text-accent-brand">
           {icon}
         </span>
-        <div className="font-display text-[15px] text-[var(--brand-navy-deep)]">{title}</div>
+        <div className="font-display text-[15px] text-content">{title}</div>
       </div>
-      <div className="mt-3 space-y-1 text-sm text-[var(--brand-ink)]">
+      <div className="mt-3 space-y-1 text-sm text-content">
         {lines.map((l) => (
           <div key={l} className="font-mono text-[13px]">
             {l}

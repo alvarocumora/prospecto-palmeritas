@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { CheckCircle2, ArrowRight } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
+import { BrandButton } from "@/components/brand";
 
 export const Route = createFileRoute("/empresas")({
   head: () => ({
@@ -75,24 +76,22 @@ function EmpresasPage() {
             key={p.name}
             className={`rounded-2xl border p-6 flex flex-col ${
               p.highlight
-                ? "bg-[var(--brand-navy-deep)] text-white border-[var(--brand-navy-deep)]"
-                : "bg-white border-[var(--brand-hair)]"
+                ? "bg-surface-inverse text-white border-content"
+                : "bg-white border-hairline"
             }`}
           >
             <div
               className={`text-[10px] font-mono uppercase tracking-wider mb-3 ${
-                p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
+                p.highlight ? "text-accent-brand-subtle" : "text-accent-brand"
               }`}
             >
               {p.tag}
             </div>
-            <div
-              className={`font-display text-2xl ${p.highlight ? "text-white" : "text-[var(--brand-navy-deep)]"}`}
-            >
+            <div className={`font-display text-2xl ${p.highlight ? "text-white" : "text-content"}`}>
               {p.name}
             </div>
             <div
-              className={`mt-1 text-sm ${p.highlight ? "text-white/70" : "text-[var(--brand-mute)]"}`}
+              className={`mt-1 text-sm ${p.highlight ? "text-white/70" : "text-content-subtle"}`}
             >
               {p.price}
             </div>
@@ -101,35 +100,30 @@ function EmpresasPage() {
                 <li
                   key={it}
                   className={`flex items-start gap-2 text-sm ${
-                    p.highlight ? "text-white/85" : "text-[var(--brand-ink)]"
+                    p.highlight ? "text-white/85" : "text-content"
                   }`}
                 >
                   <CheckCircle2
                     className={`w-4 h-4 shrink-0 mt-0.5 ${
-                      p.highlight ? "text-[var(--brand-gold)]" : "text-[var(--brand-blue)]"
+                      p.highlight ? "text-accent-brand-subtle" : "text-accent-brand"
                     }`}
                   />
                   <span>{it}</span>
                 </li>
               ))}
             </ul>
-            <Link
-              to="/contacto"
-              className={`mt-6 inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium ${
-                p.highlight
-                  ? "bg-[var(--brand-gold)] text-[var(--brand-navy-deep)]"
-                  : "bg-[var(--brand-blue)] text-white"
-              }`}
-            >
-              {p.cta} <ArrowRight className="w-4 h-4" />
-            </Link>
+            <BrandButton asChild size="sm" className="mt-6">
+              <Link to="/contacto">
+                {p.cta} <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
           </div>
         ))}
       </div>
 
-      <p className="mt-10 text-center text-sm text-[var(--brand-mute)]">
+      <p className="mt-10 text-center text-sm text-content-subtle">
         ¿Necesitas algo distinto?{" "}
-        <Link to="/contacto" className="text-[var(--brand-blue)] font-medium">
+        <Link to="/contacto" className="text-accent-brand font-medium">
           Conversemos.
         </Link>
       </p>

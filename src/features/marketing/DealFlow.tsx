@@ -60,9 +60,9 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
   return (
     <section>
       {/* Filter bar */}
-      <div className="rounded-xl border border-[var(--brand-hair)] bg-white p-3 md:p-4 flex flex-wrap gap-3 items-center mb-6">
+      <div className="rounded-xl border border-hairline bg-white p-3 md:p-4 flex flex-wrap gap-3 items-center mb-6">
         <div className="relative flex-1 min-w-[180px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--brand-mute)]" />
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-content-subtle" />
           <input
             type="search"
             placeholder="Buscar por nombre, región, código…"
@@ -94,12 +94,12 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
           <button
             type="button"
             onClick={() => setFilters(EMPTY_FILTERS)}
-            className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-mute)] hover:text-[var(--brand-blue)] inline-flex items-center gap-1"
+            className="text-[11px] font-mono uppercase tracking-wider text-content-subtle hover:text-accent-brand inline-flex items-center gap-1"
           >
             <SlidersHorizontal className="w-3.5 h-3.5" /> Limpiar
           </button>
         )}
-        <span className="ml-auto text-[11px] font-mono text-[var(--brand-mute)]">
+        <span className="ml-auto text-[11px] font-mono text-content-subtle">
           {isLoading ? "Cargando…" : `${filtered.length} de ${listings.length}`}
         </span>
       </div>
@@ -110,7 +110,7 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="rounded-xl border border-[var(--brand-hair)] bg-white h-[320px] animate-pulse"
+              className="rounded-xl border border-hairline bg-white h-[320px] animate-pulse"
             />
           ))}
         </div>
@@ -167,12 +167,12 @@ function Select({
 
 function EmptyState({ hasListings, onClear }: { hasListings: boolean; onClear: () => void }) {
   return (
-    <div className="rounded-xl border border-dashed border-[var(--brand-hair)] bg-white p-10 text-center">
-      <Inbox className="w-10 h-10 mx-auto text-[var(--brand-blue)]/40" />
-      <div className="mt-3 font-display text-lg text-[var(--brand-navy-deep)]">
+    <div className="rounded-xl border border-dashed border-hairline bg-white p-10 text-center">
+      <Inbox className="w-10 h-10 mx-auto text-accent-brand/40" />
+      <div className="mt-3 font-display text-lg text-content">
         {hasListings ? "Sin oportunidades que coincidan" : "Pronto: nuevas oportunidades"}
       </div>
-      <p className="text-sm text-[var(--brand-mute)] mt-1 max-w-md mx-auto">
+      <p className="text-sm text-content-subtle mt-1 max-w-md mx-auto">
         {hasListings
           ? "Ajusta los filtros para ampliar la búsqueda o limpia los criterios."
           : "Estamos onboardeando proyectos. Solicita acceso institucional para recibir oportunidades en privado antes del listado público."}
@@ -180,7 +180,7 @@ function EmptyState({ hasListings, onClear }: { hasListings: boolean; onClear: (
       {hasListings && (
         <button
           onClick={onClear}
-          className="mt-4 inline-flex items-center gap-1.5 text-sm text-[var(--brand-blue)] font-medium hover:underline"
+          className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent-brand font-medium hover:underline"
         >
           Limpiar filtros
         </button>

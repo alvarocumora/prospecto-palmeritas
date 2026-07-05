@@ -12,6 +12,8 @@
 
   --font-mono: "JetBrains Mono", ui-monospace, "IBM Plex Mono", monospace;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  /* Display editorial del rediseño Institutional Modernist (titulares con autoridad) */
+  --font-serif: "Lora", "Tiempos Text", "Source Serif 4", Georgia, "Times New Roman", serif;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -114,6 +116,90 @@
   /* Catastro minero */
   --catastro-explotacion: oklch(0.68 0.18 25);
   --catastro-exploracion: oklch(0.82 0.16 90);
+}
+
+/* ── Fase 3 (piloto) — flip de tema por tokens, Institutional Modernist ─────
+   Re-mapea los tokens shadcn del Operations Console de void oscuro a la paleta
+   --im-* clara, PERO solo dentro del subárbol marcado con `data-theme="im-light"`.
+   El resto de la app sigue dark hasta validar el piloto. Cobalto = primary. */
+[data-theme="im-light"] {
+  --background: var(--im-paper);
+  --bg-secondary: var(--im-paper-2);
+  --bg-panel: var(--im-paper-2);
+  --bg-elevated: oklch(1 0 0);
+  --card: var(--im-card);
+  --card-foreground: var(--im-ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--im-ink);
+  --foreground: var(--im-ink);
+  --muted: var(--im-paper-2);
+  --muted-foreground: var(--im-gray);
+  --hint: oklch(0.62 0.012 285);
+  --secondary: var(--im-paper-2);
+  --secondary-foreground: var(--im-ink);
+  --accent: var(--im-cobalt-wash);
+  --accent-foreground: var(--im-ink);
+  --border: var(--im-line);
+  --border-hot: var(--im-line-strong);
+  --input: var(--im-line);
+
+  /* Signals afinados para fondo claro */
+  --signal-cyan: oklch(0.58 0.13 220);
+  --signal-amber: oklch(0.7 0.15 75);
+  --signal-red: oklch(0.58 0.2 25);
+  --signal-green: oklch(0.58 0.14 150);
+  --signal-violet: oklch(0.55 0.16 295);
+  --text-mono: var(--im-gray);
+  --text-dim: oklch(0.62 0.012 285);
+
+  --ring: var(--im-cobalt);
+  --primary: var(--im-cobalt);
+  --primary-foreground: oklch(1 0 0);
+
+  --gold: oklch(0.72 0.13 78);
+  --gold-light: oklch(0.8 0.11 86);
+  --copper: oklch(0.55 0.12 45);
+  --teal: var(--signal-cyan);
+  --info: oklch(0.55 0.14 240);
+  --alert: var(--signal-red);
+  --destructive: var(--signal-red);
+  --destructive-foreground: oklch(1 0 0);
+
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* ── Superficie de excepción: visores canvas (mapas, deck.gl, three.js) ─────
+   Restaura las superficies oscuras y los signals brillantes SOLO en el
+   subárbol marcado, anidable dentro de `data-theme="im-light"`. Aplicar
+   `data-surface="canvas"` en el contenedor del visor. Ver docs/design-system.md §2. */
+[data-surface="canvas"] {
+  --background: oklch(0.13 0.012 240);
+  --bg-secondary: oklch(0.16 0.012 240);
+  --bg-panel: oklch(0.16 0.012 240);
+  --bg-elevated: oklch(0.2 0.013 240);
+  --card: oklch(0.16 0.012 240);
+  --card-foreground: oklch(0.93 0.008 240);
+  --popover: oklch(0.18 0.012 240);
+  --popover-foreground: oklch(0.93 0.008 240);
+  --foreground: oklch(0.93 0.008 240);
+  --muted: oklch(0.22 0.013 240);
+  --muted-foreground: oklch(0.74 0.012 240);
+  --hint: oklch(0.5 0.013 240);
+  --secondary: oklch(0.2 0.013 240);
+  --secondary-foreground: oklch(0.93 0.008 240);
+  --accent: oklch(0.24 0.014 240);
+  --accent-foreground: oklch(0.93 0.008 240);
+  --border: oklch(0.27 0.014 240);
+  --border-hot: oklch(0.34 0.018 240);
+  --input: oklch(0.27 0.014 240);
+  --signal-cyan: oklch(0.82 0.1 210);
+  --signal-amber: oklch(0.82 0.16 80);
+  --signal-red: oklch(0.68 0.22 25);
+  --signal-green: oklch(0.74 0.16 145);
+  --signal-violet: oklch(0.74 0.16 295);
+  --text-mono: oklch(0.74 0.012 240);
+  --text-dim: oklch(0.5 0.013 240);
 }
 
 @layer base {
@@ -447,49 +533,118 @@
    ============================================================ */
 
 @theme inline {
-  --color-brand-navy: var(--brand-navy);
-  --color-brand-navy-deep: var(--brand-navy-deep);
-  --color-brand-blue: var(--brand-blue);
-  --color-brand-blue-soft: var(--brand-blue-soft);
-  --color-brand-gold: var(--brand-gold);
-  --color-brand-ink: var(--brand-ink);
-  --color-brand-mute: var(--brand-mute);
-  --color-brand-surface: var(--brand-surface);
-  --color-brand-hair: var(--brand-hair);
+  /* ── Institutional Modernist — primitivos (Capa 1, rediseño total) ──────
+     Paleta nueva desde cero: papel hueso cálido, tinta azulada, acento
+     cobalto y línea arena. Reemplaza la dirección navy/oro previa.
+     Ver docs/design-system.md §2. */
+  --color-im-paper: var(--im-paper);
+  --color-im-paper-2: var(--im-paper-2);
+  --color-im-card: var(--im-card);
+  --color-im-ink: var(--im-ink);
+  --color-im-ink-soft: var(--im-ink-soft);
+  --color-im-gray: var(--im-gray);
+  --color-im-cobalt: var(--im-cobalt);
+  --color-im-cobalt-deep: var(--im-cobalt-deep);
+  --color-im-cobalt-wash: var(--im-cobalt-wash);
+  --color-im-line: var(--im-line);
+  --color-im-line-strong: var(--im-line-strong);
+
+  /* Escala de radio del rediseño (radio medio, generoso). Aditiva: ningún
+     componente la consume todavía. El Operations Console mantiene su 2px. */
+  --radius-brand-sm: 6px;
+  --radius-brand-md: 10px;
+  --radius-brand-lg: 16px;
+
+  /* ── Capa semántica unificada (Design System Fase 1) ───────────────────
+     Roles theme-aware que apuntan a la paleta Institutional Modernist.
+     Nombres elegidos para NO colisionar con los tokens shadcn
+     (background/foreground/muted/border/accent) del Operations Console,
+     de modo que ambos coexistan durante la migración.
+     Ver docs/design-system.md. */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-content: var(--content);
+  --color-content-muted: var(--content-muted);
+  --color-content-subtle: var(--content-subtle);
+  --color-hairline: var(--hairline);
+  --color-hairline-strong: var(--hairline-strong);
+  --color-accent-brand: var(--accent-brand);
+  --color-accent-brand-contrast: var(--accent-brand-contrast);
+  --color-accent-brand-subtle: var(--accent-brand-subtle);
+
+  /* Señales funcionales con afinado institucional (light) */
+  --color-brand-success: var(--brand-success);
+  --color-brand-warn: var(--brand-warn);
+  --color-brand-danger: var(--brand-danger);
+  --color-brand-info: var(--brand-info);
 }
 
 :root {
-  --brand-navy: oklch(0.27 0.09 260);
-  --brand-navy-deep: oklch(0.18 0.08 260);
-  --brand-blue: oklch(0.55 0.2 255);
-  --brand-blue-soft: oklch(0.96 0.025 255);
-  --brand-gold: oklch(0.78 0.13 78);
-  --brand-ink: oklch(0.18 0.02 260);
-  --brand-mute: oklch(0.5 0.02 260);
-  --brand-surface: oklch(0.995 0.003 260);
-  --brand-hair: oklch(0.9 0.01 260);
+  /* ── Institutional Modernist — primitivos (Capa 1, rediseño total) ──────
+     Editorial premium: papel hueso cálido + tinta azulada + acento cobalto.
+     Valores hex de referencia en comentario; expresados en OKLCH. */
+  --im-paper: oklch(0.965 0.006 85); /* #F7F5F0 papel hueso */
+  --im-paper-2: oklch(0.945 0.007 85); /* panel cálido */
+  --im-card: oklch(0.99 0.004 85); /* card sobre papel */
+  --im-ink: oklch(0.23 0.03 285); /* #1A1A2E tinta */
+  --im-ink-soft: oklch(0.4 0.025 285); /* texto secundario */
+  --im-gray: oklch(0.52 0.012 285); /* #6B6B7B sutil */
+  --im-cobalt: oklch(0.47 0.17 267); /* #2B4ACB acento */
+  --im-cobalt-deep: oklch(0.4 0.16 267); /* hover / pressed */
+  --im-cobalt-wash: oklch(0.93 0.04 267); /* realce suave / acento sobre fondo oscuro */
+  --im-line: oklch(0.91 0.008 85); /* #E3E0D8 línea */
+  --im-line-strong: oklch(0.85 0.01 85); /* línea marcada */
+
+  /* ── Capa semántica (Capa 2) — el contrato del rediseño ─────────────────
+     Apunta a la paleta Institutional Modernist. Aditivo: ningún componente
+     consume estos roles todavía, por lo que NO hay cambio visual hasta la
+     migración por módulo (Fase 2+). */
+  --surface: var(--im-paper); /* fondo de página */
+  --surface-2: var(--im-paper-2); /* panel */
+  --surface-3: var(--im-card); /* card / elevado */
+  --surface-inverse: var(--im-ink); /* banda oscura (CTA, footer, pilares) */
+  --content: var(--im-ink); /* texto primario */
+  --content-muted: var(--im-ink-soft); /* texto secundario */
+  --content-subtle: var(--im-gray); /* texto terciario / hints */
+  --hairline: var(--im-line); /* líneas */
+  --hairline-strong: var(--im-line-strong); /* líneas marcadas */
+  --accent-brand: var(--im-cobalt); /* acción primaria */
+  --accent-brand-contrast: oklch(1 0 0); /* texto sobre accent */
+  --accent-brand-subtle: var(--im-cobalt-wash); /* realce pálido / acento sobre tinta */
+
+  /* Señales funcionales afinadas para fondo papel cálido (no saturadas) */
+  --brand-success: oklch(0.55 0.13 150);
+  --brand-warn: oklch(0.7 0.13 70);
+  --brand-danger: oklch(0.55 0.2 25);
+  --brand-info: var(--im-cobalt);
 }
 
+/* Scope del sitio público (Institutional Modernist).
+   Consume directamente la capa semántica; los primitivos --brand-* legacy ya
+   no existen (migración completada en Fase 2c/2d). */
 .brand-light {
-  color: var(--brand-ink);
-  background-color: var(--brand-surface);
+  color: var(--content);
+  background-color: var(--surface);
   font-family: var(--font-sans);
   font-feature-settings: "ss01";
 }
 .brand-light * {
-  border-color: var(--brand-hair);
+  border-color: var(--hairline);
 }
+/* Display editorial: serif con peso moderado y jerarquía por escala */
 .brand-light .brand-display {
-  font-family: "Inter", system-ui, sans-serif;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 .brand-light .brand-eyebrow {
   font-family: var(--font-mono);
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--brand-mute);
+  color: var(--content-subtle);
 }
 
 /* Inputs marca-light (forms públicos) */
@@ -497,20 +652,20 @@
 .brand-input {
   width: 100%;
   background: #fff;
-  border: 1px solid var(--brand-hair);
+  border: 1px solid var(--hairline);
   border-radius: 6px;
   padding: 9px 12px;
   font-family: var(--font-sans);
   font-size: 14px;
-  color: var(--brand-ink);
+  color: var(--content);
   outline: none;
   transition:
     border-color 120ms ease,
     box-shadow 120ms ease;
 }
 .brand-input:focus {
-  border-color: var(--brand-blue);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--brand-blue) 18%, transparent);
+  border-color: var(--accent-brand);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent-brand) 18%, transparent);
 }
 
 /* Animaciones del giro del proceso */
@@ -522,10 +677,10 @@
 @keyframes brand-pulse {
   0%,
   100% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand-blue) 35%, transparent);
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--accent-brand) 35%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 14px color-mix(in oklab, var(--brand-blue) 0%, transparent);
+    box-shadow: 0 0 0 14px color-mix(in oklab, var(--accent-brand) 0%, transparent);
   }
 }
 .brand-spin-slow {

@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import { BrandButton } from "@/components/brand";
 
 type Role = "owner" | "investor" | "qp" | "other";
 
@@ -34,11 +35,11 @@ export function ContactForm({
 
   if (mut.isSuccess) {
     return (
-      <div className="rounded-xl border border-[var(--brand-hair)] bg-white p-6 flex items-start gap-3">
+      <div className="rounded-xl border border-hairline bg-white p-6 flex items-start gap-3">
         <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />
         <div>
-          <div className="font-display text-lg text-[var(--brand-navy-deep)]">Mensaje recibido</div>
-          <p className="text-sm text-[var(--brand-mute)] mt-1">
+          <div className="font-display text-lg text-content">Mensaje recibido</div>
+          <p className="text-sm text-content-subtle mt-1">
             Nuestro equipo te responde en menos de 24 horas hábiles.
           </p>
         </div>
@@ -52,7 +53,7 @@ export function ContactForm({
         e.preventDefault();
         mut.mutate();
       }}
-      className="rounded-xl border border-[var(--brand-hair)] bg-white p-5 md:p-6 space-y-4"
+      className="rounded-xl border border-hairline bg-white p-5 md:p-6 space-y-4"
     >
       <div className={compact ? "grid sm:grid-cols-2 gap-3" : "grid sm:grid-cols-2 gap-4"}>
         <Field label="Nombre">
@@ -120,21 +121,17 @@ export function ContactForm({
       )}
 
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] font-mono text-[var(--brand-mute)]">
+        <p className="text-[11px] font-mono text-content-subtle">
           Tus datos se procesan bajo NDA implícito.
         </p>
-        <button
-          type="submit"
-          disabled={mut.isPending}
-          className="inline-flex items-center gap-2 bg-[var(--brand-blue)] text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
-        >
+        <BrandButton type="submit" size="sm" disabled={mut.isPending}>
           {mut.isPending ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
             <ArrowRight className="w-4 h-4" />
           )}
           Enviar mensaje
-        </button>
+        </BrandButton>
       </div>
     </form>
   );
@@ -143,7 +140,7 @@ export function ContactForm({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-mono uppercase tracking-wider text-[var(--brand-mute)] block mb-1.5">
+      <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle block mb-1.5">
         {label}
       </span>
       {children}
