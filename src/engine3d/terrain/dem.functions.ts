@@ -34,7 +34,7 @@ const demCache = new Map<string, DemTile>();
 
 // ── Copernicus GLO-30 (AWS Open Data) ─────────────────────────────────────────
 
-function copernicusTileUrl(lat: number, lng: number): string {
+export function copernicusTileUrl(lat: number, lng: number): string {
   const latFloor = Math.floor(lat);
   const lngFloor = Math.floor(lng);
   const ns = latFloor >= 0 ? "N" : "S";

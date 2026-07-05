@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
+import { centroidOf } from "@/lib/geo";
+import { DEMO_PROJECT_IDS } from "@/lib/verification";
 
 export type PublicSatProject = {
   id: string;
@@ -55,43 +57,12 @@ export type PublicSatProject = {
   }>;
 };
 
-// Proyectos demo siempre visibles aunque no tengan listado publicado
-const DEMO_IDS = [
-  "7a499b02-ecdf-447b-8956-b106fe4ec087",
-  "e5360f13-1647-4e44-bb13-c0614e6f39fe",
-  "8dc8e288-b22c-4bd4-9626-bb7fb85d1745",
-];
+// Proyectos demo siempre visibles aunque no tengan listado publicado.
+// La lista canónica vive en verification.ts (misma que alimenta los sellos).
+const DEMO_IDS = DEMO_PROJECT_IDS;
 
 const MAX_PROJECTS = 12;
 const MAX_HOLES_PER_PROJECT = 30;
-
-function centroidOf(geom: unknown): [number, number] | null {
-  if (!geom || typeof geom !== "object") return null;
-  const g = geom as { type?: string; coordinates?: unknown };
-  try {
-    if (g.type === "Point" && Array.isArray(g.coordinates)) {
-      return [Number(g.coordinates[0]), Number(g.coordinates[1])];
-    }
-    let sx = 0,
-      sy = 0,
-      n = 0;
-    const walk = (c: unknown) => {
-      if (!Array.isArray(c)) return;
-      if (typeof c[0] === "number") {
-        sx += c[0];
-        sy += c[1];
-        n++;
-      } else {
-        for (const x of c) walk(x);
-      }
-    };
-    walk(g.coordinates);
-    if (n === 0) return null;
-    return [sx / n, sy / n];
-  } catch {
-    return null;
-  }
-}
 
 export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicSatProject[]> => {

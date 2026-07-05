@@ -1,6 +1,7 @@
 // Server fn pública: lista property_listings publicados con campos seguros
 // (sin owner_user_id ni datos sensibles). Usada por /inversionistas.
 import { createServerFn } from "@tanstack/react-start";
+import { centroidOf } from "@/lib/geo";
 
 export type PublicListing = {
   id: string;
@@ -42,35 +43,6 @@ const REGION_CENTROID: Record<string, [number, number]> = {
   Aysén: [-72.0, -45.5],
   Magallanes: [-71.0, -53.0],
 };
-
-function centroidOf(geom: unknown): [number, number] | null {
-  if (!geom || typeof geom !== "object") return null;
-  const g = geom as { type?: string; coordinates?: unknown };
-  try {
-    if (g.type === "Point" && Array.isArray(g.coordinates)) {
-      return [Number(g.coordinates[0]), Number(g.coordinates[1])];
-    }
-    // Walk and average
-    let sx = 0,
-      sy = 0,
-      n = 0;
-    const walk = (c: unknown) => {
-      if (!Array.isArray(c)) return;
-      if (typeof c[0] === "number") {
-        sx += c[0];
-        sy += c[1];
-        n++;
-      } else {
-        for (const x of c) walk(x);
-      }
-    };
-    walk(g.coordinates);
-    if (n === 0) return null;
-    return [sx / n, sy / n];
-  } catch {
-    return null;
-  }
-}
 
 export const getPublicListings = createServerFn({ method: "GET" }).handler(
   async (): Promise<{ listings: PublicListing[]; updatedAt: string }> => {

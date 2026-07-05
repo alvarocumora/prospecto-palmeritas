@@ -228,7 +228,10 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
         )}
       </button>
       <p className="text-[11px] font-mono text-content-subtle text-center">
-        Bajo NDA · Verificación KYC institucional.
+        Bajo NDA ·{" "}
+        <Link to="/metodologia" className="text-accent-brand hover:underline">
+          Verificación KYC institucional
+        </Link>
       </p>
     </form>
   );
