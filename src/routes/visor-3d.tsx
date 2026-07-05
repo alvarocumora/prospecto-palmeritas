@@ -330,6 +330,7 @@ function Site({
 // ---- Página -----------------------------------------------------------------
 
 function Visor3DPage() {
+  const search = Route.useSearch();
   const fetchSat = useServerFn(getPublicSatellite);
   const { data, isLoading, error } = useQuery({
     queryKey: ["public-satellite"],
@@ -341,9 +342,20 @@ function Visor3DPage() {
   const sites = useMemo(() => projectsToSites(projects), [projects]);
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(null);
+  const [selectedInsarId, setSelectedInsarId] = useState<string | null>(null);
+
+  // Sync from URL search params once data arrives (or when params change)
+  useEffect(() => {
+    if (!sites.length) return;
+    if (search.project) setSelectedSiteId(search.project);
+    if (search.anomaly) setSelectedAnomalyId(search.anomaly);
+    if (search.insar) setSelectedInsarId(search.insar);
+  }, [search.project, search.anomaly, search.insar, sites.length]);
 
   const selectedSite = sites.find((s) => s.project.id === selectedSiteId) ?? sites[0];
   const selectedAnomaly = selectedSite?.anomalies.find((a) => a.id === selectedAnomalyId) ?? null;
+  const selectedInsar =
+    selectedSite?.project.insar.find((i) => i.id === selectedInsarId) ?? null;
 
   const totalAnomalies = projects.reduce((s, p) => s + p.anomalies.length, 0);
   const criticalCount = projects.reduce(
