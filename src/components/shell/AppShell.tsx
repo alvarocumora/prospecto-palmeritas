@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Mail, Linkedin, Link as LinkIcon } from "lucide-react";
+import { useState } from "react";
+import { ArrowRight, Mail, Linkedin, Link as LinkIcon, Menu, X } from "lucide-react";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { useLocale, type Locale } from "@/features/marketing/i18n";
 import { useAuth } from "@/hooks/useAuth";
