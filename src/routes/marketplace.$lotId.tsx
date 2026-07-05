@@ -35,6 +35,15 @@ import {
   FREQUENCIES,
 } from "@/lib/commodityLabels";
 
+/** Formatea una fecha ISO como dd-MM-yyyy en UTC — estable entre SSR y cliente. */
+function formatDateUTC(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const yy = d.getUTCFullYear();
+  return `${dd}-${mm}-${yy}`;
+}
+
 export const Route = createFileRoute("/marketplace/$lotId")({
   loader: async ({ params }) => {
     const lot = await getCommodityLotDetail({ data: { id: params.lotId } });
@@ -316,7 +325,7 @@ function LotDetailPage() {
                       )}
                       {c.expires_at && (
                         <div className="text-[11px] font-mono text-content-subtle">
-                          Vence {new Date(c.expires_at).toLocaleDateString("es-CL")}
+                          Vence {formatDateUTC(c.expires_at)}
                         </div>
                       )}
                     </div>
