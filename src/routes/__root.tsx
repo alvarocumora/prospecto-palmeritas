@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/hooks/useAuth";
 import { LocaleProvider } from "@/features/marketing/i18n";
+import { CurrencyProvider } from "@/lib/currency";
 import { queryClient } from "@/lib/queryClient";
 
 import appCss from "../styles.css?url";
