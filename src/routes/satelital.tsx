@@ -458,7 +458,13 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
   );
 }
 
-function AnomalyRow({ a }: { a: PublicSatProject["anomalies"][number] }) {
+function AnomalyRow({
+  a,
+  projectId,
+}: {
+  a: PublicSatProject["anomalies"][number];
+  projectId: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
@@ -505,6 +511,15 @@ function AnomalyRow({ a }: { a: PublicSatProject["anomalies"][number] }) {
               value={a.detected_at ? new Date(a.detected_at).toLocaleString("es-CL") : "—"}
             />
             {a.notes && <DetailRow label="Notas" value={a.notes} />}
+            <div className="pt-2">
+              <Link
+                to="/visor-3d"
+                search={{ project: projectId, anomaly: a.id }}
+                className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1.5 rounded-md border border-accent-brand text-accent-brand hover:bg-accent-brand-subtle transition"
+              >
+                <BoxIcon className="w-3 h-3" /> Ver en 3D
+              </Link>
+            </div>
           </td>
         </tr>
       )}
