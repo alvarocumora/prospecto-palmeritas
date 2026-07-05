@@ -10,10 +10,12 @@ import {
   ShieldCheck,
   Percent,
   Send,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePropertyListing } from "@/hooks/usePropertyListings";
+import { getDataRoomDownloadUrl } from "@/lib/dataRoom.functions";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
 import { signListingNda, upsertInquiry } from "../application/inquiries";
@@ -264,7 +266,24 @@ export function ListingDetailDrawer({
                                 Bloqueado
                               </span>
                             ) : (
-                              <span className="text-[10px] font-mono text-gold">Accesible</span>
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  try {
+                                    const { url } = await getDataRoomDownloadUrl({
+                                      data: { fileId: f.id },
+                                    });
+                                    window.open(url, "_blank", "noopener");
+                                  } catch (e) {
+                                    toast.error(
+                                      e instanceof Error ? e.message : "Error al descargar",
+                                    );
+                                  }
+                                }}
+                                className="inline-flex items-center gap-1 text-[10px] font-mono text-gold hover:underline"
+                              >
+                                <Download className="w-3 h-3" /> Descargar
+                              </button>
                             )}
                           </li>
                         );
