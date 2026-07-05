@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "sdk_version": "0.20.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "none"
+  },
+  "mcp": {
+    "server": {
+      "name": "geocapitals-mcp",
+      "version": "0.1.0",
+      "title": "Geocapitals"
+    },
+    "tools": [
+      {
+        "name": "search_commodity_lots",
+        "title": "Search commodity lots",
+        "description": "Search verified, published commodity lots (cobre, oro, plata, litio, tierras raras, etc.) on the Geocapitals marketplace. Filter by commodity, country, form, incoterm, or certification.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "commodity": {
+              "description": "Commodity code (e.g. 'cu', 'au', 'ag', 'li').",
+              "type": "string"
+            },
+            "country": {
+              "description": "Country name (e.g. 'Chile', 'Peru').",
+              "type": "string"
+            },
+            "form": {
+              "description": "Form: concentrate, cathode, dore, ore, etc.",
+              "type": "string"
+            },
+            "incoterm": {
+              "description": "Incoterm: FOB, CIF, CFR, DAP…",
+              "type": "string"
+            },
+            "certification": {
+              "description": "Certification code to require.",
+              "type": "string"
+            },
+            "limit": {
+              "description": "Max results (default 20).",
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_commodity_lot",
+        "title": "Get commodity lot detail",
+        "description": "Get full details of a single published commodity lot on the Geocapitals marketplace, including certifications.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+              "description": "Lot UUID (from search_commodity_lots)."
+            }
+          },
+          "required": [
+            "id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_investment_opportunities",
+        "title": "List investment opportunities",
+        "description": "List published mining project listings open to investors on Geocapitals (deal flow across Chile, Peru, Brazil, Colombia, etc.).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "country": {
+              "description": "Filter by country name.",
+              "type": "string"
+            },
+            "commodity": {
+              "description": "Filter by primary commodity.",
+              "type": "string"
+            },
+            "stage": {
+              "description": "Project stage (greenfield, brownfield, production…).",
+              "type": "string"
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 50
+            }
+          }
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
