@@ -362,8 +362,17 @@ function MyCommodityLotsPage() {
       )}
 
       {loading ? (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground p-8 justify-center">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cargando…
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded border border-border bg-bg-panel p-4 animate-pulse space-y-3"
+            >
+              <div className="h-4 rounded bg-foreground/10 w-3/4" />
+              <div className="h-3 rounded bg-foreground/10 w-1/2" />
+              <div className="h-3 rounded bg-foreground/10 w-2/3" />
+            </div>
+          ))}
         </div>
       ) : rows.length === 0 ? (
         <div className="rounded border border-border bg-bg-panel p-8 text-center text-sm text-muted-foreground">
