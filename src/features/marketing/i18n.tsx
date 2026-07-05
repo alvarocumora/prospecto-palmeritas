@@ -12,7 +12,7 @@ export const STRINGS: Dict = {
   nav_marketplace: { es: "Marketplace", en: "Marketplace" },
   nav_investors: { es: "Inversionistas", en: "Investors" },
   nav_companies: { es: "Empresas", en: "Companies" },
-  nav_resources: { es: "Resources", en: "Resources" },
+  nav_resources: { es: "Recursos", en: "Resources" },
   nav_contact: { es: "Contacto", en: "Contact" },
   cta_login: { es: "Iniciar sesión", en: "Sign in" },
   cta_signup: { es: "Registrarse", en: "Sign up" },
