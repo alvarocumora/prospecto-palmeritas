@@ -15,6 +15,7 @@ import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
 import { Route as EmpresasRouteImport } from './routes/empresas'
@@ -131,6 +132,11 @@ const RecursosRoute = RecursosRouteImport.update({
 const ProyectosRoute = ProyectosRouteImport.update({
   id: '/proyectos',
   path: '/proyectos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OportunidadesRoute = OportunidadesRouteImport.update({
+  id: '/oportunidades',
+  path: '/oportunidades',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -629,6 +635,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -723,6 +730,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -819,6 +827,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRoute
   '/inversionistas': typeof InversionistasRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -915,6 +924,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/inversionistas'
     | '/marketplace'
+    | '/oportunidades'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1009,6 +1019,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/inversionistas'
     | '/marketplace'
+    | '/oportunidades'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1104,6 +1115,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/inversionistas'
     | '/marketplace'
+    | '/oportunidades'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1200,6 +1212,7 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRoute
   InversionistasRoute: typeof InversionistasRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  OportunidadesRoute: typeof OportunidadesRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1278,6 +1291,13 @@ declare module '@tanstack/react-router' {
       path: '/proyectos'
       fullPath: '/proyectos'
       preLoaderRoute: typeof ProyectosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/oportunidades': {
+      id: '/oportunidades'
+      path: '/oportunidades'
+      fullPath: '/oportunidades'
+      preLoaderRoute: typeof OportunidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -2121,6 +2141,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRoute,
   InversionistasRoute: InversionistasRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
+  OportunidadesRoute: OportunidadesRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,

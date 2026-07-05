@@ -183,7 +183,76 @@ export function MarketingLanding() {
         </div>
       </section>
 
+      {/* Inversión por región */}
+      <section className="border-b border-hairline">
+        <div className="max-w-7xl mx-auto px-5 py-16 lg:py-20">
+          <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
+            <div className="max-w-2xl">
+              <Eyebrow className="mb-3">Inversión por región</Eyebrow>
+              <h2 className="brand-display text-3xl md:text-4xl text-content">
+                Oportunidades geolocalizadas con retorno esperado por geografía
+              </h2>
+              <p className="mt-4 text-content-subtle">
+                Explora proyectos publicados agrupados por región y simula el retorno según
+                ticket, plazo y TIR esperada por país. Deal-flow verificado con etapas desde
+                greenfield hasta producción.
+              </p>
+            </div>
+            <BrandButton asChild variant="outline">
+              <Link to="/oportunidades">
+                Ver oportunidades por región <ArrowRight className="w-4 h-4" />
+              </Link>
+            </BrandButton>
+          </div>
 
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                country: "Chile",
+                flag: "🇨🇱",
+                irr: "22%",
+                focus: "Cu · Au · Ag · Li",
+                note: "Franja andina · catastro Sernageomin trazable",
+              },
+              {
+                country: "Perú",
+                flag: "🇵🇪",
+                irr: "24%",
+                focus: "Cu · Zn · Au polimetálico",
+                note: "Distritos brownfield con infraestructura",
+              },
+              {
+                country: "Brasil · Colombia",
+                flag: "🇧🇷 🇨🇴",
+                irr: "20–26%",
+                focus: "Fe · Au · Tierras raras",
+                note: "Proyectos con certificación ambiental",
+              },
+            ].map((r) => (
+              <Link
+                key={r.country}
+                to="/oportunidades"
+                className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl">{r.flag}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
+                    TIR ref. {r.irr}
+                  </span>
+                </div>
+                <div className="mt-3 font-display text-lg text-content">{r.country}</div>
+                <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mt-1">
+                  {r.focus}
+                </div>
+                <p className="mt-3 text-sm text-content-subtle">{r.note}</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-accent-brand text-sm font-medium group-hover:gap-2 transition-all">
+                  Simular retorno <ArrowRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Pillars band */}
       <section className="bg-surface-inverse text-white">
