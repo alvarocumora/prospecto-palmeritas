@@ -13,6 +13,12 @@ import { InvestmentSimulator } from "@/features/marketing/InvestmentSimulator";
 import { CommodityTicker } from "@/features/marketing/CommodityTicker";
 import { PlatformPreview } from "@/features/marketing/PlatformPreview";
 import { BrandButton, BrandCard, Eyebrow, SectionHeading, Stat } from "@/components/brand";
+import { Reveal } from "@/features/marketing/Reveal";
+import { AnimatedCounter } from "@/features/marketing/AnimatedCounter";
+import { LogoMarquee } from "@/features/marketing/LogoMarquee";
+import { TestimonialsBento } from "@/features/marketing/TestimonialsBento";
+import { FaqAccordion } from "@/features/marketing/FaqAccordion";
+import { HeroTopoBackground } from "@/features/marketing/HeroTopoBackground";
 import {
   Mountain,
   Users,
