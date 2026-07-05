@@ -40,6 +40,14 @@ export type ListingDetail = {
     metric_value: number | null;
     notes: string | null;
   }>;
+  // Inventario del data room — solo agregados (sin nombres de archivo):
+  // el detalle es visible tras KYC + NDA dentro de la plataforma.
+  dataRoom: {
+    totalFiles: number;
+    ndaFiles: number;
+    totalSizeBytes: number;
+    categories: Array<{ category: string; count: number }>;
+  };
 };
 
 const inputSchema = z.object({ id: z.string().uuid() });
@@ -59,16 +67,23 @@ function centroidOf(geom: unknown): [number, number] | null {
   if (!geom || typeof geom !== "object") return null;
   const g = geom as { type?: string; coordinates?: unknown };
   try {
-    let sx = 0, sy = 0, n = 0;
+    let sx = 0,
+      sy = 0,
+      n = 0;
     const walk = (c: unknown) => {
       if (!Array.isArray(c)) return;
-      if (typeof c[0] === "number") { sx += c[0]; sy += c[1]; n++; }
-      else for (const x of c) walk(x);
+      if (typeof c[0] === "number") {
+        sx += c[0];
+        sy += c[1];
+        n++;
+      } else for (const x of c) walk(x);
     };
     walk(g.coordinates);
     if (!n) return null;
     return [sx / n, sy / n];
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 export const getListingDetail = createServerFn({ method: "GET" })
@@ -101,7 +116,10 @@ export const getListingDetail = createServerFn({ method: "GET" })
         : row.geometry_geojson,
     );
     if (!centroid) {
-      const pc = row.projects as unknown as { center_lat: number | null; center_lng: number | null } | null;
+      const pc = row.projects as unknown as {
+        center_lat: number | null;
+        center_lng: number | null;
+      } | null;
       if (pc?.center_lat != null && pc?.center_lng != null) {
         centroid = [Number(pc.center_lng), Number(pc.center_lat)];
       } else if (row.region && REGION_CENTROID[row.region]) {
@@ -150,20 +168,44 @@ export const getListingDetail = createServerFn({ method: "GET" })
           .select("id", { count: "exact", head: true })
           .eq("project_id", pid),
       ]);
-      metrics.concessionsTotal = conc.count ?? (conc.data?.length ?? 0);
-      metrics.concessionsArea = (conc.data ?? []).reduce(
-        (s, r) => s + (Number(r.area_ha) || 0),
-        0,
-      ) || null;
-      metrics.drillHoles = holes.count ?? (holes.data?.length ?? 0);
-      metrics.metersDrilled = (holes.data ?? []).reduce(
-        (s, r) => s + (Number((r as { total_depth_m?: number | null }).total_depth_m) || 0),
-        0,
-      ) || null;
+      metrics.concessionsTotal = conc.count ?? conc.data?.length ?? 0;
+      metrics.concessionsArea =
+        (conc.data ?? []).reduce((s, r) => s + (Number(r.area_ha) || 0), 0) || null;
+      metrics.drillHoles = holes.count ?? holes.data?.length ?? 0;
+      metrics.metersDrilled =
+        (holes.data ?? []).reduce(
+          (s, r) => s + (Number((r as { total_depth_m?: number | null }).total_depth_m) || 0),
+          0,
+        ) || null;
       metrics.samples = samp.count ?? 0;
       metrics.satelliteAnomalies = anom.count ?? 0;
       metrics.targets = tgt.count ?? 0;
       metrics.ni43101Reports = rep.count ?? 0;
+    }
+
+    // Inventario del data room (agregados, sin nombres de archivo)
+    const dataRoom: ListingDetail["dataRoom"] = {
+      totalFiles: 0,
+      ndaFiles: 0,
+      totalSizeBytes: 0,
+      categories: [],
+    };
+    {
+      const { data: drFiles } = await supabaseAdmin
+        .from("property_data_room_files")
+        .select("category, requires_nda, file_size_bytes")
+        .eq("listing_id", row.id);
+      const byCat = new Map<string, number>();
+      for (const f of drFiles ?? []) {
+        dataRoom.totalFiles += 1;
+        if (f.requires_nda) dataRoom.ndaFiles += 1;
+        dataRoom.totalSizeBytes += Number(f.file_size_bytes) || 0;
+        const cat = f.category ?? "otros";
+        byCat.set(cat, (byCat.get(cat) ?? 0) + 1);
+      }
+      dataRoom.categories = Array.from(byCat.entries())
+        .map(([category, count]) => ({ category, count }))
+        .sort((a, b) => b.count - a.count);
     }
 
     return {
@@ -187,5 +229,6 @@ export const getListingDetail = createServerFn({ method: "GET" })
       centroid,
       metrics,
       comparables,
+      dataRoom,
     };
   });
