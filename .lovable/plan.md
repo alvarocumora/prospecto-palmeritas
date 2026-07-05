@@ -1,100 +1,62 @@
-## Visión
+## Diagnóstico: por qué los cards "no linkean a nada"
 
-Geocapitals evoluciona a **plataforma dual**: (1) inversión en proyectos mineros (ya existe) + (2) **marketplace de commodities certificados** (concentrados Cu/Zn/Pb, cátodos, doré Au/Ag, tierras raras, litio) desde Chile, Perú, Brasil, Colombia, Venezuela y África. La web comunica esta visión con nuevo hero dual, ruta `/marketplace` funcional y sección "Vision & Geografías".
+Los 6 cards en `MarketingLanding.tsx` (líneas 512-556) se renderizan como `<BrandCard>` **sin prop `to` ni `<Link>` envolvente**. No es un 404 del router: es que el elemento nunca fue un link. La flecha `→` es decorativa.
 
-## Fase 1 — Backend del marketplace (MVP funcional)
+### Estado real por módulo
 
-Nueva migración con estas tablas (todas con RLS + GRANTs):
+| # | Card | Ruta pública destino | Existe hoy | Datos reales disponibles |
+|---|---|---|---|---|
+| 1 | Mapa geológico | `/catastro/mapa` | ✅ Sí | ✅ `mining_concessions`, `cadastre_national` cargados |
+| 2 | Visor 3D geocientífico | `/visor-3d` | ❌ No | ✅ `scene3d.server` (DEM Copernicus + Sentinel) ya funciona en `_authenticated/dashboard/geology3d` |
+| 3 | Monitoreo satelital | `/satelital` | ❌ No | ✅ `satellite_layers`, `insar_displacement`, `satellite_anomalies` con datos demo Palmeritas/Franco |
+| 4 | NI 43-101 asistido | `/ni43101` | ❌ No | ✅ `technical_reports`, `ni43101_section_catalogue`, reporte demo Los Verdes |
+| 5 | Cumplimiento & patentes | `/cumplimiento` | ❌ No | ✅ `compliance_rules`, `compliance_evaluations`, `mining_bulletins` |
+| 6 | Capital raise & deals | `/oportunidades` | ✅ Sí | ✅ `property_listings` featured + `deals` |
 
-**`commodity_lots`** — lote publicado por un seller verificado
-- `seller_user_id`, `organization_id`, `project_id?` (link opcional a proyecto)
-- `commodity` (enum: `cu_concentrate`, `zn_concentrate`, `pb_concentrate`, `cu_cathode`, `au_dore`, `ag_dore`, `au_bullion`, `rare_earths`, `li_carbonate`, `li_spodumene`, `fe_ore`, `sn_concentrate`, `mo_concentrate`)
-- `form` (concentrate, cathode, doré, bullion, oxide, carbonate), `grade_pct`, `moisture_pct`, `deleterious_json`
-- `tonnage_available_t`, `lot_size_t`, `frequency` (spot, monthly, quarterly, annual offtake)
-- `country` (CL, PE, BR, CO, VE, AR, EC, BO, ZA, DRC, ZM, GH, MA, NA), `region`, `port_of_loading`
-- `incoterm` (FOB, CIF, CFR, EXW, DAP), `payment_terms`
-- `price_basis` (LME, LBMA, London PM Fix, negotiated), `premium_discount_usd_t`, `asking_price_usd?`
-- `certifications_json` (ISO 9001, ISO 14001, LBMA Good Delivery, RJC, ICMM, Fairmined, EITI, CoC)
-- `assay_report_url?`, `chain_of_custody_json`, `cover_image_url?`, `summary`
-- `status` (draft, pending_verification, published, under_negotiation, sold, archived)
-- `is_verified` bool (aprobado por admin), `verified_at`, `verified_by`
-- `views_count`, `inquiry_count`
+Conclusión: **4 de 6 destinos no existen como ruta pública** (viven detrás de `_authenticated/dashboard/*`). Los datos ya están en la BD — falta la capa pública que los muestre a un visitante sin login.
 
-**`commodity_certifications`** — catálogo de estándares (ISO 9001, LBMA, RJC, Fairmined, ICMM, EITI, ISO 14001, ISO 45001)
-- `code`, `name`, `issuer`, `description`, `logo_url`, `verify_url_template`
-- Público read-only (`TO anon SELECT`)
+## Plan por sprints (público sin login)
 
-**`commodity_lot_certifications`** — join lot↔certification con `certificate_number`, `issued_at`, `expires_at`, `verification_url`
+Cada sprint = un turno cerrado. Recomiendo el orden por menor esfuerzo / mayor "wow".
 
-**`commodity_inquiries`** — buyer/trader solicita muestra/oferta
-- `lot_id`, `buyer_user_id`, `buyer_role` (trader, refinery, offtaker, industrial_end_user, investor)
-- `intended_use`, `target_volume_t`, `target_price_usd_t`, `message`, `nda_signed_at?`
-- `status` (new, contacted, sample_requested, offer_sent, negotiating, closed_won, closed_lost)
+### Sprint 0 — Cablear los 2 que ya existen (30 min)
+- Añadir `Link` a los cards 1 y 6 → `/catastro/mapa` y `/oportunidades`.
+- Añadir estado "próximamente" a los otros 4 con hover claro (mientras se construyen).
+- Cierra la queja inmediata: ningún card queda muerto.
 
-**`buyer_profiles`** — perfil ampliado del comprador
-- `user_id`, `company_name`, `country_hq`, `entity_type` (trader, refinery, smelter, fund, industrial, family_office)
-- `annual_volume_usd`, `commodities_of_interest[]`, `geographies_of_interest[]`
-- `kyc_status` (pending, verified, rejected), `kyc_verified_at`
+### Sprint 1 — `/satelital` (demo Palmeritas)
+Vista pública que renderiza:
+- Mapa MapLibre con `satellite_layers` (WMS/COG STAC) del proyecto demo.
+- Panel InSAR con serie temporal de `insar_displacement`.
+- Tabla de `satellite_anomalies` con severidad y confidence.
+Fetcher: `createServerFn` público leyendo con `SUPABASE_PUBLISHABLE_KEY` + policy `TO anon` filtrada por `project_id = <demo>`.
 
-**Reglas RLS**:
-- `commodity_lots`: SELECT público solo cuando `status='published' AND is_verified=true`; owner ve sus drafts; admin ve todo.
-- `commodity_inquiries`: buyer ve las suyas, seller ve las de sus lots.
-- `buyer_profiles`: owner ve/edita el suyo; seller del lot ve datos básicos solo si hay inquiry.
-- `commodity_certifications`: read-only público.
+### Sprint 2 — `/visor-3d` (Los Verdes)
+- Reutilizar `Geology3DViewer` existente en modo read-only.
+- Nuevo server fn público `getPublicScene3d({ projectId })` que llama a `scene3d.server` con project demo hardcoded.
+- Sin controles de edición (solo cámara + capas visibles).
 
-**Seeds**: 6-10 lotes demo verificados repartidos en Chile (Cu concentrate + Au doré), Perú (Zn concentrate), Brasil (Fe ore + tierras raras), Colombia (Au bullion Fairmined), Venezuela (Fe/Au), Sudáfrica (Cu cathode), RDC (Co/Cu).
+### Sprint 3 — `/ni43101` (Los Verdes pre-43101)
+- Vista pública del reporte demo Los Verdes: TOC (`ni43101_section_catalogue`) + secciones renderizadas + evidencia satelital linkeada.
+- Ya existe `/_authenticated/reports/losverdes.pre43101` — clonar a versión pública con banner "muestra".
 
-## Fase 2 — Web pública: nuevo hero + ruta marketplace
+### Sprint 4 — `/cumplimiento`
+- Lista pública de `mining_bulletins` recientes por región + buscador simple.
+- Reglas `compliance_rules` como catálogo educativo.
+- CTA a login para "ver mis proyectos evaluados".
 
-### 2.1 Home rehecha (`src/features/marketing/MarketingLanding.tsx`)
-Nuevo **hero dual** con dos "caminos" desde el H1:
-- H1: *"Capital y commodities para la nueva minería de Latinoamérica y África"*
-- Dos tarjetas grandes bajo el hero: **"Invierte en proyectos"** → `/inversionistas`, **"Compra & vende commodities certificados"** → `/marketplace`.
-- Franja de logos de certificaciones (LBMA, RJC, Fairmined, ISO, ICMM, EITI).
-- Mapa/tira de banderas de geografías cubiertas (CL, PE, BR, CO, VE, AR, ZA, DRC, GH, MA).
-- Sección "Cómo funciona" con dos columnas paralelas: flujo proyecto vs flujo commodity.
-- CTA final dual (crear cuenta como inversionista / seller / buyer).
+## Datos técnicos
 
-### 2.2 Nueva ruta `/marketplace` (`src/routes/marketplace.tsx`)
-- `head()` con title, description, og:*, canonical `https://geocapitals.com/marketplace`, JSON-LD `Marketplace`.
-- Hero corto + filtros (commodity, forma, país, certificación, incoterm).
-- Grid de lotes verificados (loader llama server fn público `listPublishedCommodityLots`).
-- Sidebar de "Geografías" y "Certificaciones" con conteos.
-- CTA para sellers ("Publica tu lote") y para buyers ("Solicita acceso KYC").
+- **RLS**: cada tabla necesita una policy `TO anon` estrecha, filtrada al `project_id` o `holder_id` del caso demo. No abrir toda la tabla.
+- **Fetchers**: `createServerFn` públicos en `src/lib/*.functions.ts` usando cliente publishable server-side (no `supabaseAdmin`, no `requireSupabaseAuth`).
+- **Loaders**: patrón canónico `ensureQueryData` + `useSuspenseQuery`. `errorComponent` + `notFoundComponent` obligatorios.
+- **SEO**: cada ruta con `head()` propio (title, description, og:title, og:description, og:image cuando aplique).
+- **Sitemap**: agregar las 4 rutas nuevas a `src/routes/sitemap[.]xml.ts`.
+- **i18n**: añadir claves ES/EN en `src/features/marketing/i18n.tsx` para los CTAs.
+- **AppShell nav**: opcional — añadir "Módulos" con dropdown a los 6 públicos.
 
-### 2.3 Nueva ruta `/marketplace/$lotId` (`src/routes/marketplace.$lotId.tsx`)
-- Ficha del lote: origen, ley, tonelaje, certificaciones con verificación, chain of custody, incoterm, precio, imágenes.
-- `head()` dinámico con og:image = `cover_image_url` del lote.
-- Botón "Solicitar oferta" → si logueado abre drawer con formulario que inserta `commodity_inquiries`; si no, redirige a `/auth?intent=buyer`.
-- Server fn autenticado `createCommodityInquiry` (usa `requireSupabaseAuth`).
+## Recomendación
 
-### 2.4 Nueva ruta `/vision` (opcional, solo si sobra ámbito) — omitida en esta fase; el contenido de visión vive en la home rehecha.
+Ejecutar **Sprint 0 ya mismo** (los cards dejan de estar muertos hoy) y luego decides si seguimos por Sprint 1 (satelital, el más visualmente potente para inversionistas) o por otro orden.
 
-## Fase 3 — Dashboard: entradas para seller y buyer
-
-- **Sección "Mis lotes"** (`/_authenticated/dashboard/marketplace/lotes`): CRUD básico de `commodity_lots` con estados draft/pending/published.
-- **Sección "Mis solicitudes"** (buyer): lista de `commodity_inquiries` con estado.
-- **Bandeja seller "Inquiries recibidas"**: lista de inquiries sobre sus lots, con cambio de estado.
-- Card en dashboard-home: "Publica tu primer lote" / "Explora el marketplace" según rol.
-
-## Fase 4 — SEO + Publicación
-
-- Actualizar `sitemap.xml` para incluir `/marketplace` y `/marketplace/$lotId` de lotes publicados.
-- Meta tags específicos por commodity/país en la ficha.
-- Correr `supabase--linter` + `security--run_security_scan`, arreglar findings.
-- Publicar a `geocapitals.com`.
-
-## Detalles técnicos
-
-- Server functions públicas (`.functions.ts`) para listar/filtrar lotes usando **server publishable client** (`SUPABASE_PUBLISHABLE_KEY`, sin admin) con policy `TO anon` para lotes verificados y publicados.
-- Server function autenticada `createCommodityInquiry` con `requireSupabaseAuth`.
-- Ninguna transacción de pago en esta fase — solo lead capture + NDA opcional.
-- Todos los `CREATE TABLE` con GRANTs explícitos (SELECT anon solo donde la policy lo permite).
-- i18n mínimo: español por defecto, textos preparados para inglés más adelante.
-
-## Fuera de alcance
-
-- Pagos, escrow, firma electrónica de contratos.
-- Módulo 3D / satelital / NI 43-101 (ya existentes).
-- Cotización en vivo LME/LBMA (solo referencia textual del `price_basis`).
-- App móvil.
+¿Arranco con Sprint 0 + Sprint 1 en el próximo turno?
