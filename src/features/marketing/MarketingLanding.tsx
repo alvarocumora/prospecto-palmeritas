@@ -727,6 +727,92 @@ export function MarketingLanding() {
         </div>
       </section>
 
+      {/* Feature showcase — catastro + geofísica (fotográfico) */}
+      <section className="border-b border-hairline bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-20">
+          <Reveal className="max-w-2xl mb-10">
+            <Eyebrow className="mb-3">Capacidades diferenciales</Eyebrow>
+            <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
+              Del catastro georreferenciado a la geofísica interpretada
+            </h2>
+            <p className="mt-4 text-content-subtle">
+              Dos motores propios que sustentan cada decisión sobre un activo minero: control
+              catastral trazable y firma geofísica lista para modelar.
+            </p>
+          </Reveal>
+          <div className="grid md:grid-cols-2 gap-6">
+            <Reveal delay={80}>
+              <Link
+                to="/catastro/mapa"
+                className="group block rounded-2xl overflow-hidden border border-hairline bg-white hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={featureCatastro}
+                    alt="Catastro minero georreferenciado sobre topografía andina"
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute left-5 top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
+                    <Map className="w-3.5 h-3.5" /> Catastro trazable
+                  </div>
+                  <div className="absolute left-5 bottom-5 right-5 text-white">
+                    <div className="font-display text-2xl leading-snug">
+                      +47.000 concesiones sobre una capa geoespacial única
+                    </div>
+                    <p className="mt-2 text-sm text-white/80 max-w-md">
+                      SERNAGEOMIN, INGEMMET y ANM en un mismo mapa, con alertas de superposición y
+                      análisis de prospectividad.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between px-6 py-4">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle">
+                    Explorar mapa catastral
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-accent-brand group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </Link>
+            </Reveal>
+            <Reveal delay={160}>
+              <Link
+                to="/visor-3d"
+                className="group block rounded-2xl overflow-hidden border border-hairline bg-white hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
+              >
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img
+                    src={featureGeophysics}
+                    alt="Visualización geofísica 3D con anomalías magnéticas y satelitales"
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+                  <div className="absolute left-5 top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
+                    <Satellite className="w-3.5 h-3.5" /> Geofísica + satelital
+                  </div>
+                  <div className="absolute left-5 bottom-5 right-5 text-white">
+                    <div className="font-display text-2xl leading-snug">
+                      Anomalías satelitales y firma magnética listas para modelar
+                    </div>
+                    <p className="mt-2 text-sm text-white/80 max-w-md">
+                      DEM Copernicus + drape Sentinel + magnetometría interpretada, con target
+                      generator asistido por IA.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between px-6 py-4">
+                  <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle">
+                    Abrir visor 3D
+                  </span>
+                  <ArrowRight className="w-4 h-4 text-accent-brand group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </Link>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
       {/* Módulos del Terminal */}
       <section className="max-w-7xl mx-auto px-5 py-20">
         <div className="grid lg:grid-cols-[1fr_2fr] gap-10 mb-12">
