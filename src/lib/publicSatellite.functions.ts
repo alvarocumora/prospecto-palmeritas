@@ -11,6 +11,7 @@ export type PublicSatProject = {
   center_lat: number | null;
   center_lng: number | null;
   cover_image_url: string | null;
+  listing_id: string | null;
   anomalies: Array<{
     id: string;
     index_code: string | null;
@@ -19,6 +20,8 @@ export type PublicSatProject = {
     area_ha: number | null;
     detected_at: string | null;
     notes: string | null;
+    lng: number | null;
+    lat: number | null;
   }>;
   insar: Array<{
     id: string;
@@ -39,6 +42,34 @@ const DEMO_IDS = [
   "8dc8e288-b22c-4bd4-9626-bb7fb85d1745",
 ];
 
+function centroidOf(geom: unknown): [number, number] | null {
+  if (!geom || typeof geom !== "object") return null;
+  const g = geom as { type?: string; coordinates?: unknown };
+  try {
+    if (g.type === "Point" && Array.isArray(g.coordinates)) {
+      return [Number(g.coordinates[0]), Number(g.coordinates[1])];
+    }
+    let sx = 0,
+      sy = 0,
+      n = 0;
+    const walk = (c: unknown) => {
+      if (!Array.isArray(c)) return;
+      if (typeof c[0] === "number") {
+        sx += c[0];
+        sy += c[1];
+        n++;
+      } else {
+        for (const x of c) walk(x);
+      }
+    };
+    walk(g.coordinates);
+    if (n === 0) return null;
+    return [sx / n, sy / n];
+  } catch {
+    return null;
+  }
+}
+
 export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicSatProject[]> => {
     const supabase = createClient<Database>(
@@ -47,26 +78,41 @@ export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
       { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
     );
 
-    const { data: projects } = await supabase
-      .from("projects")
-      .select("id, name, country, region, commodity, center_lat, center_lng, cover_image_url")
-      .in("id", DEMO_IDS);
+    const [{ data: projects }, { data: anomalies }, { data: insar }, { data: listings }] =
+      await Promise.all([
+        supabase
+          .from("projects")
+          .select("id, name, country, region, commodity, center_lat, center_lng, cover_image_url")
+          .in("id", DEMO_IDS),
+        supabase
+          .from("satellite_anomalies")
+          .select(
+            "id, project_id, index_code, severity, score, area_ha, detected_at, notes, geometry",
+          )
+          .in("project_id", DEMO_IDS)
+          .order("detected_at", { ascending: false })
+          .limit(500),
+        supabase
+          .from("insar_displacement")
+          .select(
+            "id, project_id, asset_name, source, reference_date, end_date, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity",
+          )
+          .in("project_id", DEMO_IDS)
+          .order("reference_date", { ascending: false })
+          .limit(500),
+        supabase
+          .from("property_listings")
+          .select("id, project_id")
+          .in("project_id", DEMO_IDS)
+          .eq("is_published", true),
+      ]);
 
-    const { data: anomalies } = await supabase
-      .from("satellite_anomalies")
-      .select("id, project_id, index_code, severity, score, area_ha, detected_at, notes")
-      .in("project_id", DEMO_IDS)
-      .order("detected_at", { ascending: false })
-      .limit(500);
-
-    const { data: insar } = await supabase
-      .from("insar_displacement")
-      .select(
-        "id, project_id, asset_name, source, reference_date, end_date, velocity_mm_year, cumulative_displacement_mm, coherence, alert_severity",
-      )
-      .in("project_id", DEMO_IDS)
-      .order("reference_date", { ascending: false })
-      .limit(500);
+    const listingByProject = new Map<string, string>();
+    for (const l of listings ?? []) {
+      if (l.project_id && !listingByProject.has(l.project_id)) {
+        listingByProject.set(l.project_id, l.id);
+      }
+    }
 
     return (projects ?? []).map((p) => ({
       id: p.id,
@@ -77,9 +123,13 @@ export const getPublicSatellite = createServerFn({ method: "GET" }).handler(
       center_lat: p.center_lat,
       center_lng: p.center_lng,
       cover_image_url: p.cover_image_url,
+      listing_id: listingByProject.get(p.id) ?? null,
       anomalies: (anomalies ?? [])
         .filter((a) => a.project_id === p.id)
-        .map(({ project_id: _pid, ...rest }) => rest),
+        .map(({ project_id: _pid, geometry, ...rest }) => {
+          const c = centroidOf(geometry);
+          return { ...rest, lng: c?.[0] ?? null, lat: c?.[1] ?? null };
+        }),
       insar: (insar ?? [])
         .filter((i) => i.project_id === p.id)
         .map(({ project_id: _pid, ...rest }) => rest),

@@ -1,6 +1,20 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { ArrowLeft, MapPin, Mountain, Database, Drill, TestTube2, Satellite, FileSignature, Target, CheckCircle2, ExternalLink } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  MapPin,
+  Mountain,
+  Database,
+  Drill,
+  TestTube2,
+  Satellite,
+  FileSignature,
+  Target,
+  CheckCircle2,
+  ExternalLink,
+  Box as BoxIcon,
+} from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { getListingDetail, type ListingDetail } from "@/lib/listingDetail.functions";
 import { InvestmentSimulator } from "@/features/listings/InvestmentSimulator";
@@ -45,13 +59,21 @@ export const Route = createFileRoute("/proyectos/$listingId")({
     return { meta };
   },
   notFoundComponent: () => (
-    <MarketingPage eyebrow="404" title="Proyecto no encontrado" intro="El listado puede haber sido despublicado.">
-      <Link to="/inversionistas" className="text-accent-brand hover:underline">← Volver al deal flow</Link>
+    <MarketingPage
+      eyebrow="404"
+      title="Proyecto no encontrado"
+      intro="El listado puede haber sido despublicado."
+    >
+      <Link to="/inversionistas" className="text-accent-brand hover:underline">
+        ← Volver al deal flow
+      </Link>
     </MarketingPage>
   ),
   errorComponent: ({ error }) => (
     <MarketingPage eyebrow="Error" title="No pudimos cargar el proyecto" intro={error.message}>
-      <Link to="/inversionistas" className="text-accent-brand hover:underline">← Volver al deal flow</Link>
+      <Link to="/inversionistas" className="text-accent-brand hover:underline">
+        ← Volver al deal flow
+      </Link>
     </MarketingPage>
   ),
   component: ListingDetailPage,
@@ -68,10 +90,16 @@ function ListingDetailPage() {
     <MarketingPage
       eyebrow={MODALITY_LABEL[l.modality ?? ""] ?? "Oportunidad"}
       title={l.title}
-      intro={l.summary ?? `${STAGE_LABEL[l.stage ?? ""] ?? l.stage ?? ""} · ${l.commodity ?? ""} · ${ubic}`}
+      intro={
+        l.summary ??
+        `${STAGE_LABEL[l.stage ?? ""] ?? l.stage ?? ""} · ${l.commodity ?? ""} · ${ubic}`
+      }
     >
       <div className="mb-6">
-        <Link to="/inversionistas" className="inline-flex items-center gap-1.5 text-sm text-accent-brand hover:underline">
+        <Link
+          to="/inversionistas"
+          className="inline-flex items-center gap-1.5 text-sm text-accent-brand hover:underline"
+        >
           <ArrowLeft className="w-4 h-4" /> Volver al deal flow
         </Link>
       </div>
@@ -93,14 +121,69 @@ function ListingDetailPage() {
           <section className="rounded-xl border border-hairline bg-white p-5">
             <div className="brand-eyebrow mb-3">Datos verificados</div>
             <div className="grid sm:grid-cols-2 gap-3">
-              <Metric icon={<Database />} label="Concesiones" value={l.metrics.concessionsTotal} suffix={l.metrics.concessionsArea ? `${Math.round(l.metrics.concessionsArea).toLocaleString("es-CL")} ha` : undefined} />
-              <Metric icon={<Drill />} label="Sondajes" value={l.metrics.drillHoles} suffix={l.metrics.metersDrilled ? `${Math.round(l.metrics.metersDrilled).toLocaleString("es-CL")} m` : undefined} />
+              <Metric
+                icon={<Database />}
+                label="Concesiones"
+                value={l.metrics.concessionsTotal}
+                suffix={
+                  l.metrics.concessionsArea
+                    ? `${Math.round(l.metrics.concessionsArea).toLocaleString("es-CL")} ha`
+                    : undefined
+                }
+              />
+              <Metric
+                icon={<Drill />}
+                label="Sondajes"
+                value={l.metrics.drillHoles}
+                suffix={
+                  l.metrics.metersDrilled
+                    ? `${Math.round(l.metrics.metersDrilled).toLocaleString("es-CL")} m`
+                    : undefined
+                }
+              />
               <Metric icon={<TestTube2 />} label="Muestras" value={l.metrics.samples} />
-              <Metric icon={<Satellite />} label="Anomalías satelitales" value={l.metrics.satelliteAnomalies} />
+              <Metric
+                icon={<Satellite />}
+                label="Anomalías satelitales"
+                value={l.metrics.satelliteAnomalies}
+              />
               <Metric icon={<Target />} label="Targets exploración" value={l.metrics.targets} />
-              <Metric icon={<FileSignature />} label="Reportes NI 43-101" value={l.metrics.ni43101Reports} />
+              <Metric
+                icon={<FileSignature />}
+                label="Reportes NI 43-101"
+                value={l.metrics.ni43101Reports}
+              />
             </div>
           </section>
+
+          {/* Inteligencia satelital y 3D */}
+          {l.project_id && (l.metrics.satelliteAnomalies > 0 || l.metrics.targets > 0) && (
+            <section className="rounded-xl border border-hairline bg-surface-inverse text-white p-5">
+              <div className="brand-eyebrow text-accent-brand-subtle mb-2">
+                Inteligencia satelital en vivo
+              </div>
+              <p className="text-sm text-white/70 mb-4">
+                Este proyecto tiene {l.metrics.satelliteAnomalies} anomalías satelitales detectadas
+                por Sentinel-2. Explóralas sobre el mapa de monitoreo o en la escena 3D interactiva.
+              </p>
+              <div className="flex flex-wrap gap-2.5">
+                <Link
+                  to="/satelital"
+                  search={{ project: l.project_id }}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-md bg-accent-brand text-white hover:opacity-90 transition"
+                >
+                  <Satellite className="w-3.5 h-3.5" /> Monitoreo satelital
+                </Link>
+                <Link
+                  to="/visor-3d"
+                  search={{ project: l.project_id }}
+                  className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-md border border-white/25 text-white hover:bg-white/10 transition"
+                >
+                  <BoxIcon className="w-3.5 h-3.5" /> Visor 3D <ArrowRight className="w-3 h-3" />
+                </Link>
+              </div>
+            </section>
+          )}
 
           {/* Data disponible */}
           {l.data_available && l.data_available.length > 0 && (
@@ -119,7 +202,9 @@ function ListingDetailPage() {
           {l.summary && (
             <section className="rounded-xl border border-hairline bg-white p-5">
               <div className="brand-eyebrow mb-3">Descripción</div>
-              <p className="text-sm text-content leading-relaxed whitespace-pre-line">{l.summary}</p>
+              <p className="text-sm text-content leading-relaxed whitespace-pre-line">
+                {l.summary}
+              </p>
             </section>
           )}
         </div>
@@ -129,14 +214,24 @@ function ListingDetailPage() {
           <section className="rounded-xl border border-hairline bg-white p-5 sticky top-24">
             <div className="brand-eyebrow mb-3">Ficha del proyecto</div>
             <dl className="space-y-3 text-sm">
-              <FieldRow label="Modalidad" value={MODALITY_LABEL[l.modality ?? ""] ?? l.modality ?? "—"} />
+              <FieldRow
+                label="Modalidad"
+                value={MODALITY_LABEL[l.modality ?? ""] ?? l.modality ?? "—"}
+              />
               <FieldRow label="Etapa" value={STAGE_LABEL[l.stage ?? ""] ?? l.stage ?? "—"} />
               <FieldRow label="Commodity" value={l.commodity ?? "—"} />
               <FieldRow label="Ubicación" value={ubic} icon={<MapPin className="w-3.5 h-3.5" />} />
-              <FieldRow label="Superficie" value={l.area_ha != null ? `${l.area_ha.toLocaleString("es-CL")} ha` : "—"} />
+              <FieldRow
+                label="Superficie"
+                value={l.area_ha != null ? `${l.area_ha.toLocaleString("es-CL")} ha` : "—"}
+              />
               <FieldRow
                 label={l.modality === "royalty" ? "Royalty" : "Precio"}
-                value={l.modality === "royalty" && l.royalty_pct != null ? `${l.royalty_pct}% NSR` : fmtUSD(l.asking_price_usd)}
+                value={
+                  l.modality === "royalty" && l.royalty_pct != null
+                    ? `${l.royalty_pct}% NSR`
+                    : fmtUSD(l.asking_price_usd)
+                }
                 highlight
               />
               {l.code && <FieldRow label="Código" value={l.code} mono />}
@@ -154,7 +249,9 @@ function ListingDetailPage() {
           />
 
           <div className="rounded-xl border border-hairline bg-accent-brand-subtle p-4 text-center">
-            <p className="text-xs text-content-subtle mb-2">¿Necesitas más información antes de simular?</p>
+            <p className="text-xs text-content-subtle mb-2">
+              ¿Necesitas más información antes de simular?
+            </p>
             <Link
               to="/contacto"
               className="inline-flex items-center gap-1 text-sm text-accent-brand font-medium hover:underline"
@@ -168,26 +265,54 @@ function ListingDetailPage() {
   );
 }
 
-function Metric({ icon, label, value, suffix }: { icon: React.ReactNode; label: string; value: number; suffix?: string }) {
+function Metric({
+  icon,
+  label,
+  value,
+  suffix,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  suffix?: string;
+}) {
   return (
     <div className="rounded-lg border border-hairline p-3">
       <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-content-subtle">
         <span className="text-accent-brand [&_svg]:w-3.5 [&_svg]:h-3.5">{icon}</span>
         {label}
       </div>
-      <div className="font-mono text-lg font-semibold text-content mt-1">{value.toLocaleString("es-CL")}</div>
+      <div className="font-mono text-lg font-semibold text-content mt-1">
+        {value.toLocaleString("es-CL")}
+      </div>
       {suffix && <div className="text-[11px] text-content-subtle font-mono">{suffix}</div>}
     </div>
   );
 }
 
-function FieldRow({ label, value, icon, mono, highlight }: { label: string; value: string; icon?: React.ReactNode; mono?: boolean; highlight?: boolean }) {
+function FieldRow({
+  label,
+  value,
+  icon,
+  mono,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  mono?: boolean;
+  highlight?: boolean;
+}) {
   return (
     <div className="flex items-start justify-between gap-3 pb-2 border-b border-hairline last:border-0 last:pb-0">
       <dt className="text-[11px] font-mono uppercase tracking-wider text-content-subtle flex items-center gap-1 pt-0.5">
         {icon} {label}
       </dt>
-      <dd className={`text-right ${mono ? "font-mono text-xs" : ""} ${highlight ? "text-accent-brand font-semibold" : "text-content"}`}>{value}</dd>
+      <dd
+        className={`text-right ${mono ? "font-mono text-xs" : ""} ${highlight ? "text-accent-brand font-semibold" : "text-content"}`}
+      >
+        {value}
+      </dd>
     </div>
   );
 }
