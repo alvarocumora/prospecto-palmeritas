@@ -10,6 +10,7 @@ import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingDrawer } from "@/features/marketing/PublicListingDrawer";
 import { ProjectCover } from "@/features/marketing/ProjectCover";
+import { Reveal } from "@/features/marketing/Reveal";
 import type { PublicListing } from "@/lib/publicListings.functions";
 
 const MAX_ON_LANDING = 6;
@@ -126,8 +127,10 @@ export function InvestableProjects() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filtered.map((p) => (
-            <FeaturedProjectCard key={p.id} project={p} onOpen={openDrawer} />
+          {filtered.map((p, idx) => (
+            <Reveal key={p.id} delay={Math.min(idx, 5) * 70}>
+              <FeaturedProjectCard project={p} onOpen={openDrawer} />
+            </Reveal>
           ))}
         </div>
       )}
@@ -162,15 +165,17 @@ function FeaturedProjectCard({
     <button
       type="button"
       onClick={() => onOpen(p)}
-      className="group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full"
+      className="group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden h-full hover-lift hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full"
     >
       {/* Cover */}
       <div className="aspect-video relative overflow-hidden">
-        {p.cover_image_url ? (
-          <img src={p.cover_image_url} alt={p.title} className="w-full h-full object-cover" />
-        ) : (
-          <ProjectCover seed={p.id} commodity={p.commodity} region={p.region ?? p.country} />
-        )}
+        <div className="cover-zoom absolute inset-0">
+          {p.cover_image_url ? (
+            <img src={p.cover_image_url} alt={p.title} className="w-full h-full object-cover" />
+          ) : (
+            <ProjectCover seed={p.id} commodity={p.commodity} region={p.region ?? p.country} />
+          )}
+        </div>
         <div className="absolute inset-0 flex items-start justify-between p-2.5 pointer-events-none">
           <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] font-mono uppercase tracking-wider text-white border border-white/15">
             {modality}

@@ -437,6 +437,7 @@ function InsarVelocityChart({ insar }: { insar: PublicSatProject["insar"] }) {
           return (
             <rect
               key={p.id}
+              className="chart-bar"
               x={i * colW + (colW - barW) / 2}
               y={y}
               width={barW}
@@ -444,6 +445,10 @@ function InsarVelocityChart({ insar }: { insar: PublicSatProject["insar"] }) {
               rx="1"
               fill={SEV_HEX[sev] ?? "#94a3b8"}
               opacity="0.85"
+              style={{
+                transformOrigin: `${i * colW + colW / 2}px ${zeroY}px`,
+                animationDelay: `${Math.min(i, 16) * 35}ms`,
+              }}
             />
           );
         })}
@@ -508,6 +513,8 @@ function InsarTimeSeriesChart({ insar }: { insar: PublicSatProject["insar"] }) {
           />
         )}
         <polyline
+          className="chart-line"
+          pathLength={1}
           points={poly}
           fill="none"
           style={{ stroke: "var(--accent-brand)" }}
@@ -515,7 +522,14 @@ function InsarTimeSeriesChart({ insar }: { insar: PublicSatProject["insar"] }) {
           strokeLinejoin="round"
         />
         {pts.map((p, i) => (
-          <circle key={i} cx={px(p.t)} cy={py(p.v)} r="2" style={{ fill: "var(--accent-brand)" }} />
+          <circle
+            key={i}
+            className="chart-fade"
+            cx={px(p.t)}
+            cy={py(p.v)}
+            r="2"
+            style={{ fill: "var(--accent-brand)", animationDelay: `${300 + i * 40}ms` }}
+          />
         ))}
       </svg>
       <div className="flex justify-between text-[9px] font-mono text-content-subtle mt-0.5">

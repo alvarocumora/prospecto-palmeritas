@@ -1,6 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { SectionHeading } from "@/components/brand";
+import { Reveal } from "@/features/marketing/Reveal";
 
 const MAP_DOTS = [
   { x: "31%", y: "38%", color: "#fcd34d", ring: "#fcd34d22", label: "Au-Ag · JV", price: "8.5M" },
@@ -45,7 +46,7 @@ export function PlatformPreview() {
 
   return (
     <section className="max-w-7xl mx-auto px-5 py-20">
-      <div className="text-center mb-12">
+      <Reveal className="text-center mb-12">
         <SectionHeading
           align="center"
           eyebrow="Terminal en acción"
@@ -53,10 +54,10 @@ export function PlatformPreview() {
           description="Catastro, geología 3D, deal flow y cumplimiento NI 43-101 en un solo lugar."
           className="max-w-2xl mx-auto"
         />
-      </div>
+      </Reveal>
 
       {/* Browser mock — horizontally scrollable on small screens */}
-      <div className="overflow-x-auto -mx-5 px-5">
+      <Reveal delay={120} className="overflow-x-auto -mx-5 px-5">
         <div
           className="min-w-[780px] rounded-2xl border border-white/10 shadow-[0_40px_100px_-20px_rgba(11,42,91,0.45)] overflow-hidden"
           style={{ background: "#07111f" }}
@@ -404,8 +405,10 @@ export function PlatformPreview() {
                       <stop offset="100%" stopColor="#fcd34d" stopOpacity="0" />
                     </linearGradient>
                   </defs>
-                  <polygon points={areaPts} fill="url(#chart-fill)" />
+                  <polygon points={areaPts} fill="url(#chart-fill)" className="chart-fade" />
                   <polyline
+                    className="chart-line"
+                    pathLength={1}
                     points={polyPts}
                     fill="none"
                     stroke="#fcd34d"
@@ -488,7 +491,7 @@ export function PlatformPreview() {
             </div>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* CTA below preview */}
       <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
