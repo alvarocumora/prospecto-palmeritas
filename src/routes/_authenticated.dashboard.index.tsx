@@ -457,7 +457,7 @@ function DashboardHome() {
               Cambiar proyecto →
             </Link>
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-7 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-8 gap-2">
             <Shortcut
               to="/dashboard/map"
               icon={<MapIcon className="w-4 h-4 text-gold" />}
@@ -482,6 +482,11 @@ function DashboardHome() {
               to="/dashboard/estimation"
               icon={<Layers className="w-4 h-4 text-copper" />}
               title="Estimación"
+            />
+            <Shortcut
+              to="/dashboard/precios"
+              icon={<Coins className="w-4 h-4 text-emerald-500" />}
+              title="Precios metales"
             />
             <Shortcut
               to="/dashboard/hse"

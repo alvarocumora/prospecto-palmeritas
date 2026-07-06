@@ -268,6 +268,12 @@ const META: Record<
         desc: "Alertas oficiales sobre tus AOIs.",
       },
       {
+        to: "/dashboard/precios",
+        icon: <TrendingUp className="w-3.5 h-3.5" />,
+        label: "Precios metales",
+        desc: "Cobre BML en vivo y poder de compra ENAMI.",
+      },
+      {
         to: "/dashboard/listings",
         icon: <Handshake className="w-3.5 h-3.5" />,
         label: "Publicar deal",
