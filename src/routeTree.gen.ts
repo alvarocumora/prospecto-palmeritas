@@ -57,6 +57,7 @@ import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhook
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.sync-bulletins'
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
+import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
@@ -360,6 +361,12 @@ const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
   path: '/api/public/stats',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicIngestPatentRematesRoute =
+  ApiPublicIngestPatentRematesRouteImport.update({
+    id: '/api/public/ingest-patent-remates',
+    path: '/api/public/ingest-patent-remates',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
@@ -803,6 +810,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
@@ -912,6 +920,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
@@ -1023,6 +1032,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
+  '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
@@ -1134,6 +1144,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
     | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
@@ -1243,6 +1254,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
     | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
@@ -1353,6 +1365,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/validation'
     | '/api/public/health'
+    | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
     | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
@@ -1417,6 +1430,7 @@ export interface RootRouteChildren {
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
+  ApiPublicIngestPatentRematesRoute: typeof ApiPublicIngestPatentRematesRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
   ApiPublicSyncBulletinsRoute: typeof ApiPublicSyncBulletinsRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
@@ -1771,6 +1785,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/stats'
       fullPath: '/api/public/stats'
       preLoaderRoute: typeof ApiPublicStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ingest-patent-remates': {
+      id: '/api/public/ingest-patent-remates'
+      path: '/api/public/ingest-patent-remates'
+      fullPath: '/api/public/ingest-patent-remates'
+      preLoaderRoute: typeof ApiPublicIngestPatentRematesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/health': {
@@ -2455,6 +2476,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
+  ApiPublicIngestPatentRematesRoute: ApiPublicIngestPatentRematesRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
   ApiPublicSyncBulletinsRoute: ApiPublicSyncBulletinsRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,

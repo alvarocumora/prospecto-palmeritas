@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // ============================================================
@@ -339,6 +340,19 @@ export type ConcessionLegalStatus = {
     source_url: string | null;
     holder_name: string | null;
   }>;
+  /**
+   * Morosidad CONFIRMADA: aparición en la nómina anual de remates por patente
+   * impaga (patent_remates). Reemplaza la señal inferida cuando existe.
+   */
+  remate: {
+    year: number;
+    amount_clp: number | null;
+    years_owed: number | null;
+    court: string | null;
+    court_role: string | null;
+    status: string;
+    source_url: string | null;
+  } | null;
 };
 
 function interpretSituacion(
@@ -414,11 +428,37 @@ export const getConcessionLegalStatus = createServerFn({ method: "GET" })
       .order("publication_date", { ascending: false })
       .limit(20);
 
+    // Morosidad confirmada: nómina de remates por patente impaga (patent_remates).
+    // Se consulta con el cliente sin tipar porque la tabla es nueva (aún no
+    // regenerada en types.ts), siguiendo el patrón de payment_orders.
+    const untyped = supabaseAdmin as unknown as SupabaseClient;
+    const { data: remateRows } = await untyped
+      .from("patent_remates")
+      .select("year, amount_clp, years_owed, court, court_role, status, source_url")
+      .eq("concession_code", data.code)
+      .order("year", { ascending: false })
+      .limit(1);
+    const remate = (remateRows?.[0] ?? null) as ConcessionLegalStatus["remate"];
+
+    // Si hay remate confirmado, sobrescribe la señal inferida.
+    const patent = remate
+      ? {
+          level: "critical" as const,
+          label: `En nómina de remate ${remate.year} · patente impaga`,
+          detail: `Concesión incluida en la nómina de remate por no pago de patente minera a la TGR${
+            remate.years_owed ? ` (${remate.years_owed} año(s) adeudado(s))` : ""
+          }${
+            remate.amount_clp ? `, deuda $${remate.amount_clp.toLocaleString("es-CL")} CLP` : ""
+          }${remate.court ? ` · ${remate.court}` : ""}. Terreno en riesgo de subasta pública.`,
+        }
+      : interpretSituacion(concession?.status ?? null, concession?.expires_at ?? null);
+
     return {
       code: data.code,
       situacion: concession?.status ?? null,
-      patent: interpretSituacion(concession?.status ?? null, concession?.expires_at ?? null),
+      patent,
       expiresAt: concession?.expires_at ?? null,
       bulletins: (bulletins ?? []) as ConcessionLegalStatus["bulletins"],
+      remate,
     };
   });
