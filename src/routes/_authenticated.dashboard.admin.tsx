@@ -16,8 +16,13 @@ import {
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getAdminMarketplaceStats } from "@/lib/adminInbox.functions";
+import {
+  getAdminMarketplaceStats,
+  listSubscriptions,
+  setUserSubscription,
+} from "@/lib/adminInbox.functions";
 import { INQUIRY_STATUS_LABELS } from "@/lib/marketplace.functions";
+import { getPublicPlans } from "@/lib/plans.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin")({
@@ -393,42 +398,166 @@ function ProjectsTab() {
 }
 
 function BillingTab() {
-  return (
-    <div className="rounded border border-dashed border-border bg-bg-secondary p-8 text-center">
-      <CreditCard className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-      <div className="font-mono text-sm">Pagos & suscripciones</div>
-      <p className="text-xs text-muted-foreground mt-2 max-w-md mx-auto">
-        Conecta Stripe o Paddle desde{" "}
-        <span className="font-mono text-gold">Connectors → Payments</span> para gestionar planes,
-        cobros recurrentes, facturas e historial de pagos directamente desde aquí.
-      </p>
-      <div className="mt-4 grid grid-cols-3 gap-2 max-w-md mx-auto">
-        <PlanStub name="Free" price="$0" features="3 proyectos · 1 GB" />
-        <PlanStub name="Pro" price="$49/mes" features="20 proyectos · 50 GB · IA" highlight />
-        <PlanStub name="Enterprise" price="Custom" features="Sin límites · SSO · soporte 24/7" />
-      </div>
-    </div>
-  );
-}
+  const plansFn = useServerFn(getPublicPlans);
+  const subsFn = useServerFn(listSubscriptions);
+  const activateFn = useServerFn(setUserSubscription);
 
-function PlanStub({
-  name,
-  price,
-  features,
-  highlight,
-}: {
-  name: string;
-  price: string;
-  features: string;
-  highlight?: boolean;
-}) {
+  const { data: plans = [] } = useQuery({
+    queryKey: ["public-plans"],
+    queryFn: () => plansFn(),
+    staleTime: 5 * 60_000,
+  });
+  const {
+    data: subs = [],
+    isLoading,
+    refetch,
+  } = useQuery({
+    queryKey: ["admin-subscriptions"],
+    queryFn: () => subsFn(),
+    staleTime: 30_000,
+  });
+
+  const [email, setEmail] = useState("");
+  const [plan, setPlan] = useState("pro");
+  const [months, setMonths] = useState("1");
+  const [saving, setSaving] = useState(false);
+
+  const activate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await activateFn({
+        data: {
+          email: email.trim(),
+          plan: plan as "free" | "pro" | "enterprise",
+          months: Number(months),
+        },
+      });
+      toast.success(`Plan ${plan} activado para ${email}`);
+      setEmail("");
+      await refetch();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al activar");
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
-    <div
-      className={`rounded border p-3 text-left ${highlight ? "border-gold bg-gold/5" : "border-border bg-background"}`}
-    >
-      <div className="font-mono font-semibold text-sm">{name}</div>
-      <div className={`font-mono text-lg mt-1 ${highlight ? "text-gold" : ""}`}>{price}</div>
-      <div className="text-[10px] font-mono text-muted-foreground mt-1">{features}</div>
+    <div className="space-y-6">
+      {/* Planes reales desde billing_plans */}
+      <div>
+        <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground mb-3">
+          Planes activos (billing_plans)
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          {plans.map((p) => (
+            <div
+              key={p.code}
+              className={`rounded border p-3 ${p.code === "pro" ? "border-gold bg-gold/5" : "border-border bg-background"}`}
+            >
+              <div className="font-mono font-semibold text-sm">{p.name}</div>
+              <div className={`font-mono text-lg mt-1 ${p.code === "pro" ? "text-gold" : ""}`}>
+                {p.priceMonthly === 0 ? "$0" : `$${p.priceMonthly}/mes`}
+              </div>
+              <div className="text-[10px] font-mono text-muted-foreground mt-1">
+                {p.maxProjects} proy · {p.maxStorageGb} GB · watchlist{" "}
+                {p.code === "free" ? "3" : p.code === "pro" ? "50" : "∞"}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Activación manual (concierge — sin pasarela integrada aún) */}
+      <form onSubmit={activate} className="rounded border border-border bg-bg-panel p-4">
+        <div className="flex items-center gap-2 mb-3">
+          <CreditCard className="w-4 h-4 text-gold" />
+          <span className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground">
+            Activar plan (tras confirmar cobro)
+          </span>
+        </div>
+        <div className="grid sm:grid-cols-4 gap-2">
+          <input
+            required
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="email del usuario"
+            className="sm:col-span-2 rounded border border-border bg-transparent px-2 py-1.5 text-xs font-mono"
+          />
+          <select
+            value={plan}
+            onChange={(e) => setPlan(e.target.value)}
+            className="rounded border border-border bg-transparent px-2 py-1.5 text-xs font-mono"
+          >
+            <option value="free">Free</option>
+            <option value="pro">Pro</option>
+            <option value="enterprise">Enterprise</option>
+          </select>
+          <select
+            value={months}
+            onChange={(e) => setMonths(e.target.value)}
+            className="rounded border border-border bg-transparent px-2 py-1.5 text-xs font-mono"
+          >
+            {[1, 3, 6, 12].map((m) => (
+              <option key={m} value={m}>
+                {m} {m === 1 ? "mes" : "meses"}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button
+          type="submit"
+          disabled={saving}
+          className="mt-3 inline-flex items-center gap-1.5 rounded bg-gold text-black px-3 py-1.5 text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50"
+        >
+          {saving ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Crown className="w-3.5 h-3.5" />
+          )}
+          Activar suscripción
+        </button>
+        <p className="mt-2 text-[10px] font-mono text-muted-foreground">
+          Las solicitudes de plan llegan a la pestaña Contacto de la bandeja. Conectar Stripe/Flow
+          después solo agrega el checkout automático.
+        </p>
+      </form>
+
+      {/* Suscripciones activas */}
+      <div>
+        <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground mb-2">
+          Suscripciones de pago ({subs.length})
+        </div>
+        {isLoading ? (
+          <div className="text-xs font-mono text-muted-foreground">Cargando…</div>
+        ) : subs.length === 0 ? (
+          <div className="text-xs font-mono text-muted-foreground">
+            Aún sin suscripciones de pago.
+          </div>
+        ) : (
+          <div className="space-y-1.5">
+            {subs.map((s) => (
+              <div
+                key={s.user_id}
+                className="flex items-center justify-between gap-2 rounded border border-border px-3 py-2 text-xs font-mono"
+              >
+                <span className="text-foreground truncate">{s.email ?? s.user_id.slice(0, 8)}</span>
+                <span className="inline-flex items-center gap-2 shrink-0">
+                  <span className="uppercase text-gold">{s.plan}</span>
+                  <span className="text-muted-foreground">{s.status}</span>
+                  {s.current_period_end && (
+                    <span className="text-muted-foreground">
+                      hasta {new Date(s.current_period_end).toLocaleDateString("es-CL")}
+                    </span>
+                  )}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
