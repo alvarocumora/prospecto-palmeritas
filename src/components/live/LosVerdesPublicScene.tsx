@@ -33,7 +33,7 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
     },
     terrainDEM: {
       type: "raster-dem",
-      tiles: ["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+      tiles: ["/api/terrain/{z}/{x}/{y}"],
       tileSize: 256,
       encoding: "terrarium",
       maxzoom: 15,

@@ -113,7 +113,7 @@ function buildStyle(): maplibregl.StyleSpecification {
       },
       terrain: {
         type: "raster-dem",
-        tiles: ["https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"],
+        tiles: ["/api/terrain/{z}/{x}/{y}"],
         tileSize: 256,
         encoding: "terrarium",
         maxzoom: 15,
