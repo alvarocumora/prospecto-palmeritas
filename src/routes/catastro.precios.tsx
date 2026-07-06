@@ -1,14 +1,18 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { Check, Loader2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { useAuth } from "@/hooks/useAuth";
 import { getPublicPlans, getMySubscription, requestPlanUpgrade } from "@/lib/plans.functions";
+import { getPaymentConfig, createCheckoutPreference } from "@/lib/mercadopago.functions";
 
 export const Route = createFileRoute("/catastro/precios")({
+  validateSearch: (s: Record<string, unknown>) =>
+    z.object({ payment: z.enum(["success", "failure", "pending"]).optional() }).parse(s),
   head: () => ({
     meta: [
       { title: "Planes y precios · Catastro Geocapitals" },
@@ -31,8 +35,16 @@ export const Route = createFileRoute("/catastro/precios")({
 function PricingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { payment } = Route.useSearch();
   const [billing, setBilling] = useState<"monthly" | "yearly">("monthly");
   const [requesting, setRequesting] = useState<string | null>(null);
+
+  // Feedback del retorno de MercadoPago
+  useEffect(() => {
+    if (payment === "success") toast.success("¡Pago confirmado! Tu plan se activa en segundos.");
+    else if (payment === "failure") toast.error("El pago no se completó. Intenta nuevamente.");
+    else if (payment === "pending") toast.info("Pago pendiente de confirmación.");
+  }, [payment]);
 
   const plansFn = useServerFn(getPublicPlans);
   const { data: plans = [], isLoading } = useQuery({
@@ -50,7 +62,16 @@ function PricingPage() {
   });
   const currentPlan = sub?.plan ?? "free";
 
+  const cfgFn = useServerFn(getPaymentConfig);
+  const { data: payCfg } = useQuery({
+    queryKey: ["payment-config"],
+    queryFn: () => cfgFn(),
+    staleTime: 5 * 60_000,
+  });
+  const paymentsEnabled = !!payCfg?.enabled;
+
   const requestFn = useServerFn(requestPlanUpgrade);
+  const checkoutFn = useServerFn(createCheckoutPreference);
 
   const onCta = async (code: string) => {
     if (code === "free") {
@@ -63,10 +84,19 @@ function PricingPage() {
     }
     setRequesting(code);
     try {
+      if (paymentsEnabled) {
+        // Pago real: redirigir al checkout de MercadoPago.
+        const { initPoint } = await checkoutFn({
+          data: { planCode: code as "pro" | "enterprise", billing },
+        });
+        window.location.href = initPoint;
+        return;
+      }
+      // Sin pasarela: flujo concierge.
       await requestFn({ data: { planCode: code as "pro" | "enterprise", billing } });
       toast.success("Solicitud enviada. El equipo te contactará para activar tu plan.");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "No se pudo enviar la solicitud");
+      toast.error(e instanceof Error ? e.message : "No se pudo procesar");
     } finally {
       setRequesting(null);
     }
@@ -179,10 +209,12 @@ function PricingPage() {
                       "Plan activo"
                     ) : p.code === "free" ? (
                       "Empezar gratis"
-                    ) : user ? (
-                      "Solicitar activación"
-                    ) : (
+                    ) : !user ? (
                       "Crear cuenta"
+                    ) : paymentsEnabled ? (
+                      "Pagar con MercadoPago"
+                    ) : (
+                      "Solicitar activación"
                     )}
                   </button>
                 </div>
@@ -191,8 +223,10 @@ function PricingPage() {
           </div>
         )}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-8 text-center text-[10px] font-mono text-muted-foreground">
-          Precios en USD. Activación asistida por el equipo tras confirmar el pago (transferencia o
-          tarjeta).{" "}
+          Precios en USD (se cobran en CLP al tipo de cambio del día).{" "}
+          {paymentsEnabled
+            ? "Pago seguro con MercadoPago; tu plan se activa automáticamente al aprobarse."
+            : "Activación asistida por el equipo tras confirmar el pago."}{" "}
           <Link to="/contacto" className="text-primary hover:underline">
             ¿Dudas? Habla con nosotros
           </Link>
