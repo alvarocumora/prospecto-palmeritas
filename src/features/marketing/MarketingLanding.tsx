@@ -161,11 +161,11 @@ export function MarketingLanding() {
               </span>
             </h1>
 
-            <p className="mt-7 text-lg text-slate-400 max-w-xl font-light leading-relaxed">
+            <p className="mt-5 sm:mt-7 text-base sm:text-lg text-slate-400 max-w-xl font-light leading-relaxed">
               {t("hero_sub")}
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-5">
+            <div className="mt-7 sm:mt-9 flex flex-wrap items-center gap-4 sm:gap-5">
               <Link
                 to="/contacto"
                 className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
