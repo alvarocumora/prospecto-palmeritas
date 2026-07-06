@@ -347,3 +347,59 @@ export const setCommodityLotStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true as const };
   });
+
+// ── Métricas del marketplace (staff) ──────────────────────────────────────────
+
+export type AdminMarketplaceStats = {
+  lots: { total: number; byStatus: Record<string, number>; verified: number };
+  inquiries: { total: number; byStatus: Record<string, number> };
+  buyers: { byReviewStatus: Record<string, number> };
+  /** Suma volumen×precio objetivo de consultas cerradas ganadas (GTV estimado). */
+  closedWonValueUsd: number;
+  /** Ídem para estados activos (contactado→negociación): pipeline abierto. */
+  openPipelineValueUsd: number;
+};
+
+export const getAdminMarketplaceStats = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminMarketplaceStats> => {
+    await assertStaff(context.supabase, context.userId);
+    const sb = await admin();
+
+    const [{ data: lots }, { data: inquiries }, { data: buyers }] = await Promise.all([
+      sb.from("commodity_lots").select("status, is_verified"),
+      sb.from("commodity_inquiries").select("status, target_volume_t, target_price_usd_t"),
+      sb.from("investor_profiles").select("review_status"),
+    ]);
+
+    const lotByStatus: Record<string, number> = {};
+    let verified = 0;
+    for (const l of lots ?? []) {
+      lotByStatus[l.status] = (lotByStatus[l.status] ?? 0) + 1;
+      if (l.is_verified) verified++;
+    }
+
+    const inqByStatus: Record<string, number> = {};
+    let closedWonValueUsd = 0;
+    let openPipelineValueUsd = 0;
+    const OPEN = new Set(["contacted", "sample_requested", "offer_sent", "negotiating"]);
+    for (const i of inquiries ?? []) {
+      inqByStatus[i.status] = (inqByStatus[i.status] ?? 0) + 1;
+      const value = (Number(i.target_volume_t) || 0) * (Number(i.target_price_usd_t) || 0);
+      if (i.status === "closed_won") closedWonValueUsd += value;
+      else if (OPEN.has(i.status)) openPipelineValueUsd += value;
+    }
+
+    const buyerByStatus: Record<string, number> = {};
+    for (const b of buyers ?? []) {
+      buyerByStatus[b.review_status] = (buyerByStatus[b.review_status] ?? 0) + 1;
+    }
+
+    return {
+      lots: { total: (lots ?? []).length, byStatus: lotByStatus, verified },
+      inquiries: { total: (inquiries ?? []).length, byStatus: inqByStatus },
+      buyers: { byReviewStatus: buyerByStatus },
+      closedWonValueUsd,
+      openPipelineValueUsd,
+    };
+  });

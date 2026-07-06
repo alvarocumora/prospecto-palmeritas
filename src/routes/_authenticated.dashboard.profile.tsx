@@ -1,9 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useEffect, type FormEvent } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, MessageSquare, Package, ShieldCheck, Store } from "lucide-react";
+import { getMyMarketplaceProfile } from "@/lib/marketplace.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   head: () => ({ meta: [{ title: "Mi Perfil — Trackmin GeoIntel" }] }),
@@ -94,6 +97,8 @@ function ProfilePage() {
         <p className="text-xs text-muted-foreground mt-1">{user?.email}</p>
       </header>
 
+      <MarketplaceIdentity />
+
       <form
         onSubmit={submit}
         className="space-y-4 rounded border border-border bg-bg-secondary p-4"
@@ -174,6 +179,134 @@ function ProfilePage() {
           Guardar
         </button>
       </form>
+    </div>
+  );
+}
+
+/** Identidad de marketplace: qué eres como comprador y como vendedor. */
+function MarketplaceIdentity() {
+  const profileFn = useServerFn(getMyMarketplaceProfile);
+  const { data } = useQuery({
+    queryKey: ["my-marketplace-profile"],
+    queryFn: () => profileFn(),
+    staleTime: 60_000,
+  });
+
+  if (!data) {
+    return (
+      <div className="grid sm:grid-cols-2 gap-3 mb-6">
+        {Array.from({ length: 2 }).map((_, i) => (
+          <div key={i} className="rounded border border-border bg-bg-secondary p-4 animate-pulse">
+            <div className="h-4 rounded bg-foreground/10 w-1/2 mb-3" />
+            <div className="h-3 rounded bg-foreground/10 w-3/4" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const kyc = data.kycStatus;
+  const kycBadge =
+    kyc === "approved"
+      ? { label: "KYC aprobado", cls: "border-teal/40 bg-teal/10 text-teal" }
+      : kyc === "pending_review"
+        ? { label: "KYC en revisión", cls: "border-warn/40 bg-warn/10 text-warn" }
+        : kyc === "rejected"
+          ? { label: "KYC rechazado", cls: "border-danger/40 bg-danger/10 text-danger" }
+          : { label: "Sin verificar", cls: "border-border text-muted-foreground" };
+
+  const isSeller = data.lotsTotal > 0 || data.listingsTotal > 0;
+
+  return (
+    <div className="grid sm:grid-cols-2 gap-3 mb-6">
+      {/* Como comprador */}
+      <div className="rounded border border-border bg-bg-secondary p-4">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-gold" /> Como comprador
+          </div>
+          <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${kycBadge.cls}`}>
+            {kycBadge.label}
+          </span>
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {data.inquiriesSent > 0 ? (
+            <>
+              <span className="text-foreground font-semibold">{data.inquiriesSent}</span>{" "}
+              cotizaciones enviadas ·{" "}
+              <span className="text-foreground font-semibold">{data.inquiriesSentOpen}</span> en
+              curso
+            </>
+          ) : kyc === "approved" ? (
+            "Listo para consultar lotes del marketplace."
+          ) : (
+            "Completa tu verificación para consultar lotes."
+          )}
+        </div>
+        <div className="mt-3 flex gap-3">
+          {data.inquiriesSent > 0 && (
+            <Link
+              to="/dashboard/my-inquiries"
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-gold hover:underline"
+            >
+              <MessageSquare className="w-3 h-3" /> Mis cotizaciones →
+            </Link>
+          )}
+          <Link
+            to="/marketplace"
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold"
+          >
+            Ver marketplace →
+          </Link>
+        </div>
+      </div>
+
+      {/* Como vendedor */}
+      <div className="rounded border border-border bg-bg-secondary p-4">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground inline-flex items-center gap-1.5">
+            <Store className="w-3.5 h-3.5 text-gold" /> Como vendedor
+          </div>
+          {data.inquiriesReceivedNew > 0 && (
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded border border-warn/40 bg-warn/10 text-warn">
+              {data.inquiriesReceivedNew} consultas nuevas
+            </span>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground">
+          {isSeller ? (
+            <>
+              <span className="text-foreground font-semibold">{data.lotsPublished}</span>/
+              {data.lotsTotal} lotes publicados ·{" "}
+              <span className="text-foreground font-semibold">{data.inquiriesReceived}</span>{" "}
+              consultas recibidas
+              {data.listingsTotal > 0 && (
+                <>
+                  {" "}
+                  · <span className="text-foreground font-semibold">{data.listingsTotal}</span>{" "}
+                  listings de proyecto
+                </>
+              )}
+            </>
+          ) : (
+            "Publica lotes de commodities o listings de proyectos mineros."
+          )}
+        </div>
+        <div className="mt-3 flex gap-3 flex-wrap">
+          <Link
+            to="/dashboard/commodity-lots"
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-gold hover:underline"
+          >
+            <Package className="w-3 h-3" /> Mis lotes →
+          </Link>
+          <Link
+            to="/dashboard/listings"
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold"
+          >
+            Mis listings →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
