@@ -22,10 +22,12 @@ const Email = ({ fullName, reviewerName, notes }: Props) => (
       Tu perfil fue verificado por {reviewerName ?? "el equipo de Geocapitals"}. Ya puedes:
     </Text>
     <Text style={styles.p}>
-      · Solicitar acceso a data rooms NI 43-101.<br />
-      · Firmar NDA click-wrap por proyecto.<br />
-      · Recibir alertas de nuevas oportunidades alineadas a tu ticket y commodities.<br />
-      · Coordinar reuniones con titulares mineros calificados.
+      · Solicitar acceso a data rooms NI 43-101.
+      <br />
+      · Firmar NDA click-wrap por proyecto.
+      <br />
+      · Recibir alertas de nuevas oportunidades alineadas a tu ticket y commodities.
+      <br />· Coordinar reuniones con titulares mineros calificados.
     </Text>
     <KeyValueBlock
       rows={[
@@ -35,8 +37,8 @@ const Email = ({ fullName, reviewerName, notes }: Props) => (
       ]}
     />
     <Text style={styles.muted}>
-      Para cerrar una transacción, Geocapitals emite factura de éxito post-cierre. Si te interesa
-      un proyecto en particular, responde a este correo o usa el formulario en el dashboard.
+      Para cerrar una transacción, Geocapitals emite factura de éxito post-cierre. Si te interesa un
+      proyecto en particular, responde a este correo o usa el formulario en el dashboard.
     </Text>
   </EmailLayout>
 );

@@ -23,8 +23,8 @@ function TermsPage() {
         </p>
         <h2 className="text-content">3. KYC / AML</h2>
         <p>
-          Todos los inversionistas institucionales pasan por verificación KYC/AML antes de acceder
-          a data rooms. Nos reservamos el derecho de rechazar perfiles a discreción.
+          Todos los inversionistas institucionales pasan por verificación KYC/AML antes de acceder a
+          data rooms. Nos reservamos el derecho de rechazar perfiles a discreción.
         </p>
         <h2 className="text-content">4. Datos públicos</h2>
         <p>
@@ -39,8 +39,14 @@ function TermsPage() {
         <h2 className="text-content">6. Jurisdicción</h2>
         <p>Tribunales de Santiago, Chile.</p>
         <p className="text-xs">
-          Contacto: <a className="text-accent-brand" href="mailto:legal@geocapitals.com">legal@geocapitals.com</a> ·{" "}
-          <Link to="/legal/privacidad" className="text-accent-brand">Política de privacidad</Link>
+          Contacto:{" "}
+          <a className="text-accent-brand" href="mailto:legal@geocapitals.com">
+            legal@geocapitals.com
+          </a>{" "}
+          ·{" "}
+          <Link to="/legal/privacidad" className="text-accent-brand">
+            Política de privacidad
+          </Link>
         </p>
       </article>
     </MarketingPage>

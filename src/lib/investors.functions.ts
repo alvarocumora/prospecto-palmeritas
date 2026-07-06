@@ -6,6 +6,8 @@ import { sendInternalEmail } from "@/lib/email/send-internal.server";
 const IdInput = z.object({ userId: z.string().uuid() });
 const RejectInput = z.object({ userId: z.string().uuid(), reason: z.string().min(3).max(500) });
 
+// El rpc tipado del cliente de usuario no acepta un genérico, así que se relaja aquí.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function assertStaff(supabase: any, userId: string): Promise<void> {
   const { data, error } = await supabase.rpc("is_geocapitals_staff", { _user_id: userId });
   if (error) throw new Error(error.message);

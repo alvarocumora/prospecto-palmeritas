@@ -7,7 +7,6 @@
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 import { mcpPlugin } from "@lovable.dev/mcp-js/stacks/tanstack/vite";
 import { loadEnv } from "vite";
-import path from "node:path";
 
 // Load server env vars (no VITE_ prefix) into process.env so server routes can read them.
 const env = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "");
@@ -15,26 +14,16 @@ for (const [k, v] of Object.entries(env)) {
   if (!process.env[k]) process.env[k] = v;
 }
 
-const entitiesDir = path.resolve(process.cwd(), "node_modules/entities");
-
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
   vite: {
     plugins: [mcpPlugin()],
-    resolve: {
-      alias: [
-        // htmlparser2 (transitive via react-email) hardcodes `entities/lib/decode.js`,
-        // but `entities@6` exposes it at the package root. Alias to the real path.
-        {
-          find: /^entities\/lib\/decode\.js$/,
-          replacement: path.join(entitiesDir, "decode.js"),
-        },
-        { find: /^entities$/, replacement: entitiesDir },
-
-      ],
-    },
+    // Nota: NO aliasear `entities`. El árbol resuelve naturalmente v4 (cadena
+    // html-to-text, usa lib/decode.js) y v7 anidado bajo htmlparser2@10 de
+    // cheerio (usa decode.js). Un alias fijo asume una versión hoisteada
+    // concreta y rompe el build cuando npm hoistea la otra.
     build: {
       chunkSizeWarningLimit: 2000,
       rollupOptions: {

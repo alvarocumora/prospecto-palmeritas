@@ -65,10 +65,7 @@ function ResetPasswordPage() {
             <p className="text-sm text-muted-foreground">
               El enlace expiró o no es válido. Solicita uno nuevo desde el inicio de sesión.
             </p>
-            <Link
-              to="/auth"
-              className="inline-block text-xs text-gold font-mono hover:underline"
-            >
+            <Link to="/auth" className="inline-block text-xs text-gold font-mono hover:underline">
               Ir a inicio de sesión →
             </Link>
           </div>
@@ -96,7 +93,13 @@ function ResetPasswordPage() {
                     key={i}
                     className={`h-1 flex-1 rounded ${
                       i <= pw.score
-                        ? ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-lime-500", "bg-emerald-500"][pw.score]
+                        ? [
+                            "bg-red-500",
+                            "bg-orange-500",
+                            "bg-yellow-500",
+                            "bg-lime-500",
+                            "bg-emerald-500",
+                          ][pw.score]
                         : "bg-border"
                     }`}
                   />

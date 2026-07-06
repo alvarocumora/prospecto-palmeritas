@@ -53,7 +53,14 @@ const OPTIONS: Array<{
 const COMMODITIES = ["Au", "Au-Cu", "Cu", "Cu-Mo", "Ag", "Pb-Zn", "Li", "Fe", "Otro"];
 const STANDARDS = ["NI 43-101", "JORC", "SAMREC", "CRIRSCO"];
 const INVESTOR_TYPES = ["family_office", "fund", "strategic", "angel", "other"];
-const SPECIALTIES = ["Geología", "Geofísica", "Geoquímica", "Recursos", "Ingeniería de minas", "Otro"];
+const SPECIALTIES = [
+  "Geología",
+  "Geofísica",
+  "Geoquímica",
+  "Recursos",
+  "Ingeniería de minas",
+  "Otro",
+];
 
 type Step = "role" | "details" | "done";
 
@@ -176,7 +183,11 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
         if (error) throw error;
         await supabase
           .from("profiles")
-          .update({ display_name: inv.full_name.trim(), organization: inv.company_name.trim(), country: inv.country })
+          .update({
+            display_name: inv.full_name.trim(),
+            organization: inv.company_name.trim(),
+            country: inv.country,
+          })
           .eq("user_id", user.id);
         // Dispara welcome + lead interno (no bloqueante)
         try {
@@ -202,7 +213,10 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           .update({
             specialty: team.specialty,
             certifications: team.certifications
-              ? team.certifications.split(",").map((s) => s.trim()).filter(Boolean)
+              ? team.certifications
+                  .split(",")
+                  .map((s) => s.trim())
+                  .filter(Boolean)
               : null,
             country: team.country,
           })
@@ -247,12 +261,19 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
               <p className="text-xs text-muted-foreground mt-1">Sigamos con tu primer paso.</p>
             </div>
           </div>
-          <button onClick={() => setDismissed(true)} className="text-muted-foreground hover:text-foreground" aria-label="Cerrar">
+          <button
+            onClick={() => setDismissed(true)}
+            className="text-muted-foreground hover:text-foreground"
+            aria-label="Cerrar"
+          >
             <X className="w-4 h-4" />
           </button>
         </div>
         <div className="mt-3">
-          <Link to={opt.next.to} className="inline-flex items-center gap-2 rounded bg-gold text-black px-3 py-1.5 text-xs font-mono font-semibold hover:bg-gold/90">
+          <Link
+            to={opt.next.to}
+            className="inline-flex items-center gap-2 rounded bg-gold text-black px-3 py-1.5 text-xs font-mono font-semibold hover:bg-gold/90"
+          >
             {opt.next.label} <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -280,7 +301,10 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
               Personaliza tu acceso y desbloquea los módulos relevantes.
             </p>
           </div>
-          <button onClick={handleSkip} className="text-[11px] font-mono text-muted-foreground hover:text-foreground underline">
+          <button
+            onClick={handleSkip}
+            className="text-[11px] font-mono text-muted-foreground hover:text-foreground underline"
+          >
             Saltar
           </button>
         </div>
@@ -291,30 +315,63 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
               <Input value={inv.full_name} onChange={(v) => setInv({ ...inv, full_name: v })} />
             </Field>
             <Field label="Empresa / Fondo *">
-              <Input value={inv.company_name} onChange={(v) => setInv({ ...inv, company_name: v })} />
+              <Input
+                value={inv.company_name}
+                onChange={(v) => setInv({ ...inv, company_name: v })}
+              />
             </Field>
             <Field label="País">
               <Input value={inv.country} onChange={(v) => setInv({ ...inv, country: v })} />
             </Field>
             <Field label="Tipo de inversor">
-              <select value={inv.investor_type} onChange={(e) => setInv({ ...inv, investor_type: e.target.value })} className={selectCls}>
-                {INVESTOR_TYPES.map((t) => <option key={t} value={t}>{t}</option>)}
+              <select
+                value={inv.investor_type}
+                onChange={(e) => setInv({ ...inv, investor_type: e.target.value })}
+                className={selectCls}
+              >
+                {INVESTOR_TYPES.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="Ticket mín USD">
-              <Input type="number" value={inv.ticket_min_usd} onChange={(v) => setInv({ ...inv, ticket_min_usd: v })} />
+              <Input
+                type="number"
+                value={inv.ticket_min_usd}
+                onChange={(v) => setInv({ ...inv, ticket_min_usd: v })}
+              />
             </Field>
             <Field label="Ticket máx USD">
-              <Input type="number" value={inv.ticket_max_usd} onChange={(v) => setInv({ ...inv, ticket_max_usd: v })} />
+              <Input
+                type="number"
+                value={inv.ticket_max_usd}
+                onChange={(v) => setInv({ ...inv, ticket_max_usd: v })}
+              />
             </Field>
             <Field label="Commodities" full>
-              <Chips options={COMMODITIES} selected={inv.commodities} onToggle={(v) => setInv({ ...inv, commodities: toggleArr(inv.commodities, v) })} />
+              <Chips
+                options={COMMODITIES}
+                selected={inv.commodities}
+                onToggle={(v) => setInv({ ...inv, commodities: toggleArr(inv.commodities, v) })}
+              />
             </Field>
             <Field label="Estándares aceptados" full>
-              <Chips options={STANDARDS} selected={inv.accepted_standards} onToggle={(v) => setInv({ ...inv, accepted_standards: toggleArr(inv.accepted_standards, v) })} />
+              <Chips
+                options={STANDARDS}
+                selected={inv.accepted_standards}
+                onToggle={(v) =>
+                  setInv({ ...inv, accepted_standards: toggleArr(inv.accepted_standards, v) })
+                }
+              />
             </Field>
             <Field label="Sitio web" full>
-              <Input value={inv.website} onChange={(v) => setInv({ ...inv, website: v })} placeholder="https://" />
+              <Input
+                value={inv.website}
+                onChange={(v) => setInv({ ...inv, website: v })}
+                placeholder="https://"
+              />
             </Field>
             <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
               <input
@@ -324,10 +381,16 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 className="mt-0.5 accent-gold"
               />
               <span>
-                Acepto los <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">Términos</a>,
-                la <a href="/legal/privacidad" target="_blank" className="text-gold hover:underline">Política de privacidad</a>{" "}
-                y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de éxito post-cierre y
-                no custodia fondos.
+                Acepto los{" "}
+                <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">
+                  Términos
+                </a>
+                , la{" "}
+                <a href="/legal/privacidad" target="_blank" className="text-gold hover:underline">
+                  Política de privacidad
+                </a>{" "}
+                y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de éxito
+                post-cierre y no custodia fondos.
               </span>
             </label>
           </div>
@@ -336,16 +399,27 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
         {selected === "mining_owner" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label="Empresa / Organización *" full>
-              <Input value={own.organization} onChange={(v) => setOwn({ ...own, organization: v })} />
+              <Input
+                value={own.organization}
+                onChange={(v) => setOwn({ ...own, organization: v })}
+              />
             </Field>
             <Field label="País">
               <Input value={own.country} onChange={(v) => setOwn({ ...own, country: v })} />
             </Field>
             <Field label="Región">
-              <Input value={own.region} onChange={(v) => setOwn({ ...own, region: v })} placeholder="Atacama" />
+              <Input
+                value={own.region}
+                onChange={(v) => setOwn({ ...own, region: v })}
+                placeholder="Atacama"
+              />
             </Field>
             <Field label="RUT (opcional)" full>
-              <Input value={own.rut} onChange={(v) => setOwn({ ...own, rut: v })} placeholder="76.xxx.xxx-x" />
+              <Input
+                value={own.rut}
+                onChange={(v) => setOwn({ ...own, rut: v })}
+                placeholder="76.xxx.xxx-x"
+              />
             </Field>
           </div>
         )}
@@ -353,15 +427,27 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
         {selected === "geocapitals_team" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <Field label="Especialidad">
-              <select value={team.specialty} onChange={(e) => setTeam({ ...team, specialty: e.target.value })} className={selectCls}>
-                {SPECIALTIES.map((s) => <option key={s} value={s}>{s}</option>)}
+              <select
+                value={team.specialty}
+                onChange={(e) => setTeam({ ...team, specialty: e.target.value })}
+                className={selectCls}
+              >
+                {SPECIALTIES.map((s) => (
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
+                ))}
               </select>
             </Field>
             <Field label="País">
               <Input value={team.country} onChange={(v) => setTeam({ ...team, country: v })} />
             </Field>
             <Field label="Certificaciones (separadas por coma)" full>
-              <Input value={team.certifications} onChange={(v) => setTeam({ ...team, certifications: v })} placeholder="QP, AusIMM, CIM..." />
+              <Input
+                value={team.certifications}
+                onChange={(v) => setTeam({ ...team, certifications: v })}
+                placeholder="QP, AusIMM, CIM..."
+              />
             </Field>
           </div>
         )}
@@ -372,7 +458,11 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             disabled={saving}
             className="inline-flex items-center gap-2 rounded bg-gold text-black px-4 py-2 text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50"
           >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+            {saving ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            )}
             Completar onboarding
           </button>
         </div>
@@ -392,7 +482,10 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             Personalizamos la plataforma según tu perfil. Puedes cambiarlo después.
           </p>
         </div>
-        <button onClick={handleSkip} className="text-[11px] font-mono text-muted-foreground hover:text-foreground underline">
+        <button
+          onClick={handleSkip}
+          className="text-[11px] font-mono text-muted-foreground hover:text-foreground underline"
+        >
           Saltar
         </button>
       </div>
@@ -407,12 +500,16 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
               disabled={saving}
               onClick={() => pickRole(opt.value)}
               className={`text-left rounded border p-3 transition-all ${
-                isSel ? "border-gold bg-gold/10" : "border-border bg-bg-panel hover:border-gold/60 hover:bg-gold/5"
+                isSel
+                  ? "border-gold bg-gold/10"
+                  : "border-border bg-bg-panel hover:border-gold/60 hover:bg-gold/5"
               } disabled:opacity-60`}
             >
               <Icon className="w-5 h-5 text-gold mb-2" />
               <div className="font-semibold text-sm text-foreground">{opt.title}</div>
-              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">{opt.desc}</div>
+              <div className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                {opt.desc}
+              </div>
             </button>
           );
         })}
@@ -425,7 +522,15 @@ const inputCls =
   "w-full px-2 py-1.5 rounded border border-border bg-background text-sm focus:outline-none focus:border-gold";
 const selectCls = inputCls;
 
-function Field({ label, children, full }: { label: string; children: React.ReactNode; full?: boolean }) {
+function Field({
+  label,
+  children,
+  full,
+}: {
+  label: string;
+  children: React.ReactNode;
+  full?: boolean;
+}) {
   return (
     <label className={`block ${full ? "md:col-span-2" : ""}`}>
       <div className="text-[10px] uppercase font-mono text-muted-foreground mb-1">{label}</div>

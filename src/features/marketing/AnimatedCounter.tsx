@@ -58,7 +58,9 @@ export function AnimatedCounter({
 
   const formatted =
     format === "compact"
-      ? new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(display)
+      ? new Intl.NumberFormat("en", { notation: "compact", maximumFractionDigits: 1 }).format(
+          display,
+        )
       : display.toLocaleString();
 
   return (

@@ -21,8 +21,7 @@ export const Route = createFileRoute("/oportunidades")({
       { property: "og:title", content: "Oportunidades de inversión minera por región" },
       {
         property: "og:description",
-        content:
-          "Deal-flow verificado agrupado por región + simulador de retorno por geografía.",
+        content: "Deal-flow verificado agrupado por región + simulador de retorno por geografía.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://geocapitals.com/oportunidades" },
@@ -159,7 +158,10 @@ function OportunidadesPage() {
       {isLoading ? (
         <div className="grid md:grid-cols-2 gap-5">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-hairline bg-white h-[360px] animate-pulse" />
+            <div
+              key={i}
+              className="rounded-2xl border border-hairline bg-white h-[360px] animate-pulse"
+            />
           ))}
         </div>
       ) : filtered.length === 0 ? (
@@ -193,8 +195,8 @@ function OportunidadesPage() {
             ¿Buscas oportunidades por invitación?
           </h2>
           <p className="mt-3 text-white/70 max-w-xl">
-            Crea tu cuenta de inversionista para acceder a data rooms cifrados, modelos NPV/IRR
-            por proyecto y proyectos aún no listados públicamente.
+            Crea tu cuenta de inversionista para acceder a data rooms cifrados, modelos NPV/IRR por
+            proyecto y proyectos aún no listados públicamente.
           </p>
         </div>
         <BrandButton asChild>
@@ -250,11 +252,7 @@ function RegionCard({ group }: { group: RegionGroup }) {
                 : "—"
             }
           />
-          <Stat
-            icon={<TrendingUp />}
-            label="TIR sugerida"
-            value={`${group.suggestedIRR}%`}
-          />
+          <Stat icon={<TrendingUp />} label="TIR sugerida" value={`${group.suggestedIRR}%`} />
         </div>
       </header>
 
@@ -292,22 +290,8 @@ function RegionCard({ group }: { group: RegionGroup }) {
               max={10_000_000}
               onChange={setTicket}
             />
-            <Field
-              label="Años"
-              value={years}
-              step={1}
-              min={1}
-              max={15}
-              onChange={setYears}
-            />
-            <Field
-              label="TIR %"
-              value={irr}
-              step={1}
-              min={5}
-              max={60}
-              onChange={setIrr}
-            />
+            <Field label="Años" value={years} step={1} min={1} max={15} onChange={setYears} />
+            <Field label="TIR %" value={irr} step={1} min={5} max={60} onChange={setIrr} />
           </div>
           <div className="mt-3 grid grid-cols-3 gap-2 pt-3 border-t border-hairline text-center">
             <Cell label="Valor final" value={fmtUSD(projected)} highlight />

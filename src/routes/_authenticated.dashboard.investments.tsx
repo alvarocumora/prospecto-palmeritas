@@ -25,7 +25,9 @@ type Data = Awaited<ReturnType<typeof getMyInvestmentHistory>>;
 const fmtUsd = (n: number | null | undefined) =>
   n == null ? "—" : `USD ${Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 const fmtDate = (s: string | null | undefined) =>
-  s ? new Date(s).toLocaleDateString("es-CL", { year: "numeric", month: "short", day: "2-digit" }) : "—";
+  s
+    ? new Date(s).toLocaleDateString("es-CL", { year: "numeric", month: "short", day: "2-digit" })
+    : "—";
 
 function MyInvestmentsPage() {
   const [data, setData] = useState<Data | null>(null);
@@ -102,9 +104,17 @@ function KycCard({ data }: { data: Data }) {
     );
   }
   const map: Record<string, { label: string; cls: string; Icon: typeof Clock }> = {
-    pending_review: { label: "En revisión", cls: "border-warn/40 bg-warn/10 text-warn", Icon: Clock },
+    pending_review: {
+      label: "En revisión",
+      cls: "border-warn/40 bg-warn/10 text-warn",
+      Icon: Clock,
+    },
     approved: { label: "Aprobado", cls: "border-teal/40 bg-teal/10 text-teal", Icon: CheckCircle2 },
-    rejected: { label: "Rechazado", cls: "border-danger/40 bg-danger/10 text-danger", Icon: XCircle },
+    rejected: {
+      label: "Rechazado",
+      cls: "border-danger/40 bg-danger/10 text-danger",
+      Icon: XCircle,
+    },
   };
   const s = map[p.review_status] ?? map.pending_review;
   return (
@@ -116,7 +126,9 @@ function KycCard({ data }: { data: Data }) {
             {p.full_name} · {p.company_name}
           </p>
         </div>
-        <span className={`text-[11px] font-mono px-2 py-1 rounded border inline-flex items-center gap-1.5 ${s.cls}`}>
+        <span
+          className={`text-[11px] font-mono px-2 py-1 rounded border inline-flex items-center gap-1.5 ${s.cls}`}
+        >
           <s.Icon className="w-3 h-3" /> {s.label}
         </span>
       </div>
@@ -134,7 +146,12 @@ function TotalsRow({ totals }: { totals: Data["totals"] }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
       <KpiCard Icon={Wallet} label="Total pagado" value={fmtUsd(totals.paidUsd)} tone="teal" />
-      <KpiCard Icon={DollarSign} label="Compromiso total" value={fmtUsd(totals.committedUsd)} tone="gold" />
+      <KpiCard
+        Icon={DollarSign}
+        label="Compromiso total"
+        value={fmtUsd(totals.committedUsd)}
+        tone="gold"
+      />
       <KpiCard Icon={FileText} label="Operaciones" value={String(totals.count)} tone="muted" />
     </div>
   );
@@ -151,7 +168,8 @@ function KpiCard({
   value: string;
   tone: "teal" | "gold" | "muted";
 }) {
-  const cls = tone === "teal" ? "text-teal" : tone === "gold" ? "text-gold" : "text-muted-foreground";
+  const cls =
+    tone === "teal" ? "text-teal" : tone === "gold" ? "text-gold" : "text-muted-foreground";
   return (
     <div className="rounded border border-border bg-bg-panel p-4">
       <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-muted-foreground">
@@ -167,10 +185,14 @@ function SettlementsBlock({ items }: { items: Data["settlements"] }) {
     <section className="rounded border border-border bg-bg-panel mb-4">
       <header className="px-4 py-3 border-b border-border">
         <h2 className="font-semibold text-sm">Liquidaciones</h2>
-        <p className="text-[11px] text-muted-foreground mt-0.5">Transacciones registradas por el equipo Geocapitals.</p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">
+          Transacciones registradas por el equipo Geocapitals.
+        </p>
       </header>
       {items.length === 0 ? (
-        <div className="p-6 text-center text-xs text-muted-foreground">Sin liquidaciones registradas todavía.</div>
+        <div className="p-6 text-center text-xs text-muted-foreground">
+          Sin liquidaciones registradas todavía.
+        </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -190,14 +212,17 @@ function SettlementsBlock({ items }: { items: Data["settlements"] }) {
                   <td className="px-3 py-2">
                     <div className="font-medium text-foreground">{s.listing?.title ?? "—"}</div>
                     <div className="text-[10px] text-muted-foreground">
-                      {s.listing?.commodity ?? ""} {s.listing?.country ? `· ${s.listing.country}` : ""}
+                      {s.listing?.commodity ?? ""}{" "}
+                      {s.listing?.country ? `· ${s.listing.country}` : ""}
                     </div>
                   </td>
                   <td className="px-3 py-2">
                     <SettlementStatus status={s.status} />
                   </td>
                   <td className="px-3 py-2 text-right font-mono">{fmtUsd(Number(s.amount_usd))}</td>
-                  <td className="px-3 py-2 font-mono">{s.success_fee_pct ? `${s.success_fee_pct}%` : "—"}</td>
+                  <td className="px-3 py-2 font-mono">
+                    {s.success_fee_pct ? `${s.success_fee_pct}%` : "—"}
+                  </td>
                   <td className="px-3 py-2 font-mono">{fmtDate(s.received_at ?? s.recorded_at)}</td>
                   <td className="px-3 py-2 font-mono text-muted-foreground truncate max-w-[140px]">
                     {s.wire_reference ?? "—"}
@@ -234,7 +259,9 @@ function SettlementStatus({ status }: { status: string }) {
               ? "Reembolsado"
               : status;
   return (
-    <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${map[status] ?? "border-border"}`}>
+    <span
+      className={`text-[10px] font-mono px-2 py-0.5 rounded border ${map[status] ?? "border-border"}`}
+    >
       {label}
     </span>
   );
@@ -262,7 +289,9 @@ function InquiriesBlock({ items }: { items: Data["inquiries"] }) {
           {items.map((i) => (
             <li key={i.id} className="px-4 py-3 flex items-center justify-between gap-3 text-xs">
               <div className="min-w-0">
-                <div className="font-medium text-foreground truncate">{i.listing?.title ?? "—"}</div>
+                <div className="font-medium text-foreground truncate">
+                  {i.listing?.title ?? "—"}
+                </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
                   Solicitado: {fmtDate(i.created_at)}
                   {i.nda_signed_at ? ` · NDA: ${fmtDate(i.nda_signed_at)}` : ""}

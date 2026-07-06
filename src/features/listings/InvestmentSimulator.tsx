@@ -12,7 +12,10 @@ import { fmtUSD } from "@/modules/deals/domain/format";
 
 type Scenario = "conservative" | "base" | "optimistic";
 
-const SCENARIOS: Record<Scenario, { label: string; multiplier: number; irrFloor: number; color: string }> = {
+const SCENARIOS: Record<
+  Scenario,
+  { label: string; multiplier: number; irrFloor: number; color: string }
+> = {
   conservative: { label: "Conservador", multiplier: 1.4, irrFloor: 0.08, color: "text-slate-600" },
   base: { label: "Base", multiplier: 2.2, irrFloor: 0.18, color: "text-accent-brand" },
   optimistic: { label: "Optimista", multiplier: 4.0, irrFloor: 0.32, color: "text-emerald-600" },
@@ -28,8 +31,13 @@ function calcReturn(amount: number, years: number, scenario: Scenario, stageBonu
 
 // Bonus por etapa: greenfield más upside; pre-feas más cierre.
 const STAGE_BONUS: Record<string, number> = {
-  greenfield: 0.4, exploration: 0.25, scoping: 0.15, prefeasibility: 0.05,
-  feasibility: 0, construction: -0.1, production: -0.2,
+  greenfield: 0.4,
+  exploration: 0.25,
+  scoping: 0.15,
+  prefeasibility: 0.05,
+  feasibility: 0,
+  construction: -0.1,
+  production: -0.2,
 };
 
 export function InvestmentSimulator({
@@ -63,7 +71,10 @@ export function InvestmentSimulator({
   const [saved, setSaved] = useState(false);
 
   const stageBonus = STAGE_BONUS[stage ?? ""] ?? 0;
-  const result = useMemo(() => calcReturn(amount, years, scenario, stageBonus), [amount, years, scenario, stageBonus]);
+  const result = useMemo(
+    () => calcReturn(amount, years, scenario, stageBonus),
+    [amount, years, scenario, stageBonus],
+  );
 
   const breakdown = useMemo(() => {
     const arr: Array<{ y: number; v: number }> = [];
@@ -84,16 +95,20 @@ export function InvestmentSimulator({
     setSaving(true);
     try {
       // Crea inquiry con la simulación embebida en message
-      const msg = JSON.stringify({
-        type: "investment_simulation",
-        listing: listingTitle,
-        amount_usd: amount,
-        horizon_years: years,
-        scenario,
-        projected_irr: result.irr,
-        projected_multiple: result.multiplier,
-        projected_return_usd: result.final,
-      }, null, 2);
+      const msg = JSON.stringify(
+        {
+          type: "investment_simulation",
+          listing: listingTitle,
+          amount_usd: amount,
+          horizon_years: years,
+          scenario,
+          projected_irr: result.irr,
+          projected_multiple: result.multiplier,
+          projected_return_usd: result.final,
+        },
+        null,
+        2,
+      );
 
       const { error } = await supabase.from("property_deal_inquiries").insert({
         listing_id: listingId,
@@ -170,7 +185,11 @@ export function InvestmentSimulator({
               onChange={(e) => setYears(Number(e.target.value))}
               className="brand-input w-full mt-1"
             >
-              {[2, 3, 5, 7, 10].map((y) => <option key={y} value={y}>{y} años</option>)}
+              {[2, 3, 5, 7, 10].map((y) => (
+                <option key={y} value={y}>
+                  {y} años
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -183,7 +202,9 @@ export function InvestmentSimulator({
               className="brand-input w-full mt-1"
             >
               {(Object.keys(SCENARIOS) as Scenario[]).map((s) => (
-                <option key={s} value={s}>{SCENARIOS[s].label}</option>
+                <option key={s} value={s}>
+                  {SCENARIOS[s].label}
+                </option>
               ))}
             </select>
           </div>
@@ -220,8 +241,12 @@ export function InvestmentSimulator({
       <div className="rounded-md bg-amber-50 border border-amber-200 p-3 flex gap-2">
         <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
         <p className="text-[11px] text-amber-900 leading-relaxed">
-          Cálculo referencial basado en parámetros del proyecto ({stage ?? "etapa no def."}, {commodity ?? "—"}{modality === "royalty" && royaltyPct ? `, royalty ${royaltyPct}% NSR` : ""}).
-          No constituye una oferta, recomendación de inversión ni promesa de retorno. Los retornos reales dependen de variables geológicas, regulatorias y de mercado. Geocapitals actúa como facilitador del deal, no como gestor de capital.
+          Cálculo referencial basado en parámetros del proyecto ({stage ?? "etapa no def."},{" "}
+          {commodity ?? "—"}
+          {modality === "royalty" && royaltyPct ? `, royalty ${royaltyPct}% NSR` : ""}). No
+          constituye una oferta, recomendación de inversión ni promesa de retorno. Los retornos
+          reales dependen de variables geológicas, regulatorias y de mercado. Geocapitals actúa como
+          facilitador del deal, no como gestor de capital.
         </p>
       </div>
 
@@ -230,7 +255,9 @@ export function InvestmentSimulator({
         <div className="rounded-md bg-emerald-50 border border-emerald-200 p-4 text-center">
           <TrendingUp className="w-6 h-6 text-emerald-600 mx-auto mb-1" />
           <div className="font-display text-content">Simulación guardada</div>
-          <p className="text-xs text-emerald-800 mt-1">Te contactaremos para revisar el data room y NDA.</p>
+          <p className="text-xs text-emerald-800 mt-1">
+            Te contactaremos para revisar el data room y NDA.
+          </p>
         </div>
       ) : user ? (
         <button
@@ -238,7 +265,13 @@ export function InvestmentSimulator({
           disabled={saving}
           className="w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
         >
-          {saving ? "Guardando…" : <>Guardar simulación y solicitar acceso <ArrowRight className="w-4 h-4" /></>}
+          {saving ? (
+            "Guardando…"
+          ) : (
+            <>
+              Guardar simulación y solicitar acceso <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       ) : (
         <Link
@@ -255,8 +288,14 @@ export function InvestmentSimulator({
 
 function Stat({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
   return (
-    <div className={`rounded-lg p-3 ${highlight ? "bg-accent-brand text-white" : "bg-accent-brand-subtle text-content"}`}>
-      <div className={`text-[10px] font-mono uppercase tracking-wider ${highlight ? "text-white/70" : "text-content-subtle"}`}>{label}</div>
+    <div
+      className={`rounded-lg p-3 ${highlight ? "bg-accent-brand text-white" : "bg-accent-brand-subtle text-content"}`}
+    >
+      <div
+        className={`text-[10px] font-mono uppercase tracking-wider ${highlight ? "text-white/70" : "text-content-subtle"}`}
+      >
+        {label}
+      </div>
       <div className="font-mono text-lg font-semibold mt-0.5">{value}</div>
     </div>
   );

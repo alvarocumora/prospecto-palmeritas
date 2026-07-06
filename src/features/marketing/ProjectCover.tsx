@@ -87,7 +87,13 @@ export function ProjectCover({ seed, commodity, region, className = "" }: Props)
         {/* Grid tenue */}
         <defs>
           <pattern id={`g-${seed}`} width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="white" strokeWidth="0.3" opacity="0.08" />
+            <path
+              d="M 20 0 L 0 0 0 20"
+              fill="none"
+              stroke="white"
+              strokeWidth="0.3"
+              opacity="0.08"
+            />
           </pattern>
           <radialGradient id={`glow-${seed}`} cx="50%" cy="50%" r="50%">
             <stop offset="0%" stopColor={color.accent} stopOpacity="0.35" />
@@ -98,14 +104,7 @@ export function ProjectCover({ seed, commodity, region, className = "" }: Props)
 
         {/* Contornos topográficos */}
         {contours.map((c, i) => (
-          <path
-            key={i}
-            d={c.d}
-            fill="none"
-            stroke={color.line}
-            strokeWidth="0.9"
-            opacity={c.op}
-          />
+          <path key={i} d={c.d} fill="none" stroke={color.line} strokeWidth="0.9" opacity={c.op} />
         ))}
 
         {/* Glow del target */}
@@ -123,10 +122,42 @@ export function ProjectCover({ seed, commodity, region, className = "" }: Props)
             style={{ animation: "pc-pulse 2.4s ease-out infinite" }}
           />
           <circle r="4" fill={color.accent} />
-          <line x1="-20" y1="0" x2="-8" y2="0" stroke={color.accent} strokeWidth="0.8" opacity="0.8" />
-          <line x1="8" y1="0" x2="20" y2="0" stroke={color.accent} strokeWidth="0.8" opacity="0.8" />
-          <line x1="0" y1="-20" x2="0" y2="-8" stroke={color.accent} strokeWidth="0.8" opacity="0.8" />
-          <line x1="0" y1="8" x2="0" y2="20" stroke={color.accent} strokeWidth="0.8" opacity="0.8" />
+          <line
+            x1="-20"
+            y1="0"
+            x2="-8"
+            y2="0"
+            stroke={color.accent}
+            strokeWidth="0.8"
+            opacity="0.8"
+          />
+          <line
+            x1="8"
+            y1="0"
+            x2="20"
+            y2="0"
+            stroke={color.accent}
+            strokeWidth="0.8"
+            opacity="0.8"
+          />
+          <line
+            x1="0"
+            y1="-20"
+            x2="0"
+            y2="-8"
+            stroke={color.accent}
+            strokeWidth="0.8"
+            opacity="0.8"
+          />
+          <line
+            x1="0"
+            y1="8"
+            x2="0"
+            y2="20"
+            stroke={color.accent}
+            strokeWidth="0.8"
+            opacity="0.8"
+          />
         </g>
 
         {/* Corner brackets */}

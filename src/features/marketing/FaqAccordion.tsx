@@ -45,7 +45,11 @@ export function FaqAccordion() {
           </h2>
         </Reveal>
         <Reveal>
-          <Accordion type="single" collapsible className="rounded-2xl border border-hairline bg-white divide-y divide-[color:var(--hairline)]">
+          <Accordion
+            type="single"
+            collapsible
+            className="rounded-2xl border border-hairline bg-white divide-y divide-[color:var(--hairline)]"
+          >
             {FAQS.map((f, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="border-0 px-6">
                 <AccordionTrigger className="text-left text-content font-display text-base md:text-lg py-5 hover:no-underline">

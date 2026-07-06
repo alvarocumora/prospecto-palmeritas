@@ -1,12 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
-import { Loader2, CheckCircle2, XCircle, ArrowLeft, Mail, Globe, Building2, RefreshCw } from "lucide-react";
-import { toast } from "sonner";
 import {
-  listInvestorProfiles,
-  approveInvestor,
-  rejectInvestor,
-} from "@/lib/investors.functions";
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  ArrowLeft,
+  Mail,
+  Globe,
+  Building2,
+  RefreshCw,
+} from "lucide-react";
+import { toast } from "sonner";
+import { listInvestorProfiles, approveInvestor, rejectInvestor } from "@/lib/investors.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin/investors")({
   head: () => ({ meta: [{ title: "Admin · Inversionistas — Geocapitals" }] }),
@@ -121,7 +126,13 @@ function AdminInvestorsPage() {
                 : "border-border bg-bg-panel hover:border-gold/40"
             }`}
           >
-            {s === "pending_review" ? "Pendientes" : s === "approved" ? "Aprobados" : s === "rejected" ? "Rechazados" : "Todos"}
+            {s === "pending_review"
+              ? "Pendientes"
+              : s === "approved"
+                ? "Aprobados"
+                : s === "rejected"
+                  ? "Rechazados"
+                  : "Todos"}
           </button>
         ))}
       </div>
@@ -157,12 +168,20 @@ function AdminInvestorsPage() {
 
               <div className="flex flex-wrap gap-3 text-[11px] text-muted-foreground mb-3 font-mono">
                 {r.email && (
-                  <a href={`mailto:${r.email}`} className="inline-flex items-center gap-1 hover:text-foreground">
+                  <a
+                    href={`mailto:${r.email}`}
+                    className="inline-flex items-center gap-1 hover:text-foreground"
+                  >
                     <Mail className="w-3 h-3" /> {r.email}
                   </a>
                 )}
                 {r.website && (
-                  <a href={r.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 hover:text-foreground">
+                  <a
+                    href={r.website}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1 hover:text-foreground"
+                  >
                     <Globe className="w-3 h-3" /> sitio
                   </a>
                 )}
@@ -204,7 +223,9 @@ function StatusBadge({ s }: { s: string }) {
   };
   const label = s === "pending_review" ? "Pendiente" : s === "approved" ? "Aprobado" : "Rechazado";
   return (
-    <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${map[s] ?? "border-border"}`}>
+    <span
+      className={`text-[10px] font-mono px-2 py-0.5 rounded border ${map[s] ?? "border-border"}`}
+    >
       {label}
     </span>
   );

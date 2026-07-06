@@ -23,7 +23,7 @@ export function useOnboardingStatus() {
         .eq("user_id", user.id)
         .maybeSingle();
       if (!cancel) {
-        setState(((data?.state as OnboardingState) ?? "not_started"));
+        setState((data?.state as OnboardingState) ?? "not_started");
         setLoading(false);
       }
     })();
@@ -39,7 +39,7 @@ export function useOnboardingStatus() {
       .select("state")
       .eq("user_id", user.id)
       .maybeSingle();
-    setState(((data?.state as OnboardingState) ?? "not_started"));
+    setState((data?.state as OnboardingState) ?? "not_started");
   };
 
   return { state, loading, refresh, isComplete: state === "completed" };

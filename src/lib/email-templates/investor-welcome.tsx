@@ -34,8 +34,8 @@ const Email = ({ fullName, companyName, ticketRange, commodities }: Props) => (
     />
     <Text style={styles.muted}>
       Mientras tanto puedes explorar el dashboard público, ver el deal-flow activo y conocer las
-      oportunidades verificadas (NI 43-101, JORC). Si necesitas hablar con alguien antes,
-      responde directamente a este correo.
+      oportunidades verificadas (NI 43-101, JORC). Si necesitas hablar con alguien antes, responde
+      directamente a este correo.
     </Text>
   </EmailLayout>
 );
