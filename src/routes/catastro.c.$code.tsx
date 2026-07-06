@@ -1,8 +1,20 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { WatchlistButton } from "@/features/catastro-public/WatchlistButton";
-import { getConcessionByCode } from "@/lib/catastroPublic.functions";
-import { Building2, MapPin, Ruler, Calendar, Database, ArrowLeft } from "lucide-react";
+import { getConcessionByCode, getConcessionLegalStatus } from "@/lib/catastroPublic.functions";
+import {
+  Building2,
+  MapPin,
+  Ruler,
+  Calendar,
+  Database,
+  ArrowLeft,
+  Scale,
+  FileText,
+  ExternalLink,
+} from "lucide-react";
 
 export const Route = createFileRoute("/catastro/c/$code")({
   loader: async ({ params }) => {
@@ -111,6 +123,8 @@ function ConcessionPage() {
           </div>
         </div>
 
+        <LegalPanel code={c.code} />
+
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <WatchlistButton code={c.code} />
           <Link
@@ -122,6 +136,95 @@ function ConcessionPage() {
         </div>
       </article>
     </PublicCatastroShell>
+  );
+}
+
+const PATENT_STYLES: Record<string, string> = {
+  ok: "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
+  warn: "border-amber-500/40 bg-amber-500/10 text-amber-500",
+  critical: "border-red-500/40 bg-red-500/10 text-red-500",
+  info: "border-sky-500/40 bg-sky-500/10 text-sky-500",
+  unknown: "border-border text-muted-foreground",
+};
+
+/** Estado legal: situación SERNAGEOMIN interpretada como patente/TGR + boletín. */
+function LegalPanel({ code }: { code: string }) {
+  const fn = useServerFn(getConcessionLegalStatus);
+  const { data, isLoading } = useQuery({
+    queryKey: ["concession-legal", code],
+    queryFn: () => fn({ data: { code } }),
+    staleTime: 5 * 60_000,
+  });
+
+  return (
+    <section className="mt-6 border border-border rounded-md bg-bg-secondary/20 p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Scale className="w-4 h-4 text-primary" />
+        <h2 className="text-sm font-mono uppercase tracking-wider">Estado legal y patentes</h2>
+      </div>
+
+      {isLoading ? (
+        <div className="h-16 rounded bg-muted/20 animate-pulse" />
+      ) : (
+        <>
+          {/* Señal de patente derivada de la situación */}
+          {data?.patent && (
+            <div className={`rounded border p-4 ${PATENT_STYLES[data.patent.level]}`}>
+              <div className="text-sm font-semibold">{data.patent.label}</div>
+              <p className="text-xs text-foreground/70 mt-1 leading-relaxed">
+                {data.patent.detail}
+              </p>
+            </div>
+          )}
+
+          {/* Publicaciones del Boletín Oficial de Minería */}
+          <div className="mt-4">
+            <div className="flex items-center gap-1.5 text-[11px] font-mono uppercase tracking-wide text-muted-foreground mb-2">
+              <FileText className="w-3 h-3" /> Boletín Oficial de Minería
+              {data?.bulletins?.length ? ` · ${data.bulletins.length}` : ""}
+            </div>
+            {data?.bulletins?.length ? (
+              <ul className="space-y-1.5">
+                {data.bulletins.map((b) => (
+                  <li
+                    key={b.id}
+                    className="flex items-center justify-between gap-2 rounded border border-border px-3 py-2 text-xs font-mono"
+                  >
+                    <span className="min-w-0">
+                      <span className="text-foreground">{b.publication_type}</span>
+                      {b.publication_number && (
+                        <span className="text-muted-foreground"> · N° {b.publication_number}</span>
+                      )}
+                      <span className="block text-[10px] text-muted-foreground">
+                        {b.publication_date
+                          ? new Date(b.publication_date).toLocaleDateString("es-CL")
+                          : "—"}
+                        {b.source && ` · ${b.source}`}
+                      </span>
+                    </span>
+                    {b.source_url && (
+                      <a
+                        href={b.source_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+                      >
+                        Ver <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-muted-foreground">
+                Sin publicaciones registradas para esta concesión. El monitoreo del Boletín y el rol
+                de patentes de la TGR se activan con el plan Pro.
+              </p>
+            )}
+          </div>
+        </>
+      )}
+    </section>
   );
 }
 

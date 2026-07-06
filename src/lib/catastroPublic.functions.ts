@@ -313,3 +313,112 @@ export const getMyPlan = createServerFn({ method: "GET" }).handler(async () => {
     return { plan: "free" as const, anonymous: true };
   }
 });
+
+// ============================================================
+// getConcessionLegalStatus: estado legal + patentes + boletín
+// Conecta la situación SERNAGEOMIN (señal de patente/TGR) con las
+// publicaciones del Boletín Oficial de Minería (mining_bulletins).
+// ============================================================
+export type ConcessionLegalStatus = {
+  code: string;
+  situacion: string | null;
+  /** Interpretación de la situación como señal de patente/remate. */
+  patent: {
+    level: "ok" | "warn" | "critical" | "info" | "unknown";
+    label: string;
+    detail: string;
+  };
+  expiresAt: string | null;
+  /** Publicaciones del Boletín Oficial de Minería para esta concesión. */
+  bulletins: Array<{
+    id: string;
+    publication_type: string;
+    publication_date: string | null;
+    publication_number: string | null;
+    source: string | null;
+    source_url: string | null;
+    holder_name: string | null;
+  }>;
+};
+
+function interpretSituacion(
+  situacion: string | null,
+  expiresAt: string | null,
+): ConcessionLegalStatus["patent"] {
+  const s = (situacion ?? "").toUpperCase();
+  if (s.includes("ELIMIN")) {
+    return {
+      level: "critical",
+      label: "Concesión eliminada",
+      detail:
+        "Caducada o rematada — causa frecuente: patente minera impaga en la Tesorería General de la República (TGR). Oportunidad de manifestación sobre terreno liberado.",
+    };
+  }
+  if (s.includes("TRAMITE") || s.includes("TRÁMITE")) {
+    return {
+      level: "info",
+      label: "Solicitud en trámite",
+      detail:
+        "Manifestación o mensura publicada en el Boletín Oficial de Minería y en proceso de constitución. Aún no genera obligación de patente vigente.",
+    };
+  }
+  if (s.includes("CONSTITU")) {
+    // Riesgo por vencimiento cercano
+    if (expiresAt) {
+      const days = (new Date(expiresAt).getTime() - Date.now()) / 86_400_000;
+      if (days < 0)
+        return {
+          level: "critical",
+          label: "Vigente · vencida en registro",
+          detail:
+            "La fecha de vencimiento ya pasó. Verifica el pago de patente en la TGR: patente impaga habilita el remate del terreno.",
+        };
+      if (days < 120)
+        return {
+          level: "warn",
+          label: "Vigente · vencimiento próximo",
+          detail:
+            "Vencimiento en menos de 4 meses. La patente minera anual se paga en marzo a la TGR; el no pago lleva a remate.",
+        };
+    }
+    return {
+      level: "ok",
+      label: "Vigente · constituida",
+      detail:
+        "Concesión constituida. Requiere pago anual de patente minera en la TGR (marzo) para mantener vigencia.",
+    };
+  }
+  return {
+    level: "unknown",
+    label: situacion ?? "Situación desconocida",
+    detail: "Consulta la situación de patente en la Tesorería General de la República (TGR).",
+  };
+}
+
+export const getConcessionLegalStatus = createServerFn({ method: "GET" })
+  .inputValidator((input: unknown) =>
+    z.object({ code: z.string().trim().min(1).max(60) }).parse(input),
+  )
+  .handler(async ({ data }): Promise<ConcessionLegalStatus> => {
+    // Situación + vencimiento en vivo desde SERNAGEOMIN.
+    const concession = await fetchArcgisByCode(data.code);
+
+    // Publicaciones del Boletín Oficial de Minería para esta concesión.
+    const safe = data.code.replace(/[%,]/g, " ");
+    const { data: bulletins } = await supabaseAdmin
+      .from("mining_bulletins")
+      .select(
+        "id, publication_type, publication_date, publication_number, source, source_url, holder_name",
+      )
+      .or(`concession_code.ilike.%${safe}%,concession_name.ilike.%${safe}%`)
+      .order("publication_date", { ascending: false })
+      .limit(20);
+
+    return {
+      code: data.code,
+      situacion: concession?.status ?? null,
+      patent: interpretSituacion(concession?.status ?? null, concession?.expires_at ?? null),
+      expiresAt: concession?.expires_at ?? null,
+      bulletins: (bulletins ?? []) as ConcessionLegalStatus["bulletins"],
+    };
+  });
