@@ -187,7 +187,7 @@ export function MarketingLanding() {
             </div>
 
             {/* Trust strip */}
-            <div className="mt-12 pt-6 border-t border-white/5 flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
+            <div className="mt-10 sm:mt-12 pt-6 border-t border-white/5 flex items-center gap-5 sm:gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
                 AML
