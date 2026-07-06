@@ -780,22 +780,22 @@ export function MarketingLanding() {
                 to="/visor-3d"
                 className="group block rounded-2xl overflow-hidden border border-hairline bg-white hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
               >
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden">
                   <img
                     src={featureGeophysics}
                     alt="Visualización geofísica 3D con anomalías magnéticas y satelitales"
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  <div className="absolute left-5 top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute left-4 top-4 sm:left-5 sm:top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
                     <Satellite className="w-3.5 h-3.5" /> Geofísica + satelital
                   </div>
-                  <div className="absolute left-5 bottom-5 right-5 text-white">
-                    <div className="font-display text-2xl leading-snug">
+                  <div className="absolute left-4 right-4 bottom-4 sm:left-5 sm:right-5 sm:bottom-5 text-white">
+                    <div className="font-display text-lg sm:text-2xl leading-snug">
                       Anomalías satelitales y firma magnética listas para modelar
                     </div>
-                    <p className="mt-2 text-sm text-white/80 max-w-md">
+                    <p className="mt-2 text-[13px] sm:text-sm text-white/80 max-w-md">
                       DEM Copernicus + drape Sentinel + magnetometría interpretada, con target
                       generator asistido por IA.
                     </p>
