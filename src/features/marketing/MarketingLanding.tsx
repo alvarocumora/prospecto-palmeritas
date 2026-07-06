@@ -96,7 +96,7 @@ export function MarketingLanding() {
         {/* Photographic base layer */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.35]"
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.28] sm:opacity-[0.32] lg:opacity-[0.35]"
           style={{ backgroundImage: `url(${heroMining})` }}
         />
         <div
@@ -104,7 +104,7 @@ export function MarketingLanding() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(5,7,10,0.55) 0%, rgba(5,7,10,0.75) 55%, rgba(5,7,10,0.95) 100%)",
+              "linear-gradient(180deg, rgba(5,7,10,0.72) 0%, rgba(5,7,10,0.82) 55%, rgba(5,7,10,0.96) 100%)",
           }}
         />
         {/* Ambient glows */}
@@ -128,10 +128,10 @@ export function MarketingLanding() {
         />
         <HeroTopoBackground />
 
-        <div className="relative max-w-7xl mx-auto px-5 py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-5 py-14 sm:py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-10 sm:gap-12 items-center">
           <div>
             {/* Live badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-8 backdrop-blur">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-6 sm:mb-8 backdrop-blur">
               <span className="relative flex h-2 w-2">
                 <span
                   className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
@@ -145,7 +145,7 @@ export function MarketingLanding() {
               <span>{t("hero_eyebrow")}</span>
             </div>
 
-            <h1 className="brand-display text-[48px] sm:text-[64px] lg:text-[76px] leading-[0.95] tracking-tight text-white">
+            <h1 className="brand-display text-[36px] sm:text-[56px] lg:text-[76px] leading-[0.98] sm:leading-[0.95] tracking-tight text-white break-words">
               {t("hero_title").split(" ").slice(0, 2).join(" ")}{" "}
               <span className="italic font-normal text-slate-400">
                 {t("hero_title").split(" ").slice(2, 4).join(" ")}
@@ -161,11 +161,11 @@ export function MarketingLanding() {
               </span>
             </h1>
 
-            <p className="mt-7 text-lg text-slate-400 max-w-xl font-light leading-relaxed">
+            <p className="mt-5 sm:mt-7 text-base sm:text-lg text-slate-400 max-w-xl font-light leading-relaxed">
               {t("hero_sub")}
             </p>
 
-            <div className="mt-9 flex flex-wrap items-center gap-5">
+            <div className="mt-7 sm:mt-9 flex flex-wrap items-center gap-4 sm:gap-5">
               <Link
                 to="/contacto"
                 className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
@@ -187,7 +187,7 @@ export function MarketingLanding() {
             </div>
 
             {/* Trust strip */}
-            <div className="mt-12 pt-6 border-t border-white/5 flex items-center gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
+            <div className="mt-10 sm:mt-12 pt-6 border-t border-white/5 flex items-center gap-5 sm:gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
                 AML
@@ -729,7 +729,7 @@ export function MarketingLanding() {
 
       {/* Feature showcase — catastro + geofísica (fotográfico) */}
       <section className="border-b border-hairline bg-white">
-        <div className="max-w-7xl mx-auto px-5 py-20">
+        <div className="max-w-7xl mx-auto px-5 py-14 sm:py-20">
           <Reveal className="max-w-2xl mb-10">
             <Eyebrow className="mb-3">Capacidades diferenciales</Eyebrow>
             <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
@@ -746,22 +746,22 @@ export function MarketingLanding() {
                 to="/catastro/mapa"
                 className="group block rounded-2xl overflow-hidden border border-hairline bg-white hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
               >
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden">
                   <img
                     src={featureCatastro}
                     alt="Catastro minero georreferenciado sobre topografía andina"
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  <div className="absolute left-5 top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute left-4 top-4 sm:left-5 sm:top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
                     <Map className="w-3.5 h-3.5" /> Catastro trazable
                   </div>
-                  <div className="absolute left-5 bottom-5 right-5 text-white">
-                    <div className="font-display text-2xl leading-snug">
+                  <div className="absolute left-4 right-4 bottom-4 sm:left-5 sm:right-5 sm:bottom-5 text-white">
+                    <div className="font-display text-lg sm:text-2xl leading-snug">
                       +47.000 concesiones sobre una capa geoespacial única
                     </div>
-                    <p className="mt-2 text-sm text-white/80 max-w-md">
+                    <p className="mt-2 text-[13px] sm:text-sm text-white/80 max-w-md">
                       SERNAGEOMIN, INGEMMET y ANM en un mismo mapa, con alertas de superposición y
                       análisis de prospectividad.
                     </p>
@@ -780,22 +780,22 @@ export function MarketingLanding() {
                 to="/visor-3d"
                 className="group block rounded-2xl overflow-hidden border border-hairline bg-white hover-lift hover:border-accent-brand hover:shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)] transition"
               >
-                <div className="relative aspect-[16/10] overflow-hidden">
+                <div className="relative aspect-[4/3] sm:aspect-[16/10] overflow-hidden">
                   <img
                     src={featureGeophysics}
                     alt="Visualización geofísica 3D con anomalías magnéticas y satelitales"
                     loading="lazy"
                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                  <div className="absolute left-5 top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute left-4 top-4 sm:left-5 sm:top-5 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
                     <Satellite className="w-3.5 h-3.5" /> Geofísica + satelital
                   </div>
-                  <div className="absolute left-5 bottom-5 right-5 text-white">
-                    <div className="font-display text-2xl leading-snug">
+                  <div className="absolute left-4 right-4 bottom-4 sm:left-5 sm:right-5 sm:bottom-5 text-white">
+                    <div className="font-display text-lg sm:text-2xl leading-snug">
                       Anomalías satelitales y firma magnética listas para modelar
                     </div>
-                    <p className="mt-2 text-sm text-white/80 max-w-md">
+                    <p className="mt-2 text-[13px] sm:text-sm text-white/80 max-w-md">
                       DEM Copernicus + drape Sentinel + magnetometría interpretada, con target
                       generator asistido por IA.
                     </p>
