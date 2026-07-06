@@ -14,6 +14,7 @@ import {
   Scale,
   FileText,
   ExternalLink,
+  Gavel,
 } from "lucide-react";
 
 export const Route = createFileRoute("/catastro/c/$code")({
@@ -167,13 +168,47 @@ function LegalPanel({ code }: { code: string }) {
         <div className="h-16 rounded bg-muted/20 animate-pulse" />
       ) : (
         <>
-          {/* Señal de patente derivada de la situación */}
+          {/* Señal de patente (morosidad confirmada por remate sobrescribe la inferida) */}
           {data?.patent && (
             <div className={`rounded border p-4 ${PATENT_STYLES[data.patent.level]}`}>
-              <div className="text-sm font-semibold">{data.patent.label}</div>
+              <div className="flex items-center gap-2">
+                {data.remate && <Gavel className="w-4 h-4 shrink-0" />}
+                <div className="text-sm font-semibold">{data.patent.label}</div>
+              </div>
               <p className="text-xs text-foreground/70 mt-1 leading-relaxed">
                 {data.patent.detail}
               </p>
+              {data.remate && (
+                <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-mono">
+                  <span>
+                    Año nómina: <span className="font-semibold">{data.remate.year}</span>
+                  </span>
+                  {data.remate.years_owed != null && (
+                    <span>
+                      Años adeudados:{" "}
+                      <span className="font-semibold">{data.remate.years_owed}</span>
+                    </span>
+                  )}
+                  {data.remate.amount_clp != null && (
+                    <span>
+                      Deuda:{" "}
+                      <span className="font-semibold">
+                        ${data.remate.amount_clp.toLocaleString("es-CL")}
+                      </span>
+                    </span>
+                  )}
+                  {data.remate.court && (
+                    <span>
+                      Tribunal: <span className="font-semibold">{data.remate.court}</span>
+                    </span>
+                  )}
+                  {data.remate.court_role && (
+                    <span>
+                      Rol causa: <span className="font-semibold">{data.remate.court_role}</span>
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
