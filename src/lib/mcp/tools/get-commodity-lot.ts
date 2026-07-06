@@ -29,7 +29,10 @@ export default defineTool({
       return { content: [{ type: "text", text: `Error: ${error.message}` }], isError: true };
     }
     if (!lot) {
-      return { content: [{ type: "text", text: "Lot not found or not published." }], isError: true };
+      return {
+        content: [{ type: "text", text: "Lot not found or not published." }],
+        isError: true,
+      };
     }
     const { data: joins } = await supabase
       .from("commodity_lot_certifications")
@@ -38,7 +41,9 @@ export default defineTool({
       )
       .eq("lot_id", id);
     return {
-      content: [{ type: "text", text: JSON.stringify({ lot, certifications: joins ?? [] }, null, 2) }],
+      content: [
+        { type: "text", text: JSON.stringify({ lot, certifications: joins ?? [] }, null, 2) },
+      ],
       structuredContent: { lot, certifications: joins ?? [] },
     };
   },

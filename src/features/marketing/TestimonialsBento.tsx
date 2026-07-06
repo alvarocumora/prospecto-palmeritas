@@ -8,15 +8,13 @@ const QUOTES = [
     who: "María Fernanda Rojas",
     role: "Directora de Inversiones · Andes Capital",
     initials: "MR",
-    text:
-      "Geocapitals nos redujo el ciclo de due diligence de 12 semanas a 18 días. La trazabilidad del catastro y el data room cifrado cambian la conversación con el comité.",
+    text: "Geocapitals nos redujo el ciclo de due diligence de 12 semanas a 18 días. La trazabilidad del catastro y el data room cifrado cambian la conversación con el comité.",
   },
   {
     who: "Carlos Uriona",
     role: "Qualified Person · NI 43-101 Perú",
     initials: "CU",
-    text:
-      "Los borradores automáticos con audit-trail me permiten firmar reportes técnicos con confianza total en la fuente. Es lo que faltaba en la industria.",
+    text: "Los borradores automáticos con audit-trail me permiten firmar reportes técnicos con confianza total en la fuente. Es lo que faltaba en la industria.",
   },
 ];
 

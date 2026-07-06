@@ -57,25 +57,27 @@ async function fetchUsdClp(): Promise<number | null> {
   }
 }
 
-export const getMetalPrices = createServerFn({ method: "GET" }).handler(async (): Promise<{
-  quotes: MetalQuote[];
-  fx: FxRates;
-  fetchedAt: string;
-}> => {
-  const [results, usdClp] = await Promise.all([
-    Promise.all(SYMBOLS.map((s) => fetchOne(s.sym).then((r) => ({ meta: s, r })))),
-    fetchUsdClp(),
-  ]);
-  const quotes: MetalQuote[] = results
-    .filter((x) => x.r != null)
-    .map(({ meta, r }) => ({
-      code: meta.code,
-      name: meta.name,
-      unit: meta.unit,
-      priceUsd: r!.price,
-      price: fmtUsd(r!.price),
-      updatedAt: r!.updatedAt,
-    }));
-  const now = new Date().toISOString();
-  return { quotes, fx: { usdClp, fetchedAt: now }, fetchedAt: now };
-});
+export const getMetalPrices = createServerFn({ method: "GET" }).handler(
+  async (): Promise<{
+    quotes: MetalQuote[];
+    fx: FxRates;
+    fetchedAt: string;
+  }> => {
+    const [results, usdClp] = await Promise.all([
+      Promise.all(SYMBOLS.map((s) => fetchOne(s.sym).then((r) => ({ meta: s, r })))),
+      fetchUsdClp(),
+    ]);
+    const quotes: MetalQuote[] = results
+      .filter((x) => x.r != null)
+      .map(({ meta, r }) => ({
+        code: meta.code,
+        name: meta.name,
+        unit: meta.unit,
+        priceUsd: r!.price,
+        price: fmtUsd(r!.price),
+        updatedAt: r!.updatedAt,
+      }));
+    const now = new Date().toISOString();
+    return { quotes, fx: { usdClp, fetchedAt: now }, fetchedAt: now };
+  },
+);

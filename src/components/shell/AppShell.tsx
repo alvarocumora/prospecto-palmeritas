@@ -109,7 +109,9 @@ export function MarketingHeader() {
           ))}
         </nav>
         <div className="flex-1" />
-        <div className="hidden sm:inline-flex"><LangToggle /></div>
+        <div className="hidden sm:inline-flex">
+          <LangToggle />
+        </div>
         <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline">
           {t("cta_login")}
         </Link>
@@ -163,7 +165,6 @@ export function MarketingHeader() {
     </header>
   );
 }
-
 
 export function MarketingFooter() {
   return (

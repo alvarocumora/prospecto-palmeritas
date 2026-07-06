@@ -9,7 +9,10 @@ const MAP: Array<{ match: RegExp; msg: string; code?: string }> = [
   },
   { match: /user already registered/i, msg: "Ya existe una cuenta con este email. Inicia sesión." },
   { match: /password should be at least/i, msg: "La contraseña no cumple los requisitos mínimos." },
-  { match: /weak.?password|pwned/i, msg: "Contraseña detectada en filtraciones públicas. Elige otra." },
+  {
+    match: /weak.?password|pwned/i,
+    msg: "Contraseña detectada en filtraciones públicas. Elige otra.",
+  },
   { match: /rate ?limit|too many requests/i, msg: "Demasiados intentos. Espera unos minutos." },
   { match: /signup.+disabled/i, msg: "El registro está temporalmente deshabilitado." },
   { match: /network|fetch failed|load failed/i, msg: "Sin conexión. Reintenta en unos segundos." },
