@@ -40,7 +40,9 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
     },
     terrainDEM: {
       type: "raster-dem",
-      tiles: ["https://elevation-tiles-prod.s3.amazonaws.com/terrarium/{z}/{x}/{y}.png"],
+      // Proxy propio con CORS: el bucket AWS no manda ACAO y ennegrece el
+      // canvas (ver src/routes/api.terrain.$z.$x.$y.ts).
+      tiles: ["/api/terrain/{z}/{x}/{y}"],
       tileSize: 256,
       encoding: "terrarium",
       maxzoom: 15,
@@ -48,7 +50,8 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
     },
   },
   layers: [{ id: "basemap", type: "raster", source: "basemap" }],
-  terrain: { source: "terrainDEM", exaggeration: 1.5 },
+  // El terreno 3D se aplica tras el load con fallback (ver useEffect de init):
+  // si el DEM falla, el basemap 2D+pitch sigue visible en vez de un canvas negro.
   sky: {
     "sky-color": "#0a1224",
     "sky-horizon-blend": 0.5,
@@ -123,7 +126,26 @@ export function GeoSceneCanvas({ mode }: Props) {
       const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
       map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
+      // Terreno 3D fail-safe: se activa después del load. Si el DEM no carga o
+      // el WebGL falla, se retira para que el basemap satelital siga visible
+      // (2D con pitch) en vez de un canvas negro.
+      try {
+        map.setTerrain({ source: "terrainDEM", exaggeration: 1.5 });
+      } catch {
+        /* sin terreno: el mapa sigue funcionando en 2D con pitch */
+      }
       setReady(true);
+    });
+    // Un error de fuente DEM/terreno degrada a 2D en vez de ennegrecer todo.
+    map.on("error", (e: { error?: { message?: string } }) => {
+      const msg = e?.error?.message ?? "";
+      if (/terrain|raster-dem|terrainDEM/i.test(msg)) {
+        try {
+          map.setTerrain(null);
+        } catch {
+          /* noop */
+        }
+      }
     });
     mapRef.current = map;
     return () => {

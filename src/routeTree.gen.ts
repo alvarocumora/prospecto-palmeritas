@@ -111,6 +111,7 @@ import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './rout
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
+import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
@@ -682,6 +683,11 @@ const AuthenticatedDashboardAdminInboxRoute =
     path: '/inbox',
     getParentRoute: () => AuthenticatedDashboardAdminRoute,
   } as any)
+const ApiTerrainZXYRoute = ApiTerrainZXYRouteImport.update({
+  id: '/api/terrain/$z/$x/$y',
+  path: '/api/terrain/$z/$x/$y',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicLiveMapLosverdesVerifyRoute =
   ApiPublicLiveMapLosverdesVerifyRouteImport.update({
     id: '/api/public/live-map/losverdes/verify',
@@ -806,6 +812,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
+  '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -912,6 +919,7 @@ export interface FileRoutesByTo {
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
+  '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1020,6 +1028,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
+  '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1128,6 +1137,7 @@ export interface FileRouteTypes {
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
+    | '/api/terrain/$z/$x/$y'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
+    | '/api/terrain/$z/$x/$y'
   id:
     | '__root__'
     | '/'
@@ -1341,6 +1352,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
+    | '/api/terrain/$z/$x/$y'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1394,6 +1406,7 @@ export interface RootRouteChildren {
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
   ApiPublicLiveMapLosverdesVerifyRoute: typeof ApiPublicLiveMapLosverdesVerifyRoute
+  ApiTerrainZXYRoute: typeof ApiTerrainZXYRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2112,6 +2125,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminInboxRouteImport
       parentRoute: typeof AuthenticatedDashboardAdminRoute
     }
+    '/api/terrain/$z/$x/$y': {
+      id: '/api/terrain/$z/$x/$y'
+      path: '/api/terrain/$z/$x/$y'
+      fullPath: '/api/terrain/$z/$x/$y'
+      preLoaderRoute: typeof ApiTerrainZXYRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/live-map/losverdes/verify': {
       id: '/api/public/live-map/losverdes/verify'
       path: '/api/public/live-map/losverdes/verify'
@@ -2411,6 +2431,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
   ApiPublicLiveMapLosverdesVerifyRoute: ApiPublicLiveMapLosverdesVerifyRoute,
+  ApiTerrainZXYRoute: ApiTerrainZXYRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
