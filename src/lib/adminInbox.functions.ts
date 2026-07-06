@@ -403,3 +403,87 @@ export const getAdminMarketplaceStats = createServerFn({ method: "GET" })
       openPipelineValueUsd,
     };
   });
+
+// ── Activación manual de suscripciones (staff · gateway concierge) ─────────────
+
+export type AdminSubscriptionRow = {
+  user_id: string;
+  email: string | null;
+  plan: string;
+  status: string;
+  current_period_end: string | null;
+  updated_at: string;
+};
+
+export const listSubscriptions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<AdminSubscriptionRow[]> => {
+    await assertStaff(context.supabase, context.userId);
+    const sb = await admin();
+    const { data: rows, error } = await sb
+      .from("subscriptions")
+      .select("user_id, plan, status, current_period_end, updated_at")
+      .neq("plan", "free")
+      .order("updated_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+    const ids = Array.from(new Set((rows ?? []).map((r) => r.user_id)));
+    const { data: profs } = ids.length
+      ? await sb.from("profiles").select("user_id, email").in("user_id", ids)
+      : { data: [] as Array<{ user_id: string; email: string | null }> };
+    const emailOf = new Map((profs ?? []).map((p) => [p.user_id, p.email]));
+    return (rows ?? []).map((r) => ({
+      user_id: r.user_id,
+      email: emailOf.get(r.user_id) ?? null,
+      plan: r.plan,
+      status: r.status,
+      current_period_end: r.current_period_end,
+      updated_at: r.updated_at,
+    }));
+  });
+
+/**
+ * Activa/cambia el plan de un usuario por email tras confirmar el cobro.
+ * Es el write path a subscriptions que faltaba (nadie escribía la tabla).
+ */
+export const setUserSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        email: z.string().email(),
+        plan: z.enum(["free", "pro", "enterprise"]),
+        months: z.number().int().min(1).max(36).default(1),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await assertStaff(context.supabase, context.userId);
+    const sb = await admin();
+
+    const { data: prof, error: profErr } = await sb
+      .from("profiles")
+      .select("user_id")
+      .eq("email", data.email.trim().toLowerCase())
+      .maybeSingle();
+    if (profErr) throw new Error(profErr.message);
+    if (!prof) throw new Error("No existe un usuario con ese email.");
+
+    const periodEnd =
+      data.plan === "free"
+        ? null
+        : new Date(Date.now() + data.months * 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    const { error } = await sb.from("subscriptions").upsert(
+      {
+        user_id: prof.user_id,
+        plan: data.plan,
+        status: "active",
+        current_period_end: periodEnd,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id" },
+    );
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
+  });

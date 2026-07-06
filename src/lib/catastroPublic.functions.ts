@@ -130,8 +130,70 @@ export const searchConcessions = createServerFn({ method: "POST" })
 
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    return { results: rows ?? [], total: rows?.length ?? 0 };
+
+    // Fallback en vivo: el cache aún no se puebla en producción, así que si no
+    // hay resultados consultamos SERNAGEOMIN v2 directo por nombre/titular/rol.
+    if ((rows ?? []).length === 0) {
+      const live = await searchConcessionsLive(data.q, limit);
+      if (live.length > 0) return { results: live, total: live.length, source: "sernageomin" };
+    }
+
+    return { results: rows ?? [], total: rows?.length ?? 0, source: "cache" as const };
   });
+
+/** Búsqueda en vivo contra SERNAGEOMIN v2 (nombre, titular o rol). */
+async function searchConcessionsLive(
+  rawTerm: string,
+  limit: number,
+): Promise<
+  Array<{
+    code: string;
+    concession_type: string;
+    name: string | null;
+    holder: string | null;
+    rut: string | null;
+    area_ha: number | null;
+    status: string | null;
+    region: string | null;
+    commune: string | null;
+  }>
+> {
+  const { SNGM_CONCESIONES_URL, sngmQueryGeoJSON, sngmSanitizeTerm } = await import("@/lib/sngm");
+  const safe = sngmSanitizeTerm(rawTerm);
+  if (!safe) return [];
+  const clauses = [
+    `UPPER(NOMBRE) LIKE UPPER('%${safe}%')`,
+    `UPPER(TITULAR_NOMBRE) LIKE UPPER('%${safe}%')`,
+  ];
+  if (/^\d+$/.test(safe)) clauses.push(`NUMERO_ROL = ${safe}`);
+  const fc = await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
+    where: clauses.join(" OR "),
+    limit,
+    returnGeometry: false,
+  });
+  return (fc?.features ?? []).map((f) => {
+    const p = (f.properties ?? {}) as Record<string, unknown>;
+    const rolNum = p.NUMERO_ROL;
+    const rolDv = p.DV_ROL;
+    const rutNum = p.TITULAR_RUT;
+    const rutDv = p.TITULAR_DV;
+    return {
+      code:
+        rolNum != null ? `${rolNum}${rolDv != null ? `-${rolDv}` : ""}` : String(p.NOMBRE ?? ""),
+      concession_type:
+        String(p.TIPO_CONCESION ?? "").toUpperCase() === "EXPLOTACION"
+          ? "explotacion"
+          : "exploracion",
+      name: (p.NOMBRE as string) ?? null,
+      holder: (p.TITULAR_NOMBRE as string) ?? null,
+      rut: rutNum != null ? `${rutNum}${rutDv != null ? `-${rutDv}` : ""}` : null,
+      area_ha: p.HECTAREAS != null ? Number(p.HECTAREAS) : null,
+      status: (p.SITUACION_CONCESION as string) ?? null,
+      region: (p.REGION as string) ?? null,
+      commune: (p.COMUNA as string) ?? null,
+    };
+  });
+}
 
 // ============================================================
 // getConcessionByCode: ficha pública (cache → ArcGIS fallback)
