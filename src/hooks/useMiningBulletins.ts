@@ -18,6 +18,7 @@ export type MiningBulletin = {
   centroid_lat: number | null;
   centroid_lng: number | null;
   source_url: string | null;
+  raw_payload: Record<string, unknown> | null;
   scraped_at: string;
 };
 
@@ -25,7 +26,8 @@ export type BulletinAlert = {
   id: string;
   project_id: string;
   bulletin_id: string;
-  match_type: "aoi" | "holder_rut" | "holder_name";
+  // aoi/holder_rut/holder_name (boletín + AOI) · holder (ronda 27) · remate (ronda 28)
+  match_type: "aoi" | "holder_rut" | "holder_name" | "holder" | "remate";
   match_detail: string | null;
   is_read: boolean;
   created_at: string;
