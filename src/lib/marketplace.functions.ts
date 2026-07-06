@@ -1,6 +1,6 @@
 // Server functions públicas y autenticadas para el marketplace de commodities.
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
@@ -398,14 +398,14 @@ export const updateMyLotInquiryStatus = createServerFn({ method: "POST" })
     // Propiedad: la consulta debe pertenecer a un lote del seller
     const { data: inquiry, error: findErr } = await supabaseAdmin
       .from("commodity_inquiries")
-      .select("id, lot_id")
+      .select("id, lot_id, buyer_user_id, status")
       .eq("id", data.inquiryId)
       .maybeSingle();
     if (findErr) throw new Error(findErr.message);
     if (!inquiry) throw new Error("Consulta no encontrada");
     const { data: lot } = await supabaseAdmin
       .from("commodity_lots")
-      .select("seller_user_id")
+      .select("seller_user_id, title")
       .eq("id", inquiry.lot_id)
       .maybeSingle();
     if (lot?.seller_user_id !== context.userId) throw new Error("No autorizado");
@@ -419,5 +419,207 @@ export const updateMyLotInquiryStatus = createServerFn({ method: "POST" })
       .update(patch)
       .eq("id", data.inquiryId);
     if (error) throw new Error(error.message);
+
+    // Avance de cotización → email al buyer (best-effort, solo si cambió)
+    if (inquiry.status !== data.status) {
+      try {
+        const { data: prof } = await supabaseAdmin
+          .from("profiles")
+          .select("email")
+          .eq("user_id", inquiry.buyer_user_id)
+          .maybeSingle();
+        if (prof?.email) {
+          const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+          await sendInternalEmail({
+            templateName: "inquiry-update-buyer",
+            recipientEmail: prof.email,
+            idempotencyKey: `inquiry-status:${data.inquiryId}:${data.status}`,
+            templateData: {
+              lotTitle: lot.title,
+              kind: "status",
+              statusLabel: INQUIRY_STATUS_LABELS[data.status] ?? data.status,
+            },
+          });
+        }
+      } catch (e) {
+        console.error("[updateMyLotInquiryStatus] notify failed", e);
+      }
+    }
+
+    return { ok: true as const };
+  });
+
+// ---------- Lado buyer: mis cotizaciones ----------
+
+export type MyBuyerInquiryRow = {
+  id: string;
+  created_at: string;
+  status: string;
+  target_volume_t: number | null;
+  target_price_usd_t: number | null;
+  message: string | null;
+  lot: {
+    id: string;
+    title: string;
+    commodity: string;
+    form: string;
+    country: string;
+    incoterm: string | null;
+    cover_image_url: string | null;
+    status: string;
+  } | null;
+};
+
+export const listMyBuyerInquiries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MyBuyerInquiryRow[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows, error } = await supabaseAdmin
+      .from("commodity_inquiries")
+      .select("id, created_at, status, target_volume_t, target_price_usd_t, message, lot_id")
+      .eq("buyer_user_id", context.userId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+
+    const lotIds = Array.from(new Set((rows ?? []).map((r) => r.lot_id)));
+    const { data: lots } = lotIds.length
+      ? await supabaseAdmin
+          .from("commodity_lots")
+          .select("id, title, commodity, form, country, incoterm, cover_image_url, status")
+          .in("id", lotIds)
+      : { data: [] as never[] };
+    const lotOf = new Map((lots ?? []).map((l) => [l.id, l]));
+
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      status: r.status,
+      target_volume_t: r.target_volume_t != null ? Number(r.target_volume_t) : null,
+      target_price_usd_t: r.target_price_usd_t != null ? Number(r.target_price_usd_t) : null,
+      message: r.message,
+      lot: (lotOf.get(r.lot_id) as MyBuyerInquiryRow["lot"]) ?? null,
+    }));
+  });
+
+// ---------- Hilo de mensajes buyer↔seller ----------
+// La tabla commodity_inquiry_messages vive en una migración nueva; hasta
+// regenerar los types de Supabase se accede con un cliente sin tipar.
+
+export type InquiryMessage = {
+  id: string;
+  inquiry_id: string;
+  sender_user_id: string;
+  body: string;
+  created_at: string;
+  mine: boolean;
+};
+
+async function untypedAdmin(): Promise<SupabaseClient> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin as unknown as SupabaseClient;
+}
+
+/** Valida que el usuario sea participante (buyer o seller) y devuelve roles. */
+async function assertInquiryParticipant(
+  inquiryId: string,
+  userId: string,
+): Promise<{ buyerUserId: string; sellerUserId: string; lotTitle: string }> {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { data: inquiry, error } = await supabaseAdmin
+    .from("commodity_inquiries")
+    .select("id, buyer_user_id, lot_id")
+    .eq("id", inquiryId)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  if (!inquiry) throw new Error("Consulta no encontrada");
+  const { data: lot } = await supabaseAdmin
+    .from("commodity_lots")
+    .select("seller_user_id, title")
+    .eq("id", inquiry.lot_id)
+    .maybeSingle();
+  if (!lot) throw new Error("Lote no encontrado");
+  if (inquiry.buyer_user_id !== userId && lot.seller_user_id !== userId) {
+    throw new Error("No autorizado");
+  }
+  return {
+    buyerUserId: inquiry.buyer_user_id,
+    sellerUserId: lot.seller_user_id,
+    lotTitle: lot.title,
+  };
+}
+
+export const listInquiryMessages = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ inquiryId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<InquiryMessage[]> => {
+    await assertInquiryParticipant(data.inquiryId, context.userId);
+    const sb = await untypedAdmin();
+    const { data: rows, error } = await sb
+      .from("commodity_inquiry_messages")
+      .select("id, inquiry_id, sender_user_id, body, created_at")
+      .eq("inquiry_id", data.inquiryId)
+      .order("created_at", { ascending: true })
+      .limit(200);
+    if (error) {
+      // Tabla aún no migrada: el hilo se muestra vacío en vez de romper la vista
+      if (/does not exist|relation/i.test(error.message)) return [];
+      throw new Error(error.message);
+    }
+    return ((rows ?? []) as Array<Omit<InquiryMessage, "mine">>).map((m) => ({
+      ...m,
+      mine: m.sender_user_id === context.userId,
+    }));
+  });
+
+export const sendInquiryMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ inquiryId: z.string().uuid(), body: z.string().min(1).max(4000) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { buyerUserId, sellerUserId, lotTitle } = await assertInquiryParticipant(
+      data.inquiryId,
+      context.userId,
+    );
+    const sb = await untypedAdmin();
+    const { error } = await sb.from("commodity_inquiry_messages").insert({
+      inquiry_id: data.inquiryId,
+      sender_user_id: context.userId,
+      body: data.body.trim(),
+    });
+    if (error) {
+      if (/does not exist|relation/i.test(error.message)) {
+        throw new Error("La mensajería estará disponible tras aplicar la última migración.");
+      }
+      throw new Error(error.message);
+    }
+
+    // Notificar al otro participante (best-effort)
+    try {
+      const recipientId = context.userId === buyerUserId ? sellerUserId : buyerUserId;
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: prof } = await supabaseAdmin
+        .from("profiles")
+        .select("email")
+        .eq("user_id", recipientId)
+        .maybeSingle();
+      if (prof?.email) {
+        const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+        await sendInternalEmail({
+          templateName: "inquiry-update-buyer",
+          recipientEmail: prof.email,
+          idempotencyKey: `inquiry-msg:${data.inquiryId}:${Date.now()}`,
+          templateData: {
+            lotTitle,
+            kind: "message",
+            messagePreview: data.body.slice(0, 140),
+          },
+        });
+      }
+    } catch (e) {
+      console.error("[sendInquiryMessage] notify failed", e);
+    }
+
     return { ok: true as const };
   });

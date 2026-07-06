@@ -174,7 +174,7 @@ function LotDetailPage() {
           message: form.message || undefined,
         },
       });
-      toast.success("Solicitud enviada. El seller te contactará.");
+      toast.success("Solicitud enviada. Sigue el avance en Mis cotizaciones del dashboard.");
       setOpen(false);
       setForm({
         buyer_role: "trader",

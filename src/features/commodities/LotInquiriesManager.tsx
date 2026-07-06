@@ -11,6 +11,7 @@ import {
   INQUIRY_STATUS_LABELS,
   type MyLotInquiryRow,
 } from "@/lib/marketplace.functions";
+import { InquiryThread } from "./InquiryThread";
 
 const STATUS_CLS: Record<string, string> = {
   new: "border-warn/40 bg-warn/10 text-warn",
@@ -27,6 +28,7 @@ export function LotInquiriesManager({ lotId }: { lotId: string }) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, { status: string; notes: string }>>({});
+  const [openThread, setOpenThread] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -154,7 +156,16 @@ export function LotInquiriesManager({ lotId }: { lotId: string }) {
                     )}
                     Guardar
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenThread((cur) => (cur === r.id ? null : r.id))}
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold transition-colors"
+                  >
+                    <MessageSquare className="w-3 h-3" />
+                    {openThread === r.id ? "Cerrar chat" : "Mensajes"}
+                  </button>
                 </div>
+                {openThread === r.id && <InquiryThread inquiryId={r.id} />}
               </li>
             );
           })}
