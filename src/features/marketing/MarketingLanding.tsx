@@ -145,7 +145,7 @@ export function MarketingLanding() {
               <span>{t("hero_eyebrow")}</span>
             </div>
 
-            <h1 className="brand-display text-[48px] sm:text-[64px] lg:text-[76px] leading-[0.95] tracking-tight text-white">
+            <h1 className="brand-display text-[36px] sm:text-[56px] lg:text-[76px] leading-[0.98] sm:leading-[0.95] tracking-tight text-white break-words">
               {t("hero_title").split(" ").slice(0, 2).join(" ")}{" "}
               <span className="italic font-normal text-slate-400">
                 {t("hero_title").split(" ").slice(2, 4).join(" ")}
