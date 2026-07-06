@@ -12,6 +12,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
+import { LegalAlertsFeed } from "@/components/ops/LegalAlertsFeed";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -54,7 +55,7 @@ function BoletinModule() {
   } = useCourtCaseAlerts(active?.id ?? null);
   const [syncing, setSyncing] = useState(false);
   const [syncingPjud, setSyncingPjud] = useState(false);
-  const [tab, setTab] = useState<"alerts" | "all" | "pjud" | "watch">("alerts");
+  const [tab, setTab] = useState<"legal" | "alerts" | "all" | "pjud" | "watch">("legal");
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
 
@@ -105,6 +106,8 @@ function BoletinModule() {
   }, [bulletins, search, filterType]);
 
   const unreadAlerts = alerts.filter((a) => !a.is_read);
+  const unreadCourt = courtAlerts.filter((a) => !a.is_read);
+  const unreadLegal = unreadAlerts.length + unreadCourt.length;
 
   return (
     <div className="p-4 md:p-6 space-y-4">
@@ -162,6 +165,14 @@ function BoletinModule() {
 
       {/* Tabs */}
       <div className="flex gap-1 border-b border-border overflow-x-auto">
+        <TabButton active={tab === "legal"} onClick={() => setTab("legal")}>
+          Alertas legales{" "}
+          {unreadLegal > 0 && (
+            <span className="ml-1 px-1.5 py-0.5 rounded-full bg-destructive text-destructive-foreground text-[10px]">
+              {unreadLegal}
+            </span>
+          )}
+        </TabButton>
         <TabButton active={tab === "alerts"} onClick={() => setTab("alerts")}>
           Alertas Boletín{" "}
           {unreadAlerts.length > 0 && (
@@ -185,6 +196,16 @@ function BoletinModule() {
           Titulares vigilados
         </TabButton>
       </div>
+
+      {tab === "legal" && (
+        <LegalAlertsFeed
+          bulletinAlerts={alerts}
+          courtAlerts={courtAlerts}
+          onMarkBulletinRead={markRead}
+          onMarkCourtRead={markCourtRead}
+          hasProject={!!active}
+        />
+      )}
 
       {tab === "pjud" && (
         <div className="space-y-2">
