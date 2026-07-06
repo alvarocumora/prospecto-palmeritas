@@ -53,6 +53,7 @@ import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.target
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
+import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhooks.mercadopago'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
@@ -336,6 +337,11 @@ const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
 const CatastroAppWatchlistRoute = CatastroAppWatchlistRouteImport.update({
   id: '/catastro/app/watchlist',
   path: '/catastro/app/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksMercadopagoRoute = ApiWebhooksMercadopagoRouteImport.update({
+  id: '/api/webhooks/mercadopago',
+  path: '/api/webhooks/mercadopago',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
@@ -793,6 +799,7 @@ export interface FileRoutesByFullPath {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -900,6 +907,7 @@ export interface FileRoutesByTo {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -1009,6 +1017,7 @@ export interface FileRoutesById {
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
+  '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -1118,6 +1127,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/api/public/stats'
     | '/api/public/sync-catastro'
+    | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/lovable/email/suppression'
@@ -1225,6 +1235,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/api/public/stats'
     | '/api/public/sync-catastro'
+    | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/lovable/email/suppression'
@@ -1333,6 +1344,7 @@ export interface FileRouteTypes {
     | '/api/public/health'
     | '/api/public/stats'
     | '/api/public/sync-catastro'
+    | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/lovable/email/suppression'
@@ -1395,6 +1407,7 @@ export interface RootRouteChildren {
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
+  ApiWebhooksMercadopagoRoute: typeof ApiWebhooksMercadopagoRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -1717,6 +1730,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro/app/watchlist'
       fullPath: '/catastro/app/watchlist'
       preLoaderRoute: typeof CatastroAppWatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/mercadopago': {
+      id: '/api/webhooks/mercadopago'
+      path: '/api/webhooks/mercadopago'
+      fullPath: '/api/webhooks/mercadopago'
+      preLoaderRoute: typeof ApiWebhooksMercadopagoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/sync-catastro': {
@@ -2417,6 +2437,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
+  ApiWebhooksMercadopagoRoute: ApiWebhooksMercadopagoRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
