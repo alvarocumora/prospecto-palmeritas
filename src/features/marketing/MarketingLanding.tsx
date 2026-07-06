@@ -128,7 +128,7 @@ export function MarketingLanding() {
         />
         <HeroTopoBackground />
 
-        <div className="relative max-w-7xl mx-auto px-5 py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-12 items-center">
+        <div className="relative max-w-7xl mx-auto px-5 py-14 sm:py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-10 sm:gap-12 items-center">
           <div>
             {/* Live badge */}
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-8 backdrop-blur">
