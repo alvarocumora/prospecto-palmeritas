@@ -187,24 +187,7 @@ function LotDetailPage() {
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
 
-<<<<<<< HEAD
-      {/* Portada generativa del material */}
-      <div className="relative h-40 md:h-52 overflow-hidden border-b border-hairline">
-        <CommodityCover
-          seed={lot.id}
-          commodity={lot.commodity}
-          form={lot.form}
-          className="absolute inset-0"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/45 to-transparent" />
-        <div className="absolute bottom-4 left-0 right-0">
-          <div className="max-w-7xl mx-auto px-5 flex items-end justify-between gap-3 flex-wrap">
-            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/70">
-              Marketplace · {formLabel(lot.form)}
-            </span>
-            <span className="text-[11px] font-mono text-white/80">
-=======
-      {/* Portada: imagen real si existe */}
+      {/* Portada: imagen real si existe, si no patrón generativo */}
       <div className="relative h-56 md:h-72 overflow-hidden border-b border-hairline bg-slate-100">
         {lot.cover_image_url ? (
           <img
@@ -227,7 +210,6 @@ function LotDetailPage() {
               Marketplace · {formLabel(lot.form)}
             </span>
             <span className="text-[11px] font-mono text-white/90">
->>>>>>> origin/main
               {countryFlag(lot.country)} {countryName(lot.country)}
               {lot.port_of_loading && ` · ${lot.port_of_loading}`}
             </span>
