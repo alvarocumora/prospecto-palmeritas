@@ -55,6 +55,7 @@ import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
 import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhooks.mercadopago'
 import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
+import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.sync-bulletins'
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
@@ -347,6 +348,11 @@ const ApiWebhooksMercadopagoRoute = ApiWebhooksMercadopagoRouteImport.update({
 const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
   id: '/api/public/sync-catastro',
   path: '/api/public/sync-catastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSyncBulletinsRoute = ApiPublicSyncBulletinsRouteImport.update({
+  id: '/api/public/sync-bulletins',
+  path: '/api/public/sync-bulletins',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
@@ -798,6 +804,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
+  '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
@@ -906,6 +913,7 @@ export interface FileRoutesByTo {
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
+  '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
@@ -1016,6 +1024,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
+  '/api/public/sync-bulletins': typeof ApiPublicSyncBulletinsRoute
   '/api/public/sync-catastro': typeof ApiPublicSyncCatastroRoute
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
@@ -1126,6 +1135,7 @@ export interface FileRouteTypes {
     | '/dashboard/validation'
     | '/api/public/health'
     | '/api/public/stats'
+    | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/dashboard/validation'
     | '/api/public/health'
     | '/api/public/stats'
+    | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
@@ -1343,6 +1354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/validation'
     | '/api/public/health'
     | '/api/public/stats'
+    | '/api/public/sync-bulletins'
     | '/api/public/sync-catastro'
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
@@ -1406,6 +1418,7 @@ export interface RootRouteChildren {
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
+  ApiPublicSyncBulletinsRoute: typeof ApiPublicSyncBulletinsRoute
   ApiPublicSyncCatastroRoute: typeof ApiPublicSyncCatastroRoute
   ApiWebhooksMercadopagoRoute: typeof ApiWebhooksMercadopagoRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
@@ -1744,6 +1757,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/sync-catastro'
       fullPath: '/api/public/sync-catastro'
       preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sync-bulletins': {
+      id: '/api/public/sync-bulletins'
+      path: '/api/public/sync-bulletins'
+      fullPath: '/api/public/sync-bulletins'
+      preLoaderRoute: typeof ApiPublicSyncBulletinsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/stats': {
@@ -2436,6 +2456,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
+  ApiPublicSyncBulletinsRoute: ApiPublicSyncBulletinsRoute,
   ApiPublicSyncCatastroRoute: ApiPublicSyncCatastroRoute,
   ApiWebhooksMercadopagoRoute: ApiWebhooksMercadopagoRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
