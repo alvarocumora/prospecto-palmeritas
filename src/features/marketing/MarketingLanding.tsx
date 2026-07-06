@@ -729,7 +729,7 @@ export function MarketingLanding() {
 
       {/* Feature showcase — catastro + geofísica (fotográfico) */}
       <section className="border-b border-hairline bg-white">
-        <div className="max-w-7xl mx-auto px-5 py-20">
+        <div className="max-w-7xl mx-auto px-5 py-14 sm:py-20">
           <Reveal className="max-w-2xl mb-10">
             <Eyebrow className="mb-3">Capacidades diferenciales</Eyebrow>
             <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
