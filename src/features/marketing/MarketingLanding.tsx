@@ -96,7 +96,7 @@ export function MarketingLanding() {
         {/* Photographic base layer */}
         <div
           aria-hidden
-          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.35]"
+          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.28] sm:opacity-[0.32] lg:opacity-[0.35]"
           style={{ backgroundImage: `url(${heroMining})` }}
         />
         <div
@@ -104,7 +104,7 @@ export function MarketingLanding() {
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(5,7,10,0.55) 0%, rgba(5,7,10,0.75) 55%, rgba(5,7,10,0.95) 100%)",
+              "linear-gradient(180deg, rgba(5,7,10,0.72) 0%, rgba(5,7,10,0.82) 55%, rgba(5,7,10,0.96) 100%)",
           }}
         />
         {/* Ambient glows */}
