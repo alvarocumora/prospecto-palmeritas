@@ -35,6 +35,15 @@ import {
   FREQUENCIES,
 } from "@/lib/commodityLabels";
 
+/** Formatea una fecha ISO como dd-MM-yyyy en UTC — estable entre SSR y cliente. */
+function formatDateUTC(iso: string): string {
+  const d = new Date(iso);
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const yy = d.getUTCFullYear();
+  return `${dd}-${mm}-${yy}`;
+}
+
 export const Route = createFileRoute("/marketplace/$lotId")({
   loader: async ({ params }) => {
     const lot = await getCommodityLotDetail({ data: { id: params.lotId } });
@@ -178,6 +187,7 @@ function LotDetailPage() {
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
 
+<<<<<<< HEAD
       {/* Portada generativa del material */}
       <div className="relative h-40 md:h-52 overflow-hidden border-b border-hairline">
         <CommodityCover
@@ -193,6 +203,31 @@ function LotDetailPage() {
               Marketplace · {formLabel(lot.form)}
             </span>
             <span className="text-[11px] font-mono text-white/80">
+=======
+      {/* Portada: imagen real si existe */}
+      <div className="relative h-56 md:h-72 overflow-hidden border-b border-hairline bg-slate-100">
+        {lot.cover_image_url ? (
+          <img
+            src={lot.cover_image_url}
+            alt={lot.title}
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <CommodityCover
+            seed={lot.id}
+            commodity={lot.commodity}
+            form={lot.form}
+            className="absolute inset-0"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
+        <div className="absolute bottom-4 left-0 right-0">
+          <div className="max-w-7xl mx-auto px-5 flex items-end justify-between gap-3 flex-wrap">
+            <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-white/80">
+              Marketplace · {formLabel(lot.form)}
+            </span>
+            <span className="text-[11px] font-mono text-white/90">
+>>>>>>> origin/main
               {countryFlag(lot.country)} {countryName(lot.country)}
               {lot.port_of_loading && ` · ${lot.port_of_loading}`}
             </span>
@@ -308,7 +343,7 @@ function LotDetailPage() {
                       )}
                       {c.expires_at && (
                         <div className="text-[11px] font-mono text-content-subtle">
-                          Vence {new Date(c.expires_at).toLocaleDateString("es-CL")}
+                          Vence {formatDateUTC(c.expires_at)}
                         </div>
                       )}
                     </div>
