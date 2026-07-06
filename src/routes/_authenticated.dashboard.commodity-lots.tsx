@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft, Eye, Loader2, MessageSquare, Package, Plus, RefreshCw } from "lucide-react";
+import { LotInquiriesManager } from "@/features/commodities/LotInquiriesManager";
 import { toast } from "sonner";
 import {
   createCommodityLot,
@@ -59,6 +60,7 @@ function MyCommodityLotsPage() {
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [openInquiries, setOpenInquiries] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -409,15 +411,26 @@ function MyCommodityLotsPage() {
                     </span>
                   </span>
                 </div>
-                {r.status === "published" && (
-                  <Link
-                    to="/marketplace/$lotId"
-                    params={{ lotId: r.id }}
-                    className="mt-3 inline-block text-[11px] font-mono text-gold hover:underline"
+                <div className="mt-3 flex items-center gap-4">
+                  {r.status === "published" && (
+                    <Link
+                      to="/marketplace/$lotId"
+                      params={{ lotId: r.id }}
+                      className="text-[11px] font-mono text-gold hover:underline"
+                    >
+                      Ver ficha pública →
+                    </Link>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setOpenInquiries((cur) => (cur === r.id ? null : r.id))}
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold transition-colors"
                   >
-                    Ver ficha pública →
-                  </Link>
-                )}
+                    <MessageSquare className="w-3 h-3" />
+                    {openInquiries === r.id ? "Cerrar consultas" : `Consultas (${r.inquiry_count})`}
+                  </button>
+                </div>
+                {openInquiries === r.id && <LotInquiriesManager lotId={r.id} />}
               </article>
             );
           })}

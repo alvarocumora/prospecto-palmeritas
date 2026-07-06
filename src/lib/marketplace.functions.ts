@@ -209,6 +209,24 @@ export const createCommodityInquiry = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => inquiryInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    // Enforcement KYC: consultar lotes requiere perfil de inversionista
+    // aprobado — la promesa "KYC/AML institucional" del marketing se cumple
+    // en el servidor, no solo en el copy.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profile } = await supabaseAdmin
+      .from("investor_profiles")
+      .select("review_status")
+      .eq("user_id", userId)
+      .maybeSingle();
+    if (profile?.review_status !== "approved") {
+      throw new Error(
+        profile?.review_status === "pending_review"
+          ? "Tu verificación KYC está en revisión. Te avisaremos por email cuando esté aprobada."
+          : "Consultar lotes requiere verificación KYC aprobada. Completa tu perfil de inversionista en el dashboard.",
+      );
+    }
+
     const { data: row, error } = await supabase
       .from("commodity_inquiries")
       .insert({
@@ -256,4 +274,150 @@ export const createCommodityInquiry = createServerFn({ method: "POST" })
     }
 
     return { id: row.id, ok: true };
+  });
+
+// ---------- Verificación KYC del usuario actual ----------
+
+export const getMyVerificationStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ status: string | null }> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data } = await supabaseAdmin
+      .from("investor_profiles")
+      .select("review_status")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    return { status: data?.review_status ?? null };
+  });
+
+// ---------- Pipeline de negociación del seller ----------
+
+export const INQUIRY_PIPELINE = [
+  "new",
+  "contacted",
+  "sample_requested",
+  "offer_sent",
+  "negotiating",
+  "closed_won",
+  "closed_lost",
+] as const;
+
+export const INQUIRY_STATUS_LABELS: Record<string, string> = {
+  new: "Nueva",
+  contacted: "Contactado",
+  sample_requested: "Muestra solicitada",
+  offer_sent: "Oferta enviada",
+  negotiating: "En negociación",
+  closed_won: "Cerrada ganada",
+  closed_lost: "Cerrada perdida",
+};
+
+export type MyLotInquiryRow = {
+  id: string;
+  created_at: string;
+  lot_id: string;
+  lot_title: string | null;
+  buyer_email: string | null;
+  buyer_role: string;
+  company_name: string | null;
+  intended_use: string | null;
+  target_volume_t: number | null;
+  target_price_usd_t: number | null;
+  message: string | null;
+  status: string;
+  seller_notes: string | null;
+};
+
+/** Consultas recibidas sobre los lotes del seller autenticado. */
+export const listMyLotInquiries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ lotId: z.string().uuid().optional() }).parse(d ?? {}))
+  .handler(async ({ data, context }): Promise<MyLotInquiryRow[]> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Lotes del seller (el filtro de propiedad ocurre en el servidor)
+    let lotsQ = supabaseAdmin
+      .from("commodity_lots")
+      .select("id, title")
+      .eq("seller_user_id", context.userId);
+    if (data.lotId) lotsQ = lotsQ.eq("id", data.lotId);
+    const { data: lots, error: lotsErr } = await lotsQ;
+    if (lotsErr) throw new Error(lotsErr.message);
+    const lotIds = (lots ?? []).map((l) => l.id);
+    if (!lotIds.length) return [];
+    const titleOf = new Map((lots ?? []).map((l) => [l.id, l.title]));
+
+    const { data: rows, error } = await supabaseAdmin
+      .from("commodity_inquiries")
+      .select(
+        "id, created_at, lot_id, buyer_user_id, buyer_role, company_name, intended_use, target_volume_t, target_price_usd_t, message, status, seller_notes",
+      )
+      .in("lot_id", lotIds)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    const buyerIds = Array.from(new Set((rows ?? []).map((r) => r.buyer_user_id)));
+    const { data: profs } = buyerIds.length
+      ? await supabaseAdmin.from("profiles").select("user_id, email").in("user_id", buyerIds)
+      : { data: [] as Array<{ user_id: string; email: string | null }> };
+    const emailOf = new Map((profs ?? []).map((p) => [p.user_id, p.email]));
+
+    return (rows ?? []).map((r) => ({
+      id: r.id,
+      created_at: r.created_at,
+      lot_id: r.lot_id,
+      lot_title: titleOf.get(r.lot_id) ?? null,
+      buyer_email: emailOf.get(r.buyer_user_id) ?? null,
+      buyer_role: r.buyer_role,
+      company_name: r.company_name,
+      intended_use: r.intended_use,
+      target_volume_t: r.target_volume_t != null ? Number(r.target_volume_t) : null,
+      target_price_usd_t: r.target_price_usd_t != null ? Number(r.target_price_usd_t) : null,
+      message: r.message,
+      status: r.status,
+      seller_notes: r.seller_notes,
+    }));
+  });
+
+/** Avanza una consulta por el pipeline (solo el seller dueño del lote). */
+export const updateMyLotInquiryStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        inquiryId: z.string().uuid(),
+        status: z.enum(INQUIRY_PIPELINE),
+        sellerNotes: z.string().max(2000).optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Propiedad: la consulta debe pertenecer a un lote del seller
+    const { data: inquiry, error: findErr } = await supabaseAdmin
+      .from("commodity_inquiries")
+      .select("id, lot_id")
+      .eq("id", data.inquiryId)
+      .maybeSingle();
+    if (findErr) throw new Error(findErr.message);
+    if (!inquiry) throw new Error("Consulta no encontrada");
+    const { data: lot } = await supabaseAdmin
+      .from("commodity_lots")
+      .select("seller_user_id")
+      .eq("id", inquiry.lot_id)
+      .maybeSingle();
+    if (lot?.seller_user_id !== context.userId) throw new Error("No autorizado");
+
+    const patch: { status: (typeof INQUIRY_PIPELINE)[number]; seller_notes?: string | null } = {
+      status: data.status,
+    };
+    if (data.sellerNotes !== undefined) patch.seller_notes = data.sellerNotes;
+    const { error } = await supabaseAdmin
+      .from("commodity_inquiries")
+      .update(patch)
+      .eq("id", data.inquiryId);
+    if (error) throw new Error(error.message);
+    return { ok: true as const };
   });

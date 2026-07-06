@@ -22,6 +22,7 @@ import {
   getCommodityLotDetail,
   createCommodityInquiry,
   listPublishedCommodityLots,
+  getMyVerificationStatus,
   type CommodityLotRow,
 } from "@/lib/marketplace.functions";
 import { getMetalPrices, type MetalQuote } from "@/lib/commodityPrices.functions";
@@ -134,6 +135,14 @@ function LotDetailPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const inquiryFn = useServerFn(createCommodityInquiry);
+  const kycFn = useServerFn(getMyVerificationStatus);
+  const { data: kyc } = useQuery({
+    queryKey: ["my-kyc-status"],
+    queryFn: () => kycFn(),
+    staleTime: 60_000,
+    enabled: !!user,
+  });
+  const kycApproved = kyc?.status === "approved";
 
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -187,7 +196,7 @@ function LotDetailPage() {
     <div className="brand-light min-h-screen flex flex-col">
       <MarketingHeader />
 
-      {/* Portada: imagen real si existe */}
+      {/* Portada: imagen real si existe, si no patrón generativo */}
       <div className="relative h-56 md:h-72 overflow-hidden border-b border-hairline bg-slate-100">
         {lot.cover_image_url ? (
           <img
@@ -357,7 +366,29 @@ function LotDetailPage() {
                 Envía tu interés, volumen objetivo y uso previsto. El seller responderá con
                 condiciones y muestra bajo NDA.
               </p>
-              {!open ? (
+              {user && kyc && !kycApproved ? (
+                <div className="mt-5 rounded-lg border border-amber-300 bg-amber-50 p-4">
+                  <div className="flex items-center gap-2 text-sm font-medium text-amber-900">
+                    <ShieldCheck className="w-4 h-4" />
+                    {kyc.status === "pending_review"
+                      ? "Tu verificación KYC está en revisión"
+                      : "Verificación KYC requerida"}
+                  </div>
+                  <p className="mt-1.5 text-xs text-amber-800/80">
+                    {kyc.status === "pending_review"
+                      ? "Te avisaremos por email cuando esté aprobada. Después podrás solicitar ofertas."
+                      : "Consultar lotes requiere un perfil de inversionista aprobado. Completa tu verificación en el dashboard."}
+                  </p>
+                  {kyc.status !== "pending_review" && (
+                    <Link
+                      to="/dashboard"
+                      className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-amber-900 underline hover:no-underline"
+                    >
+                      Completar verificación →
+                    </Link>
+                  )}
+                </div>
+              ) : !open ? (
                 <BrandButton className="mt-5 w-full" onClick={() => setOpen(true)}>
                   {user ? "Solicitar oferta" : "Iniciar sesión y solicitar"}
                 </BrandButton>
