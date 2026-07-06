@@ -72,6 +72,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
 import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
+import { Route as AuthenticatedDashboardMyInquiriesRouteImport } from './routes/_authenticated.dashboard.my-inquiries'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
@@ -447,6 +448,12 @@ const AuthenticatedDashboardNi43101Route =
     path: '/dashboard/ni43101',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardMyInquiriesRoute =
+  AuthenticatedDashboardMyInquiriesRouteImport.update({
+    id: '/dashboard/my-inquiries',
+    path: '/dashboard/my-inquiries',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardMarketplaceRoute =
   AuthenticatedDashboardMarketplaceRouteImport.update({
     id: '/dashboard/marketplace',
@@ -760,6 +767,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
@@ -865,6 +873,7 @@ export interface FileRoutesByTo {
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
@@ -972,6 +981,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/_authenticated/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/_authenticated/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
@@ -1079,6 +1089,7 @@ export interface FileRouteTypes {
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
@@ -1184,6 +1195,7 @@ export interface FileRouteTypes {
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
@@ -1290,6 +1302,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/mag-revalidations'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
+    | '/_authenticated/dashboard/my-inquiries'
     | '/_authenticated/dashboard/ni43101'
     | '/_authenticated/dashboard/opportunities'
     | '/_authenticated/dashboard/palmeras'
@@ -1826,6 +1839,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardNi43101RouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/my-inquiries': {
+      id: '/_authenticated/dashboard/my-inquiries'
+      path: '/dashboard/my-inquiries'
+      fullPath: '/dashboard/my-inquiries'
+      preLoaderRoute: typeof AuthenticatedDashboardMyInquiriesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/marketplace': {
       id: '/_authenticated/dashboard/marketplace'
       path: '/dashboard/marketplace'
@@ -2221,6 +2241,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
+  AuthenticatedDashboardMyInquiriesRoute: typeof AuthenticatedDashboardMyInquiriesRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
   AuthenticatedDashboardOpportunitiesRoute: typeof AuthenticatedDashboardOpportunitiesRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
@@ -2276,6 +2297,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
+  AuthenticatedDashboardMyInquiriesRoute:
+    AuthenticatedDashboardMyInquiriesRoute,
   AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
   AuthenticatedDashboardOpportunitiesRoute:
     AuthenticatedDashboardOpportunitiesRoute,
