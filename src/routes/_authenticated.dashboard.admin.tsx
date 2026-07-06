@@ -12,7 +12,12 @@ import {
   Search,
   Crown,
   UserMinus,
+  Package,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getAdminMarketplaceStats } from "@/lib/adminInbox.functions";
+import { INQUIRY_STATUS_LABELS } from "@/lib/marketplace.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin")({
@@ -20,7 +25,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin")({
   component: AdminPage,
 });
 
-type Tab = "overview" | "users" | "projects" | "billing" | "operations";
+type Tab = "overview" | "users" | "projects" | "billing" | "operations" | "marketplace";
 
 type UserRow = {
   user_id: string;
@@ -85,6 +90,7 @@ function AdminPage() {
             ["projects", "Proyectos", FolderKanban],
             ["billing", "Pagos", CreditCard],
             ["operations", "Operación", ShieldAlert],
+            ["marketplace", "Marketplace", Package],
           ] as const
         ).map(([id, label, Icon]) => (
           <button
@@ -112,6 +118,7 @@ function AdminPage() {
       {tab === "projects" && <ProjectsTab />}
       {tab === "billing" && <BillingTab />}
       {tab === "operations" && <OperationsTab />}
+      {tab === "marketplace" && <MarketplaceStatsTab />}
     </div>
   );
 }
@@ -504,6 +511,150 @@ function Health({ label, status }: { label: string; status: "ok" | "warn" | "dow
       />
       <span>{label}</span>
       <span className={`ml-auto uppercase text-[10px] ${color}`}>{status}</span>
+    </div>
+  );
+}
+
+// ── Tab: métricas del marketplace de commodities ──────────────────────────────
+
+const LOT_STATUS_LABELS_ADMIN: Record<string, string> = {
+  draft: "Borrador",
+  pending_verification: "En verificación",
+  published: "Publicado",
+  under_negotiation: "En negociación",
+  sold: "Vendido",
+  archived: "Archivado",
+};
+
+const PIPELINE_ORDER = [
+  "new",
+  "contacted",
+  "sample_requested",
+  "offer_sent",
+  "negotiating",
+  "closed_won",
+  "closed_lost",
+];
+
+function fmtUsdShort(v: number): string {
+  if (v >= 1_000_000) return `US$ ${(v / 1_000_000).toFixed(1)}M`;
+  if (v >= 1_000) return `US$ ${(v / 1_000).toFixed(0)}k`;
+  return `US$ ${v.toFixed(0)}`;
+}
+
+function MarketplaceStatsTab() {
+  const statsFn = useServerFn(getAdminMarketplaceStats);
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-marketplace-stats"],
+    queryFn: () => statsFn(),
+    staleTime: 60_000,
+  });
+
+  if (isLoading || !data) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded border border-border bg-bg-panel p-4 animate-pulse">
+            <div className="h-6 rounded bg-foreground/10 w-1/2 mb-2" />
+            <div className="h-3 rounded bg-foreground/10 w-3/4" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  const maxPipeline = Math.max(...PIPELINE_ORDER.map((s) => data.inquiries.byStatus[s] ?? 0), 1);
+  const buyersApproved = data.buyers.byReviewStatus["approved"] ?? 0;
+  const buyersPending = data.buyers.byReviewStatus["pending_review"] ?? 0;
+
+  return (
+    <div className="space-y-6">
+      {/* KPIs */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[
+          {
+            v: `${data.lots.byStatus["published"] ?? 0}/${data.lots.total}`,
+            l: "Lotes publicados / total",
+          },
+          { v: String(data.inquiries.total), l: "Consultas recibidas" },
+          { v: `${buyersApproved} (+${buyersPending})`, l: "Buyers KYC (en revisión)" },
+          { v: fmtUsdShort(data.closedWonValueUsd), l: "GTV cerrado estimado" },
+        ].map(({ v, l }) => (
+          <div key={l} className="rounded border border-border bg-bg-panel p-4">
+            <div className="font-mono text-2xl text-foreground tracking-tight">{v}</div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-1">
+              {l}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Funnel del pipeline */}
+      <div className="rounded border border-border bg-bg-panel p-4">
+        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+          <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground">
+            Pipeline de negociación
+          </div>
+          <div className="text-[11px] font-mono text-muted-foreground">
+            Abierto: <span className="text-gold">{fmtUsdShort(data.openPipelineValueUsd)}</span>
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          {PIPELINE_ORDER.map((s) => {
+            const n = data.inquiries.byStatus[s] ?? 0;
+            const pct = (n / maxPipeline) * 100;
+            const color =
+              s === "closed_won"
+                ? "bg-teal"
+                : s === "closed_lost"
+                  ? "bg-danger/70"
+                  : s === "new"
+                    ? "bg-warn"
+                    : "bg-gold/80";
+            return (
+              <div key={s} className="flex items-center gap-2">
+                <span className="w-36 shrink-0 text-[11px] font-mono text-muted-foreground">
+                  {INQUIRY_STATUS_LABELS[s] ?? s}
+                </span>
+                <div className="flex-1 h-4 rounded bg-foreground/5 overflow-hidden">
+                  <div className={`h-full ${color}`} style={{ width: `${pct}%` }} />
+                </div>
+                <span className="w-8 text-right text-[11px] font-mono text-foreground tabular-nums">
+                  {n}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Lotes por estado */}
+      <div className="rounded border border-border bg-bg-panel p-4">
+        <div className="text-[11px] font-mono uppercase tracking-wide text-muted-foreground mb-3">
+          Lotes por estado · {data.lots.verified} verificados
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {Object.entries(LOT_STATUS_LABELS_ADMIN).map(([s, label]) => (
+            <span
+              key={s}
+              className="inline-flex items-center gap-1.5 rounded border border-border px-2.5 py-1 text-[11px] font-mono"
+            >
+              <span className="text-muted-foreground">{label}</span>
+              <span className="text-foreground font-semibold tabular-nums">
+                {data.lots.byStatus[s] ?? 0}
+              </span>
+            </span>
+          ))}
+        </div>
+        <div className="mt-3 flex gap-4 text-[11px] font-mono">
+          <a href="/dashboard/admin/inbox" className="text-gold hover:underline">
+            Ir a la bandeja (verificar lotes) →
+          </a>
+          <a href="/dashboard/admin/investors" className="text-gold hover:underline">
+            Revisar KYC pendientes →
+          </a>
+        </div>
+      </div>
     </div>
   );
 }

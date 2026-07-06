@@ -623,3 +623,55 @@ export const sendInquiryMessage = createServerFn({ method: "POST" })
 
     return { ok: true as const };
   });
+
+// ---------- Perfil de actividad del usuario (buyer + vendedor) ----------
+
+export type MyMarketplaceProfile = {
+  kycStatus: string | null;
+  inquiriesSent: number;
+  inquiriesSentOpen: number;
+  lotsTotal: number;
+  lotsPublished: number;
+  inquiriesReceived: number;
+  inquiriesReceivedNew: number;
+  listingsTotal: number;
+};
+
+export const getMyMarketplaceProfile = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<MyMarketplaceProfile> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const uid = context.userId;
+
+    const [{ data: kyc }, { data: sent }, { data: myLots }, { data: myListings }] =
+      await Promise.all([
+        supabaseAdmin
+          .from("investor_profiles")
+          .select("review_status")
+          .eq("user_id", uid)
+          .maybeSingle(),
+        supabaseAdmin.from("commodity_inquiries").select("status").eq("buyer_user_id", uid),
+        supabaseAdmin.from("commodity_lots").select("id, status").eq("seller_user_id", uid),
+        supabaseAdmin
+          .from("property_listings")
+          .select("id", { count: "exact", head: true })
+          .eq("owner_user_id", uid),
+      ]);
+
+    const lotIds = (myLots ?? []).map((l) => l.id);
+    const { data: received } = lotIds.length
+      ? await supabaseAdmin.from("commodity_inquiries").select("status").in("lot_id", lotIds)
+      : { data: [] as Array<{ status: string }> };
+
+    const CLOSED = new Set(["closed_won", "closed_lost"]);
+    return {
+      kycStatus: kyc?.review_status ?? null,
+      inquiriesSent: (sent ?? []).length,
+      inquiriesSentOpen: (sent ?? []).filter((i) => !CLOSED.has(i.status)).length,
+      lotsTotal: (myLots ?? []).length,
+      lotsPublished: (myLots ?? []).filter((l) => l.status === "published").length,
+      inquiriesReceived: (received ?? []).length,
+      inquiriesReceivedNew: (received ?? []).filter((i) => i.status === "new").length,
+      listingsTotal: (myListings as unknown as { count?: number })?.count ?? 0,
+    };
+  });
