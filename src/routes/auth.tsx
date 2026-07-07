@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
 import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
+import { loginSchema, signupSchema, zodToFieldErrors } from "@/lib/auth-validation";
 
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
@@ -43,6 +44,12 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [resending, setResending] = useState(false);
+  const [errors, setErrors] = useState<{
+    displayName?: string;
+    email?: string;
+    password?: string;
+    form?: string;
+  }>({});
   const pwStrength = evaluatePassword(password);
 
   useEffect(() => {
@@ -67,8 +74,20 @@ function AuthPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setNeedsConfirm(false);
-    if (mode === "signup" && pwStrength.score < 2) {
-      toast.error("Contraseña muy débil. Usa al menos 8 caracteres con mayúscula y número.");
+    setErrors({});
+
+    // Validación zod con mensajes claros por campo
+    const schema = mode === "signup" ? signupSchema : loginSchema;
+    const parsed = schema.safeParse(
+      mode === "signup"
+        ? { displayName: displayName.trim(), email: email.trim(), password }
+        : { email: email.trim(), password },
+    );
+    if (!parsed.success) {
+      const fieldErrors = zodToFieldErrors<"displayName" | "email" | "password">(parsed.error);
+      setErrors(fieldErrors);
+      const first = Object.values(fieldErrors)[0];
+      if (first) toast.error(first);
       return;
     }
     setLoading(true);
@@ -109,8 +128,18 @@ function AuthPage() {
       }
     } catch (err) {
       const t = translateAuthError(err);
+      // Mapear errores del servidor al campo correspondiente
+      if (t.code === "email_not_confirmed") {
+        setNeedsConfirm(true);
+        setErrors({ email: t.message });
+      } else if (/email|correo/i.test(t.message) && !/contrase/i.test(t.message)) {
+        setErrors({ email: t.message });
+      } else if (/contrase|password/i.test(t.message)) {
+        setErrors({ password: t.message });
+      } else {
+        setErrors({ form: t.message });
+      }
       toast.error(t.message);
-      if (t.code === "email_not_confirmed") setNeedsConfirm(true);
     } finally {
       setLoading(false);
     }
@@ -311,40 +340,59 @@ function AuthPage() {
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
-                <Field label="Nombre del geólogo">
+                <Field label="Nombre del geólogo" error={errors.displayName}>
                   <input
                     type="text"
                     value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                    onChange={(e) => {
+                      setDisplayName(e.target.value);
+                      if (errors.displayName) setErrors((p) => ({ ...p, displayName: undefined }));
+                    }}
+                    aria-invalid={!!errors.displayName}
+                    aria-describedby={errors.displayName ? "err-displayName" : undefined}
+                    className={inputCls(!!errors.displayName)}
                     placeholder="Tu nombre"
                     maxLength={100}
+                    autoComplete="name"
                   />
                 </Field>
               )}
-              <Field label="Email">
+              <Field label="Email" error={errors.email}>
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+                  }}
                   required
-                  className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "err-email" : undefined}
+                  className={inputCls(!!errors.email)}
                   placeholder="geologo@empresa.com"
                   maxLength={255}
+                  autoComplete="email"
+                  inputMode="email"
                 />
               </Field>
-              <Field label="Contraseña">
+              <Field label="Contraseña" error={errors.password}>
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+                  }}
                   required
                   minLength={8}
-                  className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "err-password" : undefined}
+                  className={inputCls(!!errors.password)}
                   placeholder="••••••••"
                   maxLength={100}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 />
               </Field>
               {mode === "signup" && password.length > 0 && (
@@ -353,6 +401,14 @@ function AuthPage() {
                   label={pwStrength.label}
                   checks={pwStrength.checks}
                 />
+              )}
+              {errors.form && (
+                <div
+                  role="alert"
+                  className="rounded border border-red-500/40 bg-red-500/5 px-3 py-2 text-[11px] font-mono text-red-400"
+                >
+                  {errors.form}
+                </div>
               )}
               <button
                 type="submit"
@@ -396,15 +452,40 @@ function AuthPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground">
         {label}
       </span>
       {children}
+      {error && (
+        <p
+          role="alert"
+          id={`err-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
+          className="mt-1 text-[11px] font-mono text-red-400"
+        >
+          {error}
+        </p>
+      )}
     </label>
   );
+}
+
+function inputCls(hasError: boolean) {
+  return `w-full mt-1 px-3 py-2.5 rounded border bg-background text-foreground text-sm focus:outline-none focus:ring-1 transition-all ${
+    hasError
+      ? "border-red-500/60 focus:border-red-500 focus:ring-red-500/30"
+      : "border-border focus:border-gold focus:ring-gold/30"
+  }`;
 }
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {

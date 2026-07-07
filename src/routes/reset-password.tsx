@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
+import { resetPasswordSchema, zodToFieldErrors } from "@/lib/auth-validation";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -18,6 +19,7 @@ function ResetPasswordPage() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState<"loading" | "ready" | "expired">("loading");
+  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
   const pw = evaluatePassword(password);
 
   useEffect(() => {
@@ -39,13 +41,23 @@ function ResetPasswordPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) return toast.error("Las contraseñas no coinciden");
-    if (pw.score < 2) return toast.error("Contraseña muy débil");
+    setErrors({});
+    const parsed = resetPasswordSchema.safeParse({ password, confirm });
+    if (!parsed.success) {
+      const fe = zodToFieldErrors<"password" | "confirm">(parsed.error);
+      setErrors(fe);
+      const first = Object.values(fe)[0];
+      if (first) toast.error(first);
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) toast.error(translateAuthError(error).message);
-    else {
+    if (error) {
+      const msg = translateAuthError(error).message;
+      setErrors({ password: msg });
+      toast.error(msg);
+    } else {
       toast.success("Contraseña actualizada");
       navigate({ to: "/dashboard" });
     }
@@ -73,19 +85,34 @@ function ResetPasswordPage() {
         {ready === "ready" && (
           <form
             onSubmit={handleSubmit}
+            noValidate
             className="space-y-4 rounded border border-border bg-bg-secondary p-6"
           >
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={8}
-              maxLength={100}
-              className="w-full px-3 py-2 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold"
-              placeholder="Nueva contraseña"
-              autoFocus
-            />
+            <div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => {
+                  setPassword(e.target.value);
+                  if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+                }}
+                required
+                minLength={8}
+                maxLength={100}
+                aria-invalid={!!errors.password}
+                className={`w-full px-3 py-2 rounded border bg-background text-foreground text-sm focus:outline-none ${
+                  errors.password ? "border-red-500/60 focus:border-red-500" : "border-border focus:border-gold"
+                }`}
+                placeholder="Nueva contraseña"
+                autoComplete="new-password"
+                autoFocus
+              />
+              {errors.password && (
+                <p role="alert" className="mt-1 text-[11px] font-mono text-red-400">
+                  {errors.password}
+                </p>
+              )}
+            </div>
             {password.length > 0 && (
               <div className="flex gap-1">
                 {[0, 1, 2, 3, 4].map((i) => (
@@ -106,16 +133,30 @@ function ResetPasswordPage() {
                 ))}
               </div>
             )}
-            <input
-              type="password"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              required
-              minLength={8}
-              maxLength={100}
-              className="w-full px-3 py-2 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold"
-              placeholder="Confirmar contraseña"
-            />
+            <div>
+              <input
+                type="password"
+                value={confirm}
+                onChange={(e) => {
+                  setConfirm(e.target.value);
+                  if (errors.confirm) setErrors((p) => ({ ...p, confirm: undefined }));
+                }}
+                required
+                minLength={8}
+                maxLength={100}
+                aria-invalid={!!errors.confirm}
+                className={`w-full px-3 py-2 rounded border bg-background text-foreground text-sm focus:outline-none ${
+                  errors.confirm ? "border-red-500/60 focus:border-red-500" : "border-border focus:border-gold"
+                }`}
+                placeholder="Confirmar contraseña"
+                autoComplete="new-password"
+              />
+              {errors.confirm && (
+                <p role="alert" className="mt-1 text-[11px] font-mono text-red-400">
+                  {errors.confirm}
+                </p>
+              )}
+            </div>
             <button
               type="submit"
               disabled={loading}
