@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { CommodityCover } from "@/features/marketing/CommodityCover";
+import { LotTrustPanel } from "@/components/marketplace/LotTrustPanel";
 import { Reveal } from "@/features/marketing/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -296,6 +297,9 @@ function LotDetailPage() {
                 <TechRow k="Región" v={lot.region ?? "—"} icon={MapPin} />
               </div>
             </section>
+
+            {/* Verificación Know-Your-Mine (agente) */}
+            <LotTrustPanel lotId={lot.id} />
 
             {/* Descripción larga */}
             {lot.description && (
