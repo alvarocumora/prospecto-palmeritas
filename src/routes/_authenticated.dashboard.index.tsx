@@ -25,6 +25,7 @@ import {
   Activity,
   ShieldCheck,
   Coins,
+  Bot,
   FileWarning,
   AlertTriangle,
   CheckCircle2,
@@ -457,7 +458,7 @@ function DashboardHome() {
               Cambiar proyecto →
             </Link>
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-8 gap-2">
+          <div className="grid grid-cols-3 md:grid-cols-8 lg:grid-cols-9 gap-2">
             <Shortcut
               to="/dashboard/map"
               icon={<MapIcon className="w-4 h-4 text-gold" />}
@@ -487,6 +488,11 @@ function DashboardHome() {
               to="/dashboard/precios"
               icon={<Coins className="w-4 h-4 text-emerald-500" />}
               title="Precios metales"
+            />
+            <Shortcut
+              to="/dashboard/agents"
+              icon={<Bot className="w-4 h-4 text-gold" />}
+              title="Panel de agentes"
             />
             <Shortcut
               to="/dashboard/hse"

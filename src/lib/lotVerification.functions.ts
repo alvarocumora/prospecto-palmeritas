@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import {
   scoreLotVerification,
@@ -85,6 +85,99 @@ async function aiDictamen(
   }
 }
 
+export type LotSignalsInput = {
+  project_id: string | null;
+  organization_id: string | null;
+  assay_report_url: string | null;
+  deleterious_json: unknown;
+  certifications_json: unknown;
+  origin_geojson: unknown;
+};
+
+/**
+ * Recopila las señales de verificación de un lote cruzando su proyecto contra
+ * SERNAGEOMIN, la nómina de remates y el Boletín. Reutilizado por el server fn
+ * de verificación y por el panel de agentes del vendedor. Devuelve también los
+ * códigos de concesión encontrados.
+ */
+export async function gatherLotSignals(
+  sb: SupabaseClient,
+  lot: LotSignalsInput,
+): Promise<{ signals: VerificationSignals; codes: string[] }> {
+  // Concesiones del proyecto vinculado.
+  let concessions: Array<{
+    code: string | null;
+    holder: string | null;
+    rut_holder: string | null;
+    status: string | null;
+  }> = [];
+  if (lot.project_id) {
+    const { data: rows } = await sb
+      .from("mining_concessions")
+      .select("code, holder, rut_holder, status")
+      .eq("project_id", lot.project_id);
+    concessions = rows ?? [];
+  }
+  const codes = concessions.map((c) => c.code).filter((c): c is string => !!c);
+
+  // Legal aggregation desde el status local sincronizado.
+  const legal: LegalBreakdown = { constituidas: 0, enTramite: 0, eliminadas: 0, unknown: 0 };
+  for (const c of concessions) legal[classifyLegalStatus(c.status)] += 1;
+
+  // Cruces autoritativos: nómina de remates y boletín (por código).
+  let remateCount = 0;
+  let bulletinCount = 0;
+  if (codes.length) {
+    const { data: remates } = await sb
+      .from("patent_remates")
+      .select("concession_code")
+      .in("concession_code", codes);
+    remateCount = new Set((remates ?? []).map((r) => r.concession_code)).size;
+
+    const { data: bulletins } = await sb
+      .from("mining_bulletins")
+      .select("concession_code, publication_type")
+      .in("concession_code", codes)
+      .in("publication_type", ["caducidad", "remate", "eliminacion"]);
+    bulletinCount = new Set((bulletins ?? []).map((b) => b.concession_code)).size;
+  }
+
+  // Identidad del vendedor (nombre de la organización) para el match de titular.
+  let orgName: string | null = null;
+  if (lot.organization_id) {
+    const { data: org } = await sb
+      .from("organizations")
+      .select("name")
+      .eq("id", lot.organization_id)
+      .maybeSingle();
+    orgName = org?.name ?? null;
+  }
+
+  const deleterious = lot.deleterious_json;
+  const deleteriousDeclared =
+    (Array.isArray(deleterious) && deleterious.length > 0) ||
+    (!!deleterious && typeof deleterious === "object" && Object.keys(deleterious).length > 0);
+  const certs = lot.certifications_json;
+
+  const signals: VerificationSignals = {
+    hasProject: !!lot.project_id,
+    concessionCount: concessions.length,
+    titularMatch: matchTitular(
+      orgName,
+      concessions.flatMap((c) => [c.holder, c.rut_holder]),
+    ),
+    legal,
+    remateCount,
+    bulletinCount,
+    hasAssayReport: !!lot.assay_report_url,
+    certificationCount: Array.isArray(certs) ? certs.length : 0,
+    deleteriousDeclared,
+    originGeoreferenced: !!lot.origin_geojson,
+  };
+
+  return { signals, codes };
+}
+
 export const verifyCommodityLot = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => input.parse(d))
   .handler(async ({ data }): Promise<LotVerification | null> => {
@@ -103,79 +196,9 @@ export const verifyCommodityLot = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!lot) return null;
 
-    // Concesiones del proyecto vinculado.
-    let concessions: Array<{
-      code: string | null;
-      holder: string | null;
-      rut_holder: string | null;
-      status: string | null;
-    }> = [];
-    if (lot.project_id) {
-      const { data: rows } = await sb
-        .from("mining_concessions")
-        .select("code, holder, rut_holder, status")
-        .eq("project_id", lot.project_id);
-      concessions = rows ?? [];
-    }
-    const codes = concessions.map((c) => c.code).filter((c): c is string => !!c);
-
-    // Legal aggregation desde el status local sincronizado.
-    const legal: LegalBreakdown = { constituidas: 0, enTramite: 0, eliminadas: 0, unknown: 0 };
-    for (const c of concessions) legal[classifyLegalStatus(c.status)] += 1;
-
-    // Cruces autoritativos: nómina de remates y boletín (por código).
-    let remateCount = 0;
-    let bulletinCount = 0;
-    if (codes.length) {
-      const { data: remates } = await sb
-        .from("patent_remates")
-        .select("concession_code")
-        .in("concession_code", codes);
-      remateCount = new Set((remates ?? []).map((r) => r.concession_code)).size;
-
-      const { data: bulletins } = await sb
-        .from("mining_bulletins")
-        .select("concession_code, publication_type")
-        .in("concession_code", codes)
-        .in("publication_type", ["caducidad", "remate", "eliminacion"]);
-      bulletinCount = new Set((bulletins ?? []).map((b) => b.concession_code)).size;
-    }
-
-    // Identidad del vendedor (nombre de la organización) para el match de titular.
-    let orgName: string | null = null;
-    if (lot.organization_id) {
-      const { data: org } = await sb
-        .from("organizations")
-        .select("name")
-        .eq("id", lot.organization_id)
-        .maybeSingle();
-      orgName = org?.name ?? null;
-    }
-
-    const deleterious = lot.deleterious_json;
-    const deleteriousDeclared =
-      (Array.isArray(deleterious) && deleterious.length > 0) ||
-      (!!deleterious && typeof deleterious === "object" && Object.keys(deleterious).length > 0);
-    const certs = lot.certifications_json;
-
-    const signals: VerificationSignals = {
-      hasProject: !!lot.project_id,
-      concessionCount: concessions.length,
-      titularMatch: matchTitular(
-        orgName,
-        concessions.flatMap((c) => [c.holder, c.rut_holder]),
-      ),
-      legal,
-      remateCount,
-      bulletinCount,
-      hasAssayReport: !!lot.assay_report_url,
-      certificationCount: Array.isArray(certs) ? certs.length : 0,
-      deleteriousDeclared,
-      originGeoreferenced: !!lot.origin_geojson,
-    };
-
+    const { signals, codes } = await gatherLotSignals(sb, lot as LotSignalsInput);
     const result = scoreLotVerification(signals);
-    const dictamen = await aiDictamen(result, concessions.length);
+    const dictamen = await aiDictamen(result, signals.concessionCount);
 
     return {
       ...result,
