@@ -923,3 +923,96 @@
     transition: none !important;
   }
 }
+
+/* ============================================================
+   GEOCAPITALS BRAND — Editorial Institutional Noir (dark scope)
+   Wrap marketing content in `.brand-noir` to render the noir & gold
+   palette (Bloomberg/FT for mining). Overrides the same semantic tokens
+   used by `.brand-light` so existing components re-color automatically.
+   Paleta LOCKED: #0d0d0d bg, #1a1a1a surface, #c9a84c gold, #f0d78c gold-hi.
+   Tipografía LOCKED: DM Serif Display + Fira Sans.
+   ============================================================ */
+.brand-noir {
+  /* Primitivos noir */
+  --noir-bg: oklch(0.16 0 0); /* #0d0d0d */
+  --noir-surface: oklch(0.21 0 0); /* #1a1a1a */
+  --noir-elevated: oklch(0.24 0 0); /* #222 */
+  --noir-hairline: oklch(0.28 0 0); /* #333 */
+  --noir-content: oklch(0.96 0 0); /* #f5f5f5 */
+  --noir-content-muted: oklch(0.72 0 0); /* #b0b0b0 */
+  --noir-content-subtle: oklch(0.6 0 0); /* #888 */
+  --noir-gold: oklch(0.75 0.11 82); /* #c9a84c */
+  --noir-gold-hi: oklch(0.87 0.12 90); /* #f0d78c */
+
+  /* Sobrescribe la capa semántica del brand-light */
+  --surface: var(--noir-bg);
+  --surface-2: var(--noir-surface);
+  --surface-3: var(--noir-elevated);
+  --surface-inverse: var(--noir-bg);
+  --content: var(--noir-content);
+  --content-muted: var(--noir-content-muted);
+  --content-subtle: var(--noir-content-subtle);
+  --hairline: var(--noir-hairline);
+  --hairline-strong: oklch(0.34 0 0);
+  --accent-brand: var(--noir-gold);
+  --accent-brand-contrast: var(--noir-bg);
+  --accent-brand-subtle: color-mix(in oklab, var(--noir-gold) 18%, transparent);
+
+  color: var(--content);
+  background-color: var(--surface);
+  font-family: "Fira Sans", ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01", "tnum";
+}
+.brand-noir * {
+  border-color: var(--hairline);
+}
+.brand-noir .brand-display,
+.brand-noir h1,
+.brand-noir h2,
+.brand-noir h3 {
+  font-family: "DM Serif Display", "Lora", Georgia, serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+.brand-noir .brand-eyebrow {
+  font-family: "Fira Sans", sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--noir-gold);
+}
+.brand-noir a {
+  color: inherit;
+}
+.brand-noir hr,
+.brand-noir .border-hairline {
+  border-color: var(--hairline);
+}
+/* Subrayado dorado del nav al hover/activo */
+.brand-noir .noir-nav-link {
+  position: relative;
+  color: var(--noir-content-subtle);
+  transition: color 160ms ease;
+}
+.brand-noir .noir-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 1px;
+  background: var(--noir-gold);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 200ms ease;
+}
+.brand-noir .noir-nav-link:hover,
+.brand-noir .noir-nav-link[data-status="active"] {
+  color: var(--noir-content);
+}
+.brand-noir .noir-nav-link:hover::after,
+.brand-noir .noir-nav-link[data-status="active"]::after {
+  transform: scaleX(1);
+}
+
