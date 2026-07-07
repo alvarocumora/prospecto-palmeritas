@@ -132,75 +132,64 @@ export function MarketingLanding() {
         <div className="relative max-w-7xl mx-auto px-5 py-14 sm:py-20 lg:py-28 grid lg:grid-cols-[1fr_1.1fr] gap-10 sm:gap-12 items-center">
           <div>
             {/* Live badge */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-6 sm:mb-8 backdrop-blur">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/[0.04] border border-[color:var(--noir-gold)]/30 text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--noir-gold)] mb-6 sm:mb-8 backdrop-blur">
               <span className="relative flex h-2 w-2">
-                <span
-                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                  style={{ background: "var(--accent-brand)" }}
-                />
-                <span
-                  className="relative inline-flex rounded-full h-2 w-2"
-                  style={{ background: "var(--accent-brand)" }}
-                />
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 bg-[color:var(--noir-gold)]" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[color:var(--noir-gold)]" />
               </span>
-              <span>{t("hero_eyebrow")}</span>
+              <span>Institutional Terminal · Live</span>
             </div>
 
-            <h1 className="brand-display text-[36px] sm:text-[56px] lg:text-[76px] leading-[0.98] sm:leading-[0.95] tracking-tight text-white break-words">
+            <h1
+              className="text-[42px] sm:text-[64px] lg:text-[84px] leading-[0.92] tracking-tight text-white break-words"
+              style={{ fontFamily: '"DM Serif Display", Georgia, serif', fontWeight: 400 }}
+            >
               {t("hero_title").split(" ").slice(0, 2).join(" ")}{" "}
-              <span className="italic font-normal text-slate-400">
+              <span className="italic text-[color:var(--noir-gold)]">
                 {t("hero_title").split(" ").slice(2, 4).join(" ")}
               </span>{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(90deg, #ffffff 0%, #ffffff 40%, rgba(148,163,184,0.55) 100%)",
-                }}
-              >
+              <span className="text-white/85">
                 {t("hero_title").split(" ").slice(4).join(" ")}
               </span>
             </h1>
 
-            <p className="mt-5 sm:mt-7 text-base sm:text-lg text-slate-400 max-w-xl font-light leading-relaxed">
-              {t("hero_sub")}
+            <p className="mt-6 sm:mt-8 text-base sm:text-lg text-[color:var(--noir-content-subtle)] max-w-xl font-light leading-relaxed">
+              Plataforma líder en LatAm para deal-flow verificado bajo estándar{" "}
+              <span className="text-[color:var(--noir-gold)] font-medium">NI 43-101</span>,
+              catastro minero técnico y marketplace institucional de commodities.
             </p>
 
-            <div className="mt-7 sm:mt-9 flex flex-wrap items-center gap-4 sm:gap-5">
+            <div className="mt-8 sm:mt-10 flex flex-wrap items-center gap-6">
               <Link
                 to="/oportunidades"
-
-                className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
+                className="group inline-flex items-center gap-3 h-12 px-8 border border-[color:var(--noir-gold)] text-[color:var(--noir-gold)] text-[11px] font-bold uppercase tracking-[0.22em] hover:bg-[color:var(--noir-gold)] hover:text-[#0d0d0d] transition-all"
               >
                 {t("cta_publish")}
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-              <Link
-                to="/terminal"
-                className="group flex items-center gap-3 text-[11px] font-semibold tracking-[0.22em] uppercase text-slate-300 hover:text-white transition-colors"
-              >
-                <span className="w-11 h-11 rounded-full border border-white/15 grid place-items-center group-hover:border-white group-hover:bg-white/5 transition-all">
-                  <svg className="w-3.5 h-3.5 fill-current translate-x-[1px]" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
+              <div className="flex flex-col">
+                <span className="text-[10px] text-[color:var(--noir-content-subtle)]/70 uppercase tracking-[0.24em] mb-1">
+                  Market status
                 </span>
-                <span>{t("cta_explore")}</span>
-              </Link>
+                <span className="text-xs font-semibold text-[color:var(--noir-content)]">
+                  Mercado abierto · 14:22 GMT-4
+                </span>
+              </div>
             </div>
 
             {/* Trust strip */}
-            <div className="mt-10 sm:mt-12 pt-6 border-t border-white/5 flex items-center gap-5 sm:gap-8 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
+            <div className="mt-10 sm:mt-12 pt-6 border-t border-white/5 flex items-center gap-5 sm:gap-8 text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--noir-content-subtle)] flex-wrap">
               <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
-                AML
+                <ShieldCheck className="w-4 h-4 text-[color:var(--noir-gold)]" /> KYC / AML
               </span>
               <span className="flex items-center gap-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> NI 43-101
+                <FileText className="w-4 h-4 text-[color:var(--noir-gold)]" /> NI 43-101
               </span>
               <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> 18 países
+                <Globe2 className="w-4 h-4 text-[color:var(--noir-gold)]" /> 18 países
               </span>
             </div>
+
 
             {/* KPI live bar */}
             <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden">
