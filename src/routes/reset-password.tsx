@@ -41,13 +41,23 @@ function ResetPasswordPage() {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password !== confirm) return toast.error("Las contraseñas no coinciden");
-    if (pw.score < 2) return toast.error("Contraseña muy débil");
+    setErrors({});
+    const parsed = resetPasswordSchema.safeParse({ password, confirm });
+    if (!parsed.success) {
+      const fe = zodToFieldErrors<"password" | "confirm">(parsed.error);
+      setErrors(fe);
+      const first = Object.values(fe)[0];
+      if (first) toast.error(first);
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-    if (error) toast.error(translateAuthError(error).message);
-    else {
+    if (error) {
+      const msg = translateAuthError(error).message;
+      setErrors({ password: msg });
+      toast.error(msg);
+    } else {
       toast.success("Contraseña actualizada");
       navigate({ to: "/dashboard" });
     }
