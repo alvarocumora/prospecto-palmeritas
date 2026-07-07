@@ -88,8 +88,9 @@ export function MarketingLanding() {
       ];
 
   return (
-    <div className="brand-light min-h-screen">
+    <div className="brand-noir min-h-screen">
       <MarketingHeader />
+
 
       {/* Hero — cinematic industrialism */}
       <section className="relative overflow-hidden bg-[#05070a] text-slate-200 border-b border-white/5">
