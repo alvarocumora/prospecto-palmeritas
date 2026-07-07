@@ -10,6 +10,8 @@ type Dict = Record<string, { es: string; en: string }>;
 export const STRINGS: Dict = {
   nav_projects: { es: "Proyectos", en: "Projects" },
   nav_marketplace: { es: "Marketplace", en: "Marketplace" },
+  nav_catastro: { es: "Catastro", en: "Cadastre" },
+  nav_pricing: { es: "Precios", en: "Pricing" },
   nav_investors: { es: "Inversionistas", en: "Investors" },
   nav_companies: { es: "Empresas", en: "Companies" },
   nav_resources: { es: "Recursos", en: "Resources" },
