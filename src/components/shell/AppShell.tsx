@@ -18,6 +18,8 @@ import logoMark from "@/assets/geocapitals-mark.png";
 const NAV = [
   { to: "/proyectos", key: "nav_projects" as const },
   { to: "/marketplace", key: "nav_marketplace" as const },
+  { to: "/catastro", key: "nav_catastro" as const },
+  { to: "/catastro/precios", key: "nav_pricing" as const },
   { to: "/inversionistas", key: "nav_investors" as const },
   { to: "/empresas", key: "nav_companies" as const },
   { to: "/recursos", key: "nav_resources" as const },
