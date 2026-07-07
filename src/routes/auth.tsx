@@ -44,6 +44,12 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [resending, setResending] = useState(false);
+  const [errors, setErrors] = useState<{
+    displayName?: string;
+    email?: string;
+    password?: string;
+    form?: string;
+  }>({});
   const pwStrength = evaluatePassword(password);
 
   useEffect(() => {
