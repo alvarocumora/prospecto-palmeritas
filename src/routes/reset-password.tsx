@@ -4,6 +4,7 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
+import { resetPasswordSchema, zodToFieldErrors } from "@/lib/auth-validation";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
