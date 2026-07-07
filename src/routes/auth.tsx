@@ -340,40 +340,59 @@ function AuthPage() {
               <div className="h-px flex-1 bg-border" />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3">
+            <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
-                <Field label="Nombre del geólogo">
+                <Field label="Nombre del geólogo" error={errors.displayName}>
                   <input
                     type="text"
                     value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                    onChange={(e) => {
+                      setDisplayName(e.target.value);
+                      if (errors.displayName) setErrors((p) => ({ ...p, displayName: undefined }));
+                    }}
+                    aria-invalid={!!errors.displayName}
+                    aria-describedby={errors.displayName ? "err-displayName" : undefined}
+                    className={inputCls(!!errors.displayName)}
                     placeholder="Tu nombre"
                     maxLength={100}
+                    autoComplete="name"
                   />
                 </Field>
               )}
-              <Field label="Email">
+              <Field label="Email" error={errors.email}>
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (errors.email) setErrors((p) => ({ ...p, email: undefined }));
+                  }}
                   required
-                  className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "err-email" : undefined}
+                  className={inputCls(!!errors.email)}
                   placeholder="geologo@empresa.com"
                   maxLength={255}
+                  autoComplete="email"
+                  inputMode="email"
                 />
               </Field>
-              <Field label="Contraseña">
+              <Field label="Contraseña" error={errors.password}>
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (errors.password) setErrors((p) => ({ ...p, password: undefined }));
+                  }}
                   required
                   minLength={8}
-                  className="w-full mt-1 px-3 py-2.5 rounded border border-border bg-background text-foreground text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-all"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "err-password" : undefined}
+                  className={inputCls(!!errors.password)}
                   placeholder="••••••••"
                   maxLength={100}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 />
               </Field>
               {mode === "signup" && password.length > 0 && (
@@ -382,6 +401,14 @@ function AuthPage() {
                   label={pwStrength.label}
                   checks={pwStrength.checks}
                 />
+              )}
+              {errors.form && (
+                <div
+                  role="alert"
+                  className="rounded border border-red-500/40 bg-red-500/5 px-3 py-2 text-[11px] font-mono text-red-400"
+                >
+                  {errors.form}
+                </div>
               )}
               <button
                 type="submit"
