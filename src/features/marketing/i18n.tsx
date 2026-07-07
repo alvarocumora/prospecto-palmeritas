@@ -17,19 +17,20 @@ export const STRINGS: Dict = {
   cta_login: { es: "Iniciar sesión", en: "Sign in" },
   cta_signup: { es: "Registrarse", en: "Sign up" },
   hero_eyebrow: {
-    es: "Capital + commodities · LatAm & África",
-    en: "Capital + commodities · LatAm & Africa",
+    es: "Deal-flow minero verificado · LatAm & África",
+    en: "Verified mining deal-flow · LatAm & Africa",
   },
   hero_title: {
-    es: "Capital y commodities para la nueva minería de LatAm y África",
-    en: "Capital and commodities for the new mining of LatAm and Africa",
+    es: "Capital inteligente para la nueva minería",
+    en: "Smart capital for the new mining era",
   },
   hero_sub: {
-    es: "Una plataforma dual: invierte en proyectos mineros verificados y transa concentrados, cátodos, doré, tierras raras y litio certificados desde Chile, Perú, Brasil, Colombia, Venezuela y África.",
-    en: "A dual platform: invest in verified mining projects and trade certified concentrates, cathodes, doré, rare earths and lithium from Chile, Peru, Brazil, Colombia, Venezuela and Africa.",
+    es: "Invierte en proyectos mineros verificados con NI 43-101, catastro trazable y modelo económico listo para comité. Deal-flow calificado en LatAm y África.",
+    en: "Invest in verified mining projects with NI 43-101, traceable cadastre and committee-ready economics. Qualified deal-flow across LatAm and Africa.",
   },
-  cta_publish: { es: "Publica tu proyecto", en: "Publish your project" },
-  cta_explore: { es: "Explorar oportunidades", en: "Explore opportunities" },
+  cta_publish: { es: "Ver oportunidades", en: "See opportunities" },
+  cta_explore: { es: "Abrir plataforma", en: "Open platform" },
+
   open_terminal: { es: "Abrir en Terminal", en: "Open in Terminal" },
   map_chip_live: { es: "GEOCAPITALS · LIVE MAP · CHILE", en: "GEOCAPITALS · LIVE MAP · CHILE" },
   map_mode_listings: { es: "Listados", en: "Listings" },
