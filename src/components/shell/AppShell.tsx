@@ -49,9 +49,10 @@ export function BrandMark({
       />
       {showText && (
         <span
-          className={`font-display text-[19px] tracking-[0.14em] font-bold ${
-            dark ? "text-white" : "text-content"
+          className={`text-[19px] tracking-tighter font-normal ${
+            dark ? "text-[color:var(--noir-gold)]" : "text-content"
           }`}
+          style={{ fontFamily: '"DM Serif Display", Georgia, serif' }}
         >
           GEOCAPITALS
         </span>
