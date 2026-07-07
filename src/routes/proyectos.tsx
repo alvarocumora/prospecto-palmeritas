@@ -15,6 +15,7 @@ import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
+import { ListingsMap } from "@/features/proyectos/ListingsMap";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -154,6 +155,31 @@ function ProyectosPage() {
           </div>
           <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
         </Link>
+      </section>
+
+      {/* Mapa de proyectos publicados (coordenadas WGS84 reales) */}
+      <section className="mt-20">
+        <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
+          <div>
+            <Eyebrow className="mb-2">Mapa de proyectos</Eyebrow>
+            <h2 className="brand-display text-2xl md:text-3xl text-content">
+              Todos los activos en un solo mapa
+            </h2>
+            <p className="text-sm text-content-subtle mt-2 max-w-xl">
+              Coordenadas reales WGS84 de cada proyecto publicado. Los pines se colorean por estado
+              de avance; los destacados llevan un anillo.
+            </p>
+          </div>
+        </div>
+        {isLoading ? (
+          <div className="h-[460px] rounded-2xl border border-hairline bg-slate-100 animate-pulse" />
+        ) : listings.filter((l) => l.centroid).length === 0 ? (
+          <p className="text-sm text-content-subtle italic">
+            Aún no hay proyectos georreferenciados publicados.
+          </p>
+        ) : (
+          <ListingsMap listings={listings} />
+        )}
       </section>
 
       {/* Oportunidades publicadas (datos reales) */}
