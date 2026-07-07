@@ -128,8 +128,18 @@ function AuthPage() {
       }
     } catch (err) {
       const t = translateAuthError(err);
+      // Mapear errores del servidor al campo correspondiente
+      if (t.code === "email_not_confirmed") {
+        setNeedsConfirm(true);
+        setErrors({ email: t.message });
+      } else if (/email|correo/i.test(t.message) && !/contrase/i.test(t.message)) {
+        setErrors({ email: t.message });
+      } else if (/contrase|password/i.test(t.message)) {
+        setErrors({ password: t.message });
+      } else {
+        setErrors({ form: t.message });
+      }
       toast.error(t.message);
-      if (t.code === "email_not_confirmed") setNeedsConfirm(true);
     } finally {
       setLoading(false);
     }
