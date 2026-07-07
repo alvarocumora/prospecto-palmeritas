@@ -49,9 +49,10 @@ export function BrandMark({
       />
       {showText && (
         <span
-          className={`font-display text-[19px] tracking-[0.14em] font-bold ${
-            dark ? "text-white" : "text-content"
+          className={`text-[19px] tracking-tighter font-normal ${
+            dark ? "text-[color:var(--noir-gold)]" : "text-content"
           }`}
+          style={{ fontFamily: '"DM Serif Display", Georgia, serif' }}
         >
           GEOCAPITALS
         </span>
@@ -95,71 +96,78 @@ export function MarketingHeader() {
   const { t } = useLocale();
   const [menuOpen, setMenuOpen] = useState(false);
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-hairline">
-      <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-4">
-        <BrandMark />
-        <nav className="hidden lg:flex items-center gap-5 text-sm text-content/80 ml-4">
+    <header className="sticky top-0 z-40 bg-[#0d0d0d]/92 backdrop-blur-md border-b border-[color:var(--noir-hairline)]/60">
+      <div className="max-w-7xl mx-auto h-16 px-6 flex items-center gap-8">
+        <BrandMark dark size={30} />
+        <nav className="hidden xl:flex items-center gap-6 text-[11px] uppercase tracking-[0.15em] font-semibold ml-2">
           {NAV.map((n) => (
             <Link
               key={n.to}
               to={n.to}
-              className="hover:text-accent-brand transition-colors whitespace-nowrap"
-              activeProps={{ className: "text-accent-brand font-medium" }}
+              className="noir-nav-link whitespace-nowrap"
+              activeProps={{ "data-status": "active" } as never}
             >
               {t(n.key)}
             </Link>
           ))}
         </nav>
         <div className="flex-1" />
-        <div className="hidden sm:inline-flex">
-          <LangToggle />
+        <div className="hidden sm:flex items-center gap-3 text-[10px] font-bold uppercase tracking-wider">
+          <LangToggle tone="dark" />
         </div>
-        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline">
+        <div className="hidden md:block h-4 w-px bg-[color:var(--noir-hairline)]" />
+        <Link
+          to="/auth"
+          className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[color:var(--noir-content-subtle)] hover:text-[color:var(--noir-content)] hidden md:inline transition-colors"
+        >
           {t("cta_login")}
         </Link>
-        <BrandButton asChild size="sm" className="hidden sm:inline-flex">
-          <Link to="/auth">
-            {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </BrandButton>
+        <Link
+          to="/auth"
+          className="hidden sm:inline-flex items-center bg-[color:var(--noir-gold)] text-[#0d0d0d] px-5 py-2 text-[11px] font-bold uppercase tracking-[0.18em] hover:bg-[color:var(--noir-gold-hi)] transition-colors"
+        >
+          {t("cta_signup")}
+        </Link>
         <button
           type="button"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={menuOpen}
-          className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-hairline text-content hover:border-accent-brand"
+          className="xl:hidden inline-flex items-center justify-center w-9 h-9 border border-[color:var(--noir-hairline)] text-[color:var(--noir-content)] hover:border-[color:var(--noir-gold)] transition-colors"
         >
           {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
       </div>
       {menuOpen && (
-        <div className="lg:hidden border-t border-hairline bg-white">
-          <nav className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm">
+        <div className="xl:hidden border-t border-[color:var(--noir-hairline)] bg-[#0d0d0d]">
+          <nav className="max-w-7xl mx-auto px-6 py-3 flex flex-col text-[12px] uppercase tracking-[0.15em] font-semibold">
             {NAV.map((n) => (
               <Link
                 key={n.to}
                 to={n.to}
                 onClick={() => setMenuOpen(false)}
-                className="py-2.5 border-b border-hairline last:border-0 text-content hover:text-accent-brand"
-                activeProps={{ className: "text-accent-brand font-medium" }}
+                className="py-3 border-b border-[color:var(--noir-hairline)] last:border-0 text-[color:var(--noir-content-subtle)] hover:text-[color:var(--noir-gold)] transition-colors"
+                activeProps={{ className: "text-[color:var(--noir-gold)]" }}
               >
                 {t(n.key)}
               </Link>
             ))}
             <div className="pt-3 flex items-center gap-3 sm:hidden">
-              <LangToggle />
+              <LangToggle tone="dark" />
               <Link
                 to="/auth"
                 onClick={() => setMenuOpen(false)}
-                className="text-sm text-content hover:text-accent-brand"
+                className="text-[11px] text-[color:var(--noir-content-subtle)] hover:text-[color:var(--noir-content)]"
               >
                 {t("cta_login")}
               </Link>
-              <BrandButton asChild size="sm">
-                <Link to="/auth" onClick={() => setMenuOpen(false)}>
-                  {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </BrandButton>
+              <Link
+                to="/auth"
+                onClick={() => setMenuOpen(false)}
+                className="inline-flex items-center bg-[color:var(--noir-gold)] text-[#0d0d0d] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] hover:bg-[color:var(--noir-gold-hi)] transition-colors"
+              >
+                {t("cta_signup")}
+              </Link>
             </div>
           </nav>
         </div>
@@ -329,7 +337,7 @@ export function AppShell({
 }) {
   if (variant === "marketing") {
     return (
-      <div className="brand-light min-h-screen flex flex-col">
+      <div className="brand-noir min-h-screen flex flex-col">
         <MarketingHeader />
         <main className="flex-1">{children}</main>
         <MarketingFooter />
@@ -366,19 +374,26 @@ export function MarketingPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="brand-light min-h-screen flex flex-col">
+    <div className="brand-noir min-h-screen flex flex-col">
       <MarketingHeader />
-      <section className="border-b border-hairline bg-gradient-to-b from-accent-brand-subtle/60 to-white">
-        <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
+      <section className="border-b border-[color:var(--noir-hairline)]">
+        <div className="max-w-7xl mx-auto px-6 py-14 lg:py-20">
           {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
-          <h1 className="brand-display text-4xl md:text-5xl text-content max-w-3xl leading-tight">
+          <h1
+            className="brand-display text-4xl md:text-6xl text-[color:var(--noir-content)] max-w-3xl leading-[1.02]"
+            style={{ fontFamily: '"DM Serif Display", Georgia, serif' }}
+          >
             {title}
           </h1>
-          {intro && <p className="mt-4 text-lg text-content-subtle max-w-2xl">{intro}</p>}
+          {intro && (
+            <p className="mt-4 text-lg text-[color:var(--noir-content-muted)] max-w-2xl">
+              {intro}
+            </p>
+          )}
         </div>
       </section>
       <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">{children}</div>
+        <div className="max-w-7xl mx-auto px-6 py-14 lg:py-20">{children}</div>
       </main>
       <MarketingFooter />
     </div>
