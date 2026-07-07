@@ -452,15 +452,40 @@ function AuthPage() {
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <label className="block">
       <span className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground">
         {label}
       </span>
       {children}
+      {error && (
+        <p
+          role="alert"
+          id={`err-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
+          className="mt-1 text-[11px] font-mono text-red-400"
+        >
+          {error}
+        </p>
+      )}
     </label>
   );
+}
+
+function inputCls(hasError: boolean) {
+  return `w-full mt-1 px-3 py-2.5 rounded border bg-background text-foreground text-sm focus:outline-none focus:ring-1 transition-all ${
+    hasError
+      ? "border-red-500/60 focus:border-red-500 focus:ring-red-500/30"
+      : "border-border focus:border-gold focus:ring-gold/30"
+  }`;
 }
 
 function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
