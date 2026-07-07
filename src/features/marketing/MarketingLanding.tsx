@@ -167,7 +167,8 @@ export function MarketingLanding() {
 
             <div className="mt-7 sm:mt-9 flex flex-wrap items-center gap-4 sm:gap-5">
               <Link
-                to="/contacto"
+                to="/oportunidades"
+
                 className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
               >
                 {t("cta_publish")}
