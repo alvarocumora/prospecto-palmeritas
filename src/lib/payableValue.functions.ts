@@ -60,6 +60,16 @@ async function fetchGoldApi(sym: string): Promise<number | null> {
   }
 }
 
+/** Precios de mercado en vivo (cobre + oro + plata), reutilizable por otros agentes. */
+export async function fetchLivePrices(): Promise<PriceInputs> {
+  const [cuUsdT, auUsdOz, agUsdOz] = await Promise.all([
+    fetchCuUsdT(),
+    fetchGoldApi("XAU"),
+    fetchGoldApi("XAG"),
+  ]);
+  return { cuUsdT, auUsdOz, agUsdOz };
+}
+
 function classify(asking: number | null, estimated: number | null): MarketComparison {
   if (asking == null || estimated == null || estimated <= 0)
     return {
