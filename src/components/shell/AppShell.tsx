@@ -374,19 +374,26 @@ export function MarketingPage({
   children: React.ReactNode;
 }) {
   return (
-    <div className="brand-light min-h-screen flex flex-col">
+    <div className="brand-noir min-h-screen flex flex-col">
       <MarketingHeader />
-      <section className="border-b border-hairline bg-gradient-to-b from-accent-brand-subtle/60 to-white">
-        <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">
+      <section className="border-b border-[color:var(--noir-hairline)]">
+        <div className="max-w-7xl mx-auto px-6 py-14 lg:py-20">
           {eyebrow && <Eyebrow className="mb-4">{eyebrow}</Eyebrow>}
-          <h1 className="brand-display text-4xl md:text-5xl text-content max-w-3xl leading-tight">
+          <h1
+            className="brand-display text-4xl md:text-6xl text-[color:var(--noir-content)] max-w-3xl leading-[1.02]"
+            style={{ fontFamily: '"DM Serif Display", Georgia, serif' }}
+          >
             {title}
           </h1>
-          {intro && <p className="mt-4 text-lg text-content-subtle max-w-2xl">{intro}</p>}
+          {intro && (
+            <p className="mt-4 text-lg text-[color:var(--noir-content-muted)] max-w-2xl">
+              {intro}
+            </p>
+          )}
         </div>
       </section>
       <main className="flex-1">
-        <div className="max-w-7xl mx-auto px-5 py-14 lg:py-20">{children}</div>
+        <div className="max-w-7xl mx-auto px-6 py-14 lg:py-20">{children}</div>
       </main>
       <MarketingFooter />
     </div>
