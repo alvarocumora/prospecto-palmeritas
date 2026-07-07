@@ -13,6 +13,7 @@ import {
   FileSignature,
   Sparkles,
   Coins,
+  Bot,
   FileWarning,
   Bell,
   Layers,
@@ -272,6 +273,12 @@ const META: Record<
         icon: <TrendingUp className="w-3.5 h-3.5" />,
         label: "Precios metales",
         desc: "Cobre BML en vivo y poder de compra ENAMI.",
+      },
+      {
+        to: "/dashboard/agents",
+        icon: <Bot className="w-3.5 h-3.5" />,
+        label: "Panel de agentes",
+        desc: "Confianza, valor y demanda de tus lotes.",
       },
       {
         to: "/dashboard/listings",
