@@ -1016,3 +1016,32 @@
   transform: scaleX(1);
 }
 
+/* Override Tailwind literal light utilities so existing marketing sections
+   (built for brand-light) render coherently under noir. */
+.brand-noir .bg-white,
+.brand-noir .bg-white\/90,
+.brand-noir .bg-\[\#fff\] {
+  background-color: var(--noir-bg) !important;
+}
+.brand-noir .bg-accent-brand-subtle,
+.brand-noir .bg-accent-brand-subtle\/40,
+.brand-noir .bg-accent-brand-subtle\/60 {
+  background-color: color-mix(in oklab, var(--noir-gold) 8%, var(--noir-bg)) !important;
+}
+.brand-noir .text-content {
+  color: var(--noir-content);
+}
+.brand-noir .text-content-subtle {
+  color: var(--noir-content-subtle);
+}
+.brand-noir .border-hairline {
+  border-color: var(--noir-hairline);
+}
+.brand-noir .from-accent-brand-subtle\/60 {
+  --tw-gradient-from: color-mix(in oklab, var(--noir-gold) 8%, var(--noir-bg)) !important;
+}
+.brand-noir .to-white {
+  --tw-gradient-to: var(--noir-bg) !important;
+}
+
+
