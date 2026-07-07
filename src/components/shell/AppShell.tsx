@@ -337,7 +337,7 @@ export function AppShell({
 }) {
   if (variant === "marketing") {
     return (
-      <div className="brand-light min-h-screen flex flex-col">
+      <div className="brand-noir min-h-screen flex flex-col">
         <MarketingHeader />
         <main className="flex-1">{children}</main>
         <MarketingFooter />
