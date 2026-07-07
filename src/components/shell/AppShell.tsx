@@ -124,6 +124,7 @@ export function MarketingHeader() {
         </Link>
         <Link
           to="/auth"
+          search={{ mode: "signup" }}
           className="hidden sm:inline-flex items-center bg-[color:var(--noir-gold)] text-[#0d0d0d] px-5 py-2 text-[11px] font-bold uppercase tracking-[0.18em] hover:bg-[color:var(--noir-gold-hi)] transition-colors"
         >
           {t("cta_signup")}
