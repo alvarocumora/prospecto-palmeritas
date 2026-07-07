@@ -164,6 +164,7 @@ export function MarketingHeader() {
               </Link>
               <Link
                 to="/auth"
+                search={{ mode: "signup" }}
                 onClick={() => setMenuOpen(false)}
                 className="inline-flex items-center bg-[color:var(--noir-gold)] text-[#0d0d0d] px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] hover:bg-[color:var(--noir-gold-hi)] transition-colors"
               >
