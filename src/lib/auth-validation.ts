@@ -2,14 +2,14 @@ import { z } from "zod";
 
 // Reusable field schemas with ES messages
 export const emailSchema = z
-  .string({ required_error: "El email es obligatorio." })
+  .string()
   .trim()
   .min(1, "El email es obligatorio.")
   .max(255, "El email no puede superar 255 caracteres.")
   .email("Ingresa un email válido (ej: nombre@empresa.com).");
 
 export const passwordSchema = z
-  .string({ required_error: "La contraseña es obligatoria." })
+  .string()
   .min(8, "La contraseña debe tener al menos 8 caracteres.")
   .max(100, "La contraseña no puede superar 100 caracteres.")
   .regex(/[A-Z]/, "Debe incluir al menos una letra mayúscula.")
@@ -25,9 +25,7 @@ export const displayNameSchema = z
 
 export const loginSchema = z.object({
   email: emailSchema,
-  password: z
-    .string({ required_error: "La contraseña es obligatoria." })
-    .min(1, "La contraseña es obligatoria."),
+  password: z.string().min(1, "La contraseña es obligatoria."),
 });
 
 export const signupSchema = z.object({
