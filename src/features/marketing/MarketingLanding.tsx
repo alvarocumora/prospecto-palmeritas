@@ -1000,6 +1000,113 @@ export function MarketingLanding() {
       {/* FAQ */}
       <FaqAccordion />
 
+      {/* Planes y precios (preview) */}
+      <section className="border-y border-hairline bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20">
+          <Reveal className="max-w-2xl mb-10">
+            <Eyebrow className="mb-3">Planes y precios</Eyebrow>
+            <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
+              Empieza gratis. Escala cuando el proyecto lo pida.
+            </h2>
+            <p className="mt-4 text-content-subtle">
+              Acceso al catastro minero de Chile, monitoreo, alertas y reportes profesionales. Sin
+              contratos anuales obligatorios.
+            </p>
+          </Reveal>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              {
+                name: "Free",
+                price: "US$ 0",
+                cadence: "por siempre",
+                features: ["Mapa catastral público", "Búsqueda por RUT/comuna", "1 AOI guardada"],
+                cta: "Empezar gratis",
+                to: "/catastro/mapa",
+                highlight: false,
+              },
+              {
+                name: "Pro",
+                price: "US$ 49",
+                cadence: "USD / mes",
+                features: [
+                  "Alertas de vencimiento y traslapes",
+                  "AOI y watchlists ilimitadas",
+                  "Exportes GeoJSON / KML / PDF",
+                ],
+                cta: "Ver plan Pro",
+                to: "/catastro/precios",
+                highlight: true,
+              },
+              {
+                name: "Enterprise",
+                price: "A medida",
+                cadence: "facturación anual",
+                features: [
+                  "Multi-tenant + SSO",
+                  "API de catastro + integraciones",
+                  "Soporte dedicado y SLA",
+                ],
+                cta: "Hablar con ventas",
+                to: "/contacto",
+                highlight: false,
+              },
+            ].map((p) => (
+              <div
+                key={p.name}
+                className={`rounded-2xl border p-6 flex flex-col ${
+                  p.highlight
+                    ? "border-accent-brand bg-accent-brand-subtle/40 shadow-[0_18px_40px_-24px_rgba(11,42,91,0.35)]"
+                    : "border-hairline bg-white"
+                }`}
+              >
+                <div className="text-[11px] font-mono uppercase tracking-[0.18em] text-content-subtle mb-2">
+                  {p.name}
+                </div>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-3xl font-bold text-content">{p.price}</span>
+                </div>
+                <div className="text-xs font-mono text-content-subtle mb-4">{p.cadence}</div>
+                <ul className="space-y-2 mb-6 flex-1">
+                  {p.features.map((f, i) => (
+                    <li
+                      key={i}
+                      className="flex items-start gap-2 text-sm text-content"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-accent-brand mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Link
+                  to={p.to}
+                  className={`text-center px-4 py-2.5 rounded-md text-sm font-medium transition ${
+                    p.highlight
+                      ? "bg-accent-brand text-white hover:opacity-90"
+                      : "border border-hairline text-content hover:border-accent-brand"
+                  }`}
+                >
+                  {p.cta}
+                </Link>
+              </div>
+            ))}
+          </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <BrandButton asChild variant="ghost" size="sm">
+              <Link to="/catastro/precios">
+                Ver todos los planes <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </BrandButton>
+            <Link
+              to="/catastro"
+              className="inline-flex items-center gap-2 text-sm text-content-subtle hover:text-accent-brand"
+            >
+              <Map className="w-4 h-4" /> Explorar catastro público
+            </Link>
+          </div>
+        </div>
+      </section>
+
+
       {/* CTA Principal */}
       <section className="relative overflow-hidden bg-surface-inverse text-white">
         <div
