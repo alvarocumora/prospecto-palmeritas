@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import authHero from "@/assets/auth-hero.jpg";
 import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
+import { loginSchema, signupSchema, zodToFieldErrors } from "@/lib/auth-validation";
 
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
