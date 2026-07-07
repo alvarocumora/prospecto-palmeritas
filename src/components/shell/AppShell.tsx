@@ -224,6 +224,11 @@ export function MarketingFooter() {
               </Link>
             </li>
             <li>
+              <Link to="/catastro/precios" className="hover:text-white">
+                Planes y precios
+              </Link>
+            </li>
+            <li>
               <Link to="/auth" className="hover:text-white">
                 Iniciar sesión
               </Link>
