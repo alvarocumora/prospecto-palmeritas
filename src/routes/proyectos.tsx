@@ -15,6 +15,7 @@ import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
+import { ListingsMap } from "@/features/proyectos/ListingsMap";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
