@@ -74,8 +74,20 @@ function AuthPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setNeedsConfirm(false);
-    if (mode === "signup" && pwStrength.score < 2) {
-      toast.error("Contraseña muy débil. Usa al menos 8 caracteres con mayúscula y número.");
+    setErrors({});
+
+    // Validación zod con mensajes claros por campo
+    const schema = mode === "signup" ? signupSchema : loginSchema;
+    const parsed = schema.safeParse(
+      mode === "signup"
+        ? { displayName: displayName.trim(), email: email.trim(), password }
+        : { email: email.trim(), password },
+    );
+    if (!parsed.success) {
+      const fieldErrors = zodToFieldErrors<"displayName" | "email" | "password">(parsed.error);
+      setErrors(fieldErrors);
+      const first = Object.values(fieldErrors)[0];
+      if (first) toast.error(first);
       return;
     }
     setLoading(true);
