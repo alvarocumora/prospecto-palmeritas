@@ -1689,6 +1689,41 @@ export type Database = {
           },
         ]
       }
+      commodity_inquiry_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          inquiry_id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          inquiry_id: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          inquiry_id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_inquiry_messages_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commodity_lot_certifications: {
         Row: {
           certificate_number: string | null
@@ -9485,6 +9520,129 @@ export type Database = {
           slug?: string
           status?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      patent_remates: {
+        Row: {
+          amount_clp: number | null
+          comuna: string | null
+          concession_code: string | null
+          concession_name: string | null
+          concession_type: string | null
+          content_hash: string
+          court: string | null
+          court_role: string | null
+          created_at: string
+          dv_rol: string | null
+          holder_name: string | null
+          holder_rut: string | null
+          id: string
+          ingested_at: string
+          raw_payload: Json | null
+          region: string | null
+          rol: string | null
+          source: string
+          source_url: string | null
+          status: string
+          updated_at: string
+          year: number
+          years_owed: number | null
+        }
+        Insert: {
+          amount_clp?: number | null
+          comuna?: string | null
+          concession_code?: string | null
+          concession_name?: string | null
+          concession_type?: string | null
+          content_hash: string
+          court?: string | null
+          court_role?: string | null
+          created_at?: string
+          dv_rol?: string | null
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          ingested_at?: string
+          raw_payload?: Json | null
+          region?: string | null
+          rol?: string | null
+          source?: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          year: number
+          years_owed?: number | null
+        }
+        Update: {
+          amount_clp?: number | null
+          comuna?: string | null
+          concession_code?: string | null
+          concession_name?: string | null
+          concession_type?: string | null
+          content_hash?: string
+          court?: string | null
+          court_role?: string | null
+          created_at?: string
+          dv_rol?: string | null
+          holder_name?: string | null
+          holder_rut?: string | null
+          id?: string
+          ingested_at?: string
+          raw_payload?: Json | null
+          region?: string | null
+          rol?: string | null
+          source?: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+          year?: number
+          years_owed?: number | null
+        }
+        Relationships: []
+      }
+      payment_orders: {
+        Row: {
+          amount_clp: number
+          amount_usd: number
+          billing: string
+          created_at: string
+          id: string
+          paid_at: string | null
+          payment_id: string | null
+          plan_code: string
+          preference_id: string | null
+          provider: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          amount_clp: number
+          amount_usd: number
+          billing: string
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id?: string | null
+          plan_code: string
+          preference_id?: string | null
+          provider?: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          amount_clp?: number
+          amount_usd?: number
+          billing?: string
+          created_at?: string
+          id?: string
+          paid_at?: string | null
+          payment_id?: string | null
+          plan_code?: string
+          preference_id?: string | null
+          provider?: string
+          status?: string
+          user_id?: string
         }
         Relationships: []
       }
