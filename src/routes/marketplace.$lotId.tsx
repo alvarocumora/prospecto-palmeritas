@@ -17,6 +17,7 @@ import { MarketingHeader, MarketingFooter } from "@/features/marketing/Marketing
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { CommodityCover } from "@/features/marketing/CommodityCover";
 import { LotTrustPanel } from "@/components/marketplace/LotTrustPanel";
+import { LotValuationPanel } from "@/components/marketplace/LotValuationPanel";
 import { Reveal } from "@/features/marketing/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -300,6 +301,9 @@ function LotDetailPage() {
 
             {/* Verificación Know-Your-Mine (agente) */}
             <LotTrustPanel lotId={lot.id} />
+
+            {/* Valor pagable estimado (agente Assay-to-Value) */}
+            <LotValuationPanel lotId={lot.id} />
 
             {/* Descripción larga */}
             {lot.description && (
