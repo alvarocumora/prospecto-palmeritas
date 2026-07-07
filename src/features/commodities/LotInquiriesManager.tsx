@@ -2,7 +2,7 @@
 // avanza por el pipeline de negociación (nueva → contactado → muestra →
 // oferta → negociación → cerrada ganada/perdida) con notas internas.
 import { useCallback, useEffect, useState } from "react";
-import { Loader2, MessageSquare, Save } from "lucide-react";
+import { Loader2, MessageSquare, Save, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
   listMyLotInquiries,
@@ -12,6 +12,7 @@ import {
   type MyLotInquiryRow,
 } from "@/lib/marketplace.functions";
 import { InquiryThread } from "./InquiryThread";
+import { TermSheetPanel } from "./TermSheetPanel";
 
 const STATUS_CLS: Record<string, string> = {
   new: "border-warn/40 bg-warn/10 text-warn",
@@ -29,6 +30,7 @@ export function LotInquiriesManager({ lotId }: { lotId: string }) {
   const [saving, setSaving] = useState<string | null>(null);
   const [drafts, setDrafts] = useState<Record<string, { status: string; notes: string }>>({});
   const [openThread, setOpenThread] = useState<string | null>(null);
+  const [openTermSheet, setOpenTermSheet] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -164,8 +166,17 @@ export function LotInquiriesManager({ lotId }: { lotId: string }) {
                     <MessageSquare className="w-3 h-3" />
                     {openThread === r.id ? "Cerrar chat" : "Mensajes"}
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => setOpenTermSheet((cur) => (cur === r.id ? null : r.id))}
+                    className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold transition-colors"
+                  >
+                    <FileText className="w-3 h-3" />
+                    {openTermSheet === r.id ? "Cerrar term sheet" : "Term sheet"}
+                  </button>
                 </div>
                 {openThread === r.id && <InquiryThread inquiryId={r.id} />}
+                {openTermSheet === r.id && <TermSheetPanel inquiryId={r.id} />}
               </li>
             );
           })}

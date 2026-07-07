@@ -10,6 +10,7 @@ import {
   type MyBuyerInquiryRow,
 } from "@/lib/marketplace.functions";
 import { InquiryThread } from "@/features/commodities/InquiryThread";
+import { RecommendedLots } from "@/features/commodities/RecommendedLots";
 import { commodityLabel, countryFlag, formLabel } from "@/lib/commodityLabels";
 
 export const Route = createFileRoute("/_authenticated/dashboard/my-inquiries")({
@@ -82,6 +83,8 @@ function MyInquiriesPage() {
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Recargar
         </button>
       </div>
+
+      <RecommendedLots />
 
       {loading ? (
         <div className="space-y-3">
