@@ -19,6 +19,7 @@ function ResetPasswordPage() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState<"loading" | "ready" | "expired">("loading");
+  const [errors, setErrors] = useState<{ password?: string; confirm?: string }>({});
   const pw = evaluatePassword(password);
 
   useEffect(() => {
