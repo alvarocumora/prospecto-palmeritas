@@ -24,6 +24,8 @@ export const SNGM_SERVICES_ROOT =
 export const SNGM_CONCESIONES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/2`;
 export const SNGM_VERTICES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/0`;
 export const SNGM_CONCESIONES_ELIMINADAS_URL = `${SNGM_SERVICES_ROOT}/Marceloeliminadas/FeatureServer/0`;
+/** Concesiones eliminadas — capa de polígonos (WGS84_Concesion, ~594k). Terreno liberado. */
+export const SNGM_ELIMINADAS_POLY_URL = `${SNGM_SERVICES_ROOT}/Marceloeliminadas/FeatureServer/2`;
 /** Faenas e instalaciones mineras (130 puntos: empresa, faena, recurso). */
 export const SNGM_YACIMIENTOS_URL = `${SNGM_SERVICES_ROOT}/ACCESO_YACIMIENTOS/FeatureServer/1`;
 /** Geología 1:10.000 (642 polígonos: UNIDAD, Clase_Geol). Nombre con í percent-encoded. */
