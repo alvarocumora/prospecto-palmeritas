@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
+import { z } from "zod";
 import {
   Search,
   Layers,
@@ -12,12 +13,28 @@ import {
   LocateFixed,
   ChevronDown,
   X,
+  Ghost,
+  Download,
+  Printer,
+  ExternalLink,
 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
-import { SNGM_CONCESIONES_URL } from "@/lib/sngm";
+import { SNGM_CONCESIONES_URL, SNGM_ELIMINADAS_POLY_URL } from "@/lib/sngm";
+import { featuresToCSV, featuresToGeoJSON, type ConcesionFeature } from "@/lib/catastroExport";
+
+const searchSchema = z.object({
+  lat: z.coerce.number().optional().catch(undefined),
+  lng: z.coerce.number().optional().catch(undefined),
+  z: z.coerce.number().optional().catch(undefined),
+  tipo: z.enum(["all", "exploracion", "explotacion"]).optional().catch(undefined),
+  sit: z.enum(["all", "constituida", "tramite", "eliminada"]).optional().catch(undefined),
+  base: z.enum(["satelite", "calles"]).optional().catch(undefined),
+  elim: z.coerce.boolean().optional().catch(undefined),
+});
 
 export const Route = createFileRoute("/catastro/mapa")({
+  validateSearch: (s: Record<string, unknown>) => searchSchema.parse(s),
   head: () => ({
     meta: [
       { title: "Mapa Nacional de Concesiones Mineras de Chile · Geocapitals" },
@@ -77,11 +94,20 @@ function colorForSituacion(situacion: unknown): string {
   return "#94a3b8";
 }
 
+type SelectedProps = Record<string, unknown>;
+function rolOf(p: SelectedProps): string {
+  return `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
+}
+
 function CatastroMap() {
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
+
   const mapRef = useRef<HTMLDivElement>(null);
   // Refs a objetos Leaflet para actualizarlos sin reinicializar el mapa.
   const mapObjRef = useRef<unknown>(null);
   const layerRef = useRef<unknown>(null);
+  const elimLayerRef = useRef<unknown>(null);
   const baseLayerRef = useRef<unknown>(null);
 
   const [q, setQ] = useState("");
@@ -90,15 +116,46 @@ function CatastroMap() {
   const [mapError, setMapError] = useState<string | null>(null);
   const [featureCount, setFeatureCount] = useState<number | null>(null);
 
-  const [tipo, setTipo] = useState<TipoFilter>("all");
-  const [situacion, setSituacion] = useState<SituacionFilter>("all");
-  const [basemap, setBasemap] = useState<Basemap>("satelite");
+  const [tipo, setTipo] = useState<TipoFilter>(search.tipo ?? "all");
+  const [situacion, setSituacion] = useState<SituacionFilter>(search.sit ?? "all");
+  const [basemap, setBasemap] = useState<Basemap>(search.base ?? "satelite");
+  const [showEliminadas, setShowEliminadas] = useState<boolean>(!!search.elim);
   const [showFilters, setShowFilters] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [selected, setSelected] = useState<SelectedProps | null>(null);
 
-  const search = useServerFn(searchConcessions);
+  // Espejo del estado para escribir la URL desde eventos del mapa sin closures viejos.
+  const stateRef = useRef({ tipo, situacion, basemap, showEliminadas, navigate });
+  stateRef.current = { tipo, situacion, basemap, showEliminadas, navigate };
+
+  const syncUrl = () => {
+    const map = mapObjRef.current as {
+      getCenter: () => { lat: number; lng: number };
+      getZoom: () => number;
+    } | null;
+    if (!map) return;
+    const st = stateRef.current;
+    const c = map.getCenter();
+    st.navigate({
+      to: "/catastro/mapa",
+      search: {
+        lat: Number(c.lat.toFixed(5)),
+        lng: Number(c.lng.toFixed(5)),
+        z: map.getZoom(),
+        tipo: st.tipo === "all" ? undefined : st.tipo,
+        sit: st.situacion === "all" ? undefined : st.situacion,
+        base: st.basemap === "satelite" ? undefined : st.basemap,
+        elim: st.showEliminadas ? true : undefined,
+      },
+      replace: true,
+    });
+  };
+  const syncUrlRef = useRef(syncUrl);
+  syncUrlRef.current = syncUrl;
+
+  const search$ = useServerFn(searchConcessions);
   const mutation = useMutation({
-    mutationFn: (term: string) => search({ data: { q: term, limit: 20 } }),
+    mutationFn: (term: string) => search$({ data: { q: term, limit: 20 } }),
   });
   const hasResults = (mutation.data?.results.length ?? 0) > 0;
 
@@ -111,15 +168,16 @@ function CatastroMap() {
         const L = (await import("leaflet")).default;
         await import("leaflet/dist/leaflet.css");
         const EL = await import("esri-leaflet");
+        const hasCoords = search.lat != null && search.lng != null;
         const map = L.map(mapRef.current, {
-          center: [-31.63, -71.17],
-          zoom: 11,
+          center: hasCoords ? [search.lat!, search.lng!] : [-31.63, -71.17],
+          zoom: search.z ?? 11,
           zoomControl: false,
         });
         mapObjRef.current = map;
         L.control.zoom({ position: "bottomright" }).addTo(map);
 
-        const base = L.tileLayer(BASEMAPS.satelite, {
+        const base = L.tileLayer(BASEMAPS[stateRef.current.basemap], {
           attribution: "Esri · SERNAGEOMIN",
           maxZoom: 19,
         }).addTo(map);
@@ -130,7 +188,7 @@ function CatastroMap() {
           minZoom: LAYER_MIN_ZOOM,
           precision: 5,
           simplifyFactor: 0.5,
-          where: "1=1",
+          where: buildWhere(stateRef.current.tipo, stateRef.current.situacion),
           style: (feature: { properties?: Record<string, unknown> }) => {
             const c = colorForSituacion(feature?.properties?.SITUACION_CONCESION);
             return { color: c, weight: 1, fillColor: c, fillOpacity: 0.18 };
@@ -138,27 +196,18 @@ function CatastroMap() {
         });
         layerRef.current = concesiones;
 
-        const popupFn = (layer: unknown) => {
-          const p =
-            (layer as { feature?: { properties?: Record<string, unknown> } }).feature?.properties ??
-            {};
-          const rol = `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
-          return `
-          <div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.45">
-            <div style="font-weight:600;font-size:12px">${p.NOMBRE ?? rol}</div>
-            <div>ROL: ${rol}</div>
-            <div>Titular: ${p.TITULAR_NOMBRE ?? "—"}</div>
-            <div>RUT: ${p.TITULAR_RUT ?? "—"}${p.TITULAR_DV ? `-${p.TITULAR_DV}` : ""}</div>
-            <div>Comuna: ${p.COMUNA ?? "—"}</div>
-            <div>Hectáreas: ${p.HECTAREAS ?? "—"}</div>
-            <div>Tipo: ${p.TIPO_CONCESION ?? "—"}</div>
-            <div>Estado: ${p.SITUACION_CONCESION ?? "—"}</div>
-          </div>`;
-        };
-        (concesiones.bindPopup as (fn: (layer: unknown) => string) => void)(popupFn);
+        concesiones.on("click", (e: unknown) => {
+          const ev = e as {
+            layer?: { feature?: { properties?: Record<string, unknown> } };
+            propagatedFrom?: { feature?: { properties?: Record<string, unknown> } };
+          };
+          const props = ev.layer?.feature?.properties ?? ev.propagatedFrom?.feature?.properties;
+          if (props) setSelected(props);
+        });
 
         const syncZoomHint = () => setNeedsZoom(map.getZoom() < LAYER_MIN_ZOOM);
         map.on("zoomend", syncZoomHint);
+        map.on("moveend", () => syncUrlRef.current());
         syncZoomHint();
         concesiones.on("loading", () => setLayerLoading(true));
         concesiones.on("load", () => {
@@ -182,17 +231,19 @@ function CatastroMap() {
       }
     })();
     return () => cleanup?.();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Aplicar filtros a la capa viva (setWhere) sin reinicializar.
+  // Aplicar filtros a la capa viva (setWhere) sin reinicializar + reflejar en URL.
   useEffect(() => {
     const layer = layerRef.current as { setWhere?: (w: string) => void } | null;
     layer?.setWhere?.(buildWhere(tipo, situacion));
+    syncUrlRef.current();
   }, [tipo, situacion]);
 
   // Cambio de basemap.
   useEffect(() => {
-    const map = mapObjRef.current as { addLayer?: (l: unknown) => void } | null;
+    const map = mapObjRef.current;
     const old = baseLayerRef.current as { remove?: () => void } | null;
     if (!map || typeof window === "undefined") return;
     (async () => {
@@ -206,14 +257,84 @@ function CatastroMap() {
       old?.remove?.();
       baseLayerRef.current = next;
     })();
+    syncUrlRef.current();
   }, [basemap]);
 
+  // Overlay de concesiones eliminadas (terreno liberado).
+  useEffect(() => {
+    const map = mapObjRef.current;
+    if (!map || typeof window === "undefined") return;
+    let cancelled = false;
+    (async () => {
+      if (showEliminadas) {
+        if (elimLayerRef.current) return;
+        const EL = await import("esri-leaflet");
+        if (cancelled) return;
+        const elim = EL.featureLayer({
+          url: SNGM_ELIMINADAS_POLY_URL,
+          minZoom: LAYER_MIN_ZOOM,
+          precision: 5,
+          simplifyFactor: 0.5,
+          where: "1=1",
+          style: () => ({
+            color: "#ef4444",
+            weight: 1,
+            dashArray: "3,3",
+            fillColor: "#ef4444",
+            fillOpacity: 0.08,
+          }),
+        });
+        elim.on("click", (e: unknown) => {
+          const ev = e as { layer?: { feature?: { properties?: Record<string, unknown> } } };
+          if (ev.layer?.feature?.properties)
+            setSelected({ ...ev.layer.feature.properties, SITUACION_CONCESION: "ELIMINADA" });
+        });
+        elim.addTo(map as never);
+        elimLayerRef.current = elim;
+      } else if (elimLayerRef.current) {
+        (elimLayerRef.current as { remove: () => void }).remove();
+        elimLayerRef.current = null;
+      }
+    })();
+    syncUrlRef.current();
+    return () => {
+      cancelled = true;
+    };
+  }, [showEliminadas]);
+
   const locate = () => {
-    const map = mapObjRef.current as {
-      locate?: (o: Record<string, unknown>) => void;
-    } | null;
+    const map = mapObjRef.current as { locate?: (o: Record<string, unknown>) => void } | null;
     map?.locate?.({ setView: true, maxZoom: 13 });
   };
+
+  const exportData = (fmt: "geojson" | "csv") => {
+    const collect = (ref: unknown): ConcesionFeature[] => {
+      const out: ConcesionFeature[] = [];
+      const layer = ref as { eachFeature?: (cb: (l: unknown) => void) => void } | null;
+      layer?.eachFeature?.((l) => {
+        const f = (l as { feature?: ConcesionFeature }).feature;
+        if (f) out.push(f);
+      });
+      return out;
+    };
+    const feats = [
+      ...collect(layerRef.current),
+      ...(showEliminadas ? collect(elimLayerRef.current) : []),
+    ];
+    if (feats.length === 0) return;
+    const content = fmt === "geojson" ? featuresToGeoJSON(feats) : featuresToCSV(feats);
+    const blob = new Blob([content], {
+      type: fmt === "geojson" ? "application/geo+json" : "text/csv;charset=utf-8",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `concesiones-catastro.${fmt === "geojson" ? "geojson" : "csv"}`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const filtersActive = tipo !== "all" || situacion !== "all";
 
   return (
     <PublicCatastroShell>
@@ -222,7 +343,7 @@ function CatastroMap() {
         <div ref={mapRef} className="absolute inset-0 z-0" />
 
         {/* Panel flotante: búsqueda + filtros + resultados */}
-        <div className="absolute top-2 left-2 right-2 sm:right-auto sm:w-[360px] z-[500] flex flex-col gap-2 max-h-[calc(100%-1rem)]">
+        <div className="absolute top-2 left-2 right-2 sm:right-auto sm:w-[360px] z-[500] flex flex-col gap-2 max-h-[calc(100%-1rem)] print:hidden">
           <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg">
             {/* Búsqueda */}
             <div className="p-2.5 flex items-center gap-2">
@@ -261,7 +382,7 @@ function CatastroMap() {
                 onClick={() => setShowFilters((v) => !v)}
                 title="Filtros"
                 className={`p-2 rounded border transition-colors ${
-                  showFilters || tipo !== "all" || situacion !== "all"
+                  showFilters || filtersActive
                     ? "border-primary text-primary bg-primary/10"
                     : "border-border text-muted-foreground hover:text-foreground"
                 }`}
@@ -300,6 +421,46 @@ function CatastroMap() {
                     </Chip>
                   ))}
                 </FilterRow>
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+                    Capa eliminadas
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowEliminadas((v) => !v)}
+                    className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono border transition-colors ${
+                      showEliminadas
+                        ? "border-red-500 text-red-500 bg-red-500/10"
+                        : "border-border text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    <Ghost className="w-3 h-3" /> {showEliminadas ? "Ocultar" : "Mostrar"}
+                  </button>
+                </div>
+                <div className="flex items-center gap-1.5 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => exportData("geojson")}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground hover:border-primary/50"
+                  >
+                    <Download className="w-3 h-3" /> GeoJSON
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => exportData("csv")}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 px-2 py-1.5 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground hover:border-primary/50"
+                  >
+                    <Download className="w-3 h-3" /> CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    title="Imprimir / PDF"
+                    className="px-2 py-1.5 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground hover:border-primary/50"
+                  >
+                    <Printer className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
@@ -365,7 +526,7 @@ function CatastroMap() {
         </div>
 
         {/* Controles de mapa: basemap + geolocalización */}
-        <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2 sm:top-2">
+        <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2 print:hidden">
           <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg flex overflow-hidden">
             <button
               type="button"
@@ -394,9 +555,52 @@ function CatastroMap() {
           </button>
         </div>
 
+        {/* Ficha rápida del polígono seleccionado */}
+        {selected && (
+          <div className="absolute bottom-3 right-3 z-[500] w-[280px] max-w-[calc(100%-1.5rem)] rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg p-3 print:hidden">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div className="min-w-0">
+                <div className="text-xs font-mono font-semibold truncate">
+                  {(selected.NOMBRE as string) ?? rolOf(selected)}
+                </div>
+                <div className="text-[10px] font-mono text-muted-foreground">
+                  ROL {rolOf(selected) || "—"}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelected(null)}
+                className="p-0.5 text-muted-foreground hover:text-foreground shrink-0"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <dl className="space-y-1 text-[10px] font-mono">
+              <SelRow k="Titular" v={selected.TITULAR_NOMBRE} />
+              <SelRow k="Comuna" v={selected.COMUNA} />
+              <SelRow k="Hectáreas" v={selected.HECTAREAS} />
+              <SelRow k="Tipo" v={selected.TIPO_CONCESION} />
+              <SelRow
+                k="Situación"
+                v={selected.SITUACION_CONCESION}
+                color={colorForSituacion(selected.SITUACION_CONCESION)}
+              />
+            </dl>
+            {rolOf(selected) && (
+              <Link
+                to="/catastro/c/$code"
+                params={{ code: rolOf(selected) }}
+                className="mt-2.5 inline-flex items-center gap-1.5 text-[11px] font-mono text-primary hover:underline"
+              >
+                Ver ficha completa <ExternalLink className="w-3 h-3" />
+              </Link>
+            )}
+          </div>
+        )}
+
         {/* Aviso: bajo el zoom mínimo la capa no se solicita */}
         {needsZoom && !mapError && (
-          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-2 rounded bg-background/95 border border-border text-[11px] font-mono text-foreground backdrop-blur shadow max-w-[90%] text-center">
+          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-2 rounded bg-background/95 border border-border text-[11px] font-mono text-foreground backdrop-blur shadow max-w-[90%] text-center print:hidden">
             Acércate (zoom {LAYER_MIN_ZOOM}+) para cargar las concesiones — la capa nacional tiene
             ~103.000 polígonos
           </div>
@@ -404,19 +608,19 @@ function CatastroMap() {
 
         {/* Cargando features */}
         {layerLoading && !needsZoom && (
-          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-1.5 rounded bg-background/95 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur">
+          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-1.5 rounded bg-background/95 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur print:hidden">
             Cargando concesiones SERNAGEOMIN…
           </div>
         )}
 
         {/* Error del servicio */}
         {mapError && (
-          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] max-w-md px-3 py-2 rounded bg-background/95 border border-danger/50 text-[11px] font-mono text-danger backdrop-blur shadow text-center">
+          <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] max-w-md px-3 py-2 rounded bg-background/95 border border-danger/50 text-[11px] font-mono text-danger backdrop-blur shadow text-center print:hidden">
             {mapError}
           </div>
         )}
 
-        {/* Leyenda + stats + atribución */}
+        {/* Leyenda + stats + atribución (visible al imprimir) */}
         <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-2 rounded-lg bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur space-y-1">
           <LegendRow color="#10b981" label="Constituida" />
           <LegendRow color="#f59e0b" label="En trámite" />
@@ -476,6 +680,17 @@ function LegendRow({ color, label }: { color: string; label: string }) {
         style={{ borderColor: color, backgroundColor: `${color}33` }}
       />
       {label}
+    </div>
+  );
+}
+
+function SelRow({ k, v, color }: { k: string; v: unknown; color?: string }) {
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <dt className="text-muted-foreground">{k}</dt>
+      <dd className="font-medium truncate" style={color ? { color } : undefined}>
+        {v == null || v === "" ? "—" : String(v)}
+      </dd>
     </div>
   );
 }
