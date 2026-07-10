@@ -27,6 +27,7 @@ import {
   Activity,
   RefreshCw,
   Wallet,
+  Ship,
 } from "lucide-react";
 import type { ExecutiveKpis } from "@/hooks/useExecutiveKpis";
 
@@ -291,6 +292,12 @@ const META: Record<
         icon: <Handshake className="w-3.5 h-3.5" />,
         label: "Publicar deal",
         desc: "Sale, JV o royalty con data room.",
+      },
+      {
+        to: "/dashboard/trades",
+        icon: <Ship className="w-3.5 h-3.5" />,
+        label: "Trade Desk",
+        desc: "Exportación: ICPO, SPA, SBLC y documentos.",
       },
     ],
   },
