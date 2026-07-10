@@ -14,7 +14,10 @@ import {
   ExternalLink,
   Info,
   ChevronRight,
+  FileDown,
 } from "lucide-react";
+import { buildTradeDoc, isGeneratable } from "@/lib/tradeDocGen";
+import { renderTradeDocPdf } from "@/lib/tradeDocPdf";
 import {
   listMyTrades,
   getTradeDetail,
@@ -416,6 +419,7 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
                 <DocRow
                   key={doc.key}
                   tradeId={id}
+                  trade={t}
                   doc={doc}
                   existing={docsByType.get(doc.key)}
                   onChange={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
@@ -431,11 +435,13 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
 
 function DocRow({
   tradeId,
+  trade,
   doc,
   existing,
   onChange,
 }: {
   tradeId: string;
+  trade: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["trade"];
   doc: (typeof DOC_CATALOG)[number];
   existing?: {
     id: string;
@@ -452,6 +458,27 @@ function DocRow({
   const [url, setUrl] = useState(existing?.file_url ?? "");
   const [ref, setRef] = useState(existing?.reference ?? "");
   const [busy, setBusy] = useState(false);
+
+  const generate = async () => {
+    const model = buildTradeDoc(doc.key, {
+      reference: trade.reference,
+      commodity: trade.commodity,
+      form: trade.form,
+      quantity_t: trade.quantity_t,
+      incoterm: trade.incoterm,
+      unit_price_usd: trade.unit_price_usd,
+      total_value_usd: trade.total_value_usd,
+      currency: trade.currency,
+      payment_instrument: trade.payment_instrument,
+      date: new Date().toISOString(),
+    });
+    if (!model) return;
+    try {
+      await renderTradeDocPdf(model);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar el PDF");
+    }
+  };
 
   const save = async (status?: string) => {
     setBusy(true);
@@ -520,6 +547,15 @@ function DocRow({
             </a>
           )}
           <DocStatusPill status={status} />
+          {isGeneratable(doc.key) && (
+            <button
+              onClick={() => void generate()}
+              title="Generar borrador PDF"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-gold/50 text-gold hover:bg-gold/10 inline-flex items-center gap-1"
+            >
+              <FileDown className="w-3 h-3" /> Generar
+            </button>
+          )}
           {status !== "signed" && status !== "verified" && (
             <button
               onClick={() => setOpen((v) => !v)}
