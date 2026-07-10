@@ -75,6 +75,7 @@ import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardPreciosRouteImport } from './routes/_authenticated.dashboard.precios'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
 import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
+import { Route as AuthenticatedDashboardOfferingsRouteImport } from './routes/_authenticated.dashboard.offerings'
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMyInquiriesRouteImport } from './routes/_authenticated.dashboard.my-inquiries'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
@@ -470,6 +471,12 @@ const AuthenticatedDashboardOpportunitiesRoute =
     path: '/dashboard/opportunities',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardOfferingsRoute =
+  AuthenticatedDashboardOfferingsRouteImport.update({
+    id: '/dashboard/offerings',
+    path: '/dashboard/offerings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardNi43101Route =
   AuthenticatedDashboardNi43101RouteImport.update({
     id: '/dashboard/ni43101',
@@ -809,6 +816,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
@@ -921,6 +929,7 @@ export interface FileRoutesByTo {
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
@@ -1035,6 +1044,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
   '/_authenticated/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
+  '/_authenticated/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/_authenticated/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
   '/_authenticated/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
@@ -1149,6 +1159,7 @@ export interface FileRouteTypes {
     | '/dashboard/marketplace'
     | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
+    | '/dashboard/offerings'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
     | '/dashboard/precios'
@@ -1261,6 +1272,7 @@ export interface FileRouteTypes {
     | '/dashboard/marketplace'
     | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
+    | '/dashboard/offerings'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
     | '/dashboard/precios'
@@ -1374,6 +1386,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/marketplace'
     | '/_authenticated/dashboard/my-inquiries'
     | '/_authenticated/dashboard/ni43101'
+    | '/_authenticated/dashboard/offerings'
     | '/_authenticated/dashboard/opportunities'
     | '/_authenticated/dashboard/palmeras'
     | '/_authenticated/dashboard/precios'
@@ -1939,6 +1952,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardOpportunitiesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/offerings': {
+      id: '/_authenticated/dashboard/offerings'
+      path: '/dashboard/offerings'
+      fullPath: '/dashboard/offerings'
+      preLoaderRoute: typeof AuthenticatedDashboardOfferingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/ni43101': {
       id: '/_authenticated/dashboard/ni43101'
       path: '/dashboard/ni43101'
@@ -2365,6 +2385,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
   AuthenticatedDashboardMyInquiriesRoute: typeof AuthenticatedDashboardMyInquiriesRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
+  AuthenticatedDashboardOfferingsRoute: typeof AuthenticatedDashboardOfferingsRoute
   AuthenticatedDashboardOpportunitiesRoute: typeof AuthenticatedDashboardOpportunitiesRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
   AuthenticatedDashboardPreciosRoute: typeof AuthenticatedDashboardPreciosRoute
@@ -2424,6 +2445,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardMyInquiriesRoute:
     AuthenticatedDashboardMyInquiriesRoute,
   AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
+  AuthenticatedDashboardOfferingsRoute: AuthenticatedDashboardOfferingsRoute,
   AuthenticatedDashboardOpportunitiesRoute:
     AuthenticatedDashboardOpportunitiesRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,

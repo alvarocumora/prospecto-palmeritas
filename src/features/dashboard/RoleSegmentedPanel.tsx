@@ -235,6 +235,12 @@ const META: Record<
         desc: "Historial, estados de pago y montos.",
       },
       {
+        to: "/dashboard/offerings",
+        icon: <Coins className="w-3.5 h-3.5" />,
+        label: "Tokenización",
+        desc: "Ofertas fraccionadas y cap table.",
+      },
+      {
         to: "/dashboard/reports",
         icon: <FileSignature className="w-3.5 h-3.5" />,
         label: "Reportes firmados",

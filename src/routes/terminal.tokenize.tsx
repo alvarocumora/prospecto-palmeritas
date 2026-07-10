@@ -15,14 +15,20 @@ export const Route = createFileRoute("/terminal/tokenize")({
         <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">Tokenize</span>
       </div>
       <div className="flex-1 flex items-center justify-center px-6">
-        <div className="max-w-md text-center space-y-3">
-          <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-            Próximamente
-          </p>
+        <div className="max-w-md text-center space-y-4">
           <h1 className="text-2xl font-semibold">Tokenización de activos mineros</h1>
           <p className="text-sm text-muted-foreground">
-            Emite participaciones fraccionadas sobre proyectos NI 43-101 con contratos inteligentes
-            auditables.
+            Emite participaciones fraccionadas sobre proyectos NI 43-101 y gestiona el cap table de
+            inversionistas.
+          </p>
+          <Link
+            to="/dashboard/offerings"
+            className="inline-flex items-center gap-1.5 rounded-md bg-gold px-4 py-2 text-sm font-medium text-black hover:bg-gold/90"
+          >
+            Abrir ofertas y cap table
+          </Link>
+          <p className="text-[10px] text-muted-foreground">
+            Participaciones referenciales. No constituye oferta pública de valores.
           </p>
         </div>
       </div>
