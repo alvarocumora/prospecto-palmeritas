@@ -1,0 +1,653 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import {
+  ArrowLeft,
+  FileCheck,
+  Plus,
+  Loader2,
+  Ship,
+  PenLine,
+  Check,
+  ExternalLink,
+  Info,
+  ChevronRight,
+} from "lucide-react";
+import {
+  listMyTrades,
+  getTradeDetail,
+  createTrade,
+  setTradeStage,
+  upsertTradeDocument,
+  signTradeDocument,
+} from "@/lib/trades.functions";
+import {
+  DOC_CATALOG,
+  TRADE_STAGES,
+  PHASE_LABEL,
+  tradeProgress,
+  stageIndex,
+  type TradePhase,
+  type TradeStage,
+} from "@/lib/tradeDocuments";
+
+export const Route = createFileRoute("/_authenticated/dashboard/trades")({
+  head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
+  component: TradesPage,
+});
+
+const fmtUsd = (n: number | null | undefined) =>
+  n == null ? "—" : `US$ ${Number(n).toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
+
+function TradesPage() {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <div className="container mx-auto p-4 md:p-6 max-w-6xl">
+      <header className="mb-4">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="w-3 h-3" /> Dashboard
+        </Link>
+        <h1 className="text-xl md:text-2xl font-bold mt-1 flex items-center gap-2">
+          <Ship className="w-5 h-5 text-gold" /> Trade Desk · comercio de commodities
+        </h1>
+        <p className="text-xs text-muted-foreground mt-1">
+          Transacciones de concentrado, cátodos y minerales con su ciclo completo: ICPO · FCO · SPA
+          · pago (SBLC/DLC) · documentos de exportación y embarque.
+        </p>
+      </header>
+
+      <div className="rounded border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-700 dark:text-amber-500 mb-4 flex items-start gap-2">
+        <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
+        Gestión documental y de estado del deal entre contrapartes. No emite instrumentos
+        financieros ni sustituye la revisión bancaria/legal de los documentos.
+      </div>
+
+      {selected ? (
+        <TradeDetail id={selected} onBack={() => setSelected(null)} />
+      ) : (
+        <TradesList onOpen={setSelected} />
+      )}
+    </div>
+  );
+}
+
+// ---------- Lista + crear ----------
+function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listMyTrades);
+  const createFn = useServerFn(createTrade);
+  const { data, isLoading } = useQuery({ queryKey: ["my-trades"], queryFn: () => listFn() });
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    counterpartyEmail: "",
+    side: "sell" as "buy" | "sell",
+    commodity: "Cu",
+    form: "concentrate",
+    quantityT: "",
+    incoterm: "CIF",
+    unitPriceUsd: "",
+    paymentInstrument: "sblc_mt760" as "sblc_mt760" | "dlc" | "tt" | "escrow",
+    reference: "",
+  });
+
+  const submit = async () => {
+    if (!form.counterpartyEmail.trim()) return toast.error("Indica el email de la contraparte");
+    setSaving(true);
+    try {
+      const { id } = await createFn({
+        data: {
+          counterpartyEmail: form.counterpartyEmail.trim(),
+          side: form.side,
+          reference: form.reference || undefined,
+          commodity: form.commodity || undefined,
+          form: form.form || undefined,
+          quantityT: form.quantityT ? Number(form.quantityT) : undefined,
+          incoterm: form.incoterm || undefined,
+          unitPriceUsd: form.unitPriceUsd ? Number(form.unitPriceUsd) : undefined,
+          paymentInstrument: form.paymentInstrument,
+        },
+      });
+      toast.success("Trade creado.");
+      setShowForm(false);
+      void qc.invalidateQueries({ queryKey: ["my-trades"] });
+      onOpen(id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo crear");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <>
+      <div className="flex justify-end mb-3">
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
+        >
+          <Plus className="w-3.5 h-3.5" /> Nuevo trade
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
+          <F label="Email contraparte" full>
+            <input
+              value={form.counterpartyEmail}
+              onChange={(e) => setForm({ ...form, counterpartyEmail: e.target.value })}
+              placeholder="comprador@empresa.com"
+              className={inputCls}
+            />
+          </F>
+          <F label="Soy">
+            <select
+              value={form.side}
+              onChange={(e) => setForm({ ...form, side: e.target.value as "buy" | "sell" })}
+              className={inputCls}
+            >
+              <option value="sell">Vendedor</option>
+              <option value="buy">Comprador</option>
+            </select>
+          </F>
+          <F label="Folio (opcional)">
+            <input
+              value={form.reference}
+              onChange={(e) => setForm({ ...form, reference: e.target.value })}
+              placeholder="TRD-2026-001"
+              className={inputCls}
+            />
+          </F>
+          <F label="Commodity">
+            <input
+              value={form.commodity}
+              onChange={(e) => setForm({ ...form, commodity: e.target.value })}
+              className={inputCls}
+            />
+          </F>
+          <F label="Forma">
+            <select
+              value={form.form}
+              onChange={(e) => setForm({ ...form, form: e.target.value })}
+              className={inputCls}
+            >
+              <option value="concentrate">Concentrado</option>
+              <option value="cathode">Cátodos</option>
+              <option value="ore">Mineral</option>
+              <option value="dore">Doré</option>
+            </select>
+          </F>
+          <F label="Cantidad (t)">
+            <input
+              type="number"
+              value={form.quantityT}
+              onChange={(e) => setForm({ ...form, quantityT: e.target.value })}
+              className={inputCls}
+            />
+          </F>
+          <F label="Incoterm">
+            <select
+              value={form.incoterm}
+              onChange={(e) => setForm({ ...form, incoterm: e.target.value })}
+              className={inputCls}
+            >
+              {["EXW", "FCA", "FOB", "CFR", "CIF", "DAP", "DDP"].map((i) => (
+                <option key={i} value={i}>
+                  {i}
+                </option>
+              ))}
+            </select>
+          </F>
+          <F label="Precio USD/t">
+            <input
+              type="number"
+              value={form.unitPriceUsd}
+              onChange={(e) => setForm({ ...form, unitPriceUsd: e.target.value })}
+              className={inputCls}
+            />
+          </F>
+          <F label="Instrumento de pago">
+            <select
+              value={form.paymentInstrument}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  paymentInstrument: e.target.value as typeof form.paymentInstrument,
+                })
+              }
+              className={inputCls}
+            >
+              <option value="sblc_mt760">SBLC (MT760)</option>
+              <option value="dlc">DLC</option>
+              <option value="tt">TT</option>
+              <option value="escrow">Escrow</option>
+            </select>
+          </F>
+          <div className="sm:col-span-2">
+            <button
+              onClick={() => void submit()}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50"
+            >
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Plus className="w-3.5 h-3.5" />
+              )}{" "}
+              Crear trade
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isLoading ? (
+        <Loading />
+      ) : (data ?? []).length === 0 ? (
+        <Empty>Sin trades todavía. Crea el primero para gestionar su ciclo documental.</Empty>
+      ) : (
+        <div className="space-y-2">
+          {(data ?? []).map((t) => {
+            const prog = tradeProgress(t.docs);
+            return (
+              <button
+                key={t.id}
+                onClick={() => onOpen(t.id)}
+                className="w-full text-left rounded-lg border border-border bg-bg-secondary/30 p-3 hover:border-primary/50 transition-colors"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-sm truncate">
+                      {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
+                      <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
+                        {t.role === "buyer" ? "compra" : "venta"}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground font-mono">
+                      {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
+                      {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <StagePill stage={t.stage} />
+                    <div className="w-16 text-right">
+                      <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
+                      <div className="h-1 rounded bg-muted/40 overflow-hidden mt-0.5">
+                        <div
+                          className="h-full bg-primary"
+                          style={{ width: `${prog.overall.pct}%` }}
+                        />
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+}
+
+// ---------- Detalle: pipeline + checklist ----------
+function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
+  const qc = useQueryClient();
+  const detailFn = useServerFn(getTradeDetail);
+  const stageFn = useServerFn(setTradeStage);
+  const { data, isLoading } = useQuery({
+    queryKey: ["trade", id],
+    queryFn: () => detailFn({ data: { id } }),
+  });
+
+  const progress = useMemo(
+    () =>
+      tradeProgress(
+        (data?.documents ?? []).map((d) => ({ doc_type: d.doc_type, status: d.status })),
+      ),
+    [data],
+  );
+
+  const advance = async (stage: TradeStage) => {
+    try {
+      await stageFn({ data: { id, stage } });
+      void qc.invalidateQueries({ queryKey: ["trade", id] });
+      void qc.invalidateQueries({ queryKey: ["my-trades"] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    }
+  };
+
+  if (isLoading) return <Loading />;
+  if (!data) return <Empty>Trade no encontrado.</Empty>;
+  const t = data.trade;
+  const docsByType = new Map(data.documents.map((d) => [d.doc_type, d]));
+
+  return (
+    <>
+      <button
+        onClick={onBack}
+        className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground mb-3"
+      >
+        <ArrowLeft className="w-3 h-3" /> Trades
+      </button>
+
+      {/* Cabecera */}
+      <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4">
+        <div className="flex items-start justify-between gap-3 flex-wrap">
+          <div>
+            <div className="font-bold">{t.reference ?? "Trade"}</div>
+            <div className="text-xs text-muted-foreground font-mono mt-0.5">
+              {t.commodity ?? "—"} · {t.form ?? "—"} · {t.quantity_t ?? "—"} t · {t.incoterm ?? "—"}
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-lg font-bold">{fmtUsd(t.total_value_usd)}</div>
+            <div className="text-[10px] text-muted-foreground font-mono">
+              {fmtUsd(t.unit_price_usd)}/t · {t.payment_instrument ?? "—"} ·{" "}
+              {t.role === "buyer" ? "compra" : "venta"}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Pipeline */}
+      <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
+        <div className="flex items-center gap-1 min-w-max">
+          {TRADE_STAGES.map((s, i) => {
+            const active = stageIndex(t.stage) >= i;
+            const current = t.stage === s.key;
+            return (
+              <button
+                key={s.key}
+                onClick={() => void advance(s.key)}
+                title={s.label}
+                className={`flex items-center gap-1.5 ${i > 0 ? "ml-1" : ""}`}
+              >
+                <span
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono border ${
+                    current
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : active
+                        ? "bg-primary/15 text-primary border-primary/40"
+                        : "bg-muted/30 text-muted-foreground border-border"
+                  }`}
+                >
+                  {active ? <Check className="w-3 h-3" /> : i + 1}
+                </span>
+                <span
+                  className={`text-[10px] font-mono whitespace-nowrap ${current ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+                >
+                  {s.label}
+                </span>
+                {i < TRADE_STAGES.length - 1 && (
+                  <span className="w-4 h-px bg-border mx-1 hidden sm:inline-block" />
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="text-[10px] text-muted-foreground mt-2">
+          Toca una etapa para avanzar el deal. Avance documental: {progress.overall.done}/
+          {progress.overall.total} · núcleo {progress.coreDone}/{progress.coreTotal}.
+        </div>
+      </div>
+
+      {/* Checklist documental por fase */}
+      {(["comercial", "financiero", "exportacion"] as TradePhase[]).map((phase) => {
+        const pp = progress.phases.find((x) => x.phase === phase)!;
+        return (
+          <div key={phase} className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <FileCheck className="w-3.5 h-3.5" /> {PHASE_LABEL[phase]}
+              </div>
+              <div className="text-[10px] font-mono text-muted-foreground">
+                {pp.done}/{pp.total}
+              </div>
+            </div>
+            <div className="rounded-lg border border-border divide-y divide-border">
+              {DOC_CATALOG.filter((d) => d.phase === phase).map((doc) => (
+                <DocRow
+                  key={doc.key}
+                  tradeId={id}
+                  doc={doc}
+                  existing={docsByType.get(doc.key)}
+                  onChange={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function DocRow({
+  tradeId,
+  doc,
+  existing,
+  onChange,
+}: {
+  tradeId: string;
+  doc: (typeof DOC_CATALOG)[number];
+  existing?: {
+    id: string;
+    status: string;
+    file_url: string | null;
+    reference: string | null;
+    issuer: string | null;
+  };
+  onChange: () => void;
+}) {
+  const upsertFn = useServerFn(upsertTradeDocument);
+  const signFn = useServerFn(signTradeDocument);
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState(existing?.file_url ?? "");
+  const [ref, setRef] = useState(existing?.reference ?? "");
+  const [busy, setBusy] = useState(false);
+
+  const save = async (status?: string) => {
+    setBusy(true);
+    try {
+      await upsertFn({
+        data: {
+          tradeId,
+          docType: doc.key,
+          fileUrl: url.trim() || undefined,
+          reference: ref.trim() || undefined,
+          status: status as never,
+        },
+      });
+      toast.success("Documento actualizado");
+      setOpen(false);
+      onChange();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const sign = async () => {
+    if (!existing) return;
+    try {
+      await signFn({ data: { docId: existing.id } });
+      toast.success("Documento firmado");
+      onChange();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    }
+  };
+
+  const status = existing?.status ?? "pending";
+  return (
+    <div className="p-2.5">
+      <div className="flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <div className="text-xs font-medium truncate">
+            {doc.acronym && <span className="font-mono text-gold mr-1">{doc.acronym}</span>}
+            {doc.label}
+            {doc.core && <span className="ml-1 text-[9px] text-primary">•núcleo</span>}
+          </div>
+          <div className="text-[10px] text-muted-foreground font-mono">
+            {existing?.reference ? `N° ${existing.reference} · ` : ""}
+            {doc.party === "buyer"
+              ? "comprador"
+              : doc.party === "seller"
+                ? "vendedor"
+                : doc.party === "both"
+                  ? "ambas partes"
+                  : "tercero"}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 shrink-0">
+          {existing?.file_url && (
+            <a
+              href={existing.file_url}
+              target="_blank"
+              rel="noreferrer"
+              className="p-1 text-primary hover:underline"
+              title="Ver documento"
+            >
+              <ExternalLink className="w-3.5 h-3.5" />
+            </a>
+          )}
+          <DocStatusPill status={status} />
+          {status !== "signed" && status !== "verified" && (
+            <button
+              onClick={() => setOpen((v) => !v)}
+              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground"
+            >
+              {existing ? "Editar" : "Adjuntar"}
+            </button>
+          )}
+        </div>
+      </div>
+      {open && (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="URL del documento (https://…)"
+            className="flex-1 min-w-[160px] px-2 py-1 text-[11px] bg-background border border-border rounded focus:outline-none focus:border-primary"
+          />
+          <input
+            value={ref}
+            onChange={(e) => setRef(e.target.value)}
+            placeholder="N° doc"
+            className="w-24 px-2 py-1 text-[11px] bg-background border border-border rounded focus:outline-none focus:border-primary"
+          />
+          <button
+            onClick={() => void save("uploaded")}
+            disabled={busy}
+            className="px-2 py-1 rounded text-[10px] font-mono bg-primary text-primary-foreground disabled:opacity-50"
+          >
+            Guardar
+          </button>
+          <button
+            onClick={() => void save("verified")}
+            disabled={busy}
+            className="px-2 py-1 rounded text-[10px] font-mono border border-emerald-500/50 text-emerald-600"
+          >
+            <Check className="w-3 h-3 inline" /> Verificar
+          </button>
+          {existing && (
+            <button
+              onClick={() => void sign()}
+              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+            >
+              <PenLine className="w-3 h-3" /> Firmar
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ---------- UI helpers ----------
+const inputCls =
+  "w-full px-2 py-1.5 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary";
+
+function F({
+  label,
+  full,
+  children,
+}: {
+  label: string;
+  full?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <label className={`text-xs ${full ? "sm:col-span-2" : ""}`}>
+      <span className="block text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
+        {label}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function StagePill({ stage }: { stage: string }) {
+  const s = TRADE_STAGES.find((x) => x.key === stage);
+  const closed = stage === "closed";
+  return (
+    <span
+      className={`px-1.5 py-0.5 rounded text-[9px] font-mono border whitespace-nowrap ${
+        closed
+          ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
+          : "text-primary border-primary/40 bg-primary/10"
+      }`}
+    >
+      {s?.label.split(" (")[0] ?? stage}
+    </span>
+  );
+}
+
+function DocStatusPill({ status }: { status: string }) {
+  const tone =
+    status === "verified"
+      ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
+      : status === "signed"
+        ? "text-sky-600 border-sky-500/40 bg-sky-500/10"
+        : status === "uploaded"
+          ? "text-amber-600 border-amber-500/40 bg-amber-500/10"
+          : status === "rejected"
+            ? "text-red-600 border-red-500/40 bg-red-500/10"
+            : "text-muted-foreground border-border";
+  const label: Record<string, string> = {
+    pending: "Pendiente",
+    uploaded: "Cargado",
+    signed: "Firmado",
+    verified: "Verificado",
+    rejected: "Rechazado",
+  };
+  return (
+    <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${tone}`}>
+      {label[status] ?? status}
+    </span>
+  );
+}
+
+function Loading() {
+  return (
+    <div className="flex items-center gap-2 text-sm text-muted-foreground p-8 justify-center">
+      <Loader2 className="w-4 h-4 animate-spin" /> Cargando…
+    </div>
+  );
+}
+
+function Empty({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="p-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-lg">
+      {children}
+    </div>
+  );
+}
