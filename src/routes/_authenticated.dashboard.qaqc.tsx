@@ -6,7 +6,7 @@ import { ShieldCheck, Plus, CheckCircle2, AlertTriangle, XCircle, Clock } from "
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/qaqc")({
-  head: () => ({ meta: [{ title: "QA/QC — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "QA/QC — Geocapitals" }] }),
   component: QaQcPage,
 });
 

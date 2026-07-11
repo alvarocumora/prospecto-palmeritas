@@ -15,7 +15,7 @@ import { AssayCsvImport } from "@/components/sampling/AssayCsvImport";
 import { GeochemFingerprintPanel } from "@/components/sampling/GeochemFingerprintPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/sampling")({
-  head: () => ({ meta: [{ title: "Muestreo — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Muestreo — Geocapitals" }] }),
   component: SamplingPage,
 });
 

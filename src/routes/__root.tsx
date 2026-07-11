@@ -16,7 +16,7 @@ function NotFoundComponent() {
         <h1 className="text-7xl font-bold font-mono text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Página no encontrada</h2>
         <p className="mt-2 text-sm text-muted-foreground">
-          La ruta solicitada no existe en Trackmin GeoIntel.
+          La ruta solicitada no existe en Geocapitals.
         </p>
         <div className="mt-6 flex items-center justify-center gap-3">
           <Link

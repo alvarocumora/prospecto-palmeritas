@@ -26,7 +26,7 @@ import { getPublicPlans } from "@/lib/plans.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin")({
-  head: () => ({ meta: [{ title: "Admin · Plataforma — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Admin · Plataforma — Geocapitals" }] }),
   component: AdminPage,
 });
 
@@ -572,14 +572,17 @@ function OperationsTab() {
       project_id: string | null;
     }[]
   >([]);
+  // Estado real derivado de un ping a Supabase (no hardcodeado).
+  const [dbStatus, setDbStatus] = useState<"ok" | "warn" | "down">("warn");
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("audit_log")
         .select("id,action,entity_type,created_at,project_id")
         .order("created_at", { ascending: false })
         .limit(50);
+      setDbStatus(error ? "down" : "ok");
       setRecent(data ?? []);
     })();
   }, []);
@@ -588,10 +591,12 @@ function OperationsTab() {
     <div className="space-y-4">
       <div className="rounded border border-border bg-bg-secondary p-4">
         <div className="font-mono text-sm font-semibold mb-2">Estado del sistema</div>
-        <div className="grid grid-cols-3 gap-3 text-xs font-mono">
-          <Health label="Base de datos" status="ok" />
-          <Health label="Edge functions" status="ok" />
-          <Health label="IA Gateway" status="ok" />
+        <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+          <Health label="Base de datos" status={dbStatus} />
+          <Health label="API (PostgREST)" status={dbStatus} />
+        </div>
+        <div className="text-[10px] text-text-secondary mt-2 font-mono">
+          Verificado por ping a Supabase. Edge functions e IA Gateway no se monitorean en vivo.
         </div>
       </div>
 

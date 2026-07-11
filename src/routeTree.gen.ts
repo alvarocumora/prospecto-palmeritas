@@ -43,7 +43,6 @@ import { Route as InvitationsTokenRouteImport } from './routes/invitations.$toke
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as DiagMiningEngineRouteImport } from './routes/diag.mining-engine'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
@@ -290,11 +289,6 @@ const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DiagMiningEngineRoute = DiagMiningEngineRouteImport.update({
-  id: '/diag/mining-engine',
-  path: '/diag/mining-engine',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
@@ -775,7 +769,6 @@ export interface FileRoutesByFullPath {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
-  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -889,7 +882,6 @@ export interface FileRoutesByTo {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
-  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1005,7 +997,6 @@ export interface FileRoutesById {
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
-  '/diag/mining-engine': typeof DiagMiningEngineRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1121,7 +1112,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
     | '/catastro/precios'
-    | '/diag/mining-engine'
     | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1235,7 +1225,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
     | '/catastro/precios'
-    | '/diag/mining-engine'
     | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1350,7 +1339,6 @@ export interface FileRouteTypes {
     | '/.well-known/oauth-protected-resource'
     | '/catastro/mapa'
     | '/catastro/precios'
-    | '/diag/mining-engine'
     | '/email/unsubscribe'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1466,7 +1454,6 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
-  DiagMiningEngineRoute: typeof DiagMiningEngineRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
@@ -1739,13 +1726,6 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/diag/mining-engine': {
-      id: '/diag/mining-engine'
-      path: '/diag/mining-engine'
-      fullPath: '/diag/mining-engine'
-      preLoaderRoute: typeof DiagMiningEngineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/precios': {
@@ -2548,7 +2528,6 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
-  DiagMiningEngineRoute: DiagMiningEngineRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,

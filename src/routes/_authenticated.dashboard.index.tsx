@@ -420,7 +420,7 @@ function DashboardHome() {
                 label: "Reportes",
               },
             ]}
-            primary={{ to: "/dashboard/marketplace", label: "Abrir deal room" }}
+            primary={{ to: "/dashboard/deals", label: "Abrir deal room" }}
           />
         </section>
 

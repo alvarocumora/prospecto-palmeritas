@@ -395,7 +395,7 @@ export function renderSection3_Property(
     figure(
       s,
       locationFig,
-      "Mapa de ubicación del Prospecto Palmeras y AOI sobre Macrostrat (geología regional). Fuente: Trackmin GeoIntel.",
+      "Mapa de ubicación del Prospecto Palmeras y AOI sobre Macrostrat (geología regional). Fuente: Geocapitals.",
       {
         height: 100,
       },
@@ -640,7 +640,7 @@ export function renderSection7_DepositType(s: PdfState, geo: GeologyData | null)
   drawCrossSection(
     s,
     "Sección esquemática NW–SE del sistema epitermal–mesotermal Au–Cu del Prospecto Palmeras. " +
-      "Profundidades hasta 500 m. No a escala. Fuente: modelo conceptual Trackmin GeoIntel.",
+      "Profundidades hasta 500 m. No a escala. Fuente: modelo conceptual Geocapitals.",
   );
 }
 
@@ -987,7 +987,7 @@ export function renderSection3bis_Zoning(
       ],
       ["Macrostrat Lithology", "Macrostrat.org", "Variable", "Geología de contexto"],
       ["Catastro Minero", "SERNAGEOMIN Geomin", "Vector", "Pertenencias vigentes"],
-      ["AOI Trackmin", "Trackmin GeoIntel", "Vector interno", "Polígono operativo"],
+      ["AOI Trackmin", "Geocapitals", "Vector interno", "Polígono operativo"],
     ],
     styles: {
       font: "helvetica",

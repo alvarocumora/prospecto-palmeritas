@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { OnboardingWizard } from "@/components/OnboardingWizard";
 
 export const Route = createFileRoute("/_authenticated/dashboard/projects")({
-  head: () => ({ meta: [{ title: "Proyectos — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Proyectos — Geocapitals" }] }),
   component: ProjectsPage,
 });
 

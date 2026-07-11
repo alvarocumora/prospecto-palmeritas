@@ -204,8 +204,11 @@ const STATUS_LABELS: Record<string, string> = {
   cancelada: "Cancelada",
 };
 
-// Hardcoded AOI from project for demo intersection (Palmeras prospect)
-const PROJECT_AOI: [number, number][] = [
+// AOI del prospecto demo Palmeras. Solo se aplica cuando el proyecto activo es
+// Palmeras; para el resto no hay AOI real en el modelo (projects no tiene
+// geometría), así que la intersección se desactiva en vez de calcular contra un
+// polígono fijo (que daría falsos positivos).
+const PALMERAS_AOI: [number, number][] = [
   [-71.1225, -33.9036],
   [-71.1108, -33.9015],
   [-71.1084, -33.8932],
@@ -213,10 +216,15 @@ const PROJECT_AOI: [number, number][] = [
   [-71.1225, -33.9036],
 ];
 
+function aoiForProject(code: string | null | undefined): [number, number][] | null {
+  return code && code.toUpperCase().includes("PALM") ? PALMERAS_AOI : null;
+}
+
 function ConcessionsTab() {
   const { active } = useProjects();
   const { user } = useAuth();
   const { data, loading, refresh } = useMiningConcessions(active?.id ?? null);
+  const projectAoi = aoiForProject(active?.code);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<ExpiryStatus | "all">("all");
   const [editing, setEditing] = useState<MiningConcession | null>(null);
@@ -335,14 +343,16 @@ function ConcessionsTab() {
       {/* Vigilancia (alertas) + Intersección AOI ↔ catastro */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <ConcessionAlertsPanel projectId={active.id} />
-        <AoiOverlapPanel
-          aoi={{ type: "Polygon", coordinates: [PROJECT_AOI] }}
-          concessions={data}
-          onSelectConcession={(id) => {
-            const c = data.find((x) => x.id === id);
-            if (c) setViewing(c);
-          }}
-        />
+        {projectAoi && (
+          <AoiOverlapPanel
+            aoi={{ type: "Polygon", coordinates: [projectAoi] }}
+            concessions={data}
+            onSelectConcession={(id) => {
+              const c = data.find((x) => x.id === id);
+              if (c) setViewing(c);
+            }}
+          />
+        )}
       </div>
 
       {/* Alerts banner */}
@@ -421,7 +431,9 @@ function ConcessionsTab() {
                 const st = expiryStatus(c.expires_at);
                 const days = daysUntilExpiry(c.expires_at);
                 const color = EXPIRY_COLORS[st];
-                const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
+                const intersects = projectAoi
+                  ? intersectsAoiBbox(c.geometry_geojson, projectAoi)
+                  : false;
                 return (
                   <button
                     key={c.id}
@@ -495,7 +507,9 @@ function ConcessionsTab() {
                     const st = expiryStatus(c.expires_at);
                     const days = daysUntilExpiry(c.expires_at);
                     const color = EXPIRY_COLORS[st];
-                    const intersects = intersectsAoiBbox(c.geometry_geojson, PROJECT_AOI);
+                    const intersects = projectAoi
+                      ? intersectsAoiBbox(c.geometry_geojson, projectAoi)
+                      : false;
                     return (
                       <tr
                         key={c.id}
@@ -576,7 +590,9 @@ function ConcessionsTab() {
       {viewing && (
         <ConcessionDetailDrawer
           concession={viewing}
-          intersectsAoi={intersectsAoiBbox(viewing.geometry_geojson, PROJECT_AOI)}
+          intersectsAoi={
+            projectAoi ? intersectsAoiBbox(viewing.geometry_geojson, projectAoi) : false
+          }
           allConcessions={data}
           onJumpTo={(c) => setViewing(c)}
           onClose={() => setViewing(null)}
