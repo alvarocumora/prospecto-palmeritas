@@ -9,6 +9,28 @@ import { DOC_BY_KEY } from "@/lib/tradeDocuments";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 
+/** Registra un evento en el feed del trade (best-effort; no rompe la acción). */
+async function logEvent(
+  sb: SupabaseClient,
+  tradeId: string,
+  actorId: string,
+  kind: string,
+  detail?: string | null,
+  docType?: string | null,
+): Promise<void> {
+  try {
+    await sb.from("trade_events").insert({
+      trade_id: tradeId,
+      actor_user_id: actorId,
+      kind,
+      detail: detail ?? null,
+      doc_type: docType ?? null,
+    });
+  } catch {
+    /* el feed es auxiliar: nunca debe hacer fallar la operación principal */
+  }
+}
+
 export type TradeRow = {
   id: string;
   reference: string | null;
@@ -186,7 +208,9 @@ export const createTrade = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
-    return { id: (row as { id: string }).id };
+    const id = (row as { id: string }).id;
+    await logEvent(sb, id, context.userId, "created", "Trade creado");
+    return { id };
   });
 
 /** El comprador (usuario actual) inicia un trade desde un lote del marketplace,
@@ -228,7 +252,9 @@ export const createTradeFromLot = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
-    return { id: (row as { id: string }).id };
+    const id = (row as { id: string }).id;
+    await logEvent(sb, id, context.userId, "created", "Trade iniciado desde lote del marketplace");
+    return { id };
   });
 
 export const setTradeStage = createServerFn({ method: "POST" })
@@ -247,6 +273,7 @@ export const setTradeStage = createServerFn({ method: "POST" })
     if (data.stage === "closed") patch.status = "closed";
     const { error } = await sb.from("commodity_trades").update(patch).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await logEvent(sb, data.id, context.userId, "stage_changed", data.stage);
     return { ok: true };
   });
 
@@ -282,12 +309,14 @@ export const upsertTradeDocument = createServerFn({ method: "POST" })
     if (data.reference !== undefined) fields.reference = data.reference;
     if (data.notes !== undefined) fields.notes = data.notes;
 
+    const evKind = data.status === "verified" ? "doc_verified" : "doc_uploaded";
     if (existing) {
       const { error } = await sb
         .from("trade_documents")
         .update(fields)
         .eq("id", (existing as { id: string }).id);
       if (error) throw new Error(error.message);
+      await logEvent(sb, data.tradeId, context.userId, evKind, null, data.docType);
       return { id: (existing as { id: string }).id };
     }
     const { data: row, error } = await sb
@@ -306,6 +335,7 @@ export const upsertTradeDocument = createServerFn({ method: "POST" })
       .select("id")
       .single();
     if (error) throw new Error(error.message);
+    await logEvent(sb, data.tradeId, context.userId, evKind, null, data.docType);
     return { id: (row as { id: string }).id };
   });
 
@@ -315,11 +345,15 @@ export const signTradeDocument = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ docId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
-    const { error } = await sb
+    const { data: row, error } = await sb
       .from("trade_documents")
       .update({ status: "signed", signed_by: context.userId, signed_at: new Date().toISOString() })
-      .eq("id", data.docId);
+      .eq("id", data.docId)
+      .select("trade_id, doc_type")
+      .single();
     if (error) throw new Error(error.message);
+    const r = row as { trade_id: string; doc_type: string };
+    await logEvent(sb, r.trade_id, context.userId, "doc_signed", null, r.doc_type);
     return { ok: true };
   });
 
@@ -366,6 +400,69 @@ export const requestTradeDocUpload = createServerFn({ method: "POST" })
       .createSignedUploadUrl(path);
     if (error || !signed) throw new Error(error?.message ?? "No se pudo preparar la subida.");
     return { path, token: signed.token, bucket: TRADE_BUCKET };
+  });
+
+// ── Feed de actividad / colaboración ─────────────────────────────────────────
+
+export type TradeEvent = {
+  id: string;
+  actor_user_id: string;
+  actorName: string | null;
+  kind: string;
+  detail: string | null;
+  doc_type: string | null;
+  created_at: string;
+};
+
+/** Feed de eventos del trade con el nombre del actor. */
+export const listTradeEvents = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<TradeEvent[]> => {
+    const sb = asSb(context.supabase);
+    const { data: rows } = await sb
+      .from("trade_events")
+      .select("id, actor_user_id, kind, detail, doc_type, created_at")
+      .eq("trade_id", data.tradeId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    const events = (rows ?? []) as Array<Omit<TradeEvent, "actorName">>;
+    if (events.length === 0) return [];
+    const ids = Array.from(new Set(events.map((e) => e.actor_user_id)));
+    const { data: profs } = await sb
+      .from("profiles")
+      .select("user_id, display_name, email")
+      .in("user_id", ids);
+    const nameOf = (uid: string) => {
+      const p = (
+        (profs ?? []) as Array<{
+          user_id: string;
+          display_name: string | null;
+          email: string | null;
+        }>
+      ).find((x) => x.user_id === uid);
+      return p?.display_name ?? p?.email ?? null;
+    };
+    return events.map((e) => ({ ...e, actorName: nameOf(e.actor_user_id) }));
+  });
+
+/** Publica un mensaje al feed del trade (visible para la contraparte). */
+export const addTradeMessage = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ tradeId: z.string().uuid(), message: z.string().trim().min(1).max(2000) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    // El INSERT vía RLS ya exige pertenencia al trade y actor = auth.uid.
+    const { error } = await sb.from("trade_events").insert({
+      trade_id: data.tradeId,
+      actor_user_id: context.userId,
+      kind: "message",
+      detail: data.message,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
 
 /** Devuelve una URL firmada (10 min) para ver un documento del trade. */
