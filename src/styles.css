@@ -99,9 +99,10 @@
   --primary: var(--signal-cyan);
   --primary-foreground: oklch(0.13 0.012 240);
 
-  /* Brand accent — usar SOLO en logo Geocapitals */
-  --gold: oklch(0.78 0.13 78);
-  --gold-light: oklch(0.86 0.11 86);
+  /* Brand accent — cobalto Geocapitals (alineado a la landing), luminancia
+     alta para leer bien sobre el tema oscuro del dashboard. */
+  --gold: oklch(0.68 0.16 267);
+  --gold-light: oklch(0.78 0.13 267);
   --copper: oklch(0.62 0.12 45);
   --teal: var(--signal-cyan);
   --info: oklch(0.74 0.13 230);
@@ -158,8 +159,9 @@
   --primary: var(--im-cobalt);
   --primary-foreground: oklch(1 0 0);
 
-  --gold: oklch(0.72 0.13 78);
-  --gold-light: oklch(0.8 0.11 86);
+  /* Brand accent cobalto — sobre papel claro (Mission Control), luminancia baja. */
+  --gold: var(--im-cobalt);
+  --gold-light: oklch(0.6 0.16 267);
   --copper: oklch(0.55 0.12 45);
   --teal: var(--signal-cyan);
   --info: oklch(0.55 0.14 240);
