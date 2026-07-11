@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Loader2, CheckCircle2, AlertTriangle, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/invitations/$token")({
-  head: () => ({ meta: [{ title: "Invitación — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Invitación — Geocapitals" }] }),
   component: InvitationPage,
 });
 

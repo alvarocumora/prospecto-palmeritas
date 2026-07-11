@@ -149,7 +149,7 @@ function FinancePage() {
             <h2 className="text-sm font-semibold mb-3 font-mono uppercase tracking-wider text-muted-foreground">
               Presupuesto por categoría
             </h2>
-            <div className="border border-border rounded overflow-hidden">
+            <div className="border border-border rounded overflow-x-auto">
               <table className="w-full text-xs font-mono">
                 <thead className="bg-muted/50">
                   <tr>
@@ -209,7 +209,7 @@ function FinancePage() {
                 <span className="ml-2 text-gold">· {summary.pendingCount} pendientes</span>
               )}
             </h2>
-            <div className="border border-border rounded overflow-hidden">
+            <div className="border border-border rounded overflow-x-auto">
               <table className="w-full text-xs font-mono">
                 <thead className="bg-muted/50">
                   <tr>

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/project-report")
       { title: "Reporte de proyecto — Geocapitals" },
       {
         name: "description",
-        content: "Reporte interactivo del proyecto activo (Trackmin GeoIntel · Pre NI 43-101).",
+        content: "Reporte interactivo del proyecto activo (Geocapitals · Pre NI 43-101).",
       },
     ],
   }),

@@ -1505,7 +1505,7 @@ export function TrackminGeoIntel() {
       <footer className="border-t border-border mt-12 py-6">
         <div className="max-w-[1400px] mx-auto px-6 flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] text-hint uppercase tracking-wider">
           <div>
-            Trackmin GeoIntel · {PROJECT.operator} · {PROJECT.ref} · Confidencial · © 2026
+            Geocapitals · {PROJECT.operator} · {PROJECT.ref} · Confidencial · © 2026
           </div>
           <div className="flex items-center gap-2">
             <Circle className="w-2 h-2 fill-teal text-teal" />

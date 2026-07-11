@@ -82,9 +82,10 @@ export function MarketingLanding() {
         { v: live.satelliteAnomalies.toString(), l: "Anomalías satelitales" },
       ]
     : [
-        { v: "+124", l: "Proyectos activos" },
-        { v: "+312", l: "Inversionistas" },
-        { v: "18", l: "Países" },
+        // Sin datos aún: placeholders neutros, no cifras inventadas.
+        { v: "—", l: "Yacimientos indexados" },
+        { v: "—", l: "Targets generados" },
+        { v: "—", l: "Anomalías satelitales" },
       ];
 
   return (
@@ -168,7 +169,6 @@ export function MarketingLanding() {
             <div className="mt-7 sm:mt-9 flex flex-wrap items-center gap-4 sm:gap-5">
               <Link
                 to="/oportunidades"
-
                 className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors duration-300"
               >
                 {t("cta_publish")}
@@ -1068,10 +1068,7 @@ export function MarketingLanding() {
                 <div className="text-xs font-mono text-content-subtle mb-4">{p.cadence}</div>
                 <ul className="space-y-2 mb-6 flex-1">
                   {p.features.map((f, i) => (
-                    <li
-                      key={i}
-                      className="flex items-start gap-2 text-sm text-content"
-                    >
+                    <li key={i} className="flex items-start gap-2 text-sm text-content">
                       <CheckCircle2 className="w-4 h-4 text-accent-brand mt-0.5 shrink-0" />
                       <span>{f}</span>
                     </li>
@@ -1105,7 +1102,6 @@ export function MarketingLanding() {
           </div>
         </div>
       </section>
-
 
       {/* CTA Principal */}
       <section className="relative overflow-hidden bg-surface-inverse text-white">

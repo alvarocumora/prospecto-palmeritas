@@ -50,7 +50,7 @@ import { Ni43101DraftPanel } from "@/components/satellite/Ni43101DraftPanel";
 export const Route = createFileRoute("/_authenticated/dashboard/ni43101")({
   head: () => ({
     meta: [
-      { title: "Informe NI 43-101 — Trackmin GeoIntel" },
+      { title: "Informe NI 43-101 — Geocapitals" },
       {
         name: "description",
         content:

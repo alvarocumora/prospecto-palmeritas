@@ -9,7 +9,7 @@ import { Loader2, MessageSquare, Package, ShieldCheck, Store } from "lucide-reac
 import { getMyMarketplaceProfile } from "@/lib/marketplace.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
-  head: () => ({ meta: [{ title: "Mi Perfil — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Mi Perfil — Geocapitals" }] }),
   component: ProfilePage,
 });
 

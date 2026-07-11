@@ -43,7 +43,7 @@ import { useSatelliteAnalysisProgress } from "@/hooks/useSatelliteAnalysisProgre
 import { SatelliteAnalysisProgress } from "@/components/targets/SatelliteAnalysisProgress";
 
 export const Route = createFileRoute("/_authenticated/dashboard/targets")({
-  head: () => ({ meta: [{ title: "Targets Pipeline — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Targets Pipeline — Geocapitals" }] }),
   component: TargetsPage,
 });
 

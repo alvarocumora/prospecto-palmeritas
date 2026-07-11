@@ -13,7 +13,7 @@ import { ClipboardCheck, CheckCircle2, Eye, Archive, RotateCcw } from "lucide-re
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/approvals")({
-  head: () => ({ meta: [{ title: "Aprobaciones — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Aprobaciones — Geocapitals" }] }),
   component: ApprovalsPage,
 });
 

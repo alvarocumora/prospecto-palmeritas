@@ -5,7 +5,7 @@ import { useAuditLog } from "@/hooks/useAuditLog";
 import { Clock, Plus, Pencil, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/audit")({
-  head: () => ({ meta: [{ title: "Auditoría — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Auditoría — Geocapitals" }] }),
   component: AuditPage,
 });
 

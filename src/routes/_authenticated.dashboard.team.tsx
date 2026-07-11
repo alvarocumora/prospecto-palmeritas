@@ -10,7 +10,7 @@ import { UserPlus, Mail, Trash2, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/team")({
-  head: () => ({ meta: [{ title: "Equipo — Trackmin GeoIntel" }] }),
+  head: () => ({ meta: [{ title: "Equipo — Geocapitals" }] }),
   component: TeamPage,
 });
 

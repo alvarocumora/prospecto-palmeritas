@@ -632,7 +632,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
             {project.anomalies.length === 0 ? (
               <p className="text-sm text-content-subtle italic">Sin resultados.</p>
             ) : (
-              <div className="border border-hairline rounded-lg overflow-hidden">
+              <div className="border border-hairline rounded-lg overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-accent-brand-subtle/50 text-xs uppercase tracking-wide text-content-subtle">
                     <tr>
@@ -663,7 +663,7 @@ function ProjectPanel({ project }: { project: PublicSatProject }) {
             {project.insar.length === 0 ? (
               <p className="text-sm text-content-subtle italic">Sin resultados.</p>
             ) : (
-              <div className="border border-hairline rounded-lg overflow-hidden">
+              <div className="border border-hairline rounded-lg overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead className="bg-accent-brand-subtle/50 text-xs uppercase tracking-wide text-content-subtle">
                     <tr>

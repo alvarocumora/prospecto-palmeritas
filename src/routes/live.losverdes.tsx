@@ -36,6 +36,7 @@ const LosVerdesPublicScene = lazy(() =>
   })),
 );
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
+import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
@@ -183,6 +184,7 @@ function LiveLosVerdesPage() {
     staleTime: 60_000,
   });
 
+  const { isAdmin } = useIsSuperAdmin();
   const [pdfBusy, setPdfBusy] = useState(false);
   const [catBusy, setCatBusy] = useState(false);
   const [genBusy, setGenBusy] = useState(false);
@@ -278,35 +280,40 @@ function LiveLosVerdesPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleGenConceptual}
-            disabled={genBusy}
-            className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
-            title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
-          >
-            {genBusy ? (
-              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-            ) : (
-              <Sparkles className="w-3 h-3 mr-1.5" />
-            )}
-            Generar modelo conceptual
-          </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleSyncCatastro}
-            disabled={catBusy}
-            className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
-          >
-            {catBusy ? (
-              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-            ) : (
-              <Layers className="w-3 h-3 mr-1.5" />
-            )}
-            Sincronizar catastro SERNAGEOMIN
-          </Button>
+          {/* Acciones de escritura solo para super-admin (no en la vista pública compartida). */}
+          {isAdmin && (
+            <>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleGenConceptual}
+                disabled={genBusy}
+                className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
+                title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
+              >
+                {genBusy ? (
+                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                ) : (
+                  <Sparkles className="w-3 h-3 mr-1.5" />
+                )}
+                Generar modelo conceptual
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleSyncCatastro}
+                disabled={catBusy}
+                className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
+              >
+                {catBusy ? (
+                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
+                ) : (
+                  <Layers className="w-3 h-3 mr-1.5" />
+                )}
+                Sincronizar catastro SERNAGEOMIN
+              </Button>
+            </>
+          )}
           <Button
             size="sm"
             onClick={handlePdf}

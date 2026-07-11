@@ -209,10 +209,10 @@ const META: Record<
     title: "Inversionista",
     headline: "Deal flow y oportunidades verificadas",
     subtitle: "Marketplace, data rooms, NI 43-101 firmados y watchlist catastral.",
-    primary: { to: "/dashboard/marketplace", label: "Abrir deal flow" },
+    primary: { to: "/dashboard/deals", label: "Abrir deal flow" },
     quick: [
       {
-        to: "/dashboard/marketplace",
+        to: "/marketplace",
         icon: <TrendingUp className="w-3.5 h-3.5" />,
         label: "Marketplace",
         desc: "Listados activos por commodity y región.",
