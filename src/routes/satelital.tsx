@@ -21,6 +21,7 @@ import { BrandCard, Eyebrow, SectionHeading, VerificationBadge } from "@/compone
 import { SatAnomalyMiniMap } from "@/features/marketing/SatAnomalyMiniMap";
 import { getPublicSatellite, type PublicSatProject } from "@/lib/publicSatellite.functions";
 import { projectVerification } from "@/lib/verification";
+import { QueryError } from "@/components/ui/QueryError";
 
 type SatelitalSearch = {
   project?: string;
@@ -111,7 +112,7 @@ const emptyFilters: Filters = {
 function SatelitalPage() {
   const search = Route.useSearch();
   const fetchSat = useServerFn(getPublicSatellite);
-  const { data } = useQuery({
+  const { data, isError, refetch } = useQuery({
     queryKey: ["public-satellite"],
     queryFn: () => fetchSat(),
     staleTime: 60_000,
@@ -207,6 +208,13 @@ function SatelitalPage() {
       </section>
 
       <section className="max-w-7xl mx-auto px-5 py-10">
+        {isError && (
+          <QueryError
+            className="mb-8"
+            message="No pudimos cargar la inteligencia satelital."
+            onRetry={() => void refetch()}
+          />
+        )}
         <div className="rounded-xl border border-hairline bg-surface p-4 mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Filter className="w-4 h-4 text-accent-brand" />

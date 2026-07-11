@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { getSellerAgentsOverview, type LotAgentsRow } from "@/lib/agentsOverview.functions";
 import { commodityLabel } from "@/lib/commodityLabels";
+import { QueryError } from "@/components/ui/QueryError";
 
 export const Route = createFileRoute("/_authenticated/dashboard/agents")({
   head: () => ({ meta: [{ title: "Panel de agentes — Geocapitals" }] }),
@@ -42,7 +43,7 @@ const MARKET_LABEL: Record<string, string> = {
 
 function AgentsPanel() {
   const fn = useServerFn(getSellerAgentsOverview);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["seller-agents-overview"],
     queryFn: () => fn(),
     staleTime: 5 * 60_000,
@@ -64,7 +65,9 @@ function AgentsPanel() {
         demanda. Actúa sobre los que están en riesgo o atención.
       </p>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError message="No pudimos cargar tus lotes." onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (
             <div

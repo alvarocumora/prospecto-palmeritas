@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, MessageSquare, Package, ShieldCheck, Store } from "lucide-react";
 import { getMyMarketplaceProfile } from "@/lib/marketplace.functions";
+import { QueryError } from "@/components/ui/QueryError";
 
 export const Route = createFileRoute("/_authenticated/dashboard/profile")({
   head: () => ({ meta: [{ title: "Mi Perfil — Geocapitals" }] }),
@@ -186,11 +187,22 @@ function ProfilePage() {
 /** Identidad de marketplace: qué eres como comprador y como vendedor. */
 function MarketplaceIdentity() {
   const profileFn = useServerFn(getMyMarketplaceProfile);
-  const { data } = useQuery({
+  const { data, isError, refetch } = useQuery({
     queryKey: ["my-marketplace-profile"],
     queryFn: () => profileFn(),
     staleTime: 60_000,
   });
+
+  if (isError) {
+    return (
+      <div className="mb-6">
+        <QueryError
+          message="No pudimos cargar tu identidad de marketplace."
+          onRetry={() => void refetch()}
+        />
+      </div>
+    );
+  }
 
   if (!data) {
     return (

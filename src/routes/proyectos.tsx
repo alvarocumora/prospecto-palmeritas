@@ -16,6 +16,7 @@ import { getPublicListings } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { ListingsMap } from "@/features/proyectos/ListingsMap";
+import { QueryError } from "@/components/ui/QueryError";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -82,7 +83,7 @@ const SHOWCASE = [
 
 function ProyectosPage() {
   const fetchListings = useServerFn(getPublicListings);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["public-listings"],
     queryFn: () => fetchListings(),
     staleTime: 60_000,
@@ -171,7 +172,9 @@ function ProyectosPage() {
             </p>
           </div>
         </div>
-        {isLoading ? (
+        {isError ? (
+          <QueryError message="No pudimos cargar los proyectos." onRetry={() => void refetch()} />
+        ) : isLoading ? (
           <div className="h-[460px] rounded-2xl border border-hairline bg-slate-100 animate-pulse" />
         ) : listings.filter((l) => l.centroid).length === 0 ? (
           <p className="text-sm text-content-subtle italic">
@@ -198,7 +201,9 @@ function ProyectosPage() {
           </BrandButton>
         </div>
 
-        {isLoading ? (
+        {isError ? (
+          <QueryError message="No pudimos cargar los proyectos." onRetry={() => void refetch()} />
+        ) : isLoading ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {Array.from({ length: 3 }).map((_, i) => (
               <div
