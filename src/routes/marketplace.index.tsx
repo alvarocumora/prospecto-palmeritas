@@ -32,6 +32,7 @@ import {
   formLabel,
   formatTonnes,
 } from "@/lib/commodityLabels";
+import { QueryError } from "@/components/ui/QueryError";
 
 const searchSchema = z.object({
   commodity: z.string().optional(),
@@ -92,7 +93,12 @@ function MarketplacePage() {
     certification: search.cert ?? "",
   });
 
-  const { data: lots = [], isLoading } = useQuery({
+  const {
+    data: lots = [],
+    isLoading,
+    isError,
+    refetch,
+  } = useQuery({
     queryKey: ["marketplace-lots", filters],
     queryFn: () =>
       listFn({
@@ -172,7 +178,10 @@ function MarketplacePage() {
       {/* Grid + sidebar */}
       <div className="grid lg:grid-cols-[1fr_280px] gap-8">
         <div>
-          {isLoading && (
+          {isError && (
+            <QueryError message="No pudimos cargar los lotes." onRetry={() => void refetch()} />
+          )}
+          {!isError && isLoading && (
             <div className="grid sm:grid-cols-2 gap-4">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div
@@ -187,7 +196,7 @@ function MarketplacePage() {
               ))}
             </div>
           )}
-          {!isLoading && lots.length === 0 && (
+          {!isError && !isLoading && lots.length === 0 && (
             <div className="rounded-2xl border border-dashed border-hairline p-10 text-center">
               <Package className="w-8 h-8 text-accent-brand mx-auto mb-3" strokeWidth={1.5} />
               <div className="font-display text-lg text-content">

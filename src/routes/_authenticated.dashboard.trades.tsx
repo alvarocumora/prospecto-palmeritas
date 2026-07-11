@@ -22,6 +22,7 @@ import {
   Send,
 } from "lucide-react";
 import { verifyCommodityLot } from "@/lib/lotVerification.functions";
+import { QueryError } from "@/components/ui/QueryError";
 import { buildTradeDoc, isGeneratable } from "@/lib/tradeDocGen";
 import { renderTradeDocPdf } from "@/lib/tradeDocPdf";
 import {
@@ -95,7 +96,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTrades);
   const createFn = useServerFn(createTrade);
-  const { data, isLoading } = useQuery({ queryKey: ["my-trades"], queryFn: () => listFn() });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["my-trades"],
+    queryFn: () => listFn(),
+  });
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -259,7 +263,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         </div>
       )}
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError message="No pudimos cargar tus trades." onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <Loading />
       ) : (data ?? []).length === 0 ? (
         <Empty>Sin trades todavía. Crea el primero para gestionar su ciclo documental.</Empty>

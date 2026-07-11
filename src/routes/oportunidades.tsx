@@ -8,6 +8,7 @@ import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings, type PublicListing } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
+import { QueryError } from "@/components/ui/QueryError";
 
 export const Route = createFileRoute("/oportunidades")({
   head: () => ({
@@ -106,7 +107,7 @@ function groupListings(all: PublicListing[]): RegionGroup[] {
 
 function OportunidadesPage() {
   const fetchListings = useServerFn(getPublicListings);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["public-listings"],
     queryFn: () => fetchListings(),
     staleTime: 60_000,
@@ -155,7 +156,9 @@ function OportunidadesPage() {
         ))}
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <QueryError message="No pudimos cargar las oportunidades." onRetry={() => void refetch()} />
+      ) : isLoading ? (
         <div className="grid md:grid-cols-2 gap-5">
           {Array.from({ length: 4 }).map((_, i) => (
             <div

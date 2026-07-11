@@ -13,6 +13,7 @@ import {
   subscribeOffering,
   getOfferingDetail,
 } from "@/lib/tokenization.functions";
+import { QueryError } from "@/components/ui/QueryError";
 
 export const Route = createFileRoute("/_authenticated/dashboard/offerings")({
   head: () => ({ meta: [{ title: "Tokenización · Ofertas — Geocapitals" }] }),
@@ -88,7 +89,10 @@ function BrowseTab() {
   const qc = useQueryClient();
   const listFn = useServerFn(listOfferings);
   const subFn = useServerFn(subscribeOffering);
-  const { data, isLoading } = useQuery({ queryKey: ["offerings"], queryFn: () => listFn() });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["offerings"],
+    queryFn: () => listFn(),
+  });
   const [units, setUnits] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState<string | null>(null);
 
@@ -108,6 +112,8 @@ function BrowseTab() {
     }
   };
 
+  if (isError)
+    return <QueryError message="No pudimos cargar las ofertas." onRetry={() => void refetch()} />;
   if (isLoading) return <Loading />;
   const open = (data ?? []).filter((o) => o.status === "open");
   if (open.length === 0) return <Empty>No hay ofertas abiertas por ahora.</Empty>;
@@ -168,7 +174,10 @@ function BrowseTab() {
 // ---------- Mis participaciones ----------
 function HoldingsTab() {
   const listFn = useServerFn(listMyHoldings);
-  const { data, isLoading } = useQuery({ queryKey: ["my-holdings"], queryFn: () => listFn() });
+  const { data, isLoading, isError, refetch } = useQuery({
+    queryKey: ["my-holdings"],
+    queryFn: () => listFn(),
+  });
   const totals = useMemo(() => {
     const rows = data ?? [];
     const active = rows.filter((r) => r.status === "confirmed" || r.status === "pending");
@@ -179,6 +188,10 @@ function HoldingsTab() {
     };
   }, [data]);
 
+  if (isError)
+    return (
+      <QueryError message="No pudimos cargar tus participaciones." onRetry={() => void refetch()} />
+    );
   if (isLoading) return <Loading />;
   if ((data ?? []).length === 0)
     return <Empty>Aún no tienes participaciones. Explora las ofertas abiertas.</Empty>;

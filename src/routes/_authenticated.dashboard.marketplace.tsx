@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { QueryError } from "@/components/ui/QueryError";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { Layers, Download, Loader2 } from "lucide-react";
@@ -26,19 +27,25 @@ function MarketplacePage() {
   const { user } = useAuth();
   const [layers, setLayers] = useState<Layer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [installing, setInstalling] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const { data } = await supabase
-        .from("shared_layers")
-        .select("id,name,description,category,geometry_geojson,tags,downloads_count")
-        .eq("is_public", true)
-        .order("downloads_count", { ascending: false });
-      setLayers((data ?? []) as Layer[]);
-      setLoading(false);
-    })();
+  const loadLayers = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    const { data, error } = await supabase
+      .from("shared_layers")
+      .select("id,name,description,category,geometry_geojson,tags,downloads_count")
+      .eq("is_public", true)
+      .order("downloads_count", { ascending: false });
+    if (error) setLoadError(true);
+    setLayers((data ?? []) as Layer[]);
+    setLoading(false);
   }, []);
+
+  useEffect(() => {
+    void loadLayers();
+  }, [loadLayers]);
 
   const install = async (layer: Layer) => {
     if (!active || !user) {
@@ -79,7 +86,9 @@ function MarketplacePage() {
         </p>
       </header>
 
-      {loading ? (
+      {loadError ? (
+        <QueryError message="No pudimos cargar las capas." onRetry={() => void loadLayers()} />
+      ) : loading ? (
         <div className="text-sm text-muted-foreground">Cargando capas…</div>
       ) : (
         <div className="grid md:grid-cols-2 gap-3">
