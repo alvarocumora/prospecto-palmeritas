@@ -18,6 +18,8 @@ import {
   FileDown,
   Upload,
   ShieldCheck,
+  MessageSquare,
+  Send,
 } from "lucide-react";
 import { verifyCommodityLot } from "@/lib/lotVerification.functions";
 import { buildTradeDoc, isGeneratable } from "@/lib/tradeDocGen";
@@ -31,9 +33,12 @@ import {
   signTradeDocument,
   requestTradeDocUpload,
   getTradeDocDownloadUrl,
+  listTradeEvents,
+  addTradeMessage,
 } from "@/lib/trades.functions";
 import {
   DOC_CATALOG,
+  DOC_BY_KEY,
   TRADE_STAGES,
   PHASE_LABEL,
   tradeProgress,
@@ -438,8 +443,106 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
           </div>
         );
       })}
+
+      {/* Actividad y mensajería entre contrapartes */}
+      <TradeActivity tradeId={id} />
     </>
   );
+}
+
+function TradeActivity({ tradeId }: { tradeId: string }) {
+  const qc = useQueryClient();
+  const listFn = useServerFn(listTradeEvents);
+  const msgFn = useServerFn(addTradeMessage);
+  const { data } = useQuery({
+    queryKey: ["trade-events", tradeId],
+    queryFn: () => listFn({ data: { tradeId } }),
+  });
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const send = async () => {
+    if (!msg.trim()) return;
+    setBusy(true);
+    try {
+      await msgFn({ data: { tradeId, message: msg.trim() } });
+      setMsg("");
+      void qc.invalidateQueries({ queryKey: ["trade-events", tradeId] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo enviar");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mt-2">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+        <MessageSquare className="w-3.5 h-3.5" /> Actividad y mensajes
+      </div>
+      <div className="flex items-center gap-2 mb-3">
+        <input
+          value={msg}
+          onChange={(e) => setMsg(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") void send();
+          }}
+          placeholder="Escribe un mensaje a la contraparte…"
+          className="flex-1 px-3 py-2 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary"
+        />
+        <button
+          onClick={() => void send()}
+          disabled={busy || !msg.trim()}
+          className="px-3 py-2 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+        >
+          <Send className="w-3.5 h-3.5" /> Enviar
+        </button>
+      </div>
+      {(data ?? []).length === 0 ? (
+        <div className="text-[11px] text-muted-foreground">Sin actividad todavía.</div>
+      ) : (
+        <ol className="space-y-2 border-l border-border pl-3">
+          {(data ?? []).map((e) => (
+            <li key={e.id} className="relative text-xs">
+              <span className="absolute -left-[15px] top-1.5 w-1.5 h-1.5 rounded-full bg-primary/60" />
+              <div>
+                {e.kind === "message" ? (
+                  <span className="text-foreground">{e.detail}</span>
+                ) : (
+                  <span className="text-muted-foreground">{eventLabel(e)}</span>
+                )}
+              </div>
+              <div className="text-[10px] font-mono text-muted-foreground/70">
+                {e.actorName ?? "—"} · {new Date(e.created_at).toLocaleString("es-CL")}
+              </div>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  );
+}
+
+function eventLabel(e: { kind: string; detail: string | null; doc_type: string | null }): string {
+  const docLabel = e.doc_type
+    ? (DOC_BY_KEY[e.doc_type]?.acronym ?? DOC_BY_KEY[e.doc_type]?.label ?? e.doc_type)
+    : "";
+  switch (e.kind) {
+    case "created":
+      return e.detail ?? "Trade creado";
+    case "stage_changed": {
+      const stage = TRADE_STAGES.find((s) => s.key === e.detail);
+      return `Avanzó a: ${stage?.label ?? e.detail}`;
+    }
+    case "doc_uploaded":
+      return `Cargó ${docLabel}`;
+    case "doc_signed":
+      return `Firmó ${docLabel}`;
+    case "doc_verified":
+      return `Verificó ${docLabel}`;
+    default:
+      return e.detail ?? e.kind;
+  }
 }
 
 function DocRow({
