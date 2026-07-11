@@ -100,10 +100,29 @@ export const getTradeDetail = createServerFn({ method: "GET" })
       .select(DOC_COLS)
       .eq("trade_id", data.id)
       .order("created_at", { ascending: true });
+
+    // Nombres reales de las partes (para los documentos generados y la ficha).
+    const { data: profs } = await sb
+      .from("profiles")
+      .select("user_id, display_name, email")
+      .in("user_id", [t.buyer_user_id, t.seller_user_id]);
+    const nameOf = (uid: string): string | null => {
+      const p = (
+        (profs ?? []) as Array<{
+          user_id: string;
+          display_name: string | null;
+          email: string | null;
+        }>
+      ).find((x) => x.user_id === uid);
+      return p?.display_name ?? p?.email ?? null;
+    };
+
     return {
       trade: {
         ...t,
         role: t.buyer_user_id === context.userId ? ("buyer" as const) : ("seller" as const),
+        buyerName: nameOf(t.buyer_user_id),
+        sellerName: nameOf(t.seller_user_id),
       },
       documents: (docs ?? []) as TradeDocRow[],
     };
@@ -193,7 +212,8 @@ const UpsertDoc = z.object({
   tradeId: z.string().uuid(),
   docType: z.string().trim().min(1).max(60),
   status: z.enum(["pending", "uploaded", "signed", "verified", "rejected"]).optional(),
-  fileUrl: z.string().url().max(2000).optional(),
+  // URL externa o ruta de storage (no forzamos formato URL).
+  fileUrl: z.string().trim().max(2000).optional(),
   issuer: z.string().trim().max(120).optional(),
   reference: z.string().trim().max(120).optional(),
   notes: z.string().trim().max(1000).optional(),
@@ -259,4 +279,70 @@ export const signTradeDocument = createServerFn({ method: "POST" })
       .eq("id", data.docId);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+// ── Almacenamiento de archivos (bucket privado, signed URLs) ──────────────────
+// Mismo diseño que el data room: el bucket es privado y todo el acceso pasa por
+// estos server fns con service role, autorizando vía la pertenencia al trade.
+const TRADE_BUCKET = "trade-docs";
+
+async function ensureTradeBucket(sb: {
+  storage: {
+    getBucket: (b: string) => Promise<{ data: unknown }>;
+    createBucket: (b: string, o: Record<string, unknown>) => Promise<unknown>;
+  };
+}) {
+  const { data } = await sb.storage.getBucket(TRADE_BUCKET);
+  if (!data)
+    await sb.storage.createBucket(TRADE_BUCKET, {
+      public: false,
+      fileSizeLimit: 50 * 1024 * 1024,
+    });
+}
+
+/** Prepara una signed upload URL para adjuntar un archivo a un documento del trade. */
+export const requestTradeDocUpload = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ tradeId: z.string().uuid(), fileName: z.string().min(1).max(300) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    // Autorización: si el cliente con RLS puede leer el trade, es contraparte.
+    const { data: trade } = await asSb(context.supabase)
+      .from("commodity_trades")
+      .select("id")
+      .eq("id", data.tradeId)
+      .maybeSingle();
+    if (!trade) throw new Error("No autorizado.");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    await ensureTradeBucket(supabaseAdmin as unknown as Parameters<typeof ensureTradeBucket>[0]);
+    const safe = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${data.tradeId}/${crypto.randomUUID()}-${safe}`;
+    const { data: signed, error } = await supabaseAdmin.storage
+      .from(TRADE_BUCKET)
+      .createSignedUploadUrl(path);
+    if (error || !signed) throw new Error(error?.message ?? "No se pudo preparar la subida.");
+    return { path, token: signed.token, bucket: TRADE_BUCKET };
+  });
+
+/** Devuelve una URL firmada (10 min) para ver un documento del trade. */
+export const getTradeDocDownloadUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ docId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<{ url: string | null }> => {
+    const { data: doc } = await asSb(context.supabase)
+      .from("trade_documents")
+      .select("file_url")
+      .eq("id", data.docId)
+      .maybeSingle();
+    const fileUrl = (doc as { file_url: string | null } | null)?.file_url;
+    if (!fileUrl) throw new Error("Documento sin archivo.");
+    // URLs externas se abren directo; las rutas de storage se firman.
+    if (/^https?:\/\//i.test(fileUrl)) return { url: fileUrl };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: signed } = await supabaseAdmin.storage
+      .from(TRADE_BUCKET)
+      .createSignedUrl(fileUrl, 60 * 10);
+    return { url: signed?.signedUrl ?? null };
   });

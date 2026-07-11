@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import {
   ArrowLeft,
   FileCheck,
@@ -15,6 +16,7 @@ import {
   Info,
   ChevronRight,
   FileDown,
+  Upload,
 } from "lucide-react";
 import { buildTradeDoc, isGeneratable } from "@/lib/tradeDocGen";
 import { renderTradeDocPdf } from "@/lib/tradeDocPdf";
@@ -25,6 +27,8 @@ import {
   setTradeStage,
   upsertTradeDocument,
   signTradeDocument,
+  requestTradeDocUpload,
+  getTradeDocDownloadUrl,
 } from "@/lib/trades.functions";
 import {
   DOC_CATALOG,
@@ -454,10 +458,41 @@ function DocRow({
 }) {
   const upsertFn = useServerFn(upsertTradeDocument);
   const signFn = useServerFn(signTradeDocument);
+  const uploadFn = useServerFn(requestTradeDocUpload);
+  const downloadFn = useServerFn(getTradeDocDownloadUrl);
+  const fileRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [url, setUrl] = useState(existing?.file_url ?? "");
   const [ref, setRef] = useState(existing?.reference ?? "");
   const [busy, setBusy] = useState(false);
+
+  const onPickFile = async (file: File) => {
+    setBusy(true);
+    try {
+      const { path, token, bucket } = await uploadFn({
+        data: { tradeId, fileName: file.name },
+      });
+      const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file);
+      if (up.error) throw up.error;
+      await upsertFn({ data: { tradeId, docType: doc.key, fileUrl: path, status: "uploaded" } });
+      toast.success("Archivo subido");
+      onChange();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo subir");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const openDoc = async () => {
+    if (!existing) return;
+    try {
+      const { url: signed } = await downloadFn({ data: { docId: existing.id } });
+      if (signed) window.open(signed, "_blank", "noopener");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo abrir");
+    }
+  };
 
   const generate = async () => {
     const model = buildTradeDoc(doc.key, {
@@ -470,6 +505,8 @@ function DocRow({
       total_value_usd: trade.total_value_usd,
       currency: trade.currency,
       payment_instrument: trade.payment_instrument,
+      buyerName: trade.buyerName,
+      sellerName: trade.sellerName,
       date: new Date().toISOString(),
     });
     if (!model) return;
@@ -535,16 +572,34 @@ function DocRow({
           </div>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
+          <input
+            ref={fileRef}
+            type="file"
+            className="hidden"
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              if (f) void onPickFile(f);
+              e.target.value = "";
+            }}
+          />
           {existing?.file_url && (
-            <a
-              href={existing.file_url}
-              target="_blank"
-              rel="noreferrer"
+            <button
+              onClick={() => void openDoc()}
               className="p-1 text-primary hover:underline"
               title="Ver documento"
             >
               <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            </button>
+          )}
+          {status !== "signed" && status !== "verified" && (
+            <button
+              onClick={() => fileRef.current?.click()}
+              disabled={busy}
+              title="Subir archivo"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground disabled:opacity-50 inline-flex items-center gap-1"
+            >
+              {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
+            </button>
           )}
           <DocStatusPill status={status} />
           {isGeneratable(doc.key) && (
