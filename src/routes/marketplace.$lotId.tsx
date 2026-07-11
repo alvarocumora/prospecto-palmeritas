@@ -28,6 +28,7 @@ import {
   type CommodityLotRow,
 } from "@/lib/marketplace.functions";
 import { getMetalPrices, type MetalQuote } from "@/lib/commodityPrices.functions";
+import { createTradeFromLot } from "@/lib/trades.functions";
 import {
   commodityLabel,
   commodityColor,
@@ -137,7 +138,26 @@ function LotDetailPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const inquiryFn = useServerFn(createCommodityInquiry);
+  const tradeFn = useServerFn(createTradeFromLot);
+  const [startingTrade, setStartingTrade] = useState(false);
   const kycFn = useServerFn(getMyVerificationStatus);
+
+  async function startTrade() {
+    if (!user) {
+      navigate({ to: "/auth", search: { intent: "investor" } as never });
+      return;
+    }
+    setStartingTrade(true);
+    try {
+      await tradeFn({ data: { lotId: lot.id } });
+      toast.success("Trade iniciado. Continúa en el Trade Desk.");
+      navigate({ to: "/dashboard/trades" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo iniciar el trade");
+    } finally {
+      setStartingTrade(false);
+    }
+  }
   const { data: kyc } = useQuery({
     queryKey: ["my-kyc-status"],
     queryFn: () => kycFn(),
@@ -397,9 +417,18 @@ function LotDetailPage() {
                   )}
                 </div>
               ) : !open ? (
-                <BrandButton className="mt-5 w-full" onClick={() => setOpen(true)}>
-                  {user ? "Solicitar oferta" : "Iniciar sesión y solicitar"}
-                </BrandButton>
+                <>
+                  <BrandButton className="mt-5 w-full" onClick={() => setOpen(true)}>
+                    {user ? "Solicitar oferta" : "Iniciar sesión y solicitar"}
+                  </BrandButton>
+                  <button
+                    onClick={() => void startTrade()}
+                    disabled={startingTrade}
+                    className="mt-2 w-full rounded-lg border border-hairline px-4 py-2.5 text-sm font-medium text-content hover:bg-black/5 disabled:opacity-50 transition-colors"
+                  >
+                    {startingTrade ? "Iniciando…" : "Iniciar transacción (Trade Desk)"}
+                  </button>
+                </>
               ) : (
                 <form onSubmit={submit} className="mt-5 space-y-3">
                   <SelectField

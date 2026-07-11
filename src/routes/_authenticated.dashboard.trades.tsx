@@ -17,7 +17,9 @@ import {
   ChevronRight,
   FileDown,
   Upload,
+  ShieldCheck,
 } from "lucide-react";
+import { verifyCommodityLot } from "@/lib/lotVerification.functions";
 import { buildTradeDoc, isGeneratable } from "@/lib/tradeDocGen";
 import { renderTradeDocPdf } from "@/lib/tradeDocPdf";
 import {
@@ -362,6 +364,9 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
           </div>
         </div>
       </div>
+
+      {/* Due diligence del lote de origen (Know-Your-Mine) */}
+      {t.lot_id && <LotTrustCard lotId={t.lot_id} />}
 
       {/* Pipeline */}
       <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
@@ -724,6 +729,57 @@ function DocStatusPill({ status }: { status: string }) {
     <span className={`px-1.5 py-0.5 rounded text-[10px] font-mono border ${tone}`}>
       {label[status] ?? status}
     </span>
+  );
+}
+
+function LotTrustCard({ lotId }: { lotId: string }) {
+  const fn = useServerFn(verifyCommodityLot);
+  const { data } = useQuery({
+    queryKey: ["lot-verification", lotId],
+    queryFn: () => fn({ data: { lotId } }),
+    staleTime: 10 * 60_000,
+  });
+  const tone =
+    data?.level === "high"
+      ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-600"
+      : data?.level === "medium"
+        ? "border-amber-500/40 bg-amber-500/5 text-amber-600"
+        : "border-red-500/40 bg-red-500/5 text-red-600";
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/30 p-3 mb-4">
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+          <ShieldCheck className="w-3.5 h-3.5" /> Due diligence del lote · Know-Your-Mine
+        </div>
+        <Link
+          to="/marketplace/$lotId"
+          params={{ lotId }}
+          className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+        >
+          Ver lote <ExternalLink className="w-3 h-3" />
+        </Link>
+      </div>
+      {data ? (
+        <div className="mt-2 flex items-center gap-3 flex-wrap">
+          <span className={`px-2 py-1 rounded border text-sm font-bold ${tone}`}>
+            {data.score}/100
+          </span>
+          <span className="text-xs font-medium">{data.levelLabel}</span>
+          {data.redFlags.length > 0 && (
+            <span className="text-[11px] text-red-600 font-medium">
+              {data.redFlags.length} bandera(s) roja(s)
+            </span>
+          )}
+          {data.dictamen && (
+            <p className="text-[11px] text-muted-foreground w-full mt-1 leading-relaxed">
+              {data.dictamen}
+            </p>
+          )}
+        </div>
+      ) : (
+        <div className="h-8 mt-2 rounded bg-muted/20 animate-pulse" />
+      )}
+    </div>
   );
 }
 

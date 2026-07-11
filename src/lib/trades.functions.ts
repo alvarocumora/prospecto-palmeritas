@@ -189,6 +189,48 @@ export const createTrade = createServerFn({ method: "POST" })
     return { id: (row as { id: string }).id };
   });
 
+/** El comprador (usuario actual) inicia un trade desde un lote del marketplace,
+ * heredando producto y cantidad. El vendedor es el dueño del lote. */
+export const createTradeFromLot = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ lotId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { data: lot } = await sb
+      .from("commodity_lots")
+      .select("id, seller_user_id, commodity, form, tonnage_available_t, lot_size_t, title")
+      .eq("id", data.lotId)
+      .maybeSingle();
+    if (!lot) throw new Error("Lote no encontrado o no disponible.");
+    const l = lot as {
+      seller_user_id: string;
+      commodity: string | null;
+      form: string | null;
+      tonnage_available_t: number | null;
+      lot_size_t: number | null;
+      title: string | null;
+    };
+    if (l.seller_user_id === context.userId)
+      throw new Error("No puedes iniciar un trade sobre tu propio lote.");
+
+    const { data: row, error } = await sb
+      .from("commodity_trades")
+      .insert({
+        lot_id: data.lotId,
+        buyer_user_id: context.userId,
+        seller_user_id: l.seller_user_id,
+        commodity: l.commodity,
+        form: l.form,
+        quantity_t: l.tonnage_available_t ?? l.lot_size_t ?? null,
+        reference: l.title ? `Lote: ${l.title}`.slice(0, 60) : null,
+        created_by: context.userId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: (row as { id: string }).id };
+  });
+
 export const setTradeStage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) =>
