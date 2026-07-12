@@ -18,6 +18,7 @@ import { BrandButton, Eyebrow } from "@/components/brand";
 import { CommodityCover } from "@/features/marketing/CommodityCover";
 import { LotTrustPanel } from "@/components/marketplace/LotTrustPanel";
 import { LotValuationPanel } from "@/components/marketplace/LotValuationPanel";
+import { SellerReputationPanel } from "@/components/marketplace/SellerReputationPanel";
 import { Reveal } from "@/features/marketing/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -324,6 +325,9 @@ function LotDetailPage() {
 
             {/* Valor pagable estimado (agente Assay-to-Value) */}
             <LotValuationPanel lotId={lot.id} />
+
+            {/* Reputación de la contraparte (buró) */}
+            <SellerReputationPanel lotId={lot.id} />
 
             {/* Descripción larga */}
             {lot.description && (
