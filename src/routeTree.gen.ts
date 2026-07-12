@@ -45,6 +45,7 @@ import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
+import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
@@ -300,6 +301,11 @@ const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
 const CatastroMapaRoute = CatastroMapaRouteImport.update({
   id: '/catastro/mapa',
   path: '/catastro/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroGlobalRoute = CatastroGlobalRouteImport.update({
+  id: '/catastro/global',
+  path: '/catastro/global',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -774,6 +780,7 @@ export interface FileRoutesByFullPath {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -888,6 +895,7 @@ export interface FileRoutesByTo {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -1004,6 +1012,7 @@ export interface FileRoutesById {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -1120,6 +1129,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
@@ -1234,6 +1244,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
@@ -1349,6 +1360,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
@@ -1465,6 +1477,7 @@ export interface RootRouteChildren {
   Visor3dRoute: typeof Visor3dRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  CatastroGlobalRoute: typeof CatastroGlobalRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1753,6 +1766,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro/mapa'
       fullPath: '/catastro/mapa'
       preLoaderRoute: typeof CatastroMapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/global': {
+      id: '/catastro/global'
+      path: '/catastro/global'
+      fullPath: '/catastro/global'
+      preLoaderRoute: typeof CatastroGlobalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/.well-known/oauth-protected-resource': {
@@ -2548,6 +2568,7 @@ const rootRouteChildren: RootRouteChildren = {
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
+  CatastroGlobalRoute: CatastroGlobalRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
