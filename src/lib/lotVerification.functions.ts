@@ -8,6 +8,7 @@ import {
   type LegalBreakdown,
   type LotVerificationResult,
 } from "@/lib/lotVerification";
+import { normalizeAlnum } from "@/lib/text";
 
 // Agente Know-Your-Mine: cruza un lote de commodity contra la columna
 // catastral-legal (proyecto → concesiones → SERNAGEOMIN / remates / boletín) y
@@ -24,22 +25,14 @@ export type LotVerification = LotVerificationResult & {
 
 const input = z.object({ lotId: z.string().uuid() });
 
-function norm(s: string | null | undefined): string {
-  return (s ?? "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "");
-}
-
 /** ¿El nombre del vendedor (org) se parece al titular de alguna concesión? */
 function matchTitular(
   orgName: string | null,
   holders: Array<string | null>,
 ): VerificationSignals["titularMatch"] {
-  const o = norm(orgName);
+  const o = normalizeAlnum(orgName);
   if (!o || o.length < 4) return "unknown";
-  const names = holders.map(norm).filter(Boolean);
+  const names = holders.map(normalizeAlnum).filter(Boolean);
   if (names.length === 0) return "unknown";
   const hit = names.some((h) => h.includes(o) || o.includes(h));
   return hit ? "match" : "mismatch";
