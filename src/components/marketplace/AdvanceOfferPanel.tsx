@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Banknote, Check, AlertTriangle, X, Info } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { Banknote, Check, AlertTriangle, X, Info, Loader2 } from "lucide-react";
 import { getAdvanceOffer } from "@/lib/underwriting.functions";
+import { createAdvanceRequest } from "@/lib/advanceRequests.functions";
+import { useAuth } from "@/hooks/useAuth";
 import type { AdvanceEligibility, FactorStatus } from "@/lib/underwriting";
 
 const ELIG_STYLE: Record<AdvanceEligibility, { chip: string; text: string }> = {
@@ -20,15 +25,21 @@ const STATUS_ICON: Record<FactorStatus, { icon: typeof Check; className: string 
 /**
  * Motor de underwriting: anticipo pre-aprobado sobre el lote, derivado de los
  * tres scores (KYM del activo + reputación de la contraparte + valor pagable).
- * Indicativo, no vinculante. Público y de solo lectura.
+ * El vendedor puede solicitar el anticipo (workflow). Indicativo, no vinculante.
  */
 export function AdvanceOfferPanel({ lotId }: { lotId: string }) {
+  const { user } = useAuth();
   const fn = useServerFn(getAdvanceOffer);
+  const requestFn = useServerFn(createAdvanceRequest);
   const { data, isLoading } = useQuery({
     queryKey: ["advance-offer", lotId],
     queryFn: () => fn({ data: { lotId } }),
     staleTime: 10 * 60_000,
   });
+
+  const [amount, setAmount] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [done, setDone] = useState(false);
 
   if (isLoading) {
     return <div className="h-40 rounded-xl border border-hairline bg-white animate-pulse" />;
@@ -37,6 +48,24 @@ export function AdvanceOfferPanel({ lotId }: { lotId: string }) {
 
   const style = ELIG_STYLE[data.eligibility];
   const financeable = data.eligibility !== "ineligible";
+  const amountValue = amount === "" ? (data.maxAdvanceUsd ?? 0) : Number(amount);
+
+  const onRequest = async () => {
+    if (!Number.isFinite(amountValue) || amountValue <= 0) {
+      toast.error("Ingresa un monto válido.");
+      return;
+    }
+    setSubmitting(true);
+    try {
+      await requestFn({ data: { lotId, requestedAmountUsd: amountValue } });
+      setDone(true);
+      toast.success("Solicitud enviada. Síguela en Anticipos del dashboard.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo enviar la solicitud.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <section className="rounded-xl border border-hairline bg-white p-5">
@@ -97,6 +126,50 @@ export function AdvanceOfferPanel({ lotId }: { lotId: string }) {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* Solicitud del vendedor */}
+      {financeable && data.maxAdvanceUsd != null && (
+        <div className="mt-4 border-t border-hairline pt-4">
+          {done ? (
+            <div className="text-[13px] text-emerald-700">
+              Solicitud enviada.{" "}
+              <Link to="/dashboard/anticipos" className="underline">
+                Ver mis anticipos
+              </Link>
+            </div>
+          ) : !user ? (
+            <Link to="/auth" className="text-[13px] text-accent-brand underline">
+              Inicia sesión como vendedor para solicitar el anticipo
+            </Link>
+          ) : (
+            <div className="flex flex-wrap items-end gap-2">
+              <label className="text-[11px] text-content-subtle">
+                <span className="block mb-1">Monto a solicitar (US$)</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={data.maxAdvanceUsd}
+                  value={amount}
+                  placeholder={String(data.maxAdvanceUsd)}
+                  onChange={(e) => setAmount(e.target.value)}
+                  className="w-40 rounded border border-hairline px-2 py-1.5 text-[13px] text-content focus:outline-none focus:ring-1 focus:ring-accent-brand"
+                />
+              </label>
+              <button
+                onClick={() => void onRequest()}
+                disabled={submitting}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-accent-brand px-3 py-1.5 text-[13px] font-medium text-white hover:opacity-90 disabled:opacity-50"
+              >
+                {submitting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : null}
+                Solicitar anticipo
+              </button>
+            </div>
+          )}
+          <p className="mt-1 text-[10px] text-content-subtle">
+            Solo el vendedor del lote puede solicitar. Se valida en el servidor.
+          </p>
         </div>
       )}
 
