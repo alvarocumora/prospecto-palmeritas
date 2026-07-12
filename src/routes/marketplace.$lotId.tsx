@@ -19,6 +19,7 @@ import { CommodityCover } from "@/features/marketing/CommodityCover";
 import { LotTrustPanel } from "@/components/marketplace/LotTrustPanel";
 import { LotValuationPanel } from "@/components/marketplace/LotValuationPanel";
 import { SellerReputationPanel } from "@/components/marketplace/SellerReputationPanel";
+import { AdvanceOfferPanel } from "@/components/marketplace/AdvanceOfferPanel";
 import { Reveal } from "@/features/marketing/Reveal";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -328,6 +329,9 @@ function LotDetailPage() {
 
             {/* Reputación de la contraparte (buró) */}
             <SellerReputationPanel lotId={lot.id} />
+
+            {/* Anticipo pre-aprobado (motor de underwriting) */}
+            <AdvanceOfferPanel lotId={lot.id} />
 
             {/* Descripción larga */}
             {lot.description && (
