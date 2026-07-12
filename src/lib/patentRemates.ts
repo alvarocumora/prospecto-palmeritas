@@ -6,6 +6,7 @@
 // planilla a filas (array de objetos con las cabeceras como llaves) y las
 // envía a /api/public/ingest-patent-remates; este módulo las normaliza a
 // RemateRow, tolerando las variantes de nombres de columna que usa la nómina.
+import { hash32, normalizeAlnum } from "@/lib/text";
 
 export type RemateRow = {
   year: number;
@@ -29,27 +30,10 @@ export type RemateRow = {
   raw_payload: Record<string, unknown>;
 };
 
-function hash32(s: string): string {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) {
-    h = Math.imul(h ^ s.charCodeAt(i), 16777619);
-  }
-  return (h >>> 0).toString(16);
-}
-
-/** Normaliza una cabecera a MAYÚSCULAS sin acentos ni signos, para el match. */
-function normKey(k: string): string {
-  return k
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toUpperCase()
-    .replace(/[^A-Z0-9]/g, "");
-}
-
 /** Extrae de una fila el primer campo cuya cabecera normalizada matchea un alias. */
 function pick(normRow: Record<string, unknown>, aliases: string[]): unknown {
   for (const a of aliases) {
-    const v = normRow[normKey(a)];
+    const v = normRow[normalizeAlnum(a)];
     if (v !== undefined && v !== null && String(v).trim() !== "") return v;
   }
   return null;
@@ -98,7 +82,7 @@ const TYPE_ALIASES: Record<string, string> = {
 
 function normalizeType(v: string | null): string | null {
   if (!v) return null;
-  const k = normKey(v);
+  const k = normalizeAlnum(v);
   if (k.includes("EXPLOTA")) return "explotacion";
   if (k.includes("EXPLORA")) return "exploracion";
   return TYPE_ALIASES[k] ?? v.toLowerCase();
@@ -125,7 +109,7 @@ export function parseRemateRows(
   for (const raw of rows) {
     // Reindexar por cabecera normalizada para el match por alias.
     const normRow: Record<string, unknown> = {};
-    for (const [k, v] of Object.entries(raw)) normRow[normKey(k)] = v;
+    for (const [k, v] of Object.entries(raw)) normRow[normalizeAlnum(k)] = v;
 
     // El rol puede venir separado (ROL + DV) o combinado ("63010070-4").
     let rol = toStr(pick(normRow, ["ROL", "NUMERO_ROL", "N ROL", "ROL CONCESION", "N_ROL"]));

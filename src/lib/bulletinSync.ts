@@ -8,6 +8,7 @@
 // Las filas nuevas se insertan en mining_bulletins (dedupe por content_hash) y
 // generan bulletin_alerts para el proyecto que vigila.
 import { SNGM_CONCESIONES_URL, sngmQueryGeoJSON, sngmSanitizeTerm } from "@/lib/sngm";
+import { hash32 } from "@/lib/text";
 
 export type BulletinRow = {
   concession_code: string | null;
@@ -26,14 +27,6 @@ export type BulletinRow = {
   source_url: string | null;
   raw_payload: Record<string, unknown>;
 };
-
-function hash32(s: string): string {
-  let h = 2166136261 >>> 0;
-  for (let i = 0; i < s.length; i++) {
-    h = Math.imul(h ^ s.charCodeAt(i), 16777619);
-  }
-  return (h >>> 0).toString(16);
-}
 
 const TYPE_BY_SITUACION: Record<string, string> = {
   "EN TRAMITE": "manifestacion",

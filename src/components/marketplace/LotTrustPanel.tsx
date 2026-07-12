@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { ScoreGauge } from "./ScoreGauge";
 import {
   ShieldCheck,
   ShieldAlert,
@@ -45,8 +46,6 @@ export function LotTrustPanel({ lotId }: { lotId: string }) {
 
   const style = LEVEL_STYLE[data.level];
   const LevelIcon = style.icon;
-  const pct = Math.max(0, Math.min(100, data.score));
-  const dash = `${pct * 2.64} 264`;
 
   return (
     <section className="rounded-xl border border-hairline bg-white p-5">
@@ -63,34 +62,7 @@ export function LotTrustPanel({ lotId }: { lotId: string }) {
       <div className="flex flex-col sm:flex-row gap-5">
         {/* Gauge */}
         <div className="flex items-center gap-4 shrink-0">
-          <div className="relative w-24 h-24">
-            <svg viewBox="0 0 96 96" className="w-24 h-24 -rotate-90">
-              <circle
-                cx="48"
-                cy="48"
-                r="42"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                className="text-black/5"
-              />
-              <circle
-                cx="48"
-                cy="48"
-                r="42"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="8"
-                strokeLinecap="round"
-                strokeDasharray={dash}
-                className={style.ring}
-              />
-            </svg>
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-2xl font-bold">{data.score}</span>
-              <span className="text-[9px] uppercase tracking-wider text-content-subtle">/ 100</span>
-            </div>
-          </div>
+          <ScoreGauge score={data.score} ringClassName={style.ring} />
           <div>
             <div className={`inline-flex items-center gap-1.5 text-sm font-semibold ${style.text}`}>
               <LevelIcon className="w-4 h-4" /> {data.levelLabel}
