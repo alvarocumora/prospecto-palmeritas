@@ -22,76 +22,154 @@ import {
   Clock,
   CheckCircle2,
   GraduationCap,
+  PackageOpen,
 } from "lucide-react";
+import { toast } from "sonner";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
-import { InvestableProjects } from "@/features/marketing/InvestableProjects";
 import { BrandButton, Eyebrow, SectionHeading } from "@/components/brand";
-
 
 export const Route = createFileRoute("/recursos")({
   head: () => ({
     meta: [
-      { title: "Recursos e inversión — Geocapitals" },
+      { title: "Recursos y curso — Geocapitals" },
       {
         name: "description",
         content:
-          "Proyectos mineros abiertos a inversión, crowdfunding institucional, tokenización futura y guías para operar la plataforma Geocapitals.",
+          "Curso Geocapitals gratuito con 4 módulos en PDF descargable, guías operativas y roadmap de tokenización. Todo el material abierto, sin login.",
       },
-      { property: "og:title", content: "Recursos e inversión — Geocapitals" },
+      { property: "og:title", content: "Recursos y curso — Geocapitals" },
       {
         property: "og:description",
         content:
-          "Deal-flow verificado, modelos de participación tipo crowdfunding y roadmap de tokenización de proyectos y commodities.",
+          "Material descargable: curso institucional en PDF, guías del terminal y roadmap de tokenización de proyectos y commodities.",
       },
     ],
   }),
   component: RecursosPage,
 });
 
+const GOLD = "oklch(0.78 0.14 82)";
+
 /* ————————————————————————————————————————————————
-   Tiers de participación estilo crowdfunding
+   Descarga forzada vía blob (sin abrir el visor,
+   sin requerir sesión — los PDF viven en /public)
 ——————————————————————————————————————————————— */
-const TIERS = [
+async function forceDownload(url: string, filename: string) {
+  try {
+    const res = await fetch(url, { credentials: "omit" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const blob = await res.blob();
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(objUrl), 2000);
+    toast.success(`Descargando ${filename}`);
+  } catch (e) {
+    // Fallback: abrir en pestaña nueva si la descarga blob falla
+    window.open(url, "_blank", "noopener,noreferrer");
+    toast.message("Abrimos el PDF en pestaña nueva", {
+      description: e instanceof Error ? e.message : "Descarga directa no disponible",
+    });
+  }
+}
+
+/* ————————————————————————————————————————————————
+   Curso Geocapitals — 4 módulos con PDF descargable
+——————————————————————————————————————————————— */
+type CourseModule = {
+  n: number;
+  tag: string;
+  title: string;
+  duration: string;
+  summary: string;
+  lessons: string[];
+  pdf: string;
+  file: string;
+  pdfSize: string;
+  icon: typeof BookOpen;
+};
+
+const COURSE: CourseModule[] = [
   {
-    tag: "Observer",
-    amount: "USD 0",
-    subtitle: "Acceso público",
-    perks: [
-      "Fichas técnicas resumidas",
-      "Mapa satelital y catastro",
-      "Alertas por proyecto",
+    n: 1,
+    tag: "Overview",
+    title: "¿Qué es Geocapitals?",
+    duration: "8 min",
+    summary:
+      "El sistema operativo para exploración minera institucional: catastro, satélites, motor 3D, NI 43-101 y capital fraccionado.",
+    lessons: [
+      "Una plataforma, cinco capas",
+      "Qué problema resolvemos",
+      "Los cinco pilares del stack",
+      "Para quién es (juniors, family offices, QP, operadores)",
     ],
-    cta: { to: "/auth", label: "Crear cuenta" },
-    highlight: false,
+    pdf: "/recursos/geocapitals-m01-overview.pdf",
+    file: "geocapitals-m01-overview.pdf",
+    pdfSize: "82 KB · A4",
+    icon: GraduationCap,
   },
   {
-    tag: "Retail QI",
-    amount: "USD 5K – 50K",
-    subtitle: "Crowdfunding calificado",
-    perks: [
-      "Ticket fraccionable por unidades",
-      "Data room con audit-trail",
-      "Reporte trimestral de avance",
+    n: 2,
+    tag: "Inversión",
+    title: "Cómo invertir · crowdfunding y tokenización",
+    duration: "12 min",
+    summary:
+      "Tres niveles de participación (Observer, Retail QI, Institucional) y el roadmap completo de tokenización de proyectos y commodities.",
+    lessons: [
+      "Tres puertas de entrada (retail QI vs institucional)",
+      "Cap-table digital y suscripción fraccionada",
+      "El proceso paso a paso: KYC → data room → ticket",
+      "Roadmap de tokenización 2026 – 2027",
     ],
-    cta: { to: "/inversionistas", label: "Explorar proyectos" },
-    highlight: true,
+    pdf: "/recursos/geocapitals-m02-inversion.pdf",
+    file: "geocapitals-m02-inversion.pdf",
+    pdfSize: "82 KB · A4",
+    icon: Coins,
   },
   {
-    tag: "Institucional",
-    amount: "USD 250K+",
-    subtitle: "Equity · Royalty · Stream",
-    perks: [
-      "Modelo económico y sensibilidades",
-      "Firma electrónica NDA + Term-sheet",
-      "Kick-off directo con QP y operador",
+    n: 3,
+    tag: "Datos",
+    title: "Catastro y datos geoespaciales",
+    duration: "10 min",
+    summary:
+      "Cómo convertimos concesiones SERNAGEOMIN, escenas Sentinel-2 y DEM Copernicus en inteligencia accionable para exploración.",
+    lessons: [
+      "Catastro minero vivo (+800K concesiones)",
+      "Índices satelitales: óxidos, arcillas, alteración, lineamientos",
+      "Motor 3D geológico: DEM real + drape + drillholes",
+      "Compliance, auditoría y firma QP",
     ],
-    cta: { to: "/contacto", label: "Contactar deal team" },
-    highlight: false,
+    pdf: "/recursos/geocapitals-m03-datos.pdf",
+    file: "geocapitals-m03-datos.pdf",
+    pdfSize: "80 KB · A4",
+    icon: Database,
+  },
+  {
+    n: 4,
+    tag: "Estándares",
+    title: "NI 43-101 asistido y gaps frecuentes",
+    duration: "10 min",
+    summary:
+      "El estándar canadiense explicado, cómo la plataforma lo estructura con evidencia trazable y qué gaps aparecen en el 80% de los reportes.",
+    lessons: [
+      "Los 25 ítems del reporte técnico",
+      "Cache por sección y evidencia enlazada",
+      "Los 5 gaps QAQC más frecuentes",
+      "Mapeo a JORC, SAMREC y SEC S-K 1300",
+    ],
+    pdf: "/recursos/geocapitals-m04-ni43101.pdf",
+    file: "geocapitals-m04-ni43101.pdf",
+    pdfSize: "81 KB · A4",
+    icon: FileText,
   },
 ];
 
 /* ————————————————————————————————————————————————
-   Roadmap de tokenización
+   Roadmap de tokenización (contexto para el curso)
 ——————————————————————————————————————————————— */
 const TOKEN_ROADMAP = [
   {
@@ -166,114 +244,40 @@ const GUIDES = [
   },
 ];
 
-const GOLD = "oklch(0.78 0.14 82)"; // acento dorado institucional
-
 /* ————————————————————————————————————————————————
-   Curso Geocapitals — 4 módulos con PDF descargable
+   Descarga completa (bundle de los 4 módulos)
 ——————————————————————————————————————————————— */
-type CourseModule = {
-  n: number;
-  tag: string;
-  title: string;
-  duration: string;
-  summary: string;
-  lessons: string[];
-  pdf: string;
-  pdfSize: string;
-  icon: typeof BookOpen;
-};
-
-const COURSE: CourseModule[] = [
-  {
-    n: 1,
-    tag: "Overview",
-    title: "¿Qué es Geocapitals?",
-    duration: "8 min",
-    summary:
-      "El sistema operativo para exploración minera institucional: catastro, satélites, motor 3D, NI 43-101 y capital fraccionado.",
-    lessons: [
-      "Una plataforma, cinco capas",
-      "Qué problema resolvemos",
-      "Los cinco pilares del stack",
-      "Para quién es (juniors, family offices, QP, operadores)",
-    ],
-    pdf: "/recursos/geocapitals-m01-overview.pdf",
-    pdfSize: "88 KB · A4",
-    icon: GraduationCap,
-  },
-  {
-    n: 2,
-    tag: "Inversión",
-    title: "Cómo invertir · crowdfunding y tokenización",
-    duration: "12 min",
-    summary:
-      "Tres niveles de participación (Observer, Retail QI, Institucional) y el roadmap completo de tokenización de proyectos y commodities.",
-    lessons: [
-      "Tres puertas de entrada (retail QI vs institucional)",
-      "Cap-table digital y suscripción fraccionada",
-      "El proceso paso a paso: KYC → data room → ticket",
-      "Roadmap de tokenización 2026 – 2027",
-    ],
-    pdf: "/recursos/geocapitals-m02-inversion.pdf",
-    pdfSize: "89 KB · A4",
-    icon: Coins,
-  },
-  {
-    n: 3,
-    tag: "Datos",
-    title: "Catastro y datos geoespaciales",
-    duration: "10 min",
-    summary:
-      "Cómo convertimos concesiones SERNAGEOMIN, escenas Sentinel-2 y DEM Copernicus en inteligencia accionable para exploración.",
-    lessons: [
-      "Catastro minero vivo (+800K concesiones)",
-      "Índices satelitales: óxidos, arcillas, alteración, lineamientos",
-      "Motor 3D geológico: DEM real + drape + drillholes",
-      "Compliance, auditoría y firma QP",
-    ],
-    pdf: "/recursos/geocapitals-m03-datos.pdf",
-    pdfSize: "89 KB · A4",
-    icon: Database,
-  },
-  {
-    n: 4,
-    tag: "Estándares",
-    title: "NI 43-101 asistido y gaps frecuentes",
-    duration: "10 min",
-    summary:
-      "El estándar canadiense explicado, cómo la plataforma lo estructura con evidencia trazable y qué gaps aparecen en el 80% de los reportes.",
-    lessons: [
-      "Los 25 ítems del reporte técnico",
-      "Cache por sección y evidencia enlazada",
-      "Los 5 gaps QAQC más frecuentes",
-      "Mapeo a JORC, SAMREC y SEC S-K 1300",
-    ],
-    pdf: "/recursos/geocapitals-m04-ni43101.pdf",
-    pdfSize: "89 KB · A4",
-    icon: FileText,
-  },
-];
+async function downloadAll() {
+  toast.message("Descargando los 4 módulos…");
+  for (const m of COURSE) {
+    // pequeño delay para que el navegador procese cada descarga
+    // eslint-disable-next-line no-await-in-loop
+    await forceDownload(m.pdf, m.file);
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise((r) => setTimeout(r, 400));
+  }
+}
 
 function CourseSection() {
   const [openN, setOpenN] = useState<number>(1);
 
   return (
     <div>
-      {/* Header + progress rail */}
+      {/* Header + acciones globales */}
       <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
         <SectionHeading
-          eyebrow="Curso Geocapitals · Gratuito"
+          eyebrow="Curso Geocapitals · Gratuito · Sin login"
           title="Aprende cómo funciona la plataforma en 40 minutos"
-          description="Cuatro módulos concentrados con PDF descargable. Del overview institucional al roadmap de tokenización — el mismo material que usamos con family offices."
+          description="Cuatro módulos concentrados con PDF descargable. Del overview institucional al roadmap de tokenización — el mismo material que usamos con family offices. Todo abierto, sin autenticación."
           className="max-w-3xl"
         />
-        <a
-          href="/recursos/geocapitals-m01-overview.pdf"
-          download
-          className="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-hairline text-sm font-mono text-content hover:border-accent-brand hover:text-accent-brand transition"
+        <button
+          type="button"
+          onClick={downloadAll}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-accent-brand bg-accent-brand text-white text-sm font-mono hover:brightness-110 transition"
         >
-          <Download className="w-4 h-4" /> Empezar por el módulo 01
-        </a>
+          <PackageOpen className="w-4 h-4" /> Descargar los 4 módulos
+        </button>
       </div>
 
       {/* Progress rail */}
@@ -341,7 +345,6 @@ function CourseSection() {
                 className="w-full flex items-center gap-4 p-5 text-left"
                 aria-expanded={open}
               >
-                {/* Ícono/número */}
                 <div className="relative shrink-0">
                   <span
                     className="grid place-items-center w-14 h-14 rounded-xl"
@@ -379,15 +382,29 @@ function CourseSection() {
                   )}
                 </div>
 
+                {/* Descarga directa desde la cabecera (siempre visible) */}
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    void forceDownload(m.pdf, m.file);
+                  }}
+                  className="hidden md:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-mono shrink-0 border transition"
+                  style={{ borderColor: GOLD, color: GOLD, background: "oklch(0.78 0.14 82 / 0.08)" }}
+                  title="Descargar PDF"
+                  aria-label={`Descargar ${m.file}`}
+                >
+                  <Download className="w-3.5 h-3.5" /> PDF
+                </button>
+
                 <span
-                  className={`hidden md:inline-flex items-center gap-1 text-xs font-mono text-content-subtle shrink-0 transition ${open ? "text-accent-brand" : ""}`}
+                  className={`hidden lg:inline-flex items-center gap-1 text-xs font-mono text-content-subtle shrink-0 transition ${open ? "text-accent-brand" : ""}`}
                 >
                   <PlayCircle className="w-4 h-4" />
                   {open ? "Cerrar" : "Ver lecciones"}
                 </span>
               </button>
 
-              {/* Body expandido */}
               {open && (
                 <div className="px-5 pb-5 border-t border-hairline pt-5 grid md:grid-cols-[1.4fr_1fr] gap-6">
                   <div>
@@ -410,7 +427,6 @@ function CourseSection() {
                     </ul>
                   </div>
 
-                  {/* PDF card */}
                   <aside
                     className="relative rounded-xl border p-5 flex flex-col overflow-hidden"
                     style={{
@@ -444,10 +460,7 @@ function CourseSection() {
                         {m.pdfSize}
                       </span>
                     </div>
-                    <div
-                      className="mt-4 font-display text-base leading-snug"
-                      style={{ color: "#fff" }}
-                    >
+                    <div className="mt-4 font-display text-base leading-snug text-white">
                       {m.title}
                     </div>
                     <div
@@ -458,14 +471,14 @@ function CourseSection() {
                     </div>
 
                     <div className="mt-auto pt-5 flex flex-col gap-2">
-                      <a
-                        href={m.pdf}
-                        download
+                      <button
+                        type="button"
+                        onClick={() => void forceDownload(m.pdf, m.file)}
                         className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-mono font-medium transition hover:brightness-110"
                         style={{ background: GOLD, color: "#0f172a" }}
                       >
                         <Download className="w-4 h-4" /> Descargar PDF
-                      </a>
+                      </button>
                       <a
                         href={m.pdf}
                         target="_blank"
@@ -504,99 +517,56 @@ function CourseSection() {
   );
 }
 
-
-
 function RecursosPage() {
   return (
     <MarketingPage
-      eyebrow="Recursos · Inversión · Roadmap"
-      title="Todo lo que necesitas para invertir, operar y escalar en minería"
-      intro="Proyectos abiertos, modelos de participación tipo crowdfunding institucional, tokenización en roadmap y guías prácticas para usar la plataforma."
+      eyebrow="Curso · Material descargable · Guías"
+      title="Aprende Geocapitals con material descargable, sin login"
+      intro="Curso institucional en PDF, guías del terminal y roadmap de tokenización. Todo el material es público y se descarga directo — sin cuenta, sin fricción."
     >
-      {/* ═══════════════ 1 · PROYECTOS ═══════════════ */}
-      <section className="-mt-14 lg:-mt-20">
-        <InvestableProjects />
+      {/* ═══════════════ 1 · CURSO (protagonista) ═══════════════ */}
+      <section className="-mt-8 lg:-mt-12">
+        <CourseSection />
       </section>
 
-      {/* ═══════════════ 2 · CROWDFUNDING ═══════════════ */}
+      {/* ═══════════════ 2 · GUÍAS ═══════════════ */}
       <section className="py-16 border-t border-hairline">
         <SectionHeading
-          eyebrow="Modelos de participación"
-          title="Crowdfunding institucional por proyecto"
-          description="Compromete capital por unidades fraccionables o entra como institucional con ticket completo. La plataforma gestiona KYC, cap-table y reporting."
+          eyebrow="Usa la plataforma"
+          title="Guías, documentación y demos"
+          description="Material práctico para entender cómo Geocapitals levanta capital, evalúa proyectos y cumple estándares globales."
           className="mb-10"
         />
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.tag}
-              className={`relative rounded-2xl border p-6 flex flex-col transition ${
-                tier.highlight
-                  ? "border-accent-brand bg-white shadow-[0_30px_60px_-40px_rgba(43,74,203,0.45)]"
-                  : "border-hairline bg-white hover:border-accent-brand/60"
-              }`}
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {GUIDES.map(({ i: Icon, t, d, to }) => (
+            <Link
+              key={t}
+              to={to}
+              className="group relative rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-30px_rgba(43,74,203,0.35)] transition-all flex gap-4"
             >
-              {tier.highlight && (
-                <span
-                  className="absolute -top-3 left-6 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-[0.16em] text-black"
-                  style={{ background: GOLD, boxShadow: `0 6px 18px -6px ${GOLD}` }}
-                >
-                  <Sparkles className="w-3 h-3" /> Más popular
-                </span>
-              )}
-              <div className="flex items-baseline justify-between">
-                <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-content-subtle">
-                  {tier.tag}
-                </span>
-                <span
-                  className="text-[10px] font-mono uppercase tracking-wider"
-                  style={{ color: GOLD }}
-                >
-                  {tier.subtitle}
+              <span className="grid place-items-center w-12 h-12 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0 group-hover:scale-105 transition-transform">
+                <Icon className="w-6 h-6" strokeWidth={1.5} />
+              </span>
+              <div className="flex-1">
+                <div className="font-display text-lg text-content group-hover:text-accent-brand transition-colors">
+                  {t}
+                </div>
+                <p className="text-sm text-content-subtle mt-1.5 leading-relaxed">{d}</p>
+                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-accent-brand opacity-0 group-hover:opacity-100 transition-opacity">
+                  Abrir <ArrowRight className="w-3 h-3" />
                 </span>
               </div>
-              <div className="brand-display text-3xl text-content mt-3">{tier.amount}</div>
-              <ul className="mt-5 space-y-2.5 flex-1">
-                {tier.perks.map((p) => (
-                  <li key={p} className="flex gap-2 text-sm text-content/80">
-                    <span
-                      className="mt-1.5 w-1.5 h-1.5 rounded-full shrink-0"
-                      style={{ background: tier.highlight ? GOLD : "var(--accent-brand)" }}
-                    />
-                    {p}
-                  </li>
-                ))}
-              </ul>
-              <BrandButton
-                asChild
-                variant={tier.highlight ? "primary" : "outline"}
-                className="mt-6 w-full justify-center"
-              >
-                <Link to={tier.cta.to}>
-                  {tier.cta.label} <ArrowRight className="w-4 h-4" />
-                </Link>
-              </BrandButton>
-            </div>
+              <span
+                className="absolute inset-x-6 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity"
+                style={{ background: GOLD }}
+              />
+            </Link>
           ))}
-        </div>
-
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] font-mono text-content-subtle">
-          <span className="inline-flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5" style={{ color: GOLD }} /> KYC / AML institucional
-          </span>
-          <span>·</span>
-          <span className="inline-flex items-center gap-1.5">
-            <Lock className="w-3.5 h-3.5" /> Cifrado AES-256
-          </span>
-          <span>·</span>
-          <span className="inline-flex items-center gap-1.5">
-            <Landmark className="w-3.5 h-3.5" /> Vehículos SPV supervisados
-          </span>
         </div>
       </section>
 
-      {/* ═══════════════ 3 · TOKENIZACIÓN ═══════════════ */}
+      {/* ═══════════════ 3 · TOKENIZACIÓN (contexto) ═══════════════ */}
       <section className="py-16 border-t border-hairline">
         <div
           className="relative overflow-hidden rounded-3xl border p-8 lg:p-12"
@@ -606,7 +576,6 @@ function RecursosPage() {
             borderColor: "oklch(0.28 0.05 260)",
           }}
         >
-          {/* Grid sutil de fondo */}
           <div
             aria-hidden
             className="absolute inset-0 opacity-[0.08]"
@@ -633,8 +602,7 @@ function RecursosPage() {
               className="brand-display text-3xl lg:text-4xl leading-tight max-w-3xl"
               style={{ color: "oklch(0.96 0.01 260)" }}
             >
-              De la concesión al{" "}
-              <span style={{ color: GOLD }}>token institucional</span>
+              De la concesión al <span style={{ color: GOLD }}>token institucional</span>
             </h2>
             <p
               className="mt-3 max-w-2xl text-sm lg:text-base"
@@ -704,77 +672,44 @@ function RecursosPage() {
               })}
             </div>
 
-            <div className="mt-10 flex flex-wrap items-center gap-3">
-              <BrandButton asChild>
-                <Link to="/contacto">
-                  Solicitar acceso al programa piloto <ArrowRight className="w-4 h-4" />
-                </Link>
-              </BrandButton>
+            <div className="mt-10 flex flex-wrap items-center gap-3 text-[11px] font-mono">
               <span
-                className="text-[11px] font-mono"
-                style={{ color: "oklch(0.7 0.02 260)" }}
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "oklch(0.8 0.02 260)" }}
               >
-                Cupos limitados para Q3 2026
+                <ShieldCheck className="w-3.5 h-3.5" style={{ color: GOLD }} /> KYC / AML
+                institucional
+              </span>
+              <span style={{ color: "oklch(0.5 0.02 260)" }}>·</span>
+              <span
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "oklch(0.8 0.02 260)" }}
+              >
+                <Lock className="w-3.5 h-3.5" /> Cifrado AES-256
+              </span>
+              <span style={{ color: "oklch(0.5 0.02 260)" }}>·</span>
+              <span
+                className="inline-flex items-center gap-1.5"
+                style={{ color: "oklch(0.8 0.02 260)" }}
+              >
+                <Landmark className="w-3.5 h-3.5" /> Vehículos SPV supervisados
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ═══════════════ 4 · CURSO GEOCAPITALS (PDFs) ═══════════════ */}
-      <section className="py-16 border-t border-hairline">
-        <CourseSection />
-      </section>
-
-      {/* ═══════════════ 5 · GUÍAS ═══════════════ */}
-      <section className="py-16 border-t border-hairline">
-        <SectionHeading
-          eyebrow="Usa la plataforma"
-          title="Guías, documentación y demos"
-          description="Material práctico para entender cómo Geocapitals levanta capital, evalúa proyectos y cumple estándares globales."
-          className="mb-10"
-        />
-
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {GUIDES.map(({ i: Icon, t, d, to }) => (
-            <Link
-              key={t}
-              to={to}
-              className="group relative rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-30px_rgba(43,74,203,0.35)] transition-all flex gap-4"
-            >
-              <span className="grid place-items-center w-12 h-12 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0 group-hover:scale-105 transition-transform">
-                <Icon className="w-6 h-6" strokeWidth={1.5} />
-              </span>
-              <div className="flex-1">
-                <div className="font-display text-lg text-content group-hover:text-accent-brand transition-colors">
-                  {t}
-                </div>
-                <p className="text-sm text-content-subtle mt-1.5 leading-relaxed">{d}</p>
-                <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-accent-brand opacity-0 group-hover:opacity-100 transition-opacity">
-                  Abrir <ArrowRight className="w-3 h-3" />
-                </span>
-              </div>
-              {/* barra dorada superior sutil al hover */}
-              <span
-                className="absolute inset-x-6 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity"
-                style={{ background: GOLD }}
-              />
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══════════════ 5 · CTA final ═══════════════ */}
+      {/* ═══════════════ 4 · CTA final ═══════════════ */}
       <section className="mt-8">
-        <div
-          className="relative rounded-3xl border border-hairline bg-accent-brand-subtle p-8 lg:p-12 text-center overflow-hidden"
-        >
+        <div className="relative rounded-3xl border border-hairline bg-accent-brand-subtle p-8 lg:p-12 text-center overflow-hidden">
           <span
             aria-hidden
             className="absolute inset-x-0 top-0 h-px"
             style={{ background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)` }}
           />
-          <Eyebrow className="mb-3">¿Buscas algo específico?</Eyebrow>
+          <Eyebrow className="mb-3">
+            <Sparkles className="w-3 h-3 inline mr-1" /> ¿Buscas algo específico?
+          </Eyebrow>
           <h3 className="brand-display text-2xl lg:text-3xl text-content">
             Whitepapers, onepagers y term-sheets bajo NDA
           </h3>
