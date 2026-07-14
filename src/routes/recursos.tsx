@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import {
   FileText,
   BookOpen,
@@ -16,10 +17,16 @@ import {
   LineChart,
   Lock,
   Cpu,
+  Download,
+  PlayCircle,
+  Clock,
+  CheckCircle2,
+  GraduationCap,
 } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { InvestableProjects } from "@/features/marketing/InvestableProjects";
 import { BrandButton, Eyebrow, SectionHeading } from "@/components/brand";
+
 
 export const Route = createFileRoute("/recursos")({
   head: () => ({
