@@ -217,9 +217,11 @@ function LiveLosVerdesPage() {
 
   useEffect(() => {
     return onLosVerdesFocus((evt) => {
-      if (evt.kind === "target" && evt.id) {
-        setAiTarget({ code: String(evt.id), name: String(evt.label ?? evt.id) });
-      }
+      if (evt.kind !== "target" || !evt.id) return;
+      const id = String(evt.id);
+      // Ignorar focos que no son exploration_targets (ej. fases del mine plan)
+      if (id.startsWith("phase-")) return;
+      setAiTarget({ code: id, name: String(evt.label ?? id) });
     });
   }, []);
 
