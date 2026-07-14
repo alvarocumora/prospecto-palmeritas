@@ -137,25 +137,29 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   const concSample = report.concessions.slice(0, 12);
   if (concSample.length) {
     h2("Concesiones representativas");
+    // Columnas: Código 70 · Nombre 160 · Titular 200 · Ha 70  (total 500pt)
+    const cX = { code: MARGIN, name: MARGIN + 70, holder: MARGIN + 230, ha: MARGIN + 430 };
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(71, 85, 105);
-    doc.text("Código", MARGIN, y);
-    doc.text("Nombre", MARGIN + 90, y);
-    doc.text("Titular", MARGIN + 290, y);
-    doc.text("Ha", MARGIN + 440, y);
+    doc.text("Código", cX.code, y);
+    doc.text("Nombre", cX.name, y);
+    doc.text("Titular", cX.holder, y);
+    doc.text("Ha", cX.ha, y, { align: "left" });
     y += 12;
     doc.setLineWidth(0.4);
     doc.setDrawColor(203, 213, 225);
     doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4);
     doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
+    const clip = (t: string, max: number) => (t.length > max ? t.slice(0, max - 1) + "…" : t);
     for (const c of concSample) {
       ensure(13);
-      doc.text(String(c.code ?? "—").slice(0, 18), MARGIN, y);
-      doc.text(String(c.name ?? "—").slice(0, 36), MARGIN + 90, y);
-      doc.text(String(c.holder ?? "—").slice(0, 28), MARGIN + 290, y);
-      doc.text(fmtNum(c.area_ha, 1), MARGIN + 440, y);
+      doc.text(clip(String(c.code ?? "—"), 14), cX.code, y);
+      doc.text(clip(String(c.name ?? "—"), 30), cX.name, y);
+      doc.text(clip(String(c.holder ?? "—"), 38), cX.holder, y);
+      doc.text(fmtNum(c.area_ha, 1), cX.ha, y);
       y += 12;
     }
     y += 6;
@@ -199,25 +203,35 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   const tgtTop = report.targets.slice(0, 15);
   if (tgtTop.length) {
     h2("Top 15 targets por score de fusión");
+    // Columnas: Código 100 · Nombre 210 · Prioridad 70 · Score 55 · Conf.% 55
+    const tX = {
+      code: MARGIN,
+      name: MARGIN + 100,
+      prio: MARGIN + 310,
+      score: MARGIN + 380,
+      conf: MARGIN + 440,
+    };
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(71, 85, 105);
-    doc.text("Código", MARGIN, y);
-    doc.text("Nombre", MARGIN + 70, y);
-    doc.text("Prioridad", MARGIN + 290, y);
-    doc.text("Score", MARGIN + 370, y);
-    doc.text("Conf.%", MARGIN + 430, y);
+    doc.text("Código", tX.code, y);
+    doc.text("Nombre", tX.name, y);
+    doc.text("Prioridad", tX.prio, y);
+    doc.text("Score", tX.score, y);
+    doc.text("Conf.%", tX.conf, y);
     y += 12;
     doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4);
     doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
+    const clip = (t: string, max: number) => (t.length > max ? t.slice(0, max - 1) + "…" : t);
     for (const t of tgtTop) {
       ensure(13);
-      doc.text(String(t.code ?? "—").slice(0, 14), MARGIN, y);
-      doc.text(String(t.name ?? "—").slice(0, 42), MARGIN + 70, y);
-      doc.text(String(t.priority ?? "—"), MARGIN + 290, y);
-      doc.text(fmtNum(t.score, 1), MARGIN + 370, y);
-      doc.text(fmtNum(t.confidence_pct, 0), MARGIN + 430, y);
+      doc.text(clip(String(t.code ?? "—"), 20), tX.code, y);
+      doc.text(clip(String(t.name ?? "—"), 40), tX.name, y);
+      doc.text(String(t.priority ?? "—"), tX.prio, y);
+      doc.text(fmtNum(t.score, 1), tX.score, y);
+      doc.text(fmtNum(t.confidence_pct, 0), tX.conf, y);
       y += 12;
     }
     y += 6;
