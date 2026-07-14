@@ -156,18 +156,23 @@ export function ListingDetailDrawer({
                 />
               </div>
 
-              <nav className="flex gap-1 px-3 border-t border-border">
-                {(["overview", "dataroom", "inquiry"] as const).map((t) => (
+              <nav className="flex gap-1 px-3 border-t border-border overflow-x-auto">
+                {(["overview", "valuation", "dataroom", "inquiry"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
+                    className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors whitespace-nowrap inline-flex items-center gap-1 ${
                       tab === t
                         ? "border-gold text-gold"
                         : "border-transparent text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {t === "overview" && "Resumen"}
+                    {t === "valuation" && (
+                      <>
+                        <Calculator className="w-3 h-3" /> Valuación
+                      </>
+                    )}
                     {t === "dataroom" && `Data Room (${files.length})`}
                     {t === "inquiry" && "Contacto / NDA"}
                   </button>
