@@ -11,11 +11,13 @@ import {
   Percent,
   Send,
   Download,
+  Calculator,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePropertyListing } from "@/hooks/usePropertyListings";
 import { getDataRoomDownloadUrl } from "@/lib/dataRoom.functions";
+import { ValuationPanel } from "./ValuationPanel";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
 import { signListingNda, upsertInquiry } from "../application/inquiries";
@@ -31,7 +33,7 @@ export function ListingDetailDrawer({
 }) {
   const { user } = useAuth();
   const { listing, files, inquiry, loading, refresh } = usePropertyListing(listingId);
-  const [tab, setTab] = useState<"overview" | "dataroom" | "inquiry">("overview");
+  const [tab, setTab] = useState<"overview" | "valuation" | "dataroom" | "inquiry">("overview");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [signing, setSigning] = useState(false);
@@ -154,18 +156,23 @@ export function ListingDetailDrawer({
                 />
               </div>
 
-              <nav className="flex gap-1 px-3 border-t border-border">
-                {(["overview", "dataroom", "inquiry"] as const).map((t) => (
+              <nav className="flex gap-1 px-3 border-t border-border overflow-x-auto">
+                {(["overview", "valuation", "dataroom", "inquiry"] as const).map((t) => (
                   <button
                     key={t}
                     onClick={() => setTab(t)}
-                    className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
+                    className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors whitespace-nowrap inline-flex items-center gap-1 ${
                       tab === t
                         ? "border-gold text-gold"
                         : "border-transparent text-muted-foreground hover:text-foreground"
                     }`}
                   >
                     {t === "overview" && "Resumen"}
+                    {t === "valuation" && (
+                      <>
+                        <Calculator className="w-3 h-3" /> Valuación
+                      </>
+                    )}
                     {t === "dataroom" && `Data Room (${files.length})`}
                     {t === "inquiry" && "Contacto / NDA"}
                   </button>
@@ -221,6 +228,10 @@ export function ListingDetailDrawer({
                   </section>
                 </div>
               )}
+
+              {tab === "valuation" && <ValuationPanel listingId={listing.id} />}
+
+
 
               {tab === "dataroom" && (
                 <div>
