@@ -721,7 +721,12 @@ function RecursosPage() {
         </div>
       </section>
 
-      {/* ═══════════════ 4 · GUÍAS ═══════════════ */}
+      {/* ═══════════════ 4 · CURSO GEOCAPITALS (PDFs) ═══════════════ */}
+      <section className="py-16 border-t border-hairline">
+        <CourseSection />
+      </section>
+
+      {/* ═══════════════ 5 · GUÍAS ═══════════════ */}
       <section className="py-16 border-t border-hairline">
         <SectionHeading
           eyebrow="Usa la plataforma"
