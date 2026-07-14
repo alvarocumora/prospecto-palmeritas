@@ -11,11 +11,13 @@ import {
   Percent,
   Send,
   Download,
+  Calculator,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePropertyListing } from "@/hooks/usePropertyListings";
 import { getDataRoomDownloadUrl } from "@/lib/dataRoom.functions";
+import { ValuationPanel } from "./ValuationPanel";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
 import { signListingNda, upsertInquiry } from "../application/inquiries";
