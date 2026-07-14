@@ -225,7 +225,7 @@ function RecursosPage() {
               </ul>
               <BrandButton
                 asChild
-                variant={tier.highlight ? "default" : "outline"}
+                variant={tier.highlight ? "primary" : "outline"}
                 className="mt-6 w-full justify-center"
               >
                 <Link to={tier.cta.to}>
