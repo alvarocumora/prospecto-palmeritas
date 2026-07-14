@@ -24,7 +24,7 @@ export const computeListingValuation = createServerFn({ method: "POST" })
     if (!input?.listingId) throw new Error("listingId requerido");
     return input;
   })
-  .handler(async ({ data, context }): Promise<ValuationBundle & { listing: unknown }> => {
+  .handler(async ({ data, context }) => {
     const { supabase } = context;
 
     // 1. Listing base
