@@ -168,6 +168,344 @@ const GUIDES = [
 
 const GOLD = "oklch(0.78 0.14 82)"; // acento dorado institucional
 
+/* ————————————————————————————————————————————————
+   Curso Geocapitals — 4 módulos con PDF descargable
+——————————————————————————————————————————————— */
+type CourseModule = {
+  n: number;
+  tag: string;
+  title: string;
+  duration: string;
+  summary: string;
+  lessons: string[];
+  pdf: string;
+  pdfSize: string;
+  icon: typeof BookOpen;
+};
+
+const COURSE: CourseModule[] = [
+  {
+    n: 1,
+    tag: "Overview",
+    title: "¿Qué es Geocapitals?",
+    duration: "8 min",
+    summary:
+      "El sistema operativo para exploración minera institucional: catastro, satélites, motor 3D, NI 43-101 y capital fraccionado.",
+    lessons: [
+      "Una plataforma, cinco capas",
+      "Qué problema resolvemos",
+      "Los cinco pilares del stack",
+      "Para quién es (juniors, family offices, QP, operadores)",
+    ],
+    pdf: "/recursos/geocapitals-m01-overview.pdf",
+    pdfSize: "88 KB · A4",
+    icon: GraduationCap,
+  },
+  {
+    n: 2,
+    tag: "Inversión",
+    title: "Cómo invertir · crowdfunding y tokenización",
+    duration: "12 min",
+    summary:
+      "Tres niveles de participación (Observer, Retail QI, Institucional) y el roadmap completo de tokenización de proyectos y commodities.",
+    lessons: [
+      "Tres puertas de entrada (retail QI vs institucional)",
+      "Cap-table digital y suscripción fraccionada",
+      "El proceso paso a paso: KYC → data room → ticket",
+      "Roadmap de tokenización 2026 – 2027",
+    ],
+    pdf: "/recursos/geocapitals-m02-inversion.pdf",
+    pdfSize: "89 KB · A4",
+    icon: Coins,
+  },
+  {
+    n: 3,
+    tag: "Datos",
+    title: "Catastro y datos geoespaciales",
+    duration: "10 min",
+    summary:
+      "Cómo convertimos concesiones SERNAGEOMIN, escenas Sentinel-2 y DEM Copernicus en inteligencia accionable para exploración.",
+    lessons: [
+      "Catastro minero vivo (+800K concesiones)",
+      "Índices satelitales: óxidos, arcillas, alteración, lineamientos",
+      "Motor 3D geológico: DEM real + drape + drillholes",
+      "Compliance, auditoría y firma QP",
+    ],
+    pdf: "/recursos/geocapitals-m03-datos.pdf",
+    pdfSize: "89 KB · A4",
+    icon: Database,
+  },
+  {
+    n: 4,
+    tag: "Estándares",
+    title: "NI 43-101 asistido y gaps frecuentes",
+    duration: "10 min",
+    summary:
+      "El estándar canadiense explicado, cómo la plataforma lo estructura con evidencia trazable y qué gaps aparecen en el 80% de los reportes.",
+    lessons: [
+      "Los 25 ítems del reporte técnico",
+      "Cache por sección y evidencia enlazada",
+      "Los 5 gaps QAQC más frecuentes",
+      "Mapeo a JORC, SAMREC y SEC S-K 1300",
+    ],
+    pdf: "/recursos/geocapitals-m04-ni43101.pdf",
+    pdfSize: "89 KB · A4",
+    icon: FileText,
+  },
+];
+
+function CourseSection() {
+  const [openN, setOpenN] = useState<number>(1);
+
+  return (
+    <div>
+      {/* Header + progress rail */}
+      <div className="flex flex-wrap items-end justify-between gap-4 mb-8">
+        <SectionHeading
+          eyebrow="Curso Geocapitals · Gratuito"
+          title="Aprende cómo funciona la plataforma en 40 minutos"
+          description="Cuatro módulos concentrados con PDF descargable. Del overview institucional al roadmap de tokenización — el mismo material que usamos con family offices."
+          className="max-w-3xl"
+        />
+        <a
+          href="/recursos/geocapitals-m01-overview.pdf"
+          download
+          className="hidden lg:inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-hairline text-sm font-mono text-content hover:border-accent-brand hover:text-accent-brand transition"
+        >
+          <Download className="w-4 h-4" /> Empezar por el módulo 01
+        </a>
+      </div>
+
+      {/* Progress rail */}
+      <ol className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-6">
+        {COURSE.map((m) => {
+          const active = m.n === openN;
+          return (
+            <li key={m.n}>
+              <button
+                type="button"
+                onClick={() => setOpenN(m.n)}
+                className={`w-full text-left rounded-lg border p-3 transition ${
+                  active
+                    ? "border-accent-brand bg-accent-brand-subtle"
+                    : "border-hairline bg-white hover:border-accent-brand/50"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span
+                    className="grid place-items-center w-6 h-6 rounded-full text-[10px] font-mono font-bold"
+                    style={{
+                      background: active ? "var(--accent-brand)" : "transparent",
+                      color: active ? "#fff" : "var(--accent-brand)",
+                      border: `1px solid var(--accent-brand)`,
+                    }}
+                  >
+                    {String(m.n).padStart(2, "0")}
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+                    {m.tag}
+                  </span>
+                  {active && (
+                    <span
+                      className="ml-auto w-1.5 h-1.5 rounded-full"
+                      style={{ background: GOLD }}
+                    />
+                  )}
+                </div>
+                <div className="mt-1.5 text-xs font-medium text-content line-clamp-2">
+                  {m.title}
+                </div>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+
+      {/* Módulos (acordeón) */}
+      <div className="space-y-3">
+        {COURSE.map((m) => {
+          const open = m.n === openN;
+          const Icon = m.icon;
+          return (
+            <article
+              key={m.n}
+              className={`rounded-2xl border transition-all ${
+                open
+                  ? "border-accent-brand bg-white shadow-[0_30px_60px_-40px_rgba(43,74,203,0.4)]"
+                  : "border-hairline bg-white hover:border-accent-brand/40"
+              }`}
+            >
+              <button
+                type="button"
+                onClick={() => setOpenN(open ? -1 : m.n)}
+                className="w-full flex items-center gap-4 p-5 text-left"
+                aria-expanded={open}
+              >
+                {/* Ícono/número */}
+                <div className="relative shrink-0">
+                  <span
+                    className="grid place-items-center w-14 h-14 rounded-xl"
+                    style={{
+                      background: open ? "var(--accent-brand)" : "var(--accent-brand-subtle)",
+                      color: open ? "#fff" : "var(--accent-brand)",
+                    }}
+                  >
+                    <Icon className="w-6 h-6" strokeWidth={1.5} />
+                  </span>
+                  {open && (
+                    <span
+                      className="absolute -top-1.5 -right-1.5 grid place-items-center w-5 h-5 rounded-full text-[9px] font-mono font-bold text-black"
+                      style={{ background: GOLD }}
+                    >
+                      {m.n}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-content-subtle">
+                      Módulo {String(m.n).padStart(2, "0")} · {m.tag}
+                    </span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-mono text-content-subtle">
+                      <Clock className="w-3 h-3" /> {m.duration}
+                    </span>
+                  </div>
+                  <h3 className="font-display text-lg lg:text-xl text-content leading-tight">
+                    {m.title}
+                  </h3>
+                  {!open && (
+                    <p className="text-sm text-content-subtle mt-1.5 line-clamp-1">{m.summary}</p>
+                  )}
+                </div>
+
+                <span
+                  className={`hidden md:inline-flex items-center gap-1 text-xs font-mono text-content-subtle shrink-0 transition ${open ? "text-accent-brand" : ""}`}
+                >
+                  <PlayCircle className="w-4 h-4" />
+                  {open ? "Cerrar" : "Ver lecciones"}
+                </span>
+              </button>
+
+              {/* Body expandido */}
+              {open && (
+                <div className="px-5 pb-5 border-t border-hairline pt-5 grid md:grid-cols-[1.4fr_1fr] gap-6">
+                  <div>
+                    <p className="text-sm text-content/80 leading-relaxed">{m.summary}</p>
+                    <ul className="mt-5 space-y-2.5">
+                      {m.lessons.map((l, i) => (
+                        <li key={l} className="flex items-start gap-2.5 text-sm">
+                          <span
+                            className="mt-0.5 grid place-items-center w-5 h-5 rounded-full shrink-0 text-[10px] font-mono font-bold"
+                            style={{
+                              background: "var(--accent-brand-subtle)",
+                              color: "var(--accent-brand)",
+                            }}
+                          >
+                            {i + 1}
+                          </span>
+                          <span className="text-content/85">{l}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* PDF card */}
+                  <aside
+                    className="relative rounded-xl border p-5 flex flex-col overflow-hidden"
+                    style={{
+                      background:
+                        "linear-gradient(155deg, oklch(0.18 0.04 260) 0%, oklch(0.11 0.03 260) 100%)",
+                      borderColor: "oklch(0.28 0.05 260)",
+                    }}
+                  >
+                    <span
+                      aria-hidden
+                      className="absolute inset-x-0 top-0 h-px"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${GOLD}, transparent)`,
+                      }}
+                    />
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[9px] font-mono uppercase tracking-[0.2em]"
+                        style={{
+                          background: "oklch(0.78 0.14 82 / 0.15)",
+                          color: GOLD,
+                          border: "1px solid oklch(0.78 0.14 82 / 0.35)",
+                        }}
+                      >
+                        PDF Institucional
+                      </span>
+                      <span
+                        className="text-[10px] font-mono ml-auto"
+                        style={{ color: "oklch(0.7 0.02 260)" }}
+                      >
+                        {m.pdfSize}
+                      </span>
+                    </div>
+                    <div
+                      className="mt-4 font-display text-base leading-snug"
+                      style={{ color: "#fff" }}
+                    >
+                      {m.title}
+                    </div>
+                    <div
+                      className="mt-1 text-[11px] font-mono"
+                      style={{ color: "oklch(0.7 0.02 260)" }}
+                    >
+                      Módulo {String(m.n).padStart(2, "0")} · Geocapitals Academy
+                    </div>
+
+                    <div className="mt-auto pt-5 flex flex-col gap-2">
+                      <a
+                        href={m.pdf}
+                        download
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-mono font-medium transition hover:brightness-110"
+                        style={{ background: GOLD, color: "#0f172a" }}
+                      >
+                        <Download className="w-4 h-4" /> Descargar PDF
+                      </a>
+                      <a
+                        href={m.pdf}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-xs font-mono transition"
+                        style={{
+                          color: "oklch(0.85 0.02 260)",
+                          border: "1px solid oklch(1 0 0 / 0.15)",
+                        }}
+                      >
+                        Abrir en pestaña nueva
+                      </a>
+                    </div>
+                  </aside>
+                </div>
+              )}
+            </article>
+          );
+        })}
+      </div>
+
+      {/* Certificado / cierre */}
+      <div className="mt-8 flex flex-wrap items-center gap-3 rounded-xl border border-hairline bg-accent-brand-subtle/50 p-4">
+        <CheckCircle2 className="w-5 h-5 text-accent-brand shrink-0" />
+        <div className="text-sm text-content/85 flex-1 min-w-[240px]">
+          Al terminar los 4 módulos podrás operar catastro, entender el motor 3D y evaluar
+          oportunidades del deal-flow como un analista institucional.
+        </div>
+        <BrandButton asChild variant="outline" className="shrink-0">
+          <Link to="/contacto">
+            Solicitar demo guiada <ArrowRight className="w-4 h-4" />
+          </Link>
+        </BrandButton>
+      </div>
+    </div>
+  );
+}
+
+
+
 function RecursosPage() {
   return (
     <MarketingPage
