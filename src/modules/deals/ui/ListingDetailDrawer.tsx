@@ -229,6 +229,10 @@ export function ListingDetailDrawer({
                 </div>
               )}
 
+              {tab === "valuation" && <ValuationPanel listingId={listing.id} />}
+
+
+
               {tab === "dataroom" && (
                 <div>
                   {!canSeeNda && (
