@@ -320,15 +320,26 @@ function LiveLosVerdesPage() {
             size="sm"
             onClick={handlePdf}
             disabled={pdfBusy || !reportQ.data}
-            className="bg-gold hover:bg-gold/90 text-background h-7 text-[11px]"
+            variant="outline"
+            className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
           >
             {pdfBusy ? (
               <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
             ) : (
               <FileDown className="w-3 h-3 mr-1.5" />
             )}
-            Informe PDF
+            Informe rápido PDF
           </Button>
+          <a
+            href="/reports/losverdes/pre43101"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center h-7 px-3 rounded-md text-[11px] font-medium bg-gold hover:bg-gold/90 text-background transition-colors"
+            title="Informe Técnico Pre-NI 43-101 / JORC con narrativa IA por sección + visor 3D"
+          >
+            <FileDown className="w-3 h-3 mr-1.5" />
+            Pre-NI 43-101
+          </a>
         </div>
       </div>
 
