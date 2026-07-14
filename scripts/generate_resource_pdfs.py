@@ -323,7 +323,7 @@ def _page_cover(c: rl_canvas.Canvas, mod: Module) -> None:
     c.drawImage(ImageReader(_qr_png(CONTACT["wa"])), qr_x, qr_y, qr_size, qr_size, mask="auto")
     c.setFillColor(MUTED)
     c.setFont(FONT, 7)
-    c.drawRightString(PAGE_W - MARGIN, qr_y - 4, "Escanear · WhatsApp")
+    c.drawRightString(PAGE_W - MARGIN, qr_y - 10, "Escanear · WhatsApp")
 
     c.setFillColor(TEXT)
     c.setFont(FONT_B, 9)
