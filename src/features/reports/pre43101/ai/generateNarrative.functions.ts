@@ -1,9 +1,9 @@
 // Genera narrativa por sección usando Lovable AI Gateway con structured output.
 // Caché en report_section_cache por (project_id, section, data_hash).
+// PÚBLICO (demo Los Verdes) — admin client dentro del handler para caché.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { generateText, Output } from "ai";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider, getLovableApiKeyOrThrow } from "@/lib/ai-gateway.server";
 
 const Input = z.object({
@@ -36,10 +36,10 @@ const NarrativeSchema = z.object({
 export type SectionNarrative = z.infer<typeof NarrativeSchema>;
 
 export const generateSectionNarrative = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => Input.parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabase } = context;
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = supabaseAdmin;
 
     // Cache lookup
     if (!data.force) {

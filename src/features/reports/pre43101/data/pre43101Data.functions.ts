@@ -1,18 +1,18 @@
 // Server function que agrega TODOS los datos del proyecto para el informe pre-NI 43-101.
-// Devuelve un DTO serializable plano.
+// Devuelve un DTO serializable plano. PÚBLICO (demo Los Verdes) — usa admin
+// client dentro del handler para lectura RLS-bypass de datos ya publicables.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({ projectId: z.string().uuid() });
 
 export type Pre43101Data = Awaited<ReturnType<typeof getPre43101Data>>;
 
 export const getPre43101Data = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => Input.parse(data))
-  .handler(async ({ data, context }) => {
-    const { supabase } = context;
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = supabaseAdmin;
     const pid = data.projectId;
 
     const [

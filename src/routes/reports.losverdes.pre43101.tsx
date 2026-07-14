@@ -4,7 +4,7 @@ import { Pre43101Shell } from "@/features/reports/pre43101/components/Pre43101Sh
 // Alto Los Verdes 5 (Tilama) — proyecto LV-TIL-001
 const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
-export const Route = createFileRoute("/_authenticated/reports/losverdes/pre43101")({
+export const Route = createFileRoute("/reports/losverdes/pre43101")({
   head: () => ({
     meta: [
       { title: "Informe Pre-NI 43-101 — Alto Los Verdes 5 | Geocapitals" },
