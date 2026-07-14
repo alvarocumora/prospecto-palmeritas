@@ -10,6 +10,8 @@ import {
   type ValuationBundle,
 } from "./methods";
 
+type MethodsAcc = ValuationBundle["methods"];
+
 /**
  * Calcula la valuación completa de un listing usando las 4 metodologías.
  * Lee datos verificables desde:
