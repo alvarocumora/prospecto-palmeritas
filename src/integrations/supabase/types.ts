@@ -8191,6 +8191,81 @@ export type Database = {
           },
         ]
       }
+      market_comparables: {
+        Row: {
+          area_ha: number | null
+          commodity: string
+          country: string
+          created_at: string
+          deal_date: string | null
+          deal_type: string
+          id: string
+          is_verified: boolean
+          notes: string | null
+          operator: string | null
+          price_per_ha_usd: number | null
+          price_usd: number
+          project_name: string
+          region: string | null
+          resource_confidence: string | null
+          resource_grade: number | null
+          resource_grade_unit: string | null
+          resource_tonnes: number | null
+          source: string
+          source_url: string | null
+          stage: string
+          updated_at: string
+        }
+        Insert: {
+          area_ha?: number | null
+          commodity: string
+          country: string
+          created_at?: string
+          deal_date?: string | null
+          deal_type?: string
+          id?: string
+          is_verified?: boolean
+          notes?: string | null
+          operator?: string | null
+          price_per_ha_usd?: number | null
+          price_usd: number
+          project_name: string
+          region?: string | null
+          resource_confidence?: string | null
+          resource_grade?: number | null
+          resource_grade_unit?: string | null
+          resource_tonnes?: number | null
+          source: string
+          source_url?: string | null
+          stage: string
+          updated_at?: string
+        }
+        Update: {
+          area_ha?: number | null
+          commodity?: string
+          country?: string
+          created_at?: string
+          deal_date?: string | null
+          deal_type?: string
+          id?: string
+          is_verified?: boolean
+          notes?: string | null
+          operator?: string | null
+          price_per_ha_usd?: number | null
+          price_usd?: number
+          project_name?: string
+          region?: string | null
+          resource_confidence?: string | null
+          resource_grade?: number | null
+          resource_grade_unit?: string | null
+          resource_tonnes?: number | null
+          source?: string
+          source_url?: string | null
+          stage?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mensuras: {
         Row: {
           acta_url: string | null
