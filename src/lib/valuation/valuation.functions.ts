@@ -125,7 +125,7 @@ export const computeListingValuation = createServerFn({ method: "POST" })
     }
 
     // 5. Ejecutar metodologías
-    const methods: ValuationBundle["methods"] = [];
+    const methods: MethodsAcc = [];
     const m1 = replacementCostValuation({ area_ha: listing.area_ha, stage: listing.stage });
     if (m1) methods.push(m1);
     const m2 = marketCompsValuation({
