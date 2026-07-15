@@ -1,0 +1,1 @@
+DROP POLICY IF EXISTS "Owners/admins can add members" ON public.project_members;
