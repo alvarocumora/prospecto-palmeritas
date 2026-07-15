@@ -1,7 +1,6 @@
 // Cruce KMZ pertenencias Franco × catastro real (mining_concessions).
 // El GeoJSON proviene del KMZ "FINAL_GIANFRANCO" subido por el operador.
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import francoPertenencias from "@/data/geo/franco_pertenencias.geojson?raw";
 
 export type FrancoPertenenciaMatch = {
@@ -38,9 +37,10 @@ type GeoJsonFC = {
 };
 
 export const getFrancoCadastreCross = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<FrancoCadastreCross> => {
-    const { supabase } = context;
+  .inputValidator((_: Record<string, never> | undefined) => ({}) as Record<string, never>)
+  .handler(async (): Promise<FrancoCadastreCross> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = supabaseAdmin;
     const fc = JSON.parse(francoPertenencias) as GeoJsonFC;
 
     // Locate the Gianfranco project (concessions GF-CONC-*)
