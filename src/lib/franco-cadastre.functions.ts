@@ -37,9 +37,9 @@ type GeoJsonFC = {
 };
 
 export const getFrancoCadastreCross = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<FrancoCadastreCross> => {
-    const { supabase } = context;
+  .handler(async (): Promise<FrancoCadastreCross> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const supabase = supabaseAdmin;
     const fc = JSON.parse(francoPertenencias) as GeoJsonFC;
 
     // Locate the Gianfranco project (concessions GF-CONC-*)
