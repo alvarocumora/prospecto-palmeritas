@@ -1,7 +1,6 @@
 // Cruce KMZ pertenencias Franco × catastro real (mining_concessions).
 // El GeoJSON proviene del KMZ "FINAL_GIANFRANCO" subido por el operador.
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import francoPertenencias from "@/data/geo/franco_pertenencias.geojson?raw";
 
 export type FrancoPertenenciaMatch = {
