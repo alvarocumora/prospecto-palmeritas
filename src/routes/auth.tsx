@@ -61,9 +61,9 @@ function AuthPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate({ to: "/dashboard" });
+      navigate({ to: safeNext(search.next), replace: true });
     }
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user, navigate, search.next]);
 
   const handleResendConfirm = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
