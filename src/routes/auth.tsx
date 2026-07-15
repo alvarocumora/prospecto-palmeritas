@@ -14,7 +14,14 @@ import { loginSchema, signupSchema, zodToFieldErrors } from "@/lib/auth-validati
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
   mode: z.enum(["login", "signup"]).optional(),
+  next: z.string().optional(),
 });
+
+function safeNext(next: string | undefined): string {
+  if (!next) return "/dashboard";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/dashboard";
+  return next;
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s) => authSearch.parse(s),
@@ -54,9 +61,9 @@ function AuthPage() {
 
   useEffect(() => {
     if (!authLoading && user) {
-      navigate({ to: "/dashboard" });
+      navigate({ to: safeNext(search.next), replace: true });
     }
-  }, [authLoading, user, navigate]);
+  }, [authLoading, user, navigate, search.next]);
 
   const handleResendConfirm = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
@@ -64,7 +71,7 @@ function AuthPage() {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
-      options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+      options: { emailRedirectTo: `${window.location.origin}${safeNext(search.next)}` },
     });
     setResending(false);
     if (error) toast.error(translateAuthError(error).message);
@@ -108,7 +115,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${safeNext(search.next)}`,
             data: { display_name: displayName || email.split("@")[0], ...intentMeta },
           },
         });
@@ -300,7 +307,7 @@ function AuthPage() {
                 setLoading(true);
                 try {
                   const result = await lovable.auth.signInWithOAuth("google", {
-                    redirect_uri: window.location.origin,
+                    redirect_uri: `${window.location.origin}${safeNext(search.next)}`,
                   });
                   if (result.error) throw result.error;
                   if (result.redirected) return;
