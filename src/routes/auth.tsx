@@ -14,7 +14,14 @@ import { loginSchema, signupSchema, zodToFieldErrors } from "@/lib/auth-validati
 const authSearch = z.object({
   intent: z.enum(["investor", "owner", "team"]).optional(),
   mode: z.enum(["login", "signup"]).optional(),
+  next: z.string().optional(),
 });
+
+function safeNext(next: string | undefined): string {
+  if (!next) return "/dashboard";
+  if (!next.startsWith("/") || next.startsWith("//")) return "/dashboard";
+  return next;
+}
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s) => authSearch.parse(s),
