@@ -37,6 +37,7 @@ type GeoJsonFC = {
 };
 
 export const getFrancoCadastreCross = createServerFn({ method: "POST" })
+  .inputValidator((_: Record<string, never> | undefined) => ({}) as Record<string, never>)
   .handler(async (): Promise<FrancoCadastreCross> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const supabase = supabaseAdmin;
