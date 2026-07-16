@@ -57,6 +57,18 @@ const COUNTRY_SEO: Record<string, CountrySeo> = {
     blurb:
       "Processos minerários activos con su fase (concessão de lavra, autorização de pesquisa, licenciamento…), sustancia y UF, directo del SIGMINE de la ANM.",
   },
+  zambia: {
+    code: "ZM",
+    slug: "zambia",
+    name: "Zambia",
+    flag: "🇿🇲",
+    institution: "Zambia Mining Cadastre",
+    title: "Zambia mining cadastre · licences live from the official portal — Geocapitals",
+    description:
+      "Search Zambian mining licences by holder, licence code or commodity (copper, cobalt…). Live data from the official Landfolio cadastre: status, hectares, expiry and commodities.",
+    blurb:
+      "Licencias mineras con su estado (active, application, inactive), titular, commodity y vencimiento, directo del portal catastral oficial de Zambia (Landfolio).",
+  },
 };
 
 export const Route = createFileRoute("/catastro/pais/$country")({
@@ -83,7 +95,7 @@ export const Route = createFileRoute("/catastro/pais/$country")({
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl font-bold mb-2">País no disponible</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Por ahora cubrimos Chile, Perú y Brasil. Más países en camino.
+          Por ahora cubrimos Chile, Perú, Brasil y Zambia. Más países en camino.
         </p>
         <Link to="/catastro/global" className="text-primary underline text-sm">
           Ir al buscador multi-país

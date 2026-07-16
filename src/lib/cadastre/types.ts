@@ -6,7 +6,7 @@
 // viven en ./connectors/* y se resuelven vía ./registry.
 
 /** Países con conector implementado. Ampliar aquí al sumar fuentes. */
-export type CadastreCountry = "CL" | "PE" | "BR";
+export type CadastreCountry = "CL" | "PE" | "BR" | "ZM";
 
 export type NormalizedStatus = "active" | "pending" | "extinct" | "unknown";
 
@@ -26,8 +26,10 @@ export type CanonicalConcession = {
   statusNormalized: NormalizedStatus;
   /** Tipo crudo (exploración/explotación/fase) si la fuente lo publica. */
   type: string | null;
-  /** Sustancia/commodity si la fuente la publica (Brasil: SUBS). */
+  /** Sustancia/commodity si la fuente la publica (Brasil: SUBS; Zambia: Commodities). */
   commodity: string | null;
+  /** Vencimiento si la fuente lo publica (ISO o texto crudo de la fuente). */
+  expiresAt: string | null;
   /** Ubicación administrativa que publique la fuente (comuna, UF, zona). */
   location: string | null;
   /** Institución de origen del dato. */

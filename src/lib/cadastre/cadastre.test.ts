@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { mapChileAttributes, normalizeChileStatus } from "./connectors/chile";
 import { mapPeruAttributes, normalizePeruStatus } from "./connectors/peru";
 import { mapBrazilAttributes, normalizeBrazilStatus } from "./connectors/brazil";
+import { mapLandfolioAttributes, normalizeLandfolioStatus } from "./connectors/landfolio";
 import { getCadastreConnector, listCadastreCountries } from "./registry";
 import { sanitizeArcgisTerm } from "./arcgis";
 
@@ -113,11 +114,70 @@ describe("mapBrazilAttributes", () => {
   });
 });
 
+describe("normalizeLandfolioStatus", () => {
+  it("mapea los StatusGrp de Landfolio al estado canónico", () => {
+    expect(normalizeLandfolioStatus("Active")).toBe("active");
+    expect(normalizeLandfolioStatus("Application")).toBe("pending");
+    expect(normalizeLandfolioStatus("Inactive")).toBe("extinct");
+    expect(normalizeLandfolioStatus(null)).toBe("unknown");
+  });
+});
+
+describe("mapLandfolioAttributes", () => {
+  const cfg = {
+    country: "ZM" as const,
+    institution: "Zambia Mining Cadastre",
+    viewerUrl: "https://portals.landfolio.com/zambia/",
+  };
+
+  it("construye el esquema canónico desde Landfolio (datos reales de Zambia)", () => {
+    const c = mapLandfolioAttributes(
+      {
+        Code: "7979-HQ-LPL ",
+        Name: "",
+        Parties: "First Quantum Mining & Operations Limited (100%)",
+        TypeGroup: "Exploration",
+        Type: "Prospecting Licence",
+        StatusGrp: "Inactive",
+        Status: "Expired",
+        AreaValue: 45712.72,
+        AreaUnit: "Hectare",
+        Commodities: "Cobalt",
+        Region: "Zambia",
+        MapRef: "Central, Kapiri Mposhi, Mkushi; Copperbelt, Masaiti",
+        DteExpires: 1263513600000,
+      },
+      cfg,
+    );
+    expect(c.country).toBe("ZM");
+    expect(c.code).toBe("7979-HQ-LPL");
+    expect(c.name).toBeNull();
+    expect(c.holder).toBe("First Quantum Mining & Operations Limited (100%)");
+    expect(c.areaHa).toBe(45712.72);
+    expect(c.commodity).toBe("Cobalt");
+    expect(c.status).toBe("Inactive · Expired");
+    expect(c.statusNormalized).toBe("extinct");
+    expect(c.expiresAt).toBe("2010-01-15");
+    expect(c.location).toContain("Copperbelt");
+    expect(c.source).toBe("Zambia Mining Cadastre (Landfolio)");
+  });
+
+  it("convierte km² a hectáreas y tolera fechas nulas", () => {
+    const c = mapLandfolioAttributes(
+      { Code: "X", AreaValue: 2.5, AreaUnit: "Square Kilometre", DteExpires: null },
+      cfg,
+    );
+    expect(c.areaHa).toBe(250);
+    expect(c.expiresAt).toBeNull();
+  });
+});
+
 describe("registry", () => {
   it("resuelve conectores por país y lista los disponibles", () => {
     expect(getCadastreConnector("CL")?.institution).toBe("SERNAGEOMIN");
     expect(getCadastreConnector("PE")?.institution).toBe("INGEMMET");
     expect(getCadastreConnector("BR")?.institution).toBe("ANM");
+    expect(getCadastreConnector("ZM")?.institution).toBe("Zambia Mining Cadastre");
     expect(getCadastreConnector("XX")).toBeNull();
     const countries = listCadastreCountries().map((c) => c.country);
     expect(countries).toContain("CL");
