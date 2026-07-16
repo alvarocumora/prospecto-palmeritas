@@ -4,15 +4,15 @@
 
 import type { TemplateDef, GeneratedDoc, DocBlock } from "./model";
 
-const v = (values: Record<string, string>, key: string, fallback = ""): string =>
+const gv = (values: Record<string, string>, key: string, fallback = ""): string =>
   values[key]?.trim() || fallback;
 
 function bracket(x: string, ph: string): string {
   return x || `[${ph}]`;
 }
 
-function jurisdictionClause(v: string): string {
-  return `El presente instrumento se rige por las leyes de ${v || "[jurisdicción]"} y las controversias serán sometidas al arbitraje del Centro de Arbitraje y Mediación (CAM) de la Cámara de Comercio de Santiago, salvo pacto en contrario por escrito.`;
+function jurisdictionClause(jur: string): string {
+  return `El presente instrumento se rige por las leyes de ${jur || "[jurisdicción]"} y las controversias serán sometidas al arbitraje del Centro de Arbitraje y Mediación (CAM) de la Cámara de Comercio de Santiago, salvo pacto en contrario por escrito.`;
 }
 
 /* ─────────────── NDA ─────────────── */
@@ -44,12 +44,12 @@ const nda: TemplateDef = {
       text: "Al término del propósito, o a requerimiento de la Divulgante, la Receptora devolverá o destruirá toda la información confidencial y certificará por escrito dicha destrucción." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const mode = v(val, "mode", "mutuo");
-    const A = bracket(v(val, "partyA"), "Parte A");
-    const B = bracket(v(val, "partyB"), "Parte B");
-    const purpose = v(val, "purpose", "la evaluación de una potencial oportunidad de negocio");
-    const term = v(val, "termMonths", "24");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const mode = gv(val, "mode", "mutuo");
+    const A = bracket(gv(val, "partyA"), "Parte A");
+    const B = bracket(gv(val, "partyB"), "Parte B");
+    const purpose = gv(val, "purpose", "la evaluación de una potencial oportunidad de negocio");
+    const term = gv(val, "termMonths", "24");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     const clauseItems: string[] = [
       `1. OBJETO. El presente acuerdo regula el intercambio de información confidencial entre las Partes con el fin de ${purpose}.`,
       `2. INFORMACIÓN CONFIDENCIAL. Se considera confidencial toda información técnica, geológica, financiera, comercial o legal entregada por ${mode === "mutuo" ? "cualquiera de las Partes" : `${A}`} en cualquier formato.`,
@@ -104,12 +104,12 @@ const ndi: TemplateDef = {
       text: "Las Partes reconocen que este acuerdo se inspira en las guías ICC 619 y ICC 500/600 en lo aplicable a la protección de intermediarios y cadenas de suministro internacionales." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const A = bracket(v(val, "partyA"), "Parte A");
-    const B = bracket(v(val, "partyB"), "Parte B");
-    const commodity = v(val, "commodity", "[producto/operación]");
-    const term = v(val, "termMonths", "36");
-    const pct = v(val, "commissionPct", "2");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const A = bracket(gv(val, "partyA"), "Parte A");
+    const B = bracket(gv(val, "partyB"), "Parte B");
+    const commodity = gv(val, "commodity", "[producto/operación]");
+    const term = gv(val, "termMonths", "36");
+    const pct = gv(val, "commissionPct", "2");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "ndi",
       reference: ctx.reference,
@@ -162,12 +162,12 @@ const mou: TemplateDef = {
       text: "Cada Parte asumirá sus propios costos y honorarios asociados a la due diligence y estructuración." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const A = bracket(v(val, "partyA"), "Parte A");
-    const B = bracket(v(val, "partyB"), "Parte B");
-    const project = v(val, "project", "[proyecto]");
-    const obj = v(val, "objective", "explorar una potencial transacción o alianza");
-    const excl = v(val, "exclusivityDays", "60");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const A = bracket(gv(val, "partyA"), "Parte A");
+    const B = bracket(gv(val, "partyB"), "Parte B");
+    const project = gv(val, "project", "[proyecto]");
+    const obj = gv(val, "objective", "explorar una potencial transacción o alianza");
+    const excl = gv(val, "exclusivityDays", "60");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "mou",
       reference: ctx.reference,
@@ -214,12 +214,12 @@ const loi: TemplateDef = {
   ],
   clauses: [],
   build: (val, _a, ctx): GeneratedDoc => {
-    const B = bracket(v(val, "buyer"), "Comprador");
-    const S = bracket(v(val, "seller"), "Vendedor");
-    const project = v(val, "project", "[proyecto]");
-    const amount = v(val, "amount", "[monto]");
-    const structure = v(val, "structure", "earn-in");
-    const validity = v(val, "validityDays", "45");
+    const B = bracket(gv(val, "buyer"), "Comprador");
+    const S = bracket(gv(val, "seller"), "Vendedor");
+    const project = gv(val, "project", "[proyecto]");
+    const amount = gv(val, "amount", "[monto]");
+    const structure = gv(val, "structure", "earn-in");
+    const validity = gv(val, "validityDays", "45");
     return {
       docType: "loi",
       reference: ctx.reference,
@@ -281,16 +281,16 @@ const termSheet: TemplateDef = {
       text: "La compañía se compromete a mantener estándares ESG y a reportar recursos y reservas conforme a NI 43-101 o JORC." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const inv = bracket(v(val, "investor"), "Inversionista");
-    const co = bracket(v(val, "company"), "Compañía");
-    const project = v(val, "project", "[proyecto]");
-    const amount = v(val, "amount", "[monto]");
-    const stake = v(val, "stake", "[%]");
-    const structure = v(val, "structure", "earn-in");
-    const milestones = v(val, "milestones", "Hitos por definir en el contrato definitivo.");
-    const valuation = v(val, "valuation", "[valorización]");
-    const gov = v(val, "governance");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const inv = bracket(gv(val, "investor"), "Inversionista");
+    const co = bracket(gv(val, "company"), "Compañía");
+    const project = gv(val, "project", "[proyecto]");
+    const amount = gv(val, "amount", "[monto]");
+    const stake = gv(val, "stake", "[%]");
+    const structure = gv(val, "structure", "earn-in");
+    const milestones = gv(val, "milestones", "Hitos por definir en el contrato definitivo.");
+    const valuation = gv(val, "valuation", "[valorización]");
+    const gov = gv(val, "governance");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "term-sheet",
       reference: ctx.reference,
@@ -351,13 +351,13 @@ const spa: TemplateDef = {
       text: "El Vendedor se obliga a no competir en el radio de 25 km del proyecto por 24 meses." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const B = bracket(v(val, "buyer"), "Comprador");
-    const S = bracket(v(val, "seller"), "Vendedor");
-    const target = bracket(v(val, "target"), "Sociedad Objetivo");
-    const shares = v(val, "shares", "100%");
-    const price = v(val, "price", "[precio]");
-    const closing = v(val, "closingDate", "[fecha de cierre]");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const B = bracket(gv(val, "buyer"), "Comprador");
+    const S = bracket(gv(val, "seller"), "Vendedor");
+    const target = bracket(gv(val, "target"), "Sociedad Objetivo");
+    const shares = gv(val, "shares", "100%");
+    const price = gv(val, "price", "[precio]");
+    const closing = gv(val, "closingDate", "[fecha de cierre]");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "spa",
       reference: ctx.reference,
@@ -415,14 +415,14 @@ const jv: TemplateDef = {
       text: "El Socio A actuará como operador con reporting mensual al comité técnico. Podrá ser removido por decisiones erróneas graves acreditadas." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const A = bracket(v(val, "partyA"), "Socio A");
-    const B = bracket(v(val, "partyB"), "Socio B");
-    const project = v(val, "project", "[proyecto]");
-    const cA = v(val, "contributionA", "aportes técnicos y concesiones");
-    const cB = v(val, "contributionB", "[monto]");
-    const sA = v(val, "stakeA", "50");
-    const sB = v(val, "stakeB", "50");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const A = bracket(gv(val, "partyA"), "Socio A");
+    const B = bracket(gv(val, "partyB"), "Socio B");
+    const project = gv(val, "project", "[proyecto]");
+    const cA = gv(val, "contributionA", "aportes técnicos y concesiones");
+    const cB = gv(val, "contributionB", "[monto]");
+    const sA = gv(val, "stakeA", "50");
+    const sB = gv(val, "stakeB", "50");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "jv",
       reference: ctx.reference,
@@ -472,12 +472,12 @@ const royalty: TemplateDef = {
       text: "El Otorgante pagará anticipos trimestrales estimados, con reliquidación anual." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const G = bracket(v(val, "grantor"), "Otorgante");
-    const Bf = bracket(v(val, "beneficiary"), "Beneficiario");
-    const conc = v(val, "concession", "[concesión]");
-    const rate = v(val, "rate", "2");
-    const buy = v(val, "buyback", "[monto]");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const G = bracket(gv(val, "grantor"), "Otorgante");
+    const Bf = bracket(gv(val, "beneficiary"), "Beneficiario");
+    const conc = gv(val, "concession", "[concesión]");
+    const rate = gv(val, "rate", "2");
+    const buy = gv(val, "buyback", "[monto]");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "royalty",
       reference: ctx.reference,
@@ -531,13 +531,13 @@ const advisory: TemplateDef = {
       text: "El Cliente reembolsará gastos preaprobados y superiores a USD 500 (viajes, data room, terceros)." },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const C = bracket(v(val, "client"), "Cliente");
-    const Ad = bracket(v(val, "advisor"), "Asesor");
-    const scope = v(val, "scope", "asesoría estratégica y financiera para levantamiento de capital y estructuración de la operación.");
-    const retainer = v(val, "retainer", "5,000");
-    const success = v(val, "successPct", "3");
-    const term = v(val, "termMonths", "12");
-    const jur = v(val, "jurisdiction", "República de Chile");
+    const C = bracket(gv(val, "client"), "Cliente");
+    const Ad = bracket(gv(val, "advisor"), "Asesor");
+    const scope = gv(val, "scope", "asesoría estratégica y financiera para levantamiento de capital y estructuración de la operación.");
+    const retainer = gv(val, "retainer", "5,000");
+    const success = gv(val, "successPct", "3");
+    const term = gv(val, "termMonths", "12");
+    const jur = gv(val, "jurisdiction", "República de Chile");
     return {
       docType: "advisory",
       reference: ctx.reference,
