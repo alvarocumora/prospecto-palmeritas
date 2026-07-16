@@ -106,6 +106,7 @@ import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
+import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
 import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
@@ -115,6 +116,7 @@ import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastre.search'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
@@ -661,6 +663,12 @@ const AuthenticatedDashboardApprovalsRoute =
     path: '/dashboard/approvals',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardApiRoute =
+  AuthenticatedDashboardApiRouteImport.update({
+    id: '/dashboard/api',
+    path: '/dashboard/api',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAnticiposRoute =
   AuthenticatedDashboardAnticiposRouteImport.update({
     id: '/dashboard/anticipos',
@@ -714,6 +722,11 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiV1CadastreSearchRoute = ApiV1CadastreSearchRouteImport.update({
+  id: '/api/v1/cadastre/search',
+  path: '/api/v1/cadastre/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVerifyComplianceReportIdRoute =
   ApiPublicVerifyComplianceReportIdRouteImport.update({
     id: '/api/public/verify-compliance/$reportId',
@@ -832,6 +845,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
+  '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -897,6 +911,7 @@ export interface FileRoutesByFullPath {
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -951,6 +966,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
+  '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -1016,6 +1032,7 @@ export interface FileRoutesByTo {
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -1072,6 +1089,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/_authenticated/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
+  '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
@@ -1137,6 +1155,7 @@ export interface FileRoutesById {
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
+  '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -1193,6 +1212,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/anticipos'
+    | '/dashboard/api'
     | '/dashboard/approvals'
     | '/dashboard/audit'
     | '/dashboard/boletin'
@@ -1258,6 +1278,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
+    | '/api/v1/cadastre/search'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1312,6 +1333,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/anticipos'
+    | '/dashboard/api'
     | '/dashboard/approvals'
     | '/dashboard/audit'
     | '/dashboard/boletin'
@@ -1377,6 +1399,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
+    | '/api/v1/cadastre/search'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1432,6 +1455,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
     | '/_authenticated/dashboard/anticipos'
+    | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/approvals'
     | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/boletin'
@@ -1497,6 +1521,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
+    | '/api/v1/cadastre/search'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1560,6 +1585,7 @@ export interface RootRouteChildren {
   ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
   ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
+  ApiV1CadastreSearchRoute: typeof ApiV1CadastreSearchRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
@@ -2248,6 +2274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardApprovalsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/api': {
+      id: '/_authenticated/dashboard/api'
+      path: '/dashboard/api'
+      fullPath: '/dashboard/api'
+      preLoaderRoute: typeof AuthenticatedDashboardApiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/anticipos': {
       id: '/_authenticated/dashboard/anticipos'
       path: '/dashboard/anticipos'
@@ -2309,6 +2342,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/queue/process'
       fullPath: '/lovable/email/queue/process'
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/v1/cadastre/search': {
+      id: '/api/v1/cadastre/search'
+      path: '/api/v1/cadastre/search'
+      fullPath: '/api/v1/cadastre/search'
+      preLoaderRoute: typeof ApiV1CadastreSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/verify-compliance/$reportId': {
@@ -2496,6 +2536,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
   AuthenticatedDashboardAnticiposRoute: typeof AuthenticatedDashboardAnticiposRoute
+  AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
@@ -2549,6 +2590,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,
   AuthenticatedDashboardAnticiposRoute: AuthenticatedDashboardAnticiposRoute,
+  AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
@@ -2699,6 +2741,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicNotificationsSatelliteAnomaliesRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
+  ApiV1CadastreSearchRoute: ApiV1CadastreSearchRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
