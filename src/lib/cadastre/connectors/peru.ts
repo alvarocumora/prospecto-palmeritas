@@ -43,6 +43,7 @@ export function mapPeruAttributes(a: Record<string, unknown>): CanonicalConcessi
     status,
     statusNormalized: normalizePeruStatus(status),
     type: null,
+    commodity: null,
     location: a.ZONA != null ? `Zona UTM ${a.ZONA}` : null,
     source: "INGEMMET GEOCATMIN",
     sourceUrl: VIEWER_URL,

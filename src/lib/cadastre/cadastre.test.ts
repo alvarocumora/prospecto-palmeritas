@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { mapChileAttributes, normalizeChileStatus } from "./connectors/chile";
 import { mapPeruAttributes, normalizePeruStatus } from "./connectors/peru";
+import { mapBrazilAttributes, normalizeBrazilStatus } from "./connectors/brazil";
 import { getCadastreConnector, listCadastreCountries } from "./registry";
 import { sanitizeArcgisTerm } from "./arcgis";
 
@@ -77,10 +78,46 @@ describe("mapPeruAttributes", () => {
   });
 });
 
+describe("normalizeBrazilStatus", () => {
+  it("mapea las FASE de la ANM al estado canónico", () => {
+    expect(normalizeBrazilStatus("CONCESSÃO DE LAVRA")).toBe("active");
+    expect(normalizeBrazilStatus("AUTORIZAÇÃO DE PESQUISA")).toBe("active");
+    expect(normalizeBrazilStatus("LICENCIAMENTO")).toBe("active");
+    expect(normalizeBrazilStatus("REQUERIMENTO DE PESQUISA")).toBe("pending");
+    expect(normalizeBrazilStatus("REQUERIMENTO DE LAVRA")).toBe("pending");
+    expect(normalizeBrazilStatus("DISPONIBILIDADE")).toBe("pending");
+    expect(normalizeBrazilStatus(null)).toBe("unknown");
+  });
+});
+
+describe("mapBrazilAttributes", () => {
+  it("construye el esquema canónico desde SIGMINE (datos reales verificados)", () => {
+    const c = mapBrazilAttributes({
+      PROCESSO: "3457/1937",
+      FASE: "CONCESSÃO DE LAVRA",
+      NOME: "VALE S.A.",
+      SUBS: "MANGANÊS",
+      USO: "Demais substâncias",
+      AREA_HA: 469.06,
+      UF: "MG",
+    });
+    expect(c.country).toBe("BR");
+    expect(c.code).toBe("3457/1937");
+    expect(c.name).toBeNull();
+    expect(c.holder).toBe("VALE S.A.");
+    expect(c.commodity).toBe("MANGANÊS");
+    expect(c.areaHa).toBe(469.06);
+    expect(c.statusNormalized).toBe("active");
+    expect(c.location).toBe("MG");
+    expect(c.source).toBe("ANM SIGMINE");
+  });
+});
+
 describe("registry", () => {
   it("resuelve conectores por país y lista los disponibles", () => {
     expect(getCadastreConnector("CL")?.institution).toBe("SERNAGEOMIN");
     expect(getCadastreConnector("PE")?.institution).toBe("INGEMMET");
+    expect(getCadastreConnector("BR")?.institution).toBe("ANM");
     expect(getCadastreConnector("XX")).toBeNull();
     const countries = listCadastreCountries().map((c) => c.country);
     expect(countries).toContain("CL");

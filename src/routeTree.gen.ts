@@ -52,6 +52,7 @@ import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authe
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
 import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhooks.mercadopago'
@@ -341,6 +342,11 @@ const ReportsLosverdesPre43101Route =
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPaisCountryRoute = CatastroPaisCountryRouteImport.update({
+  id: '/catastro/pais/$country',
+  path: '/catastro/pais/$country',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
@@ -864,6 +870,7 @@ export interface FileRoutesByFullPath {
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -980,6 +987,7 @@ export interface FileRoutesByTo {
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -1098,6 +1106,7 @@ export interface FileRoutesById {
   '/api/webhooks/mercadopago': typeof ApiWebhooksMercadopagoRoute
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
+  '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -1216,6 +1225,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/catastro/pais/$country'
     | '/lovable/email/suppression'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -1332,6 +1342,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/catastro/pais/$country'
     | '/lovable/email/suppression'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -1449,6 +1460,7 @@ export interface FileRouteTypes {
     | '/api/webhooks/mercadopago'
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
+    | '/catastro/pais/$country'
     | '/lovable/email/suppression'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -1515,6 +1527,7 @@ export interface RootRouteChildren {
   ApiWebhooksMercadopagoRoute: typeof ApiWebhooksMercadopagoRoute
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
+  CatastroPaisCountryRoute: typeof CatastroPaisCountryRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ReportsLosverdesPre43101Route: typeof ReportsLosverdesPre43101Route
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
@@ -1829,6 +1842,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/pais/$country': {
+      id: '/catastro/pais/$country'
+      path: '/catastro/pais/$country'
+      fullPath: '/catastro/pais/$country'
+      preLoaderRoute: typeof CatastroPaisCountryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/c/$code': {
@@ -2612,6 +2632,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiWebhooksMercadopagoRoute: ApiWebhooksMercadopagoRoute,
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,
+  CatastroPaisCountryRoute: CatastroPaisCountryRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ReportsLosverdesPre43101Route: ReportsLosverdesPre43101Route,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
