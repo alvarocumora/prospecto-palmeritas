@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, ExternalLink, Database, Loader2 } from "lucide-react";
 import { searchGlobalCadastre } from "@/lib/cadastre.functions";
+import { useLocale, fill, type StringKey } from "@/features/marketing/i18n";
 import type { CadastreCountry, NormalizedStatus } from "@/lib/cadastre/types";
 
 const COUNTRY_TABS: Array<{
@@ -17,28 +18,37 @@ const COUNTRY_TABS: Array<{
   { code: "BR", label: "Brasil", flag: "🇧🇷", inst: "ANM" },
 ];
 
-const STATUS_STYLE: Record<NormalizedStatus, { label: string; className: string }> = {
-  active: { label: "Vigente", className: "bg-emerald-500/15 text-emerald-600" },
-  pending: { label: "En trámite", className: "bg-sky-500/15 text-sky-600" },
-  extinct: { label: "Extinta", className: "bg-red-500/15 text-red-600" },
-  unknown: { label: "Sin clasificar", className: "bg-muted text-muted-foreground" },
+const STATUS_KEY: Record<NormalizedStatus, StringKey> = {
+  active: "cad_status_active",
+  pending: "cad_status_pending",
+  extinct: "cad_status_extinct",
+  unknown: "cad_status_unknown",
 };
 
-const PLACEHOLDER: Record<CadastreCountry, string> = {
-  CL: "Titular, nombre de concesión o rol…",
-  PE: "Titular, nombre de concesión o código único…",
-  BR: "Titular, sustancia (ferro, ouro…) o nº de processo…",
+const STATUS_CLASS: Record<NormalizedStatus, string> = {
+  active: "bg-emerald-500/15 text-emerald-600",
+  pending: "bg-sky-500/15 text-sky-600",
+  extinct: "bg-red-500/15 text-red-600",
+  unknown: "bg-muted text-muted-foreground",
+};
+
+const PLACEHOLDER_KEY: Record<CadastreCountry, StringKey> = {
+  CL: "cad_ph_cl",
+  PE: "cad_ph_pe",
+  BR: "cad_ph_br",
 };
 
 /**
  * Buscador multi-país de la Capa Catastral Universal. Compartido entre
- * /catastro/global y las fichas SEO por país (/catastro/pais/$country).
+ * /catastro/global, las fichas SEO por país (/catastro/pais/$country) y la
+ * landing internacional (/en). Textos vía i18n (ES/EN/PT).
  */
 export function GlobalCadastreSearch({
   initialCountry = "CL",
 }: {
   initialCountry?: CadastreCountry;
 }) {
+  const { t } = useLocale();
   const [country, setCountry] = useState<CadastreCountry>(initialCountry);
   const [input, setInput] = useState("");
   const [term, setTerm] = useState("");
@@ -78,7 +88,7 @@ export function GlobalCadastreSearch({
           </button>
         ))}
         <span className="px-3 py-1.5 rounded-md border border-dashed border-border text-sm text-muted-foreground/60">
-          🇦🇷 Argentina · pronto
+          🇦🇷 Argentina · {t("cad_soon")}
         </span>
       </div>
 
@@ -89,7 +99,7 @@ export function GlobalCadastreSearch({
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={PLACEHOLDER[country]}
+            placeholder={t(PLACEHOLDER_KEY[country])}
             className="w-full pl-9 pr-3 py-2.5 rounded-md border border-border bg-background text-sm focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
@@ -98,7 +108,7 @@ export function GlobalCadastreSearch({
           disabled={input.trim().length < 2 || isFetching}
           className="px-4 py-2.5 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:opacity-90 disabled:opacity-50"
         >
-          {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : "Buscar"}
+          {isFetching ? <Loader2 className="w-4 h-4 animate-spin" /> : t("cad_search_button")}
         </button>
       </form>
 
@@ -107,85 +117,82 @@ export function GlobalCadastreSearch({
         <>
           <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground mb-2">
             <Database className="w-3 h-3" />
-            {data.total} resultado(s) · fuente {data.institution} en vivo
+            {data.total} {fill(t("cad_results_live"), { inst: data.institution })}
           </div>
           {data.results.length === 0 ? (
             <div className="rounded-md border border-border p-8 text-center text-sm text-muted-foreground">
-              Sin resultados para «{term}» en {countryLabel}. Prueba con otro término u otro país.
+              {fill(t("cad_no_results"), { term, country: countryLabel })}
             </div>
           ) : (
             <div className="overflow-x-auto rounded-md border border-border">
               <table className="w-full text-xs">
                 <thead className="text-left text-muted-foreground uppercase tracking-wider text-[10px] bg-bg-secondary/40 border-b border-border">
                   <tr>
-                    <th className="py-2 px-3">Concesión / proceso</th>
-                    <th className="py-2 px-2">Titular</th>
-                    <th className="py-2 px-2 text-right">Hectáreas</th>
-                    <th className="py-2 px-2">Estado</th>
-                    <th className="py-2 px-2">Ubicación</th>
-                    <th className="py-2 px-3 text-right">Ficha</th>
+                    <th className="py-2 px-3">{t("cad_col_concession")}</th>
+                    <th className="py-2 px-2">{t("cad_col_holder")}</th>
+                    <th className="py-2 px-2 text-right">{t("cad_col_hectares")}</th>
+                    <th className="py-2 px-2">{t("cad_col_status")}</th>
+                    <th className="py-2 px-2">{t("cad_col_location")}</th>
+                    <th className="py-2 px-3 text-right">{t("cad_col_record")}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {data.results.map((r) => {
-                    const st = STATUS_STYLE[r.statusNormalized];
-                    return (
-                      <tr
-                        key={`${r.country}-${r.code}`}
-                        className="border-b border-border last:border-0 hover:bg-accent/30"
-                      >
-                        <td className="py-2 px-3">
-                          <div className="font-medium">{r.name ?? r.code}</div>
+                  {data.results.map((r) => (
+                    <tr
+                      key={`${r.country}-${r.code}`}
+                      className="border-b border-border last:border-0 hover:bg-accent/30"
+                    >
+                      <td className="py-2 px-3">
+                        <div className="font-medium">{r.name ?? r.code}</div>
+                        <div className="font-mono text-[10px] text-muted-foreground">
+                          {r.name ? r.code : (r.commodity ?? "")}
+                          {r.name && r.commodity ? ` · ${r.commodity}` : ""}
+                        </div>
+                      </td>
+                      <td className="py-2 px-2">
+                        <div className="max-w-[220px] truncate">{r.holder ?? "—"}</div>
+                        {r.holderTaxId && (
                           <div className="font-mono text-[10px] text-muted-foreground">
-                            {r.name ? r.code : (r.commodity ?? "")}
-                            {r.name && r.commodity ? ` · ${r.commodity}` : ""}
+                            {r.holderTaxId}
                           </div>
-                        </td>
-                        <td className="py-2 px-2">
-                          <div className="max-w-[220px] truncate">{r.holder ?? "—"}</div>
-                          {r.holderTaxId && (
-                            <div className="font-mono text-[10px] text-muted-foreground">
-                              {r.holderTaxId}
-                            </div>
-                          )}
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          {r.areaHa != null ? r.areaHa.toLocaleString("es-CL") : "—"}
-                        </td>
-                        <td className="py-2 px-2">
-                          <span
-                            className={`text-[10px] uppercase px-1.5 py-0.5 rounded ${st.className}`}
-                            title={r.status ?? undefined}
+                        )}
+                      </td>
+                      <td className="py-2 px-2 text-right">
+                        {r.areaHa != null ? r.areaHa.toLocaleString("es-CL") : "—"}
+                      </td>
+                      <td className="py-2 px-2">
+                        <span
+                          className={`text-[10px] uppercase px-1.5 py-0.5 rounded ${STATUS_CLASS[r.statusNormalized]}`}
+                          title={r.status ?? undefined}
+                        >
+                          {t(STATUS_KEY[r.statusNormalized])}
+                        </span>
+                      </td>
+                      <td className="py-2 px-2 text-muted-foreground">{r.location ?? "—"}</td>
+                      <td className="py-2 px-3 text-right">
+                        {r.country === "CL" ? (
+                          <Link
+                            to="/catastro/c/$code"
+                            params={{ code: r.code }}
+                            className="text-primary hover:underline"
                           >
-                            {st.label}
-                          </span>
-                        </td>
-                        <td className="py-2 px-2 text-muted-foreground">{r.location ?? "—"}</td>
-                        <td className="py-2 px-3 text-right">
-                          {r.country === "CL" ? (
-                            <Link
-                              to="/catastro/c/$code"
-                              params={{ code: r.code }}
-                              className="text-primary hover:underline"
-                            >
-                              Ver ficha
-                            </Link>
-                          ) : r.sourceUrl ? (
-                            <a
-                              href={r.sourceUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline inline-flex items-center gap-0.5"
-                            >
-                              {r.source.split(" ")[0]} <ExternalLink className="w-3 h-3" />
-                            </a>
-                          ) : (
-                            "—"
-                          )}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                            {t("cad_view_record")}
+                          </Link>
+                        ) : r.sourceUrl ? (
+                          <a
+                            href={r.sourceUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:underline inline-flex items-center gap-0.5"
+                          >
+                            {r.source.split(" ")[0]} <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          "—"
+                        )}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

@@ -85,6 +85,7 @@ export function LangToggle({ tone = "light" }: { tone?: "light" | "dark" }) {
     <div className={`inline-flex items-center gap-0.5 border rounded-md p-0.5 ${container}`}>
       <Btn value="es" label="ES" />
       <Btn value="en" label="EN" />
+      <Btn value="pt" label="PT" />
     </div>
   );
 }
