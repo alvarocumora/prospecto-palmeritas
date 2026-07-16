@@ -3989,6 +3989,39 @@ export type Database = {
           },
         ]
       }
+      document_drafts: {
+        Row: {
+          clauses: string[]
+          created_at: string
+          id: string
+          reference: string | null
+          template_id: string
+          updated_at: string
+          user_id: string
+          values: Json
+        }
+        Insert: {
+          clauses?: string[]
+          created_at?: string
+          id?: string
+          reference?: string | null
+          template_id: string
+          updated_at?: string
+          user_id: string
+          values?: Json
+        }
+        Update: {
+          clauses?: string[]
+          created_at?: string
+          id?: string
+          reference?: string | null
+          template_id?: string
+          updated_at?: string
+          user_id?: string
+          values?: Json
+        }
+        Relationships: []
+      }
       document_signatures: {
         Row: {
           created_at: string
