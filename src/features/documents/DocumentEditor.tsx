@@ -12,9 +12,11 @@ import {
   Loader2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
 import type { TemplateDef, GeneratedDoc, DocBlock } from "@/lib/documents/model";
 import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
+import { createSignRequest, type SignableDoc } from "@/lib/documents/signing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -203,13 +205,29 @@ export function DocumentEditor({
     toast.success("Valores restaurados");
   };
 
-  const copySignLink = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url).then(
-      () =>
-        toast.success("Link de firma copiado. Compártelo con la contraparte (requiere acceso)."),
-      () => toast.error("No se pudo copiar el link."),
-    );
+  const [signLink, setSignLink] = useState<string | null>(null);
+  const [requestingSign, setRequestingSign] = useState(false);
+  const signFn = useServerFn(createSignRequest);
+
+  const requestSignature = async () => {
+    if (!user) {
+      toast.error("Inicia sesión para solicitar firmas.");
+      return;
+    }
+    setRequestingSign(true);
+    try {
+      const { token } = await signFn({
+        data: { templateId: template.id, doc: doc as unknown as SignableDoc },
+      });
+      const url = `${window.location.origin}/firmar/${token}`;
+      setSignLink(url);
+      await navigator.clipboard.writeText(url).catch(() => {});
+      toast.success("Solicitud de firma creada. Link copiado — compártelo con la contraparte.");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo crear la solicitud de firma.");
+    } finally {
+      setRequestingSign(false);
+    }
   };
 
   const exportPdf = async () => {
@@ -360,10 +378,12 @@ export function DocumentEditor({
             </button>
             <button
               type="button"
-              onClick={copySignLink}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-white px-4 py-2.5 text-sm text-content hover:border-accent-brand"
+              onClick={() => void requestSignature()}
+              disabled={requestingSign}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-white px-4 py-2.5 text-sm text-content hover:border-accent-brand disabled:opacity-50"
             >
-              <Link2 className="w-4 h-4" /> Copiar link de firma
+              <Link2 className="w-4 h-4" />
+              {requestingSign ? "Creando…" : "Solicitar firma"}
             </button>
             <button
               type="button"
@@ -373,6 +393,15 @@ export function DocumentEditor({
               <RotateCcw className="w-4 h-4" /> Restaurar
             </button>
           </div>
+
+          {signLink && (
+            <div className="mt-3 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3">
+              <div className="text-[11px] font-medium text-amber-700 mb-1">
+                Link de firma (válido 30 días) — guárdalo, no volverá a mostrarse:
+              </div>
+              <code className="text-xs font-mono break-all">{signLink}</code>
+            </div>
+          )}
         </div>
 
         {/* Preview live */}
@@ -424,7 +453,7 @@ function SyncBadge({ status, signedIn }: { status: SyncStatus; signedIn: boolean
   );
 }
 
-function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
+export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
   return (
     <div className="p-8 lg:p-10 max-h-[80vh] overflow-y-auto">
       <div className="flex items-center justify-between mb-6">
