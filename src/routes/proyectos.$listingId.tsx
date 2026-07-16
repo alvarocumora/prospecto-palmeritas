@@ -13,10 +13,10 @@ import {
   Target,
   CheckCircle2,
   ExternalLink,
-  Lock,
+  Users,
   Box as BoxIcon,
 } from "lucide-react";
-import { DATA_ROOM_CATEGORY_LABELS } from "@/lib/dataRoom.functions";
+import { PublicDataRoomSection } from "@/features/listings/PublicDataRoomSection";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { VerificationBadge } from "@/components/brand";
 import { projectVerification } from "@/lib/verification";
@@ -160,6 +160,7 @@ function ListingDetailPage() {
                 label="Reportes NI 43-101"
                 value={l.metrics.ni43101Reports}
               />
+              <Metric icon={<Users />} label="Interesados" value={l.inquiriesCount} />
             </div>
           </section>
 
@@ -192,41 +193,12 @@ function ListingDetailPage() {
             </section>
           )}
 
-          {/* Data room real — inventario agregado como señal de confianza */}
-          {l.dataRoom.totalFiles > 0 && (
-            <section className="rounded-xl border border-hairline bg-white p-5">
-              <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-                <div className="brand-eyebrow">Data room</div>
-                <span className="text-[11px] font-mono text-content-subtle">
-                  {l.dataRoom.totalFiles} documentos ·{" "}
-                  {(l.dataRoom.totalSizeBytes / 1024 / 1024).toFixed(1)} MB
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2 mb-4">
-                {l.dataRoom.categories.map((c) => (
-                  <span
-                    key={c.category}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-hairline text-[11px] font-mono text-content"
-                  >
-                    {DATA_ROOM_CATEGORY_LABELS[c.category] ?? c.category}
-                    <span className="text-content-subtle">×{c.count}</span>
-                  </span>
-                ))}
-              </div>
-              <div className="flex items-center gap-2 text-xs text-content-subtle">
-                <Lock className="w-3.5 h-3.5 text-accent-brand shrink-0" />
-                <span>
-                  {l.dataRoom.ndaFiles > 0
-                    ? `${l.dataRoom.ndaFiles} de ${l.dataRoom.totalFiles} documentos requieren firmar NDA dentro de la plataforma.`
-                    : "Documentos disponibles para inversionistas verificados."}{" "}
-                  <Link to="/auth" className="text-accent-brand hover:underline">
-                    Inicia tu verificación
-                  </Link>{" "}
-                  para acceder.
-                </span>
-              </div>
-            </section>
-          )}
+          {/* Data room real — con flujo NDA + descargas para inversionistas verificados */}
+          <PublicDataRoomSection
+            listingId={l.id}
+            listingTitle={l.title}
+            aggregate={l.dataRoom}
+          />
 
           {/* Data disponible */}
           {l.data_available && l.data_available.length > 0 && (

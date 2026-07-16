@@ -48,6 +48,7 @@ export type ListingDetail = {
     totalSizeBytes: number;
     categories: Array<{ category: string; count: number }>;
   };
+  inquiriesCount: number;
 };
 
 const inputSchema = z.object({ id: z.string().uuid() });
@@ -208,6 +209,16 @@ export const getListingDetail = createServerFn({ method: "GET" })
         .sort((a, b) => b.count - a.count);
     }
 
+    // Contador de interesados (inquiries) — señal social de tracción
+    let inquiriesCount = 0;
+    {
+      const { count } = await supabaseAdmin
+        .from("property_deal_inquiries")
+        .select("id", { count: "exact", head: true })
+        .eq("listing_id", row.id);
+      inquiriesCount = count ?? 0;
+    }
+
     return {
       id: row.id,
       title: row.title,
@@ -230,5 +241,6 @@ export const getListingDetail = createServerFn({ method: "GET" })
       metrics,
       comparables,
       dataRoom,
+      inquiriesCount,
     };
   });
