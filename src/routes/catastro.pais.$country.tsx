@@ -69,6 +69,18 @@ const COUNTRY_SEO: Record<string, CountrySeo> = {
     blurb:
       "Licencias mineras con su estado (active, application, inactive), titular, commodity y vencimiento, directo del portal catastral oficial de Zambia (Landfolio).",
   },
+  malawi: {
+    code: "MW",
+    slug: "malawi",
+    name: "Malawi",
+    flag: "🇲🇼",
+    institution: "Malawi Mining Cadastre",
+    title: "Malawi mining cadastre · licences live from the official portal — Geocapitals",
+    description:
+      "Search Malawian mining licences by holder or licence code. Live data from the official Landfolio cadastre portal: status, area and expiry dates.",
+    blurb:
+      "Licencias mineras con su estado, titular, superficie y vencimiento, directo del portal catastral oficial de Malawi (Landfolio).",
+  },
 };
 
 export const Route = createFileRoute("/catastro/pais/$country")({
@@ -95,7 +107,7 @@ export const Route = createFileRoute("/catastro/pais/$country")({
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
         <h1 className="text-2xl font-bold mb-2">País no disponible</h1>
         <p className="text-sm text-muted-foreground mb-6">
-          Por ahora cubrimos Chile, Perú, Brasil y Zambia. Más países en camino.
+          Por ahora cubrimos Chile, Perú, Brasil, Zambia y Malawi. Más países en camino.
         </p>
         <Link to="/catastro/global" className="text-primary underline text-sm">
           Ir al buscador multi-país

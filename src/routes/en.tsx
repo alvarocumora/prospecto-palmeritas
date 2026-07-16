@@ -38,7 +38,7 @@ const PILLARS = [
   {
     icon: Globe2,
     title: "Universal Cadastre Layer",
-    text: "Search the official mining cadastres of Chile, Peru, Brazil and Zambia in one place — live, normalized, cross-country. First Africa connector live; ~15 more Landfolio countries to come.",
+    text: "Search the official mining cadastres of Chile, Peru, Brazil, Zambia and Malawi in one place — live, normalized, cross-country. More Landfolio countries as their endpoints open up.",
     to: "/catastro/global",
     cta: "Open the cadastre",
   },
@@ -90,7 +90,7 @@ function EnglishLanding() {
             <div className="mt-8 flex flex-wrap justify-center gap-3">
               <BrandButton asChild>
                 <Link to="/catastro/global">
-                  Search 4 national cadastres <ArrowRight className="w-4 h-4 ml-1" />
+                  Search 5 national cadastres <ArrowRight className="w-4 h-4 ml-1" />
                 </Link>
               </BrandButton>
               <BrandButton asChild variant="outline">
@@ -102,6 +102,7 @@ function EnglishLanding() {
               <span>🇵🇪 Peru · INGEMMET</span>
               <span>🇧🇷 Brazil · ANM</span>
               <span>🇿🇲 Zambia · Landfolio</span>
+              <span>🇲🇼 Malawi · Landfolio</span>
               <span className="inline-flex items-center gap-1">
                 <MapPin className="w-3 h-3" /> Miami, USA
               </span>
@@ -134,7 +135,7 @@ function EnglishLanding() {
             <div className="text-center mb-6">
               <Eyebrow className="justify-center mb-2">Try it now — no signup</Eyebrow>
               <h2 className="font-display text-2xl sm:text-3xl text-content">
-                One search. Four national cadastres — three continents.
+                One search. Five national cadastres — three continents.
               </h2>
             </div>
             <GlobalCadastreSearch />

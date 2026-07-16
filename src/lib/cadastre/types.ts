@@ -6,7 +6,7 @@
 // viven en ./connectors/* y se resuelven vía ./registry.
 
 /** Países con conector implementado. Ampliar aquí al sumar fuentes. */
-export type CadastreCountry = "CL" | "PE" | "BR" | "ZM";
+export type CadastreCountry = "CL" | "PE" | "BR" | "ZM" | "MW";
 
 export type NormalizedStatus = "active" | "pending" | "extinct" | "unknown";
 
