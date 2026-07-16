@@ -174,6 +174,56 @@ export const listDataRoomFiles = createServerFn({ method: "GET" })
     return (rows ?? []) as DataRoomFileRow[];
   });
 
+// ── Inquiries del listing (solo dueño) ────────────────────────────────────────
+
+export type ListingInquiryRow = {
+  id: string;
+  listing_id: string;
+  inquirer_user_id: string;
+  inquirer_email: string | null;
+  inquirer_name: string | null;
+  status: string;
+  message: string | null;
+  nda_signed_at: string | null;
+  closed_at: string | null;
+  closed_reason: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export const listInquiriesForOwner = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ listingId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<ListingInquiryRow[]> => {
+    const sb = await admin();
+    await assertListingOwner(sb, data.listingId, context.userId);
+    const { data: rows, error } = await sb
+      .from("property_deal_inquiries")
+      .select(
+        "id, listing_id, inquirer_user_id, status, message, nda_signed_at, closed_at, closed_reason, created_at, updated_at",
+      )
+      .eq("listing_id", data.listingId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    if (!rows || rows.length === 0) return [];
+    const ids = Array.from(new Set(rows.map((r) => r.inquirer_user_id)));
+    const { data: profiles } = await sb
+      .from("profiles")
+      .select("user_id, email, display_name")
+      .in("user_id", ids);
+    const byId = new Map(
+      (profiles ?? []).map((p) => [
+        p.user_id as string,
+        { email: p.email as string | null, name: p.display_name as string | null },
+      ]),
+    );
+    return rows.map((r) => ({
+      ...r,
+      inquirer_email: byId.get(r.inquirer_user_id)?.email ?? null,
+      inquirer_name: byId.get(r.inquirer_user_id)?.name ?? null,
+    })) as ListingInquiryRow[];
+  });
+
 // ── Descarga con gating NDA ───────────────────────────────────────────────────
 
 export const getDataRoomDownloadUrl = createServerFn({ method: "POST" })
