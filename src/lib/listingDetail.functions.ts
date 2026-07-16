@@ -241,5 +241,6 @@ export const getListingDetail = createServerFn({ method: "GET" })
       metrics,
       comparables,
       dataRoom,
+      inquiriesCount,
     };
   });
