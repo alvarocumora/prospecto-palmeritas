@@ -3,6 +3,7 @@
 // y el renderer PDF consumen estas definiciones.
 
 import type { TemplateDef, GeneratedDoc, DocBlock } from "./model";
+import { OWN_PARTY_LINE } from "./company";
 
 const gv = (values: Record<string, string>, key: string, fallback = ""): string =>
   values[key]?.trim() || fallback;
@@ -38,6 +39,7 @@ const nda: TemplateDef = {
     {
       key: "partyA",
       label: "Parte A (Divulgante)",
+      default: OWN_PARTY_LINE,
       type: "text",
       placeholder: "Razón social + tax id",
     },
@@ -140,7 +142,13 @@ const ndi: TemplateDef = {
   summary:
     "Acuerdo típico de brokerage/trade que combina confidencialidad y prohibición de elusionar a la contraparte en operaciones de commodities.",
   fields: [
-    { key: "partyA", label: "Parte A", type: "text", placeholder: "Razón social + tax id" },
+    {
+      key: "partyA",
+      label: "Parte A",
+      type: "text",
+      placeholder: "Razón social + tax id",
+      default: OWN_PARTY_LINE,
+    },
     { key: "partyB", label: "Parte B", type: "text", placeholder: "Razón social + tax id" },
     {
       key: "commodity",
@@ -215,7 +223,7 @@ const mou: TemplateDef = {
   summary:
     "Marco no vinculante entre partes que exploran una potencial transacción o alianza estratégica.",
   fields: [
-    { key: "partyA", label: "Parte A", type: "text" },
+    { key: "partyA", label: "Parte A", type: "text", default: OWN_PARTY_LINE },
     { key: "partyB", label: "Parte B", type: "text" },
     { key: "project", label: "Proyecto / oportunidad", type: "text" },
     { key: "objective", label: "Objetivo del entendimiento", type: "textarea" },
@@ -295,7 +303,7 @@ const loi: TemplateDef = {
   category: "inversion",
   summary: "Manifestación de interés preliminar del inversionista o comprador sobre una operación.",
   fields: [
-    { key: "buyer", label: "Inversionista / Comprador", type: "text" },
+    { key: "buyer", label: "Inversionista / Comprador", type: "text", default: OWN_PARTY_LINE },
     { key: "seller", label: "Titular / Vendedor", type: "text" },
     { key: "project", label: "Proyecto", type: "text" },
     { key: "amount", label: "Monto indicativo (USD)", type: "text", placeholder: "5,000,000" },
@@ -359,7 +367,7 @@ const termSheet: TemplateDef = {
   summary:
     "Resumen de términos económicos y de gobierno para una inversión minera o venture: equity, earn-in, royalty y hitos.",
   fields: [
-    { key: "investor", label: "Inversionista", type: "text" },
+    { key: "investor", label: "Inversionista", type: "text", default: OWN_PARTY_LINE },
     { key: "company", label: "Compañía / SPV", type: "text" },
     { key: "project", label: "Proyecto", type: "text" },
     { key: "amount", label: "Monto (USD)", type: "text" },
@@ -493,7 +501,7 @@ const spa: TemplateDef = {
   summary:
     "Esqueleto de contrato de compraventa de acciones para operaciones M&A minero. Requiere revisión legal.",
   fields: [
-    { key: "buyer", label: "Comprador", type: "text" },
+    { key: "buyer", label: "Comprador", type: "text", default: OWN_PARTY_LINE },
     { key: "seller", label: "Vendedor", type: "text" },
     { key: "target", label: "Sociedad objetivo", type: "text" },
     { key: "shares", label: "Acciones / porcentaje", type: "text", default: "100%" },
@@ -586,7 +594,7 @@ const jv: TemplateDef = {
   summary:
     "Marco de joint venture minero para desarrollo conjunto: aportes, participación, dilución y control operacional.",
   fields: [
-    { key: "partyA", label: "Socio A (operador)", type: "text" },
+    { key: "partyA", label: "Socio A (operador)", type: "text", default: OWN_PARTY_LINE },
     { key: "partyB", label: "Socio B (financista)", type: "text" },
     { key: "project", label: "Proyecto", type: "text" },
     {
@@ -673,7 +681,12 @@ const royalty: TemplateDef = {
   summary:
     "Contrato de regalía tipo Net Smelter Return sobre la producción de una concesión minera.",
   fields: [
-    { key: "grantor", label: "Otorgante (titular de la concesión)", type: "text" },
+    {
+      key: "grantor",
+      label: "Otorgante (titular de la concesión)",
+      type: "text",
+      default: OWN_PARTY_LINE,
+    },
     { key: "beneficiary", label: "Beneficiario del royalty", type: "text" },
     { key: "concession", label: "Concesión / proyecto", type: "text" },
     { key: "rate", label: "Tasa NSR (%)", type: "number", default: "2" },
@@ -759,7 +772,7 @@ const advisory: TemplateDef = {
     "Contrato de asesoría estratégica o financiera con retainer y success fee, típico para colocación de capital.",
   fields: [
     { key: "client", label: "Cliente", type: "text" },
-    { key: "advisor", label: "Asesor", type: "text" },
+    { key: "advisor", label: "Asesor", type: "text", default: OWN_PARTY_LINE },
     { key: "scope", label: "Alcance de servicios", type: "textarea" },
     { key: "retainer", label: "Retainer mensual (USD)", type: "text", default: "5,000" },
     { key: "successPct", label: "Success fee (%)", type: "number", default: "3" },
@@ -850,6 +863,7 @@ const dataSheet: TemplateDef = {
       label: "Vendedor / originador",
       type: "text",
       placeholder: "Razón social",
+      default: OWN_PARTY_LINE,
       group: "Identificación",
     },
     {

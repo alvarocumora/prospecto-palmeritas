@@ -3,6 +3,7 @@ import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Download,
+  Link2,
   RotateCcw,
   FileText,
   ShieldCheck,
@@ -202,6 +203,15 @@ export function DocumentEditor({
     toast.success("Valores restaurados");
   };
 
+  const copySignLink = () => {
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(
+      () =>
+        toast.success("Link de firma copiado. Compártelo con la contraparte (requiere acceso)."),
+      () => toast.error("No se pudo copiar el link."),
+    );
+  };
+
   const exportPdf = async () => {
     setBusy(true);
     try {
@@ -347,6 +357,13 @@ export function DocumentEditor({
             >
               <Download className="w-4 h-4" />
               {busy ? "Generando…" : "Descargar PDF"}
+            </button>
+            <button
+              type="button"
+              onClick={copySignLink}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-white px-4 py-2.5 text-sm text-content hover:border-accent-brand"
+            >
+              <Link2 className="w-4 h-4" /> Copiar link de firma
             </button>
             <button
               type="button"
