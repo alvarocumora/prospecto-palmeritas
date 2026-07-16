@@ -99,6 +99,7 @@ import { Route as AuthenticatedDashboardFieldMapRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
+import { Route as AuthenticatedDashboardDocumentosRouteImport } from './routes/_authenticated.dashboard.documentos'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
@@ -622,6 +623,12 @@ const AuthenticatedDashboardDrillingRoute =
     path: '/dashboard/drilling',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardDocumentosRoute =
+  AuthenticatedDashboardDocumentosRouteImport.update({
+    id: '/dashboard/documentos',
+    path: '/dashboard/documentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardDealsRoute =
   AuthenticatedDashboardDealsRouteImport.update({
     id: '/dashboard/deals',
@@ -861,6 +868,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -983,6 +991,7 @@ export interface FileRoutesByTo {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1107,6 +1116,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1231,6 +1241,7 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
+    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1353,6 +1364,7 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
+    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1476,6 +1488,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
+    | '/_authenticated/dashboard/documentos'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/estimation'
@@ -2238,6 +2251,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/documentos': {
+      id: '/_authenticated/dashboard/documentos'
+      path: '/dashboard/documentos'
+      fullPath: '/dashboard/documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/deals': {
       id: '/_authenticated/dashboard/deals'
       path: '/dashboard/deals'
@@ -2565,6 +2585,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
+  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
@@ -2622,6 +2643,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCommodityLotsRoute:
     AuthenticatedDashboardCommodityLotsRoute,
   AuthenticatedDashboardDealsRoute: AuthenticatedDashboardDealsRoute,
+  AuthenticatedDashboardDocumentosRoute: AuthenticatedDashboardDocumentosRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
