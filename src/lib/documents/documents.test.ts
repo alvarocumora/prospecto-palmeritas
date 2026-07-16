@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { TEMPLATE_BY_ID, TEMPLATES } from "./templates";
+import { OWN_PARTY_LINE, OWN_COMPANY } from "./company";
 import { mapLotToDataSheetValues, type LotForDataSheet } from "./prefill";
 
 const LOT: LotForDataSheet = {
@@ -101,5 +102,44 @@ describe("mapLotToDataSheetValues", () => {
     const rows = spec && "rows" in spec ? spec.rows : [];
     expect(rows).toContainEqual(["Humedad", "8 %"]);
     expect(rows.some((r) => r[1].includes("As"))).toBe(true);
+  });
+});
+
+describe("identidad corporativa por defecto (Asesorías Terra SpA)", () => {
+  const OWN_FIELD: Record<string, string> = {
+    nda: "partyA",
+    ndi: "partyA",
+    mou: "partyA",
+    loi: "buyer",
+    "term-sheet": "investor",
+    spa: "buyer",
+    jv: "partyA",
+    royalty: "grantor",
+    advisory: "advisor",
+    "data-sheet": "seller",
+  };
+
+  it("todas las plantillas precargan la parte propia con los datos de la empresa", () => {
+    for (const tpl of TEMPLATES) {
+      const key = OWN_FIELD[tpl.id];
+      expect(key, `plantilla ${tpl.id} sin campo propio mapeado`).toBeDefined();
+      const field = tpl.fields.find((f) => f.key === key);
+      expect(field?.default, `${tpl.id}.${key}`).toBe(OWN_PARTY_LINE);
+    }
+  });
+
+  it("la línea incluye razón social, RUT y representante legal", () => {
+    expect(OWN_PARTY_LINE).toContain(OWN_COMPANY.name);
+    expect(OWN_PARTY_LINE).toContain("77.333.862-0");
+    expect(OWN_PARTY_LINE).toContain("Álvaro Cumora Oliva Herrera");
+  });
+
+  it("build() del NDA usa la empresa como Divulgante por defecto", () => {
+    const tpl = TEMPLATE_BY_ID["nda"];
+    const values = Object.fromEntries(tpl.fields.map((f) => [f.key, f.default ?? ""]));
+    const doc = tpl.build(values, new Set(), { reference: "r", date: "2026-07-17" });
+    const fields = doc.blocks.find((b) => b.kind === "fields");
+    const rows = fields && "rows" in fields ? fields.rows : [];
+    expect(rows.some(([, v]) => v.includes("Asesorías Terra SpA"))).toBe(true);
   });
 });

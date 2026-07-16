@@ -1,4 +1,5 @@
 import type { GeneratedDoc } from "./model";
+import logoUrl from "@/assets/geocapitals-logo.png";
 
 // Renderer PDF con branding Geocapitals: cabecera con marca, acento oro,
 // tipografía Helvetica y disclaimer al pie. Client-only (import dinámico).
@@ -6,6 +7,28 @@ import type { GeneratedDoc } from "./model";
 const GOLD: [number, number, number] = [206, 168, 76]; // ~oklch(0.78 0.14 82)
 const INK: [number, number, number] = [20, 20, 24];
 const MUTED: [number, number, number] = [110, 110, 120];
+
+/** Carga el logo como dataURL PNG con su relación de aspecto; null si falla. */
+async function loadLogo(): Promise<{ dataUrl: string; ratio: number } | null> {
+  try {
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    await new Promise<void>((resolve, reject) => {
+      img.onload = () => resolve();
+      img.onerror = () => reject(new Error("logo"));
+      img.src = logoUrl;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.drawImage(img, 0, 0);
+    return { dataUrl: canvas.toDataURL("image/png"), ratio: img.naturalWidth / img.naturalHeight };
+  } catch {
+    return null;
+  }
+}
 
 export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
   const { default: jsPDF } = await import("jspdf");
@@ -31,14 +54,25 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
   pdf.setFillColor(...GOLD);
   pdf.rect(0, 4, pageW * 0.18, 2, "F");
 
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(10);
-  pdf.setTextColor(...INK);
-  pdf.text("GEOCAPITALS", marginX, y);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(8);
-  pdf.setTextColor(...MUTED);
-  pdf.text("Mining · Deals · Documentation", marginX + 84, y);
+  const logo = await loadLogo();
+  if (logo) {
+    const logoH = 22;
+    const logoW = logoH * logo.ratio;
+    pdf.addImage(logo.dataUrl, "PNG", marginX, y - 14, logoW, logoH);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(...MUTED);
+    pdf.text("Mining · Deals · Documentation", marginX + logoW + 10, y);
+  } else {
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.setTextColor(...INK);
+    pdf.text("GEOCAPITALS", marginX, y);
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(8);
+    pdf.setTextColor(...MUTED);
+    pdf.text("Mining · Deals · Documentation", marginX + 84, y);
+  }
 
   const refText = `Ref: ${doc.reference}`;
   const dateText = new Date(doc.date).toLocaleDateString("es-CL", {
@@ -155,6 +189,17 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
       { maxWidth: contentW - 60 },
     );
     pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(7);
+    pdf.setTextColor(...INK);
+    const signBase =
+      typeof window !== "undefined" ? window.location.origin : "https://geocapitals.com";
+    const signUrl = `${signBase}/dashboard/documentos/${doc.docType}`;
+    pdf.textWithLink(
+      `Firma y verificación electrónica: ${signUrl} · Ref ${doc.reference}`,
+      marginX,
+      pageH - 20,
+      { url: signUrl },
+    );
     pdf.setFontSize(8);
     pdf.text(`${p} / ${pageCount}`, pageW - marginX, pageH - 34, { align: "right" });
   }
