@@ -48,6 +48,7 @@ export type ListingDetail = {
     totalSizeBytes: number;
     categories: Array<{ category: string; count: number }>;
   };
+  inquiriesCount: number;
 };
 
 const inputSchema = z.object({ id: z.string().uuid() });
