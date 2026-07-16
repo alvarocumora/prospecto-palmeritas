@@ -13,7 +13,7 @@ import {
   Target,
   CheckCircle2,
   ExternalLink,
-  Lock,
+  Users,
   Box as BoxIcon,
 } from "lucide-react";
 import { DATA_ROOM_CATEGORY_LABELS } from "@/lib/dataRoom.functions";
