@@ -41,7 +41,11 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
   pdf.text("Mining · Deals · Documentation", marginX + 84, y);
 
   const refText = `Ref: ${doc.reference}`;
-  const dateText = new Date(doc.date).toLocaleDateString("es-CL", { year: "numeric", month: "long", day: "numeric" });
+  const dateText = new Date(doc.date).toLocaleDateString("es-CL", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
   pdf.setFontSize(8);
   pdf.text(refText, pageW - marginX, y - 4, { align: "right" });
   pdf.text(dateText, pageW - marginX, y + 8, { align: "right" });
@@ -133,7 +137,9 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
   }
 
   // ─── Footer con disclaimer y paginación ───
-  const pageCount = (pdf as unknown as { internal: { getNumberOfPages: () => number } }).internal.getNumberOfPages();
+  const pageCount = (
+    pdf as unknown as { internal: { getNumberOfPages: () => number } }
+  ).internal.getNumberOfPages();
   for (let p = 1; p <= pageCount; p++) {
     pdf.setPage(p);
     pdf.setDrawColor(...GOLD);
