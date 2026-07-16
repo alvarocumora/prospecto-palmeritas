@@ -1,13 +1,32 @@
 import { createFileRoute, notFound, Link } from "@tanstack/react-router";
+import { z } from "zod";
 import { FileWarning } from "lucide-react";
 import { DocumentEditor } from "@/features/documents/DocumentEditor";
 import { TEMPLATE_BY_ID } from "@/lib/documents/templates";
+import { mapLotToDataSheetValues } from "@/lib/documents/prefill";
+import { getCommodityLotDetail } from "@/lib/marketplace.functions";
+import { verifyCommodityLot } from "@/lib/lotVerification.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documentos/$templateId")({
-  loader: ({ params }) => {
+  validateSearch: (s: Record<string, unknown>) =>
+    z.object({ lot: z.string().uuid().optional() }).parse(s),
+  loaderDeps: ({ search }) => ({ lot: search.lot }),
+  loader: async ({ params, deps }) => {
     const template = TEMPLATE_BY_ID[params.templateId];
     if (!template) throw notFound();
-    return { template };
+
+    // Prefill desde un lote del marketplace (solo para el data sheet).
+    let prefill: Record<string, string> | null = null;
+    if (deps.lot && template.id === "data-sheet") {
+      const [lot, kym] = await Promise.all([
+        getCommodityLotDetail({ data: { id: deps.lot } }).catch(() => null),
+        verifyCommodityLot({ data: { lotId: deps.lot } }).catch(() => null),
+      ]);
+      if (lot) {
+        prefill = mapLotToDataSheetValues(lot, { kymScore: kym?.score ?? null });
+      }
+    }
+    return { template, prefill };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
@@ -48,6 +67,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
 });
 
 function DocumentPage() {
-  const { template } = Route.useLoaderData();
-  return <DocumentEditor template={template} />;
+  const { template, prefill } = Route.useLoaderData();
+  return <DocumentEditor template={template} prefill={prefill ?? undefined} />;
 }

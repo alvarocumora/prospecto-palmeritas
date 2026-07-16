@@ -1,6 +1,15 @@
 import { useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, RotateCcw, FileText, ShieldCheck, Cloud, CloudOff, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  RotateCcw,
+  FileText,
+  ShieldCheck,
+  Cloud,
+  CloudOff,
+  Loader2,
+} from "lucide-react";
 import { toast } from "sonner";
 import type { TemplateDef, GeneratedDoc, DocBlock } from "@/lib/documents/model";
 import { buildReference } from "@/lib/documents/templates";
@@ -22,7 +31,14 @@ function defaultClauses(tpl: TemplateDef): Set<string> {
   return new Set(tpl.clauses.filter((c) => c.defaultOn).map((c) => c.key));
 }
 
-export function DocumentEditor({ template }: { template: TemplateDef }) {
+export function DocumentEditor({
+  template,
+  prefill,
+}: {
+  template: TemplateDef;
+  /** Valores iniciales (ej. desde un lote del marketplace). Pisan el borrador. */
+  prefill?: Record<string, string>;
+}) {
   const { user } = useAuth();
   const storageKey = `${STORAGE_PREFIX}${template.id}`;
 
@@ -103,6 +119,20 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
       cancelled = true;
     };
   }, [storageKey, template.id, user]);
+
+  // Prefill (ej. desde un lote): se aplica después de hidratar y pisa el
+  // borrador solo en las claves que trae, para reflejar el dato actual del lote.
+  const prefillKey = prefill ? JSON.stringify(prefill) : null;
+  useEffect(() => {
+    if (!prefillKey) return;
+    const wait = window.setInterval(() => {
+      if (!hydrated.current) return;
+      window.clearInterval(wait);
+      const p = JSON.parse(prefillKey) as Record<string, string>;
+      setValues((prev) => ({ ...prev, ...p }));
+    }, 50);
+    return () => window.clearInterval(wait);
+  }, [prefillKey]);
 
   // Persistencia local + remota con debounce.
   useEffect(() => {
@@ -223,10 +253,7 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
         {/* Panel de formulario */}
         <div className="space-y-5">
           {groups.map(([groupName, fields]) => (
-            <section
-              key={groupName}
-              className="rounded-2xl border border-hairline bg-white p-5"
-            >
+            <section key={groupName} className="rounded-2xl border border-hairline bg-white p-5">
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
                 {groupName}
               </div>
@@ -404,10 +431,7 @@ function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
         </div>
       </div>
 
-      <div
-        className="h-[2px] w-10 mb-5"
-        style={{ background: "oklch(0.78 0.14 82)" }}
-      />
+      <div className="h-[2px] w-10 mb-5" style={{ background: "oklch(0.78 0.14 82)" }} />
 
       <h2 className="font-display text-2xl text-content mb-6 leading-tight">{doc.title}</h2>
 
@@ -427,7 +451,9 @@ function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
 
 function BlockPreview({ block }: { block: DocBlock }) {
   if (block.kind === "paragraph") {
-    return <p className="text-[13px] leading-relaxed text-content whitespace-pre-wrap">{block.text}</p>;
+    return (
+      <p className="text-[13px] leading-relaxed text-content whitespace-pre-wrap">{block.text}</p>
+    );
   }
   if (block.kind === "clauses") {
     return (
@@ -493,14 +519,15 @@ function BlockPreview({ block }: { block: DocBlock }) {
   }
   if (block.kind === "signature") {
     return (
-      <div className="grid gap-6 pt-8" style={{ gridTemplateColumns: `repeat(${block.parties.length}, minmax(0,1fr))` }}>
+      <div
+        className="grid gap-6 pt-8"
+        style={{ gridTemplateColumns: `repeat(${block.parties.length}, minmax(0,1fr))` }}
+      >
         {block.parties.map((p, i) => (
           <div key={i}>
             <div className="border-t border-content pt-1.5">
               <div className="text-[12px] font-medium text-content">{p}</div>
-              <div className="text-[10px] font-mono text-content-subtle">
-                Nombre, cargo y firma
-              </div>
+              <div className="text-[10px] font-mono text-content-subtle">Nombre, cargo y firma</div>
             </div>
           </div>
         ))}

@@ -294,7 +294,17 @@ function LotDetailPage() {
           <div className="space-y-10">
             {/* Ficha técnica */}
             <section>
-              <Eyebrow className="mb-3">Ficha técnica</Eyebrow>
+              <div className="flex items-center justify-between mb-3">
+                <Eyebrow>Ficha técnica</Eyebrow>
+                <Link
+                  to="/dashboard/documentos/$templateId"
+                  params={{ templateId: "data-sheet" }}
+                  search={{ lot: lot.id }}
+                  className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
+                >
+                  <FileText className="w-3.5 h-3.5" /> Generar Data Sheet
+                </Link>
+              </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 <TechRow k="Forma" v={formLabel(lot.form)} />
                 <TechRow k="Ley" v={lot.grade_pct != null ? `${Number(lot.grade_pct)} %` : "—"} />
