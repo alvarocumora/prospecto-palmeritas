@@ -807,7 +807,10 @@ function RecursosPage() {
         <CourseSection />
       </section>
 
-      {/* ═══════════════ 2 · GUÍAS ═══════════════ */}
+      {/* ═══════════════ 2 · DOCUMENTOS EDITABLES ═══════════════ */}
+      <DocumentTemplatesSection />
+
+      {/* ═══════════════ 3 · GUÍAS ═══════════════ */}
       <section className="py-16 border-t border-hairline">
         <SectionHeading
           eyebrow="Usa la plataforma"
