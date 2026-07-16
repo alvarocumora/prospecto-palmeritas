@@ -17,6 +17,7 @@ import {
   Box as BoxIcon,
 } from "lucide-react";
 import { DATA_ROOM_CATEGORY_LABELS } from "@/lib/dataRoom.functions";
+import { PublicDataRoomSection } from "@/features/listings/PublicDataRoomSection";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { VerificationBadge } from "@/components/brand";
 import { projectVerification } from "@/lib/verification";
