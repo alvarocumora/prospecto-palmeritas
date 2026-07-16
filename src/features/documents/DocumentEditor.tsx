@@ -1,12 +1,16 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
-import { ArrowLeft, Download, RotateCcw, FileText, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Download, RotateCcw, FileText, ShieldCheck, Cloud, CloudOff, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import type { TemplateDef, GeneratedDoc, DocBlock } from "@/lib/documents/model";
 import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "geocapitals:doc:";
+
+type SyncStatus = "idle" | "loading" | "saving" | "saved" | "offline" | "error";
 
 function defaultValues(tpl: TemplateDef): Record<string, string> {
   const out: Record<string, string> = {};
@@ -19,42 +23,127 @@ function defaultClauses(tpl: TemplateDef): Set<string> {
 }
 
 export function DocumentEditor({ template }: { template: TemplateDef }) {
+  const { user } = useAuth();
   const storageKey = `${STORAGE_PREFIX}${template.id}`;
 
   const [values, setValues] = useState<Record<string, string>>(() => defaultValues(template));
   const [clauses, setClauses] = useState<Set<string>>(() => defaultClauses(template));
-  const [reference] = useState<string>(() => buildReference(template.id));
+  const [reference, setReference] = useState<string>("");
   const [busy, setBusy] = useState(false);
+  const [sync, setSync] = useState<SyncStatus>("idle");
+  const hydrated = useRef(false);
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Hidratar desde localStorage tras montar (evita mismatch SSR).
+  // Genera referencia solo en cliente para evitar mismatch SSR.
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(storageKey);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as { values?: Record<string, string>; clauses?: string[] };
-      if (parsed.values) setValues((prev) => ({ ...prev, ...parsed.values }));
-      if (parsed.clauses) setClauses(new Set(parsed.clauses));
-    } catch {
-      // ignore
+    setReference((prev) => prev || buildReference(template.id));
+  }, [template.id]);
+
+  // Hidratación: Supabase (si hay sesión) → localStorage como fallback.
+  useEffect(() => {
+    let cancelled = false;
+    async function hydrate() {
+      // Fallback local siempre disponible.
+      const loadLocal = () => {
+        try {
+          const raw = window.localStorage.getItem(storageKey);
+          if (!raw) return;
+          const parsed = JSON.parse(raw) as {
+            values?: Record<string, string>;
+            clauses?: string[];
+            reference?: string;
+          };
+          if (parsed.values) setValues((prev) => ({ ...prev, ...parsed.values }));
+          if (parsed.clauses) setClauses(new Set(parsed.clauses));
+          if (parsed.reference) setReference(parsed.reference);
+        } catch {
+          // ignore
+        }
+      };
+
+      if (!user) {
+        loadLocal();
+        setSync("offline");
+        hydrated.current = true;
+        return;
+      }
+
+      setSync("loading");
+      const { data, error } = await supabase
+        .from("document_drafts")
+        .select("values, clauses, reference")
+        .eq("user_id", user.id)
+        .eq("template_id", template.id)
+        .maybeSingle();
+
+      if (cancelled) return;
+
+      if (error) {
+        loadLocal();
+        setSync("error");
+        hydrated.current = true;
+        return;
+      }
+
+      if (data) {
+        const remoteValues = (data.values ?? {}) as Record<string, string>;
+        const remoteClauses = (data.clauses ?? []) as string[];
+        setValues((prev) => ({ ...prev, ...remoteValues }));
+        setClauses(new Set(remoteClauses));
+        if (data.reference) setReference(data.reference);
+        setSync("saved");
+      } else {
+        loadLocal();
+        setSync("idle");
+      }
+      hydrated.current = true;
     }
-  }, [storageKey]);
+    hydrate();
+    return () => {
+      cancelled = true;
+    };
+  }, [storageKey, template.id, user]);
 
-  // Persistir cambios.
+  // Persistencia local + remota con debounce.
   useEffect(() => {
+    if (!hydrated.current) return;
+    // Local siempre.
     try {
       window.localStorage.setItem(
         storageKey,
-        JSON.stringify({ values, clauses: Array.from(clauses) }),
+        JSON.stringify({ values, clauses: Array.from(clauses), reference }),
       );
     } catch {
       // ignore
     }
-  }, [storageKey, values, clauses]);
+
+    if (!user || !reference) return;
+
+    if (saveTimer.current) clearTimeout(saveTimer.current);
+    setSync("saving");
+    saveTimer.current = setTimeout(async () => {
+      const { error } = await supabase.from("document_drafts").upsert(
+        {
+          user_id: user.id,
+          template_id: template.id,
+          values,
+          clauses: Array.from(clauses),
+          reference,
+        },
+        { onConflict: "user_id,template_id" },
+      );
+      setSync(error ? "error" : "saved");
+    }, 800);
+
+    return () => {
+      if (saveTimer.current) clearTimeout(saveTimer.current);
+    };
+  }, [storageKey, values, clauses, reference, user, template.id]);
 
   const doc = useMemo<GeneratedDoc>(
     () =>
       template.build(values, clauses, {
-        reference,
+        reference: reference || "GC-DRAFT",
         date: new Date().toISOString(),
       }),
     [template, values, clauses, reference],
@@ -70,9 +159,16 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
     return Array.from(map.entries());
   }, [template]);
 
-  const reset = () => {
+  const reset = async () => {
     setValues(defaultValues(template));
     setClauses(defaultClauses(template));
+    if (user) {
+      await supabase
+        .from("document_drafts")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("template_id", template.id);
+    }
     toast.success("Valores restaurados");
   };
 
@@ -97,9 +193,12 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Volver a recursos
         </Link>
-        <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle">
-          <ShieldCheck className="w-3.5 h-3.5 text-accent-brand" />
-          Borrador editable · No constituye asesoría legal
+        <div className="flex items-center gap-3 text-[11px] font-mono text-content-subtle">
+          <SyncBadge status={sync} signedIn={!!user} />
+          <div className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5 text-accent-brand" />
+            Borrador editable · No constituye asesoría legal
+          </div>
         </div>
       </div>
 
@@ -109,6 +208,15 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
         </div>
         <h1 className="font-display text-3xl lg:text-4xl mt-1 text-content">{template.title}</h1>
         <p className="text-sm text-content-subtle mt-2 max-w-3xl">{template.summary}</p>
+        {!user ? (
+          <p className="text-[11px] font-mono text-content-subtle mt-2">
+            Estás editando sin sesión: los cambios se guardan solo en este dispositivo.{" "}
+            <Link to="/auth" className="text-accent-brand underline">
+              Inicia sesión
+            </Link>{" "}
+            para sincronizar entre dispositivos.
+          </p>
+        ) : null}
       </div>
 
       <div className="grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] gap-6">
@@ -230,13 +338,45 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
               <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
                 <FileText className="w-3.5 h-3.5" /> Vista previa
               </div>
-              <div className="text-[10px] font-mono text-content-subtle">Ref {reference}</div>
+              <div className="text-[10px] font-mono text-content-subtle">
+                Ref {reference || "…"}
+              </div>
             </div>
             <DocumentPreview doc={doc} />
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function SyncBadge({ status, signedIn }: { status: SyncStatus; signedIn: boolean }) {
+  if (!signedIn) {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <CloudOff className="w-3.5 h-3.5" /> Solo en este dispositivo
+      </span>
+    );
+  }
+  if (status === "loading" || status === "saving") {
+    return (
+      <span className="inline-flex items-center gap-1">
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        {status === "loading" ? "Cargando borrador…" : "Guardando…"}
+      </span>
+    );
+  }
+  if (status === "error") {
+    return (
+      <span className="inline-flex items-center gap-1 text-red-600">
+        <CloudOff className="w-3.5 h-3.5" /> Error al sincronizar
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 text-accent-brand">
+      <Cloud className="w-3.5 h-3.5" /> Sincronizado
+    </span>
   );
 }
 
@@ -308,12 +448,12 @@ function BlockPreview({ block }: { block: DocBlock }) {
     return (
       <table className="w-full text-[12px]">
         <tbody>
-          {block.rows.map(([k, v], i) => (
+          {block.rows.map(([k, val], i) => (
             <tr key={i} className="border-b border-hairline/60 last:border-0">
               <td className="py-1.5 pr-3 font-mono text-[11px] uppercase tracking-wide text-content-subtle w-40 align-top">
                 {k}
               </td>
-              <td className="py-1.5 text-content">{v}</td>
+              <td className="py-1.5 text-content">{val}</td>
             </tr>
           ))}
         </tbody>
