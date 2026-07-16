@@ -189,14 +189,7 @@ function ListingAdminPage() {
         </div>
 
         <aside className="space-y-6">
-          <ValuationPanel
-            listingId={listing.id}
-            askingPriceUSD={listing.asking_price_usd}
-            modality={listing.modality}
-            royaltyPct={listing.royalty_pct}
-            commodity={listing.commodity}
-            stage={listing.stage}
-          />
+          <ValuationPanel listingId={listing.id} />
         </aside>
       </div>
     </div>
