@@ -799,17 +799,6 @@ function CourseSection() {
    Sección: Documentos de transacción editables
 ———————————————————————————————————————————————— */
 function DocumentTemplatesSection() {
-  const items = [
-    { id: "nda", tag: "NDA", title: "Acuerdo de Confidencialidad", desc: "Mutuo o unilateral. Cláusulas de no-elusión, penalidad y devolución opcionales.", cat: "Legal" },
-    { id: "ndi", tag: "NCNDA", title: "NDA + No Elusión (trade)", desc: "Estándar de brokerage para operaciones de commodities y presentación de contrapartes.", cat: "Legal" },
-    { id: "mou", tag: "MoU", title: "Memorando de Entendimiento", desc: "Marco no vinculante para explorar una operación con exclusividad negociadora.", cat: "M&A" },
-    { id: "loi", tag: "LOI", title: "Carta de Intención", desc: "Manifestación preliminar de interés del inversionista o comprador.", cat: "M&A" },
-    { id: "term-sheet", tag: "Term Sheet", title: "Term Sheet de Inversión", desc: "Resumen de equity, earn-in, valuation, gobierno y protecciones.", cat: "Inversión" },
-    { id: "spa", tag: "SPA", title: "Share Purchase Agreement", desc: "Esqueleto de compraventa de acciones con escrow, earn-out y no-competencia.", cat: "M&A" },
-    { id: "jv", tag: "JV", title: "Joint Venture Agreement", desc: "Estructura de aportes, participación, dilución y operador para desarrollo conjunto.", cat: "Inversión" },
-    { id: "royalty", tag: "NSR", title: "Royalty Agreement (NSR)", desc: "Regalía Net Smelter Return con opción de recompra y auditoría.", cat: "Inversión" },
-    { id: "advisory", tag: "Advisory", title: "Advisory Agreement", desc: "Retainer + success fee con tail para colocación de capital.", cat: "Legal" },
-  ];
   return (
     <section className="py-16 border-t border-hairline">
       <SectionHeading
