@@ -38,6 +38,7 @@ export function mapChileAttributes(a: Record<string, unknown>): CanonicalConcess
     statusNormalized: normalizeChileStatus(status),
     type: a.TIPO_CONCESION != null ? String(a.TIPO_CONCESION) : null,
     commodity: null,
+    expiresAt: a.FECHA_VENCIMIENTO != null ? String(a.FECHA_VENCIMIENTO) : null,
     location: a.COMUNA != null ? String(a.COMUNA) : null,
     source: "SERNAGEOMIN",
     sourceUrl: VIEWER_URL,
@@ -59,7 +60,7 @@ export const chileConnector: CadastreConnector = {
     const rows = await arcgisQueryAttributes(SNGM_CONCESIONES_URL, {
       where: clauses.join(" OR "),
       outFields:
-        "NUMERO_ROL,DV_ROL,NOMBRE,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,HECTAREAS,SITUACION_CONCESION,TIPO_CONCESION,COMUNA",
+        "NUMERO_ROL,DV_ROL,NOMBRE,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,HECTAREAS,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,FECHA_VENCIMIENTO",
       limit,
     });
     return rows.map(mapChileAttributes);

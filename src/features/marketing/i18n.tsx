@@ -104,6 +104,11 @@ export const STRINGS = {
     en: "Holder, concession name or unique code…",
     pt: "Titular, nome da concessão ou código único…",
   },
+  cad_ph_zm: {
+    es: "Titular, código de licencia o commodity (copper, cobalt…)…",
+    en: "Holder, licence code or commodity (copper, cobalt…)…",
+    pt: "Titular, código da licença ou commodity (copper, cobalt…)…",
+  },
   cad_ph_br: {
     es: "Titular, sustancia (ferro, ouro…) o nº de processo…",
     en: "Holder, substance (iron, gold…) or process number…",

@@ -58,6 +58,7 @@ export function mapBrazilAttributes(a: Record<string, unknown>): CanonicalConces
     statusNormalized: normalizeBrazilStatus(fase),
     type: fase,
     commodity: a.SUBS != null ? String(a.SUBS) : null,
+    expiresAt: null,
     location: a.UF != null ? String(a.UF) : null,
     source: "ANM SIGMINE",
     sourceUrl: VIEWER_URL,
