@@ -188,7 +188,7 @@ export function DocumentEditor({ template }: { template: TemplateDef }) {
     <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6">
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
         <Link
-          to="/recursos"
+          to="/dashboard/documentos"
           className="inline-flex items-center gap-1.5 text-[12px] font-mono text-content-subtle hover:text-content"
         >
           <ArrowLeft className="w-3.5 h-3.5" /> Volver a recursos

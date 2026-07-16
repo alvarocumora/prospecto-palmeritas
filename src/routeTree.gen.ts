@@ -52,7 +52,6 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
-import { Route as RecursosDocumentosTemplateIdRouteImport } from './routes/recursos.documentos.$templateId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
@@ -99,6 +98,7 @@ import { Route as AuthenticatedDashboardFieldMapRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
+import { Route as AuthenticatedDashboardDocumentosRouteImport } from './routes/_authenticated.dashboard.documentos'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
@@ -124,6 +124,7 @@ import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from '.
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
 import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
@@ -348,12 +349,6 @@ const ReportsLosverdesPre43101Route =
     id: '/reports/losverdes/pre43101',
     path: '/reports/losverdes/pre43101',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const RecursosDocumentosTemplateIdRoute =
-  RecursosDocumentosTemplateIdRouteImport.update({
-    id: '/documentos/$templateId',
-    path: '/documentos/$templateId',
-    getParentRoute: () => RecursosRoute,
   } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -622,6 +617,12 @@ const AuthenticatedDashboardDrillingRoute =
     path: '/dashboard/drilling',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardDocumentosRoute =
+  AuthenticatedDashboardDocumentosRouteImport.update({
+    id: '/dashboard/documentos',
+    path: '/dashboard/documentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardDealsRoute =
   AuthenticatedDashboardDealsRouteImport.update({
     id: '/dashboard/deals',
@@ -770,6 +771,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const AuthenticatedDashboardDocumentosTemplateIdRoute =
+  AuthenticatedDashboardDocumentosTemplateIdRouteImport.update({
+    id: '/$templateId',
+    path: '/$templateId',
+    getParentRoute: () => AuthenticatedDashboardDocumentosRoute,
+  } as any)
 const AuthenticatedDashboardAdminInvestorsRoute =
   AuthenticatedDashboardAdminInvestorsRouteImport.update({
     id: '/investors',
@@ -817,7 +824,7 @@ export interface FileRoutesByFullPath {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -861,6 +868,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -907,12 +915,12 @@ export interface FileRoutesByFullPath {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -939,7 +947,7 @@ export interface FileRoutesByTo {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -983,6 +991,7 @@ export interface FileRoutesByTo {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1029,12 +1038,12 @@ export interface FileRoutesByTo {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -1063,7 +1072,7 @@ export interface FileRoutesById {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1107,6 +1116,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
+  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1153,12 +1163,12 @@ export interface FileRoutesById {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -1231,6 +1241,7 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
+    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1277,12 +1288,12 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard/'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
@@ -1353,6 +1364,7 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
+    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1399,12 +1411,12 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
@@ -1476,6 +1488,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
+    | '/_authenticated/dashboard/documentos'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/estimation'
@@ -1522,12 +1535,12 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/inbox'
     | '/_authenticated/dashboard/admin/investors'
+    | '/_authenticated/dashboard/documentos/$templateId'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/targets/ai-brief'
@@ -1556,7 +1569,7 @@ export interface RootRouteChildren {
   MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
-  RecursosRoute: typeof RecursosRouteWithChildren
+  RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SatelitalRoute: typeof SatelitalRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1909,13 +1922,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ReportsLosverdesPre43101RouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/recursos/documentos/$templateId': {
-      id: '/recursos/documentos/$templateId'
-      path: '/documentos/$templateId'
-      fullPath: '/recursos/documentos/$templateId'
-      preLoaderRoute: typeof RecursosDocumentosTemplateIdRouteImport
-      parentRoute: typeof RecursosRoute
-    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -2238,6 +2244,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/documentos': {
+      id: '/_authenticated/dashboard/documentos'
+      path: '/dashboard/documentos'
+      fullPath: '/dashboard/documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/deals': {
       id: '/_authenticated/dashboard/deals'
       path: '/dashboard/deals'
@@ -2413,6 +2426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/_authenticated/dashboard/documentos/$templateId': {
+      id: '/_authenticated/dashboard/documentos/$templateId'
+      path: '/$templateId'
+      fullPath: '/dashboard/documentos/$templateId'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardDocumentosRoute
+    }
     '/_authenticated/dashboard/admin/investors': {
       id: '/_authenticated/dashboard/admin/investors'
       path: '/investors'
@@ -2491,6 +2511,21 @@ const AuthenticatedDashboardCatastroRouteWithChildren =
     AuthenticatedDashboardCatastroRouteChildren,
   )
 
+interface AuthenticatedDashboardDocumentosRouteChildren {
+  AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+}
+
+const AuthenticatedDashboardDocumentosRouteChildren: AuthenticatedDashboardDocumentosRouteChildren =
+  {
+    AuthenticatedDashboardDocumentosTemplateIdRoute:
+      AuthenticatedDashboardDocumentosTemplateIdRoute,
+  }
+
+const AuthenticatedDashboardDocumentosRouteWithChildren =
+  AuthenticatedDashboardDocumentosRoute._addFileChildren(
+    AuthenticatedDashboardDocumentosRouteChildren,
+  )
+
 interface AuthenticatedDashboardGeophysicsSurveyIdRouteChildren {
   AuthenticatedDashboardGeophysicsSurveyIdFieldRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
@@ -2565,6 +2600,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
+  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRouteWithChildren
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
@@ -2622,6 +2658,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCommodityLotsRoute:
     AuthenticatedDashboardCommodityLotsRoute,
   AuthenticatedDashboardDealsRoute: AuthenticatedDashboardDealsRoute,
+  AuthenticatedDashboardDocumentosRoute:
+    AuthenticatedDashboardDocumentosRouteWithChildren,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
@@ -2687,18 +2725,6 @@ const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
   ProyectosRouteChildren,
 )
 
-interface RecursosRouteChildren {
-  RecursosDocumentosTemplateIdRoute: typeof RecursosDocumentosTemplateIdRoute
-}
-
-const RecursosRouteChildren: RecursosRouteChildren = {
-  RecursosDocumentosTemplateIdRoute: RecursosDocumentosTemplateIdRoute,
-}
-
-const RecursosRouteWithChildren = RecursosRoute._addFileChildren(
-  RecursosRouteChildren,
-)
-
 interface TerminalRouteChildren {
   TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
   TerminalMarketRoute: typeof TerminalMarketRoute
@@ -2727,7 +2753,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
-  RecursosRoute: RecursosRouteWithChildren,
+  RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SatelitalRoute: SatelitalRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,

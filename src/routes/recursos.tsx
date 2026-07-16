@@ -799,17 +799,6 @@ function CourseSection() {
    Sección: Documentos de transacción editables
 ———————————————————————————————————————————————— */
 function DocumentTemplatesSection() {
-  const items = [
-    { id: "nda", tag: "NDA", title: "Acuerdo de Confidencialidad", desc: "Mutuo o unilateral. Cláusulas de no-elusión, penalidad y devolución opcionales.", cat: "Legal" },
-    { id: "ndi", tag: "NCNDA", title: "NDA + No Elusión (trade)", desc: "Estándar de brokerage para operaciones de commodities y presentación de contrapartes.", cat: "Legal" },
-    { id: "mou", tag: "MoU", title: "Memorando de Entendimiento", desc: "Marco no vinculante para explorar una operación con exclusividad negociadora.", cat: "M&A" },
-    { id: "loi", tag: "LOI", title: "Carta de Intención", desc: "Manifestación preliminar de interés del inversionista o comprador.", cat: "M&A" },
-    { id: "term-sheet", tag: "Term Sheet", title: "Term Sheet de Inversión", desc: "Resumen de equity, earn-in, valuation, gobierno y protecciones.", cat: "Inversión" },
-    { id: "spa", tag: "SPA", title: "Share Purchase Agreement", desc: "Esqueleto de compraventa de acciones con escrow, earn-out y no-competencia.", cat: "M&A" },
-    { id: "jv", tag: "JV", title: "Joint Venture Agreement", desc: "Estructura de aportes, participación, dilución y operador para desarrollo conjunto.", cat: "Inversión" },
-    { id: "royalty", tag: "NSR", title: "Royalty Agreement (NSR)", desc: "Regalía Net Smelter Return con opción de recompra y auditoría.", cat: "Inversión" },
-    { id: "advisory", tag: "Advisory", title: "Advisory Agreement", desc: "Retainer + success fee con tail para colocación de capital.", cat: "Legal" },
-  ];
   return (
     <section className="py-16 border-t border-hairline">
       <SectionHeading
@@ -818,35 +807,21 @@ function DocumentTemplatesSection() {
         description="Redacta NDAs, LOIs, term sheets, SPAs, JVs y royalties directamente en la plataforma. Personaliza cláusulas, previsualiza en vivo y descarga PDF listo para circular. Borradores editables — no reemplazan asesoría legal."
         className="mb-10"
       />
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {items.map((it) => (
-          <Link
-            key={it.id}
-            to="/recursos/documentos/$templateId"
-            params={{ templateId: it.id }}
-            className="group relative rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-30px_rgba(43,74,203,0.35)] transition-all"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider bg-accent-brand-subtle text-accent-brand">
-                <FileText className="w-3 h-3" /> {it.tag}
-              </span>
-              <span className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
-                {it.cat}
-              </span>
-            </div>
-            <div className="font-display text-lg text-content group-hover:text-accent-brand transition-colors">
-              {it.title}
-            </div>
-            <p className="text-sm text-content-subtle mt-1.5 leading-relaxed">{it.desc}</p>
-            <span className="mt-4 inline-flex items-center gap-1 text-[11px] font-mono uppercase tracking-wider text-accent-brand opacity-0 group-hover:opacity-100 transition-opacity">
-              Abrir editor <ArrowRight className="w-3 h-3" />
-            </span>
-            <span
-              className="absolute inset-x-6 top-0 h-px opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: GOLD }}
-            />
-          </Link>
-        ))}
+      <div className="rounded-2xl border border-hairline bg-white p-8 flex flex-wrap items-center gap-6">
+        <div className="flex-1 min-w-[260px]">
+          <div className="font-display text-xl text-content">Editor de documentos in-app</div>
+          <p className="text-sm text-content-subtle mt-1.5 max-w-2xl">
+            NDA, NCNDA, MoU, LOI, Term Sheet, SPA, JV, Royalty y Advisory: personaliza cláusulas,
+            previsualiza en vivo y descarga PDF con branding Geocapitals. Los borradores se guardan
+            en tu cuenta y se sincronizan entre dispositivos.
+          </p>
+        </div>
+        <Link
+          to="/auth"
+          className="inline-flex items-center gap-2 rounded-lg bg-content text-white px-4 py-2.5 text-sm font-medium hover:opacity-90"
+        >
+          Acceder al editor <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
     </section>
   );
