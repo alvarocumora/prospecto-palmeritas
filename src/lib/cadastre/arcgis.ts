@@ -52,6 +52,6 @@ export async function arcgisQueryAttributes(
 export function sanitizeArcgisTerm(rawTerm: string): string | null {
   const term = rawTerm.trim();
   if (!term) return null;
-  if (!/^[A-Za-z0-9ÁÉÍÓÚÑáéíóúñ \-./]{1,64}$/.test(term)) return null;
+  if (!/^[A-Za-z0-9ÁÉÍÓÚÑÇÃÕÂÊÔáéíóúñçãõâêô \-./]{1,64}$/.test(term)) return null;
   return term.replace(/'/g, "''");
 }

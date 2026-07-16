@@ -37,6 +37,7 @@ export function mapChileAttributes(a: Record<string, unknown>): CanonicalConcess
     status,
     statusNormalized: normalizeChileStatus(status),
     type: a.TIPO_CONCESION != null ? String(a.TIPO_CONCESION) : null,
+    commodity: null,
     location: a.COMUNA != null ? String(a.COMUNA) : null,
     source: "SERNAGEOMIN",
     sourceUrl: VIEWER_URL,
