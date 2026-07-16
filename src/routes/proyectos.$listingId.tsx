@@ -160,6 +160,7 @@ function ListingDetailPage() {
                 label="Reportes NI 43-101"
                 value={l.metrics.ni43101Reports}
               />
+              <Metric icon={<Users />} label="Interesados" value={l.inquiriesCount} />
             </div>
           </section>
 
