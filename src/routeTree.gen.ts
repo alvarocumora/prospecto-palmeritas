@@ -125,6 +125,7 @@ import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from '.
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
 import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
@@ -777,6 +778,12 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
     path: '/$surveyId',
     getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
   } as any)
+const AuthenticatedDashboardDocumentosTemplateIdRoute =
+  AuthenticatedDashboardDocumentosTemplateIdRouteImport.update({
+    id: '/$templateId',
+    path: '/$templateId',
+    getParentRoute: () => AuthenticatedDashboardDocumentosRoute,
+  } as any)
 const AuthenticatedDashboardAdminInvestorsRoute =
   AuthenticatedDashboardAdminInvestorsRouteImport.update({
     id: '/investors',
@@ -868,7 +875,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -921,6 +928,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -991,7 +999,7 @@ export interface FileRoutesByTo {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1044,6 +1052,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -1116,7 +1125,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRoute
+  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1169,6 +1178,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
@@ -1294,6 +1304,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
@@ -1417,6 +1428,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
@@ -1541,6 +1553,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/inbox'
     | '/_authenticated/dashboard/admin/investors'
+    | '/_authenticated/dashboard/documentos/$templateId'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/targets/ai-brief'
@@ -2433,6 +2446,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
       parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
     }
+    '/_authenticated/dashboard/documentos/$templateId': {
+      id: '/_authenticated/dashboard/documentos/$templateId'
+      path: '/$templateId'
+      fullPath: '/dashboard/documentos/$templateId'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardDocumentosRoute
+    }
     '/_authenticated/dashboard/admin/investors': {
       id: '/_authenticated/dashboard/admin/investors'
       path: '/investors'
@@ -2511,6 +2531,21 @@ const AuthenticatedDashboardCatastroRouteWithChildren =
     AuthenticatedDashboardCatastroRouteChildren,
   )
 
+interface AuthenticatedDashboardDocumentosRouteChildren {
+  AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+}
+
+const AuthenticatedDashboardDocumentosRouteChildren: AuthenticatedDashboardDocumentosRouteChildren =
+  {
+    AuthenticatedDashboardDocumentosTemplateIdRoute:
+      AuthenticatedDashboardDocumentosTemplateIdRoute,
+  }
+
+const AuthenticatedDashboardDocumentosRouteWithChildren =
+  AuthenticatedDashboardDocumentosRoute._addFileChildren(
+    AuthenticatedDashboardDocumentosRouteChildren,
+  )
+
 interface AuthenticatedDashboardGeophysicsSurveyIdRouteChildren {
   AuthenticatedDashboardGeophysicsSurveyIdFieldRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
@@ -2585,7 +2620,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
-  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRoute
+  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRouteWithChildren
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
@@ -2643,7 +2678,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCommodityLotsRoute:
     AuthenticatedDashboardCommodityLotsRoute,
   AuthenticatedDashboardDealsRoute: AuthenticatedDashboardDealsRoute,
-  AuthenticatedDashboardDocumentosRoute: AuthenticatedDashboardDocumentosRoute,
+  AuthenticatedDashboardDocumentosRoute:
+    AuthenticatedDashboardDocumentosRouteWithChildren,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
