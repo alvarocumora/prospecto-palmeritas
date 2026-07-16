@@ -14,6 +14,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      advance_requests: {
+        Row: {
+          advance_rate_pct: number
+          created_at: string
+          decided_at: string | null
+          decision_notes: string | null
+          eligibility: string
+          id: string
+          indicative_fee_pct: number | null
+          lot_id: string
+          lot_value_usd: number | null
+          max_advance_usd: number
+          offer_snapshot: Json | null
+          purpose: string | null
+          requested_amount_usd: number
+          requester_user_id: string
+          reviewer_user_id: string | null
+          risk_score: number | null
+          status: string
+          tenor_days: number | null
+          updated_at: string
+        }
+        Insert: {
+          advance_rate_pct: number
+          created_at?: string
+          decided_at?: string | null
+          decision_notes?: string | null
+          eligibility: string
+          id?: string
+          indicative_fee_pct?: number | null
+          lot_id: string
+          lot_value_usd?: number | null
+          max_advance_usd: number
+          offer_snapshot?: Json | null
+          purpose?: string | null
+          requested_amount_usd: number
+          requester_user_id: string
+          reviewer_user_id?: string | null
+          risk_score?: number | null
+          status?: string
+          tenor_days?: number | null
+          updated_at?: string
+        }
+        Update: {
+          advance_rate_pct?: number
+          created_at?: string
+          decided_at?: string | null
+          decision_notes?: string | null
+          eligibility?: string
+          id?: string
+          indicative_fee_pct?: number | null
+          lot_id?: string
+          lot_value_usd?: number | null
+          max_advance_usd?: number
+          offer_snapshot?: Json | null
+          purpose?: string | null
+          requested_amount_usd?: number
+          requester_user_id?: string
+          reviewer_user_id?: string | null
+          risk_score?: number | null
+          status?: string
+          tenor_days?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "advance_requests_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ai_anomaly_explanations: {
         Row: {
           anomaly_id: string
@@ -275,6 +349,54 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      api_keys: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          key_hash: string
+          key_prefix: string
+          last_used_at: string | null
+          month_key: string | null
+          monthly_count: number
+          name: string
+          plan: string
+          requests_total: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash: string
+          key_prefix: string
+          last_used_at?: string | null
+          month_key?: string | null
+          monthly_count?: number
+          name?: string
+          plan?: string
+          requests_total?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          key_hash?: string
+          key_prefix?: string
+          last_used_at?: string | null
+          month_key?: string | null
+          monthly_count?: number
+          name?: string
+          plan?: string
+          requests_total?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       app_roles: {
         Row: {
