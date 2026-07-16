@@ -52,7 +52,6 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
-import { Route as RecursosDocumentosTemplateIdRouteImport } from './routes/recursos.documentos.$templateId'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
@@ -350,12 +349,6 @@ const ReportsLosverdesPre43101Route =
     id: '/reports/losverdes/pre43101',
     path: '/reports/losverdes/pre43101',
     getParentRoute: () => rootRouteImport,
-  } as any)
-const RecursosDocumentosTemplateIdRoute =
-  RecursosDocumentosTemplateIdRouteImport.update({
-    id: '/documentos/$templateId',
-    path: '/documentos/$templateId',
-    getParentRoute: () => RecursosRoute,
   } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
@@ -831,7 +824,7 @@ export interface FileRoutesByFullPath {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -922,7 +915,6 @@ export interface FileRoutesByFullPath {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -955,7 +947,7 @@ export interface FileRoutesByTo {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1046,7 +1038,6 @@ export interface FileRoutesByTo {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -1081,7 +1072,7 @@ export interface FileRoutesById {
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
   '/proyectos': typeof ProyectosRouteWithChildren
-  '/recursos': typeof RecursosRouteWithChildren
+  '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
   '/satelital': typeof SatelitalRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1172,7 +1163,6 @@ export interface FileRoutesById {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
-  '/recursos/documentos/$templateId': typeof RecursosDocumentosTemplateIdRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -1298,7 +1288,6 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard/'
@@ -1422,7 +1411,6 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard'
@@ -1547,7 +1535,6 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
-    | '/recursos/documentos/$templateId'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
@@ -1582,7 +1569,7 @@ export interface RootRouteChildren {
   MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
-  RecursosRoute: typeof RecursosRouteWithChildren
+  RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SatelitalRoute: typeof SatelitalRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1934,13 +1921,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/reports/losverdes/pre43101'
       preLoaderRoute: typeof ReportsLosverdesPre43101RouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/recursos/documentos/$templateId': {
-      id: '/recursos/documentos/$templateId'
-      path: '/documentos/$templateId'
-      fullPath: '/recursos/documentos/$templateId'
-      preLoaderRoute: typeof RecursosDocumentosTemplateIdRouteImport
-      parentRoute: typeof RecursosRoute
     }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
@@ -2745,18 +2725,6 @@ const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
   ProyectosRouteChildren,
 )
 
-interface RecursosRouteChildren {
-  RecursosDocumentosTemplateIdRoute: typeof RecursosDocumentosTemplateIdRoute
-}
-
-const RecursosRouteChildren: RecursosRouteChildren = {
-  RecursosDocumentosTemplateIdRoute: RecursosDocumentosTemplateIdRoute,
-}
-
-const RecursosRouteWithChildren = RecursosRoute._addFileChildren(
-  RecursosRouteChildren,
-)
-
 interface TerminalRouteChildren {
   TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
   TerminalMarketRoute: typeof TerminalMarketRoute
@@ -2785,7 +2753,7 @@ const rootRouteChildren: RootRouteChildren = {
   MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
-  RecursosRoute: RecursosRouteWithChildren,
+  RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SatelitalRoute: SatelitalRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
