@@ -310,14 +310,21 @@ function MyListingsPage() {
                   <Eye className="w-3 h-3" /> {r.views_count}
                 </span>
               </div>
-              <div className="mt-3 flex items-center gap-4">
+              <div className="mt-3 flex items-center gap-3 flex-wrap">
+                <Link
+                  to="/dashboard/listings/$listingId"
+                  params={{ listingId: r.id }}
+                  className="inline-flex items-center gap-1 rounded bg-gold text-black px-2.5 py-1 text-[11px] font-mono font-semibold hover:bg-gold/90"
+                >
+                  Administrar →
+                </Link>
                 {r.is_published && (
                   <Link
                     to="/proyectos/$listingId"
                     params={{ listingId: r.id }}
                     className="text-[11px] font-mono text-gold hover:underline"
                   >
-                    Ver ficha pública →
+                    Ver ficha pública
                   </Link>
                 )}
                 <button
@@ -326,7 +333,7 @@ function MyListingsPage() {
                   className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-gold transition-colors"
                 >
                   <FolderOpen className="w-3 h-3" />
-                  {openDataRoom === r.id ? "Cerrar data room" : "Data room"}
+                  {openDataRoom === r.id ? "Cerrar data room" : "Data room rápido"}
                 </button>
               </div>
               {openDataRoom === r.id && <DataRoomManager listingId={r.id} />}
