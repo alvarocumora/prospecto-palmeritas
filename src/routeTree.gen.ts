@@ -43,6 +43,7 @@ import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
@@ -299,6 +300,11 @@ const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
 const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
   id: '/hooks/sync-boletin-minero',
   path: '/hooks/sync-boletin-minero',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirmarTokenRoute = FirmarTokenRouteImport.update({
+  id: '/firmar/$token',
+  path: '/firmar/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
@@ -837,6 +843,7 @@ export interface FileRoutesByFullPath {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -960,6 +967,7 @@ export interface FileRoutesByTo {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -1085,6 +1093,7 @@ export interface FileRoutesById {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/invitations/$token': typeof InvitationsTokenRoute
@@ -1210,6 +1219,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -1333,6 +1343,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -1457,6 +1468,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/invitations/$token'
@@ -1582,6 +1594,7 @@ export interface RootRouteChildren {
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  FirmarTokenRoute: typeof FirmarTokenRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
@@ -1857,6 +1870,13 @@ declare module '@tanstack/react-router' {
       path: '/hooks/sync-boletin-minero'
       fullPath: '/hooks/sync-boletin-minero'
       preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/firmar/$token': {
+      id: '/firmar/$token'
+      path: '/firmar/$token'
+      fullPath: '/firmar/$token'
+      preLoaderRoute: typeof FirmarTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
@@ -2767,6 +2787,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  FirmarTokenRoute: FirmarTokenRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
