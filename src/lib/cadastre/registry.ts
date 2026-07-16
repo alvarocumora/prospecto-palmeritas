@@ -4,7 +4,7 @@
 import { chileConnector } from "@/lib/cadastre/connectors/chile";
 import { peruConnector } from "@/lib/cadastre/connectors/peru";
 import { brazilConnector } from "@/lib/cadastre/connectors/brazil";
-import { zambiaConnector } from "@/lib/cadastre/connectors/landfolio";
+import { zambiaConnector, malawiConnector } from "@/lib/cadastre/connectors/landfolio";
 import type { CadastreConnector, CadastreCountry } from "@/lib/cadastre/types";
 
 export const CADASTRE_CONNECTORS: Record<CadastreCountry, CadastreConnector> = {
@@ -12,6 +12,7 @@ export const CADASTRE_CONNECTORS: Record<CadastreCountry, CadastreConnector> = {
   PE: peruConnector,
   BR: brazilConnector,
   ZM: zambiaConnector,
+  MW: malawiConnector,
 };
 
 export function getCadastreConnector(country: string): CadastreConnector | null {

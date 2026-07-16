@@ -25,8 +25,8 @@ export type LandfolioConfig = {
   country: CadastreCountry;
   countryName: string;
   institution: string;
-  /** URL de la capa de licencias ("All Licenses"). */
-  layerUrl: string;
+  /** URLs de capas de licencias a consultar (algunos despliegues separan por tipo). */
+  layerUrls: string[];
   /** Visor oficial del portal del país. */
   viewerUrl: string;
 };
@@ -91,8 +91,31 @@ export function mapLandfolioAttributes(
   };
 }
 
-const OUT_FIELDS =
-  "Code,Name,Parties,TypeGroup,Type,StatusGrp,Status,AreaValue,AreaUnit,Commodities,Region,MapRef,DteExpires";
+/**
+ * Une resultados de varias capas, deduplicando por código (un mismo derecho
+ * puede aparecer en más de una vista) y recortando al límite. Puro.
+ */
+export function mergeConcessions(
+  lists: CanonicalConcession[][],
+  limit: number,
+): CanonicalConcession[] {
+  const seen = new Set<string>();
+  const out: CanonicalConcession[] = [];
+  for (const list of lists) {
+    for (const c of list) {
+      const key = `${c.country}|${c.code}`;
+      if (!c.code || seen.has(key)) continue;
+      seen.add(key);
+      out.push(c);
+      if (out.length >= limit) return out;
+    }
+  }
+  return out;
+}
+
+// outFields=* : los despliegues Landfolio varían campos (Malawi no publica
+// Commodities); pedir columnas inexistentes rompe la query en ArcGIS Server.
+const OUT_FIELDS = "*";
 
 /** Crea un conector de catastro para un país que corre sobre Landfolio. */
 export function makeLandfolioConnector(cfg: LandfolioConfig): CadastreConnector {
@@ -106,15 +129,18 @@ export function makeLandfolioConnector(cfg: LandfolioConfig): CadastreConnector 
       const clauses = [
         `UPPER(Parties) LIKE UPPER('%${safe}%')`,
         `UPPER(Code) LIKE UPPER('%${safe}%')`,
-        `UPPER(Commodities) LIKE UPPER('%${safe}%')`,
       ];
-      const rows = await arcgisQueryAttributes(cfg.layerUrl, {
-        where: clauses.join(" OR "),
-        outFields: OUT_FIELDS,
-        limit,
-        timeoutMs: 30_000,
-      });
-      return rows.map((r) => mapLandfolioAttributes(r, cfg));
+      const lists = await Promise.all(
+        cfg.layerUrls.map((layerUrl) =>
+          arcgisQueryAttributes(layerUrl, {
+            where: clauses.join(" OR "),
+            outFields: OUT_FIELDS,
+            limit,
+            timeoutMs: 30_000,
+          }).then((rows) => rows.map((r) => mapLandfolioAttributes(r, cfg))),
+        ),
+      );
+      return mergeConcessions(lists, limit);
     },
   };
 }
@@ -124,6 +150,24 @@ export const zambiaConnector = makeLandfolioConnector({
   country: "ZM",
   countryName: "Zambia",
   institution: "Zambia Mining Cadastre",
-  layerUrl: "https://ags1.landfolio.com/arcgis/rest/services/ProdPortal/ZambiaPortal/MapServer/0",
+  layerUrls: [
+    "https://ags1.landfolio.com/arcgis/rest/services/ProdPortal/ZambiaPortal/MapServer/0",
+  ],
   viewerUrl: "https://portals.landfolio.com/zambia/",
+});
+
+/**
+ * Malawi — Mining Cadastre Portal (Landfolio). Verificado en vivo: la capa
+ * "Mining Licences" responde con el esquema estándar (Code, Parties, StatusGrp,
+ * AreaValue en km²…); las demás vistas del despliegue fallan server-side y no
+ * se incluyen. Namibia existe pero sus capas AGOL exigen token (no públicas).
+ */
+export const malawiConnector = makeLandfolioConnector({
+  country: "MW",
+  countryName: "Malawi",
+  institution: "Malawi Mining Cadastre",
+  layerUrls: [
+    "https://demo.landfolio.com/arcgis/rest/services/Malawi/MapPortal_ActiveLicenses/MapServer/1",
+  ],
+  viewerUrl: "https://portals.landfolio.com/malawi/",
 });

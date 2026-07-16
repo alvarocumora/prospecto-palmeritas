@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 import { mapChileAttributes, normalizeChileStatus } from "./connectors/chile";
 import { mapPeruAttributes, normalizePeruStatus } from "./connectors/peru";
 import { mapBrazilAttributes, normalizeBrazilStatus } from "./connectors/brazil";
-import { mapLandfolioAttributes, normalizeLandfolioStatus } from "./connectors/landfolio";
+import {
+  mapLandfolioAttributes,
+  normalizeLandfolioStatus,
+  mergeConcessions,
+} from "./connectors/landfolio";
 import { getCadastreConnector, listCadastreCountries } from "./registry";
 import { sanitizeArcgisTerm } from "./arcgis";
 
@@ -172,12 +176,65 @@ describe("mapLandfolioAttributes", () => {
   });
 });
 
+describe("mergeConcessions", () => {
+  const mk = (code: string) =>
+    mapLandfolioAttributes(
+      { Code: code, StatusGrp: "Active" },
+      {
+        country: "MW" as const,
+        institution: "Malawi Mining Cadastre",
+        viewerUrl: "x",
+      },
+    );
+
+  it("une capas, deduplica por código y respeta el límite", () => {
+    const merged = mergeConcessions(
+      [
+        [mk("A"), mk("B")],
+        [mk("B"), mk("C"), mk("D")],
+      ],
+      3,
+    );
+    expect(merged.map((c) => c.code)).toEqual(["A", "B", "C"]);
+  });
+
+  it("descarta códigos vacíos", () => {
+    expect(mergeConcessions([[mk("")]], 5)).toHaveLength(0);
+  });
+});
+
+describe("mapLandfolioAttributes · Malawi (datos reales)", () => {
+  it("mapea la licencia ML0232 con área en km²", () => {
+    const c = mapLandfolioAttributes(
+      {
+        Code: "ML0232",
+        TypeGroup: "Mining",
+        Type: "Mining Licence",
+        StatusGrp: "Active",
+        Status: "Pending Renewal",
+        Parties: "Tahit Networks Civil Engineering Contractors",
+        AreaValue: 0.585,
+        AreaUnit: "Square Kilometre",
+        DteExpires: 1817510400000,
+      },
+      { country: "MW", institution: "Malawi Mining Cadastre", viewerUrl: "x" },
+    );
+    expect(c.country).toBe("MW");
+    expect(c.code).toBe("ML0232");
+    expect(c.statusNormalized).toBe("active");
+    expect(c.areaHa).toBeCloseTo(58.5, 5);
+    expect(c.expiresAt).toBe("2027-08-06");
+    expect(c.commodity).toBeNull();
+  });
+});
+
 describe("registry", () => {
   it("resuelve conectores por país y lista los disponibles", () => {
     expect(getCadastreConnector("CL")?.institution).toBe("SERNAGEOMIN");
     expect(getCadastreConnector("PE")?.institution).toBe("INGEMMET");
     expect(getCadastreConnector("BR")?.institution).toBe("ANM");
     expect(getCadastreConnector("ZM")?.institution).toBe("Zambia Mining Cadastre");
+    expect(getCadastreConnector("MW")?.institution).toBe("Malawi Mining Cadastre");
     expect(getCadastreConnector("XX")).toBeNull();
     const countries = listCadastreCountries().map((c) => c.country);
     expect(countries).toContain("CL");

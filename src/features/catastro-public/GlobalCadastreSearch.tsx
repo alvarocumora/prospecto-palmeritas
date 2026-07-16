@@ -17,6 +17,7 @@ const COUNTRY_TABS: Array<{
   { code: "PE", label: "Perú", flag: "🇵🇪", inst: "INGEMMET" },
   { code: "BR", label: "Brasil", flag: "🇧🇷", inst: "ANM" },
   { code: "ZM", label: "Zambia", flag: "🇿🇲", inst: "Landfolio" },
+  { code: "MW", label: "Malawi", flag: "🇲🇼", inst: "Landfolio" },
 ];
 
 const STATUS_KEY: Record<NormalizedStatus, StringKey> = {
@@ -38,6 +39,7 @@ const PLACEHOLDER_KEY: Record<CadastreCountry, StringKey> = {
   PE: "cad_ph_pe",
   BR: "cad_ph_br",
   ZM: "cad_ph_zm",
+  MW: "cad_ph_zm",
 };
 
 /**
