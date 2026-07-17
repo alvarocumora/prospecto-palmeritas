@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { GeneratedDoc } from "@/lib/documents/model";
+import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import {
   generateSignToken,
   isSignTokenFormat,
@@ -95,7 +96,7 @@ export const createSignRequest = createServerFn({ method: "POST" })
                   year: "numeric",
                 })
               : undefined,
-            signUrl: `https://geocapitals.com/firmar/${token}`,
+            signUrl: buildSignUrl(token),
           },
         });
         emailed = res.ok && "queued" in res && res.queued === true;

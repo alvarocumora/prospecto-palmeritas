@@ -18,6 +18,7 @@ import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
 import { createSignRequest, type SignableDoc } from "@/lib/documents/signing.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "geocapitals:doc:";
@@ -226,7 +227,7 @@ export function DocumentEditor({
           signerName: signerName.trim() || undefined,
         },
       });
-      const url = `https://geocapitals.com/firmar/${token}`;
+      const url = buildSignUrl(token);
       setSignLink(url);
       await navigator.clipboard.writeText(url).catch(() => {});
       toast.success(

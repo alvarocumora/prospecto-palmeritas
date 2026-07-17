@@ -1,5 +1,6 @@
 import type { GeneratedDoc } from "./model";
 import logoUrl from "@/assets/geocapitals-logo.png";
+import { publicUrl } from "@/lib/publicUrl";
 
 // Renderer PDF con branding Geocapitals: cabecera con marca, acento oro,
 // tipografía Helvetica y disclaimer al pie. Client-only (import dinámico).
@@ -191,7 +192,7 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(7);
     pdf.setTextColor(...INK);
-    const signUrl = `https://geocapitals.com/dashboard/documentos/${doc.docType}`;
+    const signUrl = publicUrl(`/dashboard/documentos/${doc.docType}`);
     pdf.textWithLink(
       `Firma y verificación electrónica: ${signUrl} · Ref ${doc.reference}`,
       marginX,

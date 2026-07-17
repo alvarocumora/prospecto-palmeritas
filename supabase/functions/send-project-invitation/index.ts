@@ -64,8 +64,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Build acceptance link — siempre en geocapitals.com, no en el preview.
-    const link = `https://geocapitals.com/invitations/${data.token}`;
+    // Build acceptance link — SIEMPRE dominio público canónico (geocapitals.com),
+    // nunca el origin del request (que puede ser preview *.lovable.app).
+    const PUBLIC_APP_URL = Deno.env.get("PUBLIC_APP_URL") ?? "https://geocapitals.com";
+    const link = `${PUBLIC_APP_URL}/invitations/${data.token}`;
 
     // Email delivery placeholder — log for now, plug Resend/Lovable Emails later.
     console.log(`[invite] ${email} → ${link} (expires ${data.expires_at})`);

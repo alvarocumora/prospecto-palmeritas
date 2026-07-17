@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { publicUrl } from "@/lib/publicUrl";
 
 const InviteSchema = z.object({
   invitationId: z.string().uuid(),
@@ -67,7 +68,7 @@ export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
               inviterName: inviterProfile?.display_name,
               projectName: project?.name,
               organization: project?.organizations?.name,
-              shareUrl: `https://geocapitals.com/auth/invitation?token=${inv.token}`,
+              shareUrl: publicUrl(`/auth/invitation?token=${inv.token}`),
               expiresAt: inv.expires_at,
             }
           : {

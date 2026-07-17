@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Loader2, MapPin, Layers, Mountain, CheckCircle2, X, Mail } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
+import { publicUrl } from "@/lib/publicUrl";
 
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -71,7 +72,7 @@ function AuthPage() {
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
-      options: { emailRedirectTo: `https://geocapitals.com${safeNext(search.next)}` },
+      options: { emailRedirectTo: publicUrl(safeNext(search.next)) },
     });
     setResending(false);
     if (error) toast.error(translateAuthError(error).message);
@@ -115,7 +116,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `https://geocapitals.com${safeNext(search.next)}`,
+            emailRedirectTo: publicUrl(safeNext(search.next)),
             data: { display_name: displayName || email.split("@")[0], ...intentMeta },
           },
         });
@@ -155,7 +156,7 @@ function AuthPage() {
   const handleReset = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `https://geocapitals.com/reset-password`,
+      redirectTo: publicUrl("/reset-password"),
     });
     if (error) toast.error(error.message);
     else toast.success("Revisa tu email para restablecer la contraseña");

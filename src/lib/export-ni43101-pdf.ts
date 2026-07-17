@@ -450,6 +450,7 @@ async function fetchComplianceAnnex(
         rules_total: stdRules.length,
       };
     }
+    const { complianceVerifyUrl } = await import("@/lib/publicUrl");
     return {
       reportId,
       globalScore: report.compliance_score_cached ?? 0,
@@ -457,7 +458,7 @@ async function fetchComplianceAnnex(
       evaluatedAt: report.compliance_evaluated_at,
       byStandard: byStd,
       rules: detailRules,
-      verifyUrl: `https://geocapitals.com/api/public/verify-compliance/${reportId}`,
+      verifyUrl: complianceVerifyUrl(reportId),
     };
   } catch {
     return null;
