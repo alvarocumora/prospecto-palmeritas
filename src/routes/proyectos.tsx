@@ -34,13 +34,15 @@ export const Route = createFileRoute("/proyectos")({
   component: ProyectosPage,
 });
 
+// Las cards aterrizan en la FICHA DE INVERSIÓN (visión inversionista); el
+// live map técnico se abre desde dentro de la ficha.
 const SHOWCASE = [
   {
     code: "PALMERAS",
     name: "Prospecto Las Palmeras",
     region: "Illapel · Coquimbo",
     commodity: "Au-Ag",
-    to: "/live/palmeras",
+    to: "/proyectos/ficha/palmeras",
     bullets: ["74 concesiones · 12.807 ha", "16 sondajes · 4.426 m", "12 anomalías satelitales"],
   },
   {
@@ -48,7 +50,7 @@ const SHOWCASE = [
     name: "Los Verdes",
     region: "Petorca · Valparaíso",
     commodity: "Cu-Mo",
-    to: "/live/losverdes",
+    to: "/proyectos/ficha/losverdes",
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
@@ -60,7 +62,7 @@ const SHOWCASE = [
     name: "Tilama Norte",
     region: "Choapa · Coquimbo",
     commodity: "Cu-Au",
-    to: "/live/tilama",
+    to: "/proyectos/ficha/tilama",
     bullets: [
       "Catastro + boletines vigilados",
       "Geofísica MAG correlacionada",
@@ -72,7 +74,7 @@ const SHOWCASE = [
     name: "Distrito Franco",
     region: "Atacama",
     commodity: "Au",
-    to: "/live/franco",
+    to: "/proyectos/ficha/franco",
     bullets: [
       "Borrador NI 43-101 asistido",
       "Datos de campo geo-referenciados",
@@ -120,6 +122,9 @@ function ProyectosPage() {
                 </li>
               ))}
             </ul>
+            <div className="mt-4 pt-3 border-t border-hairline text-[11px] font-mono uppercase tracking-wider text-accent-brand">
+              Ficha de inversión · ticket, ROI y simulador
+            </div>
           </Link>
         ))}
       </div>

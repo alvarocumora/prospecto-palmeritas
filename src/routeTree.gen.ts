@@ -53,6 +53,7 @@ import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
+import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.ficha.$slug'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
@@ -358,6 +359,11 @@ const ReportsLosverdesPre43101Route =
     path: '/reports/losverdes/pre43101',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ProyectosFichaSlugRoute = ProyectosFichaSlugRouteImport.update({
+  id: '/proyectos_/ficha/$slug',
+  path: '/proyectos/ficha/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -936,6 +942,7 @@ export interface FileRoutesByFullPath {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -1062,6 +1069,7 @@ export interface FileRoutesByTo {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
@@ -1190,6 +1198,7 @@ export interface FileRoutesById {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/proyectos_/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
@@ -1318,6 +1327,7 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard/'
@@ -1444,6 +1454,7 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/dashboard'
@@ -1571,6 +1582,7 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/proyectos_/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
     | '/_authenticated/dashboard/'
@@ -1645,6 +1657,7 @@ export interface RootRouteChildren {
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   CatastroPaisCountryRoute: typeof CatastroPaisCountryRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ProyectosFichaSlugRoute: typeof ProyectosFichaSlugRoute
   ReportsLosverdesPre43101Route: typeof ReportsLosverdesPre43101Route
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
@@ -1966,6 +1979,13 @@ declare module '@tanstack/react-router' {
       path: '/reports/losverdes/pre43101'
       fullPath: '/reports/losverdes/pre43101'
       preLoaderRoute: typeof ReportsLosverdesPre43101RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proyectos_/ficha/$slug': {
+      id: '/proyectos_/ficha/$slug'
+      path: '/proyectos/ficha/$slug'
+      fullPath: '/proyectos/ficha/$slug'
+      preLoaderRoute: typeof ProyectosFichaSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
@@ -2845,6 +2865,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroCCodeRoute: CatastroCCodeRoute,
   CatastroPaisCountryRoute: CatastroPaisCountryRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ProyectosFichaSlugRoute: ProyectosFichaSlugRoute,
   ReportsLosverdesPre43101Route: ReportsLosverdesPre43101Route,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   ApiPublicNotificationsCatastroExpirationsRoute:

@@ -6,6 +6,7 @@ import { RoleSegmentedPanel } from "@/features/dashboard/RoleSegmentedPanel";
 import { useProjects } from "@/hooks/useProjects";
 import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
 import { GeoScene3D } from "@/components/geoscene";
+import { SceneErrorBoundary } from "@/components/geoscene/SceneErrorBoundary";
 import {
   Plus,
   ArrowRight,
@@ -441,7 +442,9 @@ function DashboardHome() {
             </Link>
           </div>
           <div data-surface="canvas" className="h-[480px] relative">
-            <GeoScene3D />
+            <SceneErrorBoundary label="GeoScene3D">
+              <GeoScene3D />
+            </SceneErrorBoundary>
           </div>
         </section>
 

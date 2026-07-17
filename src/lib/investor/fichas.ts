@@ -1,0 +1,263 @@
+// Fichas de inversión de los proyectos showcase — la vista "inversionista":
+// estado, valorización, ticket, ROI por escenario y simulación de inversión.
+//
+// IMPORTANTE: los términos económicos son REFERENCIALES, definidos por el
+// equipo Geocapitals como base de conversación. No constituyen oferta pública
+// y están sujetos a due diligence, NDA y acuerdo definitivo. Este archivo es
+// la única fuente: editar aquí actualiza ficha, simulador y cards.
+
+export type FichaSlug = "palmeras" | "losverdes" | "tilama" | "franco";
+
+export type InvestmentScenario = {
+  key: "conservador" | "base" | "optimista";
+  label: string;
+  /** Múltiplo sobre el capital invertido al horizonte (MOIC). */
+  multiple: number;
+  note: string;
+};
+
+export type ProjectFicha = {
+  slug: FichaSlug;
+  code: string;
+  name: string;
+  region: string;
+  country: string;
+  commodity: string;
+  /** Etapa del proyecto en lenguaje inversionista. */
+  stage: string;
+  stageDetail: string;
+  liveTo: string;
+  reportTo?: string;
+  highlights: string[];
+  /** Valorización referencial del activo (rango, con método declarado). */
+  valuationUsd: { low: number; high: number; method: string };
+  /** Ronda que se levanta. */
+  roundSizeUsd: number;
+  minTicketUsd: number;
+  instrument: string;
+  /** % de la sociedad ofrecido por la ronda completa. */
+  equityOfferedPct: number;
+  horizonYears: number;
+  scenarios: InvestmentScenario[];
+  useOfFunds: Array<{ label: string; pct: number }>;
+  milestones: Array<{ when: string; what: string }>;
+};
+
+const SCENARIOS_STD: InvestmentScenario[] = [
+  {
+    key: "conservador",
+    label: "Conservador",
+    multiple: 1.6,
+    note: "Avance parcial de exploración; venta temprana del activo.",
+  },
+  {
+    key: "base",
+    label: "Base",
+    multiple: 3,
+    note: "Campaña cumple hitos; reventa o farm-out con recursos definidos.",
+  },
+  {
+    key: "optimista",
+    label: "Optimista",
+    multiple: 6,
+    note: "Descubrimiento relevante; entrada de socio estratégico o major.",
+  },
+];
+
+export const FICHAS: Record<FichaSlug, ProjectFicha> = {
+  palmeras: {
+    slug: "palmeras",
+    code: "PALMERAS",
+    name: "Prospecto Las Palmeras",
+    region: "Illapel · Coquimbo",
+    country: "Chile",
+    commodity: "Au-Ag",
+    stage: "Exploración avanzada",
+    stageDetail: "74 concesiones (12.807 ha), 16 sondajes (4.426 m) y 12 anomalías satelitales.",
+    liveTo: "/live/palmeras",
+    highlights: [
+      "74 concesiones · 12.807 ha bajo control",
+      "16 sondajes · 4.426 m perforados",
+      "12 anomalías satelitales priorizadas (4 high)",
+    ],
+    valuationUsd: { low: 5_000_000, high: 8_000_000, method: "Comparables + gasto histórico" },
+    roundSizeUsd: 1_200_000,
+    minTicketUsd: 25_000,
+    instrument: "Equity SpA",
+    equityOfferedPct: 15,
+    horizonYears: 4,
+    scenarios: SCENARIOS_STD,
+    useOfFunds: [
+      { label: "Perforación (campaña 2ª fase)", pct: 55 },
+      { label: "Geofísica y satélite", pct: 15 },
+      { label: "Patentes y catastro", pct: 12 },
+      { label: "Estudios y QP / NI 43-101", pct: 10 },
+      { label: "Administración", pct: 8 },
+    ],
+    milestones: [
+      { when: "T3 2026", what: "Campaña de perforación fase 2 (8 sondajes)" },
+      { when: "T4 2026", what: "Modelo geológico actualizado + targets IA" },
+      { when: "T1 2027", what: "Informe técnico pre-NI 43-101" },
+    ],
+  },
+  losverdes: {
+    slug: "losverdes",
+    code: "LOSVERDES",
+    name: "Los Verdes",
+    region: "Petorca · Valparaíso",
+    country: "Chile",
+    commodity: "Cu-Mo",
+    stage: "Exploración avanzada · compliance en curso",
+    stageDetail:
+      "AOI 3D con satélite multi-índice, targets generados por IA y compliance NI 43-101 en curso.",
+    liveTo: "/live/losverdes",
+    reportTo: "/reports/losverdes/pre43101",
+    highlights: [
+      "Distrito cuprífero con vetas reconocidas",
+      "Targets IA sobre anomalías multiespectrales",
+      "Informe pre-NI 43-101 publicado en la plataforma",
+    ],
+    valuationUsd: { low: 8_000_000, high: 12_000_000, method: "Cubicación interna + comparables" },
+    roundSizeUsd: 1_500_000,
+    minTicketUsd: 50_000,
+    instrument: "Equity SpA",
+    equityOfferedPct: 12,
+    horizonYears: 5,
+    scenarios: SCENARIOS_STD,
+    useOfFunds: [
+      { label: "Perforación de validación", pct: 50 },
+      { label: "Geología de detalle y muestreo", pct: 18 },
+      { label: "Compliance NI 43-101 / QP", pct: 12 },
+      { label: "Patentes y catastro", pct: 12 },
+      { label: "Administración", pct: 8 },
+    ],
+    milestones: [
+      { when: "T3 2026", what: "Cierre informe pre-NI 43-101 y QA/QC" },
+      { when: "T4 2026", what: "Perforación de validación de targets IA" },
+      { when: "T2 2027", what: "Estimación de recursos inicial" },
+    ],
+  },
+  tilama: {
+    slug: "tilama",
+    code: "TILAMA",
+    name: "Tilama Norte",
+    region: "Choapa · Coquimbo",
+    country: "Chile",
+    commodity: "Cu-Au",
+    stage: "Pre-feasibility activa",
+    stageDetail: "Catastro y boletines vigilados, geofísica MAG correlacionada.",
+    liveTo: "/live/tilama",
+    highlights: [
+      "Geofísica MAG correlacionada con estructuras",
+      "Vigilancia activa de catastro y boletín minero",
+      "Acceso por ruta pavimentada · agua y energía cercanas",
+    ],
+    valuationUsd: { low: 3_000_000, high: 5_000_000, method: "Comparables del distrito" },
+    roundSizeUsd: 800_000,
+    minTicketUsd: 20_000,
+    instrument: "Equity SpA",
+    equityOfferedPct: 18,
+    horizonYears: 4,
+    scenarios: SCENARIOS_STD,
+    useOfFunds: [
+      { label: "Geofísica complementaria", pct: 30 },
+      { label: "Perforación scout", pct: 40 },
+      { label: "Patentes y catastro", pct: 15 },
+      { label: "Estudios", pct: 10 },
+      { label: "Administración", pct: 5 },
+    ],
+    milestones: [
+      { when: "T3 2026", what: "Geofísica IP complementaria" },
+      { when: "T1 2027", what: "Perforación scout (4 sondajes)" },
+    ],
+  },
+  franco: {
+    slug: "franco",
+    code: "FRANCO",
+    name: "Distrito Franco",
+    region: "Atacama",
+    country: "Chile",
+    commodity: "Au",
+    stage: "Exploración temprana",
+    stageDetail: "Borrador NI 43-101 asistido, datos de campo geo-referenciados y data room.",
+    liveTo: "/live/franco",
+    highlights: [
+      "Distrito aurífero con historia productiva",
+      "Datos de campo geo-referenciados en la plataforma",
+      "Data room institucional disponible bajo NDA",
+    ],
+    valuationUsd: { low: 4_000_000, high: 6_000_000, method: "Gasto histórico + comparables" },
+    roundSizeUsd: 1_000_000,
+    minTicketUsd: 25_000,
+    instrument: "Equity SpA",
+    equityOfferedPct: 15,
+    horizonYears: 4,
+    scenarios: SCENARIOS_STD,
+    useOfFunds: [
+      { label: "Mapeo y muestreo sistemático", pct: 35 },
+      { label: "Perforación inicial", pct: 35 },
+      { label: "Patentes y catastro", pct: 15 },
+      { label: "Estudios y QP", pct: 10 },
+      { label: "Administración", pct: 5 },
+    ],
+    milestones: [
+      { when: "T3 2026", what: "Muestreo sistemático del distrito" },
+      { when: "T4 2026", what: "Priorización de targets y permisos" },
+      { when: "T2 2027", what: "Perforación inicial" },
+    ],
+  },
+};
+
+export function getFicha(slug: string): ProjectFicha | null {
+  return (FICHAS as Record<string, ProjectFicha>)[slug] ?? null;
+}
+
+export type SimulationRow = {
+  key: InvestmentScenario["key"];
+  label: string;
+  multiple: number;
+  note: string;
+  /** Valor bruto estimado de la posición al horizonte. */
+  grossUsd: number;
+  profitUsd: number;
+  roiPct: number;
+  /** TIR aproximada: multiple^(1/años) - 1. */
+  irrApproxPct: number;
+};
+
+export type Simulation = {
+  amountUsd: number;
+  /** Participación estimada si la ronda completa coloca equityOfferedPct. */
+  sharePct: number;
+  horizonYears: number;
+  rows: SimulationRow[];
+};
+
+/**
+ * Simulación pura de inversión sobre una ficha. Clampa el monto al rango
+ * [ticket mínimo, tamaño de la ronda].
+ */
+export function simulateInvestment(ficha: ProjectFicha, amountUsd: number): Simulation {
+  const amount = Math.min(Math.max(amountUsd, ficha.minTicketUsd), ficha.roundSizeUsd);
+  const sharePct = (amount / ficha.roundSizeUsd) * ficha.equityOfferedPct;
+  const rows: SimulationRow[] = ficha.scenarios.map((s) => {
+    const gross = amount * s.multiple;
+    const profit = gross - amount;
+    const irr = Math.pow(s.multiple, 1 / ficha.horizonYears) - 1;
+    return {
+      key: s.key,
+      label: s.label,
+      multiple: s.multiple,
+      note: s.note,
+      grossUsd: gross,
+      profitUsd: profit,
+      roiPct: (profit / amount) * 100,
+      irrApproxPct: irr * 100,
+    };
+  });
+  return { amountUsd: amount, sharePct, horizonYears: ficha.horizonYears, rows };
+}
+
+export function fmtUsd0(n: number): string {
+  return `US$ ${Math.round(n).toLocaleString("es-CL")}`;
+}
