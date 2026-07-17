@@ -1,5 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Compass, MapPin, Map as MapIcon, Menu } from "lucide-react";
+import { LayoutDashboard, Briefcase, Handshake, FileSignature, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Slot = {
@@ -20,18 +20,13 @@ export function MobileBottomNav({
 }) {
   const location = useLocation();
 
+  // Deals-first: el negocio a un tap; mapa/3D/catastro viven en "Más".
   const slots: Slot[] = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Home" },
-    { to: "/dashboard/map", icon: Compass, label: "Mapa", matchPrefix: true },
-    { to: "/dashboard/geology3d", icon: MapPin, label: "3D", matchPrefix: true },
-    {
-      to: "/dashboard/catastro",
-      icon: MapIcon,
-      label: "Catastro",
-      matchPrefix: true,
-      badge: catastroAlerts,
-    },
-    { icon: Menu, label: "Más", onClick: onMoreClick },
+    { to: "/dashboard/deals", icon: Briefcase, label: "Deals", matchPrefix: true },
+    { to: "/dashboard/trades", icon: Handshake, label: "Trades", matchPrefix: true },
+    { to: "/dashboard/documentos", icon: FileSignature, label: "Docs", matchPrefix: true },
+    { icon: Menu, label: "Más", onClick: onMoreClick, badge: catastroAlerts },
   ];
 
   const isActive = (s: Slot) => {
