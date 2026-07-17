@@ -70,11 +70,15 @@ function AuthenticatedLayout() {
     if (!user) navigate({ to: "/auth" });
   }, [mounted, loading, user, navigate]);
 
+  // Solo empuja al onboarding de proyectos si el usuario aterriza en la home
+  // del dashboard SIN proyectos. El resto de rutas (documentos, marketplace,
+  // catastro, admin, perfil, etc.) son navegables sin proyecto activo — no
+  // tiene sentido bloquearlas.
   useEffect(() => {
     if (!mounted) return;
     if (loading || projectsLoading) return;
     if (!user) return;
-    if (projects.length === 0 && location.pathname !== "/dashboard/projects") {
+    if (projects.length === 0 && location.pathname === "/dashboard") {
       navigate({ to: "/dashboard/projects" });
     }
   }, [mounted, loading, projectsLoading, user, projects.length, location.pathname, navigate]);
