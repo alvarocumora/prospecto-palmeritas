@@ -1,10 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { CheckCircle2, ShieldCheck, Database, LineChart, Lock, ArrowRight } from "lucide-react";
+import {
+  CheckCircle2,
+  ShieldCheck,
+  Database,
+  LineChart,
+  Lock,
+  ArrowRight,
+  Search,
+  Calculator,
+  FileSignature,
+  Wallet,
+} from "lucide-react";
 import { z } from "zod";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { ContactForm } from "@/features/marketing/ContactForm";
 import { DealFlow } from "@/features/marketing/DealFlow";
 import { BrandButton, Eyebrow } from "@/components/brand";
+import { FICHAS, fmtUsd0 } from "@/lib/investor/fichas";
 
 const searchSchema = z.object({
   listing: z.string().uuid().optional(),
@@ -61,7 +73,102 @@ function InvPage() {
       title="Deal-flow minero verificado, en una sola pantalla"
       intro="Accede a oportunidades activas en venta, joint venture y royalty con due diligence acelerado y trazabilidad NI 43-101 sobre una capa de datos georreferenciada."
     >
-      {/* Deal flow ARRIBA — el corazón de la página */}
+      {/* Cómo invertir — el flujo en 4 pasos, sin ambigüedad */}
+      <div className="mb-16">
+        <Eyebrow className="mb-2">Cómo invertir</Eyebrow>
+        <h2 className="brand-display text-2xl text-content mb-6">
+          Un solo camino, de la ficha al cierre
+        </h2>
+        <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            {
+              i: Search,
+              n: "1",
+              t: "Explora la ficha",
+              d: "Estado, valorización referencial y ticket de entrada de cada proyecto.",
+            },
+            {
+              i: Calculator,
+              n: "2",
+              t: "Simula tu inversión",
+              d: "Participación, ROI y TIR por escenario, con supuestos a la vista.",
+            },
+            {
+              i: FileSignature,
+              n: "3",
+              t: "Firma el NDA",
+              d: "Firma electrónica en minutos y acceso al data room completo.",
+            },
+            {
+              i: Wallet,
+              n: "4",
+              t: "Invierte y sigue tu posición",
+              d: "Cierre acompañado por el equipo y seguimiento en el dashboard.",
+            },
+          ].map(({ i: Icon, n, t, d }) => (
+            <li key={n} className="rounded-xl border border-hairline bg-white p-5 relative">
+              <span className="absolute top-4 right-5 font-mono text-3xl text-accent-brand-subtle select-none">
+                {n}
+              </span>
+              <span className="grid place-items-center w-10 h-10 rounded-lg bg-accent-brand-subtle text-accent-brand mb-3">
+                <Icon className="w-5 h-5" strokeWidth={1.75} />
+              </span>
+              <div className="font-display text-[15px] text-content">{t}</div>
+              <p className="text-[13px] text-content-subtle mt-1.5 leading-relaxed">{d}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {/* Fichas de inversión de los proyectos showcase (fuente única: fichas.ts) */}
+      <div className="mb-16">
+        <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
+          <div>
+            <Eyebrow className="mb-2">Empieza aquí</Eyebrow>
+            <h2 className="brand-display text-2xl text-content">Fichas de inversión</h2>
+          </div>
+          <Link
+            to="/proyectos"
+            className="text-sm text-accent-brand inline-flex items-center gap-1.5 hover:gap-2 transition-all font-medium"
+          >
+            Ver catálogo de activos <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {Object.values(FICHAS).map((f) => (
+            <Link
+              key={f.slug}
+              to="/proyectos/ficha/$slug"
+              params={{ slug: f.slug }}
+              className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition block"
+            >
+              <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
+                <span className="text-accent-brand">{f.code}</span>
+                <span className="text-content-subtle">{f.commodity}</span>
+              </div>
+              <div className="mt-2 font-display text-lg text-content leading-snug group-hover:text-accent-brand transition-colors">
+                {f.name}
+              </div>
+              <div className="text-[11px] text-content-subtle mt-0.5">{f.stage}</div>
+              <dl className="mt-4 pt-3 border-t border-hairline space-y-1.5 text-[12px]">
+                <div className="flex items-center justify-between">
+                  <dt className="text-content-subtle">Ticket desde</dt>
+                  <dd className="font-mono text-content">{fmtUsd0(f.minTicketUsd)}</dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-content-subtle">Ronda</dt>
+                  <dd className="font-mono text-content">{fmtUsd0(f.roundSizeUsd)}</dd>
+                </div>
+              </dl>
+              <div className="mt-3 text-[11px] font-mono uppercase tracking-wider text-accent-brand inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                Ficha + simulador <ArrowRight className="w-3 h-3" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* Deal flow — oportunidades publicadas (datos reales) */}
       <div className="mb-16">
         <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
           <div>

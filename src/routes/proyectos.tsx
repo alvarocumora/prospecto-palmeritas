@@ -1,20 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  ArrowRight,
-  Mountain,
-  Activity,
-  Satellite,
-  FileText,
-  MapPin,
-  Box as BoxIcon,
-} from "lucide-react";
+import { ArrowRight, Mountain, Activity, Satellite, FileText, Box as BoxIcon } from "lucide-react";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings } from "@/lib/publicListings.functions";
-import { fmtUSD } from "@/modules/deals/domain/format";
-import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { ListingsMap } from "@/features/proyectos/ListingsMap";
 import { QueryError } from "@/components/ui/QueryError";
 
@@ -190,81 +180,23 @@ function ProyectosPage() {
         )}
       </section>
 
-      {/* Oportunidades publicadas (datos reales) */}
-      <section className="mt-20">
-        <div className="flex items-end justify-between flex-wrap gap-4 mb-8">
-          <div>
-            <Eyebrow className="mb-2">Oportunidades publicadas</Eyebrow>
-            <h2 className="brand-display text-2xl md:text-3xl text-content">
-              Deal flow abierto a inversionistas
-            </h2>
-          </div>
-          <BrandButton asChild variant="outline">
-            <Link to="/inversionistas">
-              Ver deal flow completo <ArrowRight className="w-4 h-4" />
-            </Link>
-          </BrandButton>
-        </div>
-
-        {isError ? (
-          <QueryError message="No pudimos cargar los proyectos." onRetry={() => void refetch()} />
-        ) : isLoading ? (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-hairline bg-white p-5 animate-pulse space-y-3"
-              >
-                <div className="h-3 bg-slate-100 rounded w-1/3" />
-                <div className="h-4 bg-slate-100 rounded w-3/4" />
-                <div className="h-3 bg-slate-100 rounded w-1/2" />
-                <div className="h-10 bg-slate-100 rounded" />
-              </div>
-            ))}
-          </div>
-        ) : listings.length === 0 ? (
-          <p className="text-sm text-content-subtle italic">
-            No hay oportunidades publicadas en este momento.
+      {/* El deal flow vive en /inversionistas — aquí solo el puente, sin duplicar */}
+      <section className="mt-20 rounded-2xl border border-hairline bg-accent-brand-subtle p-8 flex flex-wrap items-center justify-between gap-5">
+        <div>
+          <Eyebrow className="mb-2">¿Buscas invertir?</Eyebrow>
+          <h2 className="brand-display text-2xl text-content">
+            El flujo completo de inversión está en el portal de inversionistas
+          </h2>
+          <p className="text-sm text-content-subtle mt-2 max-w-xl">
+            Fichas con ticket de entrada y simulador de ROI, deal flow activo, NDA y data room — un
+            solo camino, sin vueltas.
           </p>
-        ) : (
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {listings.slice(0, 6).map((l) => (
-              <Link
-                key={l.id}
-                to="/proyectos/$listingId"
-                params={{ listingId: l.id }}
-                className="group rounded-xl border border-hairline bg-white p-5 flex flex-col hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition"
-              >
-                <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">
-                  <span className="text-accent-brand">
-                    {MODALITY_LABEL[l.modality ?? ""] ?? l.modality ?? "—"}
-                  </span>
-                  <span className="text-content-subtle">
-                    {STAGE_LABEL[l.stage ?? ""] ?? l.stage ?? ""}
-                  </span>
-                </div>
-                <div className="mt-2.5 font-display text-lg text-content leading-snug group-hover:text-accent-brand transition-colors line-clamp-2">
-                  {l.title}
-                </div>
-                <div className="mt-1.5 flex items-center gap-1 text-[11px] font-mono text-content-subtle">
-                  <MapPin className="w-3 h-3 shrink-0" />
-                  <span className="truncate">
-                    {[l.region, l.country].filter(Boolean).join(", ") || "—"}
-                  </span>
-                  {l.commodity && <span className="ml-auto">{l.commodity}</span>}
-                </div>
-                <div className="mt-4 pt-3 border-t border-hairline flex items-center justify-between">
-                  <span className="font-mono text-sm font-semibold text-content">
-                    {l.modality === "royalty" && l.royalty_pct != null
-                      ? `${l.royalty_pct}% NSR`
-                      : fmtUSD(l.asking_price_usd)}
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
-                </div>
-              </Link>
-            ))}
-          </div>
-        )}
+        </div>
+        <BrandButton asChild>
+          <Link to="/inversionistas">
+            Ir a invertir <ArrowRight className="w-4 h-4" />
+          </Link>
+        </BrandButton>
       </section>
 
       <section className="mt-20 rounded-2xl bg-surface-inverse text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
