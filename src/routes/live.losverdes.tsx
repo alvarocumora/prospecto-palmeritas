@@ -56,7 +56,7 @@ export const Route = createFileRoute("/live/losverdes")({
           "Visor 3D del Distrito Los Verdes – Tilama: catastro, anomalías satelitales extruidas, vetas Cu-Au-Ag y plan de explotación conceptual con cubicación y NPV.",
       },
       { name: "robots", content: "noindex, nofollow" },
-      { name: "theme-color", content: "#0b0a09" },
+      { name: "theme-color", content: "#f5f1e8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
     ],
     links: [{ rel: "manifest", href: "/manifest.losverdes.json" }],
