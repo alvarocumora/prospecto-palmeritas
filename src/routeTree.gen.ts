@@ -99,7 +99,6 @@ import { Route as AuthenticatedDashboardFieldMapRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
-import { Route as AuthenticatedDashboardDocumentosRouteImport } from './routes/_authenticated.dashboard.documentos'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
@@ -115,6 +114,7 @@ import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
+import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './routes/_authenticated.dashboard.documentos.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -623,12 +623,6 @@ const AuthenticatedDashboardDrillingRoute =
     path: '/dashboard/drilling',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardDocumentosRoute =
-  AuthenticatedDashboardDocumentosRouteImport.update({
-    id: '/dashboard/documentos',
-    path: '/dashboard/documentos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedDashboardDealsRoute =
   AuthenticatedDashboardDealsRouteImport.update({
     id: '/dashboard/deals',
@@ -718,6 +712,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
   path: '/.lovable/oauth/consent',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardDocumentosIndexRoute =
+  AuthenticatedDashboardDocumentosIndexRouteImport.update({
+    id: '/dashboard/documentos/',
+    path: '/dashboard/documentos/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -779,9 +779,9 @@ const AuthenticatedDashboardGeophysicsSurveyIdRoute =
   } as any)
 const AuthenticatedDashboardDocumentosTemplateIdRoute =
   AuthenticatedDashboardDocumentosTemplateIdRouteImport.update({
-    id: '/$templateId',
-    path: '/$templateId',
-    getParentRoute: () => AuthenticatedDashboardDocumentosRoute,
+    id: '/dashboard/documentos/$templateId',
+    path: '/dashboard/documentos/$templateId',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardAdminInvestorsRoute =
   AuthenticatedDashboardAdminInvestorsRouteImport.update({
@@ -875,7 +875,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -938,6 +937,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -999,7 +999,6 @@ export interface FileRoutesByTo {
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1062,6 +1061,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -1125,7 +1125,6 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
-  '/_authenticated/dashboard/documentos': typeof AuthenticatedDashboardDocumentosRouteWithChildren
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
@@ -1188,6 +1187,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/_authenticated/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
@@ -1251,7 +1251,6 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
-    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1314,6 +1313,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/documentos/'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -1375,7 +1375,6 @@ export interface FileRouteTypes {
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
-    | '/dashboard/documentos'
     | '/dashboard/drilling'
     | '/dashboard/drones'
     | '/dashboard/estimation'
@@ -1438,6 +1437,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/documentos'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -1500,7 +1500,6 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
-    | '/_authenticated/dashboard/documentos'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
     | '/_authenticated/dashboard/estimation'
@@ -1563,6 +1562,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/_authenticated/dashboard/documentos/'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
     | '/api/public/live-map/losverdes/verify'
@@ -2264,13 +2264,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/documentos': {
-      id: '/_authenticated/dashboard/documentos'
-      path: '/dashboard/documentos'
-      fullPath: '/dashboard/documentos'
-      preLoaderRoute: typeof AuthenticatedDashboardDocumentosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/dashboard/deals': {
       id: '/_authenticated/dashboard/deals'
       path: '/dashboard/deals'
@@ -2376,6 +2369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DotlovableOauthConsentRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/documentos/': {
+      id: '/_authenticated/dashboard/documentos/'
+      path: '/dashboard/documentos'
+      fullPath: '/dashboard/documentos/'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -2448,10 +2448,10 @@ declare module '@tanstack/react-router' {
     }
     '/_authenticated/dashboard/documentos/$templateId': {
       id: '/_authenticated/dashboard/documentos/$templateId'
-      path: '/$templateId'
+      path: '/dashboard/documentos/$templateId'
       fullPath: '/dashboard/documentos/$templateId'
       preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardDocumentosRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/admin/investors': {
       id: '/_authenticated/dashboard/admin/investors'
@@ -2531,21 +2531,6 @@ const AuthenticatedDashboardCatastroRouteWithChildren =
     AuthenticatedDashboardCatastroRouteChildren,
   )
 
-interface AuthenticatedDashboardDocumentosRouteChildren {
-  AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
-}
-
-const AuthenticatedDashboardDocumentosRouteChildren: AuthenticatedDashboardDocumentosRouteChildren =
-  {
-    AuthenticatedDashboardDocumentosTemplateIdRoute:
-      AuthenticatedDashboardDocumentosTemplateIdRoute,
-  }
-
-const AuthenticatedDashboardDocumentosRouteWithChildren =
-  AuthenticatedDashboardDocumentosRoute._addFileChildren(
-    AuthenticatedDashboardDocumentosRouteChildren,
-  )
-
 interface AuthenticatedDashboardGeophysicsSurveyIdRouteChildren {
   AuthenticatedDashboardGeophysicsSurveyIdFieldRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
 }
@@ -2620,7 +2605,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
-  AuthenticatedDashboardDocumentosRoute: typeof AuthenticatedDashboardDocumentosRouteWithChildren
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
@@ -2658,6 +2642,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardTradesRoute: typeof AuthenticatedDashboardTradesRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -2678,8 +2664,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCommodityLotsRoute:
     AuthenticatedDashboardCommodityLotsRoute,
   AuthenticatedDashboardDealsRoute: AuthenticatedDashboardDealsRoute,
-  AuthenticatedDashboardDocumentosRoute:
-    AuthenticatedDashboardDocumentosRouteWithChildren,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
@@ -2727,6 +2711,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardTradesRoute: AuthenticatedDashboardTradesRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedDashboardDocumentosTemplateIdRoute:
+    AuthenticatedDashboardDocumentosTemplateIdRoute,
+  AuthenticatedDashboardDocumentosIndexRoute:
+    AuthenticatedDashboardDocumentosIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

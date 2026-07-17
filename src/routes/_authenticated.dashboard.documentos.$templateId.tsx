@@ -26,17 +26,24 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
         prefill = mapLotToDataSheetValues(lot, { kymScore: kym?.score ?? null });
       }
     }
-    return { template, prefill };
+    // Devolvemos solo datos serializables — el `TemplateDef` incluye
+    // `build: Function`, que rompe la dehidratación SSR (seroval no serializa
+    // funciones). El componente resuelve el template en cliente por id.
+    return {
+      templateId: template.id,
+      templateTitle: template.title,
+      templateSummary: template.summary,
+      prefill,
+    };
   },
   head: ({ loaderData }) => {
     if (!loaderData) {
       return { meta: [{ title: "Documento no encontrado — Geocapitals" }] };
     }
-    const t = loaderData.template;
     return {
       meta: [
-        { title: `${t.title} — Editor Geocapitals` },
-        { name: "description", content: t.summary },
+        { title: `${loaderData.templateTitle} — Editor Geocapitals` },
+        { name: "description", content: loaderData.templateSummary },
       ],
     };
   },
@@ -67,6 +74,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
 });
 
 function DocumentPage() {
-  const { template, prefill } = Route.useLoaderData();
+  const { templateId, prefill } = Route.useLoaderData();
+  const template = TEMPLATE_BY_ID[templateId];
+  if (!template) return null;
   return <DocumentEditor template={template} prefill={prefill ?? undefined} />;
 }
