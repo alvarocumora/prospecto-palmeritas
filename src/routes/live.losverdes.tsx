@@ -56,36 +56,37 @@ export const Route = createFileRoute("/live/losverdes")({
           "Visor 3D del Distrito Los Verdes – Tilama: catastro, anomalías satelitales extruidas, vetas Cu-Au-Ag y plan de explotación conceptual con cubicación y NPV.",
       },
       { name: "robots", content: "noindex, nofollow" },
-      { name: "theme-color", content: "#0b0a09" },
+      { name: "theme-color", content: "#f5f1e8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
     ],
     links: [{ rel: "manifest", href: "/manifest.losverdes.json" }],
   }),
   component: LiveLosVerdesPage,
   pendingComponent: () => (
-    <div className="min-h-screen bg-bg-app flex items-center justify-center">
+    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center">
       <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-        <Loader2 className="w-4 h-4 animate-spin text-gold" />
+        <Loader2 className="w-4 h-4 animate-spin text-primary" />
         Cargando Los Verdes…
       </div>
     </div>
   ),
   errorComponent: ({ error, reset }) => (
-    <div className="min-h-screen bg-bg-app flex items-center justify-center p-6">
+    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-3">
-        <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
+        <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
         <h1 className="text-lg font-semibold text-foreground">
           No pudimos cargar el visor Los Verdes
         </h1>
         <p className="text-xs font-mono text-muted-foreground break-words">
           {error instanceof Error ? error.message : String(error)}
         </p>
-        <Button size="sm" onClick={reset} className="bg-gold text-background hover:bg-gold/90">
+        <Button size="sm" onClick={reset} className="bg-primary text-primary-foreground hover:bg-primary/90">
           Reintentar
         </Button>
       </div>
     </div>
   ),
+
 });
 
 /** ErrorBoundary local para aislar el visor 3D del resto de la página. */
@@ -271,7 +272,8 @@ function LiveLosVerdesPage() {
   const totals = miningQ.data?.totals;
 
   return (
-    <div className="bg-bg-app min-h-screen">
+    <div data-theme="im-light" className="bg-background text-foreground min-h-screen">
+
       {/* Banner */}
       <div className="bg-gold/10 border-b border-gold/30 px-4 py-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
