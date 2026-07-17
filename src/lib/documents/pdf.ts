@@ -349,7 +349,7 @@ export async function renderGeocapitalsPdf(
       drawSectionLabel("CLÁUSULAS");
       for (const item of block.items) {
         const clause = parseClause(item);
-        const bodyLines = pdf.splitTextToSize(clause.body, contentW - 86);
+        const bodyLines = pdf.splitTextToSize(clause.body, contentW - 128);
         const needed = Math.max(36, bodyLines.length * 12 + (clause.heading ? 22 : 12));
         ensure(needed + 6);
 
@@ -377,7 +377,7 @@ export async function renderGeocapitalsPdf(
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.2);
         pdf.setTextColor(...INK_SOFT);
-        pdf.text(bodyLines, textX, y + 3, { maxWidth: contentW - 86 });
+        pdf.text(bodyLines, textX, y + 3, { maxWidth: contentW - 128 });
         y += bodyLines.length * 12 + 14;
       }
       y += 4;
