@@ -33,6 +33,7 @@ import {
   Ship,
   TrendingUp,
   Package,
+  PackageSearch,
   MessageSquare,
   FileSignature,
   Banknote,
@@ -135,6 +136,12 @@ function AuthenticatedLayout() {
       to: "/dashboard/commodity-lots",
       icon: <Package className="w-3.5 h-3.5" />,
       label: "Materias Primas",
+      group: "NEGOCIO",
+    },
+    !isInvestor && {
+      to: "/dashboard/sourcing",
+      icon: <PackageSearch className="w-3.5 h-3.5" />,
+      label: "Requerimientos",
       group: "NEGOCIO",
     },
     {
