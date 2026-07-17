@@ -8,6 +8,7 @@ import { PUBLIC_APP_HOST, verifyDocUrl } from "@/lib/publicUrl";
 const CONTACT_EMAIL = "info@geocapitals.com";
 const CONTACT_WHATSAPP = "+56 9 6218 4071";
 const WHATSAPP_URL = "https://wa.me/56962184071";
+void WHATSAPP_URL;
 
 const PAPER: [number, number, number] = [247, 245, 240];
 const PAPER_2: [number, number, number] = [240, 237, 229];
