@@ -13,7 +13,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/api")({
 });
 
 const CURL_EXAMPLE = `curl -H "x-api-key: TU_LLAVE" \\
-  "https://prospecto-palmeritas.lovable.app/api/v1/cadastre/search?country=PE&q=buenaventura&limit=10"`;
+  "https://geocapitals.com/api/v1/cadastre/search?country=PE&q=buenaventura&limit=10"`;
 
 function ApiPage() {
   const createFn = useServerFn(createApiKey);
