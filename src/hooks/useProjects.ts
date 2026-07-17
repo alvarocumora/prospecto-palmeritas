@@ -196,7 +196,11 @@ export function useProjects() {
     store.activeId = id;
     writeStoredActiveId(id);
     emitStoreChange();
+    // Refrescar toda la data cacheada: cada módulo depende del proyecto activo,
+    // así el cambio de selector se ve reflejado sin recargar la página.
+    void queryClient.invalidateQueries();
   }, []);
+
 
   const active = store.projects.find((project) => project.id === store.activeId) ?? null;
 
