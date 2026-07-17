@@ -288,7 +288,7 @@ export async function renderGeocapitalsPdf(
     pdf.setFontSize(5.6);
     pdf.setTextColor(...MUTED);
     pdf.text(PUBLIC_APP_HOST, qrBoxX + qrBoxW / 2, qrBoxY + 102, { align: "center" });
-    pdf.text(`/verificar/${doc.reference}`.slice(0, 24), qrBoxX + qrBoxW / 2, qrBoxY + 111, {
+    pdf.text("/verificar/REF", qrBoxX + qrBoxW / 2, qrBoxY + 111, {
       align: "center",
     });
   }
@@ -349,7 +349,7 @@ export async function renderGeocapitalsPdf(
       drawSectionLabel("CLÁUSULAS");
       for (const item of block.items) {
         const clause = parseClause(item);
-        const bodyLines = pdf.splitTextToSize(clause.body, contentW - 128);
+        const bodyLines = pdf.splitTextToSize(clause.body, contentW - 170);
         const needed = Math.max(36, bodyLines.length * 12 + (clause.heading ? 22 : 12));
         ensure(needed + 6);
 
@@ -377,7 +377,7 @@ export async function renderGeocapitalsPdf(
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.2);
         pdf.setTextColor(...INK_SOFT);
-        pdf.text(bodyLines, textX, y + 3, { maxWidth: contentW - 128 });
+        pdf.text(bodyLines, textX, y + 3, { maxWidth: contentW - 170 });
         y += bodyLines.length * 12 + 14;
       }
       y += 4;
