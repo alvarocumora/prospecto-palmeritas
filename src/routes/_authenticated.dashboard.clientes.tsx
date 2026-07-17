@@ -13,6 +13,8 @@ import {
   Pencil,
   Trash2,
   AlertTriangle,
+  Percent,
+  CheckCircle2,
 } from "lucide-react";
 import {
   getClientsOverview,
@@ -21,6 +23,19 @@ import {
   deletePartner,
   type PartnerRow,
 } from "@/lib/clients.functions";
+import {
+  listCommissions,
+  upsertCommission,
+  setCommissionStatus,
+  deleteCommission,
+} from "@/lib/commissions.functions";
+import {
+  COMMISSION_STATUSES,
+  COMMISSION_STATUS_LABELS,
+  commissionAmount,
+  type CommissionStatus,
+} from "@/lib/commissions";
+import { listMyTrades } from "@/lib/trades.functions";
 import {
   PARTNER_ROLES,
   PARTNER_ROLE_LABELS,
@@ -43,7 +58,7 @@ const fmtUsd = (n: number) =>
     ? `US$ ${(n / 1_000_000).toLocaleString("es-CL", { maximumFractionDigits: 1 })}M`
     : `US$ ${Math.round(n).toLocaleString("es-CL")}`;
 
-type Tab = "clientes" | "asociados";
+type Tab = "clientes" | "asociados" | "comisiones";
 
 const EMPTY_FORM = {
   id: undefined as string | undefined,
@@ -180,6 +195,7 @@ function ClientesPage() {
           [
             ["clientes", `Clientes (${clients?.length ?? 0})`],
             ["asociados", `Asociados (${partnersData?.partners.length ?? 0})`],
+            ["comisiones", "Comisiones"],
           ] as Array<[Tab, string]>
         ).map(([key, label]) => (
           <button
@@ -420,6 +436,332 @@ function ClientesPage() {
             </div>
           )}
         </>
+      )}
+
+      {tab === "comisiones" && <CommissionsTab partners={partnersData?.partners ?? []} />}
+    </div>
+  );
+}
+
+const fmtUsd0 = (n: number) => `US$ ${Math.round(n).toLocaleString("es-CL")}`;
+
+const COMMISSION_EMPTY = {
+  id: undefined as string | undefined,
+  partnerId: "",
+  tradeId: "",
+  dealValueUsd: "",
+  commissionPct: "",
+  commissionUsd: "",
+  status: "pendiente" as CommissionStatus,
+  notes: "",
+};
+
+function CommissionsTab({ partners }: { partners: PartnerRow[] }) {
+  const listFn = useServerFn(listCommissions);
+  const tradesFn = useServerFn(listMyTrades);
+  const saveFn = useServerFn(upsertCommission);
+  const statusFn = useServerFn(setCommissionStatus);
+  const delFn = useServerFn(deleteCommission);
+
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["deal-commissions"],
+    queryFn: () => listFn(),
+    staleTime: 30_000,
+  });
+  const { data: trades } = useQuery({
+    queryKey: ["my-trades-mini"],
+    queryFn: () => tradesFn(),
+    staleTime: 60_000,
+  });
+
+  const [form, setForm] = useState(COMMISSION_EMPTY);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  const previewAmount = commissionAmount({
+    dealValueUsd: form.dealValueUsd ? Number(form.dealValueUsd) : null,
+    commissionPct: form.commissionPct ? Number(form.commissionPct) : null,
+    commissionUsd: form.commissionUsd ? Number(form.commissionUsd) : null,
+  });
+
+  const onSave = async () => {
+    if (!form.partnerId) {
+      toast.error("Selecciona el asociado.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await saveFn({
+        data: {
+          id: form.id,
+          partnerId: form.partnerId,
+          tradeId: form.tradeId || undefined,
+          dealValueUsd: form.dealValueUsd ? Number(form.dealValueUsd) : undefined,
+          commissionPct: form.commissionPct ? Number(form.commissionPct) : undefined,
+          commissionUsd: form.commissionUsd ? Number(form.commissionUsd) : undefined,
+          status: form.status,
+          notes: form.notes || undefined,
+        },
+      });
+      toast.success(form.id ? "Comisión actualizada." : "Comisión registrada.");
+      setForm(COMMISSION_EMPTY);
+      setShowForm(false);
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo guardar.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onSettle = async (id: string) => {
+    try {
+      await statusFn({ data: { id, status: "liquidada" } });
+      toast.success("Comisión marcada como liquidada.");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo actualizar.");
+    }
+  };
+
+  const onDelete = async (id: string) => {
+    if (!window.confirm("¿Eliminar esta comisión?")) return;
+    try {
+      await delFn({ data: { id } });
+      toast.success("Comisión eliminada.");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo eliminar.");
+    }
+  };
+
+  const totals = data?.totals;
+
+  return (
+    <div className="space-y-4">
+      {data?.pending && (
+        <div className="rounded-md border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-xs flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />
+          Las comisiones se activan al aplicar la migración{" "}
+          <code className="font-mono">20260719140000_deal_commissions.sql</code> (pídesela a
+          Lovable).
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="grid grid-cols-3 gap-3 flex-1 min-w-[280px]">
+          <div className="rounded-md border border-border bg-bg-secondary/20 p-3">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+              Devengado
+            </div>
+            <div className="text-lg font-mono font-bold mt-0.5">
+              {fmtUsd0(totals?.accruedUsd ?? 0)}
+            </div>
+          </div>
+          <div className="rounded-md border border-border bg-bg-secondary/20 p-3">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-amber-600">
+              Por liquidar
+            </div>
+            <div className="text-lg font-mono font-bold mt-0.5">
+              {fmtUsd0(totals?.outstandingUsd ?? 0)}
+            </div>
+          </div>
+          <div className="rounded-md border border-border bg-bg-secondary/20 p-3">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-green-600">
+              Liquidado
+            </div>
+            <div className="text-lg font-mono font-bold mt-0.5">
+              {fmtUsd0(totals?.settledUsd ?? 0)}
+            </div>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            setForm(COMMISSION_EMPTY);
+            setShowForm((v) => !v);
+          }}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
+        >
+          <Percent className="w-4 h-4" /> Registrar comisión
+        </button>
+      </div>
+
+      {showForm && (
+        <div className="rounded-md border border-border bg-bg-secondary/20 p-4 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Asociado *</span>
+            <select
+              value={form.partnerId}
+              onChange={(e) => setForm({ ...form, partnerId: e.target.value })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            >
+              <option value="">Selecciona…</option>
+              {partners.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                  {p.company ? ` · ${p.company}` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Trade (opcional)</span>
+            <select
+              value={form.tradeId}
+              onChange={(e) => {
+                const t = (trades ?? []).find((x) => x.id === e.target.value);
+                setForm({
+                  ...form,
+                  tradeId: e.target.value,
+                  dealValueUsd:
+                    t?.total_value_usd != null ? String(t.total_value_usd) : form.dealValueUsd,
+                });
+              }}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            >
+              <option value="">Sin trade vinculado</option>
+              {(trades ?? []).map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.reference ?? t.id.slice(0, 8)} · {t.commodity ?? "—"}
+                </option>
+              ))}
+            </select>
+          </label>
+          {(
+            [
+              ["dealValueUsd", "Valor del deal US$"],
+              ["commissionPct", "Comisión %"],
+              ["commissionUsd", "Comisión US$ (fija)"],
+            ] as const
+          ).map(([k, label]) => (
+            <label key={k} className="text-xs">
+              <span className="block text-text-secondary mb-1">{label}</span>
+              <input
+                type="number"
+                min={0}
+                value={form[k]}
+                onChange={(e) => setForm({ ...form, [k]: e.target.value })}
+                className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+              />
+            </label>
+          ))}
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Estado</span>
+            <select
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value as CommissionStatus })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            >
+              {COMMISSION_STATUSES.map((s) => (
+                <option key={s} value={s}>
+                  {COMMISSION_STATUS_LABELS[s]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs sm:col-span-2 lg:col-span-3">
+            <span className="block text-text-secondary mb-1">Notas</span>
+            <input
+              value={form.notes}
+              placeholder="Condiciones de la comisión, hito de pago…"
+              onChange={(e) => setForm({ ...form, notes: e.target.value })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            />
+          </label>
+          <div className="sm:col-span-2 lg:col-span-3 flex items-center gap-3">
+            <button
+              onClick={() => void onSave()}
+              disabled={saving}
+              className="px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm disabled:opacity-50"
+            >
+              {saving ? "Guardando…" : form.id ? "Actualizar" : "Registrar"}
+            </button>
+            {previewAmount != null && (
+              <span className="text-xs text-muted-foreground">
+                Comisión calculada: <strong>{fmtUsd0(previewAmount)}</strong>
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="h-24 rounded bg-muted/20 animate-pulse" />
+      ) : (data?.rows.length ?? 0) === 0 && !data?.pending ? (
+        <div className="rounded-md border border-border p-8 text-center text-sm text-text-secondary">
+          Sin comisiones registradas. Cuando un asociado te traiga o intermedie un deal, regístralo
+          aquí para llevar la liquidación.
+        </div>
+      ) : (
+        <div className="overflow-x-auto rounded-md border border-border">
+          <table className="w-full text-sm min-w-[820px]">
+            <thead>
+              <tr className="text-left text-[10px] font-mono uppercase tracking-wider text-muted-foreground border-b border-border bg-bg-secondary/30">
+                <th className="px-4 py-2.5">Asociado</th>
+                <th className="px-4 py-2.5">Deal</th>
+                <th className="px-4 py-2.5">Base / %</th>
+                <th className="px-4 py-2.5">Comisión</th>
+                <th className="px-4 py-2.5">Estado</th>
+                <th className="px-4 py-2.5" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {data?.rows.map((c) => {
+                const amount = commissionAmount({
+                  dealValueUsd: c.deal_value_usd,
+                  commissionPct: c.commission_pct,
+                  commissionUsd: c.commission_usd,
+                });
+                return (
+                  <tr key={c.id} className="hover:bg-accent/40 transition-colors align-top">
+                    <td className="px-4 py-3 font-medium">{c.partnerName ?? "—"}</td>
+                    <td className="px-4 py-3 text-xs text-muted-foreground">
+                      {c.tradeReference ?? (c.trade_id ? c.trade_id.slice(0, 8) : "—")}
+                      {c.notes && <div className="text-foreground/70 mt-0.5">{c.notes}</div>}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs">
+                      {c.deal_value_usd != null ? fmtUsd0(c.deal_value_usd) : "—"}
+                      {c.commission_pct != null ? ` · ${c.commission_pct}%` : ""}
+                    </td>
+                    <td className="px-4 py-3 font-mono text-sm font-semibold">
+                      {amount != null ? fmtUsd0(amount) : "—"}
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          c.status === "liquidada"
+                            ? "bg-green-500/15 text-green-700"
+                            : c.status === "cancelada"
+                              ? "bg-muted text-muted-foreground"
+                              : "bg-amber-500/15 text-amber-700"
+                        }`}
+                      >
+                        {COMMISSION_STATUS_LABELS[(c.status as CommissionStatus) ?? "pendiente"] ??
+                          c.status}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right whitespace-nowrap">
+                      {c.status !== "liquidada" && c.status !== "cancelada" && (
+                        <button
+                          onClick={() => void onSettle(c.id)}
+                          className="text-[11px] font-mono text-green-600 hover:underline inline-flex items-center gap-1 mr-3"
+                        >
+                          <CheckCircle2 className="w-3 h-3" /> Liquidar
+                        </button>
+                      )}
+                      <button
+                        onClick={() => void onDelete(c.id)}
+                        className="text-[11px] font-mono text-red-500 hover:underline inline-flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" /> Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

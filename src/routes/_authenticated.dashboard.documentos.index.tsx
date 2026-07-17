@@ -82,9 +82,17 @@ function DocumentsGallery() {
         <div className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent-brand">
           Documentos · Editables in-app
         </div>
-        <h1 className="font-display text-3xl lg:text-4xl mt-1 text-content">
-          Plantillas de transacción
-        </h1>
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <h1 className="font-display text-3xl lg:text-4xl mt-1 text-content">
+            Plantillas de transacción
+          </h1>
+          <Link
+            to="/dashboard/firmas"
+            className="inline-flex items-center gap-1.5 text-sm text-accent-brand hover:underline"
+          >
+            <ShieldCheck className="w-4 h-4" /> Mis solicitudes de firma
+          </Link>
+        </div>
         <p className="text-sm text-content-subtle mt-2 max-w-3xl">
           NDAs, MoUs, LOIs, term sheets, SPAs, JVs, royalties y advisory. Edita cláusulas,
           previsualiza en vivo y descarga PDF con branding Geocapitals. Tus borradores se guardan en
