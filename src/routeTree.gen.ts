@@ -106,6 +106,7 @@ import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
+import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
 import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
 import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
 import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
@@ -668,6 +669,12 @@ const AuthenticatedDashboardCommandCenterRoute =
     path: '/dashboard/command-center',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardClientesRoute =
+  AuthenticatedDashboardClientesRouteImport.update({
+    id: '/dashboard/clientes',
+    path: '/dashboard/clientes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardCatastroRoute =
   AuthenticatedDashboardCatastroRouteImport.update({
     id: '/dashboard/catastro',
@@ -906,6 +913,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
+  '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1035,6 +1043,7 @@ export interface FileRoutesByTo {
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
+  '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1166,6 +1175,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
   '/_authenticated/dashboard/catastro': typeof AuthenticatedDashboardCatastroRouteWithChildren
+  '/_authenticated/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1297,6 +1307,7 @@ export interface FileRouteTypes {
     | '/dashboard/boletin'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
+    | '/dashboard/clientes'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -1426,6 +1437,7 @@ export interface FileRouteTypes {
     | '/dashboard/boletin'
     | '/dashboard/campaigns'
     | '/dashboard/catastro'
+    | '/dashboard/clientes'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -1556,6 +1568,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/boletin'
     | '/_authenticated/dashboard/campaigns'
     | '/_authenticated/dashboard/catastro'
+    | '/_authenticated/dashboard/clientes'
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
@@ -2378,6 +2391,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardCommandCenterRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/clientes': {
+      id: '/_authenticated/dashboard/clientes'
+      path: '/dashboard/clientes'
+      fullPath: '/dashboard/clientes'
+      preLoaderRoute: typeof AuthenticatedDashboardClientesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/catastro': {
       id: '/_authenticated/dashboard/catastro'
       path: '/dashboard/catastro'
@@ -2702,6 +2722,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
   AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
   AuthenticatedDashboardCatastroRoute: typeof AuthenticatedDashboardCatastroRouteWithChildren
+  AuthenticatedDashboardClientesRoute: typeof AuthenticatedDashboardClientesRoute
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
@@ -2762,6 +2783,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
   AuthenticatedDashboardCatastroRoute:
     AuthenticatedDashboardCatastroRouteWithChildren,
+  AuthenticatedDashboardClientesRoute: AuthenticatedDashboardClientesRoute,
   AuthenticatedDashboardCommandCenterRoute:
     AuthenticatedDashboardCommandCenterRoute,
   AuthenticatedDashboardCommodityLotsRoute:

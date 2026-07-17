@@ -144,6 +144,12 @@ function AuthenticatedLayout() {
       group: "NEGOCIO",
     },
     {
+      to: "/dashboard/clientes",
+      icon: <Users className="w-3.5 h-3.5" />,
+      label: "Clientes y Asociados",
+      group: "NEGOCIO",
+    },
+    {
       to: "/dashboard/trades",
       icon: <Handshake className="w-3.5 h-3.5" />,
       label: "Trade Desk",

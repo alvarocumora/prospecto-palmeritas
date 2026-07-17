@@ -277,7 +277,7 @@ function BusinessHome() {
                 label="Clientes"
                 value={isLoading ? "…" : String(ov?.clients ?? 0)}
                 hint="contrapartes de trades"
-                to="/dashboard/trades"
+                to="/dashboard/clientes"
                 compact
               />
               <Kpi
