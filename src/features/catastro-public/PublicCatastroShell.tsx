@@ -6,13 +6,21 @@ import { useAuth } from "@/hooks/useAuth";
 export function PublicCatastroShell({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <header className="sticky top-0 z-40 border-b border-border bg-background/95 backdrop-blur">
+    <div data-theme="im-light" className="min-h-screen bg-background text-foreground flex flex-col">
+      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
-          <Link to="/catastro" className="flex items-center gap-2 font-mono font-semibold text-sm">
-            <span className="inline-block w-2 h-2 rounded-sm bg-primary" />
-            Geocapitals · Catastro
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link to="/" className="font-display text-base font-semibold tracking-tight">
+              Geocapitals
+            </Link>
+            <span className="text-border">/</span>
+            <Link
+              to="/catastro"
+              className="font-mono text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+            >
+              Catastro
+            </Link>
+          </div>
           <nav className="hidden md:flex items-center gap-1 text-xs font-mono text-muted-foreground">
             <Link
               to="/catastro/mapa"
