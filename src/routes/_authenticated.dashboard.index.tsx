@@ -1,670 +1,438 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useAuth } from "@/hooks/useAuth";
-import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
-import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
-import { RoleSegmentedPanel } from "@/features/dashboard/RoleSegmentedPanel";
-import { useProjects } from "@/hooks/useProjects";
-import { useExecutiveKpis } from "@/hooks/useExecutiveKpis";
-import { GeoScene3D } from "@/components/geoscene";
-import { SceneErrorBoundary } from "@/components/geoscene/SceneErrorBoundary";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
+  Briefcase,
+  Handshake,
+  Ship,
+  FileSignature,
+  MessageSquare,
+  Package,
   Plus,
   ArrowRight,
-  Bell,
-  Crosshair,
-  Layers,
-  Radio,
-  Target as TargetIcon,
-  Drill,
-  TestTube2,
-  Map as MapIcon,
-  Satellite,
-  Mountain,
-  FileSignature,
-  Handshake,
-  Sparkles,
-  Activity,
-  ShieldCheck,
-  Coins,
-  Bot,
-  FileWarning,
   AlertTriangle,
-  CheckCircle2,
-  Box,
+  Users,
+  FolderKanban,
+  Compass,
+  FileText,
   TrendingUp,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useProjects } from "@/hooks/useProjects";
+import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { getBusinessOverview } from "@/lib/businessOverview.functions";
+import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
+import { normalizeEvent } from "@/lib/tradeTimeline";
+
+// INICIO = Centro de Negocios: cierres, clientes, pedidos de commodities,
+// firmas y envíos — datos reales del usuario, cross-proyecto. La visión
+// técnica del proyecto activo vive en /dashboard/mission.
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
-  head: () => ({ meta: [{ title: "Mission Control — Geocapitals" }] }),
-  component: DashboardHome,
+  head: () => ({ meta: [{ title: "Centro de Negocios — Geocapitals" }] }),
+  component: BusinessHome,
 });
 
-function DashboardHome() {
+const STAGE_CHIP: Record<string, string> = {
+  icpo: "ICPO",
+  fco: "FCO",
+  spa: "SPA",
+  payment: "Pago",
+  shipping: "Embarque",
+  delivered: "Entregado",
+  closed: "Cerrado",
+};
+
+const fmtUsd = (n: number) =>
+  n >= 1_000_000
+    ? `US$ ${(n / 1_000_000).toLocaleString("es-CL", { maximumFractionDigits: 1 })}M`
+    : `US$ ${Math.round(n).toLocaleString("es-CL")}`;
+
+function BusinessHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
-  const { kpis, loading, refreshing, lastUpdated, refresh } = useExecutiveKpis();
   const { isComplete: onboardingComplete, refresh: refreshOnboarding } = useOnboardingStatus();
-  const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "operador";
+  const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "";
   const needsOnboarding = !profile?.account_type || !onboardingComplete;
+  const isInvestor = profile?.account_type === "investor";
 
-  if (projects.length === 0) {
-    return (
-      <div data-theme="im-light" className="min-h-full bg-background text-foreground">
-        <div className="p-4 md:p-8 max-w-5xl mx-auto pb-20 md:pb-8">
-          <header className="mb-6">
-            <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
-              Mission Control
-            </div>
-            <h1 className="text-2xl md:text-3xl font-bold mt-1">Hola, {name}.</h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Explora · Modela · Certifica · Cierra deals. Todo en una sola plataforma.
-            </p>
-          </header>
-          {needsOnboarding && (
-            <div className="mb-6">
-              <OnboardingWizard onComplete={refreshOnboarding} />
-            </div>
-          )}
-          <Link
-            to="/dashboard/projects"
-            className="block rounded border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-8 text-center"
-          >
-            <Plus className="w-8 h-8 text-gold mx-auto mb-3" />
-            <div className="font-mono font-semibold text-foreground">Crear primer proyecto</div>
-            <div className="text-xs text-muted-foreground mt-1">
-              Define código, ubicación y commodity
-            </div>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  const k = kpis;
-  const fmt = (n: number | null | undefined, d = 0) =>
-    n == null ? "—" : n.toLocaleString(undefined, { maximumFractionDigits: d });
-
-  // Fusion Score heurístico a partir de KPIs disponibles
-  const fusion = computeFusionScore(k);
-
-  // Acciones requeridas
-  const tasks: Array<{
-    to: string;
-    icon: ReactNode;
-    label: string;
-    count: number;
-    tone: "danger" | "warn";
-  }> = [];
-  if ((k?.alertsUnread ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/catastro",
-      icon: <Bell className="w-3.5 h-3.5" />,
-      label: "Alertas catastro",
-      count: k!.alertsUnread,
-      tone: "danger",
-    });
-  if ((k?.patentsDue ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/catastro",
-      icon: <Coins className="w-3.5 h-3.5" />,
-      label: "Patentes por pagar",
-      count: k!.patentsDue,
-      tone: "warn",
-    });
-  if ((k?.concessionsExpiring90d ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/catastro",
-      icon: <FileWarning className="w-3.5 h-3.5" />,
-      label: "Concesiones venciendo 90d",
-      count: k!.concessionsExpiring90d,
-      tone: "warn",
-    });
-  if ((k?.overlapsOpen ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/catastro",
-      icon: <Layers className="w-3.5 h-3.5" />,
-      label: "Overlaps sin resolver",
-      count: k!.overlapsOpen,
-      tone: "warn",
-    });
-  if ((k?.pendingReview ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/approvals",
-      icon: <ShieldCheck className="w-3.5 h-3.5" />,
-      label: "Pendientes aprobación",
-      count: k!.pendingReview,
-      tone: "warn",
-    });
-  if ((k?.bulletinsUnread ?? 0) > 0)
-    tasks.push({
-      to: "/dashboard/boletin",
-      icon: <Radio className="w-3.5 h-3.5" />,
-      label: "Boletín minero",
-      count: k!.bulletinsUnread,
-      tone: "warn",
-    });
-  if ((k?.qaqcFailRate ?? 0) > 10)
-    tasks.push({
-      to: "/dashboard/qaqc",
-      icon: <AlertTriangle className="w-3.5 h-3.5" />,
-      label: `QA/QC fail ${k!.qaqcFailRate!.toFixed(1)}%`,
-      count: k!.qaqcTotal,
-      tone: "danger",
-    });
-
-  const showOnboarding = needsOnboarding;
+  const fn = useServerFn(getBusinessOverview);
+  const { data: ov, isLoading } = useQuery({
+    queryKey: ["business-overview"],
+    queryFn: () => fn(),
+    staleTime: 30_000,
+    refetchInterval: 60_000,
+  });
 
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
-      <div className="p-3 md:p-6 max-w-[1600px] mx-auto pb-20 md:pb-6 space-y-5">
-        {showOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
-        {!showOnboarding && profile?.account_type && !onboardingComplete && (
-          <div className="rounded border border-gold/30 bg-gold/5 px-4 py-3 flex items-center justify-between gap-3">
-            <div className="text-xs">
-              <span className="font-mono uppercase text-gold tracking-wider">Onboarding</span>
-              <span className="ml-2 text-muted-foreground">
-                Completa tu perfil para desbloquear todas las funciones.
-              </span>
+      <div className="p-4 md:p-6 max-w-[1400px] mx-auto pb-20 md:pb-8 space-y-5">
+        <header className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+              Centro de Negocios
             </div>
-            <Link to="/dashboard/profile" className="text-xs font-mono text-gold hover:underline">
-              Continuar →
+            <h1 className="text-2xl md:text-3xl font-bold mt-1">Hola{name ? `, ${name}` : ""}.</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              Deals, commodities, firmas y envíos — tu operación completa en una pantalla.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/dashboard/trades"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm hover:opacity-90"
+            >
+              <Plus className="w-4 h-4" /> Nuevo trade
+            </Link>
+            <Link
+              to="/dashboard/documentos"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-sm hover:bg-accent"
+            >
+              <FileSignature className="w-4 h-4" /> Enviar NDA
             </Link>
           </div>
-        )}
-        {/* Header con signos vitales del proyecto */}
-        <header className="rounded border border-border bg-gradient-to-br from-bg-secondary to-bg-panel p-4 md:p-5">
-          <div className="flex items-start justify-between gap-3 flex-wrap">
-            <div className="min-w-0">
-              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="w-3 h-3 text-gold" /> Mission Control · Geocapitals OS
-              </div>
-              <h1 className="text-xl md:text-2xl font-bold mt-1 truncate">
-                {active?.name ?? "Sin proyecto activo"}
-              </h1>
-              <p className="text-xs text-muted-foreground mt-1 font-mono">
-                {active?.code ?? "—"}
-                {active?.commodity && <span> · {active.commodity}</span>}
-                {active?.country && <span> · {active.country}</span>}
-                <span className="text-hint"> · piloto {name}</span>
-              </p>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <VitalBadge
-                label="Fusion Score"
-                value={fusion.score == null ? "—" : `${fusion.score}`}
-                tone={fusion.tone}
-              />
-              <VitalBadge
-                label="QPS"
-                value={
-                  loading
-                    ? "…"
-                    : `${fmt(k?.approvedRecords)}/${fmt((k?.approvedRecords ?? 0) + (k?.pendingReview ?? 0))}`
-                }
-                tone={k?.pendingReview ? "warn" : "ok"}
-              />
-              <VitalBadge
-                label="Activos"
-                value={loading ? "…" : `${fmt(k?.activeTargets)} tgts`}
-                tone="info"
-              />
-            </div>
-          </div>
-
-          {/* Acciones requeridas */}
-          {tasks.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-border/60">
-              <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-                <Bell className="w-3 h-3 text-gold" /> Acciones requeridas{" "}
-                <span className="text-gold">({tasks.length})</span>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
-                {tasks.map((t, i) => (
-                  <Link
-                    key={i}
-                    to={t.to}
-                    className={`group rounded border p-2 flex items-center gap-2 transition-colors ${
-                      t.tone === "danger"
-                        ? "border-destructive/40 bg-destructive/5 hover:bg-destructive/10"
-                        : "border-gold/30 bg-gold/5 hover:bg-gold/10"
-                    }`}
-                  >
-                    <span className={t.tone === "danger" ? "text-destructive" : "text-gold"}>
-                      {t.icon}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-[9px] font-mono uppercase text-muted-foreground truncate">
-                        {t.label}
-                      </div>
-                      <div
-                        className={`text-sm font-mono font-bold ${t.tone === "danger" ? "text-destructive" : "text-gold"}`}
-                      >
-                        {t.count}
-                      </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-          {tasks.length === 0 && !loading && (
-            <div className="mt-3 text-xs text-muted-foreground flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-teal" />
-              Sin acciones pendientes · operación al día
-            </div>
-          )}
         </header>
 
-        {profile?.account_type && (
-          <RoleSegmentedPanel
-            accountType={profile.account_type as "investor" | "mining_owner" | "geocapitals_team"}
-            kpis={k ?? null}
-            loading={loading}
-            refreshing={refreshing}
-            lastUpdated={lastUpdated}
-            onRefresh={refresh}
-          />
-        )}
+        {needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
 
-        {/* 4 PILARES — Explore · Model · Certify · Deal */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <Pillar
-            tone="cyan"
-            icon={<Satellite className="w-5 h-5" />}
-            number="01"
-            title="Explore"
-            subtitle="Descubrir el yacimiento"
-            stats={[
-              { label: "Targets activos", value: loading ? "…" : fmt(k?.activeTargets) },
-              { label: "Campañas", value: loading ? "…" : fmt(k?.activeCampaigns) },
-              {
-                label: "Au prom",
-                value: loading ? "…" : k?.auWeightedAvg ? `${k.auWeightedAvg.toFixed(2)} g/t` : "—",
-              },
-            ]}
-            links={[
-              {
-                to: "/dashboard/targets",
-                icon: <TargetIcon className="w-3.5 h-3.5" />,
-                label: "Targets",
-              },
-              {
-                to: "/dashboard/satellite-intel",
-                icon: <Satellite className="w-3.5 h-3.5" />,
-                label: "Satelital",
-              },
-              {
-                to: "/dashboard/geophysics",
-                icon: <Activity className="w-3.5 h-3.5" />,
-                label: "Geofísica",
-              },
-              {
-                to: "/dashboard/catastro",
-                icon: <Crosshair className="w-3.5 h-3.5" />,
-                label: "Catastro",
-              },
-            ]}
-            primary={{ to: "/dashboard/targets", label: "Abrir Explore" }}
+        {/* KPIs del negocio */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <Kpi
+            icon={<Briefcase className="w-4 h-4" />}
+            label="Pipeline activo"
+            value={isLoading ? "…" : fmtUsd(ov?.trades.pipelineUsd ?? 0)}
+            hint={`${ov?.trades.active ?? 0} operaciones en curso · ${ov?.trades.closed ?? 0} cerradas`}
+            to="/dashboard/trades"
           />
-
-          <Pillar
-            tone="violet"
-            icon={<Mountain className="w-5 h-5" />}
-            number="02"
-            title="Model"
-            subtitle="3D real · superficie y subsuelo"
-            stats={[
-              { label: "Sondajes", value: loading ? "…" : fmt(k?.totalHoles) },
-              { label: "m perforados", value: loading ? "…" : fmt(k?.totalMetersDrilled) },
-              { label: "Muestras", value: loading ? "…" : fmt(k?.totalSamples) },
-            ]}
-            links={[
-              {
-                to: "/dashboard/geology3d",
-                icon: <Box className="w-3.5 h-3.5" />,
-                label: "Visor 3D",
-              },
-              {
-                to: "/dashboard/drilling",
-                icon: <Drill className="w-3.5 h-3.5" />,
-                label: "Sondajes",
-              },
-              {
-                to: "/dashboard/sampling",
-                icon: <TestTube2 className="w-3.5 h-3.5" />,
-                label: "Muestreo",
-              },
-              {
-                to: "/dashboard/estimation",
-                icon: <Layers className="w-3.5 h-3.5" />,
-                label: "Estimación",
-              },
-            ]}
-            primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
+          <Kpi
+            icon={<Ship className="w-4 h-4" />}
+            label="Envíos en curso"
+            value={isLoading ? "…" : String(ov?.shipments.active ?? 0)}
+            hint={
+              (ov?.shipments.delayed ?? 0) > 0
+                ? `⚠ ${ov!.shipments.delayed} atrasado(s)`
+                : "todo en plazo"
+            }
+            to="/dashboard/envios"
+            warn={(ov?.shipments.delayed ?? 0) > 0}
           />
-
-          <Pillar
-            tone="gold"
-            icon={<FileSignature className="w-5 h-5" />}
-            number="03"
-            title="Certify"
-            subtitle="NI 43-101 · QP · firma criptográfica"
-            stats={[
-              { label: "Aprobados", value: loading ? "…" : fmt(k?.approvedRecords) },
-              { label: "En revisión", value: loading ? "…" : fmt(k?.pendingReview) },
-              {
-                label: "QA/QC",
-                value: loading
-                  ? "…"
-                  : k?.qaqcFailRate != null
-                    ? `${(100 - k.qaqcFailRate).toFixed(1)}%`
-                    : "—",
-              },
-            ]}
-            links={[
-              {
-                to: "/dashboard/ni43101",
-                icon: <FileSignature className="w-3.5 h-3.5" />,
-                label: "NI 43-101",
-              },
-              {
-                to: "/reports/losverdes/pre43101",
-                icon: <FileSignature className="w-3.5 h-3.5" />,
-                label: "Pre-NI 43-101 LV5",
-              },
-              { to: "/dashboard/qps", icon: <ShieldCheck className="w-3.5 h-3.5" />, label: "QPs" },
-              {
-                to: "/dashboard/qaqc",
-                icon: <CheckCircle2 className="w-3.5 h-3.5" />,
-                label: "QA/QC",
-              },
-              {
-                to: "/dashboard/approvals",
-                icon: <ShieldCheck className="w-3.5 h-3.5" />,
-                label: "Aprobaciones",
-              },
-            ]}
-            primary={{ to: "/dashboard/ni43101", label: "Abrir certificación" }}
+          <Kpi
+            icon={<FileSignature className="w-4 h-4" />}
+            label="Firmas pendientes"
+            value={isLoading ? "…" : String(ov?.signs.pending ?? 0)}
+            hint={`${ov?.signs.signed ?? 0} documentos firmados`}
+            to="/dashboard/documentos"
           />
-
-          <Pillar
-            tone="teal"
-            icon={<Handshake className="w-5 h-5" />}
-            number="04"
-            title="Deal"
-            subtitle="Inversionistas · marketplace · data room"
-            stats={[
-              { label: "Concesiones", value: loading ? "…" : fmt(k?.concessionsTotal) },
-              { label: "Vigentes", value: loading ? "…" : fmt(k?.concessionsVigentes) },
-              { label: "Fusion", value: fusion.score == null ? "—" : `${fusion.score}/100` },
-            ]}
-            links={[
-              {
-                to: "/dashboard/marketplace",
-                icon: <TrendingUp className="w-3.5 h-3.5" />,
-                label: "Marketplace",
-              },
-              {
-                to: "/dashboard/deals",
-                icon: <Handshake className="w-3.5 h-3.5" />,
-                label: "Deals",
-              },
-              {
-                to: "/dashboard/finance",
-                icon: <Coins className="w-3.5 h-3.5" />,
-                label: "Finanzas",
-              },
-              {
-                to: "/dashboard/reports",
-                icon: <FileSignature className="w-3.5 h-3.5" />,
-                label: "Reportes",
-              },
-            ]}
-            primary={{ to: "/dashboard/deals", label: "Abrir deal room" }}
+          <Kpi
+            icon={<MessageSquare className="w-4 h-4" />}
+            label="Cotizaciones"
+            value={
+              isLoading ? "…" : String((ov?.inquiries.received ?? 0) + (ov?.inquiries.sent ?? 0))
+            }
+            hint={`${ov?.inquiries.received ?? 0} recibidas · ${ov?.inquiries.sent ?? 0} enviadas`}
+            to="/dashboard/my-inquiries"
           />
-        </section>
+        </div>
 
-        {/* Visor 3D canónico embebido — corazón visual de Mission Control */}
-        <section className="rounded border border-border bg-bg-secondary overflow-hidden">
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border">
-            <div className="flex items-center gap-2">
-              <Box className="w-4 h-4 text-signal-violet" />
-              <h2 className="text-[11px] font-mono uppercase tracking-wider text-foreground">
-                GeoScene3D · visor canónico
-              </h2>
+        <div className="grid lg:grid-cols-[1.4fr_1fr] gap-4 items-start">
+          {/* Columna principal: operaciones y envíos */}
+          <div className="space-y-4">
+            {/* Operaciones en curso */}
+            <section className="rounded-md border border-border bg-bg-secondary/20">
+              <SectionHead
+                icon={<Handshake className="w-4 h-4 text-primary" />}
+                title="Operaciones en curso"
+                to="/dashboard/trades"
+                cta="Trade Desk"
+              />
+              {isLoading ? (
+                <div className="p-4 h-24 animate-pulse" />
+              ) : (ov?.trades.recent.length ?? 0) === 0 ? (
+                <Empty text="Sin operaciones activas. Crea un trade desde el Trade Desk o desde una cotización del marketplace." />
+              ) : (
+                <ul className="divide-y divide-border">
+                  {ov!.trades.recent.map((t) => (
+                    <li key={t.id}>
+                      <Link
+                        to="/dashboard/trades/$tradeId"
+                        params={{ tradeId: t.id }}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent/50 transition-colors"
+                      >
+                        <span className="font-mono text-sm font-semibold shrink-0">
+                          {t.reference ?? t.id.slice(0, 8)}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {t.commodity ?? "—"}
+                          {t.quantity_t ? ` · ${t.quantity_t} t` : ""} ·{" "}
+                          {t.role === "buyer" ? "compra" : "venta"}
+                        </span>
+                        <span className="ml-auto flex items-center gap-2 shrink-0">
+                          {t.total_value_usd ? (
+                            <span className="font-mono text-xs">{fmtUsd(t.total_value_usd)}</span>
+                          ) : null}
+                          <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
+                            {STAGE_CHIP[t.stage] ?? t.stage}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {/* Envíos */}
+            <section className="rounded-md border border-border bg-bg-secondary/20">
+              <SectionHead
+                icon={<Ship className="w-4 h-4 text-primary" />}
+                title="Envíos"
+                to="/dashboard/envios"
+                cta="Logística"
+              />
+              {isLoading ? (
+                <div className="p-4 h-16 animate-pulse" />
+              ) : (ov?.shipments.recent.length ?? 0) === 0 ? (
+                <Empty text="Sin embarques en curso. Crea uno desde Envíos cuando un trade llegue a etapa SPA o pago." />
+              ) : (
+                <ul className="divide-y divide-border">
+                  {ov!.shipments.recent.map((s) => (
+                    <li key={s.id}>
+                      <Link
+                        to="/dashboard/trades/$tradeId"
+                        params={{ tradeId: s.trade_id }}
+                        className="flex items-center gap-3 px-4 py-2.5 hover:bg-accent/50 transition-colors"
+                      >
+                        <span className="font-mono text-sm shrink-0">
+                          {s.reference ?? s.id.slice(0, 8)}
+                        </span>
+                        <span className="text-xs text-muted-foreground truncate">
+                          {s.vessel_name ?? "nave por confirmar"}
+                          {s.eta ? ` · ETA ${new Date(s.eta).toLocaleDateString("es-CL")}` : ""}
+                        </span>
+                        <span className="ml-auto flex items-center gap-2 shrink-0">
+                          {s.delayed && (
+                            <span className="inline-flex items-center gap-1 text-[9px] font-mono uppercase px-2 py-0.5 rounded-full bg-red-500/15 text-red-600">
+                              <AlertTriangle className="w-3 h-3" /> Atrasado
+                            </span>
+                          )}
+                          <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-teal/10 text-teal">
+                            {SHIPMENT_STATUS_LABELS[s.status]}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+
+            {/* Firmas */}
+            <section className="rounded-md border border-border bg-bg-secondary/20">
+              <SectionHead
+                icon={<FileSignature className="w-4 h-4 text-primary" />}
+                title="Firmas electrónicas"
+                to="/dashboard/documentos"
+                cta="Documentos"
+              />
+              {isLoading ? (
+                <div className="p-4 h-16 animate-pulse" />
+              ) : (ov?.signs.recent.length ?? 0) === 0 ? (
+                <Empty text="Sin solicitudes de firma. Envía un NDA o SPA desde Documentos — el link llega por email a la contraparte." />
+              ) : (
+                <ul className="divide-y divide-border">
+                  {ov!.signs.recent.map((s) => (
+                    <li key={s.id} className="flex items-center gap-3 px-4 py-2.5">
+                      <span className="text-sm truncate">{s.title}</span>
+                      <span className="text-xs text-muted-foreground truncate">
+                        {s.signed_by_name ?? s.signer_name_expected ?? ""}
+                      </span>
+                      <span
+                        className={`ml-auto shrink-0 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                          s.status === "signed"
+                            ? "bg-green-500/15 text-green-700"
+                            : s.status === "pending"
+                              ? "bg-amber-500/15 text-amber-700"
+                              : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {s.status === "signed"
+                          ? "Firmado"
+                          : s.status === "pending"
+                            ? "Pendiente"
+                            : s.status}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
+
+          {/* Columna lateral: clientes, inventario comercial, actividad, proyecto */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-3">
+              <Kpi
+                icon={<Users className="w-4 h-4" />}
+                label="Clientes"
+                value={isLoading ? "…" : String(ov?.clients ?? 0)}
+                hint="contrapartes de trades"
+                to="/dashboard/trades"
+                compact
+              />
+              <Kpi
+                icon={<Package className="w-4 h-4" />}
+                label="Lotes + listings"
+                value={isLoading ? "…" : String((ov?.lots ?? 0) + (ov?.listings ?? 0))}
+                hint={`${ov?.lots ?? 0} lotes · ${ov?.listings ?? 0} proyectos`}
+                to="/dashboard/commodity-lots"
+                compact
+              />
             </div>
-            <Link
-              to="/dashboard/geology3d"
-              className="text-[10px] font-mono text-gold hover:underline"
-            >
-              Pantalla completa →
-            </Link>
-          </div>
-          <div data-surface="canvas" className="h-[480px] relative">
-            <SceneErrorBoundary label="GeoScene3D">
-              <GeoScene3D />
-            </SceneErrorBoundary>
-          </div>
-        </section>
 
-        {/* Atajos rápidos */}
-        <section>
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-              Atajos
-            </h2>
-            <Link
-              to="/dashboard/projects"
-              className="text-[10px] font-mono text-gold hover:underline"
-            >
-              Cambiar proyecto →
-            </Link>
+            {/* Actividad reciente (trazabilidad) */}
+            <section className="rounded-md border border-border bg-bg-secondary/20">
+              <SectionHead
+                icon={<TrendingUp className="w-4 h-4 text-primary" />}
+                title="Actividad reciente"
+              />
+              {isLoading ? (
+                <div className="p-4 h-24 animate-pulse" />
+              ) : (ov?.events.length ?? 0) === 0 ? (
+                <Empty text="La trazabilidad de tus operaciones aparecerá aquí." />
+              ) : (
+                <ul className="divide-y divide-border">
+                  {ov!.events.slice(0, 8).map((e) => {
+                    const it = normalizeEvent(e);
+                    return (
+                      <li key={it.id} className="px-4 py-2">
+                        <div className="text-xs">{it.title}</div>
+                        <div className="text-[10px] font-mono text-muted-foreground">
+                          {it.detail ? `${it.detail} · ` : ""}
+                          {new Date(it.at).toLocaleString("es-CL")}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
+            {/* Proyecto activo → visión técnica */}
+            {!isInvestor &&
+              (projects.length === 0 ? (
+                <Link
+                  to="/dashboard/projects"
+                  className="block rounded-md border border-dashed border-gold/40 bg-gold/5 hover:bg-gold/10 transition-colors p-5 text-center"
+                >
+                  <Plus className="w-6 h-6 text-gold mx-auto mb-2" />
+                  <div className="font-mono text-sm font-semibold">Crear primer proyecto</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Para operar catastro, exploración y reportes
+                  </div>
+                </Link>
+              ) : (
+                <section className="rounded-md border border-border bg-bg-secondary/20 p-4">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
+                    Proyecto activo
+                  </div>
+                  <div className="font-semibold text-sm">{active?.name ?? "—"}</div>
+                  <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                    <Link
+                      to="/dashboard/mission"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
+                    >
+                      <Compass className="w-3.5 h-3.5" /> Mission Control
+                    </Link>
+                    <Link
+                      to="/dashboard/project-report"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Reporte
+                    </Link>
+                    <Link
+                      to="/dashboard/projects"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
+                    >
+                      <FolderKanban className="w-3.5 h-3.5" /> Proyectos
+                    </Link>
+                    <Link
+                      to="/dashboard/listings"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
+                    >
+                      <ArrowRight className="w-3.5 h-3.5" /> Venderlo
+                    </Link>
+                  </div>
+                </section>
+              ))}
           </div>
-          <div className="grid grid-cols-3 md:grid-cols-8 lg:grid-cols-9 gap-2">
-            <Shortcut
-              to="/dashboard/map"
-              icon={<MapIcon className="w-4 h-4 text-gold" />}
-              title="Mapa táctico"
-            />
-            <Shortcut
-              to="/dashboard/geology3d"
-              icon={<Box className="w-4 h-4 text-signal-violet" />}
-              title="Visor 3D"
-            />
-            <Shortcut
-              to="/dashboard/catastro"
-              icon={<Crosshair className="w-4 h-4 text-teal" />}
-              title="Catastro"
-            />
-            <Shortcut
-              to="/dashboard/opportunities"
-              icon={<Sparkles className="w-4 h-4 text-yellow-500" />}
-              title="Oportunidades IA"
-            />
-            <Shortcut
-              to="/dashboard/estimation"
-              icon={<Layers className="w-4 h-4 text-copper" />}
-              title="Estimación"
-            />
-            <Shortcut
-              to="/dashboard/precios"
-              icon={<Coins className="w-4 h-4 text-emerald-500" />}
-              title="Precios metales"
-            />
-            <Shortcut
-              to="/dashboard/agents"
-              icon={<Bot className="w-4 h-4 text-gold" />}
-              title="Panel de agentes"
-            />
-            <Shortcut
-              to="/dashboard/hse"
-              icon={<ShieldCheck className="w-4 h-4 text-info" />}
-              title="HSE"
-            />
-            <Shortcut
-              to="/dashboard/team"
-              icon={<Sparkles className="w-4 h-4 text-gold" />}
-              title="Equipo"
-            />
-          </div>
-        </section>
+        </div>
       </div>
     </div>
   );
 }
 
-function computeFusionScore(k: ReturnType<typeof useExecutiveKpis>["kpis"]) {
-  if (!k) return { score: null as number | null, tone: "muted" as const };
-  let s = 0;
-  let n = 0;
-  if (k.activeTargets != null) {
-    s += Math.min(25, k.activeTargets * 2);
-    n += 25;
-  }
-  if (k.totalHoles != null) {
-    s += Math.min(25, k.totalHoles * 1.5);
-    n += 25;
-  }
-  if (k.auWeightedAvg != null) {
-    s += Math.min(25, k.auWeightedAvg * 25);
-    n += 25;
-  }
-  if (k.approvedRecords != null) {
-    s += Math.min(25, k.approvedRecords * 0.5);
-    n += 25;
-  }
-  if (n === 0) return { score: null, tone: "muted" as const };
-  const score = Math.round((s / n) * 100);
-  const tone =
-    score >= 70 ? ("ok" as const) : score >= 40 ? ("warn" as const) : ("danger" as const);
-  return { score, tone };
-}
-
-function VitalBadge({
+function Kpi({
+  icon,
   label,
   value,
-  tone,
+  hint,
+  to,
+  warn,
+  compact,
 }: {
+  icon: React.ReactNode;
   label: string;
   value: string;
-  tone: "ok" | "warn" | "danger" | "info" | "muted";
+  hint?: string;
+  to: string;
+  warn?: boolean;
+  compact?: boolean;
 }) {
-  const color =
-    tone === "ok"
-      ? "text-teal border-teal/40 bg-teal/5"
-      : tone === "warn"
-        ? "text-gold border-gold/40 bg-gold/5"
-        : tone === "danger"
-          ? "text-destructive border-destructive/40 bg-destructive/5"
-          : tone === "info"
-            ? "text-info border-info/40 bg-info/5"
-            : "text-muted-foreground border-border bg-bg-secondary";
-  return (
-    <div className={`rounded border px-2.5 py-1.5 ${color}`}>
-      <div className="text-[9px] font-mono uppercase tracking-wider opacity-70">{label}</div>
-      <div className="text-sm font-mono font-bold leading-tight">{value}</div>
-    </div>
-  );
-}
-
-const TONE_STYLES = {
-  cyan: {
-    ring: "border-signal-cyan/30 hover:border-signal-cyan/60",
-    ico: "text-signal-cyan bg-signal-cyan/10",
-    num: "text-signal-cyan",
-  },
-  violet: {
-    ring: "border-signal-violet/30 hover:border-signal-violet/60",
-    ico: "text-signal-violet bg-signal-violet/10",
-    num: "text-signal-violet",
-  },
-  gold: {
-    ring: "border-gold/30 hover:border-gold/60",
-    ico: "text-gold bg-gold/10",
-    num: "text-gold",
-  },
-  teal: {
-    ring: "border-teal/30 hover:border-teal/60",
-    ico: "text-teal bg-teal/10",
-    num: "text-teal",
-  },
-} as const;
-
-function Pillar({
-  tone,
-  icon,
-  number,
-  title,
-  subtitle,
-  stats,
-  links,
-  primary,
-}: {
-  tone: keyof typeof TONE_STYLES;
-  icon: ReactNode;
-  number: string;
-  title: string;
-  subtitle: string;
-  stats: { label: string; value: string }[];
-  links: { to: string; icon: ReactNode; label: string }[];
-  primary: { to: string; label: string };
-}) {
-  const s = TONE_STYLES[tone];
-  return (
-    <div className={`rounded border bg-bg-secondary p-4 transition-colors ${s.ring}`}>
-      <div className="flex items-start gap-3">
-        <div className={`rounded p-2 ${s.ico}`}>{icon}</div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-baseline gap-2">
-            <span className={`text-[10px] font-mono ${s.num}`}>{number}</span>
-            <h3 className="text-lg font-bold">{title}</h3>
-          </div>
-          <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
-        </div>
-        <Link
-          to={primary.to}
-          className={`text-[10px] font-mono uppercase px-2 py-1 rounded border ${s.ring}`}
-        >
-          Abrir <ArrowRight className="w-3 h-3 inline ml-0.5" />
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-3 gap-2 mt-3">
-        {stats.map((st) => (
-          <div key={st.label} className="rounded border border-border bg-bg-panel p-2">
-            <div className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground truncate">
-              {st.label}
-            </div>
-            <div className="text-sm font-mono font-bold mt-0.5 truncate">{st.value}</div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-2 gap-1.5 mt-3">
-        {links.map((l) => (
-          <Link
-            key={l.to}
-            to={l.to}
-            className="flex items-center gap-1.5 text-xs px-2 py-1.5 rounded border border-border bg-bg-panel hover:border-gold/40 hover:bg-gold/5 transition-colors"
-          >
-            <span className={s.num}>{l.icon}</span>
-            <span className="truncate font-mono">{l.label}</span>
-          </Link>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Shortcut({ to, icon, title }: { to: string; icon: ReactNode; title: string }) {
   return (
     <Link
       to={to}
-      className="rounded border border-border bg-bg-secondary p-2.5 hover:border-gold/40 transition-colors flex items-center gap-2"
+      className={`block rounded-md border bg-bg-secondary/20 hover:border-primary/50 transition-colors ${
+        warn ? "border-red-500/40" : "border-border"
+      } ${compact ? "p-3" : "p-4"}`}
     >
-      {icon}
-      <div className="font-mono font-semibold text-xs truncate">{title}</div>
+      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        {icon} {label}
+      </div>
+      <div className={`font-mono font-bold mt-1 ${compact ? "text-lg" : "text-2xl"}`}>{value}</div>
+      {hint && <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>}
     </Link>
   );
+}
+
+function SectionHead({
+  icon,
+  title,
+  to,
+  cta,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  to?: string;
+  cta?: string;
+}) {
+  return (
+    <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+      <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider">
+        {icon} {title}
+      </div>
+      {to && cta && (
+        <Link
+          to={to}
+          className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+        >
+          {cta} <ArrowRight className="w-3 h-3" />
+        </Link>
+      )}
+    </div>
+  );
+}
+
+function Empty({ text }: { text: string }) {
+  return <div className="px-4 py-6 text-xs text-muted-foreground">{text}</div>;
 }
