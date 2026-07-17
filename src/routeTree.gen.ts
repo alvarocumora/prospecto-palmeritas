@@ -34,6 +34,7 @@ import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
+import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
 import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
@@ -45,6 +46,7 @@ import { Route as InvitationsTokenRouteImport } from './routes/invitations.$toke
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
+import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedor.$token'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
@@ -69,6 +71,7 @@ import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_
 import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
+import { Route as AuthenticatedDashboardSourcingRouteImport } from './routes/_authenticated.dashboard.sourcing'
 import { Route as AuthenticatedDashboardSectionRouteImport } from './routes/_authenticated.dashboard.section'
 import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
 import { Route as AuthenticatedDashboardSat3dRouteImport } from './routes/_authenticated.dashboard.sat3d'
@@ -130,6 +133,7 @@ import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
 import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
+import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
@@ -264,6 +268,11 @@ const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
   path: '/$listingId',
   getParentRoute: () => ProyectosRoute,
 } as any)
+const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
+  id: '/proveedor/$token',
+  path: '/proveedor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
   id: '/marketplace/$lotId',
   path: '/marketplace/$lotId',
@@ -317,6 +326,11 @@ const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
 const FirmarTokenRoute = FirmarTokenRouteImport.update({
   id: '/firmar/$token',
   path: '/firmar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichaProveedorTokenRoute = FichaProveedorTokenRouteImport.update({
+  id: '/ficha-proveedor/$token',
+  path: '/ficha-proveedor/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
@@ -446,6 +460,12 @@ const AuthenticatedDashboardTargetsRoute =
   AuthenticatedDashboardTargetsRouteImport.update({
     id: '/dashboard/targets',
     path: '/dashboard/targets',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSourcingRoute =
+  AuthenticatedDashboardSourcingRouteImport.update({
+    id: '/dashboard/sourcing',
+    path: '/dashboard/sourcing',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardSectionRoute =
@@ -812,6 +832,12 @@ const AuthenticatedDashboardTargetsAiBriefRoute =
     path: '/ai-brief',
     getParentRoute: () => AuthenticatedDashboardTargetsRoute,
   } as any)
+const AuthenticatedDashboardSourcingRequestIdRoute =
+  AuthenticatedDashboardSourcingRequestIdRouteImport.update({
+    id: '/dashboard/sourcing_/$requestId',
+    path: '/dashboard/sourcing/$requestId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardListingsListingIdRoute =
   AuthenticatedDashboardListingsListingIdRouteImport.update({
     id: '/$listingId',
@@ -890,6 +916,7 @@ export interface FileRoutesByFullPath {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -901,6 +928,7 @@ export interface FileRoutesByFullPath {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -959,6 +987,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/section': typeof AuthenticatedDashboardSectionRoute
+  '/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
@@ -982,6 +1011,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
@@ -1021,6 +1051,7 @@ export interface FileRoutesByTo {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1032,6 +1063,7 @@ export interface FileRoutesByTo {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -1090,6 +1122,7 @@ export interface FileRoutesByTo {
   '/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/dashboard/section': typeof AuthenticatedDashboardSectionRoute
+  '/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
@@ -1113,6 +1146,7 @@ export interface FileRoutesByTo {
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
@@ -1154,6 +1188,7 @@ export interface FileRoutesById {
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1165,6 +1200,7 @@ export interface FileRoutesById {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -1223,6 +1259,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/sat3d': typeof AuthenticatedDashboardSat3dRoute
   '/_authenticated/dashboard/satellite-intel': typeof AuthenticatedDashboardSatelliteIntelRoute
   '/_authenticated/dashboard/section': typeof AuthenticatedDashboardSectionRoute
+  '/_authenticated/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
   '/_authenticated/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
@@ -1246,6 +1283,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/_authenticated/dashboard/sourcing_/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/dashboard/trades_/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
@@ -1287,6 +1325,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/ficha-proveedor/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1298,6 +1337,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/proveedor/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1356,6 +1396,7 @@ export interface FileRouteTypes {
     | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
     | '/dashboard/section'
+    | '/dashboard/sourcing'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/trades'
@@ -1379,6 +1420,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
+    | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
     | '/api/public/notifications/catastro-expirations'
@@ -1418,6 +1460,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/ficha-proveedor/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1429,6 +1472,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/proveedor/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1487,6 +1531,7 @@ export interface FileRouteTypes {
     | '/dashboard/sat3d'
     | '/dashboard/satellite-intel'
     | '/dashboard/section'
+    | '/dashboard/sourcing'
     | '/dashboard/targets'
     | '/dashboard/team'
     | '/dashboard/trades'
@@ -1510,6 +1555,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
+    | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
     | '/api/public/notifications/catastro-expirations'
@@ -1550,6 +1596,7 @@ export interface FileRouteTypes {
     | '/catastro/mapa'
     | '/catastro/precios'
     | '/email/unsubscribe'
+    | '/ficha-proveedor/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1561,6 +1608,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/proveedor/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1619,6 +1667,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sat3d'
     | '/_authenticated/dashboard/satellite-intel'
     | '/_authenticated/dashboard/section'
+    | '/_authenticated/dashboard/sourcing'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
     | '/_authenticated/dashboard/trades'
@@ -1642,6 +1691,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documentos/$templateId'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
+    | '/_authenticated/dashboard/sourcing_/$requestId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/dashboard/trades_/$tradeId'
     | '/api/public/notifications/catastro-expirations'
@@ -1683,6 +1733,7 @@ export interface RootRouteChildren {
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  FichaProveedorTokenRoute: typeof FichaProveedorTokenRoute
   FirmarTokenRoute: typeof FirmarTokenRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
@@ -1694,6 +1745,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
   MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
+  ProveedorTokenRoute: typeof ProveedorTokenRoute
   VerificarRefRoute: typeof VerificarRefRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
@@ -1900,6 +1952,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProyectosListingIdRouteImport
       parentRoute: typeof ProyectosRoute
     }
+    '/proveedor/$token': {
+      id: '/proveedor/$token'
+      path: '/proveedor/$token'
+      fullPath: '/proveedor/$token'
+      preLoaderRoute: typeof ProveedorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace/$lotId': {
       id: '/marketplace/$lotId'
       path: '/marketplace/$lotId'
@@ -1975,6 +2034,13 @@ declare module '@tanstack/react-router' {
       path: '/firmar/$token'
       fullPath: '/firmar/$token'
       preLoaderRoute: typeof FirmarTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ficha-proveedor/$token': {
+      id: '/ficha-proveedor/$token'
+      path: '/ficha-proveedor/$token'
+      fullPath: '/ficha-proveedor/$token'
+      preLoaderRoute: typeof FichaProveedorTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
@@ -2143,6 +2209,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/targets'
       fullPath: '/dashboard/targets'
       preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/sourcing': {
+      id: '/_authenticated/dashboard/sourcing'
+      path: '/dashboard/sourcing'
+      fullPath: '/dashboard/sourcing'
+      preLoaderRoute: typeof AuthenticatedDashboardSourcingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/section': {
@@ -2572,6 +2645,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardTargetsAiBriefRouteImport
       parentRoute: typeof AuthenticatedDashboardTargetsRoute
     }
+    '/_authenticated/dashboard/sourcing_/$requestId': {
+      id: '/_authenticated/dashboard/sourcing_/$requestId'
+      path: '/dashboard/sourcing/$requestId'
+      fullPath: '/dashboard/sourcing/$requestId'
+      preLoaderRoute: typeof AuthenticatedDashboardSourcingRequestIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/listings/$listingId': {
       id: '/_authenticated/dashboard/listings/$listingId'
       path: '/$listingId'
@@ -2781,12 +2861,14 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardSat3dRoute: typeof AuthenticatedDashboardSat3dRoute
   AuthenticatedDashboardSatelliteIntelRoute: typeof AuthenticatedDashboardSatelliteIntelRoute
   AuthenticatedDashboardSectionRoute: typeof AuthenticatedDashboardSectionRoute
+  AuthenticatedDashboardSourcingRoute: typeof AuthenticatedDashboardSourcingRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRouteWithChildren
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
   AuthenticatedDashboardTradesRoute: typeof AuthenticatedDashboardTradesRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  AuthenticatedDashboardSourcingRequestIdRoute: typeof AuthenticatedDashboardSourcingRequestIdRoute
   AuthenticatedDashboardTradesTradeIdRoute: typeof AuthenticatedDashboardTradesTradeIdRoute
   AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
 }
@@ -2854,6 +2936,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardSatelliteIntelRoute:
     AuthenticatedDashboardSatelliteIntelRoute,
   AuthenticatedDashboardSectionRoute: AuthenticatedDashboardSectionRoute,
+  AuthenticatedDashboardSourcingRoute: AuthenticatedDashboardSourcingRoute,
   AuthenticatedDashboardTargetsRoute:
     AuthenticatedDashboardTargetsRouteWithChildren,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
@@ -2862,6 +2945,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedDashboardDocumentosTemplateIdRoute:
     AuthenticatedDashboardDocumentosTemplateIdRoute,
+  AuthenticatedDashboardSourcingRequestIdRoute:
+    AuthenticatedDashboardSourcingRequestIdRoute,
   AuthenticatedDashboardTradesTradeIdRoute:
     AuthenticatedDashboardTradesTradeIdRoute,
   AuthenticatedDashboardDocumentosIndexRoute:
@@ -2926,6 +3011,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  FichaProveedorTokenRoute: FichaProveedorTokenRoute,
   FirmarTokenRoute: FirmarTokenRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
@@ -2937,6 +3023,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
   MarketplaceLotIdRoute: MarketplaceLotIdRoute,
+  ProveedorTokenRoute: ProveedorTokenRoute,
   VerificarRefRoute: VerificarRefRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,

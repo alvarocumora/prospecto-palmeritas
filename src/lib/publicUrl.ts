@@ -22,13 +22,18 @@ export const signUrl = (token: string) => publicUrl(`/firmar/${token}`);
 /** Link canónico para aceptar una invitación de equipo/proyecto. */
 export const invitationUrl = (token: string) => publicUrl(`/invitations/${token}`);
 
+/** Link para que un asociado/proveedor suba su propuesta a un requerimiento. */
+export const sourcingSubmitUrl = (token: string) => publicUrl(`/proveedor/${token}`);
+
+/** Link de solo lectura de la ficha de proveedor, para compartir con el comprador. */
+export const supplierSheetUrl = (token: string) => publicUrl(`/ficha-proveedor/${token}`);
+
 /** Link canónico para verificación pública de cumplimiento NI 43-101. */
 export const complianceVerifyUrl = (reportId: string) =>
   publicUrl(`/api/public/verify-compliance/${reportId}`);
 
 /** Endpoint público para cron/webhooks. */
-export const apiPublicUrl = (path: string) =>
-  publicUrl(`/api/public/${path.replace(/^\//, "")}`);
+export const apiPublicUrl = (path: string) => publicUrl(`/api/public/${path.replace(/^\//, "")}`);
 
 /**
  * Link canónico de validación pública de un documento (NDA, LOI, term sheet…).
