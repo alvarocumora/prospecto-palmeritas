@@ -62,7 +62,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
-  const { projects, loading: projectsLoading, active } = useProjects();
+  const { projects, active } = useProjects();
   const role = useProjectRole();
   const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
@@ -80,18 +80,9 @@ function AuthenticatedLayout() {
     if (!user) navigate({ to: "/auth" });
   }, [mounted, loading, user, navigate]);
 
-  // Solo empuja al onboarding de proyectos si el usuario aterriza en la home
-  // del dashboard SIN proyectos. El resto de rutas (documentos, marketplace,
-  // catastro, admin, perfil, etc.) son navegables sin proyecto activo — no
-  // tiene sentido bloquearlas.
-  useEffect(() => {
-    if (!mounted) return;
-    if (loading || projectsLoading) return;
-    if (!user) return;
-    if (projects.length === 0 && location.pathname === "/dashboard") {
-      navigate({ to: "/dashboard/projects" });
-    }
-  }, [mounted, loading, projectsLoading, user, projects.length, location.pathname, navigate]);
+  // El INICIO ya no exige proyecto: es el Centro de Negocios (cross-proyecto)
+  // y maneja su propio empty state. Los inversionistas sin proyectos aterrizan
+  // ahí directamente; no se les empuja a /dashboard/projects.
 
   // Close drawer on route change
   useEffect(() => {
@@ -191,6 +182,12 @@ function AuthenticatedLayout() {
         label: "Proyectos",
         group: "OPERACIÓN",
       },
+    showOps && {
+      to: "/dashboard/mission",
+      icon: <LayoutDashboard className="w-3.5 h-3.5" />,
+      label: "Mission Control",
+      group: "OPERACIÓN",
+    },
     showOps && {
       to: "/dashboard/project-report",
       icon: <FileText className="w-3.5 h-3.5" />,

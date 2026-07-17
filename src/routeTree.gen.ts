@@ -85,6 +85,7 @@ import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './route
 import { Route as AuthenticatedDashboardOfferingsRouteImport } from './routes/_authenticated.dashboard.offerings'
 import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
 import { Route as AuthenticatedDashboardMyInquiriesRouteImport } from './routes/_authenticated.dashboard.my-inquiries'
+import { Route as AuthenticatedDashboardMissionRouteImport } from './routes/_authenticated.dashboard.mission'
 import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
 import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
 import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
@@ -541,6 +542,12 @@ const AuthenticatedDashboardMyInquiriesRoute =
     path: '/dashboard/my-inquiries',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardMissionRoute =
+  AuthenticatedDashboardMissionRouteImport.update({
+    id: '/dashboard/mission',
+    path: '/dashboard/mission',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardMarketplaceRoute =
   AuthenticatedDashboardMarketplaceRouteImport.update({
     id: '/dashboard/marketplace',
@@ -919,6 +926,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/mission': typeof AuthenticatedDashboardMissionRoute
   '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
@@ -1047,6 +1055,7 @@ export interface FileRoutesByTo {
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/dashboard/mission': typeof AuthenticatedDashboardMissionRoute
   '/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
@@ -1177,6 +1186,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
   '/_authenticated/dashboard/map': typeof AuthenticatedDashboardMapRoute
   '/_authenticated/dashboard/marketplace': typeof AuthenticatedDashboardMarketplaceRoute
+  '/_authenticated/dashboard/mission': typeof AuthenticatedDashboardMissionRoute
   '/_authenticated/dashboard/my-inquiries': typeof AuthenticatedDashboardMyInquiriesRoute
   '/_authenticated/dashboard/ni43101': typeof AuthenticatedDashboardNi43101Route
   '/_authenticated/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
@@ -1307,6 +1317,7 @@ export interface FileRouteTypes {
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/mission'
     | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
     | '/dashboard/offerings'
@@ -1435,6 +1446,7 @@ export interface FileRouteTypes {
     | '/dashboard/mag-revalidations'
     | '/dashboard/map'
     | '/dashboard/marketplace'
+    | '/dashboard/mission'
     | '/dashboard/my-inquiries'
     | '/dashboard/ni43101'
     | '/dashboard/offerings'
@@ -1564,6 +1576,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/mag-revalidations'
     | '/_authenticated/dashboard/map'
     | '/_authenticated/dashboard/marketplace'
+    | '/_authenticated/dashboard/mission'
     | '/_authenticated/dashboard/my-inquiries'
     | '/_authenticated/dashboard/ni43101'
     | '/_authenticated/dashboard/offerings'
@@ -2218,6 +2231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardMyInquiriesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/mission': {
+      id: '/_authenticated/dashboard/mission'
+      path: '/dashboard/mission'
+      fullPath: '/dashboard/mission'
+      preLoaderRoute: typeof AuthenticatedDashboardMissionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/marketplace': {
       id: '/_authenticated/dashboard/marketplace'
       path: '/dashboard/marketplace'
@@ -2702,6 +2722,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
   AuthenticatedDashboardMapRoute: typeof AuthenticatedDashboardMapRoute
   AuthenticatedDashboardMarketplaceRoute: typeof AuthenticatedDashboardMarketplaceRoute
+  AuthenticatedDashboardMissionRoute: typeof AuthenticatedDashboardMissionRoute
   AuthenticatedDashboardMyInquiriesRoute: typeof AuthenticatedDashboardMyInquiriesRoute
   AuthenticatedDashboardNi43101Route: typeof AuthenticatedDashboardNi43101Route
   AuthenticatedDashboardOfferingsRoute: typeof AuthenticatedDashboardOfferingsRoute
@@ -2768,6 +2789,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardMapRoute: AuthenticatedDashboardMapRoute,
   AuthenticatedDashboardMarketplaceRoute:
     AuthenticatedDashboardMarketplaceRoute,
+  AuthenticatedDashboardMissionRoute: AuthenticatedDashboardMissionRoute,
   AuthenticatedDashboardMyInquiriesRoute:
     AuthenticatedDashboardMyInquiriesRoute,
   AuthenticatedDashboardNi43101Route: AuthenticatedDashboardNi43101Route,
