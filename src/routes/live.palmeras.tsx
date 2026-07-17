@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DemoLiveBanner } from "@/features/marketing/DemoLiveBanner";
 import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
 
 export const Route = createFileRoute("/live/palmeras")({
   head: () => ({
     meta: [
-      { title: "Live Map · Prospecto Palmeras — Geocapitals" },
+      { title: "Demo · Prospecto Palmeras — Geocapitals" },
       {
         name: "description",
         content:
@@ -19,17 +20,8 @@ export const Route = createFileRoute("/live/palmeras")({
 function LiveMapPalmerasPage() {
   return (
     <div>
-      <LiveBanner />
+      <DemoLiveBanner />
       <TrackminGeoIntel />
-    </div>
-  );
-}
-
-function LiveBanner() {
-  return (
-    <div className="bg-gold/10 border-b border-gold/30 px-6 py-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-gold">
-      <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-      Live Map · Acceso público · Confidencial
     </div>
   );
 }
