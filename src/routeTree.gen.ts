@@ -29,6 +29,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
@@ -233,6 +234,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarRefRoute = VerificarRefRouteImport.update({
+  id: '/verificar/$ref',
+  path: '/verificar/$ref',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TerminalTokenizeRoute = TerminalTokenizeRouteImport.update({
@@ -878,6 +884,7 @@ export interface FileRoutesByFullPath {
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
+  '/verificar/$ref': typeof VerificarRefRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1005,6 +1012,7 @@ export interface FileRoutesByTo {
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
+  '/verificar/$ref': typeof VerificarRefRoute
   '/catastro': typeof CatastroIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1134,6 +1142,7 @@ export interface FileRoutesById {
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
+  '/verificar/$ref': typeof VerificarRefRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -1263,6 +1272,7 @@ export interface FileRouteTypes {
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
+    | '/verificar/$ref'
     | '/catastro/'
     | '/marketplace/'
     | '/.lovable/oauth/consent'
@@ -1390,6 +1400,7 @@ export interface FileRouteTypes {
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
+    | '/verificar/$ref'
     | '/catastro'
     | '/marketplace'
     | '/.lovable/oauth/consent'
@@ -1518,6 +1529,7 @@ export interface FileRouteTypes {
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
+    | '/verificar/$ref'
     | '/catastro/'
     | '/marketplace/'
     | '/.lovable/oauth/consent'
@@ -1643,6 +1655,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
   MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
+  VerificarRefRoute: typeof VerificarRefRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
@@ -1811,6 +1824,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro'
       fullPath: '/catastro/'
       preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar/$ref': {
+      id: '/verificar/$ref'
+      path: '/verificar/$ref'
+      fullPath: '/verificar/$ref'
+      preLoaderRoute: typeof VerificarRefRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terminal/tokenize': {
@@ -2851,6 +2871,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
   MarketplaceLotIdRoute: MarketplaceLotIdRoute,
+  VerificarRefRoute: VerificarRefRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
@@ -2884,13 +2905,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

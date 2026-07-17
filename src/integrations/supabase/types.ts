@@ -14535,6 +14535,7 @@ export type Database = {
         }
         Returns: string
       }
+      verify_document: { Args: { p_ref: string }; Returns: Json }
     }
     Enums: {
       account_type: "mining_owner" | "investor" | "geocapitals_team"

@@ -29,3 +29,11 @@ export const complianceVerifyUrl = (reportId: string) =>
 /** Endpoint público para cron/webhooks. */
 export const apiPublicUrl = (path: string) =>
   publicUrl(`/api/public/${path.replace(/^\//, "")}`);
+
+/**
+ * Link canónico de validación pública de un documento (NDA, LOI, term sheet…).
+ * El QR estampado en el PDF apunta acá para que la contraparte confirme
+ * referencia, fecha, plantilla y estado de firma en geocapitals.com.
+ */
+export const verifyDocUrl = (reference: string) =>
+  publicUrl(`/verificar/${encodeURIComponent(reference)}`);

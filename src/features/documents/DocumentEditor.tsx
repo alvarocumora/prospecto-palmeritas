@@ -245,8 +245,29 @@ export function DocumentEditor({
   const exportPdf = async () => {
     setBusy(true);
     try {
-      await renderGeocapitalsPdf(doc);
-      toast.success("PDF descargado");
+      // Si hay usuario logueado, el emisor (primera parte del bloque de firma)
+      // aparece pre-firmado con su email + timestamp + hash corto de sesión.
+      const emitterSignature = user
+        ? {
+            name:
+              values["divulgante"] ||
+              values["vendedor"] ||
+              values["parte_a"] ||
+              values["emisor"] ||
+              user.email ||
+              "Emisor",
+            email: user.email ?? undefined,
+            signedAt: new Date().toISOString(),
+            hash: user.id.replace(/-/g, "").slice(0, 12),
+            partyIndex: 0,
+          }
+        : undefined;
+      await renderGeocapitalsPdf(doc, { emitterSignature });
+      toast.success(
+        emitterSignature
+          ? `PDF descargado · firmado por ${emitterSignature.email ?? emitterSignature.name}`
+          : "PDF descargado",
+      );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al generar el PDF");
     } finally {
