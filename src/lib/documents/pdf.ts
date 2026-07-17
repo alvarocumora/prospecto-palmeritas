@@ -1,5 +1,6 @@
 import type { GeneratedDoc } from "./model";
 import logoUrl from "@/assets/geocapitals-logo.png";
+import { publicUrl } from "@/lib/publicUrl";
 
 // Renderer PDF con branding Geocapitals: cabecera con marca, acento oro,
 // tipografía Helvetica y disclaimer al pie. Client-only (import dinámico).
