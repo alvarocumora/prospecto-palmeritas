@@ -153,6 +153,7 @@ export type SubmissionRow = {
   documents: Array<{ label: string; url: string }>;
   status: string;
   share_token_prefix: string | null;
+  trade_id: string | null;
   created_at: string;
 };
 
@@ -177,7 +178,7 @@ export const getSourcingRequestDetail = createServerFn({ method: "GET" })
       const { data: subs } = await sb
         .from("sourcing_submissions")
         .select(
-          "id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents, status, share_token_prefix, created_at",
+          "id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents, status, share_token_prefix, trade_id, created_at",
         )
         .eq("request_id", data.id)
         .order("created_at", { ascending: false });
@@ -244,6 +245,119 @@ export const generateSubmissionShareLink = createServerFn({ method: "POST" })
     if (!updated) throw new Error("No se pudo generar el link (¿es tu propuesta?).");
     // El share token viaja en claro solo aquí.
     return { shareToken: token };
+  });
+
+// ---------- Dueño: convertir propuesta preseleccionada en un trade ----------
+// El trade lo sostiene el desk (Geocapitals): buyer = seller = usuario actual,
+// con la identidad del proveedor y la procedencia en la referencia/notas y sus
+// documentos volcados al timeline del trade (trazabilidad de punta a punta).
+export const convertSubmissionToTrade = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<{ tradeId: string }> => {
+    const sb = asSb(context.supabase);
+    const me = context.userId as string;
+
+    const { data: sub } = await sb
+      .from("sourcing_submissions")
+      .select(
+        "id, request_id, trade_id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents",
+      )
+      .eq("id", data.submissionId)
+      .maybeSingle();
+    if (!sub) throw new Error("Propuesta no encontrada.");
+    const s = sub as SubmissionRow & { request_id: string };
+    if (s.trade_id) return { tradeId: s.trade_id };
+
+    const { data: req } = await sb
+      .from("sourcing_requests")
+      .select("reference, commodity, form, incoterm, destination, quantity_t")
+      .eq("id", s.request_id)
+      .maybeSingle();
+    if (!req) throw new Error("Requerimiento no encontrado.");
+    const r = req as {
+      reference: string;
+      commodity: string | null;
+      form: string | null;
+      incoterm: string | null;
+      destination: string | null;
+      quantity_t: number | null;
+    };
+
+    const qty = s.offer_quantity_t ?? r.quantity_t ?? null;
+    const price = s.offer_price_usd_t ?? null;
+    const total = qty != null && price != null ? qty * price : null;
+    const reference = `${r.reference} · ${s.supplier_name}`.slice(0, 60);
+    const provenance = [
+      `Origen: sourcing ${r.reference}`,
+      `Proveedor: ${s.supplier_name}${s.supplier_company ? ` (${s.supplier_company})` : ""}`,
+      s.supplier_country ? `Procedencia: ${s.supplier_country}` : null,
+      s.contact_email ? `Contacto: ${s.contact_email}` : null,
+      s.contact_phone ? `Tel: ${s.contact_phone}` : null,
+      r.destination ? `Destino: ${r.destination}` : null,
+      s.specs ? `Specs: ${s.specs}` : null,
+      s.notes ? `Notas: ${s.notes}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
+    const { data: trade, error } = await sb
+      .from("commodity_trades")
+      .insert({
+        reference,
+        created_by: me,
+        buyer_user_id: me,
+        seller_user_id: me,
+        commodity: r.commodity,
+        form: r.form,
+        quantity_t: qty,
+        incoterm: s.incoterm ?? r.incoterm,
+        unit_price_usd: price,
+        total_value_usd: total,
+        stage: "icpo",
+        status: "active",
+        notes: provenance,
+      })
+      .select("id")
+      .single();
+    if (error) {
+      if (isMissingTable(error.message))
+        throw new Error("El Trade Desk estará disponible tras aplicar la última migración.");
+      throw new Error(error.message);
+    }
+    const tradeId = (trade as { id: string }).id;
+
+    // Trazabilidad: evento de origen + cada documento del proveedor al timeline.
+    try {
+      await sb.from("trade_events").insert({
+        trade_id: tradeId,
+        actor_user_id: me,
+        kind: "created",
+        detail: `Operación creada desde la propuesta de ${s.supplier_name} (sourcing ${r.reference}).`,
+      });
+      const docs = Array.isArray(s.documents) ? s.documents : [];
+      if (docs.length > 0) {
+        await sb.from("trade_events").insert(
+          docs.map((d) => ({
+            trade_id: tradeId,
+            actor_user_id: me,
+            kind: "doc_uploaded",
+            doc_type: "proveedor",
+            detail: `${d.label}: ${d.url}`,
+          })),
+        );
+      }
+    } catch (e) {
+      console.error("[convertSubmissionToTrade] events failed", e);
+    }
+
+    // Vincula la propuesta al trade y la deja preseleccionada.
+    await sb
+      .from("sourcing_submissions")
+      .update({ trade_id: tradeId, status: "preseleccionada" })
+      .eq("id", s.id);
+
+    return { tradeId };
   });
 
 // ---------- Público: proveedor ve el requerimiento y sube propuesta ----------
