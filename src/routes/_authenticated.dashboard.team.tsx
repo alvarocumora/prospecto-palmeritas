@@ -91,7 +91,7 @@ function TeamPage() {
                 </div>
                 <button
                   onClick={async () => {
-                    const link = `${window.location.origin}/invitations/${inv.token}`;
+                    const link = `https://geocapitals.com/invitations/${inv.token}`;
                     await navigator.clipboard.writeText(link);
                     toast.success("Enlace copiado");
                   }}
