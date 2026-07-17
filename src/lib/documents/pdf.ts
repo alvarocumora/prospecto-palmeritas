@@ -41,7 +41,8 @@ export type RenderOptions = {
 };
 
 type JsPdfDoc = {
-  internal: { pageSize: { getWidth: () => number; getHeight: () => number }; getNumberOfPages: () => number };
+  internal: { pageSize: { getWidth: () => number; getHeight: () => number } };
+  getNumberOfPages: () => number;
   setFillColor: (...args: number[]) => void;
   setDrawColor: (...args: number[]) => void;
   setTextColor: (...args: number[]) => void;
@@ -165,7 +166,7 @@ export async function renderGeocapitalsPdf(
   const { default: jsPDF } = await import("jspdf");
   const autoTable = (await import("jspdf-autotable")).default;
 
-  const pdf = new jsPDF({ unit: "pt", format: "a4" }) as JsPdfDoc;
+  const pdf = new jsPDF({ unit: "pt", format: "a4" }) as unknown as JsPdfDoc;
   const pageW = pdf.internal.pageSize.getWidth();
   const pageH = pdf.internal.pageSize.getHeight();
   const marginX = 52;
@@ -502,7 +503,7 @@ export async function renderGeocapitalsPdf(
   }
 
   // ─── Header/footers finales, mini QR y paginación ───
-  const pageCount = pdf.internal.getNumberOfPages();
+  const pageCount = pdf.getNumberOfPages();
 
   for (let p = 1; p <= pageCount; p++) {
     pdf.setPage(p);
