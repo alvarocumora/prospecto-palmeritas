@@ -63,29 +63,30 @@ export const Route = createFileRoute("/live/losverdes")({
   }),
   component: LiveLosVerdesPage,
   pendingComponent: () => (
-    <div className="min-h-screen bg-bg-app flex items-center justify-center">
+    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center">
       <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
-        <Loader2 className="w-4 h-4 animate-spin text-gold" />
+        <Loader2 className="w-4 h-4 animate-spin text-primary" />
         Cargando Los Verdes…
       </div>
     </div>
   ),
   errorComponent: ({ error, reset }) => (
-    <div className="min-h-screen bg-bg-app flex items-center justify-center p-6">
+    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center p-6">
       <div className="max-w-md text-center space-y-3">
-        <AlertTriangle className="w-8 h-8 text-amber-400 mx-auto" />
+        <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
         <h1 className="text-lg font-semibold text-foreground">
           No pudimos cargar el visor Los Verdes
         </h1>
         <p className="text-xs font-mono text-muted-foreground break-words">
           {error instanceof Error ? error.message : String(error)}
         </p>
-        <Button size="sm" onClick={reset} className="bg-gold text-background hover:bg-gold/90">
+        <Button size="sm" onClick={reset} className="bg-primary text-primary-foreground hover:bg-primary/90">
           Reintentar
         </Button>
       </div>
     </div>
   ),
+
 });
 
 /** ErrorBoundary local para aislar el visor 3D del resto de la página. */
