@@ -74,6 +74,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
 });
 
 function DocumentPage() {
-  const { template, prefill } = Route.useLoaderData();
+  const { templateId, prefill } = Route.useLoaderData();
+  const template = TEMPLATE_BY_ID[templateId];
+  if (!template) return null;
   return <DocumentEditor template={template} prefill={prefill ?? undefined} />;
 }
