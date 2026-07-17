@@ -1,9 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
-import { getSupplierSheetByShareToken } from "@/lib/sourcing.functions";
+import {
+  getSupplierSheetByShareToken,
+  getSupplierFileUrlByShareToken,
+} from "@/lib/sourcing.functions";
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
 // comparte con el comprador final. Un token distinto al de submit.
@@ -124,16 +129,7 @@ function SupplierSheetPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {data.supplier.documents.map((d, i) => (
-                    <a
-                      key={i}
-                      href={d.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 text-[13px] px-3 py-1.5 rounded-lg border border-hairline bg-white hover:border-accent-brand"
-                    >
-                      <FileText className="w-3.5 h-3.5" /> {d.label}{" "}
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
+                    <SheetDocChip key={i} token={token} doc={d} />
                   ))}
                 </div>
               </div>
@@ -148,6 +144,44 @@ function SupplierSheetPage() {
       </main>
       <MarketingFooter />
     </div>
+  );
+}
+
+function SheetDocChip({
+  token,
+  doc,
+}: {
+  token: string;
+  doc: { label: string; url?: string | null; path?: string | null };
+}) {
+  const fileFn = useServerFn(getSupplierFileUrlByShareToken);
+  const [busy, setBusy] = useState(false);
+  const cls =
+    "inline-flex items-center gap-1.5 text-[13px] px-3 py-1.5 rounded-lg border border-hairline bg-white hover:border-accent-brand disabled:opacity-50";
+  if (doc.url) {
+    return (
+      <a href={doc.url} target="_blank" rel="noopener noreferrer" className={cls}>
+        <FileText className="w-3.5 h-3.5" /> {doc.label} <ExternalLink className="w-3 h-3" />
+      </a>
+    );
+  }
+  const open = async () => {
+    if (!doc.path) return;
+    setBusy(true);
+    try {
+      const res = await fileFn({ data: { token, path: doc.path } });
+      if (res?.url) window.open(res.url, "_blank", "noopener");
+      else toast.error("No se pudo abrir el archivo.");
+    } catch {
+      toast.error("No se pudo abrir el archivo.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button onClick={() => void open()} disabled={busy} className={cls}>
+      <FileText className="w-3.5 h-3.5" /> {doc.label} <ExternalLink className="w-3 h-3" />
+    </button>
   );
 }
 
