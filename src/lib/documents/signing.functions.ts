@@ -96,7 +96,7 @@ export const createSignRequest = createServerFn({ method: "POST" })
                   year: "numeric",
                 })
               : undefined,
-            signUrl: `https://geocapitals.com/firmar/${token}`,
+            signUrl: buildSignUrl(token),
           },
         });
         emailed = res.ok && "queued" in res && res.queued === true;
