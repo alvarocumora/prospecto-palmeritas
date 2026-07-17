@@ -28,20 +28,35 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
             >
               Planes
             </Link>
-            <a
-              href="https://geocapitals.com"
+            <Link
+              to="/catastro/global"
+              className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"
+              activeProps={{ className: "text-foreground bg-accent" }}
+            >
+              Multi-país
+            </Link>
+            <Link
+              to="/"
               className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"
             >
               Plataforma completa
-            </a>
+            </Link>
           </nav>
           {user ? (
-            <Link
-              to="/catastro/app/watchlist"
-              className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-            >
-              <Bell className="w-3.5 h-3.5" /> Mis monitoreos
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                to="/dashboard"
+                className="hidden sm:inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground hover:border-primary transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/catastro/app/watchlist"
+                className="inline-flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-mono font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+              >
+                <Bell className="w-3.5 h-3.5" /> Mis monitoreos
+              </Link>
+            </div>
           ) : (
             <Link
               to="/auth"

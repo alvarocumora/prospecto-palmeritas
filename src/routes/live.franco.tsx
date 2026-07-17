@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { DemoLiveBanner } from "@/features/marketing/DemoLiveBanner";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
 
 export const Route = createFileRoute("/live/franco")({
   head: () => ({
     meta: [
-      { title: "Live Map · Prospecto Franco — Geocapitals" },
+      { title: "Demo · Live Map · Prospecto Franco — Geocapitals" },
       {
         name: "description",
         content:
@@ -19,17 +20,8 @@ export const Route = createFileRoute("/live/franco")({
 function LiveMapFrancoPage() {
   return (
     <div>
-      <LiveBanner />
+      <DemoLiveBanner />
       <FrancoDashboard />
-    </div>
-  );
-}
-
-function LiveBanner() {
-  return (
-    <div className="bg-gold/10 border-b border-gold/30 px-6 py-2 flex items-center gap-2 font-mono text-[11px] uppercase tracking-wider text-gold">
-      <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-      Live Map · Acceso público · Confidencial
     </div>
   );
 }
