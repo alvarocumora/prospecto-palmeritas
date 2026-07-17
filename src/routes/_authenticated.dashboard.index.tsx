@@ -8,6 +8,7 @@ import {
   FileSignature,
   MessageSquare,
   Package,
+  PackageSearch,
   Plus,
   ArrowRight,
   AlertTriangle,
@@ -288,6 +289,16 @@ function BusinessHome() {
                 to="/dashboard/commodity-lots"
                 compact
               />
+              {!isInvestor && (
+                <Kpi
+                  icon={<PackageSearch className="w-4 h-4" />}
+                  label="Requerimientos"
+                  value={isLoading ? "…" : String(ov?.sourcing.openRequests ?? 0)}
+                  hint={`${ov?.sourcing.totalProposals ?? 0} propuestas recibidas`}
+                  to="/dashboard/sourcing"
+                  compact
+                />
+              )}
             </div>
 
             {/* Actividad reciente (trazabilidad) */}
