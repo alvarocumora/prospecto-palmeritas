@@ -124,7 +124,10 @@ export const getTradeDetail = createServerFn({ method: "GET" })
       .order("created_at", { ascending: true });
 
     // Nombres reales de las partes (para los documentos generados y la ficha).
-    const { data: profs } = await sb
+    // Con el RLS endurecido de profiles (sin PII entre usuarios) la lectura va
+    // por el cliente admin: el caller ya probó ser parte del trade vía RLS.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: profs } = await supabaseAdmin
       .from("profiles")
       .select("user_id, display_name, email")
       .in("user_id", [t.buyer_user_id, t.seller_user_id]);
@@ -173,7 +176,10 @@ export const createTrade = createServerFn({ method: "POST" })
     const sb = asSb(context.supabase);
     let counterparty = data.counterpartyUserId ?? null;
     if (!counterparty && data.counterpartyEmail) {
-      const { data: prof } = await sb
+      // profiles ya no expone email entre usuarios (RLS endurecido): la
+      // resolución email→usuario va por el cliente admin del servidor.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: prof } = await supabaseAdmin
         .from("profiles")
         .select("user_id")
         .eq("email", data.counterpartyEmail)

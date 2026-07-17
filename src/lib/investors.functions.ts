@@ -42,7 +42,10 @@ export const listInvestorProfiles = createServerFn({ method: "GET" })
     const ids = (rows ?? []).map((r) => r.user_id);
     let emails: Record<string, string | null> = {};
     if (ids.length) {
-      const { data: profs } = await supabase
+      // Staff verificado arriba; profiles ya no expone email entre usuarios
+      // (RLS endurecido), así que la hidratación va por el cliente admin.
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: profs } = await supabaseAdmin
         .from("profiles")
         .select("user_id, email, display_name")
         .in("user_id", ids);
@@ -67,7 +70,8 @@ export const approveInvestor = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
 
-    const { data: p } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: p } = await supabaseAdmin
       .from("profiles")
       .select("email")
       .eq("user_id", data.userId)
@@ -115,7 +119,8 @@ export const rejectInvestor = createServerFn({ method: "POST" })
 
     // Notificar el rechazo con el motivo — un rechazo silencioso destruye
     // la confianza más que el rechazo mismo.
-    const { data: p } = await supabase
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: p } = await supabaseAdmin
       .from("profiles")
       .select("email")
       .eq("user_id", data.userId)
