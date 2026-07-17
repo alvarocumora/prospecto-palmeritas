@@ -190,6 +190,40 @@ function ListingAdminPage() {
 
         <aside className="space-y-6">
           <ValuationPanel listingId={listing.id} />
+
+          {/* Documentos del deal de venta: NDA → LOI → Term Sheet → SPA */}
+          <section className="rounded border border-border bg-bg-panel p-4">
+            <h2 className="text-sm font-semibold mb-1">Documentos del deal</h2>
+            <p className="text-[11px] text-muted-foreground mb-3">
+              Genera y envía a firma electrónica los acuerdos de la venta — el interesado firma
+              desde un link, sin cuenta.
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  ["nda", "NDA"],
+                  ["loi", "LOI"],
+                  ["term-sheet", "Term Sheet"],
+                  ["spa", "Contrato SPA"],
+                ] as const
+              ).map(([tpl, label]) => (
+                <Link
+                  key={tpl}
+                  to="/dashboard/documentos/$templateId"
+                  params={{ templateId: tpl }}
+                  className="px-3 py-1.5 rounded border border-border text-xs font-mono hover:border-gold/60"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+            <Link
+              to="/dashboard/ni43101"
+              className="mt-3 inline-flex items-center gap-1 text-[11px] font-mono text-gold hover:underline"
+            >
+              Informe NI 43-101 del proyecto →
+            </Link>
+          </section>
         </aside>
       </div>
     </div>
