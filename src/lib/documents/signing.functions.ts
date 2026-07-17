@@ -4,6 +4,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { GeneratedDoc } from "@/lib/documents/model";
+import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import {
   generateSignToken,
   isSignTokenFormat,
