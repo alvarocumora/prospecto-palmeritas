@@ -18,6 +18,8 @@ import { template as inquiryUpdateBuyer } from "./inquiry-update-buyer";
 import { template as signRequestSigner } from "./sign-request-signer";
 import { template as signCompletedOwner } from "./sign-completed-owner";
 import { template as shipmentUpdate } from "./shipment-update";
+import { template as sourcingProposalReceived } from "./sourcing-proposal-received";
+import { template as sourcingConvertedSupplier } from "./sourcing-converted-supplier";
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
@@ -51,4 +53,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "sign-request-signer": signRequestSigner,
   "sign-completed-owner": signCompletedOwner,
   "shipment-update": shipmentUpdate,
+  "sourcing-proposal-received": sourcingProposalReceived,
+  "sourcing-converted-supplier": sourcingConvertedSupplier,
 };

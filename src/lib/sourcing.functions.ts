@@ -357,6 +357,30 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       .update({ trade_id: tradeId, status: "preseleccionada" })
       .eq("id", s.id);
 
+    // Avisar al proveedor que su propuesta avanzó a operación (si dejó email).
+    if (s.contact_email) {
+      try {
+        const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
+          import("@/lib/email/send-internal.server"),
+          import("@/lib/documents/company"),
+        ]);
+        await sendInternalEmail({
+          templateName: "sourcing-converted-supplier",
+          recipientEmail: s.contact_email,
+          idempotencyKey: `sourcing-converted:${s.id}`,
+          templateData: {
+            supplierName: s.supplier_name,
+            reference: r.reference,
+            commodity: r.commodity ?? undefined,
+            tradeReference: reference,
+            senderCompany: OWN_COMPANY.name,
+          },
+        });
+      } catch (e) {
+        console.error("[convertSubmissionToTrade] notify supplier failed", e);
+      }
+    }
+
     return { tradeId };
   });
 
@@ -425,11 +449,18 @@ export const submitSourcingProposal = createServerFn({ method: "POST" })
     if (!sb) throw new Error("Servicio no disponible.");
     const { data: req } = await sb
       .from("sourcing_requests")
-      .select("id, status, expires_at")
+      .select("id, status, expires_at, owner_user_id, reference, commodity")
       .eq("submit_token_hash", await sha256Hex(data.token))
       .maybeSingle();
     if (!req) throw new Error("Requerimiento no encontrado.");
-    const r = req as { id: string; status: string; expires_at: string | null };
+    const r = req as {
+      id: string;
+      status: string;
+      expires_at: string | null;
+      owner_user_id: string;
+      reference: string;
+      commodity: string | null;
+    };
     if (r.status !== "abierto") throw new Error("Este requerimiento ya no recibe propuestas.");
     if (r.expires_at && new Date(r.expires_at) < new Date())
       throw new Error("El link expiró. Solicita uno nuevo al comprador.");
@@ -450,6 +481,38 @@ export const submitSourcingProposal = createServerFn({ method: "POST" })
       documents: data.documents ?? [],
     });
     if (error) throw new Error(error.message);
+
+    // Avisar al dueño del requerimiento que llegó una propuesta (best-effort).
+    try {
+      const { data: owner } = await sb
+        .from("profiles")
+        .select("email")
+        .eq("user_id", r.owner_user_id)
+        .maybeSingle();
+      const ownerEmail = (owner as { email: string | null } | null)?.email;
+      if (ownerEmail) {
+        const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+        await sendInternalEmail({
+          templateName: "sourcing-proposal-received",
+          recipientEmail: ownerEmail,
+          idempotencyKey: `sourcing-proposal:${r.id}:${data.supplierName}:${Date.now()}`,
+          templateData: {
+            reference: r.reference,
+            commodity: r.commodity ?? undefined,
+            supplierName: data.supplierName,
+            supplierCompany: data.supplierCompany ?? undefined,
+            offerPrice:
+              data.offerPriceUsdT != null
+                ? `US$ ${Math.round(data.offerPriceUsdT).toLocaleString("es-CL")}/t`
+                : undefined,
+            offerQuantity: data.offerQuantityT != null ? `${data.offerQuantityT} t` : undefined,
+          },
+        });
+      }
+    } catch (e) {
+      console.error("[submitSourcingProposal] notify owner failed", e);
+    }
+
     return { ok: true as const };
   });
 
