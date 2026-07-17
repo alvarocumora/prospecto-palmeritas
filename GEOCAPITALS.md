@@ -153,6 +153,14 @@ Agrupadas en 6 secciones del CommandRail:
 
 Otros: `3d-pro`, `geology3d`, `field-map`, `map`, `command-center`, `opportunities` (IA), `palmeras`, `lv5-page5`, `sat3d`, `mag-revalidations`, `targets/ai-brief`, `project-report`, `catastro/holders/$id`, `geophysics/$surveyId(/field)`.
 
+#### Mesa de Origen (`/dashboard/supply-desk`)
+
+Capa B2B de originación de commodities, aguas arriba del Trade Desk:
+
+- **Mandatos de compra** (`supply_mandates`): demanda real de compradores (ej. antimonio para refinería en Florida USA, cátodo/concentrado de cobre, oro bullion/doré) con spec, cantidad, incoterm, base de precio e instrumento de pago. Plantillas precargadas para la demanda vigente.
+- **Red de proveedores** (`supply_partners`): asociados que son o consiguen proveedores de materia prima (productor, trader, agregador, agente, refinería) con capacidad mensual y vetting KYC (prospecto → contactado → NDA → docs → verificado).
+- **Matching** (`mandate_matches`): pipeline proveedor↔mandato (identificado → contactado → NCNDA → muestra/ensayo → calificado → oferta → asignado → trade) con cobertura % del mandato; al llegar a Trade se enlaza con `commodity_trades` y sigue su ciclo documental (ICPO · FCO · SPA · SBLC/DLC) en el Trade Desk.
+
 ### 5.3 Reportes especiales
 
 - `/reports/losverdes/pre43101` — reporte público pre-NI-43-101.

@@ -29,6 +29,7 @@ import {
   FileText,
   X,
   Briefcase,
+  Factory,
   Handshake,
   Ship,
   TrendingUp,
@@ -141,6 +142,12 @@ function AuthenticatedLayout() {
       to: "/dashboard/my-inquiries",
       icon: <MessageSquare className="w-3.5 h-3.5" />,
       label: "Cotizaciones",
+      group: "NEGOCIO",
+    },
+    !isInvestor && {
+      to: "/dashboard/supply-desk",
+      icon: <Factory className="w-3.5 h-3.5" />,
+      label: "Mesa de Origen",
       group: "NEGOCIO",
     },
     {
