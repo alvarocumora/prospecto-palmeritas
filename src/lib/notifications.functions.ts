@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { z } from "zod";
+import { publicUrl } from "@/lib/publicUrl";
 
 const InviteSchema = z.object({
   invitationId: z.string().uuid(),
