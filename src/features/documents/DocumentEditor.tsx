@@ -219,7 +219,7 @@ export function DocumentEditor({
       const { token } = await signFn({
         data: { templateId: template.id, doc: doc as unknown as SignableDoc },
       });
-      const url = `${window.location.origin}/firmar/${token}`;
+      const url = `https://geocapitals.com/firmar/${token}`;
       setSignLink(url);
       await navigator.clipboard.writeText(url).catch(() => {});
       toast.success("Solicitud de firma creada. Link copiado — compártelo con la contraparte.");
