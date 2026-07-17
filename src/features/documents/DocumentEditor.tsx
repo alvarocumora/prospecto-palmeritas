@@ -207,6 +207,8 @@ export function DocumentEditor({
 
   const [signLink, setSignLink] = useState<string | null>(null);
   const [requestingSign, setRequestingSign] = useState(false);
+  const [signerEmail, setSignerEmail] = useState("");
+  const [signerName, setSignerName] = useState("");
   const signFn = useServerFn(createSignRequest);
 
   const requestSignature = async () => {
@@ -216,13 +218,22 @@ export function DocumentEditor({
     }
     setRequestingSign(true);
     try {
-      const { token } = await signFn({
-        data: { templateId: template.id, doc: doc as unknown as SignableDoc },
+      const { token, emailed } = await signFn({
+        data: {
+          templateId: template.id,
+          doc: doc as unknown as SignableDoc,
+          signerEmail: signerEmail.trim() || undefined,
+          signerName: signerName.trim() || undefined,
+        },
       });
       const url = `https://geocapitals.com/firmar/${token}`;
       setSignLink(url);
       await navigator.clipboard.writeText(url).catch(() => {});
-      toast.success("Solicitud de firma creada. Link copiado — compártelo con la contraparte.");
+      toast.success(
+        emailed
+          ? `Solicitud creada y link enviado por email a ${signerEmail.trim()}.`
+          : "Solicitud de firma creada. Link copiado — compártelo con la contraparte.",
+      );
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo crear la solicitud de firma.");
     } finally {
@@ -392,6 +403,30 @@ export function DocumentEditor({
             >
               <RotateCcw className="w-4 h-4" /> Restaurar
             </button>
+          </div>
+
+          <div className="mt-3 grid sm:grid-cols-2 gap-2">
+            <label className="text-xs">
+              <span className="block text-content-subtle mb-1">
+                Email del firmante (opcional — enviamos el link)
+              </span>
+              <input
+                type="email"
+                value={signerEmail}
+                onChange={(e) => setSignerEmail(e.target.value)}
+                placeholder="contraparte@empresa.com"
+                className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-xs">
+              <span className="block text-content-subtle mb-1">Nombre esperado (opcional)</span>
+              <input
+                value={signerName}
+                onChange={(e) => setSignerName(e.target.value)}
+                placeholder="Nombre de quien firmará"
+                className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm"
+              />
+            </label>
           </div>
 
           {signLink && (
