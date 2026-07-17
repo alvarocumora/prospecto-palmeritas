@@ -69,7 +69,7 @@ export const getProjectFacts = createServerFn({ method: "GET" })
 
     // 2. Resolver proyecto (fuente canónica de centroide oficial).
     const projectId = listing?.project_id ?? data.projectId ?? null;
-    let project: {
+    type ProjectRow = {
       id: string;
       name: string;
       code: string | null;
@@ -78,14 +78,15 @@ export const getProjectFacts = createServerFn({ method: "GET" })
       region: string | null;
       center_lat: number | null;
       center_lng: number | null;
-    } | null = null;
+    };
+    let project: ProjectRow | null = null;
     if (projectId) {
       const { data: p } = await sb
         .from("projects")
         .select("id,name,code,commodity,country,region,center_lat,center_lng")
         .eq("id", projectId)
         .maybeSingle();
-      project = (p as typeof project) ?? null;
+      project = (p as ProjectRow | null) ?? null;
     }
 
     if (!listing && !project) return null;
