@@ -8,6 +8,7 @@ import { InviteMemberDialog } from "@/components/team/InviteMemberDialog";
 import { CapabilitiesMatrix } from "@/components/team/CapabilitiesMatrix";
 import { UserPlus, Mail, Trash2, Copy, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
+import { invitationUrl } from "@/lib/publicUrl";
 
 export const Route = createFileRoute("/_authenticated/dashboard/team")({
   head: () => ({ meta: [{ title: "Equipo — Geocapitals" }] }),
