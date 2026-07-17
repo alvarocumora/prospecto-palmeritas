@@ -50,6 +50,18 @@ type Poly = {
   areaHa: number;
 };
 
+// Anillo válido: array de pares [lng, lat] numéricos. Geometrías malformadas
+// en la base (proyectos de usuarios) no pueden tumbar el visor del dashboard.
+function isValidRing(ring: unknown): ring is number[][] {
+  return (
+    Array.isArray(ring) &&
+    ring.length >= 3 &&
+    ring.every(
+      (p) => Array.isArray(p) && p.length >= 2 && Number.isFinite(p[0]) && Number.isFinite(p[1]),
+    )
+  );
+}
+
 function centroidOfRing(ring: number[][]): [number, number] {
   let sx = 0;
   let sy = 0;
@@ -62,7 +74,7 @@ function centroidOfRing(ring: number[][]): [number, number] {
 
 function toPolygons(g: GeoJsonGeom): number[][][][] {
   if (g.type === "Polygon") return [g.coordinates];
-  return g.coordinates;
+  return Array.isArray(g.coordinates) ? g.coordinates : [];
 }
 
 export function useSatAnomaliesLayer(projectId: string | null, visible = true) {
@@ -95,8 +107,8 @@ export function useSatAnomaliesLayer(projectId: string | null, visible = true) {
       const polygons = toPolygons(r.geometry);
       if (polygons.length === 0) continue;
       // Centroide aproximado: del primer anillo exterior del primer polígono.
-      const outer = polygons[0][0];
-      if (!outer || outer.length === 0) continue;
+      const outer = polygons[0]?.[0];
+      if (!isValidRing(outer)) continue;
       const [cLng, cLat] = centroidOfRing(outer);
       const score = Math.max(0, Math.min(1, Number(r.score ?? 0)));
       const elevation = 80 + score * 520; // 80m..600m de altura visual
