@@ -116,6 +116,18 @@ export async function renderGeocapitalsPdf(
     pdf.rect(0, 0, pageW, 6, "F");
     pdf.setFillColor(...COBALT);
     pdf.rect(0, 6, pageW * 0.26, 2, "F");
+    // Marca de agua diagonal tenue (identidad unificada).
+    pdf.saveGraphicsState();
+    // @ts-expect-error jsPDF GState typing incomplete
+    pdf.setGState(new (pdf as any).GState({ opacity: 0.045 }));
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(96);
+    pdf.setTextColor(...COBALT);
+    pdf.text("GEOCAPITALS", pageW / 2, pageH / 2, {
+      align: "center",
+      angle: 32,
+    });
+    pdf.restoreGraphicsState();
   };
   paintPaper();
 
