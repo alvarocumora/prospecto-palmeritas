@@ -450,7 +450,7 @@ async function fetchComplianceAnnex(
         rules_total: stdRules.length,
       };
     }
-    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const { complianceVerifyUrl } = await import("@/lib/publicUrl");
     return {
       reportId,
       globalScore: report.compliance_score_cached ?? 0,
@@ -458,7 +458,7 @@ async function fetchComplianceAnnex(
       evaluatedAt: report.compliance_evaluated_at,
       byStandard: byStd,
       rules: detailRules,
-      verifyUrl: `${origin}/api/public/verify-compliance/${reportId}`,
+      verifyUrl: complianceVerifyUrl(reportId),
     };
   } catch {
     return null;
