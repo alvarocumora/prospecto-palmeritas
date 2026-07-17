@@ -13961,6 +13961,39 @@ export type Database = {
         }
         Relationships: []
       }
+      profiles_directory: {
+        Row: {
+          avatar_url: string | null
+          country: string | null
+          display_name: string | null
+          id: string | null
+          language: string | null
+          organization: string | null
+          specialty: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          country?: string | null
+          display_name?: string | null
+          id?: string | null
+          language?: string | null
+          organization?: string | null
+          specialty?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          country?: string | null
+          display_name?: string | null
+          id?: string | null
+          language?: string | null
+          organization?: string | null
+          specialty?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       v_satellite_run_traceability: {
         Row: {
           audit_log_count: number | null
