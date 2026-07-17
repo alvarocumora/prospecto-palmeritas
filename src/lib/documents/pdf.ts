@@ -192,7 +192,7 @@ export async function renderGeocapitalsPdf(doc: GeneratedDoc): Promise<void> {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(7);
     pdf.setTextColor(...INK);
-    const signUrl = `https://geocapitals.com/dashboard/documentos/${doc.docType}`;
+    const signUrl = publicUrl(`/dashboard/documentos/${doc.docType}`);
     pdf.textWithLink(
       `Firma y verificación electrónica: ${signUrl} · Ref ${doc.reference}`,
       marginX,
