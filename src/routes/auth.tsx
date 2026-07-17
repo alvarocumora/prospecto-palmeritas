@@ -155,7 +155,7 @@ function AuthPage() {
   const handleReset = async () => {
     if (!email) return toast.error("Ingresa tu email primero");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `https://geocapitals.com/reset-password`,
     });
     if (error) toast.error(error.message);
     else toast.success("Revisa tu email para restablecer la contraseña");
