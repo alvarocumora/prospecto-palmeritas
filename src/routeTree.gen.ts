@@ -123,6 +123,7 @@ import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastr
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
+import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -766,6 +767,12 @@ const ApiPublicNotificationsCatastroExpirationsRoute =
     path: '/api/public/notifications/catastro-expirations',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AuthenticatedDashboardTradesTradeIdRoute =
+  AuthenticatedDashboardTradesTradeIdRouteImport.update({
+    id: '/dashboard/trades_/$tradeId',
+    path: '/dashboard/trades/$tradeId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardTargetsAiBriefRoute =
   AuthenticatedDashboardTargetsAiBriefRouteImport.update({
     id: '/ai-brief',
@@ -938,6 +945,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1063,6 +1071,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1190,6 +1199,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
+  '/_authenticated/dashboard/trades_/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1317,6 +1327,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
+    | '/dashboard/trades/$tradeId'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -1442,6 +1453,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/targets/ai-brief'
+    | '/dashboard/trades/$tradeId'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -1568,6 +1580,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/targets/ai-brief'
+    | '/_authenticated/dashboard/trades_/$tradeId'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -2445,6 +2458,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard/trades_/$tradeId': {
+      id: '/_authenticated/dashboard/trades_/$tradeId'
+      path: '/dashboard/trades/$tradeId'
+      fullPath: '/dashboard/trades/$tradeId'
+      preLoaderRoute: typeof AuthenticatedDashboardTradesTradeIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/targets/ai-brief': {
       id: '/_authenticated/dashboard/targets/ai-brief'
       path: '/ai-brief'
@@ -2664,6 +2684,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  AuthenticatedDashboardTradesTradeIdRoute: typeof AuthenticatedDashboardTradesTradeIdRoute
   AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
 }
 
@@ -2735,6 +2756,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedDashboardDocumentosTemplateIdRoute:
     AuthenticatedDashboardDocumentosTemplateIdRoute,
+  AuthenticatedDashboardTradesTradeIdRoute:
+    AuthenticatedDashboardTradesTradeIdRoute,
   AuthenticatedDashboardDocumentosIndexRoute:
     AuthenticatedDashboardDocumentosIndexRoute,
 }

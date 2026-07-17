@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Ship, Plus, ExternalLink, AlertTriangle, Anchor } from "lucide-react";
+import { Ship, Plus, ExternalLink, AlertTriangle, Anchor, Route as RouteIcon } from "lucide-react";
 import {
   listMyShipments,
   createShipment,
@@ -263,6 +263,13 @@ function EnviosPage() {
                           Tracking <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
+                      <Link
+                        to="/dashboard/trades/$tradeId"
+                        params={{ tradeId: s.trade_id }}
+                        className="text-primary hover:underline inline-flex items-center gap-0.5"
+                      >
+                        <RouteIcon className="w-3 h-3" /> Ver trazabilidad
+                      </Link>
                     </div>
                     <div className="mt-3">
                       <StatusTimeline s={s} />
