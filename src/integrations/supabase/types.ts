@@ -4022,6 +4022,69 @@ export type Database = {
         }
         Relationships: []
       }
+      document_sign_requests: {
+        Row: {
+          created_at: string
+          created_by: string
+          doc: Json
+          doc_hash: string
+          expires_at: string
+          id: string
+          reference: string
+          signature_hash: string | null
+          signed_at: string | null
+          signed_by_name: string | null
+          signer_email: string | null
+          signer_name_expected: string | null
+          status: string
+          template_id: string
+          title: string
+          token_hash: string
+          token_prefix: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          doc: Json
+          doc_hash: string
+          expires_at?: string
+          id?: string
+          reference: string
+          signature_hash?: string | null
+          signed_at?: string | null
+          signed_by_name?: string | null
+          signer_email?: string | null
+          signer_name_expected?: string | null
+          status?: string
+          template_id: string
+          title: string
+          token_hash: string
+          token_prefix: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          doc?: Json
+          doc_hash?: string
+          expires_at?: string
+          id?: string
+          reference?: string
+          signature_hash?: string | null
+          signed_at?: string | null
+          signed_by_name?: string | null
+          signer_email?: string | null
+          signer_name_expected?: string | null
+          status?: string
+          template_id?: string
+          title?: string
+          token_hash?: string
+          token_prefix?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       document_signatures: {
         Row: {
           created_at: string
