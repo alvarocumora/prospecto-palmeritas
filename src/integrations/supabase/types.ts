@@ -3791,6 +3791,76 @@ export type Database = {
           },
         ]
       }
+      deal_commissions: {
+        Row: {
+          commission_pct: number | null
+          commission_usd: number | null
+          created_at: string
+          deal_value_usd: number | null
+          id: string
+          listing_id: string | null
+          notes: string | null
+          owner_user_id: string
+          partner_id: string
+          settled_at: string | null
+          status: string
+          trade_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          commission_pct?: number | null
+          commission_usd?: number | null
+          created_at?: string
+          deal_value_usd?: number | null
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          owner_user_id: string
+          partner_id: string
+          settled_at?: string | null
+          status?: string
+          trade_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          commission_pct?: number | null
+          commission_usd?: number | null
+          created_at?: string
+          deal_value_usd?: number | null
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          owner_user_id?: string
+          partner_id?: string
+          settled_at?: string | null
+          status?: string
+          trade_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_commissions_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_commissions_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_commissions_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_comparables: {
         Row: {
           comparable_project: string
@@ -4251,6 +4321,7 @@ export type Database = {
           title: string
           token_hash: string
           token_prefix: string
+          trade_id: string | null
           updated_at: string
         }
         Insert: {
@@ -4271,6 +4342,7 @@ export type Database = {
           title: string
           token_hash: string
           token_prefix: string
+          trade_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -4291,9 +4363,18 @@ export type Database = {
           title?: string
           token_hash?: string
           token_prefix?: string
+          trade_id?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "document_sign_requests_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_signatures: {
         Row: {
@@ -13167,6 +13248,140 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sourcing_requests: {
+        Row: {
+          commodity: string
+          created_at: string
+          destination: string | null
+          expires_at: string
+          form: string | null
+          id: string
+          incoterm: string | null
+          notes: string | null
+          owner_user_id: string
+          quantity_t: number | null
+          reference: string
+          specs: string | null
+          status: string
+          submit_token_hash: string
+          submit_token_prefix: string
+          target_price_usd_t: number | null
+          updated_at: string
+        }
+        Insert: {
+          commodity: string
+          created_at?: string
+          destination?: string | null
+          expires_at?: string
+          form?: string | null
+          id?: string
+          incoterm?: string | null
+          notes?: string | null
+          owner_user_id: string
+          quantity_t?: number | null
+          reference: string
+          specs?: string | null
+          status?: string
+          submit_token_hash: string
+          submit_token_prefix: string
+          target_price_usd_t?: number | null
+          updated_at?: string
+        }
+        Update: {
+          commodity?: string
+          created_at?: string
+          destination?: string | null
+          expires_at?: string
+          form?: string | null
+          id?: string
+          incoterm?: string | null
+          notes?: string | null
+          owner_user_id?: string
+          quantity_t?: number | null
+          reference?: string
+          specs?: string | null
+          status?: string
+          submit_token_hash?: string
+          submit_token_prefix?: string
+          target_price_usd_t?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sourcing_submissions: {
+        Row: {
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          documents: Json
+          id: string
+          incoterm: string | null
+          lead_time: string | null
+          notes: string | null
+          offer_price_usd_t: number | null
+          offer_quantity_t: number | null
+          request_id: string
+          share_token_hash: string | null
+          share_token_prefix: string | null
+          specs: string | null
+          status: string
+          supplier_company: string | null
+          supplier_country: string | null
+          supplier_name: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          documents?: Json
+          id?: string
+          incoterm?: string | null
+          lead_time?: string | null
+          notes?: string | null
+          offer_price_usd_t?: number | null
+          offer_quantity_t?: number | null
+          request_id: string
+          share_token_hash?: string | null
+          share_token_prefix?: string | null
+          specs?: string | null
+          status?: string
+          supplier_company?: string | null
+          supplier_country?: string | null
+          supplier_name: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          documents?: Json
+          id?: string
+          incoterm?: string | null
+          lead_time?: string | null
+          notes?: string | null
+          offer_price_usd_t?: number | null
+          offer_quantity_t?: number | null
+          request_id?: string
+          share_token_hash?: string | null
+          share_token_prefix?: string | null
+          specs?: string | null
+          status?: string
+          supplier_company?: string | null
+          supplier_country?: string | null
+          supplier_name?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_submissions_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_requests"
             referencedColumns: ["id"]
           },
         ]
