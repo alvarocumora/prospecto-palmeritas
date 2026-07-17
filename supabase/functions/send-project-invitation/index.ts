@@ -64,9 +64,8 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Build acceptance link (frontend handles the rest)
-    const origin = req.headers.get("origin") ?? "";
-    const link = `${origin}/invitations/${data.token}`;
+    // Build acceptance link — siempre en geocapitals.com, no en el preview.
+    const link = `https://geocapitals.com/invitations/${data.token}`;
 
     // Email delivery placeholder — log for now, plug Resend/Lovable Emails later.
     console.log(`[invite] ${email} → ${link} (expires ${data.expires_at})`);
