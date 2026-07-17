@@ -3,9 +3,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { PackageSearch, Plus, Trash2, CheckCircle2, Loader2 } from "lucide-react";
+import { PackageSearch, Plus, Trash2, CheckCircle2, Loader2, Upload, FileText } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
-import { getSourcingRequestByToken, submitSourcingProposal } from "@/lib/sourcing.functions";
+import {
+  getSourcingRequestByToken,
+  submitSourcingProposal,
+  requestSupplierUpload,
+} from "@/lib/sourcing.functions";
+import { supabase } from "@/integrations/supabase/client";
 
 // Página PÚBLICA: un asociado/proveedor abre el link tokenizado, ve qué se
 // busca y sube su propuesta con documentos. Sin cuenta.
@@ -38,6 +43,7 @@ function ProveedorPage() {
   const { token } = Route.useParams();
   const getFn = useServerFn(getSourcingRequestByToken);
   const submitFn = useServerFn(submitSourcingProposal);
+  const uploadFn = useServerFn(requestSupplierUpload);
 
   const { data: req, isLoading } = useQuery({
     queryKey: ["sourcing-public", token],
@@ -45,8 +51,11 @@ function ProveedorPage() {
     retry: false,
   });
 
+  type DocRef = { label: string; url?: string; path?: string };
   const [form, setForm] = useState(EMPTY);
-  const [docs, setDocs] = useState<Array<{ label: string; url: string }>>([]);
+  const [docs, setDocs] = useState<DocRef[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<{ label: string; path: string }>>([]);
+  const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -54,6 +63,35 @@ function ProveedorPage() {
   const setDoc = (i: number, k: "label" | "url", v: string) =>
     setDocs((d) => d.map((x, j) => (j === i ? { ...x, [k]: v } : x)));
   const removeDoc = (i: number) => setDocs((d) => d.filter((_, j) => j !== i));
+
+  const onPickFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Máximo 50 MB por archivo.");
+      return;
+    }
+    setUploading(true);
+    try {
+      const {
+        bucket,
+        path,
+        token: upToken,
+      } = await uploadFn({
+        data: { token, fileName: file.name },
+      });
+      const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
+      if (up.error) throw up.error;
+      setUploadedFiles((f) => [...f, { label: file.name, path }]);
+      toast.success(`Subido: ${file.name}`);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo subir el archivo.");
+    } finally {
+      setUploading(false);
+    }
+  };
+  const removeFile = (i: number) => setUploadedFiles((f) => f.filter((_, j) => j !== i));
 
   const onSubmit = async () => {
     if (form.supplierName.trim().length < 2) {
@@ -76,9 +114,12 @@ function ProveedorPage() {
           leadTime: form.leadTime || undefined,
           specs: form.specs || undefined,
           notes: form.notes || undefined,
-          documents: docs
-            .filter((d) => d.label.trim() && d.url.trim())
-            .map((d) => ({ label: d.label.trim(), url: d.url.trim() })),
+          documents: [
+            ...uploadedFiles.map((f) => ({ label: f.label, path: f.path })),
+            ...docs
+              .filter((d) => d.label.trim() && (d.url ?? "").trim())
+              .map((d) => ({ label: d.label.trim(), url: (d.url ?? "").trim() })),
+          ],
         },
       });
       setDone(true);
@@ -191,17 +232,53 @@ function ProveedorPage() {
               />
             </label>
 
-            {/* Documentos (links) */}
+            {/* Documentos: subir archivos reales (assay, títulos, data sheet) */}
             <div className="mt-4">
-              <div className="flex items-center justify-between mb-1">
-                <span className="text-xs text-content-subtle">
-                  Documentos (assay, certificados, propuesta) — pega el link
+              <span className="text-xs text-content-subtle">
+                Documentos (assay, certificados, títulos de la mina, data sheet)
+              </span>
+              <div className="mt-1.5 flex items-center gap-2 flex-wrap">
+                <label className="inline-flex items-center gap-1.5 text-[12px] px-3 py-2 rounded-lg border border-hairline bg-white hover:border-accent-brand cursor-pointer">
+                  {uploading ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Upload className="w-3.5 h-3.5" />
+                  )}
+                  {uploading ? "Subiendo…" : "Subir archivo"}
+                  <input
+                    type="file"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => void onPickFile(e)}
+                  />
+                </label>
+                <span className="text-[10px] text-content-subtle">
+                  PDF, imágenes, Excel · máx 50 MB
                 </span>
+              </div>
+              {uploadedFiles.map((f, i) => (
+                <div
+                  key={f.path}
+                  className="mt-2 flex items-center gap-2 rounded-lg border border-hairline bg-white px-3 py-2"
+                >
+                  <FileText className="w-3.5 h-3.5 text-accent-brand shrink-0" />
+                  <span className="text-[13px] flex-1 truncate">{f.label}</span>
+                  <button
+                    onClick={() => removeFile(i)}
+                    className="shrink-0 p-1 rounded hover:bg-slate-50"
+                  >
+                    <Trash2 className="w-4 h-4 text-red-500" />
+                  </button>
+                </div>
+              ))}
+
+              <div className="flex items-center justify-between mb-1 mt-4">
+                <span className="text-xs text-content-subtle">…o pega un link externo</span>
                 <button
                   onClick={addDoc}
                   className="text-[11px] font-mono text-accent-brand hover:underline inline-flex items-center gap-1"
                 >
-                  <Plus className="w-3 h-3" /> Agregar
+                  <Plus className="w-3 h-3" /> Agregar link
                 </button>
               </div>
               {docs.map((d, i) => (
@@ -213,7 +290,7 @@ function ProveedorPage() {
                     className="w-1/3 px-3 py-2 rounded-lg border border-hairline bg-white text-sm"
                   />
                   <input
-                    value={d.url}
+                    value={d.url ?? ""}
                     placeholder="https://…"
                     onChange={(e) => setDoc(i, "url", e.target.value)}
                     className="flex-1 px-3 py-2 rounded-lg border border-hairline bg-white text-sm"

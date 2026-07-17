@@ -22,6 +22,7 @@ import {
   setRequestStatus,
   generateSubmissionShareLink,
   convertSubmissionToTrade,
+  getSupplierFileUrl,
   type SubmissionRow,
 } from "@/lib/sourcing.functions";
 import { supplierSheetUrl } from "@/lib/publicUrl";
@@ -198,6 +199,50 @@ function RequestDetail() {
   );
 }
 
+function DocChip({
+  submissionId,
+  doc,
+}: {
+  submissionId: string;
+  doc: { label: string; url?: string | null; path?: string | null };
+}) {
+  const fileFn = useServerFn(getSupplierFileUrl);
+  const [busy, setBusy] = useState(false);
+  if (doc.url) {
+    return (
+      <a
+        href={doc.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-border hover:bg-accent"
+      >
+        <FileText className="w-3 h-3" /> {doc.label} <ExternalLink className="w-3 h-3" />
+      </a>
+    );
+  }
+  const open = async () => {
+    if (!doc.path) return;
+    setBusy(true);
+    try {
+      const { url } = await fileFn({ data: { submissionId, path: doc.path } });
+      window.open(url, "_blank", "noopener");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo abrir el archivo.");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={() => void open()}
+      disabled={busy}
+      className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-border hover:bg-accent disabled:opacity-50"
+    >
+      <FileText className="w-3 h-3" /> {doc.label} <ExternalLink className="w-3 h-3" />
+    </button>
+  );
+}
+
 function SubmissionCard({
   s,
   shareLink,
@@ -265,15 +310,7 @@ function SubmissionCard({
       {s.documents.length > 0 && (
         <div className="mt-2 flex flex-wrap gap-2">
           {s.documents.map((d, i) => (
-            <a
-              key={i}
-              href={d.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[11px] px-2 py-1 rounded border border-border hover:bg-accent"
-            >
-              <FileText className="w-3 h-3" /> {d.label} <ExternalLink className="w-3 h-3" />
-            </a>
+            <DocChip key={i} submissionId={s.id} doc={d} />
           ))}
         </div>
       )}

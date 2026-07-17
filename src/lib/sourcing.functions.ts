@@ -30,10 +30,29 @@ function serviceClient(): SupabaseClient | null {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-const DocRefSchema = z.object({
-  label: z.string().trim().min(1).max(120),
-  url: z.string().trim().url().max(500),
-});
+// Un documento aportado por el proveedor: un link externo (url) o un archivo
+// subido a storage (path). Debe traer al menos uno de los dos.
+const DocRefSchema = z
+  .object({
+    label: z.string().trim().min(1).max(160),
+    url: z.string().trim().url().max(500).optional(),
+    path: z.string().trim().max(500).optional(),
+  })
+  .refine((d) => Boolean(d.url) || Boolean(d.path), {
+    message: "Cada documento necesita un link o un archivo.",
+  });
+
+const SOURCING_BUCKET = "sourcing-files";
+
+async function ensureSourcingBucket(sb: SupabaseClient) {
+  const { data } = await sb.storage.getBucket(SOURCING_BUCKET);
+  if (!data) {
+    await sb.storage.createBucket(SOURCING_BUCKET, {
+      public: false,
+      fileSizeLimit: 50 * 1024 * 1024, // 50 MB por archivo
+    });
+  }
+}
 
 // ---------- Dueño: crear requerimiento ----------
 const CreateRequestInput = z.object({
@@ -150,7 +169,7 @@ export type SubmissionRow = {
   lead_time: string | null;
   specs: string | null;
   notes: string | null;
-  documents: Array<{ label: string; url: string }>;
+  documents: Array<{ label: string; url?: string | null; path?: string | null }>;
   status: string;
   share_token_prefix: string | null;
   trade_id: string | null;
@@ -343,7 +362,7 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
             actor_user_id: me,
             kind: "doc_uploaded",
             doc_type: "proveedor",
-            detail: `${d.label}: ${d.url}`,
+            detail: d.url ? `${d.label}: ${d.url}` : `${d.label} (archivo del proveedor)`,
           })),
         );
       }
@@ -382,6 +401,93 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
     }
 
     return { tradeId };
+  });
+
+// ---------- Público: proveedor sube un archivo (gated por submit token) ------
+export const requestSupplierUpload = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().trim().min(10).max(120),
+        fileName: z.string().trim().min(1).max(300),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }): Promise<{ bucket: string; path: string; token: string }> => {
+    if (!isSubmitTokenFormat(data.token)) throw new Error("Link inválido.");
+    const sb = serviceClient();
+    if (!sb) throw new Error("Servicio no disponible.");
+    const { data: req } = await sb
+      .from("sourcing_requests")
+      .select("id, status, expires_at")
+      .eq("submit_token_hash", await sha256Hex(data.token))
+      .maybeSingle();
+    if (!req) throw new Error("Requerimiento no encontrado.");
+    const r = req as { id: string; status: string; expires_at: string | null };
+    if (r.status !== "abierto") throw new Error("Este requerimiento ya no recibe archivos.");
+    if (r.expires_at && new Date(r.expires_at) < new Date()) throw new Error("El link expiró.");
+
+    await ensureSourcingBucket(sb);
+    const safe = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${r.id}/${globalThis.crypto.randomUUID()}-${safe}`;
+    const { data: signed, error } = await sb.storage
+      .from(SOURCING_BUCKET)
+      .createSignedUploadUrl(path);
+    if (error || !signed) throw new Error(error?.message ?? "No se pudo preparar la subida.");
+    return { bucket: SOURCING_BUCKET, path, token: signed.token };
+  });
+
+// ---------- Descarga firmada de un documento subido ----------
+// Verifica que el path pertenezca a una propuesta que el solicitante puede ver:
+// el dueño del requerimiento (autenticado) o el comprador con el share token.
+async function signedSupplierFileUrl(sb: SupabaseClient, path: string): Promise<string> {
+  const { data: signed, error } = await sb.storage
+    .from(SOURCING_BUCKET)
+    .createSignedUrl(path, 60 * 10);
+  if (error || !signed) throw new Error(error?.message ?? "No se pudo firmar la descarga.");
+  return signed.signedUrl;
+}
+
+export const getSupplierFileUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ submissionId: z.string().uuid(), path: z.string().min(1).max(500) }).parse(d),
+  )
+  .handler(async ({ data, context }): Promise<{ url: string }> => {
+    // RLS: el usuario solo ve propuestas de sus requerimientos.
+    const { data: sub } = await asSb(context.supabase)
+      .from("sourcing_submissions")
+      .select("request_id")
+      .eq("id", data.submissionId)
+      .maybeSingle();
+    if (!sub) throw new Error("Propuesta no encontrada.");
+    const requestId = (sub as { request_id: string }).request_id;
+    if (!data.path.startsWith(`${requestId}/`))
+      throw new Error("Archivo no pertenece a la propuesta.");
+    const svc = serviceClient();
+    if (!svc) throw new Error("Servicio no disponible.");
+    return { url: await signedSupplierFileUrl(svc, data.path) };
+  });
+
+export const getSupplierFileUrlByShareToken = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({ token: z.string().trim().min(10).max(120), path: z.string().min(1).max(500) })
+      .parse(d),
+  )
+  .handler(async ({ data }): Promise<{ url: string } | null> => {
+    if (!isShareTokenFormat(data.token)) return null;
+    const sb = serviceClient();
+    if (!sb) return null;
+    const { data: sub } = await sb
+      .from("sourcing_submissions")
+      .select("request_id")
+      .eq("share_token_hash", await sha256Hex(data.token))
+      .maybeSingle();
+    if (!sub) return null;
+    const requestId = (sub as { request_id: string }).request_id;
+    if (!data.path.startsWith(`${requestId}/`)) return null;
+    return { url: await signedSupplierFileUrl(sb, data.path) };
   });
 
 // ---------- Público: proveedor ve el requerimiento y sube propuesta ----------
