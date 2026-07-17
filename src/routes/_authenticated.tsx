@@ -95,14 +95,14 @@ function AuthenticatedLayout() {
     {
       to: "/dashboard",
       icon: <LayoutDashboard className="w-3.5 h-3.5" />,
-      label: "Mission Control",
+      label: "Inicio",
       group: "OPERATIONS",
       exact: true,
     },
     {
       to: "/dashboard/map",
       icon: <Compass className="w-3.5 h-3.5" />,
-      label: "Centro Op.",
+      label: "Mapa Táctico",
       group: "OPERATIONS",
     },
     {
@@ -117,6 +117,14 @@ function AuthenticatedLayout() {
       label: "Proyectos",
       group: "OPERATIONS",
     },
+    {
+      to: "/dashboard/documentos",
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: "Documentos",
+      group: "OPERATIONS",
+    },
+
+
 
     canAccess(role, "catastro") && {
       to: "/dashboard/catastro",
