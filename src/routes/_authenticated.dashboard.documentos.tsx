@@ -24,6 +24,7 @@ type DraftMeta = { template_id: string; reference: string | null; updated_at: st
 function DocumentsGallery() {
   const { user } = useAuth();
   const [drafts, setDrafts] = useState<Record<string, DraftMeta>>({});
+  const [signs, setSigns] = useState<Record<string, { pending: number; signed: number }>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,6 +46,20 @@ function DocumentsGallery() {
         const map: Record<string, DraftMeta> = {};
         for (const row of data ?? []) map[row.template_id] = row as DraftMeta;
         setDrafts(map);
+      }
+      // Estado de firmas (solicitudes emitidas por el usuario, RLS owner).
+      const { data: signRows } = await supabase
+        .from("document_sign_requests")
+        .select("template_id, status")
+        .eq("created_by", user.id);
+      if (!cancelled && signRows) {
+        const agg: Record<string, { pending: number; signed: number }> = {};
+        for (const r of signRows as Array<{ template_id: string; status: string }>) {
+          const a = (agg[r.template_id] ??= { pending: 0, signed: 0 });
+          if (r.status === "signed") a.signed++;
+          else if (r.status === "pending") a.pending++;
+        }
+        setSigns(agg);
       }
       setLoading(false);
     })();
@@ -72,8 +87,8 @@ function DocumentsGallery() {
         </h1>
         <p className="text-sm text-content-subtle mt-2 max-w-3xl">
           NDAs, MoUs, LOIs, term sheets, SPAs, JVs, royalties y advisory. Edita cláusulas,
-          previsualiza en vivo y descarga PDF con branding Geocapitals. Tus borradores se guardan
-          en tu cuenta y se sincronizan entre dispositivos.
+          previsualiza en vivo y descarga PDF con branding Geocapitals. Tus borradores se guardan en
+          tu cuenta y se sincronizan entre dispositivos.
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] font-mono text-content-subtle">
           <span className="inline-flex items-center gap-1.5">
@@ -83,7 +98,9 @@ function DocumentsGallery() {
           {user ? (
             <span className="inline-flex items-center gap-1.5">
               <Clock className="w-3.5 h-3.5" />
-              {loading ? "Cargando tus borradores…" : `${Object.keys(drafts).length} borrador(es) guardado(s)`}
+              {loading
+                ? "Cargando tus borradores…"
+                : `${Object.keys(drafts).length} borrador(es) guardado(s)`}
             </span>
           ) : null}
           {error ? (
@@ -124,6 +141,7 @@ function DocumentsGallery() {
                       year: "numeric",
                     })}
                   </div>
+                  <SignBadge stats={signs[d.template_id]} />
                 </Link>
               );
             })}
@@ -150,11 +168,14 @@ function DocumentsGallery() {
                     <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider bg-accent-brand-subtle text-accent-brand">
                       <FileText className="w-3 h-3" /> {t.acronym ?? t.shortTitle}
                     </span>
-                    {draft ? (
-                      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-accent-brand text-white">
-                        En curso
-                      </span>
-                    ) : null}
+                    <span className="flex items-center gap-1.5">
+                      <SignBadge stats={signs[t.id]} />
+                      {draft ? (
+                        <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-accent-brand text-white">
+                          En curso
+                        </span>
+                      ) : null}
+                    </span>
                   </div>
                   <div className="font-display text-lg text-content group-hover:text-accent-brand transition-colors">
                     {t.title}
@@ -180,5 +201,22 @@ function DocumentsGallery() {
         </section>
       ))}
     </div>
+  );
+}
+
+/** Estado de firmas del template: firmado (verde) o pendiente (ámbar). */
+function SignBadge({ stats }: { stats?: { pending: number; signed: number } }) {
+  if (!stats || (stats.pending === 0 && stats.signed === 0)) return null;
+  if (stats.signed > 0) {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-emerald-500/15 text-emerald-600">
+        Firmado{stats.signed > 1 ? ` ×${stats.signed}` : ""}
+      </span>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-amber-500/15 text-amber-600">
+      Firma pendiente{stats.pending > 1 ? ` ×${stats.pending}` : ""}
+    </span>
   );
 }
