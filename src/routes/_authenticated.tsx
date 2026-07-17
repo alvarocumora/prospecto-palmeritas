@@ -36,6 +36,9 @@ import {
   MessageSquare,
   FileSignature,
   Banknote,
+  Magnet,
+  KeyRound,
+  LineChart,
   BadgeCheck,
   Database,
   BarChart3,
@@ -168,6 +171,12 @@ function AuthenticatedLayout() {
       group: "NEGOCIO",
     },
     {
+      to: "/dashboard/precios",
+      icon: <LineChart className="w-3.5 h-3.5" />,
+      label: "Precios Metales",
+      group: "NEGOCIO",
+    },
+    {
       to: "/dashboard/documentos",
       icon: <FileSignature className="w-3.5 h-3.5" />,
       label: "Documentos · Firma",
@@ -182,6 +191,12 @@ function AuthenticatedLayout() {
         label: "Proyectos",
         group: "OPERACIÓN",
       },
+    showOps && {
+      to: "/dashboard/project-report",
+      icon: <FileText className="w-3.5 h-3.5" />,
+      label: "Reporte del Proyecto",
+      group: "OPERACIÓN",
+    },
     showOps && {
       to: "/dashboard/map",
       icon: <Compass className="w-3.5 h-3.5" />,
@@ -216,6 +231,13 @@ function AuthenticatedLayout() {
         to: "/dashboard/geophysics",
         icon: <Activity className="w-3.5 h-3.5" />,
         label: "Geofísica",
+        group: "EXPLORACIÓN",
+      },
+    !isInvestor &&
+      canAccess(role, "geophysics") && {
+        to: "/dashboard/mag-revalidations",
+        icon: <Magnet className="w-3.5 h-3.5" />,
+        label: "Revalidación MAG",
         group: "EXPLORACIÓN",
       },
     !isInvestor &&
@@ -355,6 +377,12 @@ function AuthenticatedLayout() {
       },
 
     // ---- CUENTA ----
+    {
+      to: "/dashboard/api",
+      icon: <KeyRound className="w-3.5 h-3.5" />,
+      label: "API · Llaves",
+      group: "CUENTA",
+    },
     {
       to: "/dashboard/profile",
       icon: <UserCircle className="w-3.5 h-3.5" />,
