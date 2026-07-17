@@ -271,7 +271,8 @@ function LiveLosVerdesPage() {
   const totals = miningQ.data?.totals;
 
   return (
-    <div className="bg-bg-app min-h-screen">
+    <div data-theme="im-light" className="bg-background text-foreground min-h-screen">
+
       {/* Banner */}
       <div className="bg-gold/10 border-b border-gold/30 px-4 py-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
