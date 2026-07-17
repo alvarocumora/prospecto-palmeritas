@@ -1,90 +1,94 @@
-# Plan: reordenar el dashboard y quitar callejones sin salida
+# Rediseño PDFs de transacción · Identidad única Geocapitals
 
-Trabajo grande, dividido en 4 fases entregables e independientes. Cada fase deja la plataforma más usable que la anterior.
+Objetivo: que todo documento generado (NDA, SPA, NDI, MoU, LOI, IM, etc.) comparta la misma identidad visual de la landing/plataforma (Institutional Modernist) y que el bloque de firma con sello del emisor funcione correctamente.
 
----
+## Problemas detectados en el PDF adjunto
 
-## Fase 1 — Limpiar el mapa de rutas del dashboard
+1. **Nombres de las partes se superponen** en el bloque de firma (slot izquierdo escupe "Álvaro Cumora" encima del slot derecho "Marcela Cimino \ Vincent Carpio"). Causa: `partyLines` usa `splitTextToSize(party, slotW)` pero luego pinta con `pdf.text(partyLines.slice(0, 2), x, y+14)` sin respetar el ancho — jsPDF ignora el wrap en la segunda pasada y una razón social larga desborda al slot vecino.
+2. **QR de validación no aparece** en cabecera (sólo se ve la banda ink+oro y el título). El bloque `qrDataUrl` se dibuja pero queda tapado por el título largo; además el ancho reservado para el título (`contentW - 110`) no descuenta el QR real (72 + margen).
+3. **Sello de firma electrónica del emisor no se aplica**: la tabla "Firmado electrónicamente por / Fecha / Hash" que aparece al pie viene de un bloque `fields` de la plantilla — el `emitterSignature` no llegó al renderer (o partyIndex quedó fuera de rango). Debe verse el nombre en cursiva sobre la línea + sello "FIRMADO · Geocapitals".
+4. **Paleta no coincide con landing**: se usa oro (#CEA84C) + ink puro. La identidad institucional del sitio es papel hueso (#F7F5F0), tinta azulada (#1A1A2E) y **cobalto (#2B4ACB)** como acento — no oro.
+5. **Faltan datos de contacto** (email y WhatsApp +56 9 6218 4071) que el usuario pidió previamente para todos los recursos generados.
+6. **Numeración de cláusulas salta** (1,2,3,4,5,6,**8**) — es un bug de plantilla NDA que debe corregirse.
 
-**Problema hoy:** 116 archivos de ruta bajo `/dashboard`, con nombres duplicados en el sidebar ("Mission Control" en `/dashboard` y "Centro Op." en `/dashboard/map` se sienten iguales), rutas fantasma que solo redirigen (`palmeras`, `sat3d`, `lv5-page5`, `command-center`) y una barra lateral muy larga sin jerarquía clara.
+## Alcance del cambio
 
-Acciones:
+### 1. Sistema de tokens del PDF (`src/lib/documents/pdf.ts`)
 
-1. **Consolidar navegación** en `src/routes/_authenticated.tsx` (el `CommandRail`):
-  - Renombrar `/dashboard` → "Inicio" y `/dashboard/map` → "Mapa operacional" para eliminar la sensación de duplicado.
-  - Colapsar los grupos `ANALYSIS` y `GOVERNANCE` por defecto; expandirlos si hay ruta activa.
-  - Agrupar `Marketplace Deals` + `Marketplace Capas` + `commodity-lots` bajo un solo grupo **MARKETPLACE**.
-  - Añadir separador visual antes de **ACCOUNT**.
-2. **Eliminar rutas stub** (`palmeras`, `sat3d`, `lv5-page5`, `command-center`, `franco`) y reemplazarlas por 301 en un solo helper `redirects.ts` — dejan de aparecer como archivos.
-3. **Marcar rutas "en construcción"** con un placeholder consistente (no un 404 ni una página en blanco) cuando el módulo no está listo. Un componente `<ComingSoon module="…"/>` con enlace de vuelta a Inicio.
-4. **Auditar cada entrada del sidebar** contra su ruta destino: si la ruta muestra datos vacíos o crashea, se marca "beta" o se oculta según el rol.
+Reemplazar constantes `GOLD/INK/MUTED/HAIRLINE` por una paleta alineada a `styles.css`:
 
-Entregable: sidebar más corto, sin duplicados, sin rutas que redirigen en silencio, y todo ítem del menú abre algo real.
+```
+PAPER      #F7F5F0   fondo cálido
+PAPER_2    #EFEBE1   panel secundario
+INK        #1A1A2E   texto principal / bandas
+INK_SOFT   #4A4A5E   texto secundario
+GRAY       #6B6B7B   hints / footer
+COBALT     #2B4ACB   acento (líneas, sello, QR label)
+COBALT_DP  #223CA6   hover/deep (bordes de sello)
+HAIRLINE   #D9D4C7   líneas divisorias sobre papel
+```
 
----
+- Pintar fondo de página con `PAPER` (rect full-bleed) en cada `addPage`.
+- Banda superior en `INK` con hairline `COBALT` (reemplaza la banda oro).
+- Todas las líneas divisorias en `HAIRLINE`, acentos (subrayado de título, viñetas, sello) en `COBALT`.
 
-## Fase 2 — Selector de proyecto que realmente cambia el contexto
+### 2. Cabecera institucional editorial
 
-**Problema hoy:** `useProjects` mantiene `activeId` en `localStorage` y expone `setActive`, pero muchas rutas del dashboard (deals, targets, catastro, finance, drilling, etc.) consultan por `activeId` sin invalidar sus queries cuando cambia, por lo que la UI se queda con datos del proyecto anterior.
+- Logo mark 42pt + wordmark "GEOCAPITALS" en Helvetica bold + tagline "Mining Intelligence · Deals · Documentation".
+- A la derecha: `Ref` (bold ink), fecha en gris, y **QR de validación** (56pt) con etiqueta "VALIDAR · geocapitals.com/verificar" en cobalto — se reserva ese ancho explícitamente para que el título no lo pise.
+- Título con subrayado cobalto 2pt, tamaño 20pt.
 
-Acciones:
+### 3. Bloque de firma (fix del bug de solape)
 
-1. **Mover el estado activo a un contexto React** (`ActiveProjectProvider`) además de localStorage, para que cualquier `useQuery` con `queryKey: ['x', activeProjectId]` re-consulte automáticamente al cambiar.
-2. **Poner el selector visible siempre** en el `TopBar` (arriba a la izquierda), con el nombre y código del proyecto activo y un dropdown para cambiar. Hoy vive solo dentro de `/dashboard/projects`.
-3. **Invalidar TanStack Query en el cambio**: al llamar `setActive`, ejecutar `queryClient.invalidateQueries({ predicate: q => q.queryKey.includes(prevProjectId) })`.
-4. **Rutas globales sin proyecto** (marketplace, documentos, admin, boletín nacional) se marcan como "cross-project" y el selector muestra "— todos los proyectos —" en esas pantallas.
-5. **Empty state claro** cuando no hay proyecto activo: en cada módulo project-scoped, un cartel "Elegí un proyecto en la barra superior" con CTA al selector.
+- Calcular el ancho del slot y **envolver el nombre de la parte con `splitTextToSize` y renderizar línea a línea con `y` incremental** (no `slice(0,2)` sobre un array ya wrapped que igual desborda).
+- Limitar a 3 líneas por slot con elipsis.
+- Para el emisor (party 0 por defecto): dibujar nombre en cursiva 14pt centrado sobre la línea + sello redondeado (cobalto) "FIRMADO ELECTRÓNICAMENTE · GEOCAPITALS" con timestamp UTC + hash corto debajo.
+- Añadir espacio superior (`y += 44`) para que la cursiva no pise el párrafo anterior.
 
-Entregable: cambiar de proyecto en el TopBar refresca inmediatamente los datos de Catastro, Sondajes, Targets, Finance y Reportes.
+### 4. Pie institucional con contacto
 
----
+Reemplazar el disclaimer plano por un pie de dos columnas:
 
-## Fase 3 — Documentos que se abren, editan y guardan
+```
+[hairline cobalto]
+GEOCAPITALS · Mining Intelligence      contacto@geocapitals.com
+Documento borrador editable · No       WhatsApp +56 9 6218 4071
+constituye asesoría legal ni oferta.   geocapitals.com/verificar/{ref}
+                                                        Página X / Y
+```
 
-**Problema hoy:** el usuario reporta que "no puedo ver los documentos". El editor en `/dashboard/documentos/$templateId` depende de que la plantilla exista en `TEMPLATE_BY_ID` y de que la tabla `document_drafts` esté persistiendo. Falla si el `templateId` de la URL no matchea, o si el guardado en Supabase da error silencioso.
+Mini-QR (30pt) en esquina inferior derecha sólo en la última página.
 
-Acciones:
+### 5. Corrección de plantillas (`src/lib/documents/templates.ts`)
 
-1. **Reparar el listado** `/dashboard/documentos`: mostrar las 10 plantillas con estado ("borrador guardado", "firmado", "sin usar") consultando `document_drafts` + `document_sign_requests` filtrado por `user_id`.
-2. **Corregir el editor**: verificar que al hacer click abre `DocumentEditor` sin blanquear la pantalla (loguear el error real si `TEMPLATE_BY_ID[templateId]` es `undefined`), y que autoguarda en `document_drafts` cada N segundos con feedback visual ("Guardado ✓").
-3. **Feedback de firma**: en `/firmar/$token`, mostrar claramente estados "pendiente / firmado / expirado / anulado" y un botón "Descargar PDF" cuando corresponde.
-4. **Prefill desde lote**: verificar que `/dashboard/documentos/data-sheet?lot=<id>` carga los datos del lote real del usuario, no un mock.
+- Renumerar cláusulas del NDA para eliminar el salto 6→8.
+- Verificar que cada plantilla (NDA, SPA, NDI, MoU, LOI, IM, Term Sheet, Data Room Access, Advance Request) tenga:
+  - `signature` block con `parties` normalizadas (razón social + representante en la misma línea con separador tipográfico "·", no "").
+  - Sin bloque `fields` duplicado al final tipo "Firmado electrónicamente por…" (esa metadata ahora la pinta el sello del emisor, no la plantilla).
 
-Entregable: los 10 documentos abren, guardan solos, se pueden compartir para firma y descargar como PDF.
+### 6. Sello del emisor siempre presente
 
----
+En `src/features/documents/DocumentEditor.tsx`:
 
-## Fase 4 — Datos reales del usuario, demo aparte
+- Verificar que `emitterSignature.partyIndex` corresponda a la parte "Divulgante/Vendedor/Emisor" según el docType (mapa por tipo).
+- Fallback: si el usuario logueado coincide con alguna party por email/nombre, usar ese índice; si no, party 0.
+- Pasar siempre `email`, `signedAt`, `hash`, `name`.
 
-**Problema hoy:** proyectos demo (Palmeras, Franco, Los Verdes) y listings/lotes de ejemplo se mezclan con lo que el usuario crea, dando la sensación de que "nada es real".
+### 7. Verificación
 
-Acciones:
+- Regenerar NDA de prueba y renderizar a JPEG con `pdftoppm` para inspeccionar visualmente (no debe haber solape, QR debe verse, sello cursivo debe estar sobre la línea, paleta papel/cobalto).
+- Regenerar SPA y MoU para confirmar que la identidad se aplica uniforme a todos los tipos.
+- Confirmar que la ruta `/verificar/:ref` sigue resolviendo desde el QR. QR Mostrar Validacion al escanear en telefono o dispositivo 
 
-1. **Nueva sección "Ejemplos"** en el sidebar (grupo aparte al final), donde vive Palmeras, Franco y LV5 como demos de solo lectura. Se marca con badge "DEMO".
-2. **Filtrar el resto de la app por `user_id**` de forma estricta:
-  - `/dashboard/projects` → solo proyectos donde el usuario es miembro (no demo).
-  - `/dashboard/commodity-lots` y `/dashboard/listings` → solo lo creado por el usuario, con CTA claro "Crear mi primer lote/listing".
-  - `/dashboard/marketplace` → lotes/listings publicados (curados), diferenciados visualmente de los propios.
-3. **Empty states útiles**: en vez de mostrar demo cuando el usuario no tiene datos, mostrar cartel "Aún no tenés X. Crear ahora →" y un link a "Ver ejemplos" que lleva a la sección demo.
-4. **Seguimiento de proyecto real**: al crear un proyecto nuevo, redirigir a `/dashboard/project-report` con el `activeProjectId` recién creado y hooks que lean sus datos reales (no los de Palmeras).
+## Archivos a modificar
 
-Entregable: el usuario ve solo sus datos, con demos claramente separadas para explorar.
+- `src/lib/documents/pdf.ts` — nueva paleta, cabecera, bloque de firma sin solape, pie con contacto, fondo papel.
+- `src/lib/documents/templates.ts` — renumerar NDA, normalizar `parties`, quitar duplicados de metadata firma.
+- `src/features/documents/DocumentEditor.tsx` — asegurar `emitterSignature.partyIndex` correcto por tipo.
+- (Sin cambios en `model.ts`, `signing.functions.ts`, ni en rutas.)
 
----
+## Fuera de alcance
 
-## Orden de ejecución sugerido
-
-Fase 1 (rutas) → Fase 2 (selector) → Fase 3 (documentos) → Fase 4 (datos reales).
-
-Cada fase es una PR autocontenida, se puede probar y publicar antes de pasar a la siguiente. Estimado: 1 fase por sesión de trabajo.
-
-## Detalles técnicos
-
-- **Fase 1**: solo edita `src/routes/_authenticated.tsx`, borra 4-5 archivos stub, crea `src/components/ops/ComingSoon.tsx`.
-- **Fase 2**: nuevo `src/contexts/ActiveProjectContext.tsx`, refactor de `useProjects` para publicar cambios via contexto, hook `useActiveProjectId()`, mover selector a `TopBar.tsx`.
-- **Fase 3**: revisar `DocumentEditor.tsx` (error boundary + autosave), route loader de `documentos.tsx` (join con `document_drafts`), sin cambios de schema.
-- **Fase 4**: flag `is_demo` en `projects` (migración pequeña), filtros en `useProjects` y en los loaders de listings/lots. No borra datos existentes.
-
-## Decisión pendiente
-
-¿Empezamos por Fase 1 (más visible, rápido) o preferís que arranquemos por Fase 3 (documentos) porque es lo que más te bloquea hoy?  FASE # para enviar un NDA hoy 
+- No se toca el flujo de firma remota (`/firmar/:token`) ni la RPC `verify_document`.
+- No se cambian tokens de `src/styles.css` (sólo se replican los mismos valores en constantes del renderer PDF, ya que jsPDF no lee CSS).
+- No se rediseñan las páginas de la plataforma.

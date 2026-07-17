@@ -2,39 +2,45 @@ import type { GeneratedDoc } from "./model";
 import logoMark from "@/assets/geocapitals-mark.png";
 import { verifyDocUrl } from "@/lib/publicUrl";
 
-// Renderer PDF con branding Geocapitals: cabecera institucional con marca,
-// acento oro, tipografía Helvetica, QR de validación y disclaimer al pie.
-// Client-only (import dinámico de jsPDF, autotable y qrcode).
+// Renderer PDF — identidad Institutional Modernist (papel hueso + tinta +
+// cobalto), alineado a la landing/plataforma. Cabecera con logo + QR de
+// validación, bloque de firma sin solape y sello electrónico del emisor,
+// pie institucional con contacto (email + WhatsApp).
+//
+// Client-only (importa jsPDF / autotable / qrcode de forma dinámica).
 
-const GOLD: [number, number, number] = [206, 168, 76];
-const INK: [number, number, number] = [20, 20, 24];
-const MUTED: [number, number, number] = [110, 110, 120];
-const HAIRLINE: [number, number, number] = [220, 220, 225];
+// ─────────────────────── Paleta (alineada a src/styles.css) ───────────────────────
+const PAPER: [number, number, number] = [247, 245, 240]; // #F7F5F0 papel hueso
+const INK: [number, number, number] = [26, 26, 46]; // #1A1A2E tinta
+const INK_SOFT: [number, number, number] = [74, 74, 94]; // texto secundario
+const GRAY: [number, number, number] = [107, 107, 123]; // hints / footer
+const COBALT: [number, number, number] = [43, 74, 203]; // #2B4ACB acento marca
+const COBALT_DEEP: [number, number, number] = [34, 60, 166]; // hover / borde sello
+const HAIRLINE: [number, number, number] = [217, 212, 199]; // línea sobre papel
+const WHITE: [number, number, number] = [255, 255, 255];
+
+// ─────────────────────── Contacto institucional ───────────────────────
+const CONTACT = {
+  email: "contacto@geocapitals.com",
+  whatsapp: "+56 9 6218 4071",
+  site: "geocapitals.com",
+};
 
 export type EmitterSignature = {
-  /** Nombre visible del firmante (razón social o persona). */
   name: string;
-  /** Email o identificador del usuario logueado (aparece bajo la firma). */
   email?: string;
-  /** ISO timestamp de la firma electrónica. */
   signedAt: string;
-  /** Hash corto (evidencia de integridad). */
   hash?: string;
-  /**
-   * Índice del slot de firma que corresponde al emisor.
-   * Por defecto 0 (primera parte listada en el bloque de firma).
-   */
   partyIndex?: number;
 };
 
 export type RenderOptions = {
+  /** Firma del emisor (compat previa — party 0 por defecto). */
   emitterSignature?: EmitterSignature;
+  /** Múltiples firmas estampadas sobre los slots correspondientes. */
+  signatures?: EmitterSignature[];
 };
 
-/**
- * Carga el logo (mark 1024×1024) como dataURL para máxima nitidez en el PDF.
- * El PNG local se sirve por Vite en dev y se inlinea en prod.
- */
 async function loadMark(): Promise<{ dataUrl: string; ratio: number } | null> {
   try {
     const img = new Image();
@@ -45,7 +51,6 @@ async function loadMark(): Promise<{ dataUrl: string; ratio: number } | null> {
       img.src = logoMark;
     });
     const canvas = document.createElement("canvas");
-    // Renderizamos a 512px máx — más que suficiente para el tamaño de estampa (32-36pt).
     const maxW = 512;
     const scale = Math.min(1, maxW / img.naturalWidth);
     canvas.width = Math.round(img.naturalWidth * scale);
@@ -69,8 +74,8 @@ async function makeQr(url: string): Promise<string | null> {
     const QR = await import("qrcode");
     return await QR.toDataURL(url, {
       margin: 1,
-      width: 320,
-      color: { dark: "#141418", light: "#ffffff" },
+      width: 360,
+      color: { dark: "#1A1A2E", light: "#F7F5F0" },
       errorCorrectionLevel: "M",
     });
   } catch {
@@ -94,110 +99,142 @@ export async function renderGeocapitalsPdf(
   const verify = verifyDocUrl(doc.reference);
   const [mark, qrDataUrl] = await Promise.all([loadMark(), makeQr(verify)]);
 
-  // ─── Cabecera institucional ───
-  pdf.setFillColor(...INK);
-  pdf.rect(0, 0, pageW, 6, "F");
-  pdf.setFillColor(...GOLD);
-  pdf.rect(0, 6, pageW * 0.22, 2, "F");
+  // Normaliza firmas: soporta `emitterSignature` (single) y `signatures` (array).
+  const stamps: EmitterSignature[] = [
+    ...(opts.emitterSignature ? [opts.emitterSignature] : []),
+    ...(opts.signatures ?? []),
+  ];
+  const stampByIndex = new Map<number, EmitterSignature>();
+  stamps.forEach((s) => stampByIndex.set(s.partyIndex ?? 0, s));
 
-  const headerTop = 36;
-  const markH = 34; // más grande y con margen respirable
+  // Pinta el "papel" de página completa.
+  const paintPaper = () => {
+    pdf.setFillColor(...PAPER);
+    pdf.rect(0, 0, pageW, pageH, "F");
+    // Banda superior institucional.
+    pdf.setFillColor(...INK);
+    pdf.rect(0, 0, pageW, 6, "F");
+    pdf.setFillColor(...COBALT);
+    pdf.rect(0, 6, pageW * 0.26, 2, "F");
+  };
+  paintPaper();
+
+  // ─── Cabecera institucional ───
+  const headerTop = 30;
+  const qrHeaderSize = 62;
+  const qrHeaderX = pageW - marginX - qrHeaderSize;
+  const qrHeaderY = headerTop;
+  const rightBlockW = qrHeaderSize + 12; // ancho reservado a la derecha para no pisar el título
+
+  const markH = 40;
+  let brandX = marginX;
   if (mark) {
     const markW = markH * mark.ratio;
     pdf.addImage(mark.dataUrl, "PNG", marginX, headerTop, markW, markH, undefined, "FAST");
+    brandX = marginX + markW + 14;
+  }
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(12);
+  pdf.setTextColor(...INK);
+  pdf.text("GEOCAPITALS", brandX, headerTop + 16);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(7.5);
+  pdf.setTextColor(...COBALT);
+  pdf.text("MINING INTELLIGENCE · DEALS · DOCUMENTATION", brandX, headerTop + 27);
+  pdf.setTextColor(...GRAY);
+  pdf.text(`${CONTACT.site} · ${CONTACT.email}`, brandX, headerTop + 38);
+
+  // QR de validación en cabecera (con etiqueta).
+  if (qrDataUrl) {
+    pdf.setFillColor(...WHITE);
+    pdf.setDrawColor(...HAIRLINE);
+    pdf.setLineWidth(0.5);
+    pdf.roundedRect(
+      qrHeaderX - 4,
+      qrHeaderY - 4,
+      qrHeaderSize + 8,
+      qrHeaderSize + 22,
+      3,
+      3,
+      "FD",
+    );
+    pdf.addImage(
+      qrDataUrl,
+      "PNG",
+      qrHeaderX,
+      qrHeaderY,
+      qrHeaderSize,
+      qrHeaderSize,
+      undefined,
+      "FAST",
+    );
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10.5);
-    pdf.setTextColor(...INK);
-    pdf.text("GEOCAPITALS", marginX + markW + 14, headerTop + 14);
+    pdf.setFontSize(6);
+    pdf.setTextColor(...COBALT);
+    pdf.text("VALIDAR EN GEOCAPITALS", qrHeaderX + qrHeaderSize / 2, qrHeaderY + qrHeaderSize + 8, {
+      align: "center",
+    });
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(7.5);
-    pdf.setTextColor(...MUTED);
-    pdf.text("Mining · Deals · Documentation", marginX + markW + 14, headerTop + 26);
-  } else {
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(15);
-    pdf.setTextColor(...INK);
-    pdf.text("GEOCAPITALS", marginX, headerTop + 16);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(8);
-    pdf.setTextColor(...MUTED);
-    pdf.text("Mining · Deals · Documentation", marginX, headerTop + 28);
+    pdf.setFontSize(5.4);
+    pdf.setTextColor(...GRAY);
+    pdf.text(`/verificar/${doc.reference}`, qrHeaderX + qrHeaderSize / 2, qrHeaderY + qrHeaderSize + 15, {
+      align: "center",
+    });
   }
 
+  let y = Math.max(headerTop + markH + 24, qrHeaderY + qrHeaderSize + 26);
+  pdf.setDrawColor(...HAIRLINE);
+  pdf.setLineWidth(0.5);
+  pdf.line(marginX, y, pageW - marginX, y);
+  y += 8;
+
+  // ─── Meta (ref + fecha) alineada bajo la línea, a la izquierda ───
   const dateText = new Date(doc.date).toLocaleDateString("es-CL", {
     year: "numeric",
     month: "long",
     day: "numeric",
   });
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(8);
-  pdf.setTextColor(...INK);
-  pdf.text(`Ref  ${doc.reference}`, pageW - marginX, headerTop + 4, { align: "right" });
+  pdf.setFontSize(7.5);
+  pdf.setTextColor(...COBALT);
+  pdf.text(`REF · ${doc.reference}`, marginX, y + 12);
   pdf.setFont("helvetica", "normal");
-  pdf.setTextColor(...MUTED);
-  pdf.text(dateText, pageW - marginX, headerTop + 16, { align: "right" });
-  pdf.text("Documento oficial · Geocapitals", pageW - marginX, headerTop + 27, { align: "right" });
+  pdf.setTextColor(...GRAY);
+  pdf.text(dateText.toUpperCase(), pageW - marginX, y + 12, { align: "right" });
+  y += 32;
 
-  let y = headerTop + markH + 18;
-  pdf.setDrawColor(...HAIRLINE);
-  pdf.setLineWidth(0.5);
-  pdf.line(marginX, y, pageW - marginX, y);
-  y += 26;
-
-  // ─── Título con QR de validación ───
-  pdf.setDrawColor(...GOLD);
-  pdf.setLineWidth(1.2);
-  pdf.line(marginX, y - 14, marginX + 44, y - 14);
+  // ─── Título ───
+  pdf.setDrawColor(...COBALT);
+  pdf.setLineWidth(2);
+  pdf.line(marginX, y - 14, marginX + 42, y - 14);
 
   pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(18);
+  pdf.setFontSize(20);
   pdf.setTextColor(...INK);
-  const titleLines = pdf.splitTextToSize(doc.title, contentW - 110) as string[];
+  const titleMaxW = contentW - rightBlockW; // reservar espacio del bloque derecho (QR)
+  const titleLines = pdf.splitTextToSize(doc.title, titleMaxW) as string[];
   pdf.text(titleLines, marginX, y);
+  y += titleLines.length * 22 + 8;
 
-  if (qrDataUrl) {
-    const qrSize = 72;
-    const qrX = pageW - marginX - qrSize;
-    const qrY = y - 16;
-    pdf.setFillColor(255, 255, 255);
-    pdf.setDrawColor(...HAIRLINE);
-    pdf.setLineWidth(0.5);
-    pdf.roundedRect(qrX - 5, qrY - 5, qrSize + 10, qrSize + 26, 3, 3, "FD");
-    pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize, undefined, "FAST");
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6.2);
-    pdf.setTextColor(...INK);
-    pdf.text("VALIDAR EN GEOCAPITALS.COM", qrX + qrSize / 2, qrY + qrSize + 9, {
-      align: "center",
-    });
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(5.6);
-    pdf.setTextColor(...MUTED);
-    pdf.text(`/verificar/${doc.reference}`, qrX + qrSize / 2, qrY + qrSize + 17, {
-      align: "center",
-    });
-  }
-
-  y += titleLines.length * 20 + 12;
   pdf.setDrawColor(...HAIRLINE);
   pdf.setLineWidth(0.5);
   pdf.line(marginX, y, pageW - marginX, y);
   y += 22;
 
   const ensure = (needed: number) => {
-    if (y + needed > pageH - 92) {
+    if (y + needed > pageH - 108) {
       pdf.addPage();
+      paintPaper();
       y = 60;
     }
   };
 
   // ─── Bloques ───
-  const emitter = opts.emitterSignature;
   for (const block of doc.blocks) {
     if (block.kind === "paragraph") {
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10.5);
-      pdf.setTextColor(40, 40, 48);
+      pdf.setTextColor(...INK_SOFT);
       const lines = pdf.splitTextToSize(block.text, contentW) as string[];
       ensure(lines.length * 14 + 8);
       pdf.text(lines, marginX, y);
@@ -205,13 +242,13 @@ export async function renderGeocapitalsPdf(
     } else if (block.kind === "clauses") {
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(10);
-      pdf.setTextColor(40, 40, 48);
+      pdf.setTextColor(...INK_SOFT);
       for (const item of block.items) {
-        const lines = pdf.splitTextToSize(item, contentW - 16) as string[];
+        const lines = pdf.splitTextToSize(item, contentW - 18) as string[];
         ensure(lines.length * 13 + 6);
-        pdf.setFillColor(...GOLD);
-        pdf.circle(marginX + 3, y - 3, 1.6, "F");
-        pdf.text(lines, marginX + 16, y);
+        pdf.setFillColor(...COBALT);
+        pdf.rect(marginX, y - 6, 2, 8, "F");
+        pdf.text(lines, marginX + 12, y);
         y += lines.length * 13 + 6;
       }
       y += 4;
@@ -220,12 +257,17 @@ export async function renderGeocapitalsPdf(
         startY: y,
         margin: { left: marginX, right: marginX },
         theme: "plain",
-        styles: { fontSize: 10, cellPadding: 5, textColor: [40, 40, 48] },
+        styles: {
+          fontSize: 10,
+          cellPadding: 6,
+          textColor: INK,
+          lineColor: HAIRLINE,
+        },
         columnStyles: {
-          0: { fontStyle: "bold", cellWidth: 170, textColor: MUTED },
+          0: { fontStyle: "bold", cellWidth: 170, textColor: COBALT },
         },
         body: block.rows.map(([k, v]) => [k, v]),
-        alternateRowStyles: { fillColor: [248, 246, 240] },
+        alternateRowStyles: { fillColor: [239, 235, 225] },
       });
       y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14;
     } else if (block.kind === "table") {
@@ -233,83 +275,95 @@ export async function renderGeocapitalsPdf(
         startY: y,
         margin: { left: marginX, right: marginX },
         theme: "grid",
-        headStyles: { fillColor: INK, textColor: [255, 255, 255], fontSize: 9.5 },
-        styles: { fontSize: 9.5, cellPadding: 5, textColor: [40, 40, 48] },
+        headStyles: { fillColor: INK, textColor: WHITE, fontSize: 9.5 },
+        styles: { fontSize: 9.5, cellPadding: 5, textColor: INK, lineColor: HAIRLINE },
         head: [block.head],
         body: block.rows,
       });
       y = (pdf as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14;
     } else if (block.kind === "signature") {
       const n = block.parties.length;
-      const emitterIdx = emitter ? Math.min(Math.max(emitter.partyIndex ?? 0, 0), n - 1) : -1;
-      ensure(110);
-      y += 30;
-      const gap = 24;
-      const slotW = n > 1 ? (contentW - gap * (n - 1)) / n : Math.min(280, contentW);
+      const gap = 28;
+      const slotW = n > 1 ? (contentW - gap * (n - 1)) / n : Math.min(300, contentW);
+
+      // Reservar altura suficiente para sello + nombre + subrayado + meta.
+      ensure(140);
+      y += 46; // aire para la cursiva por encima de la línea
 
       block.parties.forEach((party, i) => {
         const x = marginX + i * (slotW + gap);
-        const isEmitter = i === emitterIdx;
+        const stamp = stampByIndex.get(i);
 
-        // Estampa de firma electrónica sobre la línea (si aplica).
-        if (isEmitter && emitter) {
-          // Firma "manuscrita" — nombre en cursiva grande.
+        // Sello del emisor — firma cursiva sobre la línea + badge cobalto.
+        if (stamp) {
+          // Firma "manuscrita" — cursiva bold sobre la línea, wrapped al slot.
           pdf.setFont("helvetica", "bolditalic");
-          pdf.setFontSize(15);
+          pdf.setFontSize(16);
           pdf.setTextColor(...INK);
-          const sigName = pdf.splitTextToSize(emitter.name, slotW - 8) as string[];
-          pdf.text(sigName[0] ?? emitter.name, x + 4, y - 6);
+          const sigLines = pdf.splitTextToSize(stamp.name, slotW - 80) as string[];
+          pdf.text(sigLines[0] ?? stamp.name, x + 6, y - 6);
 
-          // Sello institucional a la derecha del slot.
-          pdf.setDrawColor(...GOLD);
+          // Badge institucional a la derecha.
+          const bw = 70;
+          const bh = 22;
+          const bx = x + slotW - bw;
+          const by = y - 30;
+          pdf.setDrawColor(...COBALT_DEEP);
           pdf.setLineWidth(0.8);
-          pdf.roundedRect(x + slotW - 74, y - 26, 70, 22, 2, 2, "S");
+          pdf.setFillColor(...WHITE);
+          pdf.roundedRect(bx, by, bw, bh, 2, 2, "FD");
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(6.2);
-          pdf.setTextColor(...GOLD);
-          pdf.text("FIRMADO", x + slotW - 39, y - 17, { align: "center" });
+          pdf.setTextColor(...COBALT);
+          pdf.text("FIRMADO", bx + bw / 2, by + 9, { align: "center" });
           pdf.setFont("helvetica", "normal");
-          pdf.setFontSize(5.6);
-          pdf.setTextColor(...MUTED);
-          pdf.text("Geocapitals · Vigente", x + slotW - 39, y - 9, { align: "center" });
+          pdf.setFontSize(5.4);
+          pdf.setTextColor(...GRAY);
+          pdf.text("Geocapitals · Vigente", bx + bw / 2, by + 17, { align: "center" });
         }
 
-        pdf.setDrawColor(80, 80, 90);
-        pdf.setLineWidth(0.6);
+        // Línea de firma.
+        pdf.setDrawColor(...INK);
+        pdf.setLineWidth(0.7);
         pdf.line(x, y, x + slotW, y);
 
+        // Nombre de la parte — wrap correcto, hasta 3 líneas con elipsis.
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
         pdf.setTextColor(...INK);
-        const partyLines = pdf.splitTextToSize(party, slotW) as string[];
-        pdf.text(partyLines.slice(0, 2), x, y + 14);
+        const partyLines = pdf.splitTextToSize(party, slotW - 4) as string[];
+        const shown = partyLines.slice(0, 3);
+        if (partyLines.length > 3) shown[2] = shown[2].replace(/.{0,3}$/, "…");
+        shown.forEach((ln, li) => {
+          pdf.text(ln, x, y + 12 + li * 11);
+        });
+        const subY = y + 12 + shown.length * 11 + 2;
 
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(7.5);
-        pdf.setTextColor(...MUTED);
-        const subY = y + 14 + Math.min(partyLines.length, 2) * 10 + 2;
-
-        if (isEmitter && emitter) {
-          const when = new Date(emitter.signedAt);
-          const stamp = `${when.toLocaleDateString("es-CL")} · ${when.toLocaleTimeString("es-CL", {
+        pdf.setTextColor(...GRAY);
+        if (stamp) {
+          const when = new Date(stamp.signedAt);
+          const stampTxt = `${when.toLocaleDateString("es-CL")} · ${when.toLocaleTimeString("es-CL", {
             hour: "2-digit",
             minute: "2-digit",
           })} UTC`;
-          pdf.text(`Firmado electrónicamente por ${emitter.email ?? emitter.name}`, x, subY);
-          pdf.text(stamp, x, subY + 10);
-          if (emitter.hash) {
-            pdf.setFontSize(6.5);
-            pdf.text(`Hash: ${emitter.hash}`, x, subY + 20);
+          pdf.text(`Firmado electrónicamente por ${stamp.email ?? stamp.name}`, x, subY);
+          pdf.text(stampTxt, x, subY + 10);
+          if (stamp.hash) {
+            pdf.setFontSize(6.6);
+            pdf.text(`Hash: ${stamp.hash}`, x, subY + 19);
           }
         } else {
           pdf.text("Nombre, cargo y firma", x, subY);
         }
       });
+      // Avanzar y — considerando slots con hasta 3 líneas.
       y += 60;
     }
   }
 
-  // ─── Footer con disclaimer, mini QR y paginación ───
+  // ─── Footer institucional ───
   const pageCount = (
     pdf as unknown as { internal: { getNumberOfPages: () => number } }
   ).internal.getNumberOfPages();
@@ -317,53 +371,73 @@ export async function renderGeocapitalsPdf(
   for (let p = 1; p <= pageCount; p++) {
     pdf.setPage(p);
 
+    // Encabezado breve en páginas > 1.
     if (p > 1) {
       pdf.setFillColor(...INK);
       pdf.rect(0, 0, pageW, 4, "F");
-      pdf.setFillColor(...GOLD);
-      pdf.rect(0, 4, pageW * 0.14, 1.5, "F");
+      pdf.setFillColor(...COBALT);
+      pdf.rect(0, 4, pageW * 0.18, 1.5, "F");
       pdf.setFont("helvetica", "bold");
       pdf.setFontSize(7.5);
-      pdf.setTextColor(...MUTED);
-      pdf.text(`GEOCAPITALS · ${doc.reference}`, marginX, 24);
+      pdf.setTextColor(...INK);
+      pdf.text("GEOCAPITALS", marginX, 22);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(...GRAY);
+      pdf.text(`Ref · ${doc.reference}`, pageW - marginX, 22, { align: "right" });
     }
 
-    pdf.setDrawColor(...GOLD);
-    pdf.setLineWidth(0.8);
-    pdf.line(marginX, pageH - 58, marginX + 28, pageH - 58);
+    // Línea cobalto + footer de dos columnas.
+    const footY = pageH - 66;
+    pdf.setDrawColor(...COBALT);
+    pdf.setLineWidth(1.2);
+    pdf.line(marginX, footY, marginX + 36, footY);
+    pdf.setDrawColor(...HAIRLINE);
+    pdf.setLineWidth(0.5);
+    pdf.line(marginX + 40, footY, pageW - marginX, footY);
 
-    if (qrDataUrl && p === pageCount) {
-      const size = 36;
-      pdf.addImage(
-        qrDataUrl,
-        "PNG",
-        pageW - marginX - size,
-        pageH - 60,
-        size,
-        size,
-        undefined,
-        "FAST",
-      );
-    }
-
+    // Columna izquierda — marca + disclaimer.
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(...INK);
+    pdf.text("GEOCAPITALS · Mining Intelligence", marginX, footY + 12);
     pdf.setFont("helvetica", "italic");
-    pdf.setFontSize(7);
-    pdf.setTextColor(...MUTED);
+    pdf.setFontSize(6.8);
+    pdf.setTextColor(...GRAY);
     pdf.text(
-      "Documento generado por Geocapitals como borrador editable. No constituye asesoría legal ni oferta financiera. Validar con las contrapartes y sus asesores antes de firmar.",
+      "Documento generado como borrador editable. No constituye asesoría legal ni oferta financiera. Validar con las contrapartes antes de firmar.",
       marginX,
-      pageH - 44,
-      { maxWidth: contentW - (p === pageCount ? 60 : 0) },
+      footY + 22,
+      { maxWidth: (pageW - marginX * 2) * 0.6 },
     );
 
-    pdf.setFont("helvetica", "normal");
+    // Columna derecha — contacto + verificación.
+    const rightCol = pageW - marginX;
+    const miniQrSize = 34;
+    const miniQrX = rightCol - miniQrSize;
+    const miniQrY = footY + 6;
+    let contactRight = rightCol;
+    if (qrDataUrl && p === pageCount) {
+      pdf.addImage(qrDataUrl, "PNG", miniQrX, miniQrY, miniQrSize, miniQrSize, undefined, "FAST");
+      contactRight = miniQrX - 8;
+    }
+    pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7);
     pdf.setTextColor(...INK);
-    pdf.textWithLink(`Verificación electrónica: ${verify}`, marginX, pageH - 22, { url: verify });
+    pdf.text(CONTACT.email, contactRight, footY + 12, { align: "right" });
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(...GRAY);
+    pdf.text(`WhatsApp ${CONTACT.whatsapp}`, contactRight, footY + 22, { align: "right" });
+    pdf.setTextColor(...COBALT);
+    pdf.textWithLink(`geocapitals.com/verificar/${doc.reference}`, contactRight, footY + 32, {
+      align: "right",
+      url: verify,
+    });
 
-    pdf.setFontSize(7);
-    pdf.setTextColor(...MUTED);
-    pdf.text(`${p} / ${pageCount}`, pageW - marginX, pageH - 22, { align: "right" });
+    // Paginación.
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.8);
+    pdf.setTextColor(...GRAY);
+    pdf.text(`Página ${p} / ${pageCount}`, marginX, pageH - 22);
   }
 
   pdf.save(`geocapitals-${doc.docType}-${doc.reference}.pdf`);

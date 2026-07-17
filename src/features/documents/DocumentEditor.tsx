@@ -247,21 +247,30 @@ export function DocumentEditor({
     try {
       // Si hay usuario logueado, el emisor (primera parte del bloque de firma)
       // aparece pre-firmado con su email + timestamp + hash corto de sesión.
+      // El emisor es la primera parte del documento — tomamos el primer campo
+      // de identificación de parte que exista en el formulario (partyA, seller,
+      // grantor, etc.). Fallback al email del usuario.
+      const emitterName =
+        values["partyA"] ||
+        values["seller"] ||
+        values["investor"] ||
+        values["grantor"] ||
+        values["client"] ||
+        values["divulgante"] ||
+        values["vendedor"] ||
+        values["emisor"] ||
+        user?.email ||
+        "Emisor";
       const emitterSignature = user
         ? {
-            name:
-              values["divulgante"] ||
-              values["vendedor"] ||
-              values["parte_a"] ||
-              values["emisor"] ||
-              user.email ||
-              "Emisor",
+            name: emitterName,
             email: user.email ?? undefined,
             signedAt: new Date().toISOString(),
             hash: user.id.replace(/-/g, "").slice(0, 12),
             partyIndex: 0,
           }
         : undefined;
+
       await renderGeocapitalsPdf(doc, { emitterSignature });
       toast.success(
         emitterSignature
