@@ -118,8 +118,8 @@ export async function renderGeocapitalsPdf(
     pdf.rect(0, 6, pageW * 0.26, 2, "F");
     // Marca de agua diagonal tenue (identidad unificada).
     pdf.saveGraphicsState();
-    // @ts-expect-error jsPDF GState typing incomplete
-    pdf.setGState(new (pdf as any).GState({ opacity: 0.045 }));
+    const GState = (pdf as unknown as { GState: new (o: { opacity: number }) => unknown }).GState;
+    (pdf as unknown as { setGState: (g: unknown) => void }).setGState(new GState({ opacity: 0.045 }));
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(96);
     pdf.setTextColor(...COBALT);
