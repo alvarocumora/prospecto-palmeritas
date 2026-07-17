@@ -218,14 +218,16 @@ export async function renderGeocapitalsPdf(
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7.5);
     pdf.setTextColor(...INK_SOFT);
-    pdf.text(cleanDocType(doc.docType), pageW - marginX, 31, { align: "right" });
+    pdf.text(cleanDocType(doc.docType), pageW - marginX, 30, { align: "right" });
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(6.8);
+    pdf.setFontSize(6.6);
     pdf.setTextColor(...MUTED);
-    pdf.text(`Ref ${doc.reference}`, pageW - marginX, 42, { align: "right" });
+    pdf.text(`Ref ${doc.reference}`, pageW - marginX, 40, { align: "right" });
+    pdf.setTextColor(...COBALT_DEEP);
+    pdf.text(CONTACT_EMAIL, pageW - marginX, 50, { align: "right" });
     pdf.setDrawColor(...HAIRLINE);
     pdf.setLineWidth(0.6);
-    pdf.line(marginX, 61, pageW - marginX, 61);
+    pdf.line(marginX, 64, pageW - marginX, 64);
   };
 
   drawTopRule();
