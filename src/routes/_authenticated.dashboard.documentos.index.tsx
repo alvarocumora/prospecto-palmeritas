@@ -5,7 +5,7 @@ import { TEMPLATES, CATEGORY_LABEL } from "@/lib/documents/templates";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
-export const Route = createFileRoute("/_authenticated/dashboard/documentos")({
+export const Route = createFileRoute("/_authenticated/dashboard/documentos/")({
   head: () => ({
     meta: [
       { title: "Documentos de transacción — Geocapitals" },
