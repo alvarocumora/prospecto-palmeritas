@@ -31,7 +31,10 @@ export type PlatformStats = {
 };
 
 async function countTable(supabase: DbClient, table: TableName): Promise<number> {
-  const { count, error } = await supabase.from(table).select("id", { count: "exact", head: true });
+  // Cast a SupabaseClient sin genéricos: con 135+ tablas el union type dispara
+  // TS2589 (instantiation excessively deep) al pasar `table` dinámicamente.
+  const client = supabase as unknown as SupabaseClient;
+  const { count, error } = await client.from(table).select("id", { count: "exact", head: true });
   if (error) return 0;
   return count ?? 0;
 }
