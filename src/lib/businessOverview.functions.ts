@@ -66,6 +66,10 @@ export type BusinessOverview = {
   listings: number;
   /** Contrapartes únicas en mis trades (clientes/proveedores). */
   clients: number;
+  sourcing: {
+    openRequests: number;
+    totalProposals: number;
+  };
   events: RawTradeEvent[];
 };
 
@@ -140,6 +144,25 @@ export const getBusinessOverview = createServerFn({ method: "GET" })
       if (other && other !== me) counterparties.add(other);
     }
 
+    // Sourcing (best-effort: la tabla puede no estar migrada aún).
+    let openRequests = 0;
+    let totalProposals = 0;
+    try {
+      const { data: reqs } = await sb
+        .from("sourcing_requests")
+        .select("status, submissions:sourcing_submissions(id)")
+        .limit(200);
+      for (const r of (reqs ?? []) as Array<{
+        status: string;
+        submissions?: Array<{ id: string }> | null;
+      }>) {
+        if (r.status === "abierto") openRequests += 1;
+        totalProposals += r.submissions?.length ?? 0;
+      }
+    } catch {
+      /* tabla de sourcing aún no aplicada */
+    }
+
     const now = new Date();
     const ships = (shipsQ.data ?? []) as Array<
       Omit<BusinessShipmentRow, "delayed"> & { created_at: string }
@@ -190,6 +213,7 @@ export const getBusinessOverview = createServerFn({ method: "GET" })
       lots: lotsQ.count ?? 0,
       listings: listingsQ.count ?? 0,
       clients: counterparties.size,
+      sourcing: { openRequests, totalProposals },
       events: (eventsQ.data ?? []) as RawTradeEvent[],
     };
   });
