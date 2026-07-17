@@ -9,8 +9,9 @@ import { GlobalGeoCopilot } from "@/components/ops/GlobalGeoCopilot";
 import { cn } from "@/lib/utils";
 
 const ROUTE_LABELS: Record<string, string> = {
-  "/dashboard": "Mission Control",
-  "/dashboard/map": "Centro Op.",
+  "/dashboard": "Inicio",
+  "/dashboard/map": "Mapa Táctico",
+  "/dashboard/documentos": "Documentos",
   "/dashboard/catastro": "Catastro",
   "/dashboard/boletin": "Boletín Minero",
   "/dashboard/geophysics": "Geofísica",
@@ -33,6 +34,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard/campaigns": "Campañas",
   "/dashboard/satellite-intel": "Inteligencia Satelital",
 };
+
 
 function breadcrumb(path: string): string {
   const exact = ROUTE_LABELS[path];
