@@ -195,8 +195,8 @@ function VerifyPage() {
           <div className="border-t border-hairline bg-surface-subtle px-6 py-4 text-[11px] font-mono text-content-subtle">
             Esta página muestra metadatos públicos. El contenido del documento no se expone. Ante
             cualquier duda, contacta al emisor o escribe a{" "}
-            <a href="mailto:contacto@geocapitals.com" className="text-accent-brand underline">
-              contacto@geocapitals.com
+            <a href="mailto:info@geocapitals.com" className="text-accent-brand underline">
+              info@geocapitals.com
             </a>
             .
           </div>
@@ -212,10 +212,10 @@ function VerifyPage() {
             WhatsApp +56 9 6218 4071
           </a>
           <a
-            href="mailto:contacto@geocapitals.com"
+            href="mailto:info@geocapitals.com"
             className="rounded-lg border border-hairline bg-white px-3 py-2 hover:border-accent-brand"
           >
-            contacto@geocapitals.com
+            info@geocapitals.com
           </a>
         </div>
       </section>

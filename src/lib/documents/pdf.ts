@@ -21,7 +21,7 @@ const WHITE: [number, number, number] = [255, 255, 255];
 
 // ─────────────────────── Contacto institucional ───────────────────────
 const CONTACT = {
-  email: "contacto@geocapitals.com",
+  email: "info@geocapitals.com",
   whatsapp: "+56 9 6218 4071",
   site: "geocapitals.com",
 };
@@ -116,6 +116,18 @@ export async function renderGeocapitalsPdf(
     pdf.rect(0, 0, pageW, 6, "F");
     pdf.setFillColor(...COBALT);
     pdf.rect(0, 6, pageW * 0.26, 2, "F");
+    // Marca de agua diagonal tenue (identidad unificada).
+    pdf.saveGraphicsState();
+    const GState = (pdf as unknown as { GState: new (o: { opacity: number }) => unknown }).GState;
+    (pdf as unknown as { setGState: (g: unknown) => void }).setGState(new GState({ opacity: 0.045 }));
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(96);
+    pdf.setTextColor(...COBALT);
+    pdf.text("GEOCAPITALS", pageW / 2, pageH / 2, {
+      align: "center",
+      angle: 32,
+    });
+    pdf.restoreGraphicsState();
   };
   paintPaper();
 
