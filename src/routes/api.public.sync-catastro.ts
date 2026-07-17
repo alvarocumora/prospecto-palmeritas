@@ -4,7 +4,7 @@
 // To configure cron in Supabase:
 //   SELECT cron.schedule('sync-catastro-daily', '0 6 * * *', $$
 //     SELECT net.http_post(
-//       url := 'https://prospecto-palmeritas.lovable.app/api/public/sync-catastro',
+//       url := 'https://geocapitals.com/api/public/sync-catastro',
 //       headers := jsonb_build_object(
 //         'Content-Type', 'application/json',
 //         'x-cron-secret', '<CRON_SECRET>'
