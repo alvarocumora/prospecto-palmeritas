@@ -227,7 +227,7 @@ export function DocumentEditor({
           signerName: signerName.trim() || undefined,
         },
       });
-      const url = `https://geocapitals.com/firmar/${token}`;
+      const url = buildSignUrl(token);
       setSignLink(url);
       await navigator.clipboard.writeText(url).catch(() => {});
       toast.success(
