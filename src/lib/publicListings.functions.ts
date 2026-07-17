@@ -64,19 +64,23 @@ export const getPublicListings = createServerFn({ method: "GET" }).handler(
       }
 
       const listings: PublicListing[] = (data ?? []).map((r) => {
-        let centroid = centroidOf(
-          typeof r.geometry_geojson === "string"
-            ? safeParse(r.geometry_geojson)
-            : r.geometry_geojson,
-        );
-        if (!centroid) {
-          const pc = r.projects as unknown as {
-            center_lat: number | null;
-            center_lng: number | null;
-          } | null;
-          if (pc?.center_lat != null && pc?.center_lng != null) {
-            centroid = [Number(pc.center_lng), Number(pc.center_lat)];
-          } else if (r.region && REGION_CENTROID[r.region]) {
+        // Fuente canónica de coordenadas: projects.center_lat/lng (misma que
+        // usa el informe pre-NI 43-101 y projectFacts). Fallbacks: geometry
+        // del listing → centroide regional.
+        const pc = r.projects as unknown as {
+          center_lat: number | null;
+          center_lng: number | null;
+        } | null;
+        let centroid: [number, number] | null = null;
+        if (pc?.center_lat != null && pc?.center_lng != null) {
+          centroid = [Number(pc.center_lng), Number(pc.center_lat)];
+        } else {
+          centroid = centroidOf(
+            typeof r.geometry_geojson === "string"
+              ? safeParse(r.geometry_geojson)
+              : r.geometry_geojson,
+          );
+          if (!centroid && r.region && REGION_CENTROID[r.region]) {
             centroid = REGION_CENTROID[r.region];
           }
         }
