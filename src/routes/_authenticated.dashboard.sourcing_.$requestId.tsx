@@ -13,12 +13,15 @@ import {
   Share2,
   Star,
   XCircle,
+  Handshake,
+  ArrowRight,
 } from "lucide-react";
 import {
   getSourcingRequestDetail,
   setSubmissionStatus,
   setRequestStatus,
   generateSubmissionShareLink,
+  convertSubmissionToTrade,
   type SubmissionRow,
 } from "@/lib/sourcing.functions";
 import { supplierSheetUrl } from "@/lib/publicUrl";
@@ -34,10 +37,12 @@ const fmtUsdT = (n: number | null) =>
 
 function RequestDetail() {
   const { requestId } = Route.useParams();
+  const navigate = Route.useNavigate();
   const detailFn = useServerFn(getSourcingRequestDetail);
   const statusFn = useServerFn(setSubmissionStatus);
   const reqStatusFn = useServerFn(setRequestStatus);
   const shareFn = useServerFn(generateSubmissionShareLink);
+  const convertFn = useServerFn(convertSubmissionToTrade);
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["sourcing-detail", requestId],
@@ -47,6 +52,19 @@ function RequestDetail() {
   });
 
   const [shareLinks, setShareLinks] = useState<Record<string, string>>({});
+  const [converting, setConverting] = useState<string | null>(null);
+
+  const onConvert = async (id: string) => {
+    setConverting(id);
+    try {
+      const { tradeId } = await convertFn({ data: { submissionId: id } });
+      toast.success("Propuesta convertida en trade. Abriendo la operación…");
+      navigate({ to: "/dashboard/trades/$tradeId", params: { tradeId } });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo convertir.");
+      setConverting(null);
+    }
+  };
 
   const onStatus = async (id: string, status: SubmissionStatus) => {
     try {
@@ -168,8 +186,10 @@ function RequestDetail() {
               key={s.id}
               s={s}
               shareLink={shareLinks[s.id] ?? null}
+              converting={converting === s.id}
               onStatus={onStatus}
               onShare={onShare}
+              onConvert={onConvert}
             />
           ))}
         </div>
@@ -181,13 +201,17 @@ function RequestDetail() {
 function SubmissionCard({
   s,
   shareLink,
+  converting,
   onStatus,
   onShare,
+  onConvert,
 }: {
   s: SubmissionRow;
   shareLink: string | null;
+  converting: boolean;
   onStatus: (id: string, status: SubmissionStatus) => void;
   onShare: (id: string) => void;
+  onConvert: (id: string) => void;
 }) {
   return (
     <div
@@ -282,12 +306,33 @@ function SubmissionCard({
         <span className="text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
           {SUBMISSION_STATUS_LABELS[(s.status as SubmissionStatus) ?? "recibida"] ?? s.status}
         </span>
-        <button
-          onClick={() => onShare(s.id)}
-          className="ml-auto text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
-        >
-          <Share2 className="w-3 h-3" /> Ficha para el comprador
-        </button>
+        <div className="ml-auto flex items-center gap-3">
+          <button
+            onClick={() => onShare(s.id)}
+            className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+          >
+            <Share2 className="w-3 h-3" /> Ficha comprador
+          </button>
+          {s.trade_id ? (
+            <Link
+              to="/dashboard/trades/$tradeId"
+              params={{ tradeId: s.trade_id }}
+              className="text-[11px] font-mono text-teal hover:underline inline-flex items-center gap-1"
+            >
+              <Handshake className="w-3 h-3" /> Ver trade <ArrowRight className="w-3 h-3" />
+            </Link>
+          ) : (
+            s.status !== "descartada" && (
+              <button
+                onClick={() => onConvert(s.id)}
+                disabled={converting}
+                className="text-[11px] font-mono text-teal hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+              >
+                <Handshake className="w-3 h-3" /> {converting ? "Creando…" : "Convertir en trade"}
+              </button>
+            )
+          )}
+        </div>
       </div>
 
       {shareLink && (
