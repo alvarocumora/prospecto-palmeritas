@@ -508,62 +508,70 @@ export async function renderGeocapitalsPdf(
 
   // ─── Header/footers finales, mini QR y paginación ───
   const pageCount = pdf.getNumberOfPages();
+  const footerH = 92;
+  const footerTop = pageH - footerH;
+  const qrSize = 42;
+  const qrX = pageW - marginX - qrSize;
+  const qrY = footerTop + 14;
+  const textColW = contentW - qrSize - 20;
 
   for (let p = 1; p <= pageCount; p++) {
     pdf.setPage(p);
 
+    // Franja footer sólida para tapar cualquier contenido previo
     pdf.setFillColor(...PAPER);
-    pdf.rect(0, pageH - 86, pageW, 86, "F");
+    pdf.rect(0, footerTop, pageW, footerH, "F");
+
+    // Regla superior del footer con acento cobalto
     pdf.setDrawColor(...HAIRLINE);
     pdf.setLineWidth(0.7);
-    pdf.line(marginX, pageH - 78, pageW - marginX, pageH - 78);
+    pdf.line(marginX, footerTop + 6, pageW - marginX, footerTop + 6);
     pdf.setDrawColor(...COBALT);
-    pdf.setLineWidth(1.1);
-    pdf.line(marginX, pageH - 78, marginX + 36, pageH - 78);
+    pdf.setLineWidth(1.2);
+    pdf.line(marginX, footerTop + 6, marginX + 40, footerTop + 6);
 
-    if (qrDataUrl && p === pageCount) {
-      const size = 36;
-      pdf.addImage(
-        qrDataUrl,
-        "PNG",
-        pageW - marginX - size,
-        pageH - 60,
-        size,
-        size,
-        undefined,
-        "FAST",
-      );
+    // Mini QR en todas las páginas (columna reservada, nunca se solapa)
+    if (qrDataUrl) {
+      pdf.setFillColor(...CARD);
+      pdf.setDrawColor(...HAIRLINE);
+      pdf.setLineWidth(0.5);
+      pdf.roundedRect(qrX - 4, qrY - 4, qrSize + 8, qrSize + 8, 3, 3, "FD");
+      pdf.addImage(qrDataUrl, "PNG", qrX, qrY, qrSize, qrSize, undefined, "FAST");
     }
+
+    // Columna izquierda: marca, contacto, disclaimer, verificación
+    let fy = footerTop + 20;
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(6.8);
     pdf.setTextColor(...COBALT_DEEP);
-    pdf.text("GEOCAPITALS · DOCUMENTACIÓN TRANSACCIONAL", marginX, pageH - 62);
+    pdf.text("GEOCAPITALS · DOCUMENTACIÓN TRANSACCIONAL", marginX, fy);
 
+    fy += 11;
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(6.7);
-    pdf.setTextColor(...MUTED);
-    pdf.text(
-      "Documento generado por Geocapitals como borrador editable. No constituye asesoría legal ni oferta financiera. Validar con las contrapartes y sus asesores antes de firmar.",
-      marginX,
-      pageH - 50,
-      { maxWidth: contentW - (p === pageCount ? 60 : 0) },
-    );
-
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(6.6);
     pdf.setTextColor(...INK_SOFT);
-    pdf.text(`${CONTACT_EMAIL} · WhatsApp ${CONTACT_WHATSAPP}`, marginX, pageH - 32);
+    pdf.text(`${CONTACT_EMAIL}   ·   WhatsApp ${CONTACT_WHATSAPP}`, marginX, fy);
 
+    fy += 11;
+    pdf.setFontSize(6.4);
+    pdf.setTextColor(...MUTED);
+    const disclaimer = pdf.splitTextToSize(
+      "Documento generado por Geocapitals como borrador editable. No constituye asesoría legal ni oferta financiera. Validar con las contrapartes y sus asesores antes de firmar.",
+      textColW,
+    );
+    pdf.text(disclaimer.slice(0, 2), marginX, fy);
+
+    fy = footerTop + footerH - 14;
     pdf.setFontSize(6.4);
     pdf.setTextColor(...INK);
-    pdf.textWithLink(`Verificación electrónica: ${verify}`, marginX, pageH - 20, { url: verify });
-    pdf.textWithLink(`Contacto WhatsApp`, marginX + 275, pageH - 20, { url: WHATSAPP_URL });
+    pdf.textWithLink(`Verificación: ${verify}`, marginX, fy, { url: verify });
 
-    pdf.setFontSize(6.8);
+    pdf.setFontSize(6.6);
     pdf.setTextColor(...MUTED);
-    pdf.text(`${p} / ${pageCount}`, pageW - marginX, pageH - 22, { align: "right" });
+    pdf.text(`${p} / ${pageCount}`, pageW - marginX, fy, { align: "right" });
   }
+
 
   pdf.save(`geocapitals-${doc.docType}-${doc.reference}.pdf`);
 }
