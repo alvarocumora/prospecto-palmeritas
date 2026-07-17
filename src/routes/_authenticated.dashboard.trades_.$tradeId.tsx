@@ -75,7 +75,7 @@ function TrackingPage() {
     );
   }
 
-  const { trade, shipments, events } = data;
+  const { trade, shipments, events, docsCount } = data;
   const activeShipment = shipments[0] ?? null;
   const step = journeyStep(trade.stage, activeShipment?.status ?? null);
   const headline = journeyHeadline(step, {
@@ -169,6 +169,38 @@ function TrackingPage() {
           </div>
         </div>
       )}
+
+      {/* Documentos del acuerdo — generar, enviar a firma y trazar */}
+      <div className="rounded-md border border-border bg-bg-secondary/20 p-4">
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
+          <FileText className="w-3.5 h-3.5 text-signal-violet" /> Documentos del acuerdo ·{" "}
+          {docsCount} archivo(s)
+        </div>
+        <p className="text-xs text-text-secondary mb-3">
+          Genera el documento con la contraparte precargada — al firmarse queda registrado en este
+          timeline automáticamente.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              ["nda", "NDA"],
+              ["data-sheet", "Data Sheet"],
+              ["loi", "LOI"],
+              ["spa", "Contrato SPA"],
+            ] as const
+          ).map(([tpl, label]) => (
+            <Link
+              key={tpl}
+              to="/dashboard/documentos/$templateId"
+              params={{ templateId: tpl }}
+              search={{ trade: trade.id }}
+              className="px-3 py-1.5 rounded border border-border text-xs hover:bg-accent inline-flex items-center gap-1.5"
+            >
+              <FileText className="w-3 h-3" /> {label}
+            </Link>
+          ))}
+        </div>
+      </div>
 
       {/* Timeline unificado */}
       <div>

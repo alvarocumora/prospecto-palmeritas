@@ -38,10 +38,16 @@ function defaultClauses(tpl: TemplateDef): Set<string> {
 export function DocumentEditor({
   template,
   prefill,
+  tradeId,
+  signerPrefill,
 }: {
   template: TemplateDef;
   /** Valores iniciales (ej. desde un lote del marketplace). Pisan el borrador. */
   prefill?: Record<string, string>;
+  /** Trade de origen: la firma queda en la trazabilidad de la operación. */
+  tradeId?: string;
+  /** Contraparte sugerida (ej. desde un trade) para la solicitud de firma. */
+  signerPrefill?: { name?: string | null; email?: string | null };
 }) {
   const { user } = useAuth();
   const storageKey = `${STORAGE_PREFIX}${template.id}`;
@@ -208,8 +214,8 @@ export function DocumentEditor({
 
   const [signLink, setSignLink] = useState<string | null>(null);
   const [requestingSign, setRequestingSign] = useState(false);
-  const [signerEmail, setSignerEmail] = useState("");
-  const [signerName, setSignerName] = useState("");
+  const [signerEmail, setSignerEmail] = useState(signerPrefill?.email ?? "");
+  const [signerName, setSignerName] = useState(signerPrefill?.name ?? "");
   const signFn = useServerFn(createSignRequest);
 
   const requestSignature = async () => {
@@ -225,6 +231,7 @@ export function DocumentEditor({
           doc: doc as unknown as SignableDoc,
           signerEmail: signerEmail.trim() || undefined,
           signerName: signerName.trim() || undefined,
+          tradeId,
         },
       });
       const url = buildSignUrl(token);

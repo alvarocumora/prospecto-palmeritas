@@ -131,14 +131,11 @@ export const getTradeDetail = createServerFn({ method: "GET" })
       .from("profiles")
       .select("user_id, display_name, email")
       .in("user_id", [t.buyer_user_id, t.seller_user_id]);
+    type Prof = { user_id: string; display_name: string | null; email: string | null };
+    const profOf = (uid: string): Prof | undefined =>
+      ((profs ?? []) as Prof[]).find((x) => x.user_id === uid);
     const nameOf = (uid: string): string | null => {
-      const p = (
-        (profs ?? []) as Array<{
-          user_id: string;
-          display_name: string | null;
-          email: string | null;
-        }>
-      ).find((x) => x.user_id === uid);
+      const p = profOf(uid);
       return p?.display_name ?? p?.email ?? null;
     };
 
@@ -148,6 +145,8 @@ export const getTradeDetail = createServerFn({ method: "GET" })
         role: t.buyer_user_id === context.userId ? ("buyer" as const) : ("seller" as const),
         buyerName: nameOf(t.buyer_user_id),
         sellerName: nameOf(t.seller_user_id),
+        buyerEmail: profOf(t.buyer_user_id)?.email ?? null,
+        sellerEmail: profOf(t.seller_user_id)?.email ?? null,
       },
       documents: (docs ?? []) as TradeDocRow[],
     };

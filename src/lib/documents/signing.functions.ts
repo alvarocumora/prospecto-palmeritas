@@ -45,6 +45,8 @@ const CreateInput = z.object({
   doc: DocSchema,
   signerName: z.string().trim().max(120).optional(),
   signerEmail: z.string().trim().email().max(160).optional(),
+  /** Trade al que pertenece el documento: al firmarse queda en su trazabilidad. */
+  tradeId: z.string().uuid().optional(),
 });
 
 export const createSignRequest = createServerFn({ method: "POST" })
@@ -53,22 +55,37 @@ export const createSignRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const token = generateSignToken();
     const generated = data.doc as GeneratedDoc;
-    const { data: row, error } = await asSb(context.supabase)
+    const baseRow = {
+      created_by: context.userId as string,
+      template_id: data.templateId,
+      reference: generated.reference,
+      title: generated.title,
+      doc: generated,
+      doc_hash: await docHash(generated),
+      signer_name_expected: data.signerName ?? null,
+      signer_email: data.signerEmail ?? null,
+      token_prefix: signTokenPrefix(token),
+      token_hash: await sha256Hex(token),
+    };
+    const sb0 = asSb(context.supabase);
+    const insertRow = (
+      data.tradeId ? { ...baseRow, trade_id: data.tradeId } : baseRow
+    ) as typeof baseRow;
+    let ins = await sb0
       .from("document_sign_requests")
-      .insert({
-        created_by: context.userId as string,
-        template_id: data.templateId,
-        reference: generated.reference,
-        title: generated.title,
-        doc: generated,
-        doc_hash: await docHash(generated),
-        signer_name_expected: data.signerName ?? null,
-        signer_email: data.signerEmail ?? null,
-        token_prefix: signTokenPrefix(token),
-        token_hash: await sha256Hex(token),
-      })
+      .insert(insertRow)
       .select("id, expires_at")
       .single();
+    // Fallback pre-migración: si trade_id aún no existe como columna, se crea
+    // la solicitud sin vínculo (el flujo de firma no puede quedar bloqueado).
+    if (ins.error && data.tradeId && /trade_id|schema cache|column/i.test(ins.error.message)) {
+      ins = await sb0
+        .from("document_sign_requests")
+        .insert(baseRow)
+        .select("id, expires_at")
+        .single();
+    }
+    const { data: row, error } = ins;
     if (error) throw new Error(error.message);
 
     // Notificar al firmante con el link (si dejó email). El correo nunca puede
@@ -171,11 +188,11 @@ const TokenInput = z.object({ token: z.string().trim().min(10).max(120) });
 async function findByToken(sb: SupabaseClient, token: string) {
   if (!isSignTokenFormat(token)) return null;
   const tokenHash = await sha256Hex(token);
+  // select * para tolerar columnas nuevas aún no migradas (ej. trade_id):
+  // el flujo público de firma jamás puede romperse por un select explícito.
   const { data } = await sb
     .from("document_sign_requests")
-    .select(
-      "id, created_by, title, reference, doc, doc_hash, status, signer_name_expected, signed_by_name, signed_at, signature_hash, expires_at, token_hash",
-    )
+    .select("*")
     .eq("token_hash", tokenHash)
     .maybeSingle();
   return data as
@@ -244,6 +261,22 @@ export const submitSignature = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!updated) throw new Error("El documento ya fue firmado o anulado.");
+
+    // Trazabilidad: si el documento pertenece a un trade, el evento de firma
+    // entra a trade_events y aparece en el timeline unificado de la operación.
+    if (row.trade_id) {
+      try {
+        await sb.from("trade_events").insert({
+          trade_id: String(row.trade_id),
+          actor_user_id: String(row.created_by),
+          kind: "doc_signed",
+          doc_type: String(row.template_id ?? "doc"),
+          detail: `${String(row.title)} firmado por ${data.signerName}`,
+        });
+      } catch (e) {
+        console.error("[submitSignature] trade event failed", e);
+      }
+    }
 
     // Avisar al dueño de la solicitud que su documento fue firmado.
     try {

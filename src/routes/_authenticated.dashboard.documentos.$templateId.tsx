@@ -6,11 +6,12 @@ import { TEMPLATE_BY_ID } from "@/lib/documents/templates";
 import { mapLotToDataSheetValues } from "@/lib/documents/prefill";
 import { getCommodityLotDetail } from "@/lib/marketplace.functions";
 import { verifyCommodityLot } from "@/lib/lotVerification.functions";
+import { getTradeDetail } from "@/lib/trades.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documentos/$templateId")({
   validateSearch: (s: Record<string, unknown>) =>
-    z.object({ lot: z.string().uuid().optional() }).parse(s),
-  loaderDeps: ({ search }) => ({ lot: search.lot }),
+    z.object({ lot: z.string().uuid().optional(), trade: z.string().uuid().optional() }).parse(s),
+  loaderDeps: ({ search }) => ({ lot: search.lot, trade: search.trade }),
   loader: async ({ params, deps }) => {
     const template = TEMPLATE_BY_ID[params.templateId];
     if (!template) throw notFound();
@@ -26,6 +27,22 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
         prefill = mapLotToDataSheetValues(lot, { kymScore: kym?.score ?? null });
       }
     }
+
+    // Contexto de trade: la contraparte queda sugerida como firmante y el
+    // documento firmado entra a la trazabilidad de la operación.
+    let tradeId: string | null = null;
+    let signerPrefill: { name: string | null; email: string | null } | null = null;
+    if (deps.trade) {
+      const res = await getTradeDetail({ data: { id: deps.trade } }).catch(() => null);
+      if (res?.trade) {
+        tradeId = res.trade.id;
+        const t = res.trade;
+        signerPrefill =
+          t.role === "buyer"
+            ? { name: t.sellerName, email: t.sellerEmail }
+            : { name: t.buyerName, email: t.buyerEmail };
+      }
+    }
     // Devolvemos solo datos serializables — el `TemplateDef` incluye
     // `build: Function`, que rompe la dehidratación SSR (seroval no serializa
     // funciones). El componente resuelve el template en cliente por id.
@@ -34,6 +51,8 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
       templateTitle: template.title,
       templateSummary: template.summary,
       prefill,
+      tradeId,
+      signerPrefill,
     };
   },
   head: ({ loaderData }) => {
@@ -74,8 +93,15 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
 });
 
 function DocumentPage() {
-  const { templateId, prefill } = Route.useLoaderData();
+  const { templateId, prefill, tradeId, signerPrefill } = Route.useLoaderData();
   const template = TEMPLATE_BY_ID[templateId];
   if (!template) return null;
-  return <DocumentEditor template={template} prefill={prefill ?? undefined} />;
+  return (
+    <DocumentEditor
+      template={template}
+      prefill={prefill ?? undefined}
+      tradeId={tradeId ?? undefined}
+      signerPrefill={signerPrefill ?? undefined}
+    />
+  );
 }
