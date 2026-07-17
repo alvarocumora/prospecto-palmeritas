@@ -18,7 +18,6 @@ const MUTED: [number, number, number] = [107, 107, 123];
 const HAIRLINE: [number, number, number] = [227, 224, 216];
 const COBALT: [number, number, number] = [43, 74, 203];
 const COBALT_DEEP: [number, number, number] = [31, 54, 158];
-const SUCCESS: [number, number, number] = [36, 128, 83];
 
 export type EmitterSignature = {
   /** Nombre visible del firmante (razón social o persona). */
@@ -179,25 +178,25 @@ export async function renderGeocapitalsPdf(
   const drawBrand = (x: number, y: number, compact = false) => {
     const markH = compact ? 22 : 34;
     const textX = x + markH + (compact ? 9 : 13);
-  if (mark) {
-    const markW = markH * mark.ratio;
+    if (mark) {
+      const markW = markH * mark.ratio;
       pdf.addImage(mark.dataUrl, "PNG", x, y, markW, markH, undefined, "FAST");
-    pdf.setFont("helvetica", "bold");
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(compact ? 8.5 : 10.5);
-    pdf.setTextColor(...INK);
+      pdf.setTextColor(...INK);
       pdf.text("GEOCAPITALS", textX, y + (compact ? 9 : 14));
-    pdf.setFont("helvetica", "normal");
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(compact ? 6.2 : 7.5);
-    pdf.setTextColor(...MUTED);
+      pdf.setTextColor(...MUTED);
       pdf.text("Mining · Deals · Documentation", textX, y + (compact ? 18 : 26));
-  } else {
-    pdf.setFont("helvetica", "bold");
+    } else {
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(compact ? 10 : 15);
-    pdf.setTextColor(...INK);
+      pdf.setTextColor(...INK);
       pdf.text("GEOCAPITALS", x, y + 16);
-    pdf.setFont("helvetica", "normal");
+      pdf.setFont("helvetica", "normal");
       pdf.setFontSize(7);
-    pdf.setTextColor(...MUTED);
+      pdf.setTextColor(...MUTED);
       pdf.text("Mining · Deals · Documentation", x, y + 27);
     }
   };
@@ -313,6 +312,7 @@ export async function renderGeocapitalsPdf(
   const ensure = (needed: number) => {
     if (y + needed > bottomLimit) {
       pdf.addPage();
+      drawContinuationHeader();
       y = 82;
     }
   };
@@ -327,7 +327,6 @@ export async function renderGeocapitalsPdf(
     pdf.setLineWidth(1);
     pdf.line(marginX, y + 7, marginX + 44, y + 7);
     y += 22;
-  }
   };
 
   // ─── Bloques ───
@@ -382,7 +381,6 @@ export async function renderGeocapitalsPdf(
     } else if (block.kind === "fields") {
       autoTable(pdf, {
         startY: y,
-        margin: { left: marginX, right: marginX },
         theme: "plain",
         pageBreak: "auto",
         rowPageBreak: "avoid",
@@ -406,7 +404,6 @@ export async function renderGeocapitalsPdf(
     } else if (block.kind === "table") {
       autoTable(pdf, {
         startY: y,
-        margin: { left: marginX, right: marginX },
         theme: "grid",
         pageBreak: "auto",
         rowPageBreak: "avoid",
@@ -439,6 +436,7 @@ export async function renderGeocapitalsPdf(
         const x = marginX + col * (slotW + gap);
         const top = y + row * slotH;
         const sig = signatures.find((s) => Math.min(Math.max(s.partyIndex ?? 0, 0), n - 1) === i);
+        const visibleName = sig ? signatureDisplayName(sig.name) : "";
         const lineY = top + 54;
 
         pdf.setFillColor(...CARD);
@@ -447,7 +445,6 @@ export async function renderGeocapitalsPdf(
         pdf.roundedRect(x, top, slotW, slotH - 16, 5, 5, "FD");
 
         if (sig) {
-          const visibleName = signatureDisplayName(sig.name);
           const sigLines = pdf.splitTextToSize(visibleName, slotW - 84).slice(0, 1);
           pdf.setFont("helvetica", "bolditalic");
           pdf.setFontSize(14.2);
@@ -509,10 +506,6 @@ export async function renderGeocapitalsPdf(
 
   for (let p = 1; p <= pageCount; p++) {
     pdf.setPage(p);
-
-    if (p > 1) {
-      drawContinuationHeader();
-    }
 
     pdf.setFillColor(...PAPER);
     pdf.rect(0, pageH - 86, pageW, 86, "F");
