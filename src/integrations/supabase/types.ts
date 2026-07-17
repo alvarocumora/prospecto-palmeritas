@@ -492,6 +492,81 @@ export type Database = {
           },
         ]
       }
+      asset_offerings: {
+        Row: {
+          closes_at: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          description: string | null
+          id: string
+          instrument: string
+          min_units: number
+          opens_at: string | null
+          price_per_unit_usd: number
+          project_id: string
+          status: string
+          terms_url: string | null
+          title: string
+          token_symbol: string
+          total_units: number
+          updated_at: string
+        }
+        Insert: {
+          closes_at?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          description?: string | null
+          id?: string
+          instrument?: string
+          min_units?: number
+          opens_at?: string | null
+          price_per_unit_usd: number
+          project_id: string
+          status?: string
+          terms_url?: string | null
+          title: string
+          token_symbol: string
+          total_units: number
+          updated_at?: string
+        }
+        Update: {
+          closes_at?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          instrument?: string
+          min_units?: number
+          opens_at?: string | null
+          price_per_unit_usd?: number
+          project_id?: string
+          status?: string
+          terms_url?: string | null
+          title?: string
+          token_symbol?: string
+          total_units?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asset_offerings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "asset_offerings_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: string
@@ -938,6 +1013,57 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      business_partners: {
+        Row: {
+          commodities: string[] | null
+          company: string | null
+          country: string | null
+          created_at: string
+          email: string | null
+          id: string
+          linked_user_id: string | null
+          name: string
+          notes: string | null
+          owner_user_id: string
+          phone: string | null
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          commodities?: string[] | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          linked_user_id?: string | null
+          name: string
+          notes?: string | null
+          owner_user_id: string
+          phone?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          commodities?: string[] | null
+          company?: string | null
+          country?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          linked_user_id?: string | null
+          name?: string
+          notes?: string | null
+          owner_user_id?: string
+          phone?: string | null
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       buyer_profiles: {
         Row: {
@@ -2077,6 +2203,90 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      commodity_trades: {
+        Row: {
+          buyer_user_id: string
+          commodity: string | null
+          created_at: string
+          created_by: string
+          currency: string
+          form: string | null
+          id: string
+          incoterm: string | null
+          inquiry_id: string | null
+          lot_id: string | null
+          notes: string | null
+          payment_instrument: string | null
+          quantity_t: number | null
+          reference: string | null
+          seller_user_id: string
+          stage: string
+          status: string
+          total_value_usd: number | null
+          unit_price_usd: number | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_user_id: string
+          commodity?: string | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          form?: string | null
+          id?: string
+          incoterm?: string | null
+          inquiry_id?: string | null
+          lot_id?: string | null
+          notes?: string | null
+          payment_instrument?: string | null
+          quantity_t?: number | null
+          reference?: string | null
+          seller_user_id: string
+          stage?: string
+          status?: string
+          total_value_usd?: number | null
+          unit_price_usd?: number | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_user_id?: string
+          commodity?: string | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          form?: string | null
+          id?: string
+          incoterm?: string | null
+          inquiry_id?: string | null
+          lot_id?: string | null
+          notes?: string | null
+          payment_instrument?: string | null
+          quantity_t?: number | null
+          reference?: string | null
+          seller_user_id?: string
+          stage?: string
+          status?: string
+          total_value_usd?: number | null
+          unit_price_usd?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commodity_trades_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commodity_trades_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_lots"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       community_events: {
         Row: {
@@ -9631,6 +9841,50 @@ export type Database = {
         }
         Relationships: []
       }
+      offering_subscriptions: {
+        Row: {
+          amount_usd: number
+          created_at: string
+          id: string
+          investor_user_id: string
+          note: string | null
+          offering_id: string
+          status: string
+          units: number
+          updated_at: string
+        }
+        Insert: {
+          amount_usd?: number
+          created_at?: string
+          id?: string
+          investor_user_id: string
+          note?: string | null
+          offering_id: string
+          status?: string
+          units: number
+          updated_at?: string
+        }
+        Update: {
+          amount_usd?: number
+          created_at?: string
+          id?: string
+          investor_user_id?: string
+          note?: string | null
+          offering_id?: string
+          status?: string
+          units?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offering_subscriptions_offering_id_fkey"
+            columns: ["offering_id"]
+            isOneToOne: false
+            referencedRelation: "asset_offerings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       onboarding_status: {
         Row: {
           completed_at: string | null
@@ -13679,6 +13933,174 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_documents: {
+        Row: {
+          created_at: string
+          created_by: string
+          doc_type: string
+          file_url: string | null
+          id: string
+          issuer: string | null
+          notes: string | null
+          phase: string | null
+          reference: string | null
+          signed_at: string | null
+          signed_by: string | null
+          status: string
+          trade_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          doc_type: string
+          file_url?: string | null
+          id?: string
+          issuer?: string | null
+          notes?: string | null
+          phase?: string | null
+          reference?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          trade_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          doc_type?: string
+          file_url?: string | null
+          id?: string
+          issuer?: string | null
+          notes?: string | null
+          phase?: string | null
+          reference?: string | null
+          signed_at?: string | null
+          signed_by?: string | null
+          status?: string
+          trade_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_documents_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_events: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          detail: string | null
+          doc_type: string | null
+          id: string
+          kind: string
+          trade_id: string
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          detail?: string | null
+          doc_type?: string | null
+          id?: string
+          kind: string
+          trade_id: string
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          detail?: string | null
+          doc_type?: string | null
+          id?: string
+          kind?: string
+          trade_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_events_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_shipments: {
+        Row: {
+          bl_number: string | null
+          carrier: string | null
+          container_count: number | null
+          created_at: string
+          created_by: string
+          eta: string | null
+          etd: string | null
+          id: string
+          notes: string | null
+          port_discharge: string | null
+          port_loading: string | null
+          quantity_t: number | null
+          reference: string | null
+          status: string
+          tracking_url: string | null
+          trade_id: string
+          updated_at: string
+          vessel_name: string | null
+        }
+        Insert: {
+          bl_number?: string | null
+          carrier?: string | null
+          container_count?: number | null
+          created_at?: string
+          created_by: string
+          eta?: string | null
+          etd?: string | null
+          id?: string
+          notes?: string | null
+          port_discharge?: string | null
+          port_loading?: string | null
+          quantity_t?: number | null
+          reference?: string | null
+          status?: string
+          tracking_url?: string | null
+          trade_id: string
+          updated_at?: string
+          vessel_name?: string | null
+        }
+        Update: {
+          bl_number?: string | null
+          carrier?: string | null
+          container_count?: number | null
+          created_at?: string
+          created_by?: string
+          eta?: string | null
+          etd?: string | null
+          id?: string
+          notes?: string | null
+          port_discharge?: string | null
+          port_loading?: string | null
+          quantity_t?: number | null
+          reference?: string | null
+          status?: string
+          tracking_url?: string | null
+          trade_id?: string
+          updated_at?: string
+          vessel_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_shipments_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
             referencedColumns: ["id"]
           },
         ]
