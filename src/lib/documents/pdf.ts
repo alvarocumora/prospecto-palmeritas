@@ -21,7 +21,7 @@ const WHITE: [number, number, number] = [255, 255, 255];
 
 // ─────────────────────── Contacto institucional ───────────────────────
 const CONTACT = {
-  email: "contacto@geocapitals.com",
+  email: "info@geocapitals.com",
   whatsapp: "+56 9 6218 4071",
   site: "geocapitals.com",
 };
