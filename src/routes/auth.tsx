@@ -116,7 +116,7 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}${safeNext(search.next)}`,
+            emailRedirectTo: publicUrl(safeNext(search.next)),
             data: { display_name: displayName || email.split("@")[0], ...intentMeta },
           },
         });
