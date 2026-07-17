@@ -24,6 +24,53 @@ async function logTradeEvent(
   });
 }
 
+// Notifica por email a la contraparte del trade (el que NO ejecutó la acción).
+// Nunca puede romper la mutación principal: todo va en try/catch.
+async function notifyCounterparty(
+  sb: SupabaseClient,
+  tradeId: string,
+  actorUserId: string,
+  idempotencyKey: string,
+  templateData: Record<string, unknown>,
+) {
+  try {
+    const { data: trade } = await sb
+      .from("commodity_trades")
+      .select("buyer_user_id, seller_user_id, reference, commodity")
+      .eq("id", tradeId)
+      .maybeSingle();
+    if (!trade) return;
+    const t = trade as {
+      buyer_user_id: string;
+      seller_user_id: string;
+      reference: string | null;
+      commodity: string | null;
+    };
+    const counterpartyId = t.buyer_user_id === actorUserId ? t.seller_user_id : t.buyer_user_id;
+    if (!counterpartyId || counterpartyId === actorUserId) return;
+    const { data: prof } = await sb
+      .from("profiles")
+      .select("email")
+      .eq("user_id", counterpartyId)
+      .maybeSingle();
+    if (!prof?.email) return;
+    const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+    await sendInternalEmail({
+      templateName: "shipment-update",
+      recipientEmail: prof.email,
+      idempotencyKey,
+      templateData: {
+        tradeRef: t.reference ?? tradeId.slice(0, 8),
+        commodity: t.commodity ?? undefined,
+        trackingPath: `/dashboard/trades/${tradeId}`,
+        ...templateData,
+      },
+    });
+  } catch (e) {
+    console.error("[shipments] notify counterparty failed", e);
+  }
+}
+
 export type ShipmentRow = {
   id: string;
   trade_id: string;
@@ -105,6 +152,23 @@ export const createShipment = createServerFn({ method: "POST" })
       "shipment_created",
       `Embarque ${(row as { reference: string }).reference} creado${data.vesselName ? ` · nave ${data.vesselName}` : ""}${data.blNumber ? ` · BL ${data.blNumber}` : ""}`,
     );
+    await notifyCounterparty(
+      sb,
+      data.tradeId,
+      context.userId as string,
+      `shipment-created:${(row as { id: string }).id}`,
+      {
+        kind: "created",
+        shipmentRef: (row as { reference: string }).reference,
+        vesselName: data.vesselName ?? undefined,
+        statusLabel: SHIPMENT_STATUS_LABELS.preparing,
+        route:
+          data.portLoading || data.portDischarge
+            ? `${data.portLoading ?? "—"} → ${data.portDischarge ?? "—"}`
+            : undefined,
+        eta: data.eta || undefined,
+      },
+    );
     return { id: (row as { id: string }).id };
   });
 
@@ -121,7 +185,7 @@ export const advanceShipment = createServerFn({ method: "POST" })
     const sb = asSb(context.supabase);
     const { data: ship } = await sb
       .from("trade_shipments")
-      .select("trade_id, status, reference")
+      .select("trade_id, status, reference, vessel_name, port_loading, port_discharge, eta")
       .eq("id", data.id)
       .maybeSingle();
     if (!ship) throw new Error("Embarque no encontrado.");
@@ -143,6 +207,37 @@ export const advanceShipment = createServerFn({ method: "POST" })
       context.userId as string,
       "shipment_status",
       `Embarque ${(ship as { reference: string | null }).reference ?? data.id.slice(0, 8)}: ${SHIPMENT_STATUS_LABELS[current]} → ${SHIPMENT_STATUS_LABELS[data.next]}`,
+    );
+    const s = ship as {
+      trade_id: string;
+      reference: string | null;
+      vessel_name: string | null;
+      port_loading: string | null;
+      port_discharge: string | null;
+      eta: string | null;
+    };
+    await notifyCounterparty(
+      sb,
+      s.trade_id,
+      context.userId as string,
+      `shipment-status:${data.id}:${data.next}`,
+      {
+        kind: "status",
+        shipmentRef: s.reference ?? data.id.slice(0, 8),
+        vesselName: s.vessel_name ?? undefined,
+        statusLabel: SHIPMENT_STATUS_LABELS[data.next],
+        route:
+          s.port_loading || s.port_discharge
+            ? `${s.port_loading ?? "—"} → ${s.port_discharge ?? "—"}`
+            : undefined,
+        eta: s.eta
+          ? new Date(s.eta).toLocaleDateString("es-CL", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })
+          : undefined,
+      },
     );
     return { ok: true };
   });

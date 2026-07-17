@@ -52,7 +52,7 @@ export const createSignRequest = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const token = generateSignToken();
     const generated = data.doc as GeneratedDoc;
-    const { error } = await asSb(context.supabase)
+    const { data: row, error } = await asSb(context.supabase)
       .from("document_sign_requests")
       .insert({
         created_by: context.userId as string,
@@ -65,10 +65,47 @@ export const createSignRequest = createServerFn({ method: "POST" })
         signer_email: data.signerEmail ?? null,
         token_prefix: signTokenPrefix(token),
         token_hash: await sha256Hex(token),
-      });
+      })
+      .select("id, expires_at")
+      .single();
     if (error) throw new Error(error.message);
+
+    // Notificar al firmante con el link (si dejó email). El correo nunca puede
+    // romper la creación de la solicitud.
+    let emailed = false;
+    if (data.signerEmail && row) {
+      try {
+        const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
+          import("@/lib/email/send-internal.server"),
+          import("@/lib/documents/company"),
+        ]);
+        const res = await sendInternalEmail({
+          templateName: "sign-request-signer",
+          recipientEmail: data.signerEmail,
+          idempotencyKey: `sign-request:${(row as { id: string }).id}`,
+          templateData: {
+            docTitle: generated.title,
+            reference: generated.reference,
+            senderCompany: OWN_COMPANY.name,
+            signerName: data.signerName ?? undefined,
+            expiresAt: (row as { expires_at: string | null }).expires_at
+              ? new Date((row as { expires_at: string }).expires_at).toLocaleDateString("es-CL", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })
+              : undefined,
+            signUrl: `https://geocapitals.com/firmar/${token}`,
+          },
+        });
+        emailed = res.ok && "queued" in res && res.queued === true;
+      } catch (e) {
+        console.error("[createSignRequest] notify signer failed", e);
+      }
+    }
+
     // Única vez que el token viaja en claro.
-    return { token };
+    return { token, emailed };
   });
 
 // ---------- Dueño: listar / anular ----------
@@ -136,7 +173,7 @@ async function findByToken(sb: SupabaseClient, token: string) {
   const { data } = await sb
     .from("document_sign_requests")
     .select(
-      "id, title, reference, doc, doc_hash, status, signer_name_expected, signed_by_name, signed_at, signature_hash, expires_at, token_hash",
+      "id, created_by, title, reference, doc, doc_hash, status, signer_name_expected, signed_by_name, signed_at, signature_hash, expires_at, token_hash",
     )
     .eq("token_hash", tokenHash)
     .maybeSingle();
@@ -206,6 +243,37 @@ export const submitSignature = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!updated) throw new Error("El documento ya fue firmado o anulado.");
+
+    // Avisar al dueño de la solicitud que su documento fue firmado.
+    try {
+      const { data: prof } = await sb
+        .from("profiles")
+        .select("email")
+        .eq("user_id", String(row.created_by))
+        .maybeSingle();
+      if (prof?.email) {
+        const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+        await sendInternalEmail({
+          templateName: "sign-completed-owner",
+          recipientEmail: prof.email,
+          idempotencyKey: `sign-completed:${row.id}`,
+          templateData: {
+            docTitle: String(row.title),
+            reference: String(row.reference),
+            signedByName: data.signerName,
+            signedAt: new Date(signedAtIso).toLocaleString("es-CL", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+          },
+        });
+      }
+    } catch (e) {
+      console.error("[submitSignature] notify owner failed", e);
+    }
 
     return { signedAt: signedAtIso, signatureHash };
   });

@@ -15,6 +15,9 @@ import { template as investorRejected } from "./investor-rejected";
 import { template as contactMessageInternal } from "./contact-message-internal";
 import { template as commodityInquiryInternal } from "./commodity-inquiry-internal";
 import { template as inquiryUpdateBuyer } from "./inquiry-update-buyer";
+import { template as signRequestSigner } from "./sign-request-signer";
+import { template as signCompletedOwner } from "./sign-completed-owner";
+import { template as shipmentUpdate } from "./shipment-update";
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
@@ -45,4 +48,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "contact-message-internal": contactMessageInternal,
   "commodity-inquiry-internal": commodityInquiryInternal,
   "inquiry-update-buyer": inquiryUpdateBuyer,
+  "sign-request-signer": signRequestSigner,
+  "sign-completed-owner": signCompletedOwner,
+  "shipment-update": shipmentUpdate,
 };
