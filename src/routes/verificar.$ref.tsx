@@ -31,37 +31,37 @@ const STATUS_META: Record<
 > = {
   signed: {
     label: "Documento firmado",
-    tone: "text-emerald-700 bg-emerald-50 border-emerald-200",
+    tone: "text-brand-success bg-surface-3 border-brand-success",
     icon: CheckCircle2,
     description: "La firma electrónica está registrada en Geocapitals y es válida.",
   },
   pending_signature: {
     label: "Pendiente de firma",
-    tone: "text-amber-700 bg-amber-50 border-amber-200",
+    tone: "text-brand-warn bg-surface-3 border-brand-warn",
     icon: Clock,
     description: "Este documento existe y está a la espera de la firma de la contraparte.",
   },
   draft: {
     label: "Borrador editable",
-    tone: "text-blue-700 bg-blue-50 border-blue-200",
+    tone: "text-accent-brand bg-accent-brand-subtle border-accent-brand",
     icon: FileText,
     description: "La referencia corresponde a un borrador en curso; aún no se ha enviado a firma.",
   },
   expired: {
     label: "Solicitud vencida",
-    tone: "text-neutral-700 bg-neutral-100 border-neutral-300",
+    tone: "text-content-muted bg-surface-2 border-hairline-strong",
     icon: XCircle,
     description: "La solicitud de firma expiró. Solicita una nueva al emisor.",
   },
   void: {
     label: "Anulado",
-    tone: "text-red-700 bg-red-50 border-red-200",
+    tone: "text-brand-danger bg-surface-3 border-brand-danger",
     icon: XCircle,
     description: "El emisor anuló este documento. No debe considerarse vigente.",
   },
   not_found: {
     label: "Referencia no encontrada",
-    tone: "text-red-700 bg-red-50 border-red-200",
+    tone: "text-brand-danger bg-surface-3 border-brand-danger",
     icon: XCircle,
     description:
       "No existe ningún documento activo con esta referencia en Geocapitals. Verifica el código o contacta al emisor.",
@@ -110,7 +110,7 @@ function VerifyPage() {
 
   return (
     <main data-theme="im-light" className="min-h-screen bg-surface">
-      <header className="border-b border-hairline bg-white">
+      <header className="border-b border-hairline bg-surface-3">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="inline-flex items-center gap-2 text-content">
             <Logo size={22} />
@@ -138,7 +138,7 @@ function VerifyPage() {
           </p>
         </div>
 
-        <div className="rounded-2xl border border-hairline bg-white overflow-hidden shadow-sm">
+        <div className="rounded-2xl border border-hairline bg-surface-3 overflow-hidden shadow-sm">
           {/* Cabecera con referencia */}
           <div className="px-6 py-5 border-b border-hairline flex items-center justify-between gap-4">
             <div>
@@ -155,7 +155,7 @@ function VerifyPage() {
               Consultando registro en Geocapitals…
             </div>
           ) : state.error ? (
-            <div className="p-6 text-sm text-red-700 bg-red-50">
+            <div className="p-6 text-sm text-brand-danger bg-surface-2">
               No pudimos validar el documento: {state.error}
             </div>
           ) : state.data ? (
@@ -195,8 +195,8 @@ function VerifyPage() {
           <div className="border-t border-hairline bg-surface-subtle px-6 py-4 text-[11px] font-mono text-content-subtle">
             Esta página muestra metadatos públicos. El contenido del documento no se expone. Ante
             cualquier duda, contacta al emisor o escribe a{" "}
-            <a href="mailto:contacto@geocapitals.com" className="text-accent-brand underline">
-              contacto@geocapitals.com
+            <a href="mailto:info@geocapitals.com" className="text-accent-brand underline">
+              info@geocapitals.com
             </a>
             .
           </div>
@@ -207,15 +207,15 @@ function VerifyPage() {
             href="https://wa.me/56962184071"
             target="_blank"
             rel="noreferrer"
-            className="rounded-lg border border-hairline bg-white px-3 py-2 hover:border-accent-brand"
+            className="rounded-lg border border-hairline bg-surface-3 px-3 py-2 hover:border-accent-brand"
           >
             WhatsApp +56 9 6218 4071
           </a>
           <a
-            href="mailto:contacto@geocapitals.com"
-            className="rounded-lg border border-hairline bg-white px-3 py-2 hover:border-accent-brand"
+            href="mailto:info@geocapitals.com"
+            className="rounded-lg border border-hairline bg-surface-3 px-3 py-2 hover:border-accent-brand"
           >
-            contacto@geocapitals.com
+            info@geocapitals.com
           </a>
         </div>
       </section>

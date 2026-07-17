@@ -27,15 +27,26 @@ export const Route = createFileRoute("/firmar/$token")({
   component: SignPage,
 });
 
-// Cuenta las parties del bloque de firma para saber a qué slot corresponde el
-// firmante remoto (la contraparte suele ser la última party listada).
-function counterpartyIndex(doc: GeneratedDoc): number {
-  for (const b of doc.blocks) {
-    if (b.kind === "signature") return Math.max(0, b.parties.length - 1);
-  }
-  return 0;
+function signedDocWithRecord(
+  doc: GeneratedDoc,
+  rec: { name: string; signedAt: string; signatureHash: string; docHash: string },
+): GeneratedDoc {
+  return {
+    ...doc,
+    blocks: [
+      ...doc.blocks,
+      {
+        kind: "fields",
+        rows: [
+          ["Firmado electrónicamente por", rec.name],
+          ["Fecha y hora (UTC)", rec.signedAt],
+          ["Hash del documento", rec.docHash],
+          ["Hash de la firma", rec.signatureHash],
+        ],
+      },
+    ],
+  };
 }
-
 
 function SignPage() {
   const { token } = Route.useParams();
@@ -79,17 +90,14 @@ function SignPage() {
     if (!req || req.status !== "signed" || !req.signedByName || !req.signedAt) return;
     setDownloading(true);
     try {
-      await renderGeocapitalsPdf(req.doc, {
-        signatures: [
-          {
-            name: req.signedByName,
-            signedAt: req.signedAt,
-            hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
-            partyIndex: counterpartyIndex(req.doc),
-          },
-        ],
-      });
-
+      await renderGeocapitalsPdf(
+        signedDocWithRecord(req.doc, {
+          name: req.signedByName,
+          signedAt: req.signedAt,
+          signatureHash: req.signatureHash ?? "",
+          docHash: req.docHash,
+        }),
+      );
     } finally {
       setDownloading(false);
     }

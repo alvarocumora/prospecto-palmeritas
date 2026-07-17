@@ -48,9 +48,7 @@ async function notifyCounterparty(
     };
     const counterpartyId = t.buyer_user_id === actorUserId ? t.seller_user_id : t.buyer_user_id;
     if (!counterpartyId || counterpartyId === actorUserId) return;
-    // profiles no expone email entre usuarios (RLS endurecido): lectura admin.
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: prof } = await supabaseAdmin
+    const { data: prof } = await sb
       .from("profiles")
       .select("email")
       .eq("user_id", counterpartyId)

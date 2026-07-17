@@ -85,18 +85,22 @@ const nda: TemplateDef = {
     const purpose = gv(val, "purpose", "la evaluación de una potencial oportunidad de negocio");
     const term = gv(val, "termMonths", "24");
     const jur = gv(val, "jurisdiction", "República de Chile");
-    const raw: Array<[string, string]> = [
-      ["OBJETO", `El presente acuerdo regula el intercambio de información confidencial entre las Partes con el fin de ${purpose}.`],
-      ["INFORMACIÓN CONFIDENCIAL", `Se considera confidencial toda información técnica, geológica, financiera, comercial o legal entregada por ${mode === "mutuo" ? "cualquiera de las Partes" : `${A}`} en cualquier formato.`],
-      ["USO", `La información será utilizada exclusivamente para el propósito indicado y no podrá divulgarse a terceros sin autorización previa y por escrito.`],
-      ["VIGENCIA", `Las obligaciones de este acuerdo tendrán una duración de ${term} meses contados desde su firma.`],
+    const clauseItems: string[] = [
+      `1. OBJETO. El presente acuerdo regula el intercambio de información confidencial entre las Partes con el fin de ${purpose}.`,
+      `2. INFORMACIÓN CONFIDENCIAL. Se considera confidencial toda información técnica, geológica, financiera, comercial o legal entregada por ${mode === "mutuo" ? "cualquiera de las Partes" : `${A}`} en cualquier formato.`,
+      `3. USO. La información será utilizada exclusivamente para el propósito indicado y no podrá divulgarse a terceros sin autorización previa y por escrito.`,
+      `4. VIGENCIA. Las obligaciones de este acuerdo tendrán una duración de ${term} meses contados desde su firma.`,
+      ...(active.has("nonCircumvention")
+        ? [`5. NO ELUSIÓN. ${nda.clauses.find((c) => c.key === "nonCircumvention")!.text}`]
+        : []),
+      ...(active.has("returnInfo")
+        ? [`6. DEVOLUCIÓN. ${nda.clauses.find((c) => c.key === "returnInfo")!.text}`]
+        : []),
+      ...(active.has("penalty")
+        ? [`7. PENALIDAD. ${nda.clauses.find((c) => c.key === "penalty")!.text}`]
+        : []),
+      `8. LEY APLICABLE Y ARBITRAJE. ${jurisdictionClause(jur)}`,
     ];
-    if (active.has("nonCircumvention")) raw.push(["NO ELUSIÓN", nda.clauses.find((c) => c.key === "nonCircumvention")!.text]);
-    if (active.has("returnInfo")) raw.push(["DEVOLUCIÓN", nda.clauses.find((c) => c.key === "returnInfo")!.text]);
-    if (active.has("penalty")) raw.push(["PENALIDAD", nda.clauses.find((c) => c.key === "penalty")!.text]);
-    raw.push(["LEY APLICABLE Y ARBITRAJE", jurisdictionClause(jur)]);
-    const clauseItems: string[] = raw.map(([label, txt], i) => `${i + 1}. ${label}. ${txt}`);
-
     return {
       docType: "nda",
       reference: ctx.reference,
