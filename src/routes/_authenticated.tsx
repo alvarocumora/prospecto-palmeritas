@@ -179,6 +179,12 @@ function AuthenticatedLayout() {
       label: "Documentos · Firma",
       group: "NEGOCIO",
     },
+    {
+      to: "/dashboard/firmas",
+      icon: <BadgeCheck className="w-3.5 h-3.5" />,
+      label: "Mis firmas",
+      group: "NEGOCIO",
+    },
 
     // ---- OPERACIÓN (gestión del activo minero) ----
     showOps &&
