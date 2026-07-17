@@ -18,6 +18,7 @@ import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
 import { createSignRequest, type SignableDoc } from "@/lib/documents/signing.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "geocapitals:doc:";
