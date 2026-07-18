@@ -104,7 +104,7 @@ export async function renderGeocapitalsPdf(
   const pageH = pdf.internal.pageSize.getHeight();
   const marginX = 48;
   const contentW = pageW - marginX * 2;
-  const footerReserve = 92;
+  const footerReserve = 118;
   const firstTopY = 138;
   const pageTopY = 64;
   const safeBottom = pageH - footerReserve;
@@ -268,10 +268,10 @@ export async function renderGeocapitalsPdf(
         const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
         const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
         const totalLines = headingLines.length + bodyLines.length;
-        const itemH = totalLines * 12.8 + 24;
+        const itemH = totalLines * 12.8 + 46;
         // Si la cláusula es razonablemente corta, evitar que el número/título
         // quede en una página y el contenido en otra.
-        const keepTogether = totalLines <= 10 && itemH < safeBottom - pageTopY;
+        const keepTogether = totalLines <= 14 && itemH < safeBottom - pageTopY;
         if (keepTogether && y + itemH > safeBottom) y = addPage();
         ensure(32);
         const markerY = y - 7;
