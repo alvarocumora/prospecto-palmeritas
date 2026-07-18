@@ -17,6 +17,7 @@ import {
   Layers as LayersIcon,
   UserCircle,
   Crown,
+  Sparkles,
   Compass,
   Plane,
   Calendar,
@@ -399,6 +400,12 @@ function AuthenticatedLayout() {
       },
 
     // ---- CUENTA ----
+    {
+      to: "/dashboard/plan",
+      icon: <Sparkles className="w-3.5 h-3.5" />,
+      label: "Plan y uso",
+      group: "CUENTA",
+    },
     {
       to: "/dashboard/api",
       icon: <KeyRound className="w-3.5 h-3.5" />,
