@@ -87,9 +87,10 @@ const CreateInput = z.object({
   label: z.string().trim().max(120).optional(),
   // Un pago debe tener monto positivo: sin monto el progreso queda inconsistente.
   amountUsd: z
-    .number({ required_error: "El monto es obligatorio." })
+    .number({ error: "El monto es obligatorio." })
     .positive("El monto debe ser mayor a 0.")
     .max(1e12),
+
   instrument: z.enum(["sblc_mt760", "dlc", "tt", "escrow", "otro"]).optional(),
   reference: z.string().trim().max(120).optional(),
   dueDate: z.string().trim().max(10).optional(),
