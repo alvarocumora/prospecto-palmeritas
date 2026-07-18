@@ -106,10 +106,16 @@ export const listMyTrades = createServerFn({ method: "GET" })
     }
     return trades.map((t) => ({
       ...t,
-      role: t.buyer_user_id === context.userId ? ("buyer" as const) : ("seller" as const),
+      role:
+        t.buyer_user_id === context.userId
+          ? ("buyer" as const)
+          : t.seller_user_id === context.userId
+            ? ("seller" as const)
+            : ("desk" as const),
       docs: byTrade.get(t.id) ?? [],
     }));
   });
+
 
 /** Detalle de un trade + documentos. */
 export const getTradeDetail = createServerFn({ method: "GET" })
