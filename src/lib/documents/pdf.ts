@@ -184,10 +184,11 @@ export async function renderGeocapitalsPdf(
     pdf.setFillColor(...WHITE);
     pdf.setDrawColor(...HAIRLINE);
     pdf.setLineWidth(0.5);
-    // Caja del QR: alto suficiente para encerrar las 2 líneas de leyenda.
+    // Caja del QR: alto ajustado a QR + 3 líneas (VALIDAR / EN GEOCAPITALS / ref).
     const qrBoxW = qrHeaderSize + 10;
     const qrCx = qrHeaderX + qrHeaderSize / 2;
-    pdf.roundedRect(qrHeaderX - 5, qrHeaderY - 5, qrBoxW, qrHeaderSize + 30, 3, 3, "FD");
+    const qrBoxH = qrHeaderSize + 38;
+    pdf.roundedRect(qrHeaderX - 5, qrHeaderY - 5, qrBoxW, qrBoxH, 3, 3, "FD");
     pdf.addImage(
       qrDataUrl,
       "PNG",
@@ -198,22 +199,22 @@ export async function renderGeocapitalsPdf(
       undefined,
       "FAST",
     );
-    // Leyenda contenida (texto corto + maxWidth para nunca desbordar la caja).
+    // Leyenda en 2 líneas fijas para que nunca se solape con la referencia.
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(5.6);
     pdf.setTextColor(...COBALT);
-    pdf.text("VALIDAR EN GEOCAPITALS", qrCx, qrHeaderY + qrHeaderSize + 9, {
-      align: "center",
-      maxWidth: qrBoxW - 6,
-    });
+    const legendY = qrHeaderY + qrHeaderSize + 8;
+    pdf.text("VALIDAR EN", qrCx, legendY, { align: "center" });
+    pdf.text("GEOCAPITALS", qrCx, legendY + 6, { align: "center" });
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(5.2);
     pdf.setTextColor(...GRAY);
-    pdf.text(ellipsize(doc.reference, 26), qrCx, qrHeaderY + qrHeaderSize + 17, {
+    pdf.text(ellipsize(doc.reference, 26), qrCx, legendY + 14, {
       align: "center",
       maxWidth: qrBoxW - 6,
     });
   }
+
 
   y = firstTopY;
   pdf.setDrawColor(...HAIRLINE);
@@ -408,13 +409,27 @@ export async function renderGeocapitalsPdf(
         const stamp = stampByIndex.get(i);
 
         if (stamp) {
+          // Tamaño de la firma manuscrita: escala inversa al largo del nombre
+          // para no invadir la caja "FIRMADO" a la derecha.
+          const nameLen = stamp.name.length;
+          const sigFontSize = nameLen > 70 ? 8.5 : nameLen > 50 ? 9.5 : nameLen > 32 ? 11 : nameLen > 22 ? 13 : 15;
+          const sigMaxW = slotW - 92;
           pdf.setFont("helvetica", "bolditalic");
-          pdf.setFontSize(stamp.name.length > 42 ? 11.5 : 14.5);
+          pdf.setFontSize(sigFontSize);
           pdf.setTextColor(...INK);
-          const sigLines = (
-            pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 96) as string[]
-          ).slice(0, 2);
-          pdf.text(sigLines, x + 6, lineY - 20 - (sigLines.length - 1) * 10);
+          // Auto-shrink si aún desborda: reduce el tamaño hasta caber en 3 líneas.
+          let lines = pdf.splitTextToSize(ellipsize(stamp.name, 120), sigMaxW) as string[];
+          let fs = sigFontSize;
+          while (lines.length > 3 && fs > 6.5) {
+            fs -= 0.5;
+            pdf.setFontSize(fs);
+            lines = pdf.splitTextToSize(ellipsize(stamp.name, 120), sigMaxW) as string[];
+          }
+          const sigLines = lines.slice(0, 3);
+          const sigLineH = fs * 0.85;
+          pdf.text(sigLines, x + 6, lineY - 10 - (sigLines.length - 1) * sigLineH);
+
+
 
           const bw = 74;
           const bh = 24;
