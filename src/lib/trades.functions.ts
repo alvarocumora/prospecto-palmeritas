@@ -141,29 +141,47 @@ export const getTradeDetail = createServerFn({ method: "GET" })
     // Con el RLS endurecido de profiles (sin PII entre usuarios) la lectura va
     // por el cliente admin: el caller ya probó ser parte del trade vía RLS.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const partyIds = [t.buyer_user_id, t.seller_user_id].filter(
+      (x): x is string => typeof x === "string" && x.length > 0,
+    );
     const { data: profs } = await supabaseAdmin
       .from("profiles")
       .select("user_id, display_name, email")
-      .in("user_id", [t.buyer_user_id, t.seller_user_id]);
+      .in("user_id", partyIds);
     type Prof = { user_id: string; display_name: string | null; email: string | null };
-    const profOf = (uid: string): Prof | undefined =>
-      ((profs ?? []) as Prof[]).find((x) => x.user_id === uid);
-    const nameOf = (uid: string): string | null => {
+    const profOf = (uid: string | null): Prof | undefined =>
+      uid ? ((profs ?? []) as Prof[]).find((x) => x.user_id === uid) : undefined;
+    const nameOf = (uid: string | null): string | null => {
       const p = profOf(uid);
       return p?.display_name ?? p?.email ?? null;
     };
+    // Contraparte externa (sin cuenta) para trades venidos de sourcing.
+    const externalName =
+      t.counterparty_name && t.counterparty_company
+        ? `${t.counterparty_name} · ${t.counterparty_company}`
+        : (t.counterparty_name ?? t.counterparty_company ?? null);
 
     return {
       trade: {
         ...t,
-        role: t.buyer_user_id === context.userId ? ("buyer" as const) : ("seller" as const),
-        buyerName: nameOf(t.buyer_user_id),
-        sellerName: nameOf(t.seller_user_id),
-        buyerEmail: profOf(t.buyer_user_id)?.email ?? null,
-        sellerEmail: profOf(t.seller_user_id)?.email ?? null,
+        role:
+          t.buyer_user_id === context.userId
+            ? ("buyer" as const)
+            : t.seller_user_id === context.userId
+              ? ("seller" as const)
+              : ("desk" as const),
+        buyerName:
+          nameOf(t.buyer_user_id) ??
+          (t.counterparty_role === "buyer" ? externalName : null),
+        sellerName:
+          nameOf(t.seller_user_id) ??
+          (t.counterparty_role === "seller" ? externalName : null),
+        buyerEmail: profOf(t.buyer_user_id)?.email ?? (t.counterparty_role === "buyer" ? t.counterparty_email : null),
+        sellerEmail: profOf(t.seller_user_id)?.email ?? (t.counterparty_role === "seller" ? t.counterparty_email : null),
       },
       documents: (docs ?? []) as TradeDocRow[],
     };
+
   });
 
 const CreateTrade = z.object({
