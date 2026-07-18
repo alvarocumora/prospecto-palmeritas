@@ -100,6 +100,23 @@ describe("normalizeEvent", () => {
     expect(status.detail).toBe("preparing → at_port");
   });
 
+  it("eventos de pago quedan en la categoría payment", () => {
+    const sched = normalizeEvent({
+      ...base,
+      kind: "payment_scheduled",
+      detail: "Anticipo · US$ 30.000",
+    });
+    expect(sched.category).toBe("payment");
+    expect(sched.title).toBe("Pago programado");
+    const paid = normalizeEvent({
+      ...base,
+      kind: "payment_paid",
+      detail: "Balance · US$ 70.000 recibido",
+    });
+    expect(paid.category).toBe("payment");
+    expect(paid.title).toBe("Pago recibido");
+  });
+
   it("mensajes y kinds desconocidos no rompen el timeline", () => {
     expect(normalizeEvent({ ...base, kind: "message", detail: "hola" }).category).toBe("message");
     const unknown = normalizeEvent({ ...base, kind: "algo_nuevo", detail: "x" });

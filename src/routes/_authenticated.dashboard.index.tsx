@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import {
   Briefcase,
+  Banknote,
   Handshake,
   Ship,
   FileSignature,
@@ -98,13 +99,25 @@ function BusinessHome() {
         {needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
 
         {/* KPIs del negocio */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
           <Kpi
             icon={<Briefcase className="w-4 h-4" />}
             label="Pipeline activo"
             value={isLoading ? "…" : fmtUsd(ov?.trades.pipelineUsd ?? 0)}
             hint={`${ov?.trades.active ?? 0} operaciones en curso · ${ov?.trades.closed ?? 0} cerradas`}
             to="/dashboard/trades"
+          />
+          <Kpi
+            icon={<Banknote className="w-4 h-4" />}
+            label="Por cobrar"
+            value={isLoading ? "…" : fmtUsd(ov?.finance.outstandingUsd ?? 0)}
+            hint={
+              (ov?.finance.overdueUsd ?? 0) > 0
+                ? `⚠ ${fmtUsd(ov!.finance.overdueUsd)} vencido · ${fmtUsd(ov?.finance.receivedUsd ?? 0)} cobrado`
+                : `${fmtUsd(ov?.finance.receivedUsd ?? 0)} cobrado`
+            }
+            to="/dashboard/trades"
+            warn={(ov?.finance.overdueUsd ?? 0) > 0}
           />
           <Kpi
             icon={<Ship className="w-4 h-4" />}

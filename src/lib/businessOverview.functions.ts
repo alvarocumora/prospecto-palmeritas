@@ -70,6 +70,11 @@ export type BusinessOverview = {
     openRequests: number;
     totalProposals: number;
   };
+  finance: {
+    receivedUsd: number;
+    outstandingUsd: number;
+    overdueUsd: number;
+  };
   events: RawTradeEvent[];
 };
 
@@ -163,6 +168,33 @@ export const getBusinessOverview = createServerFn({ method: "GET" })
       /* tabla de sourcing aún no aplicada */
     }
 
+    // Finanzas (best-effort: trade_payments puede no estar migrada). RLS filtra
+    // a los pagos de mis trades.
+    const finance = { receivedUsd: 0, outstandingUsd: 0, overdueUsd: 0 };
+    try {
+      const nowIso = new Date().toISOString().slice(0, 10);
+      const { data: pays } = await sb
+        .from("trade_payments")
+        .select("amount_usd, status, due_date")
+        .limit(1000);
+      for (const p of (pays ?? []) as Array<{
+        amount_usd: number | null;
+        status: string;
+        due_date: string | null;
+      }>) {
+        const amt = p.amount_usd ?? 0;
+        if (p.status === "cancelado") continue;
+        if (p.status === "pagado") {
+          finance.receivedUsd += amt;
+        } else {
+          finance.outstandingUsd += amt;
+          if (p.due_date && p.due_date < nowIso) finance.overdueUsd += amt;
+        }
+      }
+    } catch {
+      /* trade_payments aún no aplicada */
+    }
+
     const now = new Date();
     const ships = (shipsQ.data ?? []) as Array<
       Omit<BusinessShipmentRow, "delayed"> & { created_at: string }
@@ -214,6 +246,7 @@ export const getBusinessOverview = createServerFn({ method: "GET" })
       listings: listingsQ.count ?? 0,
       clients: counterparties.size,
       sourcing: { openRequests, totalProposals },
+      finance,
       events: (eventsQ.data ?? []) as RawTradeEvent[],
     };
   });
