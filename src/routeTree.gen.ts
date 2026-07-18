@@ -48,6 +48,7 @@ import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-
 import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
 import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedor.$token'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
@@ -128,6 +129,7 @@ import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './rou
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as CatastroProyectoTitularesIdRouteImport } from './routes/catastro.proyecto.titulares.$id'
 import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastre.search'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
@@ -337,6 +339,11 @@ const FichaProveedorTokenRoute = FichaProveedorTokenRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroProyectoRoute = CatastroProyectoRouteImport.update({
+  id: '/catastro/proyecto',
+  path: '/catastro/proyecto',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
@@ -804,6 +811,12 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const CatastroProyectoTitularesIdRoute =
+  CatastroProyectoTitularesIdRouteImport.update({
+    id: '/titulares/$id',
+    path: '/titulares/$id',
+    getParentRoute: () => CatastroProyectoRoute,
+  } as any)
 const ApiV1CadastreSearchRoute = ApiV1CadastreSearchRouteImport.update({
   id: '/api/v1/cadastre/search',
   path: '/api/v1/cadastre/search',
@@ -922,6 +935,7 @@ export interface FileRoutesByFullPath {
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
@@ -1026,6 +1040,7 @@ export interface FileRoutesByFullPath {
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
+  '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -1058,6 +1073,7 @@ export interface FileRoutesByTo {
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
@@ -1162,6 +1178,7 @@ export interface FileRoutesByTo {
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
+  '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -1196,6 +1213,7 @@ export interface FileRoutesById {
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
+  '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
@@ -1300,6 +1318,7 @@ export interface FileRoutesById {
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
+  '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -1334,6 +1353,7 @@ export interface FileRouteTypes {
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
     | '/firmar/$token'
@@ -1438,6 +1458,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
+    | '/catastro/proyecto/titulares/$id'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1470,6 +1491,7 @@ export interface FileRouteTypes {
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
     | '/firmar/$token'
@@ -1574,6 +1596,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
+    | '/catastro/proyecto/titulares/$id'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1607,6 +1630,7 @@ export interface FileRouteTypes {
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
+    | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
     | '/firmar/$token'
@@ -1711,6 +1735,7 @@ export interface FileRouteTypes {
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
+    | '/catastro/proyecto/titulares/$id'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -1745,6 +1770,7 @@ export interface RootRouteChildren {
   CatastroGlobalRoute: typeof CatastroGlobalRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
+  CatastroProyectoRoute: typeof CatastroProyectoRouteWithChildren
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FichaProveedorTokenRoute: typeof FichaProveedorTokenRoute
   FirmarTokenRoute: typeof FirmarTokenRoute
@@ -2061,6 +2087,13 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/proyecto': {
+      id: '/catastro/proyecto'
+      path: '/catastro/proyecto'
+      fullPath: '/catastro/proyecto'
+      preLoaderRoute: typeof CatastroProyectoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/precios': {
@@ -2623,6 +2656,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/catastro/proyecto/titulares/$id': {
+      id: '/catastro/proyecto/titulares/$id'
+      path: '/titulares/$id'
+      fullPath: '/catastro/proyecto/titulares/$id'
+      preLoaderRoute: typeof CatastroProyectoTitularesIdRouteImport
+      parentRoute: typeof CatastroProyectoRoute
+    }
     '/api/v1/cadastre/search': {
       id: '/api/v1/cadastre/search'
       path: '/api/v1/cadastre/search'
@@ -3007,6 +3047,17 @@ const TerminalRouteWithChildren = TerminalRoute._addFileChildren(
   TerminalRouteChildren,
 )
 
+interface CatastroProyectoRouteChildren {
+  CatastroProyectoTitularesIdRoute: typeof CatastroProyectoTitularesIdRoute
+}
+
+const CatastroProyectoRouteChildren: CatastroProyectoRouteChildren = {
+  CatastroProyectoTitularesIdRoute: CatastroProyectoTitularesIdRoute,
+}
+
+const CatastroProyectoRouteWithChildren =
+  CatastroProyectoRoute._addFileChildren(CatastroProyectoRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
@@ -3032,6 +3083,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroGlobalRoute: CatastroGlobalRoute,
   CatastroMapaRoute: CatastroMapaRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
+  CatastroProyectoRoute: CatastroProyectoRouteWithChildren,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FichaProveedorTokenRoute: FichaProveedorTokenRoute,
   FirmarTokenRoute: FirmarTokenRoute,
