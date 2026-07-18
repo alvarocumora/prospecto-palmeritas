@@ -168,11 +168,32 @@ export const cancelTradePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { error } = await asSb(context.supabase)
+    const sb = asSb(context.supabase);
+    // Se lee la fila antes de cancelar para poder describir el evento en el feed
+    // del trade (trazabilidad) sin depender de la respuesta del update.
+    const { data: before } = await sb
+      .from("trade_payments")
+      .select("trade_id, kind, label, amount_usd, status")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { error } = await sb
       .from("trade_payments")
       .update({ status: "cancelado" })
       .eq("id", data.id)
       .neq("status", "pagado");
     if (error) throw new Error(error.message);
+    const b = before as
+      | { trade_id: string; kind: string; label: string | null; amount_usd: number | null; status: string }
+      | null;
+    if (b && b.status !== "cancelado" && b.status !== "pagado") {
+      await logEvent(
+        sb,
+        b.trade_id,
+        context.userId as string,
+        "payment_cancelled",
+        `${b.label ?? b.kind} · ${usd0(b.amount_usd)} cancelado`,
+      );
+    }
     return { ok: true };
   });
+
