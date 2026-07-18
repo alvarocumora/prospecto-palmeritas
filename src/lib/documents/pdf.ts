@@ -260,9 +260,9 @@ export async function renderGeocapitalsPdf(
       renderLines(lines, marginX, 34, 13.8);
       y += 12;
     } else if (block.kind === "clauses") {
-      const clauseBottom = safeBottom - 46;
+      const clauseBottom = safeBottom - 64;
+      const clauseLineH = 12.8;
       for (const item of block.items) {
-        if (y > clauseBottom - 176) y = addPage();
         const normalized = clampText(item, 1800);
         const firstDot = normalized.indexOf(". ");
         const heading = firstDot > 0 && firstDot < 80 ? normalized.slice(0, firstDot + 1) : null;
@@ -270,32 +270,30 @@ export async function renderGeocapitalsPdf(
         const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
         const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
         const totalLines = headingLines.length + bodyLines.length;
-        const itemH = totalLines * 16 + 62;
-        // Si la cláusula es razonablemente corta, evitar que el número/título
-        // quede en una página y el contenido en otra.
-        const keepTogether = itemH < clauseBottom - pageTopY;
-        if (keepTogether && y + itemH > clauseBottom) y = addPage();
-        ensure(32);
+        const itemH = totalLines * clauseLineH + 18;
+
+        if (itemH < clauseBottom - pageTopY && y + itemH > clauseBottom) {
+          y = addPage();
+        } else if (y > clauseBottom - 120) {
+          y = addPage();
+        }
+
         const markerY = y - 7;
         if (heading) {
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(9.6);
           pdf.setTextColor(...INK);
-          if (keepTogether) {
-            pdf.text(headingLines, marginX + 12, y);
-            y += headingLines.length * 12.8;
-          } else {
-            renderLines(headingLines, marginX + 12, 3, 12.8);
-          }
+          pdf.text(headingLines, marginX + 12, y);
+          y += headingLines.length * clauseLineH;
         }
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.8);
         pdf.setTextColor(...INK_SOFT);
-        if (keepTogether) {
+        if (itemH < clauseBottom - pageTopY) {
           pdf.text(bodyLines, marginX + 12, y);
-          y += bodyLines.length * 12.8;
+          y += bodyLines.length * clauseLineH;
         } else {
-          renderLines(bodyLines, marginX + 12, 34, 12.8);
+          renderLines(bodyLines, marginX + 12, 34, clauseLineH);
         }
         pdf.setFillColor(...COBALT);
         pdf.rect(marginX, markerY, 2, Math.max(10, Math.min(26, itemH - 6)), "F");
