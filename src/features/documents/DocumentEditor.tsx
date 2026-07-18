@@ -579,10 +579,7 @@ function BlockPreview({ block }: { block: DocBlock }) {
       <ul className="space-y-2">
         {block.items.map((it, i) => (
           <li key={i} className="text-[13px] leading-relaxed text-content pl-4 relative">
-            <span
-              className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full"
-               className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-accent-brand"
-            />
+            <span className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-accent-brand" />
             {it}
           </li>
         ))}
