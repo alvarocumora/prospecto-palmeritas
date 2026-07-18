@@ -111,7 +111,10 @@ export async function renderGeocapitalsPdf(
   const verify = verifyDocUrl(doc.reference);
   const [mark, qrDataUrl] = await Promise.all([loadMark(), makeQr(verify)]);
 
-  const stamps = [...(opts.emitterSignature ? [opts.emitterSignature] : []), ...(opts.signatures ?? [])];
+  const stamps = [
+    ...(opts.emitterSignature ? [opts.emitterSignature] : []),
+    ...(opts.signatures ?? []),
+  ];
   const stampByIndex = new Map<number, EmitterSignature>();
   stamps.forEach((s) => stampByIndex.set(s.partyIndex ?? 0, s));
 
@@ -181,19 +184,34 @@ export async function renderGeocapitalsPdf(
     pdf.setFillColor(...WHITE);
     pdf.setDrawColor(...HAIRLINE);
     pdf.setLineWidth(0.5);
-    pdf.roundedRect(qrHeaderX - 4, qrHeaderY - 4, qrHeaderSize + 8, qrHeaderSize + 22, 3, 3, "FD");
-    pdf.addImage(qrDataUrl, "PNG", qrHeaderX, qrHeaderY, qrHeaderSize, qrHeaderSize, undefined, "FAST");
+    // Caja del QR: alto suficiente para encerrar las 2 líneas de leyenda.
+    const qrBoxW = qrHeaderSize + 10;
+    const qrCx = qrHeaderX + qrHeaderSize / 2;
+    pdf.roundedRect(qrHeaderX - 5, qrHeaderY - 5, qrBoxW, qrHeaderSize + 30, 3, 3, "FD");
+    pdf.addImage(
+      qrDataUrl,
+      "PNG",
+      qrHeaderX,
+      qrHeaderY,
+      qrHeaderSize,
+      qrHeaderSize,
+      undefined,
+      "FAST",
+    );
+    // Leyenda contenida (texto corto + maxWidth para nunca desbordar la caja).
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(6);
+    pdf.setFontSize(5.6);
     pdf.setTextColor(...COBALT);
-    pdf.text("VALIDAR EN GEOCAPITALS", qrHeaderX + qrHeaderSize / 2, qrHeaderY + qrHeaderSize + 8, {
+    pdf.text("VALIDAR EN GEOCAPITALS", qrCx, qrHeaderY + qrHeaderSize + 9, {
       align: "center",
+      maxWidth: qrBoxW - 6,
     });
     pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(5.4);
+    pdf.setFontSize(5.2);
     pdf.setTextColor(...GRAY);
-    pdf.text(`/verificar/${doc.reference}`, qrHeaderX + qrHeaderSize / 2, qrHeaderY + qrHeaderSize + 15, {
+    pdf.text(ellipsize(doc.reference, 26), qrCx, qrHeaderY + qrHeaderSize + 17, {
       align: "center",
+      maxWidth: qrBoxW - 6,
     });
   }
 
@@ -214,19 +232,23 @@ export async function renderGeocapitalsPdf(
   pdf.setFont("helvetica", "normal");
   pdf.setTextColor(...GRAY);
   pdf.text(dateText.toUpperCase(), pageW - marginX, y, { align: "right" });
-  y += 30;
+  y += 26;
 
+  // Barra de acento cobalto ARRIBA del título, con separación clara para que
+  // no cruce las mayúsculas.
   pdf.setDrawColor(...COBALT);
   pdf.setLineWidth(2);
-  pdf.line(marginX, y - 14, marginX + 42, y - 14);
+  pdf.line(marginX, y, marginX + 42, y);
+
   pdf.setFont("helvetica", "bold");
   const title = clampText(doc.title, 220);
   const titleFont = title.length > 85 ? 16 : title.length > 55 ? 18 : 20;
   pdf.setFontSize(titleFont);
   pdf.setTextColor(...INK);
   const titleLines = (pdf.splitTextToSize(title, contentW) as string[]).slice(0, 4);
+  y += titleFont + 6; // baja el baseline del título bajo la barra de acento
   pdf.text(titleLines, marginX, y);
-  y += titleLines.length * (titleFont + 4) + 12;
+  y += (titleLines.length - 1) * (titleFont + 4) + 14;
   pdf.setDrawColor(...HAIRLINE);
   pdf.setLineWidth(0.5);
   pdf.line(marginX, y, pageW - marginX, y);
@@ -239,9 +261,15 @@ export async function renderGeocapitalsPdf(
   const renderLines = (lines: string[], x: number, maxLinesPerPage: number, lineH: number) => {
     let start = 0;
     while (start < lines.length) {
-      const availableLines = Math.max(1, Math.min(maxLinesPerPage, Math.floor((safeBottom - y) / lineH)));
+      const availableLines = Math.max(
+        1,
+        Math.min(maxLinesPerPage, Math.floor((safeBottom - y) / lineH)),
+      );
       if (availableLines < 2 && start < lines.length) y = addPage();
-      const count = Math.max(1, Math.min(lines.length - start, Math.floor((safeBottom - y) / lineH)));
+      const count = Math.max(
+        1,
+        Math.min(lines.length - start, Math.floor((safeBottom - y) / lineH)),
+      );
       const chunk = lines.slice(start, start + count);
       pdf.text(chunk, x, y);
       y += chunk.length * lineH;
@@ -267,7 +295,9 @@ export async function renderGeocapitalsPdf(
         const firstDot = normalized.indexOf(". ");
         const heading = firstDot > 0 && firstDot < 80 ? normalized.slice(0, firstDot + 1) : null;
         const body = heading ? normalized.slice(firstDot + 2) : normalized;
-        const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
+        const headingLines = heading
+          ? (pdf.splitTextToSize(heading, contentW - 18) as string[])
+          : [];
         const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
         const totalLines = headingLines.length + bodyLines.length;
         const itemH = totalLines * clauseLineH + 42;
@@ -381,7 +411,9 @@ export async function renderGeocapitalsPdf(
           pdf.setFont("helvetica", "bolditalic");
           pdf.setFontSize(stamp.name.length > 42 ? 11.5 : 14.5);
           pdf.setTextColor(...INK);
-          const sigLines = (pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 96) as string[]).slice(0, 2);
+          const sigLines = (
+            pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 96) as string[]
+          ).slice(0, 2);
           pdf.text(sigLines, x + 6, lineY - 20 - (sigLines.length - 1) * 10);
 
           const bw = 74;
@@ -408,7 +440,9 @@ export async function renderGeocapitalsPdf(
         pdf.setFont("helvetica", "bold");
         pdf.setFontSize(8.6);
         pdf.setTextColor(...INK);
-        const partyLines = (pdf.splitTextToSize(ellipsize(party, 190), slotW - 4) as string[]).slice(0, 3);
+        const partyLines = (
+          pdf.splitTextToSize(ellipsize(party, 190), slotW - 4) as string[]
+        ).slice(0, 3);
         partyLines.forEach((ln, li) => pdf.text(ln, x, lineY + 13 + li * 10.5));
 
         const metaY = lineY + 21 + partyLines.length * 10.5;

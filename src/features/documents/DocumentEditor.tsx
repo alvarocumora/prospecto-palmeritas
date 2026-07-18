@@ -330,7 +330,10 @@ export function DocumentEditor({
         {/* Panel de formulario */}
         <div className="space-y-5">
           {groups.map(([groupName, fields]) => (
-            <section key={groupName} className="rounded-2xl border border-hairline bg-surface-3 p-5">
+            <section
+              key={groupName}
+              className="rounded-2xl border border-hairline bg-surface-3 p-5"
+            >
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
                 {groupName}
               </div>
@@ -346,13 +349,13 @@ export function DocumentEditor({
                         placeholder={f.placeholder}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
                         rows={3}
-                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                        className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       />
                     ) : f.type === "select" ? (
                       <select
                         value={values[f.key] ?? ""}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
-                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                        className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       >
                         {f.options?.map((o) => (
                           <option key={o.value} value={o.value}>
@@ -366,7 +369,7 @@ export function DocumentEditor({
                         value={values[f.key] ?? ""}
                         placeholder={f.placeholder}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
-                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                        className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       />
                     )}
                     {f.help ? (
@@ -379,7 +382,7 @@ export function DocumentEditor({
           ))}
 
           {template.clauses.length > 0 ? (
-             <section className="rounded-2xl border border-hairline bg-surface-3 p-5">
+            <section className="rounded-2xl border border-hairline bg-surface-3 p-5">
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
                 Cláusulas opcionales
               </div>
@@ -420,7 +423,7 @@ export function DocumentEditor({
               type="button"
               onClick={exportPdf}
               disabled={busy}
-               className="inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shadow-lg"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shadow-lg"
             >
               <Download className="w-4 h-4" />
               {busy ? "Generando…" : "Descargar PDF"}
@@ -429,7 +432,7 @@ export function DocumentEditor({
               type="button"
               onClick={() => void requestSignature()}
               disabled={requestingSign}
-               className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand disabled:opacity-50"
             >
               <Link2 className="w-4 h-4" />
               {requestingSign ? "Creando…" : "Solicitar firma"}
@@ -437,7 +440,7 @@ export function DocumentEditor({
             <button
               type="button"
               onClick={reset}
-               className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand"
             >
               <RotateCcw className="w-4 h-4" /> Restaurar
             </button>
@@ -453,7 +456,7 @@ export function DocumentEditor({
                 value={signerEmail}
                 onChange={(e) => setSignerEmail(e.target.value)}
                 placeholder="contraparte@empresa.com"
-                 className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
+                className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
               />
             </label>
             <label className="text-xs">
@@ -462,7 +465,7 @@ export function DocumentEditor({
                 value={signerName}
                 onChange={(e) => setSignerName(e.target.value)}
                 placeholder="Nombre de quien firmará"
-                 className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
+                className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
               />
             </label>
           </div>
@@ -479,7 +482,7 @@ export function DocumentEditor({
 
         {/* Preview live */}
         <div className="lg:sticky lg:top-4 lg:self-start">
-           <div className="rounded-2xl border border-hairline bg-surface-3 shadow-sm overflow-hidden">
+          <div className="rounded-2xl border border-hairline bg-surface-3 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-hairline bg-surface-subtle">
               <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
                 <FileText className="w-3.5 h-3.5" /> Vista previa
@@ -526,43 +529,150 @@ function SyncBadge({ status, signedIn }: { status: SyncStatus; signedIn: boolean
   );
 }
 
+// Colores exactos de la identidad del PDF (src/lib/documents/pdf.ts) para que
+// el preview del editor sea WYSIWYG respecto al archivo generado.
+const PDF = {
+  paper: "#F7F5F0",
+  paperAlt: "#EFEBE1",
+  ink: "#1A1A2E",
+  inkSoft: "#4A4A5E",
+  gray: "#6B6B7B",
+  cobalt: "#2B4ACB",
+  hairline: "#D9D4C7",
+};
+
+/** Divide una cláusula en encabezado (1ª frase corta) + cuerpo, igual que el PDF. */
+function splitClause(text: string): { heading: string | null; body: string } {
+  const clean = text.replace(/\s+/g, " ").trim();
+  const dot = clean.indexOf(". ");
+  if (dot > 0 && dot < 80) return { heading: clean.slice(0, dot + 1), body: clean.slice(dot + 2) };
+  return { heading: null, body: clean };
+}
+
 export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
+  const date = new Date(doc.date).toLocaleDateString("es-CL", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
   return (
-       <div className="p-8 lg:p-10 max-h-[80vh] overflow-y-auto bg-surface-3">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-content">
-             <span className="text-accent-brand">■</span> GEOCAPITALS
+    <div className="max-h-[80vh] overflow-y-auto" style={{ background: "#e9e7e1" }}>
+      {/* Hoja tamaño documento — espeja el PDF */}
+      <div
+        className="mx-auto my-4 shadow-sm"
+        style={{ background: PDF.paper, color: PDF.ink, maxWidth: 720, position: "relative" }}
+      >
+        {/* Banda superior tinta + acento cobalto (como el PDF) */}
+        <div style={{ height: 6, background: PDF.ink }} />
+        <div style={{ height: 2, width: "26%", background: PDF.cobalt }} />
+
+        <div className="px-10 pt-7 pb-10">
+          {/* Cabecera: marca + contacto + chip validar */}
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="font-bold text-lg tracking-tight" style={{ color: PDF.ink }}>
+                GEOCAPITALS
+              </div>
+              <div
+                className="text-[9px] font-mono uppercase tracking-wider mt-0.5"
+                style={{ color: PDF.cobalt }}
+              >
+                Mining Intelligence · Deals · Documentation
+              </div>
+              <div className="text-[10px] mt-0.5" style={{ color: PDF.gray }}>
+                geocapitals.com · info@geocapitals.com
+              </div>
+            </div>
+            <div
+              className="text-center rounded"
+              style={{
+                border: `1px solid ${PDF.hairline}`,
+                background: "#fff",
+                padding: "6px 8px",
+              }}
+            >
+              <div
+                className="grid"
+                style={{
+                  gridTemplateColumns: "repeat(5, 5px)",
+                  gap: 1,
+                  width: 29,
+                  margin: "0 auto",
+                }}
+                aria-hidden
+              >
+                {Array.from({ length: 25 }).map((_, i) => (
+                  <span
+                    key={i}
+                    style={{
+                      width: 5,
+                      height: 5,
+                      background: (i * 7) % 3 ? PDF.ink : "transparent",
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="text-[6px] font-bold mt-1" style={{ color: PDF.cobalt }}>
+                VALIDAR
+              </div>
+              <div className="text-[5px] truncate max-w-[40px]" style={{ color: PDF.gray }}>
+                {doc.reference}
+              </div>
+            </div>
           </div>
-          <div className="text-[9px] font-mono text-content-subtle mt-0.5">
-            Mining · Deals · Documentation
+
+          {/* REF + fecha */}
+          <div style={{ borderTop: `1px solid ${PDF.hairline}`, marginTop: 22, paddingTop: 12 }}>
+            <div className="flex items-center justify-between">
+              <span
+                className="text-[10px] font-mono font-bold uppercase"
+                style={{ color: PDF.cobalt }}
+              >
+                REF · {doc.reference}
+              </span>
+              <span className="text-[10px] font-mono uppercase" style={{ color: PDF.gray }}>
+                {date}
+              </span>
+            </div>
+          </div>
+
+          {/* Título con acento cobalto */}
+          <div style={{ width: 42, height: 2, background: PDF.cobalt, marginTop: 18 }} />
+          <h2
+            className="font-bold leading-tight mt-2"
+            style={{ color: PDF.ink, fontSize: doc.title.length > 55 ? 22 : 26 }}
+          >
+            {doc.title}
+          </h2>
+          <div style={{ borderTop: `1px solid ${PDF.hairline}`, marginTop: 16 }} />
+
+          {/* Bloques */}
+          <div className="mt-5 space-y-5">
+            {doc.blocks.map((b, i) => (
+              <BlockPreview key={i} block={b} />
+            ))}
+          </div>
+
+          {/* Footer */}
+          <div style={{ marginTop: 40, paddingTop: 12, borderTop: `1px solid ${PDF.cobalt}` }}>
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="text-[10px] font-bold" style={{ color: PDF.ink }}>
+                  GEOCAPITALS · Mining Intelligence
+                </div>
+                <div className="text-[8px] italic mt-0.5 max-w-[280px]" style={{ color: PDF.gray }}>
+                  Documento generado como borrador editable. No constituye asesoría legal ni oferta
+                  financiera. Validar con las contrapartes antes de firmar.
+                </div>
+              </div>
+              <div className="text-right text-[9px]" style={{ color: PDF.gray }}>
+                <div style={{ color: PDF.ink, fontWeight: 700 }}>info@geocapitals.com</div>
+                <div>WhatsApp +56 9 6218 4071</div>
+                <div style={{ color: PDF.cobalt }}>geocapitals.com/verificar/{doc.reference}</div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="text-right text-[10px] font-mono text-content-subtle">
-          <div>Ref: {doc.reference}</div>
-          <div>
-            {new Date(doc.date).toLocaleDateString("es-CL", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
-          </div>
-        </div>
-      </div>
-
-       <div className="h-[2px] w-10 mb-5 bg-accent-brand" />
-
-      <h2 className="font-display text-2xl text-content mb-6 leading-tight">{doc.title}</h2>
-
-      <div className="border-t border-hairline pt-5 space-y-5">
-        {doc.blocks.map((b, i) => (
-          <BlockPreview key={i} block={b} />
-        ))}
-      </div>
-
-      <div className="mt-10 pt-4 border-t border-hairline text-[10px] italic text-content-subtle">
-        Documento generado por Geocapitals como borrador editable. No constituye asesoría legal ni
-        oferta financiera. Validar con las contrapartes y sus asesores antes de firmar.
       </div>
     </div>
   );
@@ -571,31 +681,47 @@ export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
 function BlockPreview({ block }: { block: DocBlock }) {
   if (block.kind === "paragraph") {
     return (
-      <p className="text-[13px] leading-relaxed text-content whitespace-pre-wrap">{block.text}</p>
+      <p className="text-[13px] leading-relaxed whitespace-pre-wrap" style={{ color: PDF.inkSoft }}>
+        {block.text}
+      </p>
     );
   }
   if (block.kind === "clauses") {
     return (
-      <ul className="space-y-2">
-        {block.items.map((it, i) => (
-          <li key={i} className="text-[13px] leading-relaxed text-content pl-4 relative">
-            <span className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-accent-brand" />
-            {it}
-          </li>
-        ))}
-      </ul>
+      <div className="space-y-3">
+        {block.items.map((it, i) => {
+          const { heading, body } = splitClause(it);
+          return (
+            <div key={i} className="pl-4" style={{ borderLeft: `2.5px solid ${PDF.cobalt}` }}>
+              {heading && (
+                <div className="text-[12.5px] font-bold" style={{ color: PDF.ink }}>
+                  {heading}
+                </div>
+              )}
+              <div className="text-[12.5px] leading-relaxed" style={{ color: PDF.inkSoft }}>
+                {body}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     );
   }
   if (block.kind === "fields") {
     return (
-      <table className="w-full text-[12px]">
+      <table className="w-full text-[12px]" style={{ borderCollapse: "collapse" }}>
         <tbody>
           {block.rows.map(([k, val], i) => (
-            <tr key={i} className="border-b border-hairline/60 last:border-0">
-              <td className="py-1.5 pr-3 font-mono text-[11px] uppercase tracking-wide text-content-subtle w-40 align-top">
+            <tr key={i} style={{ background: i % 2 === 1 ? PDF.paperAlt : "transparent" }}>
+              <td
+                className="py-1.5 px-2 font-mono text-[10px] uppercase tracking-wide align-top"
+                style={{ color: PDF.cobalt, width: 150, fontWeight: 700 }}
+              >
                 {k}
               </td>
-              <td className="py-1.5 text-content">{val}</td>
+              <td className="py-1.5 px-2 align-top" style={{ color: PDF.ink }}>
+                {val}
+              </td>
             </tr>
           ))}
         </tbody>
@@ -605,13 +731,14 @@ function BlockPreview({ block }: { block: DocBlock }) {
   if (block.kind === "table") {
     return (
       <div className="overflow-x-auto">
-        <table className="w-full text-[12px] border-collapse">
+        <table className="w-full text-[12px]" style={{ borderCollapse: "collapse" }}>
           <thead>
             <tr>
               {block.head.map((h, i) => (
                 <th
                   key={i}
-                   className="text-left px-2 py-1.5 bg-content text-surface font-mono text-[10px] uppercase tracking-wide"
+                  className="text-left px-2 py-1.5 font-mono text-[10px] uppercase tracking-wide"
+                  style={{ background: PDF.ink, color: "#fff" }}
                 >
                   {h}
                 </th>
@@ -620,9 +747,9 @@ function BlockPreview({ block }: { block: DocBlock }) {
           </thead>
           <tbody>
             {block.rows.map((row, i) => (
-              <tr key={i} className="border-b border-hairline">
+              <tr key={i} style={{ borderBottom: `1px solid ${PDF.hairline}` }}>
                 {row.map((cell, j) => (
-                  <td key={j} className="px-2 py-1.5 text-content align-top">
+                  <td key={j} className="px-2 py-1.5 align-top" style={{ color: PDF.ink }}>
                     {cell}
                   </td>
                 ))}
@@ -634,16 +761,21 @@ function BlockPreview({ block }: { block: DocBlock }) {
     );
   }
   if (block.kind === "signature") {
+    const cols = Math.min(2, block.parties.length || 1);
     return (
       <div
-        className="grid gap-6 pt-8"
-        style={{ gridTemplateColumns: `repeat(${block.parties.length}, minmax(0,1fr))` }}
+        className="grid gap-7 pt-10"
+        style={{ gridTemplateColumns: `repeat(${cols}, minmax(0,1fr))` }}
       >
         {block.parties.map((p, i) => (
           <div key={i}>
-            <div className="border-t border-content pt-1.5">
-              <div className="text-[12px] font-medium text-content">{p}</div>
-              <div className="text-[10px] font-mono text-content-subtle">Nombre, cargo y firma</div>
+            <div style={{ borderTop: `0.7px solid ${PDF.ink}`, paddingTop: 6 }}>
+              <div className="text-[12px] font-bold" style={{ color: PDF.ink }}>
+                {p}
+              </div>
+              <div className="text-[10px] font-mono mt-0.5" style={{ color: PDF.gray }}>
+                Nombre, cargo y firma
+              </div>
             </div>
           </div>
         ))}
