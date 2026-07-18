@@ -7,7 +7,7 @@ import { HolderBadges } from "./HolderBadges";
 export function HolderCard({ holder }: { holder: HolderWithCounts }) {
   return (
     <Link
-      to="/dashboard/catastro/holders/$id"
+      to="/catastro/proyecto/titulares/$id"
       params={{ id: holder.id }}
       className="block border border-border rounded p-3 hover:bg-accent/30 transition-colors"
     >
