@@ -156,7 +156,17 @@ function FirmasPage() {
                       <div className="text-[11px] font-mono text-muted-foreground">
                         {r.reference} · {r.template_id.toUpperCase()}
                       </div>
+                      {r.trade_id ? (
+                        <Link
+                          to="/dashboard/trades/$tradeId"
+                          params={{ tradeId: r.trade_id }}
+                          className="mt-1 inline-flex items-center gap-1 text-[11px] font-mono text-primary hover:underline"
+                        >
+                          Trade {r.trade_reference ?? r.trade_id.slice(0, 8)} →
+                        </Link>
+                      ) : null}
                     </td>
+
                     <td className="px-4 py-3">
                       {r.signed_by_name ?? r.signer_name_expected ?? (
                         <span className="text-muted-foreground">—</span>
