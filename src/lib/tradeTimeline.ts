@@ -74,7 +74,7 @@ export function journeyHeadline(
 export type TimelineItem = {
   id: string;
   at: string;
-  category: "trade" | "document" | "shipment" | "message";
+  category: "trade" | "document" | "shipment" | "payment" | "message";
   title: string;
   detail: string | null;
 };
@@ -155,6 +155,22 @@ export function normalizeEvent(e: RawTradeEvent): TimelineItem {
         at: e.created_at,
         category: "shipment",
         title: "Embarque actualizado",
+        detail: e.detail,
+      };
+    case "payment_scheduled":
+      return {
+        id: e.id,
+        at: e.created_at,
+        category: "payment",
+        title: "Pago programado",
+        detail: e.detail,
+      };
+    case "payment_paid":
+      return {
+        id: e.id,
+        at: e.created_at,
+        category: "payment",
+        title: "Pago recibido",
         detail: e.detail,
       };
     case "message":

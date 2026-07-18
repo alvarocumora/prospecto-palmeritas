@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   Ship,
@@ -10,6 +12,10 @@ import {
   Anchor,
   ExternalLink,
   PackageCheck,
+  Banknote,
+  Plus,
+  CheckCircle2,
+  AlertTriangle,
 } from "lucide-react";
 import { getTradeTracking } from "@/lib/tradeTracking.functions";
 import {
@@ -20,6 +26,20 @@ import {
   type TimelineItem,
 } from "@/lib/tradeTimeline";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
+import {
+  listTradePayments,
+  createTradePayment,
+  markTradePaymentPaid,
+  cancelTradePayment,
+  type PaymentRow,
+} from "@/lib/payments.functions";
+import {
+  PAYMENT_KINDS,
+  PAYMENT_KIND_LABELS,
+  PAYMENT_STATUS_LABELS,
+  effectivePaymentStatus,
+  type PaymentKind,
+} from "@/lib/payments";
 
 // Trazabilidad unificada del trade — "Uber de los commodities": un titular de
 // estado, el viaje en pasos y el timeline completo (acuerdo, documentos, pago,
@@ -34,6 +54,7 @@ const CATEGORY_ICON: Record<TimelineItem["category"], typeof Ship> = {
   trade: Handshake,
   document: FileText,
   shipment: Ship,
+  payment: Banknote,
   message: MessageSquare,
 };
 
@@ -41,8 +62,12 @@ const CATEGORY_COLOR: Record<TimelineItem["category"], string> = {
   trade: "text-primary",
   document: "text-signal-violet",
   shipment: "text-teal",
+  payment: "text-green-600",
   message: "text-muted-foreground",
 };
+
+const usd0 = (n: number | null | undefined) =>
+  n != null ? `US$ ${Math.round(n).toLocaleString("es-CL")}` : "—";
 
 function TrackingPage() {
   const { tradeId } = Route.useParams();
@@ -202,6 +227,9 @@ function TrackingPage() {
         </div>
       </div>
 
+      {/* Finanzas del trade: cronograma de pagos */}
+      <PaymentsSection tradeId={trade.id} />
+
       {/* Timeline unificado */}
       <div>
         <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground mb-3">
@@ -235,6 +263,277 @@ function TrackingPage() {
           </ol>
         )}
       </div>
+    </div>
+  );
+}
+
+const STATUS_CLS: Record<string, string> = {
+  pagado: "bg-green-500/15 text-green-700",
+  vencido: "bg-red-500/15 text-red-600",
+  programado: "bg-amber-500/15 text-amber-700",
+  cancelado: "bg-muted text-muted-foreground",
+};
+
+function PaymentsSection({ tradeId }: { tradeId: string }) {
+  const listFn = useServerFn(listTradePayments);
+  const createFn = useServerFn(createTradePayment);
+  const paidFn = useServerFn(markTradePaymentPaid);
+  const cancelFn = useServerFn(cancelTradePayment);
+
+  const { data, refetch } = useQuery({
+    queryKey: ["trade-payments", tradeId],
+    queryFn: () => listFn({ data: { tradeId } }),
+    staleTime: 30_000,
+  });
+
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({
+    kind: "anticipo" as PaymentKind,
+    label: "",
+    amountUsd: "",
+    instrument: "" as "" | "sblc_mt760" | "dlc" | "tt" | "escrow" | "otro",
+    dueDate: "",
+  });
+
+  const onCreate = async () => {
+    setSaving(true);
+    try {
+      await createFn({
+        data: {
+          tradeId,
+          kind: form.kind,
+          label: form.label || undefined,
+          amountUsd: form.amountUsd ? Number(form.amountUsd) : undefined,
+          instrument: form.instrument || undefined,
+          dueDate: form.dueDate || undefined,
+        },
+      });
+      toast.success("Pago agregado al cronograma.");
+      setForm({ kind: "anticipo", label: "", amountUsd: "", instrument: "", dueDate: "" });
+      setShowForm(false);
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo agregar.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onPaid = async (id: string) => {
+    try {
+      await paidFn({ data: { id } });
+      toast.success("Pago marcado como recibido.");
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo actualizar.");
+    }
+  };
+  const onCancel = async (id: string) => {
+    try {
+      await cancelFn({ data: { id } });
+      refetch();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo cancelar.");
+    }
+  };
+
+  const s = data?.summary;
+  const now = new Date();
+
+  return (
+    <div className="rounded-md border border-border bg-bg-secondary/20 p-4">
+      <div className="flex items-center justify-between gap-2 mb-3">
+        <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+          <Banknote className="w-3.5 h-3.5 text-green-600" /> Finanzas · pagos
+        </div>
+        <button
+          onClick={() => setShowForm((v) => !v)}
+          className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+        >
+          <Plus className="w-3 h-3" /> Agregar pago
+        </button>
+      </div>
+
+      {data?.pending && (
+        <div className="rounded border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-[11px] flex items-center gap-2 mb-3">
+          <AlertTriangle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+          Los pagos se activan al aplicar la migración{" "}
+          <code className="font-mono">20260719200000_trade_payments.sql</code>.
+        </div>
+      )}
+
+      {/* Resumen */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
+        {[
+          ["Comprometido", usd0(s?.scheduledUsd ?? 0), "text-foreground"],
+          ["Cobrado", usd0(s?.paidUsd ?? 0), "text-green-600"],
+          ["Por cobrar", usd0(s?.outstandingUsd ?? 0), "text-amber-600"],
+          [
+            "Vencido",
+            usd0(s?.overdueUsd ?? 0),
+            (s?.overdueUsd ?? 0) > 0 ? "text-red-600" : "text-foreground",
+          ],
+        ].map(([label, val, cls]) => (
+          <div key={label} className="rounded border border-border p-2">
+            <div className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
+              {label}
+            </div>
+            <div className={`text-sm font-mono font-bold ${cls}`}>{val}</div>
+          </div>
+        ))}
+      </div>
+      {(s?.scheduledUsd ?? 0) > 0 && (
+        <div className="mb-3">
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+            <div className="h-full bg-green-600" style={{ width: `${s?.progressPct ?? 0}%` }} />
+          </div>
+          <div className="text-[10px] font-mono text-muted-foreground mt-1">
+            {s?.progressPct ?? 0}% cobrado
+          </div>
+        </div>
+      )}
+
+      {showForm && (
+        <div className="rounded border border-border bg-bg-primary/40 p-3 grid sm:grid-cols-2 lg:grid-cols-5 gap-2 mb-3">
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Tipo</span>
+            <select
+              value={form.kind}
+              onChange={(e) => setForm({ ...form, kind: e.target.value as PaymentKind })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            >
+              {PAYMENT_KINDS.map((k) => (
+                <option key={k} value={k}>
+                  {PAYMENT_KIND_LABELS[k]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Etiqueta</span>
+            <input
+              value={form.label}
+              placeholder="30% anticipo"
+              onChange={(e) => setForm({ ...form, label: e.target.value })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            />
+          </label>
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Monto US$</span>
+            <input
+              type="number"
+              min={0}
+              value={form.amountUsd}
+              onChange={(e) => setForm({ ...form, amountUsd: e.target.value })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            />
+          </label>
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Instrumento</span>
+            <select
+              value={form.instrument}
+              onChange={(e) =>
+                setForm({ ...form, instrument: e.target.value as typeof form.instrument })
+              }
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            >
+              <option value="">—</option>
+              <option value="sblc_mt760">SBLC MT760</option>
+              <option value="dlc">DLC</option>
+              <option value="tt">TT</option>
+              <option value="escrow">Escrow</option>
+              <option value="otro">Otro</option>
+            </select>
+          </label>
+          <label className="text-xs">
+            <span className="block text-text-secondary mb-1">Vence</span>
+            <input
+              type="date"
+              value={form.dueDate}
+              onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+              className="w-full px-2 py-1.5 bg-bg-primary border border-border rounded text-sm"
+            />
+          </label>
+          <div className="sm:col-span-2 lg:col-span-5">
+            <button
+              onClick={() => void onCreate()}
+              disabled={saving}
+              className="px-3 py-1.5 rounded bg-primary text-primary-foreground text-sm disabled:opacity-50"
+            >
+              {saving ? "Agregando…" : "Agregar pago"}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {(data?.payments.length ?? 0) === 0 ? (
+        <div className="text-xs text-text-secondary py-3">
+          Sin pagos en el cronograma. Agrega el anticipo, el pago contra embarque y el balance para
+          seguir la cobranza de la operación.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm min-w-[620px]">
+            <thead>
+              <tr className="text-left text-[10px] font-mono uppercase tracking-wider text-muted-foreground border-b border-border">
+                <th className="py-2 pr-3">Concepto</th>
+                <th className="py-2 pr-3">Monto</th>
+                <th className="py-2 pr-3">Vence</th>
+                <th className="py-2 pr-3">Estado</th>
+                <th className="py-2" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {(data?.payments ?? []).map((p: PaymentRow) => {
+                const st = effectivePaymentStatus(p, now);
+                return (
+                  <tr key={p.id}>
+                    <td className="py-2 pr-3">
+                      <div className="font-medium">
+                        {p.label ?? PAYMENT_KIND_LABELS[p.kind as PaymentKind] ?? p.kind}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {PAYMENT_KIND_LABELS[p.kind as PaymentKind] ?? p.kind}
+                        {p.instrument ? ` · ${p.instrument.toUpperCase()}` : ""}
+                      </div>
+                    </td>
+                    <td className="py-2 pr-3 font-mono">{usd0(p.amount_usd)}</td>
+                    <td className="py-2 pr-3 text-xs">
+                      {p.due_date ? new Date(p.due_date).toLocaleDateString("es-CL") : "—"}
+                    </td>
+                    <td className="py-2 pr-3">
+                      <span
+                        className={`text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${STATUS_CLS[st]}`}
+                      >
+                        {PAYMENT_STATUS_LABELS[st]}
+                      </span>
+                    </td>
+                    <td className="py-2 text-right whitespace-nowrap">
+                      {st !== "pagado" && st !== "cancelado" && (
+                        <>
+                          <button
+                            onClick={() => void onPaid(p.id)}
+                            className="text-[11px] font-mono text-green-600 hover:underline inline-flex items-center gap-1 mr-3"
+                          >
+                            <CheckCircle2 className="w-3 h-3" /> Pagado
+                          </button>
+                          <button
+                            onClick={() => void onCancel(p.id)}
+                            className="text-[11px] font-mono text-muted-foreground hover:underline"
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
