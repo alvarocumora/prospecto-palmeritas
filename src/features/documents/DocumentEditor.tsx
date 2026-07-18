@@ -615,8 +615,8 @@ export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
               <div className="text-[6px] font-bold mt-1" style={{ color: PDF.cobalt }}>
                 VALIDAR
               </div>
-              <div className="text-[5px]" style={{ color: PDF.gray }}>
-                /verificar/{doc.reference}
+              <div className="text-[5px] truncate max-w-[40px]" style={{ color: PDF.gray }}>
+                {doc.reference}
               </div>
             </div>
           </div>
