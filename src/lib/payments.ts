@@ -64,6 +64,12 @@ export type PaymentsSummary = {
   progressPct: number;
 };
 
+/** Un pago solo cuenta en el resumen si tiene monto positivo. Registros con
+ *  monto nulo o ≤ 0 son inválidos y se ignoran para no inflar el progreso. */
+export function isValidPaymentAmount(amount: number | null | undefined): amount is number {
+  return typeof amount === "number" && isFinite(amount) && amount > 0;
+}
+
 export function summarizePayments(rows: PaymentLike[], now: Date): PaymentsSummary {
   let scheduledUsd = 0;
   let paidUsd = 0;
@@ -71,9 +77,10 @@ export function summarizePayments(rows: PaymentLike[], now: Date): PaymentsSumma
   let nextDue: { amountUsd: number; dueDate: string } | null = null;
 
   for (const p of rows) {
-    const amount = p.amount_usd ?? 0;
     const st = effectivePaymentStatus(p, now);
     if (st === "cancelado") continue;
+    if (!isValidPaymentAmount(p.amount_usd)) continue; // inválido: no infla el progreso
+    const amount = p.amount_usd;
     scheduledUsd += amount;
     if (st === "pagado") {
       paidUsd += amount;
@@ -92,3 +99,4 @@ export function summarizePayments(rows: PaymentLike[], now: Date): PaymentsSumma
   const progressPct = scheduledUsd > 0 ? Math.round((paidUsd / scheduledUsd) * 100) : 0;
   return { scheduledUsd, paidUsd, outstandingUsd, overdueUsd, nextDue, progressPct };
 }
+

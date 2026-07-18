@@ -85,12 +85,18 @@ const CreateInput = z.object({
   tradeId: z.string().uuid(),
   kind: z.enum(PAYMENT_KINDS),
   label: z.string().trim().max(120).optional(),
-  amountUsd: z.number().min(0).max(1e12).optional(),
+  // Un pago debe tener monto positivo: sin monto el progreso queda inconsistente.
+  amountUsd: z
+    .number({ error: "El monto es obligatorio." })
+    .positive("El monto debe ser mayor a 0.")
+    .max(1e12),
+
   instrument: z.enum(["sblc_mt760", "dlc", "tt", "escrow", "otro"]).optional(),
   reference: z.string().trim().max(120).optional(),
   dueDate: z.string().trim().max(10).optional(),
   notes: z.string().trim().max(1000).optional(),
 });
+
 
 export const createTradePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -104,7 +110,7 @@ export const createTradePayment = createServerFn({ method: "POST" })
         created_by: context.userId as string,
         kind: data.kind,
         label: data.label ?? null,
-        amount_usd: data.amountUsd ?? null,
+        amount_usd: data.amountUsd,
         instrument: data.instrument ?? null,
         reference: data.reference ?? null,
         due_date: data.dueDate || null,
@@ -162,11 +168,32 @@ export const cancelTradePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
-    const { error } = await asSb(context.supabase)
+    const sb = asSb(context.supabase);
+    // Se lee la fila antes de cancelar para poder describir el evento en el feed
+    // del trade (trazabilidad) sin depender de la respuesta del update.
+    const { data: before } = await sb
+      .from("trade_payments")
+      .select("trade_id, kind, label, amount_usd, status")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { error } = await sb
       .from("trade_payments")
       .update({ status: "cancelado" })
       .eq("id", data.id)
       .neq("status", "pagado");
     if (error) throw new Error(error.message);
+    const b = before as
+      | { trade_id: string; kind: string; label: string | null; amount_usd: number | null; status: string }
+      | null;
+    if (b && b.status !== "cancelado" && b.status !== "pagado") {
+      await logEvent(
+        sb,
+        b.trade_id,
+        context.userId as string,
+        "payment_cancelled",
+        `${b.label ?? b.kind} · ${usd0(b.amount_usd)} cancelado`,
+      );
+    }
     return { ok: true };
   });
+

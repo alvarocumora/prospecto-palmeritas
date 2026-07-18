@@ -139,21 +139,53 @@ export type SignRequestRow = {
   signed_at: string | null;
   expires_at: string;
   created_at: string;
+  /** Trade vinculado (trazabilidad de la firma). */
+  trade_id: string | null;
+  trade_reference: string | null;
 };
 
 export const listMySignRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SignRequestRow[]> => {
-    const { data } = await asSb(context.supabase)
+    const sb = asSb(context.supabase);
+    // select * tolera pre-migración de trade_id sin romper el listado.
+    const { data } = await sb
       .from("document_sign_requests")
-      .select(
-        "id, template_id, reference, title, token_prefix, status, signer_name_expected, signed_by_name, signed_at, expires_at, created_at",
-      )
+      .select("*")
       .eq("created_by", context.userId as string)
       .order("created_at", { ascending: false })
       .limit(100);
-    return (data ?? []) as SignRequestRow[];
+    const rows = (data ?? []) as Array<Record<string, unknown>>;
+    const tradeIds = Array.from(
+      new Set(rows.map((r) => r.trade_id).filter((v): v is string => typeof v === "string")),
+    );
+    const refs = new Map<string, string | null>();
+    if (tradeIds.length > 0) {
+      const { data: trades } = await sb
+        .from("commodity_trades")
+        .select("id, reference")
+        .in("id", tradeIds);
+      for (const t of (trades ?? []) as Array<{ id: string; reference: string | null }>) {
+        refs.set(t.id, t.reference);
+      }
+    }
+    return rows.map((r) => ({
+      id: String(r.id),
+      template_id: String(r.template_id),
+      reference: String(r.reference),
+      title: String(r.title),
+      token_prefix: String(r.token_prefix),
+      status: r.status as SignRequestStatus,
+      signer_name_expected: (r.signer_name_expected ?? null) as string | null,
+      signed_by_name: (r.signed_by_name ?? null) as string | null,
+      signed_at: (r.signed_at ?? null) as string | null,
+      expires_at: String(r.expires_at),
+      created_at: String(r.created_at),
+      trade_id: (r.trade_id ?? null) as string | null,
+      trade_reference: r.trade_id ? refs.get(String(r.trade_id)) ?? null : null,
+    }));
   });
+
 
 export const voidSignRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
