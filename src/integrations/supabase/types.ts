@@ -2208,6 +2208,12 @@ export type Database = {
         Row: {
           buyer_user_id: string
           commodity: string | null
+          counterparty_company: string | null
+          counterparty_country: string | null
+          counterparty_email: string | null
+          counterparty_name: string | null
+          counterparty_phone: string | null
+          counterparty_role: string | null
           created_at: string
           created_by: string
           currency: string
@@ -2220,7 +2226,7 @@ export type Database = {
           payment_instrument: string | null
           quantity_t: number | null
           reference: string | null
-          seller_user_id: string
+          seller_user_id: string | null
           stage: string
           status: string
           total_value_usd: number | null
@@ -2230,6 +2236,12 @@ export type Database = {
         Insert: {
           buyer_user_id: string
           commodity?: string | null
+          counterparty_company?: string | null
+          counterparty_country?: string | null
+          counterparty_email?: string | null
+          counterparty_name?: string | null
+          counterparty_phone?: string | null
+          counterparty_role?: string | null
           created_at?: string
           created_by: string
           currency?: string
@@ -2242,7 +2254,7 @@ export type Database = {
           payment_instrument?: string | null
           quantity_t?: number | null
           reference?: string | null
-          seller_user_id: string
+          seller_user_id?: string | null
           stage?: string
           status?: string
           total_value_usd?: number | null
@@ -2252,6 +2264,12 @@ export type Database = {
         Update: {
           buyer_user_id?: string
           commodity?: string | null
+          counterparty_company?: string | null
+          counterparty_country?: string | null
+          counterparty_email?: string | null
+          counterparty_name?: string | null
+          counterparty_phone?: string | null
+          counterparty_role?: string | null
           created_at?: string
           created_by?: string
           currency?: string
@@ -2264,7 +2282,7 @@ export type Database = {
           payment_instrument?: string | null
           quantity_t?: number | null
           reference?: string | null
-          seller_user_id?: string
+          seller_user_id?: string | null
           stage?: string
           status?: string
           total_value_usd?: number | null
