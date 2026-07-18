@@ -29,6 +29,15 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
             >
               <Map className="w-3.5 h-3.5" /> Mapa nacional
             </Link>
+            {user && (
+              <Link
+                to="/catastro/proyecto"
+                className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"
+                activeProps={{ className: "text-foreground bg-accent" }}
+              >
+                Vista proyecto
+              </Link>
+            )}
             <Link
               to="/catastro/precios"
               className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"
@@ -50,6 +59,7 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
               Plataforma completa
             </Link>
           </nav>
+
           {user ? (
             <div className="flex items-center gap-2">
               <Link
