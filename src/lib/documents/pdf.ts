@@ -262,6 +262,7 @@ export async function renderGeocapitalsPdf(
     } else if (block.kind === "clauses") {
       const clauseBottom = safeBottom - 46;
       for (const item of block.items) {
+        if (y > clauseBottom - 176) y = addPage();
         const normalized = clampText(item, 1800);
         const firstDot = normalized.indexOf(". ");
         const heading = firstDot > 0 && firstDot < 80 ? normalized.slice(0, firstDot + 1) : null;
