@@ -13332,6 +13332,7 @@ export type Database = {
           supplier_company: string | null
           supplier_country: string | null
           supplier_name: string
+          trade_id: string | null
           updated_at: string
         }
         Insert: {
@@ -13353,6 +13354,7 @@ export type Database = {
           supplier_company?: string | null
           supplier_country?: string | null
           supplier_name: string
+          trade_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -13374,6 +13376,7 @@ export type Database = {
           supplier_company?: string | null
           supplier_country?: string | null
           supplier_name?: string
+          trade_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -13382,6 +13385,13 @@ export type Database = {
             columns: ["request_id"]
             isOneToOne: false
             referencedRelation: "sourcing_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_submissions_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
             referencedColumns: ["id"]
           },
         ]
