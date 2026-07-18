@@ -42,6 +42,7 @@ import {
   KeyRound,
   LineChart,
   BadgeCheck,
+  Wallet,
   Database,
   BarChart3,
   Satellite,
@@ -167,6 +168,12 @@ function AuthenticatedLayout() {
       to: "/dashboard/trades",
       icon: <Handshake className="w-3.5 h-3.5" />,
       label: "Trade Desk",
+      group: "NEGOCIO",
+    },
+    {
+      to: "/dashboard/cobranza",
+      icon: <Wallet className="w-3.5 h-3.5" />,
+      label: "Cobranza",
       group: "NEGOCIO",
     },
     {
