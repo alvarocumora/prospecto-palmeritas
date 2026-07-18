@@ -206,14 +206,14 @@ const ndi: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. CONFIDENCIALIDAD. Toda información técnica, comercial, financiera y de contactos intercambiada será tratada como estrictamente confidencial.`,
             `2. NO ELUSIÓN. Ninguna de las Partes podrá contactar, negociar ni contratar directa o indirectamente con las contrapartes, productores, compradores, financistas o brokers presentados por la otra, sin su consentimiento previo por escrito.`,
             `3. COMISIÓN. Cualquier operación derivada de las presentaciones efectuadas conlleva el reconocimiento de una comisión de ${pct}% del valor bruto de la transacción, pagadera al cierre de cada embarque o disbursement.`,
             `4. VIGENCIA. ${term} meses desde la firma, extensible por operaciones recurrentes.`,
             ...(active.has("iccBased") ? [`5. MARCO INTERNACIONAL. ${ndi.clauses[0].text}`] : []),
             `6. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [A, B] },
       ],
@@ -281,7 +281,7 @@ const mou: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. OBJETO. ${obj}.`,
             `2. HITOS. Las Partes acuerdan avanzar en due diligence técnica, legal y financiera dentro de la ventana de exclusividad.`,
             ...(active.has("exclusivity")
@@ -294,7 +294,7 @@ const mou: TemplateDef = {
               : []),
             `5. CONFIDENCIALIDAD. Sujeta a un NDA separado o al presente entendimiento como cláusula vinculante.`,
             `6. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [A, B] },
       ],
@@ -354,11 +354,11 @@ const loi: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. Esta carta no constituye obligación vinculante de compra, inversión o venta, y queda sujeta a: (a) due diligence satisfactoria, (b) firma de contratos definitivos, y (c) aprobaciones societarias y regulatorias aplicables.`,
             `2. Las Partes iniciarán de buena fe la due diligence y estructuración del negocio dentro de la validez indicada.`,
             `3. La confidencialidad se rige por el NDA suscrito o, en su defecto, por las prácticas usuales en operaciones de similar naturaleza.`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [B] },
       ],
@@ -473,7 +473,7 @@ const termSheet: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. CIERRE. Sujeto a due diligence satisfactoria, firma de SPA/SSA y SHA, y aprobaciones regulatorias.`,
             ...(active.has("tagAlong")
               ? [`2. LIQUIDEZ. ${termSheet.clauses.find((c) => c.key === "tagAlong")!.text}`]
@@ -491,7 +491,7 @@ const termSheet: TemplateDef = {
               : []),
             `6. EXCLUSIVIDAD. 60 días de exclusividad negociadora, vinculantes.`,
             `7. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [inv, co] },
       ],
@@ -569,7 +569,7 @@ const spa: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. OBJETO. El Vendedor vende y el Comprador compra ${shares} de las acciones de la Sociedad Objetivo.`,
             `2. PRECIO Y PAGO. Precio: USD ${price}. Se pagará al cierre mediante transferencia electrónica a la cuenta que el Vendedor indique.`,
             `3. CONDICIONES SUSPENSIVAS. (a) Aprobaciones regulatorias; (b) DD satisfactoria; (c) sin cambios adversos relevantes (MAC).`,
@@ -585,7 +585,7 @@ const spa: TemplateDef = {
               ? [`8. NO COMPETENCIA. ${spa.clauses.find((c) => c.key === "nonCompete")!.text}`]
               : []),
             `9. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [S, B] },
       ],
@@ -660,7 +660,7 @@ const jv: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. OBJETO. Explorar, desarrollar y explotar el proyecto ${project}.`,
             `2. GOBIERNO. Comité técnico paritario; decisiones mayoritarias salvo materias reservadas (endeudamiento, cambio de operador, dividendos).`,
             `3. CASH-CALLS. Aportes proporcionales a la participación vigente.`,
@@ -671,7 +671,7 @@ const jv: TemplateDef = {
               ? [`5. OPERADOR. ${jv.clauses.find((c) => c.key === "operator")!.text}`]
               : []),
             `6. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [A, B] },
       ],
@@ -750,7 +750,7 @@ const royalty: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. BASE DE CÁLCULO. Ingresos por venta de productos menos fundición, refinación, transporte y seguros ("Net Smelter Return").`,
             `2. PAGO. Mensual, dentro de los 15 días siguientes al cierre de mes.`,
             `3. RECOMPRA. El Otorgante podrá recomprar hasta el 50% del royalty en tramos de 0,5% a USD ${buy} cada uno.`,
@@ -762,7 +762,7 @@ const royalty: TemplateDef = {
               : []),
             `6. INSCRIPCIÓN. Este royalty se inscribirá como gravamen sobre la concesión en el Registro correspondiente.`,
             `7. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [G, Bf] },
       ],
@@ -837,7 +837,7 @@ const advisory: TemplateDef = {
         },
         {
           kind: "clauses",
-          items: [
+          items: renumber([
             `1. HONORARIOS. Retainer mensual de USD ${retainer} + success fee de ${success}%.`,
             `2. INDEPENDENCIA. El Asesor actúa como contratista independiente; no existe relación laboral.`,
             ...(active.has("tail")
@@ -848,7 +848,7 @@ const advisory: TemplateDef = {
               : []),
             `5. CONFIDENCIALIDAD. El Asesor mantendrá confidencialidad conforme al NDA suscrito.`,
             `6. LEY Y ARBITRAJE. ${jurisdictionClause(jur)}`,
-          ],
+          ]),
         },
         { kind: "signature", parties: [C, Ad] },
       ],
