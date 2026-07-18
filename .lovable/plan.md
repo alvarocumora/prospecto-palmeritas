@@ -1,61 +1,66 @@
 
-## 1. Rebrand del login (`/auth`)
+## Diagnóstico
 
-Hoy la pantalla usa metáforas de trabajo de campo geológico ("Sesión geólogo", "Acceso al campo", "Continúa donde dejaste tu última campaña", "Nombre del geólogo", "diseñada por geólogos"). Geocapitals es una plataforma de **negocios mineros** (deals, inversión, sourcing de commodities, valorización, NI 43-101), no una app de terreno.
+Hoy existen dos "catastros" paralelos que confunden al usuario:
 
-Cambios en `src/routes/auth.tsx`:
-- Encabezado: "Sesión geólogo" → "Plataforma Geocapitals"; "Acceso al campo" → "Acceso a tu cuenta".
-- Subtítulo login: "Continúa donde dejaste tu última campaña." → "Gestiona tus proyectos, deals y valorizaciones mineras."
-- Subtítulo registro: enfocar en "Crea tu cuenta para acceder a proyectos mineros, data rooms y valorización".
-- Label "Nombre del geólogo" → "Nombre completo".
-- Copy secundario ("diseñada por geólogos", CTA "Entrar al proyecto") → lenguaje de negocio: "Entrar" / "diseñada para el negocio minero: catastro, deals, inversión y NI 43-101".
-- Añadir 3 chips bajo el título con los pilares reales de la plataforma: Catastro & Concesiones · Deals & Inversión · NI 43-101 & Valorización.
-- Mantener tema Institutional Modernist y tokens actuales (sin cambios visuales de layout).
+**A. Catastro público (principal, `/catastro/*`)** — la ruta con planes, marca y SEO:
+- `/catastro` — landing con buscador nacional
+- `/catastro/mapa` — mapa nacional en vivo desde SERNAGEOMIN (~103k polígonos, filtros tipo/situación, basemap sat/calles, export CSV/GeoJSON)
+- `/catastro/precios`, `/catastro/global`, `/catastro/pais/$country`, `/catastro/c/$code`, `/catastro/app/watchlist`
+- Envoltura: `PublicCatastroShell`
 
-## 2. Migraciones pendientes
+**B. Catastro del dashboard (`/dashboard/catastro`)** — vista *scoped al proyecto activo*:
+- Tabs: Mis concesiones, Titulares, Patentes, Conflictos (overlaps), Vigilancia, Historial, Sync log
+- Su propio `CatastroMap` (proyecto), sync con `sync-catastro`+`compute-overlaps`, alertas de vencimiento, AOI overlap, importador SERNAGEOMIN
+- Datos: `mining_concessions` filtrado por `project_id`
 
-Revisar en la base cuáles de estas siguen sin aplicar y correr las que falten (idempotentes, ya mergeadas):
-- `20260719160000_sourcing.sql`
-- `20260719180000_sourcing_submission_trade.sql`
-- `20260719200000_trade_payments.sql`
-- `20260719140000_deal_commissions.sql`
-- `20260719120000_sign_requests_trade_link.sql`
-- `20260719100000_business_partners.sql`
-- `20260718120000_trade_shipments.sql`
+Duplicación real: dos mapas distintos, dos experiencias de búsqueda, dos capas SERNAGEOMIN cargadas por caminos separados. Lo que NO se duplica: los tabs (holders/patents/watches/history/sync) son valor genuino del dashboard.
 
-Para cada tabla nueva verificar el bloque GRANT (`authenticated` + `service_role`), RLS activo y policies por `auth.uid()`. Si alguna falta GRANT o policy, emitir migración correctiva en el mismo paso.
+## Objetivo
 
-## 3. Auditoría de flujo (entregable = informe corto + fixes puntuales)
+Que **`/catastro/mapa` sea el único mapa nacional** de la plataforma, y que el dashboard se convierta en una **capa "vista proyecto"** montada encima de ese mismo mapa + los paneles operativos (patents/holders/watches/etc.). Cero pérdida de features; solo unificación de la superficie visual y del código de mapa.
 
-Recorrido end-to-end de los flujos críticos, marcando ✅ / ⚠️ / ❌ y abriendo fix sólo donde rompe UX o seguridad:
+## Plan por fases
 
-1. **Auth & onboarding**: `/auth` → `/dashboard`, redirect post-login, estado `loading` sin flash a `/auth`.
-2. **Proyectos & Data Room**: listar, entrar a un listing, ValuationPanel, Data Room (grants, descargas sin 403).
-3. **Sourcing de commodities**: crear requerimiento → link público de proveedor → subir propuesta → convertir en trade → payments/commissions.
-4. **Trades & shipments**: crear trade, agregar shipment, adjuntar documentos, marcar pagos.
-5. **Firmas**: crear envelope, link `firmar/$token`, verificación `verificar/$ref`, QR válido.
-6. **Documentos**: editar plantilla, exportar PDF (layout, footer, watermark), branding consistente.
-7. **Live maps públicos** (`/live/losverdes`, `/live/palmeras`, `/live/franco`): acceso sin auth, tema IM, export PDF.
-8. **Seguridad**: correr `security--run_security_scan`, revisar findings críticos nuevos (RLS, PII, escaladas).
-9. **Cron & jobs**: `pg_cron` (sync catastro, sync sernageomin, scan concession expirations) — verificar últimas corridas.
+### Fase 1 — Mapa único (elimina la duplicación real)
 
-## 4. Mejoras al flujo (priorizadas, sólo scoping — se detallan cuando toque implementarlas)
+1. Promover `catastro.mapa.tsx` como el componente de mapa canónico. Extraer su cuerpo a `src/features/catastro-public/NationalCatastroMap.tsx` (props: `overlayConcessions?`, `aoi?`, `projectName?`, `onFeatureClick?`, `initialCenter?`, `showProjectStats?`).
+2. Borrar `src/components/ops/CatastroMap.tsx` (mapa del dashboard) y sustituir sus usos por `NationalCatastroMap` con las props de overlay del proyecto. El mapa nacional queda igual para el público; con `overlayConcessions` pinta encima las concesiones del proyecto activo con estilo destacado (borde cobalto, fill semi-transparente) y hace fit al bbox del proyecto.
+3. Mantener `CatastroOverlapPanel` y `AoiOverlapPanel` alimentándose de las features cargadas por `NationalCatastroMap` (mismo `onFeaturesLoaded`).
 
-- **P1** Landing post-login orientada a negocio (KPIs reales: deals abiertos, sourcing pendiente, firmas por completar, alertas de catastro) en vez de placeholder.
-- **P1** Sourcing: badge de propuestas nuevas + email al owner cuando llega submission.
-- **P2** Trades: timeline unificada (evento + shipment + pago + firma) en la ficha del trade.
-- **P2** Documentos: guardado autosave del draft + versión firmada inmutable.
-- **P3** Notificaciones: centro único (`/dashboard/notificaciones`) que consuma `email_send_log` + eventos internos.
+### Fase 2 — Reubicar el dashboard como sub-ruta del catastro principal
 
-## Entrega esperada tras aprobar el plan
+4. Mover la experiencia del dashboard a **`/catastro/proyecto`** (dentro del árbol público, pero con guard: requiere sesión + `active project`). Concretamente crear:
+   - `src/routes/catastro.proyecto.tsx` — layout con `PublicCatastroShell` + banner "Vista proyecto: {code · name}" + selector de proyecto si el usuario tiene varios + los tabs actuales.
+   - `src/routes/catastro.proyecto.index.tsx` = tab "concesiones" (mapa nacional con overlay del proyecto + stats + alertas + tabla).
+   - Sub-rutas: `catastro.proyecto.titulares.tsx`, `.patentes.tsx`, `.conflictos.tsx`, `.vigilancia.tsx`, `.historial.tsx`, `.sync.tsx` — cada una renderiza el panel existente sin reescribir lógica.
+5. Redireccionar `/dashboard/catastro` → `/catastro/proyecto` con `beforeLoad` + `redirect`, preservando `holders/$id` (mover a `catastro.proyecto.titulares.$id.tsx` con su misma vista). Sin romper links existentes.
+6. En `PublicCatastroShell`, si hay sesión + proyecto activo mostrar en la nav un enlace extra "Mi proyecto" apuntando a `/catastro/proyecto`. Si no hay sesión el enlace no aparece.
 
-1. Rebrand `/auth` (commit único).
-2. Migraciones pendientes aplicadas + verificadas.
-3. Informe de auditoría en el chat (tabla ✅/⚠️/❌ por flujo) + fixes menores incluidos.
-4. Lista final de mejoras P1/P2/P3 para decidir cuáles implementar en el siguiente ciclo.
+### Fase 3 — Unificar búsqueda y watchlist
+
+7. El input de búsqueda de `/catastro` y `/catastro/mapa` ya usa `searchConcessions` (server fn público). Añadir un toggle "Solo mi proyecto" cuando hay sesión + proyecto: filtra client-side contra `mining_concessions` del proyecto. Esto elimina la sensación de "dos buscadores".
+8. Consolidar watchlist: `/catastro/app/watchlist` (público autenticado) queda como único watchlist; el tab "Vigilancia" del dashboard se re-implementa como vista del proyecto sobre la misma tabla (`concession_alert_settings` + `bulletin_watches`), sin crear duplicados.
+
+### Fase 4 — Limpieza
+
+9. Borrar código muerto tras la migración: `src/components/ops/CatastroMap.tsx`, imports huérfanos en `_authenticated.dashboard.catastro.tsx` (el archivo queda como stub que redirige).
+10. Actualizar la navegación del dashboard (sidebar): la entrada "Catastro" apunta directamente a `/catastro/proyecto`, no a `/dashboard/catastro`.
+11. Verificación: cargar `/catastro`, `/catastro/mapa`, `/catastro/proyecto` (con y sin proyecto activo), redirect desde `/dashboard/catastro`, y que el enlace de titular `catastro/proyecto/titulares/{id}` funcione.
+
+## Notas técnicas
+
+- **Sin cambios de BD ni RLS.** Todo es refactor de rutas + extracción de componente de mapa.
+- **Auth**: `/catastro/proyecto/*` usa el patrón `beforeLoad` que verifica sesión y redirige a `/auth?intent=project` si falta. No se anida bajo `_authenticated/` para conservar la envoltura `PublicCatastroShell` (branding + nav públicos).
+- **Rendimiento**: el mapa nacional ya trae tiling desde ArcGIS a partir de zoom ≥ 9; añadir un overlay de N ≤ 200 polígonos del proyecto es despreciable.
+- **Riesgos**: rutas en producción del sidebar y links en PDFs que apunten a `/dashboard/catastro` — mitigado por el redirect permanente.
 
 ## Fuera de alcance
 
-- No se toca navegación ni el INICIO (Centro de Negocios).
-- No se rediseñan módulos completos en este ciclo (sólo copy del login + fixes puntuales que salgan de la auditoría).
-- No se cambian claves ni providers de auth.
+- Rediseño visual (ya está en Institutional Modernist).
+- Cambios al mapa 3D `Geology3DViewer` o a `/live/*`.
+- Cambios en el precio o planes.
+
+## Aprobación
+
+Si estás de acuerdo, implemento Fase 1 y Fase 2 en el primer sprint (mapa único + `/catastro/proyecto` con redirect) y Fases 3-4 en un segundo pase. ¿Procedo así o prefieres todo de una?
