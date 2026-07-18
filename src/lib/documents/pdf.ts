@@ -260,7 +260,7 @@ export async function renderGeocapitalsPdf(
       renderLines(lines, marginX, 34, 13.8);
       y += 12;
     } else if (block.kind === "clauses") {
-      const clauseBottom = safeBottom - 64;
+      const clauseBottom = safeBottom - 118;
       const clauseLineH = 12.8;
       for (const item of block.items) {
         const normalized = clampText(item, 1800);
