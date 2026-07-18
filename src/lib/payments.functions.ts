@@ -85,12 +85,17 @@ const CreateInput = z.object({
   tradeId: z.string().uuid(),
   kind: z.enum(PAYMENT_KINDS),
   label: z.string().trim().max(120).optional(),
-  amountUsd: z.number().min(0).max(1e12).optional(),
+  // Un pago debe tener monto positivo: sin monto el progreso queda inconsistente.
+  amountUsd: z
+    .number({ required_error: "El monto es obligatorio." })
+    .positive("El monto debe ser mayor a 0.")
+    .max(1e12),
   instrument: z.enum(["sblc_mt760", "dlc", "tt", "escrow", "otro"]).optional(),
   reference: z.string().trim().max(120).optional(),
   dueDate: z.string().trim().max(10).optional(),
   notes: z.string().trim().max(1000).optional(),
 });
+
 
 export const createTradePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
