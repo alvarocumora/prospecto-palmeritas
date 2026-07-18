@@ -216,21 +216,21 @@ function AuthPage() {
         <div className="absolute bottom-0 left-0 right-0 p-10 space-y-6">
           <div className="space-y-3">
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              Plataforma de exploración minera
+              Plataforma de negocios mineros
             </p>
             <h1 className="text-4xl font-bold leading-tight text-foreground max-w-md">
-              Del afloramiento al <span className="text-gold">target perforable</span>.
+              Del prospecto al <span className="text-gold">deal cerrado</span>.
             </h1>
             <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Catastro SERNAGEOMIN, geofísica, sondajes, muestreo y QA/QC en una sola plataforma
-              diseñada por geólogos.
+              Catastro, valorización, data rooms, sourcing de commodities, firmas y NI 43-101 en
+              una sola plataforma para operadores, inversionistas y traders.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 max-w-md pt-4 border-t border-border/50">
-            <Stat icon={<MapPin className="w-3 h-3" />} label="Catastro" value="Vivo" />
-            <Stat icon={<Layers className="w-3 h-3" />} label="Capas" value="12+" />
-            <Stat icon={<Mountain className="w-3 h-3" />} label="Escala" value="1:1k" />
+            <Stat icon={<MapPin className="w-3 h-3" />} label="Catastro" value="Live" />
+            <Stat icon={<Layers className="w-3 h-3" />} label="Deals" value="Activos" />
+            <Stat icon={<Mountain className="w-3 h-3" />} label="NI 43-101" value="Pre" />
           </div>
         </div>
       </aside>
