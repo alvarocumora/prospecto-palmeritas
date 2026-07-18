@@ -118,6 +118,7 @@ import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authe
 import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
 import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
+import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated.dashboard.analytics'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as AuthenticatedDashboard3dProRouteImport } from './routes/_authenticated.dashboard.3d-pro'
@@ -744,6 +745,12 @@ const AuthenticatedDashboardAnticiposRoute =
     path: '/dashboard/anticipos',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAnalyticsRoute =
+  AuthenticatedDashboardAnalyticsRouteImport.update({
+    id: '/dashboard/analytics',
+    path: '/dashboard/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAgentsRoute =
   AuthenticatedDashboardAgentsRouteImport.update({
     id: '/dashboard/agents',
@@ -941,6 +948,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -1076,6 +1084,7 @@ export interface FileRoutesByTo {
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -1213,6 +1222,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
   '/_authenticated/dashboard/approvals': typeof AuthenticatedDashboardApprovalsRoute
@@ -1350,6 +1360,7 @@ export interface FileRouteTypes {
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
     | '/dashboard/approvals'
@@ -1485,6 +1496,7 @@ export interface FileRouteTypes {
     | '/dashboard/3d-pro'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
     | '/dashboard/approvals'
@@ -1621,6 +1633,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/3d-pro'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
+    | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/anticipos'
     | '/_authenticated/dashboard/api'
     | '/_authenticated/dashboard/approvals'
@@ -2540,6 +2553,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAnticiposRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/analytics': {
+      id: '/_authenticated/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/agents': {
       id: '/_authenticated/dashboard/agents'
       path: '/dashboard/agents'
@@ -2815,6 +2835,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
+  AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAnticiposRoute: typeof AuthenticatedDashboardAnticiposRoute
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
   AuthenticatedDashboardApprovalsRoute: typeof AuthenticatedDashboardApprovalsRoute
@@ -2878,6 +2899,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,
+  AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
   AuthenticatedDashboardAnticiposRoute: AuthenticatedDashboardAnticiposRoute,
   AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
   AuthenticatedDashboardApprovalsRoute: AuthenticatedDashboardApprovalsRoute,
