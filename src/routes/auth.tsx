@@ -379,7 +379,7 @@ function AuthPage() {
                 className="w-full py-2.5 mt-2 rounded bg-gold text-background font-mono text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {mode === "login" ? "Entrar al proyecto" : "Crear cuenta"}
+                {mode === "login" ? "Entrar" : "Crear cuenta"}
               </button>
             </form>
 
