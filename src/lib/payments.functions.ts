@@ -110,7 +110,7 @@ export const createTradePayment = createServerFn({ method: "POST" })
         created_by: context.userId as string,
         kind: data.kind,
         label: data.label ?? null,
-        amount_usd: data.amountUsd ?? null,
+        amount_usd: data.amountUsd,
         instrument: data.instrument ?? null,
         reference: data.reference ?? null,
         due_date: data.dueDate || null,
