@@ -75,7 +75,8 @@ export type TradeDocRow = {
 };
 
 const TRADE_COLS =
-  "id, reference, lot_id, inquiry_id, buyer_user_id, seller_user_id, commodity, form, quantity_t, incoterm, unit_price_usd, total_value_usd, currency, payment_instrument, stage, status, notes, created_at";
+  "id, reference, lot_id, inquiry_id, buyer_user_id, seller_user_id, counterparty_role, counterparty_name, counterparty_company, counterparty_country, counterparty_email, counterparty_phone, commodity, form, quantity_t, incoterm, unit_price_usd, total_value_usd, currency, payment_instrument, stage, status, notes, created_at";
+
 const DOC_COLS =
   "id, trade_id, doc_type, phase, status, file_url, issuer, reference, signed_by, signed_at, notes, updated_at";
 
