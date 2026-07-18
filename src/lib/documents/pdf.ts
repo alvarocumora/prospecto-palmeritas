@@ -409,13 +409,19 @@ export async function renderGeocapitalsPdf(
         const stamp = stampByIndex.get(i);
 
         if (stamp) {
+          // Tamaño de la firma manuscrita: escala inversa al largo del nombre
+          // para no invadir la caja "FIRMADO" a la derecha.
+          const nameLen = stamp.name.length;
+          const sigFontSize = nameLen > 60 ? 10 : nameLen > 38 ? 12 : nameLen > 24 ? 13.5 : 15;
           pdf.setFont("helvetica", "bolditalic");
-          pdf.setFontSize(stamp.name.length > 42 ? 11.5 : 14.5);
+          pdf.setFontSize(sigFontSize);
           pdf.setTextColor(...INK);
           const sigLines = (
-            pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 96) as string[]
-          ).slice(0, 2);
-          pdf.text(sigLines, x + 6, lineY - 20 - (sigLines.length - 1) * 10);
+            pdf.splitTextToSize(ellipsize(stamp.name, 96), slotW - 92) as string[]
+          ).slice(0, 3);
+          const sigLineH = sigFontSize * 0.75;
+          pdf.text(sigLines, x + 6, lineY - 12 - (sigLines.length - 1) * sigLineH);
+
 
           const bw = 74;
           const bh = 24;
