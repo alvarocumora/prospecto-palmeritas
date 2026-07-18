@@ -102,7 +102,7 @@ function SignPage() {
       <MarketingHeader />
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-10">
         {isLoading ? (
-          <div className="h-40 rounded-xl border border-hairline bg-white animate-pulse" />
+          <div className="h-40 rounded-xl border border-hairline bg-surface-3 animate-pulse" />
         ) : !req ? (
           <div className="text-center py-20">
             <Ban className="w-8 h-8 text-content-subtle mx-auto mb-3" />
@@ -123,7 +123,7 @@ function SignPage() {
             </p>
 
             {/* Documento */}
-            <div className="rounded-xl border border-hairline bg-white p-6 mb-6">
+             <div className="rounded-xl border border-hairline bg-surface-3 p-6 mb-6">
               <DocumentPreview doc={req.doc} />
             </div>
 
@@ -143,7 +143,7 @@ function SignPage() {
                 <button
                   onClick={() => void downloadSigned()}
                   disabled={downloading}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-content text-white px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                   className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
                   {downloading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -162,7 +162,7 @@ function SignPage() {
                 El link de firma expiró. Pide a tu contraparte que genere uno nuevo.
               </div>
             ) : (
-              <div className="rounded-xl border border-hairline bg-white p-5">
+               <div className="rounded-xl border border-hairline bg-surface-3 p-5">
                 <h2 className="text-sm font-semibold text-content mb-3">
                   Firmar como{req.signerNameExpected ? ` (${req.signerNameExpected})` : ""}
                 </h2>
@@ -185,7 +185,7 @@ function SignPage() {
                 <button
                   onClick={() => void onSign()}
                   disabled={signing}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent-brand text-white px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                   className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent-brand text-accent-brand-contrast px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
                   {signing ? (
                     <Loader2 className="w-4 h-4 animate-spin" />

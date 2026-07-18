@@ -330,7 +330,7 @@ export function DocumentEditor({
         {/* Panel de formulario */}
         <div className="space-y-5">
           {groups.map(([groupName, fields]) => (
-            <section key={groupName} className="rounded-2xl border border-hairline bg-white p-5">
+            <section key={groupName} className="rounded-2xl border border-hairline bg-surface-3 p-5">
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
                 {groupName}
               </div>
@@ -346,13 +346,13 @@ export function DocumentEditor({
                         placeholder={f.placeholder}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
                         rows={3}
-                        className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       />
                     ) : f.type === "select" ? (
                       <select
                         value={values[f.key] ?? ""}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
-                        className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       >
                         {f.options?.map((o) => (
                           <option key={o.value} value={o.value}>
@@ -366,7 +366,7 @@ export function DocumentEditor({
                         value={values[f.key] ?? ""}
                         placeholder={f.placeholder}
                         onChange={(e) => setValues((p) => ({ ...p, [f.key]: e.target.value }))}
-                        className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                         className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
                       />
                     )}
                     {f.help ? (
@@ -379,7 +379,7 @@ export function DocumentEditor({
           ))}
 
           {template.clauses.length > 0 ? (
-            <section className="rounded-2xl border border-hairline bg-white p-5">
+             <section className="rounded-2xl border border-hairline bg-surface-3 p-5">
               <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
                 Cláusulas opcionales
               </div>
@@ -420,7 +420,7 @@ export function DocumentEditor({
               type="button"
               onClick={exportPdf}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-content text-white px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shadow-lg"
+               className="inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50 shadow-lg"
             >
               <Download className="w-4 h-4" />
               {busy ? "Generando…" : "Descargar PDF"}
@@ -429,7 +429,7 @@ export function DocumentEditor({
               type="button"
               onClick={() => void requestSignature()}
               disabled={requestingSign}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-white px-4 py-2.5 text-sm text-content hover:border-accent-brand disabled:opacity-50"
+               className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand disabled:opacity-50"
             >
               <Link2 className="w-4 h-4" />
               {requestingSign ? "Creando…" : "Solicitar firma"}
@@ -437,7 +437,7 @@ export function DocumentEditor({
             <button
               type="button"
               onClick={reset}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-white px-4 py-2.5 text-sm text-content hover:border-accent-brand"
+               className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface-3 px-4 py-2.5 text-sm text-content hover:border-accent-brand"
             >
               <RotateCcw className="w-4 h-4" /> Restaurar
             </button>
@@ -453,7 +453,7 @@ export function DocumentEditor({
                 value={signerEmail}
                 onChange={(e) => setSignerEmail(e.target.value)}
                 placeholder="contraparte@empresa.com"
-                className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm"
+                 className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
               />
             </label>
             <label className="text-xs">
@@ -462,7 +462,7 @@ export function DocumentEditor({
                 value={signerName}
                 onChange={(e) => setSignerName(e.target.value)}
                 placeholder="Nombre de quien firmará"
-                className="w-full rounded-lg border border-hairline bg-white px-3 py-2 text-sm"
+                 className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content"
               />
             </label>
           </div>
@@ -479,7 +479,7 @@ export function DocumentEditor({
 
         {/* Preview live */}
         <div className="lg:sticky lg:top-4 lg:self-start">
-          <div className="rounded-2xl border border-hairline bg-white shadow-sm overflow-hidden">
+           <div className="rounded-2xl border border-hairline bg-surface-3 shadow-sm overflow-hidden">
             <div className="flex items-center justify-between px-5 py-3 border-b border-hairline bg-surface-subtle">
               <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
                 <FileText className="w-3.5 h-3.5" /> Vista previa
@@ -528,11 +528,11 @@ function SyncBadge({ status, signedIn }: { status: SyncStatus; signedIn: boolean
 
 export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
   return (
-    <div className="p-8 lg:p-10 max-h-[80vh] overflow-y-auto">
+       <div className="p-8 lg:p-10 max-h-[80vh] overflow-y-auto bg-surface-3">
       <div className="flex items-center justify-between mb-6">
         <div>
           <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-content">
-            <span style={{ color: "oklch(0.78 0.14 82)" }}>■</span> GEOCAPITALS
+             <span className="text-accent-brand">■</span> GEOCAPITALS
           </div>
           <div className="text-[9px] font-mono text-content-subtle mt-0.5">
             Mining · Deals · Documentation
@@ -550,7 +550,7 @@ export function DocumentPreview({ doc }: { doc: GeneratedDoc }) {
         </div>
       </div>
 
-      <div className="h-[2px] w-10 mb-5" style={{ background: "oklch(0.78 0.14 82)" }} />
+       <div className="h-[2px] w-10 mb-5 bg-accent-brand" />
 
       <h2 className="font-display text-2xl text-content mb-6 leading-tight">{doc.title}</h2>
 
@@ -581,7 +581,7 @@ function BlockPreview({ block }: { block: DocBlock }) {
           <li key={i} className="text-[13px] leading-relaxed text-content pl-4 relative">
             <span
               className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full"
-              style={{ background: "oklch(0.78 0.14 82)" }}
+               className="absolute left-0 top-2 w-1.5 h-1.5 rounded-full bg-accent-brand"
             />
             {it}
           </li>
@@ -614,7 +614,7 @@ function BlockPreview({ block }: { block: DocBlock }) {
               {block.head.map((h, i) => (
                 <th
                   key={i}
-                  className="text-left px-2 py-1.5 bg-content text-white font-mono text-[10px] uppercase tracking-wide"
+                   className="text-left px-2 py-1.5 bg-content text-surface font-mono text-[10px] uppercase tracking-wide"
                 >
                   {h}
                 </th>

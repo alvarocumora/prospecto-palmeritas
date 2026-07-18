@@ -285,6 +285,7 @@ export async function renderGeocapitalsPdf(
       y += 2;
     } else if (block.kind === "fields") {
       ensure(40);
+      const tableStartPage = pdf.getCurrentPageInfo().pageNumber;
       autoTable(pdf, {
         startY: y,
         margin: { left: marginX, right: marginX, top: pageTopY, bottom: footerReserve },
@@ -306,8 +307,8 @@ export async function renderGeocapitalsPdf(
         },
         body: block.rows.map(([k, v]) => [k, ellipsize(v, 520)]),
         alternateRowStyles: { fillColor: PAPER_ALT },
-        willDrawPage: ({ pageNumber }) => {
-          if (pageNumber > 1) {
+        willDrawPage: ({ pageNumber }: { pageNumber: number }) => {
+          if (pageNumber > tableStartPage) {
             paintPaper();
             drawCompactHeader();
           }
@@ -316,6 +317,7 @@ export async function renderGeocapitalsPdf(
       y = ((pdf as unknown as JsPdfLike).lastAutoTable?.finalY ?? y) + 16;
     } else if (block.kind === "table") {
       ensure(48);
+      const tableStartPage = pdf.getCurrentPageInfo().pageNumber;
       autoTable(pdf, {
         startY: y,
         margin: { left: marginX, right: marginX, top: pageTopY, bottom: footerReserve },
@@ -333,8 +335,8 @@ export async function renderGeocapitalsPdf(
         },
         head: [block.head],
         body: block.rows.map((row) => row.map((cell) => ellipsize(cell, 320))),
-        willDrawPage: ({ pageNumber }) => {
-          if (pageNumber > 1) {
+        willDrawPage: ({ pageNumber }: { pageNumber: number }) => {
+          if (pageNumber > tableStartPage) {
             paintPaper();
             drawCompactHeader();
           }
