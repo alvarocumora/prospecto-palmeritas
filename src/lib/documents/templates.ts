@@ -16,6 +16,18 @@ function jurisdictionClause(jur: string): string {
   return `El presente instrumento se rige por las leyes de ${jur || "[jurisdicción]"} y las controversias serán sometidas al arbitraje del Centro de Arbitraje y Mediación (CAM) de la Cámara de Comercio de Santiago, salvo pacto en contrario por escrito.`;
 }
 
+/**
+ * Renumera cláusulas para evitar saltos cuando alguna se omite por toggle.
+ * Elimina cualquier prefijo "N. " o "N) " existente y asigna un contador
+ * secuencial 1..n conservando el resto del texto.
+ */
+function renumber(items: string[]): string[] {
+  return items.map((item, i) => {
+    const stripped = item.replace(/^\s*\d+[.)]\s*/, "");
+    return `${i + 1}. ${stripped}`;
+  });
+}
+
 /* ─────────────── NDA ─────────────── */
 const nda: TemplateDef = {
   id: "nda",
