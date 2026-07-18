@@ -267,22 +267,34 @@ export async function renderGeocapitalsPdf(
         const body = heading ? normalized.slice(firstDot + 2) : normalized;
         const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
         const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
-        const itemH = (headingLines.length + bodyLines.length) * 12.8 + 12;
+        const totalLines = headingLines.length + bodyLines.length;
+        const itemH = totalLines * 12.8 + 24;
         // Si la cláusula es razonablemente corta, evitar que el número/título
         // quede en una página y el contenido en otra.
-        if (itemH < safeBottom - pageTopY && y + itemH > safeBottom) y = addPage();
+        const keepTogether = totalLines <= 10 && itemH < safeBottom - pageTopY;
+        if (keepTogether && y + itemH > safeBottom) y = addPage();
         ensure(32);
         const markerY = y - 7;
         if (heading) {
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(9.6);
           pdf.setTextColor(...INK);
-          renderLines(headingLines, marginX + 12, 3, 12.8);
+          if (keepTogether) {
+            pdf.text(headingLines, marginX + 12, y);
+            y += headingLines.length * 12.8;
+          } else {
+            renderLines(headingLines, marginX + 12, 3, 12.8);
+          }
         }
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.8);
         pdf.setTextColor(...INK_SOFT);
-        renderLines(bodyLines, marginX + 12, 34, 12.8);
+        if (keepTogether) {
+          pdf.text(bodyLines, marginX + 12, y);
+          y += bodyLines.length * 12.8;
+        } else {
+          renderLines(bodyLines, marginX + 12, 34, 12.8);
+        }
         pdf.setFillColor(...COBALT);
         pdf.rect(marginX, markerY, 2, Math.max(10, Math.min(26, itemH - 6)), "F");
         y += 8;
