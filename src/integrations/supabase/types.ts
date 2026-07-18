@@ -14259,6 +14259,68 @@ export type Database = {
           },
         ]
       }
+      trade_payments: {
+        Row: {
+          amount_usd: number | null
+          created_at: string
+          created_by: string
+          currency: string
+          due_date: string | null
+          id: string
+          instrument: string | null
+          kind: string
+          label: string | null
+          notes: string | null
+          paid_at: string | null
+          reference: string | null
+          status: string
+          trade_id: string
+          updated_at: string
+        }
+        Insert: {
+          amount_usd?: number | null
+          created_at?: string
+          created_by: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          instrument?: string | null
+          kind?: string
+          label?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          reference?: string | null
+          status?: string
+          trade_id: string
+          updated_at?: string
+        }
+        Update: {
+          amount_usd?: number | null
+          created_at?: string
+          created_by?: string
+          currency?: string
+          due_date?: string | null
+          id?: string
+          instrument?: string | null
+          kind?: string
+          label?: string | null
+          notes?: string | null
+          paid_at?: string | null
+          reference?: string | null
+          status?: string
+          trade_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_payments_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_shipments: {
         Row: {
           bl_number: string | null

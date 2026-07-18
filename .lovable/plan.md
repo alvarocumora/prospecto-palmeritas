@@ -1,56 +1,61 @@
-## Diagnóstico
 
-Verifiqué los tres puntos y confirmé por qué no se ve el cambio:
+## 1. Rebrand del login (`/auth`)
 
-1. **PDF sin cambio visual real.** El renderer actual (`src/lib/documents/pdf.ts`) sigue con `contacto@geocapitals.com` (línea 24), sin marca de agua, con el título pegado al QR y con firmas donde la meta REF/fecha choca con el bloque QR. Los "rediseños" anteriores no quedaron persistidos en el archivo activo. El PDF que subiste lo confirma: header duplicado, tabla de campos con acento cobalto plano, cláusulas apretadas y footer con el correo viejo.
-2. **Ubicaciones en el mapa incorrectas.** Los 4 listings tienen `geometry_geojson = NULL` en base de datos. El mapa cae a coordenadas por defecto/región, por eso no coinciden con Los Verdes, Palmeras, Gianfranco y Cornellana reales.
-3. **Valorizaciones inconsistentes.** `asking_price_usd` es un número manual (2 en NULL, 2 fijos). `computeListingValuation` corre con inputs derivados del listing (área, commodity) pero ignora los datos "live" que ya existen: anomalías satelitales, targets, `economic_scenarios`, sondajes en `synthetic_drillholes`, etc. Por eso el precio pedido y la valorización estimada divergen.
+Hoy la pantalla usa metáforas de trabajo de campo geológico ("Sesión geólogo", "Acceso al campo", "Continúa donde dejaste tu última campaña", "Nombre del geólogo", "diseñada por geólogos"). Geocapitals es una plataforma de **negocios mineros** (deals, inversión, sourcing de commodities, valorización, NI 43-101), no una app de terreno.
 
-## Cambios propuestos
+Cambios en `src/routes/auth.tsx`:
+- Encabezado: "Sesión geólogo" → "Plataforma Geocapitals"; "Acceso al campo" → "Acceso a tu cuenta".
+- Subtítulo login: "Continúa donde dejaste tu última campaña." → "Gestiona tus proyectos, deals y valorizaciones mineras."
+- Subtítulo registro: enfocar en "Crea tu cuenta para acceder a proyectos mineros, data rooms y valorización".
+- Label "Nombre del geólogo" → "Nombre completo".
+- Copy secundario ("diseñada por geólogos", CTA "Entrar al proyecto") → lenguaje de negocio: "Entrar" / "diseñada para el negocio minero: catastro, deals, inversión y NI 43-101".
+- Añadir 3 chips bajo el título con los pilares reales de la plataforma: Catastro & Concesiones · Deals & Inversión · NI 43-101 & Valorización.
+- Mantener tema Institutional Modernist y tokens actuales (sin cambios visuales de layout).
 
-### 1) PDF transaccional — rediseño real y verificable
-Reescritura completa de `src/lib/documents/pdf.ts` con:
-- Correo oficial `info@geocapitals.com` en header, footer y CTA.
-- Grid layout de 12 columnas con canaletas fijas: título ocupa cols 1–8, bloque QR cols 9–12 (nunca se solapan).
-- Marca de agua tenue "GEOCAPITALS" a 8% cobalto en cada página.
-- Portada con cover band cobalto + eyebrow "DOCUMENTO TRANSACCIONAL" + tipografía serif display para título.
-- Tabla de campos con filas alternadas papel/papel-2, labels en cobalto small-caps.
-- Cláusulas con numeración en badge cobalto y sangría francesa.
-- Bloque de firmas con reserva de altura calculada (sello + nombre + hasta 3 líneas de parte + meta) y salto de página si no cabe entero.
-- Footer de 3 columnas fijas: marca+disclaimer / contacto (email+WhatsApp) / mini-QR + paginación.
-- Header de continuación en páginas ≥2 con REF + `info@geocapitals.com`.
+## 2. Migraciones pendientes
 
-Aplicar la misma pasada a `src/lib/tradeDocPdf.ts` (usa el mismo renderer base) para unificar identidad en NDA/SPA/NDI/LOI/Term Sheet.
+Revisar en la base cuáles de estas siguen sin aplicar y correr las que falten (idempotentes, ya mergeadas):
+- `20260719160000_sourcing.sql`
+- `20260719180000_sourcing_submission_trade.sql`
+- `20260719200000_trade_payments.sql`
+- `20260719140000_deal_commissions.sql`
+- `20260719120000_sign_requests_trade_link.sql`
+- `20260719100000_business_partners.sql`
+- `20260718120000_trade_shipments.sql`
 
-Actualizar `src/routes/verificar.$ref.tsx` para reemplazar los dos `contacto@geocapitals.com` restantes por `info@geocapitals.com`.
+Para cada tabla nueva verificar el bloque GRANT (`authenticated` + `service_role`), RLS activo y policies por `auth.uid()`. Si alguna falta GRANT o policy, emitir migración correctiva en el mismo paso.
 
-**QA obligatorio:** generar los 5 tipos de documento vía Playwright, convertir con `pdftoppm` e inspeccionar visualmente cada página antes de cerrar.
+## 3. Auditoría de flujo (entregable = informe corto + fixes puntuales)
 
-### 2) Ubicaciones reales en el mapa de proyectos
-- Migración que rellena `geometry_geojson` de los 4 listings publicados con los centroides reales que ya existen en el repo:
-  - Los Verdes → `src/data/geo/aoi.geojson` (Tilama, Coquimbo)
-  - Palmeras → `src/data/geo/palm_clusters.geojson` (Alhué, RM)
-  - Gianfranco → `src/data/geo/franco_pertenencias.geojson` (Valparaíso)
-  - Cornellana → coordenadas del proyecto en `src/features/*/data/project.ts`
-- `ListingsMap` ya lee `geometry_geojson`; solo hay que asegurar fallback ordenado por región cuando siga en null (no romper marcadores).
+Recorrido end-to-end de los flujos críticos, marcando ✅ / ⚠️ / ❌ y abriendo fix sólo donde rompe UX o seguridad:
 
-### 3) Valorización coherente con datos live
-- Extender `computeListingValuation` (`src/lib/valuation/valuation.functions.ts`) para leer, cuando exista `project_id`:
-  - `economic_scenarios` (NPV/IRR reales del proyecto) → alimenta método DCF en vez de sintético.
-  - `exploration_targets` + `satellite_anomalies` → factor de confianza para in-situ metal value.
-  - `synthetic_drillholes` / `resource_models` → tonelaje y ley promedio.
-- Recalcular `asking_price_usd` como P50 de los métodos disponibles y persistirlo vía migración solo para los 4 listings actuales (dejando manual override si el owner ya fijó valor).
-- Mostrar en `ValuationPanel` la fuente de cada input (badge "live · economic_scenarios", "live · targets", "sintético") para que el usuario vea de dónde viene cada número.
+1. **Auth & onboarding**: `/auth` → `/dashboard`, redirect post-login, estado `loading` sin flash a `/auth`.
+2. **Proyectos & Data Room**: listar, entrar a un listing, ValuationPanel, Data Room (grants, descargas sin 403).
+3. **Sourcing de commodities**: crear requerimiento → link público de proveedor → subir propuesta → convertir en trade → payments/commissions.
+4. **Trades & shipments**: crear trade, agregar shipment, adjuntar documentos, marcar pagos.
+5. **Firmas**: crear envelope, link `firmar/$token`, verificación `verificar/$ref`, QR válido.
+6. **Documentos**: editar plantilla, exportar PDF (layout, footer, watermark), branding consistente.
+7. **Live maps públicos** (`/live/losverdes`, `/live/palmeras`, `/live/franco`): acceso sin auth, tema IM, export PDF.
+8. **Seguridad**: correr `security--run_security_scan`, revisar findings críticos nuevos (RLS, PII, escaladas).
+9. **Cron & jobs**: `pg_cron` (sync catastro, sync sernageomin, scan concession expirations) — verificar últimas corridas.
 
-## Detalles técnicos
+## 4. Mejoras al flujo (priorizadas, sólo scoping — se detallan cuando toque implementarlas)
 
-- Todos los tokens del PDF salen de constantes ya alineadas a `src/styles.css` (PAPER, INK, COBALT, HAIRLINE); nada hardcodeado fuera del renderer.
-- La migración de `geometry_geojson` usa `ST_SetSRID(ST_GeomFromGeoJSON(...), 4326)` vía `geometry_geojson jsonb` (columna ya es JSONB, no requiere PostGIS write).
-- El recálculo de `asking_price_usd` se hace en SQL con un `UPDATE ... WHERE id IN (...)` a partir de una CTE que agrega `economic_scenarios.npv_usd` cuando existe; si no, deja el valor actual.
-- QA de PDFs: script Playwright headless que descarga cada plantilla desde `/dashboard/documentos/{templateId}`, guarda el blob y renderiza con `pdftoppm -r 130`.
+- **P1** Landing post-login orientada a negocio (KPIs reales: deals abiertos, sourcing pendiente, firmas por completar, alertas de catastro) en vez de placeholder.
+- **P1** Sourcing: badge de propuestas nuevas + email al owner cuando llega submission.
+- **P2** Trades: timeline unificada (evento + shipment + pago + firma) en la ficha del trade.
+- **P2** Documentos: guardado autosave del draft + versión firmada inmutable.
+- **P3** Notificaciones: centro único (`/dashboard/notificaciones`) que consuma `email_send_log` + eventos internos.
+
+## Entrega esperada tras aprobar el plan
+
+1. Rebrand `/auth` (commit único).
+2. Migraciones pendientes aplicadas + verificadas.
+3. Informe de auditoría en el chat (tabla ✅/⚠️/❌ por flujo) + fixes menores incluidos.
+4. Lista final de mejoras P1/P2/P3 para decidir cuáles implementar en el siguiente ciclo.
 
 ## Fuera de alcance
 
-- No se toca la UI del editor de documentos ni las plantillas (`templates.ts`) más allá de lo necesario para pasar el nombre del emisor.
-- No se agregan nuevas plantillas ni nuevos métodos de valorización; se conectan mejor los existentes.
-- No se cambia el sistema de auth ni el flujo de firma.
+- No se toca navegación ni el INICIO (Centro de Negocios).
+- No se rediseñan módulos completos en este ciclo (sólo copy del login + fixes puntuales que salgan de la auditoría).
+- No se cambian claves ni providers de auth.

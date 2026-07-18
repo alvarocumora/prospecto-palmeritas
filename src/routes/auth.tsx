@@ -216,21 +216,21 @@ function AuthPage() {
         <div className="absolute bottom-0 left-0 right-0 p-10 space-y-6">
           <div className="space-y-3">
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              Plataforma de exploración minera
+              Plataforma de negocios mineros
             </p>
             <h1 className="text-4xl font-bold leading-tight text-foreground max-w-md">
-              Del afloramiento al <span className="text-gold">target perforable</span>.
+              Del prospecto al <span className="text-gold">deal cerrado</span>.
             </h1>
             <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Catastro SERNAGEOMIN, geofísica, sondajes, muestreo y QA/QC en una sola plataforma
-              diseñada por geólogos.
+              Catastro, valorización, data rooms, sourcing de commodities, firmas y NI 43-101 en
+              una sola plataforma para operadores, inversionistas y traders.
             </p>
           </div>
 
           <div className="grid grid-cols-3 gap-3 max-w-md pt-4 border-t border-border/50">
-            <Stat icon={<MapPin className="w-3 h-3" />} label="Catastro" value="Vivo" />
-            <Stat icon={<Layers className="w-3 h-3" />} label="Capas" value="12+" />
-            <Stat icon={<Mountain className="w-3 h-3" />} label="Escala" value="1:1k" />
+            <Stat icon={<MapPin className="w-3 h-3" />} label="Catastro" value="Live" />
+            <Stat icon={<Layers className="w-3 h-3" />} label="Deals" value="Activos" />
+            <Stat icon={<Mountain className="w-3 h-3" />} label="NI 43-101" value="Pre" />
           </div>
         </div>
       </aside>
@@ -258,15 +258,15 @@ function AuthPage() {
 
           <div className="text-center space-y-1">
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              {mode === "login" ? "Sesión geólogo" : "Nuevo registro"}
+              {mode === "login" ? "Plataforma Geocapitals" : "Nueva cuenta"}
             </p>
             <h2 className="text-2xl font-bold text-foreground">
-              {mode === "login" ? "Acceso al campo" : "Crear cuenta"}
+              {mode === "login" ? "Acceso a tu cuenta" : "Crear cuenta"}
             </h2>
             <p className="text-xs text-muted-foreground">
               {mode === "login"
-                ? "Continúa donde dejaste tu última campaña."
-                : "Comienza a mapear, perforar y muestrear."}
+                ? "Gestiona tus proyectos, deals y valorizaciones mineras."
+                : "Accede a proyectos mineros, data rooms y valorización."}
             </p>
           </div>
 
@@ -305,7 +305,7 @@ function AuthPage() {
 
             <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
-                <Field label="Nombre del geólogo" error={errors.displayName}>
+                <Field label="Nombre completo" error={errors.displayName}>
                   <input
                     type="text"
                     value={displayName}
@@ -379,7 +379,7 @@ function AuthPage() {
                 className="w-full py-2.5 mt-2 rounded bg-gold text-background font-mono text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
               >
                 {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {mode === "login" ? "Entrar al proyecto" : "Crear cuenta"}
+                {mode === "login" ? "Entrar" : "Crear cuenta"}
               </button>
             </form>
 
