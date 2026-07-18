@@ -265,21 +265,26 @@ export async function renderGeocapitalsPdf(
         const firstDot = normalized.indexOf(". ");
         const heading = firstDot > 0 && firstDot < 80 ? normalized.slice(0, firstDot + 1) : null;
         const body = heading ? normalized.slice(firstDot + 2) : normalized;
+        const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
+        const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
+        const itemH = (headingLines.length + bodyLines.length) * 12.8 + 12;
+        // Si la cláusula es razonablemente corta, evitar que el número/título
+        // quede en una página y el contenido en otra.
+        if (itemH < safeBottom - pageTopY && y + itemH > safeBottom) y = addPage();
         ensure(32);
-        pdf.setFillColor(...COBALT);
-        pdf.rect(marginX, y - 7, 2, 10, "F");
+        const markerY = y - 7;
         if (heading) {
           pdf.setFont("helvetica", "bold");
           pdf.setFontSize(9.6);
           pdf.setTextColor(...INK);
-          const headingLines = pdf.splitTextToSize(heading, contentW - 18) as string[];
           renderLines(headingLines, marginX + 12, 3, 12.8);
         }
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.8);
         pdf.setTextColor(...INK_SOFT);
-        const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
         renderLines(bodyLines, marginX + 12, 34, 12.8);
+        pdf.setFillColor(...COBALT);
+        pdf.rect(marginX, markerY, 2, Math.max(10, Math.min(26, itemH - 6)), "F");
         y += 8;
       }
       y += 2;
@@ -351,7 +356,7 @@ export async function renderGeocapitalsPdf(
       const slotH = 128;
       const rows = Math.ceil(parties.length / columns);
       ensure(rows * slotH + 20);
-      y += 36;
+      y += 40;
 
       parties.forEach((party, i) => {
         if (i > 0 && i % columns === 0) y += slotH;
@@ -362,10 +367,10 @@ export async function renderGeocapitalsPdf(
 
         if (stamp) {
           pdf.setFont("helvetica", "bolditalic");
-          pdf.setFontSize(stamp.name.length > 42 ? 12.5 : 15);
+          pdf.setFontSize(stamp.name.length > 42 ? 11.5 : 14.5);
           pdf.setTextColor(...INK);
-          const sigLines = (pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 88) as string[]).slice(0, 2);
-          pdf.text(sigLines, x + 6, lineY - 18 - (sigLines.length - 1) * 10);
+          const sigLines = (pdf.splitTextToSize(ellipsize(stamp.name, 90), slotW - 96) as string[]).slice(0, 2);
+          pdf.text(sigLines, x + 6, lineY - 20 - (sigLines.length - 1) * 10);
 
           const bw = 74;
           const bh = 24;
@@ -394,7 +399,7 @@ export async function renderGeocapitalsPdf(
         const partyLines = (pdf.splitTextToSize(ellipsize(party, 190), slotW - 4) as string[]).slice(0, 3);
         partyLines.forEach((ln, li) => pdf.text(ln, x, lineY + 13 + li * 10.5));
 
-        const metaY = lineY + 19 + partyLines.length * 10.5;
+        const metaY = lineY + 21 + partyLines.length * 10.5;
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(7.2);
         pdf.setTextColor(...GRAY);

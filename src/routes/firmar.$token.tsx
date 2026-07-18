@@ -98,7 +98,7 @@ function SignPage() {
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
   return (
-    <div className="brand-light min-h-screen flex flex-col">
+    <div data-theme="im-light" className="brand-light min-h-screen flex flex-col bg-surface text-content">
       <MarketingHeader />
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-10">
         {isLoading ? (

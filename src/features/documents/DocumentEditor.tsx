@@ -292,7 +292,7 @@ export function DocumentEditor({
   };
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6">
+    <div data-theme="im-light" className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6">
       <div className="mb-4 flex items-center justify-between flex-wrap gap-3">
         <Link
           to="/dashboard/documentos"
