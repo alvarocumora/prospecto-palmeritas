@@ -305,7 +305,7 @@ function AuthPage() {
 
             <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
-                <Field label="Nombre del geólogo" error={errors.displayName}>
+                <Field label="Nombre completo" error={errors.displayName}>
                   <input
                     type="text"
                     value={displayName}
