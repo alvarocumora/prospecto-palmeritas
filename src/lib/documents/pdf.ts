@@ -184,10 +184,11 @@ export async function renderGeocapitalsPdf(
     pdf.setFillColor(...WHITE);
     pdf.setDrawColor(...HAIRLINE);
     pdf.setLineWidth(0.5);
-    // Caja del QR: alto suficiente para encerrar las 2 líneas de leyenda.
+    // Caja del QR: alto ajustado a QR + 3 líneas (VALIDAR / EN GEOCAPITALS / ref).
     const qrBoxW = qrHeaderSize + 10;
     const qrCx = qrHeaderX + qrHeaderSize / 2;
-    pdf.roundedRect(qrHeaderX - 5, qrHeaderY - 5, qrBoxW, qrHeaderSize + 30, 3, 3, "FD");
+    const qrBoxH = qrHeaderSize + 38;
+    pdf.roundedRect(qrHeaderX - 5, qrHeaderY - 5, qrBoxW, qrBoxH, 3, 3, "FD");
     pdf.addImage(
       qrDataUrl,
       "PNG",
@@ -198,22 +199,22 @@ export async function renderGeocapitalsPdf(
       undefined,
       "FAST",
     );
-    // Leyenda contenida (texto corto + maxWidth para nunca desbordar la caja).
+    // Leyenda en 2 líneas fijas para que nunca se solape con la referencia.
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(5.6);
     pdf.setTextColor(...COBALT);
-    pdf.text("VALIDAR EN GEOCAPITALS", qrCx, qrHeaderY + qrHeaderSize + 9, {
-      align: "center",
-      maxWidth: qrBoxW - 6,
-    });
+    const legendY = qrHeaderY + qrHeaderSize + 8;
+    pdf.text("VALIDAR EN", qrCx, legendY, { align: "center" });
+    pdf.text("GEOCAPITALS", qrCx, legendY + 6, { align: "center" });
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(5.2);
     pdf.setTextColor(...GRAY);
-    pdf.text(ellipsize(doc.reference, 26), qrCx, qrHeaderY + qrHeaderSize + 17, {
+    pdf.text(ellipsize(doc.reference, 26), qrCx, legendY + 14, {
       align: "center",
       maxWidth: qrBoxW - 6,
     });
   }
+
 
   y = firstTopY;
   pdf.setDrawColor(...HAIRLINE);
