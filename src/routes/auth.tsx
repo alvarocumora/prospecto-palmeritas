@@ -258,15 +258,15 @@ function AuthPage() {
 
           <div className="text-center space-y-1">
             <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              {mode === "login" ? "Sesión geólogo" : "Nuevo registro"}
+              {mode === "login" ? "Plataforma Geocapitals" : "Nueva cuenta"}
             </p>
             <h2 className="text-2xl font-bold text-foreground">
-              {mode === "login" ? "Acceso al campo" : "Crear cuenta"}
+              {mode === "login" ? "Acceso a tu cuenta" : "Crear cuenta"}
             </h2>
             <p className="text-xs text-muted-foreground">
               {mode === "login"
-                ? "Continúa donde dejaste tu última campaña."
-                : "Comienza a mapear, perforar y muestrear."}
+                ? "Gestiona tus proyectos, deals y valorizaciones mineras."
+                : "Accede a proyectos mineros, data rooms y valorización."}
             </p>
           </div>
 
