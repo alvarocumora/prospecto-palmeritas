@@ -37,7 +37,13 @@ export type TradeRow = {
   lot_id: string | null;
   inquiry_id: string | null;
   buyer_user_id: string;
-  seller_user_id: string;
+  seller_user_id: string | null;
+  counterparty_role: string | null;
+  counterparty_name: string | null;
+  counterparty_company: string | null;
+  counterparty_country: string | null;
+  counterparty_email: string | null;
+  counterparty_phone: string | null;
   commodity: string | null;
   form: string | null;
   quantity_t: number | null;
@@ -51,6 +57,7 @@ export type TradeRow = {
   notes: string | null;
   created_at: string;
 };
+
 
 export type TradeDocRow = {
   id: string;
