@@ -84,6 +84,7 @@ import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
 import { Route as AuthenticatedDashboardPreciosRouteImport } from './routes/_authenticated.dashboard.precios'
+import { Route as AuthenticatedDashboardPlanRouteImport } from './routes/_authenticated.dashboard.plan'
 import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
 import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
 import { Route as AuthenticatedDashboardOfferingsRouteImport } from './routes/_authenticated.dashboard.offerings'
@@ -542,6 +543,12 @@ const AuthenticatedDashboardPreciosRoute =
     path: '/dashboard/precios',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardPlanRoute =
+  AuthenticatedDashboardPlanRouteImport.update({
+    id: '/dashboard/plan',
+    path: '/dashboard/plan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardPalmerasRoute =
   AuthenticatedDashboardPalmerasRouteImport.update({
     id: '/dashboard/palmeras',
@@ -998,6 +1005,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/plan': typeof AuthenticatedDashboardPlanRoute
   '/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -1136,6 +1144,7 @@ export interface FileRoutesByTo {
   '/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/dashboard/plan': typeof AuthenticatedDashboardPlanRoute
   '/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -1276,6 +1285,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/offerings': typeof AuthenticatedDashboardOfferingsRoute
   '/_authenticated/dashboard/opportunities': typeof AuthenticatedDashboardOpportunitiesRoute
   '/_authenticated/dashboard/palmeras': typeof AuthenticatedDashboardPalmerasRoute
+  '/_authenticated/dashboard/plan': typeof AuthenticatedDashboardPlanRoute
   '/_authenticated/dashboard/precios': typeof AuthenticatedDashboardPreciosRoute
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
@@ -1416,6 +1426,7 @@ export interface FileRouteTypes {
     | '/dashboard/offerings'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
+    | '/dashboard/plan'
     | '/dashboard/precios'
     | '/dashboard/profile'
     | '/dashboard/project-report'
@@ -1554,6 +1565,7 @@ export interface FileRouteTypes {
     | '/dashboard/offerings'
     | '/dashboard/opportunities'
     | '/dashboard/palmeras'
+    | '/dashboard/plan'
     | '/dashboard/precios'
     | '/dashboard/profile'
     | '/dashboard/project-report'
@@ -1693,6 +1705,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/offerings'
     | '/_authenticated/dashboard/opportunities'
     | '/_authenticated/dashboard/palmeras'
+    | '/_authenticated/dashboard/plan'
     | '/_authenticated/dashboard/precios'
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/project-report'
@@ -2341,6 +2354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardPreciosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/plan': {
+      id: '/_authenticated/dashboard/plan'
+      path: '/dashboard/plan'
+      fullPath: '/dashboard/plan'
+      preLoaderRoute: typeof AuthenticatedDashboardPlanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/palmeras': {
       id: '/_authenticated/dashboard/palmeras'
       path: '/dashboard/palmeras'
@@ -2911,6 +2931,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardOfferingsRoute: typeof AuthenticatedDashboardOfferingsRoute
   AuthenticatedDashboardOpportunitiesRoute: typeof AuthenticatedDashboardOpportunitiesRoute
   AuthenticatedDashboardPalmerasRoute: typeof AuthenticatedDashboardPalmerasRoute
+  AuthenticatedDashboardPlanRoute: typeof AuthenticatedDashboardPlanRoute
   AuthenticatedDashboardPreciosRoute: typeof AuthenticatedDashboardPreciosRoute
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectReportRoute: typeof AuthenticatedDashboardProjectReportRoute
@@ -2985,6 +3006,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardOpportunitiesRoute:
     AuthenticatedDashboardOpportunitiesRoute,
   AuthenticatedDashboardPalmerasRoute: AuthenticatedDashboardPalmerasRoute,
+  AuthenticatedDashboardPlanRoute: AuthenticatedDashboardPlanRoute,
   AuthenticatedDashboardPreciosRoute: AuthenticatedDashboardPreciosRoute,
   AuthenticatedDashboardProfileRoute: AuthenticatedDashboardProfileRoute,
   AuthenticatedDashboardProjectReportRoute:
