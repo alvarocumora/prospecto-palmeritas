@@ -260,7 +260,7 @@ export async function renderGeocapitalsPdf(
       renderLines(lines, marginX, 34, 13.8);
       y += 12;
     } else if (block.kind === "clauses") {
-      const clauseBottom = safeBottom - 118;
+      const clauseBottom = safeBottom - 170;
       const clauseLineH = 12.8;
       for (const item of block.items) {
         const normalized = clampText(item, 1800);
@@ -270,7 +270,7 @@ export async function renderGeocapitalsPdf(
         const headingLines = heading ? (pdf.splitTextToSize(heading, contentW - 18) as string[]) : [];
         const bodyLines = pdf.splitTextToSize(body, contentW - 18) as string[];
         const totalLines = headingLines.length + bodyLines.length;
-        const itemH = totalLines * clauseLineH + 18;
+        const itemH = totalLines * clauseLineH + 42;
 
         if (itemH < clauseBottom - pageTopY && y + itemH > clauseBottom) {
           y = addPage();
