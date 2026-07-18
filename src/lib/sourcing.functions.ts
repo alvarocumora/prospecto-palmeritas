@@ -267,9 +267,10 @@ export const generateSubmissionShareLink = createServerFn({ method: "POST" })
   });
 
 // ---------- Dueño: convertir propuesta preseleccionada en un trade ----------
-// El trade lo sostiene el desk (Geocapitals): buyer = seller = usuario actual,
-// con la identidad del proveedor y la procedencia en la referencia/notas y sus
-// documentos volcados al timeline del trade (trazabilidad de punta a punta).
+// El dueño del sourcing (quien convierte) es el COMPRADOR del trade. El
+// proveedor externo suele no tener cuenta: se guarda como contraparte
+// (counterparty_*) y seller_user_id queda NULL. Así la UI muestra al
+// proveedor real y no una operación consigo mismo.
 export const convertSubmissionToTrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
@@ -290,7 +291,7 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
 
     const { data: req } = await sb
       .from("sourcing_requests")
-      .select("reference, commodity, form, incoterm, destination, quantity_t")
+      .select("reference, commodity, form, incoterm, destination, quantity_t, owner_user_id")
       .eq("id", s.request_id)
       .maybeSingle();
     if (!req) throw new Error("Requerimiento no encontrado.");
@@ -301,6 +302,7 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       incoterm: string | null;
       destination: string | null;
       quantity_t: number | null;
+      owner_user_id: string;
     };
 
     const qty = s.offer_quantity_t ?? r.quantity_t ?? null;
@@ -320,13 +322,21 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       .filter(Boolean)
       .join("\n");
 
+    // El dueño del sourcing es el comprador; el proveedor va como contraparte
+    // (seller externo sin cuenta → seller_user_id NULL).
     const { data: trade, error } = await sb
       .from("commodity_trades")
       .insert({
         reference,
         created_by: me,
-        buyer_user_id: me,
-        seller_user_id: me,
+        buyer_user_id: r.owner_user_id,
+        seller_user_id: null,
+        counterparty_role: "seller",
+        counterparty_name: s.supplier_name,
+        counterparty_company: s.supplier_company,
+        counterparty_country: s.supplier_country,
+        counterparty_email: s.contact_email,
+        counterparty_phone: s.contact_phone,
         commodity: r.commodity,
         form: r.form,
         quantity_t: qty,
@@ -345,6 +355,7 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       throw new Error(error.message);
     }
     const tradeId = (trade as { id: string }).id;
+
 
     // Trazabilidad: evento de origen + cada documento del proveedor al timeline.
     try {
