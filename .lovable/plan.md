@@ -1,66 +1,58 @@
 
-## Diagnóstico
+## Contexto
 
-Hoy existen dos "catastros" paralelos que confunden al usuario:
+Hoy `MarketingLanding.tsx` (~1.158 líneas, 13 secciones) mezcla: hero, dos caminos, regiones, mapa live, simulador, tipos de proyectos, prospecto destacado, capacidades, módulos del terminal, testimonios, precios, FAQ y CTA. El usuario quiere una landing más corta y enfocada en el core de negocio: **proyectos de minería + trade de commodities + catastro con mapa live + fichas de commodities del marketplace**.
 
-**A. Catastro público (principal, `/catastro/*`)** — la ruta con planes, marca y SEO:
-- `/catastro` — landing con buscador nacional
-- `/catastro/mapa` — mapa nacional en vivo desde SERNAGEOMIN (~103k polígonos, filtros tipo/situación, basemap sat/calles, export CSV/GeoJSON)
-- `/catastro/precios`, `/catastro/global`, `/catastro/pais/$country`, `/catastro/c/$code`, `/catastro/app/watchlist`
-- Envoltura: `PublicCatastroShell`
+Además, en `geocapitals.com` se sigue viendo la versión antigua. La causa más probable es que el último build de frontend no fue publicado (los cambios de frontend requieren "Update" explícito en el diálogo de publicación). Se republica al final.
 
-**B. Catastro del dashboard (`/dashboard/catastro`)** — vista *scoped al proyecto activo*:
-- Tabs: Mis concesiones, Titulares, Patentes, Conflictos (overlaps), Vigilancia, Historial, Sync log
-- Su propio `CatastroMap` (proyecto), sync con `sync-catastro`+`compute-overlaps`, alertas de vencimiento, AOI overlap, importador SERNAGEOMIN
-- Datos: `mining_concessions` filtrado por `project_id`
+## Landing rediseñada (single page, 5 secciones)
 
-Duplicación real: dos mapas distintos, dos experiencias de búsqueda, dos capas SERNAGEOMIN cargadas por caminos separados. Lo que NO se duplica: los tabs (holders/patents/watches/history/sync) son valor genuino del dashboard.
+```
+┌────────────────────────────────────────────────────┐
+│ 1. HERO compacto                                   │
+│    Título + subtítulo + 2 CTAs (Ver proyectos /    │
+│    Ver catastro live). KPIs live (proyectos,       │
+│    concesiones, anomalías) en una fila.            │
+├────────────────────────────────────────────────────┤
+│ 2. PROYECTOS DE MINERÍA                            │
+│    Grid de listings publicados (InvestableProjects │
+│    ya existente) → drawer con ficha, valorización  │
+│    y data room público.                            │
+├────────────────────────────────────────────────────┤
+│ 3. CATASTRO LIVE (mapa)                            │
+│    HeroLiveMap a ancho completo con proyectos      │
+│    georreferenciados + link a /catastro/proyecto.  │
+├────────────────────────────────────────────────────┤
+│ 4. COMMODITIES / MARKETPLACE                       │
+│    Ticker + grid de fichas de lotes públicos       │
+│    (Cu, Au, Ag, Li) con CTA "Ver marketplace".     │
+├────────────────────────────────────────────────────┤
+│ 5. CTA final + footer                              │
+│    "Publica tu proyecto" / "Solicita acceso        │
+│    inversionista".                                 │
+└────────────────────────────────────────────────────┘
+```
 
-## Objetivo
+## Cambios de archivos
 
-Que **`/catastro/mapa` sea el único mapa nacional** de la plataforma, y que el dashboard se convierta en una **capa "vista proyecto"** montada encima de ese mismo mapa + los paneles operativos (patents/holders/watches/etc.). Cero pérdida de features; solo unificación de la superficie visual y del código de mapa.
+1. **`src/features/marketing/MarketingLanding.tsx`** — reescribir dejando solo las 5 secciones arriba. Se eliminan del render: región (L364), simulador (L510), tipos de proyectos (L645), prospecto destacado individual (L678), capacidades diferenciales (L732), módulos del terminal (L818), testimonios (L924), planes/precios (L1004) y FAQ. Se mantienen `MarketingHeader`, `HeroLiveMap`, `InvestableProjects`, `CommodityTicker` y `Reveal` (componentes ya existentes; no se tocan sus archivos).
 
-## Plan por fases
+2. **Nuevo componente `src/features/marketing/PublicCommodityLots.tsx`** — grid liviano que consume un `createServerFn` público (`getPublicCommodityLots`) para mostrar 6-8 lotes publicados/verificados (commodity, grade, tonnage, incoterm, precio referencia, país) con link a `/dashboard/commodity-lots`. Usa el mismo estilo `brand-light` de la landing.
 
-### Fase 1 — Mapa único (elimina la duplicación real)
+3. **Nuevo `src/lib/marketing.functions.ts`** — server fn `getPublicCommodityLots` (SELECT de `commodity_lots` con política `TO anon` ya existente para lotes públicos; proyecta solo columnas seguras: commodity, grade, tonnage, incoterm_hint, country, reference_price, id). Sin PII de sellers.
+   - Verificación previa: confirmar con `supabase--read_query` que `commodity_lots` tiene una policy `SELECT TO anon` sobre lotes con estado publicado; si no existe, agregarla en la misma migración limitada a columnas públicas (por RLS a nivel fila, no de columna: filtrar por `status = 'published' AND verified = true`).
 
-1. Promover `catastro.mapa.tsx` como el componente de mapa canónico. Extraer su cuerpo a `src/features/catastro-public/NationalCatastroMap.tsx` (props: `overlayConcessions?`, `aoi?`, `projectName?`, `onFeatureClick?`, `initialCenter?`, `showProjectStats?`).
-2. Borrar `src/components/ops/CatastroMap.tsx` (mapa del dashboard) y sustituir sus usos por `NationalCatastroMap` con las props de overlay del proyecto. El mapa nacional queda igual para el público; con `overlayConcessions` pinta encima las concesiones del proyecto activo con estilo destacado (borde cobalto, fill semi-transparente) y hace fit al bbox del proyecto.
-3. Mantener `CatastroOverlapPanel` y `AoiOverlapPanel` alimentándose de las features cargadas por `NationalCatastroMap` (mismo `onFeaturesLoaded`).
+4. **`src/routes/index.tsx`** — actualizar `head()` con título/description más comerciales:
+   - `title`: "Geocapitals · Proyectos mineros, catastro live y trade de commodities"
+   - `description`: "Marketplace de proyectos mineros con catastro georreferenciado y lotes de commodities verificados."
 
-### Fase 2 — Reubicar el dashboard como sub-ruta del catastro principal
+## Ruta principal / dominio viejo
 
-4. Mover la experiencia del dashboard a **`/catastro/proyecto`** (dentro del árbol público, pero con guard: requiere sesión + `active project`). Concretamente crear:
-   - `src/routes/catastro.proyecto.tsx` — layout con `PublicCatastroShell` + banner "Vista proyecto: {code · name}" + selector de proyecto si el usuario tiene varios + los tabs actuales.
-   - `src/routes/catastro.proyecto.index.tsx` = tab "concesiones" (mapa nacional con overlay del proyecto + stats + alertas + tabla).
-   - Sub-rutas: `catastro.proyecto.titulares.tsx`, `.patentes.tsx`, `.conflictos.tsx`, `.vigilancia.tsx`, `.historial.tsx`, `.sync.tsx` — cada una renderiza el panel existente sin reescribir lógica.
-5. Redireccionar `/dashboard/catastro` → `/catastro/proyecto` con `beforeLoad` + `redirect`, preservando `holders/$id` (mover a `catastro.proyecto.titulares.$id.tsx` con su misma vista). Sin romper links existentes.
-6. En `PublicCatastroShell`, si hay sesión + proyecto activo mostrar en la nav un enlace extra "Mi proyecto" apuntando a `/catastro/proyecto`. Si no hay sesión el enlace no aparece.
-
-### Fase 3 — Unificar búsqueda y watchlist
-
-7. El input de búsqueda de `/catastro` y `/catastro/mapa` ya usa `searchConcessions` (server fn público). Añadir un toggle "Solo mi proyecto" cuando hay sesión + proyecto: filtra client-side contra `mining_concessions` del proyecto. Esto elimina la sensación de "dos buscadores".
-8. Consolidar watchlist: `/catastro/app/watchlist` (público autenticado) queda como único watchlist; el tab "Vigilancia" del dashboard se re-implementa como vista del proyecto sobre la misma tabla (`concession_alert_settings` + `bulletin_watches`), sin crear duplicados.
-
-### Fase 4 — Limpieza
-
-9. Borrar código muerto tras la migración: `src/components/ops/CatastroMap.tsx`, imports huérfanos en `_authenticated.dashboard.catastro.tsx` (el archivo queda como stub que redirige).
-10. Actualizar la navegación del dashboard (sidebar): la entrada "Catastro" apunta directamente a `/catastro/proyecto`, no a `/dashboard/catastro`.
-11. Verificación: cargar `/catastro`, `/catastro/mapa`, `/catastro/proyecto` (con y sin proyecto activo), redirect desde `/dashboard/catastro`, y que el enlace de titular `catastro/proyecto/titulares/{id}` funcione.
-
-## Notas técnicas
-
-- **Sin cambios de BD ni RLS.** Todo es refactor de rutas + extracción de componente de mapa.
-- **Auth**: `/catastro/proyecto/*` usa el patrón `beforeLoad` que verifica sesión y redirige a `/auth?intent=project` si falta. No se anida bajo `_authenticated/` para conservar la envoltura `PublicCatastroShell` (branding + nav públicos).
-- **Rendimiento**: el mapa nacional ya trae tiling desde ArcGIS a partir de zoom ≥ 9; añadir un overlay de N ≤ 200 polígonos del proyecto es despreciable.
-- **Riesgos**: rutas en producción del sidebar y links en PDFs que apunten a `/dashboard/catastro` — mitigado por el redirect permanente.
+- No es bug de código: `src/routes/index.tsx` ya monta `MarketingLanding`. Lo que ve el usuario en `geocapitals.com` es el último build publicado, que quedó desactualizado.
+- Tras aplicar los cambios, **publicar** con `preview_ui--publish` para que `geocapitals.com` sirva la nueva landing. Antes de publicar, correr `security--get_scan_results` (regla del proyecto).
 
 ## Fuera de alcance
 
-- Rediseño visual (ya está en Institutional Modernist).
-- Cambios al mapa 3D `Geology3DViewer` o a `/live/*`.
-- Cambios en el precio o planes.
-
-## Aprobación
-
-Si estás de acuerdo, implemento Fase 1 y Fase 2 en el primer sprint (mapa único + `/catastro/proyecto` con redirect) y Fases 3-4 en un segundo pase. ¿Procedo así o prefieres todo de una?
+- Navegación de dashboard, INICIO logeado, autenticación, edge functions, otros módulos.
+- Diseño tipográfico/paleta: se mantiene Institutional Modernist (`brand-light`, tokens semánticos).
+- No se borran los componentes retirados del render (Simulator, Testimonials, PlatformPreview, etc.) — quedan en el repo por si se reutilizan; solo se dejan de renderizar en el landing.
