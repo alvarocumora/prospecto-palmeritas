@@ -428,29 +428,53 @@ export function LandingCatastroBlock() {
           {plans.length === 0 && (
             <div className="p-5 text-[11px] font-mono text-content-muted">Cargando planes…</div>
           )}
-          {plans.slice(0, 3).map((p) => (
-            <div key={p.code} className="p-5">
-              <div className="flex items-baseline justify-between mb-2">
-                <div className="brand-display text-xl text-content">{p.name}</div>
-                <div className="font-mono text-content-muted text-[11px]">
-                  {p.priceMonthly === 0 ? "Gratis" : `USD ${p.priceMonthly}/mes`}
+          {plans.slice(0, 3).map((p, idx) => {
+            const isPopular = idx === 1;
+            return (
+              <div
+                key={p.code}
+                className={`relative p-5 ${isPopular ? "bg-surface" : ""}`}
+              >
+                {isPopular && (
+                  <span className="absolute -top-2 left-5 px-2 py-0.5 bg-accent-brand text-white text-[9px] font-mono uppercase tracking-[0.22em] rounded-sm">
+                    Más popular
+                  </span>
+                )}
+                <div className="flex items-baseline justify-between mb-2">
+                  <div className="brand-display text-xl text-content">{p.name}</div>
+                  <div className="font-mono text-content-muted text-[11px]">
+                    {p.priceMonthly === 0 ? "Gratis" : `USD ${p.priceMonthly}/mes`}
+                  </div>
                 </div>
+                {p.description && (
+                  <p className="text-[12px] text-content-muted mb-3 leading-snug">{p.description}</p>
+                )}
+                <ul className="space-y-1.5">
+                  {p.features.slice(0, 4).map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-[12px] text-content">
+                      <Check className="w-3.5 h-3.5 mt-0.5 text-accent-brand shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {p.description && (
-                <p className="text-[12px] text-content-muted mb-3 leading-snug">{p.description}</p>
-              )}
-              <ul className="space-y-1.5">
-                {p.features.slice(0, 4).map((f) => (
-                  <li key={f} className="flex items-start gap-2 text-[12px] text-content">
-                    <Check className="w-3.5 h-3.5 mt-0.5 text-accent-brand shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+            );
+          })}
+        </div>
+        <div className="px-5 py-3 border-t border-hairline flex items-center justify-between gap-3 text-[11px] text-content-muted">
+          <span className="flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            ¿Necesitas cobertura enterprise, API dedicada o data-room?
+          </span>
+          <Link
+            to="/contacto"
+            className="font-mono uppercase tracking-[0.2em] text-content hover:text-accent-brand"
+          >
+            Concierge / Custom →
+          </Link>
         </div>
       </div>
+
     </div>
   );
 }
