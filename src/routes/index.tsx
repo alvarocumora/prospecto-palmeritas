@@ -4,16 +4,22 @@ import { MarketingLanding } from "@/features/marketing/MarketingLanding";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Geocapitals · Plataforma de inversión en proyectos mineros" },
+      {
+        title: "Geocapitals · Proyectos mineros, catastro live y trade de commodities",
+      },
       {
         name: "description",
         content:
-          "Conectamos proyectos mineros con capital. Plataforma inteligente de inversión y financiamiento para minería en Latinoamérica.",
+          "Marketplace de proyectos mineros con catastro georreferenciado y lotes de commodities verificados (Cu, Au, Ag, Li).",
       },
-      { property: "og:title", content: "Geocapitals · Conectamos proyectos mineros con capital" },
+      {
+        property: "og:title",
+        content: "Geocapitals · Proyectos mineros, catastro y commodities",
+      },
       {
         property: "og:description",
-        content: "Plataforma inteligente de inversión y financiamiento para minería.",
+        content:
+          "Proyectos mineros, mapa live de concesiones y lotes de commodities verificados en una sola plataforma.",
       },
       { property: "og:type", content: "website" },
     ],
