@@ -8,6 +8,7 @@ export type LandingCatastroSnapshot = {
   porEstado: Array<{ key: string; count: number }>;
   topTitulares: Array<{ name: string; count: number }>;
   heatPoints: Array<[number, number]>;
+  polygons: GeoJSON.FeatureCollection;
   sampleSize: number;
   updatedAt: string | null;
   generatedAt: string;
@@ -55,9 +56,9 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
       supabaseAdmin.from("cadastre_national").select("tipo,status,holder_name").limit(15000),
       supabaseAdmin
         .from("cadastre_national")
-        .select("geometry_geojson")
+        .select("id,tipo,status,holder_name,geometry_geojson")
         .not("geometry_geojson", "is", null)
-        .limit(3000),
+        .limit(2500),
       supabaseAdmin
         .from("cadastre_sync_runs")
         .select("finished_at")
@@ -89,10 +90,39 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
       .map((x) => ({ name: x.key, count: x.count }));
 
     const heatPoints: Array<[number, number]> = [];
-    for (const row of (sampleRes.data ?? []) as Array<{ geometry_geojson: unknown }>) {
+    const features: GeoJSON.Feature[] = [];
+    for (const row of (sampleRes.data ?? []) as Array<{
+      id: string;
+      tipo: string | null;
+      status: string | null;
+      holder_name: string | null;
+      geometry_geojson: unknown;
+    }>) {
       const p = pointFromGeoJSON(row.geometry_geojson);
-      if (p && p[0] > -80 && p[0] < -66 && p[1] > -56 && p[1] < -17) heatPoints.push(p);
+      if (!p || !(p[0] > -80 && p[0] < -66 && p[1] > -56 && p[1] < -17)) continue;
+      heatPoints.push(p);
+      const geom = row.geometry_geojson as GeoJSON.Geometry | null;
+      if (
+        geom &&
+        (geom.type === "Polygon" || geom.type === "MultiPolygon")
+      ) {
+        features.push({
+          type: "Feature",
+          id: row.id,
+          properties: {
+            id: row.id,
+            tipo: row.tipo ?? "otros",
+            status: row.status ?? "otros",
+            holder: row.holder_name ?? "",
+          },
+          geometry: geom,
+        });
+      }
     }
+    const polygons: GeoJSON.FeatureCollection = {
+      type: "FeatureCollection",
+      features,
+    };
 
     const updatedAt =
       ((syncRes.data as Array<{ finished_at: string }> | null) ?? [])[0]?.finished_at ?? null;
@@ -103,6 +133,7 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
       porEstado: porEstado.slice(0, 6),
       topTitulares: topTitulares.slice(0, 6),
       heatPoints,
+      polygons,
       sampleSize: heatPoints.length,
       updatedAt,
       generatedAt,

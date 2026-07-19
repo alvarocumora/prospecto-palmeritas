@@ -68,7 +68,7 @@ function fmtDate(iso: string | null) {
   });
 }
 
-function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
+function CadastreMap({ polygons }: { polygons: GeoJSON.FeatureCollection }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -76,24 +76,38 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
   useEffect(() => {
     let cancelled = false;
     if (!ref.current || mapRef.current) return;
+    let ro: ResizeObserver | null = null;
     loadMaplibre().then((ml) => {
       if (cancelled || !ref.current || mapRef.current) return;
       const map = new ml.Map({
         container: ref.current,
         style: STYLE,
-        center: [-70.4, -27.5],
-        zoom: 3.6,
+        center: [-70.0, -26.5],
+        zoom: 5.6,
         attributionControl: false,
         interactive: true,
       });
       map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right");
       map.on("load", () => {
         mapRef.current = map;
+        (window as unknown as { __landingMap?: unknown }).__landingMap = map;
         setReady(true);
+        map.resize();
       });
+      if (ref.current && "ResizeObserver" in window) {
+        ro = new ResizeObserver(() => {
+          try {
+            map.resize();
+          } catch {
+            /* noop */
+          }
+        });
+        ro.observe(ref.current);
+      }
     });
     return () => {
       cancelled = true;
+      ro?.disconnect();
       mapRef.current?.remove();
       mapRef.current = null;
     };
@@ -102,60 +116,66 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    const fc = {
-      type: "FeatureCollection" as const,
-      features: points.map((p) => ({
-        type: "Feature" as const,
-        geometry: { type: "Point" as const, coordinates: p },
-        properties: {},
-      })),
-    };
-    const src = map.getSource("cadastre-heat");
+    // Clone to strip any non-cloneable wrappers from the query cache
+    const data = polygons?.features?.length
+      ? (JSON.parse(JSON.stringify(polygons)) as GeoJSON.FeatureCollection)
+      : ({ type: "FeatureCollection", features: [] } as GeoJSON.FeatureCollection);
+    const src = map.getSource("cadastre-poly");
     if (src) {
-      (src as unknown as { setData: (d: unknown) => void }).setData(fc);
+      (src as unknown as { setData: (d: unknown) => void }).setData(data);
       return;
     }
-    map.addSource("cadastre-heat", { type: "geojson", data: fc });
+    map.addSource("cadastre-poly", { type: "geojson", data });
+
+    // Fill by tipo (exploración / explotación)
     map.addLayer({
-      id: "cadastre-heat-layer",
-      type: "heatmap",
-      source: "cadastre-heat",
+      id: "cadastre-fill",
+      type: "fill",
+      source: "cadastre-poly",
       paint: {
-        "heatmap-weight": 0.6,
-        "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 0, 1, 9, 3],
-        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 6, 12, 9, 28],
-        "heatmap-opacity": 0.85,
-        "heatmap-color": [
-          "interpolate",
-          ["linear"],
-          ["heatmap-density"],
-          0, "rgba(0,0,0,0)",
-          0.2, "rgba(59,130,246,0.55)",
-          0.5, "rgba(234,179,8,0.75)",
-          0.8, "rgba(239,68,68,0.85)",
-          1, "rgba(255,255,255,0.95)",
+        "fill-color": [
+          "match",
+          ["get", "tipo"],
+          "exploracion", "#2563eb",
+          "exploración", "#2563eb",
+          "explotacion", "#f59e0b",
+          "explotación", "#f59e0b",
+          /* other */ "#64748b",
+        ],
+        "fill-opacity": [
+          "interpolate", ["linear"], ["zoom"],
+          3, 0.35,
+          6, 0.45,
+          10, 0.55,
         ],
       },
     });
     map.addLayer({
-      id: "cadastre-heat-points",
-      type: "circle",
-      source: "cadastre-heat",
-      minzoom: 6,
+      id: "cadastre-outline",
+      type: "line",
+      source: "cadastre-poly",
       paint: {
-        "circle-radius": 2,
-        "circle-color": "#facc15",
-        "circle-opacity": 0.7,
+        "line-color": [
+          "match",
+          ["get", "tipo"],
+          "exploracion", "#60a5fa",
+          "exploración", "#60a5fa",
+          "explotacion", "#fbbf24",
+          "explotación", "#fbbf24",
+          "#94a3b8",
+        ],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.2, 8, 0.8, 12, 1.6],
+        "line-opacity": 0.8,
       },
     });
-  }, [points, ready]);
+  }, [polygons, ready]);
 
   return (
     <div
       ref={ref}
-      className="absolute inset-0"
+      className="w-full h-full"
       style={{ background: "#0b1220" }}
-      aria-label="Mapa térmico del catastro minero nacional"
+      aria-label="Mapa nacional de concesiones mineras"
     />
   );
 }
@@ -176,7 +196,7 @@ export function LandingCatastroBlock() {
   });
 
   const total = data?.totalNacional ?? 0;
-  const heatPoints = useMemo(() => data?.heatPoints ?? [], [data]);
+  const polySample = data?.polygons?.features.length ?? 0;
   const maxTipo = Math.max(1, ...(data?.porTipo?.map((x) => x.count) ?? [1]));
   const maxEstado = Math.max(1, ...(data?.porEstado?.map((x) => x.count) ?? [1]));
 
@@ -193,9 +213,9 @@ export function LandingCatastroBlock() {
     <div className="space-y-8" data-theme="im-light">
       {/* Row: map + KPIs */}
       <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
-        {/* Heat map */}
-        <div className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] min-h-[440px] lg:min-h-[520px]">
-          <CadastreHeatMap points={heatPoints} />
+        {/* Concesiones */}
+        <div className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] h-[440px] lg:h-[520px] bg-[#0b1220]">
+          <CadastreMap polygons={data?.polygons ?? { type: "FeatureCollection", features: [] }} />
           {/* HUD chips */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-black/60 backdrop-blur border border-white/10 text-[10px] font-mono uppercase tracking-[0.22em] text-white">
@@ -205,8 +225,16 @@ export function LandingCatastroBlock() {
               />
               SERNAGEOMIN · Catastro live
             </div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-black/50 backdrop-blur border border-white/10 text-[10px] font-mono text-white/80">
-              {fmtInt(data?.sampleSize ?? 0)} pts · muestra de {fmtInt(total)}
+            <div className="inline-flex items-center gap-3 px-2.5 py-1 rounded-sm bg-black/50 backdrop-blur border border-white/10 text-[10px] font-mono text-white/80">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-sm" style={{ background: "#f59e0b" }} />
+                Explotación
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-sm" style={{ background: "#2563eb" }} />
+                Exploración
+              </span>
+              <span className="opacity-70">· {fmtInt(polySample)} de {fmtInt(total)}</span>
             </div>
           </div>
           <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between">
