@@ -3,6 +3,28 @@
 // la ronda y el % ofrecido. Refleja la forma de ProjectFicha (investor/fichas)
 // para que la ficha y el simulador puedan leer de DB sin fricción. Testeable.
 
+// ---------- Token público de la ficha (share link) ----------
+// Solo se persiste el hash; el token viaja en claro una única vez al generarlo.
+export const FUNDRAISE_TOKEN_PREFIX = "gcprj_";
+
+function randomHex(bytes = 32): string {
+  const arr = new Uint8Array(bytes);
+  globalThis.crypto.getRandomValues(arr);
+  return Array.from(arr, (b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+export function generateFundraiseToken(): string {
+  return `${FUNDRAISE_TOKEN_PREFIX}${randomHex()}`;
+}
+
+export function isFundraiseTokenFormat(token: string): boolean {
+  return new RegExp(`^${FUNDRAISE_TOKEN_PREFIX}[0-9a-f]{64}$`).test(token);
+}
+
+export function fundraiseTokenPrefix(token: string): string {
+  return token.slice(0, FUNDRAISE_TOKEN_PREFIX.length + 6);
+}
+
 export const FUNDRAISE_INSTRUMENTS = [
   "equity",
   "safe",

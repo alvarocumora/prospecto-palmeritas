@@ -34,6 +34,7 @@ import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
+import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
 import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
 import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
@@ -273,6 +274,11 @@ const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
   id: '/$listingId',
   path: '/$listingId',
   getParentRoute: () => ProyectosRoute,
+} as any)
+const ProyectoTokenRoute = ProyectoTokenRouteImport.update({
+  id: '/proyecto/$token',
+  path: '/proyecto/$token',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
   id: '/proveedor/$token',
@@ -971,6 +977,7 @@ export interface FileRoutesByFullPath {
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
+  '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -1112,6 +1119,7 @@ export interface FileRoutesByTo {
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
+  '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -1255,6 +1263,7 @@ export interface FileRoutesById {
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
+  '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
@@ -1398,6 +1407,7 @@ export interface FileRouteTypes {
     | '/live/tilama'
     | '/marketplace/$lotId'
     | '/proveedor/$token'
+    | '/proyecto/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1539,6 +1549,7 @@ export interface FileRouteTypes {
     | '/live/tilama'
     | '/marketplace/$lotId'
     | '/proveedor/$token'
+    | '/proyecto/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1681,6 +1692,7 @@ export interface FileRouteTypes {
     | '/live/tilama'
     | '/marketplace/$lotId'
     | '/proveedor/$token'
+    | '/proyecto/$token'
     | '/proyectos/$listingId'
     | '/terminal/capital-raise'
     | '/terminal/market'
@@ -1824,6 +1836,7 @@ export interface RootRouteChildren {
   LiveTilamaRoute: typeof LiveTilamaRoute
   MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
   ProveedorTokenRoute: typeof ProveedorTokenRoute
+  ProyectoTokenRoute: typeof ProyectoTokenRoute
   VerificarRefRoute: typeof VerificarRefRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
@@ -2029,6 +2042,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/proyectos/$listingId'
       preLoaderRoute: typeof ProyectosListingIdRouteImport
       parentRoute: typeof ProyectosRoute
+    }
+    '/proyecto/$token': {
+      id: '/proyecto/$token'
+      path: '/proyecto/$token'
+      fullPath: '/proyecto/$token'
+      preLoaderRoute: typeof ProyectoTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/proveedor/$token': {
       id: '/proveedor/$token'
@@ -3165,6 +3185,7 @@ const rootRouteChildren: RootRouteChildren = {
   LiveTilamaRoute: LiveTilamaRoute,
   MarketplaceLotIdRoute: MarketplaceLotIdRoute,
   ProveedorTokenRoute: ProveedorTokenRoute,
+  ProyectoTokenRoute: ProyectoTokenRoute,
   VerificarRefRoute: VerificarRefRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
