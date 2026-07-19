@@ -79,6 +79,7 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
   useEffect(() => {
     let cancelled = false;
     if (!ref.current || mapRef.current) return;
+    let ro: ResizeObserver | null = null;
     loadMaplibre().then((ml) => {
       if (cancelled || !ref.current || mapRef.current) return;
       const map = new ml.Map({
@@ -93,14 +94,27 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
       map.on("load", () => {
         mapRef.current = map;
         setReady(true);
+        map.resize();
       });
+      if (ref.current && "ResizeObserver" in window) {
+        ro = new ResizeObserver(() => {
+          try {
+            map.resize();
+          } catch {
+            /* noop */
+          }
+        });
+        ro.observe(ref.current);
+      }
     });
     return () => {
       cancelled = true;
+      ro?.disconnect();
       mapRef.current?.remove();
       mapRef.current = null;
     };
   }, []);
+
 
   useEffect(() => {
     const map = mapRef.current;
