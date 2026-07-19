@@ -24,6 +24,7 @@ import {
 import { VerificationBadge } from "@/components/brand/VerificationBadge";
 import { projectVerification } from "@/lib/verification";
 import { ProjectFactSheet } from "@/features/projects/ProjectFactSheet";
+import { ProjectConcessions } from "@/features/projects/ProjectConcessions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/projects_/$projectId")({
   head: () => ({ meta: [{ title: "Proyecto — Geocapitals" }] }),
@@ -475,6 +476,9 @@ function ProjectDetailPage() {
           </div>
         )}
       </section>
+
+      {/* Catastro: concesiones, superficie, matrículas y polígono */}
+      <ProjectConcessions projectId={projectId} />
 
       {/* Ficha de datos con procedencia (CERTIFICADO / DECLARADO / A_VERIFICAR) */}
       <ProjectFactSheet projectId={projectId} />
