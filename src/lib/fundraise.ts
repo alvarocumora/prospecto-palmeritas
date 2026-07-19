@@ -140,6 +140,36 @@ export function ticketOutcomeUsd(ticketUsd: number, scenario: FundraiseScenario)
   return ticketUsd * (Number.isFinite(scenario.multiple) ? scenario.multiple : 0);
 }
 
+/** Todos los proyectos son operados por Geocapitals. */
+export const PROJECT_OPERATOR = "Geocapitals";
+
+/** Escenarios de retorno estándar (MOIC) cuando la ronda no define los propios. */
+export const DEFAULT_INVESTMENT_SCENARIOS: FundraiseScenario[] = [
+  {
+    key: "conservador",
+    label: "Conservador",
+    multiple: 1.6,
+    note: "Avance parcial; salida temprana del activo.",
+  },
+  {
+    key: "base",
+    label: "Base",
+    multiple: 3,
+    note: "Cumple hitos; reventa o farm-out con recursos definidos.",
+  },
+  {
+    key: "optimista",
+    label: "Optimista",
+    multiple: 6,
+    note: "Descubrimiento relevante; entra un socio estratégico o major.",
+  },
+];
+
+/** Escenarios a mostrar: los de la ronda si existen, si no los estándar. */
+export function resolveScenarios(scenarios: FundraiseScenario[]): FundraiseScenario[] {
+  return scenarios.length > 0 ? scenarios : DEFAULT_INVESTMENT_SCENARIOS;
+}
+
 /** ¿La ronda tiene lo mínimo para publicarse? (monto, ticket e instrumento). */
 export function isFundraisePublishable(d: FundraiseData): boolean {
   return (
