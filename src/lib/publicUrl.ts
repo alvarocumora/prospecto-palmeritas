@@ -28,6 +28,8 @@ export const sourcingSubmitUrl = (token: string) => publicUrl(`/proveedor/${toke
 /** Link de solo lectura de la ficha de proveedor, para compartir con el comprador. */
 export const supplierSheetUrl = (token: string) => publicUrl(`/ficha-proveedor/${token}`);
 
+export const projectSheetUrl = (token: string) => publicUrl(`/proyecto/${token}`);
+
 /** Link canónico para verificación pública de cumplimiento NI 43-101. */
 export const complianceVerifyUrl = (reportId: string) =>
   publicUrl(`/api/public/verify-compliance/${reportId}`);

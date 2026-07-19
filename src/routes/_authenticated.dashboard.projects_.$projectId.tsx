@@ -3,8 +3,13 @@ import { useEffect, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, Save, TrendingUp, Lock, Globe } from "lucide-react";
-import { getProjectFundraise, upsertProjectFundraise } from "@/lib/fundraise.functions";
+import { ArrowLeft, Plus, Trash2, Save, TrendingUp, Lock, Globe, Share2, Copy } from "lucide-react";
+import {
+  getProjectFundraise,
+  upsertProjectFundraise,
+  generateFundraiseShareLink,
+} from "@/lib/fundraise.functions";
+import { projectSheetUrl } from "@/lib/publicUrl";
 import {
   FUNDRAISE_INSTRUMENTS,
   FUNDRAISE_INSTRUMENT_LABELS,
@@ -57,7 +62,9 @@ function ProjectDetailPage() {
   const { projectId } = Route.useParams();
   const getFn = useServerFn(getProjectFundraise);
   const saveFn = useServerFn(upsertProjectFundraise);
+  const shareFn = useServerFn(generateFundraiseShareLink);
   const qc = useQueryClient();
+  const [shareLink, setShareLink] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["project-fundraise", projectId],
@@ -98,6 +105,18 @@ function ProjectDetailPage() {
       void qc.invalidateQueries({ queryKey: ["project-fundraise", projectId] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo guardar."),
+  });
+
+  const share = useMutation({
+    mutationFn: () => shareFn({ data: { projectId } }),
+    onSuccess: async (res) => {
+      const url = projectSheetUrl(res.token);
+      setShareLink(url);
+      await navigator.clipboard.writeText(url).catch(() => {});
+      toast.success("Ficha pública lista. Link copiado.");
+      void qc.invalidateQueries({ queryKey: ["project-fundraise", projectId] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo publicar."),
   });
 
   if (isLoading) return <div className="p-6 max-w-4xl h-40 rounded bg-muted/20 animate-pulse" />;
@@ -407,23 +426,51 @@ function ProjectDetailPage() {
         />
 
         {canEdit && (
-          <div className="flex items-center gap-3 pt-1">
-            <label className="inline-flex items-center gap-2 text-xs">
-              <input
-                type="checkbox"
-                checked={form.isPublic}
-                onChange={(e) => set("isPublic", e.target.checked)}
-              />
-              Ficha pública
-            </label>
-            <button
-              onClick={() => save.mutate()}
-              disabled={save.isPending || totalPct > 100}
-              className="ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
-            >
-              <Save className="w-4 h-4" />
-              {save.isPending ? "Guardando…" : "Guardar levantamiento"}
-            </button>
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center gap-3">
+              <label className="inline-flex items-center gap-2 text-xs">
+                <input
+                  type="checkbox"
+                  checked={form.isPublic}
+                  onChange={(e) => set("isPublic", e.target.checked)}
+                />
+                Ficha pública
+              </label>
+              <button
+                onClick={() => share.mutate()}
+                disabled={share.isPending}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-primary/40 text-primary text-sm hover:bg-primary/10 disabled:opacity-50"
+              >
+                <Share2 className="w-4 h-4" />
+                {share.isPending ? "Publicando…" : "Compartir ficha pública"}
+              </button>
+              <button
+                onClick={() => save.mutate()}
+                disabled={save.isPending || totalPct > 100}
+                className="ml-auto inline-flex items-center gap-1.5 px-3 py-2 rounded bg-primary text-primary-foreground text-sm hover:opacity-90 disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                {save.isPending ? "Guardando…" : "Guardar levantamiento"}
+              </button>
+            </div>
+            {shareLink && (
+              <div className="flex items-center gap-2 rounded border border-primary/30 bg-primary/5 p-2">
+                <code className="text-[11px] font-mono break-all flex-1">{shareLink}</code>
+                <button
+                  onClick={() => {
+                    void navigator.clipboard.writeText(shareLink);
+                    toast.success("Copiado");
+                  }}
+                  className="shrink-0 p-1 rounded border border-border hover:bg-accent"
+                >
+                  <Copy className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+            <p className="text-[10px] text-muted-foreground">
+              Publicar genera un link de solo lectura con los términos de la ronda. Guarda primero
+              los cambios; requiere monto, ticket e instrumento.
+            </p>
           </div>
         )}
       </section>

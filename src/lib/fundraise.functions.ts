@@ -1,13 +1,18 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { sha256Hex } from "@/lib/documents/signing";
 import {
   FUNDRAISE_INSTRUMENTS,
   FUNDRAISE_STATUSES,
   normalizeInstrument,
   normalizeStatus,
   validateUseOfFunds,
+  isFundraisePublishable,
+  generateFundraiseToken,
+  fundraiseTokenPrefix,
+  isFundraiseTokenFormat,
   type FundraiseData,
 } from "@/lib/fundraise";
 
@@ -20,6 +25,13 @@ const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 const isMissingTable = (msg: string) => /does not exist|relation|schema cache/i.test(msg);
 
 const EDIT_ROLES = new Set(["owner", "admin"]);
+
+function serviceClient(): SupabaseClient | null {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, { auth: { persistSession: false } });
+}
 
 export type ProjectHeader = {
   id: string;
@@ -194,4 +206,87 @@ export const upsertProjectFundraise = createServerFn({ method: "POST" })
       throw new Error(error.message);
     }
     return { ok: true };
+  });
+
+// ---------- Compartir: genera el link público de la ficha (owner/admin) ----------
+export const generateFundraiseShareLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ projectId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<{ token: string }> => {
+    const sb = asSb(context.supabase);
+    const me = context.userId as string;
+
+    const role = await myRole(sb, data.projectId, me);
+    if (!role || !EDIT_ROLES.has(role)) {
+      throw new Error("Solo el owner o admin del proyecto puede publicar la ficha.");
+    }
+
+    const { data: fr, error: readErr } = await sb
+      .from("project_fundraises")
+      .select("*")
+      .eq("project_id", data.projectId)
+      .maybeSingle();
+    if (readErr) {
+      if (isMissingTable(readErr.message))
+        throw new Error("El módulo de financiamiento estará disponible tras aplicar la migración.");
+      throw new Error(readErr.message);
+    }
+    if (!fr) throw new Error("Primero completa y guarda el levantamiento.");
+    if (!isFundraisePublishable(rowToData(fr as Record<string, unknown>))) {
+      throw new Error("Completa monto a levantar, ticket mínimo e instrumento antes de publicar.");
+    }
+
+    const token = generateFundraiseToken();
+    const { error } = await sb
+      .from("project_fundraises")
+      .update({
+        is_public: true,
+        public_token_prefix: fundraiseTokenPrefix(token),
+        public_token_hash: await sha256Hex(token),
+      })
+      .eq("project_id", data.projectId);
+    if (error) throw new Error(error.message);
+    return { token };
+  });
+
+// ---------- Público: ficha del proyecto por token (solo lectura) ----------
+export type PublicFundraise = {
+  project: {
+    id: string;
+    code: string;
+    name: string;
+    commodity: string | null;
+    region: string | null;
+    country: string | null;
+  };
+  fundraise: FundraiseData;
+};
+
+export const getPublicFundraise = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ token: z.string().trim().min(10).max(120) }).parse(d))
+  .handler(async ({ data }): Promise<PublicFundraise | null> => {
+    if (!isFundraiseTokenFormat(data.token)) return null;
+    const sb = serviceClient();
+    if (!sb) return null;
+
+    const { data: fr } = await sb
+      .from("project_fundraises")
+      .select("*")
+      .eq("public_token_hash", await sha256Hex(data.token))
+      .maybeSingle();
+    if (!fr) return null;
+    const row = fr as Record<string, unknown>;
+    if (!row.is_public) return null;
+
+    const { data: proj } = await sb
+      .from("projects")
+      .select("id, code, name, commodity, region, country")
+      .eq("id", row.project_id as string)
+      .maybeSingle();
+    if (!proj) return null;
+
+    return {
+      project: proj as PublicFundraise["project"],
+      fundraise: rowToData(row),
+    };
   });

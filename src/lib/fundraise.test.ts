@@ -8,6 +8,9 @@ import {
   impliedPreMoneyUsd,
   ticketOutcomeUsd,
   isFundraisePublishable,
+  generateFundraiseToken,
+  isFundraiseTokenFormat,
+  fundraiseTokenPrefix,
   type FundraiseData,
 } from "./fundraise";
 
@@ -89,5 +92,22 @@ describe("ticket y publicable", () => {
     expect(isFundraisePublishable(base)).toBe(true);
     expect(isFundraisePublishable({ ...base, instrument: null })).toBe(false);
     expect(isFundraisePublishable({ ...base, roundSizeUsd: null })).toBe(false);
+  });
+});
+
+describe("token público de ficha", () => {
+  it("genera token con prefijo y formato válido, único", () => {
+    const t = generateFundraiseToken();
+    expect(t.startsWith("gcprj_")).toBe(true);
+    expect(isFundraiseTokenFormat(t)).toBe(true);
+    expect(generateFundraiseToken()).not.toBe(t);
+  });
+  it("rechaza formatos inválidos", () => {
+    expect(isFundraiseTokenFormat("gcprj_zzz")).toBe(false);
+    expect(isFundraiseTokenFormat("gcshr_" + "a".repeat(64))).toBe(false);
+  });
+  it("prefijo recorta a prefijo + 6", () => {
+    const t = generateFundraiseToken();
+    expect(fundraiseTokenPrefix(t)).toBe(t.slice(0, 12));
   });
 });
