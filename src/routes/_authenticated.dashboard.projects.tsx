@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -96,13 +96,22 @@ function ProjectsPage() {
               <div className="mt-3 text-[10px] font-mono text-muted-foreground">
                 {p.commodity ?? "—"} · {p.region ?? p.country ?? ""}
               </div>
-              <button
-                type="button"
-                onClick={() => setActiveId(p.id)}
-                className="mt-3 w-full text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
-              >
-                Activar
-              </button>
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveId(p.id)}
+                  className="flex-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
+                >
+                  Activar
+                </button>
+                <Link
+                  to="/dashboard/projects/$projectId"
+                  params={{ projectId: p.id }}
+                  className="flex-1 text-center text-[11px] font-mono px-2 py-1 rounded border border-primary/40 text-primary hover:bg-primary/10"
+                >
+                  Ficha · Financiamiento
+                </Link>
+              </div>
             </div>
           ))}
         </div>
