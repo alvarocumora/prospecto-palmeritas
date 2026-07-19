@@ -13,10 +13,6 @@ import {
   Sparkles,
   Layers,
   Check,
-  Boxes,
-  Gavel,
-  Radar,
-  ShieldCheck,
 } from "lucide-react";
 import { getLandingCatastroSnapshot } from "@/lib/landingCatastro.functions";
 import { getPublicPlans } from "@/lib/plans.functions";
@@ -28,12 +24,9 @@ async function loadMaplibre() {
     import("maplibre-gl"),
     import("maplibre-gl/dist/maplibre-gl.css"),
   ]);
-  _ml = (mod as unknown as { default?: typeof import("maplibre-gl") }).default ?? mod;
+  _ml = mod.default ? (mod as unknown as typeof import("maplibre-gl")) : mod;
   return _ml!;
 }
-
-
-
 
 const STYLE: StyleSpecification = {
   version: 8,
@@ -75,7 +68,7 @@ function fmtDate(iso: string | null) {
   });
 }
 
-function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
+function CadastreMap({ polygons }: { polygons: GeoJSON.FeatureCollection }) {
   const ref = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<MLMap | null>(null);
   const [ready, setReady] = useState(false);
@@ -89,8 +82,8 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
       const map = new ml.Map({
         container: ref.current,
         style: STYLE,
-        center: [-70.4, -27.5],
-        zoom: 3.6,
+        center: [-70.32, -27.36],
+        zoom: 8.4,
         attributionControl: false,
         interactive: true,
       });
@@ -119,64 +112,89 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
     };
   }, []);
 
-
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
-    const fc = {
-      type: "FeatureCollection" as const,
-      features: points.map((p) => ({
-        type: "Feature" as const,
-        geometry: { type: "Point" as const, coordinates: p },
-        properties: {},
-      })),
-    };
-    const src = map.getSource("cadastre-heat");
+    // Clone to strip any non-cloneable wrappers from the query cache
+    const data = polygons?.features?.length
+      ? (JSON.parse(JSON.stringify(polygons)) as GeoJSON.FeatureCollection)
+      : ({ type: "FeatureCollection", features: [] } as GeoJSON.FeatureCollection);
+    const src = map.getSource("cadastre-poly");
     if (src) {
-      (src as unknown as { setData: (d: unknown) => void }).setData(fc);
+      (src as unknown as { setData: (d: unknown) => void }).setData(data);
       return;
     }
-    map.addSource("cadastre-heat", { type: "geojson", data: fc });
+    map.addSource("cadastre-poly", { type: "geojson", data });
+
+    // Fill by tipo (exploración / explotación)
     map.addLayer({
-      id: "cadastre-heat-layer",
-      type: "heatmap",
-      source: "cadastre-heat",
+      id: "cadastre-fill",
+      type: "fill",
+      source: "cadastre-poly",
       paint: {
-        "heatmap-weight": 0.6,
-        "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], 0, 1, 9, 3],
-        "heatmap-radius": ["interpolate", ["linear"], ["zoom"], 0, 2, 6, 12, 9, 28],
-        "heatmap-opacity": 0.85,
-        "heatmap-color": [
-          "interpolate",
-          ["linear"],
-          ["heatmap-density"],
-          0, "rgba(0,0,0,0)",
-          0.2, "rgba(59,130,246,0.55)",
-          0.5, "rgba(234,179,8,0.75)",
-          0.8, "rgba(239,68,68,0.85)",
-          1, "rgba(255,255,255,0.95)",
+        "fill-color": [
+          "match",
+          ["get", "tipo"],
+          "exploracion", "#2563eb",
+          "exploración", "#2563eb",
+          "explotacion", "#f59e0b",
+          "explotación", "#f59e0b",
+          /* other */ "#64748b",
+        ],
+        "fill-opacity": [
+          "interpolate", ["linear"], ["zoom"],
+          3, 0.35,
+          6, 0.45,
+          10, 0.55,
         ],
       },
     });
     map.addLayer({
-      id: "cadastre-heat-points",
-      type: "circle",
-      source: "cadastre-heat",
-      minzoom: 6,
+      id: "cadastre-outline",
+      type: "line",
+      source: "cadastre-poly",
       paint: {
-        "circle-radius": 2,
-        "circle-color": "#facc15",
-        "circle-opacity": 0.7,
+        "line-color": [
+          "match",
+          ["get", "tipo"],
+          "exploracion", "#60a5fa",
+          "exploración", "#60a5fa",
+          "explotacion", "#fbbf24",
+          "explotación", "#fbbf24",
+          "#94a3b8",
+        ],
+        "line-width": ["interpolate", ["linear"], ["zoom"], 3, 0.2, 8, 0.8, 12, 1.6],
+        "line-opacity": 0.8,
       },
     });
-  }, [points, ready]);
+    map.addLayer({
+      id: "cadastre-dot",
+      type: "circle",
+      source: "cadastre-poly",
+      maxzoom: 8,
+      paint: {
+        "circle-color": [
+          "match", ["get", "tipo"],
+          "exploracion", "#60a5fa",
+          "exploración", "#60a5fa",
+          "explotacion", "#fbbf24",
+          "explotación", "#fbbf24",
+          "#94a3b8",
+        ],
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 1.2, 6, 2.4, 8, 4],
+        "circle-opacity": 0.85,
+        "circle-stroke-color": "#0b1220",
+        "circle-stroke-width": 0.4,
+      },
+    });
+  }, [polygons, ready]);
 
   return (
     <div
       ref={ref}
       className="w-full h-full"
       style={{ background: "#0b1220" }}
-      aria-label="Mapa térmico del catastro minero nacional"
+      aria-label="Mapa nacional de concesiones mineras"
     />
   );
 }
@@ -197,7 +215,7 @@ export function LandingCatastroBlock() {
   });
 
   const total = data?.totalNacional ?? 0;
-  const heatPoints = useMemo(() => data?.heatPoints ?? [], [data]);
+  const polySample = data?.polygons?.features.length ?? 0;
   const maxTipo = Math.max(1, ...(data?.porTipo?.map((x) => x.count) ?? [1]));
   const maxEstado = Math.max(1, ...(data?.porEstado?.map((x) => x.count) ?? [1]));
 
@@ -214,9 +232,9 @@ export function LandingCatastroBlock() {
     <div className="space-y-8" data-theme="im-light">
       {/* Row: map + KPIs */}
       <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
-        {/* Heat map */}
+        {/* Concesiones */}
         <div className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] h-[440px] lg:h-[520px] bg-[#0b1220]">
-          <CadastreHeatMap points={heatPoints} />
+          <CadastreMap polygons={data?.polygons ?? { type: "FeatureCollection", features: [] }} />
           {/* HUD chips */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
             <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-black/60 backdrop-blur border border-white/10 text-[10px] font-mono uppercase tracking-[0.22em] text-white">
@@ -226,8 +244,16 @@ export function LandingCatastroBlock() {
               />
               SERNAGEOMIN · Catastro live
             </div>
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-sm bg-black/50 backdrop-blur border border-white/10 text-[10px] font-mono text-white/80">
-              {fmtInt(data?.sampleSize ?? 0)} pts · muestra de {fmtInt(total)}
+            <div className="inline-flex items-center gap-3 px-2.5 py-1 rounded-sm bg-black/50 backdrop-blur border border-white/10 text-[10px] font-mono text-white/80">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-sm" style={{ background: "#f59e0b" }} />
+                Explotación
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-sm" style={{ background: "#2563eb" }} />
+                Exploración
+              </span>
+              <span className="opacity-70">· {fmtInt(polySample)} de {fmtInt(total)}</span>
             </div>
           </div>
           <div className="absolute bottom-3 left-3 right-3 z-10 flex items-center justify-between">
@@ -365,52 +391,6 @@ export function LandingCatastroBlock() {
         </div>
       </div>
 
-      {/* Differentiators */}
-      <div>
-        <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-content-muted mb-3">
-          Lo que ningún catastro público te da
-        </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {[
-            {
-              icon: Bell,
-              title: "Alertas de patente",
-              body: "Vencimientos, remates y cambios de titular al día de publicación en el boletín.",
-            },
-            {
-              icon: Radar,
-              title: "Monitoreo de titulares",
-              body: "Sigue movimientos de SQM, Codelco, Antofagasta y cualquier RUT que te interese.",
-            },
-            {
-              icon: Gavel,
-              title: "Cruce con juicios",
-              body: "Detecta concesiones con litigio, medidas precautorias o procesos administrativos.",
-            },
-            {
-              icon: Boxes,
-              title: "3D geológico + NI 43-101",
-              body: "Del polígono catastral al modelo 3D y reporte técnico pre-cargado.",
-            },
-          ].map((d) => {
-            const Icon = d.icon;
-            return (
-              <div
-                key={d.title}
-                className="border border-hairline rounded-sm bg-white p-4 hover:border-accent-brand transition-colors"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <Icon className="w-4 h-4 text-accent-brand" />
-                  <div className="brand-display text-sm text-content">{d.title}</div>
-                </div>
-                <p className="text-[12px] text-content-muted leading-snug">{d.body}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-
       {/* Plans mini */}
       <div className="border border-hairline rounded-sm bg-white">
         <div className="px-5 py-4 border-b border-hairline flex items-center justify-between gap-4">
@@ -432,53 +412,29 @@ export function LandingCatastroBlock() {
           {plans.length === 0 && (
             <div className="p-5 text-[11px] font-mono text-content-muted">Cargando planes…</div>
           )}
-          {plans.slice(0, 3).map((p, idx) => {
-            const isPopular = idx === 1;
-            return (
-              <div
-                key={p.code}
-                className={`relative p-5 ${isPopular ? "bg-surface" : ""}`}
-              >
-                {isPopular && (
-                  <span className="absolute -top-2 left-5 px-2 py-0.5 bg-accent-brand text-white text-[9px] font-mono uppercase tracking-[0.22em] rounded-sm">
-                    Más popular
-                  </span>
-                )}
-                <div className="flex items-baseline justify-between mb-2">
-                  <div className="brand-display text-xl text-content">{p.name}</div>
-                  <div className="font-mono text-content-muted text-[11px]">
-                    {p.priceMonthly === 0 ? "Gratis" : `USD ${p.priceMonthly}/mes`}
-                  </div>
+          {plans.slice(0, 3).map((p) => (
+            <div key={p.code} className="p-5">
+              <div className="flex items-baseline justify-between mb-2">
+                <div className="brand-display text-xl text-content">{p.name}</div>
+                <div className="font-mono text-content-muted text-[11px]">
+                  {p.priceMonthly === 0 ? "Gratis" : `USD ${p.priceMonthly}/mes`}
                 </div>
-                {p.description && (
-                  <p className="text-[12px] text-content-muted mb-3 leading-snug">{p.description}</p>
-                )}
-                <ul className="space-y-1.5">
-                  {p.features.slice(0, 4).map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-[12px] text-content">
-                      <Check className="w-3.5 h-3.5 mt-0.5 text-accent-brand shrink-0" />
-                      <span>{f}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
-            );
-          })}
-        </div>
-        <div className="px-5 py-3 border-t border-hairline flex items-center justify-between gap-3 text-[11px] text-content-muted">
-          <span className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            ¿Necesitas cobertura enterprise, API dedicada o data-room?
-          </span>
-          <Link
-            to="/contacto"
-            className="font-mono uppercase tracking-[0.2em] text-content hover:text-accent-brand"
-          >
-            Concierge / Custom →
-          </Link>
+              {p.description && (
+                <p className="text-[12px] text-content-muted mb-3 leading-snug">{p.description}</p>
+              )}
+              <ul className="space-y-1.5">
+                {p.features.slice(0, 4).map((f) => (
+                  <li key={f} className="flex items-start gap-2 text-[12px] text-content">
+                    <Check className="w-3.5 h-3.5 mt-0.5 text-accent-brand shrink-0" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
       </div>
-
     </div>
   );
 }

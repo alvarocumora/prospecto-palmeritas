@@ -15,7 +15,6 @@ import {
 import { getPlatformStats } from "@/lib/platformStats.functions";
 import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
 import { LandingCatastroBlock } from "@/features/marketing/LandingCatastroBlock";
-import { CatastroComparison } from "@/features/marketing/CatastroComparison";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { useLocale } from "@/features/marketing/i18n";
 import { InvestableProjects } from "@/features/marketing/InvestableProjects";
@@ -279,12 +278,6 @@ export function MarketingLanding() {
           <Reveal>
             <LandingCatastroBlock />
           </Reveal>
-
-          <div className="mt-8">
-            <Reveal>
-              <CatastroComparison />
-            </Reveal>
-          </div>
         </div>
       </section>
 
