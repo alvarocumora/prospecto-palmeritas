@@ -12,6 +12,9 @@ import {
   summarizeSubmissions,
   SUBMISSION_STATUSES,
   REQUEST_STATUSES,
+  SUPPLIER_ROLES,
+  SUPPLIER_ROLE_LABELS,
+  normalizeSupplierRole,
   type SubmissionsSummary,
 } from "@/lib/sourcing";
 import { sha256Hex } from "@/lib/documents/signing";
@@ -167,6 +170,12 @@ export type SubmissionRow = {
   offer_quantity_t: number | null;
   incoterm: string | null;
   lead_time: string | null;
+  supplier_role: string | null;
+  port_loading: string | null;
+  payment_terms: string | null;
+  offer_valid_until: string | null;
+  quality_grade: string | null;
+  packaging: string | null;
   specs: string | null;
   notes: string | null;
   documents: Array<{ label: string; url?: string | null; path?: string | null }>;
@@ -175,6 +184,11 @@ export type SubmissionRow = {
   trade_id: string | null;
   created_at: string;
 };
+
+// Columnas de una propuesta (incluye la ficha enriquecida). Un solo lugar para
+// mantener sincronizados los tres puntos de lectura.
+const SUBMISSION_COLS =
+  "id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, supplier_role, port_loading, payment_terms, offer_valid_until, quality_grade, packaging, specs, notes, documents, status, share_token_prefix, trade_id, created_at";
 
 export const getSourcingRequestDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -196,9 +210,7 @@ export const getSourcingRequestDetail = createServerFn({ method: "GET" })
 
       const { data: subs } = await sb
         .from("sourcing_submissions")
-        .select(
-          "id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents, status, share_token_prefix, trade_id, created_at",
-        )
+        .select(SUBMISSION_COLS)
         .eq("request_id", data.id)
         .order("created_at", { ascending: false });
 
@@ -280,9 +292,7 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
 
     const { data: sub } = await sb
       .from("sourcing_submissions")
-      .select(
-        "id, request_id, trade_id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents",
-      )
+      .select(`request_id, ${SUBMISSION_COLS}`)
       .eq("id", data.submissionId)
       .maybeSingle();
     if (!sub) throw new Error("Propuesta no encontrada.");
@@ -309,13 +319,22 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
     const price = s.offer_price_usd_t ?? null;
     const total = qty != null && price != null ? qty * price : null;
     const reference = `${r.reference} · ${s.supplier_name}`.slice(0, 60);
+    const roleLabel = s.supplier_role
+      ? (SUPPLIER_ROLE_LABELS[normalizeSupplierRole(s.supplier_role) ?? "otro"] ?? s.supplier_role)
+      : null;
     const provenance = [
       `Origen: sourcing ${r.reference}`,
       `Proveedor: ${s.supplier_name}${s.supplier_company ? ` (${s.supplier_company})` : ""}`,
+      roleLabel ? `Tipo: ${roleLabel}` : null,
       s.supplier_country ? `Procedencia: ${s.supplier_country}` : null,
       s.contact_email ? `Contacto: ${s.contact_email}` : null,
       s.contact_phone ? `Tel: ${s.contact_phone}` : null,
+      s.port_loading ? `Puerto de carga: ${s.port_loading}` : null,
       r.destination ? `Destino: ${r.destination}` : null,
+      s.payment_terms ? `Pago: ${s.payment_terms}` : null,
+      s.quality_grade ? `Calidad/ley: ${s.quality_grade}` : null,
+      s.packaging ? `Empaque: ${s.packaging}` : null,
+      s.offer_valid_until ? `Oferta válida hasta: ${s.offer_valid_until}` : null,
       s.specs ? `Specs: ${s.specs}` : null,
       s.notes ? `Notas: ${s.notes}` : null,
     ]
@@ -355,7 +374,6 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       throw new Error(error.message);
     }
     const tradeId = (trade as { id: string }).id;
-
 
     // Trazabilidad: evento de origen + cada documento del proveedor al timeline.
     try {
@@ -553,6 +571,16 @@ const SubmitInput = z.object({
   offerQuantityT: z.number().min(0).max(1e12).optional(),
   incoterm: z.string().trim().max(20).optional(),
   leadTime: z.string().trim().max(80).optional(),
+  supplierRole: z.enum(SUPPLIER_ROLES).optional(),
+  portLoading: z.string().trim().max(120).optional(),
+  paymentTerms: z.string().trim().max(200).optional(),
+  offerValidUntil: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Fecha inválida")
+    .optional(),
+  qualityGrade: z.string().trim().max(200).optional(),
+  packaging: z.string().trim().max(120).optional(),
   specs: z.string().trim().max(2000).optional(),
   notes: z.string().trim().max(2000).optional(),
   documents: z.array(DocRefSchema).max(20).optional(),
@@ -582,7 +610,7 @@ export const submitSourcingProposal = createServerFn({ method: "POST" })
     if (r.expires_at && new Date(r.expires_at) < new Date())
       throw new Error("El link expiró. Solicita uno nuevo al comprador.");
 
-    const { error } = await sb.from("sourcing_submissions").insert({
+    const baseRow = {
       request_id: r.id,
       supplier_name: data.supplierName,
       supplier_company: data.supplierCompany ?? null,
@@ -596,7 +624,21 @@ export const submitSourcingProposal = createServerFn({ method: "POST" })
       specs: data.specs ?? null,
       notes: data.notes ?? null,
       documents: data.documents ?? [],
-    });
+    };
+    const fichaRow = {
+      ...baseRow,
+      supplier_role: data.supplierRole ?? null,
+      port_loading: data.portLoading ?? null,
+      payment_terms: data.paymentTerms ?? null,
+      offer_valid_until: data.offerValidUntil ?? null,
+      quality_grade: data.qualityGrade ?? null,
+      packaging: data.packaging ?? null,
+    };
+    let { error } = await sb.from("sourcing_submissions").insert(fichaRow);
+    // Si la migración de ficha aún no se aplicó, reintenta con las columnas base.
+    if (error && /column|schema cache/i.test(error.message)) {
+      ({ error } = await sb.from("sourcing_submissions").insert(baseRow));
+    }
     if (error) throw new Error(error.message);
 
     // Avisar al dueño del requerimiento que llegó una propuesta (best-effort).
@@ -654,9 +696,7 @@ export const getSupplierSheetByShareToken = createServerFn({ method: "POST" })
     if (!sb) return null;
     const { data: sub } = await sb
       .from("sourcing_submissions")
-      .select(
-        "id, request_id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, specs, notes, documents, status, share_token_prefix, created_at",
-      )
+      .select(`request_id, ${SUBMISSION_COLS}`)
       .eq("share_token_hash", await sha256Hex(data.token))
       .maybeSingle();
     if (!sub) return null;

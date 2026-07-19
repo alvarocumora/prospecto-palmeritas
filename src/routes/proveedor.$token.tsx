@@ -10,6 +10,7 @@ import {
   submitSourcingProposal,
   requestSupplierUpload,
 } from "@/lib/sourcing.functions";
+import { SUPPLIER_ROLES, SUPPLIER_ROLE_LABELS, type SupplierRole } from "@/lib/sourcing";
 import { supabase } from "@/integrations/supabase/client";
 
 // Página PÚBLICA: un asociado/proveedor abre el link tokenizado, ve qué se
@@ -35,6 +36,12 @@ const EMPTY = {
   offerQuantityT: "",
   incoterm: "",
   leadTime: "",
+  supplierRole: "",
+  portLoading: "",
+  paymentTerms: "",
+  offerValidUntil: "",
+  qualityGrade: "",
+  packaging: "",
   specs: "",
   notes: "",
 };
@@ -112,6 +119,12 @@ function ProveedorPage() {
           offerQuantityT: form.offerQuantityT ? Number(form.offerQuantityT) : undefined,
           incoterm: form.incoterm || undefined,
           leadTime: form.leadTime || undefined,
+          supplierRole: (form.supplierRole as SupplierRole) || undefined,
+          portLoading: form.portLoading || undefined,
+          paymentTerms: form.paymentTerms || undefined,
+          offerValidUntil: form.offerValidUntil || undefined,
+          qualityGrade: form.qualityGrade || undefined,
+          packaging: form.packaging || undefined,
           specs: form.specs || undefined,
           notes: form.notes || undefined,
           documents: [
@@ -186,17 +199,37 @@ function ProveedorPage() {
 
             <h2 className="font-display text-lg text-content mt-6 mb-3">Tu propuesta</h2>
             <div className="grid sm:grid-cols-2 gap-3">
+              {/* Tipo de proveedor: ¿eres la mina o representas a otro? */}
+              <label className="text-xs">
+                <span className="block text-content-subtle mb-1">Tipo de proveedor</span>
+                <select
+                  value={form.supplierRole}
+                  onChange={(e) => setForm({ ...form, supplierRole: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-hairline bg-white text-sm"
+                >
+                  <option value="">Selecciona…</option>
+                  {SUPPLIER_ROLES.map((role) => (
+                    <option key={role} value={role}>
+                      {SUPPLIER_ROLE_LABELS[role]}
+                    </option>
+                  ))}
+                </select>
+              </label>
               {(
                 [
                   ["supplierName", "Nombre / contacto *"],
-                  ["supplierCompany", "Empresa"],
+                  ["supplierCompany", "Empresa / a quién representas"],
                   ["supplierCountry", "País"],
                   ["contactEmail", "Email"],
                   ["contactPhone", "Teléfono / WhatsApp"],
                   ["offerPriceUsdT", "Precio ofertado US$/t"],
                   ["offerQuantityT", "Cantidad disponible (t)"],
                   ["incoterm", "Incoterm"],
+                  ["portLoading", "Puerto de carga / origen"],
                   ["leadTime", "Plazo de entrega"],
+                  ["paymentTerms", "Modo de pago"],
+                  ["qualityGrade", "Calidad / ley (ej. Cu 24%)"],
+                  ["packaging", "Empaque (big bags, granel…)"],
                 ] as const
               ).map(([k, label]) => (
                 <label key={k} className="text-xs">
@@ -208,6 +241,16 @@ function ProveedorPage() {
                   />
                 </label>
               ))}
+              {/* Validez de la oferta */}
+              <label className="text-xs">
+                <span className="block text-content-subtle mb-1">Oferta válida hasta</span>
+                <input
+                  type="date"
+                  value={form.offerValidUntil}
+                  onChange={(e) => setForm({ ...form, offerValidUntil: e.target.value })}
+                  className="w-full px-3 py-2 rounded-lg border border-hairline bg-white text-sm"
+                />
+              </label>
             </div>
             <label className="text-xs block mt-3">
               <span className="block text-content-subtle mb-1">
