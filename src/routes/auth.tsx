@@ -1,14 +1,13 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useState, useEffect, type FormEvent } from "react";
+import { useState, useEffect, useRef, type FormEvent } from "react";
 import { z } from "zod";
-import { Loader2, MapPin, Layers, Mountain, CheckCircle2, X, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, X, Mail, Radio, Cpu, Radar, Fingerprint } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { publicUrl } from "@/lib/publicUrl";
 
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import authHero from "@/assets/auth-hero.jpg";
 import { translateAuthError, evaluatePassword } from "@/lib/auth-errors";
 import { loginSchema, signupSchema, zodToFieldErrors } from "@/lib/auth-validation";
 
@@ -28,11 +27,11 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s) => authSearch.parse(s),
   head: () => ({
     meta: [
-      { title: "Iniciar sesión — Geocapitals" },
+      { title: "Acceso a la mina — Geocapitals" },
       {
         name: "description",
         content:
-          "Plataforma para exploración minera moderna. Catastro, geofísica, sondajes y muestreo.",
+          "Portal de acceso a la plataforma minera Geocapitals. Autorización, catastro y sala de operaciones.",
       },
     ],
   }),
@@ -40,6 +39,237 @@ export const Route = createFileRoute("/auth")({
 });
 
 type Mode = "login" | "signup";
+
+/* -------------------------------------------------------------------------- */
+/*  Cinematic left panel — "Descenso a la mina"                               */
+/* -------------------------------------------------------------------------- */
+
+const BOOT_LINES = [
+  "[00.00] geocapitals.core :: initializing",
+  "[00.12] auth.gateway :: TLSv1.3 handshake OK",
+  "[00.24] catastro.stream :: SERNAGEOMIN online",
+  "[00.41] seismic.array :: 12 nodes locked",
+  "[00.63] elevator.shaft :: winch armed",
+  "[00.88] ni43101.vault :: encrypted / QP-signed",
+  "[01.05] awaiting operator credentials…",
+];
+
+function useTicker(intervalMs: number) {
+  const [n, setN] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setN((v) => v + 1), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return n;
+}
+
+function MineDescentPanel() {
+  const [boot, setBoot] = useState<string[]>([]);
+  const [depth, setDepth] = useState(0);
+  const tick = useTicker(90);
+
+  // Boot log typewriter
+  useEffect(() => {
+    let i = 0;
+    const id = setInterval(() => {
+      setBoot((prev) => (i < BOOT_LINES.length ? [...prev, BOOT_LINES[i++]] : prev));
+      if (i >= BOOT_LINES.length) clearInterval(id);
+    }, 320);
+    return () => clearInterval(id);
+  }, []);
+
+  // Depth counter loops slowly
+  useEffect(() => {
+    const id = setInterval(() => setDepth((d) => (d + 3.7) % 2400), 60);
+    return () => clearInterval(id);
+  }, []);
+
+  // Seismic waveform points
+  const wave = Array.from({ length: 64 }).map((_, i) => {
+    const x = (i / 63) * 100;
+    const y =
+      50 +
+      Math.sin((i + tick) * 0.35) * 14 +
+      Math.sin((i + tick) * 0.11) * 6 +
+      (Math.random() - 0.5) * 2;
+    return `${x},${y}`;
+  });
+
+  const lat = (33.8933 + Math.sin(tick * 0.02) * 0.0004).toFixed(6);
+  const lng = (-71.1022 + Math.cos(tick * 0.02) * 0.0004).toFixed(6);
+
+  return (
+    <aside className="relative hidden lg:flex flex-col overflow-hidden bg-[#05070a] text-[#c9d4e3] border-r border-white/5">
+      {/* Ambient gradients */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(224,167,66,0.10),transparent_55%),radial-gradient(circle_at_80%_90%,rgba(40,120,220,0.10),transparent_55%)]" />
+
+      {/* Coordinate grid */}
+      <div
+        className="absolute inset-0 opacity-[0.10]"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(224,167,66,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(224,167,66,0.5) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* Scanline */}
+      <div
+        className="pointer-events-none absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-[#e0a742]/10 to-transparent animate-[scan_6s_linear_infinite]"
+        aria-hidden="true"
+      />
+
+      {/* Top HUD */}
+      <div className="relative z-10 flex items-center justify-between p-6 font-mono text-[10px] uppercase tracking-[0.28em] text-[#e0a742]/80">
+        <div className="flex items-center gap-2">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          link seguro · geocapitals/core
+        </div>
+        <div>
+          {lat}°S · {Math.abs(Number(lng)).toFixed(6)}°W
+        </div>
+      </div>
+
+      {/* Center: shaft + depth */}
+      <div className="relative z-10 flex-1 flex items-center justify-center px-10">
+        <div className="grid grid-cols-[auto_1fr] gap-8 items-center w-full max-w-lg">
+          {/* Shaft SVG */}
+          <div className="relative h-[380px] w-24">
+            <svg viewBox="0 0 96 380" className="h-full w-full">
+              {/* Rails */}
+              <line x1="18" y1="0" x2="18" y2="380" stroke="#e0a742" strokeOpacity="0.35" />
+              <line x1="78" y1="0" x2="78" y2="380" stroke="#e0a742" strokeOpacity="0.35" />
+              {/* Ties */}
+              {Array.from({ length: 14 }).map((_, i) => (
+                <line
+                  key={i}
+                  x1="10"
+                  x2="86"
+                  y1={12 + i * 28}
+                  y2={12 + i * 28}
+                  stroke="#e0a742"
+                  strokeOpacity="0.15"
+                />
+              ))}
+              {/* Cable */}
+              <line x1="48" y1="0" x2="48" y2="380" stroke="#e0a742" strokeOpacity="0.5" strokeDasharray="2 4" />
+              {/* Elevator car */}
+              <g
+                style={{
+                  transform: `translateY(${(depth / 2400) * 320}px)`,
+                  transition: "transform 60ms linear",
+                }}
+              >
+                <rect x="18" y="4" width="60" height="42" rx="3" fill="#0b0f14" stroke="#e0a742" />
+                <rect x="24" y="10" width="48" height="4" fill="#e0a742" opacity="0.9" />
+                <rect x="24" y="18" width="48" height="2" fill="#e0a742" opacity="0.4" />
+                <rect x="24" y="24" width="30" height="2" fill="#e0a742" opacity="0.4" />
+                <rect x="24" y="30" width="40" height="2" fill="#e0a742" opacity="0.25" />
+                <circle cx="30" cy="40" r="1.5" fill="#e0a742" />
+                <circle cx="66" cy="40" r="1.5" fill="#e0a742" />
+              </g>
+            </svg>
+            <div className="absolute -left-2 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-[#e0a742]/40 to-transparent" />
+          </div>
+
+          {/* Depth + telemetry */}
+          <div className="space-y-6">
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#e0a742]/70">
+                Profundidad de acceso
+              </div>
+              <div className="mt-1 font-mono text-6xl font-bold text-white tabular-nums leading-none">
+                {Math.floor(depth)
+                  .toString()
+                  .padStart(4, "0")}
+                <span className="text-[#e0a742] text-2xl align-top ml-1">m</span>
+              </div>
+              <div className="mt-2 h-1 rounded bg-white/5 overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[#e0a742] via-[#f5c56a] to-[#e0a742]"
+                  style={{ width: `${(depth / 2400) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Seismic waveform */}
+            <div>
+              <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.28em] text-[#e0a742]/70">
+                <span className="inline-flex items-center gap-1.5">
+                  <Radio className="w-3 h-3" /> seismic · ch-07
+                </span>
+                <span className="text-emerald-400">stable</span>
+              </div>
+              <svg viewBox="0 0 100 100" className="mt-2 w-full h-16" preserveAspectRatio="none">
+                <polyline
+                  points={wave.join(" ")}
+                  fill="none"
+                  stroke="#e0a742"
+                  strokeWidth="0.6"
+                  vectorEffect="non-scaling-stroke"
+                />
+              </svg>
+            </div>
+
+            {/* Boot log */}
+            <div className="rounded border border-white/5 bg-black/40 p-3 font-mono text-[10px] leading-relaxed text-emerald-300/80 h-32 overflow-hidden">
+              {boot.map((l, i) => (
+                <div
+                  key={i}
+                  className={i === boot.length - 1 ? "text-white" : "text-emerald-300/70"}
+                >
+                  {l}
+                </div>
+              ))}
+              {boot.length >= BOOT_LINES.length && (
+                <div className="text-[#e0a742] animate-pulse">&gt; _</div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom brand */}
+      <div className="relative z-10 p-8 space-y-3 border-t border-white/5 bg-black/30">
+        <p className="font-mono text-[10px] uppercase tracking-[0.35em] text-[#e0a742]">
+          Sala de control · Geocapitals
+        </p>
+        <h1 className="text-3xl font-bold leading-tight text-white max-w-md">
+          Del prospecto al <span className="text-[#e0a742]">deal cerrado</span>.
+        </h1>
+        <div className="grid grid-cols-3 gap-4 pt-4 border-t border-white/5 font-mono text-[10px] uppercase tracking-wider">
+          <Metric icon={<Radar className="w-3 h-3" />} label="Catastro" value="LIVE" />
+          <Metric icon={<Cpu className="w-3 h-3" />} label="Modelo" value="v.42" />
+          <Metric icon={<Fingerprint className="w-3 h-3" />} label="QP" value="Signed" />
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes scan {
+          0%   { transform: translateY(-10%); }
+          100% { transform: translateY(110vh); }
+        }
+      `}</style>
+    </aside>
+  );
+}
+
+function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center gap-1.5 text-[#e0a742]/70">
+        {icon}
+        <span>{label}</span>
+      </div>
+      <div className="text-white text-sm font-semibold tracking-wider">{value}</div>
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Auth page                                                                 */
+/* -------------------------------------------------------------------------- */
 
 function AuthPage() {
   const navigate = useNavigate();
@@ -52,6 +282,7 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [needsConfirm, setNeedsConfirm] = useState(false);
   const [resending, setResending] = useState(false);
+  const [authorizing, setAuthorizing] = useState<string | null>(null);
   const [errors, setErrors] = useState<{
     displayName?: string;
     email?: string;
@@ -59,6 +290,12 @@ function AuthPage() {
     form?: string;
   }>({});
   const pwStrength = evaluatePassword(password);
+  const authSteps = useRef([
+    "Validando credenciales…",
+    "Firmando token QP…",
+    "Autorizando acceso a galería…",
+    "Abriendo compuertas…",
+  ]);
 
   useEffect(() => {
     if (!authLoading && user) {
@@ -79,12 +316,28 @@ function AuthPage() {
     else toast.success("Email de confirmación reenviado. Revisa tu bandeja.");
   };
 
+  const runAuthorizationSequence = () => {
+    let i = 0;
+    setAuthorizing(authSteps.current[0]);
+    const id = setInterval(() => {
+      i++;
+      if (i >= authSteps.current.length) {
+        clearInterval(id);
+        return;
+      }
+      setAuthorizing(authSteps.current[i]);
+    }, 420);
+    return () => {
+      clearInterval(id);
+      setAuthorizing(null);
+    };
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setNeedsConfirm(false);
     setErrors({});
 
-    // Validación zod con mensajes claros por campo
     const schema = mode === "signup" ? signupSchema : loginSchema;
     const parsed = schema.safeParse(
       mode === "signup"
@@ -99,6 +352,7 @@ function AuthPage() {
       return;
     }
     setLoading(true);
+    const stopSequence = runAuthorizationSequence();
     try {
       if (mode === "signup") {
         const intentMeta = search.intent
@@ -127,16 +381,15 @@ function AuthPage() {
           setMode("login");
           return;
         }
-        toast.success("Cuenta creada. Redirigiendo…");
+        toast.success("Acceso autorizado. Descendiendo…");
       } else {
         const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         if (!data.session) throw new Error("No se pudo iniciar sesión");
-        toast.success("Bienvenido");
+        toast.success("Acceso autorizado. Descendiendo…");
       }
     } catch (err) {
       const t = translateAuthError(err);
-      // Mapear errores del servidor al campo correspondiente
       if (t.code === "email_not_confirmed") {
         setNeedsConfirm(true);
         setErrors({ email: t.message });
@@ -149,6 +402,7 @@ function AuthPage() {
       }
       toast.error(t.message);
     } finally {
+      stopSequence();
       setLoading(false);
     }
   };
@@ -163,145 +417,81 @@ function AuthPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background grid lg:grid-cols-[1.1fr_1fr]">
-      {/* HERO panel — geological imagery */}
-      <aside className="relative hidden lg:block overflow-hidden border-r border-border">
-        <img
-          src={authHero}
-          alt="Prospecto minero andino al atardecer"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        {/* Gradient veil */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-background via-background/70 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-transparent to-background/80" />
-
-        {/* Topographic SVG overlay */}
-        <svg
-          className="absolute inset-0 h-full w-full opacity-[0.12] mix-blend-screen"
-          viewBox="0 0 600 800"
-          fill="none"
-          preserveAspectRatio="xMidYMid slice"
-          aria-hidden="true"
-        >
-          {Array.from({ length: 14 }).map((_, i) => (
-            <path
-              key={i}
-              d={`M 0 ${120 + i * 45} Q 150 ${80 + i * 50} 300 ${140 + i * 42} T 600 ${110 + i * 48}`}
-              stroke="currentColor"
-              strokeWidth="0.6"
-              className="text-gold"
-            />
-          ))}
-        </svg>
-
-        {/* Coordinate grid */}
-        <div
-          className="absolute inset-0 opacity-[0.08]"
-          style={{
-            backgroundImage:
-              "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-            color: "hsl(var(--gold))",
-          }}
-          aria-hidden="true"
-        />
-
-        {/* Top metadata strip */}
-        <div className="absolute top-0 left-0 right-0 p-6 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-gold/70">
-          <span>33°53′S · 71°06′W</span>
-          <span>UTM 19H · WGS84</span>
-        </div>
-
-        {/* Bottom content */}
-        <div className="absolute bottom-0 left-0 right-0 p-10 space-y-6">
-          <div className="space-y-3">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              Plataforma de negocios mineros
-            </p>
-            <h1 className="text-4xl font-bold leading-tight text-foreground max-w-md">
-              Del prospecto al <span className="text-gold">deal cerrado</span>.
-            </h1>
-            <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-              Catastro, valorización, data rooms, sourcing de commodities, firmas y NI 43-101 en
-              una sola plataforma para operadores, inversionistas y traders.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-3 gap-3 max-w-md pt-4 border-t border-border/50">
-            <Stat icon={<MapPin className="w-3 h-3" />} label="Catastro" value="Live" />
-            <Stat icon={<Layers className="w-3 h-3" />} label="Deals" value="Activos" />
-            <Stat icon={<Mountain className="w-3 h-3" />} label="NI 43-101" value="Pre" />
-          </div>
-        </div>
-      </aside>
+    <div className="min-h-screen bg-[#05070a] text-[#c9d4e3] grid lg:grid-cols-[1.15fr_1fr]">
+      <MineDescentPanel />
 
       {/* FORM panel */}
-      <main className="flex items-center justify-center px-6 py-12 relative">
-        {/* Mobile-only background hint */}
+      <main className="relative flex items-center justify-center px-6 py-12 overflow-hidden">
+        {/* Ambient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(224,167,66,0.08),transparent_60%)]" />
         <div
-          className="lg:hidden absolute inset-0 opacity-[0.04] pointer-events-none"
+          className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage:
-              "linear-gradient(hsl(var(--gold)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--gold)) 1px, transparent 1px)",
+              "linear-gradient(#e0a742 1px, transparent 1px), linear-gradient(90deg, #e0a742 1px, transparent 1px)",
             backgroundSize: "40px 40px",
           }}
           aria-hidden="true"
         />
+        {/* Vignette */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.65))] pointer-events-none" />
 
-        <div className="w-full max-w-sm space-y-8 relative">
+        <div className="w-full max-w-sm space-y-6 relative">
           <Link
             to="/"
-            className="flex items-center justify-center text-foreground hover:text-gold transition-colors"
+            className="flex items-center justify-center text-white hover:text-[#e0a742] transition-colors"
           >
             <Logo size={32} />
           </Link>
 
-          <div className="text-center space-y-1">
-            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-gold">
-              {mode === "login" ? "Plataforma Geocapitals" : "Nueva cuenta"}
+          <div className="text-center space-y-2">
+            <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#e0a742]">
+              Autorización de operador
             </p>
-            <h2 className="text-2xl font-bold text-foreground">
-              {mode === "login" ? "Acceso a tu cuenta" : "Crear cuenta"}
+            <h2 className="text-2xl font-bold text-white tracking-tight">
+              {mode === "login" ? "Ingreso a la mina" : "Registro de operador"}
             </h2>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-[#8a97ab]">
               {mode === "login"
-                ? "Gestiona tus proyectos, deals y valorizaciones mineras."
-                : "Accede a proyectos mineros, data rooms y valorización."}
+                ? "Presenta tus credenciales para descender a la sala de operaciones."
+                : "Alta de credenciales para acceso al portal Geocapitals."}
             </p>
           </div>
 
           {search.intent === "investor" && (
-            <div className="rounded border border-gold/40 bg-gold/5 px-3 py-2 text-[11px] text-gold font-mono text-center">
+            <div className="rounded border border-[#e0a742]/40 bg-[#e0a742]/5 px-3 py-2 text-[11px] text-[#e0a742] font-mono text-center">
               ✦ Acceso institucional · KYC/AML post registro
             </div>
           )}
 
-          <div className="rounded-lg border border-border bg-bg-secondary/60 backdrop-blur-sm p-6 space-y-4 shadow-2xl">
-            <div className="flex gap-1 text-xs font-mono p-1 bg-background rounded-md border border-border">
+          <div className="relative rounded-lg border border-white/10 bg-[#0a0e13]/80 backdrop-blur-sm p-6 space-y-4 shadow-[0_30px_80px_-30px_rgba(224,167,66,0.35)]">
+            {/* Corner brackets */}
+            <CornerBrackets />
+
+            <div className="flex gap-1 text-xs font-mono p-1 bg-black/60 rounded-md border border-white/5">
               <button
                 type="button"
                 onClick={() => setMode("login")}
                 className={`flex-1 py-2 rounded transition-all ${
                   mode === "login"
-                    ? "bg-gold text-background font-semibold shadow"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#e0a742] text-black font-semibold shadow"
+                    : "text-[#8a97ab] hover:text-white"
                 }`}
               >
-                Iniciar sesión
+                Ingresar
               </button>
               <button
                 type="button"
                 onClick={() => setMode("signup")}
                 className={`flex-1 py-2 rounded transition-all ${
                   mode === "signup"
-                    ? "bg-gold text-background font-semibold shadow"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#e0a742] text-black font-semibold shadow"
+                    : "text-[#8a97ab] hover:text-white"
                 }`}
               >
-                Crear cuenta
+                Registrar
               </button>
             </div>
-
 
             <form onSubmit={handleSubmit} className="space-y-3" noValidate>
               {mode === "signup" && (
@@ -311,10 +501,10 @@ function AuthPage() {
                     value={displayName}
                     onChange={(e) => {
                       setDisplayName(e.target.value);
-                      if (errors.displayName) setErrors((p) => ({ ...p, displayName: undefined }));
+                      if (errors.displayName)
+                        setErrors((p) => ({ ...p, displayName: undefined }));
                     }}
                     aria-invalid={!!errors.displayName}
-                    aria-describedby={errors.displayName ? "err-displayName" : undefined}
                     className={inputCls(!!errors.displayName)}
                     placeholder="Tu nombre"
                     maxLength={100}
@@ -322,7 +512,7 @@ function AuthPage() {
                   />
                 </Field>
               )}
-              <Field label="Email" error={errors.email}>
+              <Field label="Identificador (email)" error={errors.email}>
                 <input
                   type="email"
                   value={email}
@@ -332,7 +522,6 @@ function AuthPage() {
                   }}
                   required
                   aria-invalid={!!errors.email}
-                  aria-describedby={errors.email ? "err-email" : undefined}
                   className={inputCls(!!errors.email)}
                   placeholder="geologo@empresa.com"
                   maxLength={255}
@@ -340,7 +529,7 @@ function AuthPage() {
                   inputMode="email"
                 />
               </Field>
-              <Field label="Contraseña" error={errors.password}>
+              <Field label="Clave de acceso" error={errors.password}>
                 <input
                   type="password"
                   value={password}
@@ -351,7 +540,6 @@ function AuthPage() {
                   required
                   minLength={8}
                   aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "err-password" : undefined}
                   className={inputCls(!!errors.password)}
                   placeholder="••••••••"
                   maxLength={100}
@@ -373,13 +561,28 @@ function AuthPage() {
                   {errors.form}
                 </div>
               )}
+
+              {authorizing && (
+                <div className="rounded border border-[#e0a742]/40 bg-black/60 px-3 py-2 text-[11px] font-mono text-[#e0a742] flex items-center gap-2">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <span className="truncate">{authorizing}</span>
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2.5 mt-2 rounded bg-gold text-background font-mono text-sm font-semibold hover:bg-gold-light transition-colors disabled:opacity-50 inline-flex items-center justify-center gap-2 shadow-lg shadow-gold/20"
+                className="group relative w-full py-3 mt-2 rounded bg-[#e0a742] text-black font-mono text-sm font-semibold uppercase tracking-[0.2em] hover:bg-[#f5c56a] transition-colors disabled:opacity-70 inline-flex items-center justify-center gap-2 shadow-[0_0_30px_-5px_rgba(224,167,66,0.6)] overflow-hidden"
               >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {mode === "login" ? "Entrar" : "Crear cuenta"}
+                <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+                {loading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Fingerprint className="w-4 h-4" />
+                )}
+                <span className="relative">
+                  {mode === "login" ? "Autorizar acceso" : "Registrar operador"}
+                </span>
               </button>
             </form>
 
@@ -388,7 +591,7 @@ function AuthPage() {
                 type="button"
                 onClick={handleResendConfirm}
                 disabled={resending}
-                className="w-full inline-flex items-center justify-center gap-2 text-xs text-gold font-mono border border-gold/40 rounded px-3 py-2 hover:bg-gold/10 disabled:opacity-60"
+                className="w-full inline-flex items-center justify-center gap-2 text-xs text-[#e0a742] font-mono border border-[#e0a742]/40 rounded px-3 py-2 hover:bg-[#e0a742]/10 disabled:opacity-60"
               >
                 <Mail className="w-3.5 h-3.5" />
                 {resending ? "Reenviando…" : "Reenviar email de confirmación"}
@@ -399,19 +602,32 @@ function AuthPage() {
               <button
                 type="button"
                 onClick={handleReset}
-                className="w-full text-xs text-muted-foreground hover:text-gold font-mono transition-colors"
+                className="w-full text-xs text-[#8a97ab] hover:text-[#e0a742] font-mono transition-colors"
               >
-                ¿Olvidaste tu contraseña?
+                ¿Olvidaste tu clave de acceso?
               </button>
             )}
           </div>
 
-          <p className="text-center text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
+          <p className="text-center text-[10px] font-mono uppercase tracking-[0.35em] text-[#5f6b7d]">
             Catastro · Geofísica · Sondajes · QA/QC
           </p>
         </div>
       </main>
     </div>
+  );
+}
+
+function CornerBrackets() {
+  const cls =
+    "absolute w-3 h-3 border-[#e0a742]/60 pointer-events-none";
+  return (
+    <>
+      <span className={`${cls} -top-px -left-px border-t border-l`} />
+      <span className={`${cls} -top-px -right-px border-t border-r`} />
+      <span className={`${cls} -bottom-px -left-px border-b border-l`} />
+      <span className={`${cls} -bottom-px -right-px border-b border-r`} />
+    </>
   );
 }
 
@@ -426,16 +642,12 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="text-[10px] uppercase font-mono tracking-wider text-muted-foreground">
+      <span className="text-[10px] uppercase font-mono tracking-[0.25em] text-[#8a97ab]">
         {label}
       </span>
       {children}
       {error && (
-        <p
-          role="alert"
-          id={`err-${label.toLowerCase().replace(/[^a-z]+/g, "-")}`}
-          className="mt-1 text-[11px] font-mono text-red-400"
-        >
+        <p role="alert" className="mt-1 text-[11px] font-mono text-red-400">
           {error}
         </p>
       )}
@@ -444,23 +656,11 @@ function Field({
 }
 
 function inputCls(hasError: boolean) {
-  return `w-full mt-1 px-3 py-2.5 rounded border bg-background text-foreground text-sm focus:outline-none focus:ring-1 transition-all ${
+  return `w-full mt-1 px-3 py-2.5 rounded border bg-black/50 text-white text-sm placeholder:text-[#5f6b7d] focus:outline-none focus:ring-1 transition-all ${
     hasError
       ? "border-red-500/60 focus:border-red-500 focus:ring-red-500/30"
-      : "border-border focus:border-gold focus:ring-gold/30"
+      : "border-white/10 focus:border-[#e0a742] focus:ring-[#e0a742]/30"
   }`;
-}
-
-function Stat({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
-  return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5 text-gold/70">
-        {icon}
-        <span className="font-mono text-[9px] uppercase tracking-widest">{label}</span>
-      </div>
-      <div className="font-mono text-sm font-semibold text-foreground">{value}</div>
-    </div>
-  );
 }
 
 function PasswordStrengthMeter({
@@ -486,26 +686,24 @@ function PasswordStrengthMeter({
         {[0, 1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className={`h-1 flex-1 rounded ${i <= score ? colors[score] : "bg-border"}`}
+            className={`h-1 flex-1 rounded ${i <= score ? colors[score] : "bg-white/10"}`}
           />
         ))}
       </div>
       <div className="flex items-center justify-between text-[10px] font-mono">
-        <span className="text-muted-foreground">
-          Fortaleza: <span className="text-foreground">{label}</span>
+        <span className="text-[#8a97ab]">
+          Fortaleza: <span className="text-white">{label}</span>
         </span>
       </div>
       <ul className="grid grid-cols-2 gap-x-2 gap-y-0.5">
         {items.map(([k, lbl]) => (
           <li key={k} className="flex items-center gap-1 text-[10px] font-mono">
             {checks[k] ? (
-              <CheckCircle2 className="w-3 h-3 text-emerald-500" />
+              <CheckCircle2 className="w-3 h-3 text-emerald-400" />
             ) : (
-              <X className="w-3 h-3 text-muted-foreground/50" />
+              <X className="w-3 h-3 text-[#5f6b7d]" />
             )}
-            <span className={checks[k] ? "text-foreground" : "text-muted-foreground/70"}>
-              {lbl}
-            </span>
+            <span className={checks[k] ? "text-white" : "text-[#5f6b7d]"}>{lbl}</span>
           </li>
         ))}
       </ul>
