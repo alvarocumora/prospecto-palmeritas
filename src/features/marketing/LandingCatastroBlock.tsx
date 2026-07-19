@@ -82,8 +82,8 @@ function CadastreMap({ polygons }: { polygons: GeoJSON.FeatureCollection }) {
       const map = new ml.Map({
         container: ref.current,
         style: STYLE,
-        center: [-70.0, -26.5],
-        zoom: 5.6,
+        center: [-70.32, -27.36],
+        zoom: 8.4,
         attributionControl: false,
         interactive: true,
       });
