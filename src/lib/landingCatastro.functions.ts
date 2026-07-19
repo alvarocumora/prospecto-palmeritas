@@ -50,20 +50,9 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
 
     const generatedAt = new Date().toISOString();
 
-    const [totalRes, tipoRes, estadoRes, holdersRes, sampleRes, syncRes] = await Promise.all([
+    const [totalRes, groupRes, sampleRes, syncRes] = await Promise.all([
       supabaseAdmin.from("cadastre_national").select("id", { count: "exact", head: true }),
-      supabaseAdmin.rpc("cadastre_group_count", { _column: "tipo" }).then(
-        (r) => r,
-        () => ({ data: null, error: null }),
-      ),
-      supabaseAdmin.rpc("cadastre_group_count", { _column: "status" }).then(
-        (r) => r,
-        () => ({ data: null, error: null }),
-      ),
-      supabaseAdmin.rpc("cadastre_top_holders", { _limit: 6 }).then(
-        (r) => r,
-        () => ({ data: null, error: null }),
-      ),
+      supabaseAdmin.from("cadastre_national").select("tipo,status,holder_name").limit(15000),
       supabaseAdmin
         .from("cadastre_national")
         .select("geometry_geojson")
@@ -77,39 +66,27 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
         .limit(1),
     ]);
 
-    // Fallback: si los RPC no existen, agrupamos client-side pidiendo columnas.
-    let porTipo = ((tipoRes as { data: unknown }).data as Array<{ key: string; count: number }>) ?? [];
-    let porEstado =
-      ((estadoRes as { data: unknown }).data as Array<{ key: string; count: number }>) ?? [];
-    let topTitulares =
-      ((holdersRes as { data: unknown }).data as Array<{ name: string; count: number }>) ?? [];
-
-    if (porTipo.length === 0 || porEstado.length === 0 || topTitulares.length === 0) {
-      const { data: rows } = await supabaseAdmin
-        .from("cadastre_national")
-        .select("tipo,status,holder_name")
-        .limit(15000);
-      const tipoMap = new Map<string, number>();
-      const estadoMap = new Map<string, number>();
-      const holderMap = new Map<string, number>();
-      for (const r of rows ?? []) {
-        const rr = r as { tipo?: string | null; status?: string | null; holder_name?: string | null };
-        if (rr.tipo) tipoMap.set(rr.tipo, (tipoMap.get(rr.tipo) ?? 0) + 1);
-        if (rr.status) estadoMap.set(rr.status, (estadoMap.get(rr.status) ?? 0) + 1);
-        if (rr.holder_name)
-          holderMap.set(rr.holder_name, (holderMap.get(rr.holder_name) ?? 0) + 1);
-      }
-      const toArr = (m: Map<string, number>) =>
-        Array.from(m.entries())
-          .map(([key, count]) => ({ key, count }))
-          .sort((a, b) => b.count - a.count);
-      if (porTipo.length === 0) porTipo = toArr(tipoMap);
-      if (porEstado.length === 0) porEstado = toArr(estadoMap);
-      if (topTitulares.length === 0)
-        topTitulares = toArr(holderMap)
-          .slice(0, 6)
-          .map((x) => ({ name: x.key, count: x.count }));
+    const tipoMap = new Map<string, number>();
+    const estadoMap = new Map<string, number>();
+    const holderMap = new Map<string, number>();
+    for (const r of (groupRes.data ?? []) as Array<{
+      tipo: string | null;
+      status: string | null;
+      holder_name: string | null;
+    }>) {
+      if (r.tipo) tipoMap.set(r.tipo, (tipoMap.get(r.tipo) ?? 0) + 1);
+      if (r.status) estadoMap.set(r.status, (estadoMap.get(r.status) ?? 0) + 1);
+      if (r.holder_name) holderMap.set(r.holder_name, (holderMap.get(r.holder_name) ?? 0) + 1);
     }
+    const toArr = (m: Map<string, number>) =>
+      Array.from(m.entries())
+        .map(([key, count]) => ({ key, count }))
+        .sort((a, b) => b.count - a.count);
+    const porTipo = toArr(tipoMap).slice(0, 6);
+    const porEstado = toArr(estadoMap).slice(0, 6);
+    const topTitulares = toArr(holderMap)
+      .slice(0, 6)
+      .map((x) => ({ name: x.key, count: x.count }));
 
     const heatPoints: Array<[number, number]> = [];
     for (const row of (sampleRes.data ?? []) as Array<{ geometry_geojson: unknown }>) {
