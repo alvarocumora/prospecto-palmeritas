@@ -211,7 +211,7 @@ export function LandingCatastroBlock() {
       {/* Row: map + KPIs */}
       <div className="grid lg:grid-cols-[1.35fr_1fr] gap-6">
         {/* Heat map */}
-        <div className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] min-h-[440px] lg:min-h-[520px]">
+        <div className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)] h-[440px] lg:h-[520px] bg-[#0b1220]">
           <CadastreHeatMap points={heatPoints} />
           {/* HUD chips */}
           <div className="absolute top-3 left-3 z-10 flex flex-col gap-2">
