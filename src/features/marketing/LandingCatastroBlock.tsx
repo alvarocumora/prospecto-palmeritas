@@ -361,6 +361,52 @@ export function LandingCatastroBlock() {
         </div>
       </div>
 
+      {/* Differentiators */}
+      <div>
+        <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-content-muted mb-3">
+          Lo que ningún catastro público te da
+        </div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {[
+            {
+              icon: Bell,
+              title: "Alertas de patente",
+              body: "Vencimientos, remates y cambios de titular al día de publicación en el boletín.",
+            },
+            {
+              icon: Radar,
+              title: "Monitoreo de titulares",
+              body: "Sigue movimientos de SQM, Codelco, Antofagasta y cualquier RUT que te interese.",
+            },
+            {
+              icon: Gavel,
+              title: "Cruce con juicios",
+              body: "Detecta concesiones con litigio, medidas precautorias o procesos administrativos.",
+            },
+            {
+              icon: Boxes,
+              title: "3D geológico + NI 43-101",
+              body: "Del polígono catastral al modelo 3D y reporte técnico pre-cargado.",
+            },
+          ].map((d) => {
+            const Icon = d.icon;
+            return (
+              <div
+                key={d.title}
+                className="border border-hairline rounded-sm bg-white p-4 hover:border-accent-brand transition-colors"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Icon className="w-4 h-4 text-accent-brand" />
+                  <div className="brand-display text-sm text-content">{d.title}</div>
+                </div>
+                <p className="text-[12px] text-content-muted leading-snug">{d.body}</p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+
       {/* Plans mini */}
       <div className="border border-hairline rounded-sm bg-white">
         <div className="px-5 py-4 border-b border-hairline flex items-center justify-between gap-4">
