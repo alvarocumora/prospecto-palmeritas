@@ -278,6 +278,12 @@ export function MarketingLanding() {
           <Reveal>
             <LandingCatastroBlock />
           </Reveal>
+
+          <div className="mt-8">
+            <Reveal>
+              <CatastroComparison />
+            </Reveal>
+          </div>
         </div>
       </section>
 
