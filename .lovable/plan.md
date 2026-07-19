@@ -1,58 +1,70 @@
+## Problema confirmado
 
-## Contexto
+En `src/features/marketing/MarketingLanding.tsx` el componente `HeroLiveMap` se renderiza dos veces (hero + sección "Catastro live"), mostrando exactamente el mismo mapa (4 listings publicados + capa "potencial"). La sección Catastro no muestra el catastro real que sí tenemos indexado (`cadastre_national` = 11.751 concesiones SERNAGEOMIN, `mining_concessions` = 117 gestionadas). Los planes (`billing_plans`: Free / Pro USD 49 / Enterprise USD 299) existen y `/catastro/precios` está funcional con checkout MercadoPago, pero desde el landing no se promocionan.
 
-Hoy `MarketingLanding.tsx` (~1.158 líneas, 13 secciones) mezcla: hero, dos caminos, regiones, mapa live, simulador, tipos de proyectos, prospecto destacado, capacidades, módulos del terminal, testimonios, precios, FAQ y CTA. El usuario quiere una landing más corta y enfocada en el core de negocio: **proyectos de minería + trade de commodities + catastro con mapa live + fichas de commodities del marketplace**.
+## Objetivo
 
-Además, en `geocapitals.com` se sigue viendo la versión antigua. La causa más probable es que el último build de frontend no fue publicado (los cambios de frontend requieren "Update" explícito en el diálogo de publicación). Se republica al final.
+1. Eliminar la duplicación del mapa en el landing.
+2. Que la sección "Catastro" muestre datos reales del catastro nacional y no una copia del hero.
+3. Convertir esa sección en un gancho comercial: KPIs reales + herramientas + planes con CTA a `/catastro/precios`.
 
-## Landing rediseñada (single page, 5 secciones)
+## Cambios
 
+### 1. Nueva server function `getLandingCatastroSnapshot`
+
+Archivo: `src/lib/landingCatastro.functions.ts` (público, sin auth, cacheable).
+
+Devuelve, leyendo `cadastre_national` vía `supabaseAdmin`:
+
+- `totalNacional` (count)
+- `porRegion`: top 6 regiones con conteo
+- `porTipo`: distribución exploración / explotación / manifestación
+- `porEstado`: vigentes / en trámite / caducadas
+- `topTitulares`: top 5 titulares por nº de concesiones (solo nombre + count, sin PII sensible)
+- `heatPoints`: hasta 3.000 puntos `[lng, lat]` muestreados uniformemente para pintar un heatmap MapLibre
+- `updatedAt`: fecha del último `cadastre_sync_run` exitoso
+
+### 2. Nuevo componente `LandingCatastroBlock`
+
+Archivo: `src/features/marketing/LandingCatastroBlock.tsx`. Reemplaza al segundo `<HeroLiveMap />` de la sección `#catastro`. Layout en dos columnas:
+
+```text
+┌─────────────────────────────┬──────────────────────────┐
+│  Mapa MapLibre heat de       │  KPIs vivos               │
+│  cadastre_national           │  · 11.7k concesiones      │
+│  (heatmap + basemap Esri)    │  · N regiones cubiertas   │
+│  Chip "SERNAGEOMIN · live"   │  · Última sync: hh:mm     │
+│  Etiqueta "sample 3k / 11.7k"│                            │
+│                              │  Top regiones (barras)    │
+│                              │  Distribución tipo/estado │
+│                              │  Top 5 titulares          │
+└─────────────────────────────┴──────────────────────────┘
 ```
-┌────────────────────────────────────────────────────┐
-│ 1. HERO compacto                                   │
-│    Título + subtítulo + 2 CTAs (Ver proyectos /    │
-│    Ver catastro live). KPIs live (proyectos,       │
-│    concesiones, anomalías) en una fila.            │
-├────────────────────────────────────────────────────┤
-│ 2. PROYECTOS DE MINERÍA                            │
-│    Grid de listings publicados (InvestableProjects │
-│    ya existente) → drawer con ficha, valorización  │
-│    y data room público.                            │
-├────────────────────────────────────────────────────┤
-│ 3. CATASTRO LIVE (mapa)                            │
-│    HeroLiveMap a ancho completo con proyectos      │
-│    georreferenciados + link a /catastro/proyecto.  │
-├────────────────────────────────────────────────────┤
-│ 4. COMMODITIES / MARKETPLACE                       │
-│    Ticker + grid de fichas de lotes públicos       │
-│    (Cu, Au, Ag, Li) con CTA "Ver marketplace".     │
-├────────────────────────────────────────────────────┤
-│ 5. CTA final + footer                              │
-│    "Publica tu proyecto" / "Solicita acceso        │
-│    inversionista".                                 │
-└────────────────────────────────────────────────────┘
-```
 
-## Cambios de archivos
+Debajo, tira de "Herramientas del catastro" (chips con link a rutas ya existentes):
 
-1. **`src/features/marketing/MarketingLanding.tsx`** — reescribir dejando solo las 5 secciones arriba. Se eliminan del render: región (L364), simulador (L510), tipos de proyectos (L645), prospecto destacado individual (L678), capacidades diferenciales (L732), módulos del terminal (L818), testimonios (L924), planes/precios (L1004) y FAQ. Se mantienen `MarketingHeader`, `HeroLiveMap`, `InvestableProjects`, `CommodityTicker` y `Reveal` (componentes ya existentes; no se tocan sus archivos).
+- Mapa nacional → `/catastro/mapa`
+- Buscar concesión / titular → `/catastro/mapa?q=`
+- Multi-país (PE, BR, ZM, MW) → `/catastro/global`
+- Monitoreo y alertas (Pro) → `/catastro/app/watchlist`
+- Reportes PDF/GeoJSON (Pro) → `/catastro/precios`
 
-2. **Nuevo componente `src/features/marketing/PublicCommodityLots.tsx`** — grid liviano que consume un `createServerFn` público (`getPublicCommodityLots`) para mostrar 6-8 lotes publicados/verificados (commodity, grade, tonnage, incoterm, precio referencia, país) con link a `/dashboard/commodity-lots`. Usa el mismo estilo `brand-light` de la landing.
+Al final del bloque, mini-tabla de planes leída desde `getPublicPlans` (Free / Pro / Enterprise) con precios reales y CTA "Ver planes" → `/catastro/precios` y "Abrir catastro" → `/catastro/mapa`.
 
-3. **Nuevo `src/lib/marketing.functions.ts`** — server fn `getPublicCommodityLots` (SELECT de `commodity_lots` con política `TO anon` ya existente para lotes públicos; proyecta solo columnas seguras: commodity, grade, tonnage, incoterm_hint, country, reference_price, id). Sin PII de sellers.
-   - Verificación previa: confirmar con `supabase--read_query` que `commodity_lots` tiene una policy `SELECT TO anon` sobre lotes con estado publicado; si no existe, agregarla en la misma migración limitada a columnas públicas (por RLS a nivel fila, no de columna: filtrar por `status = 'published' AND verified = true`).
+### 3. Ajustes en `MarketingLanding.tsx`
 
-4. **`src/routes/index.tsx`** — actualizar `head()` con título/description más comerciales:
-   - `title`: "Geocapitals · Proyectos mineros, catastro live y trade de commodities"
-   - `description`: "Marketplace de proyectos mineros con catastro georreferenciado y lotes de commodities verificados."
+- Sección hero (`<HeroLiveMap />` línea 182): sin cambios (sigue siendo el mapa live de listados + potencial).
+- Sección `#catastro` (líneas 224-286): eliminar `<HeroLiveMap />` duplicado y el grid manual de 3 KPIs; renderizar `<LandingCatastroBlock />`. La cabecera queda con eyebrow, título y párrafo actuales; los botones "Abrir catastro / Terminal geológico" se mueven al final del bloque para no repetir el CTA.
+- El KPI `cadastreNationalCount` del bloque contiguo pasa a leerse del snapshot real en lugar de `getLandingLiveKpis`.
 
-## Ruta principal / dominio viejo
+### 4. Verificación
 
-- No es bug de código: `src/routes/index.tsx` ya monta `MarketingLanding`. Lo que ve el usuario en `geocapitals.com` es el último build publicado, que quedó desactualizado.
-- Tras aplicar los cambios, **publicar** con `preview_ui--publish` para que `geocapitals.com` sirva la nueva landing. Antes de publicar, correr `security--get_scan_results` (regla del proyecto).
+- `bunx vitest run src/features/marketing` si hay tests que apliquen; agregar smoke test que asegure que `getLandingCatastroSnapshot` responde `totalNacional > 0` contra la BD real.
+- Playwright sobre `/` con viewport 1280×1800: capturar hero y sección catastro, confirmar visualmente que no hay dos mapas idénticos y que el bloque catastro muestra heatmap + KPIs + planes.
+- Revisar `/catastro/precios` navegando desde el CTA nuevo.
 
 ## Fuera de alcance
 
-- Navegación de dashboard, INICIO logeado, autenticación, edge functions, otros módulos.
-- Diseño tipográfico/paleta: se mantiene Institutional Modernist (`brand-light`, tokens semánticos).
-- No se borran los componentes retirados del render (Simulator, Testimonials, PlatformPreview, etc.) — quedan en el repo por si se reutilizan; solo se dejan de renderizar en el landing.
+- No se toca `/catastro/proyecto`, `/catastro/mapa`, `/catastro/global` ni el flujo de MercadoPago.
+- No se modifica `HeroLiveMap` ni el resto del landing.
+- No se cambian precios ni features de `billing_plans`.
