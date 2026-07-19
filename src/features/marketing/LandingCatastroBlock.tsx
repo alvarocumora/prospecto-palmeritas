@@ -90,7 +90,6 @@ function CadastreMap({ polygons }: { polygons: GeoJSON.FeatureCollection }) {
       map.addControl(new ml.NavigationControl({ showCompass: false }), "top-right");
       map.on("load", () => {
         mapRef.current = map;
-        (window as unknown as { __landingMap?: unknown }).__landingMap = map;
         setReady(true);
         map.resize();
       });
