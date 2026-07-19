@@ -9,6 +9,9 @@ import {
   totalAllocationPct,
   impliedPostMoneyUsd,
   impliedPreMoneyUsd,
+  resolveScenarios,
+  ticketOutcomeUsd,
+  PROJECT_OPERATOR,
   type FundraiseInstrument,
 } from "@/lib/fundraise";
 
@@ -75,6 +78,38 @@ function Sheet({ data }: { data: NonNullable<Awaited<ReturnType<typeof getPublic
         {p.region ? ` · ${p.region}` : ""}
         {p.country ? ` · ${p.country}` : ""}
       </div>
+      <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-accent-brand/30 bg-accent-brand/5 px-2.5 py-1 text-[12px] text-content">
+        <ShieldCheck className="w-3.5 h-3.5 text-accent-brand" />
+        Operado por <strong>{PROJECT_OPERATOR}</strong>
+      </div>
+
+      {/* Valuación */}
+      {(f.valuationLowUsd != null || f.valuationHighUsd != null || post != null) && (
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-hairline bg-white p-4">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+              Valuación referencial
+            </div>
+            <div className="text-lg font-semibold text-content mt-0.5">
+              {f.valuationLowUsd != null || f.valuationHighUsd != null
+                ? `${usd(f.valuationLowUsd)} – ${usd(f.valuationHighUsd)}`
+                : usd(post)}
+            </div>
+            {f.valuationMethod && (
+              <div className="text-[11px] text-content-subtle mt-0.5">{f.valuationMethod}</div>
+            )}
+          </div>
+          <div className="rounded-xl border border-hairline bg-white p-4">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+              Post-money implícita
+            </div>
+            <div className="text-lg font-semibold text-content mt-0.5">{usd(post)}</div>
+            {pre != null && (
+              <div className="text-[11px] text-content-subtle mt-0.5">Pre-money {usd(pre)}</div>
+            )}
+          </div>
+        </div>
+      )}
 
       {f.highlights.length > 0 && (
         <ul className="mt-4 space-y-1.5">
@@ -108,15 +143,39 @@ function Sheet({ data }: { data: NonNullable<Awaited<ReturnType<typeof getPublic
             label="Horizonte"
             value={f.horizonYears != null ? `${f.horizonYears} años` : "—"}
           />
-          <Field label="Valorización post-money impl." value={usd(post)} />
         </div>
-        {(f.valuationLowUsd != null || f.valuationHighUsd != null) && (
-          <div className="mt-2 pt-2 border-t border-hairline text-[13px] text-content-subtle">
-            Valorización referencial: {usd(f.valuationLowUsd)} – {usd(f.valuationHighUsd)}
-            {f.valuationMethod ? ` · ${f.valuationMethod}` : ""}
-            {pre != null ? ` · pre-money impl. ${usd(pre)}` : ""}
-          </div>
-        )}
+      </div>
+
+      {/* Plan de inversión · retorno proyectado */}
+      <div className="mt-4 rounded-xl border border-hairline bg-white p-4">
+        <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
+          <TrendingUp className="w-3.5 h-3.5" /> Plan de inversión · retorno proyectado
+        </div>
+        <p className="text-[13px] text-content-subtle mb-3">
+          Invierte desde <strong className="text-content">{usd(f.minTicketUsd)}</strong>
+          {f.instrument
+            ? ` vía ${FUNDRAISE_INSTRUMENT_LABELS[f.instrument as FundraiseInstrument]}`
+            : ""}
+          . Retorno proyectado del ticket mínimo
+          {f.horizonYears != null ? ` al horizonte de ${f.horizonYears} años` : " al horizonte"}:
+        </p>
+        <div className="grid sm:grid-cols-3 gap-2">
+          {resolveScenarios(f.scenarios).map((s) => (
+            <div key={s.key} className="rounded-lg border border-hairline p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] text-content">{s.label}</span>
+                <span className="font-mono text-sm text-accent-brand">{s.multiple}×</span>
+              </div>
+              <div className="text-sm font-semibold text-content mt-1">
+                {usd(ticketOutcomeUsd(f.minTicketUsd ?? 0, s))}
+              </div>
+              {s.note && <div className="text-[11px] text-content-subtle mt-1">{s.note}</div>}
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-content-subtle mt-2">
+          Múltiplos referenciales (MOIC) sobre el capital invertido; no garantizan resultados.
+        </p>
       </div>
 
       {/* Uso de fondos */}

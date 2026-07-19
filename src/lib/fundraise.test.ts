@@ -11,6 +11,8 @@ import {
   generateFundraiseToken,
   isFundraiseTokenFormat,
   fundraiseTokenPrefix,
+  resolveScenarios,
+  DEFAULT_INVESTMENT_SCENARIOS,
   type FundraiseData,
 } from "./fundraise";
 
@@ -109,5 +111,16 @@ describe("token público de ficha", () => {
   it("prefijo recorta a prefijo + 6", () => {
     const t = generateFundraiseToken();
     expect(fundraiseTokenPrefix(t)).toBe(t.slice(0, 12));
+  });
+});
+
+describe("resolveScenarios", () => {
+  it("usa los de la ronda si existen", () => {
+    const custom = [{ key: "x", label: "X", multiple: 2, note: "" }];
+    expect(resolveScenarios(custom)).toBe(custom);
+  });
+  it("cae a los estándar si están vacíos", () => {
+    expect(resolveScenarios([])).toBe(DEFAULT_INVESTMENT_SCENARIOS);
+    expect(DEFAULT_INVESTMENT_SCENARIOS).toHaveLength(3);
   });
 });
