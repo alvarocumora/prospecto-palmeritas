@@ -168,6 +168,26 @@ function CadastreMap({ polygons }: { polygons: GeoJSON.FeatureCollection }) {
         "line-opacity": 0.8,
       },
     });
+    map.addLayer({
+      id: "cadastre-dot",
+      type: "circle",
+      source: "cadastre-poly",
+      maxzoom: 8,
+      paint: {
+        "circle-color": [
+          "match", ["get", "tipo"],
+          "exploracion", "#60a5fa",
+          "exploración", "#60a5fa",
+          "explotacion", "#fbbf24",
+          "explotación", "#fbbf24",
+          "#94a3b8",
+        ],
+        "circle-radius": ["interpolate", ["linear"], ["zoom"], 3, 1.2, 6, 2.4, 8, 4],
+        "circle-opacity": 0.85,
+        "circle-stroke-color": "#0b1220",
+        "circle-stroke-width": 0.4,
+      },
+    });
   }, [polygons, ready]);
 
   return (
