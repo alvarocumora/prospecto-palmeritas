@@ -1,70 +1,67 @@
-## Problema confirmado
 
-En `src/features/marketing/MarketingLanding.tsx` el componente `HeroLiveMap` se renderiza dos veces (hero + sección "Catastro live"), mostrando exactamente el mismo mapa (4 listings publicados + capa "potencial"). La sección Catastro no muestra el catastro real que sí tenemos indexado (`cadastre_national` = 11.751 concesiones SERNAGEOMIN, `mining_concessions` = 117 gestionadas). Los planes (`billing_plans`: Free / Pro USD 49 / Enterprise USD 299) existen y `/catastro/precios` está funcional con checkout MercadoPago, pero desde el landing no se promocionan.
+## Diagnóstico del mapa que no aparece
 
-## Objetivo
+Inspección en el preview: el `<section id="catastro">` renderiza con `height: 0` aunque el canvas de MapLibre existe. Causa probable:
 
-1. Eliminar la duplicación del mapa en el landing.
-2. Que la sección "Catastro" muestre datos reales del catastro nacional y no una copia del hero.
-3. Convertir esa sección en un gancho comercial: KPIs reales + herramientas + planes con CTA a `/catastro/precios`.
+- El contenedor del mapa depende de `min-h-[440px]` en un grid de Tailwind dentro de un `<Reveal>` con `opacity/translate` iniciales. Si MapLibre monta antes de que el bloque tenga altura visible, el canvas queda a 0×0 hasta que se dispara `resize`, y como el `Reveal` puede quedar oculto en el primer intersection observer, nunca se llama a `map.resize()`.
+- Además el CSS de `maplibre-gl/dist/maplibre-gl.css` se importa dentro de un `Promise.all` async: en producción con SSR el primer render no tiene los estilos, y el `.maplibregl-canvas-container` queda sin `position: absolute`, colapsando el alto.
 
-## Cambios
+## Cambios propuestos
 
-### 1. Nueva server function `getLandingCatastroSnapshot`
+### 1. Fix del mapa (`LandingCatastroBlock.tsx`)
 
-Archivo: `src/lib/landingCatastro.functions.ts` (público, sin auth, cacheable).
+- Importar `maplibre-gl/dist/maplibre-gl.css` de forma estática al tope del archivo (no dentro del `loadMaplibre()`), para que el CSS entre en el bundle desde el primer render.
+- Dar altura fija al contenedor del mapa (`h-[440px] lg:h-[520px]`, no `min-h`), envuelto en un wrapper con `position: relative` explícito.
+- Llamar `map.resize()` en un `ResizeObserver` sobre el contenedor y también en el `load` para cubrir el caso de que el `Reveal` cambie la geometría al hacerse visible.
+- Añadir fallback visible cuando `heatPoints.length === 0` (estado de carga con skeleton mientras llega la server function).
 
-Devuelve, leyendo `cadastre_national` vía `supabaseAdmin`:
+### 2. Catastro mejorado en el landing
 
-- `totalNacional` (count)
-- `porRegion`: top 6 regiones con conteo
-- `porTipo`: distribución exploración / explotación / manifestación
-- `porEstado`: vigentes / en trámite / caducadas
-- `topTitulares`: top 5 titulares por nº de concesiones (solo nombre + count, sin PII sensible)
-- `heatPoints`: hasta 3.000 puntos `[lng, lat]` muestreados uniformemente para pintar un heatmap MapLibre
-- `updatedAt`: fecha del último `cadastre_sync_run` exitoso
+Ampliar `LandingCatastroBlock` para que muestre por qué Geocapitals es el mejor operador, no solo un mapa:
 
-### 2. Nuevo componente `LandingCatastroBlock`
+- Barra superior con: total nacional, % vigentes, top región (cuando `region` esté populada, mientras tanto fallback a `tipo`), última sync — todo en tokens Institutional Modernist.
+- Toggle sobre el heatmap: `Densidad` (actual) · `Vigentes` · `En trámite` — cambia el filtro del sample sin recargar.
+- Chip "actualizado hoy" enlazado a `/catastro/mapa` con el rango temporal del último sync run.
+- Debajo del mapa, mini-cards de módulos avanzados que ya existen y la competencia no ofrece: Alertas de patente vencida, Monitoreo de titulares, Cruce con boletines/juicios, Vista 3D de proyecto, Reportes NI 43-101 pre-generados.
 
-Archivo: `src/features/marketing/LandingCatastroBlock.tsx`. Reemplaza al segundo `<HeroLiveMap />` de la sección `#catastro`. Layout en dos columnas:
+### 3. Tabla comparativa vs operadores (nuevo componente)
+
+Nuevo bloque `CatastroComparison.tsx`, insertado en el landing dentro de la sección `#catastro` justo antes del bloque de planes:
 
 ```text
-┌─────────────────────────────┬──────────────────────────┐
-│  Mapa MapLibre heat de       │  KPIs vivos               │
-│  cadastre_national           │  · 11.7k concesiones      │
-│  (heatmap + basemap Esri)    │  · N regiones cubiertas   │
-│  Chip "SERNAGEOMIN · live"   │  · Última sync: hh:mm     │
-│  Etiqueta "sample 3k / 11.7k"│                            │
-│                              │  Top regiones (barras)    │
-│                              │  Distribución tipo/estado │
-│                              │  Top 5 titulares          │
-└─────────────────────────────┴──────────────────────────┘
+                    Geocapitals   PropiedadMineraDigital   Sernageomin (público)   Otros SaaS
+Cobertura           11.7k live    Chile                    Chile                    Parcial
+Multi-país          PE·BR·ZM·MW   No                       No                       Limitado
+Mapa 3D + geología  Sí            No                       No                       No
+Alertas boletín     Sí            Básico                   No                       Varía
+Cruce juicios       Sí            No                       No                       No
+NI 43-101           Sí            No                       No                       No
+Trade & data room   Sí            No                       No                       No
+API / exports       GeoJSON+CSV   PDF                      Descarga masiva          Varía
+Precio entrada      Gratis        Pago                     Gratis (sin tools)       Pago
 ```
 
-Debajo, tira de "Herramientas del catastro" (chips con link a rutas ya existentes):
+- Datos verificables solo del lado Geocapitals; para competidores se marca lo público sin afirmar precios exactos, con nota al pie: "Comparativa basada en información pública de los sitios oficiales al %fecha%. No incluye planes empresariales personalizados."
+- CTAs: "Comparar planes" → `/catastro/precios`, "Ver mapa live" → `/catastro/mapa`.
 
-- Mapa nacional → `/catastro/mapa`
-- Buscar concesión / titular → `/catastro/mapa?q=`
-- Multi-país (PE, BR, ZM, MW) → `/catastro/global`
-- Monitoreo y alertas (Pro) → `/catastro/app/watchlist`
-- Reportes PDF/GeoJSON (Pro) → `/catastro/precios`
+### 4. Bloque de planes reforzado
 
-Al final del bloque, mini-tabla de planes leída desde `getPublicPlans` (Free / Pro / Enterprise) con precios reales y CTA "Ver planes" → `/catastro/precios` y "Abrir catastro" → `/catastro/mapa`.
+El mini-plans actual muestra Free/Pro/Enterprise. Agregar:
+- Etiqueta "Más popular" en Pro.
+- Fila de features clave por plan (concesiones monitoreadas, países, alertas, exports, NI 43-101) para que la comparación con la tabla anterior sea directa.
+- Enlace secundario "Concierge / Custom" para leads enterprise vía `/contacto`.
 
-### 3. Ajustes en `MarketingLanding.tsx`
+### Archivos
 
-- Sección hero (`<HeroLiveMap />` línea 182): sin cambios (sigue siendo el mapa live de listados + potencial).
-- Sección `#catastro` (líneas 224-286): eliminar `<HeroLiveMap />` duplicado y el grid manual de 3 KPIs; renderizar `<LandingCatastroBlock />`. La cabecera queda con eyebrow, título y párrafo actuales; los botones "Abrir catastro / Terminal geológico" se mueven al final del bloque para no repetir el CTA.
-- El KPI `cadastreNationalCount` del bloque contiguo pasa a leerse del snapshot real en lugar de `getLandingLiveKpis`.
+- `src/features/marketing/LandingCatastroBlock.tsx` — fix del mapa (CSS estático, altura fija, ResizeObserver), toggle de capas, cards de diferenciadores, refuerzo del bloque de planes.
+- `src/features/marketing/CatastroComparison.tsx` — nuevo, tabla comparativa.
+- `src/features/marketing/MarketingLanding.tsx` — insertar `<CatastroComparison />` dentro de `section#catastro`.
 
-### 4. Verificación
+Nada de cambios de esquema, migraciones ni backend nuevo: se aprovechan `getLandingCatastroSnapshot` y `getPublicPlans` existentes.
 
-- `bunx vitest run src/features/marketing` si hay tests que apliquen; agregar smoke test que asegure que `getLandingCatastroSnapshot` responde `totalNacional > 0` contra la BD real.
-- Playwright sobre `/` con viewport 1280×1800: capturar hero y sección catastro, confirmar visualmente que no hay dos mapas idénticos y que el bloque catastro muestra heatmap + KPIs + planes.
-- Revisar `/catastro/precios` navegando desde el CTA nuevo.
+## Verificación
 
-## Fuera de alcance
-
-- No se toca `/catastro/proyecto`, `/catastro/mapa`, `/catastro/global` ni el flujo de MercadoPago.
-- No se modifica `HeroLiveMap` ni el resto del landing.
-- No se cambian precios ni features de `billing_plans`.
+Después de implementar, en `/#catastro`:
+1. Screenshot con Playwright para confirmar que el canvas tiene altura > 0.
+2. Verificar en el DOM que `.maplibregl-canvas-container` tiene `position: absolute` (indica que el CSS cargó).
+3. Confirmar que la tabla comparativa renderiza con 4 columnas y ~9 filas.
