@@ -19,7 +19,7 @@ export function FrancoTabPlaceholder({ tab }: { tab: PalmerasTabId }) {
       </div>
       <h2 className="mt-2 font-mono text-xl text-foreground">{LABELS[tab]}</h2>
       <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-        Este módulo está disponible para Prospecto Franco pero aún no tiene datos. Se poblará a
+        Este módulo está disponible para el Proyecto Cholqui pero aún no tiene datos. Se poblará a
         medida que se carguen muestreos, geofísica, sondajes y resultados de laboratorio.
       </p>
     </Card>
