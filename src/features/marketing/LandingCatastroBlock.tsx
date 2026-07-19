@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as MLMap, StyleSpecification } from "maplibre-gl";
-import "maplibre-gl/dist/maplibre-gl.css";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -25,10 +24,15 @@ import { getPublicPlans } from "@/lib/plans.functions";
 let _ml: typeof import("maplibre-gl") | null = null;
 async function loadMaplibre() {
   if (_ml) return _ml;
-  const mod = await import("maplibre-gl");
+  const [mod] = await Promise.all([
+    import("maplibre-gl"),
+    import("maplibre-gl/dist/maplibre-gl.css"),
+  ]);
   _ml = (mod as unknown as { default?: typeof import("maplibre-gl") }).default ?? mod;
   return _ml!;
 }
+
+
 
 
 const STYLE: StyleSpecification = {
