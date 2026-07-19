@@ -70,7 +70,7 @@ export const template = {
   displayName: "Satelital · Anomalías nuevas (interno)",
   previewData: {
     recipientName: "Diego",
-    projectName: "Franco IOCG",
+    projectName: "Cholqui Cu-Au-Ag",
     anomalyCount: 7,
     topScore: 0.83,
     topIndex: "iron_oxide",

@@ -11,7 +11,7 @@ import {
   type FrancoPertenenciaMatch,
 } from "@/lib/franco-cadastre.functions";
 
-const PROJECT_TITLE = "Prospecto Franco (Gianfranco)";
+const PROJECT_TITLE = "Proyecto Cholqui";
 const REGION = "Valparaíso, Chile";
 
 function esc(s: string | number | null | undefined): string {

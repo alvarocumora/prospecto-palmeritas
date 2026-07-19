@@ -60,15 +60,15 @@ const SHOWCASE = [
     ],
   },
   {
-    code: "FRANCO",
-    name: "Distrito Franco",
-    region: "Atacama",
-    commodity: "Au",
+    code: "CHOLQUI",
+    name: "Proyecto Cholqui",
+    region: "Melipilla · R. Metropolitana",
+    commodity: "Cu-Au-Ag",
     to: "/proyectos/ficha/franco",
     bullets: [
-      "Borrador NI 43-101 asistido",
-      "Datos de campo geo-referenciados",
-      "Data room institucional",
+      "Cu-Au-Ag con buenas leyes",
+      "~5.000 ha rodeando a Mina Las Minitas en producción",
+      "Colinda con pertenencias de Yamana Gold",
     ],
   },
 ];

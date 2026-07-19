@@ -55,7 +55,7 @@ export const template = {
   displayName: "Satelital · Brief inversionista",
   previewData: {
     recipientName: "María",
-    projectName: "Franco IOCG",
+    projectName: "Cholqui Cu-Au-Ag",
     highSeverityCount: 3,
     totalNew: 7,
     topIndex: "iron_oxide",

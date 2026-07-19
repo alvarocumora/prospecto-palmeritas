@@ -157,7 +157,7 @@ export function FrancoPertenenciasMap() {
           icon={MapPin}
           sub="Pertenencias KMZ sobre satélite · color = estado de match con catastro real"
         >
-          Live map · Pertenencias Franco
+          Live map · Pertenencias Cholqui
         </SectionTitle>
         <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
           <LegendDot color="#d4af37" label="Match exacto" />

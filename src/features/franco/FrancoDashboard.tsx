@@ -15,7 +15,7 @@ export function FrancoDashboard() {
   const handleExport = useCallback(async () => {
     setExporting(true);
     try {
-      toast.info("Borrador pre NI 43-101 de Franco aún no tiene datos cargados.");
+      toast.info("Borrador pre NI 43-101 de Cholqui aún no tiene datos cargados.");
     } finally {
       setExporting(false);
     }
