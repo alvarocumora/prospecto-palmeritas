@@ -44,6 +44,33 @@ export const SUBMISSION_STATUS_LABELS: Record<SubmissionStatus, string> = {
   descartada: "Descartada",
 };
 
+// ---------- Tipo de proveedor (relación con la mercadería) ----------
+export const SUPPLIER_ROLES = ["productor", "representante", "broker", "trader", "otro"] as const;
+export type SupplierRole = (typeof SUPPLIER_ROLES)[number];
+
+export const SUPPLIER_ROLE_LABELS: Record<SupplierRole, string> = {
+  productor: "Productor / mina",
+  representante: "Representante autorizado",
+  broker: "Broker / intermediario",
+  trader: "Trader",
+  otro: "Otro",
+};
+
+/** Normaliza un string arbitrario a un SupplierRole conocido (o null). */
+export function normalizeSupplierRole(value: string | null | undefined): SupplierRole | null {
+  const v = (value ?? "").toLowerCase().trim();
+  return (SUPPLIER_ROLES as readonly string[]).includes(v) ? (v as SupplierRole) : null;
+}
+
+/** ¿La oferta está vencida? (fecha de validez pasada). Sin fecha = vigente. */
+export function isOfferExpired(validUntil: string | null | undefined, now: Date): boolean {
+  if (!validUntil) return false;
+  const t = new Date(validUntil).getTime();
+  if (!Number.isFinite(t)) return false;
+  // Vence al final del día indicado.
+  return now.getTime() > t + 86_400_000 - 1;
+}
+
 // ---------- Resumen de propuestas ----------
 export type SubmissionLike = {
   status: string;

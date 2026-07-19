@@ -6,6 +6,8 @@ import {
   isShareTokenFormat,
   tokenPrefix,
   summarizeSubmissions,
+  normalizeSupplierRole,
+  isOfferExpired,
   type SubmissionLike,
 } from "./sourcing";
 
@@ -58,5 +60,31 @@ describe("summarizeSubmissions", () => {
 
   it("lista vacía", () => {
     expect(summarizeSubmissions([])).toEqual({ total: 0, shortlisted: 0, bestPriceUsdT: null });
+  });
+});
+
+describe("normalizeSupplierRole", () => {
+  it("acepta roles conocidos (case-insensitive) y descarta el resto", () => {
+    expect(normalizeSupplierRole("productor")).toBe("productor");
+    expect(normalizeSupplierRole("BROKER")).toBe("broker");
+    expect(normalizeSupplierRole("desconocido")).toBeNull();
+    expect(normalizeSupplierRole(null)).toBeNull();
+    expect(normalizeSupplierRole(undefined)).toBeNull();
+  });
+});
+
+describe("isOfferExpired", () => {
+  const now = new Date("2026-07-18T12:00:00Z");
+  it("sin fecha = vigente", () => {
+    expect(isOfferExpired(null, now)).toBe(false);
+    expect(isOfferExpired(undefined, now)).toBe(false);
+  });
+  it("fecha futura = vigente; fecha pasada = vencida", () => {
+    expect(isOfferExpired("2026-07-20", now)).toBe(false);
+    expect(isOfferExpired("2026-07-18", now)).toBe(false); // vence al final del día
+    expect(isOfferExpired("2026-07-16", now)).toBe(true);
+  });
+  it("fecha inválida = vigente (no rompe)", () => {
+    expect(isOfferExpired("no-es-fecha", now)).toBe(false);
   });
 });

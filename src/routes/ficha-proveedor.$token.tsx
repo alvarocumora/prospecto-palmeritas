@@ -9,6 +9,7 @@ import {
   getSupplierSheetByShareToken,
   getSupplierFileUrlByShareToken,
 } from "@/lib/sourcing.functions";
+import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
 // comparte con el comprador final. Un token distinto al de submit.
@@ -50,14 +51,31 @@ function SupplierSheetPage() {
             <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-accent-brand mb-2">
               <PackageSearch className="w-4 h-4" /> Ficha de proveedor
             </div>
-            <h1 className="font-display text-2xl lg:text-3xl text-content">
-              {data.supplier.supplier_name}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="font-display text-2xl lg:text-3xl text-content">
+                {data.supplier.supplier_name}
+              </h1>
+              {data.supplier.supplier_role && (
+                <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent-brand/10 text-accent-brand">
+                  {SUPPLIER_ROLE_LABELS[
+                    normalizeSupplierRole(data.supplier.supplier_role) ?? "otro"
+                  ] ?? data.supplier.supplier_role}
+                </span>
+              )}
+            </div>
             <div className="text-sm text-content-subtle">
               {[data.supplier.supplier_company, data.supplier.supplier_country]
                 .filter(Boolean)
                 .join(" · ") || ""}
             </div>
+
+            {data.supplier.offer_valid_until &&
+              isOfferExpired(data.supplier.offer_valid_until, new Date()) && (
+                <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700">
+                  Esta oferta expiró el {data.supplier.offer_valid_until}. Solicita al proveedor una
+                  actualización de precio y disponibilidad.
+                </div>
+              )}
 
             {/* Requerimiento de referencia */}
             <div className="mt-4 rounded-xl border border-hairline bg-white p-4">
@@ -92,7 +110,12 @@ function SupplierSheetPage() {
                   }
                 />
                 <Field label="Incoterm" value={data.supplier.incoterm} />
+                <Field label="Puerto de carga" value={data.supplier.port_loading} />
                 <Field label="Plazo" value={data.supplier.lead_time} />
+                <Field label="Modo de pago" value={data.supplier.payment_terms} />
+                <Field label="Calidad / ley" value={data.supplier.quality_grade} />
+                <Field label="Empaque" value={data.supplier.packaging} />
+                <Field label="Válida hasta" value={data.supplier.offer_valid_until} />
               </div>
               {data.supplier.specs && (
                 <p className="mt-2 pt-2 border-t border-hairline text-[13px] text-content-subtle">
