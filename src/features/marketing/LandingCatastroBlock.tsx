@@ -174,7 +174,7 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
   return (
     <div
       ref={ref}
-      className="absolute inset-0"
+      className="w-full h-full"
       style={{ background: "#0b1220" }}
       aria-label="Mapa térmico del catastro minero nacional"
     />
