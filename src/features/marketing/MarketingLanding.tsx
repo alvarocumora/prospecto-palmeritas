@@ -275,12 +275,7 @@ export function MarketingLanding() {
           </Reveal>
 
           <Reveal>
-            <div
-              className="relative rounded-sm overflow-hidden border border-hairline shadow-[0_20px_60px_-30px_rgba(0,0,0,0.35)]"
-              style={{ background: "#0b1220", minHeight: 480 }}
-            >
-              <HeroLiveMap />
-            </div>
+            <LandingCatastroBlock />
           </Reveal>
         </div>
       </section>
