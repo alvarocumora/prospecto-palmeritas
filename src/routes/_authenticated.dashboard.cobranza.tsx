@@ -1,9 +1,22 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Wallet, AlertTriangle, CalendarClock, ArrowUpRight, Inbox } from "lucide-react";
+import { toast } from "sonner";
+import {
+  Wallet,
+  AlertTriangle,
+  CalendarClock,
+  ArrowUpRight,
+  Inbox,
+  BellRing,
+  Send,
+  MailWarning,
+  CheckCircle2,
+} from "lucide-react";
 import { getReceivablesOverview, type ReceivablesSide } from "@/lib/receivables.functions";
+import { getDunningQueue, sendPaymentReminder, type DunningItem } from "@/lib/dunning.functions";
+import { DUNNING_STAGE_LABELS, type DunningStage } from "@/lib/dunning";
 import {
   AGING_BUCKETS,
   AGING_BUCKET_LABELS,
@@ -30,18 +43,24 @@ const BUCKET_TONE: Record<AgingBucket, string> = {
   d90_plus: "text-red-700 font-semibold",
 };
 
-type SideKey = "cobrar" | "pagar";
+type TabKey = "cobrar" | "pagar" | "recordar";
 
 function CobranzaPage() {
   const fn = useServerFn(getReceivablesOverview);
+  const dunningFn = useServerFn(getDunningQueue);
   const { data, isLoading } = useQuery({
     queryKey: ["receivables-overview"],
     queryFn: () => fn(),
     staleTime: 2 * 60_000,
   });
-  const [side, setSide] = useState<SideKey>("cobrar");
+  const dunning = useQuery({
+    queryKey: ["dunning-queue"],
+    queryFn: () => dunningFn(),
+    staleTime: 2 * 60_000,
+  });
+  const [tab, setTab] = useState<TabKey>("cobrar");
 
-  const active = side === "cobrar" ? data?.cobrar : data?.pagar;
+  const active = tab === "cobrar" ? data?.cobrar : tab === "pagar" ? data?.pagar : null;
 
   return (
     <div className="p-4 md:p-6 space-y-5 max-w-[1200px]">
@@ -53,25 +72,25 @@ function CobranzaPage() {
         Cartera de todos tus trades: qué está por cobrar, qué está vencido y hace cuánto.
       </p>
 
-      {/* Tabs por cobrar / por pagar */}
+      {/* Tabs */}
       <div className="flex items-center gap-1 border-b border-border">
         {(
           [
-            ["cobrar", "Por cobrar", data?.cobrar.summary.outstandingUsd ?? 0],
-            ["pagar", "Por pagar", data?.pagar.summary.outstandingUsd ?? 0],
-          ] as Array<[SideKey, string, number]>
-        ).map(([key, label, total]) => (
+            ["cobrar", "Por cobrar", usd(data?.cobrar.summary.outstandingUsd ?? 0)],
+            ["pagar", "Por pagar", usd(data?.pagar.summary.outstandingUsd ?? 0)],
+            ["recordar", "Recordatorios", dunning.data ? `${dunning.data.dueNow} por enviar` : "—"],
+          ] as Array<[TabKey, string, string]>
+        ).map(([key, label, suffix]) => (
           <button
             key={key}
-            onClick={() => setSide(key)}
+            onClick={() => setTab(key)}
             className={`px-3 py-2 text-sm border-b-2 -mb-px transition-colors ${
-              side === key
+              tab === key
                 ? "border-primary text-foreground font-medium"
                 : "border-transparent text-muted-foreground hover:text-foreground"
             }`}
           >
-            {label}{" "}
-            <span className="text-[11px] font-mono text-muted-foreground">({usd(total)})</span>
+            {label} <span className="text-[11px] font-mono text-muted-foreground">({suffix})</span>
           </button>
         ))}
       </div>
@@ -83,16 +102,18 @@ function CobranzaPage() {
         </div>
       )}
 
-      {isLoading ? (
+      {tab === "recordar" ? (
+        <DunningTab />
+      ) : isLoading ? (
         <div className="h-64 rounded bg-muted/20 animate-pulse" />
       ) : active ? (
-        <SideView side={active} kind={side} />
+        <SideView side={active} kind={tab as "cobrar" | "pagar"} />
       ) : null}
     </div>
   );
 }
 
-function SideView({ side, kind }: { side: ReceivablesSide; kind: SideKey }) {
+function SideView({ side, kind }: { side: ReceivablesSide; kind: "cobrar" | "pagar" }) {
   const s = side.summary;
   const cobrar = kind === "cobrar";
   const totalLabel = cobrar ? "Total por cobrar" : "Total por pagar";
@@ -230,6 +251,152 @@ function ItemRow({ item }: { item: ReceivableItem }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+const STAGE_TONE: Record<DunningStage, string> = {
+  scheduled: "text-text-secondary bg-muted",
+  upcoming: "text-primary bg-primary/10",
+  overdue: "text-amber-700 bg-amber-500/10",
+  severe: "text-red-700 bg-red-500/10",
+};
+
+function DunningTab() {
+  const dunningFn = useServerFn(getDunningQueue);
+  const sendFn = useServerFn(sendPaymentReminder);
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["dunning-queue"],
+    queryFn: () => dunningFn(),
+    staleTime: 2 * 60_000,
+  });
+
+  const send = useMutation({
+    mutationFn: (paymentId: string) => sendFn({ data: { paymentId } }),
+    onSuccess: (res) => {
+      toast.success(`Recordatorio enviado a ${res.email}`);
+      void qc.invalidateQueries({ queryKey: ["dunning-queue"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo enviar."),
+  });
+
+  if (isLoading) return <div className="h-64 rounded bg-muted/20 animate-pulse" />;
+  if (data?.pending) {
+    return (
+      <div className="rounded-md border border-dashed border-border p-10 text-center text-sm text-muted-foreground">
+        Los recordatorios estarán disponibles cuando se active el módulo de pagos.
+      </div>
+    );
+  }
+  if (!data || data.items.length === 0) {
+    return (
+      <div className="rounded-md border border-dashed border-border p-10 text-center">
+        <CheckCircle2 className="w-8 h-8 text-green-600/60 mx-auto mb-2" />
+        <div className="text-sm text-foreground mb-0.5">Cobranza al día</div>
+        <div className="text-xs text-muted-foreground">
+          No hay cobros próximos ni vencidos que recordar.
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        <Kpi
+          label="Por enviar hoy"
+          value={String(data.dueNow)}
+          sub="Según cadencia"
+          icon={<BellRing className="w-3.5 h-3.5" />}
+        />
+        <Kpi
+          label="Vencido en cola"
+          value={usd(data.overdueUsd)}
+          tone={data.overdueUsd > 0 ? "danger" : "muted"}
+          icon={<AlertTriangle className="w-3.5 h-3.5" />}
+        />
+        <Kpi
+          label="Sin email"
+          value={String(data.items.length - data.contactable)}
+          sub="No contactables"
+          tone={data.items.length - data.contactable > 0 ? "muted" : "default"}
+          icon={<MailWarning className="w-3.5 h-3.5" />}
+        />
+      </div>
+
+      <section className="rounded-md border border-border bg-bg-secondary/20 p-4">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-3">
+          Cola de recordatorios ({data.items.length})
+        </div>
+        <div className="space-y-1">
+          {data.items.map((it) => (
+            <DunningRow
+              key={it.paymentId}
+              item={it}
+              sending={send.isPending && send.variables === it.paymentId}
+              onSend={() => send.mutate(it.paymentId)}
+            />
+          ))}
+        </div>
+        <p className="text-[10px] text-muted-foreground pt-3">
+          El recordatorio se envía por email a la contraparte (máximo uno por día por pago) y queda
+          registrado en la trazabilidad del trade. La cadencia sugiere a quién recordar, pero puedes
+          enviar cuando quieras.
+        </p>
+      </section>
+    </div>
+  );
+}
+
+function DunningRow({
+  item,
+  sending,
+  onSend,
+}: {
+  item: DunningItem;
+  sending: boolean;
+  onSend: () => void;
+}) {
+  const noEmail = !item.counterpartyEmail;
+  return (
+    <div className="flex items-center justify-between gap-3 py-2 border-b border-border/40 last:border-0">
+      <div className="min-w-0">
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded ${STAGE_TONE[item.stage]}`}>
+            {item.stage === "overdue" || item.stage === "severe"
+              ? `${DUNNING_STAGE_LABELS[item.stage]} · ${item.daysOverdue}d`
+              : DUNNING_STAGE_LABELS[item.stage]}
+          </span>
+          <Link
+            to="/dashboard/trades/$tradeId"
+            params={{ tradeId: item.tradeId }}
+            className="text-sm truncate hover:underline"
+          >
+            {item.label ?? item.kind}
+          </Link>
+        </div>
+        <div className="text-[11px] text-muted-foreground truncate mt-0.5">
+          {item.counterpartyLabel} · {item.tradeLabel} · vence {fmtDate(item.dueDate)}
+          {item.lastReminderAt ? ` · recordado ${fmtDate(item.lastReminderAt)}` : ""}
+        </div>
+      </div>
+      <div className="flex items-center gap-3 shrink-0">
+        <span className="text-sm font-mono">{usd(item.amountUsd)}</span>
+        <button
+          onClick={onSend}
+          disabled={sending || noEmail}
+          title={noEmail ? "La contraparte no tiene email registrado" : undefined}
+          className={`inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded text-xs transition-colors ${
+            item.shouldRemind
+              ? "bg-primary text-primary-foreground hover:opacity-90"
+              : "border border-border text-muted-foreground hover:text-foreground"
+          } disabled:opacity-40 disabled:cursor-not-allowed`}
+        >
+          <Send className="w-3.5 h-3.5" />
+          {sending ? "Enviando…" : "Recordar"}
+        </button>
+      </div>
+    </div>
   );
 }
 
