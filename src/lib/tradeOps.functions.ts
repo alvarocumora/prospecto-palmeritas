@@ -235,25 +235,37 @@ const TRADE_BUCKET_PUB = "trade-docs";
 
 async function resolveTradeByToken(
   token: string,
-): Promise<{ tradeId: string; role: "buyer" | "seller"; sb: SupabaseClient } | null> {
+): Promise<{
+  tradeId: string;
+  role: "buyer" | "seller";
+  ownerId: string;
+  sb: SupabaseClient;
+} | null> {
   if (!isOpsTokenFormat(token)) return null;
   const sb = serviceClient();
   if (!sb) return null;
   const hash = await sha256Hex(token);
   const { data: b } = await sb
     .from("commodity_trades")
-    .select("id")
+    .select("id, created_by")
     .eq("counterparty_buyer_token_hash", hash)
     .maybeSingle();
-  if (b) return { tradeId: (b as { id: string }).id, role: "buyer", sb };
+  if (b) {
+    const r = b as { id: string; created_by: string };
+    return { tradeId: r.id, role: "buyer", ownerId: r.created_by, sb };
+  }
   const { data: s } = await sb
     .from("commodity_trades")
-    .select("id")
+    .select("id, created_by")
     .eq("counterparty_seller_token_hash", hash)
     .maybeSingle();
-  if (s) return { tradeId: (s as { id: string }).id, role: "seller", sb };
+  if (s) {
+    const r = s as { id: string; created_by: string };
+    return { tradeId: r.id, role: "seller", ownerId: r.created_by, sb };
+  }
   return null;
 }
+
 
 /** Prepara URL firmada para que la contraparte externa suba un archivo al bucket
  *  privado `trade-docs` sin necesitar cuenta. */
