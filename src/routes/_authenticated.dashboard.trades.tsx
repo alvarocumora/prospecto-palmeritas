@@ -1021,3 +1021,154 @@ function Empty({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+
+/* -------------------- Contraparte externa (link espejo) ------------------ */
+function CounterpartyPanel({
+  trade,
+}: {
+  trade: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["trade"];
+}) {
+  const ensureFn = useServerFn(ensureCounterpartyLink);
+  const [issuedUrl, setIssuedUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const party: "buyer" | "seller" = trade.role === "buyer" ? "seller" : "buyer";
+  const cpName =
+    party === "buyer"
+      ? (trade.buyerName ?? trade.buyerEmail ?? "Comprador")
+      : (trade.sellerName ?? trade.sellerEmail ?? "Vendedor");
+  const cpEmail = party === "buyer" ? trade.buyerEmail : trade.sellerEmail;
+
+  const issue = async (rotate: boolean) => {
+    setLoading(true);
+    try {
+      const r = await ensureFn({
+        data: { tradeId: trade.id, party, email: cpEmail ?? undefined, rotate },
+      });
+      if (r.url) {
+        setIssuedUrl(r.url);
+        void navigator.clipboard.writeText(r.url).catch(() => {});
+        toast.success("Link generado y copiado.");
+      } else {
+        toast.info(`Ya existe un link activo (prefijo ${r.prefix || "—"}). Usa "Rotar" para emitir uno nuevo.`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
+        Contraparte · {party === "buyer" ? "Comprador" : "Vendedor"}
+      </div>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0 text-xs">
+          <div className="font-semibold text-foreground truncate">{cpName}</div>
+          <div className="text-muted-foreground font-mono text-[11px] truncate">
+            {cpEmail ?? "sin email"}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => void issue(false)}
+            disabled={loading}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+          >
+            <ExternalLink className="w-3 h-3" /> Emitir link
+          </button>
+          <button
+            onClick={() => void issue(true)}
+            disabled={loading}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+          >
+            Rotar
+          </button>
+        </div>
+      </div>
+      {issuedUrl && (
+        <div className="mt-2 text-[10px] font-mono break-all bg-muted/40 border border-border rounded p-2">
+          {issuedUrl}
+          <div className="text-muted-foreground mt-1">
+            Copiado al portapapeles · compártelo por email/WhatsApp con la contraparte.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* --------------------- Solicitar documentos a contraparte ---------------- */
+function RequestDocsPanel({
+  tradeId,
+  docs,
+}: {
+  tradeId: string;
+  docs: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["documents"];
+}) {
+  const qc = useQueryClient();
+  const reqFn = useServerFn(requestTradeDocs);
+  const existing = new Set(docs.map((d) => d.doc_type));
+  const suggested = DOC_CATALOG
+    .filter((d) => !existing.has(d.key))
+    .slice(0, 8);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const toggle = (k: string) =>
+    setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
+
+  const submit = async () => {
+    if (!picked.length) return toast.error("Selecciona al menos un documento.");
+    setBusy(true);
+    try {
+      await reqFn({ data: { tradeId, docTypes: picked } });
+      toast.success("Solicitud registrada. La contraparte lo verá en su panel.");
+      setPicked([]);
+      void qc.invalidateQueries({ queryKey: ["trade", tradeId] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!suggested.length) return null;
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <Upload className="w-3.5 h-3.5" /> Solicitar documentos a contraparte
+        </div>
+        <button
+          onClick={() => void submit()}
+          disabled={busy || !picked.length}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+          Solicitar ({picked.length})
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {suggested.map((d) => {
+          const on = picked.includes(d.key);
+          return (
+            <button
+              key={d.key}
+              onClick={() => toggle(d.key)}
+              className={`text-[11px] font-mono px-2 py-1 rounded border transition ${
+                on
+                  ? "bg-primary/15 border-primary/40 text-primary"
+                  : "bg-background border-border text-foreground hover:bg-muted"
+              }`}
+              title={d.label}
+            >
+              {d.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
