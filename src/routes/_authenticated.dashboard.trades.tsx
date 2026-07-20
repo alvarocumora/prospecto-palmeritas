@@ -1204,7 +1204,7 @@ function SupplierPanel({
   const [form, setForm] = useState({
     name: "",
     company: "",
-    role: "productor" as (typeof PARTNER_ROLES)[number],
+    role: "proveedor" as (typeof PARTNER_ROLES)[number],
     email: "",
     phone: "",
     country: "",
@@ -1241,7 +1241,7 @@ function SupplierPanel({
       await linkFn({ data: { tradeId, partnerId: id } });
       toast.success("Proveedor creado y vinculado.");
       setCreating(false);
-      setForm({ name: "", company: "", role: "productor", email: "", phone: "", country: "" });
+      setForm({ name: "", company: "", role: "proveedor", email: "", phone: "", country: "" });
       void refetch();
       onLinked();
     } catch (e) {
