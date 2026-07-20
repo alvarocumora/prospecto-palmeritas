@@ -13,6 +13,7 @@
 //   - auto_field:    verifica que un campo exista (evaluator_config.table, .field, .ref)
 //   - auto_evidence: verifica que haya >= N report_evidence_links del tipo dado
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
