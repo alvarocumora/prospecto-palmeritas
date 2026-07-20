@@ -209,6 +209,9 @@ Deno.serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
   );
   try {
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+
     const body = await req.json();
     const scenario_id: string = body.scenario_id;
     const delta_pct: number = Number(body.delta_pct ?? 20);
@@ -221,6 +224,10 @@ Deno.serve(async (req) => {
       .eq("id", scenario_id)
       .single();
     if (sErr || !scenario) throw new Error("Scenario not found");
+
+    const memRes = await requireProjectMember(supabase, authRes.userId, scenario.project_id);
+    if ("error" in memRes) return memRes.error;
+
     const { data: model, error: mErr } = await supabase
       .from("resource_models")
       .select("*")
