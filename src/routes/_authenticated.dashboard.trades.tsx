@@ -497,6 +497,11 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
       />
       <CounterpartyPanel trade={t} />
       <RequestDocsPanel tradeId={id} docs={data.documents} />
+      <UploadInboxPanel
+        tradeId={id}
+        docs={data.documents}
+        onChange={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
+      />
 
 
 
