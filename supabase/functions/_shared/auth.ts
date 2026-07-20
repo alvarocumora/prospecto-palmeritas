@@ -50,8 +50,10 @@ export async function requireProjectMember(
   admin: ReturnType<typeof createClient>,
   userId: string,
   projectId: string,
+  opts?: { isServiceRole?: boolean },
 ): Promise<{ ok: true } | { error: Response }> {
   if (!projectId) return { error: json(400, { error: "project_id required" }) };
+  if (opts?.isServiceRole || userId === "service-role") return { ok: true };
   // Super admins bypass tenant checks.
   const { data: sa } = await admin.rpc("is_super_admin", { _user_id: userId });
   if (sa === true) return { ok: true };
