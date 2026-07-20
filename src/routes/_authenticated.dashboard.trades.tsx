@@ -192,6 +192,30 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <>
+      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
+            Quickstart · Antimonio
+          </div>
+          <div className="text-xs text-foreground mt-0.5">
+            Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
+            Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+          </div>
+        </div>
+        <button
+          onClick={() => void startAntimony()}
+          disabled={saving}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+        >
+          {saving ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Ship className="w-3.5 h-3.5" />
+          )}
+          Iniciar operación Antimonio
+        </button>
+      </div>
+
       <div className="flex justify-end mb-3">
         <button
           onClick={() => setShowForm((v) => !v)}
@@ -203,7 +227,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
       {showForm && (
         <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
-          <F label="Email contraparte" full>
+          <div className="sm:col-span-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground -mb-1">
+            Contraparte · usuario Geocapitals o externo
+          </div>
+          <F label="Email contraparte">
             <input
               value={form.counterpartyEmail}
               onChange={(e) => setForm({ ...form, counterpartyEmail: e.target.value })}
@@ -211,6 +238,39 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               className={inputCls}
             />
           </F>
+          <F label="Nombre (si no tiene cuenta)">
+            <input
+              value={form.counterpartyName}
+              onChange={(e) => setForm({ ...form, counterpartyName: e.target.value })}
+              placeholder="Nombre y apellido"
+              className={inputCls}
+            />
+          </F>
+          <F label="Empresa">
+            <input
+              value={form.counterpartyCompany}
+              onChange={(e) => setForm({ ...form, counterpartyCompany: e.target.value })}
+              placeholder="Razón social"
+              className={inputCls}
+            />
+          </F>
+          <F label="País (ISO)">
+            <input
+              value={form.counterpartyCountry}
+              onChange={(e) => setForm({ ...form, counterpartyCountry: e.target.value })}
+              placeholder="CL, AE, CN…"
+              className={inputCls}
+            />
+          </F>
+          <F label="Teléfono">
+            <input
+              value={form.counterpartyPhone}
+              onChange={(e) => setForm({ ...form, counterpartyPhone: e.target.value })}
+              placeholder="+56 9 …"
+              className={inputCls}
+            />
+          </F>
+
           <F label="Soy">
             <select
               value={form.side}
