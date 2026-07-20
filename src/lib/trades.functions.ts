@@ -550,3 +550,53 @@ export const getTradeDocDownloadUrl = createServerFn({ method: "POST" })
       .createSignedUrl(fileUrl, 60 * 10);
     return { url: signed?.signedUrl ?? null };
   });
+
+// ── Solicitud de documentos al proveedor / contraparte ───────────────────────
+
+/** Crea placeholders `pending` en trade_documents para varios tipos a la vez y
+ *  registra un evento `docs_requested` con la lista. La contraparte cargará los
+ *  archivos desde su panel espejo `/operacion/<token>`. */
+export const requestTradeDocs = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        tradeId: z.string().uuid(),
+        docTypes: z.array(z.string().trim().min(1).max(60)).min(1).max(30),
+        note: z.string().trim().max(1000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const existing = await sb
+      .from("trade_documents")
+      .select("doc_type")
+      .eq("trade_id", data.tradeId);
+    const have = new Set(
+      ((existing.data ?? []) as Array<{ doc_type: string }>).map((r) => r.doc_type),
+    );
+    const missing = data.docTypes.filter((k) => !have.has(k));
+    if (missing.length > 0) {
+      const rows = missing.map((k) => ({
+        trade_id: data.tradeId,
+        doc_type: k,
+        phase: DOC_BY_KEY[k]?.phase ?? null,
+        status: "pending",
+        created_by: context.userId,
+      }));
+      const { error } = await sb.from("trade_documents").insert(rows);
+      if (error) throw new Error(error.message);
+    }
+    const labels = data.docTypes
+      .map((k) => DOC_BY_KEY[k]?.acronym ?? DOC_BY_KEY[k]?.label ?? k)
+      .join(", ");
+    await logEvent(
+      sb,
+      data.tradeId,
+      context.userId,
+      "docs_requested",
+      data.note ? `${labels} — ${data.note}` : labels,
+    );
+    return { requested: data.docTypes.length, created: missing.length };
+  });
