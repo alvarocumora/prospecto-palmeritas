@@ -2,6 +2,7 @@
 // POST { project_id, bbox: [minLng,minLat,maxLng,maxLat], cell_size_m? }
 // Calcula score 0-100 por celda fusionando: targets, sondajes con intercept, vetas, alteración.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
