@@ -2208,12 +2208,18 @@ export type Database = {
         Row: {
           buyer_user_id: string
           commodity: string | null
+          counterparty_buyer_email: string | null
+          counterparty_buyer_token_hash: string | null
+          counterparty_buyer_token_prefix: string | null
           counterparty_company: string | null
           counterparty_country: string | null
           counterparty_email: string | null
           counterparty_name: string | null
           counterparty_phone: string | null
           counterparty_role: string | null
+          counterparty_seller_email: string | null
+          counterparty_seller_token_hash: string | null
+          counterparty_seller_token_prefix: string | null
           created_at: string
           created_by: string
           currency: string
@@ -2236,12 +2242,18 @@ export type Database = {
         Insert: {
           buyer_user_id: string
           commodity?: string | null
+          counterparty_buyer_email?: string | null
+          counterparty_buyer_token_hash?: string | null
+          counterparty_buyer_token_prefix?: string | null
           counterparty_company?: string | null
           counterparty_country?: string | null
           counterparty_email?: string | null
           counterparty_name?: string | null
           counterparty_phone?: string | null
           counterparty_role?: string | null
+          counterparty_seller_email?: string | null
+          counterparty_seller_token_hash?: string | null
+          counterparty_seller_token_prefix?: string | null
           created_at?: string
           created_by: string
           currency?: string
@@ -2264,12 +2276,18 @@ export type Database = {
         Update: {
           buyer_user_id?: string
           commodity?: string | null
+          counterparty_buyer_email?: string | null
+          counterparty_buyer_token_hash?: string | null
+          counterparty_buyer_token_prefix?: string | null
           counterparty_company?: string | null
           counterparty_country?: string | null
           counterparty_email?: string | null
           counterparty_name?: string | null
           counterparty_phone?: string | null
           counterparty_role?: string | null
+          counterparty_seller_email?: string | null
+          counterparty_seller_token_hash?: string | null
+          counterparty_seller_token_prefix?: string | null
           created_at?: string
           created_by?: string
           currency?: string

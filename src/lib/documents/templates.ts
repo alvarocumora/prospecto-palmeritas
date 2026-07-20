@@ -1084,9 +1084,81 @@ const dataSheet: TemplateDef = {
   },
 };
 
+/* ─────────────── NCNDA (Non-Circumvention Non-Disclosure) ─────────────── */
+const ncnda: TemplateDef = {
+  id: "ncnda",
+  title: "NCNDA — No Elusión y Confidencialidad",
+  shortTitle: "NCNDA",
+  acronym: "NCNDA",
+  category: "trade",
+  summary:
+    "Acuerdo de no elusión y no divulgación entre productor, intermediario y comprador final para operaciones de commodities.",
+  fields: [
+    { key: "partyA", label: "Parte A — Intermediario / Titular", type: "text", default: OWN_PARTY_LINE, placeholder: "Razón social · RUT · Representante" },
+    { key: "partyB", label: "Parte B — Contraparte", type: "text", placeholder: "Razón social · RUT · Representante" },
+    { key: "partyBGiro", label: "Giro / Actividad Parte B", type: "text" },
+    { key: "partyBAddress", label: "Dirección Parte B", type: "text" },
+    { key: "partyBEmail", label: "Correo Parte B", type: "text" },
+    { key: "partyBPhone", label: "Teléfono Parte B", type: "text" },
+    { key: "commodity", label: "Commodity / Material", type: "text", placeholder: "Antimonio 99.85% (Sb ingot)" },
+    { key: "destination", label: "Destino del material", type: "text", placeholder: "Florida, USA" },
+    { key: "termMonths", label: "Vigencia (meses)", type: "number", default: "24" },
+    { key: "jurisdiction", label: "Jurisdicción", type: "text", default: "República de Chile" },
+  ],
+  clauses: [
+    {
+      key: "penalty",
+      label: "Penalidad por elusión",
+      defaultOn: true,
+      text: "El incumplimiento de la obligación de no elusión facultará a la Parte afectada a exigir una indemnización equivalente al cinco por ciento (5%) del valor bruto de la operación circunvenida, sin perjuicio de los daños adicionales que correspondan.",
+    },
+  ],
+  build: (val, active, ctx): GeneratedDoc => {
+    const A = bracket(gv(val, "partyA"), "Parte A");
+    const B = bracket(gv(val, "partyB"), "Parte B");
+    const commodity = gv(val, "commodity", "[commodity]");
+    const destination = gv(val, "destination", "[destino]");
+    const term = gv(val, "termMonths", "24");
+    const items = [
+      `Objeto. Las Partes suscriben este NCNDA con el objeto de intercambiar información técnica, comercial y financiera relativa a operaciones sobre ${commodity} con destino ${destination}, protegiendo dicha información y las relaciones comerciales identificadas por cada Parte.`,
+      `No elusión. Cada Parte se obliga a no contactar, negociar ni contratar, directa ni indirectamente, con productores, compradores, financistas, agentes o representantes identificados por la otra Parte, sin su consentimiento previo y por escrito, durante la vigencia y por doce (12) meses adicionales.`,
+      `Confidencialidad. Toda información técnica (assays, certificados, cadenas de custodia), comercial (precios, cantidades, contrapartes) y operativa se considerará confidencial y no podrá ser divulgada a terceros salvo bajo idénticas obligaciones de reserva.`,
+      `Vigencia. El presente acuerdo permanecerá vigente por ${term} meses contados desde su firma, prorrogables automáticamente por períodos iguales salvo aviso en contrario con treinta (30) días de anticipación.`,
+      active.has("penalty") ? (ncnda.clauses.find((c) => c.key === "penalty")!.text) : "",
+      jurisdictionClause(gv(val, "jurisdiction")),
+    ].filter(Boolean);
+    return {
+      docType: "ncnda",
+      reference: ctx.reference,
+      date: ctx.date,
+      title: "ACUERDO DE NO ELUSIÓN Y CONFIDENCIALIDAD (NCNDA)",
+      blocks: [
+        { kind: "paragraph", text: `Entre ${A} y ${B}, en adelante las "Partes", se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) conforme a las siguientes cláusulas:` },
+        {
+          kind: "fields",
+          rows: [
+            ["Parte A", A],
+            ["Parte B", B],
+            ["Giro / Actividad B", gv(val, "partyBGiro", "—")],
+            ["Dirección B", gv(val, "partyBAddress", "—")],
+            ["Correo B", gv(val, "partyBEmail", "—")],
+            ["Teléfono B", gv(val, "partyBPhone", "—")],
+            ["Commodity", commodity],
+            ["Destino del material", destination],
+            ["Vigencia", `${term} meses`],
+          ],
+        },
+        { kind: "clauses", items: renumber(items) },
+        { kind: "signature", parties: [A, B] },
+      ],
+    };
+  },
+};
+
 export const TEMPLATES: TemplateDef[] = [
   nda,
   ndi,
+  ncnda,
   mou,
   loi,
   termSheet,
