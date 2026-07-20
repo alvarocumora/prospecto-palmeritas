@@ -63,6 +63,10 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+    const memRes = await requireProjectMember(admin, user.id, project_id);
+    if ("error" in memRes) return memRes.error;
+
+
     // Bound the grid for safety
     const latSpan = maxLat - minLat;
     const lngSpan = maxLng - minLng;
