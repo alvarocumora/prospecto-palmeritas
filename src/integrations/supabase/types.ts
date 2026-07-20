@@ -4308,35 +4308,82 @@ export type Database = {
       document_drafts: {
         Row: {
           clauses: string[]
+          client_name: string | null
           created_at: string
           id: string
+          inquiry_id: string | null
+          project_id: string | null
           reference: string | null
+          status: string
           template_id: string
+          title: string | null
+          trade_id: string | null
           updated_at: string
           user_id: string
           values: Json
         }
         Insert: {
           clauses?: string[]
+          client_name?: string | null
           created_at?: string
           id?: string
+          inquiry_id?: string | null
+          project_id?: string | null
           reference?: string | null
+          status?: string
           template_id: string
+          title?: string | null
+          trade_id?: string | null
           updated_at?: string
           user_id: string
           values?: Json
         }
         Update: {
           clauses?: string[]
+          client_name?: string | null
           created_at?: string
           id?: string
+          inquiry_id?: string | null
+          project_id?: string | null
           reference?: string | null
+          status?: string
           template_id?: string
+          title?: string | null
+          trade_id?: string | null
           updated_at?: string
           user_id?: string
           values?: Json
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "document_drafts_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "document_drafts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_drafts_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       document_sign_requests: {
         Row: {
