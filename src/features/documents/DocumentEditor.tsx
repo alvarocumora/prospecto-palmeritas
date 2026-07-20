@@ -634,6 +634,21 @@ export function DocumentEditor({
               <code className="text-xs font-mono break-all">{signLink}</code>
             </div>
           )}
+
+          {isMultiParty && user ? (
+            <SignFlowPanel
+              parties={parties}
+              signers={flowSigners}
+              onSignersChange={setFlowSigners}
+              flowId={flowId}
+              tokens={flowTokens}
+              summary={flowSummary}
+              busy={flowBusy}
+              onStart={() => void startFlow()}
+              onRefresh={() => void refreshFlow()}
+              onRetry={doRetry}
+            />
+          ) : null}
         </div>
 
         {/* Preview live */}
