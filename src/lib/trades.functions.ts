@@ -187,6 +187,12 @@ export const getTradeDetail = createServerFn({ method: "GET" })
 const CreateTrade = z.object({
   counterpartyUserId: z.string().uuid().optional(),
   counterpartyEmail: z.string().email().max(200).optional(),
+  /** Datos de contraparte externa (sin cuenta). Si el email no corresponde a un
+   *  usuario, se persisten en columnas counterparty_* del trade. */
+  counterpartyName: z.string().trim().max(160).optional(),
+  counterpartyCompany: z.string().trim().max(200).optional(),
+  counterpartyCountry: z.string().trim().max(80).optional(),
+  counterpartyPhone: z.string().trim().max(60).optional(),
   side: z.enum(["buy", "sell"]), // el creador compra o vende
   lotId: z.string().uuid().optional(),
   inquiryId: z.string().uuid().optional(),
@@ -197,9 +203,12 @@ const CreateTrade = z.object({
   incoterm: z.string().trim().max(20).optional(),
   unitPriceUsd: z.number().min(0).max(1e12).optional(),
   paymentInstrument: z.enum(["sblc_mt760", "dlc", "tt", "escrow"]).optional(),
+  notes: z.string().trim().max(2000).optional(),
 });
 
-/** Crea un trade; el creador es comprador o vendedor según `side`. */
+/** Crea un trade; el creador es comprador o vendedor según `side`.
+ *  Si la contraparte no tiene cuenta, se registra como contraparte externa
+ *  (los campos counterparty_* del trade guardan sus datos identificatorios). */
 export const createTrade = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => CreateTrade.parse(d))
@@ -217,10 +226,21 @@ export const createTrade = createServerFn({ method: "POST" })
         .maybeSingle();
       counterparty = (prof as { user_id: string } | null)?.user_id ?? null;
     }
-    if (!counterparty) throw new Error("No se encontró la contraparte (revisa el email).");
+    // Sin usuario: se admite si venimos con al menos email o nombre+empresa para
+    // dejar registrada la contraparte externa.
+    const hasExternalIdentity =
+      Boolean(data.counterpartyEmail) ||
+      Boolean(data.counterpartyName && data.counterpartyCompany);
+    if (!counterparty && !hasExternalIdentity) {
+      throw new Error(
+        "Indica la contraparte: email de usuario existente o al menos nombre + empresa.",
+      );
+    }
     if (counterparty === context.userId) throw new Error("La contraparte no puede ser tú mismo.");
     const buyer = data.side === "buy" ? context.userId : counterparty;
     const seller = data.side === "sell" ? context.userId : counterparty;
+    const externalRole: "buyer" | "seller" | null =
+      counterparty == null ? (data.side === "buy" ? "seller" : "buyer") : null;
     const total =
       data.quantityT != null && data.unitPriceUsd != null
         ? data.quantityT * data.unitPriceUsd
@@ -240,6 +260,13 @@ export const createTrade = createServerFn({ method: "POST" })
         unit_price_usd: data.unitPriceUsd ?? null,
         total_value_usd: total,
         payment_instrument: data.paymentInstrument ?? null,
+        notes: data.notes ?? null,
+        counterparty_role: externalRole,
+        counterparty_name: externalRole ? (data.counterpartyName ?? null) : null,
+        counterparty_company: externalRole ? (data.counterpartyCompany ?? null) : null,
+        counterparty_country: externalRole ? (data.counterpartyCountry ?? null) : null,
+        counterparty_email: externalRole ? (data.counterpartyEmail ?? null) : null,
+        counterparty_phone: externalRole ? (data.counterpartyPhone ?? null) : null,
         created_by: context.userId,
       })
       .select("id")
@@ -249,6 +276,7 @@ export const createTrade = createServerFn({ method: "POST" })
     await logEvent(sb, id, context.userId, "created", "Trade creado");
     return { id };
   });
+
 
 /** El comprador (usuario actual) inicia un trade desde un lote del marketplace,
  * heredando producto y cantidad. El vendedor es el dueño del lote. */
