@@ -110,14 +110,19 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
 });
 
 function DocumentPage() {
-  const { templateId, prefill, tradeId, signerPrefill } = Route.useLoaderData();
+  const { templateId, prefill, tradeId, signerPrefill, draftId, projectId, inquiryId } =
+    Route.useLoaderData();
   const template = TEMPLATE_BY_ID[templateId];
   if (!template) return null;
   return (
     <DocumentEditor
+      key={draftId ?? "new"}
       template={template}
+      draftId={draftId ?? undefined}
       prefill={prefill ?? undefined}
+      projectId={projectId ?? undefined}
       tradeId={tradeId ?? undefined}
+      inquiryId={inquiryId ?? undefined}
       signerPrefill={signerPrefill ?? undefined}
     />
   );
