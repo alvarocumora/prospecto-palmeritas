@@ -6,6 +6,7 @@
 // Returns: { imported, skipped, failed, results: [...] }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
