@@ -487,6 +487,12 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
       {/* Due diligence del lote de origen (Know-Your-Mine) */}
       {t.lot_id && <LotTrustCard lotId={t.lot_id} />}
 
+      {/* Contraparte externa + link operación + solicitar documentos */}
+      <CounterpartyPanel trade={t} />
+      <RequestDocsPanel tradeId={id} docs={data.documents} />
+
+
+
       {/* Pipeline */}
       <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
         <div className="flex items-center gap-1 min-w-max">
