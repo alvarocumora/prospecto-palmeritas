@@ -1,6 +1,7 @@
 // Geo-Intel Brief (Sprint 5.2): genera un brief geológico contextual de un punto.
 // POST { project_id, lat, lng, radius_m? } → { brief, evidence }
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
