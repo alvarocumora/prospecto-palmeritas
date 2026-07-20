@@ -27,7 +27,11 @@ Deno.serve(async (req) => {
 
     let projectContext = "Sin proyecto activo seleccionado.";
     if (project_id) {
+      const authRes = await requireUser(req);
+      if ("error" in authRes) return authRes.error;
       const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+      const memRes = await requireProjectMember(admin, authRes.userId, project_id);
+      if ("error" in memRes) return memRes.error;
       const [
         proj,
         holes,
