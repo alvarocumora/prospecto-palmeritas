@@ -1158,15 +1158,23 @@ function SignFlowPanel({
 
       {!started ? (
         <>
+          <div className="rounded-md border border-amber-300/60 bg-amber-50/60 px-3 py-2 text-[11px] text-amber-800 mb-3">
+            El orden de firma sigue exactamente a las partes del contrato:
+            <b> #1 = Parte A</b>, #2 = Parte B, #3 = Parte C. Los datos se toman de los
+            campos «Firmante» del documento — edítalos ahí para no descuadrar el orden.
+          </div>
           <div className="space-y-2">
             {parties.map((role, i) => {
               const s = signers[i] ?? { role, name: "", email: "" };
+              const posLabel = ["Parte A", "Parte B", "Parte C", "Parte D"][i] ?? `#${i + 1}`;
               return (
                 <div
                   key={i}
-                  className="rounded-lg border border-hairline bg-surface-subtle p-3 grid grid-cols-1 sm:grid-cols-[24px_1fr_1fr] gap-2 items-center"
+                  className="rounded-lg border border-hairline bg-surface-subtle p-3 grid grid-cols-1 sm:grid-cols-[80px_1fr_1fr] gap-2 items-center"
                 >
-                  <div className="text-[11px] font-mono text-accent-brand">#{i + 1}</div>
+                  <div className="text-[11px] font-mono text-accent-brand">
+                    #{i + 1} · {posLabel}
+                  </div>
                   <input
                     value={s.name}
                     onChange={(e) => {
@@ -1174,7 +1182,7 @@ function SignFlowPanel({
                       next[i] = { ...s, name: e.target.value };
                       onSignersChange(next);
                     }}
-                    placeholder={`Nombre firmante (${role.slice(0, 24)}${role.length > 24 ? "…" : ""})`}
+                    placeholder={role.slice(0, 40)}
                     className="rounded border border-hairline bg-surface-3 px-2 py-1.5 text-xs"
                   />
                   <input
@@ -1185,7 +1193,7 @@ function SignFlowPanel({
                       next[i] = { ...s, email: e.target.value };
                       onSignersChange(next);
                     }}
-                    placeholder="Email"
+                    placeholder="Email del firmante"
                     className="rounded border border-hairline bg-surface-3 px-2 py-1.5 text-xs"
                   />
                 </div>
