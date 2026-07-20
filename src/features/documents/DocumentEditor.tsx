@@ -99,11 +99,11 @@ export function DocumentEditor({
     setReference((prev) => prev || buildReference(template.id));
   }, [template.id]);
 
-  // Hidratación: Supabase (si hay sesión) → localStorage como fallback.
+  // Hidratación: si viene un draftId existente, se lee de Supabase.
+  // Si es un draft nuevo, se conservan defaults (+ prefill posterior).
   useEffect(() => {
     let cancelled = false;
     async function hydrate() {
-      // Fallback local siempre disponible.
       const loadLocal = () => {
         try {
           const raw = window.localStorage.getItem(storageKey);
@@ -112,10 +112,14 @@ export function DocumentEditor({
             values?: Record<string, string>;
             clauses?: string[];
             reference?: string;
+            docTitle?: string;
+            clientName?: string;
           };
           if (parsed.values) setValues((prev) => ({ ...prev, ...parsed.values }));
           if (parsed.clauses) setClauses(new Set(parsed.clauses));
           if (parsed.reference) setReference(parsed.reference);
+          if (parsed.docTitle) setDocTitle(parsed.docTitle);
+          if (parsed.clientName) setClientName(parsed.clientName);
         } catch {
           // ignore
         }
@@ -128,12 +132,20 @@ export function DocumentEditor({
         return;
       }
 
+      // Draft nuevo (sin id en URL) → arrancamos limpio; se inserta al primer save.
+      if (isNewDraft) {
+        loadLocal();
+        setSync("idle");
+        hydrated.current = true;
+        return;
+      }
+
       setSync("loading");
       const { data, error } = await supabase
         .from("document_drafts")
-        .select("values, clauses, reference")
+        .select("values, clauses, reference, title, client_name")
+        .eq("id", draftId)
         .eq("user_id", user.id)
-        .eq("template_id", template.id)
         .maybeSingle();
 
       if (cancelled) return;
@@ -151,6 +163,9 @@ export function DocumentEditor({
         setValues((prev) => ({ ...prev, ...remoteValues }));
         setClauses(new Set(remoteClauses));
         if (data.reference) setReference(data.reference);
+        if (data.title) setDocTitle(data.title);
+        if (data.client_name) setClientName(data.client_name);
+        persistedRef.current = true;
         setSync("saved");
       } else {
         loadLocal();
@@ -162,7 +177,7 @@ export function DocumentEditor({
     return () => {
       cancelled = true;
     };
-  }, [storageKey, template.id, user]);
+  }, [storageKey, draftId, isNewDraft, user]);
 
   // Prefill (ej. desde un lote): se aplica después de hidratar y pisa el
   // borrador solo en las claves que trae, para reflejar el dato actual del lote.
@@ -178,14 +193,19 @@ export function DocumentEditor({
     return () => window.clearInterval(wait);
   }, [prefillKey]);
 
-  // Persistencia local + remota con debounce.
+  // Persistencia local + remota con debounce, indexada por draftId.
   useEffect(() => {
     if (!hydrated.current) return;
-    // Local siempre.
     try {
       window.localStorage.setItem(
         storageKey,
-        JSON.stringify({ values, clauses: Array.from(clauses), reference }),
+        JSON.stringify({
+          values,
+          clauses: Array.from(clauses),
+          reference,
+          docTitle,
+          clientName,
+        }),
       );
     } catch {
       // ignore
@@ -198,21 +218,57 @@ export function DocumentEditor({
     saveTimer.current = setTimeout(async () => {
       const { error } = await supabase.from("document_drafts").upsert(
         {
+          id: draftId,
           user_id: user.id,
           template_id: template.id,
           values,
           clauses: Array.from(clauses),
           reference,
+          title: docTitle.trim() || null,
+          client_name: clientName.trim() || null,
+          project_id: projectId ?? null,
+          trade_id: tradeId ?? null,
+          inquiry_id: inquiryId ?? null,
         },
-        { onConflict: "user_id,template_id" },
+        { onConflict: "id" },
       );
       setSync(error ? "error" : "saved");
+      // Al primer guardado, si estábamos en modo "nuevo", sincronizamos la URL
+      // con el draftId para que refresh / share funcione y no dupliquemos rows.
+      if (!error && isNewDraft && !persistedRef.current) {
+        persistedRef.current = true;
+        try {
+          navigate({
+            to: "/dashboard/documentos/$templateId",
+            params: { templateId: template.id },
+            search: (prev) => ({ ...prev, draftId }),
+            replace: true,
+          });
+        } catch {
+          // ignore navigation errors — el borrador ya quedó guardado.
+        }
+      }
     }, 800);
 
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [storageKey, values, clauses, reference, user, template.id]);
+  }, [
+    storageKey,
+    values,
+    clauses,
+    reference,
+    docTitle,
+    clientName,
+    user,
+    template.id,
+    draftId,
+    isNewDraft,
+    navigate,
+    projectId,
+    tradeId,
+    inquiryId,
+  ]);
 
   const doc = useMemo<GeneratedDoc>(
     () =>
