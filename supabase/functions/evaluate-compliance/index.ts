@@ -84,6 +84,11 @@ Deno.serve(async (req) => {
       });
     }
 
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const memRes = await requireProjectMember(admin, authRes.userId, report.project_id);
+    if ("error" in memRes) return memRes.error;
+
     const activeStandards = (standards && standards.length
       ? standards
       : report.active_standards) ?? ["ni43101"];
