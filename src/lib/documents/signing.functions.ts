@@ -580,3 +580,24 @@ export const retrySigner = createServerFn({ method: "POST" })
 
     return { ok: true, token: newToken };
   });
+
+// Anula todas las solicitudes pendientes de un flow (owner). Útil para
+// re-sincronizar orden/firmantes cuando el flujo se envió con orden incorrecto
+// y hay que emitir uno nuevo alineado a las partes del contrato. Las filas ya
+// firmadas se conservan como evidencia auditable.
+export const voidSignFlow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ flowId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { data: rows, error } = await sb
+      .from("document_sign_requests")
+      .update({ status: "void" })
+      .eq("flow_id", data.flowId)
+      .eq("created_by", context.userId as string)
+      .eq("status", "pending")
+      .select("id");
+    if (error) throw new Error(error.message);
+    return { voided: rows?.length ?? 0 };
+  });
+
