@@ -319,10 +319,23 @@ export function DocumentEditor({
   const [flowSigners, setFlowSigners] = useState<FlowSignerInput[]>([]);
   useEffect(() => {
     // Precarga inputs con las partes del bloque de firma.
+    // Para NCNDA (posiciones A/B/C) y plantillas con convención pX_name/pX_email,
+    // rellena automáticamente nombre y email desde los datos del documento para
+    // que el orden de la firma coincida SIEMPRE con las partes del contrato
+    // (Parte A → firmante #1, Parte B → #2, …).
+    const posKeys = ["A", "B", "C", "D"] as const;
     setFlowSigners((prev) =>
-      parties.map((role, i) => prev[i] ?? { role, name: "", email: "" }),
+      parties.map((role, i) => {
+        if (prev[i] && (prev[i].name || prev[i].email)) return prev[i];
+        const p = posKeys[i];
+        const name = p ? (values[`p${p}_name`] ?? "").trim() : "";
+        const email = p ? (values[`p${p}_email`] ?? "").trim() : "";
+        return { role, name, email };
+      }),
     );
-  }, [parties]);
+    // Depende de values para que al completar los campos de la parte, la fila
+    // del flujo se actualice sola.
+  }, [parties, values]);
 
   const [flowId, setFlowId] = useState<string | null>(null);
   const [flowTokens, setFlowTokens] = useState<Record<number, string>>({});
