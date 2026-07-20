@@ -49,28 +49,50 @@ function defaultClauses(tpl: TemplateDef): Set<string> {
 
 export function DocumentEditor({
   template,
+  draftId: draftIdProp,
   prefill,
+  projectId,
   tradeId,
+  inquiryId,
   signerPrefill,
 }: {
   template: TemplateDef;
+  /** Id del borrador. Si no viene, se crea uno nuevo (documento independiente por cliente). */
+  draftId?: string;
   /** Valores iniciales (ej. desde un lote del marketplace). Pisan el borrador. */
   prefill?: Record<string, string>;
+  /** Proyecto asociado (queda vinculado al borrador). */
+  projectId?: string;
   /** Trade de origen: la firma queda en la trazabilidad de la operación. */
   tradeId?: string;
+  /** Requerimiento de sourcing asociado. */
+  inquiryId?: string;
   /** Contraparte sugerida (ej. desde un trade) para la solicitud de firma. */
   signerPrefill?: { name?: string | null; email?: string | null };
 }) {
   const { user } = useAuth();
-  const storageKey = `${STORAGE_PREFIX}${template.id}`;
+  const navigate = useNavigate();
+
+  // Id estable del borrador. Se genera en cliente si no vino por URL,
+  // así todos los documentos que crea el usuario desde una misma plantilla
+  // (uno por cliente / operación) quedan separados.
+  const draftIdRef = useRef<string>(
+    draftIdProp ?? (typeof crypto !== "undefined" ? crypto.randomUUID() : ""),
+  );
+  const draftId = draftIdRef.current;
+  const isNewDraft = !draftIdProp;
+  const storageKey = `${STORAGE_PREFIX}${template.id}:${draftId}`;
 
   const [values, setValues] = useState<Record<string, string>>(() => defaultValues(template));
   const [clauses, setClauses] = useState<Set<string>>(() => defaultClauses(template));
   const [reference, setReference] = useState<string>("");
+  const [docTitle, setDocTitle] = useState<string>("");
+  const [clientName, setClientName] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [sync, setSync] = useState<SyncStatus>("idle");
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const persistedRef = useRef(false);
 
   // Genera referencia solo en cliente para evitar mismatch SSR.
   useEffect(() => {
