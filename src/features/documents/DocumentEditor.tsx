@@ -241,7 +241,7 @@ export function DocumentEditor({
           navigate({
             to: "/dashboard/documentos/$templateId",
             params: { templateId: template.id },
-            search: (prev) => ({ ...prev, draftId }),
+            search: { draftId },
             replace: true,
           });
         } catch {
