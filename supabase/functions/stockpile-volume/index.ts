@@ -106,13 +106,18 @@ Deno.serve(async (req) => {
     const { projectId, rasterId, name, polygonGeojson, baseMethod } = body;
     if (!projectId || !rasterId || !name || !polygonGeojson) throw new Error("Missing fields");
 
-    const userId = req.headers.get("x-user-id");
-    if (!userId) throw new Error("Missing x-user-id header");
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const userId = authRes.userId;
 
     const sb = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    const memRes = await requireProjectMember(sb, userId, projectId);
+    if ("error" in memRes) return memRes.error;
+
 
     const { data: row, error } = await sb
       .from("drone_rasters")
