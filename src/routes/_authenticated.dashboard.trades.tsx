@@ -36,7 +36,9 @@ import {
   getTradeDocDownloadUrl,
   listTradeEvents,
   addTradeMessage,
+  requestTradeDocs,
 } from "@/lib/trades.functions";
+import { ensureCounterpartyLink } from "@/lib/tradeOps.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -47,6 +49,7 @@ import {
   type TradePhase,
   type TradeStage,
 } from "@/lib/tradeDocuments";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
