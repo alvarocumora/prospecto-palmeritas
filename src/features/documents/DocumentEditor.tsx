@@ -463,6 +463,83 @@ export function DocumentEditor({
     }
   };
 
+  // Re-sincroniza el flujo actual: anula las solicitudes pendientes del flow
+  // vigente y crea uno nuevo con los firmantes derivados de las partes del
+  // contrato (Parte A → #1, Parte B → #2, …). No depende de tokens antiguos.
+  const voidFlowFn = useServerFn(voidSignFlow);
+  const resyncFlow = async () => {
+    if (!user) {
+      toast.error("Inicia sesión para reordenar el flujo.");
+      return;
+    }
+    if (
+      !window.confirm(
+        "Se anularán los links pendientes del flujo actual y se emitirá uno nuevo con el orden correcto (Parte A → #1, Parte B → #2, …). Los ya firmados se conservan como evidencia. ¿Continuar?",
+      )
+    )
+      return;
+    setFlowBusy(true);
+    try {
+      if (flowId) {
+        try {
+          await voidFlowFn({ data: { flowId } });
+        } catch (e) {
+          console.warn("[resyncFlow] void failed", e);
+        }
+      }
+      // Reset local state y localStorage antes de crear el nuevo flujo.
+      setFlowId(null);
+      setFlowTokens({});
+      setFlowSummary(null);
+      try {
+        window.localStorage.removeItem(flowStorageKey);
+      } catch {}
+      // Reconstruye los inputs desde las partes actuales del documento.
+      const posKeys = ["A", "B", "C", "D"] as const;
+      const fresh = parties.map((role, i) => {
+        const p = posKeys[i];
+        return {
+          role,
+          name: p ? (values[`p${p}_name`] ?? "").trim() : "",
+          email: p ? (values[`p${p}_email`] ?? "").trim() : "",
+        };
+      });
+      setFlowSigners(fresh);
+      const res = await createFlowFn({
+        data: {
+          templateId: template.id,
+          doc: doc as unknown as SignableDoc,
+          tradeId,
+          signers: fresh.map((s) => ({
+            role: s.role || undefined,
+            name: s.name || undefined,
+            email: s.email || undefined,
+          })),
+        },
+      });
+      const tokMap: Record<number, string> = {};
+      for (const t of res.tokens) tokMap[t.order] = t.token;
+      setFlowId(res.flowId);
+      setFlowTokens(tokMap);
+      try {
+        window.localStorage.setItem(
+          flowStorageKey,
+          JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
+        );
+      } catch {}
+      await navigator.clipboard.writeText(buildSignUrl(res.tokens[0].token)).catch(() => {});
+      toast.success(
+        `Flujo re-sincronizado. #1 = ${fresh[0]?.name || fresh[0]?.role || "Parte A"}. Link del primero copiado.`,
+      );
+      void refreshFlow();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo re-sincronizar el flujo.");
+    } finally {
+      setFlowBusy(false);
+    }
+  };
+
+
   const requestSignature = async () => {
     if (!user) {
       toast.error("Inicia sesión para solicitar firmas.");
