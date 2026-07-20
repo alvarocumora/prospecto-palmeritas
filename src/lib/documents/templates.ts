@@ -2,7 +2,7 @@
 // Sheet, SPA (esqueleto), JV, Royalty/NSR y Advisory. Lógica pura; el editor
 // y el renderer PDF consumen estas definiciones.
 
-import type { TemplateDef, GeneratedDoc, DocBlock } from "./model";
+import type { TemplateDef, GeneratedDoc, DocBlock, FieldDef } from "./model";
 import { OWN_PARTY_LINE } from "./company";
 
 const gv = (values: Record<string, string>, key: string, fallback = ""): string =>
