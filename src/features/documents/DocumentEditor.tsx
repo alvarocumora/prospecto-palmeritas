@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -10,13 +10,25 @@ import {
   Cloud,
   CloudOff,
   Loader2,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  Copy,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import type { TemplateDef, GeneratedDoc, DocBlock } from "@/lib/documents/model";
 import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
-import { createSignRequest, type SignableDoc } from "@/lib/documents/signing.functions";
+import {
+  createSignRequest,
+  createSignFlow,
+  getMySignFlow,
+  retrySigner,
+  type SignableDoc,
+  type SignFlowSummary,
+} from "@/lib/documents/signing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
@@ -217,6 +229,150 @@ export function DocumentEditor({
   const [signerEmail, setSignerEmail] = useState(signerPrefill?.email ?? "");
   const [signerName, setSignerName] = useState(signerPrefill?.name ?? "");
   const signFn = useServerFn(createSignRequest);
+
+  // ─── Flujo ordenado multi-firmante (NCNDA y otros con ≥2 partes) ───
+  const parties = useMemo(() => {
+    const sig = doc.blocks.find((b) => b.kind === "signature") as
+      | { kind: "signature"; parties: string[] }
+      | undefined;
+    return sig?.parties ?? [];
+  }, [doc]);
+  const isMultiParty = parties.length >= 2;
+  const flowStorageKey = `${STORAGE_PREFIX}flow:${template.id}`;
+
+  type FlowSignerInput = { role: string; name: string; email: string };
+  const [flowSigners, setFlowSigners] = useState<FlowSignerInput[]>([]);
+  useEffect(() => {
+    // Precarga inputs con las partes del bloque de firma.
+    setFlowSigners((prev) =>
+      parties.map((role, i) => prev[i] ?? { role, name: "", email: "" }),
+    );
+  }, [parties]);
+
+  const [flowId, setFlowId] = useState<string | null>(null);
+  const [flowTokens, setFlowTokens] = useState<Record<number, string>>({});
+  const [flowSummary, setFlowSummary] = useState<SignFlowSummary | null>(null);
+  const [flowBusy, setFlowBusy] = useState(false);
+
+  const createFlowFn = useServerFn(createSignFlow);
+  const getFlowFn = useServerFn(getMySignFlow);
+  const retryFn = useServerFn(retrySigner);
+
+  // Persiste flowId por plantilla para recuperar estado tras refresh.
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = window.localStorage.getItem(flowStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { flowId?: string; tokens?: Record<number, string> };
+        if (parsed.flowId) setFlowId(parsed.flowId);
+        if (parsed.tokens) setFlowTokens(parsed.tokens);
+      }
+    } catch {}
+  }, [flowStorageKey, user]);
+
+  const refreshFlow = useCallback(async () => {
+    if (!flowId) return;
+    try {
+      const s = await getFlowFn({ data: { flowId } });
+      setFlowSummary(s);
+    } catch (e) {
+      console.error("[refreshFlow]", e);
+    }
+  }, [flowId, getFlowFn]);
+
+  useEffect(() => {
+    if (!flowId) return;
+    void refreshFlow();
+    // Polling suave mientras haya firmantes pendientes.
+    const t = setInterval(() => {
+      if (flowSummary?.completed) return;
+      void refreshFlow();
+    }, 20_000);
+    return () => clearInterval(t);
+  }, [flowId, refreshFlow, flowSummary?.completed]);
+
+  const startFlow = async () => {
+    if (!user) {
+      toast.error("Inicia sesión para enviar a firma.");
+      return;
+    }
+    // Validación mínima: al menos el primer firmante debe tener email o nombre.
+    const first = flowSigners[0];
+    if (!first?.email && !first?.name) {
+      toast.error("Ingresa al menos el nombre o email del primer firmante.");
+      return;
+    }
+    setFlowBusy(true);
+    try {
+      const res = await createFlowFn({
+        data: {
+          templateId: template.id,
+          doc: doc as unknown as SignableDoc,
+          tradeId,
+          signers: flowSigners.map((s) => ({
+            role: s.role || undefined,
+            name: s.name.trim() || undefined,
+            email: s.email.trim() || undefined,
+          })),
+        },
+      });
+      const tokMap: Record<number, string> = {};
+      for (const t of res.tokens) tokMap[t.order] = t.token;
+      setFlowId(res.flowId);
+      setFlowTokens(tokMap);
+      try {
+        window.localStorage.setItem(
+          flowStorageKey,
+          JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
+        );
+      } catch {}
+      toast.success(
+        `Flujo creado con ${res.tokens.length} firmantes en orden. Link del primero copiado.`,
+      );
+      await navigator.clipboard.writeText(buildSignUrl(res.tokens[0].token)).catch(() => {});
+      void refreshFlow();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo crear el flujo de firma.");
+    } finally {
+      setFlowBusy(false);
+    }
+  };
+
+  const doRetry = async (
+    requestId: string,
+    order: number,
+    patch: { name?: string; email?: string },
+    regenerate: boolean,
+  ) => {
+    try {
+      const res = await retryFn({
+        data: {
+          id: requestId,
+          name: patch.name,
+          email: patch.email,
+          regenerateToken: regenerate,
+        },
+      });
+      if (res.token) {
+        const next = { ...flowTokens, [order]: res.token };
+        setFlowTokens(next);
+        try {
+          window.localStorage.setItem(
+            flowStorageKey,
+            JSON.stringify({ flowId, tokens: next }),
+          );
+        } catch {}
+        await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
+        toast.success("Link regenerado y copiado.");
+      } else {
+        toast.success("Datos del firmante actualizados.");
+      }
+      await refreshFlow();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo reintentar.");
+    }
+  };
 
   const requestSignature = async () => {
     if (!user) {
@@ -478,6 +634,21 @@ export function DocumentEditor({
               <code className="text-xs font-mono break-all">{signLink}</code>
             </div>
           )}
+
+          {isMultiParty && user ? (
+            <SignFlowPanel
+              parties={parties}
+              signers={flowSigners}
+              onSignersChange={setFlowSigners}
+              flowId={flowId}
+              tokens={flowTokens}
+              summary={flowSummary}
+              busy={flowBusy}
+              onStart={() => void startFlow()}
+              onRefresh={() => void refreshFlow()}
+              onRetry={doRetry}
+            />
+          ) : null}
         </div>
 
         {/* Preview live */}
@@ -783,4 +954,248 @@ function BlockPreview({ block }: { block: DocBlock }) {
     );
   }
   return null;
+}
+
+// ─── Panel de flujo ordenado multi-firmante ───
+function SignFlowPanel({
+  parties,
+  signers,
+  onSignersChange,
+  flowId,
+  tokens,
+  summary,
+  busy,
+  onStart,
+  onRefresh,
+  onRetry,
+}: {
+  parties: string[];
+  signers: { role: string; name: string; email: string }[];
+  onSignersChange: (s: { role: string; name: string; email: string }[]) => void;
+  flowId: string | null;
+  tokens: Record<number, string>;
+  summary: SignFlowSummary | null;
+  busy: boolean;
+  onStart: () => void;
+  onRefresh: () => void;
+  onRetry: (
+    id: string,
+    order: number,
+    patch: { name?: string; email?: string },
+    regenerate: boolean,
+  ) => void;
+}) {
+  const [retryOpen, setRetryOpen] = useState<string | null>(null);
+  const [retryName, setRetryName] = useState("");
+  const [retryEmail, setRetryEmail] = useState("");
+
+  const started = !!flowId && !!summary;
+
+  return (
+    <section className="mt-6 rounded-2xl border border-hairline bg-surface-3 p-5">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Users className="w-4 h-4 text-accent-brand" />
+          <div>
+            <div className="text-[13px] font-medium text-content">Firma en orden</div>
+            <div className="text-[11px] text-content-subtle">
+              {parties.length} firmantes · cada uno recibe su propio link. El siguiente sólo
+              puede firmar una vez que firmó el anterior.
+            </div>
+          </div>
+        </div>
+        {started ? (
+          <button
+            type="button"
+            onClick={onRefresh}
+            className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
+          >
+            <RefreshCw className="w-3 h-3" /> Actualizar
+          </button>
+        ) : null}
+      </div>
+
+      {!started ? (
+        <>
+          <div className="space-y-2">
+            {parties.map((role, i) => {
+              const s = signers[i] ?? { role, name: "", email: "" };
+              return (
+                <div
+                  key={i}
+                  className="rounded-lg border border-hairline bg-surface-subtle p-3 grid grid-cols-1 sm:grid-cols-[24px_1fr_1fr] gap-2 items-center"
+                >
+                  <div className="text-[11px] font-mono text-accent-brand">#{i + 1}</div>
+                  <input
+                    value={s.name}
+                    onChange={(e) => {
+                      const next = [...signers];
+                      next[i] = { ...s, name: e.target.value };
+                      onSignersChange(next);
+                    }}
+                    placeholder={`Nombre firmante (${role.slice(0, 24)}${role.length > 24 ? "…" : ""})`}
+                    className="rounded border border-hairline bg-surface-3 px-2 py-1.5 text-xs"
+                  />
+                  <input
+                    type="email"
+                    value={s.email}
+                    onChange={(e) => {
+                      const next = [...signers];
+                      next[i] = { ...s, email: e.target.value };
+                      onSignersChange(next);
+                    }}
+                    placeholder="Email"
+                    className="rounded border border-hairline bg-surface-3 px-2 py-1.5 text-xs"
+                  />
+                </div>
+              );
+            })}
+          </div>
+          <button
+            type="button"
+            onClick={onStart}
+            disabled={busy}
+            className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-accent-brand text-white px-3 py-2 text-sm disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
+            {busy ? "Creando flujo…" : "Enviar a firma en orden"}
+          </button>
+        </>
+      ) : (
+        <div className="space-y-2">
+          {summary!.signers.map((s) => {
+            const isCurrent = summary!.currentOrder === s.order;
+            const isSigned = s.status === "signed";
+            const tokenNow = tokens[s.order];
+            const link = tokenNow ? buildSignUrl(tokenNow) : null;
+            return (
+              <div
+                key={s.id}
+                className={`rounded-lg border p-3 ${
+                  isSigned
+                    ? "border-emerald-300 bg-emerald-50/50"
+                    : isCurrent
+                      ? "border-accent-brand bg-accent-brand/5"
+                      : "border-hairline bg-surface-subtle"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2 flex-wrap">
+                  <div className="flex items-center gap-2 min-w-0">
+                    {isSigned ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    ) : (
+                      <Clock className="w-4 h-4 text-content-subtle" />
+                    )}
+                    <div className="min-w-0">
+                      <div className="text-[12px] font-medium text-content truncate">
+                        #{s.order + 1} · {s.role ?? `Firmante ${s.order + 1}`}
+                      </div>
+                      <div className="text-[11px] text-content-subtle truncate">
+                        {s.signerNameExpected ?? "—"}
+                        {s.signerEmail ? ` · ${s.signerEmail}` : ""}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-[10px] font-mono uppercase tracking-wider">
+                    {isSigned ? (
+                      <span className="text-emerald-700">
+                        firmado {s.signedAt ? new Date(s.signedAt).toLocaleDateString("es-CL") : ""}
+                      </span>
+                    ) : isCurrent ? (
+                      <span className="text-accent-brand">pendiente · turno actual</span>
+                    ) : (
+                      <span className="text-content-subtle">en espera</span>
+                    )}
+                  </div>
+                </div>
+
+                {!isSigned && link ? (
+                  <div className="mt-2 flex items-center gap-2">
+                    <code className="text-[10px] font-mono break-all flex-1 rounded bg-white/70 px-2 py-1 border border-hairline">
+                      {link}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => void navigator.clipboard.writeText(link)}
+                      className="inline-flex items-center gap-1 text-[10px] font-mono text-accent-brand"
+                    >
+                      <Copy className="w-3 h-3" /> Copiar
+                    </button>
+                  </div>
+                ) : null}
+
+                {!isSigned ? (
+                  retryOpen === s.id ? (
+                    <div className="mt-2 grid sm:grid-cols-2 gap-2">
+                      <input
+                        value={retryName}
+                        onChange={(e) => setRetryName(e.target.value)}
+                        placeholder="Nuevo nombre"
+                        className="rounded border border-hairline bg-white px-2 py-1 text-xs"
+                      />
+                      <input
+                        type="email"
+                        value={retryEmail}
+                        onChange={(e) => setRetryEmail(e.target.value)}
+                        placeholder="Nuevo email"
+                        className="rounded border border-hairline bg-white px-2 py-1 text-xs"
+                      />
+                      <div className="flex gap-2 sm:col-span-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onRetry(
+                              s.id,
+                              s.order,
+                              {
+                                name: retryName || undefined,
+                                email: retryEmail || undefined,
+                              },
+                              true,
+                            );
+                            setRetryOpen(null);
+                            setRetryName("");
+                            setRetryEmail("");
+                          }}
+                          className="rounded bg-accent-brand text-white text-[11px] px-2 py-1"
+                        >
+                          Regenerar link y reenviar
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setRetryOpen(null)}
+                          className="rounded border border-hairline text-[11px] px-2 py-1"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setRetryOpen(s.id);
+                        setRetryName(s.signerNameExpected ?? "");
+                        setRetryEmail(s.signerEmail ?? "");
+                      }}
+                      className="mt-2 inline-flex items-center gap-1 text-[10px] font-mono text-content-subtle hover:text-accent-brand"
+                    >
+                      <RefreshCw className="w-3 h-3" /> Reintentar / actualizar contacto
+                    </button>
+                  )
+                ) : null}
+              </div>
+            );
+          })}
+
+          {summary!.completed ? (
+            <div className="rounded-lg border border-emerald-300 bg-emerald-50 p-3 text-[12px] text-emerald-800">
+              ✅ Todos los firmantes completaron su firma. El documento queda registrado en la
+              trazabilidad {summary!.tradeId ? "del trade vinculado" : ""}.
+            </div>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
 }

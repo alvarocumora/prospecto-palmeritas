@@ -4345,13 +4345,16 @@ export type Database = {
           doc: Json
           doc_hash: string
           expires_at: string
+          flow_id: string | null
           id: string
           reference: string
+          sign_order: number | null
           signature_hash: string | null
           signed_at: string | null
           signed_by_name: string | null
           signer_email: string | null
           signer_name_expected: string | null
+          signer_role: string | null
           status: string
           template_id: string
           title: string
@@ -4366,13 +4369,16 @@ export type Database = {
           doc: Json
           doc_hash: string
           expires_at?: string
+          flow_id?: string | null
           id?: string
           reference: string
+          sign_order?: number | null
           signature_hash?: string | null
           signed_at?: string | null
           signed_by_name?: string | null
           signer_email?: string | null
           signer_name_expected?: string | null
+          signer_role?: string | null
           status?: string
           template_id: string
           title: string
@@ -4387,13 +4393,16 @@ export type Database = {
           doc?: Json
           doc_hash?: string
           expires_at?: string
+          flow_id?: string | null
           id?: string
           reference?: string
+          sign_order?: number | null
           signature_hash?: string | null
           signed_at?: string | null
           signed_by_name?: string | null
           signer_email?: string | null
           signer_name_expected?: string | null
+          signer_role?: string | null
           status?: string
           template_id?: string
           title?: string

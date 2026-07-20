@@ -343,3 +343,240 @@ export const submitSignature = createServerFn({ method: "POST" })
 
     return { signedAt: signedAtIso, signatureHash };
   });
+
+// ═════════════════════════════════════════════════════════════════════════
+// FLUJO ORDENADO (multi-firmante): agrupa N solicitudes bajo un mismo
+// flow_id con sign_order estricto. Cada firmante tiene su propio token, y
+// se puede REINTENTAR/actualizar la información de un firmante pendiente
+// (nombre/email + nuevo token) sin afectar a los ya firmados.
+// ═════════════════════════════════════════════════════════════════════════
+
+const FlowInput = z.object({
+  templateId: z.string().trim().min(1).max(40),
+  doc: DocSchema,
+  tradeId: z.string().uuid().optional(),
+  signers: z
+    .array(
+      z.object({
+        role: z.string().trim().max(80).optional(),
+        name: z.string().trim().max(120).optional(),
+        email: z.string().trim().email().max(160).optional(),
+      }),
+    )
+    .min(1)
+    .max(6),
+});
+
+export const createSignFlow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => FlowInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const generated = data.doc as GeneratedDoc;
+    const flowId = globalThis.crypto.randomUUID();
+    const hash = await docHash(generated);
+
+    const rows: Array<Record<string, unknown>> = [];
+    const tokens: Array<{ order: number; role: string | null; token: string }> = [];
+
+    for (let i = 0; i < data.signers.length; i++) {
+      const s = data.signers[i];
+      const token = generateSignToken();
+      tokens.push({ order: i, role: s.role ?? null, token });
+      rows.push({
+        created_by: context.userId as string,
+        template_id: data.templateId,
+        reference: generated.reference,
+        title: generated.title,
+        doc: generated,
+        doc_hash: hash,
+        signer_name_expected: s.name ?? null,
+        signer_email: s.email ?? null,
+        token_prefix: signTokenPrefix(token),
+        token_hash: await sha256Hex(token),
+        flow_id: flowId,
+        sign_order: i,
+        signer_role: s.role ?? null,
+        ...(data.tradeId ? { trade_id: data.tradeId } : {}),
+      });
+    }
+
+    const { data: inserted, error } = await sb
+      .from("document_sign_requests")
+      .insert(rows)
+      .select("id, sign_order");
+    if (error) throw new Error(error.message);
+
+    // Notificar sólo al primer firmante (los siguientes se avisan al firmar el anterior).
+    const first = data.signers[0];
+    if (first?.email) {
+      try {
+        const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
+          import("@/lib/email/send-internal.server"),
+          import("@/lib/documents/company"),
+        ]);
+        await sendInternalEmail({
+          templateName: "sign-request-signer",
+          recipientEmail: first.email,
+          idempotencyKey: `sign-flow:${flowId}:0`,
+          templateData: {
+            docTitle: generated.title,
+            reference: generated.reference,
+            senderCompany: OWN_COMPANY.name,
+            signerName: first.name ?? undefined,
+            signUrl: buildSignUrl(tokens[0].token),
+          },
+        });
+      } catch (e) {
+        console.error("[createSignFlow] notify first signer failed", e);
+      }
+    }
+
+    return {
+      flowId,
+      tokens, // única vez que viajan en claro
+      requestIds: (inserted ?? []) as Array<{ id: string; sign_order: number }>,
+    };
+  });
+
+export type SignFlowSignerRow = {
+  id: string;
+  order: number;
+  role: string | null;
+  status: SignRequestStatus;
+  signerNameExpected: string | null;
+  signerEmail: string | null;
+  tokenPrefix: string;
+  signedByName: string | null;
+  signedAt: string | null;
+  expiresAt: string;
+  hasContactInfo: boolean;
+};
+
+export type SignFlowSummary = {
+  flowId: string;
+  templateId: string;
+  reference: string;
+  title: string;
+  tradeId: string | null;
+  signers: SignFlowSignerRow[];
+  currentOrder: number | null; // siguiente pendiente
+  completed: boolean;
+};
+
+function summarize(rows: Array<Record<string, unknown>>): SignFlowSummary | null {
+  if (rows.length === 0) return null;
+  const sorted = [...rows].sort(
+    (a, b) => Number(a.sign_order ?? 0) - Number(b.sign_order ?? 0),
+  );
+  const signers: SignFlowSignerRow[] = sorted.map((r) => ({
+    id: String(r.id),
+    order: Number(r.sign_order ?? 0),
+    role: (r.signer_role ?? null) as string | null,
+    status: r.status as SignRequestStatus,
+    signerNameExpected: (r.signer_name_expected ?? null) as string | null,
+    signerEmail: (r.signer_email ?? null) as string | null,
+    tokenPrefix: String(r.token_prefix),
+    signedByName: (r.signed_by_name ?? null) as string | null,
+    signedAt: (r.signed_at ?? null) as string | null,
+    expiresAt: String(r.expires_at),
+    hasContactInfo: Boolean(r.signer_name_expected || r.signer_email),
+  }));
+  const next = signers.find((s) => s.status === "pending");
+  return {
+    flowId: String(sorted[0].flow_id),
+    templateId: String(sorted[0].template_id),
+    reference: String(sorted[0].reference),
+    title: String(sorted[0].title),
+    tradeId: (sorted[0].trade_id ?? null) as string | null,
+    signers,
+    currentOrder: next ? next.order : null,
+    completed: signers.every((s) => s.status === "signed"),
+  };
+}
+
+export const getMySignFlow = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ flowId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }): Promise<SignFlowSummary | null> => {
+    const { data: rows } = await asSb(context.supabase)
+      .from("document_sign_requests")
+      .select("*")
+      .eq("flow_id", data.flowId)
+      .eq("created_by", context.userId as string);
+    return summarize((rows ?? []) as Array<Record<string, unknown>>);
+  });
+
+// Reintento: actualiza nombre/email de un firmante pendiente y regenera el
+// token (invalidando el anterior). El token nuevo se retorna una única vez.
+const RetryInput = z.object({
+  id: z.string().uuid(),
+  name: z.string().trim().max(120).optional(),
+  email: z.string().trim().email().max(160).optional(),
+  regenerateToken: z.boolean().default(true),
+});
+
+export const retrySigner = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => RetryInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    // Verifica que sea del owner y esté pendiente.
+    const { data: row, error: readErr } = await sb
+      .from("document_sign_requests")
+      .select("id, status, flow_id, sign_order")
+      .eq("id", data.id)
+      .eq("created_by", context.userId as string)
+      .maybeSingle();
+    if (readErr) throw new Error(readErr.message);
+    if (!row) throw new Error("Solicitud no encontrada.");
+    if (row.status !== "pending")
+      throw new Error("Sólo se puede reintentar un firmante pendiente.");
+
+    const patch: Record<string, unknown> = {};
+    if (data.name !== undefined) patch.signer_name_expected = data.name || null;
+    if (data.email !== undefined) patch.signer_email = data.email || null;
+
+    let newToken: string | null = null;
+    if (data.regenerateToken) {
+      newToken = generateSignToken();
+      patch.token_prefix = signTokenPrefix(newToken);
+      patch.token_hash = await sha256Hex(newToken);
+      // Extiende 30 días al regenerar.
+      patch.expires_at = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+    }
+
+    const { error } = await sb
+      .from("document_sign_requests")
+      .update(patch)
+      .eq("id", data.id)
+      .eq("created_by", context.userId as string)
+      .eq("status", "pending");
+    if (error) throw new Error(error.message);
+
+    // Reenviar email si hay dirección y token nuevo.
+    if (newToken && data.email) {
+      try {
+        const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
+          import("@/lib/email/send-internal.server"),
+          import("@/lib/documents/company"),
+        ]);
+        await sendInternalEmail({
+          templateName: "sign-request-signer",
+          recipientEmail: data.email,
+          idempotencyKey: `sign-retry:${data.id}:${Date.now()}`,
+          templateData: {
+            docTitle: "Documento pendiente de firma",
+            reference: String(row.id).slice(0, 8),
+            senderCompany: OWN_COMPANY.name,
+            signerName: data.name ?? undefined,
+            signUrl: buildSignUrl(newToken),
+          },
+        });
+      } catch (e) {
+        console.error("[retrySigner] email failed", e);
+      }
+    }
+
+    return { ok: true, token: newToken };
+  });
