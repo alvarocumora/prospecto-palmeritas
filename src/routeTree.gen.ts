@@ -17,6 +17,7 @@ import { Route as SatelitalRouteImport } from './routes/satelital'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as PortalProveedorRouteImport } from './routes/portal-proveedor'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -82,6 +83,7 @@ import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
 import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
+import { Route as AuthenticatedDashboardProveedorRouteImport } from './routes/_authenticated.dashboard.proveedor'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
@@ -190,6 +192,11 @@ const RecursosRoute = RecursosRouteImport.update({
 const ProyectosRoute = ProyectosRouteImport.update({
   id: '/proyectos',
   path: '/proyectos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalProveedorRoute = PortalProveedorRouteImport.update({
+  id: '/portal-proveedor',
+  path: '/portal-proveedor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OportunidadesRoute = OportunidadesRouteImport.update({
@@ -531,6 +538,12 @@ const AuthenticatedDashboardQaqcRoute =
   AuthenticatedDashboardQaqcRouteImport.update({
     id: '/dashboard/qaqc',
     path: '/dashboard/qaqc',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProveedorRoute =
+  AuthenticatedDashboardProveedorRouteImport.update({
+    id: '/dashboard/proveedor',
+    path: '/dashboard/proveedor',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardProjectsRoute =
@@ -955,6 +968,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1039,6 +1053,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1098,6 +1113,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1182,6 +1198,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1243,6 +1260,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1327,6 +1345,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/_authenticated/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1388,6 +1407,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1472,6 +1492,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/project-report'
     | '/dashboard/projects'
+    | '/dashboard/proveedor'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
     | '/dashboard/reports'
@@ -1531,6 +1552,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1615,6 +1637,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/project-report'
     | '/dashboard/projects'
+    | '/dashboard/proveedor'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
     | '/dashboard/reports'
@@ -1675,6 +1698,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1759,6 +1783,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/project-report'
     | '/_authenticated/dashboard/projects'
+    | '/_authenticated/dashboard/proveedor'
     | '/_authenticated/dashboard/qaqc'
     | '/_authenticated/dashboard/qps'
     | '/_authenticated/dashboard/reports'
@@ -1820,6 +1845,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
+  PortalProveedorRoute: typeof PortalProveedorRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1935,6 +1961,13 @@ declare module '@tanstack/react-router' {
       path: '/proyectos'
       fullPath: '/proyectos'
       preLoaderRoute: typeof ProyectosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal-proveedor': {
+      id: '/portal-proveedor'
+      path: '/portal-proveedor'
+      fullPath: '/portal-proveedor'
+      preLoaderRoute: typeof PortalProveedorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oportunidades': {
@@ -2390,6 +2423,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/qaqc'
       fullPath: '/dashboard/qaqc'
       preLoaderRoute: typeof AuthenticatedDashboardQaqcRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/proveedor': {
+      id: '/_authenticated/dashboard/proveedor'
+      path: '/dashboard/proveedor'
+      fullPath: '/dashboard/proveedor'
+      preLoaderRoute: typeof AuthenticatedDashboardProveedorRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/projects': {
@@ -3017,6 +3057,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectReportRoute: typeof AuthenticatedDashboardProjectReportRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
+  AuthenticatedDashboardProveedorRoute: typeof AuthenticatedDashboardProveedorRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
   AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
@@ -3095,6 +3136,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardProjectReportRoute:
     AuthenticatedDashboardProjectReportRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
+  AuthenticatedDashboardProveedorRoute: AuthenticatedDashboardProveedorRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
   AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
@@ -3176,6 +3218,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
+  PortalProveedorRoute: PortalProveedorRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
