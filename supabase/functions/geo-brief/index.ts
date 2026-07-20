@@ -38,6 +38,12 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const memRes = await requireProjectMember(admin, authRes.userId, project_id);
+    if ("error" in memRes) return memRes.error;
+
+
     const [proj, holes, targets, samples, permits, conc, litho, alter] = await Promise.all([
       admin
         .from("projects")
