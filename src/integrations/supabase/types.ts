@@ -9335,6 +9335,7 @@ export type Database = {
           metadata: Json
           name: string
           notes: string | null
+          parcel_ids: string | null
           project_id: string
           provincia: string | null
           region: string | null
@@ -9363,6 +9364,7 @@ export type Database = {
           metadata?: Json
           name: string
           notes?: string | null
+          parcel_ids?: string | null
           project_id: string
           provincia?: string | null
           region?: string | null
@@ -9391,6 +9393,7 @@ export type Database = {
           metadata?: Json
           name?: string
           notes?: string | null
+          parcel_ids?: string | null
           project_id?: string
           provincia?: string | null
           region?: string | null
@@ -10590,6 +10593,162 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      project_facts: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          label: string
+          note: string | null
+          project_id: string
+          provenance: string
+          section: string
+          sort_order: number
+          source: string | null
+          unit: string | null
+          updated_at: string
+          value: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          label: string
+          note?: string | null
+          project_id: string
+          provenance?: string
+          section?: string
+          sort_order?: number
+          source?: string | null
+          unit?: string | null
+          updated_at?: string
+          value?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          label?: string
+          note?: string | null
+          project_id?: string
+          provenance?: string
+          section?: string
+          sort_order?: number
+          source?: string | null
+          unit?: string | null
+          updated_at?: string
+          value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_facts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "project_facts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      project_fundraises: {
+        Row: {
+          created_at: string
+          created_by: string
+          equity_offered_pct: number | null
+          financing_structure: string | null
+          highlights: Json
+          horizon_years: number | null
+          id: string
+          instrument: string | null
+          is_public: boolean
+          milestones: Json
+          min_ticket_usd: number | null
+          notes: string | null
+          project_id: string
+          public_token_hash: string | null
+          public_token_prefix: string | null
+          round_size_usd: number | null
+          scenarios: Json
+          status: string
+          updated_at: string
+          use_of_funds: Json
+          valuation_high_usd: number | null
+          valuation_low_usd: number | null
+          valuation_method: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          equity_offered_pct?: number | null
+          financing_structure?: string | null
+          highlights?: Json
+          horizon_years?: number | null
+          id?: string
+          instrument?: string | null
+          is_public?: boolean
+          milestones?: Json
+          min_ticket_usd?: number | null
+          notes?: string | null
+          project_id: string
+          public_token_hash?: string | null
+          public_token_prefix?: string | null
+          round_size_usd?: number | null
+          scenarios?: Json
+          status?: string
+          updated_at?: string
+          use_of_funds?: Json
+          valuation_high_usd?: number | null
+          valuation_low_usd?: number | null
+          valuation_method?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          equity_offered_pct?: number | null
+          financing_structure?: string | null
+          highlights?: Json
+          horizon_years?: number | null
+          id?: string
+          instrument?: string | null
+          is_public?: boolean
+          milestones?: Json
+          min_ticket_usd?: number | null
+          notes?: string | null
+          project_id?: string
+          public_token_hash?: string | null
+          public_token_prefix?: string | null
+          round_size_usd?: number | null
+          scenarios?: Json
+          status?: string
+          updated_at?: string
+          use_of_funds?: Json
+          valuation_high_usd?: number | null
+          valuation_low_usd?: number | null
+          valuation_method?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_fundraises_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "project_fundraises_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       project_invitations: {
         Row: {
@@ -13342,6 +13501,11 @@ export type Database = {
           notes: string | null
           offer_price_usd_t: number | null
           offer_quantity_t: number | null
+          offer_valid_until: string | null
+          packaging: string | null
+          payment_terms: string | null
+          port_loading: string | null
+          quality_grade: string | null
           request_id: string
           share_token_hash: string | null
           share_token_prefix: string | null
@@ -13350,6 +13514,7 @@ export type Database = {
           supplier_company: string | null
           supplier_country: string | null
           supplier_name: string
+          supplier_role: string | null
           trade_id: string | null
           updated_at: string
         }
@@ -13364,6 +13529,11 @@ export type Database = {
           notes?: string | null
           offer_price_usd_t?: number | null
           offer_quantity_t?: number | null
+          offer_valid_until?: string | null
+          packaging?: string | null
+          payment_terms?: string | null
+          port_loading?: string | null
+          quality_grade?: string | null
           request_id: string
           share_token_hash?: string | null
           share_token_prefix?: string | null
@@ -13372,6 +13542,7 @@ export type Database = {
           supplier_company?: string | null
           supplier_country?: string | null
           supplier_name: string
+          supplier_role?: string | null
           trade_id?: string | null
           updated_at?: string
         }
@@ -13386,6 +13557,11 @@ export type Database = {
           notes?: string | null
           offer_price_usd_t?: number | null
           offer_quantity_t?: number | null
+          offer_valid_until?: string | null
+          packaging?: string | null
+          payment_terms?: string | null
+          port_loading?: string | null
+          quality_grade?: string | null
           request_id?: string
           share_token_hash?: string | null
           share_token_prefix?: string | null
@@ -13394,6 +13570,7 @@ export type Database = {
           supplier_company?: string | null
           supplier_country?: string | null
           supplier_name?: string
+          supplier_role?: string | null
           trade_id?: string | null
           updated_at?: string
         }
@@ -14288,9 +14465,11 @@ export type Database = {
           instrument: string | null
           kind: string
           label: string | null
+          last_reminder_at: string | null
           notes: string | null
           paid_at: string | null
           reference: string | null
+          reminder_count: number
           status: string
           trade_id: string
           updated_at: string
@@ -14305,9 +14484,11 @@ export type Database = {
           instrument?: string | null
           kind?: string
           label?: string | null
+          last_reminder_at?: string | null
           notes?: string | null
           paid_at?: string | null
           reference?: string | null
+          reminder_count?: number
           status?: string
           trade_id: string
           updated_at?: string
@@ -14322,9 +14503,11 @@ export type Database = {
           instrument?: string | null
           kind?: string
           label?: string | null
+          last_reminder_at?: string | null
           notes?: string | null
           paid_at?: string | null
           reference?: string | null
+          reminder_count?: number
           status?: string
           trade_id?: string
           updated_at?: string
