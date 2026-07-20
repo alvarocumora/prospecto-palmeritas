@@ -292,12 +292,9 @@ export function DocumentEditor({
   const reset = async () => {
     setValues(defaultValues(template));
     setClauses(defaultClauses(template));
-    if (user) {
-      await supabase
-        .from("document_drafts")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("template_id", template.id);
+    if (user && persistedRef.current) {
+      await supabase.from("document_drafts").delete().eq("id", draftId).eq("user_id", user.id);
+      persistedRef.current = false;
     }
     toast.success("Valores restaurados");
   };
