@@ -275,6 +275,9 @@ Deno.serve(async (req) => {
   );
 
   try {
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+
     const { model_id } = (await req.json()) as EstimateRequest;
     if (!model_id) throw new Error("model_id required");
 
@@ -285,6 +288,10 @@ Deno.serve(async (req) => {
       .eq("id", model_id)
       .single();
     if (mErr || !model) throw new Error("Model not found");
+
+    const memRes = await requireProjectMember(supabase, authRes.userId, model.project_id);
+    if ("error" in memRes) return memRes.error;
+
 
     await supabase.from("resource_models").update({ status: "running" }).eq("id", model_id);
 
