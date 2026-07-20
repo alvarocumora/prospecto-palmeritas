@@ -107,6 +107,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     counterpartyEmail: "",
+    counterpartyName: "",
+    counterpartyCompany: "",
+    counterpartyCountry: "",
+    counterpartyPhone: "",
     side: "sell" as "buy" | "sell",
     commodity: "Cu",
     form: "concentrate",
@@ -118,12 +122,20 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   });
 
   const submit = async () => {
-    if (!form.counterpartyEmail.trim()) return toast.error("Indica el email de la contraparte");
+    const hasEmail = form.counterpartyEmail.trim().length > 0;
+    const hasExternal =
+      form.counterpartyName.trim().length > 0 && form.counterpartyCompany.trim().length > 0;
+    if (!hasEmail && !hasExternal)
+      return toast.error("Indica email de contraparte o nombre + empresa.");
     setSaving(true);
     try {
       const { id } = await createFn({
         data: {
-          counterpartyEmail: form.counterpartyEmail.trim(),
+          counterpartyEmail: form.counterpartyEmail.trim() || undefined,
+          counterpartyName: form.counterpartyName.trim() || undefined,
+          counterpartyCompany: form.counterpartyCompany.trim() || undefined,
+          counterpartyCountry: form.counterpartyCountry.trim() || undefined,
+          counterpartyPhone: form.counterpartyPhone.trim() || undefined,
           side: form.side,
           reference: form.reference || undefined,
           commodity: form.commodity || undefined,
@@ -144,6 +156,39 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
       setSaving(false);
     }
   };
+
+  const startAntimony = async () => {
+    setSaving(true);
+    try {
+      const ym = new Date().toISOString().slice(0, 7).replace("-", "");
+      const seq = String(Math.floor(Math.random() * 9000) + 1000);
+      const { id } = await createFn({
+        data: {
+          side: "sell",
+          reference: `SB-ANTIMONIO-${ym}-${seq}`,
+          commodity: "Antimony (Sb)",
+          form: "ingots · Grade 2#",
+          quantityT: 20,
+          incoterm: "CIF",
+          paymentInstrument: "sblc_mt760",
+          counterpartyName: "Vincent Carpio",
+          counterpartyCompany: "Carpio & Kaddu Group",
+          counterpartyCountry: "AE",
+          counterpartyEmail: "carpio@carpiokaddu.com",
+          notes:
+            "Operación iniciada bajo NCNDA firmado (Vincent Carpio · Marcela A. Cimino · Alvaro Oliva). Sb Grade 2# (99.75–99.90%), pallets tipo referencia KRN / JH2601.",
+        },
+      });
+      toast.success("Operación de Antimonio creada. Ahora emite el link a la contraparte.");
+      void qc.invalidateQueries({ queryKey: ["my-trades"] });
+      onOpen(id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo iniciar la operación.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
 
   return (
     <>
