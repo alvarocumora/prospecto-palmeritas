@@ -28,6 +28,63 @@ function isOpsTokenFormat(t: string): boolean {
 
 export const operacionUrl = (token: string) => publicUrl(`/operacion/${token}`);
 
+// ---------- Autenticado: vincular business_partner al trade ----------
+// Copia los datos del proveedor a los campos `counterparty_*` del trade y
+// deja evento en el timeline. Después el dueño puede emitir el link de
+// operación con `ensureCounterpartyLink` (usa esos mismos campos).
+export const linkPartnerToTrade = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        tradeId: z.string().uuid(),
+        partnerId: z.string().uuid(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { data: partner, error: pErr } = await sb
+      .from("business_partners")
+      .select("id, name, company, email, phone, country, role")
+      .eq("id", data.partnerId)
+      .eq("owner_user_id", context.userId as string)
+      .maybeSingle();
+    if (pErr || !partner) throw new Error("Proveedor no encontrado.");
+    const p = partner as {
+      id: string;
+      name: string;
+      company: string | null;
+      email: string | null;
+      phone: string | null;
+      country: string | null;
+      role: string | null;
+    };
+    const { error } = await sb
+      .from("commodity_trades")
+      .update({
+        counterparty_name: p.name,
+        counterparty_company: p.company,
+        counterparty_email: p.email,
+        counterparty_phone: p.phone,
+        counterparty_country: p.country,
+        counterparty_role: p.role,
+      })
+      .eq("id", data.tradeId);
+    if (error) throw new Error(error.message);
+    try {
+      await sb.from("trade_events").insert({
+        trade_id: data.tradeId,
+        actor_user_id: context.userId,
+        kind: "counterparty_linked",
+        detail: `Contraparte vinculada: ${p.name}${p.company ? ` (${p.company})` : ""}`,
+      });
+    } catch {
+      /* noop */
+    }
+    return { ok: true, partnerId: p.id };
+  });
+
 function serviceClient(): SupabaseClient | null {
   const url = process.env.SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
