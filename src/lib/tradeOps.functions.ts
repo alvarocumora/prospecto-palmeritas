@@ -334,13 +334,16 @@ export const attachOperacionDoc = createServerFn({ method: "POST" })
         status: "uploaded",
         file_url: data.filePath,
         reference: data.reference ?? null,
+        // La atribución "contraparte" se refleja en el evento del timeline;
+        // created_by es NOT NULL, así que se persiste al owner del trade.
+        created_by: ctx.ownerId,
       });
       if (error) throw new Error(error.message);
     }
     try {
       await ctx.sb.from("trade_events").insert({
         trade_id: ctx.tradeId,
-        actor_user_id: null,
+        actor_user_id: ctx.ownerId,
         kind: "doc_uploaded_by_counterparty",
         detail: `Contraparte (${ctx.role}) cargó documento`,
         doc_type: data.docType,
@@ -350,4 +353,5 @@ export const attachOperacionDoc = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
 
