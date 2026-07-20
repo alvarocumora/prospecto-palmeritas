@@ -1188,6 +1188,7 @@ function SignFlowPanel({
   onStart,
   onRefresh,
   onRetry,
+  onResync,
 }: {
   parties: string[];
   signers: { role: string; name: string; email: string }[];
@@ -1204,16 +1205,33 @@ function SignFlowPanel({
     patch: { name?: string; email?: string },
     regenerate: boolean,
   ) => void;
+  onResync: () => void;
 }) {
   const [retryOpen, setRetryOpen] = useState<string | null>(null);
   const [retryName, setRetryName] = useState("");
   const [retryEmail, setRetryEmail] = useState("");
 
   const started = !!flowId && !!summary;
+  // Detecta desalineación: si algún firmante pendiente no coincide (por nombre
+  // o email) con los datos actuales de la parte del contrato, ofrecemos
+  // re-sincronizar el flujo.
+  const posKeys = ["A", "B", "C", "D"] as const;
+  const misaligned =
+    started &&
+    (summary?.signers ?? []).some((s) => {
+      if (s.status === "signed") return false;
+      const expected = signers[s.order];
+      if (!expected) return false;
+      const nameMismatch =
+        expected.name && s.signerNameExpected && expected.name !== s.signerNameExpected;
+      const emailMismatch =
+        expected.email && s.signerEmail && expected.email !== s.signerEmail;
+      return Boolean(nameMismatch || emailMismatch);
+    });
 
   return (
     <section className="mt-6 rounded-2xl border border-hairline bg-surface-3 p-5">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-3 gap-2 flex-wrap">
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-accent-brand" />
           <div>
@@ -1225,15 +1243,37 @@ function SignFlowPanel({
           </div>
         </div>
         {started ? (
-          <button
-            type="button"
-            onClick={onRefresh}
-            className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
-          >
-            <RefreshCw className="w-3 h-3" /> Actualizar
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={onResync}
+              disabled={busy}
+              title="Anula los links pendientes y emite un nuevo flujo con el orden del contrato (Parte A → #1)."
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-accent-brand hover:underline disabled:opacity-50"
+            >
+              <RotateCcw className="w-3 h-3" /> Reordenar y reenviar
+            </button>
+            <button
+              type="button"
+              onClick={onRefresh}
+              className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
+            >
+              <RefreshCw className="w-3 h-3" /> Actualizar
+            </button>
+          </div>
         ) : null}
       </div>
+
+      {started && misaligned ? (
+        <div className="mb-3 rounded-md border border-amber-300/60 bg-amber-50/60 px-3 py-2 text-[11px] text-amber-800 flex items-start justify-between gap-3">
+          <span>
+            El flujo actual no coincide con las partes del contrato (Parte A → #1, Parte B → #2…).
+            Pulsa <b>Reordenar y reenviar</b> para anular los links pendientes y emitir uno nuevo
+            con el orden correcto.
+          </span>
+        </div>
+      ) : null}
+
 
       {!started ? (
         <>
