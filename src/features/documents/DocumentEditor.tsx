@@ -866,6 +866,7 @@ export function DocumentEditor({
               onStart={() => void startFlow()}
               onRefresh={() => void refreshFlow()}
               onRetry={doRetry}
+              onResync={() => void resyncFlow()}
             />
           ) : null}
         </div>
