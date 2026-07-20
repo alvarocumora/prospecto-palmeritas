@@ -65,6 +65,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const memRes = await requireProjectMember(supabase, authRes.userId, projectId);
+    if ("error" in memRes) return memRes.error;
+
+
     const { data: rows, error } = await supabase
       .from("mining_concessions")
       .select("id, code, name, holder, area_ha, expires_at, status, metadata")
