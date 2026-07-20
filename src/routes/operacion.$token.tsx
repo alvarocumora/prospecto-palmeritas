@@ -1,8 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { getOperacionByToken } from "@/lib/tradeOps.functions";
+import { toast } from "sonner";
+import {
+  getOperacionByToken,
+  requestOperacionUpload,
+  attachOperacionDoc,
+} from "@/lib/tradeOps.functions";
 import { publicUrl } from "@/lib/publicUrl";
+import { supabase } from "@/integrations/supabase/client";
+import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
@@ -172,6 +180,8 @@ function OperacionMirror() {
               </div>
             </section>
 
+            <DocsUpload token={token} documents={data.documents} />
+
             <p className="mt-10 text-xs text-[hsl(var(--im-ink-soft))]">
               Este panel es un enlace privado. No lo comparta con terceros. Para dudas escriba a
               info@geocapitals.com.
@@ -180,5 +190,143 @@ function OperacionMirror() {
         )}
       </main>
     </div>
+  );
+}
+
+const isProvided = (s: string) => s === "uploaded" || s === "signed" || s === "verified";
+
+function DocsUpload({
+  token,
+  documents,
+}: {
+  token: string;
+  documents: Array<{ doc_type: string; status: string; file_name: string | null }>;
+}) {
+  const qc = useQueryClient();
+  const reqFn = useServerFn(requestOperacionUpload);
+  const attachFn = useServerFn(attachOperacionDoc);
+  const [docType, setDocType] = useState("");
+  const [busy, setBusy] = useState<string | null>(null);
+
+  const upload = async (chosenType: string, file: File) => {
+    if (!chosenType) return toast.error("Elige el tipo de documento.");
+    if (file.size > 50 * 1024 * 1024) return toast.error("Máximo 50 MB por archivo.");
+    setBusy(chosenType);
+    try {
+      const {
+        path,
+        token: upToken,
+        bucket,
+      } = await reqFn({
+        data: { token, fileName: file.name },
+      });
+      const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
+      if (up.error) throw up.error;
+      await attachFn({ data: { token, docType: chosenType, filePath: path } });
+      toast.success(`Documento enviado: ${file.name}`);
+      setDocType("");
+      void qc.invalidateQueries({ queryKey: ["operacion", token] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo subir el documento.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const label = (k: string) => DOC_BY_KEY[k]?.label ?? k;
+  const requested = documents.filter((d) => !isProvided(d.status));
+  const provided = documents.filter((d) => isProvided(d.status));
+
+  return (
+    <section className="mt-8 rounded-lg border border-[hsl(var(--im-hairline))] bg-white p-6">
+      <h2 className="font-serif text-xl mb-1">Documentos de la operación</h2>
+      <p className="text-sm text-[hsl(var(--im-ink-soft))] mb-4">
+        Sube aquí los documentos solicitados por tu contraparte en Geocapitals.
+      </p>
+
+      {requested.length > 0 && (
+        <div className="mb-4">
+          <p className="uppercase text-[10px] tracking-[0.2em] text-[hsl(var(--im-ink-soft))] mb-2">
+            Solicitados
+          </p>
+          <ul className="space-y-2">
+            {requested.map((d) => (
+              <li
+                key={d.doc_type}
+                className="flex items-center justify-between gap-3 border-b border-[hsl(var(--im-hairline))] pb-2 last:border-0"
+              >
+                <span className="text-sm">{label(d.doc_type)}</span>
+                <label className="text-xs px-3 py-1.5 rounded border border-[hsl(var(--im-hairline))] cursor-pointer hover:border-[hsl(var(--im-accent-brand))]">
+                  {busy === d.doc_type ? "Subiendo…" : "Subir archivo"}
+                  <input
+                    type="file"
+                    className="hidden"
+                    disabled={busy != null}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0];
+                      e.target.value = "";
+                      if (f) void upload(d.doc_type, f);
+                    }}
+                  />
+                </label>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {provided.length > 0 && (
+        <div className="mb-4">
+          <p className="uppercase text-[10px] tracking-[0.2em] text-[hsl(var(--im-ink-soft))] mb-2">
+            Recibidos
+          </p>
+          <ul className="space-y-1 text-sm">
+            {provided.map((d) => (
+              <li key={d.doc_type} className="flex items-center gap-2">
+                <span className="text-[hsl(var(--im-accent-brand))]">✓</span>
+                {label(d.doc_type)}
+                {d.file_name ? (
+                  <span className="text-[hsl(var(--im-ink-soft))]">· {d.file_name}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* Subir un documento adicional (no solicitado explícitamente) */}
+      <div className="flex items-center gap-2 flex-wrap pt-2 border-t border-[hsl(var(--im-hairline))]">
+        <span className="text-xs text-[hsl(var(--im-ink-soft))]">Otro documento:</span>
+        <select
+          value={docType}
+          onChange={(e) => setDocType(e.target.value)}
+          className="text-xs px-2 py-1.5 rounded border border-[hsl(var(--im-hairline))] bg-white"
+        >
+          <option value="">Tipo…</option>
+          {DOC_CATALOG.map((d) => (
+            <option key={d.key} value={d.key}>
+              {d.label}
+            </option>
+          ))}
+        </select>
+        <label
+          className={`text-xs px-3 py-1.5 rounded border border-[hsl(var(--im-hairline))] ${
+            docType ? "cursor-pointer hover:border-[hsl(var(--im-accent-brand))]" : "opacity-50"
+          }`}
+        >
+          {busy === docType && docType ? "Subiendo…" : "Subir archivo"}
+          <input
+            type="file"
+            className="hidden"
+            disabled={!docType || busy != null}
+            onChange={(e) => {
+              const f = e.target.files?.[0];
+              e.target.value = "";
+              if (f) void upload(docType, f);
+            }}
+          />
+        </label>
+      </div>
+    </section>
   );
 }
