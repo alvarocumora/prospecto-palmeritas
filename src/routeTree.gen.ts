@@ -17,6 +17,7 @@ import { Route as SatelitalRouteImport } from './routes/satelital'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RecursosRouteImport } from './routes/recursos'
 import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as PortalProveedorRouteImport } from './routes/portal-proveedor'
 import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
@@ -191,6 +192,11 @@ const RecursosRoute = RecursosRouteImport.update({
 const ProyectosRoute = ProyectosRouteImport.update({
   id: '/proyectos',
   path: '/proyectos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalProveedorRoute = PortalProveedorRouteImport.update({
+  id: '/portal-proveedor',
+  path: '/portal-proveedor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OportunidadesRoute = OportunidadesRouteImport.update({
@@ -962,6 +968,7 @@ export interface FileRoutesByFullPath {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1106,6 +1113,7 @@ export interface FileRoutesByTo {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1252,6 +1260,7 @@ export interface FileRoutesById {
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
   '/oportunidades': typeof OportunidadesRoute
+  '/portal-proveedor': typeof PortalProveedorRoute
   '/proyectos': typeof ProyectosRouteWithChildren
   '/recursos': typeof RecursosRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -1398,6 +1407,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1542,6 +1552,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1687,6 +1698,7 @@ export interface FileRouteTypes {
     | '/mcp'
     | '/metodologia'
     | '/oportunidades'
+    | '/portal-proveedor'
     | '/proyectos'
     | '/recursos'
     | '/reset-password'
@@ -1833,6 +1845,7 @@ export interface RootRouteChildren {
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
   OportunidadesRoute: typeof OportunidadesRoute
+  PortalProveedorRoute: typeof PortalProveedorRoute
   ProyectosRoute: typeof ProyectosRouteWithChildren
   RecursosRoute: typeof RecursosRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1948,6 +1961,13 @@ declare module '@tanstack/react-router' {
       path: '/proyectos'
       fullPath: '/proyectos'
       preLoaderRoute: typeof ProyectosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal-proveedor': {
+      id: '/portal-proveedor'
+      path: '/portal-proveedor'
+      fullPath: '/portal-proveedor'
+      preLoaderRoute: typeof PortalProveedorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/oportunidades': {
@@ -3198,6 +3218,7 @@ const rootRouteChildren: RootRouteChildren = {
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,
   OportunidadesRoute: OportunidadesRoute,
+  PortalProveedorRoute: PortalProveedorRoute,
   ProyectosRoute: ProyectosRouteWithChildren,
   RecursosRoute: RecursosRoute,
   ResetPasswordRoute: ResetPasswordRoute,
