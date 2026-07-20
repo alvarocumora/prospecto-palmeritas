@@ -20,6 +20,7 @@ import {
   ShieldCheck,
   MessageSquare,
   Send,
+  FileSignature,
 } from "lucide-react";
 import { verifyCommodityLot } from "@/lib/lotVerification.functions";
 import { QueryError } from "@/components/ui/QueryError";
@@ -41,6 +42,7 @@ import {
 import { ensureCounterpartyLink, linkPartnerToTrade } from "@/lib/tradeOps.functions";
 import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
+import { OPERATOR_LINE } from "@/lib/documents/company";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -51,7 +53,6 @@ import {
   type TradePhase,
   type TradeStage,
 } from "@/lib/tradeDocuments";
-
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
@@ -190,7 +191,6 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
       setSaving(false);
     }
   };
-
 
   return (
     <>
@@ -484,6 +484,9 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
             </div>
           </div>
         </div>
+        <div className="mt-2 pt-2 border-t border-border/60 inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
+          <ShieldCheck className="w-3 h-3" /> {OPERATOR_LINE}
+        </div>
       </div>
 
       {/* Due diligence del lote de origen (Know-Your-Mine) */}
@@ -496,14 +499,13 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
         onLinked={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
       />
       <CounterpartyPanel trade={t} />
+      <SendDocPanel tradeId={id} />
       <RequestDocsPanel tradeId={id} docs={data.documents} />
       <UploadInboxPanel
         tradeId={id}
         docs={data.documents}
         onChange={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
       />
-
-
 
       {/* Pipeline */}
       <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
@@ -1061,7 +1063,9 @@ function CounterpartyPanel({
         void navigator.clipboard.writeText(r.url).catch(() => {});
         toast.success("Link generado y copiado.");
       } else {
-        toast.info(`Ya existe un link activo (prefijo ${r.prefix || "—"}). Usa "Rotar" para emitir uno nuevo.`);
+        toast.info(
+          `Ya existe un link activo (prefijo ${r.prefix || "—"}). Usa "Rotar" para emitir uno nuevo.`,
+        );
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error");
@@ -1111,6 +1115,42 @@ function CounterpartyPanel({
   );
 }
 
+/* --------------------- Generar y enviar documento para firma ------------- */
+const DEAL_DOCS = [
+  { id: "ncnda", label: "NCNDA" },
+  { id: "nda", label: "NDA" },
+  { id: "loi", label: "LOI · Carta de intención" },
+  { id: "spa", label: "SPA · Contrato" },
+  { id: "data-sheet", label: "Data sheet" },
+] as const;
+
+function SendDocPanel({ tradeId }: { tradeId: string }) {
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+        <FileSignature className="w-3.5 h-3.5" /> Generar y enviar documento para firma
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {DEAL_DOCS.map((d) => (
+          <Link
+            key={d.id}
+            to="/dashboard/documentos/$templateId"
+            params={{ templateId: d.id }}
+            search={{ trade: tradeId }}
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-background text-[11px] font-mono hover:border-primary/60 hover:text-primary"
+          >
+            <Send className="w-3 h-3" /> {d.label}
+          </Link>
+        ))}
+      </div>
+      <p className="text-[10px] text-muted-foreground mt-2">
+        Se abre el editor con la contraparte precargada; al enviar, el documento queda ligado a este
+        trade y su firma aparece en la actividad.
+      </p>
+    </div>
+  );
+}
+
 /* --------------------- Solicitar documentos a contraparte ---------------- */
 function RequestDocsPanel({
   tradeId,
@@ -1122,9 +1162,7 @@ function RequestDocsPanel({
   const qc = useQueryClient();
   const reqFn = useServerFn(requestTradeDocs);
   const existing = new Set(docs.map((d) => d.doc_type));
-  const suggested = DOC_CATALOG
-    .filter((d) => !existing.has(d.key))
-    .slice(0, 8);
+  const suggested = DOC_CATALOG.filter((d) => !existing.has(d.key)).slice(0, 8);
   const [picked, setPicked] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
 
@@ -1200,15 +1238,12 @@ function UploadInboxPanel({
   const [busyKey, setBusyKey] = useState<string | null>(null);
 
   const pending = docs.filter((d) => d.status === "pending");
-  const received = docs.filter(
-    (d) => d.file_url && d.status !== "pending",
-  );
+  const received = docs.filter((d) => d.file_url && d.status !== "pending");
 
   if (pending.length === 0 && received.length === 0) return null;
 
   const fileName = (u: string | null) => (u ? (u.split("/").pop() ?? u) : "—");
-  const labelOf = (k: string) =>
-    DOC_BY_KEY[k]?.acronym ?? DOC_BY_KEY[k]?.label ?? k;
+  const labelOf = (k: string) => DOC_BY_KEY[k]?.acronym ?? DOC_BY_KEY[k]?.label ?? k;
 
   const upload = async (docType: string, file: File) => {
     setBusyKey(docType);
@@ -1268,9 +1303,7 @@ function UploadInboxPanel({
               >
                 <div className="min-w-0">
                   <span className="text-gold">{labelOf(d.doc_type)}</span>
-                  <span className="text-foreground ml-2 truncate">
-                    {fileName(d.file_url)}
-                  </span>
+                  <span className="text-foreground ml-2 truncate">{fileName(d.file_url)}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-muted-foreground">
@@ -1316,9 +1349,7 @@ function UploadInboxRow({
         if (f) onFile(f);
       }}
       className={`flex items-center justify-between gap-3 p-2.5 rounded border transition ${
-        drag
-          ? "border-primary bg-primary/5"
-          : "border-dashed border-border bg-background"
+        drag ? "border-primary bg-primary/5" : "border-dashed border-border bg-background"
       }`}
     >
       <div className="min-w-0">
@@ -1346,11 +1377,7 @@ function UploadInboxRow({
           disabled={busy}
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
         >
-          {busy ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <Upload className="w-3 h-3" />
-          )}
+          {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
           Subir archivo
         </button>
       </div>
