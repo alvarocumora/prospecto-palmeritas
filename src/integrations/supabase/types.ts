@@ -2206,7 +2206,7 @@ export type Database = {
       }
       commodity_trades: {
         Row: {
-          buyer_user_id: string
+          buyer_user_id: string | null
           commodity: string | null
           counterparty_buyer_email: string | null
           counterparty_buyer_token_hash: string | null
@@ -2240,7 +2240,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          buyer_user_id: string
+          buyer_user_id?: string | null
           commodity?: string | null
           counterparty_buyer_email?: string | null
           counterparty_buyer_token_hash?: string | null
@@ -2274,7 +2274,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          buyer_user_id?: string
+          buyer_user_id?: string | null
           commodity?: string | null
           counterparty_buyer_email?: string | null
           counterparty_buyer_token_hash?: string | null
