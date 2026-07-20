@@ -19,7 +19,7 @@ function json(status: number, body: unknown) {
 
 export async function requireUser(
   req: Request,
-): Promise<{ userId: string } | { error: Response }> {
+): Promise<{ userId: string; isServiceRole?: boolean } | { error: Response }> {
   const auth = req.headers.get("Authorization") ?? req.headers.get("authorization");
   if (!auth || !auth.toLowerCase().startsWith("bearer ")) {
     return { error: json(401, { error: "Unauthorized: missing bearer token" }) };
@@ -27,8 +27,13 @@ export async function requireUser(
   const token = auth.slice(7).trim();
   const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
   const ANON = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY");
+  const SERVICE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!SUPABASE_URL || !ANON) {
     return { error: json(500, { error: "Server misconfigured" }) };
+  }
+  // Trusted internal callers (cron, sync-all-projects) use the service-role key.
+  if (SERVICE && token === SERVICE) {
+    return { userId: "service-role", isServiceRole: true };
   }
   const client = createClient(SUPABASE_URL, ANON, {
     global: { headers: { Authorization: `Bearer ${token}` } },
