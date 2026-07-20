@@ -490,6 +490,11 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
       {t.lot_id && <LotTrustCard lotId={t.lot_id} />}
 
       {/* Contraparte externa + link operación + solicitar documentos */}
+      <SupplierPanel
+        tradeId={id}
+        currentName={t.role === "buyer" ? (t.sellerName ?? null) : (t.buyerName ?? null)}
+        onLinked={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
+      />
       <CounterpartyPanel trade={t} />
       <RequestDocsPanel tradeId={id} docs={data.documents} />
 
