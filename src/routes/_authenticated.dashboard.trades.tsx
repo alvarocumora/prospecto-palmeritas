@@ -36,7 +36,9 @@ import {
   getTradeDocDownloadUrl,
   listTradeEvents,
   addTradeMessage,
+  requestTradeDocs,
 } from "@/lib/trades.functions";
+import { ensureCounterpartyLink } from "@/lib/tradeOps.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -47,6 +49,7 @@ import {
   type TradePhase,
   type TradeStage,
 } from "@/lib/tradeDocuments";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
@@ -104,6 +107,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     counterpartyEmail: "",
+    counterpartyName: "",
+    counterpartyCompany: "",
+    counterpartyCountry: "",
+    counterpartyPhone: "",
     side: "sell" as "buy" | "sell",
     commodity: "Cu",
     form: "concentrate",
@@ -115,12 +122,20 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   });
 
   const submit = async () => {
-    if (!form.counterpartyEmail.trim()) return toast.error("Indica el email de la contraparte");
+    const hasEmail = form.counterpartyEmail.trim().length > 0;
+    const hasExternal =
+      form.counterpartyName.trim().length > 0 && form.counterpartyCompany.trim().length > 0;
+    if (!hasEmail && !hasExternal)
+      return toast.error("Indica email de contraparte o nombre + empresa.");
     setSaving(true);
     try {
       const { id } = await createFn({
         data: {
-          counterpartyEmail: form.counterpartyEmail.trim(),
+          counterpartyEmail: form.counterpartyEmail.trim() || undefined,
+          counterpartyName: form.counterpartyName.trim() || undefined,
+          counterpartyCompany: form.counterpartyCompany.trim() || undefined,
+          counterpartyCountry: form.counterpartyCountry.trim() || undefined,
+          counterpartyPhone: form.counterpartyPhone.trim() || undefined,
           side: form.side,
           reference: form.reference || undefined,
           commodity: form.commodity || undefined,
@@ -142,8 +157,65 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
     }
   };
 
+  const startAntimony = async () => {
+    setSaving(true);
+    try {
+      const ym = new Date().toISOString().slice(0, 7).replace("-", "");
+      const seq = String(Math.floor(Math.random() * 9000) + 1000);
+      const { id } = await createFn({
+        data: {
+          side: "sell",
+          reference: `SB-ANTIMONIO-${ym}-${seq}`,
+          commodity: "Antimony (Sb)",
+          form: "ingots · Grade 2#",
+          quantityT: 20,
+          incoterm: "CIF",
+          paymentInstrument: "sblc_mt760",
+          counterpartyName: "Vincent Carpio",
+          counterpartyCompany: "Carpio & Kaddu Group",
+          counterpartyCountry: "AE",
+          counterpartyEmail: "carpio@carpiokaddu.com",
+          notes:
+            "Operación iniciada bajo NCNDA firmado (Vincent Carpio · Marcela A. Cimino · Alvaro Oliva). Sb Grade 2# (99.75–99.90%), pallets tipo referencia KRN / JH2601.",
+        },
+      });
+      toast.success("Operación de Antimonio creada. Ahora emite el link a la contraparte.");
+      void qc.invalidateQueries({ queryKey: ["my-trades"] });
+      onOpen(id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo iniciar la operación.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
   return (
     <>
+      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
+        <div className="min-w-0">
+          <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
+            Quickstart · Antimonio
+          </div>
+          <div className="text-xs text-foreground mt-0.5">
+            Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
+            Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+          </div>
+        </div>
+        <button
+          onClick={() => void startAntimony()}
+          disabled={saving}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+        >
+          {saving ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Ship className="w-3.5 h-3.5" />
+          )}
+          Iniciar operación Antimonio
+        </button>
+      </div>
+
       <div className="flex justify-end mb-3">
         <button
           onClick={() => setShowForm((v) => !v)}
@@ -155,7 +227,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
       {showForm && (
         <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
-          <F label="Email contraparte" full>
+          <div className="sm:col-span-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground -mb-1">
+            Contraparte · usuario Geocapitals o externo
+          </div>
+          <F label="Email contraparte">
             <input
               value={form.counterpartyEmail}
               onChange={(e) => setForm({ ...form, counterpartyEmail: e.target.value })}
@@ -163,6 +238,39 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               className={inputCls}
             />
           </F>
+          <F label="Nombre (si no tiene cuenta)">
+            <input
+              value={form.counterpartyName}
+              onChange={(e) => setForm({ ...form, counterpartyName: e.target.value })}
+              placeholder="Nombre y apellido"
+              className={inputCls}
+            />
+          </F>
+          <F label="Empresa">
+            <input
+              value={form.counterpartyCompany}
+              onChange={(e) => setForm({ ...form, counterpartyCompany: e.target.value })}
+              placeholder="Razón social"
+              className={inputCls}
+            />
+          </F>
+          <F label="País (ISO)">
+            <input
+              value={form.counterpartyCountry}
+              onChange={(e) => setForm({ ...form, counterpartyCountry: e.target.value })}
+              placeholder="CL, AE, CN…"
+              className={inputCls}
+            />
+          </F>
+          <F label="Teléfono">
+            <input
+              value={form.counterpartyPhone}
+              onChange={(e) => setForm({ ...form, counterpartyPhone: e.target.value })}
+              placeholder="+56 9 …"
+              className={inputCls}
+            />
+          </F>
+
           <F label="Soy">
             <select
               value={form.side}
@@ -378,6 +486,12 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
 
       {/* Due diligence del lote de origen (Know-Your-Mine) */}
       {t.lot_id && <LotTrustCard lotId={t.lot_id} />}
+
+      {/* Contraparte externa + link operación + solicitar documentos */}
+      <CounterpartyPanel trade={t} />
+      <RequestDocsPanel tradeId={id} docs={data.documents} />
+
+
 
       {/* Pipeline */}
       <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
@@ -904,6 +1018,157 @@ function Empty({ children }: { children: React.ReactNode }) {
   return (
     <div className="p-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-lg">
       {children}
+    </div>
+  );
+}
+
+/* -------------------- Contraparte externa (link espejo) ------------------ */
+function CounterpartyPanel({
+  trade,
+}: {
+  trade: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["trade"];
+}) {
+  const ensureFn = useServerFn(ensureCounterpartyLink);
+  const [issuedUrl, setIssuedUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const party: "buyer" | "seller" = trade.role === "buyer" ? "seller" : "buyer";
+  const cpName =
+    party === "buyer"
+      ? (trade.buyerName ?? trade.buyerEmail ?? "Comprador")
+      : (trade.sellerName ?? trade.sellerEmail ?? "Vendedor");
+  const cpEmail = party === "buyer" ? trade.buyerEmail : trade.sellerEmail;
+
+  const issue = async (rotate: boolean) => {
+    setLoading(true);
+    try {
+      const r = await ensureFn({
+        data: { tradeId: trade.id, party, email: cpEmail ?? undefined, rotate },
+      });
+      if (r.url) {
+        setIssuedUrl(r.url);
+        void navigator.clipboard.writeText(r.url).catch(() => {});
+        toast.success("Link generado y copiado.");
+      } else {
+        toast.info(`Ya existe un link activo (prefijo ${r.prefix || "—"}). Usa "Rotar" para emitir uno nuevo.`);
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
+        Contraparte · {party === "buyer" ? "Comprador" : "Vendedor"}
+      </div>
+      <div className="flex items-start justify-between gap-3 flex-wrap">
+        <div className="min-w-0 text-xs">
+          <div className="font-semibold text-foreground truncate">{cpName}</div>
+          <div className="text-muted-foreground font-mono text-[11px] truncate">
+            {cpEmail ?? "sin email"}
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => void issue(false)}
+            disabled={loading}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+          >
+            <ExternalLink className="w-3 h-3" /> Emitir link
+          </button>
+          <button
+            onClick={() => void issue(true)}
+            disabled={loading}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+          >
+            Rotar
+          </button>
+        </div>
+      </div>
+      {issuedUrl && (
+        <div className="mt-2 text-[10px] font-mono break-all bg-muted/40 border border-border rounded p-2">
+          {issuedUrl}
+          <div className="text-muted-foreground mt-1">
+            Copiado al portapapeles · compártelo por email/WhatsApp con la contraparte.
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* --------------------- Solicitar documentos a contraparte ---------------- */
+function RequestDocsPanel({
+  tradeId,
+  docs,
+}: {
+  tradeId: string;
+  docs: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["documents"];
+}) {
+  const qc = useQueryClient();
+  const reqFn = useServerFn(requestTradeDocs);
+  const existing = new Set(docs.map((d) => d.doc_type));
+  const suggested = DOC_CATALOG
+    .filter((d) => !existing.has(d.key))
+    .slice(0, 8);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+
+  const toggle = (k: string) =>
+    setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
+
+  const submit = async () => {
+    if (!picked.length) return toast.error("Selecciona al menos un documento.");
+    setBusy(true);
+    try {
+      await reqFn({ data: { tradeId, docTypes: picked } });
+      toast.success("Solicitud registrada. La contraparte lo verá en su panel.");
+      setPicked([]);
+      void qc.invalidateQueries({ queryKey: ["trade", tradeId] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  if (!suggested.length) return null;
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+          <Upload className="w-3.5 h-3.5" /> Solicitar documentos a contraparte
+        </div>
+        <button
+          onClick={() => void submit()}
+          disabled={busy || !picked.length}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+        >
+          {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
+          Solicitar ({picked.length})
+        </button>
+      </div>
+      <div className="flex flex-wrap gap-1.5">
+        {suggested.map((d) => {
+          const on = picked.includes(d.key);
+          return (
+            <button
+              key={d.key}
+              onClick={() => toggle(d.key)}
+              className={`text-[11px] font-mono px-2 py-1 rounded border transition ${
+                on
+                  ? "bg-primary/15 border-primary/40 text-primary"
+                  : "bg-background border-border text-foreground hover:bg-muted"
+              }`}
+              title={d.label}
+            >
+              {d.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -106,6 +106,7 @@ export const ensureCounterpartyLink = createServerFn({ method: "POST" })
 // ---------- Público: contraparte accede al War Room con su token ----------
 export type OperacionPayload = {
   role: "buyer" | "seller";
+  tradeId: string;
   trade: {
     reference: string | null;
     commodity: string | null;
@@ -128,6 +129,13 @@ export type OperacionPayload = {
     status: string;
   }>;
   docsCount: number;
+  documents: Array<{
+    doc_type: string;
+    status: string;
+    file_name: string | null;
+    reference: string | null;
+    updated_at: string;
+  }>;
 };
 
 export const getOperacionByToken = createServerFn({ method: "POST" })
@@ -161,7 +169,7 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
     if (!trade || !role) return null;
     const tradeId = trade.id as string;
 
-    const [events, shipments, docs] = await Promise.all([
+    const [events, shipments, docsCountQ, docsList] = await Promise.all([
       sb
         .from("trade_events")
         .select("kind, detail, created_at")
@@ -174,10 +182,31 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
         .eq("trade_id", tradeId)
         .order("created_at", { ascending: false }),
       sb.from("trade_documents").select("id", { count: "exact", head: true }).eq("trade_id", tradeId),
+      sb
+        .from("trade_documents")
+        .select("doc_type, status, file_url, reference, updated_at")
+        .eq("trade_id", tradeId)
+        .order("updated_at", { ascending: false }),
     ]);
+
+    const documents = ((docsList.data ?? []) as Array<{
+      doc_type: string;
+      status: string;
+      file_url: string | null;
+      reference: string | null;
+      updated_at: string;
+    }>).map((d) => ({
+      doc_type: d.doc_type,
+      status: d.status,
+      reference: d.reference,
+      updated_at: d.updated_at,
+      // Solo exponemos el nombre de archivo, no la ruta interna del bucket.
+      file_name: d.file_url ? d.file_url.split("/").pop() ?? null : null,
+    }));
 
     return {
       role,
+      tradeId,
       trade: {
         reference: (trade.reference as string) ?? null,
         commodity: (trade.commodity as string) ?? null,
@@ -195,6 +224,134 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
       },
       events: (events.data ?? []) as OperacionPayload["events"],
       shipments: (shipments.data ?? []) as OperacionPayload["shipments"],
-      docsCount: docs.count ?? 0,
+      docsCount: docsCountQ.count ?? 0,
+      documents,
     };
   });
+
+// ---------- Público: subida de documentos por la contraparte (sin cuenta) ----
+
+const TRADE_BUCKET_PUB = "trade-docs";
+
+async function resolveTradeByToken(
+  token: string,
+): Promise<{
+  tradeId: string;
+  role: "buyer" | "seller";
+  ownerId: string;
+  sb: SupabaseClient;
+} | null> {
+  if (!isOpsTokenFormat(token)) return null;
+  const sb = serviceClient();
+  if (!sb) return null;
+  const hash = await sha256Hex(token);
+  const { data: b } = await sb
+    .from("commodity_trades")
+    .select("id, created_by")
+    .eq("counterparty_buyer_token_hash", hash)
+    .maybeSingle();
+  if (b) {
+    const r = b as { id: string; created_by: string };
+    return { tradeId: r.id, role: "buyer", ownerId: r.created_by, sb };
+  }
+  const { data: s } = await sb
+    .from("commodity_trades")
+    .select("id, created_by")
+    .eq("counterparty_seller_token_hash", hash)
+    .maybeSingle();
+  if (s) {
+    const r = s as { id: string; created_by: string };
+    return { tradeId: r.id, role: "seller", ownerId: r.created_by, sb };
+  }
+  return null;
+}
+
+
+/** Prepara URL firmada para que la contraparte externa suba un archivo al bucket
+ *  privado `trade-docs` sin necesitar cuenta. */
+export const requestOperacionUpload = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        fileName: z.string().min(1).max(300),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    const safe = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = `${ctx.tradeId}/counterparty/${crypto.randomUUID()}-${safe}`;
+    const { data: signed, error } = await ctx.sb.storage
+      .from(TRADE_BUCKET_PUB)
+      .createSignedUploadUrl(path);
+    if (error || !signed) throw new Error(error?.message ?? "No se pudo preparar la subida.");
+    return { path, token: signed.token, bucket: TRADE_BUCKET_PUB };
+  });
+
+/** Registra en `trade_documents` el archivo que la contraparte externa acaba
+ *  de subir, marcando el documento como `uploaded` y añadiendo un evento al
+ *  timeline atribuido a "contraparte". */
+export const attachOperacionDoc = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        docType: z.string().trim().min(1).max(60),
+        filePath: z.string().min(1).max(500),
+        reference: z.string().trim().max(120).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    // Debe apuntar al bucket del propio trade.
+    if (!data.filePath.startsWith(`${ctx.tradeId}/`)) {
+      throw new Error("Ruta inválida.");
+    }
+    const { data: existing } = await ctx.sb
+      .from("trade_documents")
+      .select("id")
+      .eq("trade_id", ctx.tradeId)
+      .eq("doc_type", data.docType)
+      .maybeSingle();
+    if (existing) {
+      const { error } = await ctx.sb
+        .from("trade_documents")
+        .update({
+          file_url: data.filePath,
+          reference: data.reference ?? null,
+          status: "uploaded",
+        })
+        .eq("id", (existing as { id: string }).id);
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await ctx.sb.from("trade_documents").insert({
+        trade_id: ctx.tradeId,
+        doc_type: data.docType,
+        status: "uploaded",
+        file_url: data.filePath,
+        reference: data.reference ?? null,
+        // La atribución "contraparte" se refleja en el evento del timeline;
+        // created_by es NOT NULL, así que se persiste al owner del trade.
+        created_by: ctx.ownerId,
+      });
+      if (error) throw new Error(error.message);
+    }
+    try {
+      await ctx.sb.from("trade_events").insert({
+        trade_id: ctx.tradeId,
+        actor_user_id: ctx.ownerId,
+        kind: "doc_uploaded_by_counterparty",
+        detail: `Contraparte (${ctx.role}) cargó documento`,
+        doc_type: data.docType,
+      });
+    } catch {
+      /* auxiliary */
+    }
+    return { ok: true };
+  });
+
+
