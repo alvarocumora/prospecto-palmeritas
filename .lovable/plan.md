@@ -1,67 +1,107 @@
+# Plan: Sourcing → LOI/NCNDA → Registro proveedor → Lote → **Centro de Operaciones de Trade**
 
-## Diagnóstico del mapa que no aparece
+Este plan **amplía** el anterior con un centro de operaciones tipo "war room" que une productor y cliente final, con paneles espejo, timeline compartido, archivos y firmas visibles, y updates por email en cada evento.
 
-Inspección en el preview: el `<section id="catastro">` renderiza con `height: 0` aunque el canvas de MapLibre existe. Causa probable:
+## Estado actual verificado
 
-- El contenedor del mapa depende de `min-h-[440px]` en un grid de Tailwind dentro de un `<Reveal>` con `opacity/translate` iniciales. Si MapLibre monta antes de que el bloque tenga altura visible, el canvas queda a 0×0 hasta que se dispara `resize`, y como el `Reveal` puede quedar oculto en el primer intersection observer, nunca se llama a `map.resize()`.
-- Además el CSS de `maplibre-gl/dist/maplibre-gl.css` se importa dentro de un `Promise.all` async: en producción con SSR el primer render no tiene los estilos, y el `.maplibregl-canvas-container` queda sin `position: absolute`, colapsando el alto.
+- **RFQ público con link tokenizado** `/proveedor/{token}` y bandeja `/dashboard/sourcing/{id}` con archivos, preselección y "Convertir en trade" ✅
+- **Trades base:** `commodity_trades`, `trade_documents`, `trade_events`, `trade_shipments`, `trade_payments` ✅
+- **Plantillas de documentos:** NDA, NDI, MoU, **LOI**, Term Sheet, SPA ya existen en `src/lib/documents/templates.ts` + generador PDF `src/lib/tradeDocGen.ts` (incluye LOI, ICPO, FCO, SPA)
+- **Firmas:** `document_sign_requests` + `document_signatures` con trazabilidad al trade ✅
+- **Huecos:** no hay NCNDA, ni registro abierto de proveedor, ni panel espejo cliente/proveedor, ni notificaciones por email en cada avance, ni conversión propuesta→lote publicable.
 
-## Cambios propuestos
+## Alcance ampliado
 
-### 1. Fix del mapa (`LandingCatastroBlock.tsx`)
+### A. LOI + NCNDA generados desde el RFQ o desde la propuesta
 
-- Importar `maplibre-gl/dist/maplibre-gl.css` de forma estática al tope del archivo (no dentro del `loadMaplibre()`), para que el CSS entre en el bundle desde el primer render.
-- Dar altura fija al contenedor del mapa (`h-[440px] lg:h-[520px]`, no `min-h`), envuelto en un wrapper con `position: relative` explícito.
-- Llamar `map.resize()` en un `ResizeObserver` sobre el contenedor y también en el `load` para cubrir el caso de que el `Reveal` cambie la geometría al hacerse visible.
-- Añadir fallback visible cuando `heatPoints.length === 0` (estado de carga con skeleton mientras llega la server function).
+- Botón **"Generar LOI"** y **"Generar NCNDA"** en `/dashboard/sourcing/{id}` (por requerimiento y por propuesta preseleccionada).
+- Handler `generateSourcingDocument({ requestId, submissionId?, kind: 'loi'|'ncnda' })`:
+  - Precarga: comprador (perfil logeado, empresa, RUT), proveedor/intermediario (datos de la submission), commodity, forma, tonelaje, precio ofertado/objetivo, incoterm, destino, validez 15 días.
+  - Genera PDF descargable + guarda en `document_drafts` para reeditar y disparar firma.
+- Nueva plantilla **NCNDA** en `src/lib/documents/templates.ts` (Non-Circumvention Non-Disclosure) con los campos que aparecen en el email de HQM Chile (Razón Social, RUT, giro, dirección, representante legal, correo, teléfono, destino del material, y si es intermediario los mismos datos de su contraparte).
 
-### 2. Catastro mejorado en el landing
+### B. Registro abierto de proveedor + primer lote
 
-Ampliar `LandingCatastroBlock` para que muestre por qué Geocapitals es el mejor operador, no solo un mapa:
+- Ruta pública `/registro/proveedor` en dos pasos (Institutional Modernist):
+  1. Empresa/mina + contacto (país, RUT, giro, representante legal, email, WhatsApp).
+  2. Primer lote (commodity, forma, ley, tonelaje, incoterm, puerto, precio objetivo, notas) + upload de docs (assay, títulos, fotos).
+- Server fn `registerSupplierAndLot`: magic-link, crea `commodity_lots` en `pending_verification`, notifica a `team@geocapitals.com`.
+- Página final: "Lote en revisión" + link para completar cuenta.
 
-- Barra superior con: total nacional, % vigentes, top región (cuando `region` esté populada, mientras tanto fallback a `tipo`), última sync — todo en tokens Institutional Modernist.
-- Toggle sobre el heatmap: `Densidad` (actual) · `Vigentes` · `En trámite` — cambia el filtro del sample sin recargar.
-- Chip "actualizado hoy" enlazado a `/catastro/mapa` con el rango temporal del último sync run.
-- Debajo del mapa, mini-cards de módulos avanzados que ya existen y la competencia no ofrece: Alertas de patente vencida, Monitoreo de titulares, Cruce con boletines/juicios, Vista 3D de proyecto, Reportes NI 43-101 pre-generados.
+### C. Propuesta → Lote publicable
 
-### 3. Tabla comparativa vs operadores (nuevo componente)
+- Botón **"Guardar como lote"** en cada propuesta de sourcing.
+- Server fn `convertSubmissionToLot({ submissionId })`: crea `commodity_lots` (a nombre del proveedor prospecto), copia los archivos entre buckets con `supabaseAdmin.storage.copy` dentro del handler.
 
-Nuevo bloque `CatastroComparison.tsx`, insertado en el landing dentro de la sección `#catastro` justo antes del bloque de planes:
+### D. **Centro de Operaciones de Trade** (nuevo — corazón del plan)
 
-```text
-                    Geocapitals   PropiedadMineraDigital   Sernageomin (público)   Otros SaaS
-Cobertura           11.7k live    Chile                    Chile                    Parcial
-Multi-país          PE·BR·ZM·MW   No                       No                       Limitado
-Mapa 3D + geología  Sí            No                       No                       No
-Alertas boletín     Sí            Básico                   No                       Varía
-Cruce juicios       Sí            No                       No                       No
-NI 43-101           Sí            No                       No                       No
-Trade & data room   Sí            No                       No                       No
-API / exports       GeoJSON+CSV   PDF                      Descarga masiva          Varía
-Precio entrada      Gratis        Pago                     Gratis (sin tools)       Pago
+Panel unificado que une **productor**, **cliente final** e **intermediario (yo)** alrededor de un mismo `commodity_trade`.
+
+**Estructura visual** (Institutional Modernist, papel/tinta/cobalto):
+
+```
+┌──────────────────────────────────────────────────────────┐
+│ TRADE #GC-2026-001 · Antimony Ingot 99.85% · 20 t · CIF  │
+│ [Vendedor · Productor]  ⇆  [Comprador · Cliente final]   │
+│ Estado: LOI firmado → SPA pendiente         [Progreso 3/8]│
+├──────────────┬───────────────┬───────────────┬───────────┤
+│ TIMELINE     │ DOCUMENTOS    │ ARCHIVOS TÉC. │ ENTREGA   │
+│ (feed vivo)  │ + firmas      │ (assay,SGS…)  │ + pagos   │
+└──────────────┴───────────────┴───────────────┴───────────┘
 ```
 
-- Datos verificables solo del lado Geocapitals; para competidores se marca lo público sin afirmar precios exactos, con nota al pie: "Comparativa basada en información pública de los sitios oficiales al %fecha%. No incluye planes empresariales personalizados."
-- CTAs: "Comparar planes" → `/catastro/precios`, "Ver mapa live" → `/catastro/mapa`.
+**Ruta autenticada:** `/dashboard/trades/{tradeId}` (existente) se enriquece con:
+- Cabecera con las dos partes, estado y semáforo de fase (**Intención → NCNDA → LOI → SCO → SPA → Embarque → Pago → Cierre**).
+- **Timeline** leyendo `trade_events` con ícono por tipo (documento, archivo, firma, pago, mensaje, embarque).
+- **Documentos**: tarjetas por documento con estado firmado/pendiente, botón "Solicitar firma", visor PDF, historial de versiones.
+- **Archivos técnicos**: los del proveedor + los que suba el comprador (LOI, POF, LC draft, BL, etc.) — todos en el bucket del trade, con signed URL, listados con quién los subió y cuándo.
+- **Entrega**: pestaña con `trade_shipments` (ETD/ETA, puerto de carga, contenedores, BL) y `trade_payments` (LC/TT, milestones).
+- **Chat/notas**: usa `trade_events` como registro auditado — cada mensaje queda en el feed.
 
-### 4. Bloque de planes reforzado
+**Paneles espejo para las contrapartes** (sin cuenta full):
+- **Proveedor y cliente** reciben un link tokenizado `/operacion/{token}` (público, one-time refresh) con **exactamente la misma información** filtrada a su rol (el proveedor no ve el margen del intermediario ni los datos del otro comprador; el cliente no ve el costo del origen).
+- Server fns nuevas:
+  - `generateTradePartyLink({ tradeId, party: 'seller'|'buyer' })` → token en `commodity_trades.counterparty_seller_token` / `_buyer_token` (columnas nuevas — cero cambios de esquema mayores, solo `alter table add column`).
+  - `getTradeByPartyToken({ token })` → devuelve solo los campos visibles para ese rol.
+- Ruta pública `/operacion/{token}` con la misma estructura de 4 secciones (timeline, documentos, archivos, entrega/pagos) en modo lectura + botones para "Subir archivo" y "Firmar documento" (usa `document_sign_requests` sin exigir cuenta, con verificación por email OTP corto).
 
-El mini-plans actual muestra Free/Pro/Enterprise. Agregar:
-- Etiqueta "Más popular" en Pro.
-- Fila de features clave por plan (concesiones monitoreadas, países, alertas, exports, NI 43-101) para que la comparación con la tabla anterior sea directa.
-- Enlace secundario "Concierge / Custom" para leads enterprise vía `/contacto`.
+### E. Notificaciones por email en cada evento
 
-### Archivos
+Reutiliza el sistema `sendTransactionalEmail` (`src/lib/email/send.ts`) y crea plantillas nuevas en `src/lib/email-templates/`:
 
-- `src/features/marketing/LandingCatastroBlock.tsx` — fix del mapa (CSS estático, altura fija, ResizeObserver), toggle de capas, cards de diferenciadores, refuerzo del bloque de planes.
-- `src/features/marketing/CatastroComparison.tsx` — nuevo, tabla comparativa.
-- `src/features/marketing/MarketingLanding.tsx` — insertar `<CatastroComparison />` dentro de `section#catastro`.
+- `trade-created` → a proveedor y cliente cuando arranca el trade.
+- `trade-document-shared` → cuando el intermediario publica LOI/NCNDA/SPA.
+- `trade-signature-requested` → al firmante con link de firma.
+- `trade-signature-completed` → a todas las partes cuando se firma.
+- `trade-file-uploaded` → cuando la contraparte sube un assay/POF/BL.
+- `trade-shipment-updated` → al cambiar ETA/BL.
+- `trade-payment-milestone` → al registrar pago o milestone.
 
-Nada de cambios de esquema, migraciones ni backend nuevo: se aprovechan `getLandingCatastroSnapshot` y `getPublicPlans` existentes.
+Cada email lleva link directo a `/operacion/{token}` (proveedor/cliente) o `/dashboard/trades/{tradeId}` (intermediario). Todas las plantillas siguen la identidad Institutional Modernist ya establecida.
 
-## Verificación
+Cada evento también se escribe a `trade_events` para que aparezca en el timeline en tiempo real (polling cada 30 s + `refetchInterval`).
 
-Después de implementar, en `/#catastro`:
-1. Screenshot con Playwright para confirmar que el canvas tiene altura > 0.
-2. Verificar en el DOM que `.maplibregl-canvas-container` tiene `position: absolute` (indica que el CSS cargó).
-3. Confirmar que la tabla comparativa renderiza con 4 columnas y ~9 filas.
+## Cambios de esquema mínimos
+
+Una sola migración pequeña, respetando las reglas de RLS + GRANTs:
+
+- `commodity_trades`: add `counterparty_seller_token text unique`, `counterparty_buyer_token text unique`, `counterparty_seller_email text`, `counterparty_buyer_email text`.
+- Bucket `trade-files` (si no existe) con RLS por trade_id.
+- Sin tablas nuevas: `trade_documents`, `trade_events`, `trade_shipments`, `trade_payments` ya existen.
+
+## Entrega en orden
+
+1. NCNDA (plantilla + PDF) y "Generar LOI/NCNDA" desde el sourcing.
+2. Registro abierto de proveedor + primer lote.
+3. Propuesta → lote publicable; lote → iniciar trade.
+4. **Centro de Operaciones**: cabecera + timeline enriquecido + tabs documentos/archivos/entrega/pagos en `/dashboard/trades/{tradeId}`.
+5. Panel espejo `/operacion/{token}` para proveedor y cliente (lectura + subir/firmar).
+6. Emails por evento (7 plantillas nuevas) y trigger en cada server fn relevante.
+7. Prueba manual end-to-end usando el caso Aupal Antimony (Sb 99.85%, 20 t, CIF Florida) como escenario de referencia.
+
+## Restricciones
+
+- No tocar navegación ni INICIO.
+- Solo tokens semánticos (papel/tinta/cobalto), nada de hex hardcodeados.
+- No modificar archivos auto-generados de Supabase.
+- Cada nueva tabla o columna en `public` lleva GRANT + RLS en la misma migración.
