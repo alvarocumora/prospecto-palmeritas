@@ -1185,6 +1185,179 @@ function RequestDocsPanel({
   );
 }
 
+/* -------------------- Bandeja de subida de documentos ------------------- */
+function UploadInboxPanel({
+  tradeId,
+  docs,
+  onChange,
+}: {
+  tradeId: string;
+  docs: NonNullable<Awaited<ReturnType<typeof getTradeDetail>>>["documents"];
+  onChange: () => void;
+}) {
+  const uploadFn = useServerFn(requestTradeDocUpload);
+  const upsertFn = useServerFn(upsertTradeDocument);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+
+  const pending = docs.filter((d) => d.status === "pending");
+  const received = docs.filter(
+    (d) => d.file_url && d.status !== "pending",
+  );
+
+  if (pending.length === 0 && received.length === 0) return null;
+
+  const fileName = (u: string | null) => (u ? (u.split("/").pop() ?? u) : "—");
+  const labelOf = (k: string) =>
+    DOC_BY_KEY[k]?.acronym ?? DOC_BY_KEY[k]?.label ?? k;
+
+  const upload = async (docType: string, file: File) => {
+    setBusyKey(docType);
+    try {
+      const { path, token, bucket } = await uploadFn({
+        data: { tradeId, fileName: file.name },
+      });
+      const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, file);
+      if (up.error) throw up.error;
+      await upsertFn({
+        data: { tradeId, docType, fileUrl: path, status: "uploaded" },
+      });
+      toast.success(`${labelOf(docType)} recibido.`);
+      onChange();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo subir");
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+        <Upload className="w-3.5 h-3.5" /> Bandeja de subida de documentos
+      </div>
+
+      {pending.length > 0 ? (
+        <div className="space-y-2 mb-3">
+          {pending.map((d) => (
+            <UploadInboxRow
+              key={d.id}
+              docType={d.doc_type}
+              label={labelOf(d.doc_type)}
+              full={DOC_BY_KEY[d.doc_type]?.label ?? d.doc_type}
+              busy={busyKey === d.doc_type}
+              onFile={(f) => void upload(d.doc_type, f)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-[11px] text-muted-foreground mb-3">
+          Sin documentos pendientes de subir.
+        </div>
+      )}
+
+      {received.length > 0 && (
+        <>
+          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-4 mb-2">
+            Recibidos
+          </div>
+          <div className="rounded border border-border divide-y divide-border">
+            {received.map((d) => (
+              <div
+                key={d.id}
+                className="p-2 flex items-center justify-between gap-2 text-[11px] font-mono"
+              >
+                <div className="min-w-0">
+                  <span className="text-gold">{labelOf(d.doc_type)}</span>
+                  <span className="text-foreground ml-2 truncate">
+                    {fileName(d.file_url)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span className="text-muted-foreground">
+                    {new Date(d.updated_at).toLocaleString("es-CL")}
+                  </span>
+                  <DocStatusPill status={d.status} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+function UploadInboxRow({
+  docType: _docType,
+  label,
+  full,
+  busy,
+  onFile,
+}: {
+  docType: string;
+  label: string;
+  full: string;
+  busy: boolean;
+  onFile: (f: File) => void;
+}) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [drag, setDrag] = useState(false);
+  return (
+    <div
+      onDragOver={(e) => {
+        e.preventDefault();
+        setDrag(true);
+      }}
+      onDragLeave={() => setDrag(false)}
+      onDrop={(e) => {
+        e.preventDefault();
+        setDrag(false);
+        const f = e.dataTransfer.files?.[0];
+        if (f) onFile(f);
+      }}
+      className={`flex items-center justify-between gap-3 p-2.5 rounded border transition ${
+        drag
+          ? "border-primary bg-primary/5"
+          : "border-dashed border-border bg-background"
+      }`}
+    >
+      <div className="min-w-0">
+        <div className="text-xs font-medium">
+          <span className="font-mono text-gold mr-1.5">{label}</span>
+          <span className="text-foreground">{full}</span>
+        </div>
+        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
+          Pendiente · arrastra el archivo aquí o selecciónalo
+        </div>
+      </div>
+      <div className="shrink-0">
+        <input
+          ref={ref}
+          type="file"
+          className="hidden"
+          onChange={(e) => {
+            const f = e.target.files?.[0];
+            if (f) onFile(f);
+            e.target.value = "";
+          }}
+        />
+        <button
+          onClick={() => ref.current?.click()}
+          disabled={busy}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+        >
+          {busy ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Upload className="w-3 h-3" />
+          )}
+          Subir archivo
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* -------------------- Selector / alta rápida de proveedor --------------- */
 function SupplierPanel({
   tradeId,
