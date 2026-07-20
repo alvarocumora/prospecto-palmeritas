@@ -44,11 +44,22 @@ export const linkPartnerToTrade = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
+    const userId = context.userId as string;
+    const { data: tradeRow, error: tErr } = await sb
+      .from("commodity_trades")
+      .select("id, buyer_user_id, seller_user_id")
+      .eq("id", data.tradeId)
+      .maybeSingle();
+    if (tErr || !tradeRow) throw new Error("Trade no encontrado o sin acceso.");
+    const tr = tradeRow as { buyer_user_id: string | null; seller_user_id: string | null };
+    // La contraparte es el lado opuesto al usuario dueño del trade.
+    const cpRole: "buyer" | "seller" = tr.seller_user_id === userId ? "buyer" : "seller";
+
     const { data: partner, error: pErr } = await sb
       .from("business_partners")
-      .select("id, name, company, email, phone, country, role")
+      .select("id, name, company, email, phone, country")
       .eq("id", data.partnerId)
-      .eq("owner_user_id", context.userId as string)
+      .eq("owner_user_id", userId)
       .maybeSingle();
     if (pErr || !partner) throw new Error("Proveedor no encontrado.");
     const p = partner as {
@@ -58,31 +69,30 @@ export const linkPartnerToTrade = createServerFn({ method: "POST" })
       email: string | null;
       phone: string | null;
       country: string | null;
-      role: string | null;
     };
     const { error } = await sb
       .from("commodity_trades")
       .update({
+        counterparty_role: cpRole,
         counterparty_name: p.name,
         counterparty_company: p.company,
         counterparty_email: p.email,
         counterparty_phone: p.phone,
         counterparty_country: p.country,
-        counterparty_role: p.role,
       })
       .eq("id", data.tradeId);
     if (error) throw new Error(error.message);
     try {
       await sb.from("trade_events").insert({
         trade_id: data.tradeId,
-        actor_user_id: context.userId,
+        actor_user_id: userId,
         kind: "counterparty_linked",
         detail: `Contraparte vinculada: ${p.name}${p.company ? ` (${p.company})` : ""}`,
       });
     } catch {
       /* noop */
     }
-    return { ok: true, partnerId: p.id };
+    return { ok: true, partnerId: p.id, role: cpRole };
   });
 
 function serviceClient(): SupabaseClient | null {
