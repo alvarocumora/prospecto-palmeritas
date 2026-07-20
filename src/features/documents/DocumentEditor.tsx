@@ -560,6 +560,59 @@ export function DocumentEditor({
       <div className="grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] gap-6">
         {/* Panel de formulario */}
         <div className="space-y-5">
+          {/* Ficha del documento: separa cada borrador por cliente / operación. */}
+          <section className="rounded-2xl border border-accent-brand/40 bg-accent-brand-subtle/30 p-5">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand mb-3">
+              Ficha del documento
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[12px] font-mono text-content mb-1">
+                  Título interno
+                </label>
+                <input
+                  value={docTitle}
+                  onChange={(e) => setDocTitle(e.target.value)}
+                  placeholder={`Ej: ${template.acronym ?? template.shortTitle} — Cliente / Operación`}
+                  className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                />
+                <p className="text-[11px] text-content-subtle mt-1">
+                  Sólo lo ves tú. Sirve para distinguir cada documento en tu listado.
+                </p>
+              </div>
+              <div>
+                <label className="block text-[12px] font-mono text-content mb-1">
+                  Cliente / Contraparte
+                </label>
+                <input
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="Nombre de la empresa o persona"
+                  className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                />
+              </div>
+              {(projectId || tradeId || inquiryId) && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {projectId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Proyecto vinculado
+                    </span>
+                  )}
+                  {tradeId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Trade vinculado
+                    </span>
+                  )}
+                  {inquiryId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Requerimiento vinculado
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+
           {groups.map(([groupName, fields]) => (
             <section
               key={groupName}
