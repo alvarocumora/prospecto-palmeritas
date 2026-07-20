@@ -143,6 +143,9 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
+    const memRes = await requireProjectMember(supabase, user.id, projectId);
+    if ("error" in memRes) return memRes.error;
+
     type Result = {
       code: string;
       status: "imported" | "skipped" | "failed" | "not_found";
