@@ -1179,3 +1179,205 @@ function RequestDocsPanel({
     </div>
   );
 }
+
+/* -------------------- Selector / alta rápida de proveedor --------------- */
+function SupplierPanel({
+  tradeId,
+  currentName,
+  onLinked,
+}: {
+  tradeId: string;
+  currentName: string | null;
+  onLinked: () => void;
+}) {
+  const listFn = useServerFn(listPartners);
+  const upsertFn = useServerFn(upsertPartner);
+  const linkFn = useServerFn(linkPartnerToTrade);
+  const { data, refetch } = useQuery({
+    queryKey: ["partners-list"],
+    queryFn: () => listFn(),
+  });
+  const partners = data?.partners ?? [];
+  const [selectedId, setSelectedId] = useState<string>("");
+  const [creating, setCreating] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    company: "",
+    role: "productor" as (typeof PARTNER_ROLES)[number],
+    email: "",
+    phone: "",
+    country: "",
+  });
+
+  const link = async (partnerId: string) => {
+    setBusy(true);
+    try {
+      await linkFn({ data: { tradeId, partnerId } });
+      toast.success("Proveedor vinculado al trade.");
+      onLinked();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo vincular");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const createAndLink = async () => {
+    if (form.name.trim().length < 2) return toast.error("Nombre requerido.");
+    setBusy(true);
+    try {
+      const { id } = await upsertFn({
+        data: {
+          name: form.name.trim(),
+          company: form.company.trim() || undefined,
+          role: form.role,
+          email: form.email.trim() || undefined,
+          phone: form.phone.trim() || undefined,
+          country: form.country.trim() || undefined,
+          status: "activo",
+        },
+      });
+      await linkFn({ data: { tradeId, partnerId: id } });
+      toast.success("Proveedor creado y vinculado.");
+      setCreating(false);
+      setForm({ name: "", company: "", role: "productor", email: "", phone: "", country: "" });
+      void refetch();
+      onLinked();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+      <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+          Proveedor / contraparte del trade
+        </div>
+        {currentName && (
+          <div className="text-[11px] font-mono text-foreground truncate">
+            Actual: <b>{currentName}</b>
+          </div>
+        )}
+      </div>
+
+      {!creating ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <select
+            value={selectedId}
+            onChange={(e) => setSelectedId(e.target.value)}
+            className={`${inputCls} min-w-[220px]`}
+            disabled={busy || partners.length === 0}
+          >
+            <option value="">
+              {partners.length ? "Seleccionar de mi cartera…" : "Sin proveedores guardados"}
+            </option>
+            {partners.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+                {p.company ? ` · ${p.company}` : ""}
+                {p.role ? ` · ${p.role}` : ""}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => selectedId && void link(selectedId)}
+            disabled={!selectedId || busy}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+            Vincular al trade
+          </button>
+          <button
+            onClick={() => setCreating(true)}
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted"
+          >
+            <Plus className="w-3 h-3" /> Nuevo proveedor
+          </button>
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-2">
+          <F label="Nombre *">
+            <input
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className={inputCls}
+              placeholder="Nombre completo"
+            />
+          </F>
+          <F label="Empresa">
+            <input
+              value={form.company}
+              onChange={(e) => setForm({ ...form, company: e.target.value })}
+              className={inputCls}
+              placeholder="Razón social"
+            />
+          </F>
+          <F label="Rol">
+            <select
+              value={form.role}
+              onChange={(e) =>
+                setForm({ ...form, role: e.target.value as (typeof PARTNER_ROLES)[number] })
+              }
+              className={inputCls}
+            >
+              {PARTNER_ROLES.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </F>
+          <F label="País (ISO)">
+            <input
+              value={form.country}
+              onChange={(e) => setForm({ ...form, country: e.target.value })}
+              className={inputCls}
+              placeholder="CL, AE, CN…"
+            />
+          </F>
+          <F label="Email">
+            <input
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className={inputCls}
+              placeholder="contacto@empresa.com"
+            />
+          </F>
+          <F label="Teléfono">
+            <input
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              className={inputCls}
+              placeholder="+56 9 …"
+            />
+          </F>
+          <div className="sm:col-span-2 flex items-center gap-2 justify-end">
+            <button
+              onClick={() => setCreating(false)}
+              disabled={busy}
+              className="px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() => void createAndLink()}
+              disabled={busy}
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+            >
+              {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+              Crear y vincular
+            </button>
+          </div>
+        </div>
+      )}
+      <div className="mt-2 text-[10px] text-muted-foreground font-mono">
+        Al vincular se actualizan los campos de contraparte del trade; luego emite el link de
+        operación abajo para compartirlo por email/WhatsApp.
+      </div>
+    </div>
+  );
+}
