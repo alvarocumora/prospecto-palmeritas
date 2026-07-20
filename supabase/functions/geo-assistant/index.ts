@@ -1,6 +1,7 @@
 // Geo-AI Copilot v2 (Sprint 5.1): inyecta contexto geológico denso del proyecto activo.
 // Recibe { project_id, messages: [{role, content}], focus? } y retorna SSE con la respuesta del modelo.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
