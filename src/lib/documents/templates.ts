@@ -1124,7 +1124,7 @@ const ncnda: TemplateDef = {
       `No elusión. Cada Parte se obliga a no contactar, negociar ni contratar, directa ni indirectamente, con productores, compradores, financistas, agentes o representantes identificados por la otra Parte, sin su consentimiento previo y por escrito, durante la vigencia y por doce (12) meses adicionales.`,
       `Confidencialidad. Toda información técnica (assays, certificados, cadenas de custodia), comercial (precios, cantidades, contrapartes) y operativa se considerará confidencial y no podrá ser divulgada a terceros salvo bajo idénticas obligaciones de reserva.`,
       `Vigencia. El presente acuerdo permanecerá vigente por ${term} meses contados desde su firma, prorrogables automáticamente por períodos iguales salvo aviso en contrario con treinta (30) días de anticipación.`,
-      active.penalty ? (ncnda.clauses.find((c) => c.key === "penalty")!.text) : "",
+      active.has("penalty") ? (ncnda.clauses.find((c) => c.key === "penalty")!.text) : "",
       jurisdictionClause(gv(val, "jurisdiction")),
     ].filter(Boolean);
     return {
