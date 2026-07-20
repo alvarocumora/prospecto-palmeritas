@@ -10,3 +10,9 @@ export const OWN_COMPANY = {
 
 /** Línea completa de la parte propia para campos y bloques de firma. */
 export const OWN_PARTY_LINE = `${OWN_COMPANY.name} · RUT ${OWN_COMPANY.rut} · Rep. legal: ${OWN_COMPANY.representative}`;
+
+// Operador de la plataforma: Geocapitals estructura y opera cada deal (la parte
+// legal firmante sigue siendo OWN_COMPANY). Sello de operación en trades,
+// portal de contraparte y documentos.
+export const OPERATOR = "Geocapitals";
+export const OPERATOR_LINE = `Operado por ${OPERATOR}`;

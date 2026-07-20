@@ -121,6 +121,13 @@ describe("identidad corporativa por defecto (Asesorías Terra SpA)", () => {
 
   it("todas las plantillas precargan la parte propia con los datos de la empresa", () => {
     for (const tpl of TEMPLATES) {
+      // El NCNDA (ICC, bilingüe) precarga la parte propia como Posición C, con
+      // company/name en campos separados, no como un único campo = OWN_PARTY_LINE.
+      if (tpl.id === "ncnda") {
+        const pcCompany = tpl.fields.find((f) => f.key === "pC_company");
+        expect(pcCompany?.default, "ncnda.pC_company").toContain(OWN_COMPANY.name);
+        continue;
+      }
       const key = OWN_FIELD[tpl.id];
       expect(key, `plantilla ${tpl.id} sin campo propio mapeado`).toBeDefined();
       const field = tpl.fields.find((f) => f.key === key);
