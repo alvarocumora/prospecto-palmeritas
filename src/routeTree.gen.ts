@@ -82,6 +82,7 @@ import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
 import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
 import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
+import { Route as AuthenticatedDashboardProveedorRouteImport } from './routes/_authenticated.dashboard.proveedor'
 import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
 import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
 import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
@@ -531,6 +532,12 @@ const AuthenticatedDashboardQaqcRoute =
   AuthenticatedDashboardQaqcRouteImport.update({
     id: '/dashboard/qaqc',
     path: '/dashboard/qaqc',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProveedorRoute =
+  AuthenticatedDashboardProveedorRouteImport.update({
+    id: '/dashboard/proveedor',
+    path: '/dashboard/proveedor',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardProjectsRoute =
@@ -1039,6 +1046,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1182,6 +1190,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1327,6 +1336,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/profile': typeof AuthenticatedDashboardProfileRoute
   '/_authenticated/dashboard/project-report': typeof AuthenticatedDashboardProjectReportRoute
   '/_authenticated/dashboard/projects': typeof AuthenticatedDashboardProjectsRoute
+  '/_authenticated/dashboard/proveedor': typeof AuthenticatedDashboardProveedorRoute
   '/_authenticated/dashboard/qaqc': typeof AuthenticatedDashboardQaqcRoute
   '/_authenticated/dashboard/qps': typeof AuthenticatedDashboardQpsRoute
   '/_authenticated/dashboard/reports': typeof AuthenticatedDashboardReportsRoute
@@ -1472,6 +1482,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/project-report'
     | '/dashboard/projects'
+    | '/dashboard/proveedor'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
     | '/dashboard/reports'
@@ -1615,6 +1626,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/project-report'
     | '/dashboard/projects'
+    | '/dashboard/proveedor'
     | '/dashboard/qaqc'
     | '/dashboard/qps'
     | '/dashboard/reports'
@@ -1759,6 +1771,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/profile'
     | '/_authenticated/dashboard/project-report'
     | '/_authenticated/dashboard/projects'
+    | '/_authenticated/dashboard/proveedor'
     | '/_authenticated/dashboard/qaqc'
     | '/_authenticated/dashboard/qps'
     | '/_authenticated/dashboard/reports'
@@ -2392,6 +2405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardQaqcRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/proveedor': {
+      id: '/_authenticated/dashboard/proveedor'
+      path: '/dashboard/proveedor'
+      fullPath: '/dashboard/proveedor'
+      preLoaderRoute: typeof AuthenticatedDashboardProveedorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/projects': {
       id: '/_authenticated/dashboard/projects'
       path: '/dashboard/projects'
@@ -3017,6 +3037,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardProfileRoute: typeof AuthenticatedDashboardProfileRoute
   AuthenticatedDashboardProjectReportRoute: typeof AuthenticatedDashboardProjectReportRoute
   AuthenticatedDashboardProjectsRoute: typeof AuthenticatedDashboardProjectsRoute
+  AuthenticatedDashboardProveedorRoute: typeof AuthenticatedDashboardProveedorRoute
   AuthenticatedDashboardQaqcRoute: typeof AuthenticatedDashboardQaqcRoute
   AuthenticatedDashboardQpsRoute: typeof AuthenticatedDashboardQpsRoute
   AuthenticatedDashboardReportsRoute: typeof AuthenticatedDashboardReportsRoute
@@ -3095,6 +3116,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardProjectReportRoute:
     AuthenticatedDashboardProjectReportRoute,
   AuthenticatedDashboardProjectsRoute: AuthenticatedDashboardProjectsRoute,
+  AuthenticatedDashboardProveedorRoute: AuthenticatedDashboardProveedorRoute,
   AuthenticatedDashboardQaqcRoute: AuthenticatedDashboardQaqcRoute,
   AuthenticatedDashboardQpsRoute: AuthenticatedDashboardQpsRoute,
   AuthenticatedDashboardReportsRoute: AuthenticatedDashboardReportsRoute,
