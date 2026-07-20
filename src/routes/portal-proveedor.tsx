@@ -78,7 +78,7 @@ function SupplierLandingPage() {
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               to="/auth"
-              search={{ mode: "signup", role: "supplier" }}
+              search={{ mode: "signup", intent: "owner", next: "/dashboard/proveedor" }}
               className="inline-flex items-center gap-2 rounded-lg bg-accent-brand text-white px-5 py-3 text-sm font-semibold hover:opacity-90"
             >
               Crear cuenta de proveedor <ArrowRight className="w-4 h-4" />
