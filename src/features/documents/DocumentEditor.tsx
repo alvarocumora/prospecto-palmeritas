@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect, useRef } from "react";
+import { useMemo, useState, useEffect, useRef, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import {
   ArrowLeft,
@@ -10,13 +10,25 @@ import {
   Cloud,
   CloudOff,
   Loader2,
+  CheckCircle2,
+  Clock,
+  RefreshCw,
+  Copy,
+  Users,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import type { TemplateDef, GeneratedDoc, DocBlock } from "@/lib/documents/model";
 import { buildReference } from "@/lib/documents/templates";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
-import { createSignRequest, type SignableDoc } from "@/lib/documents/signing.functions";
+import {
+  createSignRequest,
+  createSignFlow,
+  getMySignFlow,
+  retrySigner,
+  type SignableDoc,
+  type SignFlowSummary,
+} from "@/lib/documents/signing.functions";
 import { supabase } from "@/integrations/supabase/client";
 import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
@@ -217,6 +229,150 @@ export function DocumentEditor({
   const [signerEmail, setSignerEmail] = useState(signerPrefill?.email ?? "");
   const [signerName, setSignerName] = useState(signerPrefill?.name ?? "");
   const signFn = useServerFn(createSignRequest);
+
+  // ─── Flujo ordenado multi-firmante (NCNDA y otros con ≥2 partes) ───
+  const parties = useMemo(() => {
+    const sig = doc.blocks.find((b) => b.kind === "signature") as
+      | { kind: "signature"; parties: string[] }
+      | undefined;
+    return sig?.parties ?? [];
+  }, [doc]);
+  const isMultiParty = parties.length >= 2;
+  const flowStorageKey = `${STORAGE_PREFIX}flow:${template.id}`;
+
+  type FlowSignerInput = { role: string; name: string; email: string };
+  const [flowSigners, setFlowSigners] = useState<FlowSignerInput[]>([]);
+  useEffect(() => {
+    // Precarga inputs con las partes del bloque de firma.
+    setFlowSigners((prev) =>
+      parties.map((role, i) => prev[i] ?? { role, name: "", email: "" }),
+    );
+  }, [parties]);
+
+  const [flowId, setFlowId] = useState<string | null>(null);
+  const [flowTokens, setFlowTokens] = useState<Record<number, string>>({});
+  const [flowSummary, setFlowSummary] = useState<SignFlowSummary | null>(null);
+  const [flowBusy, setFlowBusy] = useState(false);
+
+  const createFlowFn = useServerFn(createSignFlow);
+  const getFlowFn = useServerFn(getMySignFlow);
+  const retryFn = useServerFn(retrySigner);
+
+  // Persiste flowId por plantilla para recuperar estado tras refresh.
+  useEffect(() => {
+    if (!user) return;
+    try {
+      const raw = window.localStorage.getItem(flowStorageKey);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { flowId?: string; tokens?: Record<number, string> };
+        if (parsed.flowId) setFlowId(parsed.flowId);
+        if (parsed.tokens) setFlowTokens(parsed.tokens);
+      }
+    } catch {}
+  }, [flowStorageKey, user]);
+
+  const refreshFlow = useCallback(async () => {
+    if (!flowId) return;
+    try {
+      const s = await getFlowFn({ data: { flowId } });
+      setFlowSummary(s);
+    } catch (e) {
+      console.error("[refreshFlow]", e);
+    }
+  }, [flowId, getFlowFn]);
+
+  useEffect(() => {
+    if (!flowId) return;
+    void refreshFlow();
+    // Polling suave mientras haya firmantes pendientes.
+    const t = setInterval(() => {
+      if (flowSummary?.completed) return;
+      void refreshFlow();
+    }, 20_000);
+    return () => clearInterval(t);
+  }, [flowId, refreshFlow, flowSummary?.completed]);
+
+  const startFlow = async () => {
+    if (!user) {
+      toast.error("Inicia sesión para enviar a firma.");
+      return;
+    }
+    // Validación mínima: al menos el primer firmante debe tener email o nombre.
+    const first = flowSigners[0];
+    if (!first?.email && !first?.name) {
+      toast.error("Ingresa al menos el nombre o email del primer firmante.");
+      return;
+    }
+    setFlowBusy(true);
+    try {
+      const res = await createFlowFn({
+        data: {
+          templateId: template.id,
+          doc: doc as unknown as SignableDoc,
+          tradeId,
+          signers: flowSigners.map((s) => ({
+            role: s.role || undefined,
+            name: s.name.trim() || undefined,
+            email: s.email.trim() || undefined,
+          })),
+        },
+      });
+      const tokMap: Record<number, string> = {};
+      for (const t of res.tokens) tokMap[t.order] = t.token;
+      setFlowId(res.flowId);
+      setFlowTokens(tokMap);
+      try {
+        window.localStorage.setItem(
+          flowStorageKey,
+          JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
+        );
+      } catch {}
+      toast.success(
+        `Flujo creado con ${res.tokens.length} firmantes en orden. Link del primero copiado.`,
+      );
+      await navigator.clipboard.writeText(buildSignUrl(res.tokens[0].token)).catch(() => {});
+      void refreshFlow();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo crear el flujo de firma.");
+    } finally {
+      setFlowBusy(false);
+    }
+  };
+
+  const doRetry = async (
+    requestId: string,
+    order: number,
+    patch: { name?: string; email?: string },
+    regenerate: boolean,
+  ) => {
+    try {
+      const res = await retryFn({
+        data: {
+          id: requestId,
+          name: patch.name,
+          email: patch.email,
+          regenerateToken: regenerate,
+        },
+      });
+      if (res.token) {
+        const next = { ...flowTokens, [order]: res.token };
+        setFlowTokens(next);
+        try {
+          window.localStorage.setItem(
+            flowStorageKey,
+            JSON.stringify({ flowId, tokens: next }),
+          );
+        } catch {}
+        await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
+        toast.success("Link regenerado y copiado.");
+      } else {
+        toast.success("Datos del firmante actualizados.");
+      }
+      await refreshFlow();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo reintentar.");
+    }
+  };
 
   const requestSignature = async () => {
     if (!user) {
