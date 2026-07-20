@@ -67,6 +67,9 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
       prefill,
       tradeId,
       signerPrefill,
+      draftId: deps.draftId ?? null,
+      projectId: deps.projectId ?? null,
+      inquiryId: deps.inquiryId ?? null,
     };
   },
   head: ({ loaderData }) => {
