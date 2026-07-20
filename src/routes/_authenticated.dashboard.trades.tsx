@@ -38,7 +38,9 @@ import {
   addTradeMessage,
   requestTradeDocs,
 } from "@/lib/trades.functions";
-import { ensureCounterpartyLink } from "@/lib/tradeOps.functions";
+import { ensureCounterpartyLink, linkPartnerToTrade } from "@/lib/tradeOps.functions";
+import { listPartners, upsertPartner } from "@/lib/clients.functions";
+import { PARTNER_ROLES } from "@/lib/clients";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
