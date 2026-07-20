@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef, useCallback } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   ArrowLeft,
   Download,
@@ -49,39 +49,61 @@ function defaultClauses(tpl: TemplateDef): Set<string> {
 
 export function DocumentEditor({
   template,
+  draftId: draftIdProp,
   prefill,
+  projectId,
   tradeId,
+  inquiryId,
   signerPrefill,
 }: {
   template: TemplateDef;
+  /** Id del borrador. Si no viene, se crea uno nuevo (documento independiente por cliente). */
+  draftId?: string;
   /** Valores iniciales (ej. desde un lote del marketplace). Pisan el borrador. */
   prefill?: Record<string, string>;
+  /** Proyecto asociado (queda vinculado al borrador). */
+  projectId?: string;
   /** Trade de origen: la firma queda en la trazabilidad de la operación. */
   tradeId?: string;
+  /** Requerimiento de sourcing asociado. */
+  inquiryId?: string;
   /** Contraparte sugerida (ej. desde un trade) para la solicitud de firma. */
   signerPrefill?: { name?: string | null; email?: string | null };
 }) {
   const { user } = useAuth();
-  const storageKey = `${STORAGE_PREFIX}${template.id}`;
+  const navigate = useNavigate();
+
+  // Id estable del borrador. Se genera en cliente si no vino por URL,
+  // así todos los documentos que crea el usuario desde una misma plantilla
+  // (uno por cliente / operación) quedan separados.
+  const draftIdRef = useRef<string>(
+    draftIdProp ?? (typeof crypto !== "undefined" ? crypto.randomUUID() : ""),
+  );
+  const draftId = draftIdRef.current;
+  const isNewDraft = !draftIdProp;
+  const storageKey = `${STORAGE_PREFIX}${template.id}:${draftId}`;
 
   const [values, setValues] = useState<Record<string, string>>(() => defaultValues(template));
   const [clauses, setClauses] = useState<Set<string>>(() => defaultClauses(template));
   const [reference, setReference] = useState<string>("");
+  const [docTitle, setDocTitle] = useState<string>("");
+  const [clientName, setClientName] = useState<string>("");
   const [busy, setBusy] = useState(false);
   const [sync, setSync] = useState<SyncStatus>("idle");
   const hydrated = useRef(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const persistedRef = useRef(false);
 
   // Genera referencia solo en cliente para evitar mismatch SSR.
   useEffect(() => {
     setReference((prev) => prev || buildReference(template.id));
   }, [template.id]);
 
-  // Hidratación: Supabase (si hay sesión) → localStorage como fallback.
+  // Hidratación: si viene un draftId existente, se lee de Supabase.
+  // Si es un draft nuevo, se conservan defaults (+ prefill posterior).
   useEffect(() => {
     let cancelled = false;
     async function hydrate() {
-      // Fallback local siempre disponible.
       const loadLocal = () => {
         try {
           const raw = window.localStorage.getItem(storageKey);
@@ -90,10 +112,14 @@ export function DocumentEditor({
             values?: Record<string, string>;
             clauses?: string[];
             reference?: string;
+            docTitle?: string;
+            clientName?: string;
           };
           if (parsed.values) setValues((prev) => ({ ...prev, ...parsed.values }));
           if (parsed.clauses) setClauses(new Set(parsed.clauses));
           if (parsed.reference) setReference(parsed.reference);
+          if (parsed.docTitle) setDocTitle(parsed.docTitle);
+          if (parsed.clientName) setClientName(parsed.clientName);
         } catch {
           // ignore
         }
@@ -106,12 +132,20 @@ export function DocumentEditor({
         return;
       }
 
+      // Draft nuevo (sin id en URL) → arrancamos limpio; se inserta al primer save.
+      if (isNewDraft) {
+        loadLocal();
+        setSync("idle");
+        hydrated.current = true;
+        return;
+      }
+
       setSync("loading");
       const { data, error } = await supabase
         .from("document_drafts")
-        .select("values, clauses, reference")
+        .select("values, clauses, reference, title, client_name")
+        .eq("id", draftId)
         .eq("user_id", user.id)
-        .eq("template_id", template.id)
         .maybeSingle();
 
       if (cancelled) return;
@@ -129,6 +163,9 @@ export function DocumentEditor({
         setValues((prev) => ({ ...prev, ...remoteValues }));
         setClauses(new Set(remoteClauses));
         if (data.reference) setReference(data.reference);
+        if (data.title) setDocTitle(data.title);
+        if (data.client_name) setClientName(data.client_name);
+        persistedRef.current = true;
         setSync("saved");
       } else {
         loadLocal();
@@ -140,7 +177,7 @@ export function DocumentEditor({
     return () => {
       cancelled = true;
     };
-  }, [storageKey, template.id, user]);
+  }, [storageKey, draftId, isNewDraft, user]);
 
   // Prefill (ej. desde un lote): se aplica después de hidratar y pisa el
   // borrador solo en las claves que trae, para reflejar el dato actual del lote.
@@ -156,14 +193,19 @@ export function DocumentEditor({
     return () => window.clearInterval(wait);
   }, [prefillKey]);
 
-  // Persistencia local + remota con debounce.
+  // Persistencia local + remota con debounce, indexada por draftId.
   useEffect(() => {
     if (!hydrated.current) return;
-    // Local siempre.
     try {
       window.localStorage.setItem(
         storageKey,
-        JSON.stringify({ values, clauses: Array.from(clauses), reference }),
+        JSON.stringify({
+          values,
+          clauses: Array.from(clauses),
+          reference,
+          docTitle,
+          clientName,
+        }),
       );
     } catch {
       // ignore
@@ -176,21 +218,57 @@ export function DocumentEditor({
     saveTimer.current = setTimeout(async () => {
       const { error } = await supabase.from("document_drafts").upsert(
         {
+          id: draftId,
           user_id: user.id,
           template_id: template.id,
           values,
           clauses: Array.from(clauses),
           reference,
+          title: docTitle.trim() || null,
+          client_name: clientName.trim() || null,
+          project_id: projectId ?? null,
+          trade_id: tradeId ?? null,
+          inquiry_id: inquiryId ?? null,
         },
-        { onConflict: "user_id,template_id" },
+        { onConflict: "id" },
       );
       setSync(error ? "error" : "saved");
+      // Al primer guardado, si estábamos en modo "nuevo", sincronizamos la URL
+      // con el draftId para que refresh / share funcione y no dupliquemos rows.
+      if (!error && isNewDraft && !persistedRef.current) {
+        persistedRef.current = true;
+        try {
+          navigate({
+            to: "/dashboard/documentos/$templateId",
+            params: { templateId: template.id },
+            search: { draftId },
+            replace: true,
+          });
+        } catch {
+          // ignore navigation errors — el borrador ya quedó guardado.
+        }
+      }
     }, 800);
 
     return () => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
     };
-  }, [storageKey, values, clauses, reference, user, template.id]);
+  }, [
+    storageKey,
+    values,
+    clauses,
+    reference,
+    docTitle,
+    clientName,
+    user,
+    template.id,
+    draftId,
+    isNewDraft,
+    navigate,
+    projectId,
+    tradeId,
+    inquiryId,
+  ]);
 
   const doc = useMemo<GeneratedDoc>(
     () =>
@@ -214,12 +292,9 @@ export function DocumentEditor({
   const reset = async () => {
     setValues(defaultValues(template));
     setClauses(defaultClauses(template));
-    if (user) {
-      await supabase
-        .from("document_drafts")
-        .delete()
-        .eq("user_id", user.id)
-        .eq("template_id", template.id);
+    if (user && persistedRef.current) {
+      await supabase.from("document_drafts").delete().eq("id", draftId).eq("user_id", user.id);
+      persistedRef.current = false;
     }
     toast.success("Valores restaurados");
   };
@@ -485,6 +560,59 @@ export function DocumentEditor({
       <div className="grid lg:grid-cols-[minmax(0,420px)_minmax(0,1fr)] gap-6">
         {/* Panel de formulario */}
         <div className="space-y-5">
+          {/* Ficha del documento: separa cada borrador por cliente / operación. */}
+          <section className="rounded-2xl border border-accent-brand/40 bg-accent-brand-subtle/30 p-5">
+            <div className="text-[10px] font-mono uppercase tracking-wider text-accent-brand mb-3">
+              Ficha del documento
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[12px] font-mono text-content mb-1">
+                  Título interno
+                </label>
+                <input
+                  value={docTitle}
+                  onChange={(e) => setDocTitle(e.target.value)}
+                  placeholder={`Ej: ${template.acronym ?? template.shortTitle} — Cliente / Operación`}
+                  className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                />
+                <p className="text-[11px] text-content-subtle mt-1">
+                  Sólo lo ves tú. Sirve para distinguir cada documento en tu listado.
+                </p>
+              </div>
+              <div>
+                <label className="block text-[12px] font-mono text-content mb-1">
+                  Cliente / Contraparte
+                </label>
+                <input
+                  value={clientName}
+                  onChange={(e) => setClientName(e.target.value)}
+                  placeholder="Nombre de la empresa o persona"
+                  className="w-full rounded-lg border border-hairline bg-surface-3 px-3 py-2 text-sm text-content focus:outline-none focus:border-accent-brand"
+                />
+              </div>
+              {(projectId || tradeId || inquiryId) && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {projectId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Proyecto vinculado
+                    </span>
+                  )}
+                  {tradeId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Trade vinculado
+                    </span>
+                  )}
+                  {inquiryId && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white border border-hairline px-2 py-0.5 text-[10px] font-mono text-content-subtle">
+                      Requerimiento vinculado
+                    </span>
+                  )}
+                </div>
+              )}
+            </div>
+          </section>
+
           {groups.map(([groupName, fields]) => (
             <section
               key={groupName}
