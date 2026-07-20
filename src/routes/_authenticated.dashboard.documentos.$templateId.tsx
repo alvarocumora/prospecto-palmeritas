@@ -10,8 +10,22 @@ import { getTradeDetail } from "@/lib/trades.functions";
 
 export const Route = createFileRoute("/_authenticated/dashboard/documentos/$templateId")({
   validateSearch: (s: Record<string, unknown>) =>
-    z.object({ lot: z.string().uuid().optional(), trade: z.string().uuid().optional() }).parse(s),
-  loaderDeps: ({ search }) => ({ lot: search.lot, trade: search.trade }),
+    z
+      .object({
+        lot: z.string().uuid().optional(),
+        trade: z.string().uuid().optional(),
+        draftId: z.string().uuid().optional(),
+        projectId: z.string().uuid().optional(),
+        inquiryId: z.string().uuid().optional(),
+      })
+      .parse(s),
+  loaderDeps: ({ search }) => ({
+    lot: search.lot,
+    trade: search.trade,
+    draftId: search.draftId,
+    projectId: search.projectId,
+    inquiryId: search.inquiryId,
+  }),
   loader: async ({ params, deps }) => {
     const template = TEMPLATE_BY_ID[params.templateId];
     if (!template) throw notFound();
