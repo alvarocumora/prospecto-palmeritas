@@ -8,6 +8,7 @@
 
 // deno-lint-ignore-file no-explicit-any
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.4";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -171,6 +172,9 @@ Deno.serve(async (req) => {
   );
 
   try {
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+
     const { scenario_id } = await req.json();
     if (!scenario_id) throw new Error("scenario_id required");
 
@@ -180,6 +184,9 @@ Deno.serve(async (req) => {
       .eq("id", scenario_id)
       .single();
     if (sErr || !scenario) throw new Error("Scenario not found");
+
+    const memRes = await requireProjectMember(supabase, authRes.userId, scenario.project_id);
+    if ("error" in memRes) return memRes.error;
 
     await supabase.from("economic_scenarios").update({ status: "running" }).eq("id", scenario_id);
 

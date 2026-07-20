@@ -1,6 +1,7 @@
 // Geo-Intel Brief (Sprint 5.2): genera un brief geológico contextual de un punto.
 // POST { project_id, lat, lng, radius_m? } → { brief, evidence }
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,6 +37,12 @@ Deno.serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
+
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const memRes = await requireProjectMember(admin, authRes.userId, project_id);
+    if ("error" in memRes) return memRes.error;
+
 
     const [proj, holes, targets, samples, permits, conc, litho, alter] = await Promise.all([
       admin

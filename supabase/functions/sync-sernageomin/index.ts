@@ -6,6 +6,7 @@
 // Body: { projectId: string }
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -85,6 +86,12 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
+
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const memRes = await requireProjectMember(supabase, authRes.userId, projectId);
+    if ("error" in memRes) return memRes.error;
+
 
     const { data: rows, error } = await supabase
       .from("mining_concessions")

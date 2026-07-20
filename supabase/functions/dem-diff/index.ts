@@ -7,6 +7,7 @@
 
 import { fromArrayBuffer } from "https://esm.sh/geotiff@2.1.3?target=deno&bundle";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.50.0";
+import { requireUser, requireProjectMember } from "../_shared/auth.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -78,6 +79,10 @@ function bboxIntersection(a: number[], b: number[]): number[] | null {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const authRes = await requireUser(req);
+    if ("error" in authRes) return authRes.error;
+    const userId = authRes.userId;
+
     const { projectId, name, rasterBeforeId, rasterAfterId, notes } = (await req.json()) as Payload;
     if (!projectId || !rasterBeforeId || !rasterAfterId || !name) throw new Error("Missing fields");
 
@@ -86,8 +91,8 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    const userId = req.headers.get("x-user-id");
-    if (!userId) throw new Error("Missing x-user-id header");
+    const memRes = await requireProjectMember(sb, userId, projectId);
+    if ("error" in memRes) return memRes.error;
 
     const [before, after] = await Promise.all([
       loadDsm(sb, rasterBeforeId),
