@@ -36,6 +36,7 @@ import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capi
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
 import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
 import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
+import { Route as OperacionTokenRouteImport } from './routes/operacion.$token'
 import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
@@ -283,6 +284,11 @@ const ProyectoTokenRoute = ProyectoTokenRouteImport.update({
 const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
   id: '/proveedor/$token',
   path: '/proveedor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperacionTokenRoute = OperacionTokenRouteImport.update({
+  id: '/operacion/$token',
+  path: '/operacion/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
@@ -976,6 +982,7 @@ export interface FileRoutesByFullPath {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
@@ -1118,6 +1125,7 @@ export interface FileRoutesByTo {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
@@ -1262,6 +1270,7 @@ export interface FileRoutesById {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
@@ -1406,6 +1415,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
@@ -1548,6 +1558,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
@@ -1691,6 +1702,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
@@ -1835,6 +1847,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
   MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
+  OperacionTokenRoute: typeof OperacionTokenRoute
   ProveedorTokenRoute: typeof ProveedorTokenRoute
   ProyectoTokenRoute: typeof ProyectoTokenRoute
   VerificarRefRoute: typeof VerificarRefRoute
@@ -2055,6 +2068,13 @@ declare module '@tanstack/react-router' {
       path: '/proveedor/$token'
       fullPath: '/proveedor/$token'
       preLoaderRoute: typeof ProveedorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operacion/$token': {
+      id: '/operacion/$token'
+      path: '/operacion/$token'
+      fullPath: '/operacion/$token'
+      preLoaderRoute: typeof OperacionTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/$lotId': {
@@ -3184,6 +3204,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
   MarketplaceLotIdRoute: MarketplaceLotIdRoute,
+  OperacionTokenRoute: OperacionTokenRoute,
   ProveedorTokenRoute: ProveedorTokenRoute,
   ProyectoTokenRoute: ProyectoTokenRoute,
   VerificarRefRoute: VerificarRefRoute,
