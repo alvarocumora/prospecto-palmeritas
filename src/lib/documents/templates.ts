@@ -1084,73 +1084,141 @@ const dataSheet: TemplateDef = {
   },
 };
 
-/* ─────────────── NCNDA (Non-Circumvention Non-Disclosure) ─────────────── */
+/* ─────────────── NCNDA (ICC — bilingüe, 3 posiciones) ─────────────── */
+// Plantilla alineada al formato estándar ICC/NCNDA que circula en el mercado
+// (Carpio & Kaddu / KYC Vetting): cláusulas bilingües EN/ES, arbitraje ICC,
+// vigencia 5+2 años y hasta 3 posiciones firmantes con datos completos.
+
+type NcndaPos = "A" | "B" | "C";
+const NCNDA_POS: { key: NcndaPos; label: string; ord: string }[] = [
+  { key: "A", label: "1ª Posición · Firmante", ord: "1st Position / 1ª Posición" },
+  { key: "B", label: "2ª Posición · Firmante", ord: "2nd Position / 2ª Posición" },
+  { key: "C", label: "3ª Posición · Firmante (Geocapitals)", ord: "3rd Position / 3ª Posición" },
+];
+
+function ncndaPosFields(p: NcndaPos, group: string, defaults: Partial<Record<string, string>> = {}): FieldDef[] {
+  const k = (s: string) => `p${p}_${s}`;
+  return [
+    { key: k("name"), label: "Nombre completo del firmante / Signatory's Full Name", type: "text", group, default: defaults.name },
+    { key: k("passport"), label: "N.º de Pasaporte / Passport No.", type: "text", group, default: defaults.passport },
+    { key: k("nationality"), label: "Nacionalidad / Nationality", type: "text", group, default: defaults.nationality },
+    { key: k("company"), label: "Empresa / Company Name", type: "text", group, default: defaults.company },
+    { key: k("position"), label: "Cargo / Position", type: "text", group, default: defaults.position },
+    { key: k("address"), label: "Dirección / Company Address", type: "text", group, default: defaults.address },
+    { key: k("phone"), label: "Teléfono / Phone", type: "text", group, default: defaults.phone },
+    { key: k("email"), label: "Correo / E-mail", type: "text", group, default: defaults.email },
+    { key: k("country"), label: "País / Country", type: "text", group, default: defaults.country },
+  ];
+}
+
+function ncndaPosRows(val: Record<string, string>, p: NcndaPos): [string, string][] {
+  const g = (s: string) => gv(val, `p${p}_${s}`, "—");
+  return [
+    ["Nombre / Name", g("name")],
+    ["Pasaporte / Passport", g("passport")],
+    ["Nacionalidad / Nationality", g("nationality")],
+    ["Empresa / Company", g("company")],
+    ["Cargo / Position", g("position")],
+    ["Dirección / Address", g("address")],
+    ["Teléfono / Phone", g("phone")],
+    ["Correo / E-mail", g("email")],
+    ["País / Country", g("country")],
+  ];
+}
+
 const ncnda: TemplateDef = {
   id: "ncnda",
-  title: "NCNDA — No Elusión y Confidencialidad",
+  title: "NCNDA — No Elusión y Confidencialidad (ICC, bilingüe)",
   shortTitle: "NCNDA",
   acronym: "NCNDA",
   category: "trade",
   summary:
-    "Acuerdo de no elusión y no divulgación entre productor, intermediario y comprador final para operaciones de commodities.",
+    "Non-Circumvention Non-Disclosure Agreement conforme a las reglas de la Cámara de Comercio Internacional (ICC), bilingüe EN/ES, con hasta tres posiciones firmantes.",
   fields: [
-    { key: "partyA", label: "Parte A — Intermediario / Titular", type: "text", default: OWN_PARTY_LINE, placeholder: "Razón social · RUT · Representante" },
-    { key: "partyB", label: "Parte B — Contraparte", type: "text", placeholder: "Razón social · RUT · Representante" },
-    { key: "partyBGiro", label: "Giro / Actividad Parte B", type: "text" },
-    { key: "partyBAddress", label: "Dirección Parte B", type: "text" },
-    { key: "partyBEmail", label: "Correo Parte B", type: "text" },
-    { key: "partyBPhone", label: "Teléfono Parte B", type: "text" },
-    { key: "commodity", label: "Commodity / Material", type: "text", placeholder: "Antimonio 99.85% (Sb ingot)" },
-    { key: "destination", label: "Destino del material", type: "text", placeholder: "Florida, USA" },
-    { key: "termMonths", label: "Vigencia (meses)", type: "number", default: "24" },
-    { key: "jurisdiction", label: "Jurisdicción", type: "text", default: "República de Chile" },
+    { key: "commodity", label: "Commodity / Material", type: "text", placeholder: "Antimony Ingot 99.85% (Sb)", group: "Operación" },
+    { key: "destination", label: "Destino del material / Destination", type: "text", placeholder: "Florida, USA", group: "Operación" },
+    { key: "termYears", label: "Vigencia (años) / Term (years)", type: "number", default: "5", group: "Operación" },
+    { key: "renewalYears", label: "Renovación (años) / Renewal (years)", type: "number", default: "2", group: "Operación" },
+    ...ncndaPosFields("A", NCNDA_POS[0].label),
+    ...ncndaPosFields("B", NCNDA_POS[1].label),
+    ...ncndaPosFields("C", NCNDA_POS[2].label, {
+      name: "Álvaro Cumora Oliva Herrera",
+      company: "Asesorías Terra SpA (Geocapitals)",
+      position: "Representante Legal",
+      country: "Chile",
+      email: "info@geocapitals.com",
+    }),
   ],
   clauses: [
     {
       key: "penalty",
-      label: "Penalidad por elusión",
+      label: "Penalidad por elusión / Circumvention Penalty",
       defaultOn: true,
-      text: "El incumplimiento de la obligación de no elusión facultará a la Parte afectada a exigir una indemnización equivalente al cinco por ciento (5%) del valor bruto de la operación circunvenida, sin perjuicio de los daños adicionales que correspondan.",
+      text: "Circumvention Penalty / Penalidad por Elusión. Any breach of the non-circumvention obligation entitles the aggrieved party to a compensation equal to five percent (5%) of the gross value of the circumvented transaction, without prejudice to further damages under ICC rules. — Cualquier incumplimiento de la obligación de no elusión facultará a la Parte agraviada a exigir una compensación equivalente al cinco por ciento (5%) del valor bruto de la operación circunvenida, sin perjuicio de daños adicionales conforme a las reglas ICC.",
     },
   ],
   build: (val, active, ctx): GeneratedDoc => {
-    const A = bracket(gv(val, "partyA"), "Parte A");
-    const B = bracket(gv(val, "partyB"), "Parte B");
     const commodity = gv(val, "commodity", "[commodity]");
-    const destination = gv(val, "destination", "[destino]");
-    const term = gv(val, "termMonths", "24");
+    const destination = gv(val, "destination", "[destination / destino]");
+    const term = gv(val, "termYears", "5");
+    const renewal = gv(val, "renewalYears", "2");
+
+    const partyLine = (p: NcndaPos): string => {
+      const company = gv(val, `p${p}_company`, "");
+      const name = gv(val, `p${p}_name`, "");
+      const country = gv(val, `p${p}_country`, "");
+      return [company, name, country].filter(Boolean).join(" · ") || `[Parte ${p}]`;
+    };
+    const A = partyLine("A");
+    const B = partyLine("B");
+    const C = partyLine("C");
+
     const items = [
-      `Objeto. Las Partes suscriben este NCNDA con el objeto de intercambiar información técnica, comercial y financiera relativa a operaciones sobre ${commodity} con destino ${destination}, protegiendo dicha información y las relaciones comerciales identificadas por cada Parte.`,
-      `No elusión. Cada Parte se obliga a no contactar, negociar ni contratar, directa ni indirectamente, con productores, compradores, financistas, agentes o representantes identificados por la otra Parte, sin su consentimiento previo y por escrito, durante la vigencia y por doce (12) meses adicionales.`,
-      `Confidencialidad. Toda información técnica (assays, certificados, cadenas de custodia), comercial (precios, cantidades, contrapartes) y operativa se considerará confidencial y no podrá ser divulgada a terceros salvo bajo idénticas obligaciones de reserva.`,
-      `Vigencia. El presente acuerdo permanecerá vigente por ${term} meses contados desde su firma, prorrogables automáticamente por períodos iguales salvo aviso en contrario con treinta (30) días de anticipación.`,
+      `Object / Objeto. The Parties enter into this Non-Circumvention Non-Disclosure Agreement (NCNDA) to exchange technical, commercial and financial information regarding transactions on ${commodity} with destination ${destination}, safeguarding such information and the commercial relationships identified by each Party. — Las Partes suscriben este Acuerdo de No Elusión y No Divulgación (NCNDA) con el objeto de intercambiar información técnica, comercial y financiera relativa a operaciones sobre ${commodity} con destino ${destination}, protegiendo dicha información y las relaciones comerciales identificadas por cada Parte.`,
+      `Non-Circumvention / No Elusión. Each Party undertakes not to contact, negotiate or contract, directly or indirectly, with producers, buyers, financiers, agents or representatives introduced by the other Party, without its prior written consent, during the term of this agreement and for a further twelve (12) months. — Cada Parte se obliga a no contactar, negociar ni contratar, directa o indirectamente, con productores, compradores, financistas, agentes o representantes identificados por la otra Parte, sin su consentimiento previo y por escrito, durante la vigencia y por doce (12) meses adicionales.`,
+      `Non-Disclosure / Confidencialidad. All technical (assays, certificates, chain of custody), commercial (prices, volumes, counterparties) and operational information shall be deemed confidential and shall not be disclosed to third parties except under identical confidentiality obligations. — Toda información técnica (ensayos, certificados, cadena de custodia), comercial (precios, cantidades, contrapartes) y operativa se considerará confidencial y no podrá ser divulgada a terceros salvo bajo idénticas obligaciones de reserva.`,
+      `Term / Vigencia. This agreement shall remain in force for ${term} year(s) from the date hereof, renewable for a further ${renewal} year(s) upon written agreement, and shall apply to all originated, follow-up, repeated, extended or renegotiated transactions. — Este acuerdo estará vigente por ${term} año(s) desde su firma, renovable por ${renewal} año(s) adicionales previo acuerdo escrito, y se aplicará a todas las transacciones originadas, de seguimiento, repetidas, extendidas o renegociadas.`,
+      `Arbitration / Arbitraje. All disputes arising out of or in connection with this agreement shall be finally settled under the Rules of Arbitration of the International Chamber of Commerce (ICC) by one or more arbitrators appointed in accordance with said rules; awards shall be binding and enforceable at law. — Toda controversia derivada de o en conexión con el presente acuerdo se resolverá definitivamente bajo las Reglas de Arbitraje de la Cámara de Comercio Internacional (ICC) por uno o más árbitros designados según dichas reglas; los laudos serán vinculantes y ejecutables por ley.`,
+      `Force Majeure / Fuerza Mayor. No Party shall be deemed in breach when the violation is due to circumstances beyond its reasonable control, including acts of God, civil disturbances or theft of privileged information without the intervention of any Party. — Ninguna Parte se considerará en incumplimiento cuando la violación se deba a circunstancias fuera de su control razonable, incluyendo actos de fuerza mayor, disturbios civiles o robo de información privilegiada sin intervención de las Partes.`,
+      `Owned or Controlled Entities / Entidades Controladas. This agreement binds all entities owned or controlled by a Party and its principals, employees, assignees, family and heirs; neither Party may assign this agreement without the other's prior written consent. — Este acuerdo obliga a todas las entidades de propiedad o controladas por cada Parte y a sus principales, empleados, cesionarios, familia y herederos; ninguna Parte podrá cederlo sin el consentimiento previo y por escrito de la otra.`,
+      `Electronic Transmission / Transmisión Electrónica. Transmission of this agreement by e-mail or electronic means shall be legal and binding upon the Parties. — La transmisión de este acuerdo por correo electrónico o medios electrónicos será legal y vinculante para las Partes.`,
+      `Not a Partnership / No Asociación. This agreement shall not be construed as a partnership; no Party shall have any claim against separate dealings, ventures or assets of the others, nor shall be liable for any other Party. — Este acuerdo no se interpretará como asociación; ninguna Parte tendrá reclamo contra operaciones, empresas o activos separados de las otras, ni será responsable por ellas.`,
+      `Third-Party Projects / Proyectos con Terceros. Any project to be shared with third parties for strategic or contractual reasons shall require mutual written acceptance of the signatories and the execution of a separate NCNDA with the new participant limited to that project. — Todo proyecto que se comparta con terceros por razones estratégicas o contractuales requerirá aceptación mutua y por escrito de los firmantes y la suscripción de un NCNDA independiente con el nuevo participante, limitado a ese proyecto.`,
       active.has("penalty") ? (ncnda.clauses.find((c) => c.key === "penalty")!.text) : "",
-      jurisdictionClause(gv(val, "jurisdiction")),
+      `Agreed and Attested / Acordado y Atestiguado. Each signatory below warrants that he/she is duly empowered by the named company to enter into and be bound by the obligations contained herein. — Cada firmante garantiza estar debidamente facultado por la empresa indicada para suscribir y quedar obligado por los compromisos aquí contenidos.`,
     ].filter(Boolean);
+
+    const blocks: DocBlock[] = [
+      {
+        kind: "paragraph",
+        text: `Between ${A}, ${B} and ${C} (collectively "The Parties") this Non-Circumvention Non-Disclosure Agreement (NCNDA) is executed under the following clauses. — Entre ${A}, ${B} y ${C} (en conjunto, "Las Partes") se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) conforme a las siguientes cláusulas.`,
+      },
+      {
+        kind: "fields",
+        rows: [
+          ["Commodity / Material", commodity],
+          ["Destino / Destination", destination],
+          ["Vigencia / Term", `${term} año(s) + ${renewal} año(s) de renovación`],
+          ["Foro / Forum", "ICC — International Chamber of Commerce"],
+        ],
+      },
+      { kind: "clauses", items: renumber(items) },
+    ];
+
+    // Bloques de datos por posición firmante (equivalentes a las tablas del PDF ICC).
+    for (const pos of NCNDA_POS) {
+      blocks.push({ kind: "paragraph", text: pos.ord });
+      blocks.push({ kind: "fields", rows: ncndaPosRows(val, pos.key) });
+    }
+
+    blocks.push({ kind: "signature", parties: [A, B, C] });
+
     return {
       docType: "ncnda",
       reference: ctx.reference,
       date: ctx.date,
-      title: "ACUERDO DE NO ELUSIÓN Y CONFIDENCIALIDAD (NCNDA)",
-      blocks: [
-        { kind: "paragraph", text: `Entre ${A} y ${B}, en adelante las "Partes", se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) conforme a las siguientes cláusulas:` },
-        {
-          kind: "fields",
-          rows: [
-            ["Parte A", A],
-            ["Parte B", B],
-            ["Giro / Actividad B", gv(val, "partyBGiro", "—")],
-            ["Dirección B", gv(val, "partyBAddress", "—")],
-            ["Correo B", gv(val, "partyBEmail", "—")],
-            ["Teléfono B", gv(val, "partyBPhone", "—")],
-            ["Commodity", commodity],
-            ["Destino del material", destination],
-            ["Vigencia", `${term} meses`],
-          ],
-        },
-        { kind: "clauses", items: renumber(items) },
-        { kind: "signature", parties: [A, B] },
-      ],
+      title: "NON-CIRCUMVENTION & NON-DISCLOSURE AGREEMENT (NCNDA)",
+      blocks,
     };
   },
 };
