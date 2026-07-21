@@ -421,4 +421,41 @@ export const attachOperacionDoc = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Aceptación explícita de los términos comerciales por la contraparte externa
+ *  (Buyer o Seller) desde la War Room pública. Se registra como evento en
+ *  `trade_events` con firma ligera (nombre + timestamp + rol) para dejar
+ *  trazabilidad. No cambia el `stage` del trade — el owner decide cuándo
+ *  avanzarlo, pero verá esta aceptación en la bitácora. */
+export const acceptOperacionTerms = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        acceptorName: z.string().trim().min(2).max(160),
+        acceptorTitle: z.string().trim().max(160).optional(),
+        note: z.string().trim().max(1000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    const detail = [
+      `Contraparte (${ctx.role}) aceptó los términos comerciales`,
+      `firmante: ${data.acceptorName}${data.acceptorTitle ? ` — ${data.acceptorTitle}` : ""}`,
+      data.note ? `nota: ${data.note}` : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
+    const { error } = await ctx.sb.from("trade_events").insert({
+      trade_id: ctx.tradeId,
+      actor_user_id: ctx.ownerId,
+      kind: "terms_accepted_by_counterparty",
+      detail,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true, acceptedAt: new Date().toISOString() };
+  });
+
+
 

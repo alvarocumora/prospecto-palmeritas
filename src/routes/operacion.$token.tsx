@@ -7,6 +7,7 @@ import {
   getOperacionByToken,
   requestOperacionUpload,
   attachOperacionDoc,
+  acceptOperacionTerms,
 } from "@/lib/tradeOps.functions";
 import { publicUrl } from "@/lib/publicUrl";
 import { supabase } from "@/integrations/supabase/client";
@@ -180,6 +181,15 @@ function OperacionMirror() {
               </div>
             </section>
 
+            <AcceptTermsPanel
+              token={token}
+              role={data.role}
+              alreadyAccepted={data.events.some(
+                (e) => e.kind === "terms_accepted_by_counterparty",
+              )}
+              defaultName={data.counterparty.name ?? ""}
+            />
+
             <DocsUpload token={token} documents={data.documents} />
 
             <p className="mt-10 text-xs text-[hsl(var(--im-ink-soft))]">
@@ -327,6 +337,128 @@ function DocsUpload({
           />
         </label>
       </div>
+    </section>
+  );
+}
+
+// ---------- Aceptación de términos comerciales por contraparte ----------
+function AcceptTermsPanel({
+  token,
+  role,
+  alreadyAccepted,
+  defaultName,
+}: {
+  token: string;
+  role: "buyer" | "seller";
+  alreadyAccepted: boolean;
+  defaultName: string;
+}) {
+  const qc = useQueryClient();
+  const acceptFn = useServerFn(acceptOperacionTerms);
+  const [name, setName] = useState(defaultName ?? "");
+  const [title, setTitle] = useState("");
+  const [note, setNote] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
+
+  const submit = async () => {
+    if (name.trim().length < 2) return toast.error("Ingresa tu nombre completo.");
+    setSaving(true);
+    try {
+      await acceptFn({
+        data: {
+          token,
+          acceptorName: name.trim(),
+          acceptorTitle: title.trim() || undefined,
+          note: note.trim() || undefined,
+        },
+      });
+      toast.success("Términos aceptados. Trazabilidad registrada.");
+      void qc.invalidateQueries({ queryKey: ["operacion", token] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo registrar la aceptación.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (alreadyAccepted) {
+    return (
+      <section className="mt-8 rounded-lg border border-[hsl(var(--im-hairline))] bg-white p-6">
+        <div className="flex items-center gap-2">
+          <span className="text-[hsl(var(--im-accent-brand))] text-lg">✓</span>
+          <h2 className="font-serif text-xl">Términos comerciales aceptados</h2>
+        </div>
+        <p className="text-sm text-[hsl(var(--im-ink-soft))] mt-2">
+          La aceptación quedó registrada en la bitácora con fecha, rol y firmante. Continúe cargando
+          los documentos POP / Shipping abajo para avanzar la operación.
+        </p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="mt-8 rounded-lg border border-[hsl(var(--im-hairline))] bg-white p-6">
+      <h2 className="font-serif text-xl mb-1">Aceptación de términos comerciales</h2>
+      <p className="text-sm text-[hsl(var(--im-ink-soft))] mb-3">
+        Como {role === "seller" ? "vendedor" : "comprador"}, confirme que ha leído y acepta las
+        condiciones (commodity, volumen 1,500 MT/mes × 12 meses, CIF Florida, pago SWIFT MT103,
+        inspección independiente). La aceptación se registra en la bitácora y habilita el envío del
+        SPA definitivo. No sustituye la firma del SPA.
+      </p>
+      {!openForm ? (
+        <button
+          onClick={() => setOpenForm(true)}
+          className="px-4 py-2 rounded bg-[hsl(var(--im-accent-brand))] text-white text-sm font-medium hover:opacity-90"
+        >
+          Aceptar términos comerciales
+        </button>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-3 mt-2">
+          <label className="text-xs">
+            <span className="block text-[hsl(var(--im-ink-soft))] mb-1">Nombre completo *</span>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 rounded border border-[hsl(var(--im-hairline))] bg-white text-sm"
+            />
+          </label>
+          <label className="text-xs">
+            <span className="block text-[hsl(var(--im-ink-soft))] mb-1">Cargo / representación</span>
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Representante legal, Director Comercial…"
+              className="w-full px-3 py-2 rounded border border-[hsl(var(--im-hairline))] bg-white text-sm"
+            />
+          </label>
+          <label className="text-xs sm:col-span-2">
+            <span className="block text-[hsl(var(--im-ink-soft))] mb-1">Nota (opcional)</span>
+            <textarea
+              value={note}
+              rows={2}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Comentarios, condiciones adicionales o pedidos de ajuste al SPA."
+              className="w-full px-3 py-2 rounded border border-[hsl(var(--im-hairline))] bg-white text-sm"
+            />
+          </label>
+          <div className="sm:col-span-2 flex items-center gap-2">
+            <button
+              onClick={() => void submit()}
+              disabled={saving}
+              className="px-4 py-2 rounded bg-[hsl(var(--im-accent-brand))] text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
+            >
+              {saving ? "Registrando…" : "Confirmar aceptación"}
+            </button>
+            <button
+              onClick={() => setOpenForm(false)}
+              className="px-3 py-2 text-sm text-[hsl(var(--im-ink-soft))]"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

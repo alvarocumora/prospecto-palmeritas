@@ -126,7 +126,7 @@ export async function buildAntimonySheetPdf(input: {
     ["Ag (Plata)", "%", "0.0003 – 0.014", "—"],
     ["Sn (Estaño)", "%", "0.0008", "—"],
   ];
-  const table = [
+  const chem = [
     "Composición química — CoA productor (JH2601, pallets 26–50 y 301–320) vs SGS (Reporte 2025-2002470-001, muestreo 22-Aug-2025).",
     ...assays.map(
       ([el, u, a, b]) =>
@@ -134,10 +134,11 @@ export async function buildAntimonySheetPdf(input: {
     ),
   ];
   return await renderServerPdf({
-    title: "Ficha técnica · Antimonio (Sb) Grade 2#",
+    title: "Purchase Terms · Antimony Ingots (Sb)",
     subtitle:
-      "Ficha resumen y análisis químico del lote ofrecido por proveedor certificado. Emitido por " +
-      "Geocapitals bajo el NCNDA firmado entre las Partes. Copia oficial para bandeja del comprador.",
+      "Condiciones formales de compra para el Buyer en Florida, USA (1,500 MT/mes × 12 meses, " +
+      "CIF, pago SWIFT MT103). Incluye ficha técnica del lote ofrecido por proveedor certificado. " +
+      "Emitido por Geocapitals bajo el NCNDA firmado entre las Partes.",
     reference: input.reference,
     parties: [
       { role: "Emisor", name: `${OWN_COMPANY.name} — Geocapitals` },
@@ -149,14 +150,22 @@ export async function buildAntimonySheetPdf(input: {
       },
     ],
     body: [
-      "1 · PRODUCTO. Antimony Ingot — Grade 2#. Marca de producción: JH2601 / KRN (referencia). Forma: lingote sobre pallets de madera. Estándar de análisis: GB/T 1599-2014 (SGS). Presentación: pallets 300–320 / 26–50, stock disponible en bodega.",
-      "2 · ORIGEN Y TRAZABILIDAD. Proveedor certificado con CoA propio y validación cruzada por laboratorio SGS. Documentación de origen legal, guías de bodega y fotos de stock disponibles en el Portal Proveedor.",
-      "3 · ANÁLISIS QUÍMICO.",
-      ...table.map((t) => t),
-      "4 · CONDICIONES COMERCIALES SUGERIDAS. Volumen del primer embarque a confirmar por el Buyer. Incoterm: CIF puerto destino a definir. Instrumento de pago: SBLC MT760 irrevocable confirmada por banco de primer nivel, contra documentos de embarque.",
-      "5 · PRÓXIMOS PASOS. (a) Confirmar destino y volumen; (b) emitir SCO / draft SPA bajo el NCNDA firmado; (c) coordinar inspección independiente pre-embarque (SGS / BV); (d) apertura del instrumento financiero.",
+      "§1 · COMMODITY. Refined Antimony Metal Ingots (Sb). Pureza mínima 99.65% (superior por mutuo acuerdo). Estándar: International Commercial Grade · Standard Ingots. Marca de producción JH2601 / KRN (referencia). Presentación: pallets 300–320 / 26–50. Origen: Seller's Option. Trial Shipment opcional por mutuo acuerdo. Estándar de análisis: GB/T 1599-2014.",
+      "§2 · CONTRACT QUANTITY & DURATION. 1,500 Metric Tons por mes. Contrato mínimo doce (12) meses, renovable por mutuo acuerdo escrito.",
+      "§3 · DELIVERY TERMS. Incoterm: CIF — Buyer's Designated Port, Florida, USA. Loading Port: Seller's Option. Destination Port: puerto designado por el Buyer en Florida, EE.UU. Schedule: primer embarque dentro de 15–30 días bancarios tras la firma del SPA; embarques mensuales sucesivos por la duración del contrato.",
+      "§4 · PRICE. El precio se referenciará al índice internacional aplicable para antimonio refinado. Dado que no existe un contrato LME estándar para antimonio, se acordará expresamente en el SPA la fuente de precio (LMU/LME reference u otro índice publicado, ej. Fastmarkets), la ventana de fijación, descuentos, premios y comisiones.",
+      "§5 · PAYMENT TERMS · SWIFT MT103. Transferencia bancaria internacional (SWIFT MT103) contra Commercial Invoice del Seller y set completo de documentos de embarque. Fondos remitidos a la cuenta bancaria designada por el Seller. Cargos bancarios fuera del país del Seller por cuenta del Buyer. Milestones alternativos podrán definirse en el SPA por mutuo acuerdo. NO SE UTILIZARÁ SBLC NI DLC para esta operación.",
+      "§6 · PROOF OF PRODUCT (POP). Commercial Invoice · Packing List · Certificate of Origin · SGS Quality Certificate (o equivalente) · Product Specification Sheet · Warehouse Receipt / Availability Certificate (cuando aplique) · Export Authorization · Product Photographs · Draft Bill of Lading.",
+      "§7 · SHIPPING DOCUMENTS. Commercial Invoice · Packing List · Full Set Clean On Board Bills of Lading · Certificate of Origin · SGS Inspection Certificate · Weight Certificate · Quality Certificate · Insurance Certificate (CIF) · Export Customs Documentation · Container Loading Photographs.",
+      "§8 · INSPECTION. Inspección de calidad y cantidad por SGS, CCIC, Alex Stewart International u otra firma internacionalmente reconocida y mutuamente aceptada. El Buyer podrá realizar inspección de destino por su propia cuenta.",
+      "§9 · TRANSACTION PROCEDURE. (1) Buyer emite ICPO/LOI + Company Profile; (2) Seller emite FCO + CIS; (3) Buyer firma y devuelve FCO; (4) Seller emite Draft SPA; (5) Buyer firma y devuelve; (6) Seller contrafirma; (7) Commercial Invoice; (8) Confirmación de PO y cronograma; (9) Preparación de carga; (10) Inspección SGS/CCIC; (11) Embarque según cronograma; (12) Set completo de documentos; (13) Pago SWIFT MT103 según SPA; (14) Arribo a puerto en Florida, EE.UU.; (15) Inspección de destino si aplica.",
+      "§10 · COMMISSIONS. Toda comisión, fee de intermediación o compensación de facilitador se acordará por separado por las Partes y será incorporada expresamente al SPA definitivo y al Fee Protection Agreement (NCNDA/IMFPA), cuando corresponda.",
+      "§11 · BUYER. Ubicación: Florida, Estados Unidos. Cantidad requerida: 1,500 MT/mes. Contrato mínimo: 12 meses. Extensiones sujetas a acuerdo escrito mutuo.",
       "---",
-      "Cualquier consulta técnica o comercial: info@geocapitals.com · WhatsApp +56 9 6218 4071. Este envío está cubierto por el NCNDA suscrito entre las Partes.",
+      "FICHA TÉCNICA DEL LOTE — Análisis químico (CoA productor vs SGS independiente).",
+      ...chem,
+      "---",
+      "Este documento oficial resume las condiciones comerciales y técnicas para la operación indicada, bajo el NCNDA suscrito entre las Partes. NO constituye oferta vinculante; la obligación de compra nace con el SPA definitivo firmado. Contacto: info@geocapitals.com · WhatsApp +56 9 6218 4071.",
     ],
     emitter: { ...EMITTER, signedAtISO: new Date().toISOString() },
     issuedAtISO: new Date().toISOString(),
