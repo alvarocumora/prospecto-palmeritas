@@ -181,6 +181,15 @@ function OperacionMirror() {
               </div>
             </section>
 
+            <AcceptTermsPanel
+              token={token}
+              role={data.role}
+              alreadyAccepted={data.events.some(
+                (e) => e.kind === "terms_accepted_by_counterparty",
+              )}
+              defaultName={data.counterparty.name ?? ""}
+            />
+
             <DocsUpload token={token} documents={data.documents} />
 
             <p className="mt-10 text-xs text-[hsl(var(--im-ink-soft))]">
