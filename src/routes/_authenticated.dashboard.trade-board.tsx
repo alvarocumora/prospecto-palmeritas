@@ -45,23 +45,16 @@ export const Route = createFileRoute("/_authenticated/dashboard/trade-board")({
 
 
 function TradeBoardPage() {
-  const raw = Route.useSearch();
+  const search = Route.useSearch();
   const navigate = useNavigate({ from: "/dashboard/trade-board" });
 
-  const safeRole = (["all", "buyer", "seller", "desk"] as const).includes(
-    raw.role as "all" | "buyer" | "seller" | "desk",
-  )
-    ? (raw.role as "all" | "buyer" | "seller" | "desk")
-    : "all";
-  const safeGroup = raw.group === "role" ? "role" : "none";
-  const search = { ...raw, role: safeRole, group: safeGroup as "none" | "role" };
-
-  const onSearchChange = (patch: Partial<typeof search>) => {
+  const onSearchChange = (patch: Partial<BoardSearchParams>) => {
     navigate({
-      search: (prev) => ({ ...prev, ...patch }),
+      search: (prev: BoardSearchParams) => ({ ...prev, ...patch }),
       replace: true,
     });
   };
+
 
   // Esc sale del fullscreen
   useEffect(() => {
