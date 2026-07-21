@@ -101,3 +101,50 @@ export function boardSummary(trades: BoardTrade[]): BoardSummary {
   }
   return { activeCount, closedCount, cancelledCount, pipelineUsd };
 }
+
+export type BoardFilters = {
+  q?: string;
+  role?: "all" | "buyer" | "seller" | "desk";
+  commodity?: string; // "" o "all" = todos
+  minUsd?: number | null;
+  maxUsd?: number | null;
+};
+
+/** Filtra trades sin tocar el orden. Búsqueda case-insensitive sobre ref, contraparte y commodity. */
+export function filterTrades(trades: BoardTrade[], f: BoardFilters): BoardTrade[] {
+  const q = (f.q ?? "").trim().toLowerCase();
+  const role = f.role && f.role !== "all" ? f.role : null;
+  const commodity =
+    f.commodity && f.commodity !== "all" ? f.commodity.trim().toLowerCase() : null;
+  const min = typeof f.minUsd === "number" && !Number.isNaN(f.minUsd) ? f.minUsd : null;
+  const max = typeof f.maxUsd === "number" && !Number.isNaN(f.maxUsd) ? f.maxUsd : null;
+
+  return trades.filter((t) => {
+    if (role && t.role !== role) return false;
+    if (commodity && (t.commodity ?? "").toLowerCase() !== commodity) return false;
+    const v = t.total_value_usd ?? 0;
+    if (min != null && v < min) return false;
+    if (max != null && v > max) return false;
+    if (q) {
+      const hay = [
+        t.reference,
+        t.commodity,
+        t.counterparty_name,
+        t.counterparty_company,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+}
+
+/** Lista única y ordenada de commodities para poblar el selector de filtro. */
+export function commoditiesFromTrades(trades: BoardTrade[]): string[] {
+  const set = new Set<string>();
+  for (const t of trades) if (t.commodity) set.add(t.commodity);
+  return [...set].sort((a, b) => a.localeCompare(b, "es"));
+}
+
