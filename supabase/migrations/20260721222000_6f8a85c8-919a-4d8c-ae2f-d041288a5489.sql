@@ -1,0 +1,1 @@
+UPDATE public.sourcing_submissions SET share_token_prefix='gcshr_5cacce', share_token_hash='6bfe60d821e4537d2eb4e8c729ad74fe9e56a4cbe219879cab6c8da27904feff', share_token_revoked_at=NULL WHERE id='4608fb36-3d52-4b7e-89bc-f617cd146e30';
