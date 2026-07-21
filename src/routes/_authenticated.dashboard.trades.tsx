@@ -64,6 +64,8 @@ import {
   type TradeStage,
 } from "@/lib/tradeDocuments";
 import { TradePackPanel } from "@/features/trades/TradePackPanel";
+import { useTradeDetailRealtime } from "@/features/trade-board/useTradeBoardRealtime";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
@@ -750,6 +752,8 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
     queryKey: ["trade", id],
     queryFn: () => detailFn({ data: { id } }),
   });
+  useTradeDetailRealtime(id);
+
 
   const progress = useMemo(
     () =>
