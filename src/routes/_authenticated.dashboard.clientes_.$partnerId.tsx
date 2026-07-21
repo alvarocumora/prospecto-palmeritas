@@ -10,8 +10,10 @@ import {
   Phone,
   Globe,
   ArrowUpRight,
+  Sparkles,
 } from "lucide-react";
 import { getPartnerHub } from "@/lib/partnerHub.functions";
+import { computeNextActions, type NextActionPriority } from "@/lib/nextActions";
 import { PARTNER_ROLE_LABELS, type PartnerRole } from "@/lib/clients";
 import {
   COMMISSION_STATUS_LABELS,
@@ -30,6 +32,11 @@ const usd = (n: number | null) =>
 const STAGE_LABEL: Record<string, string> = Object.fromEntries(
   TRADE_STAGES.map((s) => [s.key, s.label]),
 );
+const PRIORITY_DOT: Record<NextActionPriority, string> = {
+  alta: "text-red-500",
+  media: "text-amber-500",
+  baja: "text-muted-foreground",
+};
 
 function PartnerHubPage() {
   const { partnerId } = Route.useParams();
@@ -53,6 +60,7 @@ function PartnerHubPage() {
   }
 
   const { partner: p, trades, commissions, summary } = data;
+  const actions = computeNextActions({ trades, commissions, summary, now: new Date() });
 
   return (
     <div className="p-4 md:p-6 space-y-5 max-w-4xl">
@@ -108,6 +116,50 @@ function PartnerHubPage() {
           sub={`Devengado ${usd(summary.commissionsAccruedUsd)}`}
         />
       </div>
+
+      {/* Próximas acciones (next-best-action) */}
+      {actions.length > 0 && (
+        <section className="rounded-md border border-primary/30 bg-primary/5 p-5">
+          <div className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-wider text-primary mb-3">
+            <Sparkles className="w-3.5 h-3.5" /> Próximas acciones
+          </div>
+          <div className="space-y-2">
+            {actions.map((a) => {
+              const body = (
+                <>
+                  <span className={`shrink-0 mt-0.5 ${PRIORITY_DOT[a.priority]}`}>●</span>
+                  <div className="min-w-0">
+                    <div className="text-sm font-medium flex items-center gap-1.5">
+                      {a.title}
+                      {a.tradeId && (
+                        <ArrowUpRight className="w-3 h-3 text-muted-foreground shrink-0" />
+                      )}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">{a.detail}</div>
+                  </div>
+                </>
+              );
+              return a.tradeId ? (
+                <Link
+                  key={a.key}
+                  to="/dashboard/trades/$tradeId"
+                  params={{ tradeId: a.tradeId }}
+                  className="flex items-start gap-2 rounded p-1.5 -m-1.5 hover:bg-primary/10"
+                >
+                  {body}
+                </Link>
+              ) : (
+                <div key={a.key} className="flex items-start gap-2 p-1.5">
+                  {body}
+                </div>
+              );
+            })}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-3">
+            Recomendaciones automáticas por reglas. Pronto, asistidas por agentes de IA.
+          </p>
+        </section>
+      )}
 
       {/* Trades del socio */}
       <section className="rounded-md border border-border bg-bg-secondary/20 p-5">
