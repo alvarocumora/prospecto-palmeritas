@@ -12,6 +12,7 @@ import {
   Globe,
   Pencil,
   Trash2,
+  Network,
   AlertTriangle,
   Percent,
   CheckCircle2,
@@ -418,9 +419,16 @@ function ClientesPage() {
                     {p.notes && <div className="pt-1 text-foreground/80">{p.notes}</div>}
                   </div>
                   <div className="mt-3 pt-2 border-t border-border flex gap-3">
+                    <Link
+                      to="/dashboard/clientes/$partnerId"
+                      params={{ partnerId: p.id }}
+                      className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      <Network className="w-3 h-3" /> Ver hub
+                    </Link>
                     <button
                       onClick={() => editPartner(p)}
-                      className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+                      className="text-[11px] font-mono text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
                     >
                       <Pencil className="w-3 h-3" /> Editar
                     </button>
