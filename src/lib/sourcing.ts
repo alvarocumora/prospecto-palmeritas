@@ -45,16 +45,25 @@ export const SUBMISSION_STATUS_LABELS: Record<SubmissionStatus, string> = {
 };
 
 // ---------- Tipo de proveedor (relación con la mercadería) ----------
-export const SUPPLIER_ROLES = ["productor", "representante", "broker", "trader", "otro"] as const;
+export const SUPPLIER_ROLES = [
+  "productor",
+  "titular",
+  "representante",
+  "broker",
+  "trader",
+  "otro",
+] as const;
 export type SupplierRole = (typeof SUPPLIER_ROLES)[number];
 
 export const SUPPLIER_ROLE_LABELS: Record<SupplierRole, string> = {
   productor: "Productor / mina",
+  titular: "Titular / dueño de proyecto",
   representante: "Representante autorizado",
   broker: "Broker / intermediario",
   trader: "Trader",
   otro: "Otro",
 };
+
 
 /** Normaliza un string arbitrario a un SupplierRole conocido (o null). */
 export function normalizeSupplierRole(value: string | null | undefined): SupplierRole | null {
