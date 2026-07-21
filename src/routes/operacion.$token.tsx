@@ -7,6 +7,7 @@ import {
   getOperacionByToken,
   requestOperacionUpload,
   attachOperacionDoc,
+  acceptOperacionTerms,
 } from "@/lib/tradeOps.functions";
 import { publicUrl } from "@/lib/publicUrl";
 import { supabase } from "@/integrations/supabase/client";
