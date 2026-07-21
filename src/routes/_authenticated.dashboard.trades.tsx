@@ -235,14 +235,14 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
     isFetching: fetchingDelivery,
   } = useQuery({
     queryKey: ["antimony-delivery-status"],
-    queryFn: () =>
-      statusFn({
+    queryFn: async (): Promise<DeliveryRow[]> =>
+      (await statusFn({
         data: {
           recipients: antimonyRecipients,
           templateNames: antimonyTemplates,
           sinceHours: 72,
         },
-      }) as Promise<DeliveryRow[]>,
+      })) as DeliveryRow[],
     staleTime: 15_000,
     refetchInterval: 30_000,
   });
