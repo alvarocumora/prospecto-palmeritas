@@ -213,7 +213,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   };
 
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
-  const statusFn = useServerFn(getEmailDeliveryStatus);
+  const deliveryFn = useServerFn(getEmailDeliveryStatus);
   const [dispatching, setDispatching] = useState(false);
 
   const antimonyRecipients = useMemo(
@@ -236,7 +236,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   } = useQuery({
     queryKey: ["antimony-delivery-status"],
     queryFn: async (): Promise<DeliveryRow[]> =>
-      (await statusFn({
+      (await deliveryFn({
         data: {
           recipients: antimonyRecipients,
           templateNames: antimonyTemplates,
