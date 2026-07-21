@@ -11,6 +11,7 @@ import {
 } from "@/lib/sourcing.functions";
 import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
 import { downloadSupplierSheetPdf } from "@/lib/supplierSheetPdf";
+import { verifyShareUrl } from "@/lib/publicUrl";
 
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
