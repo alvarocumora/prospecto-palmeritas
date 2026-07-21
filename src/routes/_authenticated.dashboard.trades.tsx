@@ -636,9 +636,39 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         <Loading />
       ) : (data ?? []).length === 0 ? (
         <Empty>Sin trades todavía. Crea el primero para gestionar su ciclo documental.</Empty>
-      ) : (
+      ) : (() => {
+        const q = query.trim().toLowerCase();
+        const filtered = (data ?? []).filter((t) => {
+          if (!showCancelled && (t.status === "cancelled" || t.stage === "cancelled")) return false;
+          if (!q) return true;
+          return (
+            (t.reference ?? "").toLowerCase().includes(q) ||
+            (t.commodity ?? "").toLowerCase().includes(q) ||
+            (t.form ?? "").toLowerCase().includes(q)
+          );
+        });
+        const cancelledCount = (data ?? []).filter((t) => t.status === "cancelled" || t.stage === "cancelled").length;
+        return (
         <div className="space-y-2">
-          {(data ?? []).map((t) => {
+          <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pb-1">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filtrar por ref, commodity…"
+              className="flex-1 min-w-0 px-2 py-1 rounded border border-border bg-transparent text-xs"
+            />
+            <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={showCancelled}
+                onChange={(e) => setShowCancelled(e.target.checked)}
+                className="accent-[#0F2A6B]"
+              />
+              Ver cancelados{cancelledCount ? ` (${cancelledCount})` : ""}
+            </label>
+            <span className="shrink-0">{filtered.length}/{(data ?? []).length}</span>
+          </div>
+          {filtered.map((t) => {
             const prog = tradeProgress(t.docs);
             const status = onboardingStatus?.status?.[t.id];
             const isChecked = checked.has(t.id);
