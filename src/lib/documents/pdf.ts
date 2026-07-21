@@ -23,6 +23,14 @@ const CONTACT = {
   site: "geocapitals.com",
 };
 
+// Matriz de tabulación compartida por TODOS los documentos (LOI, NCNDA,
+// ficha, ICPO, SPA, invoice, packing list). Cualquier ajuste tipográfico o
+// de columna se hace acá para mantener alineamiento idéntico entre docs.
+const LABEL_COL_W = 150;
+const CELL_PAD = { top: 6, right: 8, bottom: 6, left: 8 };
+const TABLE_FONT = 9.4;
+const TABLE_ROW_MIN_H = 20;
+
 export type EmitterSignature = {
   name: string;
   email?: string;
@@ -341,20 +349,30 @@ export async function renderGeocapitalsPdf(
         pageBreak: "auto",
         rowPageBreak: "avoid",
         styles: {
-          fontSize: 9.4,
-          cellPadding: { top: 5, right: 6, bottom: 5, left: 6 },
+          font: "helvetica",
+          fontSize: TABLE_FONT,
+          cellPadding: CELL_PAD,
           textColor: INK,
           lineColor: HAIRLINE,
+          lineWidth: 0.4,
           overflow: "linebreak",
           valign: "top",
-          minCellHeight: 18,
+          minCellHeight: TABLE_ROW_MIN_H,
         },
         columnStyles: {
-          0: { fontStyle: "bold", cellWidth: 135, textColor: COBALT },
-          1: { cellWidth: contentW - 135 },
+          0: {
+            fontStyle: "bold",
+            cellWidth: LABEL_COL_W,
+            textColor: COBALT,
+          },
+          1: { cellWidth: contentW - LABEL_COL_W },
         },
         body: block.rows.map(([k, v]) => [k, ellipsize(v, 520)]),
         alternateRowStyles: { fillColor: PAPER_ALT },
+        didParseCell: (data) => {
+          // Hairline inferior en cada fila para calzar con el estilo `table`.
+          data.cell.styles.lineWidth = { top: 0, right: 0, bottom: 0.4, left: 0 } as unknown as number;
+        },
         willDrawPage: ({ pageNumber }: { pageNumber: number }) => {
           if (pageNumber > tableStartPage) {
             paintPaper();
@@ -369,18 +387,30 @@ export async function renderGeocapitalsPdf(
       autoTable(pdf, {
         startY: y,
         margin: { left: marginX, right: marginX, top: pageTopY, bottom: footerReserve },
-        theme: "grid",
+        theme: "plain",
         pageBreak: "auto",
         rowPageBreak: "avoid",
-        headStyles: { fillColor: INK, textColor: WHITE, fontSize: 8.8, cellPadding: 5 },
+        headStyles: {
+          fillColor: PAPER_ALT,
+          textColor: COBALT,
+          fontStyle: "bold",
+          fontSize: TABLE_FONT,
+          cellPadding: CELL_PAD,
+          lineColor: COBALT,
+          lineWidth: { top: 0, right: 0, bottom: 0.8, left: 0 } as unknown as number,
+        },
         styles: {
-          fontSize: 8.7,
-          cellPadding: 4.5,
+          font: "helvetica",
+          fontSize: TABLE_FONT,
+          cellPadding: CELL_PAD,
           textColor: INK,
           lineColor: HAIRLINE,
+          lineWidth: { top: 0, right: 0, bottom: 0.4, left: 0 } as unknown as number,
           overflow: "linebreak",
           valign: "top",
+          minCellHeight: TABLE_ROW_MIN_H,
         },
+        alternateRowStyles: { fillColor: PAPER_ALT },
         head: [block.head],
         body: block.rows.map((row) => row.map((cell) => ellipsize(cell, 320))),
         willDrawPage: ({ pageNumber }: { pageNumber: number }) => {
