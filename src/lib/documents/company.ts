@@ -16,3 +16,8 @@ export const OWN_PARTY_LINE = `${OWN_COMPANY.name} · RUT ${OWN_COMPANY.rut} · 
 // portal de contraparte y documentos.
 export const OPERATOR = "Geocapitals";
 export const OPERATOR_LINE = `Operado por ${OPERATOR}`;
+
+// Bandeja de operaciones de Geocapitals: recibe copia de las notificaciones de
+// firma y cambios de estado de cada deal, para que el operador tenga trazabilidad
+// aunque el documento sea del dueño de la solicitud.
+export const GEOCAPITALS_NOTIFY_EMAIL = "team@geocapitals.com";
