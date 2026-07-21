@@ -304,6 +304,72 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
         </div>
       )}
 
+      {/* Historial de versiones */}
+      {showHistory && versions.length > 0 && (
+        <div className="rounded-md border border-border bg-muted/10 mb-3">
+          <div className="px-3 py-2 border-b border-border text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <History className="w-3 h-3" /> Historial de versiones
+          </div>
+          <div className="divide-y divide-border max-h-64 overflow-auto">
+            {versions.map((v) => (
+              <div
+                key={v.id}
+                className="flex items-center justify-between gap-2 px-3 py-1.5 text-[11px]"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="font-mono uppercase text-[9px] font-bold px-1 py-0.5 rounded bg-primary/10 text-primary shrink-0">
+                    {v.doc_type}
+                  </span>
+                  <span className="font-mono shrink-0">v{v.version_number}</span>
+                  <span className="text-muted-foreground truncate">
+                    {new Date(v.created_at).toLocaleString("es-CL", {
+                      year: "2-digit",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span className="font-mono text-[9px] text-muted-foreground/70 truncate hidden sm:inline">
+                    #{v.terms_hash.slice(0, 8)}
+                  </span>
+                </div>
+                <button
+                  onClick={async () => {
+                    setLoadingVer(v.id);
+                    try {
+                      const r = await signVerFn({ data: { versionId: v.id } });
+                      const a = document.createElement("a");
+                      a.href = r.url;
+                      a.download = r.filename;
+                      a.rel = "noopener";
+                      a.target = "_blank";
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Error");
+                    } finally {
+                      setLoadingVer(null);
+                    }
+                  }}
+                  disabled={loadingVer === v.id}
+                  className="p-1 rounded hover:bg-muted/40 shrink-0"
+                  title="Descargar esta versión"
+                >
+                  {loadingVer === v.id ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <FileDown className="w-3 h-3" />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+
       {errors.length > 0 && (
         <div className="text-[11px] text-destructive font-mono mb-3">
           Errores: {errors.map((e) => `${e.type}: ${e.error}`).join(" · ")}
