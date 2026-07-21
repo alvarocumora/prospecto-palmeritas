@@ -3,13 +3,14 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck } from "lucide-react";
+import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck, Download, Loader2 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import {
   getSupplierSheetByShareToken,
   getSupplierFileUrlByShareToken,
 } from "@/lib/sourcing.functions";
 import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
+import { downloadSupplierSheetPdf } from "@/lib/supplierSheetPdf";
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
 // comparte con el comprador final. Un token distinto al de submit.
@@ -67,6 +68,10 @@ function SupplierSheetPage() {
               {[data.supplier.supplier_company, data.supplier.supplier_country]
                 .filter(Boolean)
                 .join(" · ") || ""}
+            </div>
+
+            <div className="mt-3">
+              <DownloadSheetButton sheet={data} />
             </div>
 
             {data.supplier.offer_valid_until &&
@@ -216,5 +221,31 @@ function Field({ label, value }: { label: string; value: string | null | undefin
       </div>
       <div className="text-content">{value ?? "—"}</div>
     </div>
+  );
+}
+
+function DownloadSheetButton({ sheet }: { sheet: import("@/lib/sourcing.functions").SupplierSheet }) {
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    setBusy(true);
+    try {
+      await downloadSupplierSheetPdf(sheet);
+      toast.success("PDF descargado");
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo generar el PDF");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={() => void onClick()}
+      disabled={busy}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-brand text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
+    >
+      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+      {busy ? "Generando PDF…" : "Descargar ficha en PDF"}
+    </button>
   );
 }
