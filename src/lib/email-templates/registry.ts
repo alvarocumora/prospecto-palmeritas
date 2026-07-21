@@ -65,5 +65,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "payment-reminder": paymentReminder,
   "supplier-onboarding": supplierOnboarding,
   "antimony-product-sheet": antimonyProductSheet,
+  "copper-product-sheet": copperProductSheet,
   "agent-outreach": agentOutreach,
 };
