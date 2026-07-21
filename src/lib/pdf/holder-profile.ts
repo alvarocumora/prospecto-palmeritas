@@ -160,7 +160,8 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
   const safeName = (holderName ?? holderRut ?? "titular")
     .replace(/[^a-zA-Z0-9-]+/g, "_")
     .slice(0, 40);
-  doc.save(`perfil-titular-${safeName}.pdf`);
+  const { triggerPdfDownload } = await import("@/lib/documents/pdf");
+  await triggerPdfDownload(doc.output("blob"), `perfil-titular-${safeName}.pdf`);
 
   return { publications: pubs.length, cases: cases.length };
 }
