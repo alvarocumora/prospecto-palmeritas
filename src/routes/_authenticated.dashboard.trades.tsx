@@ -249,8 +249,12 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
 
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
+  const dispatchCopperFn = useServerFn(
+    (await import("@/lib/copperDispatch.functions")).dispatchCopperPackage as never,
+  );
   const deliveryFn = useServerFn(getEmailDeliveryStatus);
   const [dispatching, setDispatching] = useState(false);
+  const [dispatchingCopper, setDispatchingCopper] = useState(false);
 
   const antimonyRecipients = useMemo(
     () => [
