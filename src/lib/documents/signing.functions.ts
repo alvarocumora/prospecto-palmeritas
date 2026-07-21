@@ -15,6 +15,7 @@ import {
   canSign,
   type SignRequestStatus,
 } from "@/lib/documents/signing";
+import { DOC_BY_KEY } from "@/lib/tradeDocuments";
 
 // Firma electrónica de documentos del editor: el dueño crea la solicitud (el
 // token viaja en claro UNA vez) y la contraparte firma desde /firmar/$token
@@ -182,10 +183,9 @@ export const listMySignRequests = createServerFn({ method: "GET" })
       expires_at: String(r.expires_at),
       created_at: String(r.created_at),
       trade_id: (r.trade_id ?? null) as string | null,
-      trade_reference: r.trade_id ? refs.get(String(r.trade_id)) ?? null : null,
+      trade_reference: r.trade_id ? (refs.get(String(r.trade_id)) ?? null) : null,
     }));
   });
-
 
 export const voidSignRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -297,9 +297,10 @@ export const submitSignature = createServerFn({ method: "POST" })
     // Trazabilidad: si el documento pertenece a un trade, el evento de firma
     // entra a trade_events y aparece en el timeline unificado de la operación.
     if (row.trade_id) {
+      const tradeId = String(row.trade_id);
       try {
         await sb.from("trade_events").insert({
-          trade_id: String(row.trade_id),
+          trade_id: tradeId,
           actor_user_id: String(row.created_by),
           kind: "doc_signed",
           doc_type: String(row.template_id ?? "doc"),
@@ -307,6 +308,41 @@ export const submitSignature = createServerFn({ method: "POST" })
         });
       } catch (e) {
         console.error("[submitSignature] trade event failed", e);
+      }
+
+      // Si la plantilla corresponde a un documento del catálogo del trade
+      // (icpo, fco, loi, spa…), reflejar la firma en el checklist documental:
+      // el avance del deal se actualiza sin recarga manual.
+      const docType = String(row.template_id ?? "");
+      const cat = DOC_BY_KEY[docType];
+      if (cat) {
+        try {
+          const { data: existing } = await sb
+            .from("trade_documents")
+            .select("id")
+            .eq("trade_id", tradeId)
+            .eq("doc_type", docType)
+            .limit(1)
+            .maybeSingle();
+          if (existing) {
+            await sb
+              .from("trade_documents")
+              .update({ status: "signed", signed_at: signedAtIso })
+              .eq("id", (existing as { id: string }).id);
+          } else {
+            await sb.from("trade_documents").insert({
+              trade_id: tradeId,
+              created_by: String(row.created_by),
+              doc_type: docType,
+              phase: cat.phase,
+              status: "signed",
+              reference: String(row.reference ?? ""),
+              signed_at: signedAtIso,
+            });
+          }
+        } catch (e) {
+          console.error("[submitSignature] trade_documents sync failed", e);
+        }
       }
     }
 
@@ -466,9 +502,7 @@ export type SignFlowSummary = {
 
 function summarize(rows: Array<Record<string, unknown>>): SignFlowSummary | null {
   if (rows.length === 0) return null;
-  const sorted = [...rows].sort(
-    (a, b) => Number(a.sign_order ?? 0) - Number(b.sign_order ?? 0),
-  );
+  const sorted = [...rows].sort((a, b) => Number(a.sign_order ?? 0) - Number(b.sign_order ?? 0));
   const signers: SignFlowSignerRow[] = sorted.map((r) => ({
     id: String(r.id),
     order: Number(r.sign_order ?? 0),
@@ -600,4 +634,3 @@ export const voidSignFlow = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { voided: rows?.length ?? 0 };
   });
-

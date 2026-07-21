@@ -43,6 +43,7 @@ import { ensureCounterpartyLink, linkPartnerToTrade } from "@/lib/tradeOps.funct
 import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
 import { OPERATOR_LINE } from "@/lib/documents/company";
+import { listMySignRequests } from "@/lib/documents/signing.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -1124,11 +1125,25 @@ const DEAL_DOCS = [
   { id: "data-sheet", label: "Data sheet" },
 ] as const;
 
+const SIGN_STATUS_META: Record<string, { label: string; cls: string }> = {
+  signed: { label: "Firmado", cls: "bg-green-500/15 text-green-600" },
+  pending: { label: "Pendiente", cls: "bg-amber-500/15 text-amber-600" },
+  void: { label: "Anulado", cls: "bg-muted text-muted-foreground" },
+};
+
 function SendDocPanel({ tradeId }: { tradeId: string }) {
+  const listFn = useServerFn(listMySignRequests);
+  const { data } = useQuery({
+    queryKey: ["sign-requests"],
+    queryFn: () => listFn(),
+    staleTime: 30_000,
+  });
+  const sent = (data ?? []).filter((r) => r.trade_id === tradeId);
+
   return (
     <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
       <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
-        <FileSignature className="w-3.5 h-3.5" /> Generar y enviar documento para firma
+        <FileSignature className="w-3.5 h-3.5" /> Documentos del acuerdo · firma electrónica
       </div>
       <div className="flex flex-wrap gap-2">
         {DEAL_DOCS.map((d) => (
@@ -1143,9 +1158,38 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
           </Link>
         ))}
       </div>
+
+      {sent.length > 0 && (
+        <div className="mt-3 pt-3 border-t border-border/60 space-y-1.5">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+            Enviados ({sent.length})
+          </div>
+          {sent.map((r) => {
+            const meta = SIGN_STATUS_META[r.status] ?? SIGN_STATUS_META.pending;
+            return (
+              <div key={r.id} className="flex items-center justify-between gap-3 text-xs">
+                <div className="min-w-0">
+                  <div className="truncate">{r.title}</div>
+                  <div className="text-[10px] text-muted-foreground truncate">
+                    {r.status === "signed"
+                      ? `Firmado por ${r.signed_by_name ?? "—"}${r.signed_at ? ` · ${new Date(r.signed_at).toLocaleDateString("es-CL")}` : ""}`
+                      : `Firmante: ${r.signer_name_expected ?? "—"} · ${r.token_prefix}…`}
+                  </div>
+                </div>
+                <span
+                  className={`shrink-0 text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded-full ${meta.cls}`}
+                >
+                  {meta.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <p className="text-[10px] text-muted-foreground mt-2">
         Se abre el editor con la contraparte precargada; al enviar, el documento queda ligado a este
-        trade y su firma aparece en la actividad.
+        trade y, al firmarse, avanza el checklist documental.
       </p>
     </div>
   );
