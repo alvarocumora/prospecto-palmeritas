@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -9,16 +9,36 @@ import {
   Copy,
   Package,
   Check,
+  History,
 } from "lucide-react";
 import {
   generateTradePack,
   dispatchTradePack,
+  listTradePackVersions,
+  signTradePackVersion,
   TRADE_PACK_DOCS,
   TRADE_PACK_LABELS,
   type TradePackDoc,
 } from "@/lib/tradePack.functions";
 
-type Doc = { type: TradePackDoc; label: string; filename: string; url: string };
+type Doc = {
+  type: TradePackDoc;
+  label: string;
+  filename: string;
+  url: string;
+  version?: number;
+  reused?: boolean;
+};
+
+type Version = {
+  id: string;
+  doc_type: TradePackDoc;
+  version_number: number;
+  terms_hash: string;
+  filename: string;
+  created_at: string;
+};
+
 
 type Trade = {
   buyerEmail?: string | null;
