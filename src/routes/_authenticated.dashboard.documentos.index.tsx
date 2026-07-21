@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2 } from "lucide-react";
+import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2, Download, Sparkles } from "lucide-react";
 import { TEMPLATES, TEMPLATE_BY_ID, CATEGORY_LABEL } from "@/lib/documents/templates";
+import { SPECIAL_DOCS, downloadSpecialDoc, type SpecialDocId } from "@/lib/documents/specialDocs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
