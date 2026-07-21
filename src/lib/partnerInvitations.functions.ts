@@ -216,15 +216,10 @@ export const acceptPartnerInvitation = createServerFn({ method: "POST" })
     });
     if (rpcErr) throw new Error(rpcErr.message);
 
-    // 5) firma electrónica del NCNDA (registro simple con nombre + fecha)
-    await admin.from("document_signatures").insert({
-      document_id: inv.ncnda_ref ?? `NCNDA-${inv.id.slice(0, 8)}`,
-      signer_user_id: userId,
-      signer_name: data.signatureName,
-      signer_email: inv.email,
-      signature_type: "electronic_simple",
-      metadata: { invitation_id: inv.id, chosen_role: data.chosenRole },
-    });
+    // 5) el RPC ya marcó signed_at y registró el evento 'accepted' con el user_id.
+    // La traza de firma del NCNDA vive en partner_invitations.signed_at +
+    // partner_invitation_events. Para adjuntar una firma electrónica formal a
+    // otros documentos usamos signature_envelopes desde el dashboard.
 
     return { ok: true, userId };
   });
