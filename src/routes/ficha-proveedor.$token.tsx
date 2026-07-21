@@ -71,9 +71,11 @@ function SupplierSheetPage() {
                 .join(" · ") || ""}
             </div>
 
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap items-start gap-3">
               <DownloadSheetButton sheet={data} />
+              <MobileQr />
             </div>
+
 
             {data.supplier.offer_valid_until &&
               isOfferExpired(data.supplier.offer_valid_until, new Date()) && (
