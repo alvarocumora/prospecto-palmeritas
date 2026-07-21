@@ -36,6 +36,7 @@ interface Props {
   tradeReference?: string;
   senderCompany?: string;
   operationUrl?: string;
+  sheetPdfUrl?: string;
 }
 
 const thStyle = {
