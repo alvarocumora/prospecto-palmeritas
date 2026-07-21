@@ -69,4 +69,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "antimony-product-sheet": antimonyProductSheet,
   "copper-product-sheet": copperProductSheet,
   "agent-outreach": agentOutreach,
+  "trade-pack-dispatch": tradePackDispatch,
 };
+
