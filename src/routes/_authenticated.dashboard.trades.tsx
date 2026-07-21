@@ -44,6 +44,7 @@ import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
 import { OPERATOR_LINE } from "@/lib/documents/company";
 import { listMySignRequests } from "@/lib/documents/signing.functions";
+import { sendSupplierOnboarding } from "@/lib/supplierOnboarding.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
