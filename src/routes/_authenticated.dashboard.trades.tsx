@@ -358,6 +358,44 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               )}
               Iniciar operación Cobre (Cu Cathode)
             </button>
+            <button
+              onClick={async () => {
+                setDispatchingCopper(true);
+                try {
+                  const res = await dispatchCopperFn({ data: {} });
+                  const okCount = res.results.filter((r) => r.ok).length;
+                  const failCount = res.results.length - okCount;
+                  const detail = res.results
+                    .map((r) => `${r.to}: ${r.ok ? "ok" : (r.reason ?? "error")}`)
+                    .join("\n");
+                  if (res.results.length === 0) {
+                    toast.warning(
+                      "No hay trade de cobre o falta contraparte. Crea el trade y agrega email de contraparte.",
+                    );
+                  } else if (failCount === 0) {
+                    toast.success(`Purchase Terms Cobre enviado (${okCount})`, { description: detail });
+                  } else {
+                    toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
+                  }
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "No se pudo despachar Cobre.");
+                } finally {
+                  setDispatchingCopper(false);
+                }
+              }}
+              disabled={dispatchingCopper}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
+              title="Genera y envía el PDF Purchase Terms Copper Cathode Grade A a la contraparte del trade"
+            >
+              {dispatchingCopper ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              Enviar Purchase Terms Cobre (PDF)
+            </button>
+
+
 
           </div>
         </div>
