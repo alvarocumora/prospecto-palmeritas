@@ -212,4 +212,141 @@ export async function buildCopperSheetPdf(input: {
   });
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Generadores genéricos para el Document Pack por trade.
+// Reciben los datos reales del trade (commodity, tonelaje, incoterm, precio,
+// contrapartes) y arman los PDFs oficiales listos para adjuntar por correo.
+
+export type TradePackContext = {
+  reference: string;
+  commodity: string;
+  form?: string | null;
+  quantityMt?: number | null;
+  incoterm?: string | null;
+  paymentInstrument?: string | null;
+  unitPriceUsd?: number | null;
+  totalUsd?: number | null;
+  destination?: string | null;
+  buyer: Party;
+  seller: Party;
+  notes?: string | null;
+};
+
+const fmtQty = (q?: number | null) =>
+  q == null ? "A definir en SPA" : `${Number(q).toLocaleString("en-US")} MT`;
+const fmtPrice = (p?: number | null) =>
+  p == null ? "Referencia LME/LMU + premio a acordar" : `US$ ${Number(p).toLocaleString("en-US")} / MT`;
+
+/** Ficha técnica / Purchase Terms genérica poblada con datos reales del trade. */
+export async function buildTradeFichaPdf(ctx: TradePackContext): Promise<Uint8Array> {
+  return await renderServerPdf({
+    title: `Purchase Terms · ${ctx.commodity}`,
+    subtitle:
+      "Condiciones formales de compra emitidas por Geocapitals bajo NCNDA suscrito entre las Partes. " +
+      "Documento oficial para archivo; la obligación de compra nace con el SPA definitivo firmado.",
+    reference: ctx.reference,
+    parties: [
+      { role: "Buyer", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
+      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+    ],
+    body: [
+      `§1 · COMMODITY. ${ctx.commodity}${ctx.form ? ` · Forma: ${ctx.form}` : ""}. Origen: Seller's Option. Inspección independiente por SGS / CCIC / Alex Stewart o equivalente internacional.`,
+      `§2 · CANTIDAD Y DURACIÓN. ${fmtQty(ctx.quantityMt)} por embarque/mes. Contrato mínimo 12 meses, renovable por mutuo acuerdo escrito.`,
+      `§3 · ENTREGA. Incoterm: ${ctx.incoterm ?? "CIF"}${ctx.destination ? ` — ${ctx.destination}` : ""}. Puerto de carga: Seller's Option. Cronograma según SPA.`,
+      `§4 · PRECIO. ${fmtPrice(ctx.unitPriceUsd)}${ctx.totalUsd ? ` · Valor total estimado: US$ ${Number(ctx.totalUsd).toLocaleString("en-US")}` : ""}. Fórmula de fijación y descuentos se acuerdan en el SPA.`,
+      `§5 · PAGO. ${ctx.paymentInstrument ?? "SWIFT MT103 o DLC MT700 según acuerdo"}. Cargos bancarios fuera del país del Seller por cuenta del Buyer salvo pacto en contrario.`,
+      "§6 · POP / SHIPPING DOCS. Commercial Invoice · Packing List · Certificate of Origin · SGS/CoA · Insurance Certificate (CIF) · Bill of Lading · Export Customs Documentation.",
+      "§7 · INSPECCIÓN. Calidad y cantidad por firma internacional (SGS, CCIC, Alex Stewart). Inspección de destino por cuenta del Buyer.",
+      "§8 · CONFIDENCIALIDAD. Bajo NCNDA/IMFPA suscrito. Comunicación directa con contrapartes finales requiere autorización escrita de Geocapitals.",
+      ctx.notes ? `§9 · NOTAS DE LA OPERACIÓN. ${ctx.notes}` : "",
+      "---",
+      "Este documento oficial resume los términos comerciales de la operación indicada. NO constituye oferta vinculante. Contacto: info@geocapitals.com · WhatsApp +56 9 6218 4071.",
+    ].filter(Boolean),
+    emitter: { ...EMITTER, signedAtISO: new Date().toISOString() },
+    issuedAtISO: new Date().toISOString(),
+  });
+}
+
+/** LOI genérica poblada con datos reales del trade. */
+export async function buildTradeLoiPdf(ctx: TradePackContext): Promise<Uint8Array> {
+  return await buildLoiPdf({
+    reference: `LOI-${ctx.reference}`,
+    counterparty: ctx.seller,
+    commodity: ctx.commodity + (ctx.form ? ` (${ctx.form})` : ""),
+    quantity: fmtQty(ctx.quantityMt),
+    incoterm: ctx.incoterm ?? "CIF",
+    destination: ctx.destination ?? undefined,
+    paymentInstrument: ctx.paymentInstrument ?? undefined,
+  });
+}
+
+/** NCNDA genérica (ICC-standard) para las Partes del trade. */
+export async function buildTradeNcndaPdf(ctx: TradePackContext): Promise<Uint8Array> {
+  return await buildNdaPdf({
+    reference: `NCNDA-${ctx.reference}`,
+    counterparty: ctx.seller,
+    purpose: `evaluación y ejecución de la operación de ${ctx.commodity} (${ctx.reference}), incluyendo intercambio de contrapartes, precios, análisis y logística`,
+    termMonths: 24,
+  });
+}
+
+/** ICPO — Irrevocable Corporate Purchase Order del Buyer. */
+export async function buildTradeIcpoPdf(ctx: TradePackContext): Promise<Uint8Array> {
+  return await renderServerPdf({
+    title: "ICPO · Irrevocable Corporate Purchase Order",
+    subtitle:
+      "Orden de compra corporativa irrevocable emitida por el Buyer al Seller, sujeta a firma de SPA y verificación bancaria del instrumento de pago.",
+    reference: `ICPO-${ctx.reference}`,
+    parties: [
+      { role: "Buyer (Emisor)", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
+      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+    ],
+    body: [
+      `1 · PRODUCTO. ${ctx.commodity}${ctx.form ? ` · ${ctx.form}` : ""}.`,
+      `2 · CANTIDAD. ${fmtQty(ctx.quantityMt)} por embarque/mes.`,
+      `3 · INCOTERM. ${ctx.incoterm ?? "CIF"}${ctx.destination ? ` · Destino: ${ctx.destination}` : ""}.`,
+      `4 · PRECIO. ${fmtPrice(ctx.unitPriceUsd)}. Fórmula de fijación se acordará en el SPA definitivo.`,
+      `5 · INSTRUMENTO DE PAGO. ${ctx.paymentInstrument ?? "A definir (MT103 / DLC MT700 / SBLC MT760)"}. Buyer confirma capacidad financiera para emisión del instrumento indicado.`,
+      "6 · INSPECCIÓN. Buyer acepta inspección independiente por SGS / CCIC / Alex Stewart en origen; se reserva derecho a inspección de destino por su cuenta.",
+      "7 · SOFT PROBE. Este ICPO se emite bajo el NCNDA vigente entre las Partes y es válido por 30 días para permitir emisión del Draft SPA por el Seller.",
+      "8 · SIGUIENTE PASO. A recepción de esta ICPO, Seller emitirá FCO (Full Corporate Offer) y Draft SPA con cronograma, banking details y wording del instrumento de pago.",
+      "---",
+      "Esta orden es irrevocable en cuanto a la intención de compra; la obligación contractual nace con el SPA firmado. Emitida bajo NCNDA suscrito.",
+    ],
+    emitter: { ...EMITTER, signedAtISO: new Date().toISOString() },
+    issuedAtISO: new Date().toISOString(),
+  });
+}
+
+/** SPA Draft — Sale & Purchase Agreement en borrador. */
+export async function buildTradeSpaDraftPdf(ctx: TradePackContext): Promise<Uint8Array> {
+  return await renderServerPdf({
+    title: "SPA (DRAFT) · Sale & Purchase Agreement",
+    subtitle:
+      "Borrador del contrato de compraventa internacional para la operación indicada. Documento sujeto a revisión legal por las Partes; la versión definitiva se firmará electrónicamente en la War Room.",
+    reference: `SPA-${ctx.reference}`,
+    parties: [
+      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+      { role: "Buyer", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
+    ],
+    body: [
+      `CLÁUSULA 1 · OBJETO. El Seller vende y el Buyer compra ${fmtQty(ctx.quantityMt)} de ${ctx.commodity}${ctx.form ? ` (${ctx.form})` : ""} conforme a las especificaciones técnicas anexas (Ficha Técnica y CoA/SGS).`,
+      `CLÁUSULA 2 · PRECIO. ${fmtPrice(ctx.unitPriceUsd)}${ctx.totalUsd ? ` · Valor total estimado del contrato: US$ ${Number(ctx.totalUsd).toLocaleString("en-US")}` : ""}. Ajustes por fórmula de mercado según se detalla en el Anexo A.`,
+      `CLÁUSULA 3 · ENTREGA. Incoterms 2020 · ${ctx.incoterm ?? "CIF"}${ctx.destination ? ` — ${ctx.destination}` : ""}. Riesgo y propiedad se transfieren según Incoterm acordado.`,
+      `CLÁUSULA 4 · PAGO. ${ctx.paymentInstrument ?? "SWIFT MT103 o DLC MT700"} contra Commercial Invoice y set completo de documentos de embarque. Cuenta bancaria del Seller detallada en Anexo B.`,
+      "CLÁUSULA 5 · INSPECCIÓN Y CALIDAD. Inspección en origen por SGS / CCIC / Alex Stewart. Certificado de calidad y peso son concluyentes salvo error manifiesto. Buyer conserva derecho de re-muestreo en destino a su costo.",
+      "CLÁUSULA 6 · EMBALAJE Y DOCUMENTOS. Embalaje según práctica internacional. Set documental: Commercial Invoice · Packing List · B/L · Certificate of Origin · SGS · Insurance Certificate · Weight Certificate.",
+      "CLÁUSULA 7 · FUERZA MAYOR. Aplica cláusula estándar ICC de fuerza mayor (guerra, embargo, catástrofe natural, restricciones portuarias mayores).",
+      "CLÁUSULA 8 · CONFIDENCIALIDAD Y NO-CIRCUMVENTION. Rige el NCNDA suscrito entre las Partes por 24 meses desde la firma de este contrato.",
+      "CLÁUSULA 9 · LEY APLICABLE Y ARBITRAJE. Este contrato se rige por las reglas del comercio internacional (INCOTERMS 2020 y UCP 600 cuando aplique). Controversias se someten a arbitraje bajo reglas de la CCI (Cámara de Comercio Internacional), sede a acordar.",
+      "CLÁUSULA 10 · COMISIONES. Las comisiones de intermediación se detallan en el Fee Protection Agreement (IMFPA) suscrito paralelamente y forman parte integrante del contrato.",
+      "---",
+      "DRAFT — Documento en borrador para revisión legal por ambas Partes. La versión final firmada electrónicamente en la War Room de Geocapitals será el instrumento vinculante.",
+    ],
+    emitter: { ...EMITTER, signedAtISO: new Date().toISOString() },
+    issuedAtISO: new Date().toISOString(),
+  });
+}
+
 export { uploadPdfSigned };
+
