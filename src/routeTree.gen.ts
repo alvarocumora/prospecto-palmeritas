@@ -28,6 +28,7 @@ import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as VerificarIndexRouteImport } from './routes/verificar.index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
 import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
@@ -252,6 +253,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarIndexRoute = VerificarIndexRouteImport.update({
+  id: '/verificar/',
+  path: '/verificar/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
@@ -1047,6 +1053,7 @@ export interface FileRoutesByFullPath {
   '/verificar/$ref': typeof VerificarRefRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -1198,6 +1205,7 @@ export interface FileRoutesByTo {
   '/verificar/$ref': typeof VerificarRefRoute
   '/catastro': typeof CatastroIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
+  '/verificar': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -1351,6 +1359,7 @@ export interface FileRoutesById {
   '/verificar/$ref': typeof VerificarRefRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/dashboard/3d-pro': typeof AuthenticatedDashboard3dProRoute
@@ -1504,6 +1513,7 @@ export interface FileRouteTypes {
     | '/verificar/$ref'
     | '/catastro/'
     | '/marketplace/'
+    | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/3d-pro'
@@ -1655,6 +1665,7 @@ export interface FileRouteTypes {
     | '/verificar/$ref'
     | '/catastro'
     | '/marketplace'
+    | '/verificar'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/3d-pro'
@@ -1807,6 +1818,7 @@ export interface FileRouteTypes {
     | '/verificar/$ref'
     | '/catastro/'
     | '/marketplace/'
+    | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/dashboard/3d-pro'
@@ -1956,6 +1968,7 @@ export interface RootRouteChildren {
   VerificarRefRoute: typeof VerificarRefRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  VerificarIndexRoute: typeof VerificarIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
@@ -2117,6 +2130,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar/': {
+      id: '/verificar/'
+      path: '/verificar'
+      fullPath: '/verificar/'
+      preLoaderRoute: typeof VerificarIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/': {
@@ -3383,6 +3403,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificarRefRoute: VerificarRefRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  VerificarIndexRoute: VerificarIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
