@@ -214,6 +214,50 @@ async function runOnboardingForTrade(
     );
 
     let emailed = false;
+    let ndaPdfUrl: string | undefined;
+    let loiPdfUrl: string | undefined;
+    try {
+      // Generar y subir NDA + LOI oficiales (server-side, PDF real).
+      const { buildNdaPdf, buildLoiPdf, uploadPdfSigned } = await import(
+        "@/lib/documents/officialPdfs.server"
+      );
+      const counterparty = {
+        role: "Proveedor",
+        name: signerName ?? partnerLine,
+        company: partner?.company ?? trade.counterparty_company ?? undefined,
+        email: signerEmail,
+      };
+      const [ndaBytes, loiBytes] = await Promise.all([
+        buildNdaPdf({
+          reference: `NDA-${trade.reference ?? trade.id.slice(0, 8)}`,
+          counterparty,
+          purpose: `evaluación y ejecución de la operación ${trade.reference ?? ""} sobre ${trade.commodity ?? "el producto indicado"}`,
+        }),
+        buildLoiPdf({
+          reference: `LOI-${trade.reference ?? trade.id.slice(0, 8)}`,
+          counterparty,
+          commodity: [trade.commodity, trade.form].filter(Boolean).join(" · ") || "commodity",
+          quantity: trade.quantity_t ? `${trade.quantity_t} t (referencia)` : undefined,
+          incoterm: trade.incoterm ?? undefined,
+        }),
+      ]);
+      const stamp = Date.now();
+      [ndaPdfUrl, loiPdfUrl] = await Promise.all([
+        uploadPdfSigned({
+          bytes: ndaBytes,
+          path: `onboarding/${trade.id}/nda-${stamp}.pdf`,
+          ttlDays: 30,
+        }),
+        uploadPdfSigned({
+          bytes: loiBytes,
+          path: `onboarding/${trade.id}/loi-${stamp}.pdf`,
+          ttlDays: 30,
+        }),
+      ]);
+    } catch (e) {
+      console.error("[onboarding] pdf attach failed", e);
+    }
+
     try {
       const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
         import("@/lib/email/send-internal.server"),
@@ -240,12 +284,15 @@ async function runOnboardingForTrade(
           loiUrl: buildSignUrl(loi.token),
           portalUrl,
           expiresAt,
+          ndaPdfUrl,
+          loiPdfUrl,
         },
       });
       emailed = res.ok && "queued" in res && res.queued === true;
     } catch (e) {
       console.error("[onboarding] email failed", e);
     }
+
 
     try {
       await sb.from("trade_events").insert({
