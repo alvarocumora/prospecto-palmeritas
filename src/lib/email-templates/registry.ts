@@ -23,6 +23,7 @@ import { template as sourcingConvertedSupplier } from "./sourcing-converted-supp
 import { template as paymentReminder } from "./payment-reminder";
 import { template as supplierOnboarding } from "./supplier-onboarding";
 import { template as antimonyProductSheet } from "./antimony-product-sheet";
+import { template as agentOutreach } from "./agent-outreach";
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
@@ -61,4 +62,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "payment-reminder": paymentReminder,
   "supplier-onboarding": supplierOnboarding,
   "antimony-product-sheet": antimonyProductSheet,
+  "agent-outreach": agentOutreach,
 };

@@ -15,10 +15,12 @@ import {
   Sparkles,
   Copy,
   Loader2,
+  Send,
+  CheckCircle2,
 } from "lucide-react";
 import { getPartnerHub } from "@/lib/partnerHub.functions";
 import { computeNextActions, type NextAction, type NextActionPriority } from "@/lib/nextActions";
-import { draftNextActionMessage } from "@/lib/dealAgent.functions";
+import { draftNextActionMessage, sendNextActionEmail } from "@/lib/dealAgent.functions";
 import type { HubTrade } from "@/lib/partnerHub";
 import { PARTNER_ROLE_LABELS, type PartnerRole } from "@/lib/clients";
 import {
@@ -136,6 +138,7 @@ function PartnerHubPage() {
                 action={a}
                 partnerName={p.name}
                 partnerCompany={p.company}
+                partnerEmail={p.email}
                 trade={a.tradeId ? trades.find((t) => t.id === a.tradeId) : undefined}
               />
             ))}
@@ -232,19 +235,29 @@ function PartnerHubPage() {
   );
 }
 
+function parseEmail(msg: string, fallbackSubject: string): { subject: string; body: string } {
+  const m = msg.match(/^\s*asunto\s*:\s*(.+?)\n+([\s\S]+)$/i);
+  if (m) return { subject: m[1].trim(), body: m[2].trim() };
+  return { subject: fallbackSubject, body: msg.trim() };
+}
+
 function ActionRow({
   action,
   partnerName,
   partnerCompany,
+  partnerEmail,
   trade,
 }: {
   action: NextAction;
   partnerName: string;
   partnerCompany: string | null;
+  partnerEmail: string | null;
   trade?: HubTrade;
 }) {
   const draftFn = useServerFn(draftNextActionMessage);
+  const sendFn = useServerFn(sendNextActionEmail);
   const [message, setMessage] = useState<string | null>(null);
+  const [sent, setSent] = useState(false);
   const draft = useMutation({
     mutationFn: () =>
       draftFn({
@@ -258,8 +271,30 @@ function ActionRow({
           commodity: trade?.commodity ?? undefined,
         },
       }),
-    onSuccess: (res) => setMessage(res.message),
+    onSuccess: (res) => {
+      setMessage(res.message);
+      setSent(false);
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo redactar."),
+  });
+  const send = useMutation({
+    mutationFn: () => {
+      const { subject, body } = parseEmail(message ?? "", `Geocapitals · ${action.title}`);
+      return sendFn({
+        data: {
+          toEmail: partnerEmail!,
+          subject,
+          body,
+          tradeId: action.tradeId,
+          partnerName,
+        },
+      });
+    },
+    onSuccess: () => {
+      setSent(true);
+      toast.success(`Enviado a ${partnerEmail}`);
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo enviar."),
   });
 
   return (
@@ -304,16 +339,39 @@ function ActionRow({
             rows={6}
             className="w-full text-xs bg-transparent resize-y outline-none"
           />
-          <div className="flex justify-end">
+          <div className="flex items-center justify-end gap-3 pt-1">
             <button
               onClick={() => {
                 void navigator.clipboard.writeText(message);
                 toast.success("Copiado");
               }}
-              className="inline-flex items-center gap-1 text-[10px] font-mono text-primary hover:underline"
+              className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground"
             >
               <Copy className="w-3 h-3" /> Copiar
             </button>
+            {partnerEmail ? (
+              <button
+                onClick={() => send.mutate()}
+                disabled={send.isPending || sent}
+                className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-1 rounded bg-primary text-primary-foreground hover:opacity-90 disabled:opacity-50"
+              >
+                {sent ? (
+                  <>
+                    <CheckCircle2 className="w-3 h-3" /> Enviado
+                  </>
+                ) : send.isPending ? (
+                  <>
+                    <Loader2 className="w-3 h-3 animate-spin" /> Enviando…
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-3 h-3" /> Enviar a {partnerEmail}
+                  </>
+                )}
+              </button>
+            ) : (
+              <span className="text-[10px] text-muted-foreground">Sin email para enviar</span>
+            )}
           </div>
         </div>
       )}
