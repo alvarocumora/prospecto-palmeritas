@@ -5257,6 +5257,39 @@ export type Database = {
           },
         ]
       }
+      email_delivery_events: {
+        Row: {
+          event: string
+          id: string
+          ip_hash: string | null
+          message_id: string
+          metadata: Json | null
+          occurred_at: string
+          recipient_email: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          event: string
+          id?: string
+          ip_hash?: string | null
+          message_id: string
+          metadata?: Json | null
+          occurred_at?: string
+          recipient_email?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          event?: string
+          id?: string
+          ip_hash?: string | null
+          message_id?: string
+          metadata?: Json | null
+          occurred_at?: string
+          recipient_email?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string

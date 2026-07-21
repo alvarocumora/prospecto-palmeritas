@@ -51,6 +51,7 @@ import {
   type OnboardingStatus,
 } from "@/lib/supplierOnboarding.functions";
 import { dispatchAntimonyPackage } from "@/lib/antimonyDispatch.functions";
+import { getEmailDeliveryStatus, type DeliveryRow } from "@/lib/email/deliveryStatus.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -212,7 +213,40 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   };
 
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
+  const deliveryFn = useServerFn(getEmailDeliveryStatus);
   const [dispatching, setDispatching] = useState(false);
+
+  const antimonyRecipients = useMemo(
+    () => [
+      "ana.rojo67@gmail.com",
+      "ciminomarcela@gmail.com",
+      "carpio@carpiokaddu.com",
+    ],
+    [],
+  );
+  const antimonyTemplates = useMemo(
+    () => ["supplier-onboarding", "antimony-product-sheet"],
+    [],
+  );
+
+  const {
+    data: deliveryStatus,
+    refetch: refetchDelivery,
+    isFetching: fetchingDelivery,
+  } = useQuery({
+    queryKey: ["antimony-delivery-status"],
+    queryFn: async (): Promise<DeliveryRow[]> =>
+      (await deliveryFn({
+        data: {
+          recipients: antimonyRecipients,
+          templateNames: antimonyTemplates,
+          sinceHours: 72,
+        },
+      })) as DeliveryRow[],
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
+
   const dispatchAntimony = async () => {
     setDispatching(true);
     try {
@@ -224,6 +258,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         .join("\n");
       if (failCount === 0) toast.success(`Paquete Antimonio enviado (${okCount})`, { description: detail });
       else toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
+      // Refresca el panel de estado tras el envío.
+      setTimeout(() => void refetchDelivery(), 1500);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo despachar el paquete.");
     } finally {
@@ -233,44 +269,52 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <>
-      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
-        <div className="min-w-0">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
-            Quickstart · Antimonio
+      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="min-w-0">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
+              Quickstart · Antimonio
+            </div>
+            <div className="text-xs text-foreground mt-0.5">
+              Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
+              Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+            </div>
           </div>
-          <div className="text-xs text-foreground mt-0.5">
-            Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
-            Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => void dispatchAntimony()}
+              disabled={dispatching}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
+              title="Envía NDA+LOI+Portal a Ana Rojo y ficha técnica del antimonio a Marcela y Vincent"
+            >
+              {dispatching ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              Enviar LOI a Ana + Fichas a Carpio & Kaddu
+            </button>
+            <button
+              onClick={() => void startAntimony()}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+            >
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Ship className="w-3.5 h-3.5" />
+              )}
+              Iniciar operación Antimonio
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => void dispatchAntimony()}
-            disabled={dispatching}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
-            title="Envía NDA+LOI+Portal a Ana Rojo y ficha técnica del antimonio a Marcela y Vincent"
-          >
-            {dispatching ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Send className="w-3.5 h-3.5" />
-            )}
-            Enviar LOI a Ana + Fichas a Carpio & Kaddu
-          </button>
-          <button
-            onClick={() => void startAntimony()}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
-          >
-            {saving ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Ship className="w-3.5 h-3.5" />
-            )}
-            Iniciar operación Antimonio
-          </button>
-        </div>
+        <AntimonyDeliveryPanel
+          rows={deliveryStatus ?? []}
+          loading={fetchingDelivery}
+          onRefresh={() => void refetchDelivery()}
+        />
       </div>
+
 
 
       {(() => {
@@ -1853,6 +1897,137 @@ function OnboardingBadge({ s }: { s?: OnboardingStatus }) {
       title={s.sentAt ? `Enviado ${new Date(s.sentAt).toLocaleDateString("es-CL")}` : undefined}
     >
       {m.label}
+    </span>
+  );
+}
+
+// ---------- Panel de estado de entrega (envío / apertura) ----------
+const TEMPLATE_LABEL: Record<string, string> = {
+  "supplier-onboarding": "Onboarding proveedor (NDA + LOI + Portal)",
+  "antimony-product-sheet": "Ficha técnica antimonio",
+};
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return "—";
+  try {
+    return new Date(iso).toLocaleString("es-CL", {
+      day: "2-digit",
+      month: "short",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+function AntimonyDeliveryPanel({
+  rows,
+  loading,
+  onRefresh,
+}: {
+  rows: DeliveryRow[];
+  loading: boolean;
+  onRefresh: () => void;
+}) {
+  if (rows.length === 0 && !loading) {
+    return (
+      <div className="mt-3 text-[11px] font-mono text-muted-foreground border-t border-gold/20 pt-2">
+        Aún no se ha despachado el paquete. Al enviarlo aparecerá aquí el estado (enviado / abierto).
+      </div>
+    );
+  }
+  return (
+    <div className="mt-3 border-t border-gold/20 pt-2">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+          Confirmación de entrega y lectura
+        </div>
+        <button
+          onClick={onRefresh}
+          disabled={loading}
+          className="text-[10px] font-mono text-muted-foreground hover:text-foreground disabled:opacity-50"
+          title="Refrescar estado"
+        >
+          {loading ? "Actualizando…" : "Refrescar"}
+        </button>
+      </div>
+      <div className="space-y-1">
+        {rows.map((r) => {
+          const opened = !!r.openedAt;
+          const sentOk = r.status === "sent" || r.status === "pending" || opened;
+          const failed =
+            r.status === "failed" || r.status === "dlq" || r.status === "bounced" || r.status === "complained";
+          return (
+            <div
+              key={`${r.templateName}::${r.recipient}`}
+              className="flex items-center justify-between gap-2 text-[11px] bg-white/50 dark:bg-black/20 rounded px-2 py-1"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="font-mono text-foreground truncate">{r.recipient}</div>
+                <div className="text-[10px] text-muted-foreground truncate">
+                  {TEMPLATE_LABEL[r.templateName] ?? r.templateName}
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <StatusBadge
+                  ok={sentOk && !failed}
+                  fail={failed}
+                  label={
+                    failed
+                      ? "Falló"
+                      : r.status === "pending"
+                        ? "En cola"
+                        : "Enviado"
+                  }
+                  time={r.sentAt}
+                />
+                <StatusBadge
+                  ok={opened}
+                  neutral={!opened}
+                  label={opened ? "Abierto" : "Sin apertura"}
+                  time={r.openedAt}
+                />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-1.5 text-[10px] text-muted-foreground">
+        La apertura se detecta con un pixel de tracking. Algunos clientes de correo (Gmail con proxy
+        de imágenes, Outlook con imágenes bloqueadas) pueden retrasar u ocultar la confirmación.
+      </div>
+    </div>
+  );
+}
+
+function StatusBadge({
+  ok,
+  fail,
+  neutral,
+  label,
+  time,
+}: {
+  ok?: boolean;
+  fail?: boolean;
+  neutral?: boolean;
+  label: string;
+  time?: string | null;
+}) {
+  const cls = fail
+    ? "bg-red-500/15 text-red-600 border-red-500/30"
+    : ok
+      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30"
+      : neutral
+        ? "bg-muted text-muted-foreground border-border"
+        : "bg-muted text-muted-foreground border-border";
+  return (
+    <span
+      className={`inline-flex items-center gap-1 border rounded px-1.5 py-0.5 text-[10px] font-mono ${cls}`}
+      title={time ? fmtDate(time) : undefined}
+    >
+      {ok ? "✓" : fail ? "✕" : "•"} {label}
+      {time ? ` · ${fmtDate(time)}` : ""}
     </span>
   );
 }

@@ -16,6 +16,7 @@ interface Props {
   expiresAt?: string;
   ndaPdfUrl?: string;
   loiPdfUrl?: string;
+  trackingPixelUrl?: string;
 }
 
 const btn = {
@@ -46,9 +47,11 @@ const Email = ({
   expiresAt,
   ndaPdfUrl,
   loiPdfUrl,
+  trackingPixelUrl,
 }: Props) => (
   <EmailLayout
     preview={`Onboarding proveedor · ${commodity ?? "operación"} — NDA + LOI + carga de documentos`}
+    trackingPixelUrl={trackingPixelUrl}
   >
     <Heading style={styles.h1}>Onboarding de proveedor · Geocapitals</Heading>
     <Text style={styles.p}>

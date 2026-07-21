@@ -88,13 +88,15 @@ export async function sendInternalEmail(
 
   const unsubscribeToken = await ensureUnsubscribeToken(admin, email);
 
-  const element = React.createElement(template.component, templateData as never);
+  const messageId = crypto.randomUUID();
+  const trackingPixelUrl = `https://geocapitals.com/api/public/email/pixel/${messageId}.gif`;
+
+  const mergedData = { ...templateData, trackingPixelUrl, messageId };
+  const element = React.createElement(template.component, mergedData as never);
   const html = await renderAsync(element);
   const text = await renderAsync(element, { plainText: true });
   const subject =
-    typeof template.subject === "function" ? template.subject(templateData) : template.subject;
-
-  const messageId = crypto.randomUUID();
+    typeof template.subject === "function" ? template.subject(mergedData) : template.subject;
 
   await admin.from("email_send_log").insert({
     message_id: messageId,
