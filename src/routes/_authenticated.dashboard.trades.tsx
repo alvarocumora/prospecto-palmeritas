@@ -191,19 +191,21 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
           side: "sell",
           reference: `SB-ANTIMONIO-${ym}-${seq}`,
           commodity: "Antimony (Sb)",
-          form: "ingots · Grade 2#",
-          quantityT: 20,
+          form: "Refined Antimony Metal Ingots · min 99.65% Sb · Standard Commercial Grade",
+          quantityT: 1500,
           incoterm: "CIF",
-          paymentInstrument: "sblc_mt760",
+          paymentInstrument: "mt103",
           counterpartyName: "Vincent Carpio",
           counterpartyCompany: "Carpio & Kaddu Group",
-          counterpartyCountry: "AE",
-          counterpartyEmail: "carpio@carpiokaddu.com",
+          counterpartyCountry: "US",
+          counterpartyEmail: "vincent@carpiokaddu.com",
           notes:
-            "Operación iniciada bajo NCNDA firmado (Vincent Carpio · Marcela A. Cimino · Alvaro Oliva). Sb Grade 2# (99.75–99.90%), pallets tipo referencia KRN / JH2601.",
+            "Operación única Antimonio · 1,500 MT/mes × 12 meses · CIF Florida, USA · Pago SWIFT MT103.\n" +
+            "Seller: Aupal Propiedades — Ana Rojo (ana.rojo67@gmail.com). Buyer: Carpio & Kaddu Group — Vincent Carpio + Marcela A. Cimino.\n" +
+            "Pureza mín. 99.65% Sb (CoA muestra 99.75–99.90%). Origen: Seller's Option. Inspección: SGS / CCIC / Alex Stewart. Trial opcional por mutuo acuerdo. NCNDA firmado por las 3 partes.",
         },
       });
-      toast.success("Operación de Antimonio creada. Ahora emite el link a la contraparte.");
+      toast.success("Operación de Antimonio creada (1,500 MT/mes · MT103). Emite el link a las contrapartes.");
       void qc.invalidateQueries({ queryKey: ["my-trades"] });
       onOpen(id);
     } catch (e) {
