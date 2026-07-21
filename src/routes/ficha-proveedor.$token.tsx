@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck, Download, Loader2 } from "lucide-react";
+import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck, Download, Loader2, Smartphone } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import {
   getSupplierSheetByShareToken,
@@ -11,6 +11,7 @@ import {
 } from "@/lib/sourcing.functions";
 import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
 import { downloadSupplierSheetPdf } from "@/lib/supplierSheetPdf";
+
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
 // comparte con el comprador final. Un token distinto al de submit.
