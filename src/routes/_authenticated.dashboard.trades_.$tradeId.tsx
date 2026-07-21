@@ -40,6 +40,7 @@ import {
   effectivePaymentStatus,
   type PaymentKind,
 } from "@/lib/payments";
+import { TradeCopilotPanel } from "@/features/trades/TradeCopilotPanel";
 
 // Trazabilidad unificada del trade — "Uber de los commodities": un titular de
 // estado, el viaje en pasos y el timeline completo (acuerdo, documentos, pago,
@@ -157,6 +158,16 @@ function TrackingPage() {
           ))}
         </div>
       </div>
+
+      {/* Trade Copilot — resumen IA + backfill de términos */}
+      <TradeCopilotPanel
+        tradeId={trade.id}
+        hasMissingTerms={
+          trade.quantity_t == null ||
+          trade.incoterm == null ||
+          trade.unit_price_usd == null
+        }
+      />
 
       {/* Carga activa */}
       {activeShipment && (
