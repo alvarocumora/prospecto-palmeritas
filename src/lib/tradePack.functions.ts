@@ -6,11 +6,42 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createHash } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { publicUrl } from "@/lib/publicUrl";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
+
+const STORAGE_BUCKET = "email-attachments";
+
+/** Canonicaliza un objeto y devuelve SHA-256 hex (12 chars) para huella de términos. */
+function termsHashOf(obj: unknown): string {
+  const canonical = JSON.stringify(obj, Object.keys(obj as object).sort());
+  return createHash("sha256").update(canonical).digest("hex");
+}
+
+/** Campos del ctx que definen los "términos" para el hash por doc_type.
+ *  Cambios en teléfono/email de la contraparte NO deben generar versión nueva. */
+function termsFingerprintCtx(ctx: Awaited<ReturnType<typeof loadTradeCtx>>) {
+  return {
+    reference: ctx.reference,
+    commodity: ctx.commodity,
+    form: ctx.form,
+    quantityMt: ctx.quantityMt,
+    incoterm: ctx.incoterm,
+    paymentInstrument: ctx.paymentInstrument,
+    unitPriceUsd: ctx.unitPriceUsd,
+    totalUsd: ctx.totalUsd,
+    destination: ctx.destination,
+    notes: ctx.notes,
+    buyerName: ctx.buyer.name,
+    buyerCompany: (ctx.buyer as { company?: string }).company ?? null,
+    sellerName: ctx.seller.name,
+    sellerCompany: (ctx.seller as { company?: string }).company ?? null,
+  };
+}
+
 
 export const TRADE_PACK_DOCS = ["ficha", "loi", "ncnda", "icpo", "spa"] as const;
 export type TradePackDoc = (typeof TRADE_PACK_DOCS)[number];
