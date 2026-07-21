@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck, Download, Loader2 } from "lucide-react";
+import { PackageSearch, Mail, Phone, FileText, ExternalLink, ShieldCheck, Download, Loader2, Smartphone } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import {
   getSupplierSheetByShareToken,
@@ -11,6 +11,7 @@ import {
 } from "@/lib/sourcing.functions";
 import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
 import { downloadSupplierSheetPdf } from "@/lib/supplierSheetPdf";
+
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
 // comparte con el comprador final. Un token distinto al de submit.
@@ -70,9 +71,11 @@ function SupplierSheetPage() {
                 .join(" · ") || ""}
             </div>
 
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap items-start gap-3">
               <DownloadSheetButton sheet={data} />
+              <MobileQr />
             </div>
+
 
             {data.supplier.offer_valid_until &&
               isOfferExpired(data.supplier.offer_valid_until, new Date()) && (
@@ -247,5 +250,40 @@ function DownloadSheetButton({ sheet }: { sheet: import("@/lib/sourcing.function
       {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
       {busy ? "Generando PDF…" : "Descargar ficha en PDF"}
     </button>
+  );
+}
+
+function MobileQr() {
+  const [dataUrl, setDataUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const QR = await import("qrcode");
+        const url = typeof window !== "undefined" ? window.location.href : "";
+        if (!url) return;
+        const png = await QR.toDataURL(url, { margin: 1, width: 160 });
+        if (alive) setDataUrl(png);
+      } catch {
+        /* ignore */
+      }
+    })();
+    return () => {
+      alive = false;
+    };
+  }, []);
+  if (!dataUrl) return null;
+  return (
+    <div className="inline-flex items-center gap-3 rounded-xl border border-hairline bg-white px-3 py-2">
+      <img src={dataUrl} alt="QR acceso móvil" className="w-16 h-16" />
+      <div className="text-[11px] leading-tight">
+        <div className="inline-flex items-center gap-1 font-mono uppercase tracking-wider text-accent-brand">
+          <Smartphone className="w-3 h-3" /> Acceso móvil
+        </div>
+        <div className="text-content-subtle mt-0.5">
+          Escanea para abrir esta ficha en tu celular.
+        </div>
+      </div>
+    </div>
   );
 }

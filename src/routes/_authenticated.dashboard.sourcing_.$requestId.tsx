@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -15,6 +15,9 @@ import {
   XCircle,
   Handshake,
   ArrowRight,
+  Send,
+  CheckCircle2,
+  Clock,
 } from "lucide-react";
 import {
   getSourcingRequestDetail,
@@ -23,8 +26,11 @@ import {
   generateSubmissionShareLink,
   convertSubmissionToTrade,
   getSupplierFileUrl,
+  dispatchSupplierSheetToBuyers,
+  listSupplierSheetDispatches,
   type SubmissionRow,
 } from "@/lib/sourcing.functions";
+import { listPartners } from "@/lib/clients.functions";
 import { supplierSheetUrl } from "@/lib/publicUrl";
 import {
   SUBMISSION_STATUS_LABELS,
@@ -33,6 +39,7 @@ import {
   isOfferExpired,
   type SubmissionStatus,
 } from "@/lib/sourcing";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/sourcing_/$requestId")({
   head: () => ({ meta: [{ title: "Requerimiento — Geocapitals" }] }),
@@ -400,6 +407,7 @@ function SubmissionCard({
           >
             <Share2 className="w-3 h-3" /> Ficha comprador
           </button>
+          <DispatchButton submissionId={s.id} />
           {s.trade_id ? (
             <Link
               to="/dashboard/trades/$tradeId"
@@ -436,6 +444,213 @@ function SubmissionCard({
           </button>
         </div>
       )}
+
+      <DispatchPanel submissionId={s.id} />
     </div>
   );
 }
+
+// ---------- Despacho bajo NCNDA a compradores seleccionados ----------
+
+function DispatchButton({ submissionId }: { submissionId: string }) {
+  return (
+    <button
+      onClick={() => {
+        const el = document.getElementById(`dispatch-${submissionId}`);
+        if (el) {
+          el.dataset.open = el.dataset.open === "1" ? "0" : "1";
+          el.style.display = el.dataset.open === "1" ? "block" : "none";
+        }
+      }}
+      className="text-[11px] font-mono text-cobalt hover:underline inline-flex items-center gap-1"
+    >
+      <Send className="w-3 h-3" /> Despachar bajo NCNDA
+    </button>
+  );
+}
+
+function DispatchPanel({ submissionId }: { submissionId: string }) {
+  const partnersFn = useServerFn(listPartners);
+  const dispatchFn = useServerFn(dispatchSupplierSheetToBuyers);
+  const listFn = useServerFn(listSupplierSheetDispatches);
+
+  const { data: partnersData } = useQuery({
+    queryKey: ["partners-buyers"],
+    queryFn: () => partnersFn(),
+    staleTime: 60_000,
+  });
+  const { data: history, refetch: refetchHistory } = useQuery({
+    queryKey: ["dispatch-history", submissionId],
+    queryFn: () => listFn({ data: { submissionId } }),
+    staleTime: 15_000,
+  });
+
+  const buyers = useMemo(
+    () =>
+      (partnersData?.partners ?? [])
+        .filter((p) => (p.role === "cliente" || p.role === "broker") && p.email)
+        .map((p) => ({ id: p.id, name: p.name, company: p.company, email: p.email! })),
+    [partnersData],
+  );
+
+  const [selected, setSelected] = useState<Record<string, boolean>>({});
+  const [extraEmails, setExtraEmails] = useState("");
+  const [ncndaRef, setNcndaRef] = useState("");
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  const toggle = (id: string) => setSelected((s) => ({ ...s, [id]: !s[id] }));
+
+  const submit = async () => {
+    const chosen = buyers.filter((b) => selected[b.id]);
+    const extras = extraEmails
+      .split(/[,;\s]+/)
+      .map((e) => e.trim())
+      .filter((e) => /.+@.+\..+/.test(e))
+      .map((email) => ({ email }));
+    const recipients = [
+      ...chosen.map((b) => ({
+        email: b.email,
+        name: b.name,
+        company: b.company ?? undefined,
+        partnerId: b.id,
+      })),
+      ...extras,
+    ];
+    if (recipients.length === 0) {
+      toast.error("Selecciona al menos un comprador o agrega un correo.");
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await dispatchFn({
+        data: {
+          submissionId,
+          recipients,
+          ncndaRef: ncndaRef.trim() || undefined,
+          note: note.trim() || undefined,
+        },
+      });
+      const ok = res.results.filter((r) => r.ok).length;
+      const fail = res.results.length - ok;
+      toast.success(`Despachado a ${ok}${fail ? ` · ${fail} fallidos` : ""}`);
+      setSelected({});
+      setExtraEmails("");
+      setNote("");
+      void refetchHistory();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo despachar.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div
+      id={`dispatch-${submissionId}`}
+      data-open="0"
+      style={{ display: "none" }}
+      className="mt-3 rounded-md border border-cobalt/30 bg-cobalt/5 p-3"
+    >
+      <div className="text-[11px] font-mono uppercase tracking-wider text-cobalt mb-2">
+        Despacho bajo NCNDA · compradores
+      </div>
+      {buyers.length === 0 ? (
+        <div className="text-xs text-muted-foreground">
+          No hay asociados con rol Cliente o Broker. Agrega compradores en{" "}
+          <Link to="/dashboard/clientes" className="text-primary underline">
+            Clientes & Asociados
+          </Link>
+          , o ingresa correos manualmente abajo.
+        </div>
+      ) : (
+        <div className="grid sm:grid-cols-2 gap-1">
+          {buyers.map((b) => (
+            <label
+              key={b.id}
+              className="flex items-center gap-2 text-xs rounded border border-border/60 bg-white/60 px-2 py-1 cursor-pointer hover:border-cobalt/50"
+            >
+              <input
+                type="checkbox"
+                checked={!!selected[b.id]}
+                onChange={() => toggle(b.id)}
+              />
+              <div className="min-w-0">
+                <div className="font-medium truncate">{b.name}</div>
+                <div className="text-[10px] text-muted-foreground truncate">
+                  {[b.company, b.email].filter(Boolean).join(" · ")}
+                </div>
+              </div>
+            </label>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-2 grid gap-2">
+        <input
+          value={extraEmails}
+          onChange={(e) => setExtraEmails(e.target.value)}
+          placeholder="Correos adicionales (separados por coma)"
+          className="w-full text-xs px-2 py-1.5 rounded border border-border bg-white"
+        />
+        <div className="grid sm:grid-cols-2 gap-2">
+          <input
+            value={ncndaRef}
+            onChange={(e) => setNcndaRef(e.target.value)}
+            placeholder="Ref. NCNDA (opcional)"
+            className="text-xs px-2 py-1.5 rounded border border-border bg-white"
+          />
+          <input
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder="Nota interna al comprador (opcional)"
+            className="text-xs px-2 py-1.5 rounded border border-border bg-white"
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="text-[10px] text-muted-foreground">
+            Se enviará bajo el formato estándar de documentos de plataforma con link a la ficha
+            en https://geocapitals.com. Cada envío queda auditado.
+          </div>
+          <button
+            onClick={() => void submit()}
+            disabled={busy}
+            className="text-[11px] font-mono px-3 py-1.5 rounded bg-cobalt text-white hover:bg-cobalt/90 disabled:opacity-50 inline-flex items-center gap-1"
+          >
+            <Send className="w-3 h-3" /> {busy ? "Enviando…" : "Enviar bajo NCNDA"}
+          </button>
+        </div>
+      </div>
+
+      {history && history.dispatches && history.dispatches.length > 0 && (
+        <div className="mt-3 pt-2 border-t border-cobalt/20">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
+            Historial · {history.dispatches.length}
+          </div>
+          <div className="space-y-1">
+            {history.dispatches.slice(0, 6).map((d) => (
+              <div
+                key={d.id}
+                className="flex items-center gap-2 text-[11px] text-foreground/80"
+              >
+                {d.status === "sent" ? (
+                  <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                ) : (
+                  <Clock className="w-3 h-3 text-amber-600" />
+                )}
+                <span className="font-mono truncate max-w-[240px]">{d.recipient_email}</span>
+                <span className="text-muted-foreground truncate">
+                  {d.recipient_company ?? d.recipient_name ?? ""}
+                </span>
+                <span className="ml-auto text-[10px] text-muted-foreground">
+                  {new Date(d.created_at as string).toLocaleString("es-CL")}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+

@@ -13649,6 +13649,76 @@ export type Database = {
           },
         ]
       }
+      sourcing_dispatches: {
+        Row: {
+          created_at: string
+          id: string
+          message_id: string | null
+          ncnda_ref: string | null
+          note: string | null
+          owner_user_id: string
+          partner_id: string | null
+          recipient_company: string | null
+          recipient_email: string
+          recipient_name: string | null
+          request_id: string
+          status: string
+          submission_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          ncnda_ref?: string | null
+          note?: string | null
+          owner_user_id: string
+          partner_id?: string | null
+          recipient_company?: string | null
+          recipient_email: string
+          recipient_name?: string | null
+          request_id: string
+          status?: string
+          submission_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message_id?: string | null
+          ncnda_ref?: string | null
+          note?: string | null
+          owner_user_id?: string
+          partner_id?: string | null
+          recipient_company?: string | null
+          recipient_email?: string
+          recipient_name?: string | null
+          request_id?: string
+          status?: string
+          submission_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_dispatches_partner_id_fkey"
+            columns: ["partner_id"]
+            isOneToOne: false
+            referencedRelation: "business_partners"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_dispatches_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_dispatches_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sourcing_requests: {
         Row: {
           commodity: string
