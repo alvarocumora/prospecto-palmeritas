@@ -212,6 +212,42 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
     }
   };
 
+  const startCopper = async () => {
+    setSaving(true);
+    try {
+      const ym = new Date().toISOString().slice(0, 7).replace("-", "");
+      const seq = String(Math.floor(Math.random() * 9000) + 1000);
+      const { id } = await createFn({
+        data: {
+          side: "sell",
+          reference: `CU-CATHODE-${ym}-${seq}`,
+          commodity: "Copper Cathode Grade A (Cu)",
+          form: "Cathode plates · ASTM B115 / B49 · 99.97–99.99% Cu",
+          quantityT: 2000,
+          incoterm: "CIF",
+          paymentInstrument: "dlc_mt700",
+          notes:
+            "Copper Cathode Grade A · Trial 500 MT · Contract 2,000 MT/mes · 12 meses + extensiones. " +
+            "CIF puerto designado por Buyer · Loading port Seller's option · Embarque 15–20 días bancarios tras verificación del instrumento. " +
+            "Payment: Opción A DLC MT700 irrevocable, transferible, confirmado, at sight, UCP 600 (Top 50 Bank) · Opción B SBLC MT760 (Top 50 Bank). " +
+            "Performance Bond 2% emitido por Seller dentro de 10 días bancarios tras verificación del instrumento. " +
+            "POP en 5 días bancarios: Commercial Invoice, Packing List, Certificate of Origin, SGS QC, Warehouse Receipt, Export Authorization (si aplica), fotos, Draft B/L. " +
+            "Shipping docs: Full set Clean On Board B/L, SGS Inspection, Weight & Quality Cert, Insurance 110% CIF, fotos de carga, export customs. " +
+            "Inspección SGS / CCIC / Alex Stewart o equivalente; destino a cargo del Buyer. " +
+            "Procedimiento: ICPO/LOI+CIS → FCO+Seller CIS → SPA → PI → DLC/SBLC → PB 2% + POP → embarque 15–20 días → docs → destino → pago MT103 contra docs o según DLC.",
+        },
+      });
+      toast.success("Trade de Cobre creado con términos CIF · DLC MT700 · 2.000 MT/mes.");
+      void qc.invalidateQueries({ queryKey: ["my-trades"] });
+      onOpen(id);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo iniciar el trade de cobre.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
   const deliveryFn = useServerFn(getEmailDeliveryStatus);
   const [dispatching, setDispatching] = useState(false);
