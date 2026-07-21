@@ -117,7 +117,13 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
       const res = await genFn({ data: { tradeId, include: [...selected] } });
       setDocs(res.docs);
       setErrors(res.errors);
-      toast.success(`Paquete generado — ${res.docs.length} PDF(s)`);
+      const reused = res.docs.filter((d) => d.reused).length;
+      toast.success(
+        `Paquete listo — ${res.docs.length} PDF${res.docs.length !== 1 ? "s" : ""}` +
+          (reused ? ` (${reused} reutilizado${reused !== 1 ? "s" : ""})` : ""),
+      );
+      await loadVersions();
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error generando paquete");
     } finally {
