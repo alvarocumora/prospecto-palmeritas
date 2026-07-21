@@ -74,10 +74,27 @@ export const dispatchAntimonyPackage = createServerFn({ method: "POST" })
       });
     }
 
-    // 2) Ficha técnica del antimonio a los buyers.
+    // 2) Ficha técnica del antimonio a los buyers — con PDF oficial adjunto (signed URL).
     const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+    const { buildAntimonySheetPdf, uploadPdfSigned } = await import(
+      "@/lib/documents/officialPdfs.server"
+    );
     const operationUrl = tradeId ? publicUrl(`/operacion/${tradeId}`) : undefined;
     for (const buyer of data.buyers) {
+      let sheetPdfUrl: string | undefined;
+      try {
+        const bytes = await buildAntimonySheetPdf({
+          reference: `SHEET-${reference}`,
+          recipient: { role: "Buyer", name: buyer.name, company: buyer.company, email: buyer.email },
+        });
+        sheetPdfUrl = await uploadPdfSigned({
+          bytes,
+          path: `antimony/${tradeId ?? "n-a"}/sheet-${Date.now()}-${buyer.email.replace(/[^a-z0-9]/gi, "_")}.pdf`,
+          ttlDays: 60,
+        });
+      } catch (e) {
+        console.error("[antimony] pdf attach failed", e);
+      }
       try {
         const res = await sendInternalEmail({
           templateName: "antimony-product-sheet",
@@ -89,8 +106,10 @@ export const dispatchAntimonyPackage = createServerFn({ method: "POST" })
             tradeReference: reference,
             senderCompany: "Geocapitals",
             operationUrl,
+            sheetPdfUrl,
           },
         });
+
         results.push({
           to: buyer.email,
           kind: "antimony-product-sheet",
