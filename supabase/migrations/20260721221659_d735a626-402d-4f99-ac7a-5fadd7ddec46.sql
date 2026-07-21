@@ -1,0 +1,1 @@
+UPDATE public.sourcing_submissions SET share_token_prefix='CkyTAJaB', share_token_hash='6171445424d23ffbcf97368664f0ae14af824120fd70e0c6be4614907db1e5b9', share_token_revoked_at=NULL WHERE id='4608fb36-3d52-4b7e-89bc-f617cd146e30';
