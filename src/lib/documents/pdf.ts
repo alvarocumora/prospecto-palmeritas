@@ -23,6 +23,14 @@ const CONTACT = {
   site: "geocapitals.com",
 };
 
+// Matriz de tabulación compartida por TODOS los documentos (LOI, NCNDA,
+// ficha, ICPO, SPA, invoice, packing list). Cualquier ajuste tipográfico o
+// de columna se hace acá para mantener alineamiento idéntico entre docs.
+const LABEL_COL_W = 150;
+const CELL_PAD = { top: 6, right: 8, bottom: 6, left: 8 };
+const TABLE_FONT = 9.4;
+const TABLE_ROW_MIN_H = 20;
+
 export type EmitterSignature = {
   name: string;
   email?: string;
