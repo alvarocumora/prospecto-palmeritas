@@ -4,16 +4,16 @@ import { Heading, Text, Section, Hr } from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { EmailLayout, KeyValueBlock, styles, colors, badge } from "./_shared";
 
-// Ficha técnica del antimonio (Sb Grade 2#) que Geocapitals envía a los
-// compradores (Carpio & Kaddu Group) para que evalúen la calidad del lote
-// antes del envío del SCO/LOI. Los valores provienen de los CoA del proveedor
-// (Aupal Propiedades) — 2 batches independientes (JH2601 y SGS 2025-2002470).
+// Ficha oficial de la operación Antimonio (Sb) — formato PURCHASE TERMS
+// alineado a la mesa internacional (Buyer FL, 1.500 MT/mes × 12 meses,
+// pago SWIFT MT103, referencia LMU/Fastmarkets). Reemplaza el envío anterior
+// con SBLC MT760, que no aplica a operaciones por transferencia bancaria.
 
 interface Assay {
   element: string;
   unit: string;
-  batchA?: string; // JH2601 (CoA interno)
-  batchB?: string; // SGS 2025-2002470
+  batchA?: string;
+  batchB?: string;
 }
 
 const ASSAYS: Assay[] = [
@@ -58,6 +58,22 @@ const tdStyle = {
   fontFamily: "'IBM Plex Mono', monospace",
 } as const;
 
+const SectionH = ({ children }: { children: React.ReactNode }) => (
+  <Text
+    style={{
+      ...styles.p,
+      fontWeight: 700,
+      fontSize: 12,
+      letterSpacing: "0.12em",
+      textTransform: "uppercase",
+      color: colors.primary,
+      margin: "22px 0 6px",
+    }}
+  >
+    {children}
+  </Text>
+);
+
 const Email = ({
   recipientName,
   recipientCompany,
@@ -68,39 +84,55 @@ const Email = ({
   trackingPixelUrl,
 }: Props) => (
   <EmailLayout
-    preview={`Ficha técnica · Antimonio Sb Grade 2# — CoA + SGS · ${tradeReference ?? ""}`}
+    preview={`PURCHASE TERMS · Antimony Ingots (Sb) — 1,500 MT/mo × 12 mo · CIF Florida · ${tradeReference ?? ""}`}
     trackingPixelUrl={trackingPixelUrl}
   >
-    <Heading style={styles.h1}>Ficha técnica · Antimonio (Sb) Grade 2#</Heading>
+    <Heading style={styles.h1}>Purchase Terms · Antimony Ingots (Sb)</Heading>
     <Text style={styles.p}>
       {recipientName ? `${recipientName}` : "Estimados"}
-      {recipientCompany ? ` — ${recipientCompany}` : ""}: adjunto la ficha resumen y ficha técnica
-      del lote de antimonio ofrecido por nuestro proveedor certificado. Toda la trazabilidad,
-      documentos originales y firmas quedan disponibles en la War Room de la operación.
+      {recipientCompany ? ` — ${recipientCompany}` : ""}: a continuación las condiciones formales de
+      compra de <b>Antimony Ingots Sb ≥ 99.65%</b> para el comprador en <b>Florida, USA</b>. Este
+      documento reemplaza cualquier borrador anterior que mencionara SBLC/DLC: la operación se
+      liquidará por <b>transferencia bancaria internacional SWIFT MT103</b>. Toda la trazabilidad,
+      documentos y firmas se llevan en la War Room privada.
     </Text>
 
     <KeyValueBlock
       rows={[
         ["Operación", tradeReference],
-        ["Producto", "Antimony Ingot — Grade 2#"],
-        ["Marca de producción", "JH2601 / KRN (referencia)"],
-        ["Forma", "Lingote (ingot), pallets de madera"],
-        ["Origen", "Proveedor certificado — CoA + SGS disponibles"],
-        ["Presentación", "Pallets 300–320 / 26–50 · stock en bodega"],
-        ["Estándar de análisis", "GB/T 1599-2014 (SGS)"],
+        ["Producto", "Antimony Ingots (Sb) — Refined Antimony Metal"],
+        ["Pureza", "Mín. 99.65% Sb (superior por mutuo acuerdo)"],
+        ["Estándar", "International Commercial Grade · Standard Ingots"],
+        ["Volumen mensual", "1,500 MT / mes"],
+        ["Duración", "Mínimo 12 meses, renovable por mutuo acuerdo"],
+        ["Incoterm", "CIF — Buyer's Designated Port, Florida, USA"],
+        ["Puerto de carga", "Seller's Option"],
+        ["Primer embarque", "15–30 días bancarios post-SPA firmado"],
+        ["Pago", "SWIFT MT103 · Wire Transfer contra Commercial Invoice y documentos completos"],
+        [
+          "Referencia de precio",
+          "Índice internacional aplicable (LMU/LME reference o índice acordado, ej. Fastmarkets); fórmula final se fija en el SPA",
+        ],
+        ["Inspección", "SGS / CCIC / Alex Stewart o equivalente internacional"],
+        ["Comisiones", "Definidas en SPA + NCNDA/IMFPA — ver sección Commissions"],
         ["Intermediario", senderCompany ?? "Geocapitals"],
       ]}
     />
 
-    <Text style={{ ...styles.p, fontWeight: 700, marginTop: 20, marginBottom: 8 }}>
-      Composición química — Certificados independientes {badge("success", "Sb ≥ 99.75%")}
-    </Text>
-    <Text style={styles.muted}>
-      Columna A: CoA interno del productor (JH2601 · Pallets 26–50 y 301–320). Columna B: SGS
-      Reporte 2025-2002470-001 · muestra en polvo 14 g, muestreo 22-Aug-2025.
+    <SectionH>Commodity</SectionH>
+    <Text style={styles.p}>
+      Refined Antimony Metal Ingots · Marca de producción JH2601 / KRN (referencia) · Pallets de
+      madera · Origen a opción del Seller · Presentación: pallets 300–320 / 26–50, stock verificable
+      en bodega. Estándar de análisis GB/T 1599-2014. Trial Shipment opcional por mutuo acuerdo.
     </Text>
 
-    <Section style={{ margin: "12px 0 4px" }}>
+    <SectionH>Composición química — Certificados independientes {badge("success", "Sb ≥ 99.75%")}</SectionH>
+    <Text style={styles.muted}>
+      Columna A: CoA interno del productor (JH2601 · Pallets 26–50 y 301–320). Columna B: SGS
+      Reporte 2025-2002470-001 · muestra 14 g, muestreo 22-Aug-2025.
+    </Text>
+
+    <Section style={{ margin: "10px 0 4px" }}>
       <table
         cellPadding={0}
         cellSpacing={0}
@@ -129,34 +161,88 @@ const Email = ({
       </table>
     </Section>
 
-    <Hr style={styles.hr} />
-
-    <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 6 }}>
-      Próximos pasos — desde Geocapitals
-    </Text>
+    <SectionH>Delivery Terms</SectionH>
     <Text style={styles.p}>
-      1 · Confirmen destino final (puerto y país) y volumen objetivo del primer embarque para
-      responder con SCO (Soft Corporate Offer) y draft de contrato bajo el NCNDA ya firmado.
-      <br />2 · Podemos coordinar inspección independiente (SGS / Bureau Veritas) previa al
-      embarque y validación de origen legal del material.
-      <br />3 · Instrumento de pago sugerido: <b>SBLC MT760</b> irrevocable, confirmado por banco
-      de primer nivel, contra documentos de embarque.
+      <b>Incoterm:</b> CIF Buyer's Designated Port, Florida, USA · <b>Loading Port:</b> Seller's
+      Option · <b>Destination:</b> Puerto designado por el Buyer en Florida, EE.UU. ·{" "}
+      <b>Schedule:</b> primer embarque dentro de 15–30 días bancarios tras la firma del SPA;
+      embarques mensuales sucesivos por 12 meses.
+    </Text>
+
+    <SectionH>Price</SectionH>
+    <Text style={styles.p}>
+      El precio se referenciará al índice internacional aplicable para antimonio refinado. Dado que
+      no existe un contrato LME estándar para antimonio, se acordará expresamente en el SPA
+      definitivo la fuente de precio (LMU/LME reference o índice publicado ampliamente aceptado, ej.
+      Fastmarkets), la ventana de fijación, descuentos, premios y comisiones.
+    </Text>
+
+    <SectionH>Payment Terms · SWIFT MT103</SectionH>
+    <Text style={styles.p}>
+      Pago por transferencia bancaria internacional (SWIFT MT103) contra Commercial Invoice del
+      Seller y set completo de documentos de embarque. Fondos remitidos a la cuenta bancaria
+      designada por el Seller. Cargos bancarios fuera del país del Seller por cuenta del Buyer.
+      Milestones alternativos podrán definirse en el SPA por mutuo acuerdo.
+    </Text>
+
+    <SectionH>Proof of Product (POP)</SectionH>
+    <Text style={styles.p}>
+      Commercial Invoice · Packing List · Certificate of Origin · SGS Quality Certificate (o
+      equivalente) · Product Specification Sheet · Warehouse Receipt / Availability Certificate
+      (cuando aplique) · Export Authorization · Product Photographs · Draft Bill of Lading.
+    </Text>
+
+    <SectionH>Shipping Documents</SectionH>
+    <Text style={styles.p}>
+      Commercial Invoice · Packing List · Full Set Clean On Board Bills of Lading · Certificate of
+      Origin · SGS Inspection Certificate · Weight Certificate · Quality Certificate · Insurance
+      Certificate (CIF) · Export Customs Documentation · Container Loading Photographs.
+    </Text>
+
+    <SectionH>Inspection</SectionH>
+    <Text style={styles.p}>
+      Inspección de calidad y cantidad por SGS, CCIC, Alex Stewart International u otra firma
+      internacionalmente reconocida y mutuamente aceptada. El Buyer podrá efectuar inspección de
+      destino por su cuenta.
+    </Text>
+
+    <SectionH>Transaction Procedure</SectionH>
+    <Text style={styles.p}>
+      1. Buyer emite ICPO/LOI + Company Profile · 2. Seller emite FCO + CIS · 3. Buyer firma y
+      devuelve FCO · 4. Seller emite Draft SPA · 5. Buyer firma y devuelve · 6. Seller contrafirma
+      · 7. Commercial Invoice · 8. Confirmación de PO y cronograma · 9. Preparación de carga · 10.
+      Inspección SGS/CCIC · 11. Embarque según cronograma · 12. Set completo de documentos · 13.
+      <b> Pago SWIFT MT103</b> según SPA · 14. Arribo a Florida · 15. Inspección de destino (si
+      aplica).
+    </Text>
+
+    <SectionH>Commissions</SectionH>
+    <Text style={styles.p}>
+      Cualquier comisión, fee de intermediación o compensación de facilitador será acordada por
+      separado por las partes e incorporada expresamente al SPA definitivo y al Fee Protection
+      Agreement (NCNDA/IMFPA), cuando corresponda.
+    </Text>
+
+    <SectionH>Buyer</SectionH>
+    <Text style={styles.p}>
+      Ubicación: Florida, Estados Unidos · Cantidad requerida: 1,500 MT/mes · Contrato mínimo: 12
+      meses · Extensiones por acuerdo escrito mutuo.
     </Text>
 
     {sheetPdfUrl ? (
       <Section
         style={{
-          margin: "16px 0 8px",
+          margin: "18px 0 8px",
           padding: "12px 14px",
           background: "#F1F4FF",
           borderLeft: `3px solid ${colors.primary}`,
         }}
       >
         <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>
-          Copia oficial (PDF) para su bandeja
+          Copia oficial (PDF) — Purchase Terms + Ficha técnica
         </Text>
         <Text style={styles.muted}>
-          Adjuntamos ficha técnica firmada por Geocapitals con sello de confidencialidad.
+          Documento firmado por Geocapitals con sello de confidencialidad y QR de validación.
         </Text>
         <a
           href={sheetPdfUrl}
@@ -172,23 +258,28 @@ const Email = ({
             fontSize: 13,
           }}
         >
-          Descargar ficha técnica (PDF)
+          Descargar Purchase Terms (PDF)
         </a>
       </Section>
     ) : null}
 
     {operationUrl ? (
-      <Text style={styles.p}>
-        War Room de la operación:{" "}
-        <a href={operationUrl} style={{ color: colors.primary, fontWeight: 600 }}>
-          {operationUrl}
-        </a>
-      </Text>
+      <>
+        <Hr style={styles.hr} />
+        <Text style={styles.p}>
+          <b>Aceptación y trazabilidad.</b> Para aceptar formalmente estos términos, subir fotos del
+          material, cargar CoA/SGS y firmar los documentos, use su War Room privada:
+          <br />
+          <a href={operationUrl} style={{ color: colors.primary, fontWeight: 600 }}>
+            {operationUrl}
+          </a>
+        </Text>
+      </>
     ) : null}
 
     <Text style={styles.muted}>
-      Cualquier consulta técnica o comercial: info@geocapitals.com · WhatsApp +56 9 6218 4071.
-      Este envío está cubierto por el NCNDA suscrito entre las partes.
+      Cualquier consulta técnica o comercial: info@geocapitals.com · WhatsApp +56 9 6218 4071. Este
+      envío está cubierto por el NCNDA suscrito entre las partes.
     </Text>
 
     <Text
@@ -202,8 +293,10 @@ const Email = ({
       }}
     >
       CONFIDENCIAL — Este mensaje y el PDF adjunto son propiedad de Geocapitals y de las Partes
-      identificadas. Contienen información sensible cubierta por acuerdo de confidencialidad (NCNDA).
-      Prohibida su reproducción, distribución o divulgación a terceros sin autorización escrita.
+      identificadas. Contienen información sensible cubierta por acuerdo de confidencialidad
+      (NCNDA). Prohibida su reproducción, distribución o divulgación a terceros sin autorización
+      escrita. Este documento no constituye oferta vinculante; la obligación de compra nace con el
+      SPA definitivo firmado por ambas partes.
     </Text>
   </EmailLayout>
 );
@@ -212,10 +305,10 @@ const Email = ({
 export const template = {
   component: Email,
   subject: (d: Record<string, unknown>) =>
-    `Geocapitals · Ficha técnica Antimonio Sb Grade 2#${
+    `Geocapitals · Purchase Terms Antimony (Sb) — 1,500 MT/mo × 12 mo · CIF Florida${
       d.tradeReference ? ` — ${String(d.tradeReference)}` : ""
     }`,
-  displayName: "Antimonio · Ficha técnica (CoA + SGS)",
+  displayName: "Antimonio · Purchase Terms + Ficha técnica",
   previewData: {
     recipientName: "Vincent Carpio",
     recipientCompany: "Carpio & Kaddu Group",
