@@ -732,7 +732,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             );
           })}
         </div>
-      )}
+        );
+      })()}
     </>
 
   );
