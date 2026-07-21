@@ -1,6 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 
 // Primer agente real de Geocapitals: dada una "próxima acción" del hub de un
 // socio, redacta el mensaje de contacto (email o WhatsApp) usando el gateway de
@@ -73,4 +76,49 @@ export const draftNextActionMessage = createServerFn({ method: "POST" })
       if (e instanceof Error) throw e;
       throw new Error("No se pudo generar el mensaje.");
     }
+  });
+
+// ---------- Envío directo: el agente encola el email y lo registra ----------
+const SendInput = z.object({
+  toEmail: z.string().trim().email().max(200),
+  subject: z.string().trim().min(1).max(200),
+  body: z.string().trim().min(1).max(5000),
+  tradeId: z.string().uuid().optional(),
+  partnerName: z.string().trim().max(160).optional(),
+});
+
+export const sendNextActionEmail = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SendInput.parse(d))
+  .handler(async ({ data, context }): Promise<{ ok: true; emailed: boolean }> => {
+    const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+    const result = await sendInternalEmail({
+      templateName: "agent-outreach",
+      recipientEmail: data.toEmail,
+      idempotencyKey: `agent-outreach:${crypto.randomUUID()}`,
+      templateData: {
+        subject: data.subject,
+        body: data.body,
+        fromName: "Equipo Geocapitals",
+      },
+    });
+    if (!result.ok) throw new Error(result.error);
+    const emailed = "queued" in result && result.queued === true;
+
+    // Trazabilidad: si el mensaje corresponde a un trade, entra a la actividad.
+    if (data.tradeId) {
+      try {
+        await asSb(context.supabase)
+          .from("trade_events")
+          .insert({
+            trade_id: data.tradeId,
+            actor_user_id: context.userId,
+            kind: "agent_message_sent",
+            detail: `Mensaje enviado a ${data.partnerName ?? data.toEmail}: ${data.subject}`,
+          });
+      } catch (e) {
+        console.error("[sendNextActionEmail] trade event failed", e);
+      }
+    }
+    return { ok: true, emailed };
   });
