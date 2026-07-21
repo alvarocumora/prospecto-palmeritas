@@ -1,25 +1,48 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { zodValidator, fallback } from "@tanstack/zod-adapter";
-import { z } from "zod";
 import { ArrowLeft } from "lucide-react";
 import { TradeBoardView } from "@/features/trade-board/TradeBoardView";
 
-const searchSchema = z.object({
-  q: fallback(z.string(), "").default(""),
-  role: fallback(z.string(), "all").default("all"),
-  commodity: fallback(z.string(), "all").default("all"),
-  min: fallback(z.number().nullable(), null).default(null),
-  max: fallback(z.number().nullable(), null).default(null),
-  full: fallback(z.boolean(), false).default(false),
-  group: fallback(z.string(), "none").default("none"),
-});
+type BoardSearchParams = {
+  q: string;
+  role: "all" | "buyer" | "seller" | "desk";
+  commodity: string;
+  min: number | null;
+  max: number | null;
+  full: boolean;
+  group: "none" | "role";
+};
+
+function toNum(v: unknown): number | null {
+  if (v == null || v === "") return null;
+  const n = Number(v);
+  return Number.isFinite(n) ? n : null;
+}
+
+function validateSearch(raw: Record<string, unknown>): BoardSearchParams {
+  const roleRaw = String(raw.role ?? "all");
+  const role = (["all", "buyer", "seller", "desk"] as const).includes(
+    roleRaw as BoardSearchParams["role"],
+  )
+    ? (roleRaw as BoardSearchParams["role"])
+    : "all";
+  return {
+    q: typeof raw.q === "string" ? raw.q : "",
+    role,
+    commodity: typeof raw.commodity === "string" && raw.commodity ? raw.commodity : "all",
+    min: toNum(raw.min),
+    max: toNum(raw.max),
+    full: raw.full === true || raw.full === "1" || raw.full === "true",
+    group: raw.group === "role" ? "role" : "none",
+  };
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard/trade-board")({
   head: () => ({ meta: [{ title: "Tablero de trades — Geocapitals" }] }),
-  validateSearch: zodValidator(searchSchema),
+  validateSearch,
   component: TradeBoardPage,
 });
+
 
 function TradeBoardPage() {
   const raw = Route.useSearch();
