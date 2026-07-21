@@ -1791,3 +1791,31 @@ function SupplierPanel({
     </div>
   );
 }
+
+function OnboardingBadge({ s }: { s?: OnboardingStatus }) {
+  if (!s || s.state === "pending") return null;
+  const map: Record<OnboardingStatus["state"], { label: string; cls: string }> = {
+    pending: { label: "", cls: "" },
+    sent: {
+      label: "NDA+LOI enviado",
+      cls: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+    },
+    partial: {
+      label: s.ndaSigned ? "NDA firmado" : "LOI firmado",
+      cls: "bg-sky-500/10 text-sky-700 border-sky-500/30",
+    },
+    signed: {
+      label: "NDA+LOI firmado",
+      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+    },
+  };
+  const m = map[s.state];
+  return (
+    <span
+      className={`text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded border ${m.cls}`}
+      title={s.sentAt ? `Enviado ${new Date(s.sentAt).toLocaleDateString("es-CL")}` : undefined}
+    >
+      {m.label}
+    </span>
+  );
+}
