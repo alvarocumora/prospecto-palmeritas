@@ -43,6 +43,7 @@ import {
   LineChart,
   BadgeCheck,
   Wallet,
+  LayoutGrid,
   Database,
   BarChart3,
   Satellite,
@@ -168,6 +169,12 @@ function AuthenticatedLayout() {
       to: "/dashboard/trades",
       icon: <Handshake className="w-3.5 h-3.5" />,
       label: "Trade Desk",
+      group: "NEGOCIO",
+    },
+    {
+      to: "/dashboard/trade-board",
+      icon: <LayoutGrid className="w-3.5 h-3.5" />,
+      label: "Tablero de trades",
       group: "NEGOCIO",
     },
     {

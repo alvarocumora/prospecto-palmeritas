@@ -73,6 +73,7 @@ import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.p
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
+import { Route as AuthenticatedDashboardTradeBoardRouteImport } from './routes/_authenticated.dashboard.trade-board'
 import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
 import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
 import { Route as AuthenticatedDashboardSourcingRouteImport } from './routes/_authenticated.dashboard.sourcing'
@@ -478,6 +479,12 @@ const AuthenticatedDashboardTradesRoute =
   AuthenticatedDashboardTradesRouteImport.update({
     id: '/dashboard/trades',
     path: '/dashboard/trades',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTradeBoardRoute =
+  AuthenticatedDashboardTradeBoardRouteImport.update({
+    id: '/dashboard/trade-board',
+    path: '/dashboard/trade-board',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardTeamRoute =
@@ -1064,6 +1071,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
+  '/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1209,6 +1217,7 @@ export interface FileRoutesByTo {
   '/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/dashboard/team': typeof AuthenticatedDashboardTeamRoute
+  '/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1356,6 +1365,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/sourcing': typeof AuthenticatedDashboardSourcingRoute
   '/_authenticated/dashboard/targets': typeof AuthenticatedDashboardTargetsRouteWithChildren
   '/_authenticated/dashboard/team': typeof AuthenticatedDashboardTeamRoute
+  '/_authenticated/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/_authenticated/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/api/public/health': typeof ApiPublicHealthRoute
@@ -1503,6 +1513,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing'
     | '/dashboard/targets'
     | '/dashboard/team'
+    | '/dashboard/trade-board'
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/api/public/health'
@@ -1648,6 +1659,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing'
     | '/dashboard/targets'
     | '/dashboard/team'
+    | '/dashboard/trade-board'
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/api/public/health'
@@ -1794,6 +1806,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sourcing'
     | '/_authenticated/dashboard/targets'
     | '/_authenticated/dashboard/team'
+    | '/_authenticated/dashboard/trade-board'
     | '/_authenticated/dashboard/trades'
     | '/_authenticated/dashboard/validation'
     | '/api/public/health'
@@ -2353,6 +2366,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/trades'
       fullPath: '/dashboard/trades'
       preLoaderRoute: typeof AuthenticatedDashboardTradesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/trade-board': {
+      id: '/_authenticated/dashboard/trade-board'
+      path: '/dashboard/trade-board'
+      fullPath: '/dashboard/trade-board'
+      preLoaderRoute: typeof AuthenticatedDashboardTradeBoardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/team': {
@@ -3068,6 +3088,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardSourcingRoute: typeof AuthenticatedDashboardSourcingRoute
   AuthenticatedDashboardTargetsRoute: typeof AuthenticatedDashboardTargetsRouteWithChildren
   AuthenticatedDashboardTeamRoute: typeof AuthenticatedDashboardTeamRoute
+  AuthenticatedDashboardTradeBoardRoute: typeof AuthenticatedDashboardTradeBoardRoute
   AuthenticatedDashboardTradesRoute: typeof AuthenticatedDashboardTradesRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
@@ -3149,6 +3170,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardTargetsRoute:
     AuthenticatedDashboardTargetsRouteWithChildren,
   AuthenticatedDashboardTeamRoute: AuthenticatedDashboardTeamRoute,
+  AuthenticatedDashboardTradeBoardRoute: AuthenticatedDashboardTradeBoardRoute,
   AuthenticatedDashboardTradesRoute: AuthenticatedDashboardTradesRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
