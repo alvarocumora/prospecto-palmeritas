@@ -82,9 +82,9 @@ export const getTradeCopilotBrief = createServerFn({ method: "POST" })
         .limit(20),
       sb
         .from("trade_pack_versions")
-        .select("version, created_at")
+        .select("version_number, created_at")
         .eq("trade_id", data.tradeId)
-        .order("version", { ascending: false })
+        .order("version_number", { ascending: false })
         .limit(1),
     ]);
 
@@ -292,22 +292,23 @@ export const suggestTradeTerms = createServerFn({ method: "POST" })
 
     const { data: pack } = await sb
       .from("trade_pack_versions")
-      .select("version, terms_snapshot, created_at")
+      .select("version_number, ctx_snapshot, created_at, doc_type")
       .eq("trade_id", data.tradeId)
-      .order("version", { ascending: false })
+      .in("doc_type", ["loi", "icpo", "spa"])
+      .order("version_number", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    const packRow = pack as { version?: number; terms_snapshot?: unknown } | null;
-    const packSnapshot = packRow?.terms_snapshot ?? null;
+    const packRow = pack as { version_number?: number; ctx_snapshot?: unknown; doc_type?: string } | null;
+    const packSnapshot = packRow?.ctx_snapshot ?? null;
 
     const userPrompt =
       "Trade actual (algunos campos pueden estar vacíos):\n```json\n" +
       JSON.stringify(trade, null, 2) +
       "\n```\n" +
       (packSnapshot
-        ? "Términos del LOI/pack v" +
-          (packRow?.version ?? "?") +
+        ? "Términos del " + (packRow?.doc_type ?? "pack") + " v" +
+          (packRow?.version_number ?? "?") +
           " (fuente de verdad si contradice al trade):\n```json\n" +
           JSON.stringify(packSnapshot, null, 2) +
           "\n```\n"
