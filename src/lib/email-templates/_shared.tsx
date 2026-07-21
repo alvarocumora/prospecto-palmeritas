@@ -101,6 +101,8 @@ interface LayoutProps {
   ctaHref?: string;
   ctaLabel?: string;
   audience?: "internal" | "investor";
+  /** Inyectado automáticamente por sendInternalEmail para confirmar apertura. */
+  trackingPixelUrl?: string;
 }
 
 export function EmailLayout({
@@ -110,6 +112,7 @@ export function EmailLayout({
   ctaHref,
   ctaLabel,
   audience,
+  trackingPixelUrl,
 }: LayoutProps) {
   return (
     <Html lang="es" dir="ltr">
@@ -135,6 +138,15 @@ export function EmailLayout({
             <br />
             Catastro · Satelital · NI 43-101 · Deal flow
           </Text>
+          {trackingPixelUrl ? (
+            <img
+              src={trackingPixelUrl}
+              alt=""
+              width={1}
+              height={1}
+              style={{ width: 1, height: 1, border: 0, display: "block" }}
+            />
+          ) : null}
         </Container>
       </Body>
     </Html>
