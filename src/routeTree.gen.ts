@@ -148,6 +148,7 @@ import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './r
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
+import { Route as AuthenticatedDashboardClientesPartnerIdRouteImport } from './routes/_authenticated.dashboard.clientes_.$partnerId'
 import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
 import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
@@ -929,6 +930,12 @@ const AuthenticatedDashboardDocumentosTemplateIdRoute =
     path: '/dashboard/documentos/$templateId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardClientesPartnerIdRoute =
+  AuthenticatedDashboardClientesPartnerIdRouteImport.update({
+    id: '/dashboard/clientes_/$partnerId',
+    path: '/dashboard/clientes/$partnerId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAdminInvestorsRoute =
   AuthenticatedDashboardAdminInvestorsRouteImport.update({
     id: '/investors',
@@ -1090,6 +1097,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/clientes/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
@@ -1236,6 +1244,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/dashboard/clientes/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
@@ -1384,6 +1393,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
+  '/_authenticated/dashboard/clientes_/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
@@ -1532,6 +1542,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/clientes/$partnerId'
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
@@ -1678,6 +1689,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
+    | '/dashboard/clientes/$partnerId'
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
@@ -1825,6 +1837,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/inbox'
     | '/_authenticated/dashboard/admin/investors'
+    | '/_authenticated/dashboard/clientes_/$partnerId'
     | '/_authenticated/dashboard/documentos/$templateId'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
@@ -2893,6 +2906,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/clientes_/$partnerId': {
+      id: '/_authenticated/dashboard/clientes_/$partnerId'
+      path: '/dashboard/clientes/$partnerId'
+      fullPath: '/dashboard/clientes/$partnerId'
+      preLoaderRoute: typeof AuthenticatedDashboardClientesPartnerIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/admin/investors': {
       id: '/_authenticated/dashboard/admin/investors'
       path: '/investors'
@@ -3092,6 +3112,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardTradesRoute: typeof AuthenticatedDashboardTradesRoute
   AuthenticatedDashboardValidationRoute: typeof AuthenticatedDashboardValidationRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+  AuthenticatedDashboardClientesPartnerIdRoute: typeof AuthenticatedDashboardClientesPartnerIdRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
   AuthenticatedDashboardSourcingRequestIdRoute: typeof AuthenticatedDashboardSourcingRequestIdRoute
@@ -3174,6 +3195,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardTradesRoute: AuthenticatedDashboardTradesRoute,
   AuthenticatedDashboardValidationRoute: AuthenticatedDashboardValidationRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+  AuthenticatedDashboardClientesPartnerIdRoute:
+    AuthenticatedDashboardClientesPartnerIdRoute,
   AuthenticatedDashboardDocumentosTemplateIdRoute:
     AuthenticatedDashboardDocumentosTemplateIdRoute,
   AuthenticatedDashboardProjectsProjectIdRoute:
