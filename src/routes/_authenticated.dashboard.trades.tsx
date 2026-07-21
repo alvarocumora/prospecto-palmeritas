@@ -64,6 +64,8 @@ import {
   type TradeStage,
 } from "@/lib/tradeDocuments";
 import { TradePackPanel } from "@/features/trades/TradePackPanel";
+import { useTradeDetailRealtime } from "@/features/trade-board/useTradeBoardRealtime";
+
 
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
