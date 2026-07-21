@@ -342,6 +342,20 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               )}
               Iniciar operación Antimonio
             </button>
+            <button
+              onClick={() => void startCopper()}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt text-white text-xs font-semibold hover:bg-cobalt/90 disabled:opacity-50 shrink-0"
+              title="Copper Cathode Grade A · CIF · DLC MT700 · 2.000 MT/mes · 12 meses"
+            >
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Ship className="w-3.5 h-3.5" />
+              )}
+              Iniciar operación Cobre (Cu Cathode)
+            </button>
+
           </div>
         </div>
         <AntimonyDeliveryPanel
