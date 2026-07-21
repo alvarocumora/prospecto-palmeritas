@@ -153,6 +153,7 @@ import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './rout
 import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
 import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
+import { Route as ApiPublicEmailPixelMessageIdRouteImport } from './routes/api/public/email.pixel.$messageId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 import { Route as AuthenticatedDashboardCatastroHoldersIdRouteImport } from './routes/_authenticated.dashboard.catastro.holders.$id'
 
@@ -959,6 +960,12 @@ const ApiPublicLiveMapLosverdesVerifyRoute =
     path: '/api/public/live-map/losverdes/verify',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicEmailPixelMessageIdRoute =
+  ApiPublicEmailPixelMessageIdRouteImport.update({
+    id: '/api/public/email/pixel/$messageId',
+    path: '/api/public/email/pixel/$messageId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
   AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport.update({
     id: '/field',
@@ -1116,6 +1123,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/email/pixel/$messageId': typeof ApiPublicEmailPixelMessageIdRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
   '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
@@ -1263,6 +1271,7 @@ export interface FileRoutesByTo {
   '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/email/pixel/$messageId': typeof ApiPublicEmailPixelMessageIdRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
   '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
@@ -1412,6 +1421,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
   '/_authenticated/dashboard/catastro/holders/$id': typeof AuthenticatedDashboardCatastroHoldersIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
+  '/api/public/email/pixel/$messageId': typeof ApiPublicEmailPixelMessageIdRoute
   '/api/public/live-map/losverdes/verify': typeof ApiPublicLiveMapLosverdesVerifyRoute
   '/api/terrain/$z/$x/$y': typeof ApiTerrainZXYRoute
 }
@@ -1561,6 +1571,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos/'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
+    | '/api/public/email/pixel/$messageId'
     | '/api/public/live-map/losverdes/verify'
     | '/api/terrain/$z/$x/$y'
   fileRoutesByTo: FileRoutesByTo
@@ -1708,6 +1719,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos'
     | '/dashboard/catastro/holders/$id'
     | '/dashboard/geophysics/$surveyId/field'
+    | '/api/public/email/pixel/$messageId'
     | '/api/public/live-map/losverdes/verify'
     | '/api/terrain/$z/$x/$y'
   id:
@@ -1856,6 +1868,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documentos/'
     | '/_authenticated/dashboard/catastro/holders/$id'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
+    | '/api/public/email/pixel/$messageId'
     | '/api/public/live-map/losverdes/verify'
     | '/api/terrain/$z/$x/$y'
   fileRoutesById: FileRoutesById
@@ -1927,6 +1940,7 @@ export interface RootRouteChildren {
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  ApiPublicEmailPixelMessageIdRoute: typeof ApiPublicEmailPixelMessageIdRoute
   ApiPublicLiveMapLosverdesVerifyRoute: typeof ApiPublicLiveMapLosverdesVerifyRoute
   ApiTerrainZXYRoute: typeof ApiTerrainZXYRoute
 }
@@ -2941,6 +2955,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicLiveMapLosverdesVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/email/pixel/$messageId': {
+      id: '/api/public/email/pixel/$messageId'
+      path: '/api/public/email/pixel/$messageId'
+      fullPath: '/api/public/email/pixel/$messageId'
+      preLoaderRoute: typeof ApiPublicEmailPixelMessageIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/geophysics/$surveyId/field': {
       id: '/_authenticated/dashboard/geophysics/$surveyId/field'
       path: '/field'
@@ -3323,6 +3344,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicEmailPixelMessageIdRoute: ApiPublicEmailPixelMessageIdRoute,
   ApiPublicLiveMapLosverdesVerifyRoute: ApiPublicLiveMapLosverdesVerifyRoute,
   ApiTerrainZXYRoute: ApiTerrainZXYRoute,
 }
