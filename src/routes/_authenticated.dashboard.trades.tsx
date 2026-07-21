@@ -1590,6 +1590,19 @@ function SupplierPanel({
           >
             <Plus className="w-3 h-3" /> Nuevo proveedor
           </button>
+          <button
+            onClick={() => void sendOnboarding()}
+            disabled={onboarding || busy}
+            title="Envía en un mail al proveedor: NDA + LOI para firma electrónica + link del Portal Proveedor para carga documental."
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0F2A6B] text-white text-[11px] font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-50"
+          >
+            {onboarding ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Send className="w-3 h-3" />
+            )}
+            Enviar NDA + LOI + Portal
+          </button>
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-2">
