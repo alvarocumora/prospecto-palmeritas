@@ -571,5 +571,46 @@ export async function renderGeocapitalsPdf(
     pdf.text(`Página ${p} / ${pageCount}`, marginX, pageH - 22);
   }
 
-  pdf.save(`geocapitals-${doc.docType}-${doc.reference}.pdf`);
+  const filename = `geocapitals-${doc.docType}-${doc.reference}.pdf`;
+  await triggerPdfDownload(pdf.output("blob"), filename);
+}
+
+// Descarga robusta cross-browser (Chrome/Firefox/Edge/Safari desktop + iOS/Android).
+// jsPDF.save() usa saveAs() que en Safari/iOS y algunos WebViews queda bloqueado
+// como pop-up cuando el render fue async (perdimos el gesture directo). Un anchor
+// con blob URL + click programático se comporta como descarga nativa y, si el
+// navegador no soporta `download` (iOS Safari <13), abre el PDF en nueva pestaña
+// para que el usuario pueda usar "Compartir → Guardar en Archivos".
+export async function triggerPdfDownload(blob: Blob, filename: string): Promise<void> {
+  try {
+    const nav = navigator as Navigator & {
+      msSaveOrOpenBlob?: (b: Blob, name: string) => boolean;
+    };
+    if (typeof nav.msSaveOrOpenBlob === "function") {
+      nav.msSaveOrOpenBlob(blob, filename);
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    a.target = "_blank";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    // iOS Safari: si download no está soportado, abrir en nueva pestaña.
+    const supportsDownload = "download" in a;
+    if (!supportsDownload) {
+      window.open(url, "_blank");
+    } else {
+      a.click();
+    }
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 4000);
+  } catch (err) {
+    console.error("[pdf] download failed", err);
+    throw err;
+  }
 }
