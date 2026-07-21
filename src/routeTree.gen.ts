@@ -102,6 +102,7 @@ import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
+import { Route as AuthenticatedDashboardInvitacionesRouteImport } from './routes/_authenticated.dashboard.invitaciones'
 import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
@@ -657,6 +658,12 @@ const AuthenticatedDashboardListingsRoute =
     path: '/dashboard/listings',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardInvitacionesRoute =
+  AuthenticatedDashboardInvitacionesRouteImport.update({
+    id: '/dashboard/invitaciones',
+    path: '/dashboard/invitaciones',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardInvestmentsRoute =
   AuthenticatedDashboardInvestmentsRouteImport.update({
     id: '/dashboard/investments',
@@ -1065,6 +1072,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1214,6 +1222,7 @@ export interface FileRoutesByTo {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1365,6 +1374,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/_authenticated/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/_authenticated/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1516,6 +1526,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/invitaciones'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
@@ -1665,6 +1676,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/invitaciones'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
@@ -1815,6 +1827,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/investments'
+    | '/_authenticated/dashboard/invitaciones'
     | '/_authenticated/dashboard/listings'
     | '/_authenticated/dashboard/lv5-page5'
     | '/_authenticated/dashboard/mag-revalidations'
@@ -2611,6 +2624,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardListingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/invitaciones': {
+      id: '/_authenticated/dashboard/invitaciones'
+      path: '/dashboard/invitaciones'
+      fullPath: '/dashboard/invitaciones'
+      preLoaderRoute: typeof AuthenticatedDashboardInvitacionesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/investments': {
       id: '/_authenticated/dashboard/investments'
       path: '/dashboard/investments'
@@ -3122,6 +3142,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardInvestmentsRoute: typeof AuthenticatedDashboardInvestmentsRoute
+  AuthenticatedDashboardInvitacionesRoute: typeof AuthenticatedDashboardInvitacionesRoute
   AuthenticatedDashboardListingsRoute: typeof AuthenticatedDashboardListingsRouteWithChildren
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
   AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -3197,6 +3218,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
   AuthenticatedDashboardInvestmentsRoute:
     AuthenticatedDashboardInvestmentsRoute,
+  AuthenticatedDashboardInvitacionesRoute:
+    AuthenticatedDashboardInvitacionesRoute,
   AuthenticatedDashboardListingsRoute:
     AuthenticatedDashboardListingsRouteWithChildren,
   AuthenticatedDashboardLv5Page5Route: AuthenticatedDashboardLv5Page5Route,
