@@ -70,6 +70,10 @@ function SupplierSheetPage() {
                 .join(" · ") || ""}
             </div>
 
+            <div className="mt-3">
+              <DownloadSheetButton sheet={data} />
+            </div>
+
             {data.supplier.offer_valid_until &&
               isOfferExpired(data.supplier.offer_valid_until, new Date()) && (
                 <div className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[13px] text-red-700">
