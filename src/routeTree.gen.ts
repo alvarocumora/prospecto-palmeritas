@@ -38,6 +38,7 @@ import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$list
 import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
 import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
 import { Route as OperacionTokenRouteImport } from './routes/operacion.$token'
+import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
 import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
 import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
@@ -101,6 +102,7 @@ import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
+import { Route as AuthenticatedDashboardInvitacionesRouteImport } from './routes/_authenticated.dashboard.invitaciones'
 import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
@@ -299,6 +301,11 @@ const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
 const OperacionTokenRoute = OperacionTokenRouteImport.update({
   id: '/operacion/$token',
   path: '/operacion/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
+  id: '/onboarding/$token',
+  path: '/onboarding/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
@@ -649,6 +656,12 @@ const AuthenticatedDashboardListingsRoute =
   AuthenticatedDashboardListingsRouteImport.update({
     id: '/dashboard/listings',
     path: '/dashboard/listings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardInvitacionesRoute =
+  AuthenticatedDashboardInvitacionesRouteImport.update({
+    id: '/dashboard/invitaciones',
+    path: '/dashboard/invitaciones',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardInvestmentsRoute =
@@ -1017,6 +1030,7 @@ export interface FileRoutesByFullPath {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
@@ -1058,6 +1072,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1165,6 +1180,7 @@ export interface FileRoutesByTo {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
@@ -1206,6 +1222,7 @@ export interface FileRoutesByTo {
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1315,6 +1332,7 @@ export interface FileRoutesById {
   '/live/palmeras': typeof LivePalmerasRoute
   '/live/tilama': typeof LiveTilamaRoute
   '/marketplace/$lotId': typeof MarketplaceLotIdRoute
+  '/onboarding/$token': typeof OnboardingTokenRoute
   '/operacion/$token': typeof OperacionTokenRoute
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
@@ -1356,6 +1374,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
   '/_authenticated/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
+  '/_authenticated/dashboard/invitaciones': typeof AuthenticatedDashboardInvitacionesRoute
   '/_authenticated/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
   '/_authenticated/dashboard/mag-revalidations': typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -1465,6 +1484,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/onboarding/$token'
     | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
@@ -1506,6 +1526,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/invitaciones'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
@@ -1613,6 +1634,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/onboarding/$token'
     | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
@@ -1654,6 +1676,7 @@ export interface FileRouteTypes {
     | '/dashboard/hse'
     | '/dashboard/inventory'
     | '/dashboard/investments'
+    | '/dashboard/invitaciones'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
     | '/dashboard/mag-revalidations'
@@ -1762,6 +1785,7 @@ export interface FileRouteTypes {
     | '/live/palmeras'
     | '/live/tilama'
     | '/marketplace/$lotId'
+    | '/onboarding/$token'
     | '/operacion/$token'
     | '/proveedor/$token'
     | '/proyecto/$token'
@@ -1803,6 +1827,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
     | '/_authenticated/dashboard/investments'
+    | '/_authenticated/dashboard/invitaciones'
     | '/_authenticated/dashboard/listings'
     | '/_authenticated/dashboard/lv5-page5'
     | '/_authenticated/dashboard/mag-revalidations'
@@ -1912,6 +1937,7 @@ export interface RootRouteChildren {
   LivePalmerasRoute: typeof LivePalmerasRoute
   LiveTilamaRoute: typeof LiveTilamaRoute
   MarketplaceLotIdRoute: typeof MarketplaceLotIdRoute
+  OnboardingTokenRoute: typeof OnboardingTokenRoute
   OperacionTokenRoute: typeof OperacionTokenRoute
   ProveedorTokenRoute: typeof ProveedorTokenRoute
   ProyectoTokenRoute: typeof ProyectoTokenRoute
@@ -2148,6 +2174,13 @@ declare module '@tanstack/react-router' {
       path: '/operacion/$token'
       fullPath: '/operacion/$token'
       preLoaderRoute: typeof OperacionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/$token': {
+      id: '/onboarding/$token'
+      path: '/onboarding/$token'
+      fullPath: '/onboarding/$token'
+      preLoaderRoute: typeof OnboardingTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/$lotId': {
@@ -2589,6 +2622,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/listings'
       fullPath: '/dashboard/listings'
       preLoaderRoute: typeof AuthenticatedDashboardListingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/invitaciones': {
+      id: '/_authenticated/dashboard/invitaciones'
+      path: '/dashboard/invitaciones'
+      fullPath: '/dashboard/invitaciones'
+      preLoaderRoute: typeof AuthenticatedDashboardInvitacionesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/investments': {
@@ -3102,6 +3142,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
   AuthenticatedDashboardInvestmentsRoute: typeof AuthenticatedDashboardInvestmentsRoute
+  AuthenticatedDashboardInvitacionesRoute: typeof AuthenticatedDashboardInvitacionesRoute
   AuthenticatedDashboardListingsRoute: typeof AuthenticatedDashboardListingsRouteWithChildren
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
   AuthenticatedDashboardMagRevalidationsRoute: typeof AuthenticatedDashboardMagRevalidationsRoute
@@ -3177,6 +3218,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
   AuthenticatedDashboardInvestmentsRoute:
     AuthenticatedDashboardInvestmentsRoute,
+  AuthenticatedDashboardInvitacionesRoute:
+    AuthenticatedDashboardInvitacionesRoute,
   AuthenticatedDashboardListingsRoute:
     AuthenticatedDashboardListingsRouteWithChildren,
   AuthenticatedDashboardLv5Page5Route: AuthenticatedDashboardLv5Page5Route,
@@ -3313,6 +3356,7 @@ const rootRouteChildren: RootRouteChildren = {
   LivePalmerasRoute: LivePalmerasRoute,
   LiveTilamaRoute: LiveTilamaRoute,
   MarketplaceLotIdRoute: MarketplaceLotIdRoute,
+  OnboardingTokenRoute: OnboardingTokenRoute,
   OperacionTokenRoute: OperacionTokenRoute,
   ProveedorTokenRoute: ProveedorTokenRoute,
   ProyectoTokenRoute: ProyectoTokenRoute,
