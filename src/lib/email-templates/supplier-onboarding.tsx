@@ -74,6 +74,14 @@ const Email = ({
       <Button href={ndaUrl} style={btn}>
         Revisar y firmar NDA
       </Button>
+      {ndaPdfUrl ? (
+        <Text style={{ ...styles.muted, marginTop: 4 }}>
+          Copia oficial en PDF (para su bandeja / archivo):{" "}
+          <a href={ndaPdfUrl} style={{ color: "#0F2A6B", fontWeight: 600 }}>
+            Descargar NDA (PDF firmado por Geocapitals)
+          </a>
+        </Text>
+      ) : null}
     </Section>
 
     <Section style={{ margin: "16px 0" }}>
@@ -83,7 +91,16 @@ const Email = ({
       <Button href={loiUrl} style={btnAlt}>
         Revisar y firmar LOI
       </Button>
+      {loiPdfUrl ? (
+        <Text style={{ ...styles.muted, marginTop: 4 }}>
+          Copia oficial en PDF (para su bandeja / archivo):{" "}
+          <a href={loiPdfUrl} style={{ color: "#0F2A6B", fontWeight: 600 }}>
+            Descargar LOI (PDF firmado por Geocapitals)
+          </a>
+        </Text>
+      ) : null}
     </Section>
+
 
     <Section style={{ margin: "16px 0" }}>
       <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>
