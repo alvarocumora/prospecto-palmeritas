@@ -27,6 +27,7 @@ import { template as antimonyProductSheet } from "./antimony-product-sheet";
 import { template as copperProductSheet } from "./copper-product-sheet";
 import { template as agentOutreach } from "./agent-outreach";
 import { template as tradePackDispatch } from "./trade-pack-dispatch";
+import { template as partnerInvitation } from "./partner-invitation";
 
 
 export interface TemplateEntry {
