@@ -63,6 +63,8 @@ import {
   type TradePhase,
   type TradeStage,
 } from "@/lib/tradeDocuments";
+import { TradePackPanel } from "@/features/trades/TradePackPanel";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
