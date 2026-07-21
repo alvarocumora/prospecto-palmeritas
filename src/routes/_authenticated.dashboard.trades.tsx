@@ -604,8 +604,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               }
               className={inputCls}
             >
-              <option value="sblc_mt760">SBLC (MT760)</option>
-              <option value="dlc">DLC</option>
+              <option value="mt103">SWIFT MT103 (Wire)</option>
+              <option value="dlc_mt700">DLC MT700</option>
+              <option value="sblc_mt760">SBLC MT760</option>
               <option value="tt">TT</option>
               <option value="escrow">Escrow</option>
             </select>
