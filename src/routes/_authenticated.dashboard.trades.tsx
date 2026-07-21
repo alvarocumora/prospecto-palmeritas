@@ -128,6 +128,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [batching, setBatching] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
+  const [query, setQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     counterpartyEmail: "",
@@ -191,19 +193,21 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
           side: "sell",
           reference: `SB-ANTIMONIO-${ym}-${seq}`,
           commodity: "Antimony (Sb)",
-          form: "ingots · Grade 2#",
-          quantityT: 20,
+          form: "Refined Antimony Metal Ingots · min 99.65% Sb · Standard Commercial Grade",
+          quantityT: 1500,
           incoterm: "CIF",
-          paymentInstrument: "sblc_mt760",
+          paymentInstrument: "mt103",
           counterpartyName: "Vincent Carpio",
           counterpartyCompany: "Carpio & Kaddu Group",
-          counterpartyCountry: "AE",
-          counterpartyEmail: "carpio@carpiokaddu.com",
+          counterpartyCountry: "US",
+          counterpartyEmail: "vincent@carpiokaddu.com",
           notes:
-            "Operación iniciada bajo NCNDA firmado (Vincent Carpio · Marcela A. Cimino · Alvaro Oliva). Sb Grade 2# (99.75–99.90%), pallets tipo referencia KRN / JH2601.",
+            "Operación única Antimonio · 1,500 MT/mes × 12 meses · CIF Florida, USA · Pago SWIFT MT103.\n" +
+            "Seller: Aupal Propiedades — Ana Rojo (ana.rojo67@gmail.com). Buyer: Carpio & Kaddu Group — Vincent Carpio + Marcela A. Cimino.\n" +
+            "Pureza mín. 99.65% Sb (CoA muestra 99.75–99.90%). Origen: Seller's Option. Inspección: SGS / CCIC / Alex Stewart. Trial opcional por mutuo acuerdo. NCNDA firmado por las 3 partes.",
         },
       });
-      toast.success("Operación de Antimonio creada. Ahora emite el link a la contraparte.");
+      toast.success("Operación de Antimonio creada (1,500 MT/mes · MT103). Emite el link a las contrapartes.");
       void qc.invalidateQueries({ queryKey: ["my-trades"] });
       onOpen(id);
     } catch (e) {
@@ -602,8 +606,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               }
               className={inputCls}
             >
-              <option value="sblc_mt760">SBLC (MT760)</option>
-              <option value="dlc">DLC</option>
+              <option value="mt103">SWIFT MT103 (Wire)</option>
+              <option value="dlc_mt700">DLC MT700</option>
+              <option value="sblc_mt760">SBLC MT760</option>
               <option value="tt">TT</option>
               <option value="escrow">Escrow</option>
             </select>
@@ -631,9 +636,39 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         <Loading />
       ) : (data ?? []).length === 0 ? (
         <Empty>Sin trades todavía. Crea el primero para gestionar su ciclo documental.</Empty>
-      ) : (
+      ) : (() => {
+        const q = query.trim().toLowerCase();
+        const filtered = (data ?? []).filter((t) => {
+          if (!showCancelled && (t.status === "cancelled" || t.stage === "cancelled")) return false;
+          if (!q) return true;
+          return (
+            (t.reference ?? "").toLowerCase().includes(q) ||
+            (t.commodity ?? "").toLowerCase().includes(q) ||
+            (t.form ?? "").toLowerCase().includes(q)
+          );
+        });
+        const cancelledCount = (data ?? []).filter((t) => t.status === "cancelled" || t.stage === "cancelled").length;
+        return (
         <div className="space-y-2">
-          {(data ?? []).map((t) => {
+          <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pb-1">
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Filtrar por ref, commodity…"
+              className="flex-1 min-w-0 px-2 py-1 rounded border border-border bg-transparent text-xs"
+            />
+            <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
+              <input
+                type="checkbox"
+                checked={showCancelled}
+                onChange={(e) => setShowCancelled(e.target.checked)}
+                className="accent-[#0F2A6B]"
+              />
+              Ver cancelados{cancelledCount ? ` (${cancelledCount})` : ""}
+            </label>
+            <span className="shrink-0">{filtered.length}/{(data ?? []).length}</span>
+          </div>
+          {filtered.map((t) => {
             const prog = tradeProgress(t.docs);
             const status = onboardingStatus?.status?.[t.id];
             const isChecked = checked.has(t.id);
@@ -697,7 +732,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             );
           })}
         </div>
-      )}
+        );
+      })()}
     </>
 
   );
