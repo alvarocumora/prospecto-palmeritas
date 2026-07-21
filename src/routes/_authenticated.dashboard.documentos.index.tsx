@@ -197,6 +197,9 @@ function DocumentsGallery() {
         )}
       </section>
 
+      {/* Bloque 1.5 · Documentos especiales generados con el formato global. */}
+      <SpecialDocsSection />
+
       {/* Bloque 2 · Catálogo de plantillas para crear nuevos documentos. */}
       <div className="mb-4">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
