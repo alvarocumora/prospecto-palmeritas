@@ -213,7 +213,40 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   };
 
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
+  const statusFn = useServerFn(getEmailDeliveryStatus);
   const [dispatching, setDispatching] = useState(false);
+
+  const antimonyRecipients = useMemo(
+    () => [
+      "ana.rojo67@gmail.com",
+      "ciminomarcela@gmail.com",
+      "carpio@carpiokaddu.com",
+    ],
+    [],
+  );
+  const antimonyTemplates = useMemo(
+    () => ["supplier-onboarding", "antimony-product-sheet"],
+    [],
+  );
+
+  const {
+    data: deliveryStatus,
+    refetch: refetchDelivery,
+    isFetching: fetchingDelivery,
+  } = useQuery({
+    queryKey: ["antimony-delivery-status"],
+    queryFn: () =>
+      statusFn({
+        data: {
+          recipients: antimonyRecipients,
+          templateNames: antimonyTemplates,
+          sinceHours: 72,
+        },
+      }) as Promise<DeliveryRow[]>,
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
+
   const dispatchAntimony = async () => {
     setDispatching(true);
     try {
@@ -225,6 +258,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         .join("\n");
       if (failCount === 0) toast.success(`Paquete Antimonio enviado (${okCount})`, { description: detail });
       else toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
+      // Refresca el panel de estado tras el envío.
+      setTimeout(() => void refetchDelivery(), 1500);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo despachar el paquete.");
     } finally {
@@ -234,44 +269,52 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <>
-      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
-        <div className="min-w-0">
-          <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
-            Quickstart · Antimonio
+      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4">
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <div className="min-w-0">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
+              Quickstart · Antimonio
+            </div>
+            <div className="text-xs text-foreground mt-0.5">
+              Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
+              Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+            </div>
           </div>
-          <div className="text-xs text-foreground mt-0.5">
-            Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
-            Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => void dispatchAntimony()}
+              disabled={dispatching}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
+              title="Envía NDA+LOI+Portal a Ana Rojo y ficha técnica del antimonio a Marcela y Vincent"
+            >
+              {dispatching ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Send className="w-3.5 h-3.5" />
+              )}
+              Enviar LOI a Ana + Fichas a Carpio & Kaddu
+            </button>
+            <button
+              onClick={() => void startAntimony()}
+              disabled={saving}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+            >
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Ship className="w-3.5 h-3.5" />
+              )}
+              Iniciar operación Antimonio
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => void dispatchAntimony()}
-            disabled={dispatching}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
-            title="Envía NDA+LOI+Portal a Ana Rojo y ficha técnica del antimonio a Marcela y Vincent"
-          >
-            {dispatching ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Send className="w-3.5 h-3.5" />
-            )}
-            Enviar LOI a Ana + Fichas a Carpio & Kaddu
-          </button>
-          <button
-            onClick={() => void startAntimony()}
-            disabled={saving}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
-          >
-            {saving ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <Ship className="w-3.5 h-3.5" />
-            )}
-            Iniciar operación Antimonio
-          </button>
-        </div>
+        <AntimonyDeliveryPanel
+          rows={deliveryStatus ?? []}
+          loading={fetchingDelivery}
+          onRefresh={() => void refetchDelivery()}
+        />
       </div>
+
 
 
       {(() => {
