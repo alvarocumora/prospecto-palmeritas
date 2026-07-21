@@ -44,7 +44,12 @@ import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
 import { OPERATOR_LINE } from "@/lib/documents/company";
 import { listMySignRequests } from "@/lib/documents/signing.functions";
-import { sendSupplierOnboarding } from "@/lib/supplierOnboarding.functions";
+import {
+  sendSupplierOnboarding,
+  sendSupplierOnboardingBatch,
+  listOnboardingStatusForTrades,
+  type OnboardingStatus,
+} from "@/lib/supplierOnboarding.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -104,10 +109,21 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTrades);
   const createFn = useServerFn(createTrade);
+  const batchFn = useServerFn(sendSupplierOnboardingBatch);
+  const statusFn = useServerFn(listOnboardingStatusForTrades);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["my-trades"],
     queryFn: () => listFn(),
   });
+  const tradeIds = useMemo(() => (data ?? []).map((t) => t.id), [data]);
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ["onboarding-status", tradeIds],
+    queryFn: () => statusFn({ data: { tradeIds } }),
+    enabled: tradeIds.length > 0,
+    staleTime: 30_000,
+  });
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [batching, setBatching] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
