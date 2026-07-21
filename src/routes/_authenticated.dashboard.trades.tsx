@@ -63,6 +63,8 @@ import {
   type TradePhase,
   type TradeStage,
 } from "@/lib/tradeDocuments";
+import { TradePackPanel } from "@/features/trades/TradePackPanel";
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
@@ -813,6 +815,8 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
         onLinked={() => void qc.invalidateQueries({ queryKey: ["trade", id] })}
       />
       <CounterpartyPanel trade={t} />
+      <TradePackPanel tradeId={id} trade={t} />
+
       <SendDocPanel tradeId={id} />
       <RequestDocsPanel tradeId={id} docs={data.documents} />
       <UploadInboxPanel
