@@ -342,6 +342,29 @@ export const setTradeStage = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+/** Cambia el estado (activo / cerrado / cancelado) de un trade sin tocar la etapa. */
+export const setTradeStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["active", "closed", "cancelled"]),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { error } = await sb
+      .from("commodity_trades")
+      .update({ status: data.status })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logEvent(sb, data.id, context.userId, "status_changed", data.status);
+    return { ok: true };
+  });
+
+
 const UpsertDoc = z.object({
   tradeId: z.string().uuid(),
   docType: z.string().trim().min(1).max(60),
