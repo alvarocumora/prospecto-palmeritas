@@ -10279,6 +10279,119 @@ export type Database = {
         }
         Relationships: []
       }
+      partner_invitation_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          invitation_id: string
+          metadata: Json | null
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          invitation_id: string
+          metadata?: Json | null
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          invitation_id?: string
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "partner_invitation_events_invitation_id_fkey"
+            columns: ["invitation_id"]
+            isOneToOne: false
+            referencedRelation: "partner_invitations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      partner_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_user_id: string | null
+          chosen_role:
+            | Database["public"]["Enums"]["partner_invitation_role"]
+            | null
+          company: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          full_name: string | null
+          id: string
+          invited_by: string
+          message: string | null
+          ncnda_pdf_url: string | null
+          ncnda_ref: string | null
+          opened_at: string | null
+          project_ids: string[]
+          sent_at: string | null
+          signed_at: string | null
+          status: Database["public"]["Enums"]["partner_invitation_status"]
+          suggested_role: Database["public"]["Enums"]["partner_invitation_role"]
+          token: string
+          trade_ids: string[]
+          updated_at: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          chosen_role?:
+            | Database["public"]["Enums"]["partner_invitation_role"]
+            | null
+          company?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string
+          message?: string | null
+          ncnda_pdf_url?: string | null
+          ncnda_ref?: string | null
+          opened_at?: string | null
+          project_ids?: string[]
+          sent_at?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["partner_invitation_status"]
+          suggested_role?: Database["public"]["Enums"]["partner_invitation_role"]
+          token?: string
+          trade_ids?: string[]
+          updated_at?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_user_id?: string | null
+          chosen_role?:
+            | Database["public"]["Enums"]["partner_invitation_role"]
+            | null
+          company?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          full_name?: string | null
+          id?: string
+          invited_by?: string
+          message?: string | null
+          ncnda_pdf_url?: string | null
+          ncnda_ref?: string | null
+          opened_at?: string | null
+          project_ids?: string[]
+          sent_at?: string | null
+          signed_at?: string | null
+          status?: Database["public"]["Enums"]["partner_invitation_status"]
+          suggested_role?: Database["public"]["Enums"]["partner_invitation_role"]
+          token?: string
+          trade_ids?: string[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       patent_remates: {
         Row: {
           amount_clp: number | null
@@ -15179,6 +15292,16 @@ export type Database = {
       }
     }
     Functions: {
+      accept_partner_invitation: {
+        Args: {
+          _chosen_role: Database["public"]["Enums"]["partner_invitation_role"]
+          _company?: string
+          _full_name?: string
+          _token: string
+          _user_id: string
+        }
+        Returns: string
+      }
       accept_project_invitation: { Args: { _token: string }; Returns: Json }
       archive_missing_cadastre: {
         Args: { _origen: string; _run_id: string; _run_started_at: string }
@@ -15496,6 +15619,10 @@ export type Database = {
         Args: { _project_id: string }
         Returns: boolean
       }
+      mark_partner_invitation_opened: {
+        Args: { _token: string }
+        Returns: undefined
+      }
       mask_sensitive_jsonb: { Args: { _data: Json }; Returns: Json }
       match_holder_publications: {
         Args: { _holder_id: string }
@@ -15740,6 +15867,14 @@ export type Database = {
         | "other"
       onboarding_state: "not_started" | "in_progress" | "completed"
       org_role: "owner" | "admin" | "member" | "viewer"
+      partner_invitation_role: "broker" | "investor" | "both"
+      partner_invitation_status:
+        | "pending"
+        | "sent"
+        | "opened"
+        | "signed"
+        | "accepted"
+        | "void"
       project_role:
         | "owner"
         | "admin"
@@ -16003,6 +16138,15 @@ export const Constants = {
       ],
       onboarding_state: ["not_started", "in_progress", "completed"],
       org_role: ["owner", "admin", "member", "viewer"],
+      partner_invitation_role: ["broker", "investor", "both"],
+      partner_invitation_status: [
+        "pending",
+        "sent",
+        "opened",
+        "signed",
+        "accepted",
+        "void",
+      ],
       project_role: [
         "owner",
         "admin",
