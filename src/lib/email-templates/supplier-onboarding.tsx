@@ -44,6 +44,8 @@ const Email = ({
   loiUrl,
   portalUrl,
   expiresAt,
+  ndaPdfUrl,
+  loiPdfUrl,
 }: Props) => (
   <EmailLayout
     preview={`Onboarding proveedor · ${commodity ?? "operación"} — NDA + LOI + carga de documentos`}
