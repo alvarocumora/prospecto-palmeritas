@@ -61,6 +61,82 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
     { kind: "table", head: ["Concepto", "Valor"], rows: oferta },
   ];
 
+  // Consolidación técnica específica: Informe ALS de Tierras Raras · Proyecto TRENTO
+  const isTrentoRee =
+    /TRENTO/i.test(request.reference) || /tierras raras|ree|rare earth/i.test(request.commodity);
+  if (isTrentoRee) {
+    blocks.push({
+      kind: "paragraph",
+      text:
+        "Consolidación del Informe Técnico de Análisis de Resultados (ALS · método ME-MS82) para el Proyecto TRENTO. Base analítica: 189 muestras distribuidas en 4 certificados. Elementos analizados: La, Ce, Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Yb, Lu, Y. Valores en ppm (1 ppm = 1 g/t).",
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Certificado", "Código ALS", "N° muestras"],
+      rows: [
+        ["TEST 656", "LS16037656", "22"],
+        ["TEST 157", "CO16055157", "17"],
+        ["TEST 697", "CO16082697", "56"],
+        ["TEST 947", "CO16084947", "94"],
+        ["Total", "—", "189"],
+      ],
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Indicador global", "Valor"],
+      rows: [
+        ["Maximo SigmaREE observado", "2.055,80 ppm (2,056 kg/t)"],
+        ["Muestras > 1.000 ppm SigmaREE (TEST 656)", "6"],
+        ["Relacion LREE/HREE (muestra 1020)", "9,46"],
+        ["Perfil dominante", "LREE (Ce+La+Nd+Pr > 90% del SigmaREE)"],
+        ["Metodo analitico", "ALS ME-MS82 (fusion Na2O2 + ICP-MS)"],
+      ],
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Elemento", "% del SigmaREE promedio", "Grupo"],
+      rows: [
+        ["Ce (Cerio)", "42,34 %", "LREE"],
+        ["La (Lantano)", "31,44 %", "LREE"],
+        ["Nd (Neodimio)", "13,60 %", "LREE"],
+        ["Pr (Praseodimio)", "4,67 %", "LREE"],
+        ["Sm + Eu", "~ 3 %", "LREE"],
+        ["Gd-Lu + Y", "~ 5 %", "HREE"],
+      ],
+    });
+    blocks.push({
+      kind: "table",
+      head: ["#", "Muestra", "SigmaREE (ppm)", "LREE (ppm)", "HREE (ppm)", "LREE/HREE"],
+      rows: [
+        ["1", "1020", "1.261,50", "1.140,90", "120,60", "9,46"],
+        ["2", "1007", "> 1.000", "—", "—", "—"],
+        ["3", "1008", "> 1.000", "—", "—", "—"],
+        ["4", "1010", "> 1.000", "—", "—", "—"],
+        ["5", "1006", "> 1.000", "—", "—", "—"],
+        ["6", "1019", "> 1.000", "—", "—", "—"],
+      ],
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Muestra destacada", "Certificado", "Elementos donde marca maximo"],
+      rows: [
+        ["1132", "TEST 157", "Gd, Tb, Dy, Ho (HREE)"],
+        ["1131", "TEST 157", "Er, Tm, Yb, Lu, Y (HREE)"],
+        ["1133 / 1135", "TEST 157", "Alta concentracion LREE"],
+        ["1020 / 1007 / 1008 / 1010 / 1006 / 1019", "TEST 656", "SigmaREE > 1.000 ppm"],
+      ],
+    });
+    blocks.push({
+      kind: "clauses",
+      items: [
+        "El contenido total de tierras raras está dominado por LREE (Ce, La, Nd, Pr), con participación relevante de Y dentro del grupo HREE.",
+        "La distribución no es homogénea: pocas muestras concentran la mayor parte del SigmaREE, lo que sugiere zonas mineralizadas focalizadas dentro del proyecto.",
+        "Valores obtenidos por ALS mediante ME-MS82; no incluyen información mineralógica ni de recuperación metalúrgica.",
+        "Datos utilizados con fines exploratorios y comparativos entre certificados; no constituyen estimación de recursos NI 43-101.",
+      ],
+    });
+  }
+
   if (supplier.specs && supplier.specs.trim()) {
     blocks.push({ kind: "paragraph", text: `Especificaciones técnicas: ${supplier.specs.trim()}` });
   }
