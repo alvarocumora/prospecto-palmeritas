@@ -110,6 +110,8 @@ describe("identidad corporativa por defecto (Asesorías Terra SpA)", () => {
     nda: "partyA",
     ndi: "partyA",
     mou: "partyA",
+    icpo: "buyer",
+    fco: "seller",
     loi: "buyer",
     "term-sheet": "investor",
     spa: "buyer",

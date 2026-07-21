@@ -98,14 +98,29 @@ const nda: TemplateDef = {
     const term = gv(val, "termMonths", "24");
     const jur = gv(val, "jurisdiction", "República de Chile");
     const raw: Array<[string, string]> = [
-      ["OBJETO", `El presente acuerdo regula el intercambio de información confidencial entre las Partes con el fin de ${purpose}.`],
-      ["INFORMACIÓN CONFIDENCIAL", `Se considera confidencial toda información técnica, geológica, financiera, comercial o legal entregada por ${mode === "mutuo" ? "cualquiera de las Partes" : `${A}`} en cualquier formato.`],
-      ["USO", `La información será utilizada exclusivamente para el propósito indicado y no podrá divulgarse a terceros sin autorización previa y por escrito.`],
-      ["VIGENCIA", `Las obligaciones de este acuerdo tendrán una duración de ${term} meses contados desde su firma.`],
+      [
+        "OBJETO",
+        `El presente acuerdo regula el intercambio de información confidencial entre las Partes con el fin de ${purpose}.`,
+      ],
+      [
+        "INFORMACIÓN CONFIDENCIAL",
+        `Se considera confidencial toda información técnica, geológica, financiera, comercial o legal entregada por ${mode === "mutuo" ? "cualquiera de las Partes" : `${A}`} en cualquier formato.`,
+      ],
+      [
+        "USO",
+        `La información será utilizada exclusivamente para el propósito indicado y no podrá divulgarse a terceros sin autorización previa y por escrito.`,
+      ],
+      [
+        "VIGENCIA",
+        `Las obligaciones de este acuerdo tendrán una duración de ${term} meses contados desde su firma.`,
+      ],
     ];
-    if (active.has("nonCircumvention")) raw.push(["NO ELUSIÓN", nda.clauses.find((c) => c.key === "nonCircumvention")!.text]);
-    if (active.has("returnInfo")) raw.push(["DEVOLUCIÓN", nda.clauses.find((c) => c.key === "returnInfo")!.text]);
-    if (active.has("penalty")) raw.push(["PENALIDAD", nda.clauses.find((c) => c.key === "penalty")!.text]);
+    if (active.has("nonCircumvention"))
+      raw.push(["NO ELUSIÓN", nda.clauses.find((c) => c.key === "nonCircumvention")!.text]);
+    if (active.has("returnInfo"))
+      raw.push(["DEVOLUCIÓN", nda.clauses.find((c) => c.key === "returnInfo")!.text]);
+    if (active.has("penalty"))
+      raw.push(["PENALIDAD", nda.clauses.find((c) => c.key === "penalty")!.text]);
     raw.push(["LEY APLICABLE Y ARBITRAJE", jurisdictionClause(jur)]);
     const clauseItems: string[] = raw.map(([label, txt], i) => `${i + 1}. ${label}. ${txt}`);
 
@@ -1096,15 +1111,55 @@ const NCNDA_POS: { key: NcndaPos; label: string; ord: string }[] = [
   { key: "C", label: "3ª Posición · Firmante (Geocapitals)", ord: "3rd Position / 3ª Posición" },
 ];
 
-function ncndaPosFields(p: NcndaPos, group: string, defaults: Partial<Record<string, string>> = {}): FieldDef[] {
+function ncndaPosFields(
+  p: NcndaPos,
+  group: string,
+  defaults: Partial<Record<string, string>> = {},
+): FieldDef[] {
   const k = (s: string) => `p${p}_${s}`;
   return [
-    { key: k("name"), label: "Nombre completo del firmante / Signatory's Full Name", type: "text", group, default: defaults.name },
-    { key: k("passport"), label: "N.º de Pasaporte / Passport No.", type: "text", group, default: defaults.passport },
-    { key: k("nationality"), label: "Nacionalidad / Nationality", type: "text", group, default: defaults.nationality },
-    { key: k("company"), label: "Empresa / Company Name", type: "text", group, default: defaults.company },
-    { key: k("position"), label: "Cargo / Position", type: "text", group, default: defaults.position },
-    { key: k("address"), label: "Dirección / Company Address", type: "text", group, default: defaults.address },
+    {
+      key: k("name"),
+      label: "Nombre completo del firmante / Signatory's Full Name",
+      type: "text",
+      group,
+      default: defaults.name,
+    },
+    {
+      key: k("passport"),
+      label: "N.º de Pasaporte / Passport No.",
+      type: "text",
+      group,
+      default: defaults.passport,
+    },
+    {
+      key: k("nationality"),
+      label: "Nacionalidad / Nationality",
+      type: "text",
+      group,
+      default: defaults.nationality,
+    },
+    {
+      key: k("company"),
+      label: "Empresa / Company Name",
+      type: "text",
+      group,
+      default: defaults.company,
+    },
+    {
+      key: k("position"),
+      label: "Cargo / Position",
+      type: "text",
+      group,
+      default: defaults.position,
+    },
+    {
+      key: k("address"),
+      label: "Dirección / Company Address",
+      type: "text",
+      group,
+      default: defaults.address,
+    },
     { key: k("phone"), label: "Teléfono / Phone", type: "text", group, default: defaults.phone },
     { key: k("email"), label: "Correo / E-mail", type: "text", group, default: defaults.email },
     { key: k("country"), label: "País / Country", type: "text", group, default: defaults.country },
@@ -1135,10 +1190,34 @@ const ncnda: TemplateDef = {
   summary:
     "Non-Circumvention Non-Disclosure Agreement conforme a las reglas de la Cámara de Comercio Internacional (ICC), bilingüe EN/ES, con hasta tres posiciones firmantes.",
   fields: [
-    { key: "commodity", label: "Commodity / Material", type: "text", placeholder: "Antimony Ingot 99.85% (Sb)", group: "Operación" },
-    { key: "destination", label: "Destino del material / Destination", type: "text", placeholder: "Florida, USA", group: "Operación" },
-    { key: "termYears", label: "Vigencia (años) / Term (years)", type: "number", default: "5", group: "Operación" },
-    { key: "renewalYears", label: "Renovación (años) / Renewal (years)", type: "number", default: "2", group: "Operación" },
+    {
+      key: "commodity",
+      label: "Commodity / Material",
+      type: "text",
+      placeholder: "Antimony Ingot 99.85% (Sb)",
+      group: "Operación",
+    },
+    {
+      key: "destination",
+      label: "Destino del material / Destination",
+      type: "text",
+      placeholder: "Florida, USA",
+      group: "Operación",
+    },
+    {
+      key: "termYears",
+      label: "Vigencia (años) / Term (years)",
+      type: "number",
+      default: "5",
+      group: "Operación",
+    },
+    {
+      key: "renewalYears",
+      label: "Renovación (años) / Renewal (years)",
+      type: "number",
+      default: "2",
+      group: "Operación",
+    },
     ...ncndaPosFields("A", NCNDA_POS[0].label),
     ...ncndaPosFields("B", NCNDA_POS[1].label),
     ...ncndaPosFields("C", NCNDA_POS[2].label, {
@@ -1184,7 +1263,7 @@ const ncnda: TemplateDef = {
       `Electronic Transmission / Transmisión Electrónica. Transmission of this agreement by e-mail or electronic means shall be legal and binding upon the Parties. — La transmisión de este acuerdo por correo electrónico o medios electrónicos será legal y vinculante para las Partes.`,
       `Not a Partnership / No Asociación. This agreement shall not be construed as a partnership; no Party shall have any claim against separate dealings, ventures or assets of the others, nor shall be liable for any other Party. — Este acuerdo no se interpretará como asociación; ninguna Parte tendrá reclamo contra operaciones, empresas o activos separados de las otras, ni será responsable por ellas.`,
       `Third-Party Projects / Proyectos con Terceros. Any project to be shared with third parties for strategic or contractual reasons shall require mutual written acceptance of the signatories and the execution of a separate NCNDA with the new participant limited to that project. — Todo proyecto que se comparta con terceros por razones estratégicas o contractuales requerirá aceptación mutua y por escrito de los firmantes y la suscripción de un NCNDA independiente con el nuevo participante, limitado a ese proyecto.`,
-      active.has("penalty") ? (ncnda.clauses.find((c) => c.key === "penalty")!.text) : "",
+      active.has("penalty") ? ncnda.clauses.find((c) => c.key === "penalty")!.text : "",
       `Agreed and Attested / Acordado y Atestiguado. Each signatory below warrants that he/she is duly empowered by the named company to enter into and be bound by the obligations contained herein. — Cada firmante garantiza estar debidamente facultado por la empresa indicada para suscribir y quedar obligado por los compromisos aquí contenidos.`,
     ].filter(Boolean);
 
@@ -1223,11 +1302,191 @@ const ncnda: TemplateDef = {
   },
 };
 
+/* ─────────────── ICPO (Orden de Compra Corporativa Irrevocable) ─────────────── */
+const icpo: TemplateDef = {
+  id: "icpo",
+  title: "Orden de Compra Corporativa Irrevocable (ICPO)",
+  shortTitle: "ICPO",
+  acronym: "ICPO",
+  category: "trade",
+  summary:
+    "Orden irrevocable emitida por el comprador para adquirir un commodity, previa a la FCO/SPA.",
+  fields: [
+    { key: "buyer", label: "Comprador (emisor)", type: "text", default: OWN_PARTY_LINE },
+    { key: "seller", label: "Vendedor", type: "text" },
+    {
+      key: "commodity",
+      label: "Commodity / Material",
+      type: "text",
+      placeholder: "Antimony Ingot 99.85% (Sb)",
+    },
+    {
+      key: "spec",
+      label: "Especificación / Grado",
+      type: "text",
+      placeholder: "Grade 2# · 99.75–99.90%",
+    },
+    { key: "quantity", label: "Cantidad", type: "text", placeholder: "1,500 TM" },
+    { key: "incoterm", label: "Incoterm", type: "text", default: "CIF" },
+    { key: "destination", label: "Puerto de destino", type: "text", placeholder: "Florida, USA" },
+    { key: "price", label: "Precio objetivo (USD/t)", type: "text", placeholder: "—" },
+    { key: "payment", label: "Instrumento de pago", type: "text", default: "SBLC MT760" },
+    { key: "validityDays", label: "Validez (días)", type: "number", default: "10" },
+  ],
+  clauses: [],
+  build: (val, _a, ctx): GeneratedDoc => {
+    const B = bracket(gv(val, "buyer"), "Comprador");
+    const S = bracket(gv(val, "seller"), "Vendedor");
+    const commodity = gv(val, "commodity", "[commodity]");
+    const spec = gv(val, "spec", "[especificación]");
+    const quantity = gv(val, "quantity", "[cantidad]");
+    const incoterm = gv(val, "incoterm", "CIF");
+    const destination = gv(val, "destination", "[destino]");
+    const price = gv(val, "price", "[precio]");
+    const payment = gv(val, "payment", "SBLC MT760");
+    const validity = gv(val, "validityDays", "10");
+    return {
+      docType: "icpo",
+      reference: ctx.reference,
+      date: ctx.date,
+      title: "ORDEN DE COMPRA CORPORATIVA IRREVOCABLE (ICPO)",
+      blocks: [
+        {
+          kind: "paragraph",
+          text: `${B} (el "Comprador") emite de forma irrevocable la presente orden de compra a ${S} (el "Vendedor") por el suministro de ${commodity}, con capacidad financiera confirmable, sujeta a la aceptación mediante Oferta Corporativa Completa (FCO) y al contrato de compraventa (SPA) definitivo.`,
+        },
+        {
+          kind: "fields",
+          rows: [
+            ["Comprador", B],
+            ["Vendedor", S],
+            ["Commodity", commodity],
+            ["Especificación", spec],
+            ["Cantidad", quantity],
+            ["Incoterm", incoterm],
+            ["Puerto de destino", destination],
+            ["Precio objetivo", `USD ${price}/t`],
+            ["Instrumento de pago", payment],
+            ["Validez", `${validity} días`],
+          ],
+        },
+        {
+          kind: "clauses",
+          items: renumber([
+            `1. Esta ICPO es irrevocable dentro de su validez y expresa la intención firme de compra del Comprador, sujeta a due diligence, FCO del Vendedor y firma del SPA definitivo.`,
+            `2. El instrumento de pago (${payment}) se emitirá contra documentos conforme al SPA; las coordenadas bancarias se intercambiarán bajo el acuerdo de no elusión y confidencialidad vigente.`,
+            `3. Las Partes se obligan a la no elusión y confidencialidad respecto de contrapartes, precios y condiciones aquí referidas.`,
+            `4. Esta orden no constituye por sí sola contrato de compraventa; su perfeccionamiento requiere el SPA firmado por ambas Partes.`,
+          ]),
+        },
+        { kind: "signature", parties: [B] },
+      ],
+    };
+  },
+};
+
+/* ─────────────── FCO (Oferta Corporativa Completa) ─────────────── */
+const fco: TemplateDef = {
+  id: "fco",
+  title: "Oferta Corporativa Completa (FCO)",
+  shortTitle: "FCO",
+  acronym: "FCO",
+  category: "trade",
+  summary: "Oferta firme emitida por el vendedor en respuesta a la ICPO, previa al SPA.",
+  fields: [
+    { key: "seller", label: "Vendedor (emisor)", type: "text", default: OWN_PARTY_LINE },
+    { key: "buyer", label: "Comprador", type: "text" },
+    {
+      key: "commodity",
+      label: "Commodity / Material",
+      type: "text",
+      placeholder: "Antimony Ingot 99.85% (Sb)",
+    },
+    {
+      key: "spec",
+      label: "Especificación / Grado",
+      type: "text",
+      placeholder: "Grade 2# · 99.75–99.90%",
+    },
+    { key: "quantity", label: "Cantidad ofertada", type: "text", placeholder: "1,500 TM" },
+    { key: "origin", label: "Origen", type: "text", placeholder: "Bolivia / Chile" },
+    { key: "incoterm", label: "Incoterm", type: "text", default: "CIF" },
+    { key: "price", label: "Precio (USD/t)", type: "text", placeholder: "—" },
+    {
+      key: "payment",
+      label: "Condiciones de pago",
+      type: "text",
+      default: "SBLC MT760 irrevocable",
+    },
+    {
+      key: "delivery",
+      label: "Programa de entrega",
+      type: "text",
+      placeholder: "12 meses, spot + parciales",
+    },
+    { key: "validityDays", label: "Validez (días)", type: "number", default: "10" },
+  ],
+  clauses: [],
+  build: (val, _a, ctx): GeneratedDoc => {
+    const S = bracket(gv(val, "seller"), "Vendedor");
+    const B = bracket(gv(val, "buyer"), "Comprador");
+    const commodity = gv(val, "commodity", "[commodity]");
+    const spec = gv(val, "spec", "[especificación]");
+    const quantity = gv(val, "quantity", "[cantidad]");
+    const origin = gv(val, "origin", "[origen]");
+    const incoterm = gv(val, "incoterm", "CIF");
+    const price = gv(val, "price", "[precio]");
+    const payment = gv(val, "payment", "SBLC MT760 irrevocable");
+    const delivery = gv(val, "delivery", "[programa de entrega]");
+    const validity = gv(val, "validityDays", "10");
+    return {
+      docType: "fco",
+      reference: ctx.reference,
+      date: ctx.date,
+      title: "OFERTA CORPORATIVA COMPLETA (FCO)",
+      blocks: [
+        {
+          kind: "paragraph",
+          text: `${S} (el "Vendedor") ofrece de forma firme a ${B} (el "Comprador") el suministro de ${commodity}, en respuesta a su ICPO, sujeta a la firma del contrato de compraventa (SPA) definitivo y a la emisión del instrumento de pago acordado.`,
+        },
+        {
+          kind: "fields",
+          rows: [
+            ["Vendedor", S],
+            ["Comprador", B],
+            ["Commodity", commodity],
+            ["Especificación", spec],
+            ["Cantidad ofertada", quantity],
+            ["Origen", origin],
+            ["Incoterm", incoterm],
+            ["Precio", `USD ${price}/t`],
+            ["Pago", payment],
+            ["Entrega", delivery],
+            ["Validez", `${validity} días`],
+          ],
+        },
+        {
+          kind: "clauses",
+          items: renumber([
+            `1. Esta FCO constituye una oferta firme del Vendedor dentro de su validez, sujeta a la firma del SPA definitivo y a la verificación de capacidad de pago del Comprador.`,
+            `2. El pago se estructura mediante ${payment}, operable contra los documentos de embarque conforme al SPA (factura, B/L, certificados SGS y de origen).`,
+            `3. El Vendedor garantiza la disponibilidad y trazabilidad del material conforme a la especificación indicada; toda inspección se realizará por entidad independiente (SGS u otra acordada).`,
+            `4. Rige entre las Partes la obligación de no elusión y confidencialidad; esta oferta no constituye contrato hasta la firma del SPA.`,
+          ]),
+        },
+        { kind: "signature", parties: [S] },
+      ],
+    };
+  },
+};
+
 export const TEMPLATES: TemplateDef[] = [
   nda,
   ndi,
   ncnda,
   mou,
+  icpo,
+  fco,
   loi,
   termSheet,
   spa,

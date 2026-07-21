@@ -1119,8 +1119,10 @@ function CounterpartyPanel({
 /* --------------------- Generar y enviar documento para firma ------------- */
 const DEAL_DOCS = [
   { id: "ncnda", label: "NCNDA" },
-  { id: "nda", label: "NDA" },
+  { id: "icpo", label: "ICPO" },
+  { id: "fco", label: "FCO" },
   { id: "loi", label: "LOI · Carta de intención" },
+  { id: "nda", label: "NDA" },
   { id: "spa", label: "SPA · Contrato" },
   { id: "data-sheet", label: "Data sheet" },
 ] as const;
