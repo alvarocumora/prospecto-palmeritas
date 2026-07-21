@@ -236,14 +236,77 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         </button>
       </div>
 
-      <div className="flex justify-end mb-3">
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nuevo trade
-        </button>
-      </div>
+      {(() => {
+        const status = onboardingStatus?.status ?? {};
+        const allIds = tradeIds;
+        const allChecked = allIds.length > 0 && allIds.every((id) => checked.has(id));
+        const someChecked = checked.size > 0;
+        const runBatch = async () => {
+          const ids = Array.from(checked);
+          if (ids.length === 0) return;
+          setBatching(true);
+          try {
+            const res = await batchFn({ data: { tradeIds: ids } });
+            const { summary } = res;
+            const parts = [
+              `${summary.sent} enviados`,
+              summary.created ? `${summary.created} creados sin email` : "",
+              summary.failed ? `${summary.failed} con error` : "",
+            ].filter(Boolean);
+            if (summary.failed > 0) {
+              const firstErr = res.results.find((r) => !r.ok);
+              toast.warning(`Onboarding: ${parts.join(" · ")}`, {
+                description: firstErr?.error ?? undefined,
+              });
+            } else {
+              toast.success(`Onboarding enviado — ${parts.join(" · ")}`);
+            }
+            setChecked(new Set());
+            void qc.invalidateQueries({ queryKey: ["my-trades"] });
+            void qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "No se pudo enviar el lote");
+          } finally {
+            setBatching(false);
+          }
+        };
+        return (
+          <div className="rounded-lg border border-border bg-bg-secondary/30 p-2.5 mb-3 flex items-center justify-between gap-2 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-[11px] font-mono text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={allChecked}
+                onChange={(e) =>
+                  setChecked(e.target.checked ? new Set(allIds) : new Set())
+                }
+                className="accent-primary"
+              />
+              {someChecked ? `${checked.size} seleccionados` : "Seleccionar todos"}
+            </label>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => void runBatch()}
+                disabled={!someChecked || batching}
+                title="Envía NDA + LOI + link del Portal a la contraparte de cada trade seleccionado"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0F2A6B] text-white text-xs font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-40"
+              >
+                {batching ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
+                Enviar onboarding a {someChecked ? checked.size : "N"} trades
+              </button>
+              <button
+                onClick={() => setShowForm((v) => !v)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
+              >
+                <Plus className="w-3.5 h-3.5" /> Nuevo trade
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {showForm && (
         <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
