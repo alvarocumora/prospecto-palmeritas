@@ -237,7 +237,6 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
       </div>
 
       {(() => {
-        const status = onboardingStatus?.status ?? {};
         const allIds = tradeIds;
         const allChecked = allIds.length > 0 && allIds.every((id) => checked.has(id));
         const someChecked = checked.size > 0;
