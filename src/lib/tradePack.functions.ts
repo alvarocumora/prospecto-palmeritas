@@ -6,11 +6,42 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createHash } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { publicUrl } from "@/lib/publicUrl";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
+
+const STORAGE_BUCKET = "email-attachments";
+
+/** Canonicaliza un objeto y devuelve SHA-256 hex (12 chars) para huella de términos. */
+function termsHashOf(obj: unknown): string {
+  const canonical = JSON.stringify(obj, Object.keys(obj as object).sort());
+  return createHash("sha256").update(canonical).digest("hex");
+}
+
+/** Campos del ctx que definen los "términos" para el hash por doc_type.
+ *  Cambios en teléfono/email de la contraparte NO deben generar versión nueva. */
+function termsFingerprintCtx(ctx: Awaited<ReturnType<typeof loadTradeCtx>>) {
+  return {
+    reference: ctx.reference,
+    commodity: ctx.commodity,
+    form: ctx.form,
+    quantityMt: ctx.quantityMt,
+    incoterm: ctx.incoterm,
+    paymentInstrument: ctx.paymentInstrument,
+    unitPriceUsd: ctx.unitPriceUsd,
+    totalUsd: ctx.totalUsd,
+    destination: ctx.destination,
+    notes: ctx.notes,
+    buyerName: ctx.buyer.name,
+    buyerCompany: (ctx.buyer as { company?: string }).company ?? null,
+    sellerName: ctx.seller.name,
+    sellerCompany: (ctx.seller as { company?: string }).company ?? null,
+  };
+}
+
 
 export const TRADE_PACK_DOCS = ["ficha", "loi", "ncnda", "icpo", "spa"] as const;
 export type TradePackDoc = (typeof TRADE_PACK_DOCS)[number];
@@ -152,23 +183,75 @@ export const generateTradePack = createServerFn({ method: "POST" })
       spa: () => buildTradeSpaDraftPdf(ctx),
     };
 
-    const docs: PackDoc[] = [];
+    const docs: (PackDoc & { version: number; reused: boolean })[] = [];
     const errors: Array<{ type: TradePackDoc; error: string }> = [];
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const fingerprint = termsFingerprintCtx(ctx);
 
     for (const type of which) {
       try {
-        const bytes = await builders[type]();
+        const hash = termsHashOf({ type, ...fingerprint });
         const filename = `${type.toUpperCase()}-${ctx.reference}.pdf`;
-        const url = await uploadPdfSigned({
-          bytes,
-          path: `trade-pack/${data.tradeId}/${type}-${Date.now()}.pdf`,
-          ttlDays: 60,
+
+        // Última versión del mismo doc_type
+        const { data: latest } = await sb
+          .from("trade_pack_versions")
+          .select("id, version_number, terms_hash, storage_path")
+          .eq("trade_id", data.tradeId)
+          .eq("doc_type", type)
+          .order("version_number", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        let storagePath: string;
+        let version: number;
+        let reused = false;
+
+        if (latest && (latest as { terms_hash: string }).terms_hash === hash) {
+          // Términos idénticos → reutilizar archivo existente
+          storagePath = (latest as { storage_path: string }).storage_path;
+          version = (latest as { version_number: number }).version_number;
+          reused = true;
+        } else {
+          // Términos nuevos → generar y guardar nueva versión
+          const bytes = await builders[type]();
+          version = latest ? (latest as { version_number: number }).version_number + 1 : 1;
+          storagePath = `trade-pack/${data.tradeId}/${type}/v${version}-${hash.slice(0, 12)}.pdf`;
+          await uploadPdfSigned({ bytes, path: storagePath, ttlDays: 60 });
+          const { error: insErr } = await sb.from("trade_pack_versions").insert({
+            trade_id: data.tradeId,
+            doc_type: type,
+            version_number: version,
+            terms_hash: hash,
+            storage_path: storagePath,
+            filename,
+            ctx_snapshot: fingerprint,
+            generated_by: context.userId,
+          });
+          if (insErr) throw new Error(insErr.message);
+        }
+
+        // Firmar URL fresca (60 días) desde admin — la ruta ya existe
+        const ttl = 60 * 24 * 60 * 60;
+        const { data: signed, error: sErr } = await supabaseAdmin.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUrl(storagePath, ttl, { download: filename });
+        if (sErr) throw sErr;
+
+        docs.push({
+          type,
+          label: TRADE_PACK_LABELS[type],
+          filename,
+          url: signed.signedUrl,
+          version,
+          reused,
         });
-        docs.push({ type, label: TRADE_PACK_LABELS[type], filename, url });
       } catch (e) {
         errors.push({ type, error: e instanceof Error ? e.message : String(e) });
       }
     }
+
 
     // Registrar evento en el timeline del trade
     try {
@@ -303,3 +386,58 @@ export const dispatchTradePack = createServerFn({ method: "POST" })
 
     return { reference: ctx.reference, operationUrl, docs, results };
   });
+
+/** Lista todas las versiones históricas del pack de un trade, agrupadas por doc_type. */
+export const listTradePackVersions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ tradeId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { data: rows, error } = await sb
+      .from("trade_pack_versions")
+      .select("id, doc_type, version_number, terms_hash, filename, created_at, generated_by")
+      .eq("trade_id", data.tradeId)
+      .order("doc_type", { ascending: true })
+      .order("version_number", { ascending: false });
+    if (error) throw new Error(error.message);
+    return {
+      versions: (rows ?? []) as Array<{
+        id: string;
+        doc_type: TradePackDoc;
+        version_number: number;
+        terms_hash: string;
+        filename: string;
+        created_at: string;
+        generated_by: string | null;
+      }>,
+      labels: TRADE_PACK_LABELS,
+    };
+  });
+
+/** Firma la URL de una versión histórica específica y la devuelve por 60 días. */
+export const signTradePackVersion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ versionId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    // RLS ya restringe a participantes del trade
+    const { data: row, error } = await sb
+      .from("trade_pack_versions")
+      .select("storage_path, filename")
+      .eq("id", data.versionId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Versión no encontrada o sin acceso");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const r = row as { storage_path: string; filename: string };
+    const { data: signed, error: sErr } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(r.storage_path, 60 * 24 * 60 * 60, { download: r.filename });
+    if (sErr) throw sErr;
+    return { url: signed.signedUrl, filename: r.filename };
+  });
+

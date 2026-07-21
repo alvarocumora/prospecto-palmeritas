@@ -14561,6 +14561,53 @@ export type Database = {
           },
         ]
       }
+      trade_pack_versions: {
+        Row: {
+          created_at: string
+          ctx_snapshot: Json
+          doc_type: string
+          filename: string
+          generated_by: string | null
+          id: string
+          storage_path: string
+          terms_hash: string
+          trade_id: string
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          ctx_snapshot?: Json
+          doc_type: string
+          filename: string
+          generated_by?: string | null
+          id?: string
+          storage_path: string
+          terms_hash: string
+          trade_id: string
+          version_number: number
+        }
+        Update: {
+          created_at?: string
+          ctx_snapshot?: Json
+          doc_type?: string
+          filename?: string
+          generated_by?: string | null
+          id?: string
+          storage_path?: string
+          terms_hash?: string
+          trade_id?: string
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_pack_versions_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_payments: {
         Row: {
           amount_usd: number | null

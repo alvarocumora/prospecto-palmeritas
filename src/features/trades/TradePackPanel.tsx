@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
@@ -9,16 +9,36 @@ import {
   Copy,
   Package,
   Check,
+  History,
 } from "lucide-react";
 import {
   generateTradePack,
   dispatchTradePack,
+  listTradePackVersions,
+  signTradePackVersion,
   TRADE_PACK_DOCS,
   TRADE_PACK_LABELS,
   type TradePackDoc,
 } from "@/lib/tradePack.functions";
 
-type Doc = { type: TradePackDoc; label: string; filename: string; url: string };
+type Doc = {
+  type: TradePackDoc;
+  label: string;
+  filename: string;
+  url: string;
+  version?: number;
+  reused?: boolean;
+};
+
+type Version = {
+  id: string;
+  doc_type: TradePackDoc;
+  version_number: number;
+  terms_hash: string;
+  filename: string;
+  created_at: string;
+};
+
 
 type Trade = {
   buyerEmail?: string | null;
@@ -33,6 +53,26 @@ type Trade = {
 export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Trade }) {
   const genFn = useServerFn(generateTradePack);
   const sendFn = useServerFn(dispatchTradePack);
+  const listVersFn = useServerFn(listTradePackVersions);
+  const signVerFn = useServerFn(signTradePackVersion);
+
+  const [versions, setVersions] = useState<Version[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [loadingVer, setLoadingVer] = useState<string | null>(null);
+
+  const loadVersions = async () => {
+    try {
+      const r = await listVersFn({ data: { tradeId } });
+      setVersions(r.versions);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    loadVersions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tradeId]);
+
 
   const [selected, setSelected] = useState<Set<TradePackDoc>>(
     () => new Set(TRADE_PACK_DOCS),
@@ -77,7 +117,13 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
       const res = await genFn({ data: { tradeId, include: [...selected] } });
       setDocs(res.docs);
       setErrors(res.errors);
-      toast.success(`Paquete generado — ${res.docs.length} PDF(s)`);
+      const reused = res.docs.filter((d) => d.reused).length;
+      toast.success(
+        `Paquete listo — ${res.docs.length} PDF${res.docs.length !== 1 ? "s" : ""}` +
+          (reused ? ` (${reused} reutilizado${reused !== 1 ? "s" : ""})` : ""),
+      );
+      await loadVersions();
+
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error generando paquete");
     } finally {
@@ -192,6 +238,15 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
             <MessageCircle className="w-3.5 h-3.5" /> Compartir todo por WhatsApp
           </button>
         )}
+        {versions.length > 0 && (
+          <button
+            onClick={() => setShowHistory((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted/30"
+          >
+            <History className="w-3.5 h-3.5" />
+            Historial ({versions.length})
+          </button>
+        )}
       </div>
 
       {/* Lista de documentos generados */}
@@ -200,11 +255,24 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           {docs.map((d) => (
             <div key={d.filename} className="flex items-center justify-between gap-2 px-3 py-2">
               <div className="min-w-0">
-                <div className="text-xs font-semibold truncate">{d.label}</div>
+                <div className="text-xs font-semibold truncate flex items-center gap-1.5">
+                  {d.label}
+                  {d.version != null && (
+                    <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
+                      v{d.version}
+                    </span>
+                  )}
+                  {d.reused && (
+                    <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground">
+                      reutilizado
+                    </span>
+                  )}
+                </div>
                 <div className="text-[10px] font-mono text-muted-foreground truncate">
                   {d.filename}
                 </div>
               </div>
+
               <div className="flex items-center gap-1 shrink-0">
                 <a
                   href={d.url}
@@ -235,6 +303,72 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           ))}
         </div>
       )}
+
+      {/* Historial de versiones */}
+      {showHistory && versions.length > 0 && (
+        <div className="rounded-md border border-border bg-muted/10 mb-3">
+          <div className="px-3 py-2 border-b border-border text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <History className="w-3 h-3" /> Historial de versiones
+          </div>
+          <div className="divide-y divide-border max-h-64 overflow-auto">
+            {versions.map((v) => (
+              <div
+                key={v.id}
+                className="flex items-center justify-between gap-2 px-3 py-1.5 text-[11px]"
+              >
+                <div className="min-w-0 flex items-center gap-2">
+                  <span className="font-mono uppercase text-[9px] font-bold px-1 py-0.5 rounded bg-primary/10 text-primary shrink-0">
+                    {v.doc_type}
+                  </span>
+                  <span className="font-mono shrink-0">v{v.version_number}</span>
+                  <span className="text-muted-foreground truncate">
+                    {new Date(v.created_at).toLocaleString("es-CL", {
+                      year: "2-digit",
+                      month: "2-digit",
+                      day: "2-digit",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                  <span className="font-mono text-[9px] text-muted-foreground/70 truncate hidden sm:inline">
+                    #{v.terms_hash.slice(0, 8)}
+                  </span>
+                </div>
+                <button
+                  onClick={async () => {
+                    setLoadingVer(v.id);
+                    try {
+                      const r = await signVerFn({ data: { versionId: v.id } });
+                      const a = document.createElement("a");
+                      a.href = r.url;
+                      a.download = r.filename;
+                      a.rel = "noopener";
+                      a.target = "_blank";
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Error");
+                    } finally {
+                      setLoadingVer(null);
+                    }
+                  }}
+                  disabled={loadingVer === v.id}
+                  className="p-1 rounded hover:bg-muted/40 shrink-0"
+                  title="Descargar esta versión"
+                >
+                  {loadingVer === v.id ? (
+                    <Loader2 className="w-3 h-3 animate-spin" />
+                  ) : (
+                    <FileDown className="w-3 h-3" />
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
 
       {errors.length > 0 && (
         <div className="text-[11px] text-destructive font-mono mb-3">
