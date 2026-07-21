@@ -128,6 +128,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const [checked, setChecked] = useState<Set<string>>(new Set());
   const [batching, setBatching] = useState(false);
   const [showForm, setShowForm] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
+  const [query, setQuery] = useState("");
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     counterpartyEmail: "",
