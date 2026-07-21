@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2 } from "lucide-react";
+import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2, Download, Sparkles } from "lucide-react";
 import { TEMPLATES, TEMPLATE_BY_ID, CATEGORY_LABEL } from "@/lib/documents/templates";
+import { SPECIAL_DOCS, downloadSpecialDoc, type SpecialDocId } from "@/lib/documents/specialDocs";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -196,6 +197,9 @@ function DocumentsGallery() {
         )}
       </section>
 
+      {/* Bloque 1.5 · Documentos especiales generados con el formato global. */}
+      <SpecialDocsSection />
+
       {/* Bloque 2 · Catálogo de plantillas para crear nuevos documentos. */}
       <div className="mb-4">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
@@ -285,5 +289,73 @@ function SignBadge({ stats }: { stats?: { pending: number; signed: number } }) {
     <span className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono uppercase tracking-wider bg-amber-500/15 text-amber-600">
       Firma pendiente{stats.pending > 1 ? ` ×${stats.pending}` : ""}
     </span>
+  );
+}
+
+function SpecialDocsSection() {
+  const [busy, setBusy] = useState<SpecialDocId | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDownload = async (id: SpecialDocId) => {
+    setError(null);
+    setBusy(id);
+    try {
+      await downloadSpecialDoc(id);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "No se pudo generar el PDF");
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <section className="mb-12">
+      <div className="flex items-center justify-between mb-3">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle inline-flex items-center gap-1.5">
+          <Sparkles className="w-3 h-3 text-accent-brand" />
+          Documentos especiales · Formato global con QR
+        </div>
+      </div>
+      <p className="text-sm text-content-subtle mb-3 max-w-3xl">
+        Fichas y adendas de operaciones activas generadas con el mismo motor Institutional
+        Modernist que NDA, LOI y NCNDA: papel hueso, tabulación estándar, QR de verificación en
+        cabecera y pie, y contacto oficial de Geocapitals.
+      </p>
+      {error ? (
+        <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
+          {error}
+        </div>
+      ) : null}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {SPECIAL_DOCS.map((d) => (
+          <div
+            key={d.id}
+            className="rounded-2xl border border-hairline bg-white p-5 flex flex-col"
+          >
+            <div className="flex items-center justify-between mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider bg-accent-brand-subtle text-accent-brand">
+                <FileText className="w-3 h-3" /> {d.acronym}
+              </span>
+              <span className="text-[9px] font-mono uppercase tracking-wider text-content-subtle">
+                Institutional Modernist
+              </span>
+            </div>
+            <div className="font-display text-lg text-content leading-snug">{d.label}</div>
+            <p className="text-sm text-content-subtle mt-1.5 leading-relaxed flex-1">
+              {d.summary}
+            </p>
+            <button
+              type="button"
+              onClick={() => handleDownload(d.id)}
+              disabled={busy === d.id}
+              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-accent-brand text-white px-4 py-2 text-sm font-medium hover:bg-accent-brand/90 disabled:opacity-60"
+            >
+              <Download className="w-4 h-4" />
+              {busy === d.id ? "Generando…" : "Descargar PDF"}
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
