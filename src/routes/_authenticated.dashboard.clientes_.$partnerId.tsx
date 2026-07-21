@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 import {
   ArrowLeft,
   Network,
@@ -11,9 +13,13 @@ import {
   Globe,
   ArrowUpRight,
   Sparkles,
+  Copy,
+  Loader2,
 } from "lucide-react";
 import { getPartnerHub } from "@/lib/partnerHub.functions";
-import { computeNextActions, type NextActionPriority } from "@/lib/nextActions";
+import { computeNextActions, type NextAction, type NextActionPriority } from "@/lib/nextActions";
+import { draftNextActionMessage } from "@/lib/dealAgent.functions";
+import type { HubTrade } from "@/lib/partnerHub";
 import { PARTNER_ROLE_LABELS, type PartnerRole } from "@/lib/clients";
 import {
   COMMISSION_STATUS_LABELS,
@@ -124,39 +130,19 @@ function PartnerHubPage() {
             <Sparkles className="w-3.5 h-3.5" /> Próximas acciones
           </div>
           <div className="space-y-2">
-            {actions.map((a) => {
-              const body = (
-                <>
-                  <span className={`shrink-0 mt-0.5 ${PRIORITY_DOT[a.priority]}`}>●</span>
-                  <div className="min-w-0">
-                    <div className="text-sm font-medium flex items-center gap-1.5">
-                      {a.title}
-                      {a.tradeId && (
-                        <ArrowUpRight className="w-3 h-3 text-muted-foreground shrink-0" />
-                      )}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground">{a.detail}</div>
-                  </div>
-                </>
-              );
-              return a.tradeId ? (
-                <Link
-                  key={a.key}
-                  to="/dashboard/trades/$tradeId"
-                  params={{ tradeId: a.tradeId }}
-                  className="flex items-start gap-2 rounded p-1.5 -m-1.5 hover:bg-primary/10"
-                >
-                  {body}
-                </Link>
-              ) : (
-                <div key={a.key} className="flex items-start gap-2 p-1.5">
-                  {body}
-                </div>
-              );
-            })}
+            {actions.map((a) => (
+              <ActionRow
+                key={a.key}
+                action={a}
+                partnerName={p.name}
+                partnerCompany={p.company}
+                trade={a.tradeId ? trades.find((t) => t.id === a.tradeId) : undefined}
+              />
+            ))}
           </div>
           <p className="text-[10px] text-muted-foreground mt-3">
-            Recomendaciones automáticas por reglas. Pronto, asistidas por agentes de IA.
+            Recomendaciones por reglas; el borrador del mensaje lo redacta el asistente de IA de
+            Geocapitals.
           </p>
         </section>
       )}
@@ -241,6 +227,95 @@ function PartnerHubPage() {
             })}
           </div>
         </section>
+      )}
+    </div>
+  );
+}
+
+function ActionRow({
+  action,
+  partnerName,
+  partnerCompany,
+  trade,
+}: {
+  action: NextAction;
+  partnerName: string;
+  partnerCompany: string | null;
+  trade?: HubTrade;
+}) {
+  const draftFn = useServerFn(draftNextActionMessage);
+  const [message, setMessage] = useState<string | null>(null);
+  const draft = useMutation({
+    mutationFn: () =>
+      draftFn({
+        data: {
+          channel: "email",
+          partnerName,
+          partnerCompany: partnerCompany ?? undefined,
+          actionTitle: action.title,
+          actionDetail: action.detail,
+          tradeReference: trade?.reference ?? undefined,
+          commodity: trade?.commodity ?? undefined,
+        },
+      }),
+    onSuccess: (res) => setMessage(res.message),
+    onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo redactar."),
+  });
+
+  return (
+    <div className="rounded p-1.5">
+      <div className="flex items-start gap-2">
+        <span className={`shrink-0 mt-0.5 ${PRIORITY_DOT[action.priority]}`}>●</span>
+        <div className="min-w-0 flex-1">
+          <div className="text-sm font-medium flex items-center gap-1.5">
+            {action.tradeId ? (
+              <Link
+                to="/dashboard/trades/$tradeId"
+                params={{ tradeId: action.tradeId }}
+                className="hover:underline inline-flex items-center gap-1.5"
+              >
+                {action.title}
+                <ArrowUpRight className="w-3 h-3 text-muted-foreground shrink-0" />
+              </Link>
+            ) : (
+              action.title
+            )}
+          </div>
+          <div className="text-[11px] text-muted-foreground">{action.detail}</div>
+        </div>
+        <button
+          onClick={() => draft.mutate()}
+          disabled={draft.isPending}
+          className="shrink-0 inline-flex items-center gap-1 px-2 py-1 rounded border border-primary/40 text-primary text-[11px] hover:bg-primary/10 disabled:opacity-50"
+        >
+          {draft.isPending ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <Mail className="w-3 h-3" />
+          )}
+          Redactar
+        </button>
+      </div>
+      {message && (
+        <div className="mt-2 ml-4 rounded border border-border bg-background p-2">
+          <textarea
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            rows={6}
+            className="w-full text-xs bg-transparent resize-y outline-none"
+          />
+          <div className="flex justify-end">
+            <button
+              onClick={() => {
+                void navigator.clipboard.writeText(message);
+                toast.success("Copiado");
+              }}
+              className="inline-flex items-center gap-1 text-[10px] font-mono text-primary hover:underline"
+            >
+              <Copy className="w-3 h-3" /> Copiar
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
