@@ -386,3 +386,58 @@ export const dispatchTradePack = createServerFn({ method: "POST" })
 
     return { reference: ctx.reference, operationUrl, docs, results };
   });
+
+/** Lista todas las versiones históricas del pack de un trade, agrupadas por doc_type. */
+export const listTradePackVersions = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ tradeId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const { data: rows, error } = await sb
+      .from("trade_pack_versions")
+      .select("id, doc_type, version_number, terms_hash, filename, created_at, generated_by")
+      .eq("trade_id", data.tradeId)
+      .order("doc_type", { ascending: true })
+      .order("version_number", { ascending: false });
+    if (error) throw new Error(error.message);
+    return {
+      versions: (rows ?? []) as Array<{
+        id: string;
+        doc_type: TradePackDoc;
+        version_number: number;
+        terms_hash: string;
+        filename: string;
+        created_at: string;
+        generated_by: string | null;
+      }>,
+      labels: TRADE_PACK_LABELS,
+    };
+  });
+
+/** Firma la URL de una versión histórica específica y la devuelve por 60 días. */
+export const signTradePackVersion = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ versionId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    // RLS ya restringe a participantes del trade
+    const { data: row, error } = await sb
+      .from("trade_pack_versions")
+      .select("storage_path, filename")
+      .eq("id", data.versionId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!row) throw new Error("Versión no encontrada o sin acceso");
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const r = row as { storage_path: string; filename: string };
+    const { data: signed, error: sErr } = await supabaseAdmin.storage
+      .from(STORAGE_BUCKET)
+      .createSignedUrl(r.storage_path, 60 * 24 * 60 * 60, { download: r.filename });
+    if (sErr) throw sErr;
+    return { url: signed.signedUrl, filename: r.filename };
+  });
+
