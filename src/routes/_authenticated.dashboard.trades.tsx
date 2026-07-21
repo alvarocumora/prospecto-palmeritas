@@ -464,14 +464,38 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         <div className="space-y-2">
           {(data ?? []).map((t) => {
             const prog = tradeProgress(t.docs);
+            const status = onboardingStatus?.status?.[t.id];
+            const isChecked = checked.has(t.id);
             return (
-              <button
+              <div
                 key={t.id}
-                onClick={() => onOpen(t.id)}
-                className="w-full text-left rounded-lg border border-border bg-bg-secondary/30 p-3 hover:border-primary/50 transition-colors"
+                className={`w-full rounded-lg border p-3 transition-colors ${
+                  isChecked
+                    ? "border-[#0F2A6B] bg-[#0F2A6B]/5"
+                    : "border-border bg-bg-secondary/30 hover:border-primary/50"
+                }`}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
+                  <label className="flex items-center pr-1 cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        setChecked((prev) => {
+                          const next = new Set(prev);
+                          if (e.target.checked) next.add(t.id);
+                          else next.delete(t.id);
+                          return next;
+                        });
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="accent-[#0F2A6B]"
+                    />
+                  </label>
+                  <button
+                    onClick={() => onOpen(t.id)}
+                    className="flex-1 min-w-0 text-left"
+                  >
                     <div className="font-semibold text-sm truncate">
                       {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
                       <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
@@ -482,8 +506,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                       {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
                       {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
                     </div>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2 shrink-0">
+                    <OnboardingBadge s={status} />
                     <StagePill stage={t.stage} />
                     <div className="w-16 text-right">
                       <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
@@ -497,12 +522,13 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
       )}
     </>
+
   );
 }
 
