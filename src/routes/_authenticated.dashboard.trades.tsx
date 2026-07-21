@@ -752,6 +752,8 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
     queryKey: ["trade", id],
     queryFn: () => detailFn({ data: { id } }),
   });
+  useTradeDetailRealtime(id);
+
 
   const progress = useMemo(
     () =>
