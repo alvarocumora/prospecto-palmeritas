@@ -21,11 +21,15 @@ import { OWN_PARTY_LINE } from "@/lib/documents/company";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 
-const Input = z.object({
+const SingleInput = z.object({
   tradeId: z.string().uuid(),
   partnerId: z.string().uuid().optional(),
   overrideEmail: z.string().trim().email().max(160).optional(),
   overrideName: z.string().trim().max(120).optional(),
+});
+
+const BatchInput = z.object({
+  tradeIds: z.array(z.string().uuid()).min(1).max(50),
 });
 
 type TradeRow = {
@@ -81,7 +85,6 @@ async function insertSignRequest(
     .insert({ ...base, trade_id: tradeId })
     .select("id, expires_at")
     .single();
-  // Fallback pre-migración: si trade_id aún no existe, insertar sin el vínculo.
   if (ins.error && /trade_id|schema cache|column/i.test(ins.error.message)) {
     ins = await sb
       .from("document_sign_requests")
@@ -126,13 +129,24 @@ function buildDoc(
   return tpl.build(values, active, { reference, date: today() });
 }
 
-export const sendSupplierOnboarding = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => Input.parse(d))
-  .handler(async ({ data, context }) => {
-    const sb = asSb(context.supabase);
-
-    // 1. Trade
+// Núcleo compartido por la versión single y batch. Devuelve el resultado
+// del envío para un único trade sin lanzar (recolecta el error en `error`).
+async function runOnboardingForTrade(
+  sb: SupabaseClient,
+  userId: string,
+  data: z.infer<typeof SingleInput>,
+): Promise<{
+  tradeId: string;
+  ok: boolean;
+  emailed: boolean;
+  recipient?: string;
+  reference?: string;
+  ndaSignUrl?: string;
+  loiSignUrl?: string;
+  portalUrl?: string;
+  error?: string;
+}> {
+  try {
     const { data: tradeRaw, error: tErr } = await sb
       .from("commodity_trades")
       .select(
@@ -144,7 +158,6 @@ export const sendSupplierOnboarding = createServerFn({ method: "POST" })
     if (!tradeRaw) throw new Error("Trade no encontrado o sin acceso.");
     const trade = tradeRaw as TradeRow;
 
-    // 2. Partner (opcional) — puede venir por id o resolverse por counterparty del trade.
     let partner: PartnerRow | null = null;
     if (data.partnerId) {
       const { data: p, error: pErr } = await sb
@@ -163,26 +176,23 @@ export const sendSupplierOnboarding = createServerFn({ method: "POST" })
       ""
     ).trim();
     if (!signerEmail) {
-      throw new Error(
-        "No hay email del proveedor. Vincula un partner con email o pásalo explícito.",
-      );
+      throw new Error("Sin email de contraparte — vincula un partner o pasá overrideEmail.");
     }
     const signerName =
-      data.overrideName ??
-      partner?.name ??
-      trade.counterparty_name ??
-      undefined;
-    const partnerLine = [
-      partner?.name ?? trade.counterparty_name ?? signerName ?? "",
-      partner?.company ?? trade.counterparty_company ?? "",
-    ]
-      .filter(Boolean)
-      .join(" · ") || signerName || signerEmail;
+      data.overrideName ?? partner?.name ?? trade.counterparty_name ?? undefined;
+    const partnerLine =
+      [
+        partner?.name ?? trade.counterparty_name ?? signerName ?? "",
+        partner?.company ?? trade.counterparty_company ?? "",
+      ]
+        .filter(Boolean)
+        .join(" · ") ||
+      signerName ||
+      signerEmail;
 
-    // 3. Generar y persistir los dos sign requests.
     const nda = await insertSignRequest(
       sb,
-      context.userId as string,
+      userId,
       "nda",
       buildDoc("nda", trade, partnerLine),
       signerName,
@@ -191,7 +201,7 @@ export const sendSupplierOnboarding = createServerFn({ method: "POST" })
     );
     const loi = await insertSignRequest(
       sb,
-      context.userId as string,
+      userId,
       "loi",
       buildDoc("loi", trade, partnerLine),
       signerName,
@@ -199,12 +209,10 @@ export const sendSupplierOnboarding = createServerFn({ method: "POST" })
       trade.id,
     );
 
-    // 4. Link del Portal Proveedor (ruta pública ya existente).
     const portalUrl = publicUrl(
       `/portal-proveedor?trade=${encodeURIComponent(trade.reference ?? trade.id)}&email=${encodeURIComponent(signerEmail)}`,
     );
 
-    // 5. Enviar un único correo con los 3 enlaces.
     let emailed = false;
     try {
       const [{ sendInternalEmail }, { OWN_COMPANY }] = await Promise.all([
@@ -236,32 +244,154 @@ export const sendSupplierOnboarding = createServerFn({ method: "POST" })
       });
       emailed = res.ok && "queued" in res && res.queued === true;
     } catch (e) {
-      console.error("[sendSupplierOnboarding] email failed", e);
+      console.error("[onboarding] email failed", e);
     }
 
-    // 6. Timeline del trade (best-effort).
     try {
       await sb.from("trade_events").insert({
         trade_id: trade.id,
         kind: "supplier_onboarding_sent",
-        actor_user_id: context.userId as string,
-        payload: {
+        actor_user_id: userId,
+        detail: JSON.stringify({
           to: signerEmail,
           nda_request_id: nda.id,
           loi_request_id: loi.id,
           portal_url: portalUrl,
           emailed,
-        },
+        }),
       });
     } catch {
-      // Si la tabla o columnas difieren en el entorno, no bloqueamos el envío.
+      // trade_events schema puede variar; no bloqueamos.
     }
 
     return {
+      tradeId: trade.id,
+      ok: true,
       emailed,
       recipient: signerEmail,
-      nda: { requestId: nda.id, signUrl: buildSignUrl(nda.token) },
-      loi: { requestId: loi.id, signUrl: buildSignUrl(loi.token) },
+      reference: trade.reference ?? undefined,
+      ndaSignUrl: buildSignUrl(nda.token),
+      loiSignUrl: buildSignUrl(loi.token),
       portalUrl,
     };
+  } catch (e) {
+    return {
+      tradeId: data.tradeId,
+      ok: false,
+      emailed: false,
+      error: e instanceof Error ? e.message : String(e),
+    };
+  }
+}
+
+export const sendSupplierOnboarding = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => SingleInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const r = await runOnboardingForTrade(sb, context.userId as string, data);
+    if (!r.ok) throw new Error(r.error ?? "No se pudo enviar el onboarding.");
+    return {
+      emailed: r.emailed,
+      recipient: r.recipient!,
+      nda: { signUrl: r.ndaSignUrl! },
+      loi: { signUrl: r.loiSignUrl! },
+      portalUrl: r.portalUrl!,
+    };
   });
+
+// Batch: procesa N trades en serie (concurrencia 1) para no saturar el
+// motor de emails ni multiplicar el consumo de tokens. Nunca lanza — devuelve
+// el reporte por trade para que la UI muestre éxitos y errores.
+export const sendSupplierOnboardingBatch = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => BatchInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    const results: Awaited<ReturnType<typeof runOnboardingForTrade>>[] = [];
+    for (const tradeId of data.tradeIds) {
+      results.push(
+        await runOnboardingForTrade(sb, context.userId as string, { tradeId }),
+      );
+    }
+    const summary = {
+      total: results.length,
+      sent: results.filter((r) => r.ok && r.emailed).length,
+      created: results.filter((r) => r.ok && !r.emailed).length,
+      failed: results.filter((r) => !r.ok).length,
+    };
+    return { results, summary };
+  });
+
+// Estado de onboarding derivado para la lista. Un query eficiente:
+// (1) último trade_event de tipo supplier_onboarding_sent por trade,
+// (2) últimas sign_requests NDA/LOI ligadas a esos trades.
+export const listOnboardingStatusForTrades = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ tradeIds: z.array(z.string().uuid()).max(200) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    if (data.tradeIds.length === 0) return { status: {} as Record<string, OnboardingStatus> };
+
+    const [events, signs] = await Promise.all([
+      sb
+        .from("trade_events")
+        .select("trade_id, kind, created_at")
+        .in("trade_id", data.tradeIds)
+        .eq("kind", "supplier_onboarding_sent"),
+      sb
+        .from("document_sign_requests")
+        .select("trade_id, template_id, status, signed_at, created_at")
+        .in("trade_id", data.tradeIds)
+        .in("template_id", ["nda", "loi"]),
+    ]);
+
+    const sentAt = new Map<string, string>();
+    for (const e of (events.data ?? []) as Array<{ trade_id: string; created_at: string }>) {
+      const prev = sentAt.get(e.trade_id);
+      if (!prev || prev < e.created_at) sentAt.set(e.trade_id, e.created_at);
+    }
+
+    type SR = { trade_id: string; template_id: string; status: string | null; signed_at: string | null };
+    const byTrade = new Map<string, { nda?: SR; loi?: SR }>();
+    for (const r of (signs.data ?? []) as SR[]) {
+      const slot = byTrade.get(r.trade_id) ?? {};
+      if (r.template_id === "nda") slot.nda = r;
+      else if (r.template_id === "loi") slot.loi = r;
+      byTrade.set(r.trade_id, slot);
+    }
+
+    const status: Record<string, OnboardingStatus> = {};
+    for (const id of data.tradeIds) {
+      const s = byTrade.get(id) ?? {};
+      const isSigned = (r?: SR) =>
+        !!r && (r.status === "signed" || r.status === "completed" || !!r.signed_at);
+      const ndaSigned = isSigned(s.nda);
+      const loiSigned = isSigned(s.loi);
+      const wasSent = sentAt.has(id) || !!s.nda || !!s.loi;
+      const state: OnboardingStatus["state"] =
+        ndaSigned && loiSigned
+          ? "signed"
+          : ndaSigned || loiSigned
+            ? "partial"
+            : wasSent
+              ? "sent"
+              : "pending";
+      status[id] = {
+        state,
+        ndaSigned,
+        loiSigned,
+        sentAt: sentAt.get(id) ?? null,
+      };
+    }
+    return { status };
+  });
+
+export type OnboardingStatus = {
+  state: "pending" | "sent" | "partial" | "signed";
+  ndaSigned: boolean;
+  loiSigned: boolean;
+  sentAt: string | null;
+};

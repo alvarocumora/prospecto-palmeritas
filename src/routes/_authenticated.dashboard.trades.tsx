@@ -44,7 +44,12 @@ import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
 import { OPERATOR_LINE } from "@/lib/documents/company";
 import { listMySignRequests } from "@/lib/documents/signing.functions";
-import { sendSupplierOnboarding } from "@/lib/supplierOnboarding.functions";
+import {
+  sendSupplierOnboarding,
+  sendSupplierOnboardingBatch,
+  listOnboardingStatusForTrades,
+  type OnboardingStatus,
+} from "@/lib/supplierOnboarding.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -104,10 +109,21 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const qc = useQueryClient();
   const listFn = useServerFn(listMyTrades);
   const createFn = useServerFn(createTrade);
+  const batchFn = useServerFn(sendSupplierOnboardingBatch);
+  const statusFn = useServerFn(listOnboardingStatusForTrades);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["my-trades"],
     queryFn: () => listFn(),
   });
+  const tradeIds = useMemo(() => (data ?? []).map((t) => t.id), [data]);
+  const { data: onboardingStatus } = useQuery({
+    queryKey: ["onboarding-status", tradeIds],
+    queryFn: () => statusFn({ data: { tradeIds } }),
+    enabled: tradeIds.length > 0,
+    staleTime: 30_000,
+  });
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+  const [batching, setBatching] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -220,14 +236,76 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         </button>
       </div>
 
-      <div className="flex justify-end mb-3">
-        <button
-          onClick={() => setShowForm((v) => !v)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nuevo trade
-        </button>
-      </div>
+      {(() => {
+        const allIds = tradeIds;
+        const allChecked = allIds.length > 0 && allIds.every((id) => checked.has(id));
+        const someChecked = checked.size > 0;
+        const runBatch = async () => {
+          const ids = Array.from(checked);
+          if (ids.length === 0) return;
+          setBatching(true);
+          try {
+            const res = await batchFn({ data: { tradeIds: ids } });
+            const { summary } = res;
+            const parts = [
+              `${summary.sent} enviados`,
+              summary.created ? `${summary.created} creados sin email` : "",
+              summary.failed ? `${summary.failed} con error` : "",
+            ].filter(Boolean);
+            if (summary.failed > 0) {
+              const firstErr = res.results.find((r) => !r.ok);
+              toast.warning(`Onboarding: ${parts.join(" · ")}`, {
+                description: firstErr?.error ?? undefined,
+              });
+            } else {
+              toast.success(`Onboarding enviado — ${parts.join(" · ")}`);
+            }
+            setChecked(new Set());
+            void qc.invalidateQueries({ queryKey: ["my-trades"] });
+            void qc.invalidateQueries({ queryKey: ["onboarding-status"] });
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "No se pudo enviar el lote");
+          } finally {
+            setBatching(false);
+          }
+        };
+        return (
+          <div className="rounded-lg border border-border bg-bg-secondary/30 p-2.5 mb-3 flex items-center justify-between gap-2 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-[11px] font-mono text-muted-foreground cursor-pointer">
+              <input
+                type="checkbox"
+                checked={allChecked}
+                onChange={(e) =>
+                  setChecked(e.target.checked ? new Set(allIds) : new Set())
+                }
+                className="accent-primary"
+              />
+              {someChecked ? `${checked.size} seleccionados` : "Seleccionar todos"}
+            </label>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => void runBatch()}
+                disabled={!someChecked || batching}
+                title="Envía NDA + LOI + link del Portal a la contraparte de cada trade seleccionado"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0F2A6B] text-white text-xs font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-40"
+              >
+                {batching ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Send className="w-3.5 h-3.5" />
+                )}
+                Enviar onboarding a {someChecked ? checked.size : "N"} trades
+              </button>
+              <button
+                onClick={() => setShowForm((v) => !v)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
+              >
+                <Plus className="w-3.5 h-3.5" /> Nuevo trade
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {showForm && (
         <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
@@ -385,14 +463,38 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         <div className="space-y-2">
           {(data ?? []).map((t) => {
             const prog = tradeProgress(t.docs);
+            const status = onboardingStatus?.status?.[t.id];
+            const isChecked = checked.has(t.id);
             return (
-              <button
+              <div
                 key={t.id}
-                onClick={() => onOpen(t.id)}
-                className="w-full text-left rounded-lg border border-border bg-bg-secondary/30 p-3 hover:border-primary/50 transition-colors"
+                className={`w-full rounded-lg border p-3 transition-colors ${
+                  isChecked
+                    ? "border-[#0F2A6B] bg-[#0F2A6B]/5"
+                    : "border-border bg-bg-secondary/30 hover:border-primary/50"
+                }`}
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0">
+                  <label className="flex items-center pr-1 cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        setChecked((prev) => {
+                          const next = new Set(prev);
+                          if (e.target.checked) next.add(t.id);
+                          else next.delete(t.id);
+                          return next;
+                        });
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                      className="accent-[#0F2A6B]"
+                    />
+                  </label>
+                  <button
+                    onClick={() => onOpen(t.id)}
+                    className="flex-1 min-w-0 text-left"
+                  >
                     <div className="font-semibold text-sm truncate">
                       {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
                       <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
@@ -403,8 +505,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                       {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
                       {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
                     </div>
-                  </div>
+                  </button>
                   <div className="flex items-center gap-2 shrink-0">
+                    <OnboardingBadge s={status} />
                     <StagePill stage={t.stage} />
                     <div className="w-16 text-right">
                       <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
@@ -418,12 +521,13 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                     <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
       )}
     </>
+
   );
 }
 
@@ -1685,5 +1789,33 @@ function SupplierPanel({
         operación abajo para compartirlo por email/WhatsApp.
       </div>
     </div>
+  );
+}
+
+function OnboardingBadge({ s }: { s?: OnboardingStatus }) {
+  if (!s || s.state === "pending") return null;
+  const map: Record<OnboardingStatus["state"], { label: string; cls: string }> = {
+    pending: { label: "", cls: "" },
+    sent: {
+      label: "NDA+LOI enviado",
+      cls: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+    },
+    partial: {
+      label: s.ndaSigned ? "NDA firmado" : "LOI firmado",
+      cls: "bg-sky-500/10 text-sky-700 border-sky-500/30",
+    },
+    signed: {
+      label: "NDA+LOI firmado",
+      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+    },
+  };
+  const m = map[s.state];
+  return (
+    <span
+      className={`text-[10px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded border ${m.cls}`}
+      title={s.sentAt ? `Enviado ${new Date(s.sentAt).toLocaleDateString("es-CL")}` : undefined}
+    >
+      {m.label}
+    </span>
   );
 }
