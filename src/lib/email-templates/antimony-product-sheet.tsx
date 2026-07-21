@@ -37,6 +37,7 @@ interface Props {
   senderCompany?: string;
   operationUrl?: string;
   sheetPdfUrl?: string;
+  trackingPixelUrl?: string;
 }
 
 const thStyle = {
@@ -64,9 +65,11 @@ const Email = ({
   senderCompany,
   operationUrl,
   sheetPdfUrl,
+  trackingPixelUrl,
 }: Props) => (
   <EmailLayout
     preview={`Ficha técnica · Antimonio Sb Grade 2# — CoA + SGS · ${tradeReference ?? ""}`}
+    trackingPixelUrl={trackingPixelUrl}
   >
     <Heading style={styles.h1}>Ficha técnica · Antimonio (Sb) Grade 2#</Heading>
     <Text style={styles.p}>
