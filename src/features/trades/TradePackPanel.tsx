@@ -238,6 +238,15 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
             <MessageCircle className="w-3.5 h-3.5" /> Compartir todo por WhatsApp
           </button>
         )}
+        {versions.length > 0 && (
+          <button
+            onClick={() => setShowHistory((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-border hover:bg-muted/30"
+          >
+            <History className="w-3.5 h-3.5" />
+            Historial ({versions.length})
+          </button>
+        )}
       </div>
 
       {/* Lista de documentos generados */}
@@ -246,11 +255,24 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           {docs.map((d) => (
             <div key={d.filename} className="flex items-center justify-between gap-2 px-3 py-2">
               <div className="min-w-0">
-                <div className="text-xs font-semibold truncate">{d.label}</div>
+                <div className="text-xs font-semibold truncate flex items-center gap-1.5">
+                  {d.label}
+                  {d.version != null && (
+                    <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
+                      v{d.version}
+                    </span>
+                  )}
+                  {d.reused && (
+                    <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground">
+                      reutilizado
+                    </span>
+                  )}
+                </div>
                 <div className="text-[10px] font-mono text-muted-foreground truncate">
                   {d.filename}
                 </div>
               </div>
+
               <div className="flex items-center gap-1 shrink-0">
                 <a
                   href={d.url}
