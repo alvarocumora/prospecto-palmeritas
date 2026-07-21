@@ -13779,6 +13779,54 @@ export type Database = {
         }
         Relationships: []
       }
+      sourcing_share_token_views: {
+        Row: {
+          id: string
+          ip_hash: string | null
+          outcome: string
+          referer: string | null
+          request_id: string
+          submission_id: string
+          ua_hash: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: string
+          ip_hash?: string | null
+          outcome?: string
+          referer?: string | null
+          request_id: string
+          submission_id: string
+          ua_hash?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: string
+          ip_hash?: string | null
+          outcome?: string
+          referer?: string | null
+          request_id?: string
+          submission_id?: string
+          ua_hash?: string | null
+          viewed_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sourcing_share_token_views_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_requests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sourcing_share_token_views_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "sourcing_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sourcing_submissions: {
         Row: {
           contact_email: string | null
@@ -13799,6 +13847,7 @@ export type Database = {
           request_id: string
           share_token_hash: string | null
           share_token_prefix: string | null
+          share_token_revoked_at: string | null
           specs: string | null
           status: string
           supplier_company: string | null
@@ -13827,6 +13876,7 @@ export type Database = {
           request_id: string
           share_token_hash?: string | null
           share_token_prefix?: string | null
+          share_token_revoked_at?: string | null
           specs?: string | null
           status?: string
           supplier_company?: string | null
@@ -13855,6 +13905,7 @@ export type Database = {
           request_id?: string
           share_token_hash?: string | null
           share_token_prefix?: string | null
+          share_token_revoked_at?: string | null
           specs?: string | null
           status?: string
           supplier_company?: string | null
