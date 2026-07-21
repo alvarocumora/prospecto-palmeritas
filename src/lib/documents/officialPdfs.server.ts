@@ -172,4 +172,44 @@ export async function buildAntimonySheetPdf(input: {
   });
 }
 
+export async function buildCopperSheetPdf(input: {
+  reference: string;
+  recipient: Party;
+}): Promise<Uint8Array> {
+  return await renderServerPdf({
+    title: "Purchase Terms · Electrolytic Copper Cathode Grade A",
+    subtitle:
+      "Condiciones formales de compra para Copper Cathode Grade A (ASTM B115 / B49, 99.97–99.99% Cu). " +
+      "Trial 500 MT · Contrato 2,000 MT/mes × 12 meses · CIF Buyer's Port · Pago DLC MT700 o SBLC MT760 (Top 50 Bank). " +
+      "Emitido por Geocapitals bajo NCNDA firmado entre las Partes.",
+    reference: input.reference,
+    parties: [
+      { role: "Emisor", name: `${OWN_COMPANY.name} — Geocapitals` },
+      {
+        role: "Destinatario",
+        name: input.recipient.name,
+        company: input.recipient.company,
+        email: input.recipient.email,
+      },
+    ],
+    body: [
+      "§1 · COMMODITY. Electrolytic Copper Cathode Grade A. Estándar: ASTM B115 / ASTM B49. Pureza: 99.97% – 99.99% Cu. Grado: A. Forma: Cathode Plates. Origen: Seller's Option. Inspección: SGS / CCIC / Alex Stewart o equivalente internacional.",
+      "§2 · QUANTITY & DURATION. Trial Quantity: 500 MT. Contract Quantity: 2,000 MT/mes. Contract Duration: doce (12) meses con extensiones por mutuo acuerdo escrito.",
+      "§3 · DELIVERY TERMS. Incoterm: CIF — Buyer's Designated Port. Loading Port: Seller's Option. Destination Port: puerto designado por el Buyer. Shipment Schedule: 15–20 días bancarios tras recepción y verificación del instrumento financiero operativo.",
+      "§4 · PAYMENT · OPCIÓN A · DLC MT700. Buyer emitirá una Carta de Crédito Documentaria Irrevocable, Transferible y Confirmada (SWIFT MT700) por un Top 50 International Bank aceptable al Seller. La DLC será: pagadera a la vista (at sight), transferible, confirmada, sujeta a UCP 600, y con validez para el periodo de embarque y pago.",
+      "§5 · PAYMENT · OPCIÓN B · SBLC MT760. Buyer podrá emitir una Standby Letter of Credit Irrevocable y Transferible (SWIFT MT760) por un Top 50 International Bank aceptable al Seller. Tras autenticación y aceptación de la SBLC, el Seller iniciará el performance contractual.",
+      "§6 · PERFORMANCE BOND (PB). El Seller emitirá un Performance Bond de 2% dentro de diez (10) días bancarios tras recepción y verificación del instrumento operativo (DLC MT700 o SBLC MT760).",
+      "§7 · PROOF OF PRODUCT (POP). Dentro de cinco (5) días bancarios tras confirmación del instrumento financiero operativo, el Seller entregará: Commercial Invoice · Packing List · Certificate of Origin · SGS Quality Certificate · Warehouse Receipt / Availability Certificate · Export Authorization (cuando aplique) · Product Photographs · Draft Bill of Lading.",
+      "§8 · SHIPPING DOCUMENTS. Commercial Invoice · Packing List · Full Set Clean On Board Bills of Lading · Certificate of Origin · SGS Inspection Certificate · Weight Certificate · Quality Certificate · Insurance Certificate (110% CIF Value) · Container Loading Photographs · Export Customs Documentation.",
+      "§9 · INSPECTION. Inspección de calidad y cantidad por SGS, CCIC, Alex Stewart o firma internacional equivalente. Inspección de destino podrá realizarla el Buyer por su propia cuenta.",
+      "§10 · TRANSACTION PROCEDURE. (1) Buyer emite ICPO/LOI + Company Profile + CIS; (2) Seller emite FCO + Seller CIS; (3) Buyer firma y devuelve FCO; (4) Seller emite Draft SPA; (5) Buyer firma y devuelve SPA; (6) Seller contrafirma y devuelve SPA; (7) Seller emite Proforma Invoice; (8) Buyer emite DLC MT700 o SBLC MT760 operativa; (9) Seller verifica instrumento por canales bancarios; (10) Seller emite PB 2% y POP; (11) Embarque comienza dentro de 15–20 días bancarios; (12) Seller entrega set completo de documentos de embarque; (13) Cargo arriba a puerto de destino; (14) Buyer realiza inspección de destino; (15) Pago liberado según términos DLC o vía MT103 contra documentos de embarque.",
+      "§11 · CONFIDENCIALIDAD. Esta operación se ejecuta bajo NCNDA/IMFPA firmado. Toda comisión de intermediación se incorporará expresamente al SPA definitivo. Prohibida la comunicación directa con contrapartes finales sin autorización escrita de Geocapitals.",
+      "---",
+      "Este documento oficial resume las condiciones comerciales para la operación indicada. NO constituye oferta vinculante; la obligación de compra nace con el SPA definitivo firmado por ambas Partes. Contacto: info@geocapitals.com · WhatsApp +56 9 6218 4071.",
+    ],
+    emitter: { ...EMITTER, signedAtISO: new Date().toISOString() },
+    issuedAtISO: new Date().toISOString(),
+  });
+}
+
 export { uploadPdfSigned };
