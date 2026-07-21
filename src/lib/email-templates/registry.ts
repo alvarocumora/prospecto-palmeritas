@@ -26,6 +26,8 @@ import { template as supplierOnboarding } from "./supplier-onboarding";
 import { template as antimonyProductSheet } from "./antimony-product-sheet";
 import { template as copperProductSheet } from "./copper-product-sheet";
 import { template as agentOutreach } from "./agent-outreach";
+import { template as tradePackDispatch } from "./trade-pack-dispatch";
+
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
