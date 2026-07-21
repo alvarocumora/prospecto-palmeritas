@@ -59,6 +59,7 @@ import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
+import { Route as VerificarFichaTokenRouteImport } from './routes/verificar.ficha.$token'
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
 import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.ficha.$slug'
@@ -411,6 +412,11 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const VerificarFichaTokenRoute = VerificarFichaTokenRouteImport.update({
+  id: '/verificar/ficha/$token',
+  path: '/verificar/ficha/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
   id: '/share/targets/$projectId',
   path: '/share/targets/$projectId',
@@ -1116,6 +1122,7 @@ export interface FileRoutesByFullPath {
   '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
+  '/verificar/ficha/$token': typeof VerificarFichaTokenRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
@@ -1266,6 +1273,7 @@ export interface FileRoutesByTo {
   '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
+  '/verificar/ficha/$token': typeof VerificarFichaTokenRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
@@ -1418,6 +1426,7 @@ export interface FileRoutesById {
   '/proyectos_/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
+  '/verificar/ficha/$token': typeof VerificarFichaTokenRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/dashboard/admin/inbox': typeof AuthenticatedDashboardAdminInboxRoute
   '/_authenticated/dashboard/admin/investors': typeof AuthenticatedDashboardAdminInvestorsRoute
@@ -1570,6 +1579,7 @@ export interface FileRouteTypes {
     | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
+    | '/verificar/ficha/$token'
     | '/dashboard/'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
@@ -1720,6 +1730,7 @@ export interface FileRouteTypes {
     | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
+    | '/verificar/ficha/$token'
     | '/dashboard'
     | '/dashboard/admin/inbox'
     | '/dashboard/admin/investors'
@@ -1871,6 +1882,7 @@ export interface FileRouteTypes {
     | '/proyectos_/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
+    | '/verificar/ficha/$token'
     | '/_authenticated/dashboard/'
     | '/_authenticated/dashboard/admin/inbox'
     | '/_authenticated/dashboard/admin/investors'
@@ -1959,6 +1971,7 @@ export interface RootRouteChildren {
   ProyectosFichaSlugRoute: typeof ProyectosFichaSlugRoute
   ReportsLosverdesPre43101Route: typeof ReportsLosverdesPre43101Route
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
+  VerificarFichaTokenRoute: typeof VerificarFichaTokenRoute
   ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
   ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
@@ -2322,6 +2335,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/verificar/ficha/$token': {
+      id: '/verificar/ficha/$token'
+      path: '/verificar/ficha/$token'
+      fullPath: '/verificar/ficha/$token'
+      preLoaderRoute: typeof VerificarFichaTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/share/targets/$projectId': {
       id: '/share/targets/$projectId'
@@ -3378,6 +3398,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProyectosFichaSlugRoute: ProyectosFichaSlugRoute,
   ReportsLosverdesPre43101Route: ReportsLosverdesPre43101Route,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
+  VerificarFichaTokenRoute: VerificarFichaTokenRoute,
   ApiPublicNotificationsCatastroExpirationsRoute:
     ApiPublicNotificationsCatastroExpirationsRoute,
   ApiPublicNotificationsSatelliteAnomaliesRoute:

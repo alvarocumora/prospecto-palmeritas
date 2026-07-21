@@ -11,6 +11,7 @@ import {
 } from "@/lib/sourcing.functions";
 import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, isOfferExpired } from "@/lib/sourcing";
 import { downloadSupplierSheetPdf } from "@/lib/supplierSheetPdf";
+import { verifyShareUrl } from "@/lib/publicUrl";
 
 
 // Página PÚBLICA de solo lectura: la FICHA DE PROVEEDOR que el comprador/gestor
@@ -73,7 +74,7 @@ function SupplierSheetPage() {
 
             <div className="mt-3 flex flex-wrap items-start gap-3">
               <DownloadSheetButton sheet={data} />
-              <MobileQr />
+              <MobileQr token={token} />
             </div>
 
 
@@ -253,16 +254,15 @@ function DownloadSheetButton({ sheet }: { sheet: import("@/lib/sourcing.function
   );
 }
 
-function MobileQr() {
+function MobileQr({ token }: { token: string }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
+  const verifyUrl = verifyShareUrl(token);
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         const QR = await import("qrcode");
-        const url = typeof window !== "undefined" ? window.location.href : "";
-        if (!url) return;
-        const png = await QR.toDataURL(url, { margin: 1, width: 160 });
+        const png = await QR.toDataURL(verifyUrl, { margin: 1, width: 180 });
         if (alive) setDataUrl(png);
       } catch {
         /* ignore */
@@ -271,17 +271,18 @@ function MobileQr() {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [verifyUrl]);
   if (!dataUrl) return null;
   return (
     <div className="inline-flex items-center gap-3 rounded-xl border border-hairline bg-white px-3 py-2">
-      <img src={dataUrl} alt="QR acceso móvil" className="w-16 h-16" />
+      <img src={dataUrl} alt="QR verificación" className="w-16 h-16" />
       <div className="text-[11px] leading-tight">
         <div className="inline-flex items-center gap-1 font-mono uppercase tracking-wider text-accent-brand">
-          <Smartphone className="w-3 h-3" /> Acceso móvil
+          <Smartphone className="w-3 h-3" /> Verificar y abrir
         </div>
-        <div className="text-content-subtle mt-0.5">
-          Escanea para abrir esta ficha en tu celular.
+        <div className="text-content-subtle mt-0.5 max-w-[180px]">
+          Escanea para validar autenticidad y ver contador de vistas en{" "}
+          <span className="font-mono">geocapitals.com</span>.
         </div>
       </div>
     </div>
