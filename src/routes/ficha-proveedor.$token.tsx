@@ -223,3 +223,29 @@ function Field({ label, value }: { label: string; value: string | null | undefin
     </div>
   );
 }
+
+function DownloadSheetButton({ sheet }: { sheet: import("@/lib/sourcing.functions").SupplierSheet }) {
+  const [busy, setBusy] = useState(false);
+  const onClick = async () => {
+    setBusy(true);
+    try {
+      await downloadSupplierSheetPdf(sheet);
+      toast.success("PDF descargado");
+    } catch (e) {
+      console.error(e);
+      toast.error("No se pudo generar el PDF");
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button
+      onClick={() => void onClick()}
+      disabled={busy}
+      className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-brand text-white text-sm font-medium hover:opacity-90 disabled:opacity-50"
+    >
+      {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+      {busy ? "Generando PDF…" : "Descargar ficha en PDF"}
+    </button>
+  );
+}
