@@ -183,23 +183,75 @@ export const generateTradePack = createServerFn({ method: "POST" })
       spa: () => buildTradeSpaDraftPdf(ctx),
     };
 
-    const docs: PackDoc[] = [];
+    const docs: (PackDoc & { version: number; reused: boolean })[] = [];
     const errors: Array<{ type: TradePackDoc; error: string }> = [];
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const fingerprint = termsFingerprintCtx(ctx);
 
     for (const type of which) {
       try {
-        const bytes = await builders[type]();
+        const hash = termsHashOf({ type, ...fingerprint });
         const filename = `${type.toUpperCase()}-${ctx.reference}.pdf`;
-        const url = await uploadPdfSigned({
-          bytes,
-          path: `trade-pack/${data.tradeId}/${type}-${Date.now()}.pdf`,
-          ttlDays: 60,
+
+        // Última versión del mismo doc_type
+        const { data: latest } = await sb
+          .from("trade_pack_versions")
+          .select("id, version_number, terms_hash, storage_path")
+          .eq("trade_id", data.tradeId)
+          .eq("doc_type", type)
+          .order("version_number", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        let storagePath: string;
+        let version: number;
+        let reused = false;
+
+        if (latest && (latest as { terms_hash: string }).terms_hash === hash) {
+          // Términos idénticos → reutilizar archivo existente
+          storagePath = (latest as { storage_path: string }).storage_path;
+          version = (latest as { version_number: number }).version_number;
+          reused = true;
+        } else {
+          // Términos nuevos → generar y guardar nueva versión
+          const bytes = await builders[type]();
+          version = latest ? (latest as { version_number: number }).version_number + 1 : 1;
+          storagePath = `trade-pack/${data.tradeId}/${type}/v${version}-${hash.slice(0, 12)}.pdf`;
+          await uploadPdfSigned({ bytes, path: storagePath, ttlDays: 60 });
+          const { error: insErr } = await sb.from("trade_pack_versions").insert({
+            trade_id: data.tradeId,
+            doc_type: type,
+            version_number: version,
+            terms_hash: hash,
+            storage_path: storagePath,
+            filename,
+            ctx_snapshot: fingerprint,
+            generated_by: context.userId,
+          });
+          if (insErr) throw new Error(insErr.message);
+        }
+
+        // Firmar URL fresca (60 días) desde admin — la ruta ya existe
+        const ttl = 60 * 24 * 60 * 60;
+        const { data: signed, error: sErr } = await supabaseAdmin.storage
+          .from(STORAGE_BUCKET)
+          .createSignedUrl(storagePath, ttl, { download: filename });
+        if (sErr) throw sErr;
+
+        docs.push({
+          type,
+          label: TRADE_PACK_LABELS[type],
+          filename,
+          url: signed.signedUrl,
+          version,
+          reused,
         });
-        docs.push({ type, label: TRADE_PACK_LABELS[type], filename, url });
       } catch (e) {
         errors.push({ type, error: e instanceof Error ? e.message : String(e) });
       }
     }
+
 
     // Registrar evento en el timeline del trade
     try {
