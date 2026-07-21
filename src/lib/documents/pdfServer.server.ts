@@ -10,21 +10,31 @@
 // es la copia oficial que se adjunta al mail como PDF real cuando la
 // infraestructura de emails no soporta attachments binarios.
 
-import { PDFDocument, StandardFonts, rgb, type PDFFont, type PDFPage } from "pdf-lib";
+import {
+  PDFDocument,
+  StandardFonts,
+  rgb,
+  type PDFFont,
+  type PDFImage,
+  type PDFPage,
+} from "pdf-lib";
+import { GEOCAPITALS_MARK_PNG_BASE64, GEOCAPITALS_MARK_RATIO } from "./brandAssets";
+import { verifyDocUrl } from "@/lib/publicUrl";
 
 // Paleta Institutional Modernist (mismos tokens que el renderer web).
 const PAPER = rgb(0.969, 0.961, 0.941);
-const INK = rgb(0.102, 0.102, 0.180);
-const INK_SOFT = rgb(0.290, 0.290, 0.369);
-const COBALT = rgb(0.169, 0.290, 0.796);
-const HAIRLINE = rgb(0.851, 0.831, 0.780);
+const INK = rgb(0.102, 0.102, 0.18);
+const INK_SOFT = rgb(0.29, 0.29, 0.369);
+const COBALT = rgb(0.169, 0.29, 0.796);
+const HAIRLINE = rgb(0.851, 0.831, 0.78);
 const CONF_BG = rgb(1.0, 0.965, 0.905);
-const CONF_BORDER = rgb(0.910, 0.780, 0.396);
+const CONF_BORDER = rgb(0.91, 0.78, 0.396);
+const GOLD = rgb(0.792, 0.643, 0.235);
 
 const PAGE_W = 595.28; // A4 puntos
 const PAGE_H = 841.89;
 const MARGIN_X = 56;
-const MARGIN_TOP = 108;
+const MARGIN_TOP = 138;
 const MARGIN_BOTTOM = 92;
 const CONTENT_W = PAGE_W - MARGIN_X * 2;
 
@@ -43,7 +53,12 @@ export type ServerPdfInput = {
   emitter?: { name: string; role?: string; email?: string; signedAtISO?: string };
   /** Fecha de emisión visible (ISO YYYY-MM-DD). */
   issuedAtISO?: string;
+  /** URL de validación pública para el QR. Por defecto verifyDocUrl(reference). */
+  verifyUrl?: string;
 };
+
+/** Matriz de módulos del QR (bits 0/1), Worker-safe (qrcode.create, sin canvas). */
+type QrMatrix = { size: number; bits: (0 | 1)[] } | null;
 
 type Ctx = {
   doc: PDFDocument;
@@ -51,6 +66,8 @@ type Ctx = {
   font: PDFFont;
   bold: PDFFont;
   italic: PDFFont;
+  mark: PDFImage | null;
+  qr: QrMatrix;
   cursorY: number;
   meta: { title: string; reference: string; pageNumber: number };
 };
@@ -60,23 +77,71 @@ function fmtDate(iso?: string) {
   return d.toLocaleDateString("es-CL", { day: "2-digit", month: "long", year: "numeric" });
 }
 
+// Genera la matriz de módulos del QR sin canvas (Worker-safe). Devuelve null si
+// el módulo no está disponible, para que el PDF se emita igual sin QR.
+async function buildQrMatrix(url: string): Promise<QrMatrix> {
+  try {
+    const QR = await import("qrcode");
+    const qr = QR.create(url, { errorCorrectionLevel: "M" });
+    const size = qr.modules.size;
+    const src = qr.modules.data as unknown as ArrayLike<number>;
+    const bits: (0 | 1)[] = [];
+    for (let i = 0; i < size * size; i++) bits.push(src[i] ? 1 : 0);
+    return { size, bits };
+  } catch {
+    return null;
+  }
+}
+
+// Dibuja el QR como cuadrados vectoriales (pdf-lib), sin imagen rasterizada.
+function drawQrMatrix(
+  page: PDFPage,
+  qr: NonNullable<QrMatrix>,
+  x: number,
+  y: number,
+  side: number,
+) {
+  const cell = side / qr.size;
+  for (let r = 0; r < qr.size; r++) {
+    for (let c = 0; c < qr.size; c++) {
+      if (!qr.bits[r * qr.size + c]) continue;
+      page.drawRectangle({
+        x: x + c * cell,
+        // fila 0 arriba: y es el borde superior de la caja.
+        y: y - (r + 1) * cell,
+        width: cell + 0.3, // solape mínimo para evitar hairlines entre módulos
+        height: cell + 0.3,
+        color: INK,
+      });
+    }
+  }
+}
+
 function drawHeader(ctx: Ctx) {
-  const { page, bold, font } = ctx;
+  const { page, bold, font, mark, qr } = ctx;
   // Fondo papel completo.
   page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: PAPER });
   // Barra de marca cobalto.
   page.drawRectangle({ x: 0, y: PAGE_H - 46, width: PAGE_W, height: 46, color: COBALT });
+  // Marco «G» dorado a la izquierda de la barra.
+  let brandX = MARGIN_X;
+  if (mark) {
+    const markH = 30;
+    const markW = markH * GEOCAPITALS_MARK_RATIO;
+    page.drawImage(mark, { x: MARGIN_X, y: PAGE_H - 38, width: markW, height: markH });
+    brandX = MARGIN_X + markW + 12;
+  }
   page.drawText("GEOCAPITALS", {
-    x: MARGIN_X,
-    y: PAGE_H - 30,
+    x: brandX,
+    y: PAGE_H - 26,
     size: 14,
     font: bold,
     color: rgb(1, 1, 1),
   });
   page.drawText("Motor de transacciones internacionales · geocapitals.com", {
-    x: MARGIN_X,
-    y: PAGE_H - 42,
-    size: 8,
+    x: brandX,
+    y: PAGE_H - 39,
+    size: 7.5,
     font,
     color: rgb(0.85, 0.88, 1),
   });
@@ -90,12 +155,43 @@ function drawHeader(ctx: Ctx) {
     font,
     color: rgb(1, 1, 1),
   });
-  // Banda de confidencialidad.
+
+  // Caja del QR de validación pública (arriba a la derecha, sobre el papel).
+  const qrSide = 54;
+  const qrBoxW = qrSide + 12;
+  const qrBoxH = qrSide + 24;
+  const qrBoxX = PAGE_W - MARGIN_X - qrBoxW;
+  const qrBoxTop = PAGE_H - 54; // borde superior de la caja
+  if (qr) {
+    page.drawRectangle({
+      x: qrBoxX,
+      y: qrBoxTop - qrBoxH,
+      width: qrBoxW,
+      height: qrBoxH,
+      color: rgb(1, 1, 1),
+      borderColor: HAIRLINE,
+      borderWidth: 0.75,
+    });
+    drawQrMatrix(page, qr, qrBoxX + 6, qrBoxTop - 6, qrSide);
+    const cx = qrBoxX + qrBoxW / 2;
+    const legend = "VALIDAR EN GEOCAPITALS";
+    const lw = bold.widthOfTextAtSize(legend, 5.4);
+    page.drawText(legend, {
+      x: cx - lw / 2,
+      y: qrBoxTop - qrBoxH + 8,
+      size: 5.4,
+      font: bold,
+      color: COBALT,
+    });
+  }
+
+  // Banda de confidencialidad (angosta, deja el hueco del QR a la derecha).
   const cbY = PAGE_H - 82;
+  const bandW = qr ? CONTENT_W - qrBoxW - 12 : CONTENT_W;
   page.drawRectangle({
     x: MARGIN_X,
     y: cbY,
-    width: CONTENT_W,
+    width: bandW,
     height: 26,
     color: CONF_BG,
     borderColor: CONF_BORDER,
@@ -108,6 +204,8 @@ function drawHeader(ctx: Ctx) {
     font: bold,
     color: rgb(0.6, 0.42, 0.05),
   });
+  // Sello dorado bajo la banda (acento de marca).
+  page.drawRectangle({ x: MARGIN_X, y: cbY - 4, width: bandW, height: 1.5, color: GOLD });
 }
 
 function drawFooter(ctx: Ctx, totalPages: number) {
@@ -181,7 +279,11 @@ async function ensureSpace(ctx: Ctx, needed: number) {
   if (ctx.cursorY - needed < MARGIN_BOTTOM) await newPage(ctx);
 }
 
-function drawParagraph(ctx: Ctx, text: string, opts: { bold?: boolean; size?: number; gap?: number } = {}) {
+function drawParagraph(
+  ctx: Ctx,
+  text: string,
+  opts: { bold?: boolean; size?: number; gap?: number } = {},
+) {
   const size = opts.size ?? 10.5;
   const font = opts.bold ? ctx.bold : ctx.font;
   const lines = wrapText(text, font, size, CONTENT_W);
@@ -323,12 +425,24 @@ export async function renderServerPdf(input: ServerPdfInput): Promise<Uint8Array
     doc.embedFont(StandardFonts.HelveticaOblique),
   ]);
 
+  // Marca dorada (embedPng acepta base64 directo) y QR de validación pública.
+  // Ambos son opcionales: si algo falla, el PDF se emite igual.
+  let mark: PDFImage | null = null;
+  try {
+    mark = await doc.embedPng(GEOCAPITALS_MARK_PNG_BASE64);
+  } catch {
+    mark = null;
+  }
+  const qr = await buildQrMatrix(input.verifyUrl ?? verifyDocUrl(input.reference));
+
   const ctx: Ctx = {
     doc,
     page: doc.addPage([PAGE_W, PAGE_H]),
     font,
     bold,
     italic,
+    mark,
+    qr,
     cursorY: PAGE_H - MARGIN_TOP,
     meta: { title: input.title, reference: input.reference, pageNumber: 1 },
   };
@@ -391,20 +505,16 @@ export async function uploadPdfSigned(opts: {
   if (!url || !key) throw new Error("Missing Supabase server env vars");
   const admin = createClient(url, key);
   const bucket = "email-attachments";
-  const { error } = await admin.storage
-    .from(bucket)
-    .upload(opts.path, opts.bytes, {
-      contentType: "application/pdf",
-      upsert: true,
-      cacheControl: "3600",
-    });
+  const { error } = await admin.storage.from(bucket).upload(opts.path, opts.bytes, {
+    contentType: "application/pdf",
+    upsert: true,
+    cacheControl: "3600",
+  });
   if (error && !/Duplicate|already exists/i.test(error.message)) throw error;
   const ttl = (opts.ttlDays ?? 30) * 24 * 60 * 60;
-  const { data, error: sErr } = await admin.storage
-    .from(bucket)
-    .createSignedUrl(opts.path, ttl, {
-      download: opts.path.split("/").pop(),
-    });
+  const { data, error: sErr } = await admin.storage.from(bucket).createSignedUrl(opts.path, ttl, {
+    download: opts.path.split("/").pop(),
+  });
   if (sErr) throw sErr;
   return data.signedUrl;
 }

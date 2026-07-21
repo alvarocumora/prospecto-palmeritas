@@ -17,6 +17,7 @@ import { template as commodityInquiryInternal } from "./commodity-inquiry-intern
 import { template as inquiryUpdateBuyer } from "./inquiry-update-buyer";
 import { template as signRequestSigner } from "./sign-request-signer";
 import { template as signCompletedOwner } from "./sign-completed-owner";
+import { template as signCompletedInternal } from "./sign-completed-internal";
 import { template as shipmentUpdate } from "./shipment-update";
 import { template as sourcingProposalReceived } from "./sourcing-proposal-received";
 import { template as sourcingConvertedSupplier } from "./sourcing-converted-supplier";
@@ -56,6 +57,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "inquiry-update-buyer": inquiryUpdateBuyer,
   "sign-request-signer": signRequestSigner,
   "sign-completed-owner": signCompletedOwner,
+  "sign-completed-internal": signCompletedInternal,
   "shipment-update": shipmentUpdate,
   "sourcing-proposal-received": sourcingProposalReceived,
   "sourcing-converted-supplier": sourcingConvertedSupplier,

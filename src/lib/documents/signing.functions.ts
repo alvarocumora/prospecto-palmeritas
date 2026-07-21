@@ -346,15 +346,29 @@ export const submitSignature = createServerFn({ method: "POST" })
       }
     }
 
-    // Avisar al dueño de la solicitud que su documento fue firmado.
+    // Avisar al dueño de la solicitud y a la bandeja de operaciones de
+    // Geocapitals que el documento fue firmado. Geocapitals opera cada deal, así
+    // que recibe copia de toda firma para mantener trazabilidad del trade.
     try {
       const { data: prof } = await sb
         .from("profiles")
         .select("email")
         .eq("user_id", String(row.created_by))
         .maybeSingle();
+
+      const signedAtLabel = new Date(signedAtIso).toLocaleString("es-CL", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+      const dealReference = (row.trade_reference as string | null) ?? undefined;
+
+      const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+      const { GEOCAPITALS_NOTIFY_EMAIL } = await import("@/lib/documents/company");
+
       if (prof?.email) {
-        const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
         await sendInternalEmail({
           templateName: "sign-completed-owner",
           recipientEmail: prof.email,
@@ -363,18 +377,28 @@ export const submitSignature = createServerFn({ method: "POST" })
             docTitle: String(row.title),
             reference: String(row.reference),
             signedByName: data.signerName,
-            signedAt: new Date(signedAtIso).toLocaleString("es-CL", {
-              day: "numeric",
-              month: "long",
-              year: "numeric",
-              hour: "2-digit",
-              minute: "2-digit",
-            }),
+            signedAt: signedAtLabel,
           },
         });
       }
+
+      // Copia interna a Geocapitals (el template fija `to`; recipientEmail es
+      // sólo fallback). Idempotencia propia para no chocar con el aviso al dueño.
+      await sendInternalEmail({
+        templateName: "sign-completed-internal",
+        recipientEmail: GEOCAPITALS_NOTIFY_EMAIL,
+        idempotencyKey: `sign-completed-internal:${row.id}`,
+        templateData: {
+          docTitle: String(row.title),
+          reference: String(row.reference),
+          dealReference,
+          signedByName: data.signerName,
+          signedAt: signedAtLabel,
+          ownerEmail: prof?.email ?? undefined,
+        },
+      });
     } catch (e) {
-      console.error("[submitSignature] notify owner failed", e);
+      console.error("[submitSignature] notify owner/geocapitals failed", e);
     }
 
     return { signedAt: signedAtIso, signatureHash };
