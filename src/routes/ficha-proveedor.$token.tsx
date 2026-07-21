@@ -74,7 +74,7 @@ function SupplierSheetPage() {
 
             <div className="mt-3 flex flex-wrap items-start gap-3">
               <DownloadSheetButton sheet={data} />
-              <MobileQr />
+              <MobileQr token={token} />
             </div>
 
 
