@@ -1445,12 +1445,14 @@ function SupplierPanel({
   const listFn = useServerFn(listPartners);
   const upsertFn = useServerFn(upsertPartner);
   const linkFn = useServerFn(linkPartnerToTrade);
+  const onboardFn = useServerFn(sendSupplierOnboarding);
   const { data, refetch } = useQuery({
     queryKey: ["partners-list"],
     queryFn: () => listFn(),
   });
   const partners = data?.partners ?? [];
   const [selectedId, setSelectedId] = useState<string>("");
+  const [onboarding, setOnboarding] = useState(false);
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
