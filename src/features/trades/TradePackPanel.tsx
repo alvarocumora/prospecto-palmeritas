@@ -53,6 +53,26 @@ type Trade = {
 export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Trade }) {
   const genFn = useServerFn(generateTradePack);
   const sendFn = useServerFn(dispatchTradePack);
+  const listVersFn = useServerFn(listTradePackVersions);
+  const signVerFn = useServerFn(signTradePackVersion);
+
+  const [versions, setVersions] = useState<Version[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [loadingVer, setLoadingVer] = useState<string | null>(null);
+
+  const loadVersions = async () => {
+    try {
+      const r = await listVersFn({ data: { tradeId } });
+      setVersions(r.versions);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+  useEffect(() => {
+    loadVersions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tradeId]);
+
 
   const [selected, setSelected] = useState<Set<TradePackDoc>>(
     () => new Set(TRADE_PACK_DOCS),
