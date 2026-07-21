@@ -1505,6 +1505,45 @@ function SupplierPanel({
     }
   };
 
+  const sendOnboarding = async () => {
+    setOnboarding(true);
+    try {
+      const partnerId = selectedId || undefined;
+      const partner = partners.find((p) => p.id === selectedId);
+      let overrideEmail: string | undefined;
+      let overrideName: string | undefined;
+      if (!partnerId || !partner?.email) {
+        const ask = window.prompt(
+          "Email del proveedor para enviar NDA + LOI + link del Portal:",
+          partner?.email ?? "",
+        );
+        if (!ask) {
+          setOnboarding(false);
+          return;
+        }
+        overrideEmail = ask.trim();
+        overrideName = partner?.name;
+      }
+      const res = await onboardFn({
+        data: { tradeId, partnerId, overrideEmail, overrideName },
+      });
+      if (res.emailed) {
+        toast.success(`NDA + LOI + Portal enviados a ${res.recipient}`);
+      } else {
+        toast.message("Solicitudes creadas — el envío por email quedó pendiente.", {
+          description: `NDA: ${res.nda.signUrl.slice(0, 42)}… · LOI: ${res.loi.signUrl.slice(0, 42)}…`,
+        });
+      }
+      onLinked();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo enviar el onboarding");
+    } finally {
+      setOnboarding(false);
+    }
+  };
+
+
+
   return (
     <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
       <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
