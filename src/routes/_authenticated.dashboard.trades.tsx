@@ -51,6 +51,7 @@ import {
   type OnboardingStatus,
 } from "@/lib/supplierOnboarding.functions";
 import { dispatchAntimonyPackage } from "@/lib/antimonyDispatch.functions";
+import { dispatchCopperPackage } from "@/lib/copperDispatch.functions";
 import { getEmailDeliveryStatus, type DeliveryRow } from "@/lib/email/deliveryStatus.functions";
 import {
   DOC_CATALOG,
