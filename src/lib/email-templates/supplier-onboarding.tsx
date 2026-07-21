@@ -14,6 +14,8 @@ interface Props {
   loiUrl?: string;
   portalUrl?: string;
   expiresAt?: string;
+  ndaPdfUrl?: string;
+  loiPdfUrl?: string;
 }
 
 const btn = {
