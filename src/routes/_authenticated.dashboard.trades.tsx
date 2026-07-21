@@ -211,6 +211,26 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
     }
   };
 
+  const dispatchFn = useServerFn(dispatchAntimonyPackage);
+  const [dispatching, setDispatching] = useState(false);
+  const dispatchAntimony = async () => {
+    setDispatching(true);
+    try {
+      const res = await dispatchFn({ data: {} });
+      const okCount = res.results.filter((r) => r.ok).length;
+      const failCount = res.results.length - okCount;
+      const detail = res.results
+        .map((r) => `${r.kind} → ${r.to}: ${r.ok ? "ok" : (r.reason ?? "error")}`)
+        .join("\n");
+      if (failCount === 0) toast.success(`Paquete Antimonio enviado (${okCount})`, { description: detail });
+      else toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo despachar el paquete.");
+    } finally {
+      setDispatching(false);
+    }
+  };
+
   return (
     <>
       <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4 flex items-center justify-between gap-3 flex-wrap">
@@ -223,19 +243,35 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
           </div>
         </div>
-        <button
-          onClick={() => void startAntimony()}
-          disabled={saving}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
-        >
-          {saving ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <Ship className="w-3.5 h-3.5" />
-          )}
-          Iniciar operación Antimonio
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => void dispatchAntimony()}
+            disabled={dispatching}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt/10 text-cobalt text-xs font-semibold hover:bg-cobalt/20 disabled:opacity-50 shrink-0"
+            title="Envía NDA+LOI+Portal a Ana Rojo y ficha técnica del antimonio a Marcela y Vincent"
+          >
+            {dispatching ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Send className="w-3.5 h-3.5" />
+            )}
+            Enviar LOI a Ana + Fichas a Carpio & Kaddu
+          </button>
+          <button
+            onClick={() => void startAntimony()}
+            disabled={saving}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+          >
+            {saving ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Ship className="w-3.5 h-3.5" />
+            )}
+            Iniciar operación Antimonio
+          </button>
+        </div>
       </div>
+
 
       {(() => {
         const allIds = tradeIds;
