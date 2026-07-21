@@ -890,3 +890,204 @@ export const listSupplierSheetDispatches = createServerFn({ method: "GET" })
     }
     return { pending: false, dispatches: rows ?? [] };
   });
+
+// ---------- Público: verificación anti-tampering del share token (QR) ----------
+// El QR de la ficha apunta a /verificar/ficha/<token>. Esa página llama a esta
+// función, que:
+//   1) Valida el formato del token (regex del prefijo `gcshr_`).
+//   2) Busca la propuesta por SHA-256 del token — nunca compara texto plano.
+//   3) Verifica que no esté revocada.
+//   4) Registra la visita (hash de IP y UA + fecha) para el contador y auditoría.
+//   5) Devuelve un resumen público de la ficha y el trade real vinculado (si
+//      existe): commodity, cantidad, referencia y estado. Nunca expone precios,
+//      contactos, ni datos internos.
+export type ShareTokenVerification = {
+  status: "valid" | "revoked" | "not_found" | "invalid_format";
+  tokenPrefix: string;
+  viewCount: number;
+  dispatchCount: number;
+  firstIssuedAt: string | null;
+  lastViewedAt: string | null;
+  supplier?: {
+    name: string;
+    company: string | null;
+    country: string | null;
+    role: string | null;
+  };
+  request?: {
+    reference: string;
+    commodity: string;
+    quantityT: number | null;
+    incoterm: string | null;
+    destination: string | null;
+  };
+  trade?: {
+    reference: string | null;
+    commodity: string | null;
+    quantityT: number | null;
+    status: string;
+  } | null;
+  sheetPath?: string;
+};
+
+async function hashWithSalt(value: string): Promise<string> {
+  const salt = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "gc";
+  return sha256Hex(`${salt}:${value}`);
+}
+
+export const verifySupplierShareToken = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ token: z.string().trim().min(1).max(120) }).parse(d))
+  .handler(async ({ data }): Promise<ShareTokenVerification> => {
+    const sb = serviceClient();
+    if (!sb) throw new Error("Servicio no disponible.");
+
+    // Metadatos de la visita (best-effort).
+    let ipHash: string | null = null;
+    let uaHash: string | null = null;
+    let referer: string | null = null;
+    try {
+      const { getRequestHeader } = await import("@tanstack/react-start/server");
+      const rawIp =
+        getRequestHeader("cf-connecting-ip") ||
+        getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
+        getRequestHeader("x-real-ip") ||
+        "";
+      const ua = getRequestHeader("user-agent") ?? "";
+      referer = getRequestHeader("referer") ?? null;
+      if (rawIp) ipHash = await hashWithSalt(rawIp);
+      if (ua) uaHash = await hashWithSalt(ua);
+    } catch {
+      /* ignore */
+    }
+
+    const prefix = data.token.length >= 12 ? tokenPrefix(data.token) : "—";
+
+    if (!isShareTokenFormat(data.token)) {
+      return {
+        status: "invalid_format",
+        tokenPrefix: prefix,
+        viewCount: 0,
+        dispatchCount: 0,
+        firstIssuedAt: null,
+        lastViewedAt: null,
+      };
+    }
+
+    const tokenHash = await sha256Hex(data.token);
+    const { data: sub } = await sb
+      .from("sourcing_submissions")
+      .select(
+        "id, request_id, supplier_name, supplier_company, supplier_country, supplier_role, share_token_revoked_at, trade_id, created_at",
+      )
+      .eq("share_token_hash", tokenHash)
+      .maybeSingle();
+
+    if (!sub) {
+      // Registra el intento fallido (sin submission_id no podemos usar la tabla:
+      // el token puede ser inventado). No pasa nada — el contador solo cuenta
+      // visitas válidas.
+      return {
+        status: "not_found",
+        tokenPrefix: prefix,
+        viewCount: 0,
+        dispatchCount: 0,
+        firstIssuedAt: null,
+        lastViewedAt: null,
+      };
+    }
+
+    const row = sub as {
+      id: string;
+      request_id: string;
+      supplier_name: string;
+      supplier_company: string | null;
+      supplier_country: string | null;
+      supplier_role: string | null;
+      share_token_revoked_at: string | null;
+      trade_id: string | null;
+      created_at: string;
+    };
+    const outcome: "valid" | "revoked" = row.share_token_revoked_at ? "revoked" : "valid";
+
+    // Registrar visita
+    await sb.from("sourcing_share_token_views").insert({
+      submission_id: row.id,
+      request_id: row.request_id,
+      ip_hash: ipHash,
+      ua_hash: uaHash,
+      referer,
+      outcome,
+    });
+
+    const [{ count: viewCount }, { count: dispatchCount }, { data: lastView }, { data: req }] =
+      await Promise.all([
+        sb
+          .from("sourcing_share_token_views")
+          .select("id", { count: "exact", head: true })
+          .eq("submission_id", row.id)
+          .eq("outcome", "valid"),
+        sb
+          .from("sourcing_dispatches")
+          .select("id", { count: "exact", head: true })
+          .eq("submission_id", row.id),
+        sb
+          .from("sourcing_share_token_views")
+          .select("viewed_at")
+          .eq("submission_id", row.id)
+          .eq("outcome", "valid")
+          .order("viewed_at", { ascending: false })
+          .limit(1)
+          .maybeSingle(),
+        sb
+          .from("sourcing_requests")
+          .select("reference, commodity, quantity_t, incoterm, destination")
+          .eq("id", row.request_id)
+          .maybeSingle(),
+      ]);
+
+    let trade: ShareTokenVerification["trade"] = null;
+    if (row.trade_id) {
+      const { data: t } = await sb
+        .from("commodity_trades")
+        .select("reference, commodity, quantity_t, status")
+        .eq("id", row.trade_id)
+        .maybeSingle();
+      if (t) {
+        const tt = t as Record<string, unknown>;
+        trade = {
+          reference: (tt.reference as string | null) ?? null,
+          commodity: (tt.commodity as string | null) ?? null,
+          quantityT: (tt.quantity_t as number | null) ?? null,
+          status: String(tt.status ?? "active"),
+        };
+      }
+    }
+
+    const r = (req ?? {}) as Record<string, unknown>;
+    return {
+      status: outcome,
+      tokenPrefix: prefix,
+      viewCount: viewCount ?? 0,
+      dispatchCount: dispatchCount ?? 0,
+      firstIssuedAt: row.created_at,
+      lastViewedAt: (lastView as { viewed_at: string } | null)?.viewed_at ?? null,
+      supplier: {
+        name: row.supplier_name,
+        company: row.supplier_company,
+        country: row.supplier_country,
+        role: row.supplier_role,
+      },
+      request: req
+        ? {
+            reference: String(r.reference),
+            commodity: String(r.commodity),
+            quantityT: (r.quantity_t as number | null) ?? null,
+            incoterm: (r.incoterm as string | null) ?? null,
+            destination: (r.destination as string | null) ?? null,
+          }
+        : undefined,
+      trade,
+      sheetPath: outcome === "valid" ? `/ficha-proveedor/${data.token}` : undefined,
+    };
+  });
+
