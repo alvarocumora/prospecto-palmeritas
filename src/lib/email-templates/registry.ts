@@ -21,6 +21,7 @@ import { template as shipmentUpdate } from "./shipment-update";
 import { template as sourcingProposalReceived } from "./sourcing-proposal-received";
 import { template as sourcingConvertedSupplier } from "./sourcing-converted-supplier";
 import { template as paymentReminder } from "./payment-reminder";
+import { template as supplierOnboarding } from "./supplier-onboarding";
 
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
@@ -57,4 +58,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "sourcing-proposal-received": sourcingProposalReceived,
   "sourcing-converted-supplier": sourcingConvertedSupplier,
   "payment-reminder": paymentReminder,
+  "supplier-onboarding": supplierOnboarding,
 };

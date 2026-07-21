@@ -44,6 +44,7 @@ import { listPartners, upsertPartner } from "@/lib/clients.functions";
 import { PARTNER_ROLES } from "@/lib/clients";
 import { OPERATOR_LINE } from "@/lib/documents/company";
 import { listMySignRequests } from "@/lib/documents/signing.functions";
+import { sendSupplierOnboarding } from "@/lib/supplierOnboarding.functions";
 import {
   DOC_CATALOG,
   DOC_BY_KEY,
@@ -1444,12 +1445,14 @@ function SupplierPanel({
   const listFn = useServerFn(listPartners);
   const upsertFn = useServerFn(upsertPartner);
   const linkFn = useServerFn(linkPartnerToTrade);
+  const onboardFn = useServerFn(sendSupplierOnboarding);
   const { data, refetch } = useQuery({
     queryKey: ["partners-list"],
     queryFn: () => listFn(),
   });
   const partners = data?.partners ?? [];
   const [selectedId, setSelectedId] = useState<string>("");
+  const [onboarding, setOnboarding] = useState(false);
   const [creating, setCreating] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
@@ -1502,6 +1505,45 @@ function SupplierPanel({
     }
   };
 
+  const sendOnboarding = async () => {
+    setOnboarding(true);
+    try {
+      const partnerId = selectedId || undefined;
+      const partner = partners.find((p) => p.id === selectedId);
+      let overrideEmail: string | undefined;
+      let overrideName: string | undefined;
+      if (!partnerId || !partner?.email) {
+        const ask = window.prompt(
+          "Email del proveedor para enviar NDA + LOI + link del Portal:",
+          partner?.email ?? "",
+        );
+        if (!ask) {
+          setOnboarding(false);
+          return;
+        }
+        overrideEmail = ask.trim();
+        overrideName = partner?.name;
+      }
+      const res = await onboardFn({
+        data: { tradeId, partnerId, overrideEmail, overrideName },
+      });
+      if (res.emailed) {
+        toast.success(`NDA + LOI + Portal enviados a ${res.recipient}`);
+      } else {
+        toast.message("Solicitudes creadas — el envío por email quedó pendiente.", {
+          description: `NDA: ${res.nda.signUrl.slice(0, 42)}… · LOI: ${res.loi.signUrl.slice(0, 42)}…`,
+        });
+      }
+      onLinked();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo enviar el onboarding");
+    } finally {
+      setOnboarding(false);
+    }
+  };
+
+
+
   return (
     <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
       <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
@@ -1547,6 +1589,19 @@ function SupplierPanel({
             className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted"
           >
             <Plus className="w-3 h-3" /> Nuevo proveedor
+          </button>
+          <button
+            onClick={() => void sendOnboarding()}
+            disabled={onboarding || busy}
+            title="Envía en un mail al proveedor: NDA + LOI para firma electrónica + link del Portal Proveedor para carga documental."
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0F2A6B] text-white text-[11px] font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-50"
+          >
+            {onboarding ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              <Send className="w-3 h-3" />
+            )}
+            Enviar NDA + LOI + Portal
           </button>
         </div>
       ) : (
