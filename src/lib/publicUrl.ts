@@ -22,6 +22,9 @@ export const signUrl = (token: string) => publicUrl(`/firmar/${token}`);
 /** Link canónico para aceptar una invitación de equipo/proyecto. */
 export const invitationUrl = (token: string) => publicUrl(`/invitations/${token}`);
 
+/** Link canónico para el wizard público de onboarding de socios (broker/cliente). */
+export const onboardingUrl = (token: string) => publicUrl(`/onboarding/${token}`);
+
 /** Link para que un asociado/proveedor suba su propuesta a un requerimiento. */
 export const sourcingSubmitUrl = (token: string) => publicUrl(`/proveedor/${token}`);
 
