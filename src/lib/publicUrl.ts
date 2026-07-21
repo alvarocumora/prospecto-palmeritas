@@ -31,6 +31,13 @@ export const sourcingSubmitUrl = (token: string) => publicUrl(`/proveedor/${toke
 /** Link de solo lectura de la ficha de proveedor, para compartir con el comprador. */
 export const supplierSheetUrl = (token: string) => publicUrl(`/ficha-proveedor/${token}`);
 
+/**
+ * Link de verificación pública de la ficha de proveedor. Es el destino del QR
+ * impreso / mostrado en pantalla: muestra si el share token es válido, cuántas
+ * veces se ha abierto, y el trade real conectado. Desde ahí se accede a la ficha.
+ */
+export const verifyShareUrl = (token: string) => publicUrl(`/verificar/ficha/${token}`);
+
 export const projectSheetUrl = (token: string) => publicUrl(`/proyecto/${token}`);
 
 /** Link canónico para verificación pública de cumplimiento NI 43-101. */
