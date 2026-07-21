@@ -28,6 +28,7 @@ import { template as copperProductSheet } from "./copper-product-sheet";
 import { template as agentOutreach } from "./agent-outreach";
 import { template as tradePackDispatch } from "./trade-pack-dispatch";
 import { template as partnerInvitation } from "./partner-invitation";
+import { template as supplierSheetDispatch } from "./supplier-sheet-dispatch";
 
 
 export interface TemplateEntry {
@@ -72,5 +73,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "agent-outreach": agentOutreach,
   "trade-pack-dispatch": tradePackDispatch,
   "partner-invitation": partnerInvitation,
+  "supplier-sheet-dispatch": supplierSheetDispatch,
 };
 

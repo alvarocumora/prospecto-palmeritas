@@ -720,3 +720,173 @@ export const getSupplierSheetByShareToken = createServerFn({ method: "POST" })
       supplier: { ...s, documents: Array.isArray(s.documents) ? s.documents : [] },
     };
   });
+
+// ---------- Dueño: despachar ficha bajo NCNDA a compradores seleccionados ----------
+// Genera (si no existe) el share token de la ficha, arma el link público
+// https://geocapitals.com/ficha-proveedor/<token> y envía un correo bajo el
+// modelo estándar Geocapitals a cada comprador. Cada envío queda auditado en
+// public.sourcing_dispatches.
+
+const DispatchRecipient = z.object({
+  email: z.string().trim().email().max(160),
+  name: z.string().trim().max(160).optional(),
+  company: z.string().trim().max(160).optional(),
+  partnerId: z.string().uuid().optional(),
+});
+
+export const dispatchSupplierSheetToBuyers = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        submissionId: z.string().uuid(),
+        recipients: z.array(DispatchRecipient).min(1).max(20),
+        ncndaRef: z.string().trim().max(80).optional(),
+        note: z.string().trim().max(1000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const sb = asSb(context.supabase);
+    // 1) Carga ficha + requerimiento (RLS: solo dueño).
+    const { data: sub, error: subErr } = await sb
+      .from("sourcing_submissions")
+      .select(
+        "id, request_id, supplier_name, supplier_company, supplier_country, offer_price_usd_t, offer_valid_until, incoterm, share_token_prefix, share_token_hash",
+      )
+      .eq("id", data.submissionId)
+      .maybeSingle();
+    if (subErr) throw new Error(subErr.message);
+    if (!sub) throw new Error("Propuesta no encontrada o sin permisos.");
+
+    // 2) Asegura share token (si no existe, genera y guarda hash).
+    let shareToken: string | null = null;
+    const row = sub as Record<string, unknown>;
+    if (!row.share_token_hash) {
+      shareToken = generateShareToken();
+      const { error: updErr } = await sb
+        .from("sourcing_submissions")
+        .update({
+          share_token_prefix: tokenPrefix(shareToken),
+          share_token_hash: await sha256Hex(shareToken),
+        })
+        .eq("id", data.submissionId);
+      if (updErr) throw new Error(updErr.message);
+    } else {
+      // Ya existe: regenera uno nuevo para que este despacho lleve un link vigente.
+      shareToken = generateShareToken();
+      const { error: updErr } = await sb
+        .from("sourcing_submissions")
+        .update({
+          share_token_prefix: tokenPrefix(shareToken),
+          share_token_hash: await sha256Hex(shareToken),
+        })
+        .eq("id", data.submissionId);
+      if (updErr) throw new Error(updErr.message);
+    }
+
+    const { data: req } = await sb
+      .from("sourcing_requests")
+      .select("id, reference, commodity, form, quantity_t, incoterm, destination")
+      .eq("id", String(row.request_id))
+      .maybeSingle();
+    const r = (req ?? {}) as Record<string, unknown>;
+
+    const { publicUrl } = await import("@/lib/publicUrl");
+    const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
+    const sheetUrl = publicUrl(`/ficha-proveedor/${shareToken}`);
+    const reference = String(r.reference ?? "");
+    const commodity = String(r.commodity ?? "");
+
+    const results: Array<{ email: string; ok: boolean; reason?: string }> = [];
+    for (const rec of data.recipients) {
+      try {
+        const res = await sendInternalEmail({
+          templateName: "supplier-sheet-dispatch",
+          recipientEmail: rec.email,
+          idempotencyKey: `supplier-sheet:${data.submissionId}:${rec.email}:${Date.now()}`,
+          templateData: {
+            recipientName: rec.name,
+            recipientCompany: rec.company,
+            senderCompany: "Geocapitals",
+            requestReference: reference,
+            commodity,
+            form: (r.form ?? null) as string | null,
+            quantityT: (r.quantity_t ?? null) as number | null,
+            incoterm: (r.incoterm ?? row.incoterm ?? null) as string | null,
+            destination: (r.destination ?? null) as string | null,
+            supplierName: (row.supplier_name ?? null) as string | null,
+            supplierCompany: (row.supplier_company ?? null) as string | null,
+            supplierCountry: (row.supplier_country ?? null) as string | null,
+            offerPrice: row.offer_price_usd_t
+              ? `US$ ${Number(row.offer_price_usd_t).toLocaleString("en-US")}/t`
+              : undefined,
+            offerValidUntil: (row.offer_valid_until ?? null) as string | null,
+            sheetUrl,
+            ncndaRef: data.ncndaRef,
+            note: data.note,
+          },
+        });
+        const ok = Boolean(res.ok);
+        const reason =
+          ok && "queued" in res && res.queued
+            ? "queued"
+            : "reason" in res
+              ? (res.reason as string | undefined)
+              : "error" in res
+                ? (res.error as string | undefined)
+                : undefined;
+        results.push({ email: rec.email, ok, reason });
+
+        await sb.from("sourcing_dispatches").insert({
+          owner_user_id: context.userId as string,
+          submission_id: data.submissionId,
+          request_id: String(row.request_id),
+          recipient_email: rec.email,
+          recipient_name: rec.name ?? null,
+          recipient_company: rec.company ?? null,
+          partner_id: rec.partnerId ?? null,
+          ncnda_ref: data.ncndaRef ?? null,
+          message_id: ("messageId" in res ? (res.messageId as string) : null) ?? null,
+          status: ok ? "sent" : "failed",
+          note: reason ?? null,
+        });
+      } catch (e) {
+        const reason = e instanceof Error ? e.message : String(e);
+        results.push({ email: rec.email, ok: false, reason });
+        await sb.from("sourcing_dispatches").insert({
+          owner_user_id: context.userId as string,
+          submission_id: data.submissionId,
+          request_id: String(row.request_id),
+          recipient_email: rec.email,
+          recipient_name: rec.name ?? null,
+          recipient_company: rec.company ?? null,
+          partner_id: rec.partnerId ?? null,
+          ncnda_ref: data.ncndaRef ?? null,
+          status: "failed",
+          note: reason,
+        });
+      }
+    }
+
+    return { ok: true, sheetUrl, shareToken, results };
+  });
+
+export const listSupplierSheetDispatches = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await asSb(context.supabase)
+      .from("sourcing_dispatches")
+      .select(
+        "id, recipient_email, recipient_name, recipient_company, ncnda_ref, status, note, created_at",
+      )
+      .eq("submission_id", data.submissionId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) {
+      if (isMissingTable(error.message)) return { pending: true, dispatches: [] };
+      throw new Error(error.message);
+    }
+    return { pending: false, dispatches: rows ?? [] };
+  });
