@@ -63,6 +63,7 @@ const Email = ({
   tradeReference,
   senderCompany,
   operationUrl,
+  sheetPdfUrl,
 }: Props) => (
   <EmailLayout
     preview={`Ficha técnica · Antimonio Sb Grade 2# — CoA + SGS · ${tradeReference ?? ""}`}
@@ -139,6 +140,40 @@ const Email = ({
       de primer nivel, contra documentos de embarque.
     </Text>
 
+    {sheetPdfUrl ? (
+      <Section
+        style={{
+          margin: "16px 0 8px",
+          padding: "12px 14px",
+          background: "#F1F4FF",
+          borderLeft: `3px solid ${colors.primary}`,
+        }}
+      >
+        <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>
+          Copia oficial (PDF) para su bandeja
+        </Text>
+        <Text style={styles.muted}>
+          Adjuntamos ficha técnica firmada por Geocapitals con sello de confidencialidad.
+        </Text>
+        <a
+          href={sheetPdfUrl}
+          style={{
+            display: "inline-block",
+            marginTop: 6,
+            padding: "9px 16px",
+            background: colors.primary,
+            color: "#FFFFFF",
+            borderRadius: 6,
+            textDecoration: "none",
+            fontWeight: 600,
+            fontSize: 13,
+          }}
+        >
+          Descargar ficha técnica (PDF)
+        </a>
+      </Section>
+    ) : null}
+
     {operationUrl ? (
       <Text style={styles.p}>
         War Room de la operación:{" "}
@@ -152,8 +187,24 @@ const Email = ({
       Cualquier consulta técnica o comercial: info@geocapitals.com · WhatsApp +56 9 6218 4071.
       Este envío está cubierto por el NCNDA suscrito entre las partes.
     </Text>
+
+    <Text
+      style={{
+        ...styles.muted,
+        fontSize: 11,
+        marginTop: 12,
+        padding: "8px 10px",
+        background: "#FFF7E6",
+        borderLeft: "3px solid #E8C765",
+      }}
+    >
+      CONFIDENCIAL — Este mensaje y el PDF adjunto son propiedad de Geocapitals y de las Partes
+      identificadas. Contienen información sensible cubierta por acuerdo de confidencialidad (NCNDA).
+      Prohibida su reproducción, distribución o divulgación a terceros sin autorización escrita.
+    </Text>
   </EmailLayout>
 );
+
 
 export const template = {
   component: Email,
