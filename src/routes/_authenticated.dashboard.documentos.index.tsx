@@ -1,8 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2, Download, Sparkles } from "lucide-react";
+import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2, Download, Sparkles, PenLine } from "lucide-react";
 import { TEMPLATES, TEMPLATE_BY_ID, CATEGORY_LABEL } from "@/lib/documents/templates";
 import { SPECIAL_DOCS, downloadSpecialDoc, type SpecialDocId } from "@/lib/documents/specialDocs";
+import { SpecialDocSignDialog } from "@/features/documents/SpecialDocSignDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -295,6 +296,7 @@ function SignBadge({ stats }: { stats?: { pending: number; signed: number } }) {
 function SpecialDocsSection() {
   const [busy, setBusy] = useState<SpecialDocId | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [signing, setSigning] = useState<SpecialDocId | null>(null);
 
   const handleDownload = async (id: SpecialDocId) => {
     setError(null);
@@ -313,13 +315,20 @@ function SpecialDocsSection() {
       <div className="flex items-center justify-between mb-3">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle inline-flex items-center gap-1.5">
           <Sparkles className="w-3 h-3 text-accent-brand" />
-          Documentos especiales · Formato global con QR
+          Documentos especiales · Formato global con QR + firma electrónica
         </div>
+        <Link
+          to="/dashboard/firmas"
+          className="text-[10px] font-mono uppercase tracking-wider text-accent-brand hover:underline inline-flex items-center gap-1"
+        >
+          <ShieldCheck className="w-3 h-3" /> Estado de firmas
+        </Link>
       </div>
       <p className="text-sm text-content-subtle mb-3 max-w-3xl">
         Fichas y adendas de operaciones activas generadas con el mismo motor Institutional
         Modernist que NDA, LOI y NCNDA: papel hueso, tabulación estándar, QR de verificación en
-        cabecera y pie, y contacto oficial de Geocapitals.
+        cabecera y pie, y contacto oficial de Geocapitals. Puedes descargarlas o enviarlas a firma
+        electrónica multi-parte con trazabilidad SHA-256.
       </p>
       {error ? (
         <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
@@ -337,25 +346,38 @@ function SpecialDocsSection() {
                 <FileText className="w-3 h-3" /> {d.acronym}
               </span>
               <span className="text-[9px] font-mono uppercase tracking-wider text-content-subtle">
-                Institutional Modernist
+                {d.signers.length > 1 ? `${d.signers.length} firmantes` : "Firma"}
               </span>
             </div>
             <div className="font-display text-lg text-content leading-snug">{d.label}</div>
             <p className="text-sm text-content-subtle mt-1.5 leading-relaxed flex-1">
               {d.summary}
             </p>
-            <button
-              type="button"
-              onClick={() => handleDownload(d.id)}
-              disabled={busy === d.id}
-              className="mt-4 inline-flex items-center justify-center gap-2 rounded-lg bg-accent-brand text-white px-4 py-2 text-sm font-medium hover:bg-accent-brand/90 disabled:opacity-60"
-            >
-              <Download className="w-4 h-4" />
-              {busy === d.id ? "Generando…" : "Descargar PDF"}
-            </button>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => handleDownload(d.id)}
+                disabled={busy === d.id}
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-hairline bg-white text-content px-3 py-2 text-sm font-medium hover:border-accent-brand disabled:opacity-60"
+              >
+                <Download className="w-4 h-4" />
+                {busy === d.id ? "Generando…" : "Descargar"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setSigning(d.id)}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent-brand text-white px-3 py-2 text-sm font-medium hover:bg-accent-brand/90"
+              >
+                <PenLine className="w-4 h-4" />
+                Firma
+              </button>
+            </div>
           </div>
         ))}
       </div>
+      {signing && (
+        <SpecialDocSignDialog docId={signing} onClose={() => setSigning(null)} />
+      )}
     </section>
   );
 }
