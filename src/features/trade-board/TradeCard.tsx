@@ -64,7 +64,21 @@ export function TradeCard({ card }: { card: BoardCard }) {
             {card.quantity_t != null ? ` · ${card.quantity_t} t` : ""}
           </div>
           <div className="text-[10px] text-muted-foreground truncate">{card.counterparty}</div>
-          <div className="mt-1 text-xs font-mono">{usd(card.total_value_usd)}</div>
+          <div className="mt-1 flex items-center justify-between gap-1">
+            <div className="text-xs font-mono">{usd(card.total_value_usd)}</div>
+            {card.daysInStage != null && (
+              <div
+                className={`text-[9px] font-mono px-1 rounded ${
+                  card.stuck
+                    ? "bg-amber-500/20 text-amber-700"
+                    : "text-muted-foreground"
+                }`}
+                title={card.stuck ? "Excede SLA" : "Días en etapa"}
+              >
+                {card.daysInStage}d
+              </div>
+            )}
+          </div>
           <div className="mt-1.5 h-1 rounded-full bg-muted overflow-hidden">
             <div
               className="h-full bg-accent-brand"

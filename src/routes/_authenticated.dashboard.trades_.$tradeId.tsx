@@ -41,6 +41,7 @@ import {
   type PaymentKind,
 } from "@/lib/payments";
 import { TradeCopilotPanel } from "@/features/trades/TradeCopilotPanel";
+import { CommodityIntelPanel } from "@/features/trades/CommodityIntelPanel";
 
 // Trazabilidad unificada del trade — "Uber de los commodities": un titular de
 // estado, el viaje en pasos y el timeline completo (acuerdo, documentos, pago,
@@ -168,6 +169,13 @@ function TrackingPage() {
           trade.unit_price_usd == null
         }
       />
+
+      {/* Inteligencia de mercado */}
+      {trade.commodity && (
+        <CommodityIntelPanel commodity={trade.commodity} quantityT={trade.quantity_t ?? null} />
+      )}
+
+
 
       {/* Carga activa */}
       {activeShipment && (
