@@ -229,13 +229,67 @@ export function buildTrentoMonaBastFicha(): GeneratedDoc {
   };
 }
 
+// ───────────── NCNDA · SingularX + ZBALATAM (data room proyectos) ─────────
+
+export function buildSingularxNcnda(): GeneratedDoc {
+  return {
+    docType: "NCNDA",
+    reference: "GC-NCNDA-SGX-ZBA-202607-1",
+    date: today(),
+    title:
+      "Non-Circumvention & Non-Disclosure Agreement (NCNDA) — Geocapitals · SingularX · ZBALA LATAM",
+    blocks: [
+      {
+        kind: "fields",
+        rows: [
+          ["Parte A · Advisor / Operador", "Geocapitals SpA · info@geocapitals.com · +56 9 6218 4071"],
+          ["Parte B · Broker / Buy-side", "SingularX — Eduardo · eduardo@singularx.io"],
+          ["Parte C · Broker / Buy-side", "ZBALA LATAM — Joaquín Belmar · joaquin.belmar@zbalatam.com"],
+          ["Objeto", "Ofertas de compra de concentrados (Cu, Au, Sb, REE) y compra/venta de minas en Chile"],
+          ["Alcance data room", "Proyectos de oro, cobre, antimonio y tierras raras coordinados por Geocapitals"],
+          ["Vigencia / Term", "24 meses desde la firma · No-elusión 12 meses adicionales"],
+          ["Jurisdicción / Governing law", "República de Chile · CAM Santiago"],
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "Between Geocapitals SpA (Party A), SingularX (Party B) and ZBALA LATAM (Party C) — collectively \"The Parties\" — this Non-Circumvention Non-Disclosure Agreement (NCNDA) is executed to enable the exchange of technical, commercial and financial information regarding purchase offers of mineral concentrates and mining assets in Chile. — Entre Geocapitals SpA (Parte A), SingularX (Parte B) y ZBALA LATAM (Parte C) — en conjunto, \"Las Partes\" — se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) para permitir el intercambio de información técnica, comercial y financiera relativa a ofertas de compra de concentrados minerales y activos mineros en Chile.",
+      },
+      {
+        kind: "clauses",
+        items: [
+          "1. Object / Objeto. Regulate the exchange of information regarding concentrate offers (Cu, Au, Sb, REE) and mining assets sourced or advised by Geocapitals, and coordinate buy-side inquiries from SingularX and ZBALA LATAM. — Regular el intercambio de información sobre ofertas de concentrados (Cu, Au, Sb, REE) y activos mineros originados o asesorados por Geocapitals, y coordinar las consultas de compra de SingularX y ZBALA LATAM.",
+          "2. Confidential Information / Información confidencial. Includes — without limitation — data room contents, NI 43-101 reports, block models, reserves and resources, financials, titles, contracts, counterparties, prices and any material shared by any Party. — Incluye, sin limitación, el contenido del data room, informes NI 43-101, modelos de bloques, reservas y recursos, estados financieros, títulos, contratos, contrapartes, precios y cualquier material compartido por cualquiera de las Partes.",
+          "3. Non-Circumvention / No-elusión. The Parties agree not to contact, negotiate or contract, directly or indirectly, with the sellers, buyers, financiers, titleholders or counterparties identified by another Party, during the term and for 12 additional months. — Las Partes se obligan a no contactar, negociar ni contratar, directa o indirectamente, con los vendedores, compradores, financistas, titulares o contrapartes identificados por otra Parte, durante la vigencia y por 12 meses adicionales.",
+          "4. Authorized circle / Círculo autorizado. Each Party may share information with its advisors, financiers and technical team under identical confidentiality obligations, being liable for their acts. — Cada Parte podrá compartir la información con sus asesores, financistas y equipo técnico bajo idénticas obligaciones de confidencialidad, respondiendo por sus actos.",
+          "5. Data room access / Acceso al data room. Geocapitals will grant access to joaquin.belmar@zbalatam.com and eduardo@singularx.io to the project data rooms upon execution of this NCNDA, with per-user traceability. — Geocapitals otorgará acceso a joaquin.belmar@zbalatam.com y eduardo@singularx.io a los data rooms de los proyectos una vez firmado este NCNDA, con trazabilidad por usuario.",
+          "6. Third-Party Projects / Proyectos con terceros. Any project to be shared with third parties shall require prior written acceptance of the signatories and the execution of a separate NCNDA limited to that project. — Todo proyecto que se comparta con terceros requerirá aceptación previa y por escrito de los firmantes y la suscripción de un NCNDA independiente limitado a ese proyecto.",
+          "7. Term / Vigencia. 24 months from execution; confidentiality survives with respect to information received during such period. — 24 meses desde la firma; la confidencialidad subsiste respecto de la información recibida durante dicho período.",
+          "8. Penalty / Penalidad. Breach entitles the affected Party to a minimum indemnity of US$ 250,000, without prejudice to additional proven damages. — El incumplimiento faculta a la Parte afectada a exigir una indemnización mínima de US$ 250.000, sin perjuicio de los daños adicionales que se acrediten.",
+          "9. Governing law & arbitration / Ley y arbitraje. Governed by the laws of Chile. Disputes shall be submitted to arbitration at the CAM of the Santiago Chamber of Commerce. — Se rige por las leyes de Chile. Las controversias se someterán al arbitraje del CAM de la Cámara de Comercio de Santiago.",
+          "10. Electronic signature / Firma electrónica. The Parties accept electronic signature and the QR traceability issued by the Geocapitals platform as valid expression of consent. — Las Partes aceptan la firma electrónica y la trazabilidad QR emitida por la plataforma Geocapitals como expresión válida del consentimiento.",
+        ],
+      },
+      {
+        kind: "signature",
+        parties: [
+          "Por Geocapitals SpA",
+          "Por SingularX — Eduardo",
+          "Por ZBALA LATAM — Joaquín Belmar",
+        ],
+      },
+    ],
+  };
+}
+
 // ─────────────────────────── API pública ──────────────────────────────────
 
 export type SpecialDocId =
   | "gold-nda"
   | "gold-ficha"
   | "trento-adenda"
-  | "trento-mona-bast";
+  | "trento-mona-bast"
+  | "singularx-ncnda";
 
 export const SPECIAL_DOCS: Array<{
   id: SpecialDocId;
@@ -275,6 +329,14 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Ficha comercial LREE — concentrado 30-60% TREO, ruta metalúrgica y compradores objetivo.",
     build: buildTrentoMonaBastFicha,
+  },
+  {
+    id: "singularx-ncnda",
+    label: "NCNDA · SingularX + ZBALA LATAM",
+    acronym: "NCNDA",
+    summary:
+      "Tripartito ICC bilingüe (ES/EN) para habilitar accesos al data room de proyectos y ofertas de compra.",
+    build: buildSingularxNcnda,
   },
 ];
 
