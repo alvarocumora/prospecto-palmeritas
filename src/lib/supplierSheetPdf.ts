@@ -233,6 +233,59 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
     });
   }
 
+  // Consolidación específica: Cátodos de cobre refinado · Sonora (México).
+  const isCuCathodeSonora =
+    /CU-CATODO-SONORA/i.test(request.reference) ||
+    (/cobre|copper/i.test(request.commodity) &&
+      /c[aá]todo|placa/i.test(`${request.form} ${supplier.packaging}`) &&
+      /sonora/i.test(`${supplier.supplier_country} ${supplier.port_loading}`));
+  if (isCuCathodeSonora) {
+    blocks.push({
+      kind: "paragraph",
+      text: "Detalle del mineral ofertado — Cátodos de cobre refinado. Datos tomados de la disponibilidad informada por el proveedor. Precio referenciado al valor LME con descuento; sujeto a due diligence e inspección independiente.",
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Característica", "Detalle"],
+      rows: [
+        ["Producto", "Cátodos de cobre refinado"],
+        ["Origen", "Estado de Sonora, México"],
+        ["Pureza mínima", "99,99% Cu"],
+        ["Formato", "Placas planas de aprox. 1,00 m × 0,80 m"],
+        ["Espesor", "5 mm a 10 mm"],
+        ["Stock disponible", "300 toneladas"],
+        ["Capacidad de suministro", "250 toneladas por semana"],
+        ["Primera operación spot", "80 toneladas"],
+        [
+          "Aplicaciones",
+          "Conductores eléctricos, cables, componentes eléctricos y usos industriales",
+        ],
+      ],
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Concepto comercial", "Condición"],
+      rows: [
+        ["Precio", "Referenciado al valor LME, con descuento de 5%"],
+        [
+          "Modo de pago",
+          "Contado por transferencia electrónica al momento de la carga y recepción de la mercancía",
+        ],
+        ["Primera operación (spot)", "80 toneladas"],
+        ["Esquema", "Operación formal con cumplimiento fiscal en México"],
+      ],
+    });
+    blocks.push({
+      kind: "clauses",
+      items: [
+        "Posibilidad de coordinar visita técnica, inspección y toma de muestras. Para autorizar la visita se requiere identificación de los asistentes y Orden de Compra (OC).",
+        "Posterior al análisis de muestras se formaliza el contrato y se programa la fecha de compra y carga.",
+        "Precio referenciado al valor LME con descuento de 5%; puede ajustarse ante variación de la bolsa internacional del cobre.",
+        "Operación bajo esquema formal y cumplimiento fiscal en México. Documento de referencia comercial — no constituye oferta vinculante.",
+      ],
+    });
+  }
+
   if (supplier.specs && supplier.specs.trim()) {
     blocks.push({ kind: "paragraph", text: `Especificaciones técnicas: ${supplier.specs.trim()}` });
   }
