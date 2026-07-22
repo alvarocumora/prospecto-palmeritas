@@ -342,7 +342,7 @@ export async function renderGeocapitalsPdf(
       const ly = y + 22 + i * 12;
       const badge = a.match ? "OK" : "X";
       pdf.setFont("helvetica", "bold");
-      pdf.setTextColor(...(a.match ? [16, 122, 87] : [176, 45, 45]));
+      pdf.setTextColor(...(a.match ? okInk : badInk));
       pdf.text(`[${badge}]`, marginX + 8, ly);
       pdf.setFont("helvetica", "normal");
       pdf.setTextColor(...INK);
