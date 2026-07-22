@@ -461,6 +461,79 @@ export const submitSignature = createServerFn({ method: "POST" })
     return { signedAt: signedAtIso, signatureHash };
   });
 
+// ---------- Público: verificación de integridad por firmante ----------
+// Recomputa el signature_hash esperado para cada firma completada del mismo
+// flujo (o de la solicitud individual) a partir de los campos almacenados
+// (doc_hash, signer_name, signed_at, token_hash) y lo compara contra el hash
+// persistido. Permite a la contraparte comprobar por sí misma que ninguna
+// firma fue alterada después de emitida, y que cada firma coincide con su
+// signOrder (parte) declarada en el documento.
+export type SignatureVerification = {
+  order: number;
+  role: string | null;
+  signerNameExpected: string | null;
+  signedByName: string;
+  signedAt: string;
+  storedHash: string;
+  expectedHash: string;
+  hashMatch: boolean;
+  orderMatch: boolean; // el signOrder cae dentro del rango de partes del documento
+};
+
+export const verifyFlowSignatures = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => TokenInput.parse(d))
+  .handler(async ({ data }): Promise<SignatureVerification[]> => {
+    const sb = serviceClient();
+    if (!sb) return [];
+    const row = await findByToken(sb, data.token);
+    if (!row) return [];
+
+    // Partes declaradas en el documento (bloque signature): usadas para
+    // validar que cada signOrder cae dentro del rango de partes esperadas.
+    const doc = row.doc as GeneratedDoc;
+    const sigBlock = doc?.blocks?.find((b) => (b as { kind?: string }).kind === "signature") as
+      | { kind: "signature"; parties: string[] }
+      | undefined;
+    const partiesCount = sigBlock?.parties?.length ?? 0;
+
+    // Todas las filas del flujo (o la única fila si no hay flow_id) que ya
+    // hayan sido firmadas: se recomputa el hash de cada una con sus propios
+    // token_hash + doc_hash, sin depender de datos del cliente.
+    const query = sb
+      .from("document_sign_requests")
+      .select(
+        "sign_order, signer_role, signer_name_expected, signed_by_name, signed_at, signature_hash, doc_hash, token_hash, status",
+      )
+      .eq("status", "signed");
+    const { data: siblings } = row.flow_id
+      ? await query.eq("flow_id", String(row.flow_id))
+      : await query.eq("id", String(row.id));
+
+    const out: SignatureVerification[] = [];
+    for (const r of (siblings ?? []) as Array<Record<string, unknown>>) {
+      if (!r.signed_by_name || !r.signed_at || !r.signature_hash) continue;
+      const order = Number(r.sign_order ?? 0);
+      const expected = await buildSignatureHash({
+        docHash: String(r.doc_hash),
+        signerName: String(r.signed_by_name),
+        signedAtIso: String(r.signed_at),
+        tokenHash: String(r.token_hash),
+      });
+      out.push({
+        order,
+        role: (r.signer_role ?? null) as string | null,
+        signerNameExpected: (r.signer_name_expected ?? null) as string | null,
+        signedByName: String(r.signed_by_name),
+        signedAt: String(r.signed_at),
+        storedHash: String(r.signature_hash),
+        expectedHash: expected,
+        hashMatch: String(r.signature_hash) === expected,
+        orderMatch: partiesCount === 0 ? true : order >= 0 && order < partiesCount,
+      });
+    }
+    return out.sort((a, b) => a.order - b.order);
+  });
+
 // ═════════════════════════════════════════════════════════════════════════
 // FLUJO ORDENADO (multi-firmante): agrupa N solicitudes bajo un mismo
 // flow_id con sign_order estricto. Cada firmante tiene su propio token, y
