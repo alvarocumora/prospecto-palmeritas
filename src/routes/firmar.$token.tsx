@@ -8,7 +8,6 @@ import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import { DocumentPreview } from "@/features/documents/DocumentEditor";
 import { getSignRequest, submitSignature } from "@/lib/documents/signing.functions";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
-import type { GeneratedDoc } from "@/lib/documents/model";
 
 // Página PÚBLICA de firma electrónica: la contraparte abre el link tokenizado,
 // revisa el documento congelado y firma con su nombre + declaración. Sin cuenta.
@@ -26,15 +25,6 @@ export const Route = createFileRoute("/firmar/$token")({
   }),
   component: SignPage,
 });
-
-// Cuenta las parties del bloque de firma para saber a qué slot corresponde el
-// firmante remoto (la contraparte suele ser la última party listada).
-function counterpartyIndex(doc: GeneratedDoc): number {
-  for (const b of doc.blocks) {
-    if (b.kind === "signature") return Math.max(0, b.parties.length - 1);
-  }
-  return 0;
-}
 
 
 function SignPage() {
@@ -76,24 +66,36 @@ function SignPage() {
   };
 
   const downloadSigned = async () => {
-    if (!req || req.status !== "signed" || !req.signedByName || !req.signedAt) return;
+    if (!req || req.status !== "signed") return;
     setDownloading(true);
     try {
-      await renderGeocapitalsPdf(req.doc, {
-        signatures: [
-          {
-            name: req.signedByName,
-            signedAt: req.signedAt,
-            hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
-            partyIndex: counterpartyIndex(req.doc),
-          },
-        ],
-      });
-
+      // Estampa CADA firma en su propio slot (partyIndex = sign_order del
+      // firmante en el flujo). Si el flujo es multi-parte y aún faltan
+      // firmantes, sólo se estampan los que ya firmaron.
+      const stamps =
+        req.flowSignatures.length > 0
+          ? req.flowSignatures.map((s) => ({
+              name: s.signedByName,
+              signedAt: s.signedAt,
+              hash: (s.signatureHash ?? "").slice(0, 12),
+              partyIndex: s.order,
+            }))
+          : req.signedByName && req.signedAt
+            ? [
+                {
+                  name: req.signedByName,
+                  signedAt: req.signedAt,
+                  hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
+                  partyIndex: req.signOrder,
+                },
+              ]
+            : [];
+      await renderGeocapitalsPdf(req.doc, { signatures: stamps });
     } finally {
       setDownloading(false);
     }
   };
+
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
