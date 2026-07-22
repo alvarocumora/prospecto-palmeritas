@@ -282,6 +282,106 @@ export function buildSingularxNcnda(): GeneratedDoc {
   };
 }
 
+// ────────────── Ficha Antimonio en Breña triturada (Honduras · A&D) ──────
+
+export function buildAntimonyBrenaFicha(): GeneratedDoc {
+  // Tabla oficial de precios FOB por ley (Corporación Minera A&D S.A. — SCO 24/06/2026).
+  const priceTable: string[][] = [
+    ["35%", "US$ 5.616", "57%", "US$ 6.336"],
+    ["36%", "US$ 5.649", "58%", "US$ 6.368"],
+    ["37%", "US$ 5.683", "59%", "US$ 6.401"],
+    ["38%", "US$ 5.717", "60%", "US$ 6.433"],
+    ["39%", "US$ 5.750", "61%", "US$ 6.465"],
+    ["40%", "US$ 5.784", "62%", "US$ 6.498"],
+    ["41%", "US$ 5.816", "63%", "US$ 6.530"],
+    ["42%", "US$ 5.849", "64%", "US$ 6.563"],
+    ["43%", "US$ 5.881", "65%", "US$ 6.595"],
+    ["44%", "US$ 5.914", "66%", "US$ 6.628"],
+    ["45%", "US$ 5.946", "67%", "US$ 6.660"],
+    ["46%", "US$ 5.979", "68%", "US$ 6.693"],
+    ["47%", "US$ 6.011", "69%", "US$ 6.725"],
+    ["48%", "US$ 6.044", "70%", "US$ 6.757"],
+    ["49%", "US$ 6.076", "71%", "US$ 6.790"],
+    ["50%", "US$ 6.108", "72%", "US$ 6.822"],
+    ["51%", "US$ 6.141", "73%", "US$ 6.855"],
+    ["52%", "US$ 6.173", "74%", "US$ 6.888"],
+    ["53%", "US$ 6.206", "75%", "US$ 6.920"],
+    ["54%", "US$ 6.238", "76%", "US$ 6.952"],
+    ["55%", "US$ 6.271", "77%", "US$ 7.030"],
+    ["56%", "US$ 6.303", "—", "—"],
+  ];
+  return {
+    docType: "FICHA",
+    reference: "GC-FICHA-SB-BRENA-202607-1",
+    date: today(),
+    title:
+      "Ficha comercial — Antimonio en breña triturada (Sb 35–77% · Honduras · FOB)",
+    blocks: [
+      {
+        kind: "fields",
+        rows: [
+          ["Producto", "Antimonio en breña triturada (mineral sulfurado / óxido)"],
+          ["Origen", "Honduras — Corporación Minera A&D S.A. de C.V. (concesiones vigentes)"],
+          ["Advisor / Operador", "Geocapitals SpA · info@geocapitals.com · +56 9 6218 4071"],
+          ["Granulometría", "1 pulgada a finos"],
+          ["Ley Sb", "35% – 77% (rango contractual con escala de precio)"],
+          ["Volumen disponible", "100 MT/mes o más (escalable)"],
+          ["Periodo de contrato", "12 meses renovables"],
+          ["Incoterm", "FOB puerto Honduras"],
+          ["Puertos de embarque", "Puerto Cortés · Puerto Castilla (Atlántico) · San Lorenzo (Pacífico)"],
+          ["Pago", "SBLC 100% irrevocable, transferible y divisible · SWIFT MT103 contra inspección"],
+          ["Acceso", "Bajo NDA / NCNDA · Data room controlado por Geocapitals"],
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "Oferta corporativa suave (SCO) originada por Corporación Minera A&D S.A. (Honduras) y canalizada por Geocapitals como advisor de la operación. Producto: antimonio en breña triturada, granulometría 1\" a finos, con escala de precio FOB en función de la ley Sb (35% a 77%). La operación se estructura para compradores directos con proof of funds y capacidad de emisión de SBLC 100% irrevocable, transferible y divisible, con pago en puerto de carga contra informes de inspección y documentos de embarque vía SWIFT MT103.",
+      },
+      {
+        kind: "table",
+        head: ["Ley Sb", "US$ / MT (FOB)", "Ley Sb", "US$ / MT (FOB)"],
+        rows: priceTable,
+      },
+      {
+        kind: "table",
+        head: ["Elemento", "Símbolo", "Muestra 1", "Muestra 2"],
+        rows: [
+          ["Antimonio", "Sb %", "71,54", "47,90"],
+          ["Plomo", "Pb %", "0,02", "0,03"],
+          ["Bismuto", "Bi %", "0,00", "0,00"],
+          ["Arsénico", "As %", "0,03", "0,04"],
+          ["Zinc (muestra roja)", "Zn %", "43,32", "—"],
+        ],
+      },
+      {
+        kind: "clauses",
+        items: [
+          "1. Base de precio. Tabla FOB oficial 24/06/2026 en USD por tonelada métrica, con impuestos incluidos según origen. Ajuste proporcional automático ante variaciones de la referencia internacional (Rotterdam / MB Antimony).",
+          "2. Calidad. Ensayos por absorción atómica de laboratorio independiente (Consuelo Montes Segura, San Luis Potosí). Muestras representativas confirman leyes Sb entre 47,9% y 71,5%, con impurezas Pb/Bi/As dentro de rangos comerciales estándar.",
+          "3. Inspección y pago. Inspección SGS / Alfred H. Knight en puerto de carga. Liberación de SBLC contra Certificate of Analysis + Bill of Lading + Certificate of Origin (SWIFT MT103).",
+          "4. Logística. Embarque FOB desde Puerto Cortés, Puerto Castilla (Atlántico) o San Lorenzo (Pacífico) según destino final. Empaque en super sacos (big bags) o granel según requerimiento del comprador.",
+          "5. Bancos. Beneficiario final Corporación Minera A&D S.A. de C.V. · Banco beneficiario Banco FICOHSA (Honduras) · Banco intermediario Bank of America.",
+          "6. Requisitos del comprador. Proof of Funds (POF) vigente, ICPO firmada, KYC completo y contrato marco (SPA) bajo términos aquí descritos. Geocapitals coordina onboarding, NCNDA tripartito y trazabilidad QR de todos los documentos.",
+          "7. Confidencialidad. La presente ficha se libera únicamente bajo NDA/NCNDA vigente. Toda información técnica adicional (planos de concesión, muestras adicionales, capacidad instalada) se comparte en el data room controlado por Geocapitals.",
+        ],
+      },
+      {
+        kind: "fields",
+        rows: [
+          ["Representante legal (origen)", "Delmer Francisco Munguía Pagoada — Corporación Minera A&D S.A."],
+          ["Gerente general (origen)", "César González Díaz — Corporación Minera A&D S.A."],
+          ["Advisor comercial", "Geocapitals SpA — info@geocapitals.com · +56 9 6218 4071"],
+          ["Fecha SCO base", "24 de junio de 2026"],
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "Esta ficha no constituye oferta pública ni recomendación de inversión. La transacción se materializa mediante NCNDA tripartito, ICPO, SPA y protocolos SBLC/SWIFT MT103 estándar. Geocapitals actúa como advisor de la operación y coordina la comunicación entre el titular hondureño y el comprador final.",
+      },
+    ],
+  };
+}
+
 // ─────────────────────────── API pública ──────────────────────────────────
 
 export type SpecialDocId =
@@ -289,7 +389,8 @@ export type SpecialDocId =
   | "gold-ficha"
   | "trento-adenda"
   | "trento-mona-bast"
-  | "singularx-ncnda";
+  | "singularx-ncnda"
+  | "antimony-brena";
 
 export type SpecialDocSigner = { role: string; name?: string; email?: string };
 
@@ -354,6 +455,16 @@ export const SPECIAL_DOCS: Array<{
       { role: "Por ZBALA LATAM", name: "Joaquín Belmar", email: "joaquin.belmar@zbalatam.com" },
     ],
   },
+  {
+    id: "antimony-brena",
+    label: "Ficha · Antimonio en breña triturada (Honduras)",
+    acronym: "FICHA",
+    summary:
+      "SCO Corporación Minera A&D — Sb 35–77%, tabla FOB oficial, ensayos AA y protocolo SBLC/SWIFT MT103.",
+    build: buildAntimonyBrenaFicha,
+    signers: [{ role: "Acuse de recibo" }],
+  },
+
 ];
 
 
