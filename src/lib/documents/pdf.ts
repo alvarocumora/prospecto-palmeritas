@@ -90,15 +90,50 @@ async function makeQr(url: string): Promise<string | null> {
   }
 }
 
+// jsPDF Helvetica no soporta Unicode fuera de WinAnsi: sustituimos glifos
+// (≈, Σ, subíndices, superíndices, flechas) por equivalentes ASCII para que
+// no salgan como "H", £ o cuadros vacíos y no descuadren la maquetación.
+const UNICODE_MAP: Array<[RegExp, string]> = [
+  [/≈/g, "~"],
+  [/≠/g, "!="],
+  [/≥/g, ">="],
+  [/≤/g, "<="],
+  [/±/g, "+/-"],
+  [/×/g, "x"],
+  [/÷/g, "/"],
+  [/Σ/g, "Sum"],
+  [/Δ/g, "Delta"],
+  [/α/g, "alpha"],
+  [/β/g, "beta"],
+  [/µ|μ/g, "u"],
+  [/[₀₁₂₃₄₅₆₇₈₉]/g, (m) => String("₀₁₂₃₄₅₆₇₈₉".indexOf(m))],
+  [/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (m) => "^" + String("⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(m))],
+  [/→/g, "->"],
+  [/←/g, "<-"],
+  [/[""]/g, '"'],
+  [/['']/g, "'"],
+  [/–|—/g, "-"],
+  [/…/g, "..."],
+];
+
+function sanitize(text: string): string {
+  let out = text;
+  for (const [re, rep] of UNICODE_MAP) {
+    out = out.replace(re, rep as string);
+  }
+  return out;
+}
+
 function clampText(text: string, max = 1200): string {
-  const clean = text.replace(/\s+/g, " ").trim();
-  return clean.length > max ? `${clean.slice(0, max - 1)}…` : clean;
+  const clean = sanitize(text).replace(/\s+/g, " ").trim();
+  return clean.length > max ? `${clean.slice(0, max - 1)}...` : clean;
 }
 
 function ellipsize(text: string, max = 160): string {
-  const clean = text.replace(/\s+/g, " ").trim();
-  return clean.length > max ? `${clean.slice(0, max - 1)}…` : clean;
+  const clean = sanitize(text).replace(/\s+/g, " ").trim();
+  return clean.length > max ? `${clean.slice(0, max - 1)}...` : clean;
 }
+
 
 export async function renderGeocapitalsPdf(
   doc: GeneratedDoc,
