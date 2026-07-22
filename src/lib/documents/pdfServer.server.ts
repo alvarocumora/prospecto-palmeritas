@@ -37,7 +37,7 @@ const PAGE_H = 841.89;
 const MARGIN_X = 54;
 const FIRST_CONTENT_Y = PAGE_H - 156;
 const NEXT_CONTENT_Y = PAGE_H - 74;
-const MARGIN_BOTTOM = 106;
+const MARGIN_BOTTOM = 86;
 const CONTENT_W = PAGE_W - MARGIN_X * 2;
 
 const CONFIDENTIAL_NOTE =
