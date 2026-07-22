@@ -111,6 +111,7 @@ import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authent
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
 import { Route as AuthenticatedDashboardGeology3dRouteImport } from './routes/_authenticated.dashboard.geology3d'
 import { Route as AuthenticatedDashboardFrancoRouteImport } from './routes/_authenticated.dashboard.franco'
+import { Route as AuthenticatedDashboardFletesRouteImport } from './routes/_authenticated.dashboard.fletes'
 import { Route as AuthenticatedDashboardFirmasRouteImport } from './routes/_authenticated.dashboard.firmas'
 import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
 import { Route as AuthenticatedDashboardFieldMapRouteImport } from './routes/_authenticated.dashboard.field-map'
@@ -712,6 +713,12 @@ const AuthenticatedDashboardFrancoRoute =
     path: '/dashboard/franco',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardFletesRoute =
+  AuthenticatedDashboardFletesRouteImport.update({
+    id: '/dashboard/fletes',
+    path: '/dashboard/fletes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardFirmasRoute =
   AuthenticatedDashboardFirmasRouteImport.update({
     id: '/dashboard/firmas',
@@ -1079,6 +1086,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/dashboard/firmas': typeof AuthenticatedDashboardFirmasRoute
+  '/dashboard/fletes': typeof AuthenticatedDashboardFletesRoute
   '/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
@@ -1231,6 +1239,7 @@ export interface FileRoutesByTo {
   '/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
   '/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/dashboard/firmas': typeof AuthenticatedDashboardFirmasRoute
+  '/dashboard/fletes': typeof AuthenticatedDashboardFletesRoute
   '/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
@@ -1385,6 +1394,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
   '/_authenticated/dashboard/finance': typeof AuthenticatedDashboardFinanceRoute
   '/_authenticated/dashboard/firmas': typeof AuthenticatedDashboardFirmasRoute
+  '/_authenticated/dashboard/fletes': typeof AuthenticatedDashboardFletesRoute
   '/_authenticated/dashboard/franco': typeof AuthenticatedDashboardFrancoRoute
   '/_authenticated/dashboard/geology3d': typeof AuthenticatedDashboardGeology3dRoute
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
@@ -1539,6 +1549,7 @@ export interface FileRouteTypes {
     | '/dashboard/field-map'
     | '/dashboard/finance'
     | '/dashboard/firmas'
+    | '/dashboard/fletes'
     | '/dashboard/franco'
     | '/dashboard/geology3d'
     | '/dashboard/geophysics'
@@ -1691,6 +1702,7 @@ export interface FileRouteTypes {
     | '/dashboard/field-map'
     | '/dashboard/finance'
     | '/dashboard/firmas'
+    | '/dashboard/fletes'
     | '/dashboard/franco'
     | '/dashboard/geology3d'
     | '/dashboard/geophysics'
@@ -1844,6 +1856,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/field-map'
     | '/_authenticated/dashboard/finance'
     | '/_authenticated/dashboard/firmas'
+    | '/_authenticated/dashboard/fletes'
     | '/_authenticated/dashboard/franco'
     | '/_authenticated/dashboard/geology3d'
     | '/_authenticated/dashboard/geophysics'
@@ -2713,6 +2726,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardFrancoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/fletes': {
+      id: '/_authenticated/dashboard/fletes'
+      path: '/dashboard/fletes'
+      fullPath: '/dashboard/fletes'
+      preLoaderRoute: typeof AuthenticatedDashboardFletesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/firmas': {
       id: '/_authenticated/dashboard/firmas'
       path: '/dashboard/firmas'
@@ -3176,6 +3196,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardFieldMapRoute: typeof AuthenticatedDashboardFieldMapRoute
   AuthenticatedDashboardFinanceRoute: typeof AuthenticatedDashboardFinanceRoute
   AuthenticatedDashboardFirmasRoute: typeof AuthenticatedDashboardFirmasRoute
+  AuthenticatedDashboardFletesRoute: typeof AuthenticatedDashboardFletesRoute
   AuthenticatedDashboardFrancoRoute: typeof AuthenticatedDashboardFrancoRoute
   AuthenticatedDashboardGeology3dRoute: typeof AuthenticatedDashboardGeology3dRoute
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
@@ -3250,6 +3271,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardFieldMapRoute: AuthenticatedDashboardFieldMapRoute,
   AuthenticatedDashboardFinanceRoute: AuthenticatedDashboardFinanceRoute,
   AuthenticatedDashboardFirmasRoute: AuthenticatedDashboardFirmasRoute,
+  AuthenticatedDashboardFletesRoute: AuthenticatedDashboardFletesRoute,
   AuthenticatedDashboardFrancoRoute: AuthenticatedDashboardFrancoRoute,
   AuthenticatedDashboardGeology3dRoute: AuthenticatedDashboardGeology3dRoute,
   AuthenticatedDashboardGeophysicsRoute:

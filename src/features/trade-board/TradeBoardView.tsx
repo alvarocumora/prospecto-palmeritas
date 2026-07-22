@@ -11,19 +11,21 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
-import { LayoutGrid, Maximize2, Minimize2, Rows3 } from "lucide-react";
+import { LayoutGrid, Maximize2, Minimize2, Rows3, GanttChart, Download, AlertTriangle } from "lucide-react";
 import { listMyTrades, setTradeStage } from "@/lib/trades.functions";
 import {
   buildTradeBoard,
   boardSummary,
   filterTrades,
   commoditiesFromTrades,
+  tradesToCsv,
   type BoardTrade,
   type BoardColumn,
 } from "@/lib/tradeBoard";
 import { TRADE_STAGES, type TradeStage } from "@/lib/tradeDocuments";
 import { TradeColumnView } from "./TradeColumn";
 import { TradeFilters, type BoardSearch } from "./TradeFilters";
+import { TradeTimeline } from "./TradeTimeline";
 import { useTradeBoardRealtime } from "./useTradeBoardRealtime";
 import { Button } from "@/components/ui/button";
 
@@ -31,8 +33,20 @@ const STAGE_SET = new Set(TRADE_STAGES.map((s) => s.key));
 const usd = (n: number | null) =>
   n != null ? `US$ ${Math.round(n).toLocaleString("es-CL")}` : "—";
 
+function downloadCsv(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 export type TradeBoardViewProps = {
-  search: BoardSearch & { full: boolean; group: "none" | "role" };
+  search: BoardSearch & { full: boolean; group: "none" | "role"; view?: "kanban" | "timeline" };
   onSearchChange: (patch: Partial<TradeBoardViewProps["search"]>) => void;
 };
 
@@ -114,15 +128,46 @@ export function TradeBoardView({ search, onSearchChange }: TradeBoardViewProps) 
             <LayoutGrid className="w-5 h-5 text-accent-brand" />
             <h1 className="text-xl font-semibold">Tablero de trades</h1>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() =>
+                onSearchChange({ view: search.view === "timeline" ? "kanban" : "timeline" })
+              }
+            >
+              {search.view === "timeline" ? (
+                <>
+                  <LayoutGrid className="w-3.5 h-3.5 mr-1" /> Kanban
+                </>
+              ) : (
+                <>
+                  <GanttChart className="w-3.5 h-3.5 mr-1" /> Timeline
+                </>
+              )}
+            </Button>
             <Button
               size="sm"
               variant="outline"
               className="h-8 text-xs"
               onClick={() => onSearchChange({ group: search.group === "role" ? "none" : "role" })}
+              disabled={search.view === "timeline"}
             >
               <Rows3 className="w-3.5 h-3.5 mr-1" />
               {search.group === "role" ? "Vista plana" : "Agrupar por rol"}
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+              onClick={() => {
+                const stamp = new Date().toISOString().slice(0, 10);
+                downloadCsv(`trades-${stamp}.csv`, tradesToCsv(filtered));
+              }}
+              disabled={filtered.length === 0}
+            >
+              <Download className="w-3.5 h-3.5 mr-1" /> CSV
             </Button>
             <Button
               size="sm"
@@ -143,11 +188,20 @@ export function TradeBoardView({ search, onSearchChange }: TradeBoardViewProps) 
           </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
           <Kpi label="Activos" value={String(summary.activeCount)} />
           <Kpi label="Pipeline" value={usd(summary.pipelineUsd)} />
+          <Kpi label="Forecast" value={usd(summary.forecastUsd)} accent />
+          <Kpi
+            label="Aging prom."
+            value={summary.avgAgingDays != null ? `${summary.avgAgingDays} d` : "—"}
+          />
+          <Kpi
+            label="Stuck"
+            value={String(summary.stuckCount)}
+            tone={summary.stuckCount > 0 ? "warn" : undefined}
+          />
           <Kpi label="Cerrados" value={String(summary.closedCount)} />
-          <Kpi label="Cancelados" value={String(summary.cancelledCount)} tone="muted" />
         </div>
 
         <TradeFilters
@@ -164,6 +218,8 @@ export function TradeBoardView({ search, onSearchChange }: TradeBoardViewProps) 
         <div className="rounded-md border border-dashed border-hairline p-10 text-center text-sm text-muted-foreground">
           Aún no hay trades. Créalos en el Trade Desk.
         </div>
+      ) : search.view === "timeline" ? (
+        <TradeTimeline trades={filtered} />
       ) : (
         <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
           {grouped ? (
@@ -206,14 +262,37 @@ function Swimlane({ label, cols, tall }: { label: string; cols: BoardColumn[]; t
   );
 }
 
-function Kpi({ label, value, tone }: { label: string; value: string; tone?: "muted" }) {
+function Kpi({
+  label,
+  value,
+  tone,
+  accent,
+}: {
+  label: string;
+  value: string;
+  tone?: "muted" | "warn";
+  accent?: boolean;
+}) {
   return (
-    <div className="rounded-md border border-hairline bg-surface p-3">
-      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+    <div
+      className={`rounded-md border p-3 ${
+        accent ? "border-accent-brand bg-accent-brand/5" : "border-hairline bg-surface"
+      }`}
+    >
+      <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1">
+        {tone === "warn" && <AlertTriangle className="w-3 h-3 text-amber-600" />}
         {label}
       </div>
       <div
-        className={`text-lg font-semibold font-mono ${tone === "muted" ? "text-muted-foreground" : ""}`}
+        className={`text-lg font-semibold font-mono ${
+          tone === "muted"
+            ? "text-muted-foreground"
+            : tone === "warn"
+              ? "text-amber-600"
+              : accent
+                ? "text-accent-brand"
+                : ""
+        }`}
       >
         {value}
       </div>

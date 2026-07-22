@@ -11,6 +11,7 @@ type BoardSearchParams = {
   max: number | null;
   full: boolean;
   group: "none" | "role";
+  view: "kanban" | "timeline";
 };
 
 function toNum(v: unknown): number | null {
@@ -34,6 +35,7 @@ function validateSearch(raw: Record<string, unknown>): BoardSearchParams {
     max: toNum(raw.max),
     full: raw.full === true || raw.full === "1" || raw.full === "true",
     group: raw.group === "role" ? "role" : "none",
+    view: raw.view === "timeline" ? "timeline" : "kanban",
   };
 }
 

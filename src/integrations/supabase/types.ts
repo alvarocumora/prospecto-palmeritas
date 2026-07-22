@@ -6347,6 +6347,51 @@ export type Database = {
         }
         Relationships: []
       }
+      freight_rates: {
+        Row: {
+          container_type: string
+          created_at: string
+          created_by: string | null
+          id: string
+          notes: string | null
+          port_destination: string
+          port_origin: string
+          source: string | null
+          transit_days: number | null
+          updated_at: string
+          usd_rate: number
+          valid_from: string
+        }
+        Insert: {
+          container_type: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          port_destination: string
+          port_origin: string
+          source?: string | null
+          transit_days?: number | null
+          updated_at?: string
+          usd_rate: number
+          valid_from?: string
+        }
+        Update: {
+          container_type?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          notes?: string | null
+          port_destination?: string
+          port_origin?: string
+          source?: string | null
+          transit_days?: number | null
+          updated_at?: string
+          usd_rate?: number
+          valid_from?: string
+        }
+        Relationships: []
+      }
       geo_copilot_conversations: {
         Row: {
           created_at: string
@@ -14697,6 +14742,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      trade_board_prefs: {
+        Row: {
+          column_order: string[]
+          hidden_stages: string[]
+          preferred_view: string
+          updated_at: string
+          user_id: string
+          wip_limits: Json
+        }
+        Insert: {
+          column_order?: string[]
+          hidden_stages?: string[]
+          preferred_view?: string
+          updated_at?: string
+          user_id: string
+          wip_limits?: Json
+        }
+        Update: {
+          column_order?: string[]
+          hidden_stages?: string[]
+          preferred_view?: string
+          updated_at?: string
+          user_id?: string
+          wip_limits?: Json
+        }
+        Relationships: []
       }
       trade_documents: {
         Row: {
