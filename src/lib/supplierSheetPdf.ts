@@ -10,8 +10,7 @@ import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole } from "@/lib/sourcing";
 
 const fmtUsdT = (n: number | null | undefined) =>
   n != null ? `US$ ${Math.round(n).toLocaleString("es-CL")}/t` : "—";
-const fmtT = (n: number | null | undefined) =>
-  n != null ? `${n.toLocaleString("es-CL")} t` : "—";
+const fmtT = (n: number | null | undefined) => (n != null ? `${n.toLocaleString("es-CL")} t` : "—");
 const dash = (v: string | null | undefined) => (v && v.trim() ? v : "—");
 
 export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
@@ -67,8 +66,7 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
   if (isTrentoRee) {
     blocks.push({
       kind: "paragraph",
-      text:
-        "Consolidación del Informe Técnico de Análisis de Resultados (ALS · método ME-MS82) para el Proyecto TRENTO. Base analítica: 189 muestras distribuidas en 4 certificados. Elementos analizados: La, Ce, Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Yb, Lu, Y. Valores en ppm (1 ppm = 1 g/t).",
+      text: "Consolidación del Informe Técnico de Análisis de Resultados (ALS · método ME-MS82) para el Proyecto TRENTO. Base analítica: 189 muestras distribuidas en 4 certificados. Elementos analizados: La, Ce, Pr, Nd, Sm, Eu, Gd, Tb, Dy, Ho, Er, Tm, Yb, Lu, Y. Valores en ppm (1 ppm = 1 g/t).",
     });
     blocks.push({
       kind: "table",
@@ -133,6 +131,104 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
         "La distribución no es homogénea: pocas muestras concentran la mayor parte del SigmaREE, lo que sugiere zonas mineralizadas focalizadas dentro del proyecto.",
         "Valores obtenidos por ALS mediante ME-MS82; no incluyen información mineralógica ni de recuperación metalúrgica.",
         "Datos utilizados con fines exploratorios y comparativos entre certificados; no constituyen estimación de recursos NI 43-101.",
+      ],
+    });
+  }
+
+  // Consolidación específica: Antimonio en breña · SCO Corp. Minera A&D (Honduras).
+  const isAntimonyBrena =
+    /SB-BRENA|ANTIMONIO.*BRE|BRENA.*ANTIMONIO/i.test(request.reference) ||
+    (/antimon/i.test(request.commodity) &&
+      /bre[nñ]a/i.test(`${request.form} ${supplier.packaging}`));
+  if (isAntimonyBrena) {
+    blocks.push({
+      kind: "paragraph",
+      text: "Detalle del mineral ofertado — Antimonio (Sb) en breña. Datos tomados de la Soft Corporate Offer (SCO) del proveedor. Precio en USD por tonelada métrica, con impuestos, escalonado por ley de antimonio; ante variación de la bolsa internacional se ajusta de manera proporcional.",
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Característica", "Detalle"],
+      rows: [
+        ["Producto", "Antimonio (Sb) en breña — mineral triturado"],
+        ["Origen", "Honduras"],
+        ["Granulometría", "1 pulgada a finos"],
+        ["Ley (rango)", "35% a 77% Sb"],
+        ["Presentación", "Breña / mineral a granel"],
+        ["Disponibilidad", "100 t/mes (a más)"],
+        ["Período de contrato", "1 año (12 meses), a más"],
+        ["Modalidad", "FOB"],
+        [
+          "Puertos de embarque",
+          "Puerto Cortés (Cortés) · Puerto Castilla (Colón) · San Lorenzo (Choluteca)",
+        ],
+      ],
+    });
+    // Tabla de leyes y precios (US$/MT), pareada en dos bloques como en la SCO.
+    const priceByGrade: Array<[number, number]> = [
+      [35, 5616],
+      [36, 5649],
+      [37, 5683],
+      [38, 5717],
+      [39, 5750],
+      [40, 5784],
+      [41, 5816],
+      [42, 5849],
+      [43, 5881],
+      [44, 5914],
+      [45, 5946],
+      [46, 5979],
+      [47, 6011],
+      [48, 6044],
+      [49, 6076],
+      [50, 6108],
+      [51, 6141],
+      [52, 6173],
+      [53, 6206],
+      [54, 6238],
+      [55, 6271],
+      [56, 6303],
+      [57, 6336],
+      [58, 6368],
+      [59, 6401],
+      [60, 6433],
+      [61, 6465],
+      [62, 6498],
+      [63, 6530],
+      [64, 6563],
+      [65, 6595],
+      [66, 6628],
+      [67, 6660],
+      [68, 6693],
+      [69, 6725],
+      [70, 6757],
+      [71, 6790],
+      [72, 6822],
+      [73, 6855],
+      [74, 6888],
+      [75, 6920],
+      [76, 6952],
+      [77, 7030],
+    ];
+    const money = (n: number) => `US$ ${n.toLocaleString("es-CL")}`;
+    const half = Math.ceil(priceByGrade.length / 2);
+    const left = priceByGrade.slice(0, half);
+    const right = priceByGrade.slice(half);
+    const priceRows = left.map((l, i) => {
+      const r = right[i];
+      return [`${l[0]}%`, money(l[1]), r ? `${r[0]}%` : "", r ? money(r[1]) : ""];
+    });
+    blocks.push({
+      kind: "table",
+      head: ["Ley % Sb", "Precio/MT", "Ley % Sb", "Precio/MT"],
+      rows: priceRows,
+    });
+    blocks.push({
+      kind: "clauses",
+      items: [
+        "Precios en dólares americanos por tonelada métrica (MT), con impuestos; ajustables proporcionalmente ante variación de la bolsa internacional de antimonio.",
+        "Modalidad FOB en los puertos indicados. El proveedor declara ser titular de las concesiones mineras.",
+        "Pago mediante SBLC 100% irrevocable, transferible y divisible, con pago en el puerto de carga tras informes de inspección y documentos de embarque vía SWIFT MT103. Banca: Bank of America (intermediario), Banco FICOHSA (beneficiario), beneficiario final Corporación Minera A&D, S.A. de C.V.",
+        "Oferta dirigida solo a compradores directos que acrediten prueba de fondos (POF). Documento de referencia comercial — no constituye oferta vinculante.",
       ],
     });
   }
