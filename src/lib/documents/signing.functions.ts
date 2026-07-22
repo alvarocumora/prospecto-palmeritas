@@ -202,6 +202,15 @@ export const voidSignRequest = createServerFn({ method: "POST" })
   });
 
 // ---------- Público: ver y firmar por token ----------
+export type FlowSignatureStamp = {
+  order: number;
+  role: string | null;
+  signerNameExpected: string | null;
+  signedByName: string;
+  signedAt: string;
+  signatureHash: string;
+};
+
 export type PublicSignRequest = {
   title: string;
   reference: string;
@@ -213,6 +222,12 @@ export type PublicSignRequest = {
   signatureHash: string | null;
   docHash: string;
   expiresAt: string;
+  /** Índice de la parte que corresponde a ESTE firmante (0-based). Coincide
+   *  con la posición del slot en el bloque `signature` del documento. */
+  signOrder: number;
+  /** Todas las firmas ya completadas del mismo flujo (multi-parte). Se usa
+   *  al renderizar el PDF final para estampar cada firma en su slot. */
+  flowSignatures: FlowSignatureStamp[];
 };
 
 const TokenInput = z.object({ token: z.string().trim().min(10).max(120) });
@@ -239,6 +254,45 @@ export const getSignRequest = createServerFn({ method: "POST" })
     if (!sb) return null;
     const row = await findByToken(sb, data.token);
     if (!row) return null;
+
+    const signOrder = Number(row.sign_order ?? 0);
+
+    // Cuando el documento tiene múltiples firmantes (flow_id), recuperamos
+    // TODAS las firmas ya completadas para poder estamparlas en el PDF final
+    // en su slot correspondiente (cada firmante en su propia parte).
+    let flowSignatures: FlowSignatureStamp[] = [];
+    if (row.flow_id) {
+      const { data: siblings } = await sb
+        .from("document_sign_requests")
+        .select(
+          "sign_order, signer_role, signer_name_expected, signed_by_name, signed_at, signature_hash, status",
+        )
+        .eq("flow_id", String(row.flow_id))
+        .eq("status", "signed");
+      flowSignatures = ((siblings ?? []) as Array<Record<string, unknown>>)
+        .filter((r) => r.signed_by_name && r.signed_at && r.signature_hash)
+        .map((r) => ({
+          order: Number(r.sign_order ?? 0),
+          role: (r.signer_role ?? null) as string | null,
+          signerNameExpected: (r.signer_name_expected ?? null) as string | null,
+          signedByName: String(r.signed_by_name),
+          signedAt: String(r.signed_at),
+          signatureHash: String(r.signature_hash),
+        }))
+        .sort((a, b) => a.order - b.order);
+    } else if (row.status === "signed" && row.signed_by_name && row.signed_at) {
+      flowSignatures = [
+        {
+          order: signOrder,
+          role: (row.signer_role ?? null) as string | null,
+          signerNameExpected: (row.signer_name_expected ?? null) as string | null,
+          signedByName: String(row.signed_by_name),
+          signedAt: String(row.signed_at),
+          signatureHash: String(row.signature_hash ?? row.doc_hash ?? ""),
+        },
+      ];
+    }
+
     return {
       title: String(row.title),
       reference: String(row.reference),
@@ -250,8 +304,11 @@ export const getSignRequest = createServerFn({ method: "POST" })
       signatureHash: (row.signature_hash ?? null) as string | null,
       docHash: String(row.doc_hash),
       expiresAt: String(row.expires_at),
+      signOrder,
+      flowSignatures,
     };
   });
+
 
 const SignInput = z.object({
   token: z.string().trim().min(10).max(120),
