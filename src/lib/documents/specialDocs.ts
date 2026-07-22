@@ -160,9 +160,82 @@ export function buildTrentoAdenda(): GeneratedDoc {
   };
 }
 
+// ─────────────────────── Ficha TRENTO · Monacita / Bastnasita ─────────────
+
+export function buildTrentoMonaBastFicha(): GeneratedDoc {
+  return {
+    docType: "FICHA",
+    reference: "GC-FICHA-REE-TRENTO-MB-202607-1",
+    date: today(),
+    title:
+      "Ficha comercial — Proyecto TRENTO · Concentrado LREE (Monacita / Bastnasita)",
+    blocks: [
+      {
+        kind: "fields",
+        rows: [
+          ["Proyecto", "TRENTO — Tierras Raras Livianas (LREE)"],
+          ["Emisor", "Geocapitals SpA · info@geocapitals.com · +56 9 6218 4071"],
+          ["Mineralogía objetivo", "Monacita ((Ce,La,Nd,Th)PO₄) + Bastnasita ((Ce,La)CO₃F)"],
+          ["Producto ofrecido", "Concentrado LREE 30–60% TREO (upgrade gravimétrico + flotación)"],
+          ["Base analítica", "189 muestras ALS · método ME-MS82 · 15 elementos REE + Y"],
+          ["Firma geoquímica", "Ce > La > Nd > Pr · Ce+La+Nd+Pr > 90% ΣREE"],
+          ["Ratio LREE/HREE", "≈ 9,46 (LREE dominante)"],
+          ["ΣREE máx. muestra", "2.055 ppm (~0,21% TREO)"],
+          ["Etapa", "Exploración avanzada · Confirmación 60-90 días en curso"],
+          ["Acceso", "Bajo NDA · Data room controlado por Geocapitals"],
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "El Proyecto TRENTO presenta una firma geoquímica LREE-dominante consistente con mineralogía de monacita y/o bastnasita, los dos minerales madre económicos de las tierras raras livianas. La presente ficha resume el caso comercial para la producción de un concentrado 30-60% TREO destinado a refinerías internacionales, con ruta metalúrgica gravimétrica + magnética + flotación validada por peers (Mountain Pass, Mount Weld, Bayan Obo).",
+      },
+      {
+        kind: "table",
+        head: ["Elemento", "Símbolo", "Ley top (ppm)", "% ΣREE canasta"],
+        rows: [
+          ["Cerio", "Ce", "≈ 1.020", "≈ 47%"],
+          ["Lantano", "La", "≈ 520", "≈ 24%"],
+          ["Neodimio", "Nd", "≈ 340", "≈ 16%"],
+          ["Praseodimio", "Pr", "≈ 95", "≈ 4%"],
+          ["Samario + Eu + Gd", "Sm/Eu/Gd", "≈ 60", "≈ 3%"],
+          ["HREE (Dy, Tb, Y, resto)", "HREE", "≈ 120", "≈ 6%"],
+        ],
+      },
+      {
+        kind: "table",
+        head: ["Escenario", "Concentrado", "Precio canasta", "Valor USD/t roca"],
+        rows: [
+          ["Base — ley cabeza 0,21% TREO", "in-situ", "USD 8-12/kg TREO", "USD 16-24"],
+          ["Upgrade gravimétrico 30% TREO", "30% TREO", "USD 8-12/kg TREO", "USD 2.400-3.600 /t conc."],
+          ["Upgrade flotación 60% TREO", "60% TREO", "USD 8-12/kg TREO", "USD 4.800-7.200 /t conc."],
+          ["Referencia peers", "Mountain Pass 7%", "—", "Standalone REE viable"],
+        ],
+      },
+      {
+        kind: "clauses",
+        items: [
+          "1. Encaje mineralógico. La firma Ce+La+Nd+Pr > 90% ΣREE y LREE/HREE ≈ 9,46 es diagnóstica de monacita y/o bastnasita. Xenotima (HREE) queda descartada por el orden geoquímico observado.",
+          "2. Ruta metalúrgica. (a) Chancado y molienda a p80 objetivo. (b) Concentración gravimétrica (mesas Wilfley / espirales). (c) Separación magnética para monacita paramagnética. (d) Flotación con colectores de ácido graso para bastnasita. Concentrado final 30-60% TREO exportable.",
+          "3. Plan de confirmación 60-90 días. (i) QEMSCAN/XRD para cuantificar monacita vs bastnasita vs apatito/allanita. (ii) Análisis Th/U — define ruta metalúrgica y permisos de radiactivos. (iii) Ensayos de liberación y flowsheet piloto. (iv) Levantamiento topográfico y muestreo sistemático para modelo de bloques y estimación in-situ TREO.",
+          "4. Compradores objetivo. Refinerías LREE en China, Malasia (Lynas), Europa (Solvay) y USA (MP Materials). Off-take típico: concentrado 30-60% TREO, contratos anuales indexados a canasta LREE (Ce/La/Nd/Pr).",
+          "5. Estructura comercial. (a) Off-take + prepago, (b) JV con operador metalúrgico, o (c) venta directa del activo. Ticket referencial condicionado a completar el plan de confirmación y modelo de recursos.",
+        ],
+      },
+      {
+        kind: "paragraph",
+        text: "Esta ficha es parte del expediente TRENTO bajo NDA y no constituye oferta pública ni recomendación de inversión. Toda información técnica se libera únicamente en el data room controlado por Geocapitals una vez firmado el acuerdo de confidencialidad.",
+      },
+    ],
+  };
+}
+
 // ─────────────────────────── API pública ──────────────────────────────────
 
-export type SpecialDocId = "gold-nda" | "gold-ficha" | "trento-adenda";
+export type SpecialDocId =
+  | "gold-nda"
+  | "gold-ficha"
+  | "trento-adenda"
+  | "trento-mona-bast";
 
 export const SPECIAL_DOCS: Array<{
   id: SpecialDocId;
@@ -195,7 +268,16 @@ export const SPECIAL_DOCS: Array<{
       "Diagnóstico mineralógico REE, valoración indicativa y plan de confirmación 60-90 días.",
     build: buildTrentoAdenda,
   },
+  {
+    id: "trento-mona-bast",
+    label: "Ficha TRENTO · Monacita / Bastnasita",
+    acronym: "FICHA",
+    summary:
+      "Ficha comercial LREE — concentrado 30-60% TREO, ruta metalúrgica y compradores objetivo.",
+    build: buildTrentoMonaBastFicha,
+  },
 ];
+
 
 export async function downloadSpecialDoc(id: SpecialDocId): Promise<void> {
   const entry = SPECIAL_DOCS.find((d) => d.id === id);
