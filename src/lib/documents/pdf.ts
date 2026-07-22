@@ -153,7 +153,7 @@ function ellipsize(text: string, max = 160): string {
 export async function renderGeocapitalsPdf(
   doc: GeneratedDoc,
   opts: RenderOptions = {},
-): Promise<void> {
+): Promise<Blob | void> {
   const { default: jsPDF } = await import("jspdf");
   const autoTable = (await import("jspdf-autotable")).default;
 
