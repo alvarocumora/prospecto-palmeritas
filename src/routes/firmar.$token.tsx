@@ -145,16 +145,7 @@ function SignPage() {
     if (!req || req.flowSignatures.length === 0) return;
     setDownloadingAudited(true);
     try {
-      // Recomputa la validación al vuelo para que el PDF descargado incluya el
-      // resultado más reciente (aunque el usuario tarde en apretar el botón).
-      const fresh = await verifyFn({ data: { token } });
-      const audit = (fresh ?? []).map((v) => ({
-        order: v.order,
-        party: myParty?.parties[v.order],
-        signerName: v.signedByName,
-        match: v.hashMatch && v.orderMatch,
-        hash: v.storedHash,
-      }));
+      const audit = await buildAuditEntries();
       await renderGeocapitalsPdf(req.doc, {
         signatures: buildStamps(),
         signatureAudit: audit,
@@ -165,6 +156,62 @@ function SignPage() {
       setDownloadingAudited(false);
     }
   };
+
+  const buildAuditEntries = async () => {
+    // Recomputa la validación al vuelo para que el PDF/preview refleje el
+    // estado más reciente aunque el usuario tarde en apretar el botón.
+    const fresh = await verifyFn({ data: { token } });
+    return (fresh ?? []).map((v) => ({
+      order: v.order,
+      party: myParty?.parties[v.order],
+      signerName: v.signedByName,
+      match: v.hashMatch && v.orderMatch,
+      hash: v.storedHash,
+    }));
+  };
+
+  // Previsualización del PDF auditado (mismo binario que la descarga).
+  // El blob se genera en cliente y se muestra en un iframe con object URL,
+  // que se revoca al ocultar la vista o al desmontar la página.
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const togglePreview = async () => {
+    if (!req || req.flowSignatures.length === 0) return;
+    if (previewOpen) {
+      setPreviewOpen(false);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      return;
+    }
+    setPreviewLoading(true);
+    try {
+      const audit = await buildAuditEntries();
+      const blob = await renderGeocapitalsPdf(req.doc, {
+        signatures: buildStamps(),
+        signatureAudit: audit,
+        returnBlob: true,
+      });
+      if (!(blob instanceof Blob)) throw new Error("preview");
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(blob));
+      setPreviewOpen(true);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar la vista previa.");
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
 
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
