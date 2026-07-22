@@ -39,9 +39,20 @@ export type EmitterSignature = {
   partyIndex?: number;
 };
 
+export type SignatureAuditEntry = {
+  order: number;
+  party?: string;
+  signerName: string;
+  match: boolean;
+  hash?: string;
+};
+
 export type RenderOptions = {
   emitterSignature?: EmitterSignature;
   signatures?: EmitterSignature[];
+  /** Resumen de validación por firmante (coincide/no coincide) impreso
+   *  bajo el título en la primera página. */
+  signatureAudit?: SignatureAuditEntry[];
 };
 
 type JsPdfLike = {
