@@ -668,7 +668,9 @@ export async function renderGeocapitalsPdf(
   }
 
   const filename = `geocapitals-${doc.docType}-${doc.reference}.pdf`;
-  await triggerPdfDownload(pdf.output("blob"), filename);
+  const blob = pdf.output("blob");
+  if (opts.returnBlob) return blob;
+  await triggerPdfDownload(blob, filename);
 }
 
 // Descarga robusta cross-browser (Chrome/Firefox/Edge/Safari desktop + iOS/Android).
