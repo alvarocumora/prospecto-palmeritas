@@ -13,6 +13,8 @@ import {
   PenLine,
   CheckCircle2,
   XCircle,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import { DocumentPreview } from "@/features/documents/DocumentEditor";
