@@ -93,7 +93,7 @@ async function makeQr(url: string): Promise<string | null> {
 // jsPDF Helvetica no soporta Unicode fuera de WinAnsi: sustituimos glifos
 // (≈, Σ, subíndices, superíndices, flechas) por equivalentes ASCII para que
 // no salgan como "H", £ o cuadros vacíos y no descuadren la maquetación.
-const UNICODE_MAP: Array<[RegExp, string]> = [
+const UNICODE_MAP: Array<[RegExp, string | ((m: string) => string)]> = [
   [/≈/g, "~"],
   [/≠/g, "!="],
   [/≥/g, ">="],
@@ -106,8 +106,8 @@ const UNICODE_MAP: Array<[RegExp, string]> = [
   [/α/g, "alpha"],
   [/β/g, "beta"],
   [/µ|μ/g, "u"],
-  [/[₀₁₂₃₄₅₆₇₈₉]/g, (m) => String("₀₁₂₃₄₅₆₇₈₉".indexOf(m))],
-  [/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (m) => "^" + String("⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(m))],
+  [/[₀₁₂₃₄₅₆₇₈₉]/g, (m: string) => String("₀₁₂₃₄₅₆₇₈₉".indexOf(m))],
+  [/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, (m: string) => "^" + String("⁰¹²³⁴⁵⁶⁷⁸⁹".indexOf(m))],
   [/→/g, "->"],
   [/←/g, "<-"],
   [/[""]/g, '"'],
@@ -119,10 +119,11 @@ const UNICODE_MAP: Array<[RegExp, string]> = [
 function sanitize(text: string): string {
   let out = text;
   for (const [re, rep] of UNICODE_MAP) {
-    out = out.replace(re, rep as string);
+    out = typeof rep === "string" ? out.replace(re, rep) : out.replace(re, rep);
   }
   return out;
 }
+
 
 function clampText(text: string, max = 1200): string {
   const clean = sanitize(text).replace(/\s+/g, " ").trim();
