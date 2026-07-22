@@ -53,6 +53,9 @@ export type RenderOptions = {
   /** Resumen de validación por firmante (coincide/no coincide) impreso
    *  bajo el título en la primera página. */
   signatureAudit?: SignatureAuditEntry[];
+  /** Si es true, devuelve el Blob generado en lugar de disparar la descarga.
+   *  Útil para previsualizar el PDF en un iframe antes de descargarlo. */
+  returnBlob?: boolean;
 };
 
 type JsPdfLike = {
@@ -150,7 +153,7 @@ function ellipsize(text: string, max = 160): string {
 export async function renderGeocapitalsPdf(
   doc: GeneratedDoc,
   opts: RenderOptions = {},
-): Promise<void> {
+): Promise<Blob | void> {
   const { default: jsPDF } = await import("jspdf");
   const autoTable = (await import("jspdf-autotable")).default;
 
@@ -665,7 +668,9 @@ export async function renderGeocapitalsPdf(
   }
 
   const filename = `geocapitals-${doc.docType}-${doc.reference}.pdf`;
-  await triggerPdfDownload(pdf.output("blob"), filename);
+  const blob = pdf.output("blob");
+  if (opts.returnBlob) return blob;
+  await triggerPdfDownload(blob, filename);
 }
 
 // Descarga robusta cross-browser (Chrome/Firefox/Edge/Safari desktop + iOS/Android).

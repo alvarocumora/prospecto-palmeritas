@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -13,6 +13,8 @@ import {
   PenLine,
   CheckCircle2,
   XCircle,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import { DocumentPreview } from "@/features/documents/DocumentEditor";
@@ -143,16 +145,7 @@ function SignPage() {
     if (!req || req.flowSignatures.length === 0) return;
     setDownloadingAudited(true);
     try {
-      // Recomputa la validación al vuelo para que el PDF descargado incluya el
-      // resultado más reciente (aunque el usuario tarde en apretar el botón).
-      const fresh = await verifyFn({ data: { token } });
-      const audit = (fresh ?? []).map((v) => ({
-        order: v.order,
-        party: myParty?.parties[v.order],
-        signerName: v.signedByName,
-        match: v.hashMatch && v.orderMatch,
-        hash: v.storedHash,
-      }));
+      const audit = await buildAuditEntries();
       await renderGeocapitalsPdf(req.doc, {
         signatures: buildStamps(),
         signatureAudit: audit,
@@ -163,6 +156,62 @@ function SignPage() {
       setDownloadingAudited(false);
     }
   };
+
+  const buildAuditEntries = async () => {
+    // Recomputa la validación al vuelo para que el PDF/preview refleje el
+    // estado más reciente aunque el usuario tarde en apretar el botón.
+    const fresh = await verifyFn({ data: { token } });
+    return (fresh ?? []).map((v) => ({
+      order: v.order,
+      party: myParty?.parties[v.order],
+      signerName: v.signedByName,
+      match: v.hashMatch && v.orderMatch,
+      hash: v.storedHash,
+    }));
+  };
+
+  // Previsualización del PDF auditado (mismo binario que la descarga).
+  // El blob se genera en cliente y se muestra en un iframe con object URL,
+  // que se revoca al ocultar la vista o al desmontar la página.
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
+  const togglePreview = async () => {
+    if (!req || req.flowSignatures.length === 0) return;
+    if (previewOpen) {
+      setPreviewOpen(false);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      return;
+    }
+    setPreviewLoading(true);
+    try {
+      const audit = await buildAuditEntries();
+      const blob = await renderGeocapitalsPdf(req.doc, {
+        signatures: buildStamps(),
+        signatureAudit: audit,
+        returnBlob: true,
+      });
+      if (!(blob instanceof Blob)) throw new Error("preview");
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(blob));
+      setPreviewOpen(true);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar la vista previa.");
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
 
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
@@ -343,22 +392,62 @@ function SignPage() {
                     Descargar PDF firmado
                   </button>
                   {req.flowSignatures.length > 0 && (
-                    <button
-                      onClick={() => void downloadAudited()}
-                      disabled={downloadingAudited}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-accent-brand text-accent-brand px-4 py-2.5 text-sm font-medium hover:bg-accent-brand/5 disabled:opacity-50"
-                      title="Incluye una banda de auditoría con coincide/no coincide por firmante"
-                    >
-                      {downloadingAudited ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <ShieldCheck className="w-4 h-4" />
-                      )}
-                      Descargar PDF validado (auditoría)
-                    </button>
+                    <>
+                      <button
+                        onClick={() => void togglePreview()}
+                        disabled={previewLoading}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface text-content px-4 py-2.5 text-sm font-medium hover:bg-surface-3 disabled:opacity-50"
+                        title="Previsualiza el PDF con la banda de auditoría antes de descargarlo"
+                      >
+                        {previewLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : previewOpen ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                        {previewOpen ? "Ocultar vista previa" : "Previsualizar PDF validado"}
+                      </button>
+                      <button
+                        onClick={() => void downloadAudited()}
+                        disabled={downloadingAudited}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-accent-brand text-accent-brand px-4 py-2.5 text-sm font-medium hover:bg-accent-brand/5 disabled:opacity-50"
+                        title="Incluye una banda de auditoría con coincide/no coincide por firmante"
+                      >
+                        {downloadingAudited ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ShieldCheck className="w-4 h-4" />
+                        )}
+                        Descargar PDF validado (auditoría)
+                      </button>
+                    </>
                   )}
                 </div>
+                {previewOpen && previewUrl && (
+                  <div className="mt-4 rounded-lg border border-hairline bg-surface overflow-hidden">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-hairline bg-surface-3">
+                      <div className="text-[11px] text-content-subtle">
+                        Vista previa del PDF validado (incluye banda de auditoría por firmante)
+                      </div>
+                      <a
+                        href={previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-accent-brand hover:underline"
+                      >
+                        Abrir en pestaña nueva
+                      </a>
+                    </div>
+                    <iframe
+                      src={previewUrl}
+                      title="Vista previa PDF validado"
+                      className="w-full h-[720px] bg-white"
+                    />
+                  </div>
+                )}
               </div>
+
             ) : req.status === "void" ? (
               <div className="rounded-xl border border-hairline bg-slate-50 p-5 text-sm text-content-subtle">
                 Esta solicitud de firma fue anulada por el emisor.
