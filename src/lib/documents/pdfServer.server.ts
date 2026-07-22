@@ -126,7 +126,6 @@ function drawQrMatrix(
 
 function drawPageFoundation(ctx: Ctx) {
   const { page, bold } = ctx;
-  const { page, bold, font, mark, qr } = ctx;
   page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: PAPER });
 
   // Marco institucional: hoja de papel, filo tinta y acento cobalto.
