@@ -4385,6 +4385,42 @@ export type Database = {
           },
         ]
       }
+      document_registry: {
+        Row: {
+          doc_type: string | null
+          issued_at: string
+          issuer: string | null
+          metadata: Json
+          reference: string
+          status: string
+          template_id: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          doc_type?: string | null
+          issued_at?: string
+          issuer?: string | null
+          metadata?: Json
+          reference: string
+          status?: string
+          template_id?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          doc_type?: string | null
+          issued_at?: string
+          issuer?: string | null
+          metadata?: Json
+          reference?: string
+          status?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       document_sign_requests: {
         Row: {
           created_at: string
