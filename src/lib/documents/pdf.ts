@@ -317,13 +317,17 @@ export async function renderGeocapitalsPdf(
     const allOk = audit.every((a) => a.match);
     const bandH = 22 + audit.length * 12;
     if (y + bandH > safeBottom) y = addPage();
-    pdf.setFillColor(...(allOk ? [237, 247, 240] : [253, 236, 236]));
-    pdf.setDrawColor(...(allOk ? [16, 122, 87] : [176, 45, 45]));
+    const okFill: [number, number, number] = [237, 247, 240];
+    const badFill: [number, number, number] = [253, 236, 236];
+    const okInk: [number, number, number] = [16, 122, 87];
+    const badInk: [number, number, number] = [176, 45, 45];
+    pdf.setFillColor(...(allOk ? okFill : badFill));
+    pdf.setDrawColor(...(allOk ? okInk : badInk));
     pdf.setLineWidth(0.6);
     pdf.roundedRect(marginX, y, contentW, bandH, 3, 3, "FD");
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(7.5);
-    pdf.setTextColor(...(allOk ? [16, 122, 87] : [176, 45, 45]));
+    pdf.setTextColor(...(allOk ? okInk : badInk));
     pdf.text(
       allOk
         ? "AUDITORIA DE FIRMAS · TODAS LAS FIRMAS COINCIDEN"
