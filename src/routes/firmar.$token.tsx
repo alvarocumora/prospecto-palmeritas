@@ -392,22 +392,62 @@ function SignPage() {
                     Descargar PDF firmado
                   </button>
                   {req.flowSignatures.length > 0 && (
-                    <button
-                      onClick={() => void downloadAudited()}
-                      disabled={downloadingAudited}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-accent-brand text-accent-brand px-4 py-2.5 text-sm font-medium hover:bg-accent-brand/5 disabled:opacity-50"
-                      title="Incluye una banda de auditoría con coincide/no coincide por firmante"
-                    >
-                      {downloadingAudited ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <ShieldCheck className="w-4 h-4" />
-                      )}
-                      Descargar PDF validado (auditoría)
-                    </button>
+                    <>
+                      <button
+                        onClick={() => void togglePreview()}
+                        disabled={previewLoading}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-hairline bg-surface text-content px-4 py-2.5 text-sm font-medium hover:bg-surface-3 disabled:opacity-50"
+                        title="Previsualiza el PDF con la banda de auditoría antes de descargarlo"
+                      >
+                        {previewLoading ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : previewOpen ? (
+                          <EyeOff className="w-4 h-4" />
+                        ) : (
+                          <Eye className="w-4 h-4" />
+                        )}
+                        {previewOpen ? "Ocultar vista previa" : "Previsualizar PDF validado"}
+                      </button>
+                      <button
+                        onClick={() => void downloadAudited()}
+                        disabled={downloadingAudited}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-accent-brand text-accent-brand px-4 py-2.5 text-sm font-medium hover:bg-accent-brand/5 disabled:opacity-50"
+                        title="Incluye una banda de auditoría con coincide/no coincide por firmante"
+                      >
+                        {downloadingAudited ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <ShieldCheck className="w-4 h-4" />
+                        )}
+                        Descargar PDF validado (auditoría)
+                      </button>
+                    </>
                   )}
                 </div>
+                {previewOpen && previewUrl && (
+                  <div className="mt-4 rounded-lg border border-hairline bg-surface overflow-hidden">
+                    <div className="flex items-center justify-between px-3 py-2 border-b border-hairline bg-surface-3">
+                      <div className="text-[11px] text-content-subtle">
+                        Vista previa del PDF validado (incluye banda de auditoría por firmante)
+                      </div>
+                      <a
+                        href={previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-accent-brand hover:underline"
+                      >
+                        Abrir en pestaña nueva
+                      </a>
+                    </div>
+                    <iframe
+                      src={previewUrl}
+                      title="Vista previa PDF validado"
+                      className="w-full h-[720px] bg-white"
+                    />
+                  </div>
+                )}
               </div>
+
             ) : req.status === "void" ? (
               <div className="rounded-xl border border-hairline bg-slate-50 p-5 text-sm text-content-subtle">
                 Esta solicitud de firma fue anulada por el emisor.
