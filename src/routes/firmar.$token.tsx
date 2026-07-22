@@ -106,33 +106,64 @@ function SignPage() {
     }
   };
 
+  const [downloadingAudited, setDownloadingAudited] = useState(false);
+
+  const buildStamps = () => {
+    if (!req) return [];
+    return req.flowSignatures.length > 0
+      ? req.flowSignatures.map((s) => ({
+          name: s.signedByName,
+          signedAt: s.signedAt,
+          hash: (s.signatureHash ?? "").slice(0, 12),
+          partyIndex: s.order,
+        }))
+      : req.signedByName && req.signedAt
+        ? [
+            {
+              name: req.signedByName,
+              signedAt: req.signedAt,
+              hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
+              partyIndex: req.signOrder,
+            },
+          ]
+        : [];
+  };
+
   const downloadSigned = async () => {
     if (!req || req.status !== "signed") return;
     setDownloading(true);
     try {
-      const stamps =
-        req.flowSignatures.length > 0
-          ? req.flowSignatures.map((s) => ({
-              name: s.signedByName,
-              signedAt: s.signedAt,
-              hash: (s.signatureHash ?? "").slice(0, 12),
-              partyIndex: s.order,
-            }))
-          : req.signedByName && req.signedAt
-            ? [
-                {
-                  name: req.signedByName,
-                  signedAt: req.signedAt,
-                  hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
-                  partyIndex: req.signOrder,
-                },
-              ]
-            : [];
-      await renderGeocapitalsPdf(req.doc, { signatures: stamps });
+      await renderGeocapitalsPdf(req.doc, { signatures: buildStamps() });
     } finally {
       setDownloading(false);
     }
   };
+
+  const downloadAudited = async () => {
+    if (!req || req.flowSignatures.length === 0) return;
+    setDownloadingAudited(true);
+    try {
+      // Recomputa la validación al vuelo para que el PDF descargado incluya el
+      // resultado más reciente (aunque el usuario tarde en apretar el botón).
+      const fresh = await verifyFn({ data: { token } });
+      const audit = (fresh ?? []).map((v) => ({
+        order: v.order,
+        party: myParty?.parties[v.order],
+        signerName: v.signedByName,
+        match: v.hashMatch && v.orderMatch,
+        hash: v.storedHash,
+      }));
+      await renderGeocapitalsPdf(req.doc, {
+        signatures: buildStamps(),
+        signatureAudit: audit,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar el PDF auditado.");
+    } finally {
+      setDownloadingAudited(false);
+    }
+  };
+
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
