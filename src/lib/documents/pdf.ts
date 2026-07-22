@@ -53,6 +53,9 @@ export type RenderOptions = {
   /** Resumen de validación por firmante (coincide/no coincide) impreso
    *  bajo el título en la primera página. */
   signatureAudit?: SignatureAuditEntry[];
+  /** Si es true, devuelve el Blob generado en lugar de disparar la descarga.
+   *  Útil para previsualizar el PDF en un iframe antes de descargarlo. */
+  returnBlob?: boolean;
 };
 
 type JsPdfLike = {
