@@ -455,6 +455,16 @@ export const SPECIAL_DOCS: Array<{
       { role: "Por ZBALA LATAM", name: "Joaquín Belmar", email: "joaquin.belmar@zbalatam.com" },
     ],
   },
+  {
+    id: "antimony-brena",
+    label: "Ficha · Antimonio en breña triturada (Honduras)",
+    acronym: "FICHA",
+    summary:
+      "SCO Corporación Minera A&D — Sb 35–77%, tabla FOB oficial, ensayos AA y protocolo SBLC/SWIFT MT103.",
+    build: buildAntimonyBrenaFicha,
+    signers: [{ role: "Acuse de recibo" }],
+  },
+
 ];
 
 
