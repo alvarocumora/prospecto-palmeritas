@@ -34,6 +34,7 @@ export const COMMODITIES: Record<string, { label: string; short: string; color: 
   mo_concentrate: { label: "Concentrado de molibdeno", short: "Mo conc.", color: "#00D4FF" },
   co_hydroxide: { label: "Hidróxido de cobalto", short: "Co(OH)₂", color: "#3B6EF5" },
   ni_sulphate: { label: "Sulfato de níquel", short: "NiSO₄", color: "#9BCF8A" },
+  sb_ore: { label: "Antimonio (mineral)", short: "Sb ore", color: "#6E7B8B" },
 };
 
 export const FORMS: Record<string, string> = {
