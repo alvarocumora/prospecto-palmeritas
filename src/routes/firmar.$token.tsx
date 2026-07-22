@@ -1,16 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { FileSignature, ShieldCheck, Download, Loader2, Ban } from "lucide-react";
+import {
+  FileSignature,
+  ShieldCheck,
+  ShieldAlert,
+  Download,
+  Loader2,
+  Ban,
+  PenLine,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import { DocumentPreview } from "@/features/documents/DocumentEditor";
-import { getSignRequest, submitSignature } from "@/lib/documents/signing.functions";
+import {
+  getSignRequest,
+  submitSignature,
+  verifyFlowSignatures,
+} from "@/lib/documents/signing.functions";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
 
 // Página PÚBLICA de firma electrónica: la contraparte abre el link tokenizado,
-// revisa el documento congelado y firma con su nombre + declaración. Sin cuenta.
+// revisa el documento congelado, ve una vista previa de SU slot (parte,
+// placeholder y sello) y firma. Sin cuenta.
 
 export const Route = createFileRoute("/firmar/$token")({
   head: () => ({
@@ -26,12 +41,12 @@ export const Route = createFileRoute("/firmar/$token")({
   component: SignPage,
 });
 
-
 function SignPage() {
   const { token } = Route.useParams();
   const queryClient = useQueryClient();
   const getFn = useServerFn(getSignRequest);
   const signFn = useServerFn(submitSignature);
+  const verifyFn = useServerFn(verifyFlowSignatures);
 
   const { data: req, isLoading } = useQuery({
     queryKey: ["sign-request", token],
@@ -39,10 +54,35 @@ function SignPage() {
     retry: false,
   });
 
+  // Verificación por firmante: recomputa el hash esperado de cada firma
+  // completada y devuelve match/no match. Sólo tiene sentido cuando ya hay
+  // al menos una firma en el flujo.
+  const { data: verifications } = useQuery({
+    queryKey: ["sign-verify", token],
+    queryFn: () => verifyFn({ data: { token } }),
+    enabled: Boolean(req && req.flowSignatures.length > 0),
+    retry: false,
+  });
+
   const [name, setName] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [signing, setSigning] = useState(false);
   const [downloading, setDownloading] = useState(false);
+
+  // Parte concreta (slot) del documento asignada a este firmante.
+  const myParty = useMemo(() => {
+    if (!req) return null;
+    const sig = req.doc.blocks.find((b) => (b as { kind?: string }).kind === "signature") as
+      | { kind: "signature"; parties: string[] }
+      | undefined;
+    if (!sig) return null;
+    const parties = sig.parties ?? [];
+    return {
+      parties,
+      party: parties[req.signOrder] ?? null,
+      totalParties: parties.length,
+    };
+  }, [req]);
 
   const onSign = async () => {
     if (name.trim().length < 3) {
@@ -58,6 +98,7 @@ function SignPage() {
       await signFn({ data: { token, signerName: name.trim(), accepted: true } });
       toast.success("Documento firmado.");
       queryClient.invalidateQueries({ queryKey: ["sign-request", token] });
+      queryClient.invalidateQueries({ queryKey: ["sign-verify", token] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo firmar.");
     } finally {
@@ -69,9 +110,6 @@ function SignPage() {
     if (!req || req.status !== "signed") return;
     setDownloading(true);
     try {
-      // Estampa CADA firma en su propio slot (partyIndex = sign_order del
-      // firmante en el flujo). Si el flujo es multi-parte y aún faltan
-      // firmantes, sólo se estampan los que ya firmaron.
       const stamps =
         req.flowSignatures.length > 0
           ? req.flowSignatures.map((s) => ({
@@ -95,7 +133,6 @@ function SignPage() {
       setDownloading(false);
     }
   };
-
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
@@ -124,10 +161,129 @@ function SignPage() {
               <code className="font-mono">{req.docHash.slice(0, 16)}…</code>
             </p>
 
+            {/* Vista previa de la parte del firmante: le mostramos SU slot
+                (placeholder, nombre esperado y sello previsto) antes de que
+                acepte, para que confirme que está firmando la parte correcta. */}
+            {myParty?.party && req.status === "pending" && !expired && (
+              <div className="mb-6 rounded-xl border border-accent-brand/40 bg-accent-brand/5 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <PenLine className="w-4 h-4 text-accent-brand" />
+                  <h2 className="text-sm font-semibold text-content">
+                    Vista previa de tu firma · Parte {req.signOrder + 1} de {myParty.totalParties}
+                  </h2>
+                </div>
+                <div className="rounded-lg border border-hairline bg-surface p-5">
+                  {/* Simulación del slot que quedará impreso en el PDF final */}
+                  <div className="min-h-[70px] flex items-end justify-between gap-3">
+                    <div className="flex-1">
+                      <div
+                        className="italic font-serif text-content text-lg leading-tight truncate"
+                        aria-label="Vista previa de tu firma"
+                      >
+                        {name.trim() || (
+                          <span className="text-content-subtle/60 not-italic text-sm">
+                            Aquí aparecerá tu nombre como firma manuscrita
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="shrink-0 rounded border border-accent-brand/60 bg-surface px-2.5 py-1.5 text-center">
+                      <div className="text-[9px] font-bold text-accent-brand tracking-wider">
+                        {name.trim() ? "FIRMADO" : "PENDIENTE"}
+                      </div>
+                      <div className="text-[7px] text-content-subtle">Geocapitals</div>
+                    </div>
+                  </div>
+                  <div className="border-t border-content mt-1 pt-2">
+                    <div className="text-xs font-semibold text-content">{myParty.party}</div>
+                    <div className="text-[10px] text-content-subtle mt-1">
+                      {name.trim()
+                        ? `Firmado electrónicamente por ${name.trim()}`
+                        : req.signerNameExpected
+                          ? `Firmante esperado: ${req.signerNameExpected}`
+                          : "Nombre, cargo y firma"}
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-2 text-[10px] text-content-subtle">
+                  Tu firma quedará estampada exactamente en este slot del PDF. Las otras partes
+                  firman en sus propios slots por separado.
+                </p>
+              </div>
+            )}
+
             {/* Documento */}
-             <div className="rounded-xl border border-hairline bg-surface-3 p-6 mb-6">
+            <div className="rounded-xl border border-hairline bg-surface-3 p-6 mb-6">
               <DocumentPreview doc={req.doc} />
             </div>
+
+            {/* Validación de integridad por firmante (aparece cuando hay
+                al menos una firma completada en el flujo). */}
+            {req.flowSignatures.length > 0 && (
+              <div className="mb-6 rounded-xl border border-hairline bg-surface-3 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <ShieldCheck className="w-4 h-4 text-content" />
+                  <h2 className="text-sm font-semibold text-content">
+                    Validación de integridad por firmante
+                  </h2>
+                </div>
+                <ul className="space-y-2">
+                  {req.flowSignatures.map((s) => {
+                    const v = verifications?.find((x) => x.order === s.order);
+                    const ok = v ? v.hashMatch && v.orderMatch : null;
+                    const partyLabel = myParty?.parties[s.order] ?? `Parte ${s.order + 1}`;
+                    return (
+                      <li
+                        key={s.order}
+                        className="rounded-lg border border-hairline bg-surface p-3"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="text-xs font-semibold text-content truncate">
+                              {partyLabel}
+                            </div>
+                            <div className="text-[11px] text-content-subtle truncate">
+                              {s.signedByName} · {new Date(s.signedAt).toLocaleString("es-CL")}
+                            </div>
+                            <div className="text-[10px] font-mono text-content-subtle break-all mt-1">
+                              {s.signatureHash.slice(0, 24)}…
+                            </div>
+                          </div>
+                          <div className="shrink-0">
+                            {ok === null ? (
+                              <Loader2 className="w-4 h-4 animate-spin text-content-subtle" />
+                            ) : ok ? (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 text-emerald-700 px-2 py-0.5 text-[10px] font-semibold">
+                                <CheckCircle2 className="w-3 h-3" /> Coincide
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/15 text-rose-700 px-2 py-0.5 text-[10px] font-semibold">
+                                <XCircle className="w-3 h-3" /> No coincide
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        {v && (!v.hashMatch || !v.orderMatch) && (
+                          <div className="mt-2 flex items-start gap-1.5 rounded border border-rose-500/30 bg-rose-500/5 px-2 py-1.5 text-[10px] text-rose-700">
+                            <ShieldAlert className="w-3 h-3 mt-0.5 shrink-0" />
+                            <span>
+                              {!v.hashMatch && "El hash almacenado no coincide con el recalculado. "}
+                              {!v.orderMatch &&
+                                "El signOrder del firmante está fuera del rango de partes del documento."}
+                            </span>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+                <p className="mt-3 text-[10px] text-content-subtle">
+                  El hash de cada firmante se recalcula en el servidor a partir del documento
+                  congelado, su nombre y el momento de la firma. Cualquier modificación posterior
+                  se detecta aquí.
+                </p>
+              </div>
+            )}
 
             {/* Estado / acción */}
             {req.status === "signed" ? (
@@ -145,7 +301,7 @@ function SignPage() {
                 <button
                   onClick={() => void downloadSigned()}
                   disabled={downloading}
-                   className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
                   {downloading ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -164,7 +320,7 @@ function SignPage() {
                 El link de firma expiró. Pide a tu contraparte que genere uno nuevo.
               </div>
             ) : (
-               <div className="rounded-xl border border-hairline bg-surface-3 p-5">
+              <div className="rounded-xl border border-hairline bg-surface-3 p-5">
                 <h2 className="text-sm font-semibold text-content mb-3">
                   Firmar como{req.signerNameExpected ? ` (${req.signerNameExpected})` : ""}
                 </h2>
@@ -187,7 +343,7 @@ function SignPage() {
                 <button
                   onClick={() => void onSign()}
                   disabled={signing}
-                   className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent-brand text-accent-brand-contrast px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-accent-brand text-accent-brand-contrast px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
                 >
                   {signing ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
