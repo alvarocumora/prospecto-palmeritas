@@ -160,22 +160,45 @@ function drawHeader(ctx: Ctx) {
   drawPageFoundation(ctx);
 
   if (ctx.meta.pageNumber > 1) {
+    let compactBrandX = MARGIN_X;
+    if (mark) {
+      const markH = 18;
+      const markW = markH * GEOCAPITALS_MARK_RATIO;
+      page.drawImage(mark, { x: MARGIN_X, y: PAGE_H - 38, width: markW, height: markH });
+      compactBrandX = MARGIN_X + markW + 8;
+    }
     page.drawText("GEOCAPITALS", {
-      x: MARGIN_X,
+      x: compactBrandX,
       y: PAGE_H - 32,
       size: 8,
       font: bold,
       color: INK,
     });
     const refTxt = `REF · ${shorten(ctx.meta.reference, 44)}`;
+    const miniQrSide = qr ? 24 : 0;
+    const refRight = PAGE_W - MARGIN_X - (qr ? miniQrSide + 10 : 0);
     const refW = font.widthOfTextAtSize(refTxt, 8);
     page.drawText(refTxt, {
-      x: PAGE_W - MARGIN_X - refW,
+      x: refRight - refW,
       y: PAGE_H - 32,
       size: 8,
       font,
       color: INK_SOFT,
     });
+    if (qr) {
+      const qrX = PAGE_W - MARGIN_X - miniQrSide;
+      const qrTop = PAGE_H - 20;
+      page.drawRectangle({
+        x: qrX - 3,
+        y: qrTop - miniQrSide - 3,
+        width: miniQrSide + 6,
+        height: miniQrSide + 6,
+        color: rgb(1, 1, 1),
+        borderColor: HAIRLINE,
+        borderWidth: 0.45,
+      });
+      drawQrMatrix(page, qr, qrX, qrTop, miniQrSide);
+    }
     page.drawLine({
       start: { x: MARGIN_X, y: PAGE_H - 46 },
       end: { x: PAGE_W - MARGIN_X, y: PAGE_H - 46 },
@@ -293,7 +316,7 @@ function drawHeader(ctx: Ctx) {
 }
 
 function drawFooter(ctx: Ctx, totalPages: number) {
-  const { page, font, bold, qr } = ctx;
+  const { page, font } = ctx;
   const y = 44;
   page.drawLine({
     start: { x: MARGIN_X, y: y + 22 },
@@ -308,29 +331,6 @@ function drawFooter(ctx: Ctx, totalPages: number) {
     font,
     color: INK_SOFT,
   });
-  if (qr && ctx.meta.pageNumber === totalPages) {
-    const side = 28;
-    const x = PAGE_W - MARGIN_X - side;
-    const top = y + 21;
-    page.drawRectangle({
-      x: x - 4,
-      y: top - side - 4,
-      width: side + 8,
-      height: side + 8,
-      color: rgb(1, 1, 1),
-      borderColor: HAIRLINE,
-      borderWidth: 0.5,
-    });
-    drawQrMatrix(page, qr, x, top, side);
-    const label = "QR VALIDACIÓN";
-    page.drawText(label, {
-      x: x - bold.widthOfTextAtSize(label, 4.8) / 2 + side / 2,
-      y: top - side - 12,
-      size: 4.8,
-      font: bold,
-      color: COBALT,
-    });
-  }
   const pt = `Página ${ctx.meta.pageNumber} de ${totalPages}`;
   const w = font.widthOfTextAtSize(pt, 8);
   page.drawText(pt, {
