@@ -11,6 +11,7 @@
 // infraestructura de emails no soporta attachments binarios.
 
 import {
+  degrees,
   PDFDocument,
   StandardFonts,
   rgb,
@@ -33,9 +34,10 @@ const GOLD = rgb(0.792, 0.643, 0.235);
 
 const PAGE_W = 595.28; // A4 puntos
 const PAGE_H = 841.89;
-const MARGIN_X = 56;
-const MARGIN_TOP = 138;
-const MARGIN_BOTTOM = 92;
+const MARGIN_X = 54;
+const FIRST_CONTENT_Y = PAGE_H - 156;
+const NEXT_CONTENT_Y = PAGE_H - 74;
+const MARGIN_BOTTOM = 86;
 const CONTENT_W = PAGE_W - MARGIN_X * 2;
 
 const CONFIDENTIAL_NOTE =
@@ -71,6 +73,11 @@ type Ctx = {
   cursorY: number;
   meta: { title: string; reference: string; pageNumber: number };
 };
+
+function shorten(text: string, max = 34) {
+  const clean = text.replace(/\s+/g, " ").trim();
+  return clean.length > max ? `${clean.slice(0, max - 1)}…` : clean;
+}
 
 function fmtDate(iso?: string) {
   const d = iso ? new Date(iso) : new Date();
@@ -117,51 +124,136 @@ function drawQrMatrix(
   }
 }
 
+function drawPageFoundation(ctx: Ctx) {
+  const { page, bold } = ctx;
+  page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: PAPER });
+
+  // Marco institucional: hoja de papel, filo tinta y acento cobalto.
+  page.drawRectangle({ x: 0, y: PAGE_H - 6, width: PAGE_W, height: 6, color: INK });
+  page.drawRectangle({ x: 0, y: PAGE_H - 8, width: PAGE_W * 0.26, height: 2, color: COBALT });
+  page.drawRectangle({
+    x: 30,
+    y: 34,
+    width: PAGE_W - 60,
+    height: PAGE_H - 76,
+    borderColor: HAIRLINE,
+    borderWidth: 0.7,
+  });
+  page.drawRectangle({ x: 30, y: PAGE_H - 88, width: 2, height: 42, color: COBALT });
+
+  const watermark = "GEOCAPITALS";
+  const wmSize = 64;
+  const wmW = bold.widthOfTextAtSize(watermark, wmSize);
+  page.drawText(watermark, {
+    x: PAGE_W / 2 - wmW / 2 + 18,
+    y: PAGE_H / 2 - 18,
+    size: wmSize,
+    font: bold,
+    color: COBALT,
+    opacity: 0.035,
+    rotate: degrees(32),
+  });
+}
+
 function drawHeader(ctx: Ctx) {
   const { page, bold, font, mark, qr } = ctx;
-  // Fondo papel completo.
-  page.drawRectangle({ x: 0, y: 0, width: PAGE_W, height: PAGE_H, color: PAPER });
-  // Barra de marca cobalto.
-  page.drawRectangle({ x: 0, y: PAGE_H - 46, width: PAGE_W, height: 46, color: COBALT });
-  // Marco «G» dorado a la izquierda de la barra.
+  drawPageFoundation(ctx);
+
+  if (ctx.meta.pageNumber > 1) {
+    let compactBrandX = MARGIN_X;
+    if (mark) {
+      const markH = 18;
+      const markW = markH * GEOCAPITALS_MARK_RATIO;
+      page.drawImage(mark, { x: MARGIN_X, y: PAGE_H - 38, width: markW, height: markH });
+      compactBrandX = MARGIN_X + markW + 8;
+    }
+    page.drawText("GEOCAPITALS", {
+      x: compactBrandX,
+      y: PAGE_H - 32,
+      size: 8,
+      font: bold,
+      color: INK,
+    });
+    const refTxt = `REF · ${shorten(ctx.meta.reference, 44)}`;
+    const miniQrSide = qr ? 24 : 0;
+    const refRight = PAGE_W - MARGIN_X - (qr ? miniQrSide + 10 : 0);
+    const refW = font.widthOfTextAtSize(refTxt, 8);
+    page.drawText(refTxt, {
+      x: refRight - refW,
+      y: PAGE_H - 32,
+      size: 8,
+      font,
+      color: INK_SOFT,
+    });
+    if (qr) {
+      const qrX = PAGE_W - MARGIN_X - miniQrSide;
+      const qrTop = PAGE_H - 20;
+      page.drawRectangle({
+        x: qrX - 3,
+        y: qrTop - miniQrSide - 3,
+        width: miniQrSide + 6,
+        height: miniQrSide + 6,
+        color: rgb(1, 1, 1),
+        borderColor: HAIRLINE,
+        borderWidth: 0.45,
+      });
+      drawQrMatrix(page, qr, qrX, qrTop, miniQrSide);
+    }
+    page.drawLine({
+      start: { x: MARGIN_X, y: PAGE_H - 46 },
+      end: { x: PAGE_W - MARGIN_X, y: PAGE_H - 46 },
+      thickness: 0.5,
+      color: HAIRLINE,
+    });
+    return;
+  }
+
+  // Cabecera principal: marca sobre papel, no bloque sólido; igual a la matriz institucional.
   let brandX = MARGIN_X;
   if (mark) {
-    const markH = 30;
+    const markH = 36;
     const markW = markH * GEOCAPITALS_MARK_RATIO;
-    page.drawImage(mark, { x: MARGIN_X, y: PAGE_H - 38, width: markW, height: markH });
-    brandX = MARGIN_X + markW + 12;
+    page.drawImage(mark, { x: MARGIN_X, y: PAGE_H - 58, width: markW, height: markH });
+    brandX = MARGIN_X + markW + 14;
   }
   page.drawText("GEOCAPITALS", {
     x: brandX,
-    y: PAGE_H - 26,
+    y: PAGE_H - 35,
     size: 14,
     font: bold,
-    color: rgb(1, 1, 1),
+    color: INK,
   });
-  page.drawText("Motor de transacciones internacionales · geocapitals.com", {
+  page.drawText("MINING INTELLIGENCE · DEALS · DOCUMENTATION", {
     x: brandX,
-    y: PAGE_H - 39,
+    y: PAGE_H - 49,
     size: 7.5,
     font,
-    color: rgb(0.85, 0.88, 1),
+    color: COBALT,
   });
-  // Referencia arriba a la derecha.
-  const refTxt = `REF · ${ctx.meta.reference}`;
-  const refW = font.widthOfTextAtSize(refTxt, 9);
-  page.drawText(refTxt, {
-    x: PAGE_W - MARGIN_X - refW,
-    y: PAGE_H - 30,
-    size: 9,
+  page.drawText("geocapitals.com · info@geocapitals.com", {
+    x: brandX,
+    y: PAGE_H - 61,
+    size: 7,
     font,
-    color: rgb(1, 1, 1),
+    color: INK_SOFT,
   });
 
-  // Caja del QR de validación pública (arriba a la derecha, sobre el papel).
-  const qrSide = 54;
+  const refTxt = `REF · ${ctx.meta.reference}`;
+  const refW = font.widthOfTextAtSize(refTxt, 8);
+  page.drawText(refTxt, {
+    x: PAGE_W - MARGIN_X - refW,
+    y: PAGE_H - 34,
+    size: 8,
+    font,
+    color: INK_SOFT,
+  });
+
+  // Caja del QR de validación pública.
+  const qrSide = 58;
   const qrBoxW = qrSide + 12;
-  const qrBoxH = qrSide + 24;
+  const qrBoxH = qrSide + 34;
   const qrBoxX = PAGE_W - MARGIN_X - qrBoxW;
-  const qrBoxTop = PAGE_H - 54; // borde superior de la caja
+  const qrBoxTop = PAGE_H - 68;
   if (qr) {
     page.drawRectangle({
       x: qrBoxX,
@@ -174,19 +266,34 @@ function drawHeader(ctx: Ctx) {
     });
     drawQrMatrix(page, qr, qrBoxX + 6, qrBoxTop - 6, qrSide);
     const cx = qrBoxX + qrBoxW / 2;
-    const legend = "VALIDAR EN GEOCAPITALS";
-    const lw = bold.widthOfTextAtSize(legend, 5.4);
-    page.drawText(legend, {
-      x: cx - lw / 2,
-      y: qrBoxTop - qrBoxH + 8,
-      size: 5.4,
+    const topLegend = "VALIDAR EN";
+    const bottomLegend = "GEOCAPITALS";
+    page.drawText(topLegend, {
+      x: cx - bold.widthOfTextAtSize(topLegend, 5.6) / 2,
+      y: qrBoxTop - qrBoxH + 20,
+      size: 5.6,
       font: bold,
       color: COBALT,
+    });
+    page.drawText(bottomLegend, {
+      x: cx - bold.widthOfTextAtSize(bottomLegend, 5.6) / 2,
+      y: qrBoxTop - qrBoxH + 12,
+      size: 5.6,
+      font: bold,
+      color: COBALT,
+    });
+    const miniRef = shorten(ctx.meta.reference, 24);
+    page.drawText(miniRef, {
+      x: cx - font.widthOfTextAtSize(miniRef, 4.9) / 2,
+      y: qrBoxTop - qrBoxH + 5,
+      size: 4.9,
+      font,
+      color: INK_SOFT,
     });
   }
 
   // Banda de confidencialidad (angosta, deja el hueco del QR a la derecha).
-  const cbY = PAGE_H - 82;
+  const cbY = PAGE_H - 112;
   const bandW = qr ? CONTENT_W - qrBoxW - 12 : CONTENT_W;
   page.drawRectangle({
     x: MARGIN_X,
@@ -268,15 +375,15 @@ function wrapText(text: string, font: PDFFont, size: number, maxWidth: number): 
   return out;
 }
 
-async function newPage(ctx: Ctx) {
+function newPage(ctx: Ctx) {
   ctx.page = ctx.doc.addPage([PAGE_W, PAGE_H]);
   ctx.meta.pageNumber += 1;
-  ctx.cursorY = PAGE_H - MARGIN_TOP;
+  ctx.cursorY = NEXT_CONTENT_Y;
   drawHeader(ctx);
 }
 
-async function ensureSpace(ctx: Ctx, needed: number) {
-  if (ctx.cursorY - needed < MARGIN_BOTTOM) await newPage(ctx);
+function ensureSpace(ctx: Ctx, needed: number) {
+  if (ctx.cursorY - needed < MARGIN_BOTTOM) newPage(ctx);
 }
 
 function drawParagraph(
@@ -289,7 +396,6 @@ function drawParagraph(
   const lines = wrapText(text, font, size, CONTENT_W);
   const lineHeight = size * 1.45;
   for (const line of lines) {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     ensureSpace(ctx, lineHeight);
     ctx.page.drawText(line, {
       x: MARGIN_X,
@@ -332,7 +438,6 @@ function drawKV(ctx: Ctx, rows: Array<[string, string | undefined]>) {
   const labelW = 160;
   for (const [k, v] of rows) {
     if (!v) continue;
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     ensureSpace(ctx, 18);
     ctx.page.drawText(k, { x: MARGIN_X, y: ctx.cursorY, size, font: ctx.bold, color: INK_SOFT });
     const wrapped = wrapText(v, ctx.font, size, CONTENT_W - labelW);
@@ -353,7 +458,6 @@ function drawKV(ctx: Ctx, rows: Array<[string, string | undefined]>) {
 }
 
 function drawSignatureBlock(ctx: Ctx, emitter: NonNullable<ServerPdfInput["emitter"]>) {
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   ensureSpace(ctx, 120);
   ctx.cursorY -= 20;
   const boxY = ctx.cursorY - 90;
@@ -420,9 +524,9 @@ export async function renderServerPdf(input: ServerPdfInput): Promise<Uint8Array
   doc.setCreator("Geocapitals PDF Server");
 
   const [font, bold, italic] = await Promise.all([
-    doc.embedFont(StandardFonts.Helvetica),
-    doc.embedFont(StandardFonts.HelveticaBold),
-    doc.embedFont(StandardFonts.HelveticaOblique),
+    doc.embedFont(StandardFonts.TimesRoman),
+    doc.embedFont(StandardFonts.TimesRomanBold),
+    doc.embedFont(StandardFonts.TimesRomanItalic),
   ]);
 
   // Marca dorada (embedPng acepta base64 directo) y QR de validación pública.
@@ -443,7 +547,7 @@ export async function renderServerPdf(input: ServerPdfInput): Promise<Uint8Array
     italic,
     mark,
     qr,
-    cursorY: PAGE_H - MARGIN_TOP,
+    cursorY: FIRST_CONTENT_Y,
     meta: { title: input.title, reference: input.reference, pageNumber: 1 },
   };
   drawHeader(ctx);
