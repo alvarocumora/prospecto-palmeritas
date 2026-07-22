@@ -39,9 +39,20 @@ export type EmitterSignature = {
   partyIndex?: number;
 };
 
+export type SignatureAuditEntry = {
+  order: number;
+  party?: string;
+  signerName: string;
+  match: boolean;
+  hash?: string;
+};
+
 export type RenderOptions = {
   emitterSignature?: EmitterSignature;
   signatures?: EmitterSignature[];
+  /** Resumen de validación por firmante (coincide/no coincide) impreso
+   *  bajo el título en la primera página. */
+  signatureAudit?: SignatureAuditEntry[];
 };
 
 type JsPdfLike = {
@@ -298,6 +309,52 @@ export async function renderGeocapitalsPdf(
   pdf.setLineWidth(0.5);
   pdf.line(marginX, y, pageW - marginX, y);
   y += 22;
+
+  // Banda de auditoría de firmas: resumen coincide/no coincide por firmante
+  // impreso bajo el título. Sólo aparece cuando el llamador pasa el audit.
+  const audit = opts.signatureAudit ?? [];
+  if (audit.length > 0) {
+    const allOk = audit.every((a) => a.match);
+    const bandH = 22 + audit.length * 12;
+    if (y + bandH > safeBottom) y = addPage();
+    const okFill: [number, number, number] = [237, 247, 240];
+    const badFill: [number, number, number] = [253, 236, 236];
+    const okInk: [number, number, number] = [16, 122, 87];
+    const badInk: [number, number, number] = [176, 45, 45];
+    pdf.setFillColor(...(allOk ? okFill : badFill));
+    pdf.setDrawColor(...(allOk ? okInk : badInk));
+    pdf.setLineWidth(0.6);
+    pdf.roundedRect(marginX, y, contentW, bandH, 3, 3, "FD");
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(7.5);
+    pdf.setTextColor(...(allOk ? okInk : badInk));
+    pdf.text(
+      allOk
+        ? "AUDITORIA DE FIRMAS · TODAS LAS FIRMAS COINCIDEN"
+        : "AUDITORIA DE FIRMAS · SE DETECTARON INCONSISTENCIAS",
+      marginX + 8,
+      y + 12,
+    );
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(6.8);
+    pdf.setTextColor(...INK);
+    audit.forEach((a, i) => {
+      const ly = y + 22 + i * 12;
+      const badge = a.match ? "OK" : "X";
+      pdf.setFont("helvetica", "bold");
+      pdf.setTextColor(...(a.match ? okInk : badInk));
+      pdf.text(`[${badge}]`, marginX + 8, ly);
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(...INK);
+      const label = ellipsize(
+        `${a.party ? a.party : `Parte ${a.order + 1}`} — ${a.signerName}${a.hash ? ` · ${a.hash.slice(0, 12)}` : ""}`,
+        140,
+      );
+      pdf.text(label, marginX + 32, ly);
+    });
+    y += bandH + 14;
+  }
+
 
   const ensure = (needed: number) => {
     if (y + needed > safeBottom) y = addPage();

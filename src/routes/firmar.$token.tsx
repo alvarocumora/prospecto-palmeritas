@@ -106,33 +106,64 @@ function SignPage() {
     }
   };
 
+  const [downloadingAudited, setDownloadingAudited] = useState(false);
+
+  const buildStamps = () => {
+    if (!req) return [];
+    return req.flowSignatures.length > 0
+      ? req.flowSignatures.map((s) => ({
+          name: s.signedByName,
+          signedAt: s.signedAt,
+          hash: (s.signatureHash ?? "").slice(0, 12),
+          partyIndex: s.order,
+        }))
+      : req.signedByName && req.signedAt
+        ? [
+            {
+              name: req.signedByName,
+              signedAt: req.signedAt,
+              hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
+              partyIndex: req.signOrder,
+            },
+          ]
+        : [];
+  };
+
   const downloadSigned = async () => {
     if (!req || req.status !== "signed") return;
     setDownloading(true);
     try {
-      const stamps =
-        req.flowSignatures.length > 0
-          ? req.flowSignatures.map((s) => ({
-              name: s.signedByName,
-              signedAt: s.signedAt,
-              hash: (s.signatureHash ?? "").slice(0, 12),
-              partyIndex: s.order,
-            }))
-          : req.signedByName && req.signedAt
-            ? [
-                {
-                  name: req.signedByName,
-                  signedAt: req.signedAt,
-                  hash: (req.signatureHash ?? req.docHash ?? "").slice(0, 12),
-                  partyIndex: req.signOrder,
-                },
-              ]
-            : [];
-      await renderGeocapitalsPdf(req.doc, { signatures: stamps });
+      await renderGeocapitalsPdf(req.doc, { signatures: buildStamps() });
     } finally {
       setDownloading(false);
     }
   };
+
+  const downloadAudited = async () => {
+    if (!req || req.flowSignatures.length === 0) return;
+    setDownloadingAudited(true);
+    try {
+      // Recomputa la validación al vuelo para que el PDF descargado incluya el
+      // resultado más reciente (aunque el usuario tarde en apretar el botón).
+      const fresh = await verifyFn({ data: { token } });
+      const audit = (fresh ?? []).map((v) => ({
+        order: v.order,
+        party: myParty?.parties[v.order],
+        signerName: v.signedByName,
+        match: v.hashMatch && v.orderMatch,
+        hash: v.storedHash,
+      }));
+      await renderGeocapitalsPdf(req.doc, {
+        signatures: buildStamps(),
+        signatureAudit: audit,
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar el PDF auditado.");
+    } finally {
+      setDownloadingAudited(false);
+    }
+  };
+
 
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
@@ -298,18 +329,35 @@ function SignPage() {
                 <div className="mt-1 text-[11px] font-mono text-content-subtle break-all">
                   Firma: {req.signatureHash}
                 </div>
-                <button
-                  onClick={() => void downloadSigned()}
-                  disabled={downloading}
-                  className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
-                >
-                  {downloading ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Download className="w-4 h-4" />
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={() => void downloadSigned()}
+                    disabled={downloading}
+                    className="inline-flex items-center gap-1.5 rounded-lg bg-content text-surface px-4 py-2.5 text-sm font-medium hover:opacity-90 disabled:opacity-50"
+                  >
+                    {downloading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Download className="w-4 h-4" />
+                    )}
+                    Descargar PDF firmado
+                  </button>
+                  {req.flowSignatures.length > 0 && (
+                    <button
+                      onClick={() => void downloadAudited()}
+                      disabled={downloadingAudited}
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-accent-brand text-accent-brand px-4 py-2.5 text-sm font-medium hover:bg-accent-brand/5 disabled:opacity-50"
+                      title="Incluye una banda de auditoría con coincide/no coincide por firmante"
+                    >
+                      {downloadingAudited ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <ShieldCheck className="w-4 h-4" />
+                      )}
+                      Descargar PDF validado (auditoría)
+                    </button>
                   )}
-                  Descargar PDF firmado
-                </button>
+                </div>
               </div>
             ) : req.status === "void" ? (
               <div className="rounded-xl border border-hairline bg-slate-50 p-5 text-sm text-content-subtle">
