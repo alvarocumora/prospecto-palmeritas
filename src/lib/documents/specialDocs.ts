@@ -291,12 +291,16 @@ export type SpecialDocId =
   | "trento-mona-bast"
   | "singularx-ncnda";
 
+export type SpecialDocSigner = { role: string; name?: string; email?: string };
+
 export const SPECIAL_DOCS: Array<{
   id: SpecialDocId;
   label: string;
   acronym: string;
   summary: string;
   build: () => GeneratedDoc;
+  /** Firmantes sugeridos para el flujo de firma electrónica. */
+  signers: SpecialDocSigner[];
 }> = [
   {
     id: "gold-nda",
@@ -305,6 +309,10 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Confidencialidad mutua para due diligence del proyecto aurífero NI 43-101 (4,0 Moz Au · USD 900 M).",
     build: buildGoldNda,
+    signers: [
+      { role: "Por Geocapitals SpA" },
+      { role: "Por el Receptor" },
+    ],
   },
   {
     id: "gold-ficha",
@@ -313,6 +321,7 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Resumen ejecutivo con reservas, valoración comparativa y plan de acceso al data room.",
     build: buildGoldFicha,
+    signers: [{ role: "Acuse de recibo" }],
   },
   {
     id: "trento-adenda",
@@ -321,6 +330,7 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Diagnóstico mineralógico REE, valoración indicativa y plan de confirmación 60-90 días.",
     build: buildTrentoAdenda,
+    signers: [{ role: "Acuse de recibo" }],
   },
   {
     id: "trento-mona-bast",
@@ -329,6 +339,7 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Ficha comercial LREE — concentrado 30-60% TREO, ruta metalúrgica y compradores objetivo.",
     build: buildTrentoMonaBastFicha,
+    signers: [{ role: "Acuse de recibo" }],
   },
   {
     id: "singularx-ncnda",
@@ -337,6 +348,11 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Tripartito ICC bilingüe (ES/EN) para habilitar accesos al data room de proyectos y ofertas de compra.",
     build: buildSingularxNcnda,
+    signers: [
+      { role: "Por Geocapitals SpA", email: "info@geocapitals.com" },
+      { role: "Por SingularX", name: "Eduardo", email: "eduardo@singularx.io" },
+      { role: "Por ZBALA LATAM", name: "Joaquín Belmar", email: "joaquin.belmar@zbalatam.com" },
+    ],
   },
 ];
 
