@@ -104,10 +104,10 @@ export const listPartnerInvitations = createServerFn({ method: "GET" })
 export const getInvitationByToken = createServerFn({ method: "GET" })
   .inputValidator((d: unknown) => z.object({ token: z.string().min(8) }).parse(d))
   .handler(async ({ data }) => {
-    const { createClient } = await import("@supabase/supabase-js");
-    const url = import.meta.env.VITE_SUPABASE_URL as string;
-    const key = process.env.SUPABASE_PUBLISHABLE_KEY as string;
-    const sb = createClient(url, key);
+    // Usa el cliente admin server-only para evitar depender de una policy pública
+    // sobre partner_invitations (que expondría todos los tokens al listar).
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const sb = supabaseAdmin as unknown as SupabaseClient;
     const { data: inv, error } = await sb
       .from("partner_invitations")
       .select(
@@ -115,6 +115,7 @@ export const getInvitationByToken = createServerFn({ method: "GET" })
       )
       .eq("token", data.token)
       .maybeSingle();
+
     if (error) throw new Error(error.message);
     if (!inv) throw new Error("Invitación no encontrada");
 
