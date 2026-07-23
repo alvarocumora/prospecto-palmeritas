@@ -64,7 +64,6 @@ export const SUPPLIER_ROLE_LABELS: Record<SupplierRole, string> = {
   otro: "Otro",
 };
 
-
 /** Normaliza un string arbitrario a un SupplierRole conocido (o null). */
 export function normalizeSupplierRole(value: string | null | undefined): SupplierRole | null {
   const v = (value ?? "").toLowerCase().trim();
@@ -104,4 +103,65 @@ export function summarizeSubmissions(rows: SubmissionLike[]): SubmissionsSummary
     }
   }
   return { total: rows.length, shortlisted, bestPriceUsdT: best };
+}
+
+// ---------- Detalle estructurado de la ficha (ficha_detail JSONB) ----------
+// Reemplaza los bloques hardcodeados por datos en la base: cada ficha guarda su
+// intro, sus tablas (detalle del mineral, tabla de leyes/precios, etc.) y sus
+// cláusulas comerciales. El renderer de PDF (y la página pública) los leen tal
+// cual, de forma genérica, sin lógica específica por commodity.
+export type FichaDetailTable = {
+  /** Título opcional que se dibuja como párrafo antes de la tabla. */
+  title?: string;
+  columns: string[];
+  rows: string[][];
+};
+
+export type FichaDetail = {
+  /** Párrafo introductorio del bloque de detalle. */
+  intro?: string;
+  /** Tablas del mineral ofertado (detalle, leyes/precios, análisis, etc.). */
+  tables?: FichaDetailTable[];
+  /** Cláusulas comerciales / notas legales. */
+  clauses?: string[];
+};
+
+/**
+ * Normaliza un valor arbitrario (JSONB desde la base) a un FichaDetail seguro:
+ * descarta filas/columnas mal formadas para que el render nunca falle con datos
+ * corruptos. Devuelve null si no hay contenido útil.
+ */
+export function normalizeFichaDetail(value: unknown): FichaDetail | null {
+  if (!value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  const out: FichaDetail = {};
+  if (typeof v.intro === "string" && v.intro.trim()) out.intro = v.intro.trim();
+
+  if (Array.isArray(v.tables)) {
+    const tables: FichaDetailTable[] = [];
+    for (const t of v.tables) {
+      if (!t || typeof t !== "object") continue;
+      const tt = t as Record<string, unknown>;
+      const columns = Array.isArray(tt.columns) ? tt.columns.map((c) => String(c)) : [];
+      const rows = Array.isArray(tt.rows)
+        ? tt.rows
+            .filter((r) => Array.isArray(r))
+            .map((r) => (r as unknown[]).map((c) => (c == null ? "" : String(c))))
+        : [];
+      if (columns.length === 0 || rows.length === 0) continue;
+      const table: FichaDetailTable = { columns, rows };
+      if (typeof tt.title === "string" && tt.title.trim()) table.title = tt.title.trim();
+      tables.push(table);
+    }
+    if (tables.length) out.tables = tables;
+  }
+
+  if (Array.isArray(v.clauses)) {
+    const clauses = v.clauses
+      .filter((c) => typeof c === "string" && c.trim())
+      .map((c) => (c as string).trim());
+    if (clauses.length) out.clauses = clauses;
+  }
+
+  return out.intro || out.tables || out.clauses ? out : null;
 }
