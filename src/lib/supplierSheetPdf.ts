@@ -6,7 +6,7 @@
 import type { GeneratedDoc } from "@/lib/documents/model";
 import { renderGeocapitalsPdf } from "@/lib/documents/pdf";
 import type { SupplierSheet } from "@/lib/sourcing.functions";
-import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole } from "@/lib/sourcing";
+import { SUPPLIER_ROLE_LABELS, normalizeSupplierRole, normalizeFichaDetail } from "@/lib/sourcing";
 
 const fmtUsdT = (n: number | null | undefined) =>
   n != null ? `US$ ${Math.round(n).toLocaleString("es-CL")}/t` : "—";
@@ -60,6 +60,68 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
     { kind: "table", head: ["Concepto", "Valor"], rows: oferta },
   ];
 
+  // Detalle estructurado desde la base (ficha_detail). Si existe, manda: se
+  // renderiza genéricamente (intro + tablas + cláusulas) y se omiten los bloques
+  // hardcodeados de abajo, que quedan solo como respaldo si aún no hay datos.
+  const detail = normalizeFichaDetail(supplier.ficha_detail);
+  if (detail) {
+    if (detail.intro) blocks.push({ kind: "paragraph", text: detail.intro });
+    for (const t of detail.tables ?? []) {
+      if (t.title) blocks.push({ kind: "paragraph", text: t.title });
+      blocks.push({ kind: "table", head: t.columns, rows: t.rows });
+    }
+    if (detail.clauses && detail.clauses.length) {
+      blocks.push({ kind: "clauses", items: detail.clauses });
+    }
+  } else {
+    renderLegacyBlocks(blocks, request, supplier);
+  }
+
+  if (supplier.specs && supplier.specs.trim()) {
+    blocks.push({ kind: "paragraph", text: `Especificaciones técnicas: ${supplier.specs.trim()}` });
+  }
+  if (supplier.notes && supplier.notes.trim()) {
+    blocks.push({ kind: "paragraph", text: `Notas: ${supplier.notes.trim()}` });
+  }
+  if (supplier.documents.length > 0) {
+    blocks.push({
+      kind: "table",
+      head: ["#", "Documento aportado"],
+      rows: supplier.documents.map((d, i) => [String(i + 1), d.label || `Documento ${i + 1}`]),
+    });
+  }
+
+  blocks.push({
+    kind: "paragraph",
+    text: "Verifica la autenticidad de esta ficha escaneando el QR del pie de página o visitando geocapitals.com. Contacto operativo: info@geocapitals.com · WhatsApp +56 9 6218 4071.",
+  });
+
+  const stamp = new Date().toISOString().slice(0, 10);
+  const refSlug = `FICHA-${request.reference}-${supplier.supplier_name}`
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64);
+
+  return {
+    docType: "ficha-proveedor",
+    title: `Ficha de proveedor · ${supplier.supplier_name}`,
+    reference: `${refSlug}-${stamp}`,
+    date: stamp,
+    blocks,
+  };
+}
+
+// Bloques hardcodeados heredados (TRENTO REE, antimonio, cobre). Se usan solo
+// como respaldo cuando la ficha aún no tiene ficha_detail en la base; una vez
+// migrada/backfilleada, el render estructurado los reemplaza.
+type LegacyReq = SupplierSheet["request"];
+type LegacySup = SupplierSheet["supplier"];
+function renderLegacyBlocks(
+  blocks: GeneratedDoc["blocks"],
+  request: LegacyReq,
+  supplier: LegacySup,
+) {
   // Consolidación técnica específica: Informe ALS de Tierras Raras · Proyecto TRENTO
   const isTrentoRee =
     /TRENTO/i.test(request.reference) || /tierras raras|ree|rare earth/i.test(request.commodity);
@@ -285,40 +347,6 @@ export function buildSupplierSheetDoc(sheet: SupplierSheet): GeneratedDoc {
       ],
     });
   }
-
-  if (supplier.specs && supplier.specs.trim()) {
-    blocks.push({ kind: "paragraph", text: `Especificaciones técnicas: ${supplier.specs.trim()}` });
-  }
-  if (supplier.notes && supplier.notes.trim()) {
-    blocks.push({ kind: "paragraph", text: `Notas: ${supplier.notes.trim()}` });
-  }
-  if (supplier.documents.length > 0) {
-    blocks.push({
-      kind: "table",
-      head: ["#", "Documento aportado"],
-      rows: supplier.documents.map((d, i) => [String(i + 1), d.label || `Documento ${i + 1}`]),
-    });
-  }
-
-  blocks.push({
-    kind: "paragraph",
-    text: "Verifica la autenticidad de esta ficha escaneando el QR del pie de página o visitando geocapitals.com. Contacto operativo: info@geocapitals.com · WhatsApp +56 9 6218 4071.",
-  });
-
-  const stamp = new Date().toISOString().slice(0, 10);
-  const refSlug = `FICHA-${request.reference}-${supplier.supplier_name}`
-    .toUpperCase()
-    .replace(/[^A-Z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 64);
-
-  return {
-    docType: "ficha-proveedor",
-    title: `Ficha de proveedor · ${supplier.supplier_name}`,
-    reference: `${refSlug}-${stamp}`,
-    date: stamp,
-    blocks,
-  };
 }
 
 export async function downloadSupplierSheetPdf(sheet: SupplierSheet): Promise<void> {

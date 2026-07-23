@@ -15,7 +15,9 @@ import {
   SUPPLIER_ROLES,
   SUPPLIER_ROLE_LABELS,
   normalizeSupplierRole,
+  normalizeFichaDetail,
   type SubmissionsSummary,
+  type FichaDetail,
 } from "@/lib/sourcing";
 import { sha256Hex } from "@/lib/documents/signing";
 
@@ -183,6 +185,9 @@ export type SubmissionRow = {
   share_token_prefix: string | null;
   trade_id: string | null;
   created_at: string;
+  /** Detalle estructurado (tablas + cláusulas). Se hidrata aparte, tolerante a
+   *  que la columna aún no exista en la base. */
+  ficha_detail?: FichaDetail | null;
 };
 
 // Columnas de una propuesta (incluye la ficha enriquecida). Un solo lugar para
@@ -708,6 +713,21 @@ export const getSupplierSheetByShareToken = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!req) return null;
     const r = req as Record<string, unknown>;
+
+    // Detalle estructurado: se consulta aparte y tolerando que la columna
+    // ficha_detail aún no esté migrada (no rompe la ficha pública).
+    let fichaDetail: FichaDetail | null = null;
+    try {
+      const { data: fd } = await sb
+        .from("sourcing_submissions")
+        .select("ficha_detail")
+        .eq("id", s.id)
+        .maybeSingle();
+      fichaDetail = normalizeFichaDetail((fd as { ficha_detail?: unknown } | null)?.ficha_detail);
+    } catch {
+      fichaDetail = null;
+    }
+
     return {
       request: {
         reference: String(r.reference),
@@ -717,7 +737,11 @@ export const getSupplierSheetByShareToken = createServerFn({ method: "POST" })
         incoterm: (r.incoterm ?? null) as string | null,
         destination: (r.destination ?? null) as string | null,
       },
-      supplier: { ...s, documents: Array.isArray(s.documents) ? s.documents : [] },
+      supplier: {
+        ...s,
+        documents: Array.isArray(s.documents) ? s.documents : [],
+        ficha_detail: fichaDetail,
+      },
     };
   });
 
@@ -1090,4 +1114,3 @@ export const verifySupplierShareToken = createServerFn({ method: "POST" })
       sheetPath: outcome === "valid" ? `/ficha-proveedor/${data.token}` : undefined,
     };
   });
-
