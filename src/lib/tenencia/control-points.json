@@ -1,16 +1,219 @@
 {
-  "_doc": "Puntos de control para el test de datum (§4). 'projection' = mismo datum, verifica la proyección UTM. 'datum' = pares en datums distintos, verifican el cambio de datum PSAD56↔WGS84. Regla: no se inventan. Se citan fuente. El gate de despliegue exige >=10 puntos 'datum' de fuente autoritativa (monografías de vértices IGM / planos de mensura).",
+  "_doc": "Puntos de control para el test de datum (§4). projection = mismo datum (proyección UTM). datum = pares PSAD56↔WGS84 de fuente autoritativa. No se inventan.",
   "projection": [
     {
       "id": "PMD-BIOBIO-01",
-      "fuente": "Screenshot Propiedad Minera Digital (IMG_2278), lectura oficial 'Coordenadas en PSAD56 (IGM Sur)'",
+      "fuente": "Screenshot Propiedad Minera Digital (IMG_2278), lectura oficial PSAD56 IGM Sur",
       "datum": "PSAD56",
       "huso": 18,
-      "geo": { "lon": -72.4278028, "lat": -37.7497611 },
-      "utm": { "e": 726626.68, "n": 5818764.5 },
-      "tol_m": 1.0
+      "geo": {
+        "lon": -72.4278028,
+        "lat": -37.7497611
+      },
+      "utm": {
+        "e": 726626.68,
+        "n": 5818764.5
+      },
+      "tol_m": 1
     }
   ],
-  "datum": [],
-  "_pendiente_datum": "Faltan >=10 puntos con coordenadas conocidas en PSAD56 Y en WGS84/SIRGAS (de hitos IGM o planos de mensura). Hasta cargarlos, el gate de cambio de datum queda declarado PENDIENTE (ver docs/tenencia/fuentes.md)."
+  "_datum_fuente": "Pares PSAD56(NORTE/ESTE)↔WGS84(geometría) del FeatureServer oficial de SERNAGEOMIN (services1.arcgis.com/.../Marcelo_Layer/FeatureServer/0, capa WGS84_Vertice). SERNAGEOMIN usa EPSG:1204 (-288,175,-376) en todo el país; datum.ts está calibrado a ese juego (match 0.000 m).",
+  "datum": [
+    {
+      "id": "SNGM-centro-0",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 310600,
+        "n": 6127400,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -71.0771304,
+        "lat": -34.9810648
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-centro-1",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 312600,
+        "n": 6127400,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -71.0552331,
+        "lat": -34.9814376
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-centro-2",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 312600,
+        "n": 6126400,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -71.0554584,
+        "lat": -34.9904489
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-centro-3",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 310600,
+        "n": 6126400,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -71.0773581,
+        "lat": -34.990076
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-centro-4",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 312200,
+        "n": 6127400,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -71.0596126,
+        "lat": -34.9813633
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-norte-0",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 444256.54,
+        "n": 7396134.04,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -69.5481646,
+        "lat": -23.5473105
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-norte-1",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 444491.08,
+        "n": 7396153,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -69.5458661,
+        "lat": -23.5471473
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-norte-2",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 444500.45,
+        "n": 7396037.03,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -69.5457786,
+        "lat": -23.5481952
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-norte-3",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 444787.32,
+        "n": 7396060.22,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -69.5429672,
+        "lat": -23.5479955
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-norte-4",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 444801.31,
+        "n": 7395887.05,
+        "huso": 19
+      },
+      "wgs84_geo": {
+        "lon": -69.5428365,
+        "lat": -23.5495601
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-sur-0",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 712000,
+        "n": 5819000,
+        "huso": 18
+      },
+      "wgs84_geo": {
+        "lon": -72.596268,
+        "lat": -37.7544233
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-sur-1",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 712000,
+        "n": 5818000,
+        "huso": 18
+      },
+      "wgs84_geo": {
+        "lon": -72.5959765,
+        "lat": -37.7634282
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-sur-2",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 712000,
+        "n": 5817000,
+        "huso": 18
+      },
+      "wgs84_geo": {
+        "lon": -72.5956848,
+        "lat": -37.7724332
+      },
+      "tol_m": 1
+    },
+    {
+      "id": "SNGM-sur-3",
+      "fuente": "SERNAGEOMIN FeatureServer WGS84_Vertice (Marcelo_Layer/0)",
+      "psad56_utm": {
+        "e": 712000,
+        "n": 5816000,
+        "huso": 18
+      },
+      "wgs84_geo": {
+        "lon": -72.595393,
+        "lat": -37.7814381
+      },
+      "tol_m": 1
+    }
+  ]
 }

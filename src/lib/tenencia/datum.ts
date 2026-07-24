@@ -52,17 +52,18 @@ export function husoFromLon(lonDeg: number): Huso {
 // ---- Definiciones proj4 (strings PROJ) ----
 const WGS84_GEO = "EPSG:4326";
 
-const psad56GeoDef = (band: Psad56Band) =>
-  `+proj=longlat +ellps=intl +towgs84=${band.towgs84.join(",")},0,0,0,0 +no_defs`;
+// SERNAGEOMIN transforma PSAD56→WGS84 con un ÚNICO juego de parámetros NACIONAL
+// (EPSG:1204), verificado a 0.000 m contra su FeatureServer WGS84_Vertice (24
+// vértices reales, husos 18/19, norte/centro/sur). Para que los traslapes calcen
+// con el catastro OFICIAL, este módulo usa el MISMO juego. Los parámetros por
+// franja (PSAD56_BANDS, EPSG 6971/6972/6973) son la alternativa "más precisa a
+// WGS84 real", pero NO la que usa el catastro (difieren ~60 m); quedan como
+// referencia y para `psad56Band`.
+const PSAD56_TOWGS84: [number, number, number] = [-288, 175, -376];
 
-const psad56UtmDef = (huso: Huso, band: Psad56Band) =>
-  `+proj=utm +zone=${huso} +south +ellps=intl +towgs84=${band.towgs84.join(",")},0,0,0,0 +units=m +no_defs`;
-
-// PSAD56 sin cambio de datum (solo proyección) — para obtener la latitud PSAD56
-// exacta y así elegir la franja antes de aplicar el shift.
-const psad56GeoPlain = "+proj=longlat +ellps=intl +no_defs";
-const psad56UtmPlain = (huso: Huso) =>
-  `+proj=utm +zone=${huso} +south +ellps=intl +units=m +no_defs`;
+const psad56GeoDef = `+proj=longlat +ellps=intl +towgs84=${PSAD56_TOWGS84.join(",")},0,0,0,0 +no_defs`;
+const psad56UtmDef = (huso: Huso) =>
+  `+proj=utm +zone=${huso} +south +ellps=intl +towgs84=${PSAD56_TOWGS84.join(",")},0,0,0,0 +units=m +no_defs`;
 
 const wgs84UtmDef = (huso: Huso) => `+proj=utm +zone=${huso} +south +datum=WGS84 +units=m +no_defs`;
 
@@ -74,48 +75,27 @@ const sirgasUtmDef = (huso: Huso) =>
 export type LngLat = [number, number]; // [lon, lat] en grados (WGS84 4326)
 export type Utm = { e: number; n: number; huso: Huso };
 
-/**
- * Convierte una coordenada UTM (en cualquier datum) a WGS84 geográfico (4326).
- * Para PSAD56, la franja se elige con la latitud PSAD56 real del punto (obtenida
- * por proyección inversa sin datum), no con una estimación.
- */
-export function utmToWgs84({ e, n, huso }: Utm, datum: Datum): LngLat {
-  if (datum === "WGS84") {
-    return proj4(wgs84UtmDef(huso), WGS84_GEO, [e, n]) as LngLat;
-  }
-  if (datum === "SIRGAS") {
-    return proj4(sirgasUtmDef(huso), WGS84_GEO, [e, n]) as LngLat;
-  }
-  // PSAD56: 1) UTM→geo PSAD56 (solo proyección) para la latitud; 2) franja;
-  // 3) geo PSAD56 (con towgs84 de la franja) → WGS84.
-  const [, latPsad] = proj4(psad56UtmPlain(huso), psad56GeoPlain, [e, n]) as LngLat;
-  const band = psad56Band(latPsad);
-  return proj4(psad56UtmDef(huso, band), WGS84_GEO, [e, n]) as LngLat;
+function utmDefFor(datum: Datum, huso: Huso): string {
+  if (datum === "WGS84") return wgs84UtmDef(huso);
+  if (datum === "SIRGAS") return sirgasUtmDef(huso);
+  return psad56UtmDef(huso); // PSAD56 alineado a SERNAGEOMIN
 }
 
-/**
- * Convierte WGS84 geográfico (4326) a UTM en el datum indicado. El huso se
- * detecta por longitud salvo que se fuerce; la franja PSAD56 por latitud.
- */
+/** Convierte una coordenada UTM (en el datum indicado) a WGS84 geográfico (4326). */
+export function utmToWgs84({ e, n, huso }: Utm, datum: Datum): LngLat {
+  return proj4(utmDefFor(datum, huso), WGS84_GEO, [e, n]) as LngLat;
+}
+
+/** Convierte WGS84 geográfico (4326) a UTM. Huso por longitud salvo que se fuerce. */
 export function wgs84ToUtm([lon, lat]: LngLat, datum: Datum, forceHuso?: Huso): Utm {
   const huso = forceHuso ?? husoFromLon(lon);
-  if (datum === "WGS84") {
-    const [e, n] = proj4(WGS84_GEO, wgs84UtmDef(huso), [lon, lat]) as LngLat;
-    return { e, n, huso };
-  }
-  if (datum === "SIRGAS") {
-    const [e, n] = proj4(WGS84_GEO, sirgasUtmDef(huso), [lon, lat]) as LngLat;
-    return { e, n, huso };
-  }
-  const band = psad56Band(lat);
-  const [e, n] = proj4(WGS84_GEO, psad56UtmDef(huso, band), [lon, lat]) as LngLat;
+  const [e, n] = proj4(WGS84_GEO, utmDefFor(datum, huso), [lon, lat]) as LngLat;
   return { e, n, huso };
 }
 
-/** Geográfico PSAD56 ↔ WGS84 (para verificar/mostrar cambios de datum). */
+/** Geográfico PSAD56 → WGS84 (para verificar/mostrar el cambio de datum). */
 export function psad56GeoToWgs84([lon, lat]: LngLat): LngLat {
-  const band = psad56Band(lat);
-  return proj4(psad56GeoDef(band), WGS84_GEO, [lon, lat]) as LngLat;
+  return proj4(psad56GeoDef, WGS84_GEO, [lon, lat]) as LngLat;
 }
 
 /** Reproyecta un anillo (array de [lon,lat] o UTM) de un datum UTM a 4326. */

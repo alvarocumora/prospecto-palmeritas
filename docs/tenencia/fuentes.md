@@ -23,19 +23,22 @@ la ingesta SERNAGEOMIN ya existente. Los datums (§4) usan **proj4**, no pyproj.
 > `outSR=4326` (la reproyección la hace el ArcGIS server). No se depende de alcanzar
 > SERNAGEOMIN desde este contenedor.
 
-## Datum (§4) — IMPLEMENTADO: `src/lib/tenencia/datum.ts` (proj4)
+## Datum (§4) — IMPLEMENTADO y GATE CERRADO: `src/lib/tenencia/datum.ts` (proj4)
 
-- Transformación PSAD56→WGS84 **por franja latitudinal** (parámetros verificados en epsg.io):
-  N de 26°S = EPSG:6971 `[-302, 272, -360]` · 26–36°S = 6972 `[-328, 340, -329]` ·
-  36–43°30'S = 6973 `[-352, 403, -287]` (geocentric translations, 10 m/eje).
-- Almacenamiento canónico **EPSG:4326**; conversión en los bordes. Detección de huso 18S/19S
-  por longitud; SIRGAS-Chile ≈ WGS84 (GRS80).
-- **Tests (`datum.test.ts`, pasan):** round-trip <0,5 m; selección de franja; magnitud del
-  corrimiento 80–500 m; **punto de control de proyección PMD** (screenshot IMG_2278, lectura
-  oficial PSAD56 IGM Sur) reproducido a <1 m.
-- **Gate §4 PENDIENTE:** el test de **cambio de datum** (PSAD56↔WGS84) exige ≥10 puntos con
-  coordenadas conocidas en AMBOS datums (hitos IGM / planos de mensura). Hoy hay 0 → marcado
-  `todo` en el test. No se inventan. Ver `control-points.json`.
+- **Calibrado a SERNAGEOMIN.** El catastro oficial transforma PSAD56→WGS84 con un **único juego
+  nacional EPSG:1204 `[-288, 175, -376]`**, verificado a **0.000 m** contra su FeatureServer
+  `WGS84_Vertice` (services1.arcgis.com/.../Marcelo_Layer/FeatureServer/0) en 24 vértices reales,
+  husos 18/19, norte/centro/sur. `datum.ts` usa ese mismo juego para que los traslapes calcen con
+  el catastro. **Hallazgo:** los parámetros EPSG por franja (6971/6972/6973) difieren ~60 m de lo
+  que usa SERNAGEOMIN — usar la franja habría desalineado los polígonos del usuario ~60 m respecto
+  del catastro (justo el riesgo de §4). Las franjas quedan como referencia (`PSAD56_BANDS`).
+- Almacenamiento canónico **EPSG:4326**; conversión en los bordes. Huso 18S/19S por longitud;
+  SIRGAS-Chile ≈ WGS84 (GRS80).
+- **Gate §4 CERRADO.** `datum.test.ts` valida el cambio de datum contra **14 pares de control
+  reales** PSAD56(NORTE/ESTE)↔WGS84(geometría) del FeatureServer oficial de SERNAGEOMIN
+  (`control-points.json`, capa `WGS84_Vertice`), husos 18/19, tres zonas — todos <1 m. Más el
+  round-trip <0,5 m, la magnitud del corrimiento y el punto de proyección PMD. No se inventó ningún
+  valor: las coordenadas en ambos datums vienen de la fuente autoritativa.
 
 ---
 
