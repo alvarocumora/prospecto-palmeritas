@@ -1,22 +1,25 @@
-# B1 — Suite de datum (bloqueante). Corre en CI y falla el build si un punto de
-# control se sale de tolerancia. Independiente del ci.yml (Node) para no chocar
-# con el workflow que mantiene Lovable.
-name: Datum (B1)
+# Suite Python de datos (B1 datum + B2 ETL). Corre en CI y falla el build si un
+# test no pasa (p.ej. un punto de control fuera de tolerancia, o el versionado
+# del ETL se rompe). Independiente del ci.yml (Node) que mantiene Lovable.
+name: Datos (B1/B2)
 
 on:
   pull_request:
     paths:
-      - "tests/datum/**"
+      - "tests/**"
+      - "etl/**"
       - "src/lib/tenencia/control-points.json"
+      - "supabase/migrations/**b2_catastro_etl.sql"
       - ".github/workflows/datum.yml"
   push:
     branches: [main]
     paths:
-      - "tests/datum/**"
+      - "tests/**"
+      - "etl/**"
       - "src/lib/tenencia/control-points.json"
 
 jobs:
-  datum:
+  datos:
     runs-on: ubuntu-latest
     services:
       postgis:
@@ -43,5 +46,5 @@ jobs:
           python-version: "3.11"
       - name: Install Python deps
         run: pip install -r tests/requirements.txt
-      - name: Run datum suite
-        run: pytest -v tests/datum
+      - name: Run suite (datum + etl)
+        run: pytest -v tests/datum tests/etl
