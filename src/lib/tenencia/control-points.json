@@ -1,0 +1,16 @@
+{
+  "_doc": "Puntos de control para el test de datum (§4). 'projection' = mismo datum, verifica la proyección UTM. 'datum' = pares en datums distintos, verifican el cambio de datum PSAD56↔WGS84. Regla: no se inventan. Se citan fuente. El gate de despliegue exige >=10 puntos 'datum' de fuente autoritativa (monografías de vértices IGM / planos de mensura).",
+  "projection": [
+    {
+      "id": "PMD-BIOBIO-01",
+      "fuente": "Screenshot Propiedad Minera Digital (IMG_2278), lectura oficial 'Coordenadas en PSAD56 (IGM Sur)'",
+      "datum": "PSAD56",
+      "huso": 18,
+      "geo": { "lon": -72.4278028, "lat": -37.7497611 },
+      "utm": { "e": 726626.68, "n": 5818764.5 },
+      "tol_m": 1.0
+    }
+  ],
+  "datum": [],
+  "_pendiente_datum": "Faltan >=10 puntos con coordenadas conocidas en PSAD56 Y en WGS84/SIRGAS (de hitos IGM o planos de mensura). Hasta cargarlos, el gate de cambio de datum queda declarado PENDIENTE (ver docs/tenencia/fuentes.md)."
+}
