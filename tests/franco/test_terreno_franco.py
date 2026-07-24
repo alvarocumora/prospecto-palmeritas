@@ -13,6 +13,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 MIG_B2 = ROOT / "supabase/migrations/20260724060000_b2_catastro_etl.sql"
 MIG_B4 = ROOT / "supabase/migrations/20260724070000_b4_terreno_franco.sql"
+MIG_B4B = ROOT / "supabase/migrations/20260724073000_b4_terreno_franco_estados.sql"
 
 
 def _poly(coords):
@@ -45,6 +46,7 @@ def cur():
     )
     c.execute(MIG_B2.read_text())
     c.execute(MIG_B4.read_text())
+    c.execute(MIG_B4B.read_text())
     c.execute(
         "INSERT INTO public.fuentes_datos (id, nombre) VALUES ('t','t') ON CONFLICT DO NOTHING"
     )
@@ -52,7 +54,7 @@ def cur():
     conn.close()
 
 
-def _seed(cur, geom, estado="VIGENTE", ext="1"):
+def _seed(cur, geom, estado="CONSTITUIDA", ext="1"):
     cur.execute(
         "INSERT INTO public.catastro_concesiones (fuente_id, external_id, estado, geom, origen_hash) "
         "VALUES ('t', %s, %s, ST_Multi(ST_SetSRID(ST_GeomFromGeoJSON(%s),4326)), %s)",
@@ -94,6 +96,13 @@ def test_filtro_superficie_minima(cur):
     assert _franco(cur, AOI, min_ha=libre + 1) == []
     # con min_ha menor, sí
     assert len(_franco(cur, AOI, min_ha=libre - 1)) == 1
+
+
+def test_eliminada_no_ocupa(cur):
+    # Una concesión ELIMINADA libera terreno: no debe restar (default excluye).
+    _seed(cur, OCUPA, estado="ELIMINADA")
+    areas = _franco(cur, AOI)
+    assert len(areas) == 1  # AOI completo, la ELIMINADA no ocupa
 
 
 def test_filtro_por_estado(cur):
