@@ -1,0 +1,47 @@
+# B1 — Suite de datum (bloqueante). Corre en CI y falla el build si un punto de
+# control se sale de tolerancia. Independiente del ci.yml (Node) para no chocar
+# con el workflow que mantiene Lovable.
+name: Datum (B1)
+
+on:
+  pull_request:
+    paths:
+      - "tests/datum/**"
+      - "src/lib/tenencia/control-points.json"
+      - ".github/workflows/datum.yml"
+  push:
+    branches: [main]
+    paths:
+      - "tests/datum/**"
+      - "src/lib/tenencia/control-points.json"
+
+jobs:
+  datum:
+    runs-on: ubuntu-latest
+    services:
+      postgis:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: geocap
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s --health-timeout 5s --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/geocap
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Python deps
+        run: pip install -r tests/requirements.txt
+      - name: Run datum suite
+        run: pytest -v tests/datum

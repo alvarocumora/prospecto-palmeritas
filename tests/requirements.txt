@@ -1,0 +1,4 @@
+# Dependencias de los tests Python (B1 datum, y ETL en B2+).
+pyproj==3.7.2
+pytest==8.3.4
+psycopg[binary]==3.2.3
