@@ -99,11 +99,11 @@ function CellView({ cell }: { cell: Cell }) {
 }
 
 export function CatastroComparison() {
-  const today = new Date().toLocaleDateString("es-CL", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
+  // Formato determinístico (evita mismatch SSR/CSR por diferencias de ICU en "es-CL")
+  const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  const d = new Date();
+  const today = `${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+
 
   return (
     <div data-theme="im-light" className="border border-hairline rounded-sm bg-white overflow-hidden">
