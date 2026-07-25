@@ -78,6 +78,7 @@ import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as AuthenticatedPanelPrivacidadRouteImport } from './routes/_authenticated.panel.privacidad'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
 import { Route as AuthenticatedDashboardTradeBoardRouteImport } from './routes/_authenticated.dashboard.trade-board'
@@ -521,6 +522,12 @@ const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   path: '/api/public/health',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPanelPrivacidadRoute =
+  AuthenticatedPanelPrivacidadRouteImport.update({
+    id: '/privacidad',
+    path: '/privacidad',
+    getParentRoute: () => AuthenticatedPanelRoute,
+  } as any)
 const AuthenticatedDashboardValidationRoute =
   AuthenticatedDashboardValidationRouteImport.update({
     id: '/dashboard/validation',
@@ -1099,7 +1106,7 @@ export interface FileRoutesByFullPath {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/panel': typeof AuthenticatedPanelRoute
+  '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1195,6 +1202,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1262,7 +1270,7 @@ export interface FileRoutesByTo {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/panel': typeof AuthenticatedPanelRoute
+  '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1358,6 +1366,7 @@ export interface FileRoutesByTo {
   '/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1427,7 +1436,7 @@ export interface FileRoutesById {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
-  '/_authenticated/panel': typeof AuthenticatedPanelRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1523,6 +1532,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/trade-board': typeof AuthenticatedDashboardTradeBoardRoute
   '/_authenticated/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
+  '/_authenticated/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1688,6 +1698,7 @@ export interface FileRouteTypes {
     | '/dashboard/trade-board'
     | '/dashboard/trades'
     | '/dashboard/validation'
+    | '/panel/privacidad'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -1851,6 +1862,7 @@ export interface FileRouteTypes {
     | '/dashboard/trade-board'
     | '/dashboard/trades'
     | '/dashboard/validation'
+    | '/panel/privacidad'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -2015,6 +2027,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/trade-board'
     | '/_authenticated/dashboard/trades'
     | '/_authenticated/dashboard/validation'
+    | '/_authenticated/panel/privacidad'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -2622,6 +2635,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/panel/privacidad': {
+      id: '/_authenticated/panel/privacidad'
+      path: '/privacidad'
+      fullPath: '/panel/privacidad'
+      preLoaderRoute: typeof AuthenticatedPanelPrivacidadRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
     }
     '/_authenticated/dashboard/validation': {
       id: '/_authenticated/dashboard/validation'
@@ -3277,6 +3297,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedPanelRouteChildren {
+  AuthenticatedPanelPrivacidadRoute: typeof AuthenticatedPanelPrivacidadRoute
+}
+
+const AuthenticatedPanelRouteChildren: AuthenticatedPanelRouteChildren = {
+  AuthenticatedPanelPrivacidadRoute: AuthenticatedPanelPrivacidadRoute,
+}
+
+const AuthenticatedPanelRouteWithChildren =
+  AuthenticatedPanelRoute._addFileChildren(AuthenticatedPanelRouteChildren)
+
 interface AuthenticatedDashboardAdminRouteChildren {
   AuthenticatedDashboardAdminInboxRoute: typeof AuthenticatedDashboardAdminInboxRoute
   AuthenticatedDashboardAdminInvestorsRoute: typeof AuthenticatedDashboardAdminInvestorsRoute
@@ -3371,7 +3402,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
-  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
   AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
@@ -3449,7 +3480,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
+  AuthenticatedPanelRoute: AuthenticatedPanelRouteWithChildren,
   AuthenticatedDashboard3dProRoute: AuthenticatedDashboard3dProRoute,
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
