@@ -191,25 +191,19 @@ export const submitInscripcion = createServerFn({ method: "POST" })
       payload: { ref: data.ref ?? null, country: data.country },
     });
 
-    // Contador del link de invitación.
+    // Contador del link de invitación (update manual).
     if (data.ref) {
-      await supabaseAdmin.rpc("increment_link_completion", { p_token: data.ref }).then(
-        () => undefined,
-        async () => {
-          // Fallback si el RPC no existe: update manual.
-          const { data: link } = await supabaseAdmin
-            .from("invitation_links")
-            .select("id, completions_count")
-            .eq("token", data.ref!)
-            .maybeSingle();
-          if (link) {
-            await supabaseAdmin
-              .from("invitation_links")
-              .update({ completions_count: (link.completions_count ?? 0) + 1 })
-              .eq("id", link.id);
-          }
-        },
-      );
+      const { data: link } = await supabaseAdmin
+        .from("invitation_links")
+        .select("id, completions_count")
+        .eq("token", data.ref)
+        .maybeSingle();
+      if (link) {
+        await supabaseAdmin
+          .from("invitation_links")
+          .update({ completions_count: (link.completions_count ?? 0) + 1 })
+          .eq("id", link.id);
+      }
     }
 
     return { ok: true, folio: supplier.folio, supplierId: supplier.id };
