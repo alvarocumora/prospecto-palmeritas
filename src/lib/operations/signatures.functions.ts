@@ -277,20 +277,24 @@ export const getOperationSignatureRequest = createServerFn({ method: "POST" })
       .eq("id", env.operation_id!)
       .maybeSingle();
 
-    let pdfUrl: string | null = null;
-    if (env.operation_document_id) {
+    const signUrl = async (id: string | null | undefined) => {
+      if (!id) return null;
       const { data: doc } = await sb
         .from("operation_documents")
         .select("storage_bucket, storage_path")
-        .eq("id", env.operation_document_id)
+        .eq("id", id)
         .maybeSingle();
-      if (doc?.storage_path) {
-        const { data: signed } = await sb.storage
-          .from(doc.storage_bucket)
-          .createSignedUrl(doc.storage_path, 300);
-        pdfUrl = signed?.signedUrl ?? null;
-      }
-    }
+      if (!doc?.storage_path) return null;
+      const { data: signed } = await sb.storage
+        .from(doc.storage_bucket)
+        .createSignedUrl(doc.storage_path, 300);
+      return signed?.signedUrl ?? null;
+    };
+
+    const pdfUrl = await signUrl(env.operation_document_id);
+    const signedPdfUrl = await signUrl(
+      (env as { signed_document_id?: string | null }).signed_document_id,
+    );
 
     // Estado agregado de otros firmantes (para mostrar en UI)
     const { data: others } = await sb
@@ -320,6 +324,7 @@ export const getOperationSignatureRequest = createServerFn({ method: "POST" })
       },
       operation: op ?? null,
       pdf_url: pdfUrl,
+      signed_pdf_url: signedPdfUrl,
       signers: others ?? [],
     };
   });
