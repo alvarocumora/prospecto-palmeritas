@@ -39,6 +39,9 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
   const [claimError, setClaimError] = useState<string | null>(null);
   const [claimed, setClaimed] = useState(false);
 
+  const [live, setLive] = useState(false);
+  const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const load = async () => {
     try {
       const d = await view({ data: { token, role } });
@@ -48,10 +51,39 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
     }
   };
 
+  const scheduleReload = () => {
+    if (reloadTimer.current) clearTimeout(reloadTimer.current);
+    reloadTimer.current = setTimeout(() => {
+      void load();
+    }, 350);
+  };
+
   useEffect(() => {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
+
+  // Realtime: tareas, documentos, mensajes y actividad de esta operación.
+  useEffect(() => {
+    const opId = data?.operation?.id;
+    if (!opId) return;
+    const filter = `operation_id=eq.${opId}`;
+    const channel = supabase
+      .channel(`portal:${role}:${opId}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "operation_documents", filter }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "operation_tasks", filter }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "operation_messages", filter }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "operation_access_logs", filter }, scheduleReload)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "operations", filter: `id=eq.${opId}` }, scheduleReload)
+      .subscribe((status) => {
+        setLive(status === "SUBSCRIBED");
+      });
+    return () => {
+      if (reloadTimer.current) clearTimeout(reloadTimer.current);
+      supabase.removeChannel(channel);
+    };
+  }, [data?.operation?.id, role]);
+
 
   const doClaim = async () => {
     setClaiming(true);
