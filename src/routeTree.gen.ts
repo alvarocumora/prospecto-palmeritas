@@ -22,6 +22,7 @@ import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
+import { Route as InscripcionRouteImport } from './routes/inscripcion'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as ContactoRouteImport } from './routes/contacto'
@@ -225,6 +226,11 @@ const McpRoute = McpRouteImport.update({
 const InversionistasRoute = InversionistasRouteImport.update({
   id: '/inversionistas',
   path: '/inversionistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscripcionRoute = InscripcionRouteImport.update({
+  id: '/inscripcion',
+  path: '/inscripcion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnRoute = EnRouteImport.update({
@@ -1017,6 +1023,7 @@ export interface FileRoutesByFullPath {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1170,6 +1177,7 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1325,6 +1333,7 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1480,6 +1489,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1633,6 +1643,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1787,6 +1798,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1942,6 +1954,7 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   EnRoute: typeof EnRoute
+  InscripcionRoute: typeof InscripcionRoute
   InversionistasRoute: typeof InversionistasRoute
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
@@ -2101,6 +2114,13 @@ declare module '@tanstack/react-router' {
       path: '/inversionistas'
       fullPath: '/inversionistas'
       preLoaderRoute: typeof InversionistasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscripcion': {
+      id: '/inscripcion'
+      path: '/inscripcion'
+      fullPath: '/inscripcion'
+      preLoaderRoute: typeof InscripcionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en': {
@@ -3385,6 +3405,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   EnRoute: EnRoute,
+  InscripcionRoute: InscripcionRoute,
   InversionistasRoute: InversionistasRoute,
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,
