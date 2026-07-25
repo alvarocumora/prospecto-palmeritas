@@ -203,6 +203,9 @@ export const reviewOperationDocument = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = await admin();
+    // Solo staff Geocapitals puede revisar documentos.
+    const { data: isStaff } = await sb.rpc("is_gc_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Solo staff Geocapitals puede revisar documentos");
     const { data: doc, error } = await sb
       .from("operation_documents")
       .update({
@@ -215,6 +218,7 @@ export const reviewOperationDocument = createServerFn({ method: "POST" })
       .select("operation_id")
       .single();
     if (error) throw error;
+
     await sb.from("operation_access_logs").insert({
       operation_id: doc.operation_id,
       actor_user_id: context.userId,
