@@ -29,6 +29,7 @@ import { template as agentOutreach } from "./agent-outreach";
 import { template as tradePackDispatch } from "./trade-pack-dispatch";
 import { template as partnerInvitation } from "./partner-invitation";
 import { template as supplierSheetDispatch } from "./supplier-sheet-dispatch";
+import { template as operationPortalInvitation } from "./operation-portal-invitation";
 
 
 export interface TemplateEntry {
