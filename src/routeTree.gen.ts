@@ -154,6 +154,7 @@ import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from '.
 import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
+import { Route as AuthenticatedDashboardProveedoresIdRouteImport } from './routes/_authenticated.dashboard.proveedores.$id'
 import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated.dashboard.projects_.$projectId'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -971,6 +972,12 @@ const AuthenticatedDashboardSourcingRequestIdRoute =
     path: '/dashboard/sourcing/$requestId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardProveedoresIdRoute =
+  AuthenticatedDashboardProveedoresIdRouteImport.update({
+    id: '/dashboard/proveedores/$id',
+    path: '/dashboard/proveedores/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardProjectsProjectIdRoute =
   AuthenticatedDashboardProjectsProjectIdRouteImport.update({
     id: '/dashboard/projects_/$projectId',
@@ -1182,6 +1189,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
@@ -1340,6 +1348,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
@@ -1500,6 +1509,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/projects_/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/_authenticated/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/_authenticated/dashboard/sourcing_/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/dashboard/trades_/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
@@ -1660,6 +1670,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/projects/$projectId'
+    | '/dashboard/proveedores/$id'
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
@@ -1818,6 +1829,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/projects/$projectId'
+    | '/dashboard/proveedores/$id'
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
@@ -1977,6 +1989,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/projects_/$projectId'
+    | '/_authenticated/dashboard/proveedores/$id'
     | '/_authenticated/dashboard/sourcing_/$requestId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/dashboard/trades_/$tradeId'
@@ -3090,6 +3103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardSourcingRequestIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/proveedores/$id': {
+      id: '/_authenticated/dashboard/proveedores/$id'
+      path: '/dashboard/proveedores/$id'
+      fullPath: '/dashboard/proveedores/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardProveedoresIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/projects_/$projectId': {
       id: '/_authenticated/dashboard/projects_/$projectId'
       path: '/dashboard/projects/$projectId'
@@ -3338,6 +3358,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardClientesPartnerIdRoute: typeof AuthenticatedDashboardClientesPartnerIdRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
+  AuthenticatedDashboardProveedoresIdRoute: typeof AuthenticatedDashboardProveedoresIdRoute
   AuthenticatedDashboardSourcingRequestIdRoute: typeof AuthenticatedDashboardSourcingRequestIdRoute
   AuthenticatedDashboardTradesTradeIdRoute: typeof AuthenticatedDashboardTradesTradeIdRoute
   AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
@@ -3430,6 +3451,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardDocumentosTemplateIdRoute,
   AuthenticatedDashboardProjectsProjectIdRoute:
     AuthenticatedDashboardProjectsProjectIdRoute,
+  AuthenticatedDashboardProveedoresIdRoute:
+    AuthenticatedDashboardProveedoresIdRoute,
   AuthenticatedDashboardSourcingRequestIdRoute:
     AuthenticatedDashboardSourcingRequestIdRoute,
   AuthenticatedDashboardTradesTradeIdRoute:
