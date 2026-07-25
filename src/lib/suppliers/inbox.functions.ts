@@ -103,12 +103,13 @@ export const listInboxSuppliers = createServerFn({ method: "GET" })
     }));
   });
 
+type Json = string | number | boolean | null | Json[] | { [k: string]: Json };
 export type InboxDetail = {
-  supplier: Record<string, unknown>;
-  offers: Array<Record<string, unknown>>;
-  documents: Array<Record<string, unknown> & { signed_url: string | null }>;
-  notes: Array<Record<string, unknown>>;
-  extractions: Array<Record<string, unknown>>;
+  supplier: Record<string, Json>;
+  offers: Array<Record<string, Json>>;
+  documents: Array<Record<string, Json>>;
+  notes: Array<Record<string, Json>>;
+  extractions: Array<Record<string, Json>>;
 };
 
 export const getInboxDetail = createServerFn({ method: "GET" })
