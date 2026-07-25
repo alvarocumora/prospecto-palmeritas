@@ -30,6 +30,27 @@ URL: https://faolex.fao.org/docs/pdf/chi51004.pdf (texto oficial reproducido).
 - El motor asume un cuadrilátero simple; concesiones en L (varias caras) requieren
   descomponer en rectángulos antes de validar cada uno.
 
+## Patentes y carry (motor B5.2) — Ley 21.420
+
+Fuente: Ley 21.420 (vigente desde 2024). Cargado por IA, **pendiente de abogado**
+(`fecha_verificacion = NULL` en `patentes_escala`). Tablas: `patentes_escala` (escalas)
+y `valores_utm` (valor UTM fechado del SII).
+
+| Concesión | Tramo (años de vigencia) | UTM/ha (anual) |
+|---|---|---|
+| Explotación sin labores | 1–5 · 6–10 · 11–15 · 16–20 · 21–25 · 26–30 · 31+ | 0,4 · 0,8 · 0,9 · 1,2 · 3 · 6 · 12 |
+| Explotación con labores (rebajada) | todos | 0,1 |
+| Exploración | todos | 0,06 (3/50) |
+
+- **Valor UTM cargado:** julio 2026 = **$71.649** (SII). El motor marca el resultado
+  **desactualizado** si la UTM tiene más de 35 días.
+- **DISCREPANCIA a resolver por el abogado:** la patente de exploración aparece como
+  **3/50 (0,06)** en una fuente y **1/50 (0,02)** "para casos calificados" en otra.
+- **Reforma en trámite (NO es ley):** proyecto 2026 (Boletín 18259-08) eliminaría la escala
+  progresiva y fijaría 4/10 UTM/ha para explotación. Cuando sea ley, actualizar la tabla.
+- "Carry prohibitivo sin labores" = umbral configurable (por defecto ≥ 3 UTM/ha, el salto del
+  año 21); es una señal comercial, no una regla legal.
+
 ## Pendientes de verificación (valor NULL en la tabla)
 - **Duración de la concesión de exploración y su prórroga / no renovación.** El
   texto base decía "2 años, prorrogable por 2", pero las **Leyes 21.420 (2022) y
