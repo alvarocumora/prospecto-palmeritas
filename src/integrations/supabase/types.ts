@@ -4554,8 +4554,10 @@ export type Database = {
           envelope_id: string
           id: string
           ip_address: string | null
+          last_reminder_at: string | null
           project_id: string
           rejection_reason: string | null
+          reminder_count: number
           signature_hmac: string | null
           signed_at: string | null
           signed_document_hash: string | null
@@ -4574,8 +4576,10 @@ export type Database = {
           envelope_id: string
           id?: string
           ip_address?: string | null
+          last_reminder_at?: string | null
           project_id: string
           rejection_reason?: string | null
+          reminder_count?: number
           signature_hmac?: string | null
           signed_at?: string | null
           signed_document_hash?: string | null
@@ -4594,8 +4598,10 @@ export type Database = {
           envelope_id?: string
           id?: string
           ip_address?: string | null
+          last_reminder_at?: string | null
           project_id?: string
           rejection_reason?: string | null
+          reminder_count?: number
           signature_hmac?: string | null
           signed_at?: string | null
           signed_document_hash?: string | null
