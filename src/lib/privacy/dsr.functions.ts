@@ -43,37 +43,38 @@ export const exportMyData = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const uid = context.userId;
-    const sb = context.supabase;
-    const tables = [
-      "profiles",
-      "suppliers",
-      "supplier_offers",
-      "rfqs",
-      "rfq_applications",
-      "privacy_consents",
-      "data_subject_requests",
-      "document_signatures",
-      "document_sign_requests",
-    ] as const;
+    const sb = context.supabase as unknown as {
+      from: (t: string) => {
+        select: (c: string) => {
+          eq: (col: string, val: string) => Promise<{ data: unknown[] | null }>;
+        };
+      };
+    };
+    const email = (context.claims as { email?: string })?.email ?? null;
+
+    const specs: Array<{ table: string; col: string; val: string }> = [
+      { table: "profiles", col: "id", val: uid },
+      { table: "suppliers", col: "user_id", val: uid },
+      { table: "supplier_offers", col: "user_id", val: uid },
+      { table: "rfqs", col: "user_id", val: uid },
+      { table: "rfq_applications", col: "user_id", val: uid },
+      { table: "data_subject_requests", col: "user_id", val: uid },
+      { table: "privacy_consents", col: "email", val: email ?? "__none__" },
+    ];
 
     const result: Record<string, unknown> = {
       exported_at: new Date().toISOString(),
       user_id: uid,
-      email: (context.claims as { email?: string })?.email ?? null,
+      email,
     };
-
-    for (const t of tables) {
-      const cols = t === "suppliers" ? "*" : "*";
-      const filterCol = t === "privacy_consents" ? "email" : t === "profiles" ? "id" : "user_id";
-      const filterVal = t === "privacy_consents"
-        ? ((context.claims as { email?: string })?.email ?? "__none__")
-        : uid;
+    for (const s of specs) {
       try {
-        const { data } = await sb.from(t).select(cols).eq(filterCol, filterVal);
-        result[t] = data ?? [];
+        const { data } = await sb.from(s.table).select("*").eq(s.col, s.val);
+        result[s.table] = data ?? [];
       } catch {
-        result[t] = [];
+        result[s.table] = [];
       }
     }
-    return result;
+    return JSON.parse(JSON.stringify(result)) as Record<string, unknown>;
   });
+
