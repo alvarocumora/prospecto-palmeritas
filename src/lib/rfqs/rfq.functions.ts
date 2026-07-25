@@ -130,13 +130,17 @@ export const closeRfq = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+// application_status enum values (shared with trade module)
+export const APP_STATUSES = ["pending", "review", "approved", "rejected"] as const;
+export type AppStatus = (typeof APP_STATUSES)[number];
+
 export const decideApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((raw: unknown) =>
     z
       .object({
         id: z.string().uuid(),
-        status: z.enum(["postulado", "preseleccionado", "rechazado", "adjudicado"]),
+        status: z.enum(APP_STATUSES),
         notes: z.string().optional(),
       })
       .parse(raw),
