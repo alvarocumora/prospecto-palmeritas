@@ -16373,6 +16373,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      compute_supplier_risk_score: {
+        Args: { _supplier_id: string }
+        Returns: {
+          compliance_score: number
+          corporate_score: number
+          esg_score: number
+          financial_score: number
+          mining_score: number
+          risk_band: string
+          risk_score: number
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
