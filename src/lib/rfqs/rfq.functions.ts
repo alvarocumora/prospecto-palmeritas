@@ -181,11 +181,12 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
   const { data: products } = ids.length
     ? await anon.from("rfq_products").select("rfq_id, product_name, qty_monthly_mt, qty_total_mt, incoterm, port_destination").in("rfq_id", ids)
     : { data: [] };
-  const byRfq = new Map<string, Array<Record<string, unknown>>>();
-  for (const p of products ?? []) {
-    const arr = byRfq.get(p.rfq_id as string) ?? [];
-    arr.push(p as Record<string, unknown>);
-    byRfq.set(p.rfq_id as string, arr);
+  type ProductRow = { rfq_id: string; product_name: string; qty_monthly_mt: number | null; qty_total_mt: number | null; incoterm: string | null; port_destination: string | null };
+  const byRfq = new Map<string, ProductRow[]>();
+  for (const p of (products ?? []) as ProductRow[]) {
+    const arr = byRfq.get(p.rfq_id) ?? [];
+    arr.push(p);
+    byRfq.set(p.rfq_id, arr);
   }
   return (rfqs ?? []).map((r) => ({ ...r, products: byRfq.get(r.id) ?? [] }));
 });
