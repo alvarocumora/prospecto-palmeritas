@@ -63,10 +63,13 @@ export const getPortalView = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!op) throw new Error("Operación no disponible");
 
-    const visibilityFilter =
+    const visibilityFilter: Array<"buyer_shared" | "seller_shared" | "all_parties"> =
       data.role === "buyer"
         ? ["buyer_shared", "all_parties"]
         : ["seller_shared", "all_parties"];
+
+    const messageChannels: Array<"buyer_gc" | "seller_gc" | "tripartite"> =
+      data.role === "buyer" ? ["buyer_gc", "tripartite"] : ["seller_gc", "tripartite"];
 
     const [docs, tasks, messages] = await Promise.all([
       admin
@@ -85,7 +88,7 @@ export const getPortalView = createServerFn({ method: "POST" })
         .from("operation_messages")
         .select("id, channel, author_role, body, created_at")
         .eq("operation_id", inv.operation_id)
-        .in("channel", data.role === "buyer" ? ["buyer_gc", "tripartite"] : ["seller_gc", "tripartite"])
+        .in("channel", messageChannels)
         .order("created_at", { ascending: true })
         .limit(100),
     ]);
@@ -146,12 +149,13 @@ export const claimPortalInvitation = createServerFn({ method: "POST" })
     }
 
     // Actualiza estado de contraparte a access_created si aún era invitation_sent/not_invited
-    const statusField = data.role === "buyer" ? "buyer_status" : "seller_status";
+    const patch: Record<string, string> =
+      data.role === "buyer" ? { buyer_status: "access_created" } : { seller_status: "access_created" };
     await admin
       .from("operations")
-      .update({ [statusField]: "access_created" })
+      .update(patch as never)
       .eq("id", inv.operation_id)
-      .in(statusField, ["not_invited", "invitation_sent"]);
+      .in(data.role === "buyer" ? "buyer_status" : "seller_status", ["not_invited", "invitation_sent"]);
 
     await admin.from("operation_access_logs").insert({
       operation_id: inv.operation_id,
