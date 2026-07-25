@@ -4548,7 +4548,9 @@ export type Database = {
       }
       document_signatures: {
         Row: {
+          access_token: string | null
           created_at: string
+          emailed_at: string | null
           envelope_id: string
           id: string
           ip_address: string | null
@@ -4560,13 +4562,15 @@ export type Database = {
           signer_email: string | null
           signer_name: string
           signer_role: string
-          signer_user_id: string
+          signer_user_id: string | null
           signing_order: number
           status: string
           user_agent: string | null
         }
         Insert: {
+          access_token?: string | null
           created_at?: string
+          emailed_at?: string | null
           envelope_id: string
           id?: string
           ip_address?: string | null
@@ -4578,13 +4582,15 @@ export type Database = {
           signer_email?: string | null
           signer_name: string
           signer_role: string
-          signer_user_id: string
+          signer_user_id?: string | null
           signing_order?: number
           status?: string
           user_agent?: string | null
         }
         Update: {
+          access_token?: string | null
           created_at?: string
+          emailed_at?: string | null
           envelope_id?: string
           id?: string
           ip_address?: string | null
@@ -4596,12 +4602,19 @@ export type Database = {
           signer_email?: string | null
           signer_name?: string
           signer_role?: string
-          signer_user_id?: string
+          signer_user_id?: string | null
           signing_order?: number
           status?: string
           user_agent?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "document_signatures_envelope_id_fkey"
+            columns: ["envelope_id"]
+            isOneToOne: false
+            referencedRelation: "operation_signature_status"
+            referencedColumns: ["envelope_id"]
+          },
           {
             foreignKeyName: "document_signatures_envelope_id_fkey"
             columns: ["envelope_id"]
@@ -14613,6 +14626,13 @@ export type Database = {
             foreignKeyName: "signature_audit_trail_envelope_id_fkey"
             columns: ["envelope_id"]
             isOneToOne: false
+            referencedRelation: "operation_signature_status"
+            referencedColumns: ["envelope_id"]
+          },
+          {
+            foreignKeyName: "signature_audit_trail_envelope_id_fkey"
+            columns: ["envelope_id"]
+            isOneToOne: false
             referencedRelation: "signature_envelopes"
             referencedColumns: ["id"]
           },
@@ -14646,8 +14666,11 @@ export type Database = {
           expires_at: string | null
           id: string
           metadata: Json | null
-          project_id: string
+          operation_document_id: string | null
+          operation_id: string | null
+          project_id: string | null
           required_signers: number
+          signed_document_id: string | null
           status: string
           updated_at: string
         }
@@ -14664,8 +14687,11 @@ export type Database = {
           expires_at?: string | null
           id?: string
           metadata?: Json | null
-          project_id: string
+          operation_document_id?: string | null
+          operation_id?: string | null
+          project_id?: string | null
           required_signers?: number
+          signed_document_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -14682,12 +14708,29 @@ export type Database = {
           expires_at?: string | null
           id?: string
           metadata?: Json | null
-          project_id?: string
+          operation_document_id?: string | null
+          operation_id?: string | null
+          project_id?: string | null
           required_signers?: number
+          signed_document_id?: string | null
           status?: string
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "signature_envelopes_operation_document_id_fkey"
+            columns: ["operation_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_envelopes_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "signature_envelopes_project_id_fkey"
             columns: ["project_id"]
@@ -14700,6 +14743,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_envelopes_signed_document_id_fkey"
+            columns: ["signed_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
             referencedColumns: ["id"]
           },
         ]
@@ -16717,6 +16767,48 @@ export type Database = {
           project_name: string | null
         }
         Relationships: []
+      }
+      operation_signature_status: {
+        Row: {
+          completed_at: string | null
+          completed_signers: number | null
+          created_at: string | null
+          document_kind: string | null
+          document_sha256: string | null
+          document_title: string | null
+          document_type: string | null
+          document_version: number | null
+          envelope_id: string | null
+          expires_at: string | null
+          operation_document_id: string | null
+          operation_id: string | null
+          required_signers: number | null
+          signed_document_id: string | null
+          status: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "signature_envelopes_operation_document_id_fkey"
+            columns: ["operation_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_envelopes_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "signature_envelopes_signed_document_id_fkey"
+            columns: ["signed_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles_directory: {
         Row: {

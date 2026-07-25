@@ -71,6 +71,7 @@ import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.fich
 import { Route as PortalSellerTokenRouteImport } from './routes/portal.seller.$token'
 import { Route as PortalBuyerTokenRouteImport } from './routes/portal.buyer.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as FirmarOperacionTokenRouteImport } from './routes/firmar.operacion.$token'
 import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
 import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
@@ -489,6 +490,11 @@ const PortalBuyerTokenRoute = PortalBuyerTokenRouteImport.update({
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirmarOperacionTokenRoute = FirmarOperacionTokenRouteImport.update({
+  id: '/firmar/operacion/$token',
+  path: '/firmar/operacion/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroPaisCountryRoute = CatastroPaisCountryRouteImport.update({
@@ -1245,6 +1251,7 @@ export interface FileRoutesByFullPath {
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
+  '/firmar/operacion/$token': typeof FirmarOperacionTokenRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/buyer/$token': typeof PortalBuyerTokenRoute
   '/portal/seller/$token': typeof PortalSellerTokenRoute
@@ -1414,6 +1421,7 @@ export interface FileRoutesByTo {
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
+  '/firmar/operacion/$token': typeof FirmarOperacionTokenRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/buyer/$token': typeof PortalBuyerTokenRoute
   '/portal/seller/$token': typeof PortalSellerTokenRoute
@@ -1585,6 +1593,7 @@ export interface FileRoutesById {
   '/catastro/app/watchlist': typeof CatastroAppWatchlistRoute
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
+  '/firmar/operacion/$token': typeof FirmarOperacionTokenRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/portal/buyer/$token': typeof PortalBuyerTokenRoute
   '/portal/seller/$token': typeof PortalSellerTokenRoute
@@ -1756,6 +1765,7 @@ export interface FileRouteTypes {
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
+    | '/firmar/operacion/$token'
     | '/lovable/email/suppression'
     | '/portal/buyer/$token'
     | '/portal/seller/$token'
@@ -1925,6 +1935,7 @@ export interface FileRouteTypes {
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
+    | '/firmar/operacion/$token'
     | '/lovable/email/suppression'
     | '/portal/buyer/$token'
     | '/portal/seller/$token'
@@ -2095,6 +2106,7 @@ export interface FileRouteTypes {
     | '/catastro/app/watchlist'
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
+    | '/firmar/operacion/$token'
     | '/lovable/email/suppression'
     | '/portal/buyer/$token'
     | '/portal/seller/$token'
@@ -2197,6 +2209,7 @@ export interface RootRouteChildren {
   CatastroAppWatchlistRoute: typeof CatastroAppWatchlistRoute
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   CatastroPaisCountryRoute: typeof CatastroPaisCountryRoute
+  FirmarOperacionTokenRoute: typeof FirmarOperacionTokenRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   PortalBuyerTokenRoute: typeof PortalBuyerTokenRoute
   PortalSellerTokenRoute: typeof PortalSellerTokenRoute
@@ -2650,6 +2663,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/firmar/operacion/$token': {
+      id: '/firmar/operacion/$token'
+      path: '/firmar/operacion/$token'
+      fullPath: '/firmar/operacion/$token'
+      preLoaderRoute: typeof FirmarOperacionTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/pais/$country': {
@@ -3805,6 +3825,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroAppWatchlistRoute: CatastroAppWatchlistRoute,
   CatastroCCodeRoute: CatastroCCodeRoute,
   CatastroPaisCountryRoute: CatastroPaisCountryRoute,
+  FirmarOperacionTokenRoute: FirmarOperacionTokenRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   PortalBuyerTokenRoute: PortalBuyerTokenRoute,
   PortalSellerTokenRoute: PortalSellerTokenRoute,

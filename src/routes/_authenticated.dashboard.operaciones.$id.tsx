@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Copy, RefreshCw, Ban, Activity, Users } from "lucide-react";
 import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
+import { OperationSignaturesPanel } from "@/features/operations/OperationSignaturesPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/operaciones/$id")({
   head: () => ({
@@ -168,6 +169,35 @@ function OperationDetail() {
             onChange={refresh}
           />
         </section>
+
+        {/* Firmas electrónicas sobre versiones inmutables */}
+        <section className="mt-8">
+          <div className="mb-3">
+            <h2 className="font-serif text-xl">Firmas electrónicas</h2>
+            <p className="text-xs text-[hsl(var(--content-subtle))]">
+              Cada flujo firma una versión inmutable (SHA-256) de un documento
+              del Data Room. El link es único por firmante.
+            </p>
+          </div>
+          <OperationSignaturesPanel
+            operationId={id}
+            documents={(data.documents ?? []).map((d) => ({
+              id: String((d as { id: string }).id),
+              title: String((d as { title: string }).title ?? ""),
+              kind: String((d as { kind: string }).kind ?? ""),
+              version: Number((d as { version?: number }).version ?? 1),
+              is_frozen: Boolean((d as { is_frozen?: boolean }).is_frozen),
+              sha256: ((d as { sha256?: string | null }).sha256 ?? null) as string | null,
+            }))}
+            participants={(data.participants ?? []).map((p) => ({
+              role: String((p as { role: string }).role ?? ""),
+              full_name: ((p as { full_name?: string | null }).full_name ?? null) as string | null,
+              email: ((p as { email?: string | null }).email ?? null) as string | null,
+            }))}
+            canManage
+          />
+        </section>
+
 
 
         {/* Actividad + acciones */}
