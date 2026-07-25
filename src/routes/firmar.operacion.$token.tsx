@@ -57,6 +57,53 @@ function SignOperationPage() {
   const [name, setName] = useState("");
   const [accepted, setAccepted] = useState(false);
   const [signing, setSigning] = useState(false);
+  const [stampedFrozen, setStampedFrozen] = useState<string | null>(null);
+  const [stampedSigned, setStampedSigned] = useState<string | null>(null);
+  const [stamping, setStamping] = useState(false);
+
+  const wm: SignerWatermark | null = useMemo(() => {
+    if (!data) return null;
+    return {
+      name: (name.trim() || data.signer.name) as string,
+      role: String(data.signer.role || ""),
+      reference: data.envelope.hash?.slice(0, 12),
+      status: data.signer.status === "signed" ? "firmado" : "pendiente",
+      signedAt: data.signer.signed_at ?? null,
+    };
+  }, [data, name]);
+
+  // Regenera automáticamente el PDF con marca de agua del firmante actual.
+  useEffect(() => {
+    let cancel = false;
+    async function run() {
+      if (!data?.pdf_url || !wm) return;
+      setStamping(true);
+      try {
+        const b = await fetchAndStamp(data.pdf_url, wm);
+        if (cancel) return;
+        setStampedFrozen((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return URL.createObjectURL(b);
+        });
+        if (data.signed_pdf_url) {
+          const s = await fetchAndStamp(data.signed_pdf_url, wm);
+          if (cancel) return;
+          setStampedSigned((prev) => {
+            if (prev) URL.revokeObjectURL(prev);
+            return URL.createObjectURL(s);
+          });
+        }
+      } catch (e) {
+        console.error("[watermark]", e);
+      } finally {
+        if (!cancel) setStamping(false);
+      }
+    }
+    void run();
+    return () => {
+      cancel = true;
+    };
+  }, [data?.pdf_url, data?.signed_pdf_url, wm]);
 
   const onSign = async () => {
     if (name.trim().length < 3) return toast.error("Escribe tu nombre completo.");
@@ -74,6 +121,20 @@ function SignOperationPage() {
       toast.error(e instanceof Error ? e.message : "No se pudo firmar.");
     } finally {
       setSigning(false);
+    }
+  };
+
+  const downloadStamped = async (which: "frozen" | "signed") => {
+    if (!data || !wm) return;
+    const src = which === "frozen" ? data.pdf_url : data.signed_pdf_url;
+    if (!src) return;
+    try {
+      const blob = await fetchAndStamp(src, wm);
+      const suffix = which === "frozen" ? "congelado" : "firmado";
+      const base = (data.envelope.title || "documento").replace(/[^\w.-]+/g, "_");
+      triggerBlobDownload(blob, `${base}-${suffix}-marca-${wm.role}.pdf`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar el PDF con marca.");
     }
   };
 
