@@ -5,6 +5,7 @@ import { getPortalView, claimPortalInvitation, postPortalMessage } from "@/lib/o
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
 import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck } from "lucide-react";
 
 type Role = "buyer" | "seller";
