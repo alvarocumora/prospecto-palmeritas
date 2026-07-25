@@ -63,6 +63,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "commodity-inquiry-internal": commodityInquiryInternal,
   "inquiry-update-buyer": inquiryUpdateBuyer,
   "sign-request-signer": signRequestSigner,
+  "sign-reminder-signer": signReminderSigner,
   "sign-completed-owner": signCompletedOwner,
   "sign-completed-internal": signCompletedInternal,
   "shipment-update": shipmentUpdate,
