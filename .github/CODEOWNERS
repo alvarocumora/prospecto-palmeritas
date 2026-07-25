@@ -1,0 +1,18 @@
+# CODEOWNERS — frontera de territorio del repo. Ver docs/territorio-y-sync.md
+#
+# Hace la propiedad visible y exigible en GitHub: todo PR que toque estas rutas
+# requiere revisión del dueño humano. Para que sea un candado real, `main` debe
+# tener branch protection: requerir PR + revisión de CODEOWNERS + prohibir
+# force-push (lo configura el admin del repo).
+
+# --- Territorio Claude Code (data/ETL/motores/tests/docs) ---
+/supabase/migrations/   @alvarocumora
+/etl/                   @alvarocumora
+/packages/reglas/       @alvarocumora
+/tests/                 @alvarocumora
+/docs/                  @alvarocumora
+/.github/CODEOWNERS     @alvarocumora
+
+# --- Territorio Lovable ---
+# /src y /supabase/functions los administra Lovable (regeneración desde su cloud).
+# No se asignan a un revisor humano fijo aquí para no bloquear su flujo.
