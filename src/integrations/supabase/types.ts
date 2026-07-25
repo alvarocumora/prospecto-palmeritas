@@ -3717,6 +3717,48 @@ export type Database = {
           },
         ]
       }
+      data_subject_requests: {
+        Row: {
+          created_at: string
+          details: string | null
+          email: string
+          handled_at: string | null
+          handled_by: string | null
+          id: string
+          kind: Database["public"]["Enums"]["dsr_kind"]
+          response: string | null
+          status: Database["public"]["Enums"]["dsr_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          details?: string | null
+          email: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["dsr_kind"]
+          response?: string | null
+          status?: Database["public"]["Enums"]["dsr_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          details?: string | null
+          email?: string
+          handled_at?: string | null
+          handled_by?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["dsr_kind"]
+          response?: string | null
+          status?: Database["public"]["Enums"]["dsr_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       deal_certifications: {
         Row: {
           budget_clp: number
@@ -16580,6 +16622,7 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      is_platform_staff: { Args: { _user_id: string }; Returns: boolean }
       is_project_member: {
         Args: { _project_id: string; _user_id: string }
         Returns: boolean
@@ -16653,6 +16696,7 @@ export type Database = {
         Args: { _limit?: number; _min_score?: number; _region?: string }
         Returns: Json
       }
+      purge_privacy_retention: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
@@ -16858,6 +16902,13 @@ export type Database = {
         | "gkz"
         | "ch20235"
         | "sk1300"
+      dsr_kind:
+        | "access"
+        | "rectification"
+        | "cancellation"
+        | "opposition"
+        | "portability"
+      dsr_status: "pending" | "in_review" | "fulfilled" | "rejected"
       follow_up_category:
         | "catastro"
         | "satellite"
@@ -17158,6 +17209,14 @@ export const Constants = {
         "ch20235",
         "sk1300",
       ],
+      dsr_kind: [
+        "access",
+        "rectification",
+        "cancellation",
+        "opposition",
+        "portability",
+      ],
+      dsr_status: ["pending", "in_review", "fulfilled", "rejected"],
       follow_up_category: [
         "catastro",
         "satellite",
