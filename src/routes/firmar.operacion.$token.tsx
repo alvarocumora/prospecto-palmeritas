@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Clock,
   ExternalLink,
+  Download,
 } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import {
@@ -170,18 +171,36 @@ function SignOperationPage() {
             {/* PDF del documento congelado */}
             {data.pdf_url && (
               <div className="mb-6 rounded-xl border border-hairline overflow-hidden bg-surface-3">
-                <div className="flex items-center justify-between px-4 py-2 border-b border-hairline">
+                <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-hairline">
                   <div className="text-xs font-semibold text-content">
                     Documento a firmar (versión inmutable)
                   </div>
-                  <a
-                    href={data.pdf_url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
-                  >
-                    Abrir en pestaña <ExternalLink className="w-3 h-3" />
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={data.pdf_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
+                    >
+                      Abrir <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <a
+                      href={data.pdf_url}
+                      download={`${data.envelope.title || "documento"}-congelado.pdf`}
+                      className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
+                    >
+                      <Download className="w-3 h-3" /> Versión congelada
+                    </a>
+                    {data.signed_pdf_url && (
+                      <a
+                        href={data.signed_pdf_url}
+                        download={`${data.envelope.title || "documento"}-firmado.pdf`}
+                        className="inline-flex items-center gap-1 rounded-md bg-content text-surface px-2.5 py-1 text-xs font-medium hover:opacity-90"
+                      >
+                        <Download className="w-3 h-3" /> PDF firmado
+                      </a>
+                    )}
+                  </div>
                 </div>
                 <iframe
                   src={data.pdf_url}
