@@ -75,6 +75,7 @@ export const exportMyData = createServerFn({ method: "GET" })
         result[s.table] = [];
       }
     }
-    return JSON.parse(JSON.stringify(result)) as Record<string, unknown>;
+    return { json: JSON.stringify(result) };
   });
+
 
