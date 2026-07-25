@@ -10336,6 +10336,545 @@ export type Database = {
         }
         Relationships: []
       }
+      operation_access_logs: {
+        Row: {
+          action: string
+          actor_role: Database["public"]["Enums"]["op_participant_role"] | null
+          actor_user_id: string | null
+          created_at: string
+          id: string
+          ip_address: string | null
+          metadata: Json | null
+          operation_id: string
+          target_id: string | null
+          target_type: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          actor_role?: Database["public"]["Enums"]["op_participant_role"] | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          operation_id: string
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          actor_role?: Database["public"]["Enums"]["op_participant_role"] | null
+          actor_user_id?: string | null
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          metadata?: Json | null
+          operation_id?: string
+          target_id?: string | null
+          target_type?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_access_logs_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_documents: {
+        Row: {
+          content_type: string | null
+          created_at: string
+          description: string | null
+          file_size: number | null
+          frozen_at: string | null
+          id: string
+          is_frozen: boolean
+          kind: string
+          operation_id: string
+          parent_document_id: string | null
+          review_notes: string | null
+          review_status: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          sha256: string | null
+          storage_bucket: string
+          storage_path: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          uploaded_by_role: Database["public"]["Enums"]["op_participant_role"]
+          version: number
+          visibility: Database["public"]["Enums"]["op_doc_visibility"]
+        }
+        Insert: {
+          content_type?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          frozen_at?: string | null
+          id?: string
+          is_frozen?: boolean
+          kind: string
+          operation_id: string
+          parent_document_id?: string | null
+          review_notes?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sha256?: string | null
+          storage_bucket?: string
+          storage_path?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_role: Database["public"]["Enums"]["op_participant_role"]
+          version?: number
+          visibility?: Database["public"]["Enums"]["op_doc_visibility"]
+        }
+        Update: {
+          content_type?: string | null
+          created_at?: string
+          description?: string | null
+          file_size?: number | null
+          frozen_at?: string | null
+          id?: string
+          is_frozen?: boolean
+          kind?: string
+          operation_id?: string
+          parent_document_id?: string | null
+          review_notes?: string | null
+          review_status?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          sha256?: string | null
+          storage_bucket?: string
+          storage_path?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          uploaded_by_role?: Database["public"]["Enums"]["op_participant_role"]
+          version?: number
+          visibility?: Database["public"]["Enums"]["op_doc_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_documents_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operation_documents_parent_document_id_fkey"
+            columns: ["parent_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_invitations: {
+        Row: {
+          accepted_at: string | null
+          accepted_by: string | null
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          invited_email: string
+          invited_name: string | null
+          operation_id: string
+          participant_type: Database["public"]["Enums"]["op_participant_role"]
+          revoked_at: string | null
+          revoked_by: string | null
+          secure_token: string
+          status: Database["public"]["Enums"]["op_invitation_status"]
+        }
+        Insert: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by: string
+          expires_at?: string
+          id?: string
+          invited_email: string
+          invited_name?: string | null
+          operation_id: string
+          participant_type: Database["public"]["Enums"]["op_participant_role"]
+          revoked_at?: string | null
+          revoked_by?: string | null
+          secure_token?: string
+          status?: Database["public"]["Enums"]["op_invitation_status"]
+        }
+        Update: {
+          accepted_at?: string | null
+          accepted_by?: string | null
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          invited_email?: string
+          invited_name?: string | null
+          operation_id?: string
+          participant_type?: Database["public"]["Enums"]["op_participant_role"]
+          revoked_at?: string | null
+          revoked_by?: string | null
+          secure_token?: string
+          status?: Database["public"]["Enums"]["op_invitation_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_invitations_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_messages: {
+        Row: {
+          attachment_document_id: string | null
+          author_id: string
+          author_role: Database["public"]["Enums"]["op_participant_role"]
+          body: string
+          channel: Database["public"]["Enums"]["op_message_channel"]
+          created_at: string
+          id: string
+          operation_id: string
+          read_by: Json | null
+        }
+        Insert: {
+          attachment_document_id?: string | null
+          author_id: string
+          author_role: Database["public"]["Enums"]["op_participant_role"]
+          body: string
+          channel: Database["public"]["Enums"]["op_message_channel"]
+          created_at?: string
+          id?: string
+          operation_id: string
+          read_by?: Json | null
+        }
+        Update: {
+          attachment_document_id?: string | null
+          author_id?: string
+          author_role?: Database["public"]["Enums"]["op_participant_role"]
+          body?: string
+          channel?: Database["public"]["Enums"]["op_message_channel"]
+          created_at?: string
+          id?: string
+          operation_id?: string
+          read_by?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_messages_attachment_document_id_fkey"
+            columns: ["attachment_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operation_messages_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_participants: {
+        Row: {
+          access_status: string | null
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          invited_at: string | null
+          joined_at: string | null
+          last_access_at: string | null
+          operation_id: string
+          organization_id: string | null
+          role: Database["public"]["Enums"]["op_participant_role"]
+          user_id: string | null
+        }
+        Insert: {
+          access_status?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          joined_at?: string | null
+          last_access_at?: string | null
+          operation_id: string
+          organization_id?: string | null
+          role: Database["public"]["Enums"]["op_participant_role"]
+          user_id?: string | null
+        }
+        Update: {
+          access_status?: string | null
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          invited_at?: string | null
+          joined_at?: string | null
+          last_access_at?: string | null
+          operation_id?: string
+          organization_id?: string | null
+          role?: Database["public"]["Enums"]["op_participant_role"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_participants_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operation_participants_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_status_history: {
+        Row: {
+          changed_by: string | null
+          created_at: string
+          from_status: string | null
+          id: string
+          note: string | null
+          operation_id: string
+          scope: string
+          to_status: string
+        }
+        Insert: {
+          changed_by?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          operation_id: string
+          scope: string
+          to_status: string
+        }
+        Update: {
+          changed_by?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          operation_id?: string
+          scope?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_status_history_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operation_tasks: {
+        Row: {
+          assigned_internal_id: string | null
+          completed_at: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          due_date: string | null
+          id: string
+          operation_id: string
+          priority: string
+          related_document_id: string | null
+          status: Database["public"]["Enums"]["op_task_status"]
+          target_role: Database["public"]["Enums"]["op_participant_role"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_internal_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          operation_id: string
+          priority?: string
+          related_document_id?: string | null
+          status?: Database["public"]["Enums"]["op_task_status"]
+          target_role: Database["public"]["Enums"]["op_participant_role"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_internal_id?: string | null
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          operation_id?: string
+          priority?: string
+          related_document_id?: string | null
+          status?: Database["public"]["Enums"]["op_task_status"]
+          target_role?: Database["public"]["Enums"]["op_participant_role"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operation_tasks_operation_id_fkey"
+            columns: ["operation_id"]
+            isOneToOne: false
+            referencedRelation: "operations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "operation_tasks_related_document_id_fkey"
+            columns: ["related_document_id"]
+            isOneToOne: false
+            referencedRelation: "operation_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      operations: {
+        Row: {
+          buyer_company: string | null
+          buyer_email: string | null
+          buyer_name: string | null
+          buyer_phone: string | null
+          buyer_status: Database["public"]["Enums"]["op_buyer_status"]
+          code: string
+          commission_pct: number | null
+          commodity: string
+          created_at: string
+          created_by: string
+          destination_country: string | null
+          destination_port: string | null
+          duration_months: number | null
+          id: string
+          incoterm: string | null
+          internal_notes: string | null
+          linked_trade_id: string | null
+          name: string
+          origin_country: string | null
+          priority: string | null
+          quantity_monthly: number | null
+          quantity_total: number | null
+          responsible_user_id: string | null
+          seller_company: string | null
+          seller_email: string | null
+          seller_name: string | null
+          seller_phone: string | null
+          seller_status: Database["public"]["Enums"]["op_seller_status"]
+          status: Database["public"]["Enums"]["operation_status"]
+          subproduct: string | null
+          target_price_usd: number | null
+          tech_spec: Json | null
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          buyer_company?: string | null
+          buyer_email?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          buyer_status?: Database["public"]["Enums"]["op_buyer_status"]
+          code: string
+          commission_pct?: number | null
+          commodity: string
+          created_at?: string
+          created_by: string
+          destination_country?: string | null
+          destination_port?: string | null
+          duration_months?: number | null
+          id?: string
+          incoterm?: string | null
+          internal_notes?: string | null
+          linked_trade_id?: string | null
+          name: string
+          origin_country?: string | null
+          priority?: string | null
+          quantity_monthly?: number | null
+          quantity_total?: number | null
+          responsible_user_id?: string | null
+          seller_company?: string | null
+          seller_email?: string | null
+          seller_name?: string | null
+          seller_phone?: string | null
+          seller_status?: Database["public"]["Enums"]["op_seller_status"]
+          status?: Database["public"]["Enums"]["operation_status"]
+          subproduct?: string | null
+          target_price_usd?: number | null
+          tech_spec?: Json | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          buyer_company?: string | null
+          buyer_email?: string | null
+          buyer_name?: string | null
+          buyer_phone?: string | null
+          buyer_status?: Database["public"]["Enums"]["op_buyer_status"]
+          code?: string
+          commission_pct?: number | null
+          commodity?: string
+          created_at?: string
+          created_by?: string
+          destination_country?: string | null
+          destination_port?: string | null
+          duration_months?: number | null
+          id?: string
+          incoterm?: string | null
+          internal_notes?: string | null
+          linked_trade_id?: string | null
+          name?: string
+          origin_country?: string | null
+          priority?: string | null
+          quantity_monthly?: number | null
+          quantity_total?: number | null
+          responsible_user_id?: string | null
+          seller_company?: string | null
+          seller_email?: string | null
+          seller_name?: string | null
+          seller_phone?: string | null
+          seller_status?: Database["public"]["Enums"]["op_seller_status"]
+          status?: Database["public"]["Enums"]["operation_status"]
+          subproduct?: string | null
+          target_price_usd?: number | null
+          tech_spec?: Json | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "operations_linked_trade_id_fkey"
+            columns: ["linked_trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string
@@ -16617,7 +17156,16 @@ export type Database = {
         Args: { _project_id: string }
         Returns: boolean
       }
+      is_gc_staff: { Args: { _user_id: string }; Returns: boolean }
       is_geocapitals_staff: { Args: { _user_id: string }; Returns: boolean }
+      is_operation_participant: {
+        Args: {
+          _op_id: string
+          _role?: Database["public"]["Enums"]["op_participant_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
@@ -16692,6 +17240,7 @@ export type Database = {
         Returns: number
       }
       normalize_rut: { Args: { _rut: string }; Returns: string }
+      op_generate_code: { Args: { _commodity: string }; Returns: string }
       opportunities_geo: {
         Args: { _limit?: number; _min_score?: number; _region?: string }
         Returns: Json
@@ -16943,6 +17492,64 @@ export type Database = {
         | "aprobada"
         | "descartada"
       onboarding_state: "not_started" | "in_progress" | "completed"
+      op_buyer_status:
+        | "not_invited"
+        | "invitation_sent"
+        | "access_created"
+        | "nda_pending"
+        | "profile_incomplete"
+        | "kyc_incomplete"
+        | "under_review"
+        | "observed"
+        | "approved"
+        | "suspended"
+        | "rejected"
+      op_doc_visibility:
+        | "internal"
+        | "buyer_shared"
+        | "seller_shared"
+        | "all_parties"
+        | "custom"
+      op_invitation_status: "pending" | "accepted" | "revoked" | "expired"
+      op_message_channel: "buyer_gc" | "seller_gc" | "tripartite" | "internal"
+      op_participant_role: "buyer" | "seller" | "geocapitals"
+      op_seller_status:
+        | "not_invited"
+        | "invitation_sent"
+        | "access_created"
+        | "nda_pending"
+        | "docs_incomplete"
+        | "under_review"
+        | "observed"
+        | "due_diligence"
+        | "prequalified"
+        | "approved"
+        | "suspended"
+        | "rejected"
+      op_task_status:
+        | "pending"
+        | "in_progress"
+        | "answered"
+        | "under_review"
+        | "completed"
+        | "overdue"
+      operation_status:
+        | "draft"
+        | "counterparties_invited"
+        | "nda_in_progress"
+        | "doc_collection"
+        | "kyc_review"
+        | "due_diligence"
+        | "technical_eval"
+        | "commercial_eval"
+        | "negotiation"
+        | "contract"
+        | "financial_instrument"
+        | "logistics"
+        | "in_transit"
+        | "completed"
+        | "suspended"
+        | "cancelled"
       org_role: "owner" | "admin" | "member" | "viewer"
       partner_invitation_role: "broker" | "investor" | "both"
       partner_invitation_status:
@@ -17254,6 +17861,69 @@ export const Constants = {
         "descartada",
       ],
       onboarding_state: ["not_started", "in_progress", "completed"],
+      op_buyer_status: [
+        "not_invited",
+        "invitation_sent",
+        "access_created",
+        "nda_pending",
+        "profile_incomplete",
+        "kyc_incomplete",
+        "under_review",
+        "observed",
+        "approved",
+        "suspended",
+        "rejected",
+      ],
+      op_doc_visibility: [
+        "internal",
+        "buyer_shared",
+        "seller_shared",
+        "all_parties",
+        "custom",
+      ],
+      op_invitation_status: ["pending", "accepted", "revoked", "expired"],
+      op_message_channel: ["buyer_gc", "seller_gc", "tripartite", "internal"],
+      op_participant_role: ["buyer", "seller", "geocapitals"],
+      op_seller_status: [
+        "not_invited",
+        "invitation_sent",
+        "access_created",
+        "nda_pending",
+        "docs_incomplete",
+        "under_review",
+        "observed",
+        "due_diligence",
+        "prequalified",
+        "approved",
+        "suspended",
+        "rejected",
+      ],
+      op_task_status: [
+        "pending",
+        "in_progress",
+        "answered",
+        "under_review",
+        "completed",
+        "overdue",
+      ],
+      operation_status: [
+        "draft",
+        "counterparties_invited",
+        "nda_in_progress",
+        "doc_collection",
+        "kyc_review",
+        "due_diligence",
+        "technical_eval",
+        "commercial_eval",
+        "negotiation",
+        "contract",
+        "financial_instrument",
+        "logistics",
+        "in_transit",
+        "completed",
+        "suspended",
+        "cancelled",
+      ],
       org_role: ["owner", "admin", "member", "viewer"],
       partner_invitation_role: ["broker", "investor", "both"],
       partner_invitation_status: [
