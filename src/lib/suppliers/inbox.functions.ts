@@ -159,11 +159,11 @@ export const getInboxDetail = createServerFn({ method: "GET" })
     );
 
     return {
-      supplier: supplier as Record<string, unknown>,
-      offers: (offers ?? []) as Array<Record<string, unknown>>,
-      documents: docsWithUrl as InboxDetail["documents"],
-      notes: (notes ?? []) as Array<Record<string, unknown>>,
-      extractions: (extractions ?? []) as Array<Record<string, unknown>>,
+      supplier: supplier as unknown as Record<string, Json>,
+      offers: (offers ?? []) as unknown as Array<Record<string, Json>>,
+      documents: docsWithUrl as unknown as InboxDetail["documents"],
+      notes: (notes ?? []) as unknown as Array<Record<string, Json>>,
+      extractions: (extractions ?? []) as unknown as Array<Record<string, Json>>,
     };
   });
 
