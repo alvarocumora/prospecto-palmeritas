@@ -98,10 +98,10 @@ export const createOperation = createServerFn({ method: "POST" })
     // Nombre del emisor (para el correo)
     const { data: inviter } = await supabaseAdmin
       .from("profiles")
-      .select("full_name, email")
-      .eq("id", context.userId)
+      .select("display_name, email")
+      .eq("user_id", context.userId)
       .maybeSingle();
-    const invitedByName = inviter?.full_name ?? inviter?.email ?? null;
+    const invitedByName = inviter?.display_name ?? inviter?.email ?? null;
 
     for (const kind of ["buyer", "seller"] as const) {
       const email = kind === "buyer" ? data.buyer_email : data.seller_email;
