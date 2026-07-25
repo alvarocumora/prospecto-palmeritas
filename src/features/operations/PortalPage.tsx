@@ -1,14 +1,12 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { getPortalView, claimPortalInvitation, postPortalMessage } from "@/lib/operations/portal.functions";
 import { useAuth } from "@/hooks/useAuth";
-import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
-import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck, Radio } from "lucide-react";
-
+import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck } from "lucide-react";
 
 type Role = "buyer" | "seller";
 type PortalData = Awaited<ReturnType<typeof getPortalView>>;
@@ -39,9 +37,6 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
   const [claimError, setClaimError] = useState<string | null>(null);
   const [claimed, setClaimed] = useState(false);
 
-  const [live, setLive] = useState(false);
-  const reloadTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   const load = async () => {
     try {
       const d = await view({ data: { token, role } });
@@ -51,39 +46,10 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
     }
   };
 
-  const scheduleReload = () => {
-    if (reloadTimer.current) clearTimeout(reloadTimer.current);
-    reloadTimer.current = setTimeout(() => {
-      void load();
-    }, 350);
-  };
-
   useEffect(() => {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
-
-  // Realtime: tareas, documentos, mensajes y actividad de esta operación.
-  useEffect(() => {
-    const opId = data?.operation?.id;
-    if (!opId) return;
-    const filter = `operation_id=eq.${opId}`;
-    const channel = supabase
-      .channel(`portal:${role}:${opId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "operation_documents", filter }, scheduleReload)
-      .on("postgres_changes", { event: "*", schema: "public", table: "operation_tasks", filter }, scheduleReload)
-      .on("postgres_changes", { event: "*", schema: "public", table: "operation_messages", filter }, scheduleReload)
-      .on("postgres_changes", { event: "*", schema: "public", table: "operation_access_logs", filter }, scheduleReload)
-      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "operations", filter: `id=eq.${opId}` }, scheduleReload)
-      .subscribe((status) => {
-        setLive(status === "SUBSCRIBED");
-      });
-    return () => {
-      if (reloadTimer.current) clearTimeout(reloadTimer.current);
-      supabase.removeChannel(channel);
-    };
-  }, [data?.operation?.id, role]);
-
 
   const doClaim = async () => {
     setClaiming(true);
@@ -150,19 +116,9 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
             <div className="mt-1 font-serif text-lg">{copy.title}</div>
           </div>
           <div className="text-right">
-            <div className="flex items-center justify-end gap-2 text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">
-              <span
-                title={live ? "Actualizaciones en vivo activas" : "Sin conexión en vivo — actualiza al interactuar"}
-                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 ${live ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-[hsl(var(--hairline))] bg-white text-[hsl(var(--content-subtle))]"}`}
-              >
-                <Radio className={`h-3 w-3 ${live ? "animate-pulse" : ""}`} />
-                {live ? "En vivo" : "Offline"}
-              </span>
-              <span>Operación</span>
-            </div>
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">Operación</div>
             <div className="mt-1 font-mono text-sm">{op.code}</div>
           </div>
-
         </div>
       </header>
 
