@@ -1,116 +1,132 @@
+# Operaciones GeoCapitals — Buyer Portal + Seller Portal + Dashboard vivo
 
-# Plan: Portal Proveedores + Buyer RFQ (integrados en Geocapitals)
+Reorientar el Trade Desk para que cada pedido sea un **workspace transaccional privado** con tres espacios conectados: interno GeoCapitals, portal comprador, portal vendedor. GeoCapitals mantiene control central; cada contraparte solo ve lo autorizado.
 
-Dos módulos hermanos bajo el mismo proyecto y con el mismo tema visual (Institutional Modernist: papel hueso, tinta, cobalto, serif). Entrega por fases; cada fase deja algo repartible.
+## Enfoque MVP (sin logística/financiero avanzado)
 
----
+Priorizar: crear operación → generar 2 links seguros → invitar contrapartes → checklist + carga documental → firma NDA → data room segregado → mensajería → dashboard en vivo con RLS + audit log.
 
-## Alcance por módulo
+Reutilizar lo existente donde aplica: `commodity_trades`, `data_rooms/data_room_files/data_room_access_grants`, `signature_envelopes`, `document_registry`, `document_sign_requests`, `trade_events`, `partner_invitations` (patrón de token seguro). No duplicar módulos ya funcionales; extenderlos con nueva capa "operations".
 
-**A) Portal Proveedores** (`/inscripcion` público + `/panel` proveedor + `/dashboard/bandeja` interno)
-- Wizard móvil 4 pasos con guardado parcial, validación por país (RUT/RUC/CUIT/NIT).
-- Link compartible con token, QR y contador (`/dashboard/enlaces`).
-- Cuenta del proveedor (magic link) para seguir estado y subir documentos.
-- Bandeja interna con comparador, señales de alerta (lista de hechos, sin puntaje).
-- IA lectora de certificados (Lovable AI Gateway, `google/gemini-3.6-flash` multimodal).
-- Cumplimiento base Ley 21.719: consentimiento versionado, /privacidad, export/delete cuenta, log de accesos.
+## Fase 0 — Diseño previo a UI (entregables antes de codear)
 
-**B) Buyer RFQ** (`/dashboard/rfq/*` interno + `/rfq/$publicId` público)
-- Dashboard KPIs (RFQs, proveedores, DD, contratos).
-- Crear RFQ multi-pestaña (general, productos, compliance REICON checklist).
-- Perfil de proveedor con KYC/ESG/Compliance/Risk Score.
-- Workflow: Pending → Review → Approved → Commercial → ICPO → SPA → Shipment.
-- Risk Engine ponderado (Mining 30, Corporate 20, Financial 15, ESG 10, Compliance 25).
-- Ficha RFQ pública con "Apply as Supplier" que aterriza en el Portal Proveedores.
-- GeoCompliance AI: revisa docs, detecta faltantes, resume, recomienda.
+Antes de pantallas, generar y validar:
+1. Modelo de datos (ver §Técnico)
+2. Políticas RLS por rol (buyer / seller / geocapitals / super_admin)
+3. Flujo de invitación (token → registro → binding a operación+rol)
+4. Matriz de permisos por tipo de documento
+5. Mapa de pantallas (interno vs buyer vs seller)
+6. Máquinas de estado (comprador, vendedor, operación)
+7. Canales Realtime (por operación, por participante)
 
-**Puente único**: un `supplier_profiles` compartido. Un proveedor que se inscribe por `/inscripcion` puede aparecer en `/dashboard/bandeja` y postular a RFQs.
+## Fase 1 — Esquema y seguridad (bloqueante)
 
----
+**Tablas nuevas** en `public`:
+- `operations` (código único `GC-XXX-####`, commodity, spec técnica JSONB, incoterm, cantidades, destino, responsable, prioridad, status enum)
+- `operation_participants` (operation_id, user_id, org_id, role: buyer|seller|geocapitals, access_status, joined_at, last_access_at)
+- `operation_invitations` (operation_id, participant_type, invited_email, secure_token único, expires_at, accepted_at, revoked_at, created_by)
+- `portal_access_tokens` (rotación/revocación independiente del invite)
+- `portal_sessions` (audit: user_id, ip, user_agent, started_at)
+- `operation_documents` (operation_id, storage_path, kind, version, uploaded_by_role, immutable_after_sign bool)
+- `document_permissions` (document_id, can_view_buyer, can_view_seller, can_view_geocapitals, can_download, expires_at)
+- `operation_tasks` (target_role, priority, due_date, status)
+- `operation_messages` + `message_channels` (buyer↔gc, seller↔gc, tripartito bloqueado por defecto, notas internas)
+- `signature_requests` + `signatures` (extender los existentes con vínculo a operación y `partyRole`)
+- `access_logs` (todo acceso/descarga)
+- `participant_status_history` (auditoría cambios estado)
+- `portal_notifications`
 
-## Diseño
+**Enums**: `operation_status`, `buyer_status`, `seller_status`, `participant_role`, `invitation_status`, `doc_visibility`.
 
-Todo bajo `data-theme="im-light"` con tokens semánticos ya existentes (`surface`, `content`, `hairline`, `accent-brand`). Se ignoran las paletas alternas del brief (verde mineral, azul SAP). Tipografía: la serif display + Inter + IBM Plex Mono para cifras que ya usa la plataforma. Componentes shadcn ya presentes.
+**RLS obligatorio** (cada tabla nueva):
+- Buyer ve filas donde existe `operation_participants` con su `user_id` y `role='buyer'`.
+- Seller idem con `role='seller'`.
+- Notas internas y comisiones: solo `geocapitals` staff (`has_role`).
+- Documentos: filtrado por `document_permissions` + rol.
+- Servicio de token público: helper `SECURITY DEFINER` que valida token, expiración, no-revocado, y devuelve solo campos permitidos.
 
----
+**Storage**: bucket privado `operation-docs` con RLS en `storage.objects`; descargas siempre vía signed URL temporal generada por server fn tras chequear permisos.
 
-## Fases
+**GRANTs** completos por tabla (authenticated + service_role; nunca anon salvo endpoints token-based server-side).
 
-**Fase 1 — Base de datos + seguridad (1 migración grande)**
-- Tablas: `suppliers`, `supplier_offers`, `offer_elements`, `supplier_documents`, `supplier_events`, `invitation_links`, `rfqs`, `rfq_products`, `rfq_compliance_items`, `supplier_scores`, `risk_assessments`, `rfq_applications`.
-- RLS estricta: `suppliers` legible solo por su `owner_user_id` o staff (`has_role`). `invitation_links` solo staff. `rfqs` legibles por creador + assigned staff; ficha pública vía server fn dedicada.
-- GRANTs explícitos (authenticated + service_role, sin anon salvo lookup público por token via server fn).
-- Consent log + `privacy_policy_versions`.
+## Fase 2 — Backend server functions
 
-**Fase 2 — Portal Proveedores mínimo repartible**
-- `/inscripcion` wizard 4 pasos con `useLocalStorage` para draft + `createServerFn` público con rate-limit por IP y honeypot (sin Turnstile inicial; se agrega en Fase 5).
-- `/inscripcion/gracias` con folio, próximos pasos y CTA "crear cuenta".
-- `/dashboard/enlaces` (staff) genera tokens + copy WhatsApp + QR descargable.
-- `/panel` (proveedor autenticado bajo `_authenticated`) con estado en lenguaje claro, edición de contacto, agregar oferta, subir docs.
-- Bucket privado `supplier-docs` con URLs firmadas cortas.
+Bajo `src/lib/operations/`:
+- `createOperation.functions.ts` — crea operación, genera 2 invitaciones (buyer+seller), inicializa 3 data rooms segregados, aplica checklist plantilla por commodity/país.
+- `invitations.functions.ts` — generar/revocar/regenerar tokens (crypto seguros, no secuenciales), enviar email vía pipeline existente.
+- `redeemInvitation.functions.ts` — canjear token (público, valida hash + expiración) → registro/binding.
+- `portalData.functions.ts` — feeds separados `getBuyerPortalView` / `getSellerPortalView` proyectando solo campos autorizados.
+- `documents.functions.ts` — upload, versionado, congelar tras firma, signed URL bajo permiso.
+- `tasks.functions.ts`, `messages.functions.ts`, `signatures.functions.ts` (extender flujo existente con `partyRole`).
+- `generateOperationDoc.functions.ts` — reusa `renderGeocapitalsPdf` para NDA/LOI/ICPO/SCO/NCNDA/IMFPA/BRS con placeholders auto.
 
-**Fase 3 — Bandeja interna + IA de certificados**
-- `/dashboard/bandeja` (tabla densa + filtros + comparador side-by-side).
-- Server fn `extractCertificatePdf` con Lovable AI Gateway (multimodal) que sube el archivo, extrae tabla elemento/valor y guarda en `offer_elements` con `confidence` y `pending_confirmation=true`. UI muestra el recorte junto al valor.
-- Señales de alerta calculadas del lado servidor y renderizadas como bullets con evidencia.
+Todas con `requireSupabaseAuth` salvo los endpoints públicos token-based (bajo `src/routes/api/public/portal/*` con validación server-side estricta).
 
-**Fase 4 — Buyer RFQ**
-- `/dashboard/rfq` (lista + KPIs).
-- `/dashboard/rfq/nuevo` (wizard tabs: General, Productos, Compliance REICON).
-- `/dashboard/rfq/$id` (detalle + postulaciones + timeline).
-- `/rfq/$publicId` ficha pública con "Apply as Supplier" → prellena `/inscripcion?ref=RFQ-xxx`.
-- Risk Engine puro (`src/lib/risk.ts` + tests). Badge Low/Med/High.
-- Export PDF del RFQ vía `renderGeocapitalsPdf`.
+## Fase 3 — Portales externos (rutas separadas)
 
-**Fase 5 — Compliance + endurecimiento**
-- `/privacidad` versionada + tabla `privacy_consents`.
-- Rutas de export/delete de datos del proveedor desde `/panel/mis-datos`.
-- Log de acceso a PII (trigger).
-- Turnstile en `/inscripcion` (secret `TURNSTILE_SECRET`).
-- Job de anonimización de descartados > N días.
+- `src/routes/portal/buyer.$token.tsx` — layout independiente del dashboard interno.
+- `src/routes/portal/seller.$token.tsx`
+- Sub-vistas: perfil, checklist, documentos, firmas pendientes, tareas, mensajes, timeline autorizado.
+- Diseño Institutional Modernist, mobile-first (carga desde cámara, firma táctil, formularios por pasos, botón WhatsApp).
+- Auth ligera: token + email + código OTP; sesión limitada a esa operación+rol.
 
-**Fase 6 — GeoCompliance AI (RFQ)**
-- Server fn que evalúa un `supplier_profile` completo contra el checklist REICON del RFQ, retorna resumen + faltantes + recomendación (Approve / Request More Info / Reject), guardado en `risk_assessments`.
+Portal comprador NUNCA ve: docs vendedor no compartidos, comisiones, notas internas, otras operaciones, matching de competidores.
+Portal vendedor NUNCA ve: PoF comprador (salvo autorización), datos bancarios comprador, comisiones, otros vendedores postulando.
 
----
+## Fase 4 — Dashboard interno vivo
 
-## Detalle técnico
+- `src/routes/_authenticated/dashboard.operaciones.index.tsx` — lista con KPIs (último acceso buyer/seller, docs hoy, % KYC, alertas, días sin actividad).
+- `src/routes/_authenticated/dashboard.operaciones.$id.tsx` — **vista de 3 columnas** (Buyer | GeoCapitals | Seller) con progreso, checklist, docs, firmas, mensajes, alertas por columna.
+- Botones internos: copiar link buyer/seller, enviar invitación, revocar, regenerar, ver sesiones, bloquear.
+- Panel "Actividad reciente" alimentado por Realtime (`operation_events`).
 
-- **Stack**: TanStack Start, server fns bajo `src/lib/suppliers/*.functions.ts` y `src/lib/rfq/*.functions.ts`. Rutas autenticadas bajo `src/routes/_authenticated/`. Rutas públicas top-level.
-- **IA**: helper `createLovableAiGatewayProvider` ya existe. Nuevo `src/lib/ai/certificate-extract.server.ts` con `generateText` + `Output.object` (schema plano, sin `.min/.max`), fallback `NoObjectGeneratedError`. Modelo por defecto: `google/gemini-3.6-flash`.
-- **Storage**: bucket privado `supplier-docs` vía `supabase--storage_create_bucket`. Subida cliente → server fn firma URL PUT.
-- **Compresión imágenes**: en cliente antes de subir (canvas resize a 2000px, calidad 0.8).
-- **Nunca datos bancarios** en formularios ni tablas.
-- **Rate limit** en server fn público: tabla `public_form_hits` con TTL 1h por IP+phone.
-- **Puente Buyer↔Supplier**: `rfq_applications(supplier_id, rfq_id, status, application_score)` con trigger que actualiza scores desde `supplier_scores`.
+## Fase 5 — Realtime + notificaciones
 
----
+Suscripciones Supabase Realtime por `operation_id`:
+- INSERTS en `operation_documents`, `signatures`, `operation_messages`, `operation_tasks`, `access_logs`, `participant_status_history`.
+- Reutilizar patrón de `useTradeBoardRealtime`.
+- Notificaciones email best-effort por eventos clave (invitación, firma, observación).
 
-## Entregas incrementales
+## Fase 6 — Seed demo GC-SB-0001 (Antimonio)
+
+Migración de datos con la operación de ejemplo, checklists buyer/seller precargados, campos técnicos Sb, y vincular al trade de antimonio ya existente para no duplicar.
+
+## Fuera de alcance MVP (explícito)
+
+Logística avanzada, instrumentos financieros complejos, integración DocuSign/Adobe (arquitectura preparada pero firma interna con audit trail para MVP), matching automático vendedores, IA scoring avanzado.
+
+## Verificación antes de cerrar
+
+- Linter Supabase sin findings nuevos.
+- Prueba cross-operation: buyer de op A NO puede leer op B (test RLS).
+- Token revocado → 401 en portal.
+- Documento firmado → inmutable (nueva versión requerida).
+- Descarga siempre vía signed URL con TTL corto.
+- Audit log registra todo acceso/descarga/cambio estado.
+
+## Sección técnica breve
 
 ```text
-Fase 1 → migración aplicada, DB lista
-Fase 2 → link compartible funcional por WhatsApp (repartible)
-Fase 3 → equipo puede triar ofertas + IA de certificados
-Fase 4 → compradores publican RFQs y reciben postulaciones
-Fase 5 → cumple Ley 21.719 antes de dic-2026
-Fase 6 → recomendaciones automáticas de compliance
+operations ──< operation_participants >── auth.users
+     │
+     ├──< operation_invitations (token, expires_at, revoked_at)
+     ├──< operation_documents ──< document_permissions
+     │                        └──< signature_requests ──< signatures
+     ├──< operation_tasks
+     ├──< operation_messages (channel: buyer_gc | seller_gc | tripartite | internal)
+     ├──< access_logs
+     └──< participant_status_history
 ```
 
-Cada fase compila, corre tests y queda usable sin depender de la siguiente.
+Estados: ver §12 del brief (implementar exactos). Rutas públicas bajo `/portal/buyer/$token` y `/portal/seller/$token`; APIs bajo `/api/public/portal/*` con verificación de token en cada handler.
 
----
+## Orden de ejecución sugerido
 
-## Fuera de alcance (explícito)
+1. Migración esquema + RLS + GRANTs + bucket + storage policies.
+2. Server fns (create/invite/redeem/portalData/documents/tasks/messages).
+3. Portales externos buyer/seller (móvil-first).
+4. Dashboard interno 3 columnas + Realtime.
+5. Seed GC-SB-0001.
+6. Auditoría de seguridad (linter + tests cross-tenant).
 
-- WhatsApp Business API oficial (se usa `wa.me`).
-- Chat en tiempo real proveedor↔analista (mensajes asíncronos simples).
-- Verificación automática de concesiones no chilenas.
-- Scoring crediticio de personas.
-- Firma electrónica y blockchain (reutilizar módulo existente cuando aplique, no re-construir).
-
----
-
-## Confirmación antes de arrancar
-
-Voy a arrancar por **Fase 1 (migración) + Fase 2 (portal público repartible)** en el primer sprint de build. ¿Ok o prefieres que empiece por el Buyer RFQ (Fase 4)?
+¿Procedo con esta arquitectura o ajusto alcance (p. ej. omitir portal vendedor en la primera iteración, o integrar directamente sobre `commodity_trades` en lugar de crear tabla `operations`)?
