@@ -353,7 +353,7 @@ export const extractCertificate = createServerFn({ method: "POST" })
       .insert({
         document_id: data.document_id,
         model: "google/gemini-3.6-flash",
-        fields: fields as unknown as Record<string, unknown>,
+        fields: fields as unknown as Json,
         raw_text: rawText.slice(0, 8000),
         confidence: null,
       })
