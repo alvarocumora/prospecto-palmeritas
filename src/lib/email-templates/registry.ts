@@ -16,6 +16,7 @@ import { template as contactMessageInternal } from "./contact-message-internal";
 import { template as commodityInquiryInternal } from "./commodity-inquiry-internal";
 import { template as inquiryUpdateBuyer } from "./inquiry-update-buyer";
 import { template as signRequestSigner } from "./sign-request-signer";
+import { template as signReminderSigner } from "./sign-reminder-signer";
 import { template as signCompletedOwner } from "./sign-completed-owner";
 import { template as signCompletedInternal } from "./sign-completed-internal";
 import { template as shipmentUpdate } from "./shipment-update";
