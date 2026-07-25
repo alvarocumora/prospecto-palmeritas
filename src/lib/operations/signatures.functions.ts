@@ -266,7 +266,7 @@ export const getOperationSignatureRequest = createServerFn({ method: "POST" })
 
     const { data: env } = await sb
       .from("signature_envelopes")
-      .select("id, operation_id, operation_document_id, document_title, document_hash, status, required_signers, completed_signers, expires_at, metadata")
+      .select("id, operation_id, operation_document_id, signed_document_id, document_title, document_hash, status, required_signers, completed_signers, expires_at, metadata")
       .eq("id", sig.envelope_id)
       .maybeSingle();
     if (!env) throw new Error("Sobre no encontrado");
