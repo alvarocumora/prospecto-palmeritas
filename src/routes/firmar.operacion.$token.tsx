@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -12,7 +12,13 @@ import {
   Clock,
   ExternalLink,
   Download,
+  Droplets,
 } from "lucide-react";
+import {
+  fetchAndStamp,
+  triggerBlobDownload,
+  type SignerWatermark,
+} from "@/lib/documents/watermark";
 import { MarketingHeader, MarketingFooter } from "@/components/shell/AppShell";
 import {
   getOperationSignatureRequest,
