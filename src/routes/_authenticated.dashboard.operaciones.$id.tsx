@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Copy, RefreshCw, Ban, Activity, Users } from "lucide-react";
 import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
+import { OperationSignaturesPanel } from "@/features/operations/OperationSignaturesPanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/operaciones/$id")({
   head: () => ({
