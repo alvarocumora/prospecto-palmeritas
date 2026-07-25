@@ -150,9 +150,19 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
             <div className="mt-1 font-serif text-lg">{copy.title}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">Operación</div>
+            <div className="flex items-center justify-end gap-2 text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">
+              <span
+                title={live ? "Actualizaciones en vivo activas" : "Sin conexión en vivo — actualiza al interactuar"}
+                className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 ${live ? "border-emerald-300 bg-emerald-50 text-emerald-700" : "border-[hsl(var(--hairline))] bg-white text-[hsl(var(--content-subtle))]"}`}
+              >
+                <Radio className={`h-3 w-3 ${live ? "animate-pulse" : ""}`} />
+                {live ? "En vivo" : "Offline"}
+              </span>
+              <span>Operación</span>
+            </div>
             <div className="mt-1 font-mono text-sm">{op.code}</div>
           </div>
+
         </div>
       </header>
 
