@@ -62,3 +62,15 @@ segundo store de catastro. Propuesta:
 
 Esto se hace **después** de versionar el esquema drifteado (este bloque) y con
 confirmación, para no romper contratos del front.
+
+## Progreso de reconciliación (motores → cadastre_national)
+
+- ✅ **Terreno franco.** `tenencia_terreno_franco` retargeteada a `cadastre_national`
+  (`20260725200000_reconcilia_terreno_franco_cadastre.sql`): misma firma/salida
+  (drop-in para el front), vocabulario real `status ∈ {vigente, en_tramite,
+  vencida, cancelada}` (verificado en `functions/_shared/sernageomin.ts`), ocupan
+  vigente+en_tramite, filas vigentes `archived_at IS NULL`. 5 tests sobre la tabla
+  canónica.
+- ⬜ Patentes (RPC `patente_estimada(external_id)` sobre `area_ha/tipo` + escala/UTM).
+- ⬜ Obligaciones (job apuntando a `cadastre_national`).
+- ⬜ Código de Minería (RPC de validación geométrica sobre `geom`).
