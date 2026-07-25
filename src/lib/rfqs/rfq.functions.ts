@@ -214,7 +214,7 @@ export const applyToRfq = createServerFn({ method: "POST" })
       .insert({
         rfq_id: data.rfq_id,
         supplier_id: data.supplier_id,
-        status: "postulado",
+        status: "pending",
         notes: data.notes,
         application_score: r?.risk_score ?? null,
       })
