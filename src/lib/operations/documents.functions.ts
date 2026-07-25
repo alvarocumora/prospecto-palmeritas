@@ -105,13 +105,15 @@ export const uploadOperationDocument = createServerFn({ method: "POST" })
     });
     if (upErr) throw new Error(`No se pudo subir: ${upErr.message}`);
 
-    const visibility: Visibility =
-      data.visibility ??
-      (uploaderRole === "buyer"
-        ? "buyer_shared"
-        : uploaderRole === "seller"
-          ? "seller_shared"
-          : "all_parties");
+    // Visibility siempre está segregada por rol del uploader:
+    // - buyer/seller (portal externo) → solo su carpeta compartida con Geocapitals,
+    //   no pueden elegir "internal" ni la carpeta del rol contrario.
+    // - geocapitals (staff) → puede definir cualquier visibilidad.
+    let visibility: Visibility;
+    if (uploaderRole === "buyer") visibility = "buyer_shared";
+    else if (uploaderRole === "seller") visibility = "seller_shared";
+    else visibility = data.visibility ?? "all_parties";
+
 
     const { data: doc, error: docErr } = await sb
       .from("operation_documents")
@@ -201,6 +203,9 @@ export const reviewOperationDocument = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = await admin();
+    // Solo staff Geocapitals puede revisar documentos.
+    const { data: isStaff } = await sb.rpc("is_gc_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Solo staff Geocapitals puede revisar documentos");
     const { data: doc, error } = await sb
       .from("operation_documents")
       .update({
@@ -213,6 +218,7 @@ export const reviewOperationDocument = createServerFn({ method: "POST" })
       .select("operation_id")
       .single();
     if (error) throw error;
+
     await sb.from("operation_access_logs").insert({
       operation_id: doc.operation_id,
       actor_user_id: context.userId,
@@ -229,6 +235,9 @@ export const freezeOperationDocument = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => z.object({ document_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();
+    // Solo staff Geocapitals puede congelar (sella la versión inmutable).
+    const { data: isStaff } = await sb.rpc("is_gc_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Solo staff Geocapitals puede congelar documentos");
     const { data: doc, error } = await sb
       .from("operation_documents")
       .update({ is_frozen: true, frozen_at: new Date().toISOString() })
