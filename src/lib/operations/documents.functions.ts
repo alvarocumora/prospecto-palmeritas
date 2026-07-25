@@ -105,13 +105,15 @@ export const uploadOperationDocument = createServerFn({ method: "POST" })
     });
     if (upErr) throw new Error(`No se pudo subir: ${upErr.message}`);
 
-    const visibility: Visibility =
-      data.visibility ??
-      (uploaderRole === "buyer"
-        ? "buyer_shared"
-        : uploaderRole === "seller"
-          ? "seller_shared"
-          : "all_parties");
+    // Visibility siempre está segregada por rol del uploader:
+    // - buyer/seller (portal externo) → solo su carpeta compartida con Geocapitals,
+    //   no pueden elegir "internal" ni la carpeta del rol contrario.
+    // - geocapitals (staff) → puede definir cualquier visibilidad.
+    let visibility: Visibility;
+    if (uploaderRole === "buyer") visibility = "buyer_shared";
+    else if (uploaderRole === "seller") visibility = "seller_shared";
+    else visibility = data.visibility ?? "all_parties";
+
 
     const { data: doc, error: docErr } = await sb
       .from("operation_documents")
