@@ -299,21 +299,55 @@ export const regenerateInvitation = createServerFn({ method: "POST" })
         invited_name: name,
         created_by: context.userId,
       })
-      .select("secure_token")
+      .select("secure_token, expires_at")
       .single();
     if (error) throw error;
+
+    // Envío inmediato del correo con el nuevo link
+    const { data: fullOp } = await supabaseAdmin
+      .from("operations")
+      .select("code, name, commodity, incoterm, quantity_monthly, quantity_total, unit, origin_country, destination_country")
+      .eq("id", data.operation_id)
+      .maybeSingle();
+    let emailed = false;
+    if (fullOp) {
+      try {
+        const { sendPortalInvitationEmail } = await import("./dispatch.server");
+        const res = await sendPortalInvitationEmail({
+          role: data.role,
+          email,
+          name: name ?? null,
+          token: inv.secure_token as string,
+          operationId: data.operation_id,
+          operationCode: fullOp.code as string,
+          operationName: fullOp.name as string,
+          commodity: fullOp.commodity as string,
+          incoterm: (fullOp.incoterm as string | null) ?? null,
+          quantityMonthly: (fullOp.quantity_monthly as number | null) ?? null,
+          quantityTotal: (fullOp.quantity_total as number | null) ?? null,
+          unit: (fullOp.unit as string | null) ?? null,
+          originCountry: (fullOp.origin_country as string | null) ?? null,
+          destinationCountry: (fullOp.destination_country as string | null) ?? null,
+          expiresAt: (inv.expires_at as string | null) ?? null,
+        });
+        emailed = res.ok === true;
+      } catch (e) {
+        console.error("[operations] regenerate email failed", e);
+      }
+    }
 
     await supabaseAdmin.from("operation_access_logs").insert({
       operation_id: data.operation_id,
       actor_user_id: context.userId,
       actor_role: "geocapitals",
       action: "invitation_regenerated",
-      metadata: { role: data.role },
+      metadata: { role: data.role, emailed } as never,
     });
 
     return {
       token: inv.secure_token,
       url: publicUrl(`/portal/${data.role}/${encodeURIComponent(inv.secure_token as string)}`),
+      emailed,
     };
   });
 
