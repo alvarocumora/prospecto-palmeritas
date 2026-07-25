@@ -22,6 +22,7 @@ import { Route as OportunidadesRouteImport } from './routes/oportunidades'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
+import { Route as InscripcionRouteImport } from './routes/inscripcion'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as ContactoRouteImport } from './routes/contacto'
@@ -48,6 +49,7 @@ import { Route as LiveFrancoRouteImport } from './routes/live.franco'
 import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
 import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
+import { Route as InscripcionGraciasRouteImport } from './routes/inscripcion.gracias'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
@@ -57,6 +59,7 @@ import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated.panel'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
@@ -117,6 +120,7 @@ import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_aut
 import { Route as AuthenticatedDashboardFieldMapRouteImport } from './routes/_authenticated.dashboard.field-map'
 import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
 import { Route as AuthenticatedDashboardEnviosRouteImport } from './routes/_authenticated.dashboard.envios'
+import { Route as AuthenticatedDashboardEnlacesRouteImport } from './routes/_authenticated.dashboard.enlaces'
 import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
 import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
@@ -225,6 +229,11 @@ const McpRoute = McpRouteImport.update({
 const InversionistasRoute = InversionistasRouteImport.update({
   id: '/inversionistas',
   path: '/inversionistas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscripcionRoute = InscripcionRouteImport.update({
+  id: '/inscripcion',
+  path: '/inscripcion',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EnRoute = EnRouteImport.update({
@@ -356,6 +365,11 @@ const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
   path: '/invitations/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InscripcionGraciasRoute = InscripcionGraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
+  getParentRoute: () => InscripcionRoute,
+} as any)
 const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
   id: '/hooks/sync-pjud',
   path: '/hooks/sync-pjud',
@@ -400,6 +414,11 @@ const CatastroGlobalRoute = CatastroGlobalRouteImport.update({
   id: '/catastro/global',
   path: '/catastro/global',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
@@ -749,6 +768,12 @@ const AuthenticatedDashboardEnviosRoute =
     path: '/dashboard/envios',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardEnlacesRoute =
+  AuthenticatedDashboardEnlacesRouteImport.update({
+    id: '/dashboard/enlaces',
+    path: '/dashboard/enlaces',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardDronesRoute =
   AuthenticatedDashboardDronesRouteImport.update({
     id: '/dashboard/drones',
@@ -1017,6 +1042,7 @@ export interface FileRoutesByFullPath {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRouteWithChildren
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1032,6 +1058,7 @@ export interface FileRoutesByFullPath {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1041,6 +1068,7 @@ export interface FileRoutesByFullPath {
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
+  '/inscripcion/gracias': typeof InscripcionGraciasRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1081,6 +1109,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
+  '/dashboard/enlaces': typeof AuthenticatedDashboardEnlacesRoute
   '/dashboard/envios': typeof AuthenticatedDashboardEnviosRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
@@ -1170,6 +1199,7 @@ export interface FileRoutesByTo {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRouteWithChildren
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1185,6 +1215,7 @@ export interface FileRoutesByTo {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/panel': typeof AuthenticatedPanelRoute
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1194,6 +1225,7 @@ export interface FileRoutesByTo {
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
+  '/inscripcion/gracias': typeof InscripcionGraciasRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1234,6 +1266,7 @@ export interface FileRoutesByTo {
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
   '/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
+  '/dashboard/enlaces': typeof AuthenticatedDashboardEnlacesRoute
   '/dashboard/envios': typeof AuthenticatedDashboardEnviosRoute
   '/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
@@ -1325,6 +1358,7 @@ export interface FileRoutesById {
   '/contacto': typeof ContactoRoute
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
+  '/inscripcion': typeof InscripcionRouteWithChildren
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1340,6 +1374,7 @@ export interface FileRoutesById {
   '/visor-3d': typeof Visor3dRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/panel': typeof AuthenticatedPanelRoute
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
   '/catastro/precios': typeof CatastroPreciosRoute
@@ -1349,6 +1384,7 @@ export interface FileRoutesById {
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
+  '/inscripcion/gracias': typeof InscripcionGraciasRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1389,6 +1425,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
   '/_authenticated/dashboard/drilling': typeof AuthenticatedDashboardDrillingRoute
   '/_authenticated/dashboard/drones': typeof AuthenticatedDashboardDronesRoute
+  '/_authenticated/dashboard/enlaces': typeof AuthenticatedDashboardEnlacesRoute
   '/_authenticated/dashboard/envios': typeof AuthenticatedDashboardEnviosRoute
   '/_authenticated/dashboard/estimation': typeof AuthenticatedDashboardEstimationRoute
   '/_authenticated/dashboard/field-map': typeof AuthenticatedDashboardFieldMapRoute
@@ -1480,6 +1517,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1495,6 +1533,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/panel'
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -1504,6 +1543,7 @@ export interface FileRouteTypes {
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
+    | '/inscripcion/gracias'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -1544,6 +1584,7 @@ export interface FileRouteTypes {
     | '/dashboard/deals'
     | '/dashboard/drilling'
     | '/dashboard/drones'
+    | '/dashboard/enlaces'
     | '/dashboard/envios'
     | '/dashboard/estimation'
     | '/dashboard/field-map'
@@ -1633,6 +1674,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1648,6 +1690,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/panel'
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -1657,6 +1700,7 @@ export interface FileRouteTypes {
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
+    | '/inscripcion/gracias'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -1697,6 +1741,7 @@ export interface FileRouteTypes {
     | '/dashboard/deals'
     | '/dashboard/drilling'
     | '/dashboard/drones'
+    | '/dashboard/enlaces'
     | '/dashboard/envios'
     | '/dashboard/estimation'
     | '/dashboard/field-map'
@@ -1787,6 +1832,7 @@ export interface FileRouteTypes {
     | '/contacto'
     | '/empresas'
     | '/en'
+    | '/inscripcion'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1802,6 +1848,7 @@ export interface FileRouteTypes {
     | '/visor-3d'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/panel'
     | '/catastro/global'
     | '/catastro/mapa'
     | '/catastro/precios'
@@ -1811,6 +1858,7 @@ export interface FileRouteTypes {
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
+    | '/inscripcion/gracias'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -1851,6 +1899,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/deals'
     | '/_authenticated/dashboard/drilling'
     | '/_authenticated/dashboard/drones'
+    | '/_authenticated/dashboard/enlaces'
     | '/_authenticated/dashboard/envios'
     | '/_authenticated/dashboard/estimation'
     | '/_authenticated/dashboard/field-map'
@@ -1942,6 +1991,7 @@ export interface RootRouteChildren {
   ContactoRoute: typeof ContactoRoute
   EmpresasRoute: typeof EmpresasRoute
   EnRoute: typeof EnRoute
+  InscripcionRoute: typeof InscripcionRouteWithChildren
   InversionistasRoute: typeof InversionistasRoute
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
@@ -2101,6 +2151,13 @@ declare module '@tanstack/react-router' {
       path: '/inversionistas'
       fullPath: '/inversionistas'
       preLoaderRoute: typeof InversionistasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscripcion': {
+      id: '/inscripcion'
+      path: '/inscripcion'
+      fullPath: '/inscripcion'
+      preLoaderRoute: typeof InscripcionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/en': {
@@ -2285,6 +2342,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvitationsTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/inscripcion/gracias': {
+      id: '/inscripcion/gracias'
+      path: '/gracias'
+      fullPath: '/inscripcion/gracias'
+      preLoaderRoute: typeof InscripcionGraciasRouteImport
+      parentRoute: typeof InscripcionRoute
+    }
     '/hooks/sync-pjud': {
       id: '/hooks/sync-pjud'
       path: '/hooks/sync-pjud'
@@ -2347,6 +2411,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/catastro/global'
       preLoaderRoute: typeof CatastroGlobalRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
@@ -2768,6 +2839,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardEnviosRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/enlaces': {
+      id: '/_authenticated/dashboard/enlaces'
+      path: '/dashboard/enlaces'
+      fullPath: '/dashboard/enlaces'
+      preLoaderRoute: typeof AuthenticatedDashboardEnlacesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/drones': {
       id: '/_authenticated/dashboard/drones'
       path: '/dashboard/drones'
@@ -3173,6 +3251,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedPanelRoute: typeof AuthenticatedPanelRoute
   AuthenticatedDashboard3dProRoute: typeof AuthenticatedDashboard3dProRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
@@ -3191,6 +3270,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
   AuthenticatedDashboardDrillingRoute: typeof AuthenticatedDashboardDrillingRoute
   AuthenticatedDashboardDronesRoute: typeof AuthenticatedDashboardDronesRoute
+  AuthenticatedDashboardEnlacesRoute: typeof AuthenticatedDashboardEnlacesRoute
   AuthenticatedDashboardEnviosRoute: typeof AuthenticatedDashboardEnviosRoute
   AuthenticatedDashboardEstimationRoute: typeof AuthenticatedDashboardEstimationRoute
   AuthenticatedDashboardFieldMapRoute: typeof AuthenticatedDashboardFieldMapRoute
@@ -3244,6 +3324,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedPanelRoute: AuthenticatedPanelRoute,
   AuthenticatedDashboard3dProRoute: AuthenticatedDashboard3dProRoute,
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
@@ -3266,6 +3347,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardDealsRoute: AuthenticatedDashboardDealsRoute,
   AuthenticatedDashboardDrillingRoute: AuthenticatedDashboardDrillingRoute,
   AuthenticatedDashboardDronesRoute: AuthenticatedDashboardDronesRoute,
+  AuthenticatedDashboardEnlacesRoute: AuthenticatedDashboardEnlacesRoute,
   AuthenticatedDashboardEnviosRoute: AuthenticatedDashboardEnviosRoute,
   AuthenticatedDashboardEstimationRoute: AuthenticatedDashboardEstimationRoute,
   AuthenticatedDashboardFieldMapRoute: AuthenticatedDashboardFieldMapRoute,
@@ -3339,6 +3421,18 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface InscripcionRouteChildren {
+  InscripcionGraciasRoute: typeof InscripcionGraciasRoute
+}
+
+const InscripcionRouteChildren: InscripcionRouteChildren = {
+  InscripcionGraciasRoute: InscripcionGraciasRoute,
+}
+
+const InscripcionRouteWithChildren = InscripcionRoute._addFileChildren(
+  InscripcionRouteChildren,
+)
+
 interface ProyectosRouteChildren {
   ProyectosListingIdRoute: typeof ProyectosListingIdRoute
 }
@@ -3385,6 +3479,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactoRoute: ContactoRoute,
   EmpresasRoute: EmpresasRoute,
   EnRoute: EnRoute,
+  InscripcionRoute: InscripcionRouteWithChildren,
   InversionistasRoute: InversionistasRoute,
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,

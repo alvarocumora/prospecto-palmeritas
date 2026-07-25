@@ -1,105 +1,116 @@
 
-# Plan: Tablero Trade v2 + Fichas Commodities enriquecidas
+# Plan: Portal Proveedores + Buyer RFQ (integrados en Geocapitals)
 
-Aplicamos todas las mejoras seleccionadas. Trabajo se divide en cuatro entregables independientes que comparten una capa de datos común (`commodity_prices`, `freight_rates`, `market_comparables` ya existentes).
+Dos módulos hermanos bajo el mismo proyecto y con el mismo tema visual (Institutional Modernist: papel hueso, tinta, cobalto, serif). Entrega por fases; cada fase deja algo repartible.
 
-## 1. Tablero de Trades — mejoras UX
+---
 
-**Columnas configurables + WIP limits**
-- Nueva tabla `trade_board_prefs` (por usuario): `hidden_stages[]`, `wip_limits jsonb`, `column_order[]`.
-- Popover "Configurar tablero" en `TradeBoardView` para ocultar/mostrar etapas, reordenar (drag) y fijar WIP por columna.
-- Banner rojo cuando una columna excede su WIP; bloqueo suave del drop (toast de aviso, no impide).
+## Alcance por módulo
 
-**KPIs avanzados + aging**
-- Extender `boardSummary` con: días promedio por etapa, trades "stuck" (>N días sin evento en `trade_events`), forecast ponderado (Σ valor × probabilidad por etapa: ICPO 10%, LOI 25%, FCO 50%, SPA 70%, SBLC 85%, Embarque 95%, Closed 100%).
-- `TradeCard` muestra badge de días en etapa; color rojo si supera SLA.
-- Fila KPI extendida: Aging medio, Forecast ponderado, Stuck count.
+**A) Portal Proveedores** (`/inscripcion` público + `/panel` proveedor + `/dashboard/bandeja` interno)
+- Wizard móvil 4 pasos con guardado parcial, validación por país (RUT/RUC/CUIT/NIT).
+- Link compartible con token, QR y contador (`/dashboard/enlaces`).
+- Cuenta del proveedor (magic link) para seguir estado y subir documentos.
+- Bandeja interna con comparador, señales de alerta (lista de hechos, sin puntaje).
+- IA lectora de certificados (Lovable AI Gateway, `google/gemini-3.6-flash` multimodal).
+- Cumplimiento base Ley 21.719: consentimiento versionado, /privacidad, export/delete cuenta, log de accesos.
 
-**Vista Timeline/Gantt**
-- Toggle `view=kanban|timeline` en el search param.
-- `TradeTimelineView`: filas = trades, columnas = etapas del pipeline, marcador sobre la etapa actual + barra de progreso hasta cerrado; hover muestra fechas de eventos (`trade_events`).
+**B) Buyer RFQ** (`/dashboard/rfq/*` interno + `/rfq/$publicId` público)
+- Dashboard KPIs (RFQs, proveedores, DD, contratos).
+- Crear RFQ multi-pestaña (general, productos, compliance REICON checklist).
+- Perfil de proveedor con KYC/ESG/Compliance/Risk Score.
+- Workflow: Pending → Review → Approved → Commercial → ICPO → SPA → Shipment.
+- Risk Engine ponderado (Mining 30, Corporate 20, Financial 15, ESG 10, Compliance 25).
+- Ficha RFQ pública con "Apply as Supplier" que aterriza en el Portal Proveedores.
+- GeoCompliance AI: revisa docs, detecta faltantes, resume, recomienda.
 
-**Bulk actions + export**
-- Modo selección múltiple (checkbox en `TradeCard`).
-- Acciones batch: cambiar etapa, asignar responsable, exportar filtrados a CSV/XLSX (usando `xlsx` ya presente o `sheetjs`).
+**Puente único**: un `supplier_profiles` compartido. Un proveedor que se inscribe por `/inscripcion` puede aparecer en `/dashboard/bandeja` y postular a RFQs.
 
-## 2. Ficha de commodity — enriquecimiento
+---
 
-Se aplica a `SupplierSheetPdf` (server-side) y a un nuevo panel `CommodityIntelPanel` mostrado en el detalle del trade y en la ficha web (`/lot/$id`).
+## Diseño
 
-**Precio live + histórico**
-- Panel superior con: último precio, variación 24h/7d/30d, sparkline 30/90d.
-- Datos leídos de `commodity_prices` (ver §3).
+Todo bajo `data-theme="im-light"` con tokens semánticos ya existentes (`surface`, `content`, `hairline`, `accent-brand`). Se ignoran las paletas alternas del brief (verde mineral, azul SAP). Tipografía: la serif display + Inter + IBM Plex Mono para cifras que ya usa la plataforma. Componentes shadcn ya presentes.
 
-**Calculadora flete CIF/FOB**
-- Selector origen (puerto Chile: San Antonio, Valparaíso, Mejillones, Iquique) → destino (Shanghai, Rotterdam, Los Angeles, Busan, Antwerp, Hamburg).
-- Muestra USD/MT, tránsito estimado, fuente y fecha; permite override manual.
-- Cálculo final: FOB = precio × qty; CIF = FOB + flete + seguro (0.15% default).
+---
 
-**Comparables de mercado**
-- Consulta `market_comparables` filtrando por commodity/grade y últimos 180d.
-- Tabla compacta: fecha, ley, precio, incoterm, región (contraparte anonimizada).
+## Fases
 
-**Escenarios de margen**
-- Mini simulador: sliders de precio (±15%), flete (±30%), ley (±10%).
-- Salida: margen bruto USD, margen %, NPV rápido (single-period a 30d con costo capital 8%).
+**Fase 1 — Base de datos + seguridad (1 migración grande)**
+- Tablas: `suppliers`, `supplier_offers`, `offer_elements`, `supplier_documents`, `supplier_events`, `invitation_links`, `rfqs`, `rfq_products`, `rfq_compliance_items`, `supplier_scores`, `risk_assessments`, `rfq_applications`.
+- RLS estricta: `suppliers` legible solo por su `owner_user_id` o staff (`has_role`). `invitation_links` solo staff. `rfqs` legibles por creador + assigned staff; ficha pública vía server fn dedicada.
+- GRANTs explícitos (authenticated + service_role, sin anon salvo lookup público por token via server fn).
+- Consent log + `privacy_policy_versions`.
 
-Los cuatro bloques se serializan también al PDF (nuevas secciones "Market intel", "Logística", "Comparables", "Sensibilidad") manteniendo la matriz institucional (`renderGeocapitalsPdf`).
+**Fase 2 — Portal Proveedores mínimo repartible**
+- `/inscripcion` wizard 4 pasos con `useLocalStorage` para draft + `createServerFn` público con rate-limit por IP y honeypot (sin Turnstile inicial; se agrega en Fase 5).
+- `/inscripcion/gracias` con folio, próximos pasos y CTA "crear cuenta".
+- `/dashboard/enlaces` (staff) genera tokens + copy WhatsApp + QR descargable.
+- `/panel` (proveedor autenticado bajo `_authenticated`) con estado en lenguaje claro, edición de contacto, agregar oferta, subir docs.
+- Bucket privado `supplier-docs` con URLs firmadas cortas.
 
-## 3. Fuente de precios (híbrida en cascada)
+**Fase 3 — Bandeja interna + IA de certificados**
+- `/dashboard/bandeja` (tabla densa + filtros + comparador side-by-side).
+- Server fn `extractCertificatePdf` con Lovable AI Gateway (multimodal) que sube el archivo, extrae tabla elemento/valor y guarda en `offer_elements` con `confidence` y `pending_confirmation=true`. UI muestra el recorte junto al valor.
+- Señales de alerta calculadas del lado servidor y renderizadas como bullets con evidencia.
 
-Se implementa la cascada completa; cada fuente rellena `commodity_prices` con `source` distinto y el consumidor prioriza la más fresca disponible.
+**Fase 4 — Buyer RFQ**
+- `/dashboard/rfq` (lista + KPIs).
+- `/dashboard/rfq/nuevo` (wizard tabs: General, Productos, Compliance REICON).
+- `/dashboard/rfq/$id` (detalle + postulaciones + timeline).
+- `/rfq/$publicId` ficha pública con "Apply as Supplier" → prellena `/inscripcion?ref=RFQ-xxx`.
+- Risk Engine puro (`src/lib/risk.ts` + tests). Badge Low/Med/High.
+- Export PDF del RFQ vía `renderGeocapitalsPdf`.
 
-1. **LME oficial (Metals-API / Metalpriceapi)** para Cu, Zn, Pb, Ni, Sn, Al, Sb.
-   - Requiere secret `METALS_API_KEY`.
-   - Cron horario (`pg_cron` → `/api/public/hooks/prices-lme`).
-2. **Yahoo Finance** (sin key, delay 15min) como fallback y para futuros COMEX (HG=F, SI=F, GC=F).
-   - Cron cada 30 min → `/api/public/hooks/prices-yahoo`.
-3. **SHFE + Fastmarkets scraping** para REE, antimonio, tierras raras.
-   - Job diario, tolerante a fallos, marca `source='shfe'|'fastmarkets'` con timestamp.
-4. **Manual + CSV semanal** — página `/dashboard/precios` con upload CSV (columnas: commodity, grade, price_usd, currency, date, source) e histórico editable.
+**Fase 5 — Compliance + endurecimiento**
+- `/privacidad` versionada + tabla `privacy_consents`.
+- Rutas de export/delete de datos del proveedor desde `/panel/mis-datos`.
+- Log de acceso a PII (trigger).
+- Turnstile en `/inscripcion` (secret `TURNSTILE_SECRET`).
+- Job de anonimización de descartados > N días.
 
-Tabla `commodity_prices` ya existe (9 col). Añadir índice compuesto `(commodity, price_date DESC)` si falta.
+**Fase 6 — GeoCompliance AI (RFQ)**
+- Server fn que evalúa un `supplier_profile` completo contra el checklist REICON del RFQ, retorna resumen + faltantes + recomendación (Approve / Request More Info / Reject), guardado en `risk_assessments`.
 
-Vista `v_commodity_price_latest` que devuelve el mejor precio por commodity aplicando prioridad: manual > LME > SHFE > Yahoo, cayendo hacia el siguiente si el más reciente supera 72h.
+---
 
-## 4. Flete — tabla estática por ruta
+## Detalle técnico
 
-Nueva tabla `freight_rates`:
+- **Stack**: TanStack Start, server fns bajo `src/lib/suppliers/*.functions.ts` y `src/lib/rfq/*.functions.ts`. Rutas autenticadas bajo `src/routes/_authenticated/`. Rutas públicas top-level.
+- **IA**: helper `createLovableAiGatewayProvider` ya existe. Nuevo `src/lib/ai/certificate-extract.server.ts` con `generateText` + `Output.object` (schema plano, sin `.min/.max`), fallback `NoObjectGeneratedError`. Modelo por defecto: `google/gemini-3.6-flash`.
+- **Storage**: bucket privado `supplier-docs` vía `supabase--storage_create_bucket`. Subida cliente → server fn firma URL PUT.
+- **Compresión imágenes**: en cliente antes de subir (canvas resize a 2000px, calidad 0.8).
+- **Nunca datos bancarios** en formularios ni tablas.
+- **Rate limit** en server fn público: tabla `public_form_hits` con TTL 1h por IP+phone.
+- **Puente Buyer↔Supplier**: `rfq_applications(supplier_id, rfq_id, status, application_score)` con trigger que actualiza scores desde `supplier_scores`.
+
+---
+
+## Entregas incrementales
+
+```text
+Fase 1 → migración aplicada, DB lista
+Fase 2 → link compartible funcional por WhatsApp (repartible)
+Fase 3 → equipo puede triar ofertas + IA de certificados
+Fase 4 → compradores publican RFQs y reciben postulaciones
+Fase 5 → cumple Ley 21.719 antes de dic-2026
+Fase 6 → recomendaciones automáticas de compliance
 ```
-port_origin text, port_destination text, container_type text ('20ft'|'40ft'|'bulk_mt'),
-usd_rate numeric, transit_days int, valid_from date, source text, notes text
-```
-Seed inicial con rutas Chile → CN/EU/US/KR (San Antonio→Shanghai, Valparaíso→Rotterdam, Mejillones→Busan, Iquique→Los Angeles, etc.) usando referencias públicas Drewry/Freightos H1 2026 (editable después).
 
-Función `getFreightQuote(origin, destination, mode)` en `src/lib/freight.ts`. Página `/dashboard/fletes` para editar tarifas (rol admin/broker).
+Cada fase compila, corre tests y queda usable sin depender de la siguiente.
 
-## Detalles técnicos
+---
 
-- **Nuevas tablas**: `trade_board_prefs`, `freight_rates`. Ambas con GRANTs + RLS por usuario/organización.
-- **Nuevas server functions** (`src/lib/`): `boardPrefs.functions.ts`, `commodityIntel.functions.ts`, `freight.functions.ts`, `prices.functions.ts`.
-- **Nuevas rutas públicas** (cron endpoints): `src/routes/api/public/hooks/prices-lme.ts`, `.../prices-yahoo.ts`, `.../prices-shfe.ts`, todas con `apikey` header check.
-- **Nuevas rutas UI**:
-  - `_authenticated/dashboard/precios.tsx` (CSV upload + tabla)
-  - `_authenticated/dashboard/fletes.tsx` (editor rutas)
-- **Componentes nuevos**:
-  - `TradeBoardConfig.tsx` (popover columnas/WIP)
-  - `TradeTimelineView.tsx`
-  - `TradeBulkBar.tsx`
-  - `CommodityIntelPanel.tsx` (con sub-componentes: `PriceStrip`, `FreightCalc`, `ComparablesTable`, `MarginSim`)
-- **Secretos requeridos**: `METALS_API_KEY` (se solicitará vía `add_secret` cuando lleguemos al paso 3.1).
-- Diseño Institutional Modernist en todo (tokens `surface/content/hairline/accent-brand`, serif display en headers, `data-theme="im-light"`).
+## Fuera de alcance (explícito)
 
-## Orden de implementación
+- WhatsApp Business API oficial (se usa `wa.me`).
+- Chat en tiempo real proveedor↔analista (mensajes asíncronos simples).
+- Verificación automática de concesiones no chilenas.
+- Scoring crediticio de personas.
+- Firma electrónica y blockchain (reutilizar módulo existente cuando aplique, no re-construir).
 
-1. Migraciones (`trade_board_prefs`, `freight_rates`, índice precios, vista `v_commodity_price_latest`) + seed rutas.
-2. Panel `CommodityIntelPanel` (usa datos existentes de `commodity_prices` y `market_comparables`).
-3. Mejoras tablero (config, KPIs+aging, timeline, bulk/export).
-4. Ingesta precios (LME → Yahoo → SHFE → manual) + página `/dashboard/precios` y `/dashboard/fletes`.
-5. Integración de intel al PDF de fichas.
-6. QA visual (Playwright: kanban, timeline, ficha con panel intel, PDF renderizado).
+---
 
-## Fuera de alcance
+## Confirmación antes de arrancar
 
-- Flete API live (Searates/Freightos) — se deja `getFreightQuote` extensible pero sin proveedor externo.
-- Comparables anonimizados con firma criptográfica — se usan los datos ya cargados en `market_comparables`.
+Voy a arrancar por **Fase 1 (migración) + Fase 2 (portal público repartible)** en el primer sprint de build. ¿Ok o prefieres que empiece por el Buyer RFQ (Fase 4)?

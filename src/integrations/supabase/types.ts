@@ -8073,6 +8073,39 @@ export type Database = {
           },
         ]
       }
+      invitation_links: {
+        Row: {
+          active: boolean
+          completions_count: number
+          created_at: string
+          created_by: string | null
+          id: string
+          label: string
+          opens_count: number
+          token: string
+        }
+        Insert: {
+          active?: boolean
+          completions_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label: string
+          opens_count?: number
+          token: string
+        }
+        Update: {
+          active?: boolean
+          completions_count?: number
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          label?: string
+          opens_count?: number
+          token?: string
+        }
+        Relationships: []
+      }
       job_logs: {
         Row: {
           created_at: string
@@ -10131,6 +10164,53 @@ export type Database = {
         }
         Relationships: []
       }
+      offer_elements: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          element: string
+          evidence_document_id: string | null
+          id: string
+          offer_id: string
+          pending_confirmation: boolean
+          source: string
+          unit: string | null
+          value: number | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          element: string
+          evidence_document_id?: string | null
+          id?: string
+          offer_id: string
+          pending_confirmation?: boolean
+          source?: string
+          unit?: string | null
+          value?: number | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          element?: string
+          evidence_document_id?: string | null
+          id?: string
+          offer_id?: string
+          pending_confirmation?: boolean
+          source?: string
+          unit?: string | null
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_elements_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offering_subscriptions: {
         Row: {
           amount_usd: number
@@ -10838,6 +10918,68 @@ export type Database = {
           mo_usd_lb?: number | null
           source?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      privacy_consents: {
+        Row: {
+          accepted_at: string
+          email: string
+          id: string
+          ip_hash: string | null
+          policy_version: string
+          supplier_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          accepted_at?: string
+          email: string
+          id?: string
+          ip_hash?: string | null
+          policy_version: string
+          supplier_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          accepted_at?: string
+          email?: string
+          id?: string
+          ip_hash?: string | null
+          policy_version?: string
+          supplier_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "privacy_consents_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      privacy_policy_versions: {
+        Row: {
+          content_md: string
+          created_at: string
+          effective_at: string
+          id: string
+          version: string
+        }
+        Insert: {
+          content_md: string
+          created_at?: string
+          effective_at?: string
+          id?: string
+          version: string
+        }
+        Update: {
+          content_md?: string
+          created_at?: string
+          effective_at?: string
+          id?: string
+          version?: string
         }
         Relationships: []
       }
@@ -11734,6 +11876,30 @@ export type Database = {
         }
         Relationships: []
       }
+      public_form_hits: {
+        Row: {
+          created_at: string
+          form_name: string
+          id: string
+          ip_hash: string
+          phone_hash: string | null
+        }
+        Insert: {
+          created_at?: string
+          form_name: string
+          id?: string
+          ip_hash: string
+          phone_hash?: string | null
+        }
+        Update: {
+          created_at?: string
+          form_name?: string
+          id?: string
+          ip_hash?: string
+          phone_hash?: string | null
+        }
+        Relationships: []
+      }
       public_holders: {
         Row: {
           created_at: string
@@ -12554,6 +12720,233 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfq_applications: {
+        Row: {
+          application_score: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          rfq_id: string
+          status: Database["public"]["Enums"]["application_status"]
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          application_score?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rfq_id: string
+          status?: Database["public"]["Enums"]["application_status"]
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          application_score?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          rfq_id?: string
+          status?: Database["public"]["Enums"]["application_status"]
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_applications_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rfq_applications_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfq_products: {
+        Row: {
+          created_at: string
+          grade: string | null
+          hs_code: string | null
+          id: string
+          incoterm: string | null
+          packaging: string | null
+          port_destination: string | null
+          port_loading: string | null
+          preferred_origin: string | null
+          product_name: string
+          purity: string | null
+          qty_monthly_mt: number | null
+          qty_total_mt: number | null
+          rfq_id: string
+          target_price_usd: number | null
+        }
+        Insert: {
+          created_at?: string
+          grade?: string | null
+          hs_code?: string | null
+          id?: string
+          incoterm?: string | null
+          packaging?: string | null
+          port_destination?: string | null
+          port_loading?: string | null
+          preferred_origin?: string | null
+          product_name: string
+          purity?: string | null
+          qty_monthly_mt?: number | null
+          qty_total_mt?: number | null
+          rfq_id: string
+          target_price_usd?: number | null
+        }
+        Update: {
+          created_at?: string
+          grade?: string | null
+          hs_code?: string | null
+          id?: string
+          incoterm?: string | null
+          packaging?: string | null
+          port_destination?: string | null
+          port_loading?: string | null
+          preferred_origin?: string | null
+          product_name?: string
+          purity?: string | null
+          qty_monthly_mt?: number | null
+          qty_total_mt?: number | null
+          rfq_id?: string
+          target_price_usd?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_products_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfqs: {
+        Row: {
+          buyer_company: string | null
+          buyer_name: string
+          compliance_checklist: Json
+          contract_duration_months: number | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          destination_country: string | null
+          destination_port: string | null
+          id: string
+          incoterm: string | null
+          is_public: boolean
+          notes: string | null
+          public_ref: string
+          status: Database["public"]["Enums"]["rfq_status"]
+          updated_at: string
+          validity_date: string | null
+        }
+        Insert: {
+          buyer_company?: string | null
+          buyer_name: string
+          compliance_checklist?: Json
+          contract_duration_months?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          destination_country?: string | null
+          destination_port?: string | null
+          id?: string
+          incoterm?: string | null
+          is_public?: boolean
+          notes?: string | null
+          public_ref?: string
+          status?: Database["public"]["Enums"]["rfq_status"]
+          updated_at?: string
+          validity_date?: string | null
+        }
+        Update: {
+          buyer_company?: string | null
+          buyer_name?: string
+          compliance_checklist?: Json
+          contract_duration_months?: number | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          destination_country?: string | null
+          destination_port?: string | null
+          id?: string
+          incoterm?: string | null
+          is_public?: boolean
+          notes?: string | null
+          public_ref?: string
+          status?: Database["public"]["Enums"]["rfq_status"]
+          updated_at?: string
+          validity_date?: string | null
+        }
+        Relationships: []
+      }
+      risk_assessments: {
+        Row: {
+          band: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          missing_documents: Json
+          raw_output: Json | null
+          recommendation: string | null
+          rfq_id: string | null
+          score: number | null
+          summary: string | null
+          supplier_id: string
+        }
+        Insert: {
+          band?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          missing_documents?: Json
+          raw_output?: Json | null
+          recommendation?: string | null
+          rfq_id?: string | null
+          score?: number | null
+          summary?: string | null
+          supplier_id: string
+        }
+        Update: {
+          band?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          missing_documents?: Json
+          raw_output?: Json | null
+          recommendation?: string | null
+          rfq_id?: string | null
+          score?: number | null
+          summary?: string | null
+          supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_assessments_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "risk_assessments_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
             referencedColumns: ["id"]
           },
         ]
@@ -14228,6 +14621,300 @@ export type Database = {
           stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      supplier_documents: {
+        Row: {
+          doc_type: string
+          file_hash: string | null
+          id: string
+          mime_type: string | null
+          offer_id: string | null
+          review_notes: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewer_id: string | null
+          size_bytes: number | null
+          storage_path: string
+          supplier_id: string
+          uploaded_at: string
+        }
+        Insert: {
+          doc_type: string
+          file_hash?: string | null
+          id?: string
+          mime_type?: string | null
+          offer_id?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          supplier_id: string
+          uploaded_at?: string
+        }
+        Update: {
+          doc_type?: string
+          file_hash?: string | null
+          id?: string
+          mime_type?: string | null
+          offer_id?: string | null
+          review_notes?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewer_id?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          supplier_id?: string
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_documents_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_documents_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: string
+          id: string
+          payload: Json
+          supplier_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: string
+          id?: string
+          payload?: Json
+          supplier_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: string
+          id?: string
+          payload?: Json
+          supplier_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_offers: {
+        Row: {
+          accepts_inspection: string
+          can_send_sample: boolean | null
+          chain_of_custody: string | null
+          concession_missing_reason: string | null
+          concession_ref: string | null
+          created_at: string
+          grade_unit: string | null
+          grade_value: number | null
+          has_export_permit: string | null
+          id: string
+          incoterm: string | null
+          material_availability: string | null
+          mine_name: string | null
+          port_or_delivery: string | null
+          presentation: string | null
+          price_ask: string | null
+          price_basis: string | null
+          product: string
+          region: string | null
+          status: Database["public"]["Enums"]["offer_status"]
+          supplier_id: string
+          tonnage_available_t: number | null
+          tonnage_monthly_t: number | null
+          updated_at: string
+        }
+        Insert: {
+          accepts_inspection: string
+          can_send_sample?: boolean | null
+          chain_of_custody?: string | null
+          concession_missing_reason?: string | null
+          concession_ref?: string | null
+          created_at?: string
+          grade_unit?: string | null
+          grade_value?: number | null
+          has_export_permit?: string | null
+          id?: string
+          incoterm?: string | null
+          material_availability?: string | null
+          mine_name?: string | null
+          port_or_delivery?: string | null
+          presentation?: string | null
+          price_ask?: string | null
+          price_basis?: string | null
+          product: string
+          region?: string | null
+          status?: Database["public"]["Enums"]["offer_status"]
+          supplier_id: string
+          tonnage_available_t?: number | null
+          tonnage_monthly_t?: number | null
+          updated_at?: string
+        }
+        Update: {
+          accepts_inspection?: string
+          can_send_sample?: boolean | null
+          chain_of_custody?: string | null
+          concession_missing_reason?: string | null
+          concession_ref?: string | null
+          created_at?: string
+          grade_unit?: string | null
+          grade_value?: number | null
+          has_export_permit?: string | null
+          id?: string
+          incoterm?: string | null
+          material_availability?: string | null
+          mine_name?: string | null
+          port_or_delivery?: string | null
+          presentation?: string | null
+          price_ask?: string | null
+          price_basis?: string | null
+          product?: string
+          region?: string | null
+          status?: Database["public"]["Enums"]["offer_status"]
+          supplier_id?: string
+          tonnage_available_t?: number | null
+          tonnage_monthly_t?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_offers_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_scores: {
+        Row: {
+          compliance_score: number | null
+          corporate_score: number | null
+          esg_score: number | null
+          financial_score: number | null
+          mining_score: number | null
+          risk_band: string | null
+          risk_score: number | null
+          supplier_id: string
+          updated_at: string
+        }
+        Insert: {
+          compliance_score?: number | null
+          corporate_score?: number | null
+          esg_score?: number | null
+          financial_score?: number | null
+          mining_score?: number | null
+          risk_band?: string | null
+          risk_score?: number | null
+          supplier_id: string
+          updated_at?: string
+        }
+        Update: {
+          compliance_score?: number | null
+          corporate_score?: number | null
+          esg_score?: number | null
+          financial_score?: number | null
+          mining_score?: number | null
+          risk_band?: string | null
+          risk_score?: number | null
+          supplier_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_scores_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: true
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          contact_name: string
+          contact_role: string | null
+          country: Database["public"]["Enums"]["supplier_country"]
+          created_at: string
+          discard_reason: string | null
+          email: string
+          folio: string
+          id: string
+          intermediaries_count: string | null
+          invitation_token: string | null
+          legal_name: string
+          owner_user_id: string | null
+          phone_e164: string
+          source: string | null
+          status: Database["public"]["Enums"]["supplier_status"]
+          supplier_role: Database["public"]["Enums"]["supplier_role"]
+          tax_id: string
+          updated_at: string
+        }
+        Insert: {
+          contact_name: string
+          contact_role?: string | null
+          country?: Database["public"]["Enums"]["supplier_country"]
+          created_at?: string
+          discard_reason?: string | null
+          email: string
+          folio?: string
+          id?: string
+          intermediaries_count?: string | null
+          invitation_token?: string | null
+          legal_name: string
+          owner_user_id?: string | null
+          phone_e164: string
+          source?: string | null
+          status?: Database["public"]["Enums"]["supplier_status"]
+          supplier_role: Database["public"]["Enums"]["supplier_role"]
+          tax_id: string
+          updated_at?: string
+        }
+        Update: {
+          contact_name?: string
+          contact_role?: string | null
+          country?: Database["public"]["Enums"]["supplier_country"]
+          created_at?: string
+          discard_reason?: string | null
+          email?: string
+          folio?: string
+          id?: string
+          intermediaries_count?: string | null
+          invitation_token?: string | null
+          legal_name?: string
+          owner_user_id?: string | null
+          phone_e164?: string
+          source?: string | null
+          status?: Database["public"]["Enums"]["supplier_status"]
+          supplier_role?: Database["public"]["Enums"]["supplier_role"]
+          tax_id?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -16002,6 +16689,15 @@ export type Database = {
         | "silicic_cap"
         | "unclassified"
       app_role: "super_admin" | "support"
+      application_status:
+        | "pending"
+        | "review"
+        | "approved"
+        | "commercial"
+        | "icpo"
+        | "spa"
+        | "shipment"
+        | "rejected"
       commodity_buyer_role:
         | "trader"
         | "refinery"
@@ -16094,6 +16790,12 @@ export type Database = {
         | "gypsum"
         | "silica"
         | "other"
+      offer_status:
+        | "borrador"
+        | "enviada"
+        | "en_revision"
+        | "aprobada"
+        | "descartada"
       onboarding_state: "not_started" | "in_progress" | "completed"
       org_role: "owner" | "admin" | "member" | "viewer"
       partner_invitation_role: "broker" | "investor" | "both"
@@ -16118,12 +16820,27 @@ export type Database = {
         | "community_relations"
         | "external_consultant"
       review_status: "pending_review" | "approved" | "rejected"
+      rfq_status:
+        | "borrador"
+        | "publicado"
+        | "en_evaluacion"
+        | "adjudicado"
+        | "cerrado"
+        | "cancelado"
       subscription_status:
         | "trialing"
         | "active"
         | "past_due"
         | "canceled"
         | "incomplete"
+      supplier_country: "CL" | "PE" | "AR" | "BO" | "OTRO"
+      supplier_role: "titular" | "mandatario" | "intermediario" | "trader"
+      supplier_status:
+        | "nuevo"
+        | "en_revision"
+        | "documentos_incompletos"
+        | "verificado"
+        | "descartado"
       workspace_function_role: "admin" | "operador" | "analista"
     }
     CompositeTypes: {
@@ -16264,6 +16981,16 @@ export const Constants = {
         "unclassified",
       ],
       app_role: ["super_admin", "support"],
+      application_status: [
+        "pending",
+        "review",
+        "approved",
+        "commercial",
+        "icpo",
+        "spa",
+        "shipment",
+        "rejected",
+      ],
       commodity_buyer_role: [
         "trader",
         "refinery",
@@ -16365,6 +17092,13 @@ export const Constants = {
         "silica",
         "other",
       ],
+      offer_status: [
+        "borrador",
+        "enviada",
+        "en_revision",
+        "aprobada",
+        "descartada",
+      ],
       onboarding_state: ["not_started", "in_progress", "completed"],
       org_role: ["owner", "admin", "member", "viewer"],
       partner_invitation_role: ["broker", "investor", "both"],
@@ -16391,12 +17125,29 @@ export const Constants = {
         "external_consultant",
       ],
       review_status: ["pending_review", "approved", "rejected"],
+      rfq_status: [
+        "borrador",
+        "publicado",
+        "en_evaluacion",
+        "adjudicado",
+        "cerrado",
+        "cancelado",
+      ],
       subscription_status: [
         "trialing",
         "active",
         "past_due",
         "canceled",
         "incomplete",
+      ],
+      supplier_country: ["CL", "PE", "AR", "BO", "OTRO"],
+      supplier_role: ["titular", "mandatario", "intermediario", "trader"],
+      supplier_status: [
+        "nuevo",
+        "en_revision",
+        "documentos_incompletos",
+        "verificado",
+        "descartado",
       ],
       workspace_function_role: ["admin", "operador", "analista"],
     },
