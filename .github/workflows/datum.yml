@@ -9,7 +9,7 @@ on:
       - "tests/**"
       - "etl/**"
       - "src/lib/tenencia/control-points.json"
-      - "supabase/migrations/**b2_catastro_etl.sql"
+      - "supabase/migrations/**"
       - ".github/workflows/datum.yml"
   push:
     branches: [main]
