@@ -14624,6 +14624,44 @@ export type Database = {
         }
         Relationships: []
       }
+      supplier_doc_extractions: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          document_id: string
+          fields: Json
+          id: string
+          model: string
+          raw_text: string | null
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          document_id: string
+          fields?: Json
+          id?: string
+          model: string
+          raw_text?: string | null
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          document_id?: string
+          fields?: Json
+          id?: string
+          model?: string
+          raw_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_doc_extractions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       supplier_documents: {
         Row: {
           doc_type: string
@@ -14715,6 +14753,51 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "supplier_events_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_notes: {
+        Row: {
+          author_user_id: string
+          body: string
+          created_at: string
+          id: string
+          offer_id: string | null
+          supplier_id: string
+          visibility: string
+        }
+        Insert: {
+          author_user_id: string
+          body: string
+          created_at?: string
+          id?: string
+          offer_id?: string | null
+          supplier_id: string
+          visibility?: string
+        }
+        Update: {
+          author_user_id?: string
+          body?: string
+          created_at?: string
+          id?: string
+          offer_id?: string | null
+          supplier_id?: string
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_notes_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_notes_supplier_id_fkey"
             columns: ["supplier_id"]
             isOneToOne: false
             referencedRelation: "suppliers"
