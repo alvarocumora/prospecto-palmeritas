@@ -51,6 +51,14 @@ y `valores_utm` (valor UTM fechado del SII).
 - "Carry prohibitivo sin labores" = umbral configurable (por defecto ≥ 3 UTM/ha, el salto del
   año 21); es una señal comercial, no una regla legal.
 
+## Obligaciones y vencimientos (B6)
+- **Vencimiento de la patente = 31 de marzo** de cada año (la patente se paga en marzo).
+  Es un supuesto procesal de fuente conocida, **por confirmar con abogado**; hoy vive en
+  `packages/reglas/obligaciones.py` (`marzo_31`). Las alertas se escalonan a 90/30/7 días y
+  "vencido", de forma idempotente (no se reenvía la misma alerta).
+- La obligación de patente usa el **año 1** de la escala por defecto (no hay dato de año de
+  vigencia por concesión en la fuente); cuando exista, el generador debe usar el tramo real.
+
 ## Pendientes de verificación (valor NULL en la tabla)
 - **Duración de la concesión de exploración y su prórroga / no renovación.** El
   texto base decía "2 años, prorrogable por 2", pero las **Leyes 21.420 (2022) y
