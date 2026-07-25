@@ -72,7 +72,7 @@ export const createOperation = createServerFn({ method: "POST" })
         seller_company: data.seller_company ?? null,
         seller_email: data.seller_email || null,
         seller_phone: data.seller_phone ?? null,
-        tech_spec: data.tech_spec ?? {},
+        tech_spec: (data.tech_spec ?? {}) as never,
         linked_trade_id: data.linked_trade_id ?? null,
         responsible_user_id: context.userId,
         created_by: context.userId,
