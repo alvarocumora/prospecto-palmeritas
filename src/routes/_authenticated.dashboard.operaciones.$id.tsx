@@ -152,6 +152,24 @@ function OperationDetail() {
           />
         </div>
 
+        {/* Data Room de la operación */}
+        <section className="mt-8">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-serif text-xl">Data Room · Documentos ({data.documents.length})</h2>
+            <span className="text-xs text-[hsl(var(--content-subtle))]">
+              Segrega por rol · aprueba, solicita ajustes o congela para firma.
+            </span>
+          </div>
+          <OperationDocumentsPanel
+            documents={data.documents as unknown as OperationDocLike[]}
+            role="geocapitals"
+            operationId={id}
+            canReview
+            onChange={refresh}
+          />
+        </section>
+
+
         {/* Actividad + acciones */}
         <div className="mt-8 grid gap-4 lg:grid-cols-2">
           <div className="rounded-xl border border-[hsl(var(--hairline))] bg-white p-4">
