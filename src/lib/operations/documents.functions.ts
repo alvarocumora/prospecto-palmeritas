@@ -235,6 +235,9 @@ export const freezeOperationDocument = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => z.object({ document_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();
+    // Solo staff Geocapitals puede congelar (sella la versión inmutable).
+    const { data: isStaff } = await sb.rpc("is_gc_staff", { _user_id: context.userId });
+    if (!isStaff) throw new Error("Solo staff Geocapitals puede congelar documentos");
     const { data: doc, error } = await sb
       .from("operation_documents")
       .update({ is_frozen: true, frozen_at: new Date().toISOString() })
