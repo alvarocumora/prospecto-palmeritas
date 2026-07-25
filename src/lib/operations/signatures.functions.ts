@@ -316,7 +316,7 @@ export const getOperationSignatureRequest = createServerFn({ method: "POST" })
         required: env.required_signers,
         completed: env.completed_signers,
         expires_at: env.expires_at,
-        metadata: env.metadata as Record<string, unknown>,
+        metadata: (env.metadata ?? {}) as Record<string, string | number | boolean | null>,
       },
       operation: op ?? null,
       pdf_url: pdfUrl,
