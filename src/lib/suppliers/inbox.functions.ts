@@ -173,7 +173,7 @@ export const updateSupplierStatus = createServerFn({ method: "POST" })
     z
       .object({
         id: z.string().uuid(),
-        status: z.enum(["nueva", "en_revision", "aprobada", "rechazada", "info_pendiente"]),
+        status: z.enum(["nuevo", "en_revision", "verificado", "descartado", "documentos_incompletos"]),
       })
       .parse(raw),
   )
