@@ -1,12 +1,14 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { getPortalView, claimPortalInvitation, postPortalMessage } from "@/lib/operations/portal.functions";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
-import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck } from "lucide-react";
+import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck, Radio } from "lucide-react";
+
 
 type Role = "buyer" | "seller";
 type PortalData = Awaited<ReturnType<typeof getPortalView>>;
