@@ -95,7 +95,7 @@ export async function stampSignerWatermark(
   }
 
   const bytes = await pdf.save();
-  return new Blob([bytes], { type: "application/pdf" });
+  return new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer], { type: "application/pdf" });
 }
 
 function roleLabel(role: string): string {
