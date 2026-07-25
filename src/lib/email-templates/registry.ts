@@ -75,5 +75,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trade-pack-dispatch": tradePackDispatch,
   "partner-invitation": partnerInvitation,
   "supplier-sheet-dispatch": supplierSheetDispatch,
+  "operation-portal-invitation": operationPortalInvitation,
 };
 
