@@ -5,6 +5,7 @@ import { getPortalView, claimPortalInvitation, postPortalMessage } from "@/lib/o
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
 import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck } from "lucide-react";
 
 type Role = "buyer" | "seller";
@@ -174,23 +175,12 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
               {data.documents.length} documento{data.documents.length === 1 ? "" : "s"} compartido{data.documents.length === 1 ? "" : "s"}
             </span>
           </div>
-          {data.documents.length === 0 ? (
-            <EmptyState icon={FileText} text="Geocapitals aún no ha compartido documentos contigo. Recibirás una notificación cuando haya novedades." />
-          ) : (
-            <div className="grid gap-3">
-              {data.documents.map((d) => (
-                <div key={d.id} className="flex items-center justify-between rounded-lg border border-[hsl(var(--hairline))] bg-white px-4 py-3">
-                  <div>
-                    <div className="text-sm font-medium">{d.title}</div>
-                    <div className="text-xs text-[hsl(var(--content-subtle))]">
-                      {d.kind} · v{d.version} · {new Date(d.created_at).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <StatusPill status={d.review_status ?? "pending"} />
-                </div>
-              ))}
-            </div>
-          )}
+          <OperationDocumentsPanel
+            documents={data.documents as unknown as OperationDocLike[]}
+            role={role}
+            token={token}
+            onChange={load}
+          />
         </section>
 
         {/* Tasks */}
