@@ -93,7 +93,16 @@ export const createOperation = createServerFn({ method: "POST" })
     });
 
     // Genera invitaciones si hay correos
-    const invitations: Array<{ role: "buyer" | "seller"; url: string; token: string }> = [];
+    const invitations: Array<{ role: "buyer" | "seller"; url: string; token: string; emailed: boolean }> = [];
+    const { sendPortalInvitationEmail } = await import("./dispatch.server");
+    // Nombre del emisor (para el correo)
+    const { data: inviter } = await supabaseAdmin
+      .from("profiles")
+      .select("full_name, email")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const invitedByName = inviter?.full_name ?? inviter?.email ?? null;
+
     for (const kind of ["buyer", "seller"] as const) {
       const email = kind === "buyer" ? data.buyer_email : data.seller_email;
       const name = kind === "buyer" ? data.buyer_name : data.seller_name;
@@ -107,14 +116,46 @@ export const createOperation = createServerFn({ method: "POST" })
           invited_name: name ?? null,
           created_by: context.userId,
         })
-        .select("secure_token")
+        .select("secure_token, expires_at")
         .single();
       if (invErr) throw invErr;
       const token = inv.secure_token as string;
+      let emailed = false;
+      try {
+        const res = await sendPortalInvitationEmail({
+          role: kind,
+          email,
+          name: name ?? null,
+          token,
+          operationId: op.id,
+          operationCode: op.code,
+          operationName: data.name,
+          commodity: data.commodity,
+          incoterm: data.incoterm ?? null,
+          quantityMonthly: data.quantity_monthly ?? null,
+          quantityTotal: data.quantity_total ?? null,
+          unit: data.unit,
+          originCountry: data.origin_country ?? null,
+          destinationCountry: data.destination_country ?? null,
+          expiresAt: (inv.expires_at as string | null) ?? null,
+          invitedByName,
+        });
+        emailed = res.ok === true;
+      } catch (e) {
+        console.error("[operations] failed to send portal invitation", kind, e);
+      }
+      await supabaseAdmin.from("operation_access_logs").insert({
+        operation_id: op.id,
+        actor_user_id: context.userId,
+        actor_role: "geocapitals",
+        action: emailed ? "invitation_emailed" : "invitation_email_failed",
+        metadata: { role: kind, email } as never,
+      });
       invitations.push({
         role: kind,
         token,
         url: publicUrl(`/portal/${kind}/${encodeURIComponent(token)}`),
+        emailed,
       });
     }
 
