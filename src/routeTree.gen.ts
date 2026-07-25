@@ -158,6 +158,7 @@ import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastr
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
+import { Route as ApiPublicHooksSignatureRemindersRouteImport } from './routes/api/public/hooks/signature-reminders'
 import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
@@ -1003,6 +1004,12 @@ const ApiPublicNotificationsCatastroExpirationsRoute =
     path: '/api/public/notifications/catastro-expirations',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSignatureRemindersRoute =
+  ApiPublicHooksSignatureRemindersRouteImport.update({
+    id: '/api/public/hooks/signature-reminders',
+    path: '/api/public/hooks/signature-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AuthenticatedDashboardTradesTradeIdRoute =
   AuthenticatedDashboardTradesTradeIdRouteImport.update({
     id: '/dashboard/trades_/$tradeId',
@@ -1275,6 +1282,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1445,6 +1453,7 @@ export interface FileRoutesByTo {
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1617,6 +1626,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/sourcing_/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/dashboard/trades_/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
@@ -1789,6 +1799,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
+    | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -1959,6 +1970,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
+    | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -2130,6 +2142,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sourcing_/$requestId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/dashboard/trades_/$tradeId'
+    | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
     | '/api/public/verify-compliance/$reportId'
@@ -2217,6 +2230,7 @@ export interface RootRouteChildren {
   ReportsLosverdesPre43101Route: typeof ReportsLosverdesPre43101Route
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
   VerificarFichaTokenRoute: typeof VerificarFichaTokenRoute
+  ApiPublicHooksSignatureRemindersRoute: typeof ApiPublicHooksSignatureRemindersRoute
   ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
   ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
@@ -3274,6 +3288,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/signature-reminders': {
+      id: '/api/public/hooks/signature-reminders'
+      path: '/api/public/hooks/signature-reminders'
+      fullPath: '/api/public/hooks/signature-reminders'
+      preLoaderRoute: typeof ApiPublicHooksSignatureRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/dashboard/trades_/$tradeId': {
       id: '/_authenticated/dashboard/trades_/$tradeId'
       path: '/dashboard/trades/$tradeId'
@@ -3833,6 +3854,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportsLosverdesPre43101Route: ReportsLosverdesPre43101Route,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
   VerificarFichaTokenRoute: VerificarFichaTokenRoute,
+  ApiPublicHooksSignatureRemindersRoute: ApiPublicHooksSignatureRemindersRoute,
   ApiPublicNotificationsCatastroExpirationsRoute:
     ApiPublicNotificationsCatastroExpirationsRoute,
   ApiPublicNotificationsSatelliteAnomaliesRoute:
