@@ -235,42 +235,47 @@ function SignOperationPage() {
               </ul>
             </div>
 
-            {/* PDF del documento congelado */}
+            {/* PDF del documento congelado — con marca de agua del firmante */}
             {data.pdf_url && (
               <div className="mb-6 rounded-xl border border-hairline overflow-hidden bg-surface-3">
                 <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-2 border-b border-hairline">
-                  <div className="text-xs font-semibold text-content">
+                  <div className="text-xs font-semibold text-content flex items-center gap-2">
                     Documento a firmar (versión inmutable)
+                    <span className="inline-flex items-center gap-1 rounded-full bg-accent-brand/10 text-accent-brand px-2 py-0.5 text-[10px] font-medium">
+                      <Droplets className="w-3 h-3" />
+                      Marca de agua: {wm?.name} · {wm?.role}
+                      {stamping ? " · aplicando…" : ""}
+                    </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <a
-                      href={data.pdf_url}
+                      href={stampedFrozen ?? data.pdf_url}
                       target="_blank"
                       rel="noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
                     >
                       Abrir <ExternalLink className="w-3 h-3" />
                     </a>
-                    <a
-                      href={data.pdf_url}
-                      download={`${data.envelope.title || "documento"}-congelado.pdf`}
+                    <button
+                      type="button"
+                      onClick={() => void downloadStamped("frozen")}
                       className="inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
                     >
                       <Download className="w-3 h-3" /> Versión congelada
-                    </a>
+                    </button>
                     {data.signed_pdf_url && (
-                      <a
-                        href={data.signed_pdf_url}
-                        download={`${data.envelope.title || "documento"}-firmado.pdf`}
+                      <button
+                        type="button"
+                        onClick={() => void downloadStamped("signed")}
                         className="inline-flex items-center gap-1 rounded-md bg-content text-surface px-2.5 py-1 text-xs font-medium hover:opacity-90"
                       >
                         <Download className="w-3 h-3" /> PDF firmado
-                      </a>
+                      </button>
                     )}
                   </div>
                 </div>
                 <iframe
-                  src={data.pdf_url}
+                  src={stampedSigned ?? stampedFrozen ?? data.pdf_url}
                   className="w-full h-[600px] bg-surface"
                   title="Documento a firmar"
                 />
