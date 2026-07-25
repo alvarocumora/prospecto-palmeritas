@@ -68,6 +68,8 @@ import { Route as VerificarFichaTokenRouteImport } from './routes/verificar.fich
 import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
 import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.ficha.$slug'
+import { Route as PortalSellerTokenRouteImport } from './routes/portal.seller.$token'
+import { Route as PortalBuyerTokenRouteImport } from './routes/portal.buyer.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
 import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
@@ -469,6 +471,16 @@ const ReportsLosverdesPre43101Route =
 const ProyectosFichaSlugRoute = ProyectosFichaSlugRouteImport.update({
   id: '/proyectos_/ficha/$slug',
   path: '/proyectos/ficha/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalSellerTokenRoute = PortalSellerTokenRouteImport.update({
+  id: '/portal/seller/$token',
+  path: '/portal/seller/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PortalBuyerTokenRoute = PortalBuyerTokenRouteImport.update({
+  id: '/portal/buyer/$token',
+  path: '/portal/buyer/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
@@ -1213,6 +1225,8 @@ export interface FileRoutesByFullPath {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/portal/buyer/$token': typeof PortalBuyerTokenRoute
+  '/portal/seller/$token': typeof PortalSellerTokenRoute
   '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -1377,6 +1391,8 @@ export interface FileRoutesByTo {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/portal/buyer/$token': typeof PortalBuyerTokenRoute
+  '/portal/seller/$token': typeof PortalSellerTokenRoute
   '/proyectos/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -1543,6 +1559,8 @@ export interface FileRoutesById {
   '/catastro/c/$code': typeof CatastroCCodeRoute
   '/catastro/pais/$country': typeof CatastroPaisCountryRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/portal/buyer/$token': typeof PortalBuyerTokenRoute
+  '/portal/seller/$token': typeof PortalSellerTokenRoute
   '/proyectos_/ficha/$slug': typeof ProyectosFichaSlugRoute
   '/reports/losverdes/pre43101': typeof ReportsLosverdesPre43101Route
   '/share/targets/$projectId': typeof ShareTargetsProjectIdRoute
@@ -1709,6 +1727,8 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/portal/buyer/$token'
+    | '/portal/seller/$token'
     | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -1873,6 +1893,8 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/portal/buyer/$token'
+    | '/portal/seller/$token'
     | '/proyectos/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -2038,6 +2060,8 @@ export interface FileRouteTypes {
     | '/catastro/c/$code'
     | '/catastro/pais/$country'
     | '/lovable/email/suppression'
+    | '/portal/buyer/$token'
+    | '/portal/seller/$token'
     | '/proyectos_/ficha/$slug'
     | '/reports/losverdes/pre43101'
     | '/share/targets/$projectId'
@@ -2135,6 +2159,8 @@ export interface RootRouteChildren {
   CatastroCCodeRoute: typeof CatastroCCodeRoute
   CatastroPaisCountryRoute: typeof CatastroPaisCountryRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  PortalBuyerTokenRoute: typeof PortalBuyerTokenRoute
+  PortalSellerTokenRoute: typeof PortalSellerTokenRoute
   ProyectosFichaSlugRoute: typeof ProyectosFichaSlugRoute
   ReportsLosverdesPre43101Route: typeof ReportsLosverdesPre43101Route
   ShareTargetsProjectIdRoute: typeof ShareTargetsProjectIdRoute
@@ -2564,6 +2590,20 @@ declare module '@tanstack/react-router' {
       path: '/proyectos/ficha/$slug'
       fullPath: '/proyectos/ficha/$slug'
       preLoaderRoute: typeof ProyectosFichaSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/seller/$token': {
+      id: '/portal/seller/$token'
+      path: '/portal/seller/$token'
+      fullPath: '/portal/seller/$token'
+      preLoaderRoute: typeof PortalSellerTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/portal/buyer/$token': {
+      id: '/portal/buyer/$token'
+      path: '/portal/buyer/$token'
+      fullPath: '/portal/buyer/$token'
+      preLoaderRoute: typeof PortalBuyerTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
@@ -3697,6 +3737,8 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroCCodeRoute: CatastroCCodeRoute,
   CatastroPaisCountryRoute: CatastroPaisCountryRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  PortalBuyerTokenRoute: PortalBuyerTokenRoute,
+  PortalSellerTokenRoute: PortalSellerTokenRoute,
   ProyectosFichaSlugRoute: ProyectosFichaSlugRoute,
   ReportsLosverdesPre43101Route: ReportsLosverdesPre43101Route,
   ShareTargetsProjectIdRoute: ShareTargetsProjectIdRoute,
