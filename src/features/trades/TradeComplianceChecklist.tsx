@@ -123,6 +123,10 @@ export function TradeComplianceChecklist({
   const r = readinessQ.data;
   const pct = r && r.mandatory_total > 0 ? Math.round((r.mandatory_ok / r.mandatory_total) * 100) : 0;
 
+  useEffect(() => {
+    onReadinessChange?.(r ?? null);
+  }, [r, onReadinessChange]);
+
   const handleFile = async (docKind: string, file: File | null | undefined) => {
     if (!file || !onUpload) return;
     setBusy(docKind);
