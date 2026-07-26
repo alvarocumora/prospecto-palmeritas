@@ -473,10 +473,11 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     if (r.error) throw new Error(r.error.message);
     const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
     return {
-      rows: (c.data ?? []) as Array<Record<string, unknown>>,
-      readiness: (readinessRow ?? null) as Record<string, unknown> | null,
+      rows: ((c.data ?? []) as unknown) as any[],
+      readiness: (readinessRow ?? null) as any,
     };
   });
+
 
 
 
