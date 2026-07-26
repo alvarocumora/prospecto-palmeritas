@@ -46,8 +46,8 @@ import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceCheck
 import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
 import { TradeProductsPanel } from "@/features/trades/TradeProductsPanel";
 import { TradeAccessLinksPanel } from "@/features/trades/TradeAccessLinksPanel";
-import { useIsGcStaff } from "@/hooks/useIsGcStaff";
 import { setTradeStage } from "@/lib/trades.functions";
+
 
 import { useQueryClient } from "@tanstack/react-query";
 
