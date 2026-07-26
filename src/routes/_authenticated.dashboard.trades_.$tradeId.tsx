@@ -43,6 +43,9 @@ import {
 import { TradeCopilotPanel } from "@/features/trades/TradeCopilotPanel";
 import { CommodityIntelPanel } from "@/features/trades/CommodityIntelPanel";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
+import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
+import { setTradeStage } from "@/lib/trades.functions";
+import { useQueryClient } from "@tanstack/react-query";
 
 // Trazabilidad unificada del trade — "Uber de los commodities": un titular de
 // estado, el viaje en pasos y el timeline completo (acuerdo, documentos, pago,
