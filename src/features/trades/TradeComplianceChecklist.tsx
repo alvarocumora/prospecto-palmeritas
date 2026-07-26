@@ -64,6 +64,7 @@ export function TradeComplianceChecklist({
   fetcher,
   queryKey,
   onUpload,
+  onReadinessChange,
   title = "Documentos · Compliance",
 }: {
   /** Modo autenticado: consulta directa por RPC con RLS del usuario. */
@@ -72,6 +73,7 @@ export function TradeComplianceChecklist({
   fetcher?: () => Promise<ComplianceFetchResult>;
   queryKey?: readonly unknown[];
   onUpload?: (docKind: string, file: File) => Promise<void>;
+  onReadinessChange?: (r: Readiness | null) => void;
   title?: string;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
