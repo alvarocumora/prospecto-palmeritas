@@ -96,7 +96,7 @@ export function TradeProductsPanel({
         const res = await getPublic({ data: { token: token! } });
         return (res ?? []) as Row[];
       }
-      const { data, error } = await supabase.rpc("get_trade_products", {
+      const { data, error } = await (supabase as any).rpc("get_trade_products", {
         p_trade_id: tradeId!,
       });
       if (error) throw new Error(error.message);
@@ -139,7 +139,7 @@ export function TradeProductsPanel({
           },
         });
       } else {
-        const { error } = await supabase.from("trade_products").insert({
+        const { error } = await (supabase as any).from("trade_products").insert({
           trade_id: tradeId,
           product_name: form.product_name.trim(),
           purity: form.purity.trim() || null,
@@ -171,7 +171,7 @@ export function TradeProductsPanel({
   }
 
   async function updateStatus(id: string, status: string) {
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from("trade_products")
       .update({ status })
       .eq("id", id);
