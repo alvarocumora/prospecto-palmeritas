@@ -478,18 +478,43 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     };
   });
 
+export type TradeProductRow = {
+  id: string;
+  product_name: string;
+  presentation: string | null;
+  purity: string | null;
+  grade_value: number | null;
+  grade_unit: string | null;
+  tonnage_total_t: number | null;
+  tonnage_monthly_t: number | null;
+  packaging: string | null;
+  origin_country: string | null;
+  origin_region: string | null;
+  incoterm: string | null;
+  price_usd: number | null;
+  price_note: string | null;
+  status: string;
+  added_by_role: string | null;
+  notes: string | null;
+  source_supplier_offer_id: string | null;
+  source_rfq_product_id: string | null;
+  source_submission_id: string | null;
+  created_at: string;
+};
+
 /** Público (por token): productos declarados en la operación (War Room). */
 export const getOperacionProducts = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
-  .handler(async ({ data }): Promise<Array<Record<string, unknown>>> => {
+  .handler(async ({ data }): Promise<TradeProductRow[]> => {
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
     const { data: rows, error } = await (ctx.sb as any).rpc("get_trade_products", {
       p_trade_id: ctx.tradeId,
     });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as Array<Record<string, unknown>>;
+    return (rows ?? []) as TradeProductRow[];
   });
+
 
 
 /** Público (por token): el seller externo agrega un producto a la operación. */
