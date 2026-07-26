@@ -207,7 +207,46 @@ function OperacionMirror() {
   );
 }
 
+function ComplianceChecklistPublic({ token }: { token: string }) {
+  const qc = useQueryClient();
+  const fetchFn = useServerFn(getOperacionChecklist);
+  const reqFn = useServerFn(requestOperacionUpload);
+  const attachFn = useServerFn(attachOperacionDoc);
+
+  const onUpload = async (docKind: string, file: File) => {
+    if (file.size > 50 * 1024 * 1024) {
+      toast.error("Máximo 50 MB por archivo.");
+      return;
+    }
+    try {
+      const { path, token: upToken, bucket } = await reqFn({ data: { token, fileName: file.name } });
+      const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
+      if (up.error) throw up.error;
+      await attachFn({ data: { token, docType: docKind, filePath: path } });
+      toast.success(`Documento enviado: ${file.name}`);
+      void qc.invalidateQueries({ queryKey: ["operacion", token] });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo subir el documento.");
+    }
+  };
+
+  return (
+    <div className="mt-8">
+      <TradeComplianceChecklist
+        fetcher={async () => {
+          const r = await fetchFn({ data: { token } });
+          return { rows: (r.rows ?? []) as any, readiness: (r.readiness ?? null) as any };
+        }}
+        queryKey={["operacion-checklist", token]}
+        onUpload={onUpload}
+        title="Checklist de compliance"
+      />
+    </div>
+  );
+}
+
 const isProvided = (s: string) => s === "uploaded" || s === "signed" || s === "verified";
+
 
 function DocsUpload({
   token,
