@@ -192,6 +192,8 @@ function OperacionMirror() {
               defaultName={data.counterparty.name ?? ""}
             />
 
+            <ComplianceChecklistPublic token={token} />
+
             <DocsUpload token={token} documents={data.documents} />
 
             <p className="mt-10 text-xs text-[hsl(var(--im-ink-soft))]">
