@@ -57,39 +57,52 @@ const ROLE_LABEL: Record<ChecklistRow["required_from_role"], string> = {
   geocapitals: "Geocapitals",
 };
 
+export type ComplianceFetchResult = { rows: ChecklistRow[]; readiness: Readiness | null };
+
 export function TradeComplianceChecklist({
   tradeId,
+  fetcher,
+  queryKey,
   onUpload,
   title = "Documentos · Compliance",
 }: {
-  tradeId: string;
+  /** Modo autenticado: consulta directa por RPC con RLS del usuario. */
+  tradeId?: string;
+  /** Modo público (por token): fetch resuelto server-side. Ignora tradeId. */
+  fetcher?: () => Promise<ComplianceFetchResult>;
+  queryKey?: readonly unknown[];
   onUpload?: (docKind: string, file: File) => Promise<void>;
   title?: string;
 }) {
   const [busy, setBusy] = useState<string | null>(null);
 
-  const checklistQ = useQuery({
-    queryKey: ["trade-checklist", tradeId],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("trade_documents_checklist", { p_trade_id: tradeId });
-      if (error) throw new Error(error.message);
-      return (data ?? []) as ChecklistRow[];
+  const usingFetcher = typeof fetcher === "function";
+  const key = queryKey ?? (usingFetcher ? ["trade-checklist-public"] : ["trade-checklist", tradeId]);
+
+  const dataQ = useQuery({
+    queryKey: key,
+    queryFn: async (): Promise<ComplianceFetchResult> => {
+      if (usingFetcher) return await fetcher!();
+      const [c, r] = await Promise.all([
+        supabase.rpc("trade_documents_checklist", { p_trade_id: tradeId }),
+        supabase.rpc("trade_documents_readiness", { p_trade_id: tradeId }),
+      ]);
+      if (c.error) throw new Error(c.error.message);
+      if (r.error) throw new Error(r.error.message);
+      const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
+      return {
+        rows: (c.data ?? []) as ChecklistRow[],
+        readiness: (readinessRow ?? null) as Readiness | null,
+      };
     },
+    enabled: usingFetcher || !!tradeId,
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
 
-  const readinessQ = useQuery({
-    queryKey: ["trade-readiness", tradeId],
-    queryFn: async () => {
-      const { data, error } = await supabase.rpc("trade_documents_readiness", { p_trade_id: tradeId });
-      if (error) throw new Error(error.message);
-      const row = Array.isArray(data) ? data[0] : data;
-      return (row ?? null) as Readiness | null;
-    },
-    staleTime: 30_000,
-    refetchInterval: 60_000,
-  });
+  const checklistQ = { data: dataQ.data?.rows, isLoading: dataQ.isLoading, error: dataQ.error, refetch: dataQ.refetch };
+  const readinessQ = { data: dataQ.data?.readiness ?? null, refetch: dataQ.refetch };
+
 
   const groups = useMemo(() => {
     const rows = checklistQ.data ?? [];
