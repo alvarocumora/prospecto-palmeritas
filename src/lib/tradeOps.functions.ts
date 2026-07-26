@@ -457,5 +457,27 @@ export const acceptOperacionTerms = createServerFn({ method: "POST" })
     return { ok: true, acceptedAt: new Date().toISOString() };
   });
 
+/** Público (por token): checklist REICON + readiness resueltos server-side para
+ *  la War Room de contraparte. Reusa los RPCs `trade_documents_checklist` y
+ *  `trade_documents_readiness` con el service client (bypass RLS/grants). */
+export const getOperacionChecklist = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    const [c, r] = await Promise.all([
+      ctx.sb.rpc("trade_documents_checklist", { p_trade_id: ctx.tradeId }),
+      ctx.sb.rpc("trade_documents_readiness", { p_trade_id: ctx.tradeId }),
+    ]);
+    if (c.error) throw new Error(c.error.message);
+    if (r.error) throw new Error(r.error.message);
+    const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
+    return {
+      rows: (c.data ?? []) as Array<Record<string, unknown>>,
+      readiness: (readinessRow ?? null) as Record<string, unknown> | null,
+    };
+  });
+
+
 
 
