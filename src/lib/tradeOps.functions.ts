@@ -478,7 +478,68 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     };
   });
 
+/** Público (por token): productos declarados en la operación (War Room). */
+export const getOperacionProducts = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    const { data: rows, error } = await ctx.sb.rpc("get_trade_products", {
+      p_trade_id: ctx.tradeId,
+    });
+    if (error) throw new Error(error.message);
+    return (rows ?? []) as unknown[];
+  });
 
-
-
+/** Público (por token): el seller externo agrega un producto a la operación. */
+export const addOperacionProduct = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        product_name: z.string().trim().min(1).max(200),
+        purity: z.string().trim().max(100).optional(),
+        tonnage_total_t: z.number().positive().optional(),
+        incoterm: z.string().trim().max(20).optional(),
+        price_note: z.string().trim().max(200).optional(),
+        notes: z.string().trim().max(1000).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const ctx = await resolveTradeByToken(data.token);
+    if (!ctx) throw new Error("Enlace no válido.");
+    // Solo el seller (contraparte vendedora) puede declarar productos desde la War Room.
+    if (ctx.role !== "seller") {
+      throw new Error("Solo la contraparte vendedora puede agregar productos.");
+    }
+    const { data: row, error } = await ctx.sb
+      .from("trade_products")
+      .insert({
+        trade_id: ctx.tradeId,
+        product_name: data.product_name,
+        purity: data.purity ?? null,
+        tonnage_total_t: data.tonnage_total_t ?? null,
+        incoterm: data.incoterm ?? null,
+        price_note: data.price_note ?? null,
+        notes: data.notes ?? null,
+        added_by_role: "seller",
+        status: "offered",
+        created_by: ctx.ownerId,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    try {
+      await ctx.sb.from("trade_events").insert({
+        trade_id: ctx.tradeId,
+        actor_user_id: ctx.ownerId,
+        kind: "product_added_by_counterparty",
+        detail: `Contraparte (seller) declaró producto: ${data.product_name}`,
+      });
+    } catch {
+      /* auxiliary */
+    }
+    return { id: (row as { id: string }).id };
+  });
 
