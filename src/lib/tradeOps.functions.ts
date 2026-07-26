@@ -539,8 +539,9 @@ export const addOperacionProduct = createServerFn({ method: "POST" })
     if (ctx.role !== "seller") {
       throw new Error("Solo la contraparte vendedora puede agregar productos.");
     }
-    const { data: row, error } = await ctx.sb
+    const { data: row, error } = await (ctx.sb as any)
       .from("trade_products")
+
       .insert({
         trade_id: ctx.tradeId,
         product_name: data.product_name,
