@@ -245,7 +245,25 @@ function TrackingPage() {
             </Link>
           ))}
         </div>
+        <div className="mt-3 flex flex-wrap gap-2 text-[11px]">
+          <Link
+            to="/dashboard/proveedores"
+            className="px-2.5 py-1 rounded border border-border hover:bg-accent inline-flex items-center gap-1"
+          >
+            <Handshake className="w-3 h-3" /> Ver proveedores
+          </Link>
+          <Link
+            to="/dashboard/rfqs"
+            className="px-2.5 py-1 rounded border border-border hover:bg-accent inline-flex items-center gap-1"
+          >
+            <FileText className="w-3 h-3" /> Requerimientos (RFQ)
+          </Link>
+        </div>
       </div>
+
+      {/* Checklist REICON: compliance de la operación */}
+      <TradeComplianceChecklist tradeId={trade.id} />
+
 
       {/* Finanzas del trade: cronograma de pagos */}
       <PaymentsSection tradeId={trade.id} />
