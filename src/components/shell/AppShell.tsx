@@ -23,6 +23,8 @@ const NAV = [
   { to: "/inversionistas", key: "nav_investors" as const },
   { to: "/empresas", key: "nav_companies" as const },
   { to: "/recursos", key: "nav_resources" as const },
+  { to: "/rfqs", key: "nav_rfqs" as const },
+  { to: "/inscripcion", key: "nav_suppliers" as const },
   { to: "/contacto", key: "nav_contact" as const },
 ] as const;
 

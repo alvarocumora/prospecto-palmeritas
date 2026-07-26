@@ -168,7 +168,7 @@ function AuthenticatedLayout() {
     {
       to: "/dashboard/trades",
       icon: <Handshake className="w-3.5 h-3.5" />,
-      label: "Trade Desk",
+      label: "Mesa de operaciones",
       group: "NEGOCIO",
     },
     {

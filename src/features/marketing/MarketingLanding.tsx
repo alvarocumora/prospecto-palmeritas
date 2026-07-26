@@ -306,7 +306,7 @@ export function MarketingLanding() {
                 </p>
               </div>
               <Link
-                to="/dashboard/commodity-lots"
+                to="/marketplace"
                 className="group inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.22em] text-content hover:text-accent-brand transition-colors self-start md:self-end"
               >
                 Ver marketplace completo
