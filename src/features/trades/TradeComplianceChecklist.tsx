@@ -83,6 +83,7 @@ export function TradeComplianceChecklist({
     queryKey: key,
     queryFn: async (): Promise<ComplianceFetchResult> => {
       if (usingFetcher) return await fetcher!();
+      if (!tradeId) return { rows: [], readiness: null };
       const [c, r] = await Promise.all([
         supabase.rpc("trade_documents_checklist", { p_trade_id: tradeId }),
         supabase.rpc("trade_documents_readiness", { p_trade_id: tradeId }),
