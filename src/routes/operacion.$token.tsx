@@ -14,6 +14,8 @@ import { publicUrl } from "@/lib/publicUrl";
 import { supabase } from "@/integrations/supabase/client";
 import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
+import { TradeProductsPanel } from "@/features/trades/TradeProductsPanel";
+
 
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
