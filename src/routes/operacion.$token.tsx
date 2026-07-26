@@ -194,7 +194,14 @@ function OperacionMirror() {
               defaultName={data.counterparty.name ?? ""}
             />
 
+            {data.role === "seller" && (
+              <div className="mt-8">
+                <TradeProductsPanel mode="public" token={token} canAdd />
+              </div>
+            )}
+
             <ComplianceChecklistPublic token={token} />
+
 
             <DocsUpload token={token} documents={data.documents} />
 
