@@ -410,27 +410,6 @@ export const convertSubmissionToTrade = createServerFn({ method: "POST" })
       .update({ trade_id: tradeId, status: "preseleccionada" })
       .eq("id", s.id);
 
-    // Puente productos: importa la oferta del sourcing como trade_product
-    // (idempotente por source_submission_id). Si el bridge RPC aún no está
-    // desplegado, no bloquea la creación del trade.
-    try {
-      const { data: existingProd } = await (sb as any)
-        .from("trade_products")
-        .select("id")
-        .eq("trade_id", tradeId)
-        .eq("source_submission_id", s.id)
-        .maybeSingle();
-      if (!existingProd) {
-        await (sb as any).rpc("import_submission_to_trade_products", {
-          p_trade_id: tradeId,
-          p_submission_id: s.id,
-        });
-      }
-    } catch (e) {
-      console.error("[convertSubmissionToTrade] product bridge failed", e);
-    }
-
-
     // Avisar al proveedor que su propuesta avanzó a operación (si dejó email).
     if (s.contact_email) {
       try {

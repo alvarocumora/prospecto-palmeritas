@@ -44,11 +44,8 @@ import { TradeCopilotPanel } from "@/features/trades/TradeCopilotPanel";
 import { CommodityIntelPanel } from "@/features/trades/CommodityIntelPanel";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
 import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
-import { TradeProductsPanel } from "@/features/trades/TradeProductsPanel";
-import { TradeAccessLinksPanel } from "@/features/trades/TradeAccessLinksPanel";
+import { TradeNegotiationPanel } from "@/features/trades/TradeNegotiationPanel";
 import { setTradeStage } from "@/lib/trades.functions";
-
-
 import { useQueryClient } from "@tanstack/react-query";
 
 // Trazabilidad unificada del trade — "Uber de los commodities": un titular de
@@ -290,23 +287,19 @@ function TrackingPage() {
         </div>
       </div>
 
-      {/* Productos declarados en la operación */}
-      <TradeProductsPanel
+      {/* Negociación estructurada de términos (oferta / contra-oferta) */}
+      <TradeNegotiationPanel
         tradeId={trade.id}
-        mode="authenticated"
-        canManage
-        canAdd
+        onAccepted={() => {
+          void qc.invalidateQueries({ queryKey: ["trade-tracking", trade.id] });
+        }}
       />
-
-      {/* Gobernanza de accesos (solo staff GC) */}
-      <TradeAccessLinksPanel tradeId={trade.id} />
 
       {/* Checklist REICON: compliance de la operación */}
       <TradeComplianceChecklist tradeId={trade.id} onReadinessChange={setReadiness} />
 
       {/* Screening de sanciones (visible solo staff GC) */}
       <TradeScreeningPanel tradeId={trade.id} />
-
 
       {/* Gate de avance de etapa por readiness */}
       {(() => {

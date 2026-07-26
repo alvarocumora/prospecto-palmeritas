@@ -14,8 +14,6 @@ import { publicUrl } from "@/lib/publicUrl";
 import { supabase } from "@/integrations/supabase/client";
 import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
-import { TradeProductsPanel } from "@/features/trades/TradeProductsPanel";
-
 
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
@@ -194,14 +192,7 @@ function OperacionMirror() {
               defaultName={data.counterparty.name ?? ""}
             />
 
-            {data.role === "seller" && (
-              <div className="mt-8">
-                <TradeProductsPanel mode="public" token={token} canAdd />
-              </div>
-            )}
-
             <ComplianceChecklistPublic token={token} />
-
 
             <DocsUpload token={token} documents={data.documents} />
 
