@@ -16473,6 +16473,45 @@ export type Database = {
           },
         ]
       }
+      trade_screenings: {
+        Row: {
+          id: string
+          lists_checked: string[]
+          matched_details: string | null
+          notes: string | null
+          outcome: string
+          screened_at: string
+          screened_by: string | null
+          subject_name: string
+          subject_type: string
+          trade_id: string
+        }
+        Insert: {
+          id?: string
+          lists_checked?: string[]
+          matched_details?: string | null
+          notes?: string | null
+          outcome: string
+          screened_at?: string
+          screened_by?: string | null
+          subject_name: string
+          subject_type?: string
+          trade_id: string
+        }
+        Update: {
+          id?: string
+          lists_checked?: string[]
+          matched_details?: string | null
+          notes?: string | null
+          outcome?: string
+          screened_at?: string
+          screened_by?: string | null
+          subject_name?: string
+          subject_type?: string
+          trade_id?: string
+        }
+        Relationships: []
+      }
       trade_shipments: {
         Row: {
           bl_number: string | null
@@ -17254,6 +17293,20 @@ export type Database = {
           target_id: string
         }[]
       }
+      get_trade_screenings: {
+        Args: { p_trade_id: string }
+        Returns: {
+          id: string
+          lists_checked: string[]
+          matched_details: string
+          notes: string
+          outcome: string
+          screened_at: string
+          screened_by: string
+          subject_name: string
+          subject_type: string
+        }[]
+      }
       get_user_plan: { Args: { _user_id: string }; Returns: string }
       has_app_role: {
         Args: {
@@ -17449,6 +17502,18 @@ export type Database = {
           _status?: string
           _tokens_in?: number
           _tokens_out?: number
+        }
+        Returns: string
+      }
+      record_trade_screening: {
+        Args: {
+          p_lists?: string[]
+          p_matched_details?: string
+          p_notes?: string
+          p_outcome?: string
+          p_subject_name: string
+          p_subject_type?: string
+          p_trade_id: string
         }
         Returns: string
       }
