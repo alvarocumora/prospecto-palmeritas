@@ -44,6 +44,7 @@ import { TradeCopilotPanel } from "@/features/trades/TradeCopilotPanel";
 import { CommodityIntelPanel } from "@/features/trades/CommodityIntelPanel";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
 import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
+import { TradeNegotiationPanel } from "@/features/trades/TradeNegotiationPanel";
 import { setTradeStage } from "@/lib/trades.functions";
 import { useQueryClient } from "@tanstack/react-query";
 
