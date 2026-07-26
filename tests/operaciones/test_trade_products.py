@@ -32,6 +32,9 @@ def cur():
     c = conn.cursor()
     for role in ("authenticated", "service_role"):
         c.execute("DO $$ BEGIN CREATE ROLE %s; EXCEPTION WHEN duplicate_object THEN NULL; END $$" % role)
+    c.execute("DROP FUNCTION IF EXISTS public.get_trade_products(uuid), "
+              "public.import_supplier_offer_to_trade(uuid,uuid), "
+              "public.import_submission_to_trade_products(uuid,uuid) CASCADE")
     c.execute("DROP TABLE IF EXISTS public.trade_products, public.supplier_offers, public.commodity_trades CASCADE")
     c.execute(STUBS)
     c.execute(MIG.read_text())
