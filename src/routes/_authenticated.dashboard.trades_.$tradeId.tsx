@@ -287,7 +287,63 @@ function TrackingPage() {
       </div>
 
       {/* Checklist REICON: compliance de la operación */}
-      <TradeComplianceChecklist tradeId={trade.id} />
+      <TradeComplianceChecklist tradeId={trade.id} onReadinessChange={setReadiness} />
+
+      {/* Screening de sanciones (visible solo staff GC) */}
+      <TradeScreeningPanel tradeId={trade.id} />
+
+      {/* Gate de avance de etapa por readiness */}
+      {(() => {
+        const currentStage = (trade.stage ?? "icpo") as Stage;
+        const idx = STAGE_ORDER.indexOf(currentStage);
+        const next = idx >= 0 && idx < STAGE_ORDER.length - 1 ? STAGE_ORDER[idx + 1] : null;
+        if (!next) return null;
+        const ready = readiness?.ready === true;
+        const missing = readiness?.mandatory_missing ?? null;
+        const label =
+          next === "fco" ? "Pasar a evaluación comercial" : `Avanzar a ${STAGE_LABEL[next]}`;
+        const tip = ready
+          ? "Todos los documentos obligatorios están conformes."
+          : missing != null
+            ? `Faltan ${missing} documento(s) obligatorio(s)`
+            : "Cargando estado de compliance…";
+        return (
+          <div className="rounded-md border border-[hsl(var(--im-hairline,var(--border)))] bg-white p-4 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-xs">
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Etapa actual
+              </div>
+              <div className="font-medium text-sm">{STAGE_LABEL[currentStage]}</div>
+              <div className="text-muted-foreground mt-1">{tip}</div>
+            </div>
+            <button
+              disabled={!ready || advancing}
+              title={tip}
+              onClick={async () => {
+                setAdvancing(true);
+                try {
+                  await advanceStage({ data: { id: trade.id, stage: next } });
+                  toast.success(`Etapa actualizada a ${STAGE_LABEL[next]}`);
+                  await qc.invalidateQueries({ queryKey: ["trade-tracking", trade.id] });
+                } catch (e) {
+                  toast.error(e instanceof Error ? e.message : "No se pudo avanzar la etapa.");
+                } finally {
+                  setAdvancing(false);
+                }
+              }}
+              className={`text-xs px-4 py-2 rounded border inline-flex items-center gap-2 ${
+                ready
+                  ? "border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800"
+                  : "border-neutral-300 bg-neutral-100 text-neutral-400 cursor-not-allowed"
+              }`}
+            >
+              {ready ? <CheckCircle2 className="w-3 h-3" /> : <AlertTriangle className="w-3 h-3" />}
+              {label}
+            </button>
+          </div>
+        );
+      })()}
+
 
 
       {/* Finanzas del trade: cronograma de pagos */}
