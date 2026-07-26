@@ -80,8 +80,8 @@ export function TradeScreeningPanel({ tradeId }: { tradeId: string }) {
         p_subject_type: form.subjectType,
         p_lists: form.lists,
         p_outcome: form.outcome,
-        p_matched_details: form.matchedDetails.trim() || null,
-        p_notes: form.notes.trim() || null,
+        p_matched_details: form.matchedDetails.trim() || undefined,
+        p_notes: form.notes.trim() || undefined,
       });
       if (error) throw new Error(error.message);
       toast.success("Screening registrado.");
