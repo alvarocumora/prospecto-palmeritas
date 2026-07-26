@@ -16,6 +16,8 @@ export const STRINGS = {
   nav_investors: { es: "Inversionistas", en: "Investors", pt: "Investidores" },
   nav_companies: { es: "Empresas", en: "Companies", pt: "Empresas" },
   nav_resources: { es: "Recursos", en: "Resources", pt: "Recursos" },
+  nav_suppliers: { es: "Ser proveedor", en: "Become supplier", pt: "Ser fornecedor" },
+  nav_rfqs: { es: "Requerimientos", en: "RFQs", pt: "Requerimentos" },
   nav_contact: { es: "Contacto", en: "Contact", pt: "Contato" },
   cta_login: { es: "Iniciar sesión", en: "Sign in", pt: "Entrar" },
   cta_signup: { es: "Registrarse", en: "Sign up", pt: "Cadastrar-se" },
