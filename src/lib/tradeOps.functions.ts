@@ -481,15 +481,16 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
 /** Público (por token): productos declarados en la operación (War Room). */
 export const getOperacionProducts = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<Array<Record<string, unknown>>> => {
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
-    const { data: rows, error } = await ctx.sb.rpc("get_trade_products", {
+    const { data: rows, error } = await (ctx.sb as any).rpc("get_trade_products", {
       p_trade_id: ctx.tradeId,
     });
     if (error) throw new Error(error.message);
-    return (rows ?? []) as unknown[];
+    return (rows ?? []) as Array<Record<string, unknown>>;
   });
+
 
 /** Público (por token): el seller externo agrega un producto a la operación. */
 export const addOperacionProduct = createServerFn({ method: "POST" })

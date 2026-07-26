@@ -23,12 +23,13 @@ export function TradeAccessLinksPanel({ tradeId }: { tradeId: string }) {
   const { data: rows = [], isLoading } = useQuery({
     queryKey,
     queryFn: async () => {
-      const { data, error } = await supabase.rpc("get_trade_access_links", {
+      const { data, error } = await (supabase as any).rpc("get_trade_access_links", {
         p_trade_id: tradeId,
       });
       if (error) throw new Error(error.message);
       return (data ?? []) as Row[];
     },
+
     enabled: isStaff,
     staleTime: 15_000,
   });
