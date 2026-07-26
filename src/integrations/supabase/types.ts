@@ -10405,6 +10405,54 @@ export type Database = {
           },
         ]
       }
+      operation_document_structure: {
+        Row: {
+          commodity: string
+          condition: string | null
+          description: string | null
+          doc_kind: string
+          fecha_verificacion: string | null
+          fuente: string | null
+          obligation: string
+          required_from_role: string
+          section: string
+          section_no: number
+          sequence: number
+          title: string
+          verificado_por: string | null
+        }
+        Insert: {
+          commodity: string
+          condition?: string | null
+          description?: string | null
+          doc_kind: string
+          fecha_verificacion?: string | null
+          fuente?: string | null
+          obligation?: string
+          required_from_role?: string
+          section: string
+          section_no: number
+          sequence?: number
+          title: string
+          verificado_por?: string | null
+        }
+        Update: {
+          commodity?: string
+          condition?: string | null
+          description?: string | null
+          doc_kind?: string
+          fecha_verificacion?: string | null
+          fuente?: string | null
+          obligation?: string
+          required_from_role?: string
+          section?: string
+          section_no?: number
+          sequence?: number
+          title?: string
+          verificado_por?: string | null
+        }
+        Relationships: []
+      }
       operation_documents: {
         Row: {
           content_type: string | null
@@ -17339,6 +17387,34 @@ export type Database = {
       }
       normalize_rut: { Args: { _rut: string }; Returns: string }
       op_generate_code: { Args: { _commodity: string }; Returns: string }
+      operation_documents_checklist: {
+        Args: { p_operation_id: string }
+        Returns: {
+          condition: string
+          description: string
+          doc_kind: string
+          document_id: string
+          obligation: string
+          required_from_role: string
+          section: string
+          section_no: number
+          sequence: number
+          status: string
+          title: string
+          uploaded_at: string
+          version: number
+        }[]
+      }
+      operation_documents_readiness: {
+        Args: { p_operation_id: string }
+        Returns: {
+          mandatory_missing: number
+          mandatory_ok: number
+          mandatory_total: number
+          optional_total: number
+          ready: boolean
+        }[]
+      }
       opportunities_geo: {
         Args: { _limit?: number; _min_score?: number; _region?: string }
         Returns: Json
@@ -17434,6 +17510,53 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      tenencia_overlaps: {
+        Args: { p_exclude_project?: string; p_geom: Json }
+        Returns: {
+          area_ha: number
+          code: string
+          commune: string
+          concession_id: string
+          concession_type: string
+          expires_at: string
+          holder: string
+          name: string
+          overlap_ha: number
+          pct_of_aoi: number
+          pct_of_concession: number
+          project_id: string
+          region: string
+          severity: string
+          status: string
+        }[]
+      }
+      trade_documents_checklist: {
+        Args: { p_trade_id: string }
+        Returns: {
+          condition: string
+          description: string
+          doc_kind: string
+          document_id: string
+          obligation: string
+          required_from_role: string
+          section: string
+          section_no: number
+          sequence: number
+          status: string
+          title: string
+          uploaded_at: string
+        }[]
+      }
+      trade_documents_readiness: {
+        Args: { p_trade_id: string }
+        Returns: {
+          mandatory_missing: number
+          mandatory_ok: number
+          mandatory_total: number
+          optional_total: number
+          ready: boolean
+        }[]
+      }
       trigger_pipeline_async: {
         Args: { _project_id: string; _sources?: string[] }
         Returns: Json

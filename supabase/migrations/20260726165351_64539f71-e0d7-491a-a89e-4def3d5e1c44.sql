@@ -1,0 +1,4 @@
+-- === 20260724040000_tenencia_geom_consolidation.sql ===
+-- === 20260725210000_operation_document_checklist.sql ===
+-- === 20260725220000_trade_documents_checklist.sql ===
+-- placeholder; replaced below

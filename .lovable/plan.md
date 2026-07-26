@@ -1,56 +1,67 @@
-# Firma de NDA vinculada a versiones inmutables por operación
+## Objetivo
 
-Vincular envelopes de firma (`signature_envelopes` + `document_signatures`) a documentos concretos de cada operación (`operation_documents`), usando la versión **frozen** como el artefacto inmutable auditable.
+Un único flujo de operaciones ("Trades") alcanzable desde el menú, con checklist de compliance conectado a los RPC del repo y gate de readiness. Landing sin links rotos, rutas duplicadas/huérfanas redirigidas o enlazadas. Solo cambios en `/src` (más aplicar 3 migraciones ya mergeadas, sin reescribirlas).
 
-## Modelo
+## 0. Migraciones (verificado: no aplicadas en la base)
 
-- `operation_documents.is_frozen = true` + `sha256` = versión inmutable. Una vez congelada no admite re-subida; una nueva versión crea un `operation_documents` hijo (`parent_document_id`, `version+1`).
-- `signature_envelopes` se crea apuntando al doc congelado:
-  - `document_type = 'operation_document'`
-  - `document_ref_id = operation_documents.id`
-  - `document_hash = operation_documents.sha256`
-  - `document_storage_path = operation_documents.storage_path`
-  - `metadata = { operation_id, kind, version }`
-- Firmantes = participantes de la operación (buyer, seller, gc_staff) según plantilla (NDA bilateral, NCNDA trilateral, LOI, etc.).
-- Al completar todas las firmas → envelope `completed`, se genera PDF estampado y se sube como **nueva versión hija** del documento (`kind` = `<original>_signed`, `is_frozen=true`).
+Los RPC/tabla del checklist no existen aún en el proyecto Supabase (`trade_documents_checklist`, `trade_documents_readiness`, `operation_document_structure` → `null`). Aplicar en orden, tal cual están en el repo:
 
-## Cambios
+1. `20260724040000_tenencia_geom_consolidation.sql`
+2. `20260725210000_operation_document_checklist.sql` (catálogo REICON + tabla `operation_document_structure`)
+3. `20260725220000_trade_documents_checklist.sql` (RPC sobre `commodity_trades` / `trade_documents`)
 
-### 1. Migración
-- Trigger `prevent_frozen_mutation` en `operation_documents`: bloquea UPDATE de `storage_path/sha256/file_size` cuando `is_frozen=true`.
-- Trigger `bump_version_on_child`: al insertar con `parent_document_id`, setea `version = parent.version + 1`.
-- Índice único parcial: `(operation_id, kind) WHERE is_frozen=false AND parent_document_id IS NULL` para evitar duplicados activos por kind.
-- Vista `operation_signature_status` que joina envelope + operation_document + conteo de firmas.
-- RLS: policy en `signature_envelopes` y `document_signatures` que permita a participantes de la operación (buyer/seller/staff) leer sus envelopes vía `metadata->>'operation_id'`.
+## 1. Reachability del menú + rutas huérfanas
 
-### 2. Server functions — `src/lib/operations/signatures.functions.ts`
-- `createOperationSignatureFlow({ operationId, documentId, template, signers[] })`:
-  - Valida `is_frozen=true`; si no lo está, congela el doc primero (reusa `freezeOperationDocument`).
-  - Crea envelope + `document_signatures` para cada firmante mapeando `signer_role` a `op_participant_role`.
-  - Emite correos de invitación a firmar (reutiliza template existente + link `/firmar/$token`).
-- `listOperationSignatureFlows(operationId)` → envelopes con estado.
-- `finalizeOperationSignatureFlow(envelopeId)` (auto al firmar último): renderiza PDF auditado con `renderGeocapitalsPdf` + banda de auditoría, sube como hijo congelado, registra en `operation_access_logs` y `document_registry`.
-- Trigger DB o hook server que al pasar envelope a `completed` dispare la finalización.
+En `src/routes/_authenticated.tsx` (grupo NEGOCIO):
+- Renombrar la entrada `/dashboard/trades` a **"Mesa de operaciones"** (mantener icono Handshake) y dejarla como entrada principal. La entrada `Tablero de trades` se mantiene como vista Kanban.
+- Quitar del rail entradas huérfanas del sistema "Operaciones" viejo (no estaban listadas, pero mantenerlas fuera).
 
-### 3. UI
-- `src/features/operations/OperationSignaturesPanel.tsx`:
-  - Lista envelopes de la operación con estado (pendiente/parcial/completado), versión del documento, hash corto y link al PDF firmado.
-  - Botón "Iniciar firma" sobre docs frozen; abre diálogo para elegir plantilla (NDA / NCNDA / LOI / SPA) y firmantes (autocompletados desde `operation_participants`).
-  - Copia enlace `/firmar/$token` por firmante y estado de correo.
-- Inyectar panel en `PortalPage.tsx` (buyer/seller ven solo sus envelopes) y en `_authenticated.dashboard.operaciones.$id.tsx` (staff ve todos).
-- En `OperationDocumentsPanel`, badge "🔒 v{n} · firmado" cuando existe envelope completed.
+Rutas duplicadas/huérfanas — reemplazar el archivo por una redirección declarativa (`beforeLoad: () => redirect(...)`) al equivalente en Trades:
 
-### 4. Ruta de firma
-- Reutilizar `src/routes/firmar.$token.tsx`; añadir soporte para envelopes de tipo `operation_document`: carga PDF desde signed URL del storage de operación, muestra contexto de operación (GC code, contraparte).
+| Ruta actual | Acción |
+|---|---|
+| `/dashboard/operaciones` (index) | redirect → `/dashboard/trades` |
+| `/dashboard/operaciones/nuevo` | redirect → `/dashboard/trades` (con hint `?new=1`) |
+| `/dashboard/operaciones/$id` | redirect → `/dashboard/trades/$tradeId` usando el mismo id (deprecado, un aviso corto arriba del detalle si el id no existe en trades) |
+| `/portal/buyer/$token`, `/portal/seller/$token` | redirect → `/operacion/$token` (War Room canónica) |
 
-## Detalles técnicos
+Rutas huérfanas del sistema Proveedores/RFQ — enlazar desde el detalle del trade en lugar de dejarlas colgadas:
+- `/dashboard/proveedores` (+ `$id`, `/dashboard/proveedor`): enlazadas desde el panel "Contraparte" del detalle de trade (botón "Ver proveedor").
+- `/dashboard/rfqs` (+ `$id`, `nuevo`): enlazadas desde el detalle de trade en el panel "Requerimiento origen".
+- `/dashboard/enlaces`, `/dashboard/invitaciones`, `/dashboard/fletes`: dejar como sub-vistas de admin — añadir un pequeño índice "Herramientas" al pie del rail (grupo CUENTA), no como items sueltos.
 
-- Firma HMAC actual (`signature_hmac`) sigue vinculando `signer_user_id + envelope.document_hash + timestamp`.
-- El PDF final estampado guarda su propio SHA-256; se registra en `document_registry` para que el QR de verificación resuelva vía `/verificar/$ref`.
-- Idempotencia: `createOperationSignatureFlow` usa `metadata.idempotency_key = op:{opId}:doc:{docId}:v{version}` para evitar duplicar envelopes de la misma versión.
-- Segregación RLS: buyer solo ve envelopes donde es firmante o el doc tiene `visibility in ('shared','buyer_only')`; idem seller.
+## 2. Panel Compliance (nuevo)
+
+Componente reusable `src/features/trades/TradeComplianceChecklist.tsx`:
+- Carga `supabase.rpc('trade_documents_checklist', { p_trade_id })` y `trade_documents_readiness`.
+- Agrupa por `section` ordenado por `section_no`, cada fila ordenada por `sequence`.
+- Cada ítem: título + descripción + badge de `status` (falta / subido / aprobado / observado / firmado), pill `obligation` (mandatory vs if_available vs conditional con tooltip de `condition`), autor esperado (`required_from_role`).
+- Barra superior: `mandatory_ok / mandatory_total` + estado `ready`.
+- Botón "Subir" por fila: abre input y llama a `attachOperacionDoc({ docType: item.doc_kind, ... })` — el `doc_kind` del catálogo es el `docType` (no editable). Refresca ambos RPC al terminar.
+- Suscripción realtime a `trade_documents` filtrada por `trade_id` para refrescar el checklist sin recargar.
+
+Integración:
+- `src/routes/_authenticated.dashboard.trades_.$tradeId.tsx` → añadir el panel en el layout del detalle. El botón "Pasar a evaluación comercial" se **deshabilita** mientras `ready === false`, con tooltip "Faltan N documentos obligatorios".
+- `src/routes/operacion.$token.tsx` (War Room pública) → mismo panel en modo restringido: solo muestra ítems visibles a la contraparte y los `Subir` respetan el token (`attachOperacionDoc` ya soporta upload por token; se pasa `docType = doc_kind`).
+
+## 3. Navegación cruzada desde el detalle del trade
+
+Nuevo panel lateral "Enlaces de la operación" en `_authenticated.dashboard.trades_.$tradeId.tsx`:
+- Contraparte: link a `/dashboard/proveedores/$id` (si `business_partner_id`), botón "Invitar proveedor" → `/inscripcion?trade=$tradeId`.
+- Requerimiento origen: link a `/dashboard/rfqs/$id` si existe `rfq_id` en el trade (si no existe la columna, botón "Crear RFQ" → `/dashboard/rfqs/nuevo?trade=$tradeId`).
+- War Room de contraparte: botón "Abrir War Room" que ejecuta `ensureCounterpartyLink` y copia el URL de `operacionUrl(token)`.
+
+## 4. Landing y menú público
+
+- `src/features/marketing/MarketingLanding.tsx:309` → cambiar `to="/dashboard/commodity-lots"` por `to="/marketplace"`.
+- `src/components/shell/AppShell.tsx` (`NAV`) → añadir `{ to: "/inscripcion", key: "nav_supplier_signup" }` y `{ to: "/rfqs", key: "nav_rfqs" }`. Registrar las dos llaves en `src/features/marketing/i18n.ts` (es/en).
+
+## 5. Verificación
+
+- Después de aplicar migraciones: `SELECT proname FROM pg_proc WHERE proname IN ('trade_documents_checklist','trade_documents_readiness')` debe devolver 2 filas y `to_regclass('public.operation_document_structure')` no nulo.
+- Abrir un trade de copper existente: el checklist debe mostrar las 40 filas REICON, estado inicial "falta", `ready=false`, y el botón "Pasar a evaluación comercial" deshabilitado.
+- Subir un documento por el panel: la fila cambia a "subido/aprobado" y `mandatory_ok` incrementa sin recargar.
 
 ## Fuera de alcance
 
-- Firma con certificado avanzado (eIDAS / FEA Chile) — se mantiene firma electrónica simple con HMAC + auditoría.
-- Nueva UI de creación de plantillas custom; se usan las plantillas ya existentes (NDA, NCNDA, LOI, SPA).
+No se toca `supabase/migrations/*` (solo se aplican), ni `etl/`, `packages/reglas/`, `tests/`, `docs/`. No se agregan tablas ni RPC nuevos. No se elimina el sistema "Operaciones" del backend, solo se redirigen sus rutas de UI.
