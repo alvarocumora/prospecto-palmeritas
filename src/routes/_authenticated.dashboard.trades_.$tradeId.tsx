@@ -287,6 +287,14 @@ function TrackingPage() {
         </div>
       </div>
 
+      {/* Negociación estructurada de términos (oferta / contra-oferta) */}
+      <TradeNegotiationPanel
+        tradeId={trade.id}
+        onAccepted={() => {
+          void qc.invalidateQueries({ queryKey: ["trade-tracking", trade.id] });
+        }}
+      />
+
       {/* Checklist REICON: compliance de la operación */}
       <TradeComplianceChecklist tradeId={trade.id} onReadinessChange={setReadiness} />
 
