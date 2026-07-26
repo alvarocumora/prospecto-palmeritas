@@ -108,11 +108,11 @@ export function TradeNegotiationPanel({
   const { data, isLoading, refetch } = useQuery({
     queryKey,
     queryFn: async (): Promise<NegotiationRow[]> => {
-      const { data, error } = await supabase.rpc("get_trade_negotiation", {
+      const { data, error } = await (supabase.rpc as any)("get_trade_negotiation", {
         p_trade_id: tradeId,
       });
       if (error) throw new Error(error.message);
-      return (data ?? []) as NegotiationRow[];
+      return (data ?? []) as unknown as NegotiationRow[];
     },
     staleTime: 15_000,
     refetchInterval: 45_000,
