@@ -124,7 +124,7 @@ export function TradeNegotiationPanel({
   const submitPropose = async (args: ProposeArgs) => {
     setBusy("propose");
     try {
-      const { error } = await supabase.rpc("propose_trade_terms", args);
+      const { error } = await (supabase.rpc as any)("propose_trade_terms", args);
       if (error) throw new Error(error.message);
       toast.success(args.p_replies_to ? "Contra-oferta enviada" : "Oferta enviada");
       setFormOpen(false);
@@ -147,7 +147,7 @@ export function TradeNegotiationPanel({
     }
     setBusy(offer.id);
     try {
-      const { error } = await supabase.rpc("respond_trade_terms", {
+      const { error } = await (supabase.rpc as any)("respond_trade_terms", {
         p_offer_id: offer.id,
         p_action: action,
         p_note: note,
