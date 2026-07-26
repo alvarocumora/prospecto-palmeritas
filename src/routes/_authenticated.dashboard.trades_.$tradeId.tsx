@@ -75,9 +75,31 @@ const CATEGORY_COLOR: Record<TimelineItem["category"], string> = {
 const usd0 = (n: number | null | undefined) =>
   n != null ? `US$ ${Math.round(n).toLocaleString("es-CL")}` : "—";
 
+const STAGE_ORDER = ["icpo", "fco", "spa", "payment", "shipping", "delivered", "closed"] as const;
+type Stage = (typeof STAGE_ORDER)[number];
+const STAGE_LABEL: Record<Stage, string> = {
+  icpo: "ICPO",
+  fco: "Evaluación comercial (FCO)",
+  spa: "Contrato (SPA)",
+  payment: "Pago",
+  shipping: "Embarque",
+  delivered: "Entregado",
+  closed: "Cerrado",
+};
+
 function TrackingPage() {
   const { tradeId } = Route.useParams();
   const fn = useServerFn(getTradeTracking);
+  const advanceStage = useServerFn(setTradeStage);
+  const qc = useQueryClient();
+  const [readiness, setReadiness] = useState<{
+    mandatory_total: number;
+    mandatory_ok: number;
+    mandatory_missing: number;
+    optional_total: number;
+    ready: boolean;
+  } | null>(null);
+  const [advancing, setAdvancing] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["trade-tracking", tradeId],
     queryFn: () => fn({ data: { tradeId } }),
