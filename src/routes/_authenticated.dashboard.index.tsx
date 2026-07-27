@@ -22,6 +22,7 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
+import { useMyModules, type ModuleInfo } from "@/hooks/useMyModules";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
 import { getBusinessOverview } from "@/lib/businessOverview.functions";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
@@ -33,6 +34,9 @@ import { normalizeEvent } from "@/lib/tradeTimeline";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   head: () => ({ meta: [{ title: "Centro de Negocios — Geocapitals" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    locked: typeof s.locked === "string" ? (s.locked as string) : undefined,
+  }),
   component: BusinessHome,
 });
 
