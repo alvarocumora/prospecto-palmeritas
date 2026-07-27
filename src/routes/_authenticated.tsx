@@ -446,10 +446,47 @@ function AuthenticatedLayout() {
     },
   ].filter(Boolean) as RailItem[];
 
+  // Filtro por módulo SaaS (get_my_modules): si el plan restringe módulos,
+  // ocultamos las rutas que no están habilitadas. Los items "core" (Inicio,
+  // Analítica, perfil, plan, admin) son transversales y siempre visibles.
+  const availableModuleKeys = new Set((myModules?.modules ?? []).map((m) => m.key));
+  const unrestricted = myModules?.unrestricted ?? true;
+  const allowedItems = items.filter((it) => {
+    const mod = moduleForRoute(it.to);
+    if (mod === "core") return true;
+    if (!unrestricted && !availableModuleKeys.has(mod)) return false;
+    if (selectedModule !== "all" && mod !== selectedModule) return false;
+    return true;
+  });
+
+  // Gate de ruta: si el usuario navegó a una ruta cuyo módulo no está en su plan,
+  // redirigimos al Inicio con aviso.
+  useEffect(() => {
+    if (!myModules || unrestricted) return;
+    const currentModule = moduleForRoute(location.pathname);
+    if (currentModule === "core") return;
+    if (!availableModuleKeys.has(currentModule)) {
+      navigate({ to: "/dashboard", search: { locked: currentModule } as never });
+    }
+  }, [location.pathname, myModules, unrestricted]);
+
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
-      <CommandRail items={items} brand={null} />
+      <CommandRail
+        items={allowedItems}
+        brand={null}
+        topSlot={
+          myModules && myModules.modules.length > 0 ? (
+            <ModuleSwitcher
+              modules={myModules.modules}
+              selected={selectedModule}
+              onSelect={setSelectedModule}
+              locale={locale}
+            />
+          ) : null
+        }
+      />
 
       {/* Mobile drawer */}
       <MobileDrawer
