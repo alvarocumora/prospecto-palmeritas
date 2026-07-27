@@ -19,10 +19,12 @@ export function CommandRail({
   items,
   footer,
   brand,
+  topSlot,
 }: {
   items: RailItem[];
   footer?: ReactNode;
   brand?: ReactNode;
+  topSlot?: ReactNode;
 }) {
   const location = useLocation();
   const [pinned, setPinned] = useState(false);
@@ -106,6 +108,8 @@ export function CommandRail({
           {brand}
         </div>
       )}
+
+      {topSlot && expanded && <div className="shrink-0">{topSlot}</div>}
 
       <nav className="flex-1 overflow-y-auto py-2 scrollbar-none">
         {groupOrder.map((group, gi) => {
