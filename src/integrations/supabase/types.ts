@@ -9969,6 +9969,39 @@ export type Database = {
         }
         Relationships: []
       }
+      modules_catalog: {
+        Row: {
+          description_en: string | null
+          description_es: string | null
+          display_order: number
+          gated: boolean
+          icon: string | null
+          key: string
+          name_en: string
+          name_es: string
+        }
+        Insert: {
+          description_en?: string | null
+          description_es?: string | null
+          display_order?: number
+          gated?: boolean
+          icon?: string | null
+          key: string
+          name_en: string
+          name_es: string
+        }
+        Update: {
+          description_en?: string | null
+          description_es?: string | null
+          display_order?: number
+          gated?: boolean
+          icon?: string | null
+          key?: string
+          name_en?: string
+          name_es?: string
+        }
+        Relationships: []
+      }
       ni43101_gap_findings: {
         Row: {
           category: string
@@ -11530,6 +11563,24 @@ export type Database = {
           revenue_factor?: number
           strip_ratio?: number | null
           tonnage_mt?: number | null
+        }
+        Relationships: []
+      }
+      plan_entitlements: {
+        Row: {
+          key: string
+          kind: string
+          plan_code: string
+        }
+        Insert: {
+          key: string
+          kind: string
+          plan_code: string
+        }
+        Update: {
+          key?: string
+          kind?: string
+          plan_code?: string
         }
         Relationships: []
       }
@@ -16358,6 +16409,84 @@ export type Database = {
           },
         ]
       }
+      trade_negotiations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          delivery_from: string | null
+          delivery_to: string | null
+          id: string
+          incoterm: string | null
+          message: string | null
+          party: string
+          payment_terms: string | null
+          port_discharge: string | null
+          port_loading: string | null
+          price_usd_t: number | null
+          quantity_t: number | null
+          replies_to: string | null
+          shipping_notes: string | null
+          status: string
+          trade_id: string
+          valid_until: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          delivery_from?: string | null
+          delivery_to?: string | null
+          id?: string
+          incoterm?: string | null
+          message?: string | null
+          party: string
+          payment_terms?: string | null
+          port_discharge?: string | null
+          port_loading?: string | null
+          price_usd_t?: number | null
+          quantity_t?: number | null
+          replies_to?: string | null
+          shipping_notes?: string | null
+          status?: string
+          trade_id: string
+          valid_until?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          delivery_from?: string | null
+          delivery_to?: string | null
+          id?: string
+          incoterm?: string | null
+          message?: string | null
+          party?: string
+          payment_terms?: string | null
+          port_discharge?: string | null
+          port_loading?: string | null
+          price_usd_t?: number | null
+          quantity_t?: number | null
+          replies_to?: string | null
+          shipping_notes?: string | null
+          status?: string
+          trade_id?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_negotiations_replies_to_fkey"
+            columns: ["replies_to"]
+            isOneToOne: false
+            referencedRelation: "trade_negotiations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "trade_negotiations_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_pack_versions: {
         Row: {
           created_at: string
@@ -16466,6 +16595,98 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "trade_payments_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_products: {
+        Row: {
+          added_by_role: string
+          created_at: string
+          created_by: string | null
+          grade_unit: string | null
+          grade_value: number | null
+          hs_code: string | null
+          id: string
+          incoterm: string | null
+          notes: string | null
+          origin_country: string | null
+          origin_region: string | null
+          packaging: string | null
+          presentation: string | null
+          price_note: string | null
+          price_usd: number | null
+          product_name: string
+          purity: string | null
+          source_rfq_product_id: string | null
+          source_submission_id: string | null
+          source_supplier_offer_id: string | null
+          status: string
+          tonnage_monthly_t: number | null
+          tonnage_total_t: number | null
+          trade_id: string
+          updated_at: string
+        }
+        Insert: {
+          added_by_role?: string
+          created_at?: string
+          created_by?: string | null
+          grade_unit?: string | null
+          grade_value?: number | null
+          hs_code?: string | null
+          id?: string
+          incoterm?: string | null
+          notes?: string | null
+          origin_country?: string | null
+          origin_region?: string | null
+          packaging?: string | null
+          presentation?: string | null
+          price_note?: string | null
+          price_usd?: number | null
+          product_name: string
+          purity?: string | null
+          source_rfq_product_id?: string | null
+          source_submission_id?: string | null
+          source_supplier_offer_id?: string | null
+          status?: string
+          tonnage_monthly_t?: number | null
+          tonnage_total_t?: number | null
+          trade_id: string
+          updated_at?: string
+        }
+        Update: {
+          added_by_role?: string
+          created_at?: string
+          created_by?: string | null
+          grade_unit?: string | null
+          grade_value?: number | null
+          hs_code?: string | null
+          id?: string
+          incoterm?: string | null
+          notes?: string | null
+          origin_country?: string | null
+          origin_region?: string | null
+          packaging?: string | null
+          presentation?: string | null
+          price_note?: string | null
+          price_usd?: number | null
+          product_name?: string
+          purity?: string | null
+          source_rfq_product_id?: string | null
+          source_submission_id?: string | null
+          source_supplier_offer_id?: string | null
+          status?: string
+          tonnage_monthly_t?: number | null
+          tonnage_total_t?: number | null
+          trade_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_products_trade_id_fkey"
             columns: ["trade_id"]
             isOneToOne: false
             referencedRelation: "commodity_trades"
@@ -17057,6 +17278,7 @@ export type Database = {
       }
     }
     Functions: {
+      _commodity_key: { Args: { p: string }; Returns: string }
       accept_partner_invitation: {
         Args: {
           _chosen_role: Database["public"]["Enums"]["partner_invitation_role"]
@@ -17236,6 +17458,7 @@ export type Database = {
           website: string
         }[]
       }
+      get_my_modules: { Args: never; Returns: Json }
       get_org_plan: {
         Args: { _org_id: string }
         Returns: {
@@ -17293,6 +17516,55 @@ export type Database = {
           target_id: string
         }[]
       }
+      get_trade_negotiation: {
+        Args: { p_trade_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          delivery_from: string
+          delivery_to: string
+          id: string
+          incoterm: string
+          message: string
+          party: string
+          payment_terms: string
+          port_discharge: string
+          port_loading: string
+          price_usd_t: number
+          quantity_t: number
+          replies_to: string
+          shipping_notes: string
+          status: string
+          valid_until: string
+        }[]
+      }
+      get_trade_products: {
+        Args: { p_trade_id: string }
+        Returns: {
+          added_by_role: string
+          created_at: string
+          grade_unit: string
+          grade_value: number
+          hs_code: string
+          id: string
+          incoterm: string
+          notes: string
+          origin_country: string
+          origin_region: string
+          packaging: string
+          presentation: string
+          price_note: string
+          price_usd: number
+          product_name: string
+          purity: string
+          source_rfq_product_id: string
+          source_submission_id: string
+          source_supplier_offer_id: string
+          status: string
+          tonnage_monthly_t: number
+          tonnage_total_t: number
+        }[]
+      }
       get_trade_screenings: {
         Args: { p_trade_id: string }
         Returns: {
@@ -17346,6 +17618,14 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      import_submission_to_trade_products: {
+        Args: { p_submission_id: string; p_trade_id: string }
+        Returns: string
+      }
+      import_supplier_offer_to_trade: {
+        Args: { p_supplier_offer_id: string; p_trade_id: string }
+        Returns: string
       }
       increment_usage: {
         Args: { _delta?: number; _metric: string; _org_id: string }
@@ -17472,6 +17752,25 @@ export type Database = {
         Args: { _limit?: number; _min_score?: number; _region?: string }
         Returns: Json
       }
+      propose_trade_terms: {
+        Args: {
+          p_delivery_from?: string
+          p_delivery_to?: string
+          p_incoterm?: string
+          p_message?: string
+          p_party: string
+          p_payment_terms?: string
+          p_port_discharge?: string
+          p_port_loading?: string
+          p_price_usd_t?: number
+          p_quantity_t?: number
+          p_replies_to?: string
+          p_shipping_notes?: string
+          p_trade_id: string
+          p_valid_until?: string
+        }
+        Returns: string
+      }
       purge_privacy_retention: { Args: never; Returns: undefined }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
@@ -17521,6 +17820,10 @@ export type Database = {
       refresh_all_projects_satellite: { Args: never; Returns: number }
       refresh_precios_global: { Args: never; Returns: number }
       requeue_stuck_jobs: { Args: { _older_than?: string }; Returns: number }
+      respond_trade_terms: {
+        Args: { p_action: string; p_note?: string; p_offer_id: string }
+        Returns: undefined
+      }
       schedule_compliance_evaluations: { Args: never; Returns: number }
       schedule_gold_spot_fetch: { Args: never; Returns: string }
       schedule_satellite_polling: { Args: never; Returns: number }
