@@ -53,11 +53,14 @@ import {
 
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
+import { useMyModules, useSelectedModule } from "@/hooks/useMyModules";
 import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
+import { ModuleSwitcher } from "@/components/ops/ModuleSwitcher";
 import { TopBar } from "@/components/ops/TopBar";
 import { StatusBar } from "@/components/ops/StatusBar";
 import { MobileBottomNav } from "@/components/ops/MobileBottomNav";
 import { Logo } from "@/components/Logo";
+import { moduleForRoute } from "@/lib/modules";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -70,6 +73,9 @@ function AuthenticatedLayout() {
   const role = useProjectRole();
   const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
+  const { data: myModules } = useMyModules();
+  const [selectedModule, setSelectedModule] = useSelectedModule(myModules?.modules);
+  const locale: "es" | "en" = (profile as any)?.language === "en" ? "en" : "es";
   const navigate = useNavigate();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
