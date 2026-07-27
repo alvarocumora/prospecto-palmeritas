@@ -59,6 +59,9 @@ function BusinessHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
   const { isComplete: onboardingComplete, refresh: refreshOnboarding } = useOnboardingStatus();
+  const { locked } = Route.useSearch();
+  const { data: myModules } = useMyModules();
+  const locale: "es" | "en" = (profile as any)?.language === "en" ? "en" : "es";
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "";
   const needsOnboarding = !profile?.account_type || !onboardingComplete;
   const isInvestor = profile?.account_type === "investor";
@@ -99,6 +102,42 @@ function BusinessHome() {
             </Link>
           </div>
         </header>
+
+        {locked && (
+          <div className="rounded-md border border-signal-amber/50 bg-signal-amber/10 px-3 py-2 text-xs text-signal-amber">
+            {locale === "es"
+              ? `El módulo "${locked}" no está incluido en tu plan actual. Contacta a Geocapitals para habilitarlo.`
+              : `The "${locked}" module is not included in your current plan. Contact Geocapitals to enable it.`}
+          </div>
+        )}
+
+        {myModules && myModules.modules.length > 1 && (
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {myModules.modules.map((m: ModuleInfo) => (
+              <Link
+                key={m.key}
+                to={
+                  m.key === "commodities"
+                    ? "/dashboard/trades"
+                    : m.key === "capital"
+                      ? "/dashboard/deals"
+                      : "/dashboard/projects"
+                }
+                className="rounded-md border border-border bg-bg-secondary/30 p-3 hover:border-primary/60 hover:bg-accent/40 transition-colors"
+              >
+                <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                  {locale === "es" ? "Módulo" : "Module"}
+                </div>
+                <div className="text-sm font-semibold mt-0.5">
+                  {locale === "es" ? m.name_es : m.name_en}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 line-clamp-2">
+                  {locale === "es" ? m.description_es : m.description_en}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
 
         {needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
 
