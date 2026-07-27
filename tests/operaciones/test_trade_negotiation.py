@@ -10,6 +10,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 MIG = ROOT / "supabase/migrations/20260726010000_trade_negotiation.sql"
+MIG_LINK = ROOT / "supabase/migrations/20260726030000_negociacion_por_link.sql"
 
 STUBS = """
 CREATE SCHEMA IF NOT EXISTS auth;
@@ -35,6 +36,7 @@ def cur():
     c.execute("DROP TABLE IF EXISTS public.trade_negotiations, public.commodity_trades CASCADE")
     c.execute(STUBS)
     c.execute(MIG.read_text())
+    c.execute(MIG_LINK.read_text())      # relajación para flujo por link
     c.execute("INSERT INTO public.commodity_trades (commodity) VALUES ('Copper Cathode') RETURNING id")
     tid = c.fetchone()[0]
     yield c, tid
@@ -94,6 +96,18 @@ def test_no_responder_propuesta_cerrada(cur):
     c.execute("SELECT public.respond_trade_terms(%s,'accept')", (o1,))
     with pytest.raises(Exception):
         c.execute("SELECT public.respond_trade_terms(%s,'reject')", (o1,))
+
+
+def test_negociacion_por_link_sin_sesion(cur):
+    # Flujo por link: el server fn valida el token y llama sin auth.uid().
+    c, tid = cur
+    c.execute("CREATE OR REPLACE FUNCTION auth.uid() RETURNS uuid LANGUAGE sql STABLE AS $$ SELECT NULL::uuid $$")
+    o1 = _propose(c, tid, "buyer", 9100)          # contraparte propone por link, sin cuenta
+    c.execute("SELECT created_by FROM public.trade_negotiations WHERE id=%s", (o1,))
+    assert c.fetchone()[0] is None                # created_by null en flujo por token
+    c.execute("SELECT public.respond_trade_terms(%s,'accept')", (o1,))
+    c.execute("SELECT unit_price_usd FROM public.commodity_trades WHERE id=%s", (tid,))
+    assert float(c.fetchone()[0]) == 9100         # aceptar por link vuelca al trade
 
 
 def test_hilo_de_negociacion_ordenado(cur):
