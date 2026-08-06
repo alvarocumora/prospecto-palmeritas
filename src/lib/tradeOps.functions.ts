@@ -206,9 +206,18 @@ export type OperacionPayload = {
 };
 
 export const getOperacionByToken = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        session: z.string().min(10).max(200),
+      })
+      .parse(d),
+  )
   .handler(async ({ data }): Promise<OperacionPayload | null> => {
     if (!isOpsTokenFormat(data.token)) return null;
+    const { getPortalSession } = await import("@/lib/portalSession.server");
+    if (!(await getPortalSession(data.token, data.session))) return null;
     const sb = serviceClient();
     if (!sb) return null;
 
@@ -341,11 +350,14 @@ export const requestOperacionUpload = createServerFn({ method: "POST" })
     z
       .object({
         token: z.string().min(10).max(120),
+        session: z.string().min(10).max(200),
         fileName: z.string().min(1).max(300),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    const { requirePortalSession } = await import("@/lib/portalSession.server");
+    await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
     const safe = data.fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
@@ -365,6 +377,7 @@ export const attachOperacionDoc = createServerFn({ method: "POST" })
     z
       .object({
         token: z.string().min(10).max(120),
+        session: z.string().min(10).max(200),
         docType: z.string().trim().min(1).max(60),
         filePath: z.string().min(1).max(500),
         reference: z.string().trim().max(120).optional(),
@@ -372,6 +385,8 @@ export const attachOperacionDoc = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    const { requirePortalSession } = await import("@/lib/portalSession.server");
+    await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
     // Debe apuntar al bucket del propio trade.
@@ -431,6 +446,7 @@ export const acceptOperacionTerms = createServerFn({ method: "POST" })
     z
       .object({
         token: z.string().min(10).max(120),
+        session: z.string().min(10).max(200),
         acceptorName: z.string().trim().min(2).max(160),
         acceptorTitle: z.string().trim().max(160).optional(),
         note: z.string().trim().max(1000).optional(),
@@ -438,6 +454,8 @@ export const acceptOperacionTerms = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
+    const { requirePortalSession } = await import("@/lib/portalSession.server");
+    await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
     const detail = [
@@ -461,8 +479,17 @@ export const acceptOperacionTerms = createServerFn({ method: "POST" })
  *  la War Room de contraparte. Reusa los RPCs `trade_documents_checklist` y
  *  `trade_documents_readiness` con el service client (bypass RLS/grants). */
 export const getOperacionChecklist = createServerFn({ method: "POST" })
-  .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        token: z.string().min(10).max(120),
+        session: z.string().min(10).max(200),
+      })
+      .parse(d),
+  )
   .handler(async ({ data }) => {
+    const { requirePortalSession } = await import("@/lib/portalSession.server");
+    await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
     if (!ctx) throw new Error("Enlace no válido.");
     const [c, r] = await Promise.all([
