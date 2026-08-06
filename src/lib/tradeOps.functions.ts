@@ -324,7 +324,7 @@ async function resolveTradeByToken(
   token: string,
 ): Promise<{
   tradeId: string;
-  role: "buyer" | "seller";
+  role: OperacionPayload["role"];
   ownerId: string;
   sb: SupabaseClient;
 } | null> {
@@ -350,8 +350,23 @@ async function resolveTradeByToken(
     const r = s as { id: string; created_by: string };
     return { tradeId: r.id, role: "seller", ownerId: r.created_by, sb };
   }
+  // Participante adicional con permiso explícito de carga.
+  const { resolveAccessLinkByHash } = await import("@/lib/tradeAccess.server");
+  const link = await resolveAccessLinkByHash(sb, hash);
+  if (link && link.canUpload) {
+    const { data: t } = await sb
+      .from("commodity_trades")
+      .select("id, created_by")
+      .eq("id", link.tradeId)
+      .maybeSingle();
+    if (t) {
+      const r = t as { id: string; created_by: string };
+      return { tradeId: r.id, role: link.role, ownerId: r.created_by, sb };
+    }
+  }
   return null;
 }
+
 
 
 /** Prepara URL firmada para que la contraparte externa suba un archivo al bucket
