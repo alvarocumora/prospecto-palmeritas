@@ -10,6 +10,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 MIG = ROOT / "supabase/migrations/20260804000000_trade_margin_split.sql"
+MIG2 = ROOT / "supabase/migrations/20260804010000_margin_extra_pool.sql"
 
 STUBS = """
 CREATE SCHEMA IF NOT EXISTS auth;
@@ -34,6 +35,7 @@ def cur():
     c.execute("DROP TABLE IF EXISTS public.trade_commission_splits, public.trade_pricing, public.commodity_trades CASCADE")
     c.execute(STUBS)
     c.execute(MIG.read_text())
+    c.execute(MIG2.read_text())      # pool extra
     c.execute("INSERT INTO public.commodity_trades (commodity) VALUES ('Gold') RETURNING id")
     tid = c.fetchone()[0]
     # base 100 / venta 120 / 10 unidades => margen 200
@@ -76,6 +78,25 @@ def test_qty_override(cur):
     c.execute("SELECT public.get_trade_margin_split(%s, 20)", (tid,))   # qty 20 en vez de 10
     r = c.fetchone()[0]
     assert float(r["margin"]) == 400 and float(r["distribution"][0]["amount"]) == 400
+
+
+def test_deal_oro_pool_extra_reparte_en_4(cur):
+    # Caso real: base 113.000 / venta 117.000 / 5.000 g => margen 20.000.000.
+    # + pool extra 5.000.000 => distributable 25.000.000, repartido en 4 = 6.250.000 c/u.
+    c, tid = cur
+    c.execute("DELETE FROM public.trade_pricing WHERE trade_id=%s", (tid,))
+    c.execute("INSERT INTO public.trade_pricing (trade_id, unit, base_price, sale_price, currency, "
+              "qty_per_order, extra_pool_per_order) VALUES (%s,'g',113000,117000,'CLP',5000,5000000)", (tid,))
+    for i in range(1, 5):
+        c.execute("INSERT INTO public.trade_commission_splits (trade_id, beneficiary_type, beneficiary_name, "
+                  "share_kind, share_value, sort) VALUES (%s,'operator',%s,'fixed_per_order',6250000,%s)",
+                  (tid, f"Socio {i}", i))
+    c.execute("SELECT public.get_trade_margin_split(%s)", (tid,))
+    r = c.fetchone()[0]
+    assert float(r["margin"]) == 20000000 and float(r["extra_pool"]) == 5000000
+    assert float(r["distributable"]) == 25000000
+    assert float(r["distributed"]) == 25000000 and float(r["remaining"]) == 0
+    assert all(float(d["amount"]) == 6250000 for d in r["distribution"])
 
 
 def test_reparto_es_staff_only(cur):
