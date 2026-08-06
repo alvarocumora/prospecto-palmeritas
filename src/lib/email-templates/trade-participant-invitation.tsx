@@ -36,7 +36,7 @@ const Email = ({ name, company, role, commodity, reference, accessUrl }: Props) 
 
     {accessUrl ? (
       <>
-        <Button href={accessUrl} style={styles.button}>
+        <Button href={accessUrl} style={styles.cta}>
           Abrir la operación
         </Button>
         <Text style={styles.muted}>{accessUrl}</Text>
