@@ -292,6 +292,7 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
 
     return {
       role,
+      readOnly,
       tradeId,
       trade: {
         reference: (trade.reference as string) ?? null,
