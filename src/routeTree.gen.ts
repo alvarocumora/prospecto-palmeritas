@@ -54,6 +54,7 @@ import { Route as InscripcionGraciasRouteImport } from './routes/inscripcion.gra
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
+import { Route as FichaTokenRouteImport } from './routes/ficha.$token'
 import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedor.$token'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto'
@@ -402,6 +403,11 @@ const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
 const FirmarTokenRoute = FirmarTokenRouteImport.update({
   id: '/firmar/$token',
   path: '/firmar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichaTokenRoute = FichaTokenRouteImport.update({
+  id: '/ficha/$token',
+  path: '/ficha/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FichaProveedorTokenRoute = FichaProveedorTokenRouteImport.update({
@@ -1159,6 +1165,7 @@ export interface FileRoutesByFullPath {
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
+  '/ficha/$token': typeof FichaTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1330,6 +1337,7 @@ export interface FileRoutesByTo {
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
+  '/ficha/$token': typeof FichaTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1503,6 +1511,7 @@ export interface FileRoutesById {
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/ficha-proveedor/$token': typeof FichaProveedorTokenRoute
+  '/ficha/$token': typeof FichaTokenRoute
   '/firmar/$token': typeof FirmarTokenRoute
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
@@ -1676,6 +1685,7 @@ export interface FileRouteTypes {
     | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
+    | '/ficha/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -1847,6 +1857,7 @@ export interface FileRouteTypes {
     | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
+    | '/ficha/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -2019,6 +2030,7 @@ export interface FileRouteTypes {
     | '/catastro/proyecto'
     | '/email/unsubscribe'
     | '/ficha-proveedor/$token'
+    | '/ficha/$token'
     | '/firmar/$token'
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
@@ -2191,6 +2203,7 @@ export interface RootRouteChildren {
   CatastroProyectoRoute: typeof CatastroProyectoRouteWithChildren
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   FichaProveedorTokenRoute: typeof FichaProveedorTokenRoute
+  FichaTokenRoute: typeof FichaTokenRoute
   FirmarTokenRoute: typeof FirmarTokenRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
@@ -2558,6 +2571,13 @@ declare module '@tanstack/react-router' {
       path: '/firmar/$token'
       fullPath: '/firmar/$token'
       preLoaderRoute: typeof FirmarTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ficha/$token': {
+      id: '/ficha/$token'
+      path: '/ficha/$token'
+      fullPath: '/ficha/$token'
+      preLoaderRoute: typeof FichaTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ficha-proveedor/$token': {
@@ -3815,6 +3835,7 @@ const rootRouteChildren: RootRouteChildren = {
   CatastroProyectoRoute: CatastroProyectoRouteWithChildren,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   FichaProveedorTokenRoute: FichaProveedorTokenRoute,
+  FichaTokenRoute: FichaTokenRoute,
   FirmarTokenRoute: FirmarTokenRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
