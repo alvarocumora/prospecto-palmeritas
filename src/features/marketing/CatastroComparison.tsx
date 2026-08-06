@@ -99,10 +99,15 @@ function CellView({ cell }: { cell: Cell }) {
 }
 
 export function CatastroComparison() {
-  // Formato determinístico (evita mismatch SSR/CSR por diferencias de ICU en "es-CL")
-  const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-  const d = new Date();
-  const today = `${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+  // La fecha se calcula sólo tras montar: el servidor y el cliente pueden estar
+  // en días distintos (husos horarios) y eso rompía la hidratación.
+  const [today, setToday] = useState<string>("");
+  useEffect(() => {
+    const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    const d = new Date();
+    setToday(`${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`);
+  }, []);
+
 
 
   return (
