@@ -172,7 +172,8 @@ export const ensureCounterpartyLink = createServerFn({ method: "POST" })
 
 // ---------- Público: contraparte accede al War Room con su token ----------
 export type OperacionPayload = {
-  role: "buyer" | "seller";
+  role: "buyer" | "seller" | "broker" | "advisor" | "observer" | "geocapitals";
+  readOnly?: boolean;
   tradeId: string;
   trade: {
     reference: string | null;
