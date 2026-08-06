@@ -91,7 +91,7 @@ function MineDescentPanel() {
       50 +
       Math.sin((i + tick) * 0.35) * 14 +
       Math.sin((i + tick) * 0.11) * 6 +
-      (Math.random() - 0.5) * 2;
+      Math.sin((i + tick) * 1.73) * 1;
     return `${x},${y}`;
   });
 
