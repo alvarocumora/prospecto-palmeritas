@@ -457,6 +457,7 @@ function AcceptTermsPanel({
       await acceptFn({
         data: {
           token,
+          session,
           acceptorName: name.trim(),
           acceptorTitle: title.trim() || undefined,
           note: note.trim() || undefined,
