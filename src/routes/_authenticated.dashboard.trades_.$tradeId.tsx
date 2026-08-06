@@ -325,8 +325,6 @@ function TrackingPage() {
             trade.unit_price_usd != null
               ? `US$ ${Number(trade.unit_price_usd).toLocaleString("es-CL")} / t`
               : null,
-          buyer: trade.counterparty_name ?? null,
-          seller: trade.counterparty_company ?? null,
         }}
       />
 
