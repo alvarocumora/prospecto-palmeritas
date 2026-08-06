@@ -16285,6 +16285,74 @@ export type Database = {
           },
         ]
       }
+      trade_access_links: {
+        Row: {
+          access_count: number
+          can_negotiate: boolean
+          can_upload: boolean
+          company: string | null
+          created_at: string
+          created_by: string | null
+          email: string
+          expires_at: string | null
+          full_name: string | null
+          id: string
+          last_access_at: string | null
+          revoked_at: string | null
+          role: string
+          token_hash: string
+          token_prefix: string
+          trade_id: string
+          updated_at: string
+        }
+        Insert: {
+          access_count?: number
+          can_negotiate?: boolean
+          can_upload?: boolean
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          email: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          last_access_at?: string | null
+          revoked_at?: string | null
+          role: string
+          token_hash: string
+          token_prefix: string
+          trade_id: string
+          updated_at?: string
+        }
+        Update: {
+          access_count?: number
+          can_negotiate?: boolean
+          can_upload?: boolean
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          email?: string
+          expires_at?: string | null
+          full_name?: string | null
+          id?: string
+          last_access_at?: string | null
+          revoked_at?: string | null
+          role?: string
+          token_hash?: string
+          token_prefix?: string
+          trade_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_access_links_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_board_prefs: {
         Row: {
           column_order: string[]

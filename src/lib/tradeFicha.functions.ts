@@ -45,7 +45,7 @@ export type PublicFicha = {
   reference: string | null;
   pricing: FichaPricing;
   products: FichaProduct[];
-  role: "buyer" | "seller";
+  role: string;
   operacionUrl: string;
   fichaUrl: string;
 };
@@ -59,7 +59,7 @@ function serviceClient(): SupabaseClient | null {
 
 async function resolveTrade(
   token: string,
-): Promise<{ sb: SupabaseClient; tradeId: string; role: "buyer" | "seller" } | null> {
+): Promise<{ sb: SupabaseClient; tradeId: string; role: string } | null> {
   if (!TOKEN_RE.test(token)) return null;
   const sb = serviceClient();
   if (!sb) return null;
@@ -76,6 +76,9 @@ async function resolveTrade(
     .eq("counterparty_seller_token_hash", hash)
     .maybeSingle();
   if (s) return { sb, tradeId: (s as { id: string }).id, role: "seller" };
+  const { resolveAccessLinkByHash } = await import("@/lib/tradeAccess.server");
+  const link = await resolveAccessLinkByHash(sb, hash);
+  if (link) return { sb, tradeId: link.tradeId, role: link.role };
   return null;
 }
 

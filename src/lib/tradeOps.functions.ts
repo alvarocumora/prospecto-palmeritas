@@ -172,7 +172,8 @@ export const ensureCounterpartyLink = createServerFn({ method: "POST" })
 
 // ---------- Público: contraparte accede al War Room con su token ----------
 export type OperacionPayload = {
-  role: "buyer" | "seller";
+  role: "buyer" | "seller" | "broker" | "advisor" | "observer" | "geocapitals";
+  readOnly?: boolean;
   tradeId: string;
   trade: {
     reference: string | null;
@@ -220,7 +221,8 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
       )
       .eq("counterparty_buyer_token_hash", hash)
       .maybeSingle();
-    let role: "buyer" | "seller" | null = byBuyer ? "buyer" : null;
+    let role: OperacionPayload["role"] | null = byBuyer ? "buyer" : null;
+    let readOnly = false;
     let trade = byBuyer as Record<string, unknown> | null;
     if (!trade) {
       const { data: bySeller } = await sb
@@ -232,6 +234,23 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
         .maybeSingle();
       trade = bySeller as Record<string, unknown> | null;
       role = bySeller ? "seller" : null;
+    }
+    if (!trade) {
+      // Participante adicional (bróker, asesor, observador) del mismo trade.
+      const { resolveAccessLinkByHash } = await import("@/lib/tradeAccess.server");
+      const link = await resolveAccessLinkByHash(sb, hash);
+      if (link) {
+        const { data: extra } = await sb
+          .from("commodity_trades")
+          .select(
+            "id, reference, commodity, quantity_t, incoterm, unit_price_usd, total_value_usd, stage, status, created_at, counterparty_name, counterparty_company",
+          )
+          .eq("id", link.tradeId)
+          .maybeSingle();
+        trade = extra as Record<string, unknown> | null;
+        role = link.role;
+        readOnly = link.role !== "buyer" && link.role !== "seller" && !link.canNegotiate;
+      }
     }
     if (!trade || !role) return null;
     const tradeId = trade.id as string;
@@ -273,6 +292,7 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
 
     return {
       role,
+      readOnly,
       tradeId,
       trade: {
         reference: (trade.reference as string) ?? null,
@@ -304,7 +324,7 @@ async function resolveTradeByToken(
   token: string,
 ): Promise<{
   tradeId: string;
-  role: "buyer" | "seller";
+  role: OperacionPayload["role"];
   ownerId: string;
   sb: SupabaseClient;
 } | null> {
@@ -330,8 +350,23 @@ async function resolveTradeByToken(
     const r = s as { id: string; created_by: string };
     return { tradeId: r.id, role: "seller", ownerId: r.created_by, sb };
   }
+  // Participante adicional con permiso explícito de carga.
+  const { resolveAccessLinkByHash } = await import("@/lib/tradeAccess.server");
+  const link = await resolveAccessLinkByHash(sb, hash);
+  if (link && link.canUpload) {
+    const { data: t } = await sb
+      .from("commodity_trades")
+      .select("id, created_by")
+      .eq("id", link.tradeId)
+      .maybeSingle();
+    if (t) {
+      const r = t as { id: string; created_by: string };
+      return { tradeId: r.id, role: link.role, ownerId: r.created_by, sb };
+    }
+  }
   return null;
 }
+
 
 
 /** Prepara URL firmada para que la contraparte externa suba un archivo al bucket

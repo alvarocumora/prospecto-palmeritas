@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Check, Minus, ArrowRight } from "lucide-react";
 
@@ -101,8 +102,13 @@ function CellView({ cell }: { cell: Cell }) {
 export function CatastroComparison() {
   // Formato determinístico (evita mismatch SSR/CSR por diferencias de ICU en "es-CL")
   const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-  const d = new Date();
-  const today = `${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`;
+  // La fecha sólo se calcula en el cliente: el servidor renderiza en UTC y
+  // producía mismatch de hidratación al cruzar la medianoche local.
+  const [today, setToday] = useState("");
+  useEffect(() => {
+    const d = new Date();
+    setToday(`${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`);
+  }, []);
 
 
   return (
