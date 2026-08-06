@@ -183,14 +183,16 @@ function OperacionMirror() {
               </div>
             </section>
 
-            <AcceptTermsPanel
-              token={token}
-              role={data.role}
-              alreadyAccepted={data.events.some(
-                (e) => e.kind === "terms_accepted_by_counterparty",
-              )}
-              defaultName={data.counterparty.name ?? ""}
-            />
+            {data.role === "buyer" || data.role === "seller" ? (
+              <AcceptTermsPanel
+                token={token}
+                role={data.role}
+                alreadyAccepted={data.events.some(
+                  (e) => e.kind === "terms_accepted_by_counterparty",
+                )}
+                defaultName={data.counterparty.name ?? ""}
+              />
+            ) : null}
 
             <ComplianceChecklistPublic token={token} />
 
