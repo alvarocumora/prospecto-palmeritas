@@ -34,9 +34,9 @@ import { normalizeEvent } from "@/lib/tradeTimeline";
 
 export const Route = createFileRoute("/_authenticated/dashboard/")({
   head: () => ({ meta: [{ title: "Centro de Negocios — Geocapitals" }] }),
-  validateSearch: (s: Record<string, unknown>) => ({
-    locked: typeof s.locked === "string" ? (s.locked as string) : undefined,
-  }),
+  validateSearch: (s: Record<string, unknown>): { locked?: string } =>
+    typeof s.locked === "string" ? { locked: s.locked } : {},
+
   component: BusinessHome,
 });
 
