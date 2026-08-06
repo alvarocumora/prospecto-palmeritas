@@ -5,7 +5,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { MessageCircle, Mail, Link2, ArrowUpRight } from "lucide-react";
+import { MessageCircle, Mail, Link2, ArrowUpRight, FileDown, Loader2 } from "lucide-react";
 import {
   getPublicFicha,
   emailFichaToGeocapitals,
@@ -13,6 +13,9 @@ import {
   type FichaProduct,
 } from "@/lib/tradeFicha.functions";
 import { TradeDocsPanel } from "@/features/trades/TradeDocsPanel";
+import { renderGeocapitalsPdf, triggerPdfDownload } from "@/lib/documents/pdf";
+import { buildTradeFichaDoc, type TradeDocInput } from "@/lib/documents/tradeDocs";
+
 
 export const Route = createFileRoute("/ficha/$token")({
   loader: async ({ params }) => {
