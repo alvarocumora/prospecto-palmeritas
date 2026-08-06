@@ -28,6 +28,7 @@ import { template as antimonyProductSheet } from "./antimony-product-sheet";
 import { template as copperProductSheet } from "./copper-product-sheet";
 import { template as agentOutreach } from "./agent-outreach";
 import { template as tradePackDispatch } from "./trade-pack-dispatch";
+import { template as portalOtp } from "./portal-otp";
 import { template as partnerInvitation } from "./partner-invitation";
 import { template as supplierSheetDispatch } from "./supplier-sheet-dispatch";
 import { template as operationPortalInvitation } from "./operation-portal-invitation";
@@ -77,6 +78,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "copper-product-sheet": copperProductSheet,
   "agent-outreach": agentOutreach,
   "trade-pack-dispatch": tradePackDispatch,
+  "portal-otp": portalOtp,
   "partner-invitation": partnerInvitation,
   "supplier-sheet-dispatch": supplierSheetDispatch,
   "operation-portal-invitation": operationPortalInvitation,

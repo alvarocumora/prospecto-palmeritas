@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ import { publicUrl } from "@/lib/publicUrl";
 import { supabase } from "@/integrations/supabase/client";
 import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
+import { PortalGate, portalSessionKey } from "@/features/operations/PortalGate";
+import { PortalDocGenPanel } from "@/features/operations/PortalDocGenPanel";
 
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
@@ -33,12 +35,40 @@ function fmtMoney(n: number | null | undefined, unit = "US$") {
 function OperacionMirror() {
   const { token } = Route.useParams();
   const fn = useServerFn(getOperacionByToken);
+  const [session, setSession] = useState<string | null>(null);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    try {
+      setSession(window.localStorage.getItem(portalSessionKey(token)));
+    } catch {
+      setSession(null);
+    }
+    setReady(true);
+  }, [token]);
+
+  const clearSession = useCallback(() => {
+    try {
+      window.localStorage.removeItem(portalSessionKey(token));
+    } catch {
+      /* ignore */
+    }
+    setSession(null);
+  }, [token]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["operacion", token],
-    queryFn: () => fn({ data: { token } }),
+    queryKey: ["operacion", token, session],
+    enabled: ready && !!session,
+    queryFn: () => fn({ data: { token, session: session as string } }),
     staleTime: 30_000,
     refetchInterval: 60_000,
+    retry: false,
   });
+
+  // Sesión vencida o revocada -> volver a la puerta de acceso.
+  useEffect(() => {
+    if (session && ready && !isLoading && (error || data === null)) clearSession();
+  }, [session, ready, isLoading, error, data, clearSession]);
 
   return (
     <div
@@ -57,15 +87,22 @@ function OperacionMirror() {
       </header>
 
       <main className="mx-auto max-w-5xl px-6 py-10">
-        {isLoading && <p className="text-sm text-[hsl(var(--im-ink-soft))]">Cargando operación…</p>}
-        {(error || (!isLoading && !data)) && (
-          <div className="rounded-lg border border-[hsl(var(--im-hairline))] p-8 bg-white">
-            <h1 className="font-serif text-2xl mb-2">Enlace no válido</h1>
-            <p className="text-sm text-[hsl(var(--im-ink-soft))]">
-              El enlace expiró o no corresponde a una operación activa. Solicítelo nuevamente a su
-              contraparte en Geocapitals.
-            </p>
-          </div>
+        {!ready && <p className="text-sm text-[hsl(var(--im-ink-soft))]">Verificando acceso…</p>}
+        {ready && !session && (
+          <PortalGate
+            token={token}
+            onGranted={(s) => {
+              try {
+                window.localStorage.setItem(portalSessionKey(token), s);
+              } catch {
+                /* ignore */
+              }
+              setSession(s);
+            }}
+          />
+        )}
+        {ready && session && isLoading && (
+          <p className="text-sm text-[hsl(var(--im-ink-soft))]">Cargando operación…</p>
         )}
         {data && (
           <>
@@ -185,6 +222,7 @@ function OperacionMirror() {
 
             <AcceptTermsPanel
               token={token}
+              session={session as string}
               role={data.role}
               alreadyAccepted={data.events.some(
                 (e) => e.kind === "terms_accepted_by_counterparty",
@@ -192,9 +230,11 @@ function OperacionMirror() {
               defaultName={data.counterparty.name ?? ""}
             />
 
-            <ComplianceChecklistPublic token={token} />
+            <ComplianceChecklistPublic token={token} session={session as string} />
 
-            <DocsUpload token={token} documents={data.documents} />
+            <PortalDocGenPanel token={token} session={session as string} />
+
+            <DocsUpload token={token} session={session as string} documents={data.documents} />
 
             <p className="mt-10 text-xs text-[hsl(var(--im-ink-soft))]">
               Este panel es un enlace privado. No lo comparta con terceros. Para dudas escriba a
@@ -207,7 +247,7 @@ function OperacionMirror() {
   );
 }
 
-function ComplianceChecklistPublic({ token }: { token: string }) {
+function ComplianceChecklistPublic({ token, session }: { token: string; session: string }) {
   const qc = useQueryClient();
   const fetchFn = useServerFn(getOperacionChecklist);
   const reqFn = useServerFn(requestOperacionUpload);
@@ -219,10 +259,12 @@ function ComplianceChecklistPublic({ token }: { token: string }) {
       return;
     }
     try {
-      const { path, token: upToken, bucket } = await reqFn({ data: { token, fileName: file.name } });
+      const { path, token: upToken, bucket } = await reqFn({
+        data: { token, session, fileName: file.name },
+      });
       const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
       if (up.error) throw up.error;
-      await attachFn({ data: { token, docType: docKind, filePath: path } });
+      await attachFn({ data: { token, session, docType: docKind, filePath: path } });
       toast.success(`Documento enviado: ${file.name}`);
       void qc.invalidateQueries({ queryKey: ["operacion", token] });
     } catch (e) {
@@ -234,7 +276,7 @@ function ComplianceChecklistPublic({ token }: { token: string }) {
     <div className="mt-8">
       <TradeComplianceChecklist
         fetcher={async () => {
-          const r = await fetchFn({ data: { token } });
+          const r = await fetchFn({ data: { token, session } });
           return { rows: (r.rows ?? []) as any, readiness: (r.readiness ?? null) as any };
         }}
         queryKey={["operacion-checklist", token]}
@@ -250,9 +292,11 @@ const isProvided = (s: string) => s === "uploaded" || s === "signed" || s === "v
 
 function DocsUpload({
   token,
+  session,
   documents,
 }: {
   token: string;
+  session: string;
   documents: Array<{ doc_type: string; status: string; file_name: string | null }>;
 }) {
   const qc = useQueryClient();
@@ -271,11 +315,11 @@ function DocsUpload({
         token: upToken,
         bucket,
       } = await reqFn({
-        data: { token, fileName: file.name },
+        data: { token, session, fileName: file.name },
       });
       const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
       if (up.error) throw up.error;
-      await attachFn({ data: { token, docType: chosenType, filePath: path } });
+      await attachFn({ data: { token, session, docType: chosenType, filePath: path } });
       toast.success(`Documento enviado: ${file.name}`);
       setDocType("");
       void qc.invalidateQueries({ queryKey: ["operacion", token] });
@@ -387,11 +431,13 @@ function DocsUpload({
 // ---------- Aceptación de términos comerciales por contraparte ----------
 function AcceptTermsPanel({
   token,
+  session,
   role,
   alreadyAccepted,
   defaultName,
 }: {
   token: string;
+  session: string;
   role: "buyer" | "seller";
   alreadyAccepted: boolean;
   defaultName: string;
@@ -411,6 +457,7 @@ function AcceptTermsPanel({
       await acceptFn({
         data: {
           token,
+          session,
           acceptorName: name.trim(),
           acceptorTitle: title.trim() || undefined,
           note: note.trim() || undefined,
