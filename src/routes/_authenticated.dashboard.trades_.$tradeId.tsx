@@ -46,6 +46,9 @@ import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceCheck
 import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
 import { TradeMarginPanel } from "@/features/trades/TradeMarginPanel";
 import { TradeNegotiationPanel } from "@/features/trades/TradeNegotiationPanel";
+import { TradeParticipantsPanel } from "@/features/trades/TradeParticipantsPanel";
+import { TradeKycPanel } from "@/features/trades/TradeKycPanel";
+import { TradeDocsPanel } from "@/features/trades/TradeDocsPanel";
 import { setTradeStage } from "@/lib/trades.functions";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -304,6 +307,28 @@ function TrackingPage() {
 
       {/* Margen y reparto de comisiones (visible solo staff GC) */}
       <TradeMarginPanel tradeId={trade.id} />
+
+      {/* Participantes: brókers, asesores y contrapartes con enlace propio */}
+      <TradeParticipantsPanel tradeId={trade.id} />
+
+      {/* Expediente KYC / prueba de fondos por parte */}
+      <TradeKycPanel tradeId={trade.id} />
+
+      {/* Documentos comerciales bilingües (ICPO / FCO / IMFPA + ficha) */}
+      <TradeDocsPanel
+        input={{
+          reference: trade.reference ?? null,
+          commodity: trade.commodity ?? null,
+          incoterm: trade.incoterm ?? null,
+          quantity: trade.quantity_t != null ? `${trade.quantity_t} t` : null,
+          price:
+            trade.unit_price_usd != null
+              ? `US$ ${Number(trade.unit_price_usd).toLocaleString("es-CL")} / t`
+              : null,
+          buyer: trade.counterparty_name ?? null,
+          seller: trade.counterparty_company ?? null,
+        }}
+      />
 
       {/* Gate de avance de etapa por readiness */}
       {(() => {
