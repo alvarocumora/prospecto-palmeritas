@@ -66,7 +66,10 @@ function useTicker(intervalMs: number) {
 function MineDescentPanel() {
   const [boot, setBoot] = useState<string[]>([]);
   const [depth, setDepth] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const tick = useTicker(90);
+
+  useEffect(() => setMounted(true), []);
 
   // Boot log typewriter
   useEffect(() => {
@@ -91,12 +94,21 @@ function MineDescentPanel() {
       50 +
       Math.sin((i + tick) * 0.35) * 14 +
       Math.sin((i + tick) * 0.11) * 6 +
-      (Math.random() - 0.5) * 2;
+      Math.sin((i + tick) * 1.73) * 1;
     return `${x},${y}`;
   });
 
   const lat = (33.8933 + Math.sin(tick * 0.02) * 0.0004).toFixed(6);
   const lng = (-71.1022 + Math.cos(tick * 0.02) * 0.0004).toFixed(6);
+
+  if (!mounted) {
+    return (
+      <aside
+        className="relative hidden lg:flex flex-col overflow-hidden bg-[#05070a] border-r border-white/5"
+        aria-hidden="true"
+      />
+    );
+  }
 
   return (
     <aside className="relative hidden lg:flex flex-col overflow-hidden bg-[#05070a] text-[#c9d4e3] border-r border-white/5">
