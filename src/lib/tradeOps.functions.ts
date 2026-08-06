@@ -221,7 +221,8 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
       )
       .eq("counterparty_buyer_token_hash", hash)
       .maybeSingle();
-    let role: "buyer" | "seller" | null = byBuyer ? "buyer" : null;
+    let role: OperacionPayload["role"] | null = byBuyer ? "buyer" : null;
+    let readOnly = false;
     let trade = byBuyer as Record<string, unknown> | null;
     if (!trade) {
       const { data: bySeller } = await sb
@@ -233,6 +234,23 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
         .maybeSingle();
       trade = bySeller as Record<string, unknown> | null;
       role = bySeller ? "seller" : null;
+    }
+    if (!trade) {
+      // Participante adicional (bróker, asesor, observador) del mismo trade.
+      const { resolveAccessLinkByHash } = await import("@/lib/tradeAccess.server");
+      const link = await resolveAccessLinkByHash(sb, hash);
+      if (link) {
+        const { data: extra } = await sb
+          .from("commodity_trades")
+          .select(
+            "id, reference, commodity, quantity_t, incoterm, unit_price_usd, total_value_usd, stage, status, created_at, counterparty_name, counterparty_company",
+          )
+          .eq("id", link.tradeId)
+          .maybeSingle();
+        trade = extra as Record<string, unknown> | null;
+        role = link.role;
+        readOnly = link.role !== "buyer" && link.role !== "seller" && !link.canNegotiate;
+      }
     }
     if (!trade || !role) return null;
     const tradeId = trade.id as string;
