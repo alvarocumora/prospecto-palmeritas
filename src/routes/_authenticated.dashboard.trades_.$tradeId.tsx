@@ -45,6 +45,8 @@ import { CommodityIntelPanel } from "@/features/trades/CommodityIntelPanel";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
 import { TradeScreeningPanel } from "@/features/trades/TradeScreeningPanel";
 import { TradeMarginPanel } from "@/features/trades/TradeMarginPanel";
+import { TradePricingPanel } from "@/features/trades/TradePricingPanel";
+import { TradeAccessLinksPanel } from "@/features/trades/TradeAccessLinksPanel";
 import { TradeNegotiationPanel } from "@/features/trades/TradeNegotiationPanel";
 import { setTradeStage } from "@/lib/trades.functions";
 import { useQueryClient } from "@tanstack/react-query";
@@ -303,7 +305,11 @@ function TrackingPage() {
       <TradeScreeningPanel tradeId={trade.id} />
 
       {/* Margen y reparto de comisiones (visible solo staff GC) */}
+      <TradePricingPanel tradeId={trade.id} />
+
       <TradeMarginPanel tradeId={trade.id} />
+
+      <TradeAccessLinksPanel tradeId={trade.id} />
 
       {/* Gate de avance de etapa por readiness */}
       {(() => {
