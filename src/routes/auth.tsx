@@ -101,6 +101,15 @@ function MineDescentPanel() {
   const lat = (33.8933 + Math.sin(tick * 0.02) * 0.0004).toFixed(6);
   const lng = (-71.1022 + Math.cos(tick * 0.02) * 0.0004).toFixed(6);
 
+  if (!mounted) {
+    return (
+      <aside
+        className="relative hidden lg:flex flex-col overflow-hidden bg-[#05070a] border-r border-white/5"
+        aria-hidden="true"
+      />
+    );
+  }
+
   return (
     <aside className="relative hidden lg:flex flex-col overflow-hidden bg-[#05070a] text-[#c9d4e3] border-r border-white/5">
       {/* Ambient gradients */}
