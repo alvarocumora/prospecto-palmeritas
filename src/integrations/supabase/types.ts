@@ -16312,6 +16312,50 @@ export type Database = {
         }
         Relationships: []
       }
+      trade_commission_splits: {
+        Row: {
+          beneficiary_name: string
+          beneficiary_type: string
+          created_at: string
+          id: string
+          notes: string | null
+          share_kind: string
+          share_value: number
+          sort: number
+          trade_id: string
+        }
+        Insert: {
+          beneficiary_name: string
+          beneficiary_type: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          share_kind: string
+          share_value: number
+          sort?: number
+          trade_id: string
+        }
+        Update: {
+          beneficiary_name?: string
+          beneficiary_type?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          share_kind?: string
+          share_value?: number
+          sort?: number
+          trade_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_commission_splits_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_documents: {
         Row: {
           created_at: string
@@ -16597,6 +16641,59 @@ export type Database = {
             foreignKeyName: "trade_payments_trade_id_fkey"
             columns: ["trade_id"]
             isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_pricing: {
+        Row: {
+          base_price: number
+          contract_months: number | null
+          currency: string
+          extra_pool_per_order: number
+          iva_pct: number | null
+          notes: string | null
+          order_frequency: string | null
+          qty_per_order: number | null
+          sale_price: number
+          trade_id: string
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          base_price: number
+          contract_months?: number | null
+          currency?: string
+          extra_pool_per_order?: number
+          iva_pct?: number | null
+          notes?: string | null
+          order_frequency?: string | null
+          qty_per_order?: number | null
+          sale_price: number
+          trade_id: string
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          base_price?: number
+          contract_months?: number | null
+          currency?: string
+          extra_pool_per_order?: number
+          iva_pct?: number | null
+          notes?: string | null
+          order_frequency?: string | null
+          qty_per_order?: number | null
+          sale_price?: number
+          trade_id?: string
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_pricing_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: true
             referencedRelation: "commodity_trades"
             referencedColumns: ["id"]
           },
@@ -17516,6 +17613,19 @@ export type Database = {
           target_id: string
         }[]
       }
+      get_trade_access_links: {
+        Args: { p_trade_id: string }
+        Returns: {
+          active: boolean
+          email: string
+          party: string
+          token_prefix: string
+        }[]
+      }
+      get_trade_margin_split: {
+        Args: { p_order_qty?: number; p_trade_id: string }
+        Returns: Json
+      }
       get_trade_negotiation: {
         Args: { p_trade_id: string }
         Returns: {
@@ -17563,6 +17673,19 @@ export type Database = {
           status: string
           tonnage_monthly_t: number
           tonnage_total_t: number
+        }[]
+      }
+      get_trade_public_ficha: { Args: { p_trade_id: string }; Returns: Json }
+      get_trade_public_price: {
+        Args: { p_trade_id: string }
+        Returns: {
+          contract_months: number
+          currency: string
+          iva_pct: number
+          order_frequency: string
+          qty_per_order: number
+          sale_price: number
+          unit: string
         }[]
       }
       get_trade_screenings: {
