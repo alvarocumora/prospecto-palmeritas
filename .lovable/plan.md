@@ -1,67 +1,37 @@
-## Objetivo
+# Ficha pública de oro + entorno de trade multiparte
 
-Un único flujo de operaciones ("Trades") alcanzable desde el menú, con checklist de compliance conectado a los RPC del repo y gate de readiness. Landing sin links rotos, rutas duplicadas/huérfanas redirigidas o enlazadas. Solo cambios en `/src` (más aplicar 3 migraciones ya mergeadas, sin reescribirlas).
+## Estado real verificado
 
-## 0. Migraciones (verificado: no aplicadas en la base)
+- Existen las funciones de base `get_trade_public_ficha`, `get_trade_public_price`, `get_trade_margin_split`, `get_trade_products`, `get_trade_negotiation`, `get_trade_access_links`, y las tablas `trade_pricing`, `trade_products`, `trade_commission_splits`.
+- **No existe** la tabla `trade_access_links` (la función que la consulta quedó huérfana).
+- **No existen** los archivos de la ficha pública: `src/routes/ficha.$token.tsx`, `src/lib/tradeFicha.functions.ts`, `src/features/trades/TradeMarginPanel.tsx`. Hay que crearlos.
+- Los dos trades de oro (`AU-DORE-202607-CKG`, `AU-CONC-202607-CKG`) existen pero **sin productos, sin precios y sin tokens de contraparte**.
+- El acceso externo hoy es sólo binario: `counterparty_buyer_token_hash` / `counterparty_seller_token_hash` en `commodity_trades`. No hay forma de sumar un tercer participante (otro bróker, abogado, inspector).
 
-Los RPC/tabla del checklist no existen aún en el proyecto Supabase (`trade_documents_checklist`, `trade_documents_readiness`, `operation_document_structure` → `null`). Aplicar en orden, tal cual están en el repo:
+## Qué se construye
 
-1. `20260724040000_tenencia_geom_consolidation.sql`
-2. `20260725210000_operation_document_checklist.sql` (catálogo REICON + tabla `operation_document_structure`)
-3. `20260725220000_trade_documents_checklist.sql` (RPC sobre `commodity_trades` / `trade_documents`)
+### 1. Ficha pública del trade de oro
+- Ruta pública `/ficha/$token` (sin login) que llama a `get_trade_public_ficha`: commodity, referencia, productos/specs (pureza, presentación, origen, empaque) y **sólo precio de venta** — nunca precio base, margen ni reparto.
+- Encabezado institucional (papel hueso / tinta / cobalto, serif), meta y OG dinámicos por commodity, `noindex`.
+- Acciones: copiar enlace, compartir por WhatsApp, descargar ficha en PDF con QR de verificación, y enviar por correo (server fn interna).
 
-## 1. Reachability del menú + rutas huérfanas
+### 2. Datos reales del trade de oro (Chile)
+- Panel de staff para cargar y editar productos y precios del trade (`trade_products`, `trade_pricing`): unidad, precio base, precio de venta, moneda, cantidad por pedido, pool extra, frecuencia.
+- Panel interno de margen y reparto (`get_trade_margin_split`) visible sólo para staff GeoCapitals: margen, distribuible, beneficiarios y remanente.
 
-En `src/routes/_authenticated.tsx` (grupo NEGOCIO):
-- Renombrar la entrada `/dashboard/trades` a **"Mesa de operaciones"** (mantener icono Handshake) y dejarla como entrada principal. La entrada `Tablero de trades` se mantiene como vista Kanban.
-- Quitar del rail entradas huérfanas del sistema "Operaciones" viejo (no estaban listadas, pero mantenerlas fuera).
+### 3. Entorno de trade tripartito + participantes adicionales
+- Nueva tabla de participantes por operación con rol (`buyer`, `seller`, `geocapitals`, `broker`, `observer`, `advisor`), email, nombre, estado y token propio (hash + prefijo), con caducidad y revocación.
+- Panel de staff "Accesos de la operación": invitar por correo, generar enlace seguro, copiar/reenviar, revocar y ver último acceso.
+- La sala de contraparte (`/operacion/$token`) resuelve el token contra la nueva tabla (además de los dos campos legados) y muestra contenido según rol: documentos y checklist, hilo de negociación, productos y ficha. Broker/observer con vista de sólo lectura salvo mensajes.
+- Bitácora de accesos por participante.
 
-Rutas duplicadas/huérfanas — reemplazar el archivo por una redirección declarativa (`beforeLoad: () => redirect(...)`) al equivalente en Trades:
+## Detalles técnicos
 
-| Ruta actual | Acción |
-|---|---|
-| `/dashboard/operaciones` (index) | redirect → `/dashboard/trades` |
-| `/dashboard/operaciones/nuevo` | redirect → `/dashboard/trades` (con hint `?new=1`) |
-| `/dashboard/operaciones/$id` | redirect → `/dashboard/trades/$tradeId` usando el mismo id (deprecado, un aviso corto arriba del detalle si el id no existe en trades) |
-| `/portal/buyer/$token`, `/portal/seller/$token` | redirect → `/operacion/$token` (War Room canónica) |
+- Migración: tabla `trade_participants` (o `trade_access_links`, alineada con `get_trade_access_links`) con GRANTs, RLS (staff GC + partes del trade), índice único por `(trade_id, role, email)` y `updated_at` con trigger. RPC `issue_trade_access` / `revoke_trade_access` en SECURITY DEFINER para emitir hash SHA-256 sin exponer el token.
+- Server fns nuevas en `src/lib/tradeFicha.functions.ts` (ficha pública, envío por correo) y extensión de `src/lib/tradeOps.functions.ts` para resolución de token multiparte.
+- UI nueva: `src/routes/ficha.$token.tsx`, `src/features/trades/TradeMarginPanel.tsx`, `src/features/trades/TradePricingPanel.tsx`, `src/features/trades/TradeAccessLinksPanel.tsx`, integrados en `_authenticated.dashboard.trades_.$tradeId.tsx`.
+- Sólo tokens semánticos del sistema Institutional Modernist.
 
-Rutas huérfanas del sistema Proveedores/RFQ — enlazar desde el detalle del trade en lugar de dejarlas colgadas:
-- `/dashboard/proveedores` (+ `$id`, `/dashboard/proveedor`): enlazadas desde el panel "Contraparte" del detalle de trade (botón "Ver proveedor").
-- `/dashboard/rfqs` (+ `$id`, `nuevo`): enlazadas desde el detalle de trade en el panel "Requerimiento origen".
-- `/dashboard/enlaces`, `/dashboard/invitaciones`, `/dashboard/fletes`: dejar como sub-vistas de admin — añadir un pequeño índice "Herramientas" al pie del rail (grupo CUENTA), no como items sueltos.
+## Verificación
 
-## 2. Panel Compliance (nuevo)
-
-Componente reusable `src/features/trades/TradeComplianceChecklist.tsx`:
-- Carga `supabase.rpc('trade_documents_checklist', { p_trade_id })` y `trade_documents_readiness`.
-- Agrupa por `section` ordenado por `section_no`, cada fila ordenada por `sequence`.
-- Cada ítem: título + descripción + badge de `status` (falta / subido / aprobado / observado / firmado), pill `obligation` (mandatory vs if_available vs conditional con tooltip de `condition`), autor esperado (`required_from_role`).
-- Barra superior: `mandatory_ok / mandatory_total` + estado `ready`.
-- Botón "Subir" por fila: abre input y llama a `attachOperacionDoc({ docType: item.doc_kind, ... })` — el `doc_kind` del catálogo es el `docType` (no editable). Refresca ambos RPC al terminar.
-- Suscripción realtime a `trade_documents` filtrada por `trade_id` para refrescar el checklist sin recargar.
-
-Integración:
-- `src/routes/_authenticated.dashboard.trades_.$tradeId.tsx` → añadir el panel en el layout del detalle. El botón "Pasar a evaluación comercial" se **deshabilita** mientras `ready === false`, con tooltip "Faltan N documentos obligatorios".
-- `src/routes/operacion.$token.tsx` (War Room pública) → mismo panel en modo restringido: solo muestra ítems visibles a la contraparte y los `Subir` respetan el token (`attachOperacionDoc` ya soporta upload por token; se pasa `docType = doc_kind`).
-
-## 3. Navegación cruzada desde el detalle del trade
-
-Nuevo panel lateral "Enlaces de la operación" en `_authenticated.dashboard.trades_.$tradeId.tsx`:
-- Contraparte: link a `/dashboard/proveedores/$id` (si `business_partner_id`), botón "Invitar proveedor" → `/inscripcion?trade=$tradeId`.
-- Requerimiento origen: link a `/dashboard/rfqs/$id` si existe `rfq_id` en el trade (si no existe la columna, botón "Crear RFQ" → `/dashboard/rfqs/nuevo?trade=$tradeId`).
-- War Room de contraparte: botón "Abrir War Room" que ejecuta `ensureCounterpartyLink` y copia el URL de `operacionUrl(token)`.
-
-## 4. Landing y menú público
-
-- `src/features/marketing/MarketingLanding.tsx:309` → cambiar `to="/dashboard/commodity-lots"` por `to="/marketplace"`.
-- `src/components/shell/AppShell.tsx` (`NAV`) → añadir `{ to: "/inscripcion", key: "nav_supplier_signup" }` y `{ to: "/rfqs", key: "nav_rfqs" }`. Registrar las dos llaves en `src/features/marketing/i18n.ts` (es/en).
-
-## 5. Verificación
-
-- Después de aplicar migraciones: `SELECT proname FROM pg_proc WHERE proname IN ('trade_documents_checklist','trade_documents_readiness')` debe devolver 2 filas y `to_regclass('public.operation_document_structure')` no nulo.
-- Abrir un trade de copper existente: el checklist debe mostrar las 40 filas REICON, estado inicial "falta", `ready=false`, y el botón "Pasar a evaluación comercial" deshabilitado.
-- Subir un documento por el panel: la fila cambia a "subido/aprobado" y `mandatory_ok` incrementa sin recargar.
-
-## Fuera de alcance
-
-No se toca `supabase/migrations/*` (solo se aplican), ni `etl/`, `packages/reglas/`, `tests/`, `docs/`. No se agregan tablas ni RPC nuevos. No se elimina el sistema "Operaciones" del backend, solo se redirigen sus rutas de UI.
+Cargar precios y productos del trade de oro, emitir tres accesos (comprador, vendedor, bróker adicional), abrir la ficha pública en incógnito y comprobar que no aparece precio base ni margen, y que cada portal ve lo que le corresponde.
