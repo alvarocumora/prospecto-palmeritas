@@ -21,11 +21,13 @@ export async function loadPortalDocCtx(s: PortalSession): Promise<TradePackConte
   const t = data as Record<string, unknown>;
 
   const counterparty = {
+    role: s.role === "buyer" ? "Buyer" : "Seller",
     name: (t.counterparty_name as string) ?? "Contraparte",
     company: (t.counterparty_company as string) ?? undefined,
     email: (t.counterparty_email as string) ?? undefined,
   };
   const geocapitals = {
+    role: s.role === "buyer" ? "Seller" : "Buyer",
     name: "Geocapitals SpA",
     company: "Geocapitals SpA",
     email: "info@geocapitals.com",
