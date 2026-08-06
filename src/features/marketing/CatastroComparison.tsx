@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+
 import { Check, Minus, ArrowRight } from "lucide-react";
 
 type Cell = { kind: "yes"; note?: string } | { kind: "no" } | { kind: "partial"; note?: string } | { kind: "text"; value: string };
