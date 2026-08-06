@@ -472,16 +472,6 @@ function AuthenticatedLayout() {
     return true;
   });
 
-  // Gate de ruta: si el usuario navegó a una ruta cuyo módulo no está en su plan,
-  // redirigimos al Inicio con aviso.
-  useEffect(() => {
-    if (!myModules || unrestricted) return;
-    const currentModule = moduleForRoute(location.pathname);
-    if (currentModule === "core") return;
-    if (!availableModuleKeys.has(currentModule)) {
-      navigate({ to: "/dashboard", search: { locked: currentModule } as never });
-    }
-  }, [location.pathname, myModules, unrestricted]);
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
