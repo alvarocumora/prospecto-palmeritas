@@ -86,7 +86,9 @@ function FichaPublica() {
 
   const p = f.pricing;
   const prod = f.products[0];
-  const priceLabel = money(p?.sale_price ?? null, p?.currency ?? null, p?.unit ?? null);
+  const priceLabel =
+    money(p?.sale_price ?? null, p?.currency ?? null, p?.unit ?? null) +
+    (p?.sale_price != null && p?.iva_pct != null ? ` + IVA (${Number(p.iva_pct)}%)` : "");
   const wsp = `https://wa.me/56962184071?text=${encodeURIComponent(
     `Hola Geocapitals, consulto por la operación ${f.reference ?? f.commodity ?? ""} — ${f.fichaUrl}`,
   )}`;
