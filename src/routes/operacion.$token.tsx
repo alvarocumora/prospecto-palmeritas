@@ -15,6 +15,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
 
+const ROLE_LABEL: Record<string, string> = {
+  buyer: "Comprador",
+  seller: "Vendedor",
+  broker: "Bróker",
+  advisor: "Asesor",
+  observer: "Observador",
+  geocapitals: "GeoCapitals",
+};
+
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
     meta: [
