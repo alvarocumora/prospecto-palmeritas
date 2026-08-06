@@ -99,6 +99,19 @@ function AuthenticatedLayout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
+  // Gate de ruta: si el usuario navegó a una ruta cuyo módulo no está en su plan,
+  // redirigimos al Inicio con aviso. (Debe ir antes de cualquier return temprano.)
+  useEffect(() => {
+    if (!myModules || (myModules.unrestricted ?? true)) return;
+    const keys = new Set((myModules.modules ?? []).map((m) => m.key));
+    const currentModule = moduleForRoute(location.pathname);
+    if (currentModule === "core") return;
+    if (!keys.has(currentModule)) {
+      navigate({ to: "/dashboard", search: { locked: currentModule } as never });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, myModules]);
+
   if (!mounted || loading) return null;
   if (!user) return null;
 
