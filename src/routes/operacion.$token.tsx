@@ -15,15 +15,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { DOC_CATALOG, DOC_BY_KEY } from "@/lib/tradeDocuments";
 import { TradeComplianceChecklist } from "@/features/trades/TradeComplianceChecklist";
 
-const ROLE_LABEL: Record<string, string> = {
-  buyer: "Comprador",
-  seller: "Vendedor",
-  broker: "Bróker",
-  advisor: "Asesor",
-  observer: "Observador",
-  geocapitals: "GeoCapitals",
-};
-
 export const Route = createFileRoute("/operacion/$token")({
   head: () => ({
     meta: [
@@ -80,8 +71,7 @@ function OperacionMirror() {
           <>
             <section className="rounded-lg border border-[hsl(var(--im-hairline))] bg-white p-8">
               <p className="text-xs uppercase tracking-[0.2em] text-[hsl(var(--im-accent-brand))]">
-                Rol asignado: {ROLE_LABEL[data.role] ?? "Participante"}
-                {data.readOnly ? " · solo lectura" : ""}
+                Rol asignado: {data.role === "buyer" ? "Comprador" : "Vendedor"}
               </p>
               <h1 className="font-serif text-3xl mt-2">
                 {data.trade.reference ?? "Operación en curso"}
@@ -193,16 +183,14 @@ function OperacionMirror() {
               </div>
             </section>
 
-            {data.role === "buyer" || data.role === "seller" ? (
-              <AcceptTermsPanel
-                token={token}
-                role={data.role}
-                alreadyAccepted={data.events.some(
-                  (e) => e.kind === "terms_accepted_by_counterparty",
-                )}
-                defaultName={data.counterparty.name ?? ""}
-              />
-            ) : null}
+            <AcceptTermsPanel
+              token={token}
+              role={data.role}
+              alreadyAccepted={data.events.some(
+                (e) => e.kind === "terms_accepted_by_counterparty",
+              )}
+              defaultName={data.counterparty.name ?? ""}
+            />
 
             <ComplianceChecklistPublic token={token} />
 
