@@ -6,7 +6,12 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { MessageCircle, Mail, Link2, ArrowUpRight } from "lucide-react";
-import { getPublicFicha, emailFichaToGeocapitals, type PublicFicha } from "@/lib/tradeFicha.functions";
+import {
+  getPublicFicha,
+  emailFichaToGeocapitals,
+  type PublicFicha,
+  type FichaProduct,
+} from "@/lib/tradeFicha.functions";
 
 export const Route = createFileRoute("/ficha/$token")({
   loader: async ({ params }) => {
@@ -139,7 +144,7 @@ function FichaPublica() {
             <div className="mt-5">
               <p className="text-xs uppercase tracking-wider text-neutral-500">Otros productos</p>
               <ul className="mt-2 space-y-1 text-sm text-neutral-700">
-                {f.products.slice(1).map((x, i) => (
+                {f.products.slice(1).map((x: FichaProduct, i: number) => (
                   <li key={i}>
                     · {x.product_name}
                     {x.purity ? ` — ${x.purity}` : ""}
