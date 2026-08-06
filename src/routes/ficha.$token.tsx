@@ -5,7 +5,7 @@
 import { createFileRoute, notFound } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { MessageCircle, Mail, Link2, ArrowUpRight } from "lucide-react";
+import { MessageCircle, Mail, Link2, ArrowUpRight, FileDown, Loader2 } from "lucide-react";
 import {
   getPublicFicha,
   emailFichaToGeocapitals,
@@ -13,6 +13,9 @@ import {
   type FichaProduct,
 } from "@/lib/tradeFicha.functions";
 import { TradeDocsPanel } from "@/features/trades/TradeDocsPanel";
+import { renderGeocapitalsPdf, triggerPdfDownload } from "@/lib/documents/pdf";
+import { buildTradeFichaDoc, type TradeDocInput } from "@/lib/documents/tradeDocs";
+
 
 export const Route = createFileRoute("/ficha/$token")({
   loader: async ({ params }) => {
@@ -79,6 +82,7 @@ function FichaPublica() {
   const f = Route.useLoaderData();
   const { token } = Route.useParams();
   const [sending, setSending] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const p = f.pricing;
   const prod = f.products[0];
@@ -86,6 +90,47 @@ function FichaPublica() {
   const wsp = `https://wa.me/56962184071?text=${encodeURIComponent(
     `Hola Geocapitals, consulto por la operación ${f.reference ?? f.commodity ?? ""} — ${f.fichaUrl}`,
   )}`;
+
+  const docInput: TradeDocInput = {
+    reference: f.reference,
+    commodity: f.commodity,
+    productName: prod?.product_name ?? null,
+    presentation: prod?.presentation ?? null,
+    purity: prod?.purity ?? null,
+    packaging: prod?.packaging ?? null,
+    origin: [prod?.origin_region, prod?.origin_country].filter(Boolean).join(", ") || null,
+    incoterm: prod?.incoterm ?? null,
+    quantity:
+      p?.qty_per_order != null
+        ? `${Number(p.qty_per_order).toLocaleString("es-CL")} ${p.unit ?? ""}`
+        : null,
+    frequency: p?.order_frequency ?? null,
+    contractMonths: p?.contract_months ?? null,
+    price: priceLabel,
+  };
+
+  // Descarga directa de la ficha en PDF (bilingüe) para compartir fuera de la plataforma.
+  const downloadFicha = async () => {
+    setDownloading(true);
+    try {
+      const doc = buildTradeFichaDoc(docInput, "both");
+      const blob = await renderGeocapitalsPdf(doc, { returnBlob: true });
+      if (!blob) throw new Error("no blob");
+      const slug = (f.reference ?? f.commodity ?? "operacion")
+        .toString()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .toLowerCase();
+      await triggerPdfDownload(blob, `geocapitals-ficha-${slug}.pdf`);
+      toast.success("Ficha en PDF descargada.");
+    } catch {
+      toast.error("No se pudo generar la ficha en PDF.");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const sendEmail = async () => {
     setSending(true);
@@ -99,6 +144,7 @@ function FichaPublica() {
       setSending(false);
     }
   };
+
 
   return (
     <main className="min-h-screen bg-[#F7F5EF] px-4 py-10">
@@ -160,30 +206,38 @@ function FichaPublica() {
         </section>
 
         <section className="border-t border-neutral-200 px-6 py-5">
+          <div className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded border border-neutral-200 bg-[#F7F5EF] px-4 py-3">
+            <div>
+              <p className="text-[11px] uppercase tracking-wider text-neutral-500">
+                Ficha para compartir
+              </p>
+              <p className="text-xs text-neutral-600">
+                PDF bilingüe con sello institucional y QR de validación.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => void downloadFicha()}
+              disabled={downloading}
+              className="inline-flex items-center gap-1.5 rounded bg-[#1B3FAE] px-4 py-2 text-xs font-medium text-white hover:opacity-90 disabled:opacity-50"
+            >
+              {downloading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <FileDown className="h-3.5 w-3.5" />
+              )}
+              Descargar ficha en PDF
+            </button>
+          </div>
           <TradeDocsPanel
             compact
             title="Documentos comerciales (ES/EN)"
-            input={{
-              reference: f.reference,
-              commodity: f.commodity,
-              productName: prod?.product_name ?? null,
-              presentation: prod?.presentation ?? null,
-              purity: prod?.purity ?? null,
-              packaging: prod?.packaging ?? null,
-              origin: [prod?.origin_region, prod?.origin_country].filter(Boolean).join(", ") || null,
-              incoterm: prod?.incoterm ?? null,
-              quantity:
-                p?.qty_per_order != null
-                  ? `${Number(p.qty_per_order).toLocaleString("es-CL")} ${p.unit ?? ""}`
-                  : null,
-              frequency: p?.order_frequency ?? null,
-              contractMonths: p?.contract_months ?? null,
-              price: priceLabel,
-            }}
+            input={docInput}
           />
         </section>
 
         <footer className="flex flex-wrap gap-2 border-t border-neutral-200 px-6 py-4 text-xs">
+
           <a
             href={wsp}
             target="_blank"
