@@ -66,7 +66,10 @@ function useTicker(intervalMs: number) {
 function MineDescentPanel() {
   const [boot, setBoot] = useState<string[]>([]);
   const [depth, setDepth] = useState(0);
+  const [mounted, setMounted] = useState(false);
   const tick = useTicker(90);
+
+  useEffect(() => setMounted(true), []);
 
   // Boot log typewriter
   useEffect(() => {
