@@ -12,6 +12,7 @@ import {
   type PublicFicha,
   type FichaProduct,
 } from "@/lib/tradeFicha.functions";
+import { TradeDocsPanel } from "@/features/trades/TradeDocsPanel";
 
 export const Route = createFileRoute("/ficha/$token")({
   loader: async ({ params }) => {
@@ -110,6 +111,9 @@ function FichaPublica() {
           {f.reference ? (
             <p className="mt-1 text-xs text-neutral-500">Referencia {f.reference}</p>
           ) : null}
+          <p className="mt-2 text-[11px] uppercase tracking-wider text-neutral-500">
+            Acceso: {f.roleLabel}
+          </p>
         </header>
 
         <section className="px-6 py-5">
@@ -153,6 +157,30 @@ function FichaPublica() {
               </ul>
             </div>
           ) : null}
+        </section>
+
+        <section className="border-t border-neutral-200 px-6 py-5">
+          <TradeDocsPanel
+            compact
+            title="Documentos comerciales (ES/EN)"
+            input={{
+              reference: f.reference,
+              commodity: f.commodity,
+              productName: prod?.product_name ?? null,
+              presentation: prod?.presentation ?? null,
+              purity: prod?.purity ?? null,
+              packaging: prod?.packaging ?? null,
+              origin: [prod?.origin_region, prod?.origin_country].filter(Boolean).join(", ") || null,
+              incoterm: prod?.incoterm ?? null,
+              quantity:
+                p?.qty_per_order != null
+                  ? `${Number(p.qty_per_order).toLocaleString("es-CL")} ${p.unit ?? ""}`
+                  : null,
+              frequency: p?.order_frequency ?? null,
+              contractMonths: p?.contract_months ?? null,
+              price: priceLabel,
+            }}
+          />
         </section>
 
         <footer className="flex flex-wrap gap-2 border-t border-neutral-200 px-6 py-4 text-xs">
