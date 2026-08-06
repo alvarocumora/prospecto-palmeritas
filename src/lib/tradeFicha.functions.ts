@@ -45,7 +45,9 @@ export type PublicFicha = {
   reference: string | null;
   pricing: FichaPricing;
   products: FichaProduct[];
-  role: "buyer" | "seller";
+  role: string;
+  roleLabel: string;
+  permissions: { documents: boolean; negotiate: boolean; upload: boolean };
   operacionUrl: string;
   fichaUrl: string;
 };
@@ -57,9 +59,25 @@ function serviceClient(): SupabaseClient | null {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-async function resolveTrade(
-  token: string,
-): Promise<{ sb: SupabaseClient; tradeId: string; role: "buyer" | "seller" } | null> {
+export type ResolvedFichaAccess = {
+  sb: SupabaseClient;
+  tradeId: string;
+  role: string;
+  participantId?: string;
+  permissions: { documents: boolean; negotiate: boolean; upload: boolean };
+};
+
+const FULL_PERMS = { documents: true, negotiate: true, upload: true };
+
+const ROLE_LABELS: Record<string, string> = {
+  buyer: "Comprador",
+  seller: "Vendedor",
+  broker: "Bróker / intermediario",
+  advisor: "Asesor",
+  observer: "Observador",
+};
+
+async function resolveTrade(token: string): Promise<ResolvedFichaAccess | null> {
   if (!TOKEN_RE.test(token)) return null;
   const sb = serviceClient();
   if (!sb) return null;
@@ -69,13 +87,46 @@ async function resolveTrade(
     .select("id")
     .eq("counterparty_buyer_token_hash", hash)
     .maybeSingle();
-  if (b) return { sb, tradeId: (b as { id: string }).id, role: "buyer" };
+  if (b) return { sb, tradeId: (b as { id: string }).id, role: "buyer", permissions: FULL_PERMS };
   const { data: s } = await sb
     .from("commodity_trades")
     .select("id")
     .eq("counterparty_seller_token_hash", hash)
     .maybeSingle();
-  if (s) return { sb, tradeId: (s as { id: string }).id, role: "seller" };
+  if (s) return { sb, tradeId: (s as { id: string }).id, role: "seller", permissions: FULL_PERMS };
+
+  // Participante invitado (bróker, asesor, observador o contraparte adicional).
+  const { data: part } = await sb
+    .from("trade_participants")
+    .select("id, trade_id, role, can_view_documents, can_negotiate, can_upload, status")
+    .eq("token_hash", hash)
+    .eq("status", "active")
+    .maybeSingle();
+  if (part) {
+    const pr = part as {
+      id: string;
+      trade_id: string;
+      role: string;
+      can_view_documents: boolean;
+      can_negotiate: boolean;
+      can_upload: boolean;
+    };
+    void sb
+      .from("trade_participants")
+      .update({ last_access_at: new Date().toISOString() })
+      .eq("id", pr.id);
+    return {
+      sb,
+      tradeId: pr.trade_id,
+      role: pr.role,
+      participantId: pr.id,
+      permissions: {
+        documents: pr.can_view_documents,
+        negotiate: pr.can_negotiate,
+        upload: pr.can_upload,
+      },
+    };
+  }
   return null;
 }
 
@@ -87,7 +138,7 @@ export const getPublicFicha = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<PublicFicha | null> => {
     const resolved = await resolveTrade(data.token);
     if (!resolved) return null;
-    const { sb, tradeId, role } = resolved;
+    const { sb, tradeId, role, permissions } = resolved;
     const { data: ficha, error } = await sb.rpc("get_trade_public_ficha" as never, {
       p_trade_id: tradeId,
     } as never);
@@ -106,6 +157,8 @@ export const getPublicFicha = createServerFn({ method: "POST" })
       pricing: f.pricing ?? null,
       products: f.products ?? [],
       role,
+      roleLabel: ROLE_LABELS[role] ?? role,
+      permissions,
       operacionUrl: publicUrl(`/operacion/${data.token}`),
       fichaUrl: publicUrl(`/ficha/${data.token}`),
     };

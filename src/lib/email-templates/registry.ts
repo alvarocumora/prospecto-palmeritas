@@ -32,6 +32,7 @@ import { template as partnerInvitation } from "./partner-invitation";
 import { template as supplierSheetDispatch } from "./supplier-sheet-dispatch";
 import { template as operationPortalInvitation } from "./operation-portal-invitation";
 import { template as tradeFichaInternal } from "./trade-ficha-internal";
+import { template as tradeParticipantInvitation } from "./trade-participant-invitation";
 
 
 export interface TemplateEntry {
@@ -80,5 +81,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "supplier-sheet-dispatch": supplierSheetDispatch,
   "operation-portal-invitation": operationPortalInvitation,
   "trade-ficha-internal": tradeFichaInternal,
+  "trade-participant-invitation": tradeParticipantInvitation,
 };
 

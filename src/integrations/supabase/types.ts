@@ -16521,6 +16521,71 @@ export type Database = {
           },
         ]
       }
+      trade_kyc_documents: {
+        Row: {
+          created_at: string
+          doc_key: string
+          expires_at: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          label: string | null
+          party: string
+          review_note: string | null
+          review_status: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          trade_id: string
+          updated_at: string
+          uploaded_at: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_key: string
+          expires_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          label?: string | null
+          party: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          trade_id: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_key?: string
+          expires_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          label?: string | null
+          party?: string
+          review_note?: string | null
+          review_status?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          trade_id?: string
+          updated_at?: string
+          uploaded_at?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_kyc_documents_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       trade_negotiations: {
         Row: {
           created_at: string
@@ -16639,6 +16704,80 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "trade_pack_versions_trade_id_fkey"
+            columns: ["trade_id"]
+            isOneToOne: false
+            referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      trade_participants: {
+        Row: {
+          can_negotiate: boolean
+          can_upload: boolean
+          can_view_documents: boolean
+          can_view_ficha: boolean
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          invited_at: string | null
+          invited_by: string | null
+          last_access_at: string | null
+          name: string | null
+          revoked_at: string | null
+          role: string
+          status: string
+          token_hash: string | null
+          token_prefix: string | null
+          trade_id: string
+          updated_at: string
+        }
+        Insert: {
+          can_negotiate?: boolean
+          can_upload?: boolean
+          can_view_documents?: boolean
+          can_view_ficha?: boolean
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          last_access_at?: string | null
+          name?: string | null
+          revoked_at?: string | null
+          role: string
+          status?: string
+          token_hash?: string | null
+          token_prefix?: string | null
+          trade_id: string
+          updated_at?: string
+        }
+        Update: {
+          can_negotiate?: boolean
+          can_upload?: boolean
+          can_view_documents?: boolean
+          can_view_ficha?: boolean
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          invited_at?: string | null
+          invited_by?: string | null
+          last_access_at?: string | null
+          name?: string | null
+          revoked_at?: string | null
+          role?: string
+          status?: string
+          token_hash?: string | null
+          token_prefix?: string | null
+          trade_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "trade_participants_trade_id_fkey"
             columns: ["trade_id"]
             isOneToOne: false
             referencedRelation: "commodity_trades"
