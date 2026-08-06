@@ -71,7 +71,8 @@ function OperacionMirror() {
           <>
             <section className="rounded-lg border border-[hsl(var(--im-hairline))] bg-white p-8">
               <p className="text-xs uppercase tracking-[0.2em] text-[hsl(var(--im-accent-brand))]">
-                Rol asignado: {data.role === "buyer" ? "Comprador" : "Vendedor"}
+                Rol asignado: {ROLE_LABEL[data.role] ?? "Participante"}
+                {data.readOnly ? " · solo lectura" : ""}
               </p>
               <h1 className="font-serif text-3xl mt-2">
                 {data.trade.reference ?? "Operación en curso"}
