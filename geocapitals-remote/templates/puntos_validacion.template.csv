@@ -1,0 +1,13 @@
+# PLANTILLA — puntos de validación de terreno (Cholqui). NO son datos reales.
+# Rellenar con los puntos de terreno REALES (ensaye químico + observación geológica).
+# CRS y position_uncertainty_m se declaran en el YAML (validation_points), NO acá.
+# Coordenadas en el CRS declarado en el YAML (Cholqui: EPSG:24879, PSAD56 huso 19).
+# tipo: ensaye | observacion | control_positivo
+# Dejar en blanco los ensayes que no existan (NO poner 0 ni inventar).
+# Los ids del control positivo argílico van también en positive_control_ids del YAML.
+id,norte,este,cota,tipo,descripcion,cu_t_pct,cu_s_pct,au_gpt,ag_gpt
+P-01,,,,observacion,,,,,
+P-02,,,,ensaye,,,,,
+P-17,,,,control_positivo,alteracion argilica mapeada en terreno,,,,
+P-18,,,,control_positivo,alteracion argilica mapeada en terreno,,,,
+P-19,,,,control_positivo,alteracion argilica mapeada en terreno,,,,
