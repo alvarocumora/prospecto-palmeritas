@@ -1,0 +1,29 @@
+name: cholqui
+aoi:
+  # bbox aproximado del prospecto, PSAD'56 huso 19
+  crs: EPSG:24879
+  bbox: [304000, 6249000, 316000, 6260000]
+output_crs: EPSG:32719
+
+seasons:
+  months: [2, 3, 4]        # fin de verano austral
+  years: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  max_cloud_pct: 10
+
+masks:
+  ndvi_threshold: 0.25
+  ndvi_sensitivity: [0.20, 0.25, 0.30]
+
+validation_points:
+  crs: EPSG:24879
+  position_uncertainty_m: 60
+  path: data/cholqui_puntos.csv
+  positive_control_ids: [P-17, P-18, P-19]
+
+structure:
+  known_strikes_deg: [350, 20, 352, 45, 15, 55, 50, 295, 250]
+  min_lineament_length_m: 150
+
+cadastre:
+  source: sernageomin_wfs
+  buffer_m: 60

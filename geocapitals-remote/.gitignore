@@ -1,0 +1,7 @@
+out/
+*.tif
+*.tiff
+__pycache__/
+*.egg-info/
+.env
+data/
