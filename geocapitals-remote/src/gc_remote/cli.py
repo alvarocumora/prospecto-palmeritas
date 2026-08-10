@@ -38,5 +38,19 @@ def validate(config: str):
                            "output_crs": cfg.output_crs, "config_sha256": cfg.config_sha256[:12]}, ensure_ascii=False))
 
 
+
+
+@app.command()
+def candidates(config: str, out: str = "./out", max_scenes: int = 18,
+               percentile: float = 97.0, max_n: int = 20):
+    """Candidatos de MUESTREO (no validacion): anomalia Al-OH sobre superficie interpretable."""
+    from . import targets
+    cfg = Config.from_yaml(config)
+    out_dir = Path(out) / cfg.name
+    fc = targets.run_candidates(cfg, out_dir, max_scenes=max_scenes, percentile=percentile, max_n=max_n)
+    typer.echo(f"{fc['metadata']['n_candidates']} candidatos -> {out_dir}/sampling_candidates.geojson")
+    typer.echo("  " + fc["metadata"]["disclaimer"])
+
+
 if __name__ == "__main__":
     app()
