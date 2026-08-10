@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gc-remote"
+version = "0.1.0"
+description = "GeoCapitals Nivel 0 — screening satelital de alteración y estructura para concesiones mineras."
+requires-python = ">=3.11"
+dependencies = [
+  "numpy", "pyproj", "pyyaml", "pydantic>=2", "shapely",
+  "rasterio", "rioxarray", "xarray", "dask", "odc-stac", "pystac-client",
+  "planetary-computer", "geopandas", "scikit-image", "scikit-learn",
+  "typer", "jinja2", "matplotlib", "folium",
+]
+
+[project.scripts]
+gc-remote = "gc_remote.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
