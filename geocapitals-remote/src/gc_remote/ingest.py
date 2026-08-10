@@ -45,3 +45,39 @@ def dry_season_ndvi(ds):
     rep_scl[water_frac > 0.5] = 6                             # agua persistente
     rep_scl[n_clear == 0] = 0                                 # nunca observado limpio
     return driest, typical, rep_scl, n_clear
+
+
+def load_composite(items, bbox_wgs84, crs="EPSG:32719", resolution=20,
+                   ndvi_threshold=0.25):
+    """Mosaico de mediana (obs limpias) de las bandas de reflectancia + máscara de
+    superficie interpretable (persistente, no vegetada) + coordenadas georreferenciadas.
+    Devuelve dict: refl{banda->2D}, interpretable(bool 2D), x, y (1D), crs.
+    """
+    bands = ["B02", "B04", "B08", "B8A", "B11", "B12", "SCL"]
+    ds = load_stack(items, bbox_wgs84, bands=bands, resolution=resolution, crs=crs)
+    scl = ds["SCL"]
+    dirty = scl.isin([0, 1, 2, 3, 8, 9, 10])
+
+    refl = {}
+    for b in ["B02", "B04", "B08", "B8A", "B11", "B12"]:
+        refl[b] = ds[b].astype("float32").where(~dirty).median(dim="time", skipna=True).compute().values
+
+    red = refl["B04"]; nir = refl["B08"]
+    den = nir + red
+    with np.errstate(divide="ignore", invalid="ignore"):
+        ndvi_med = np.where(den != 0, (nir - red) / den, np.nan)
+    n_clear = (~dirty).sum(dim="time").compute().values
+    water_frac = (scl == 6).mean(dim="time").compute().values
+
+    interpretable = (
+        np.isfinite(ndvi_med) & (ndvi_med <= ndvi_threshold)
+        & (n_clear > 0) & (water_frac <= 0.5)
+    )
+    return {
+        "refl": refl,
+        "ndvi": ndvi_med,
+        "interpretable": interpretable,
+        "x": ds["x"].values,
+        "y": ds["y"].values,
+        "crs": crs,
+    }
