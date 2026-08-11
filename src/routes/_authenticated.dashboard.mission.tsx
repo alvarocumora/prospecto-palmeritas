@@ -98,7 +98,7 @@ function DashboardHome() {
   }> = [];
   if ((k?.alertsUnread ?? 0) > 0)
     tasks.push({
-      to: "/dashboard/catastro",
+      to: "/catastro/proyecto",
       icon: <Bell className="w-3.5 h-3.5" />,
       label: "Alertas catastro",
       count: k!.alertsUnread,
@@ -106,7 +106,7 @@ function DashboardHome() {
     });
   if ((k?.patentsDue ?? 0) > 0)
     tasks.push({
-      to: "/dashboard/catastro",
+      to: "/catastro/proyecto",
       icon: <Coins className="w-3.5 h-3.5" />,
       label: "Patentes por pagar",
       count: k!.patentsDue,
@@ -114,7 +114,7 @@ function DashboardHome() {
     });
   if ((k?.concessionsExpiring90d ?? 0) > 0)
     tasks.push({
-      to: "/dashboard/catastro",
+      to: "/catastro/proyecto",
       icon: <FileWarning className="w-3.5 h-3.5" />,
       label: "Concesiones venciendo 90d",
       count: k!.concessionsExpiring90d,
@@ -122,7 +122,7 @@ function DashboardHome() {
     });
   if ((k?.overlapsOpen ?? 0) > 0)
     tasks.push({
-      to: "/dashboard/catastro",
+      to: "/catastro/proyecto",
       icon: <Layers className="w-3.5 h-3.5" />,
       label: "Overlaps sin resolver",
       count: k!.overlapsOpen,
@@ -300,7 +300,7 @@ function DashboardHome() {
                 label: "Geofísica",
               },
               {
-                to: "/dashboard/catastro",
+                to: "/catastro/proyecto",
                 icon: <Crosshair className="w-3.5 h-3.5" />,
                 label: "Catastro",
               },
@@ -473,7 +473,7 @@ function DashboardHome() {
               title="Visor 3D"
             />
             <Shortcut
-              to="/dashboard/catastro"
+              to="/catastro/proyecto"
               icon={<Crosshair className="w-4 h-4 text-teal" />}
               title="Catastro"
             />

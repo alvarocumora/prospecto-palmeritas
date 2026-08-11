@@ -255,16 +255,16 @@ const META: Record<
     title: "Titular / Holder",
     headline: "Tu portafolio de concesiones, en tiempo real",
     subtitle: "Vigencia, patentes, overlaps y boletín minero monitoreados.",
-    primary: { to: "/dashboard/catastro", label: "Abrir catastro" },
+    primary: { to: "/catastro/proyecto", label: "Abrir catastro" },
     quick: [
       {
-        to: "/dashboard/catastro",
+        to: "/catastro/proyecto",
         icon: <Layers className="w-3.5 h-3.5" />,
         label: "Mis concesiones",
         desc: "Vigencia, geometría y trazabilidad.",
       },
       {
-        to: "/dashboard/catastro",
+        to: "/catastro/proyecto",
         icon: <Coins className="w-3.5 h-3.5" />,
         label: "Patentes",
         desc: "Calendario de pago y vencimientos.",
