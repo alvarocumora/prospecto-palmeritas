@@ -42,7 +42,7 @@ const Email = ({
     <EmailLayout
       preview={`Concesión ${concessionCode ?? ""} ${label.toLowerCase()}`}
       audience="internal"
-      ctaHref={appUrl(`/dashboard/catastro${concessionId ? `?id=${concessionId}` : ""}`)}
+      ctaHref={appUrl(`/catastro/proyecto${concessionId ? `?id=${concessionId}` : ""}`)}
       ctaLabel="Abrir en el dashboard"
     >
       <Heading style={styles.h1}>

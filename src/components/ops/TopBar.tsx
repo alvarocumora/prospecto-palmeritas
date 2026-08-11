@@ -12,7 +12,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard": "Inicio",
   "/dashboard/map": "Mapa Táctico",
   "/dashboard/documentos": "Documentos",
-  "/dashboard/catastro": "Catastro",
+  "/catastro/proyecto": "Catastro",
   "/dashboard/boletin": "Boletín Minero",
   "/dashboard/geophysics": "Geofísica",
   "/dashboard/drones": "Drones",

@@ -86,10 +86,10 @@ function InboxPage() {
             </p>
           </div>
           <Link
-            to="/dashboard/enlaces"
+            to="/dashboard/trades"
             className="text-xs underline text-[hsl(var(--content-subtle))]"
           >
-            Gestionar enlaces
+            Mesa de operaciones
           </Link>
         </div>
 

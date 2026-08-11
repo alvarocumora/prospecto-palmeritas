@@ -21,7 +21,7 @@ const MODULE_LABELS: Record<string, string> = {
   "/dashboard": "Mission Control",
   "/dashboard/map": "Centro Operativo",
   "/dashboard/command-center": "Command Center",
-  "/dashboard/catastro": "Catastro",
+  "/catastro/proyecto": "Catastro",
   "/dashboard/boletin": "Boletín Minero",
   "/dashboard/geophysics": "Geofísica",
   "/dashboard/drones": "Drones",
@@ -44,11 +44,9 @@ const MODULE_LABELS: Record<string, string> = {
   "/dashboard/marketplace": "Marketplace Capas",
   "/dashboard/deals": "Marketplace Deals",
   "/dashboard/projects": "Proyectos",
-  "/dashboard/field-map": "Mapa de campo",
   "/dashboard/campaigns": "Campañas",
   "/dashboard/geology3d": "Geología 3D",
   "/dashboard/sat3d": "Satélite 3D",
-  "/dashboard/3d-pro": "Mag 3D Pro",
 };
 
 function resolveModule(path: string): string {

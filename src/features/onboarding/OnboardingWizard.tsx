@@ -39,7 +39,7 @@ const OPTIONS: Array<{
     icon: Mountain,
     title: "Titular / Holder",
     desc: "Monitoreo de concesiones, patentes, alertas catastrales y boletín minero.",
-    next: { to: "/dashboard/catastro", label: "Importar mis concesiones" },
+    next: { to: "/catastro/proyecto", label: "Importar mis concesiones" },
   },
   {
     value: "geocapitals_team",

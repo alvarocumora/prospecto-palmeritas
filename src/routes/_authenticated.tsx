@@ -3,53 +3,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
-import {
-  // Mountain removed: palmeras demo no longer in sidebar
-  LayoutDashboard,
-  Map as MapIcon,
-  Activity,
-  Drill,
-  TestTube2,
-  FolderKanban,
-  LogOut,
-  Users,
-  ClipboardList,
-  Layers as LayersIcon,
-  UserCircle,
-  Crown,
-  Sparkles,
-  Compass,
-  Plane,
-  Calendar,
-  ShieldCheck,
-  ClipboardCheck,
-  Target,
-  Boxes,
-  DollarSign,
-  ShieldAlert,
-  FileText,
-  X,
-  Briefcase,
-  Handshake,
-  Ship,
-  TrendingUp,
-  Package,
-  PackageSearch,
-  MessageSquare,
-  FileSignature,
-  Banknote,
-  Magnet,
-  KeyRound,
-  LineChart,
-  BadgeCheck,
-  Wallet,
-  LayoutGrid,
-  Database,
-  BarChart3,
-  Satellite,
-  // MapPin removed: field-map consolidated into /dashboard/map
-  Scissors,
-} from "lucide-react";
+import { LogOut, X } from "lucide-react";
 
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
@@ -61,6 +15,8 @@ import { StatusBar } from "@/components/ops/StatusBar";
 import { MobileBottomNav } from "@/components/ops/MobileBottomNav";
 import { Logo } from "@/components/Logo";
 import { moduleForRoute } from "@/lib/modules";
+import { WORKSPACE_NAV } from "@/lib/workspace";
+import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
@@ -127,337 +83,23 @@ function AuthenticatedLayout() {
   // Inversionista sin proyectos: no ve operación/exploración/gobernanza.
   const showOps = !isInvestor || projects.length > 0;
 
-  const items: RailItem[] = [
-    // ---- NEGOCIO (deals mineros: el corazón de la plataforma) ----
-    {
-      to: "/dashboard",
-      icon: <LayoutDashboard className="w-3.5 h-3.5" />,
-      label: "Inicio",
-      group: "NEGOCIO",
-      exact: true,
-    },
-    {
-      to: "/dashboard/deals",
-      icon: <Briefcase className="w-3.5 h-3.5" />,
-      label: "Deals de Proyectos",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/investments",
-      icon: <TrendingUp className="w-3.5 h-3.5" />,
-      label: "Inversiones",
-      group: "NEGOCIO",
-    },
-    !isInvestor && {
-      to: "/dashboard/listings",
-      icon: <FolderKanban className="w-3.5 h-3.5" />,
-      label: "Vender Proyecto",
-      group: "NEGOCIO",
-    },
-    !isInvestor && {
-      to: "/dashboard/commodity-lots",
-      icon: <Package className="w-3.5 h-3.5" />,
-      label: "Materias Primas",
-      group: "NEGOCIO",
-    },
-    !isInvestor && {
-      to: "/dashboard/sourcing",
-      icon: <PackageSearch className="w-3.5 h-3.5" />,
-      label: "Requerimientos",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/my-inquiries",
-      icon: <MessageSquare className="w-3.5 h-3.5" />,
-      label: "Cotizaciones",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/clientes",
-      icon: <Users className="w-3.5 h-3.5" />,
-      label: "Clientes y Asociados",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/analytics",
-      icon: <BarChart3 className="w-3.5 h-3.5" />,
-      label: "Analítica",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/trades",
-      icon: <Handshake className="w-3.5 h-3.5" />,
-      label: "Mesa de operaciones",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/trade-board",
-      icon: <LayoutGrid className="w-3.5 h-3.5" />,
-      label: "Tablero de trades",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/cobranza",
-      icon: <Wallet className="w-3.5 h-3.5" />,
-      label: "Cobranza",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/envios",
-      icon: <Ship className="w-3.5 h-3.5" />,
-      label: "Envíos",
-      group: "NEGOCIO",
-    },
-    !isInvestor && {
-      to: "/dashboard/anticipos",
-      icon: <Banknote className="w-3.5 h-3.5" />,
-      label: "Anticipos",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/precios",
-      icon: <LineChart className="w-3.5 h-3.5" />,
-      label: "Precios Metales",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/documentos",
-      icon: <FileSignature className="w-3.5 h-3.5" />,
-      label: "Documentos · Firma",
-      group: "NEGOCIO",
-    },
-    {
-      to: "/dashboard/firmas",
-      icon: <BadgeCheck className="w-3.5 h-3.5" />,
-      label: "Mis firmas",
-      group: "NEGOCIO",
-    },
-
-    // ---- OPERACIÓN (gestión del activo minero) ----
-    showOps &&
-      canAccess(role, "projects") && {
-        to: "/dashboard/projects",
-        icon: <FolderKanban className="w-3.5 h-3.5" />,
-        label: "Proyectos",
-        group: "OPERACIÓN",
-      },
-    showOps && {
-      to: "/dashboard/mission",
-      icon: <LayoutDashboard className="w-3.5 h-3.5" />,
-      label: "Mission Control",
-      group: "OPERACIÓN",
-    },
-    showOps && {
-      to: "/dashboard/project-report",
-      icon: <FileText className="w-3.5 h-3.5" />,
-      label: "Reporte del Proyecto",
-      group: "OPERACIÓN",
-    },
-    showOps && {
-      to: "/dashboard/map",
-      icon: <Compass className="w-3.5 h-3.5" />,
-      label: "Mapa Táctico",
-      group: "OPERACIÓN",
-    },
-    showOps && {
-      to: "/dashboard/campaigns",
-      icon: <Calendar className="w-3.5 h-3.5" />,
-      label: "Campañas",
-      group: "OPERACIÓN",
-    },
-    showOps &&
-      canAccess(role, "catastro") && {
-        to: "/dashboard/catastro",
-        icon: <MapIcon className="w-3.5 h-3.5" />,
-        label: "Catastro",
-        group: "OPERACIÓN",
-      },
-    showOps &&
-      canAccess(role, "catastro") && {
-        to: "/dashboard/boletin",
-        icon: <FileText className="w-3.5 h-3.5" />,
-        label: "Boletín Minero",
-        group: "OPERACIÓN",
-        badge: catastroAlerts,
-      },
-
-    // ---- EXPLORACIÓN (herramientas técnicas — segundo plano) ----
-    !isInvestor &&
-      canAccess(role, "geophysics") && {
-        to: "/dashboard/geophysics",
-        icon: <Activity className="w-3.5 h-3.5" />,
-        label: "Geofísica",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "geophysics") && {
-        to: "/dashboard/mag-revalidations",
-        icon: <Magnet className="w-3.5 h-3.5" />,
-        label: "Revalidación MAG",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "geophysics") && {
-        to: "/dashboard/drones",
-        icon: <Plane className="w-3.5 h-3.5" />,
-        label: "Drones",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "drilling") && {
-        to: "/dashboard/drilling",
-        icon: <Drill className="w-3.5 h-3.5" />,
-        label: "Sondajes",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "drilling") && {
-        to: "/dashboard/section",
-        icon: <Scissors className="w-3.5 h-3.5" />,
-        label: "Sección 3D",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "sampling") && {
-        to: "/dashboard/sampling",
-        icon: <TestTube2 className="w-3.5 h-3.5" />,
-        label: "Muestreo",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "qaqc") && {
-        to: "/dashboard/qaqc",
-        icon: <ShieldCheck className="w-3.5 h-3.5" />,
-        label: "QA/QC",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "targets") && {
-        to: "/dashboard/targets",
-        icon: <Target className="w-3.5 h-3.5" />,
-        label: "Targets",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "targets") && {
-        to: "/dashboard/satellite-intel",
-        icon: <Satellite className="w-3.5 h-3.5" />,
-        label: "Inteligencia Sat.",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "estimation") && {
-        to: "/dashboard/estimation",
-        icon: <BarChart3 className="w-3.5 h-3.5" />,
-        label: "Estimación Recursos",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "inventory") && {
-        to: "/dashboard/inventory",
-        icon: <Boxes className="w-3.5 h-3.5" />,
-        label: "Inventario",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "reports") && {
-        to: "/dashboard/reports",
-        icon: <FileText className="w-3.5 h-3.5" />,
-        label: "Reportes",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "reports") && {
-        to: "/dashboard/ni43101",
-        icon: <FileText className="w-3.5 h-3.5" />,
-        label: "Informe 43-101",
-        group: "EXPLORACIÓN",
-      },
-    !isInvestor &&
-      canAccess(role, "reports") && {
-        to: "/dashboard/qps",
-        icon: <BadgeCheck className="w-3.5 h-3.5" />,
-        label: "QPs · Firmas",
-        group: "EXPLORACIÓN",
-      },
-
-    // ---- GOBERNANZA ----
-    !isInvestor &&
-      canAccess(role, "approvals") && {
-        to: "/dashboard/approvals",
-        icon: <ClipboardCheck className="w-3.5 h-3.5" />,
-        label: "Aprobaciones",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "finance") && {
-        to: "/dashboard/finance",
-        icon: <DollarSign className="w-3.5 h-3.5" />,
-        label: "Costos",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "hse") && {
-        to: "/dashboard/hse",
-        icon: <ShieldAlert className="w-3.5 h-3.5" />,
-        label: "HSE",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "team") && {
-        to: "/dashboard/team",
-        icon: <Users className="w-3.5 h-3.5" />,
-        label: "Equipo",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "audit") && {
-        to: "/dashboard/audit",
-        icon: <ClipboardList className="w-3.5 h-3.5" />,
-        label: "Auditoría",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "audit") && {
-        to: "/dashboard/validation",
-        icon: <Database className="w-3.5 h-3.5" />,
-        label: "Validación Datos",
-        group: "GOBERNANZA",
-      },
-    !isInvestor &&
-      canAccess(role, "marketplace") && {
-        to: "/dashboard/marketplace",
-        icon: <LayersIcon className="w-3.5 h-3.5" />,
-        label: "Marketplace Capas",
-        group: "GOBERNANZA",
-      },
-
-    // ---- CUENTA ----
-    {
-      to: "/dashboard/plan",
-      icon: <Sparkles className="w-3.5 h-3.5" />,
-      label: "Plan y uso",
-      group: "CUENTA",
-    },
-    {
-      to: "/dashboard/api",
-      icon: <KeyRound className="w-3.5 h-3.5" />,
-      label: "API · Llaves",
-      group: "CUENTA",
-    },
-    {
-      to: "/dashboard/profile",
-      icon: <UserCircle className="w-3.5 h-3.5" />,
-      label: "Mi Perfil",
-      group: "CUENTA",
-    },
-    isSuperAdmin && {
-      to: "/dashboard/admin",
-      icon: <Crown className="w-3.5 h-3.5" />,
-      label: "Admin",
-      group: "CUENTA",
-    },
-  ].filter(Boolean) as RailItem[];
+  const items: RailItem[] = WORKSPACE_NAV.filter((e) => {
+    if (e.superAdminOnly && !isSuperAdmin) return false;
+    if (e.hideForInvestor && isInvestor) return false;
+    if (e.requiresProjects && !showOps) return false;
+    if (e.capability && !canAccess(role, e.capability)) return false;
+    return true;
+  }).map((e) => {
+    const Icon = e.icon;
+    return {
+      to: e.to,
+      label: e.label,
+      group: e.group,
+      exact: e.exact,
+      icon: <Icon className="w-3.5 h-3.5" />,
+      badge: e.badgeKey === "catastroAlerts" ? catastroAlerts : undefined,
+    } as RailItem;
+  });
 
   // Filtro por módulo SaaS (get_my_modules): si el plan restringe módulos,
   // ocultamos las rutas que no están habilitadas. Los items "core" (Inicio,
@@ -471,7 +113,6 @@ function AuthenticatedLayout() {
     if (selectedModule !== "all" && mod !== selectedModule) return false;
     return true;
   });
-
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
@@ -508,6 +149,7 @@ function AuthenticatedLayout() {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         {/* key por ruta: cada vista entra con un fade-up sutil */}
+        <WorkspaceTabs pathname={location.pathname} />
         <div key={location.pathname} className="animate-fade-up">
           <Outlet />
         </div>

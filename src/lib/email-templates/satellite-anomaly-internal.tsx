@@ -32,7 +32,7 @@ const Email = ({
     <EmailLayout
       preview={`${anomalyCount ?? 0} anomalías satelitales nuevas en ${projectName ?? ""}`}
       audience="internal"
-      ctaHref={appUrl(`/dashboard/3d-pro${projectId ? `?project=${projectId}` : ""}`)}
+      ctaHref={appUrl(`/dashboard/geology3d${projectId ? `?project=${projectId}` : ""}`)}
       ctaLabel="Abrir visor 3D"
     >
       <Heading style={styles.h1}>
