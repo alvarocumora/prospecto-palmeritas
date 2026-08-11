@@ -10,7 +10,9 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
   const seg = p.split("/")[0];
 
   // Capital & Deals de Minas
-  if (["deals", "investments", "listings", "offerings", "opportunities"].includes(seg)) {
+  if (
+    ["deals", "investments", "listings", "offerings", "opportunities"].includes(seg)
+  ) {
     return "capital";
   }
   // Commodities & Trading
@@ -20,26 +22,22 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
       "trade-board",
       "commodity-lots",
       "sourcing",
-      "marketplace",
+      "rfqs",
       "my-inquiries",
       "clientes",
       "proveedor",
       "proveedores",
       "cobranza",
       "envios",
-      "fletes",
       "anticipos",
       "precios",
       "documentos",
       "firmas",
-      "finance",
-      "invitaciones",
-      "enlaces",
     ].includes(seg)
   ) {
     return "commodities";
   }
-  // Core / transversal
+  // Core / transversal (Administración)
   if (
     [
       "analytics",
@@ -49,10 +47,17 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
       "admin",
       "agents",
       "command-center",
+      "approvals",
+      "finance",
+      "hse",
+      "team",
+      "audit",
+      "marketplace",
     ].includes(seg)
   ) {
     return "core";
   }
+
   // Todo lo demás cae en catastro (proyectos, exploración, catastro, geofísica, etc.)
   return "catastro";
 }
