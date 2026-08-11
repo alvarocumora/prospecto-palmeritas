@@ -114,7 +114,6 @@ function AuthenticatedLayout() {
     return true;
   });
 
-
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
