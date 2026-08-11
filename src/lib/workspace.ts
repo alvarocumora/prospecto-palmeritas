@@ -42,7 +42,9 @@ import {
   Wallet,
 } from "lucide-react";
 import type { ModuleKey } from "@/hooks/useMyModules";
-import type { ProjectCapability } from "@/hooks/useProjectRole";
+import type { MODULE_ROLES } from "@/hooks/useProjectRole";
+
+type ProjectCapability = keyof typeof MODULE_ROLES;
 
 /**
  * SISTEMA MAESTRO — navegación unificada.
