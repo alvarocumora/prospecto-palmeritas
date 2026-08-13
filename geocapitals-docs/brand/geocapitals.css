@@ -1,0 +1,252 @@
+/* ============================================================================
+   GeoCapitals — hoja de estilo de documentos (KYC + ficha de oferta)
+   Render objetivo: chromium --headless --print-to-pdf sobre A4.
+   Medidas reales de chromium (NO se aplica factor de escala de wkhtmltopdf).
+   Tipografía: DejaVu Sans (fallback estándar; Carlito no está instalado).
+   ============================================================================ */
+
+:root {
+  --navy:  #0d2b3e;
+  --blue:  #14506b;
+  --gold:  #b98a2f;
+  --text:  #1c2430;
+  --muted: #48586a;
+  --rule:  #c7d0d8;
+  --bg:    #f5f8fa;
+  --status:#a8752a;   /* etiquetas de estado */
+  --amber: #b8860b;   /* "Por confirmar" */
+}
+
+* { box-sizing: border-box; }
+
+@page {
+  size: A4;
+  margin: 16mm 15mm 18mm 15mm;
+}
+
+html, body {
+  font-family: "DejaVu Sans", "Carlito", "Calibri", Arial, sans-serif;
+  color: var(--text);
+  font-size: 9.6pt;
+  line-height: 1.42;
+  margin: 0;
+  padding: 0;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ------------------------------------------------------------------ página */
+.page {
+  position: relative;
+  page-break-after: always;
+  padding-bottom: 4mm;
+}
+.page:last-child { page-break-after: auto; }
+
+/* barra superior de marca: 45% navy / 40% blue / 15% gold, alto 14pt */
+.topbar {
+  display: flex;
+  height: 14pt;
+  width: 100%;
+  margin-bottom: 6mm;
+  border-radius: 1pt;
+  overflow: hidden;
+}
+.topbar > i { display: block; height: 100%; }
+.topbar .t-navy { width: 45%; background: var(--navy); }
+.topbar .t-blue { width: 40%; background: var(--blue); }
+.topbar .t-gold { width: 15%; background: var(--gold); }
+
+/* --------------------------------------------------------------- cabecera */
+.doc-head {
+  display: flex;
+  align-items: center;
+  gap: 5mm;
+  margin-bottom: 5mm;
+}
+.doc-head .mark {
+  width: 15mm; height: 15mm;
+  flex: 0 0 15mm;
+  border: 1.4pt solid var(--navy);
+  border-radius: 2pt;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--navy);
+  font-weight: bold;
+  font-size: 13pt;
+  letter-spacing: 0.5pt;
+}
+.doc-head .mark img { max-width: 100%; max-height: 100%; }
+.doc-head .titles { flex: 1 1 auto; }
+.doc-head .brand {
+  color: var(--navy);
+  font-size: 13pt;
+  font-weight: bold;
+  letter-spacing: 0.3pt;
+}
+.doc-head .subtitle {
+  color: var(--muted);
+  font-size: 8.4pt;
+  margin-top: 0.6mm;
+}
+.doc-head .docmeta {
+  text-align: right;
+  font-size: 7.8pt;
+  color: var(--muted);
+  line-height: 1.5;
+}
+.doc-head .docmeta b { color: var(--text); }
+
+h1 {
+  color: var(--navy);
+  font-size: 15pt;
+  margin: 2mm 0 1mm 0;
+  font-weight: bold;
+}
+h2 {
+  color: var(--blue);
+  font-size: 11pt;
+  margin: 5mm 0 2mm 0;
+  padding-bottom: 1mm;
+  border-bottom: 0.8pt solid var(--rule);
+  font-weight: bold;
+}
+h3 {
+  color: var(--navy);
+  font-size: 9.6pt;
+  margin: 3.5mm 0 1.5mm 0;
+  font-weight: bold;
+}
+p { margin: 0 0 2mm 0; }
+.lead { color: var(--muted); font-size: 9pt; margin-bottom: 3mm; }
+.small { font-size: 7.8pt; color: var(--muted); }
+ul, ol { margin: 0 0 2mm 0; padding-left: 5mm; }
+li { margin-bottom: 1mm; }
+
+/* --------------------------------------------------------------- badges */
+.badge {
+  display: inline-block;
+  height: 5.2mm;
+  line-height: 5.2mm;
+  padding: 0 2.2mm;
+  background: var(--blue);
+  color: #fff;
+  font-size: 7.6pt;
+  font-weight: bold;
+  border-radius: 1pt;
+  vertical-align: middle;
+}
+.badge.gold { background: var(--gold); }
+.badge.navy { background: var(--navy); }
+
+/* etiquetas de estado */
+.status {
+  color: var(--status);
+  font-weight: bold;
+  font-size: 8pt;
+  text-transform: uppercase;
+  letter-spacing: 0.3pt;
+}
+
+/* campo faltante */
+.tbc {
+  color: var(--amber);
+  font-weight: bold;
+}
+
+/* ---------------------------------------------------------------- tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1mm 0 3mm 0;
+  font-size: 8.6pt;
+}
+th, td {
+  text-align: left;
+  padding: 1.6mm 2.2mm;
+  border-bottom: 0.6pt solid var(--rule);
+  vertical-align: top;
+}
+thead th {
+  background: var(--navy);
+  color: #fff;
+  font-weight: bold;
+  font-size: 8pt;
+  border-bottom: none;
+}
+tbody tr:nth-child(even) td { background: #eef3f6; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.compact th, table.compact td { padding: 1.2mm 1.8mm; }
+
+/* fila de campo etiqueta/valor */
+.kv {
+  display: grid;
+  grid-template-columns: 42mm 1fr;
+  gap: 0 3mm;
+  margin-bottom: 1.3mm;
+  font-size: 8.8pt;
+}
+.kv .k { color: var(--muted); }
+.kv .v { color: var(--text); }
+
+/* ---------------------------------------------------------------- cajas */
+.box {
+  border: 0.8pt solid var(--rule);
+  border-left: 2.4pt solid var(--blue);
+  background: var(--bg);
+  padding: 2.6mm 3mm;
+  border-radius: 1pt;
+  margin: 2mm 0 3mm 0;
+}
+.box.gold  { border-left-color: var(--gold); }
+.box.navy  { border-left-color: var(--navy); }
+.box .box-t {
+  font-weight: bold;
+  color: var(--navy);
+  font-size: 8.8pt;
+  margin-bottom: 1mm;
+}
+
+.cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 6mm;
+}
+.cols-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 0 5mm;
+}
+
+/* KPI destacado */
+.kpi {
+  display: flex;
+  gap: 4mm;
+  margin: 2mm 0 3mm 0;
+}
+.kpi .cell {
+  flex: 1;
+  border: 0.8pt solid var(--rule);
+  border-top: 2pt solid var(--gold);
+  border-radius: 1pt;
+  padding: 2.4mm 2.6mm;
+  background: #fff;
+}
+.kpi .cell .n { color: var(--navy); font-size: 13pt; font-weight: bold; }
+.kpi .cell .l { color: var(--muted); font-size: 7.6pt; margin-top: 0.6mm; }
+
+/* pie dentro de la página (numeración la pone chromium en el margen) */
+.disc {
+  margin-top: 4mm;
+  padding-top: 2mm;
+  border-top: 0.6pt solid var(--rule);
+  font-size: 7pt;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+/* utilidades */
+.mt0 { margin-top: 0; }
+.mb0 { margin-bottom: 0; }
+.nowrap { white-space: nowrap; }
+.center { text-align: center; }
+.right { text-align: right; }

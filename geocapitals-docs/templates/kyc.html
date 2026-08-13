@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+<meta charset="utf-8">
+<title>{{ org_name }} — {{ t.doc_title }}</title>
+<style>{{ css }}</style>
+</head>
+<body>
+
+{% macro head(sub) %}
+<div class="topbar"><i class="t-navy"></i><i class="t-blue"></i><i class="t-gold"></i></div>
+<div class="doc-head">
+  <div class="mark">{% if logo %}<img src="{{ logo }}" alt="{{ org_name }}">{% else %}GC{% endif %}</div>
+  <div class="titles">
+    <div class="brand">{{ org_name }}</div>
+    <div class="subtitle">{{ tagline }}</div>
+  </div>
+  <div class="docmeta">
+    <div><b>{{ t.doc_title }}</b></div>
+    <div>{{ t.doc_kind }}</div>
+    <div>{{ t.date }}: {{ fecha }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{# ============================ PÁGINA 1 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h1>{{ t.doc_title }}</h1>
+  <p class="lead">{{ t.lead }}</p>
+
+  <h2>{{ t.sec_alcance }}</h2>
+  <ul>
+    {% for p in t.principios %}<li>{{ p }}</li>{% endfor %}
+  </ul>
+
+  <div class="box navy">
+    <div class="box-t">{{ org_name }}</div>
+    <div class="small">
+      {% if lang == 'en' %}
+      The fields in this document are completed by the counterparty and verified by
+      GeoCapitals. Empty fields are shown as <span class="tbc">Por confirmar</span>
+      until validated; a blank is never presented as a confirmed value.
+      {% else %}
+      Los campos de este documento los completa la contraparte y los verifica
+      GeoCapitals. Los campos vacíos se muestran como
+      <span class="tbc">Por confirmar</span> hasta su validación; un vacío nunca se
+      presenta como valor confirmado.
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="kpi">
+    <div class="cell"><div class="n">8</div><div class="l">{% if lang=='en' %}Sections{% else %}Secciones{% endif %}</div></div>
+    <div class="cell"><div class="n">KYC</div><div class="l">{% if lang=='en' %}Framework{% else %}Marco{% endif %}</div></div>
+    <div class="cell"><div class="n">UBO</div><div class="l">{% if lang=='en' %}Beneficial owner{% else %}Beneficiario final{% endif %}</div></div>
+  </div>
+
+  <div class="disc">
+    {% if lang=='en' %}Confidential. For pre-qualification purposes only. Does not
+    constitute a commercial guarantee or legal advice.{% else %}Confidencial. Solo para
+    fines de precalificación. No constituye garantía comercial ni asesoría legal.{% endif %}
+  </div>
+</div>
+
+{# ============================ PÁGINA 2 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>{{ t.sec_identidad }}</h2>
+  <div class="cols">
+    <div>
+      {% for f in t.id_fields[:4] %}
+      <div class="kv"><div class="k">{{ f }}</div><div class="v"><span class="tbc">Por confirmar</span></div></div>
+      {% endfor %}
+    </div>
+    <div>
+      {% for f in t.id_fields[4:] %}
+      <div class="kv"><div class="k">{{ f }}</div><div class="v"><span class="tbc">Por confirmar</span></div></div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <h3>{{ t.rep_intro }}</h3>
+  <table class="compact">
+    <thead><tr>
+      <th>{% if lang=='en' %}Full name{% else %}Nombre completo{% endif %}</th>
+      <th>{% if lang=='en' %}ID{% else %}RUT / ID{% endif %}</th>
+      <th>{% if lang=='en' %}Role{% else %}Cargo{% endif %}</th>
+      <th>{% if lang=='en' %}Signing power{% else %}Poder de firma{% endif %}</th>
+    </tr></thead>
+    <tbody>
+      {% for i in range(4) %}
+      <tr><td><span class="tbc">Por confirmar</span></td><td><span class="tbc">—</span></td><td><span class="tbc">—</span></td><td><span class="tbc">—</span></td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="box">
+    <div class="box-t">UBO</div>
+    <div class="small">{% if lang=='en' %}Declare every ultimate beneficial owner holding
+      10% or more, directly or indirectly.{% else %}Declarar todo beneficiario final con
+      participación igual o superior al 10%, directa o indirecta.{% endif %}</div>
+  </div>
+</div>
+
+{# ============================ PÁGINA 3 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>{{ t.sec_legal }}</h2>
+  <table>
+    <thead><tr><th>{{ t.col_doc }}</th><th>{{ t.col_status }}</th><th>{{ t.col_notes }}</th></tr></thead>
+    <tbody>
+      {% for doc in t.legal_docs %}
+      <tr>
+        <td>{{ doc }}</td>
+        <td><span class="status">{{ t.status_pending }}</span></td>
+        <td><span class="tbc">—</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="box gold">
+    <div class="box-t">{% if lang=='en' %}Tax standing{% else %}Situación tributaria{% endif %}</div>
+    <div class="small">{% if lang=='en' %}A current tax-compliance certificate is required
+      before the first settlement.{% else %}Se exige certificado de cumplimiento tributario
+      vigente antes de la primera liquidación.{% endif %}</div>
+  </div>
+</div>
+
+{# ============================ PÁGINA 4 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>{{ t.sec_operativa }}</h2>
+  <table>
+    <thead><tr><th>{{ t.col_doc }}</th><th>{{ t.col_status }}</th><th>{{ t.col_notes }}</th></tr></thead>
+    <tbody>
+      {% for doc in t.op_docs %}
+      <tr>
+        <td>{{ doc }}</td>
+        <td><span class="status">{{ t.status_pending }}</span></td>
+        <td><span class="tbc">—</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="cols">
+    <div class="box">
+      <div class="box-t">HSE</div>
+      <div class="small">{% if lang=='en' %}Health, safety and environment protocols must be
+        current and auditable.{% else %}Los protocolos de seguridad, salud y medio ambiente
+        deben estar vigentes y ser auditables.{% endif %}</div>
+    </div>
+    <div class="box">
+      <div class="box-t">{% if lang=='en' %}Capacity{% else %}Capacidad{% endif %}</div>
+      <div class="small">{% if lang=='en' %}Declared installed capacity is contrasted against
+        the committed volume.{% else %}La capacidad instalada declarada se contrasta con el
+        volumen comprometido.{% endif %}</div>
+    </div>
+  </div>
+</div>
+
+{# ============================ PÁGINA 5 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>{{ t.sec_material }}</h2>
+  <p class="lead">{{ t.mat_intro }}</p>
+  <table>
+    <thead><tr><th>{{ t.col_doc }}</th><th>{{ t.col_status }}</th><th>{{ t.col_notes }}</th></tr></thead>
+    <tbody>
+      {% for f in t.mat_fields %}
+      <tr>
+        <td>{{ f }}</td>
+        <td><span class="status">{{ t.status_pending }}</span></td>
+        <td><span class="tbc">—</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="box navy">
+    <div class="box-t">{% if lang=='en' %}Traceability{% else %}Trazabilidad{% endif %}</div>
+    <div class="small">{% if lang=='en' %}The assay is the only source of grade. Assumed
+      grade scenarios are calculation inputs, never a confirmed assay.{% else %}El assay es
+      la única fuente de ley. Los escenarios de ley supuestos son insumos de cálculo, nunca
+      un ensaye confirmado.{% endif %}</div>
+  </div>
+</div>
+
+{# ============================ PÁGINA 6 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>{{ t.sec_riesgo }}</h2>
+  <ul>
+    {% for r in t.riesgo_items %}<li>{{ r }}</li>{% endfor %}
+  </ul>
+
+  <h2>{{ t.sec_checklist }}</h2>
+  <div class="cols-3">
+    <div class="box"><div class="box-t">{{ t.status_pending }}</div><div class="small">{% if lang=='en' %}Not yet received.{% else %}Aún no recibido.{% endif %}</div></div>
+    <div class="box"><div class="box-t">{{ t.status_received }}</div><div class="small">{% if lang=='en' %}Received, pending verification.{% else %}Recibido, por verificar.{% endif %}</div></div>
+    <div class="box gold"><div class="box-t">{{ t.status_verified }}</div><div class="small">{% if lang=='en' %}Verified by GeoCapitals.{% else %}Verificado por GeoCapitals.{% endif %}</div></div>
+  </div>
+
+  <h2>{{ t.sec_declaracion }}</h2>
+  <p>{{ t.declaracion }}</p>
+
+  <table class="compact" style="margin-top:6mm">
+    <tbody>
+      <tr>
+        <td style="width:50%; border-bottom:none; padding-top:12mm">
+          <div style="border-top:0.8pt solid var(--text); padding-top:1mm">{{ t.counterparty }} — {{ t.signature }}</div>
+        </td>
+        <td style="width:50%; border-bottom:none; padding-top:12mm">
+          <div style="border-top:0.8pt solid var(--text); padding-top:1mm">{{ t.reviewer }} — {{ t.signature }}</div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="disc">
+    {{ org_name }}{% if contact_email %} · {{ contact_email }}{% endif %}{% if contact_phone %} · {{ contact_phone }}{% endif %}{% if contact_web %} · {{ contact_web }}{% endif %}
+    <br>{% if lang=='en' %}Confidential document. Reproduction restricted to the parties of
+    the deal.{% else %}Documento confidencial. Reproducción restringida a las partes de la
+    operación.{% endif %}
+  </div>
+</div>
+
+</body>
+</html>
