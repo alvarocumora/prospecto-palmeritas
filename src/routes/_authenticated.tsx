@@ -153,14 +153,17 @@ function MobileDrawer({
   onClose,
   items,
   userName,
+  roleLabel,
   onSignOut,
 }: {
   open: boolean;
   onClose: () => void;
   items: RailItem[];
   userName: string;
+  roleLabel?: string | null;
   onSignOut: () => void;
 }) {
+
   const groups = items.reduce<Record<string, RailItem[]>>((acc, it) => {
     const g = it.group ?? "—";
     (acc[g] ??= []).push(it);
