@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { effectivePaymentStatus, isValidPaymentAmount, PAYMENT_KIND_LABELS } from "@/lib/payments";
 import { daysOverdue } from "@/lib/receivables";
 import { dunningStage, shouldRemind, dunningPriority, type DunningStage } from "@/lib/dunning";
@@ -103,7 +103,7 @@ async function selectPayments(sb: SupabaseClient): Promise<PaymentRow[] | "missi
 }
 
 export const getDunningQueue = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<DunningQueue> => {
     const sb = asSb(context.supabase);
     const me = context.userId as string;
@@ -216,7 +216,7 @@ export const getDunningQueue = createServerFn({ method: "GET" })
   });
 
 export const sendPaymentReminder = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ paymentId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true; email: string }> => {
     const sb = asSb(context.supabase);

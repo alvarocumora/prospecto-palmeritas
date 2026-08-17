@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import {
   generateSubmitToken,
   generateShareToken,
@@ -73,7 +73,7 @@ const CreateRequestInput = z.object({
 });
 
 export const createSourcingRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => CreateRequestInput.parse(d))
   .handler(async ({ data, context }) => {
     const token = generateSubmitToken();
@@ -123,7 +123,7 @@ export type SourcingRequestRow = {
 };
 
 export const listSourcingRequests = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<{ pending: boolean; requests: SourcingRequestRow[] }> => {
     const sb = asSb(context.supabase);
     const { data, error } = await sb
@@ -196,7 +196,7 @@ const SUBMISSION_COLS =
   "id, supplier_name, supplier_company, supplier_country, contact_email, contact_phone, offer_price_usd_t, offer_quantity_t, incoterm, lead_time, supplier_role, port_loading, payment_terms, offer_valid_until, quality_grade, packaging, specs, notes, documents, status, share_token_prefix, trade_id, created_at";
 
 export const getSourcingRequestDetail = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(
     async ({
@@ -236,7 +236,7 @@ export const getSourcingRequestDetail = createServerFn({ method: "GET" })
   );
 
 export const setSubmissionStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ id: z.string().uuid(), status: z.enum(SUBMISSION_STATUSES) }).parse(d),
   )
@@ -250,7 +250,7 @@ export const setSubmissionStatus = createServerFn({ method: "POST" })
   });
 
 export const setRequestStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ id: z.string().uuid(), status: z.enum(REQUEST_STATUSES) }).parse(d),
   )
@@ -266,7 +266,7 @@ export const setRequestStatus = createServerFn({ method: "POST" })
 
 // ---------- Dueño: generar ficha compartible con el comprador ----------
 export const generateSubmissionShareLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -289,7 +289,7 @@ export const generateSubmissionShareLink = createServerFn({ method: "POST" })
 // (counterparty_*) y seller_user_id queda NULL. Así la UI muestra al
 // proveedor real y no una operación consigo mismo.
 export const convertSubmissionToTrade = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ tradeId: string }> => {
     const sb = asSb(context.supabase);
@@ -483,7 +483,7 @@ async function signedSupplierFileUrl(sb: SupabaseClient, path: string): Promise<
 }
 
 export const getSupplierFileUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ submissionId: z.string().uuid(), path: z.string().min(1).max(500) }).parse(d),
   )
@@ -759,7 +759,7 @@ const DispatchRecipient = z.object({
 });
 
 export const dispatchSupplierSheetToBuyers = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -897,7 +897,7 @@ export const dispatchSupplierSheetToBuyers = createServerFn({ method: "POST" })
   });
 
 export const listSupplierSheetDispatches = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ submissionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { data: rows, error } = await asSb(context.supabase)

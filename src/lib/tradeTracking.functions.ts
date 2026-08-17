@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import type { ShipmentStatus } from "@/lib/shipments";
 import type { RawTradeEvent } from "@/lib/tradeTimeline";
 
@@ -39,7 +39,7 @@ export type TradeTracking = {
 };
 
 export const getTradeTracking = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<TradeTracking | null> => {
     const sb = asSb(context.supabase);

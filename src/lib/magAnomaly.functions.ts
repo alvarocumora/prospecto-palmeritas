@@ -2,7 +2,7 @@
 // Free, no API key. ImageServer REST: https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 
 const EMAG2_BASE = "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
 
@@ -89,7 +89,7 @@ function detectLocalMaxima(samples: Sample[], gridN: number, topK: number): Samp
 }
 
 export const detectMagTargets = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) =>
     z
       .object({
@@ -152,7 +152,7 @@ export const detectMagTargets = createServerFn({ method: "POST" })
   });
 
 export const listMagTargets = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => z.object({ projectId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;

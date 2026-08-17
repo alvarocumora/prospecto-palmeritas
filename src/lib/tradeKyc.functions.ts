@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 const BUCKET = "operation-docs";
@@ -60,7 +60,7 @@ async function assertTradeAccess(sb: SupabaseClient, tradeId: string) {
 }
 
 export const listTradeKyc = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<KycRow[]> => {
     const sb = asSb(context.supabase);
@@ -90,7 +90,7 @@ const uploadInput = (d: unknown) =>
     .parse(d);
 
 export const uploadTradeKycDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator(uploadInput)
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const sb = asSb(context.supabase);
@@ -125,7 +125,7 @@ export const uploadTradeKycDocument = createServerFn({ method: "POST" })
   });
 
 export const reviewTradeKycDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -154,7 +154,7 @@ export const reviewTradeKycDocument = createServerFn({ method: "POST" })
 
 /** URL firmada (5 min) para descargar un documento del expediente. */
 export const getTradeKycFileUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ url: string | null }> => {
     const sb = asSb(context.supabase);

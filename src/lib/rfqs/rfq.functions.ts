@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
@@ -39,7 +39,7 @@ function makeRef() {
 }
 
 export const createRfq = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((raw: unknown) => rfqSchema.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -72,7 +72,7 @@ export const createRfq = createServerFn({ method: "POST" })
   });
 
 export const listMyRfqs = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("rfqs")
@@ -84,7 +84,7 @@ export const listMyRfqs = createServerFn({ method: "GET" })
   });
 
 export const getRfqDetail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { data: rfq, error } = await context.supabase.from("rfqs").select("*").eq("id", data.id).maybeSingle();
@@ -120,7 +120,7 @@ export const getRfqDetail = createServerFn({ method: "POST" })
   });
 
 export const closeRfq = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((raw: unknown) =>
     z.object({ id: z.string().uuid(), status: z.enum(["publicado", "en_evaluacion", "adjudicado", "cerrado", "cancelado"]) }).parse(raw),
   )
@@ -135,7 +135,7 @@ export const APP_STATUSES = ["pending", "review", "approved", "rejected"] as con
 export type AppStatus = (typeof APP_STATUSES)[number];
 
 export const decideApplication = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -192,7 +192,7 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
 });
 
 export const applyToRfq = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((raw: unknown) =>
     z.object({ rfq_id: z.string().uuid(), supplier_id: z.string().uuid(), notes: z.string().optional() }).parse(raw),
   )

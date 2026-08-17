@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import { buildTermSheet, termSheetToMarkdown, type TermSheet } from "@/lib/termSheet";
 import { computePayableValue, normalizeDeleterious } from "@/lib/payableValue";
 import { fetchLivePrices } from "@/lib/payableValue.functions";
@@ -47,7 +47,7 @@ async function aiSummary(ts: TermSheet): Promise<string | null> {
 }
 
 export const draftTermSheet = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => input.parse(d))
   .handler(async ({ data, context }): Promise<TermSheetDraft | null> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

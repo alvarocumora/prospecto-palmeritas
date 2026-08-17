@@ -2,7 +2,7 @@
 // Compara la corrida nueva con el snapshot persistido y registra el diff.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 
 const EMAG2_BASE = "https://gis.ngdc.noaa.gov/arcgis/rest/services/EMAG2v3/ImageServer";
 
@@ -197,7 +197,7 @@ function buildDiff(prev: ExistingTarget[], next: Peak[]): DiffRow[] {
 }
 
 export const revalidateMagTargets = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) =>
     z
       .object({
@@ -354,7 +354,7 @@ export const revalidateMagTargets = createServerFn({ method: "POST" })
   });
 
 export const listMagRevalidations = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) =>
     z
       .object({
@@ -378,7 +378,7 @@ export const listMagRevalidations = createServerFn({ method: "POST" })
   });
 
 export const getMagRevalidationDiffs = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => z.object({ revalidationId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;

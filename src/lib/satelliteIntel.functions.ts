@@ -4,7 +4,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 
 type HyperRow = Tables<"hyperspectral_products">;
@@ -114,7 +114,7 @@ function normalizeFeature(f: unknown, collection: string): StacItem {
 }
 
 export const searchStac = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => SearchInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -189,7 +189,7 @@ const SeedHyperInput = z.object({
 });
 
 export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => SeedHyperInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -266,7 +266,7 @@ type ProductRow = {
 };
 
 export const explainHyperspectralProducts = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => ExplainInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -371,7 +371,7 @@ function classifySeverity(velocity: number): "info" | "watch" | "warning" | "cri
 // estabilidad <5 mm/yr en el cuerpo). Mientras el worker Python real no esté en
 // producción, esto entrega una demo trazable y produce alertas accionables.
 export const seedInsarMonitoring = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => RunInsarInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -457,7 +457,7 @@ const ExplainInsarInput = z.object({
 });
 
 export const explainInsarPattern = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => ExplainInsarInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -582,7 +582,7 @@ function circlePolygon(
 // pero coherente). Hasta que el worker Python real (PDAL/rasterio) esté en
 // línea, este endpoint produce mediciones trazables para demos a ENAMI.
 export const seedStockpileVolume = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => StockpileSeedInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -645,7 +645,7 @@ const ExplainStockpileInput = z.object({
 });
 
 export const explainStockpileChanges = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => ExplainStockpileInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -834,7 +834,7 @@ function haversineM(lat1: number, lng1: number, lat2: number, lng2: number): num
 }
 
 export const getTargetSatelliteSummaries = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => TargetSummariesInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -1084,7 +1084,7 @@ function recommendationFor(asset: string | null, vel: number): string {
 }
 
 export const runInsarAlertWorkflow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => RunWorkflowInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -1190,7 +1190,7 @@ const AddRecInput = z.object({
 });
 
 export const addInsarAlertAction = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => AddRecInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -1224,7 +1224,7 @@ export const addInsarAlertAction = createServerFn({ method: "POST" })
 const HistoryInput = z.object({ projectId: z.string().uuid() });
 
 export const getInsarAlertHistory = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => HistoryInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -1343,7 +1343,7 @@ function bufferPolygon(lat: number, lng: number, meters: number): GeoJSON.Polygo
 }
 
 export const runSatelliteAnalysisOnTargets = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input) => RunOnTargetsInput.parse(input))
   .handler(async ({ data, context }): Promise<RunOnTargetsOutput> => {
     const { supabase, userId } = context;

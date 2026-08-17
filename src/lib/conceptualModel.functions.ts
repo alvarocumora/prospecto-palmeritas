@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import { generateConceptualModel } from "./conceptualModel.server";
 import proj4 from "proj4";
 import { lngLatToMeters } from "@/engine3d/geospatial/crs";
@@ -20,7 +20,7 @@ async function assertSuperAdmin(userId: string) {
 
 // ─── Generador (one-shot) ───────────────────────────────────────────────────
 export const generateConceptualModelFn = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => ProjectInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertSuperAdmin(context.userId);

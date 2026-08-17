@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import {
   deriveRequirement,
   rankLots,
@@ -24,7 +24,7 @@ export type RecommendedLot = {
 };
 
 export const recommendLotsForBuyer = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }): Promise<RecommendedLot[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
