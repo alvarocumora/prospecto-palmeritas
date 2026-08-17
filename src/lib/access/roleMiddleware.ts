@@ -29,7 +29,7 @@ export type ServerAccess = {
 };
 
 type SupabaseLike = {
-  from: (t: string) => any;
+  from: (t: string) => { select: (c: string) => unknown } & Record<string, unknown>;
   rpc: (fn: string, args?: Record<string, unknown>) => any;
 };
 
