@@ -35,23 +35,28 @@ type SupabaseLike = {
 };
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
-
 /** Resuelve el rol efectivo del usuario autenticado desde la base. */
 export async function resolveServerAccess(
   supabase: SupabaseLike,
   userId: string,
 ): Promise<ServerAccess> {
   const [roleRes, profileRes, modulesRes] = await Promise.all([
-    supabase.from("app_roles").select("role").eq("user_id", userId).eq("role", "super_admin").maybeSingle(),
+    supabase
+      .from("app_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "super_admin")
+      .maybeSingle(),
     supabase.from("profiles").select("account_type").eq("id", userId).maybeSingle(),
     supabase.rpc("get_my_modules"),
   ]);
 
   const isSuperAdmin = !!roleRes?.data;
   const accountType = (profileRes?.data?.account_type ?? null) as ServerAccess["accountType"];
-  const payload = (modulesRes?.data ?? null) as
-    | { unrestricted?: boolean; modules?: { key: ModuleKey }[] }
-    | null;
+  const payload = (modulesRes?.data ?? null) as {
+    unrestricted?: boolean;
+    modules?: { key: ModuleKey }[];
+  } | null;
   const unrestricted = payload?.unrestricted ?? true;
   const modules = (payload?.modules ?? []).map((m) => m.key);
 
