@@ -30,7 +30,7 @@ function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const { projects, active } = useProjects();
   const access = useWorkspaceAccess();
-  const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
+  useIsSuperAdmin();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
   const [selectedModule, setSelectedModule] = useSelectedModule(myModules?.modules);
