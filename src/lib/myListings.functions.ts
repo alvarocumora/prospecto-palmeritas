@@ -3,7 +3,7 @@
 // (setListingPublished en adminInbox.functions.ts).
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 
 const CreateListingSchema = z.object({
   title: z.string().min(3).max(200),
@@ -45,7 +45,7 @@ export type MyListingRow = {
 };
 
 export const createPropertyListing = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => CreateListingSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -102,7 +102,7 @@ export const createPropertyListing = createServerFn({ method: "POST" })
   });
 
 export const listMyListings = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin

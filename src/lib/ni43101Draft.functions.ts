@@ -3,7 +3,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 
 export type DraftHyperRow = {
   source: string;
@@ -84,7 +84,7 @@ export type Ni43101Draft = {
 };
 
 export const getNi43101DraftReport = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input: { projectId: string }) =>
     z.object({ projectId: z.string().uuid() }).parse(input),
   )

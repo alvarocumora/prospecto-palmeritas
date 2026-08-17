@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import { publicUrl } from "@/lib/publicUrl";
 
 // ---------------------------------------------------------------------------
@@ -44,7 +44,7 @@ const createSchema = z.object({
  * Emite email individual con link /firmar/operacion/$token por firmante.
  */
 export const createOperationSignatureFlow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) => createSchema.parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();
@@ -199,7 +199,7 @@ export const createOperationSignatureFlow = createServerFn({ method: "POST" })
 
 /** Lista los flujos de firma de una operación. */
 export const listOperationSignatureFlows = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z.object({ operation_id: z.string().uuid() }).parse(raw),
   )
@@ -420,7 +420,7 @@ export const submitOperationSignature = createServerFn({ method: "POST" })
 
 /** Revoca un envelope (staff). Todas las firmas pendientes quedan invalidadas. */
 export const voidOperationSignatureFlow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z.object({ envelope_id: z.string().uuid(), reason: z.string().max(400).optional() }).parse(raw),
   )

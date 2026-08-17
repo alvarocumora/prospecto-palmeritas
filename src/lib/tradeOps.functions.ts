@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { sha256Hex } from "@/lib/documents/signing";
 import { tokenPrefix } from "@/lib/sourcing";
 import { publicUrl } from "@/lib/publicUrl";
@@ -33,7 +33,7 @@ export const operacionUrl = (token: string) => publicUrl(`/operacion/${token}`);
 // deja evento en el timeline. Después el dueño puede emitir el link de
 // operación con `ensureCounterpartyLink` (usa esos mismos campos).
 export const linkPartnerToTrade = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -104,7 +104,7 @@ function serviceClient(): SupabaseClient | null {
 
 // ---------- Autenticado: generar / regenerar link de contraparte ----------
 export const ensureCounterpartyLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({

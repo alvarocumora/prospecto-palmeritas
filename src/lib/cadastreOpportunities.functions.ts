@@ -3,7 +3,7 @@
 // - Computa features con PostGIS (distancia a yacimientos, anomalías cercanas).
 // - Genera tesis y acción con Lovable AI Gateway.
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import type { Json, TablesInsert } from "@/integrations/supabase/types";
 import type { FeatureCollection } from "geojson";
 import { z } from "zod";
@@ -142,7 +142,7 @@ async function explainWithAI(
 }
 
 export const scoreCadastreOpportunities = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => ScoreInput.parse(d))
   .handler(async ({ data, context }) => {
     // Solo super_admin
@@ -275,7 +275,7 @@ const ListInput = z.object({
 });
 
 export const listOpportunities = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => ListInput.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     let q = context.supabase
@@ -303,7 +303,7 @@ const GeoInput = z.object({
 });
 
 export const getOpportunitiesGeo = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => GeoInput.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     const { data: result, error } = await context.supabase.rpc("opportunities_geo", {

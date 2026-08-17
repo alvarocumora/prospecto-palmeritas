@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import { z } from "zod";
 import { publicUrl } from "@/lib/publicUrl";
 
@@ -19,7 +19,7 @@ const ReportSchema = z.object({
  * Requires the caller to be a member of the project.
  */
 export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d) => InviteSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -87,7 +87,7 @@ export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
  * Notify the project team / investors that a technical report changed to signed.
  */
 export const sendReportSignedEmail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d) => ReportSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;

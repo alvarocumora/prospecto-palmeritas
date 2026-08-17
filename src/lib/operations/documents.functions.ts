@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 
 // ---------------------------------------------------------------------------
 // Operation Documents — subida, revisión, congelamiento y descarga firmada.
@@ -191,7 +191,7 @@ export const getOperationDocumentUrl = createServerFn({ method: "POST" })
 
 /** Marca revisión (approved / rejected / needs_revision) — sólo staff. */
 export const reviewOperationDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -231,7 +231,7 @@ export const reviewOperationDocument = createServerFn({ method: "POST" })
 
 /** Congela documento para firma / evidencia contractual. */
 export const freezeOperationDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) => z.object({ document_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();

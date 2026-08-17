@@ -2,7 +2,7 @@
 // comparables. Lee de commodity_prices y market_comparables. El símbolo se
 // resuelve por nombre libre (case-insensitive) o por código conocido.
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 
@@ -81,7 +81,7 @@ function resolveSymbol(input: string): string {
 }
 
 export const getCommodityIntel = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ commodity: z.string().min(1), limitComps: z.number().int().min(1).max(50).optional() }).parse(d),
   )
@@ -128,7 +128,7 @@ export const getCommodityIntel = createServerFn({ method: "GET" })
 // (no admin) — cada usuario puede empujar sus lecturas de mercado; en la UI se
 // muestra la fuente. RLS de commodity_prices ya limita quién escribe.
 export const upsertCommodityPrice = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({

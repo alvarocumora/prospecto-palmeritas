@@ -8,7 +8,7 @@
 //    listing (property_deal_inquiries.nda_signed_at)
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 
 const BUCKET = "data-room-files";
 
@@ -73,7 +73,7 @@ async function assertListingOwner(
 // ── Subida (solo dueño) ───────────────────────────────────────────────────────
 
 export const requestDataRoomUpload = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) =>
     z
       .object({
@@ -95,7 +95,7 @@ export const requestDataRoomUpload = createServerFn({ method: "POST" })
   });
 
 export const registerDataRoomFile = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) =>
     z
       .object({
@@ -134,7 +134,7 @@ export const registerDataRoomFile = createServerFn({ method: "POST" })
   });
 
 export const deleteDataRoomFile = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => z.object({ fileId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = await admin();
@@ -159,7 +159,7 @@ export const deleteDataRoomFile = createServerFn({ method: "POST" })
 // ── Listado (dueño ve todo; otros ven metadata para saber qué hay) ───────────
 
 export const listDataRoomFiles = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => z.object({ listingId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context: _context }) => {
     const sb = await admin();
@@ -192,7 +192,7 @@ export type ListingInquiryRow = {
 };
 
 export const listInquiriesForOwner = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => z.object({ listingId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<ListingInquiryRow[]> => {
     const sb = await admin();
@@ -227,7 +227,7 @@ export const listInquiriesForOwner = createServerFn({ method: "GET" })
 // ── Descarga con gating NDA ───────────────────────────────────────────────────
 
 export const getDataRoomDownloadUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => z.object({ fileId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = await admin();

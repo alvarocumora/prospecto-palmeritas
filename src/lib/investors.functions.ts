@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import { z } from "zod";
 import { sendInternalEmail } from "@/lib/email/send-internal.server";
 
@@ -16,7 +16,7 @@ async function assertStaff(supabase: any, userId: string): Promise<void> {
 
 /** Lista perfiles inversionistas con estado de revisión (staff-only). */
 export const listInvestorProfiles = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) =>
     z
       .object({
@@ -56,7 +56,7 @@ export const listInvestorProfiles = createServerFn({ method: "GET" })
 
 /** Aprueba un inversionista y envía email de bienvenida. */
 export const approveInvestor = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => IdInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -98,7 +98,7 @@ export const approveInvestor = createServerFn({ method: "POST" })
 
 /** Rechaza un inversionista con motivo. */
 export const rejectInvestor = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d) => RejectInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -138,7 +138,7 @@ export const rejectInvestor = createServerFn({ method: "POST" })
 
 /** Disparado por el wizard al completar perfil: envía welcome + notifica equipo. */
 export const notifyInvestorSubmitted = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: prof } = await supabase
@@ -193,7 +193,7 @@ export const notifyInvestorSubmitted = createServerFn({ method: "POST" })
 
 /** Historial y estado de inversiones del usuario actual (perfil KYC + liquidaciones + inquiries). */
 export const getMyInvestmentHistory = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
 

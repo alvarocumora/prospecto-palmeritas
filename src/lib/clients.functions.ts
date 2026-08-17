@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import {
   aggregateClients,
   PARTNER_ROLES,
@@ -24,7 +24,7 @@ export type ClientRow = ClientAggregate & {
 };
 
 export const getClientsOverview = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<ClientRow[]> => {
     const sb = asSb(context.supabase);
     const me = context.userId as string;
@@ -94,7 +94,7 @@ export type PartnerRow = {
 const isMissingTable = (msg: string) => /does not exist|relation|schema cache/i.test(msg);
 
 export const listPartners = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<{ pending: boolean; partners: PartnerRow[] }> => {
     const { data, error } = await asSb(context.supabase)
       .from("business_partners")
@@ -124,7 +124,7 @@ const PartnerInput = z.object({
 });
 
 export const upsertPartner = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => PartnerInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -161,7 +161,7 @@ export const upsertPartner = createServerFn({ method: "POST" })
   });
 
 export const deletePartner = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await asSb(context.supabase)

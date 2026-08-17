@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { canAdvanceShipment, SHIPMENT_STATUS_LABELS, type ShipmentStatus } from "@/lib/shipments";
 
 // Embarques de trades: CRUD con RLS de contrapartes y trazabilidad — cada
@@ -95,7 +95,7 @@ export type ShipmentRow = {
 
 // ---------- Listar mis embarques (RLS filtra por contraparte) ----------
 export const listMyShipments = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<ShipmentRow[]> => {
     const { data } = await asSb(context.supabase)
       .from("trade_shipments")
@@ -122,7 +122,7 @@ const CreateInput = z.object({
 });
 
 export const createShipment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => CreateInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -181,7 +181,7 @@ const AdvanceInput = z.object({
 });
 
 export const advanceShipment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => AdvanceInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -246,7 +246,7 @@ export const advanceShipment = createServerFn({ method: "POST" })
 
 // ---------- Trades elegibles para crear embarque ----------
 export const listShippableTrades = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }) => {
     const { data } = await asSb(context.supabase)
       .from("commodity_trades")

@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import { DOC_BY_KEY } from "@/lib/tradeDocuments";
@@ -82,7 +82,7 @@ const DOC_COLS =
 
 /** Trades donde el usuario es comprador o vendedor. */
 export const listMyTrades = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }) => {
     const sb = asSb(context.supabase);
     const { data, error } = await sb
@@ -119,7 +119,7 @@ export const listMyTrades = createServerFn({ method: "GET" })
 
 /** Detalle de un trade + documentos. */
 export const getTradeDetail = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -210,7 +210,7 @@ const CreateTrade = z.object({
  *  Si la contraparte no tiene cuenta, se registra como contraparte externa
  *  (los campos counterparty_* del trade guardan sus datos identificatorios). */
 export const createTrade = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => CreateTrade.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -281,7 +281,7 @@ export const createTrade = createServerFn({ method: "POST" })
 /** El comprador (usuario actual) inicia un trade desde un lote del marketplace,
  * heredando producto y cantidad. El vendedor es el dueño del lote. */
 export const createTradeFromLot = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ lotId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -323,7 +323,7 @@ export const createTradeFromLot = createServerFn({ method: "POST" })
   });
 
 export const setTradeStage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -344,7 +344,7 @@ export const setTradeStage = createServerFn({ method: "POST" })
 
 /** Cambia el estado (activo / cerrado / cancelado) de un trade sin tocar la etapa. */
 export const setTradeStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -378,7 +378,7 @@ const UpsertDoc = z.object({
 
 /** Crea o actualiza un documento del trade (por tipo). */
 export const upsertTradeDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => UpsertDoc.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -429,7 +429,7 @@ export const upsertTradeDocument = createServerFn({ method: "POST" })
 
 /** Marca un documento como firmado por el usuario actual (atribución + fecha). */
 export const signTradeDocument = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ docId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -466,7 +466,7 @@ async function ensureTradeBucket(sb: {
 
 /** Prepara una signed upload URL para adjuntar un archivo a un documento del trade. */
 export const requestTradeDocUpload = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ tradeId: z.string().uuid(), fileName: z.string().min(1).max(300) }).parse(d),
   )
@@ -504,7 +504,7 @@ export type TradeEvent = {
 
 /** Feed de eventos del trade con el nombre del actor. */
 export const listTradeEvents = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<TradeEvent[]> => {
     const sb = asSb(context.supabase);
@@ -536,7 +536,7 @@ export const listTradeEvents = createServerFn({ method: "GET" })
 
 /** Publica un mensaje al feed del trade (visible para la contraparte). */
 export const addTradeMessage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ tradeId: z.string().uuid(), message: z.string().trim().min(1).max(2000) }).parse(d),
   )
@@ -555,7 +555,7 @@ export const addTradeMessage = createServerFn({ method: "POST" })
 
 /** Devuelve una URL firmada (10 min) para ver un documento del trade. */
 export const getTradeDocDownloadUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ docId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ url: string | null }> => {
     const { data: doc } = await asSb(context.supabase)
@@ -580,7 +580,7 @@ export const getTradeDocDownloadUrl = createServerFn({ method: "POST" })
  *  registra un evento `docs_requested` con la lista. La contraparte cargará los
  *  archivos desde su panel espejo `/operacion/<token>`. */
 export const requestTradeDocs = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({

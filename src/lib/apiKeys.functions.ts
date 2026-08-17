@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminRole } from "@/lib/access/roleMiddleware";
 import { generateApiKey, hashApiKey, keyPrefix } from "@/lib/apiKeys";
 
 // Gestión de API keys del catastro unificado. La llave completa se devuelve
@@ -22,7 +22,7 @@ export type ApiKeyRow = {
 };
 
 export const createApiKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d: unknown) => z.object({ name: z.string().trim().min(1).max(60) }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -47,7 +47,7 @@ export const createApiKey = createServerFn({ method: "POST" })
   });
 
 export const listMyApiKeys = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }): Promise<ApiKeyRow[]> => {
     const { data } = await asSb(context.supabase)
       .from("api_keys")
@@ -60,7 +60,7 @@ export const listMyApiKeys = createServerFn({ method: "GET" })
   });
 
 export const revokeApiKey = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await asSb(context.supabase)

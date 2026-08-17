@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import {
@@ -42,7 +42,7 @@ const OFFERING_COLS =
 
 /** Lista ofertas abiertas + (si aplica) las de proyectos del usuario, con stats. */
 export const listOfferings = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }) => {
     const sb = asSb(context.supabase);
     const { data: offerings, error } = await sb
@@ -70,7 +70,7 @@ export const listOfferings = createServerFn({ method: "GET" })
 
 /** Detalle de una oferta + cap table (visible según RLS). */
 export const getOfferingDetail = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -104,7 +104,7 @@ const CreateInput = z.object({
 
 /** Crea una oferta (RLS exige rol owner/admin del proyecto). */
 export const createOffering = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => CreateInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -131,7 +131,7 @@ export const createOffering = createServerFn({ method: "POST" })
 
 /** Cambia el estado de una oferta (draft→open→closed / cancelled). */
 export const setOfferingStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -152,7 +152,7 @@ export const setOfferingStatus = createServerFn({ method: "POST" })
 
 /** Un inversionista compromete unidades en una oferta abierta. */
 export const subscribeOffering = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) =>
     z.object({ offeringId: z.string().uuid(), units: z.number().int().min(1) }).parse(d),
   )
@@ -188,7 +188,7 @@ export const subscribeOffering = createServerFn({ method: "POST" })
 
 /** Actualiza el estado de una suscripción (inversionista cancela; dueño confirma/rechaza). */
 export const setSubscriptionStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -209,7 +209,7 @@ export const setSubscriptionStatus = createServerFn({ method: "POST" })
 
 /** Participaciones del inversionista autenticado, con datos de la oferta. */
 export const listMyHoldings = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }) => {
     const sb = asSb(context.supabase);
     const { data: subs, error } = await sb
