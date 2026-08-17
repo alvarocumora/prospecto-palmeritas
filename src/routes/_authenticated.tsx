@@ -4,7 +4,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { LogOut, X } from "lucide-react";
 
-import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { useMyModules, useSelectedModule } from "@/hooks/useMyModules";
 import { useWorkspaceAccess } from "@/hooks/useWorkspaceAccess";
@@ -30,7 +29,6 @@ function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
   const { projects, active } = useProjects();
   const access = useWorkspaceAccess();
-  useIsSuperAdmin();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
   const [selectedModule, setSelectedModule] = useSelectedModule(myModules?.modules);
