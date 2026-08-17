@@ -58,18 +58,18 @@ function AuthenticatedLayout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // Gate de ruta: si el usuario navegó a una ruta cuyo módulo no está en su plan,
-  // redirigimos al Inicio con aviso. (Debe ir antes de cualquier return temprano.)
+  // Gate de ruta (control de acceso maestro): si el usuario navegó a una
+  // pantalla que su rol/plan no permite, lo devolvemos al Inicio con aviso.
+  // (Debe ir antes de cualquier return temprano.)
   useEffect(() => {
-    if (!myModules || (myModules.unrestricted ?? true)) return;
-    const keys = new Set((myModules.modules ?? []).map((m) => m.key));
-    const currentModule = moduleForRoute(location.pathname);
-    if (currentModule === "core") return;
-    if (!keys.has(currentModule)) {
-      navigate({ to: "/dashboard", search: { locked: currentModule } as never });
+    if (!access.ready) return;
+    const decision = access.canPath(location.pathname);
+    if (decision.allowed) return;
+    if (decision.reason.kind === "plan") {
+      navigate({ to: "/dashboard", search: { locked: decision.reason.module } as never });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname, myModules]);
+  }, [location.pathname, access.ready]);
 
   if (!mounted || loading) return null;
   if (!user) return null;
@@ -77,22 +77,7 @@ function AuthenticatedLayout() {
   // Navegación deals-first: el negocio (venta de proyectos, inversión y
   // materias primas) va primero para TODOS los roles; la operación y las
   // herramientas técnicas de exploración quedan detrás, gateadas por rol.
-  const accountType = (profile?.account_type ?? null) as
-    | "investor"
-    | "mining_owner"
-    | "geocapitals_team"
-    | null;
-  const isInvestor = accountType === "investor";
-  // Inversionista sin proyectos: no ve operación/exploración/gobernanza.
-  const showOps = !isInvestor || projects.length > 0;
-
-  const items: RailItem[] = WORKSPACE_NAV.filter((e) => {
-    if (e.superAdminOnly && !isSuperAdmin) return false;
-    if (e.hideForInvestor && isInvestor) return false;
-    if (e.requiresProjects && !showOps) return false;
-    if (e.capability && !canAccess(role, e.capability)) return false;
-    return true;
-  }).map((e) => {
+  const items: RailItem[] = WORKSPACE_NAV.filter((e) => access.canEntry(e).allowed).map((e) => {
     const Icon = e.icon;
     return {
       to: e.to,
@@ -104,18 +89,14 @@ function AuthenticatedLayout() {
     } as RailItem;
   });
 
-  // Filtro por módulo SaaS (get_my_modules): si el plan restringe módulos,
-  // ocultamos las rutas que no están habilitadas. Los items "core" (Inicio,
-  // Analítica, perfil, plan, admin) son transversales y siempre visibles.
-  const availableModuleKeys = new Set((myModules?.modules ?? []).map((m) => m.key));
-  const unrestricted = myModules?.unrestricted ?? true;
+  // Filtro por espacio de trabajo seleccionado en el ModuleSwitcher.
   const allowedItems = items.filter((it) => {
     const mod = moduleForRoute(it.to);
     if (mod === "core") return true;
-    if (!unrestricted && !availableModuleKeys.has(mod)) return false;
     if (selectedModule !== "all" && mod !== selectedModule) return false;
     return true;
   });
+
 
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
