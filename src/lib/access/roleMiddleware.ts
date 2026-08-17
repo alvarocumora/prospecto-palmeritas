@@ -92,3 +92,6 @@ export const requireTradeRole = requireWorkspaceRole("trade");
 export const requireCatastroRole = requireWorkspaceRole("catastro");
 /** Módulo Capital & Deals. */
 export const requireCapitalRole = requireWorkspaceRole("capital");
+
+/** Cualquier módulo del sistema maestro (documentos y firmas transversales). */
+export const requireAnyModuleRole = requireWorkspaceRole("trade", "capital", "catastro");

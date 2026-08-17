@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import {
   FACT_SECTIONS,
   PROVENANCE_STATES,
@@ -47,7 +47,7 @@ export type FactSheetView = {
 };
 
 export const getProjectFactSheet = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => z.object({ projectId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<FactSheetView> => {
     const sb = asSb(context.supabase);
@@ -94,7 +94,7 @@ const SaveInput = z.object({
 });
 
 export const saveProjectFactSheet = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => SaveInput.parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true; count: number }> => {
     const sb = asSb(context.supabase);

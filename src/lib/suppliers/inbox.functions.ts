@@ -4,7 +4,7 @@
 // se valida el rol antes de cualquier lectura.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminRole } from "@/lib/access/roleMiddleware";
 import {
   createLovableAiGatewayProvider,
   getLovableApiKeyOrThrow,
@@ -35,7 +35,7 @@ export type InboxSupplier = {
 };
 
 export const listInboxSuppliers = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -113,7 +113,7 @@ export type InboxDetail = {
 };
 
 export const getInboxDetail = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }): Promise<InboxDetail> => {
     await assertStaff(context.userId);
@@ -168,7 +168,7 @@ export const getInboxDetail = createServerFn({ method: "GET" })
   });
 
 export const updateSupplierStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -194,7 +194,7 @@ export const updateSupplierStatus = createServerFn({ method: "POST" })
   });
 
 export const updateDocReview = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -215,7 +215,7 @@ export const updateDocReview = createServerFn({ method: "POST" })
   });
 
 export const addSupplierNote = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -260,7 +260,7 @@ const CertSchema = z.object({
 export type ExtractionResult = z.infer<typeof CertSchema>;
 
 export const extractCertificate = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((raw: unknown) =>
     z.object({ document_id: z.string().uuid() }).parse(raw),
   )
