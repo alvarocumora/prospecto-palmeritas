@@ -120,6 +120,8 @@ function AuthenticatedLayout() {
         onClose={() => setDrawerOpen(false)}
         items={items}
         userName={profile?.display_name ?? user.email ?? ""}
+        roleLabel={access.role ? ROLE_LABEL[access.role] : null}
+
         onSignOut={async () => {
           await signOut();
           navigate({ to: "/" });
