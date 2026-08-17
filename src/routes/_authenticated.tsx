@@ -133,10 +133,13 @@ function AuthenticatedLayout() {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         {/* key por ruta: cada vista entra con un fade-up sutil */}
-        <WorkspaceTabs pathname={location.pathname} />
+        <WorkspaceTabs pathname={location.pathname} filterTab={access.canTab} />
         <div key={location.pathname} className="animate-fade-up">
-          <Outlet />
+          <ModuleAccessGate pathname={location.pathname}>
+            <Outlet />
+          </ModuleAccessGate>
         </div>
+
       </main>
 
       <StatusBar />
