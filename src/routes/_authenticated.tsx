@@ -2,12 +2,14 @@ import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tansta
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
-import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import { LogOut, X } from "lucide-react";
 
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { useMyModules, useSelectedModule } from "@/hooks/useMyModules";
+import { useWorkspaceAccess } from "@/hooks/useWorkspaceAccess";
+import { ModuleAccessGate } from "@/components/access/ModuleAccessGate";
+import { ROLE_LABEL } from "@/lib/access/workspaceAccess";
 import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
 import { ModuleSwitcher } from "@/components/ops/ModuleSwitcher";
 import { TopBar } from "@/components/ops/TopBar";
@@ -18,6 +20,7 @@ import { moduleForRoute } from "@/lib/modules";
 import { WORKSPACE_NAV } from "@/lib/workspace";
 import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
 import { cn } from "@/lib/utils";
+
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
