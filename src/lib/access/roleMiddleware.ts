@@ -28,10 +28,13 @@ export type ServerAccess = {
   roles: ServerAccessRole[];
 };
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type SupabaseLike = {
-  from: (t: string) => { select: (c: string) => unknown } & Record<string, unknown>;
+  from: (t: string) => any;
   rpc: (fn: string, args?: Record<string, unknown>) => any;
 };
+/* eslint-enable @typescript-eslint/no-explicit-any */
+
 
 /** Resuelve el rol efectivo del usuario autenticado desde la base. */
 export async function resolveServerAccess(
