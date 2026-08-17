@@ -20,7 +20,6 @@ import { WORKSPACE_NAV } from "@/lib/workspace";
 import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
 import { cn } from "@/lib/utils";
 
-
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
 });
@@ -95,7 +94,6 @@ function AuthenticatedLayout() {
     return true;
   });
 
-
   return (
     <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
@@ -121,7 +119,6 @@ function AuthenticatedLayout() {
         items={items}
         userName={profile?.display_name ?? user.email ?? ""}
         roleLabel={access.role ? ROLE_LABEL[access.role] : null}
-
         onSignOut={async () => {
           await signOut();
           navigate({ to: "/" });
@@ -139,7 +136,6 @@ function AuthenticatedLayout() {
             <Outlet />
           </ModuleAccessGate>
         </div>
-
       </main>
 
       <StatusBar />
@@ -163,7 +159,6 @@ function MobileDrawer({
   roleLabel?: string | null;
   onSignOut: () => void;
 }) {
-
   const groups = items.reduce<Record<string, RailItem[]>>((acc, it) => {
     const g = it.group ?? "—";
     (acc[g] ??= []).push(it);
