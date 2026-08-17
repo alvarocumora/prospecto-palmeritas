@@ -228,7 +228,13 @@ function MobileDrawer({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[11px] font-mono truncate">{userName}</div>
+            {roleLabel && (
+              <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-text-dim">
+                Rol: {roleLabel}
+              </div>
+            )}
           </div>
+
           <button type="button" onClick={onSignOut} className="text-text-dim hover:text-signal-red">
             <LogOut className="w-4 h-4" />
           </button>
