@@ -2,12 +2,13 @@ import { createFileRoute, Outlet, Link, useLocation, useNavigate } from "@tansta
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
-import { useProjectRole, canAccess } from "@/hooks/useProjectRole";
 import { LogOut, X } from "lucide-react";
 
-import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { useMyModules, useSelectedModule } from "@/hooks/useMyModules";
+import { useWorkspaceAccess } from "@/hooks/useWorkspaceAccess";
+import { ModuleAccessGate } from "@/components/access/ModuleAccessGate";
+import { ROLE_LABEL } from "@/lib/access/workspaceAccess";
 import { CommandRail, type RailItem } from "@/components/ops/CommandRail";
 import { ModuleSwitcher } from "@/components/ops/ModuleSwitcher";
 import { TopBar } from "@/components/ops/TopBar";
@@ -25,9 +26,8 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
-  const { projects, active } = useProjects();
-  const role = useProjectRole();
-  const { isAdmin: isSuperAdmin } = useIsSuperAdmin();
+  const { active } = useProjects();
+  const access = useWorkspaceAccess();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
   const [selectedModule, setSelectedModule] = useSelectedModule(myModules?.modules);
@@ -55,18 +55,18 @@ function AuthenticatedLayout() {
     setDrawerOpen(false);
   }, [location.pathname]);
 
-  // Gate de ruta: si el usuario navegó a una ruta cuyo módulo no está en su plan,
-  // redirigimos al Inicio con aviso. (Debe ir antes de cualquier return temprano.)
+  // Gate de ruta (control de acceso maestro): si el usuario navegó a una
+  // pantalla que su rol/plan no permite, lo devolvemos al Inicio con aviso.
+  // (Debe ir antes de cualquier return temprano.)
   useEffect(() => {
-    if (!myModules || (myModules.unrestricted ?? true)) return;
-    const keys = new Set((myModules.modules ?? []).map((m) => m.key));
-    const currentModule = moduleForRoute(location.pathname);
-    if (currentModule === "core") return;
-    if (!keys.has(currentModule)) {
-      navigate({ to: "/dashboard", search: { locked: currentModule } as never });
+    if (!access.ready) return;
+    const decision = access.canPath(location.pathname);
+    if (decision.allowed) return;
+    if (decision.reason.kind === "plan") {
+      navigate({ to: "/dashboard", search: { locked: decision.reason.module } as never });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname, myModules]);
+  }, [location.pathname, access.ready]);
 
   if (!mounted || loading) return null;
   if (!user) return null;
@@ -74,22 +74,7 @@ function AuthenticatedLayout() {
   // Navegación deals-first: el negocio (venta de proyectos, inversión y
   // materias primas) va primero para TODOS los roles; la operación y las
   // herramientas técnicas de exploración quedan detrás, gateadas por rol.
-  const accountType = (profile?.account_type ?? null) as
-    | "investor"
-    | "mining_owner"
-    | "geocapitals_team"
-    | null;
-  const isInvestor = accountType === "investor";
-  // Inversionista sin proyectos: no ve operación/exploración/gobernanza.
-  const showOps = !isInvestor || projects.length > 0;
-
-  const items: RailItem[] = WORKSPACE_NAV.filter((e) => {
-    if (e.superAdminOnly && !isSuperAdmin) return false;
-    if (e.hideForInvestor && isInvestor) return false;
-    if (e.requiresProjects && !showOps) return false;
-    if (e.capability && !canAccess(role, e.capability)) return false;
-    return true;
-  }).map((e) => {
+  const items: RailItem[] = WORKSPACE_NAV.filter((e) => access.canEntry(e).allowed).map((e) => {
     const Icon = e.icon;
     return {
       to: e.to,
@@ -101,15 +86,10 @@ function AuthenticatedLayout() {
     } as RailItem;
   });
 
-  // Filtro por módulo SaaS (get_my_modules): si el plan restringe módulos,
-  // ocultamos las rutas que no están habilitadas. Los items "core" (Inicio,
-  // Analítica, perfil, plan, admin) son transversales y siempre visibles.
-  const availableModuleKeys = new Set((myModules?.modules ?? []).map((m) => m.key));
-  const unrestricted = myModules?.unrestricted ?? true;
+  // Filtro por espacio de trabajo seleccionado en el ModuleSwitcher.
   const allowedItems = items.filter((it) => {
     const mod = moduleForRoute(it.to);
     if (mod === "core") return true;
-    if (!unrestricted && !availableModuleKeys.has(mod)) return false;
     if (selectedModule !== "all" && mod !== selectedModule) return false;
     return true;
   });
@@ -138,6 +118,7 @@ function AuthenticatedLayout() {
         onClose={() => setDrawerOpen(false)}
         items={items}
         userName={profile?.display_name ?? user.email ?? ""}
+        roleLabel={access.role ? ROLE_LABEL[access.role] : null}
         onSignOut={async () => {
           await signOut();
           navigate({ to: "/" });
@@ -149,9 +130,11 @@ function AuthenticatedLayout() {
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
         {/* key por ruta: cada vista entra con un fade-up sutil */}
-        <WorkspaceTabs pathname={location.pathname} />
+        <WorkspaceTabs pathname={location.pathname} filterTab={access.canTab} />
         <div key={location.pathname} className="animate-fade-up">
-          <Outlet />
+          <ModuleAccessGate pathname={location.pathname}>
+            <Outlet />
+          </ModuleAccessGate>
         </div>
       </main>
 
@@ -166,12 +149,14 @@ function MobileDrawer({
   onClose,
   items,
   userName,
+  roleLabel,
   onSignOut,
 }: {
   open: boolean;
   onClose: () => void;
   items: RailItem[];
   userName: string;
+  roleLabel?: string | null;
   onSignOut: () => void;
 }) {
   const groups = items.reduce<Record<string, RailItem[]>>((acc, it) => {
@@ -238,7 +223,13 @@ function MobileDrawer({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[11px] font-mono truncate">{userName}</div>
+            {roleLabel && (
+              <div className="text-[9px] font-mono uppercase tracking-[0.12em] text-text-dim">
+                Rol: {roleLabel}
+              </div>
+            )}
           </div>
+
           <button type="button" onClick={onSignOut} className="text-text-dim hover:text-signal-red">
             <LogOut className="w-4 h-4" />
           </button>
