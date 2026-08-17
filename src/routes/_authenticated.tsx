@@ -27,7 +27,7 @@ export const Route = createFileRoute("/_authenticated")({
 
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
-  const { projects, active } = useProjects();
+  const { active } = useProjects();
   const access = useWorkspaceAccess();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
