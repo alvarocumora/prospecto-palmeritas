@@ -191,23 +191,40 @@ export const getListingDetail = createServerFn({ method: "GET" })
       totalSizeBytes: 0,
       categories: [],
     };
-    {
-      const { data: drFiles } = await supabaseAdmin
-        .from("property_data_room_files")
-        .select("category, requires_nda, file_size_bytes")
-        .eq("listing_id", row.id);
-      const byCat = new Map<string, number>();
-      for (const f of drFiles ?? []) {
-        dataRoom.totalFiles += 1;
-        if (f.requires_nda) dataRoom.ndaFiles += 1;
-        dataRoom.totalSizeBytes += Number(f.file_size_bytes) || 0;
-        const cat = f.category ?? "otros";
-        byCat.set(cat, (byCat.get(cat) ?? 0) + 1);
+    if (pid) {
+      // Data room canónico del proyecto (data_rooms → carpetas → archivos)
+      const { data: room } = await supabaseAdmin
+        .from("data_rooms")
+        .select("id")
+        .eq("project_id", pid)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (room?.id) {
+        const [{ data: drFiles }, { data: folders }] = await Promise.all([
+          supabaseAdmin
+            .from("data_room_files")
+            .select("folder_id, confidentiality, size_bytes")
+            .eq("data_room_id", room.id),
+          supabaseAdmin.from("data_room_folders").select("id, name").eq("data_room_id", room.id),
+        ]);
+        const folderCode = new Map(
+          (folders ?? []).map((f) => [f.id as string, (f.name as string).slice(0, 2)]),
+        );
+        const byCat = new Map<string, number>();
+        for (const f of drFiles ?? []) {
+          dataRoom.totalFiles += 1;
+          if ((f.confidentiality as string) !== "public") dataRoom.ndaFiles += 1;
+          dataRoom.totalSizeBytes += Number(f.size_bytes) || 0;
+          const cat = f.folder_id ? (folderCode.get(f.folder_id as string) ?? "00") : "00";
+          byCat.set(cat, (byCat.get(cat) ?? 0) + 1);
+        }
+        dataRoom.categories = Array.from(byCat.entries())
+          .map(([category, count]) => ({ category, count }))
+          .sort((a, b) => b.count - a.count);
       }
-      dataRoom.categories = Array.from(byCat.entries())
-        .map(([category, count]) => ({ category, count }))
-        .sort((a, b) => b.count - a.count);
     }
+
 
     // Contador de interesados (inquiries) — señal social de tracción
     let inquiriesCount = 0;
