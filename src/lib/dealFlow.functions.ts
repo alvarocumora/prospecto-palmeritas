@@ -17,7 +17,25 @@ export const DEAL_STAGES = [
   "cierre",
 ] as const;
 
-export type DealStage = (typeof DEAL_STAGES)[number] | "descartado";
+/** Estados fuera de la línea principal (pausa y salidas). */
+export const DEAL_OFF_STAGES = [
+  "pausado",
+  "retirado",
+  "rechazado",
+  "expirado",
+  "descartado",
+] as const;
+
+export type DealStage = (typeof DEAL_STAGES)[number] | (typeof DEAL_OFF_STAGES)[number];
+
+/** Estados finales: el deal ya no admite transiciones. */
+export const DEAL_TERMINAL_STAGES: DealStage[] = [
+  "cierre",
+  "retirado",
+  "rechazado",
+  "expirado",
+  "descartado",
+];
 
 export const DEAL_STAGE_LABEL: Record<DealStage, string> = {
   interesado: "Interesado",
@@ -26,6 +44,10 @@ export const DEAL_STAGE_LABEL: Record<DealStage, string> = {
   oferta: "Oferta",
   due_diligence: "Due diligence",
   cierre: "Cierre",
+  pausado: "En pausa",
+  retirado: "Retirado",
+  rechazado: "Rechazado",
+  expirado: "Expirado",
   descartado: "Descartado",
 };
 
@@ -48,15 +70,28 @@ export type DealFlowState = {
   events: DealStageEvent[];
 };
 
-const NEXT: Record<string, DealStage[]> = {
-  interesado: ["nda_firmado", "descartado"],
-  nda_firmado: ["data_room", "descartado"],
-  data_room: ["oferta", "descartado"],
-  oferta: ["due_diligence", "descartado"],
-  due_diligence: ["cierre", "descartado"],
-  cierre: [],
-  descartado: [],
+const FORWARD: Record<string, DealStage | undefined> = {
+  interesado: "nda_firmado",
+  nda_firmado: "data_room",
+  data_room: "oferta",
+  oferta: "due_diligence",
+  due_diligence: "cierre",
 };
+
+/**
+ * Refleja la máquina de estados del RPC `deal_advance`: desde cualquier etapa
+ * viva se puede avanzar, pausar, retirarse o rechazar; desde pausa se retoma
+ * la etapa previa registrada en la bitácora.
+ */
+function nextStagesFor(stage: DealStage, resumeStage: DealStage | null): DealStage[] {
+  if (DEAL_TERMINAL_STAGES.includes(stage)) return [];
+  if (stage === "pausado") {
+    return [resumeStage ?? "interesado", "retirado", "rechazado"];
+  }
+  const forward = FORWARD[stage];
+  return [...(forward ? [forward] : []), "pausado", "retirado", "rechazado"];
+}
+
 
 /** Etapa + bitácora del deal del usuario actual (o del titular) para un listing. */
 export const getDealFlow = createServerFn({ method: "GET" })
@@ -87,6 +122,12 @@ export const getDealFlow = createServerFn({ method: "GET" })
       .limit(50);
 
     const stage = (inquiry.stage ?? "interesado") as DealStage;
+    const resumeStage =
+      stage === "pausado"
+        ? (((events ?? []).find((e) => e.to_stage === "pausado")?.from_stage as
+            | DealStage
+            | undefined) ?? null)
+        : null;
     return {
       inquiryId: inquiry.id as string,
       listingId: inquiry.listing_id as string,
@@ -94,9 +135,10 @@ export const getDealFlow = createServerFn({ method: "GET" })
       stageUpdatedAt: (inquiry.stage_updated_at as string | null) ?? null,
       ndaSignedAt: (inquiry.nda_signed_at as string | null) ?? null,
       isOwner,
-      nextStages: NEXT[stage] ?? [],
+      nextStages: nextStagesFor(stage, resumeStage),
       events: (events ?? []) as DealStageEvent[],
     };
+
   });
 
 /** Avanza la etapa del deal; el RPC valida transición y autorización. */
@@ -106,7 +148,7 @@ export const advanceDealStage = createServerFn({ method: "POST" })
     z
       .object({
         inquiryId: z.string().uuid(),
-        stage: z.enum([...DEAL_STAGES, "descartado"]),
+        stage: z.enum([...DEAL_STAGES, ...DEAL_OFF_STAGES]),
         note: z.string().trim().max(500).optional(),
       })
       .parse(d),

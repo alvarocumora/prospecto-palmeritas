@@ -2,15 +2,19 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, ChevronRight, CircleDot, History, XCircle } from "lucide-react";
+import { Check, ChevronRight, CircleDot, History, PauseCircle, XCircle } from "lucide-react";
 import {
   advanceDealStage,
   getDealFlow,
   DEAL_STAGES,
   DEAL_STAGE_LABEL,
+  DEAL_TERMINAL_STAGES,
   type DealStage,
 } from "@/lib/dealFlow.functions";
 import { cn } from "@/lib/utils";
+
+const EXIT_STAGES: DealStage[] = ["retirado", "rechazado", "descartado", "expirado"];
+
 
 /** Traza el avance del deal (interesado → NDA → data room → oferta → DD → cierre). */
 export function DealStageTracker({
@@ -52,7 +56,10 @@ export function DealStageTracker({
   if (!data) return null;
 
   const currentIndex = DEAL_STAGES.indexOf(data.stage as (typeof DEAL_STAGES)[number]);
-  const discarded = data.stage === "descartado";
+  const exited = EXIT_STAGES.includes(data.stage);
+  const paused = data.stage === "pausado";
+  const offLine = exited || paused;
+  const closed = DEAL_TERMINAL_STAGES.includes(data.stage);
 
   return (
     <section className="p-3 rounded border border-border bg-bg-elevated space-y-3">
@@ -62,20 +69,24 @@ export function DealStageTracker({
         <span
           className={cn(
             "ml-auto px-1.5 py-0.5 rounded text-[10px] font-mono border",
-            discarded
+            exited
               ? "border-destructive/40 text-destructive"
-              : "border-gold/40 text-gold bg-gold/10",
+              : paused
+                ? "border-border text-muted-foreground"
+                : "border-gold/40 text-gold bg-gold/10",
           )}
         >
           {DEAL_STAGE_LABEL[data.stage]}
         </span>
       </div>
 
+
+
       {/* Línea de etapas */}
       <ol className="flex flex-wrap items-center gap-1">
         {DEAL_STAGES.map((s, i) => {
-          const done = !discarded && i < currentIndex;
-          const active = !discarded && i === currentIndex;
+          const done = !offLine && i < currentIndex;
+          const active = !offLine && i === currentIndex;
           return (
             <li key={s} className="flex items-center gap-1">
               <span
@@ -99,6 +110,12 @@ export function DealStageTracker({
         })}
       </ol>
 
+      {closed && (
+        <p className="text-[10px] font-mono text-muted-foreground">
+          Este deal está cerrado ({DEAL_STAGE_LABEL[data.stage]}) y no admite más movimientos.
+        </p>
+      )}
+
       {data.nextStages.length > 0 && (
         <div className="space-y-2">
           <input
@@ -108,36 +125,54 @@ export function DealStageTracker({
             className="w-full px-2 py-1.5 text-[11px] font-mono rounded border border-border bg-background outline-none focus:border-gold"
           />
           <div className="flex flex-wrap gap-2">
-            {data.nextStages.map((s) => (
-              <button
-                key={s}
-                type="button"
-                disabled={mutation.isPending}
-                onClick={() => mutation.mutate(s)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono disabled:opacity-50",
-                  s === "descartado"
-                    ? "border border-border text-muted-foreground hover:text-destructive"
-                    : "bg-gold text-bg-primary font-semibold hover:bg-gold/90",
-                )}
-              >
-                {s === "descartado" ? (
-                  <XCircle className="w-3.5 h-3.5" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5" />
-                )}
-                {s === "descartado" ? "Descartar" : `Pasar a ${DEAL_STAGE_LABEL[s]}`}
-              </button>
-            ))}
+            {data.nextStages.map((s) => {
+              const isExit = EXIT_STAGES.includes(s);
+              const isPause = s === "pausado";
+              const isResume = paused && !isExit;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  disabled={mutation.isPending}
+                  onClick={() => mutation.mutate(s)}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-mono disabled:opacity-50",
+                    isExit
+                      ? "border border-border text-muted-foreground hover:text-destructive"
+                      : isPause
+                        ? "border border-border text-muted-foreground hover:text-foreground"
+                        : "bg-gold text-bg-primary font-semibold hover:bg-gold/90",
+                  )}
+                >
+                  {isExit ? (
+                    <XCircle className="w-3.5 h-3.5" />
+                  ) : isPause ? (
+                    <PauseCircle className="w-3.5 h-3.5" />
+                  ) : (
+                    <ChevronRight className="w-3.5 h-3.5" />
+                  )}
+                  {isExit
+                    ? s === "retirado"
+                      ? "Retirarme"
+                      : "Rechazar"
+                    : isPause
+                      ? "Pausar"
+                      : isResume
+                        ? `Retomar en ${DEAL_STAGE_LABEL[s]}`
+                        : `Pasar a ${DEAL_STAGE_LABEL[s]}`}
+                </button>
+              );
+            })}
           </div>
           {!data.isOwner && (
             <p className="text-[10px] font-mono text-muted-foreground">
-              La apertura del data room, el due diligence y el cierre los confirma el titular del
-              proyecto.
+              La apertura del data room, el due diligence, el cierre y el rechazo los confirma el
+              titular del proyecto.
             </p>
           )}
         </div>
       )}
+
 
       {data.events.length > 0 && (
         <div>

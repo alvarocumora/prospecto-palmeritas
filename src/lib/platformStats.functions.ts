@@ -42,7 +42,10 @@ async function countTable(supabase: DbClient, table: TableName): Promise<number>
 export const getPlatformStats = createServerFn({ method: "GET" }).handler(async () => {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-  const [projectsRes, concessions, cadNat, deposits, targets, anomalies, deals, opps] =
+  // `dealsOpen` = operaciones vivas reales: solicitudes de inversión en curso
+  // + trades de commodities en curso. La tabla `deals` quedó deprecada (datos
+  // sembrados sin proyecto asociado) y ya no alimenta métricas públicas.
+  const [projectsRes, concessions, cadNat, deposits, targets, anomalies, openDeals, opps] =
     await Promise.all([
       supabaseAdmin.from("projects").select("id,name,country,region,status,commodity").limit(8),
       supabaseAdmin.from("mining_concessions").select("area_ha", { count: "exact" }),
@@ -56,13 +59,26 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
       countTable(supabaseAdmin, "mineral_deposits"),
       countTable(supabaseAdmin, "exploration_targets"),
       countTable(supabaseAdmin, "satellite_anomalies"),
-      countTable(supabaseAdmin, "deals"),
+      (async () => {
+        const [inq, trades] = await Promise.all([
+          supabaseAdmin
+            .from("property_deal_inquiries")
+            .select("id", { count: "exact", head: true })
+            .is("closed_at", null),
+          supabaseAdmin
+            .from("commodity_trades")
+            .select("id", { count: "exact", head: true })
+            .not("status", "in", "(completed,cancelled,closed)"),
+        ]);
+        return (inq.count ?? 0) + (trades.count ?? 0);
+      })(),
       supabaseAdmin
         .from("cadastre_opportunities")
         .select("score", { count: "exact" })
         .order("score", { ascending: false })
         .limit(1),
     ]);
+
 
   const projectRows = projectsRes.data ?? [];
   const concessionRows = (concessions.data as Array<{ area_ha: number | null }> | null) ?? [];
@@ -79,7 +95,7 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
     mineralDeposits: deposits,
     explorationTargets: targets,
     satelliteAnomalies: anomalies,
-    dealsOpen: deals,
+    dealsOpen: openDeals,
     opportunitiesScored: opps.count ?? 0,
     topOpportunityScore: topOpp,
     featuredProjects: projectRows.map((p) => ({
