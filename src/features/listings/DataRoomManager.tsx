@@ -20,9 +20,10 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
   const [files, setFiles] = useState<DataRoomFileRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [category, setCategory] = useState<string>("otros");
+  const [category, setCategory] = useState<string>("00");
   const [requiresNda, setRequiresNda] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
+
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,7 +62,7 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
           fileName: file.name,
           fileSizeBytes: file.size,
           mimeType: file.type || null,
-          category: category as (typeof DATA_ROOM_CATEGORIES)[number],
+          category,
           requiresNda,
         },
       });
@@ -77,7 +78,7 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
   const onDelete = async (f: DataRoomFileRow) => {
     if (!window.confirm(`¿Eliminar "${f.file_name}" del data room?`)) return;
     try {
-      await deleteDataRoomFile({ data: { fileId: f.id } });
+      await deleteDataRoomFile({ data: { listingId, fileId: f.id } });
       toast.success("Archivo eliminado");
       await load();
     } catch (e) {
@@ -87,12 +88,13 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
 
   const onDownload = async (f: DataRoomFileRow) => {
     try {
-      const { url } = await getDataRoomDownloadUrl({ data: { fileId: f.id } });
+      const { url } = await getDataRoomDownloadUrl({ data: { listingId, fileId: f.id } });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al descargar");
     }
   };
+
 
   return (
     <div className="mt-3 pt-3 border-t border-border">
