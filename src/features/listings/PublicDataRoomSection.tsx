@@ -73,12 +73,13 @@ export function PublicDataRoomSection({
 
   const onDownload = async (f: DataRoomFileRow) => {
     try {
-      const { url } = await getDataRoomDownloadUrl({ data: { fileId: f.id } });
+      const { url } = await getDataRoomDownloadUrl({ data: { listingId, fileId: f.id } });
       window.open(url, "_blank", "noopener");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error al descargar");
     }
   };
+
 
   return (
     <section className="rounded-xl border border-hairline bg-white p-5">
@@ -236,28 +237,19 @@ function NdaModal({
       return;
     }
     setSubmitting(true);
-    const { error: ndaErr } = await signListingNda({
-      listingId,
-      userId,
-      signature: userEmail,
-    });
-    if (ndaErr) {
-      setSubmitting(false);
-      toast.error(`No se pudo firmar el NDA: ${ndaErr.message}`);
-      return;
-    }
-    if (message.trim().length > 0) {
-      await upsertInquiry({
-        listingId,
-        userId,
-        message,
-        currentStatus: "nda_signed",
+    try {
+      await signNdaAndGrantAccess({
+        data: { listingId, signature: userEmail, message: message.trim() || null },
       });
+      toast.success("NDA firmado · acceso al data room habilitado");
+      onSigned();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo firmar el NDA");
+    } finally {
+      setSubmitting(false);
     }
-    setSubmitting(false);
-    toast.success("NDA firmado · acceso al data room habilitado");
-    onSigned();
   };
+
 
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
