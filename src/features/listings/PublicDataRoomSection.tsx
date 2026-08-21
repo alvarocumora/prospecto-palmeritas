@@ -13,9 +13,10 @@ import {
   DATA_ROOM_CATEGORY_LABELS,
   getDataRoomDownloadUrl,
   listDataRoomFiles,
+  signNdaAndGrantAccess,
   type DataRoomFileRow,
 } from "@/lib/dataRoom.functions";
-import { signListingNda, upsertInquiry } from "@/modules/deals/application/inquiries";
+
 
 type Aggregate = {
   totalFiles: number;
