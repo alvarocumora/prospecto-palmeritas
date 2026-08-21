@@ -18,9 +18,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { usePropertyListing } from "@/hooks/usePropertyListings";
 import { getDataRoomDownloadUrl } from "@/lib/dataRoom.functions";
 import { ValuationPanel } from "./ValuationPanel";
+import { DealStageTracker } from "./DealStageTracker";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
-import { signListingNda, upsertInquiry } from "../application/inquiries";
+import { markNdaStage, signListingNda, upsertInquiry } from "../application/inquiries";
 
 export function ListingDetailDrawer({
   listingId,
@@ -77,6 +78,7 @@ export function ListingDetailDrawer({
       toast.error(`No se pudo firmar el NDA: ${error.message}`);
       return;
     }
+    if (inquiry?.id) await markNdaStage(inquiry.id);
     toast.success("NDA firmado · acceso al data room habilitado");
     refresh();
   };
@@ -306,6 +308,15 @@ export function ListingDetailDrawer({
 
               {tab === "inquiry" && (
                 <div className="space-y-4">
+                  {inquiry && (
+                    <DealStageTracker
+                      listingId={listing.id}
+                      onAdvanced={() => {
+                        refresh();
+                        onMutated();
+                      }}
+                    />
+                  )}
                   {isOwner ? (
                     <div className="p-3 rounded border border-border bg-bg-elevated text-xs font-mono text-muted-foreground">
                       Eres el titular de este listing. Las consultas de interesados aparecerán en tu

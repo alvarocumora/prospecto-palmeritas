@@ -4141,6 +4141,54 @@ export type Database = {
           },
         ]
       }
+      deal_stage_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          from_stage: string | null
+          id: string
+          inquiry_id: string
+          listing_id: string
+          note: string | null
+          to_stage: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_stage?: string | null
+          id?: string
+          inquiry_id: string
+          listing_id: string
+          note?: string | null
+          to_stage: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_stage?: string | null
+          id?: string
+          inquiry_id?: string
+          listing_id?: string
+          note?: string | null
+          to_stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_stage_events_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "property_deal_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_stage_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_target_markets: {
         Row: {
           deal_id: string
@@ -12286,6 +12334,8 @@ export type Database = {
           nda_ip: string | null
           nda_signature: string | null
           nda_signed_at: string | null
+          stage: string
+          stage_updated_at: string
           status: string
           updated_at: string
         }
@@ -12300,6 +12350,8 @@ export type Database = {
           nda_ip?: string | null
           nda_signature?: string | null
           nda_signed_at?: string | null
+          stage?: string
+          stage_updated_at?: string
           status?: string
           updated_at?: string
         }
@@ -12314,6 +12366,8 @@ export type Database = {
           nda_ip?: string | null
           nda_signature?: string | null
           nda_signed_at?: string | null
+          stage?: string
+          stage_updated_at?: string
           status?: string
           updated_at?: string
         }
@@ -17739,6 +17793,31 @@ export type Database = {
           risk_band: string
           risk_score: number
         }[]
+      }
+      deal_advance: {
+        Args: { p_inquiry_id: string; p_note?: string; p_stage: string }
+        Returns: {
+          closed_at: string | null
+          closed_reason: string | null
+          created_at: string
+          id: string
+          inquirer_user_id: string
+          listing_id: string
+          message: string | null
+          nda_ip: string | null
+          nda_signature: string | null
+          nda_signed_at: string | null
+          stage: string
+          stage_updated_at: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "property_deal_inquiries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
