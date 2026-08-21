@@ -114,7 +114,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
         status: "active",
         nda_required: true,
         watermark_enabled: true,
-        created_by: listing.owner_user_id,
+        created_by: listing.owner_user_id as string,
       })
       .select("id")
       .single();
@@ -122,7 +122,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
     roomId = created.id as string;
   }
 
-  await ensureFolders(sb, roomId, listing.owner_user_id as string | null);
+  await ensureFolders(sb, roomId, listing.owner_user_id as string);
 
   return {
     roomId,
@@ -133,7 +133,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
   };
 }
 
-async function ensureFolders(sb: Admin, roomId: string, createdBy: string | null) {
+async function ensureFolders(sb: Admin, roomId: string, createdBy: string) {
   const { data: rows } = await sb
     .from("data_room_folders")
     .select("id, name")
