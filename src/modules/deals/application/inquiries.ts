@@ -33,3 +33,12 @@ export async function signListingNda(args: {
     { onConflict: "listing_id,inquirer_user_id" },
   );
 }
+
+/** Sincroniza la etapa del deal tras firmar el NDA (best-effort). */
+export async function markNdaStage(inquiryId: string) {
+  return supabase.rpc("deal_advance", {
+    p_inquiry_id: inquiryId,
+    p_stage: "nda_firmado",
+    p_note: "NDA firmado en la ficha del proyecto",
+  });
+}

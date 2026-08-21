@@ -36,7 +36,6 @@ import {
   Sparkles,
   Target,
   TestTube2,
-  TrendingUp,
   UserCircle,
   Users,
   Wallet,
@@ -113,7 +112,10 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Terreno franco", to: "/dashboard/franco" },
       { label: "Mapa nacional", to: "/catastro/mapa" },
       { label: "Watchlist", to: "/catastro/app/watchlist" },
+      { label: "Oportunidades IA", to: "/dashboard/opportunities" },
+      { label: "Capas GIS", to: "/dashboard/marketplace" },
     ],
+
   },
   {
     to: "/dashboard/projects",
@@ -227,6 +229,8 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Clientes y asociados", to: "/dashboard/clientes" },
       { label: "Bandeja de proveedores", to: "/dashboard/proveedores" },
       { label: "Hub proveedor", to: "/dashboard/proveedor" },
+      { label: "Mi panel proveedor", to: "/panel" },
+
     ],
   },
   {
@@ -255,32 +259,21 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
   },
 
   // ─────────────── CAPITAL & DEALS ───────────────
+  // Un solo spine de inversión: descubrir → data room → oferta → portafolio.
   {
     to: "/dashboard/deals",
-    label: "Deals de proyectos",
+    label: "Deal Flow",
     icon: Briefcase,
     group: "CAPITAL & DEALS",
     module: "capital",
-  },
-  {
-    to: "/dashboard/investments",
-    label: "Inversiones",
-    icon: TrendingUp,
-    group: "CAPITAL & DEALS",
-    module: "capital",
-  },
-  {
-    to: "/dashboard/listings",
-    label: "Vender proyecto",
-    icon: FolderKanban,
-    group: "CAPITAL & DEALS",
-    module: "capital",
-    hideForInvestor: true,
     tabs: [
-      { label: "Mis listings", to: "/dashboard/listings" },
-      { label: "Ofertas", to: "/dashboard/offerings" },
+      { label: "Deal flow", to: "/dashboard/deals" },
+      { label: "Mi portafolio", to: "/dashboard/investments" },
+      { label: "Vender proyecto", to: "/dashboard/listings", hideForInvestor: true },
+      { label: "Ofertas recibidas", to: "/dashboard/offerings", hideForInvestor: true },
     ],
   },
+
 
   // ─────────────── ADMINISTRACIÓN (transversal) ───────────────
   {

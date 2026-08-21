@@ -46,6 +46,8 @@ export interface DealInquiry {
   listing_id: string;
   inquirer_user_id: string;
   status: string;
+  stage?: string | null;
+  stage_updated_at?: string | null;
   message: string | null;
   nda_signed_at: string | null;
   created_at: string;
