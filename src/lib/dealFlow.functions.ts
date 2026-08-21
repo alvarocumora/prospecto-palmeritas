@@ -115,7 +115,7 @@ export const advanceDealStage = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("deal_advance", {
       p_inquiry_id: data.inquiryId,
       p_stage: data.stage,
-      p_note: data.note ?? null,
+      p_note: data.note ?? undefined,
     });
     if (error) throw new Error(error.message);
     return { ok: true as const, stage: data.stage };
