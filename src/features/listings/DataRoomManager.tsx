@@ -172,7 +172,9 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
                   {DATA_ROOM_CATEGORY_LABELS[f.category ?? ""] ?? f.category ?? "documento"}
                   {f.file_size_bytes ? ` · ${(f.file_size_bytes / 1024 / 1024).toFixed(2)} MB` : ""}
                   {f.requires_nda ? " · requiere NDA" : " · público al deal"}
+                  {f.pending ? " · pendiente de carga" : ""}
                 </span>
+
               </button>
               <button
                 type="button"
