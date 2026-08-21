@@ -191,12 +191,12 @@ export const getListingDetail = createServerFn({ method: "GET" })
       totalSizeBytes: 0,
       categories: [],
     };
-    if (pid) {
+    if (row.project_id) {
       // Data room canónico del proyecto (data_rooms → carpetas → archivos)
       const { data: room } = await supabaseAdmin
         .from("data_rooms")
         .select("id")
-        .eq("project_id", pid)
+        .eq("project_id", row.project_id)
         .order("created_at", { ascending: true })
         .limit(1)
         .maybeSingle();
