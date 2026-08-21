@@ -21,7 +21,7 @@ import { ValuationPanel } from "./ValuationPanel";
 import { DealStageTracker } from "./DealStageTracker";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
-import { signListingNda, upsertInquiry } from "../application/inquiries";
+import { markNdaStage, signListingNda, upsertInquiry } from "../application/inquiries";
 
 export function ListingDetailDrawer({
   listingId,
