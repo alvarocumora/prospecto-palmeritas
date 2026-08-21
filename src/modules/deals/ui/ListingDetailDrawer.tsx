@@ -78,6 +78,7 @@ export function ListingDetailDrawer({
       toast.error(`No se pudo firmar el NDA: ${error.message}`);
       return;
     }
+    if (inquiry?.id) await markNdaStage(inquiry.id);
     toast.success("NDA firmado · acceso al data room habilitado");
     refresh();
   };
