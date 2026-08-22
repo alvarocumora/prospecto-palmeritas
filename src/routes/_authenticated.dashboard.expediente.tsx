@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Circle, FolderKanban, ArrowRight } from "lucide-react";
 import { getProjectMasterRecords } from "@/lib/projectMaster.functions";
 import { DEAL_STAGE_LABEL, type DealStage } from "@/lib/dealFlow.functions";
+import { DueDiligencePanel } from "@/features/projects/DueDiligencePanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/expediente")({
   head: () => ({
@@ -153,6 +154,8 @@ function ExpedientePage() {
                   </ul>
                 </div>
               </div>
+
+              <DueDiligencePanel projectId={r.projectId} />
 
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
