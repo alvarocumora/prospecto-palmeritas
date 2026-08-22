@@ -154,6 +154,8 @@ function ExpedientePage() {
                 </div>
               </div>
 
+              <DueDiligencePanel projectId={r.projectId} />
+
               <div className="mt-4 flex flex-wrap gap-2">
                 <Link
                   to="/dashboard/listings"
