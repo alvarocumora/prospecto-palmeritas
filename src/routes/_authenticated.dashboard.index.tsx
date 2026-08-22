@@ -24,6 +24,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useMyModules, type ModuleInfo } from "@/hooks/useMyModules";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { RoleQuickStart } from "@/features/home/RoleQuickStart";
 import { getBusinessOverview } from "@/lib/businessOverview.functions";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
 import { normalizeEvent } from "@/lib/tradeTimeline";
@@ -110,6 +111,8 @@ function BusinessHome() {
               : `The "${locked}" module is not included in your current plan. Contact Geocapitals to enable it.`}
           </div>
         )}
+
+        <RoleQuickStart />
 
         {myModules && myModules.modules.length > 1 && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
