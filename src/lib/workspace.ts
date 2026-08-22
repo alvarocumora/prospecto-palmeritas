@@ -269,8 +269,9 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     tabs: [
       { label: "Deal flow", to: "/dashboard/deals" },
       { label: "Expediente maestro", to: "/dashboard/expediente", hideForInvestor: true },
-
+      { label: "Mi portafolio", to: "/dashboard/investments" },
       { label: "Vender proyecto", to: "/dashboard/listings", hideForInvestor: true },
+
       { label: "Ofertas recibidas", to: "/dashboard/offerings", hideForInvestor: true },
     ],
   },
