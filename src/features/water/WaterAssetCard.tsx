@@ -9,7 +9,8 @@ import { cn } from "@/lib/utils";
 import {
   EXERCISE_LABEL,
   NATURE_LABEL,
-  QUALITY_STATUS_LABEL,
+  QUALITY_STATUS_META,
+  resolveQualityStatus,
   RIGHT_TYPE_LABEL,
   UNIT_VALUE_CLP,
   VALUATION_DISCLAIMER,
@@ -24,8 +25,9 @@ import {
   type WaterQualityTest,
 } from "./data";
 import { downloadWaterFicha } from "./waterFichaPdf";
+import { WaterQualityPanel } from "./WaterQualityPanel";
 
-const TABS = ["Overview", "Legal", "Hydrology", "Location", "Documents", "Valuation"] as const;
+const TABS = ["Overview", "Legal", "Hydrology", "Quality", "Location", "Documents", "Valuation"] as const;
 type Tab = (typeof TABS)[number];
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -197,24 +199,26 @@ export function WaterAssetCard({
             <h4 className="mt-5 text-[11px] uppercase tracking-[0.14em] text-slate-500">Water Quality</h4>
             <div className="mt-2 rounded border border-slate-200 p-3">
               <div className="text-[13px] font-medium text-slate-900">
-                {QUALITY_STATUS_LABEL[quality?.status ?? asset.quality_status] ?? "Not Tested"}
+                {QUALITY_STATUS_META[resolveQualityStatus(asset, quality)].label}
               </div>
-              {quality?.parameters && Object.keys(quality.parameters).length > 0 ? (
-                <dl className="mt-2 grid grid-cols-2 gap-x-4">
-                  {Object.entries(quality.parameters).map(([k, v]) => (
-                    <div key={k} className="flex justify-between border-b border-slate-100 py-1">
-                      <dt className="text-[11px] text-slate-500">{k}</dt>
-                      <dd className="text-[12px] text-slate-900">{String(v)}</dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : (
-                <p className="mt-1 text-[12px] text-slate-500">
-                  Water quality documentation pending verification.
-                </p>
-              )}
+              <button
+                type="button"
+                onClick={() => setTab("Quality")}
+                className="mt-1 text-[12px] font-medium text-sky-700 underline underline-offset-2"
+              >
+                Ver módulo Water Quality
+              </button>
             </div>
           </div>
+        )}
+
+        {tab === "Quality" && (
+          <WaterQualityPanel
+            asset={asset}
+            quality={quality}
+            mode={mode}
+            onRequestInfo={onRequestInfo}
+          />
         )}
 
         {tab === "Location" && (
