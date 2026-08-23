@@ -330,15 +330,8 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     hideForInvestor: true,
     capability: "audit",
   },
-  {
-    to: "/dashboard/marketplace",
-    label: "Marketplace de capas",
-    icon: LayersIcon,
-    group: "ADMINISTRACIÓN",
-    module: "core",
-    hideForInvestor: true,
-    capability: "marketplace",
-  },
+  // «Marketplace de capas» vive como pestaña «Capas GIS» dentro de Catastro.
+
   {
     to: "/dashboard/plan",
     label: "Plan y uso",
