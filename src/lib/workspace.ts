@@ -275,6 +275,16 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     ],
   },
 
+  {
+    to: "/dashboard/agua",
+    label: "Water Assets",
+    icon: Droplets,
+    group: "CAPITAL & DEALS",
+    module: "capital",
+  },
+
+
+
 
   // ─────────────── ADMINISTRACIÓN (transversal) ───────────────
   {
