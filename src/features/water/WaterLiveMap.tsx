@@ -261,7 +261,7 @@ export function WaterLiveMap({
       <div ref={containerRef} className="absolute inset-0 rounded-lg overflow-hidden" />
 
       {/* Basemap switch */}
-      <div className="absolute top-3 left-3 z-[500] flex rounded-md overflow-hidden border border-white/15 bg-[#04122a]/85 backdrop-blur">
+      <div className="absolute top-3 left-14 z-[500] flex rounded-md overflow-hidden border border-white/15 bg-[#04122a]/85 backdrop-blur">
         {(Object.keys(BASEMAPS) as BasemapKey[]).map((k) => (
           <button
             key={k}
