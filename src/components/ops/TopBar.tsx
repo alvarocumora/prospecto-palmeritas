@@ -27,7 +27,7 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard/reports": "Reportes",
   "/dashboard/team": "Equipo",
   "/dashboard/audit": "Auditoría",
-  "/dashboard/marketplace": "Marketplace",
+  "/dashboard/marketplace": "Capas GIS",
   "/dashboard/projects": "Proyectos",
   "/dashboard/profile": "Perfil",
   "/dashboard/admin": "Admin",

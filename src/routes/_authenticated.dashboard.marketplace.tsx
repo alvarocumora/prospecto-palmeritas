@@ -8,7 +8,7 @@ import { Layers, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/marketplace")({
-  head: () => ({ meta: [{ title: "Marketplace de Capas — Geocapitals" }] }),
+  head: () => ({ meta: [{ title: "Capas GIS compartidas — Geocapitals" }] }),
   component: MarketplacePage,
 });
 

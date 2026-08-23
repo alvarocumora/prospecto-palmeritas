@@ -41,7 +41,7 @@ const MODULE_LABELS: Record<string, string> = {
   "/dashboard/team": "Equipo",
   "/dashboard/audit": "Auditoría",
   "/dashboard/validation": "Validación de Datos",
-  "/dashboard/marketplace": "Marketplace Capas",
+  "/dashboard/marketplace": "Capas GIS",
   "/dashboard/deals": "Marketplace Deals",
   "/dashboard/projects": "Proyectos",
   "/dashboard/campaigns": "Campañas",
