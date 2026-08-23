@@ -14,6 +14,7 @@ import {
   Database,
   DollarSign,
   Drill,
+  Droplets,
   FileSignature,
   FileText,
   FolderKanban,
@@ -274,6 +275,16 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Ofertas recibidas", to: "/dashboard/offerings", hideForInvestor: true },
     ],
   },
+
+  {
+    to: "/dashboard/agua",
+    label: "Water Assets",
+    icon: Droplets,
+    group: "CAPITAL & DEALS",
+    module: "capital",
+  },
+
+
 
 
   // ─────────────── ADMINISTRACIÓN (transversal) ───────────────

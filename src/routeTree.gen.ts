@@ -33,6 +33,7 @@ import { Route as VerificarIndexRouteImport } from './routes/verificar.index'
 import { Route as RfqsIndexRouteImport } from './routes/rfqs.index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as AguaIndexRouteImport } from './routes/agua.index'
 import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
@@ -82,6 +83,7 @@ import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as AguaVerificarAssetIdRouteImport } from './routes/agua.verificar.$assetId'
 import { Route as AuthenticatedPanelPrivacidadRouteImport } from './routes/_authenticated.panel.privacidad'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
@@ -138,6 +140,7 @@ import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
 import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated.dashboard.analytics'
+import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -289,6 +292,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaIndexRoute = AguaIndexRouteImport.update({
+  id: '/agua/',
+  path: '/agua/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarRefRoute = VerificarRefRouteImport.update({
@@ -539,6 +547,11 @@ const ApiPublicIngestPatentRematesRoute =
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaVerificarAssetIdRoute = AguaVerificarAssetIdRouteImport.update({
+  id: '/agua/verificar/$assetId',
+  path: '/agua/verificar/$assetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPanelPrivacidadRoute =
@@ -877,6 +890,12 @@ const AuthenticatedDashboardAnalyticsRoute =
     path: '/dashboard/analytics',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAguaRoute =
+  AuthenticatedDashboardAguaRouteImport.update({
+    id: '/dashboard/agua',
+    path: '/dashboard/agua',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAgentsRoute =
   AuthenticatedDashboardAgentsRouteImport.update({
     id: '/dashboard/agents',
@@ -1124,6 +1143,7 @@ export interface FileRoutesByFullPath {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua/': typeof AguaIndexRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/rfqs/': typeof RfqsIndexRoute
@@ -1132,6 +1152,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1188,6 +1209,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1287,6 +1309,7 @@ export interface FileRoutesByTo {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua': typeof AguaIndexRoute
   '/catastro': typeof CatastroIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/rfqs': typeof RfqsIndexRoute
@@ -1295,6 +1318,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1351,6 +1375,7 @@ export interface FileRoutesByTo {
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1452,6 +1477,7 @@ export interface FileRoutesById {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua/': typeof AguaIndexRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/rfqs/': typeof RfqsIndexRoute
@@ -1460,6 +1486,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/_authenticated/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1516,6 +1543,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/_authenticated/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1617,6 +1645,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua/'
     | '/catastro/'
     | '/marketplace/'
     | '/rfqs/'
@@ -1625,6 +1654,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/agua'
     | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
@@ -1681,6 +1711,7 @@ export interface FileRouteTypes {
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -1780,6 +1811,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua'
     | '/catastro'
     | '/marketplace'
     | '/rfqs'
@@ -1788,6 +1820,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/agua'
     | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
@@ -1844,6 +1877,7 @@ export interface FileRouteTypes {
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -1944,6 +1978,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua/'
     | '/catastro/'
     | '/marketplace/'
     | '/rfqs/'
@@ -1952,6 +1987,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
+    | '/_authenticated/dashboard/agua'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/anticipos'
     | '/_authenticated/dashboard/api'
@@ -2008,6 +2044,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/trades'
     | '/_authenticated/dashboard/validation'
     | '/_authenticated/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -2103,12 +2140,14 @@ export interface RootRouteChildren {
   ProveedorTokenRoute: typeof ProveedorTokenRoute
   ProyectoTokenRoute: typeof ProyectoTokenRoute
   VerificarRefRoute: typeof VerificarRefRoute
+  AguaIndexRoute: typeof AguaIndexRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   RfqsIndexRoute: typeof RfqsIndexRoute
   VerificarIndexRoute: typeof VerificarIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  AguaVerificarAssetIdRoute: typeof AguaVerificarAssetIdRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicIngestPatentRematesRoute: typeof ApiPublicIngestPatentRematesRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
@@ -2307,6 +2346,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro'
       fullPath: '/catastro/'
       preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/': {
+      id: '/agua/'
+      path: '/agua'
+      fullPath: '/agua/'
+      preLoaderRoute: typeof AguaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar/$ref': {
@@ -2650,6 +2696,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/health'
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/verificar/$assetId': {
+      id: '/agua/verificar/$assetId'
+      path: '/agua/verificar/$assetId'
+      fullPath: '/agua/verificar/$assetId'
+      preLoaderRoute: typeof AguaVerificarAssetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/panel/privacidad': {
@@ -3044,6 +3097,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/agua': {
+      id: '/_authenticated/dashboard/agua'
+      path: '/dashboard/agua'
+      fullPath: '/dashboard/agua'
+      preLoaderRoute: typeof AuthenticatedDashboardAguaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/agents': {
       id: '/_authenticated/dashboard/agents'
       path: '/dashboard/agents'
@@ -3371,6 +3431,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
+  AuthenticatedDashboardAguaRoute: typeof AuthenticatedDashboardAguaRoute
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAnticiposRoute: typeof AuthenticatedDashboardAnticiposRoute
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
@@ -3445,6 +3506,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,
+  AuthenticatedDashboardAguaRoute: AuthenticatedDashboardAguaRoute,
   AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
   AuthenticatedDashboardAnticiposRoute: AuthenticatedDashboardAnticiposRoute,
   AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
@@ -3636,12 +3698,14 @@ const rootRouteChildren: RootRouteChildren = {
   ProveedorTokenRoute: ProveedorTokenRoute,
   ProyectoTokenRoute: ProyectoTokenRoute,
   VerificarRefRoute: VerificarRefRoute,
+  AguaIndexRoute: AguaIndexRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   RfqsIndexRoute: RfqsIndexRoute,
   VerificarIndexRoute: VerificarIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  AguaVerificarAssetIdRoute: AguaVerificarAssetIdRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicIngestPatentRematesRoute: ApiPublicIngestPatentRematesRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
