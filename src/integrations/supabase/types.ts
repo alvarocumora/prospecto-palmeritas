@@ -17455,6 +17455,438 @@ export type Database = {
         }
         Relationships: []
       }
+      water_assets: {
+        Row: {
+          asset_id: string
+          capture_system: string | null
+          commune: string
+          country: string
+          created_at: string
+          dga_resolution: string | null
+          dga_resolution_date: string | null
+          exercise: string
+          flow_eventual_ls: number | null
+          flow_notes: string | null
+          flow_permanent_ls: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          province: string
+          quality_status: string
+          reference_value_clp: number | null
+          region: string
+          right_type: string
+          river: string
+          status: string
+          summary: string | null
+          unit_value_clp: number
+          updated_at: string
+          utm_datum: string | null
+          utm_east: number | null
+          utm_north: number | null
+          utm_zone: string | null
+          verification_status: string
+        }
+        Insert: {
+          asset_id: string
+          capture_system?: string | null
+          commune: string
+          country?: string
+          created_at?: string
+          dga_resolution?: string | null
+          dga_resolution_date?: string | null
+          exercise?: string
+          flow_eventual_ls?: number | null
+          flow_notes?: string | null
+          flow_permanent_ls?: number
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          nature?: string
+          province: string
+          quality_status?: string
+          reference_value_clp?: number | null
+          region: string
+          right_type?: string
+          river: string
+          status?: string
+          summary?: string | null
+          unit_value_clp?: number
+          updated_at?: string
+          utm_datum?: string | null
+          utm_east?: number | null
+          utm_north?: number | null
+          utm_zone?: string | null
+          verification_status?: string
+        }
+        Update: {
+          asset_id?: string
+          capture_system?: string | null
+          commune?: string
+          country?: string
+          created_at?: string
+          dga_resolution?: string | null
+          dga_resolution_date?: string | null
+          exercise?: string
+          flow_eventual_ls?: number | null
+          flow_notes?: string | null
+          flow_permanent_ls?: number
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          nature?: string
+          province?: string
+          quality_status?: string
+          reference_value_clp?: number | null
+          region?: string
+          right_type?: string
+          river?: string
+          status?: string
+          summary?: string | null
+          unit_value_clp?: number
+          updated_at?: string
+          utm_datum?: string | null
+          utm_east?: number | null
+          utm_north?: number | null
+          utm_zone?: string | null
+          verification_status?: string
+        }
+        Relationships: []
+      }
+      water_documents: {
+        Row: {
+          asset_uuid: string
+          created_at: string
+          doc_date: string | null
+          doc_type: string
+          external_url: string | null
+          id: string
+          institution: string | null
+          is_public: boolean
+          status: string
+          storage_path: string | null
+          title: string
+        }
+        Insert: {
+          asset_uuid: string
+          created_at?: string
+          doc_date?: string | null
+          doc_type: string
+          external_url?: string | null
+          id?: string
+          institution?: string | null
+          is_public?: boolean
+          status?: string
+          storage_path?: string | null
+          title: string
+        }
+        Update: {
+          asset_uuid?: string
+          created_at?: string
+          doc_date?: string | null
+          doc_type?: string
+          external_url?: string | null
+          id?: string
+          institution?: string | null
+          is_public?: boolean
+          status?: string
+          storage_path?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_documents_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_due_diligence: {
+        Row: {
+          asset_uuid: string
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          item: string
+          note: string | null
+          status: string
+        }
+        Insert: {
+          asset_uuid: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          item: string
+          note?: string | null
+          status?: string
+        }
+        Update: {
+          asset_uuid?: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          item?: string
+          note?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_due_diligence_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_hydrology: {
+        Row: {
+          asset_uuid: string
+          basin: string | null
+          created_at: string
+          dga_station: string | null
+          drought_risk: string | null
+          ecological_flow_ls: number | null
+          id: string
+          mean_monthly_flow: Json | null
+          notes: string | null
+          sub_basin: string | null
+        }
+        Insert: {
+          asset_uuid: string
+          basin?: string | null
+          created_at?: string
+          dga_station?: string | null
+          drought_risk?: string | null
+          ecological_flow_ls?: number | null
+          id?: string
+          mean_monthly_flow?: Json | null
+          notes?: string | null
+          sub_basin?: string | null
+        }
+        Update: {
+          asset_uuid?: string
+          basin?: string | null
+          created_at?: string
+          dga_station?: string | null
+          drought_risk?: string | null
+          ecological_flow_ls?: number | null
+          id?: string
+          mean_monthly_flow?: Json | null
+          notes?: string | null
+          sub_basin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_hydrology_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_legal_records: {
+        Row: {
+          asset_uuid: string
+          attribute: string
+          created_at: string
+          display_order: number
+          id: string
+          note: string | null
+          value: string | null
+          verification: string
+        }
+        Insert: {
+          asset_uuid: string
+          attribute: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          note?: string | null
+          value?: string | null
+          verification?: string
+        }
+        Update: {
+          asset_uuid?: string
+          attribute?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          note?: string | null
+          value?: string | null
+          verification?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_legal_records_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_portfolio_assets: {
+        Row: {
+          asset_uuid: string
+          portfolio_id: string
+        }
+        Insert: {
+          asset_uuid: string
+          portfolio_id: string
+        }
+        Update: {
+          asset_uuid?: string
+          portfolio_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_portfolio_assets_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "water_portfolio_assets_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "water_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_portfolios: {
+        Row: {
+          code: string
+          color: string
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      water_quality_tests: {
+        Row: {
+          asset_uuid: string
+          certification: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          laboratory: string | null
+          parameters: Json
+          sampling_date: string | null
+          status: string
+        }
+        Insert: {
+          asset_uuid: string
+          certification?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          laboratory?: string | null
+          parameters?: Json
+          sampling_date?: string | null
+          status?: string
+        }
+        Update: {
+          asset_uuid?: string
+          certification?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          laboratory?: string | null
+          parameters?: Json
+          sampling_date?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_quality_tests_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_valuations: {
+        Row: {
+          asset_uuid: string
+          created_at: string
+          currency: string
+          flow_ls: number
+          id: string
+          method: string
+          notes: string | null
+          reference_value_clp: number
+          unit_value_clp: number
+          valuation_date: string
+        }
+        Insert: {
+          asset_uuid: string
+          created_at?: string
+          currency?: string
+          flow_ls: number
+          id?: string
+          method?: string
+          notes?: string | null
+          reference_value_clp: number
+          unit_value_clp: number
+          valuation_date?: string
+        }
+        Update: {
+          asset_uuid?: string
+          created_at?: string
+          currency?: string
+          flow_ls?: number
+          id?: string
+          method?: string
+          notes?: string | null
+          reference_value_clp?: number
+          unit_value_clp?: number
+          valuation_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_valuations_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       concession_change_summary: {
