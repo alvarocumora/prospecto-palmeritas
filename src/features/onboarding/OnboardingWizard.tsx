@@ -32,7 +32,7 @@ const OPTIONS: Array<{
     icon: Briefcase,
     title: "Inversionista / Fondo",
     desc: "Acceso a deal flow, data rooms, reportes NI 43-101 firmados y watchlist catastral.",
-    next: { to: "/dashboard/marketplace", label: "Ver deal flow" },
+    next: { to: "/dashboard/deals", label: "Ver deal flow" },
   },
   {
     value: "mining_owner",
