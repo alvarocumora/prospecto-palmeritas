@@ -233,7 +233,79 @@ export const QUALITY_STATUS_LABEL: Record<string, string> = {
   historical: "Historical Analysis Available",
   lab_verified: "Laboratory Verified",
   potable_verified: "Potable Standard Verified",
+  pending_verification: "Water quality documentation pending verification",
 };
+
+export type QualityStatusKey =
+  | "not_tested"
+  | "historical"
+  | "lab_verified"
+  | "pending_verification";
+
+export const QUALITY_STATUS_META: Record<
+  QualityStatusKey,
+  { label: string; description: string; tone: string }
+> = {
+  not_tested: {
+    label: "Not Tested",
+    description:
+      "Sin muestreo registrado. No existen análisis físico-químicos ni microbiológicos asociados al punto de captación.",
+    tone: "border-slate-200 bg-slate-50 text-slate-700",
+  },
+  historical: {
+    label: "Historical Analysis Available",
+    description:
+      "Existen análisis históricos aportados por el titular. Valores referenciales: requieren remuestreo para uso en due diligence.",
+    tone: "border-amber-200 bg-amber-50 text-amber-900",
+  },
+  lab_verified: {
+    label: "Laboratory Verified",
+    description:
+      "Muestreo realizado por laboratorio acreditado con certificado validado por Geocapitals.",
+    tone: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  },
+  pending_verification: {
+    label: "Pending Verification",
+    description:
+      "Water quality documentation pending verification: se recibió documentación y está en revisión por Geocapitals.",
+    tone: "border-sky-200 bg-sky-50 text-sky-800",
+  },
+};
+
+/** Normaliza el estado del activo/ensayo a una de las 4 categorías del módulo. */
+export function resolveQualityStatus(
+  asset: Pick<WaterAsset, "quality_status">,
+  quality: WaterQualityTest | null | undefined,
+): QualityStatusKey {
+  const raw = (quality?.status ?? asset.quality_status ?? "not_tested").toLowerCase();
+  if (raw === "lab_verified" || raw === "potable_verified") return "lab_verified";
+  if (raw === "historical") return "historical";
+  if (raw === "pending" || raw === "pending_verification" || raw === "document_provided")
+    return "pending_verification";
+  return "not_tested";
+}
+
+/** Metadatos de parámetros habituales con límites de referencia chilenos. */
+export const QUALITY_PARAM_META: Record<
+  string,
+  { label: string; unit?: string; reference?: string }
+> = {
+  ph: { label: "pH", reference: "NCh 409: 6,5 – 8,5" },
+  conductivity: { label: "Conductividad", unit: "µS/cm", reference: "NCh 1333: ≤ 750" },
+  turbidity: { label: "Turbiedad", unit: "NTU", reference: "NCh 409: ≤ 2" },
+  tds: { label: "Sólidos disueltos totales", unit: "mg/L", reference: "NCh 409: ≤ 1.500" },
+  hardness: { label: "Dureza total", unit: "mg/L CaCO₃", reference: "NCh 409: ≤ 500" },
+  arsenic: { label: "Arsénico", unit: "mg/L", reference: "NCh 409: ≤ 0,01" },
+  iron: { label: "Hierro", unit: "mg/L", reference: "NCh 409: ≤ 0,3" },
+  manganese: { label: "Manganeso", unit: "mg/L", reference: "NCh 409: ≤ 0,1" },
+  nitrates: { label: "Nitratos", unit: "mg/L", reference: "NCh 409: ≤ 50" },
+  sulfates: { label: "Sulfatos", unit: "mg/L", reference: "NCh 409: ≤ 500" },
+  chlorides: { label: "Cloruros", unit: "mg/L", reference: "NCh 409: ≤ 400" },
+  coliforms: { label: "Coliformes totales", unit: "NMP/100 mL", reference: "NCh 409: ausencia" },
+  temperature: { label: "Temperatura", unit: "°C" },
+  dissolved_oxygen: { label: "Oxígeno disuelto", unit: "mg/L" },
+};
+
 
 export const UNIT_VALUE_CLP = 750_000;
 
