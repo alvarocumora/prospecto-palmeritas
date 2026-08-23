@@ -33,6 +33,7 @@ import { Route as VerificarIndexRouteImport } from './routes/verificar.index'
 import { Route as RfqsIndexRouteImport } from './routes/rfqs.index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as AguaIndexRouteImport } from './routes/agua.index'
 import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
@@ -289,6 +290,11 @@ const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
 const CatastroIndexRoute = CatastroIndexRouteImport.update({
   id: '/catastro/',
   path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaIndexRoute = AguaIndexRouteImport.update({
+  id: '/agua/',
+  path: '/agua/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarRefRoute = VerificarRefRouteImport.update({
@@ -1124,6 +1130,7 @@ export interface FileRoutesByFullPath {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua/': typeof AguaIndexRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/rfqs/': typeof RfqsIndexRoute
@@ -1287,6 +1294,7 @@ export interface FileRoutesByTo {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua': typeof AguaIndexRoute
   '/catastro': typeof CatastroIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/rfqs': typeof RfqsIndexRoute
@@ -1452,6 +1460,7 @@ export interface FileRoutesById {
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
   '/verificar/$ref': typeof VerificarRefRoute
+  '/agua/': typeof AguaIndexRoute
   '/catastro/': typeof CatastroIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/rfqs/': typeof RfqsIndexRoute
@@ -1617,6 +1626,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua/'
     | '/catastro/'
     | '/marketplace/'
     | '/rfqs/'
@@ -1780,6 +1790,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua'
     | '/catastro'
     | '/marketplace'
     | '/rfqs'
@@ -1944,6 +1955,7 @@ export interface FileRouteTypes {
     | '/terminal/market'
     | '/terminal/tokenize'
     | '/verificar/$ref'
+    | '/agua/'
     | '/catastro/'
     | '/marketplace/'
     | '/rfqs/'
@@ -2103,6 +2115,7 @@ export interface RootRouteChildren {
   ProveedorTokenRoute: typeof ProveedorTokenRoute
   ProyectoTokenRoute: typeof ProyectoTokenRoute
   VerificarRefRoute: typeof VerificarRefRoute
+  AguaIndexRoute: typeof AguaIndexRoute
   CatastroIndexRoute: typeof CatastroIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   RfqsIndexRoute: typeof RfqsIndexRoute
@@ -2307,6 +2320,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro'
       fullPath: '/catastro/'
       preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/': {
+      id: '/agua/'
+      path: '/agua'
+      fullPath: '/agua/'
+      preLoaderRoute: typeof AguaIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar/$ref': {
@@ -3636,6 +3656,7 @@ const rootRouteChildren: RootRouteChildren = {
   ProveedorTokenRoute: ProveedorTokenRoute,
   ProyectoTokenRoute: ProyectoTokenRoute,
   VerificarRefRoute: VerificarRefRoute,
+  AguaIndexRoute: AguaIndexRoute,
   CatastroIndexRoute: CatastroIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   RfqsIndexRoute: RfqsIndexRoute,
