@@ -11,7 +11,7 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
 
   // Capital & Deals de Minas
   if (
-    ["deals", "investments", "listings", "offerings"].includes(seg)
+    ["deals", "investments", "listings", "offerings", "agua"].includes(seg)
   ) {
     return "capital";
   }
