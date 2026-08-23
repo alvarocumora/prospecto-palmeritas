@@ -83,6 +83,7 @@ import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.
 import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
 import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
 import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as AguaVerificarAssetIdRouteImport } from './routes/agua.verificar.$assetId'
 import { Route as AuthenticatedPanelPrivacidadRouteImport } from './routes/_authenticated.panel.privacidad'
 import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
 import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
@@ -545,6 +546,11 @@ const ApiPublicIngestPatentRematesRoute =
 const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
   id: '/api/public/health',
   path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaVerificarAssetIdRoute = AguaVerificarAssetIdRouteImport.update({
+  id: '/agua/verificar/$assetId',
+  path: '/agua/verificar/$assetId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPanelPrivacidadRoute =
@@ -1195,6 +1201,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1359,6 +1366,7 @@ export interface FileRoutesByTo {
   '/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1525,6 +1533,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/trades': typeof AuthenticatedDashboardTradesRoute
   '/_authenticated/dashboard/validation': typeof AuthenticatedDashboardValidationRoute
   '/_authenticated/panel/privacidad': typeof AuthenticatedPanelPrivacidadRoute
+  '/agua/verificar/$assetId': typeof AguaVerificarAssetIdRoute
   '/api/public/health': typeof ApiPublicHealthRoute
   '/api/public/ingest-patent-remates': typeof ApiPublicIngestPatentRematesRoute
   '/api/public/stats': typeof ApiPublicStatsRoute
@@ -1691,6 +1700,7 @@ export interface FileRouteTypes {
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -1855,6 +1865,7 @@ export interface FileRouteTypes {
     | '/dashboard/trades'
     | '/dashboard/validation'
     | '/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -2020,6 +2031,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/trades'
     | '/_authenticated/dashboard/validation'
     | '/_authenticated/panel/privacidad'
+    | '/agua/verificar/$assetId'
     | '/api/public/health'
     | '/api/public/ingest-patent-remates'
     | '/api/public/stats'
@@ -2122,6 +2134,7 @@ export interface RootRouteChildren {
   VerificarIndexRoute: typeof VerificarIndexRoute
   DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
   Char91DotmcpChar93InvokeToolToolRoute: typeof Char91DotmcpChar93InvokeToolToolRoute
+  AguaVerificarAssetIdRoute: typeof AguaVerificarAssetIdRoute
   ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   ApiPublicIngestPatentRematesRoute: typeof ApiPublicIngestPatentRematesRoute
   ApiPublicStatsRoute: typeof ApiPublicStatsRoute
@@ -2670,6 +2683,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/health'
       fullPath: '/api/public/health'
       preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/verificar/$assetId': {
+      id: '/agua/verificar/$assetId'
+      path: '/agua/verificar/$assetId'
+      fullPath: '/agua/verificar/$assetId'
+      preLoaderRoute: typeof AguaVerificarAssetIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/panel/privacidad': {
@@ -3663,6 +3683,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificarIndexRoute: VerificarIndexRoute,
   DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
   Char91DotmcpChar93InvokeToolToolRoute: Char91DotmcpChar93InvokeToolToolRoute,
+  AguaVerificarAssetIdRoute: AguaVerificarAssetIdRoute,
   ApiPublicHealthRoute: ApiPublicHealthRoute,
   ApiPublicIngestPatentRematesRoute: ApiPublicIngestPatentRematesRoute,
   ApiPublicStatsRoute: ApiPublicStatsRoute,
