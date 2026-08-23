@@ -14,6 +14,7 @@ import {
   Database,
   DollarSign,
   Drill,
+  Droplets,
   FileSignature,
   FileText,
   FolderKanban,
