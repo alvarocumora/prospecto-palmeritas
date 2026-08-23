@@ -19,7 +19,6 @@ import {
   FolderKanban,
   Handshake,
   KeyRound,
-  Layers as LayersIcon,
   LayoutDashboard,
   LayoutGrid,
   LineChart,
