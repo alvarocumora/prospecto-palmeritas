@@ -140,6 +140,7 @@ import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
 import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
 import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated.dashboard.analytics'
+import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
@@ -889,6 +890,12 @@ const AuthenticatedDashboardAnalyticsRoute =
     path: '/dashboard/analytics',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAguaRoute =
+  AuthenticatedDashboardAguaRouteImport.update({
+    id: '/dashboard/agua',
+    path: '/dashboard/agua',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardAgentsRoute =
   AuthenticatedDashboardAgentsRouteImport.update({
     id: '/dashboard/agents',
@@ -1145,6 +1152,7 @@ export interface FileRoutesByFullPath {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1310,6 +1318,7 @@ export interface FileRoutesByTo {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1477,6 +1486,7 @@ export interface FileRoutesById {
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
+  '/_authenticated/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
   '/_authenticated/dashboard/analytics': typeof AuthenticatedDashboardAnalyticsRoute
   '/_authenticated/dashboard/anticipos': typeof AuthenticatedDashboardAnticiposRoute
   '/_authenticated/dashboard/api': typeof AuthenticatedDashboardApiRoute
@@ -1644,6 +1654,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/agua'
     | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
@@ -1809,6 +1820,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/dashboard/admin'
     | '/dashboard/agents'
+    | '/dashboard/agua'
     | '/dashboard/analytics'
     | '/dashboard/anticipos'
     | '/dashboard/api'
@@ -1975,6 +1987,7 @@ export interface FileRouteTypes {
     | '/.mcp/invoke-tool/$tool'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
+    | '/_authenticated/dashboard/agua'
     | '/_authenticated/dashboard/analytics'
     | '/_authenticated/dashboard/anticipos'
     | '/_authenticated/dashboard/api'
@@ -3084,6 +3097,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/agua': {
+      id: '/_authenticated/dashboard/agua'
+      path: '/dashboard/agua'
+      fullPath: '/dashboard/agua'
+      preLoaderRoute: typeof AuthenticatedDashboardAguaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/agents': {
       id: '/_authenticated/dashboard/agents'
       path: '/dashboard/agents'
@@ -3411,6 +3431,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
+  AuthenticatedDashboardAguaRoute: typeof AuthenticatedDashboardAguaRoute
   AuthenticatedDashboardAnalyticsRoute: typeof AuthenticatedDashboardAnalyticsRoute
   AuthenticatedDashboardAnticiposRoute: typeof AuthenticatedDashboardAnticiposRoute
   AuthenticatedDashboardApiRoute: typeof AuthenticatedDashboardApiRoute
@@ -3485,6 +3506,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,
+  AuthenticatedDashboardAguaRoute: AuthenticatedDashboardAguaRoute,
   AuthenticatedDashboardAnalyticsRoute: AuthenticatedDashboardAnalyticsRoute,
   AuthenticatedDashboardAnticiposRoute: AuthenticatedDashboardAnticiposRoute,
   AuthenticatedDashboardApiRoute: AuthenticatedDashboardApiRoute,
