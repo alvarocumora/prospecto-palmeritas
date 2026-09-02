@@ -6,17 +6,29 @@
 import { publicUrl } from "@/lib/publicUrl";
 import {
   CHOLQUI,
+  CHOLQUI_ARIDOS,
+  CHOLQUI_ASSAYS,
+  CHOLQUI_ASSAY_REPORT,
   CHOLQUI_ASSUMPTIONS,
+  CHOLQUI_BASE_CASE,
   CHOLQUI_CAVEATS,
+  CHOLQUI_CONCEPTUAL,
+  CHOLQUI_ENAMI,
   CHOLQUI_FACTS,
+  CHOLQUI_GAPS,
   CHOLQUI_GEOLOGY,
+  CHOLQUI_GUARANTEES,
+  CHOLQUI_GUARANTEE_TOTALS,
   CHOLQUI_HIGHLIGHTS,
+  CHOLQUI_PLAN_TONNES,
   CHOLQUI_POINTS,
   CHOLQUI_ROUND,
   CHOLQUI_SCENARIOS,
   LAS_MINITAS,
+  fmtClp,
+  fmtClpM,
   fmtUsd,
-  fmtUsdM,
+  solubleRatioPct,
 } from "./data/cholqui";
 
 const INK: [number, number, number] = [18, 22, 26];
