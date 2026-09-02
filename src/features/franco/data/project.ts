@@ -1,16 +1,13 @@
 import type { PalmerasProject } from "@/features/palmeras/types";
+import { CHOLQUI } from "./cholqui";
 
-// NOTA: Ficha de presentación del proyecto (antes "Gianfranco/Distrito Franco",
-// renombrado a "Proyecto Cholqui"). El slug/rutas internas siguen siendo
-// `franco` para no romper enlaces. Las coordenadas son aproximadas, derivadas
-// del UTM PSAD'56 Zona 19H de los documentos del proyecto; confirmar centroide
-// oficial contra el plano de pertenencias.
+// Derivado de la fuente única `cholqui.ts` — no editar valores aquí.
 export const FRANCO_PROJECT: PalmerasProject = {
-  name: "Proyecto Cholqui",
-  ref: "CHQ-001",
-  operator: "Volcania Minerals SpA",
-  coords: "-33.72, -71.04",
-  location: "Cholqui, Cajón de Panamá, Melipilla, Región Metropolitana, Chile",
-  status: "Exploración avanzada",
+  name: CHOLQUI.name,
+  ref: CHOLQUI.ref,
+  operator: CHOLQUI.operator,
+  coords: `${CHOLQUI.center.lat}, ${CHOLQUI.center.lng}`,
+  location: CHOLQUI.location,
+  status: CHOLQUI.stage,
   created: "2026",
 };
