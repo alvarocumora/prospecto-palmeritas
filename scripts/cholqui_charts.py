@@ -126,8 +126,10 @@ def sample_map(path):
                 break
         else:
             clusters.append([x, y, [code]])
-    for x, y, codes in clusters:
-        ax.annotate("/".join(codes), (x, y), textcoords="offset points", xytext=(8, 5),
+    clusters.sort(key=lambda cl: (-cl[1], cl[0]))
+    for i, (x, y, codes) in enumerate(clusters):
+        off = (8, 6) if i % 2 == 0 else (8, -13)
+        ax.annotate("/".join(codes), (x, y), textcoords="offset points", xytext=off,
                     fontsize=8, color=GRAPHITE, family="Geist Mono")
 
     ax.scatter([MINITAS[0]], [MINITAS[1]], s=190, marker="^", color=COPPER,
