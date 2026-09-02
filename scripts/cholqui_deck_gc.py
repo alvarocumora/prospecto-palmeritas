@@ -184,10 +184,10 @@ def table(x, y, cols, rows, widths, size=9.6, row_h=26, head_fill=PAPER_2, zebra
     return yy
 
 
-def bullets(x, y, items, width=1100, size=11.5, gap=12, color=INK, marker=COBALT):
+def bullets(x, y, items, width=1100, size=11.5, gap=22, color=INK, marker=COBALT):
     for it in items:
         text(x, y, "—", "Sans-B", size, marker)
-        y = wrap(x + 20, y, it, width - 20, "Sans", size, color, size * 1.35) - gap - size * 0.2
+        y = wrap(x + 20, y, it, width - 20, "Sans", size, color, size * 1.45) - gap
     return y
 
 
