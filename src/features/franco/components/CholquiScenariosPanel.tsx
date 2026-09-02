@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { CHOLQUI_ASSUMPTIONS, CHOLQUI_SCENARIOS, fmtUsdM } from "../data/cholqui";
+import { CHOLQUI_ASSUMPTIONS, CHOLQUI_SCENARIOS, fmtClpM } from "../data/cholqui";
 
 export function CholquiScenariosPanel() {
-  const [grade, setGrade] = useState(CHOLQUI_SCENARIOS[1].grade);
+  const [grade, setGrade] = useState(CHOLQUI_SCENARIOS[0].grade);
   const active = CHOLQUI_SCENARIOS.find((s) => s.grade === grade) ?? CHOLQUI_SCENARIOS[0];
-  const maxMargin = Math.max(...CHOLQUI_SCENARIOS.map((s) => s.marginUsd));
+  const maxMargin = Math.max(...CHOLQUI_SCENARIOS.map((s) => s.marginClp));
 
   return (
     <section className="border border-hairline bg-white rounded-2xl overflow-hidden">
@@ -13,11 +13,12 @@ export function CholquiScenariosPanel() {
           Economía preliminar · ilustrativa
         </div>
         <h2 className="font-display text-2xl mt-1 text-content">
-          Sensibilidad a la ley de cobre
+          Sensibilidad a la ley de cobre soluble
         </h2>
         <p className="text-sm text-content-subtle mt-1 max-w-3xl">
-          Flujo operacional de venta de mineral a planta (tarifa ENAMI) sobre un ciclo de 25 meses.
-          Los cuatro escenarios comparten el mismo plan minero: sólo cambia la ley.
+          Venta de mineral oxidado a ENAMI sobre el plan entregado de 166.500 t en 24 meses. Los
+          escenarios comparten el mismo plan minero y costos: sólo cambia la tarifa por ley de cobre
+          soluble (Circular ENAMI N°27, julio 2026). El caso efectivamente modelado es 1,5 %.
         </p>
       </header>
 
