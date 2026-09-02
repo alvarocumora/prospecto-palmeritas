@@ -675,7 +675,7 @@ for i, (v, l, n) in enumerate(
 ):
     metric(72 + i * 292, y, v, l, n, w_=250, vsize=27, color=COPPER if i == 1 else COBALT)
 y -= 120
-box(72, y - 130, W - 144, 130, fill=PAPER_2, stroke=None)
+box(72, y - 152, W - 144, 152, fill=PAPER_2, stroke=None)
 text(96, y - 30, "CONDICIÓN DE VALIDEZ", "Mono-B", 8.6, COBALT)
 bullets(
     96,
@@ -696,7 +696,7 @@ header(
     "Qué falta validar antes de comprometer capital",
     "Revisión técnica, legal y financiera de julio de 2026 sobre los antecedentes entregados.",
 )
-bullets(72, H - 200, GAPS, width=1100, size=11.2, gap=9, marker=COPPER)
+bullets(72, H - 205, GAPS, width=1100, size=11.2, gap=21, marker=COPPER)
 note_box(
     72,
     150,
@@ -795,7 +795,7 @@ footer("Certificados de dominio, avalúos y gravámenes · Contrato de suministr
 
 # ================================================================== SLIDE 16
 header("15 · Riesgos", "Advertencias obligatorias", None)
-bullets(72, H - 190, CAVEATS, width=1100, size=11.4, gap=11, marker=COPPER)
+bullets(72, H - 200, CAVEATS, width=1100, size=11.4, gap=24, marker=COPPER)
 note_box(
     72,
     130,
