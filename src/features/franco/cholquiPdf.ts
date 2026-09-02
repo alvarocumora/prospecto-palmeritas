@@ -291,49 +291,72 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
 
   // ── Economía preliminar ──────────────────────────────────────────────────
   newPage();
-  h1("05 · Economía preliminar", "Sensibilidad a la ley de cobre");
+  h1("05 · Economía preliminar", "Sensibilidad a la ley de cobre soluble");
   para(
-    "Las planillas del proyecto modelan un flujo operacional de venta de mineral a planta (tarifa ENAMI) sobre un ciclo de 25 meses. La variable crítica es la ley de cobre: los cuatro escenarios comparten el mismo plan minero y sólo cambian el ingreso.",
+    `El modelo entregado considera la venta de mineral oxidado a ENAMI sobre un plan de ${CHOLQUI_PLAN_TONNES.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses (${CHOLQUI_BASE_CASE.ramp}). Los escenarios comparten plan minero y costos: sólo cambia la tarifa por ley de cobre soluble según la ${CHOLQUI_ENAMI.circular}. El caso efectivamente modelado es 1,5 % Cu soluble.`,
   );
   table(
-    ["Escenario", "Ingresos brutos", "Costos totales", "Margen acumulado", "Equilibrio"],
+    ["Escenario", "Tarifa (CLP/tms)", "Ingresos brutos", "Costos operac.", "Superávit", "Equilibrio"],
     CHOLQUI_SCENARIOS.map((s) => [
       s.label,
-      fmtUsdM(s.revenueUsd),
-      fmtUsdM(s.costUsd),
-      fmtUsdM(s.marginUsd),
-      `Mes ${s.paybackMonth}`,
+      s.tariffClpTms.toLocaleString("es-CL"),
+      fmtClpM(s.revenueClp),
+      fmtClpM(s.costClp),
+      fmtClpM(s.marginClp),
+      s.paybackMonth ? `Mes ${s.paybackMonth}` : "No modelado",
     ]),
   );
 
-  // Barras de margen (dibujadas, sin imágenes externas)
-  const maxMargin = Math.max(...CHOLQUI_SCENARIOS.map((s) => s.marginUsd));
+  // Barras de superávit (dibujadas, sin imágenes externas)
+  const maxMargin = Math.max(...CHOLQUI_SCENARIOS.map((s) => s.marginClp));
   ensure(120);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(7.2);
   pdf.setTextColor(...COBALT);
-  pdf.text("MARGEN ACUMULADO NO DESCONTADO POR ESCENARIO", M, y);
+  pdf.text("SUPERAVIT OPERACIONAL NO DESCONTADO POR ESCENARIO", M, y);
   y += 14;
   const barH = 16;
   CHOLQUI_SCENARIOS.forEach((s) => {
-    const w = ((CW - 150) * s.marginUsd) / maxMargin;
+    const w = Math.max(0, ((CW - 170) * s.marginClp) / maxMargin);
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(8.2);
     pdf.setTextColor(...INK);
     pdf.text(s.label, M, y + 11);
     pdf.setFillColor(...COBALT);
-    pdf.rect(M + 54, y, w, barH, "F");
+    pdf.rect(M + 66, y, w, barH, "F");
     pdf.setTextColor(...SLATE);
     pdf.setFontSize(7.8);
-    pdf.text(fmtUsdM(s.marginUsd), M + 60 + w, y + 11);
+    pdf.text(fmtClpM(s.marginClp), M + 72 + w, y + 11);
     y += barH + 8;
   });
   y += 8;
 
-  h1("06 · Supuestos", "Supuestos comunes a los cuatro escenarios");
+  h1("06 · Supuestos", "Supuestos comunes a los escenarios");
   table(["Supuesto", "Valor"], CHOLQUI_ASSUMPTIONS.map(([k, v]) => [k, v]));
   disclaimer(
-    "Escenarios ilustrativos, sujetos a validación geológica, metalúrgica, de ingeniería y económica. Las leyes de 1,5 % a 3,0 % Cu son hipótesis de sensibilidad y NO corresponden a leyes promedio comprobadas ni a recursos minerales. El modelo no incorpora impuestos, financiamiento, cierre de faena ni permisos.",
+    "Escenarios ilustrativos, sujetos a validación geológica, metalúrgica, de ingeniería y económica. Las leyes de 1,5 % a 3,0 % Cu soluble son hipótesis de sensibilidad tarifaria y NO corresponden a leyes promedio comprobadas ni a recursos minerales. El modelo no incorpora impuestos, financiamiento, cierre de faena, seguros ni permisos, y no contiene VAN ni TIR.",
+  );
+
+  // ── Brechas materiales del modelo ────────────────────────────────────────
+  newPage();
+  h1("06b · Brechas", "Qué falta validar antes de comprometer capital");
+  CHOLQUI_GAPS.forEach((g) => para(`— ${g}`, SLATE, 8.6));
+  table(
+    ["Garantía documentada", "Titular", "Avalúo fiscal", "Estado"],
+    CHOLQUI_GUARANTEES.map((g) => [
+      g.asset,
+      g.holder,
+      g.appraisalClp ? fmtClp(g.appraisalClp) : "Sin tasación",
+      g.status,
+    ]),
+  );
+  para(
+    `Total documentado ${fmtClp(CHOLQUI_GUARANTEE_TOTALS.documentedClp)} · libre de embargo ${fmtClp(CHOLQUI_GUARANTEE_TOTALS.freeOfLiensClp)}. Contrato de áridos: ${CHOLQUI_ARIDOS.minVolumeM3Month.toLocaleString("es-CL")} m³/mes a ${fmtClp(CHOLQUI_ARIDOS.priceClpM3)}/m³ + IVA. ${CHOLQUI_ARIDOS.caveat}`,
+    SLATE,
+    8.4,
+  );
+  disclaimer(
+    "Los avalúos fiscales no equivalen a tasación comercial ni a valor de realización. El Lote 2 (Rol 16-33) mantiene embargo vigente a favor de la Tesorería General de la República.",
   );
 
   // ── Estructura de inversión ──────────────────────────────────────────────
