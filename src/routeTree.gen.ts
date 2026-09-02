@@ -133,6 +133,7 @@ import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './route
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
 import { Route as AuthenticatedDashboardCobranzaRouteImport } from './routes/_authenticated.dashboard.cobranza'
 import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
+import { Route as AuthenticatedDashboardCholquiRouteImport } from './routes/_authenticated.dashboard.cholqui'
 import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
 import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
 import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
@@ -848,6 +849,12 @@ const AuthenticatedDashboardClientesRoute =
     path: '/dashboard/clientes',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardCholquiRoute =
+  AuthenticatedDashboardCholquiRouteImport.update({
+    id: '/dashboard/cholqui',
+    path: '/dashboard/cholqui',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardCampaignsRoute =
   AuthenticatedDashboardCampaignsRouteImport.update({
     id: '/dashboard/campaigns',
@@ -1160,6 +1167,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
+  '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
@@ -1326,6 +1334,7 @@ export interface FileRoutesByTo {
   '/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
+  '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
@@ -1494,6 +1503,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/audit': typeof AuthenticatedDashboardAuditRoute
   '/_authenticated/dashboard/boletin': typeof AuthenticatedDashboardBoletinRoute
   '/_authenticated/dashboard/campaigns': typeof AuthenticatedDashboardCampaignsRoute
+  '/_authenticated/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/_authenticated/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/_authenticated/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
@@ -1662,6 +1672,7 @@ export interface FileRouteTypes {
     | '/dashboard/audit'
     | '/dashboard/boletin'
     | '/dashboard/campaigns'
+    | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
     | '/dashboard/command-center'
@@ -1828,6 +1839,7 @@ export interface FileRouteTypes {
     | '/dashboard/audit'
     | '/dashboard/boletin'
     | '/dashboard/campaigns'
+    | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
     | '/dashboard/command-center'
@@ -1995,6 +2007,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/audit'
     | '/_authenticated/dashboard/boletin'
     | '/_authenticated/dashboard/campaigns'
+    | '/_authenticated/dashboard/cholqui'
     | '/_authenticated/dashboard/clientes'
     | '/_authenticated/dashboard/cobranza'
     | '/_authenticated/dashboard/command-center'
@@ -3048,6 +3061,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardClientesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/cholqui': {
+      id: '/_authenticated/dashboard/cholqui'
+      path: '/dashboard/cholqui'
+      fullPath: '/dashboard/cholqui'
+      preLoaderRoute: typeof AuthenticatedDashboardCholquiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/campaigns': {
       id: '/_authenticated/dashboard/campaigns'
       path: '/dashboard/campaigns'
@@ -3439,6 +3459,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAuditRoute: typeof AuthenticatedDashboardAuditRoute
   AuthenticatedDashboardBoletinRoute: typeof AuthenticatedDashboardBoletinRoute
   AuthenticatedDashboardCampaignsRoute: typeof AuthenticatedDashboardCampaignsRoute
+  AuthenticatedDashboardCholquiRoute: typeof AuthenticatedDashboardCholquiRoute
   AuthenticatedDashboardClientesRoute: typeof AuthenticatedDashboardClientesRoute
   AuthenticatedDashboardCobranzaRoute: typeof AuthenticatedDashboardCobranzaRoute
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
@@ -3514,6 +3535,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardAuditRoute: AuthenticatedDashboardAuditRoute,
   AuthenticatedDashboardBoletinRoute: AuthenticatedDashboardBoletinRoute,
   AuthenticatedDashboardCampaignsRoute: AuthenticatedDashboardCampaignsRoute,
+  AuthenticatedDashboardCholquiRoute: AuthenticatedDashboardCholquiRoute,
   AuthenticatedDashboardClientesRoute: AuthenticatedDashboardClientesRoute,
   AuthenticatedDashboardCobranzaRoute: AuthenticatedDashboardCobranzaRoute,
   AuthenticatedDashboardCommandCenterRoute:
