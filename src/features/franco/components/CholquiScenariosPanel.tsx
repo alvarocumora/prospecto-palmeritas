@@ -42,10 +42,13 @@ export function CholquiScenariosPanel() {
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-y border-hairline bg-surface-2">
         {(
           [
-            ["Ingresos brutos", fmtUsdM(active.revenueUsd)],
-            ["Costos totales", fmtUsdM(active.costUsd)],
-            ["Margen acumulado", fmtUsdM(active.marginUsd)],
-            ["Equilibrio acumulado", `Mes ${active.paybackMonth}`],
+            ["Ingresos brutos", fmtClpM(active.revenueClp)],
+            ["Costos operacionales", fmtClpM(active.costClp)],
+            ["Superávit operacional", fmtClpM(active.marginClp)],
+            [
+              "Equilibrio acumulado",
+              active.paybackMonth ? `Mes ${active.paybackMonth}` : "No modelado en la fuente",
+            ],
           ] as Array<[string, string]>
         ).map(([k, v]) => (
           <div key={k} className="px-5 py-4">
