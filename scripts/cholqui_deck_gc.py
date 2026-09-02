@@ -778,7 +778,7 @@ table(
     [370, 250, 200, 268],
     row_h=26,
 )
-y -= 150
+y -= 210
 metric(72, y, "CLP 437 M", "Total documentado", "Suma de avalúos fiscales certificados", w_=280, vsize=26)
 metric(432, y, "CLP 313 M", "Libre de embargo", "Excluye el Lote 2 (Rol 16-33) con embargo TGR", w_=280, vsize=26)
 metric(792, y, "CLP 130 M/mes", "Contrato de áridos", "20.000 m³/mes a CLP 6.500/m³ + IVA, desde febrero 2026", w_=300, vsize=26, color=COPPER)
