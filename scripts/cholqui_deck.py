@@ -337,7 +337,7 @@ footer("Fuentes: Prospecto “Cholqui” — Geología Regional, Mineralización
 # ------------------------------------------------------------------ slide 7
 bg()
 header("07 · Sampling & assays", "Muestreo y análisis")
-takeaway("El muestreo inicial confirma la presencia de mineralización de Cu–Au–Ag en superficie y justifica exploración sistemática adicional.", width=690)
+takeaway("Mineralización de Cu–Au–Ag confirmada en superficie; justifica exploración sistemática.", width=690)
 c.drawImage(ImageReader("/tmp/ch_map.png"), 62, 140, 520, 400, mask="auto")
 text(322, 128, "Puntos de observación y muestreo · Tabla 1 (PSAD'56 19H)", "Sans", 9.5, SLATE, align="c")
 hdr = ["MUESTRA", "SECTOR", "MINERALOGÍA OBSERVADA (MICROSCOPÍA)"]
@@ -420,7 +420,7 @@ footer("Fuentes: Prospecto “Cholqui” — Recomendaciones y Trabajos de Explo
 # ----------------------------------------------------------------- slide 10
 bg()
 header("10 · Preliminary economics", "Sensibilidad económica preliminar")
-takeaway("Escenarios ilustrativos construidos sobre un plan minero de 25 meses y tarifa ENAMI: la variable crítica es la ley de cobre.", width=690)
+takeaway("Plan minero de 25 meses y tarifa ENAMI: la variable crítica es la ley.", width=690)
 c.drawImage(ImageReader("/tmp/ch_sens.png"), 62, 240, 700, 296, mask="auto")
 x0 = 790
 text(x0, 590, "ESCENARIO", "Mono", 8.5, COPPER)
@@ -446,7 +446,7 @@ footer("Fuentes: Analisis_economico_Proyecto_Cholqui 1,5 % / 2 % / 2,5 % / 3 % �
 # ----------------------------------------------------------------- slide 11
 bg()
 header("11 · Cash profile", "Perfil de caja de los escenarios")
-takeaway("Bajo el plan minero de la planilla, el punto de equilibrio acumulado se alcanza entre el mes 2 y el mes 9 según la ley.", width=690)
+takeaway("Equilibrio acumulado entre el mes 2 y el mes 9 según la ley de cobre.", width=690)
 c.drawImage(ImageReader("/tmp/ch_cum.png"), 62, 240, 700, 292, mask="auto")
 x0 = 790
 items = [

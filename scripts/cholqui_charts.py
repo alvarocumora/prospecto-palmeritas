@@ -121,7 +121,7 @@ def sample_map(path):
     clusters = []  # [x, y, [codes]]
     for x, y, code, _ in POINTS:
         for cl in clusters:
-            if abs(cl[0] - x) < 220 and abs(cl[1] - y) < 220:
+            if abs(cl[0] - x) < 420 and abs(cl[1] - y) < 420:
                 cl[2].append(code)
                 break
         else:
