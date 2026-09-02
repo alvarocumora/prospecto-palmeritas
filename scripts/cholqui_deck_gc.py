@@ -807,7 +807,8 @@ footer(SRC)
 # ================================================================== SLIDE 17
 bg(INK)
 box(0, H - 8, W, 8, fill=COBALT, stroke=None)
-c.drawImage(logo, 72, H - 140, 160, 46, mask="auto", preserveAspectRatio=True, anchor="sw")
+box(72, H - 116, 12, 12, fill=COBALT, stroke=None)
+text(94, H - 114, "GEOCAPITALS", "Mono-B", 15, PAPER)
 text(72, 470, "PROYECTO CHOLQUI", "Sans-B", 40, PAPER)
 rule(72, 442, 110, COBALT, 3)
 wrap(
