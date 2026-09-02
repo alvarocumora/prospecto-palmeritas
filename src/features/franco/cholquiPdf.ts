@@ -278,12 +278,25 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
       ["Mineralogía observada", CHOLQUI_GEOLOGY.mineralogia],
       ["Observaciones de terreno", `${CHOLQUI_GEOLOGY.observaciones} puntos`],
       ["Cuerpos mineralizados descritos", `${CHOLQUI_GEOLOGY.cuerpos}`],
-      ["Muestras a laboratorio certificado", `${CHOLQUI_GEOLOGY.muestrasLab}`],
+      ["Muestras a laboratorio certificado", `${CHOLQUI_GEOLOGY.muestrasLab} (Informe ${CHOLQUI_ASSAY_REPORT.id} · ${CHOLQUI_ASSAY_REPORT.lab})`],
       ["Autores", CHOLQUI_GEOLOGY.autores],
+      ["Potencial conceptual", `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t de ${CHOLQUI_CONCEPTUAL.product} en ${CHOLQUI_CONCEPTUAL.sector} — no es recurso`],
     ],
   );
+  table(
+    ["Muestra", "Sector", "Cu total %", "Cu soluble %", "Sol./Total", "Au g/t", "Ag ppm"],
+    CHOLQUI_ASSAYS.map((a) => [
+      a.sample,
+      a.location,
+      a.cuTotalPct.toLocaleString("es-CL", { minimumFractionDigits: 3 }),
+      a.cuSolublePct.toLocaleString("es-CL", { minimumFractionDigits: 3 }),
+      `${solubleRatioPct(a).toFixed(0)} %`,
+      a.auGpt.toLocaleString("es-CL", { minimumFractionDigits: 2 }),
+      `${a.agPpm}`,
+    ]),
+  );
   disclaimer(
-    "Las observaciones mineralógicas de terreno no equivalen a leyes químicas y no permiten inferir tonelaje, continuidad ni ley promedio. El muestreo es de superficie: no hay sondaje propio.",
+    `Las observaciones mineralógicas de terreno no equivalen a leyes químicas. Los ensayos certificados corresponden a ${CHOLQUI_ASSAY_REPORT.samples} muestras puntuales de superficie y no permiten inferir tonelaje, continuidad, ley promedio de mina, dilución ni recuperación metalúrgica. No hay sondaje propio. La cifra conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t (${CHOLQUI_CONCEPTUAL.formula}) no es recurso ni reserva bajo CH 20235, NI 43-101, JORC ni S-K 1300.`,
   );
 
   // ── Puntos de muestreo ───────────────────────────────────────────────────
