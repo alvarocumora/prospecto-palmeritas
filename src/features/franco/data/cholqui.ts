@@ -371,9 +371,5 @@ export function fmtClp(n: number): string {
 }
 
 export function fmtClpM(n: number): string {
-  const m = n / 1_000_000;
-  if (Math.abs(m) >= 1000) {
-    return `CLP ${(m / 1000).toLocaleString("es-CL", { maximumFractionDigits: 2 })} MM`;
-  }
-  return `CLP ${m.toLocaleString("es-CL", { maximumFractionDigits: 0 })} M`;
+  return `CLP ${(n / 1_000_000).toLocaleString("es-CL", { maximumFractionDigits: 0 })} M`;
 }
