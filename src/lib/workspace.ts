@@ -164,6 +164,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Informe 43-101", to: "/dashboard/ni43101" },
       { label: "Reportes", to: "/dashboard/reports" },
       { label: "Reporte del proyecto", to: "/dashboard/project-report" },
+      { label: "Cholqui live", to: "/dashboard/cholqui" },
       { label: "QPs · Firmas", to: "/dashboard/qps" },
       { label: "Validación de datos", to: "/dashboard/validation", capability: "audit" },
     ],
