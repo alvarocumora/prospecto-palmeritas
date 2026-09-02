@@ -517,7 +517,7 @@ for i, (v, l, n) in enumerate(
 ):
     metric(72 + i * 292, y, v, l, n, w_=250, vsize=26)
 y -= 130
-box(72, y - 190, W - 144, 190, fill=PAPER_2, stroke=None)
+box(72, y - 160, W - 144, 160, fill=PAPER_2, stroke=None)
 text(96, y - 32, "POR QUÉ IMPORTA", "Mono-B", 8.6, COBALT)
 bullets(
     96,
@@ -529,7 +529,7 @@ bullets(
     ],
     width=1050,
     size=10.8,
-    gap=8,
+    gap=20,
 )
 note_box(
     72,
@@ -675,7 +675,7 @@ for i, (v, l, n) in enumerate(
 ):
     metric(72 + i * 292, y, v, l, n, w_=250, vsize=27, color=COPPER if i == 1 else COBALT)
 y -= 120
-box(72, y - 152, W - 144, 152, fill=PAPER_2, stroke=None)
+box(72, y - 120, W - 144, 120, fill=PAPER_2, stroke=None)
 text(96, y - 30, "CONDICIÓN DE VALIDEZ", "Mono-B", 8.6, COBALT)
 bullets(
     96,
@@ -686,7 +686,7 @@ bullets(
     ],
     width=1050,
     size=10.8,
-    gap=8,
+    gap=20,
 )
 footer(SRC)
 
