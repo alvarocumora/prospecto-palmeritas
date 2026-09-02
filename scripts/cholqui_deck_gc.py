@@ -713,11 +713,11 @@ header(
 )
 y = H - 205
 for when, what in MILESTONES:
-    box(72, y - 62, 150, 62, fill=COBALT_SOFT, stroke=None)
-    text(88, y - 38, when, "Mono-B", 12, COBALT)
-    box(222, y - 62, W - 294, 62, fill=None, stroke=HAIR)
-    wrap(244, y - 30, what, 900, "Sans", 11.5, INK, 15)
-    y -= 74
+    box(72, y - 54, 150, 54, fill=COBALT_SOFT, stroke=None)
+    text(88, y - 34, when, "Mono-B", 12, COBALT)
+    box(222, y - 54, W - 294, 54, fill=None, stroke=HAIR)
+    wrap(244, y - 26, what, 900, "Sans", 11.5, INK, 15)
+    y -= 66
 note_box(
     72,
     150,
