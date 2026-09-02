@@ -62,19 +62,19 @@ export function CholquiScenariosPanel() {
 
       <div className="px-6 py-6 space-y-3">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
-          Margen acumulado no descontado por escenario
+          Superávit operacional no descontado por escenario
         </div>
         {CHOLQUI_SCENARIOS.map((s) => (
           <div key={s.grade} className="flex items-center gap-3">
-            <span className="w-16 text-xs font-mono text-content-muted">{s.label}</span>
+            <span className="w-20 text-xs font-mono text-content-muted">{s.label}</span>
             <div className="flex-1 h-4 bg-surface-2 rounded-sm overflow-hidden">
               <div
                 className={s.grade === grade ? "h-full bg-accent-brand" : "h-full bg-content/25"}
-                style={{ width: `${(s.marginUsd / maxMargin) * 100}%` }}
+                style={{ width: `${Math.max(0, (s.marginClp / maxMargin) * 100)}%` }}
               />
             </div>
-            <span className="w-24 text-right text-xs font-mono text-content-muted">
-              {fmtUsdM(s.marginUsd)}
+            <span className="w-28 text-right text-xs font-mono text-content-muted">
+              {fmtClpM(s.marginClp)}
             </span>
           </div>
         ))}
@@ -82,7 +82,7 @@ export function CholquiScenariosPanel() {
 
       <div className="px-6 pb-6">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-2">
-          Supuestos comunes a los cuatro escenarios
+          Supuestos comunes a los escenarios
         </div>
         <dl className="grid md:grid-cols-2 gap-x-8">
           {CHOLQUI_ASSUMPTIONS.map(([k, v]) => (
