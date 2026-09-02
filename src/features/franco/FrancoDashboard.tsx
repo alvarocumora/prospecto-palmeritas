@@ -1,45 +1,55 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import type { PalmerasTabId } from "@/features/palmeras/types";
-import { FrancoTopNav } from "./components/FrancoTopNav";
-import { FrancoTabPlaceholder } from "./components/FrancoTabPlaceholder";
-import { FrancoHero } from "./components/FrancoHero";
-import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
+import { CholquiHero } from "./components/CholquiHero";
+import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
+import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
+import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
 import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
-import { FrancoNI43101DraftPanel } from "./components/FrancoNI43101DraftPanel";
+import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
+import { CHOLQUI } from "./data/cholqui";
 
+/**
+ * Live view público del Proyecto Cholqui. Toda la data proviene de
+ * `data/cholqui.ts`, la misma fuente que alimenta el PDF de inversión y la
+ * ficha /proyectos/ficha/franco.
+ */
 export function FrancoDashboard() {
-  const [active, setActive] = useState<PalmerasTabId>("overview");
-  const [exporting, setExporting] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
-  const handleExport = useCallback(async () => {
-    setExporting(true);
+  const handleDownload = useCallback(async () => {
+    setDownloading(true);
     try {
-      toast.info("Borrador pre NI 43-101 de Cholqui aún no tiene datos cargados.");
+      const { downloadCholquiInvestmentPdf } = await import("./cholquiPdf");
+      await downloadCholquiInvestmentPdf();
+      toast.success("PDF de inversión generado");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo generar el PDF");
     } finally {
-      setExporting(false);
+      setDownloading(false);
     }
   }, []);
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <FrancoTopNav
-        active={active}
-        setActive={setActive}
-        onExport={handleExport}
-        exporting={exporting}
-      />
-      <main className="max-w-[1400px] mx-auto px-4 md:px-6 py-6 space-y-6">
-        {active === "overview" ? (
-          <>
-            <FrancoHero />
-            <FrancoPertenenciasMap />
-            <FrancoPertenenciasPanel />
-            <FrancoNI43101DraftPanel />
-          </>
-        ) : (
-          <FrancoTabPlaceholder tab={active} />
-        )}
+    <div data-theme="im-light" className="min-h-screen bg-surface text-content">
+      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8 space-y-6">
+        <CholquiHero onDownload={handleDownload} downloading={downloading} />
+
+        <div data-surface="canvas" className="rounded-2xl overflow-hidden">
+          <FrancoPertenenciasMap />
+        </div>
+
+        <CholquiScenariosPanel />
+        <CholquiEvidencePanel />
+        <CholquiRoundPanel />
+
+        <div data-surface="canvas" className="rounded-2xl overflow-hidden">
+          <FrancoPertenenciasPanel />
+        </div>
+
+        <footer className="text-[11px] text-content-subtle pb-8">
+          {CHOLQUI.name} ({CHOLQUI.code}) · Operado por Geocapitals · Antes conocido como{" "}
+          {CHOLQUI.formerName}. Documento informativo: no constituye oferta pública de valores.
+        </footer>
       </main>
     </div>
   );
