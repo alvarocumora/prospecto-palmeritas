@@ -12,6 +12,7 @@ import {
   getFrancoCadastreCross,
   type FrancoPertenenciaMatch,
 } from "@/lib/franco-cadastre.functions";
+import { CHOLQUI_POINTS, LAS_MINITAS } from "../data/cholqui";
 
 type FCFeature = {
   type: "Feature";
