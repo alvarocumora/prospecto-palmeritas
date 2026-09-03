@@ -11847,6 +11847,54 @@ export type Database = {
         }
         Relationships: []
       }
+      project_certifications: {
+        Row: {
+          created_at: string
+          expires_on: string | null
+          file_url: string | null
+          id: string
+          issued_on: string | null
+          issuer: string | null
+          kind: string
+          notes: string | null
+          number: string | null
+          project_code: string
+          provenance: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_on?: string | null
+          file_url?: string | null
+          id?: string
+          issued_on?: string | null
+          issuer?: string | null
+          kind: string
+          notes?: string | null
+          number?: string | null
+          project_code: string
+          provenance?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_on?: string | null
+          file_url?: string | null
+          id?: string
+          issued_on?: string | null
+          issuer?: string | null
+          kind?: string
+          notes?: string | null
+          number?: string | null
+          project_code?: string
+          provenance?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_facts: {
         Row: {
           created_at: string
@@ -12131,6 +12179,93 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      project_operations_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          metric_key: string
+          period: string
+          project_code: string
+          provenance: string
+          recorded_at: string
+          source: string | null
+          unit: string | null
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          metric_key: string
+          period: string
+          project_code: string
+          provenance?: string
+          recorded_at?: string
+          source?: string | null
+          unit?: string | null
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          metric_key?: string
+          period?: string
+          project_code?: string
+          provenance?: string
+          recorded_at?: string
+          source?: string | null
+          unit?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
+      project_stage_timeline: {
+        Row: {
+          completed_on: string | null
+          created_at: string
+          evidence: string | null
+          id: string
+          label: string
+          project_code: string
+          provenance: string
+          sort_order: number
+          stage_key: string
+          started_on: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_on?: string | null
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          label: string
+          project_code: string
+          provenance?: string
+          sort_order?: number
+          stage_key: string
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_on?: string | null
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          label?: string
+          project_code?: string
+          provenance?: string
+          sort_order?: number
+          stage_key?: string
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       project_technical_brief: {
         Row: {
@@ -15255,6 +15390,148 @@ export type Database = {
             columns: ["trade_id"]
             isOneToOne: false
             referencedRelation: "commodity_trades"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spv_entities: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          incorporated_on: string | null
+          legal_name: string
+          notes: string | null
+          project_code: string
+          rut: string | null
+          share_price: number | null
+          total_shares: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          incorporated_on?: string | null
+          legal_name: string
+          notes?: string | null
+          project_code: string
+          rut?: string | null
+          share_price?: number | null
+          total_shares?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          incorporated_on?: string | null
+          legal_name?: string
+          notes?: string | null
+          project_code?: string
+          rut?: string | null
+          share_price?: number | null
+          total_shares?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spv_position_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          event_type: string
+          id: string
+          position_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type: string
+          id?: string
+          position_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type?: string
+          id?: string
+          position_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spv_position_events_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "spv_positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spv_positions: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          document_url: string | null
+          id: string
+          instrument: string
+          investor_email: string | null
+          investor_name: string
+          investor_user_id: string | null
+          notes: string | null
+          shares: number
+          spv_id: string
+          status: string
+          subscribed_on: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          document_url?: string | null
+          id?: string
+          instrument?: string
+          investor_email?: string | null
+          investor_name: string
+          investor_user_id?: string | null
+          notes?: string | null
+          shares?: number
+          spv_id: string
+          status?: string
+          subscribed_on?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          document_url?: string | null
+          id?: string
+          instrument?: string
+          investor_email?: string | null
+          investor_name?: string
+          investor_user_id?: string | null
+          notes?: string | null
+          shares?: number
+          spv_id?: string
+          status?: string
+          subscribed_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spv_positions_spv_id_fkey"
+            columns: ["spv_id"]
+            isOneToOne: false
+            referencedRelation: "spv_entities"
             referencedColumns: ["id"]
           },
         ]
