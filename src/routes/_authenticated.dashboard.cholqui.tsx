@@ -1,6 +1,16 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { CholquiSatellitePanel } from "@/features/franco/components/CholquiSatellitePanel";
+import { CholquiSpvPanel } from "@/features/franco/components/CholquiSpvPanel";
+
+const TABS = [
+  ["ficha", "Ficha & escenarios"],
+  ["satelite", "Satélite"],
+  ["spv", "Inversionistas & SPV"],
+] as const;
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/cholqui")({
   head: () => ({
