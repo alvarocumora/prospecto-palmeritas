@@ -4,6 +4,7 @@ import { CholquiHero } from "./components/CholquiHero";
 import { CholquiSatellitePanel } from "./components/CholquiSatellitePanel";
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
+import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
 import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
 import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
 import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
@@ -41,6 +42,7 @@ export function FrancoDashboard() {
         </div>
 
         <CholquiScenariosPanel />
+        <CholquiMinePlanPanel />
         <CholquiSatellitePanel />
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
