@@ -50,8 +50,8 @@ const COPPER: [number, number, number] = [192, 112, 58];
 export const CHOLQUI_LIVE_URL = publicUrl(CHOLQUI.liveUrl);
 
 /** Versión del documento: cambia con el contenido, se imprime en el pie. */
-export const CHOLQUI_DOC_VERSION = "v1.1";
-export const CHOLQUI_TEASER_VERSION = "v1.0";
+export const CHOLQUI_DOC_VERSION = "v1.2";
+export const CHOLQUI_TEASER_VERSION = "v1.1";
 
 type CholquiPdfKind = "brief" | "teaser";
 
@@ -406,16 +406,25 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     ]),
   );
 
-  para("Maquinaria requerida por escalón de producción (arriendo con operador)", COBALT, 8.4);
+  para("Maquinaria por escalón de producción — operativas + respaldo (arriendo con operador)", COBALT, 8.4);
   table(
-    ["Equipo", ...RATE_STEPS.map((r) => `${nfCl(r)} t`)],
+    ["Equipo", "Disp.", ...RATE_STEPS.map((r) => `${nfCl(r)} t`)],
     [
       ...fleetForRate(RATE_STEPS[0]).lines.map((line, idx) => [
-        line.spec.label,
-        ...RATE_STEPS.map((r) => String(fleetForRate(r).lines[idx].units)),
+        line.spec.critical ? `${line.spec.label} (crítico)` : line.spec.label,
+        `${Math.round(line.spec.availability * 100)} %`,
+        ...RATE_STEPS.map((r) => {
+          const l = fleetForRate(r).lines[idx];
+          return l.standbyUnits > 0 ? `${l.operatingUnits} + ${l.standbyUnits}` : String(l.operatingUnits);
+        }),
       ]),
-      ["Costo de flota (CLP/mes)", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).monthlyClp))],
+      ["Equipos operativos (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).operatingClp))],
+      ["Equipos de respaldo (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).standbyClp))],
+      ["Costo total de flota (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).monthlyClp))],
     ],
+  );
+  para(
+    "Las unidades operativas se dimensionan sobre capacidad efectiva (capacidad nominal x disponibilidad mecánica). Los equipos críticos suman una unidad stand-by desde su umbral de ritmo, de modo que una falla no detiene la cadena; el respaldo se tarifa a valor reducido por no operar a plena carga. Estimación de ingeniería preliminar, no cotizaciones cerradas.",
   );
 
   para("Costo por tonelada según ritmo — el costo fijo se diluye al escalar", COBALT, 8.4);
