@@ -141,7 +141,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(size);
     pdf.setTextColor(...color);
-    const lines = pdf.splitTextToSize(t, CW) as string[];
+    const lines = pdf.splitTextToSize(safe(t), CW) as string[];
     for (const line of lines) {
       ensure(14);
       pdf.text(line, M, y);
@@ -152,7 +152,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   const bullets = (items: string[]) => {
     for (const it of items) {
-      const lines = pdf.splitTextToSize(it, CW - 16) as string[];
+      const lines = pdf.splitTextToSize(safe(it), CW - 16) as string[];
       ensure(lines.length * 13 + 4);
       pdf.setFillColor(...COPPER);
       pdf.rect(M, y - 5, 4, 4, "F");
@@ -170,8 +170,8 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   const table = (head: string[], body: (string | number)[][]) => {
     autoTable(pdf, {
       startY: y,
-      head: [head],
-      body: body as never,
+      head: [head.map(safe)],
+      body: body.map((row) => row.map((c) => safe(String(c)))) as never,
       margin: { left: M, right: M },
       theme: "grid",
       styles: { font: "helvetica", fontSize: 8.4, cellPadding: 5, textColor: INK, lineColor: HAIR },
@@ -184,7 +184,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   };
 
   const disclaimer = (t: string) => {
-    const lines = pdf.splitTextToSize(t, CW - 20) as string[];
+    const lines = pdf.splitTextToSize(safe(t), CW - 20) as string[];
     ensure(lines.length * 10 + 18);
     pdf.setFillColor(238, 234, 226);
     pdf.rect(M, y - 8, CW, lines.length * 10 + 16, "F");
