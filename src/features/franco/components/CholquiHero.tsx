@@ -1,9 +1,19 @@
 import { Download, ExternalLink, MapPin, Loader2 } from "lucide-react";
 import { CHOLQUI, LAS_MINITAS } from "../data/cholqui";
 
-type Props = { onDownload: () => void; downloading: boolean };
+type Props = {
+  onDownload: () => void;
+  downloading: boolean;
+  onDownloadTeaser?: () => void;
+  downloadingTeaser?: boolean;
+};
 
-export function CholquiHero({ onDownload, downloading }: Props) {
+export function CholquiHero({
+  onDownload,
+  downloading,
+  onDownloadTeaser,
+  downloadingTeaser = false,
+}: Props) {
   const kpis: Array<[string, string]> = [
     ["Superficie", `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`],
     ["Propiedad", `${CHOLQUI.pedimentos} pedimentos · ${CHOLQUI.pertenencias} pertenencias`],
@@ -43,6 +53,21 @@ export function CholquiHero({ onDownload, downloading }: Props) {
             )}
             Descargar PDF de inversión
           </button>
+          {onDownloadTeaser ? (
+            <button
+              type="button"
+              onClick={onDownloadTeaser}
+              disabled={downloadingTeaser}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/25 text-white text-sm disabled:opacity-60"
+            >
+              {downloadingTeaser ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Download className="w-4 h-4" />
+              )}
+              Descargar teaser de inversión
+            </button>
+          ) : null}
           <a
             href={`mailto:${CHOLQUI.contact.email}?subject=${encodeURIComponent(`${CHOLQUI.name} — interés de inversión`)}`}
             className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/25 text-white text-sm"

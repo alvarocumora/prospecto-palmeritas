@@ -50,9 +50,12 @@ const COPPER: [number, number, number] = [192, 112, 58];
 export const CHOLQUI_LIVE_URL = publicUrl(CHOLQUI.liveUrl);
 
 /** Versión del documento: cambia con el contenido, se imprime en el pie. */
-export const CHOLQUI_DOC_VERSION = "v1.0";
+export const CHOLQUI_DOC_VERSION = "v1.1";
+export const CHOLQUI_TEASER_VERSION = "v1.0";
 
-export async function downloadCholquiInvestmentPdf(): Promise<void> {
+type CholquiPdfKind = "brief" | "teaser";
+
+export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief"): Promise<void> {
   const { default: jsPDF } = await import("jspdf");
   const autoTable = (await import("jspdf-autotable")).default;
   const QR = await import("qrcode");
@@ -63,6 +66,7 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
   const M = 48;
   const CW = W - M * 2;
   const issued = new Date().toLocaleDateString("es-CL", { dateStyle: "long" });
+  const docVersion = kind === "teaser" ? CHOLQUI_TEASER_VERSION : CHOLQUI_DOC_VERSION;
 
   const qr = await QR.toDataURL(CHOLQUI_LIVE_URL, {
     margin: 1,
@@ -87,7 +91,7 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
     pdf.setFontSize(6.8);
     pdf.setTextColor(...SLATE);
     pdf.text(
-      `Geocapitals · ${CHOLQUI.name} (${CHOLQUI.code}) · ${CHOLQUI_DOC_VERSION} · ${issued}`,
+      `Geocapitals · ${CHOLQUI.name} (${CHOLQUI.code}) · ${docVersion} · ${issued}`,
       M,
       H - 30,
     );
@@ -217,7 +221,7 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
     M,
     192,
   );
-  pdf.text(`Emisión: ${issued} · Documento ${CHOLQUI_DOC_VERSION}`, M, 208);
+  pdf.text(`Emisión: ${issued} · Documento ${docVersion}`, M, 208);
 
   pdf.addImage(qr, "PNG", W - M - 78, 128, 78, 78);
   pdf.setFontSize(6.4);
@@ -309,7 +313,7 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
   );
 
   // ── Puntos de muestreo ───────────────────────────────────────────────────
-  newPage();
+  // Continúa en la misma página si el aviso de evidencia abrió una página nueva.
   h1("04 · Puntos de terreno", "Observación y muestreo georreferenciado");
   table(
     ["Punto", "Sector", "Este (PSAD'56 19H)", "Norte", "Lat (WGS84)", "Lng (WGS84)"],
@@ -431,6 +435,70 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
     "Estimación de ingeniería preliminar: rendimientos, arriendos y costos unitarios son referenciales y deben validarse con cotizaciones firmes y ensayos metalúrgicos. No constituyen recursos ni reservas, no incorporan impuestos, financiamiento ni cierre de faena, y no contienen VAN ni TIR auditados. La meseta de 20.000 t/mes depende de cambios regulatorios y permisos aún no obtenidos.",
   );
 
+  // ── Proyección mensual y sensibilidad del plan escalable ──────────────────
+  newPage();
+  h1("06a.1 · Flujo mensual", "Ventas, costos y caja a 24 meses");
+  para(
+    "Proyección mensual de ingeniería preliminar para los dos ritmos de meseta. El precio aplicado es la tarifa ENAMI asociada a 1,5 % Cu soluble; el caso de 20.000 t/mes se presenta como hipótesis de ampliación sujeta a regulación y permisos.",
+  );
+  table(
+    ["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acum."],
+    plan15.months.map((m) => [
+      `15k · ${m.month}`,
+      nfCl(m.rate),
+      nfCl(m.cumulativeT),
+      nfCl(Math.round(plan15.tariffClpTms)),
+      fmtClpM(m.revenueClp),
+      fmtClpM(m.costClp),
+      fmtClpM(m.marginClp),
+      fmtClpM(m.cumulativeCashflowClp),
+    ]),
+  );
+  table(
+    ["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acum."],
+    plan20.months.map((m) => [
+      `20k · ${m.month}`,
+      nfCl(m.rate),
+      nfCl(m.cumulativeT),
+      nfCl(Math.round(plan20.tariffClpTms)),
+      fmtClpM(m.revenueClp),
+      fmtClpM(m.costClp),
+      fmtClpM(m.marginClp),
+      fmtClpM(m.cumulativeCashflowClp),
+    ]),
+  );
+  disclaimer(
+    "La caja acumulada parte descontando la inversión inicial considerada de CLP 242.132.990. Los valores son una proyección mensual, no estados financieros, presupuesto aprobado ni promesa de rentabilidad.",
+  );
+
+  newPage();
+  h1("06a.2 · Sensibilidad", "Meseta, ley soluble y resultado a 24 meses");
+  para(
+    "Matriz de sensibilidad combinando las mesetas de 15.000 y 20.000 t/mes con las cuatro leyes tarifarias del antecedente ENAMI. El costo de cada escenario se recalcula con la flota y los costos unitarios derivados del ritmo.",
+  );
+  table(
+    ["Meseta", "Cu sol.", "Mineral", "Precio", "Ingresos", "Costos", "Superávit", "Caja neta", "Payback"],
+    [15_000, 20_000].flatMap((r) =>
+      CHOLQUI_SCENARIOS.map((s) => {
+        const run = projectCashflow({ plateau: r, gradePct: s.grade });
+        return [
+          `${nfCl(r)} t/mes`,
+          `${s.grade.toLocaleString("es-CL", { minimumFractionDigits: 1 })} %`,
+          `${nfCl(run.totalTonnes)} t`,
+          nfCl(Math.round(run.tariffClpTms)),
+          fmtClpM(run.totalRevenueClp),
+          fmtClpM(run.totalCostClp),
+          fmtClpM(run.operatingSurplusClp),
+          fmtClpM(run.netAfterCapexClp),
+          run.paybackMonth ? `Mes ${run.paybackMonth}` : "> 24 m",
+        ];
+      }),
+    ),
+  );
+  disclaimer(
+    "Las leyes de 1,5 % a 3,0 % Cu soluble son hipótesis de sensibilidad tarifaria y no leyes promedio comprobadas. El modelo no incorpora impuestos, financiamiento, cierre, seguros, permisos, VAN ni TIR auditados. No se presentan recursos ni reservas certificados.",
+  );
+
   // ── Brechas materiales del modelo ────────────────────────────────────────
   newPage();
   h1("06b · Brechas", "Qué falta validar antes de comprometer capital");
@@ -519,5 +587,11 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
   y += 134;
 
   footer();
-  pdf.save(`Geocapitals_${CHOLQUI.code}_Investment_Brief_${CHOLQUI_DOC_VERSION}.pdf`);
+  const documentLabel = kind === "teaser" ? "Investment_Teaser" : "Investment_Brief";
+  pdf.save(`Geocapitals_${CHOLQUI.code}_${documentLabel}_${docVersion}.pdf`);
+}
+
+/** Versión compacta para compartir antes de una reunión, con la misma data verificada. */
+export async function downloadCholquiInvestmentTeaserPdf(): Promise<void> {
+  return downloadCholquiInvestmentPdf("teaser");
 }
