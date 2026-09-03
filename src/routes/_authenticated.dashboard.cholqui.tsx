@@ -1,6 +1,16 @@
+import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { CholquiSatellitePanel } from "@/features/franco/components/CholquiSatellitePanel";
+import { CholquiSpvPanel } from "@/features/franco/components/CholquiSpvPanel";
+
+const TABS = [
+  ["ficha", "Ficha & escenarios"],
+  ["satelite", "Satélite"],
+  ["spv", "Inversionistas & SPV"],
+] as const;
+
 
 export const Route = createFileRoute("/_authenticated/dashboard/cholqui")({
   head: () => ({
@@ -25,6 +35,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/cholqui")({
 });
 
 function CholquiLivePage() {
+  const [tab, setTab] = useState<(typeof TABS)[number][0]>("ficha");
   return (
     <div data-theme="im-light" className="bg-surface text-content">
       <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-6 flex items-center justify-between gap-3 flex-wrap">
@@ -45,7 +56,31 @@ function CholquiLivePage() {
           Abrir enlace público para inversionistas
         </a>
       </div>
-      <FrancoDashboard />
+
+      <div className="max-w-[1200px] mx-auto px-4 md:px-6 pt-4 flex gap-2 flex-wrap">
+        {TABS.map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setTab(key)}
+            className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+              tab === key
+                ? "bg-accent-brand text-accent-brand-contrast border-transparent"
+                : "border-hairline text-content-muted hover:border-accent-brand"
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "ficha" && <FrancoDashboard />}
+      {tab !== "ficha" && (
+        <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8">
+          {tab === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel />}
+        </main>
+      )}
     </div>
   );
 }
+
