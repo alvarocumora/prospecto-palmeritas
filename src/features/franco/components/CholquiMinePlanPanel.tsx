@@ -29,6 +29,25 @@ export function CholquiMinePlanPanel() {
 
   const stepFleet = RATE_STEPS.map((r) => ({ rate: r, fleet: fleetForRate(r), cost: unitCosts(r) }));
 
+  /** Sensibilidad a 24 meses: cada meseta × cada ley de Cu soluble. */
+  const sensitivity = useMemo(
+    () =>
+      PLATEAU_OPTIONS.flatMap((o) =>
+        CHOLQUI_SCENARIOS.map((s) => ({
+          plateau: o.plateau,
+          grade: s.grade,
+          run: projectCashflow({
+            plateau: o.plateau,
+            gradePct: s.grade,
+            startRate: 1_000,
+            rampMonths: 12,
+            totalMonths: 24,
+          }),
+        })),
+      ),
+    [],
+  );
+
   return (
     <section className="border border-hairline bg-white rounded-2xl overflow-hidden">
       <header className="px-6 py-5 border-b border-hairline">
@@ -160,6 +179,134 @@ export function CholquiMinePlanPanel() {
             ? `Equilibrio acumulado en el mes ${plan.paybackMonth}.`
             : "El flujo acumulado no cruza cero dentro del horizonte de 24 meses en este escenario."}
         </div>
+      </div>
+
+      {/* Proyección mensual de ventas, costos y caja */}
+      <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
+          Proyección mensual a 24 meses · meseta {nf.format(plateau)} t/mes · ley {grade.toString().replace(".", ",")} % Cu soluble
+        </div>
+        <table className="w-full text-xs border-collapse min-w-[860px]">
+          <thead>
+            <tr className="border-b border-hairline text-content-subtle">
+              {["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acumulada"].map(
+                (h, i) => (
+                  <th
+                    key={h}
+                    className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i === 0 ? "text-left" : "text-right"}`}
+                  >
+                    {h}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {plan.months.map((m) => (
+              <tr
+                key={m.month}
+                className={`border-b border-hairline ${
+                  plan.paybackMonth === m.month ? "bg-accent-brand/5" : ""
+                }`}
+              >
+                <td className="py-1.5 font-mono text-content">{m.month}</td>
+                <td className="py-1.5 text-right font-mono text-content">{nf.format(m.rate)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">{nf.format(m.cumulativeT)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {nf.format(Math.round(plan.tariffClpTms))}
+                </td>
+                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(m.revenueClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">{fmtClpM(m.costClp)}</td>
+                <td
+                  className={`py-1.5 text-right font-mono ${m.marginClp >= 0 ? "text-accent-brand" : "text-copper"}`}
+                >
+                  {fmtClpM(m.marginClp)}
+                </td>
+                <td
+                  className={`py-1.5 text-right font-mono ${
+                    m.cumulativeCashflowClp >= 0 ? "text-content" : "text-copper"
+                  }`}
+                >
+                  {fmtClpM(m.cumulativeCashflowClp)}
+                </td>
+              </tr>
+            ))}
+            <tr className="bg-surface-2">
+              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle">Total 24 m</td>
+              <td className="py-2 text-right font-mono text-content">—</td>
+              <td className="py-2 text-right font-mono text-content">{nf.format(plan.totalTonnes)}</td>
+              <td className="py-2 text-right font-mono text-content-muted">
+                {nf.format(Math.round(plan.tariffClpTms))}
+              </td>
+              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.totalRevenueClp)}</td>
+              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.totalCostClp)}</td>
+              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.operatingSurplusClp)}</td>
+              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.netAfterCapexClp)}</td>
+            </tr>
+          </tbody>
+        </table>
+        <p className="text-[10px] text-content-subtle mt-2">
+          El precio corresponde a la tarifa ENAMI aplicable a la ley seleccionada (Circular N°27);
+          no incluye reajustes de mercado ni retención tributaria posterior. La caja acumulada parte
+          de la inversión inicial de {fmtClpM(plan.capexClp)}.
+        </p>
+      </div>
+
+      {/* Sensibilidad */}
+      <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
+          Sensibilidad a 24 meses · meseta × ley de Cu soluble
+        </div>
+        <table className="w-full text-xs border-collapse min-w-[820px]">
+          <thead>
+            <tr className="border-b border-hairline text-content-subtle">
+              {["Escenario", "Ley Cu sol.", "Mineral", "Precio CLP/tms", "Ingresos", "Costos", "Margen", "Caja neta", "Equilibrio"].map(
+                (h, i) => (
+                  <th
+                    key={h}
+                    className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i < 2 ? "text-left" : "text-right"}`}
+                  >
+                    {h}
+                  </th>
+                ),
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {sensitivity.map((s) => (
+              <tr
+                key={`${s.plateau}-${s.grade}`}
+                className={`border-b border-hairline ${
+                  s.plateau === plateau && s.grade === grade ? "bg-accent-brand/5" : ""
+                }`}
+              >
+                <td className="py-1.5 text-content">{nf.format(s.plateau)} t/mes</td>
+                <td className="py-1.5 font-mono text-content-muted">
+                  {s.grade.toString().replace(".", ",")} %
+                </td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {nf.format(s.run.totalTonnes)} t
+                </td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {nf.format(Math.round(s.run.tariffClpTms))}
+                </td>
+                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(s.run.totalRevenueClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">{fmtClpM(s.run.totalCostClp)}</td>
+                <td
+                  className={`py-1.5 text-right font-mono ${
+                    s.run.operatingSurplusClp >= 0 ? "text-accent-brand" : "text-copper"
+                  }`}
+                >
+                  {fmtClpM(s.run.operatingSurplusClp)}
+                </td>
+                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(s.run.netAfterCapexClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {s.run.paybackMonth ? `Mes ${s.run.paybackMonth}` : "> 24 m"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Flota por escalón */}
