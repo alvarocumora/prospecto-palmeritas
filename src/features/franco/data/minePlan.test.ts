@@ -79,3 +79,30 @@ describe("projectCashflow", () => {
     expect(be!).toBeGreaterThan(0);
   });
 });
+
+describe("flota con respaldo", () => {
+  it("da al menos una unidad de respaldo a cada equipo crítico en la meseta", () => {
+    for (const line of fleetForRate(15_000).lines) {
+      if (line.spec.critical) expect(line.standbyUnits).toBeGreaterThanOrEqual(1);
+      expect(line.units).toBe(line.operatingUnits + line.standbyUnits);
+    }
+  });
+
+  it("dimensiona sobre capacidad efectiva, no nominal", () => {
+    for (const line of fleetForRate(20_000).lines) {
+      const effective = line.spec.capacityTMonth * line.spec.availability;
+      expect(line.operatingUnits * effective).toBeGreaterThanOrEqual(20_000 - 1e-6);
+    }
+  });
+
+  it("suma costos operativos y de respaldo en el total", () => {
+    const f = fleetForRate(10_000);
+    expect(f.operatingClp + f.standbyClp).toBe(f.monthlyClp);
+    expect(f.standbyClp).toBeGreaterThan(0);
+  });
+
+  it("mantiene el costo unitario decreciente al escalar pese al respaldo", () => {
+    const costs = [1_000, 3_000, 5_000, 10_000, 15_000, 20_000].map((r) => unitCosts(r).totalClpT);
+    for (let i = 1; i < costs.length; i++) expect(costs[i]).toBeLessThan(costs[i - 1]);
+  });
+});

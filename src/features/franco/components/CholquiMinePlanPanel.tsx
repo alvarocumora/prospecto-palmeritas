@@ -312,12 +312,13 @@ export function CholquiMinePlanPanel() {
       {/* Flota por escalón */}
       <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
-          Maquinaria requerida por escalón de producción (arriendo con operador)
+          Maquinaria por escalón de producción · operativas + respaldo (arriendo con operador)
         </div>
-        <table className="w-full text-xs border-collapse min-w-[720px]">
+        <table className="w-full text-xs border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-hairline text-content-subtle">
               <th className="text-left py-2 font-mono uppercase tracking-wider text-[10px]">Equipo</th>
+              <th className="text-right py-2 font-mono text-[10px]">Disp.</th>
               {RATE_STEPS.map((r) => (
                 <th key={r} className="text-right py-2 font-mono text-[10px]">
                   {nf.format(r)} t
@@ -330,18 +331,52 @@ export function CholquiMinePlanPanel() {
               <tr key={line.spec.key} className="border-b border-hairline">
                 <td className="py-2 text-content">
                   {line.spec.label}
+                  {line.spec.critical && (
+                    <span className="ml-2 text-[9px] font-mono uppercase tracking-wider text-accent-brand">
+                      crítico
+                    </span>
+                  )}
                   <div className="text-[10px] text-content-subtle">{line.spec.note}</div>
                 </td>
-                {stepFleet.map((s) => (
-                  <td key={s.rate} className="py-2 text-right font-mono text-content">
-                    {s.fleet.lines[idx].units}
-                  </td>
-                ))}
+                <td className="py-2 text-right font-mono text-content-muted">
+                  {Math.round(line.spec.availability * 100)} %
+                </td>
+                {stepFleet.map((s) => {
+                  const l = s.fleet.lines[idx];
+                  return (
+                    <td key={s.rate} className="py-2 text-right font-mono text-content">
+                      {l.operatingUnits}
+                      {l.standbyUnits > 0 && (
+                        <span className="text-copper"> + {l.standbyUnits}</span>
+                      )}
+                    </td>
+                  );
+                })}
               </tr>
             ))}
+            <tr className="border-b border-hairline">
+              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+                Costo de equipos operativos (CLP/mes)
+              </td>
+              {stepFleet.map((s) => (
+                <td key={s.rate} className="py-2 text-right font-mono text-content-muted">
+                  {fmtClpM(s.fleet.operatingClp)}
+                </td>
+              ))}
+            </tr>
+            <tr className="border-b border-hairline">
+              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+                Costo de equipos de respaldo (CLP/mes)
+              </td>
+              {stepFleet.map((s) => (
+                <td key={s.rate} className="py-2 text-right font-mono text-copper">
+                  {fmtClpM(s.fleet.standbyClp)}
+                </td>
+              ))}
+            </tr>
             <tr className="bg-surface-2">
-              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle">
-                Costo de flota (CLP/mes)
+              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+                Costo total de flota (CLP/mes)
               </td>
               {stepFleet.map((s) => (
                 <td key={s.rate} className="py-2 text-right font-mono text-content">
@@ -351,7 +386,16 @@ export function CholquiMinePlanPanel() {
             </tr>
           </tbody>
         </table>
+        <p className="text-[10px] text-content-subtle mt-3 max-w-3xl">
+          Las unidades operativas se dimensionan sobre capacidad efectiva (capacidad nominal ×
+          disponibilidad mecánica). Los equipos críticos suman una unidad de respaldo desde su umbral
+          de ritmo, de modo que una falla no detiene la cadena; el stand-by se tarifa a valor
+          reducido por no operar a plena carga. Estimación de ingeniería preliminar, no cotizaciones
+          cerradas.
+        </p>
       </div>
+
+
 
       {/* Costos unitarios */}
       <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
