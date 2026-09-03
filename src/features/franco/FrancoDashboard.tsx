@@ -41,6 +41,7 @@ export function FrancoDashboard() {
         </div>
 
         <CholquiScenariosPanel />
+        <CholquiMinePlanPanel />
         <CholquiSatellitePanel />
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
