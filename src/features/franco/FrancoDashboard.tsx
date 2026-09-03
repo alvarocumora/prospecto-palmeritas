@@ -1,6 +1,8 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
+import { CholquiSatellitePanel } from "./components/CholquiSatellitePanel";
+
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
 import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
