@@ -30,6 +30,15 @@ import {
   fmtUsd,
   solubleRatioPct,
 } from "./data/cholqui";
+import {
+  CONTINGENCY_PCT,
+  FIXED_CLP_MONTH,
+  RATE_STEPS,
+  VARIABLE_CLP_T,
+  fleetForRate,
+  projectCashflow,
+  unitCosts,
+} from "./data/minePlan";
 
 const INK: [number, number, number] = [18, 22, 26];
 const PAPER: [number, number, number] = [245, 242, 236];
