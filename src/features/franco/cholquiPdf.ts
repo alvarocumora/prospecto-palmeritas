@@ -82,26 +82,34 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     pdf.rect(0, 0, W, H, "F");
   };
 
-  const footer = () => {
-    page += 1;
-    pdf.setDrawColor(...HAIR);
-    pdf.setLineWidth(0.6);
-    pdf.line(M, H - 44, W - M, H - 44);
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(6.8);
-    pdf.setTextColor(...SLATE);
-    pdf.text(
-      `Geocapitals · ${CHOLQUI.name} (${CHOLQUI.code}) · ${docVersion} · ${issued}`,
-      M,
-      H - 30,
-    );
-    pdf.text(`geocapitals.com${CHOLQUI.liveUrl}  ·  pág. ${page}`, W - M, H - 30, {
-      align: "right",
-    });
+  /** Glifos no soportados por las fuentes base de jsPDF. */
+  const safe = (t: string) =>
+    t.replace(/→/g, "->").replace(/≤/g, "<=").replace(/≥/g, ">=").replace(/’/g, "'");
+
+  /** Estampa el pie en todas las páginas al final, incluidas las creadas por autotable. */
+  const stampFooters = () => {
+    const total = pdf.getNumberOfPages();
+    for (let p = 1; p <= total; p++) {
+      pdf.setPage(p);
+      pdf.setDrawColor(...HAIR);
+      pdf.setLineWidth(0.6);
+      pdf.line(M, H - 44, W - M, H - 44);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(6.8);
+      pdf.setTextColor(...SLATE);
+      pdf.text(
+        `Geocapitals · ${CHOLQUI.name} (${CHOLQUI.code}) · ${docVersion} · ${issued}`,
+        M,
+        H - 30,
+      );
+      pdf.text(`geocapitals.com${CHOLQUI.liveUrl}  ·  pág. ${p} / ${total}`, W - M, H - 30, {
+        align: "right",
+      });
+    }
   };
 
   const newPage = () => {
-    footer();
+    page += 1;
     pdf.addPage();
     paperBg();
     y = M + 8;
