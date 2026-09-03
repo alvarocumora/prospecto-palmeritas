@@ -371,6 +371,66 @@ export async function downloadCholquiInvestmentPdf(): Promise<void> {
     "Escenarios ilustrativos, sujetos a validación geológica, metalúrgica, de ingeniería y económica. Las leyes de 1,5 % a 3,0 % Cu soluble son hipótesis de sensibilidad tarifaria y NO corresponden a leyes promedio comprobadas ni a recursos minerales. El modelo no incorpora impuestos, financiamiento, cierre de faena, seguros ni permisos, y no contiene VAN ni TIR.",
   );
 
+  // ── Plan minero escalable ────────────────────────────────────────────────
+  newPage();
+  const nfCl = (n: number) => Math.round(n).toLocaleString("es-CL");
+  const plan15 = projectCashflow({ plateau: 15_000, gradePct: 1.5 });
+  const plan20 = projectCashflow({ plateau: 20_000, gradePct: 1.5 });
+
+  h1("06a · Plan minero", "Escalamiento de 1.000 a 15.000 / 20.000 t por mes");
+  para(
+    `Proyección de ingeniería preliminar partiendo de 1.000 t/mes con rampa lineal de 12 meses y meseta sostenida hasta el mes 24. La meseta de 15.000 t/mes corresponde al plan declarado; la de 20.000 t/mes es una hipótesis de ampliación sujeta al marco regulatorio y a permisos, no autorizada a la fecha. La flota se dimensiona desde el tonelaje y los costos separan componentes variables (CLP ${nfCl(VARIABLE_CLP_T)}/t) de fijos mensuales (CLP ${nfCl(FIXED_CLP_MONTH)}/mes), con ${CONTINGENCY_PCT} % de contingencia.`,
+  );
+  table(
+    ["Meseta", "Mineral 24 meses", "Ingresos ENAMI", "Costos", "Superávit", "Equilibrio", "Costo medio"],
+    [plan15, plan20].map((p) => [
+      `${nfCl(p.params.plateau)} t/mes`,
+      `${nfCl(p.totalTonnes)} t`,
+      fmtClpM(p.totalRevenueClp),
+      fmtClpM(p.totalCostClp),
+      fmtClpM(p.operatingSurplusClp),
+      p.paybackMonth ? `Mes ${p.paybackMonth}` : "No alcanzado",
+      `${nfCl(p.avgUnitCostClpT)} CLP/t`,
+    ]),
+  );
+
+  para("Maquinaria requerida por escalón de producción (arriendo con operador)", COBALT, 8.4);
+  table(
+    ["Equipo", ...RATE_STEPS.map((r) => `${nfCl(r)} t`)],
+    [
+      ...fleetForRate(RATE_STEPS[0]).lines.map((line, idx) => [
+        line.spec.label,
+        ...RATE_STEPS.map((r) => String(fleetForRate(r).lines[idx].units)),
+      ]),
+      ["Costo de flota (CLP/mes)", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).monthlyClp))],
+    ],
+  );
+
+  para("Costo por tonelada según ritmo — el costo fijo se diluye al escalar", COBALT, 8.4);
+  table(
+    ["Componente (CLP/t)", ...RATE_STEPS.map((r) => `${nfCl(r)} t`)],
+    [
+      ["Variable de operación", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).variableClpT))],
+      ["Fijo prorrateado", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).fixedClpT))],
+      ["Flota prorrateada", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).fleetClpT))],
+      [`Contingencia ${CONTINGENCY_PCT} %`, ...RATE_STEPS.map((r) => nfCl(unitCosts(r).contingencyClpT))],
+      ["Costo total", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).totalClpT))],
+      [
+        `Margen vs tarifa ${fmtClp(plan15.tariffClpTms)}/tms`,
+        ...RATE_STEPS.map((r) => nfCl(plan15.tariffClpTms - unitCosts(r).totalClpT)),
+      ],
+    ],
+  );
+
+  para(
+    `Punto de equilibrio operacional a 1,5 % Cu soluble: ${
+      plan15.breakevenRate ? `${nfCl(plan15.breakevenRate)} t/mes` : "no alcanzable bajo 30.000 t/mes"
+    }. Inversión inicial considerada: ${fmtClpM(plan15.capexClp)}.`,
+  );
+  disclaimer(
+    "Estimación de ingeniería preliminar: rendimientos, arriendos y costos unitarios son referenciales y deben validarse con cotizaciones firmes y ensayos metalúrgicos. No constituyen recursos ni reservas, no incorporan impuestos, financiamiento ni cierre de faena, y no contienen VAN ni TIR auditados. La meseta de 20.000 t/mes depende de cambios regulatorios y permisos aún no obtenidos.",
+  );
+
   // ── Brechas materiales del modelo ────────────────────────────────────────
   newPage();
   h1("06b · Brechas", "Qué falta validar antes de comprometer capital");
