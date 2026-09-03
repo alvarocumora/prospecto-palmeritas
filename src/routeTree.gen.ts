@@ -164,6 +164,7 @@ import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './r
 import { Route as AuthenticatedDashboardRfqsNuevoRouteImport } from './routes/_authenticated.dashboard.rfqs.nuevo'
 import { Route as AuthenticatedDashboardRfqsIdRouteImport } from './routes/_authenticated.dashboard.rfqs.$id'
 import { Route as AuthenticatedDashboardProveedoresIdRouteImport } from './routes/_authenticated.dashboard.proveedores.$id'
+import { Route as AuthenticatedDashboardProjectsNuevoRouteImport } from './routes/_authenticated.dashboard.projects_.nuevo'
 import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated.dashboard.projects_.$projectId'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
@@ -1033,6 +1034,12 @@ const AuthenticatedDashboardProveedoresIdRoute =
     path: '/dashboard/proveedores/$id',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardProjectsNuevoRoute =
+  AuthenticatedDashboardProjectsNuevoRouteImport.update({
+    id: '/dashboard/projects_/nuevo',
+    path: '/dashboard/projects/nuevo',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardProjectsProjectIdRoute =
   AuthenticatedDashboardProjectsProjectIdRouteImport.update({
     id: '/dashboard/projects_/$projectId',
@@ -1243,6 +1250,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/projects/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
   '/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/dashboard/rfqs/$id': typeof AuthenticatedDashboardRfqsIdRoute
   '/dashboard/rfqs/nuevo': typeof AuthenticatedDashboardRfqsNuevoRoute
@@ -1410,6 +1418,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/dashboard/projects/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
   '/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/dashboard/rfqs/$id': typeof AuthenticatedDashboardRfqsIdRoute
   '/dashboard/rfqs/nuevo': typeof AuthenticatedDashboardRfqsNuevoRoute
@@ -1579,6 +1588,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/projects_/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
+  '/_authenticated/dashboard/projects_/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
   '/_authenticated/dashboard/proveedores/$id': typeof AuthenticatedDashboardProveedoresIdRoute
   '/_authenticated/dashboard/rfqs/$id': typeof AuthenticatedDashboardRfqsIdRoute
   '/_authenticated/dashboard/rfqs/nuevo': typeof AuthenticatedDashboardRfqsNuevoRoute
@@ -1748,6 +1758,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/projects/$projectId'
+    | '/dashboard/projects/nuevo'
     | '/dashboard/proveedores/$id'
     | '/dashboard/rfqs/$id'
     | '/dashboard/rfqs/nuevo'
@@ -1915,6 +1926,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/projects/$projectId'
+    | '/dashboard/projects/nuevo'
     | '/dashboard/proveedores/$id'
     | '/dashboard/rfqs/$id'
     | '/dashboard/rfqs/nuevo'
@@ -2083,6 +2095,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/projects_/$projectId'
+    | '/_authenticated/dashboard/projects_/nuevo'
     | '/_authenticated/dashboard/proveedores/$id'
     | '/_authenticated/dashboard/rfqs/$id'
     | '/_authenticated/dashboard/rfqs/nuevo'
@@ -3278,6 +3291,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProveedoresIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/projects_/nuevo': {
+      id: '/_authenticated/dashboard/projects_/nuevo'
+      path: '/dashboard/projects/nuevo'
+      fullPath: '/dashboard/projects/nuevo'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsNuevoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/projects_/$projectId': {
       id: '/_authenticated/dashboard/projects_/$projectId'
       path: '/dashboard/projects/$projectId'
@@ -3512,6 +3532,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardClientesPartnerIdRoute: typeof AuthenticatedDashboardClientesPartnerIdRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
+  AuthenticatedDashboardProjectsNuevoRoute: typeof AuthenticatedDashboardProjectsNuevoRoute
   AuthenticatedDashboardProveedoresIdRoute: typeof AuthenticatedDashboardProveedoresIdRoute
   AuthenticatedDashboardRfqsIdRoute: typeof AuthenticatedDashboardRfqsIdRoute
   AuthenticatedDashboardRfqsNuevoRoute: typeof AuthenticatedDashboardRfqsNuevoRoute
@@ -3603,6 +3624,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardDocumentosTemplateIdRoute,
   AuthenticatedDashboardProjectsProjectIdRoute:
     AuthenticatedDashboardProjectsProjectIdRoute,
+  AuthenticatedDashboardProjectsNuevoRoute:
+    AuthenticatedDashboardProjectsNuevoRoute,
   AuthenticatedDashboardProveedoresIdRoute:
     AuthenticatedDashboardProveedoresIdRoute,
   AuthenticatedDashboardRfqsIdRoute: AuthenticatedDashboardRfqsIdRoute,
