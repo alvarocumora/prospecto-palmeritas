@@ -594,7 +594,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   pdf.addImage(qr, "PNG", W - M - 88, y + 22, 74, 74);
   y += 134;
 
-  footer();
+  stampFooters();
   const documentLabel = kind === "teaser" ? "Investment_Teaser" : "Investment_Brief";
   pdf.save(`Geocapitals_${CHOLQUI.code}_${documentLabel}_${docVersion}.pdf`);
 }
