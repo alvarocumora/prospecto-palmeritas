@@ -180,6 +180,100 @@ export const FLEET_SPECS: EquipmentSpec[] = [
   },
 ];
 
+/** Costos variables por tonelada de mineral chancado, CLP/t. */
+export const VARIABLE_COSTS: Array<{ key: string; label: string; clpPerT: number }> = [
+  { key: "perforacion", label: "Perforación", clpPerT: 3_200 },
+  { key: "tronadura", label: "Tronadura (explosivo y accesorios)", clpPerT: 2_900 },
+  { key: "carguio", label: "Carguío", clpPerT: 2_600 },
+  { key: "haul", label: "Transporte interno", clpPerT: 2_400 },
+  { key: "chancado", label: "Chancado (insumos y desgaste)", clpPerT: 6_800 },
+  { key: "flete", label: "Transporte a planta ENAMI (130 km × CLP 90/t·km)", clpPerT: 11_700 },
+  { key: "insumos", label: "Insumos, energía y servicios de mina", clpPerT: 3_000 },
+];
+
+/** Costos fijos mensuales independientes del tonelaje, CLP/mes. */
+export const FIXED_COSTS: Array<{ key: string; label: string; clpPerMonth: number }> = [
+  { key: "admin", label: "Administración y supervisión", clpPerMonth: 38_000_000 },
+  { key: "legal", label: "Permisos, patentes, seguros y provisión de cierre", clpPerMonth: 12_000_000 },
+  { key: "campamento", label: "Campamento, servicios y comunicaciones", clpPerMonth: 9_000_000 },
+];
+
+/** Contingencia de ingeniería sobre el costo total (variable + fijo + flota). */
+export const CONTINGENCY_PCT = 12;
+
+export const VARIABLE_CLP_T = VARIABLE_COSTS.reduce((a, c) => a + c.clpPerT, 0);
+export const FIXED_CLP_MONTH = FIXED_COSTS.reduce((a, c) => a + c.clpPerMonth, 0);
+
+/** Escalones de referencia usados en la tabla de flota. */
+export const RATE_STEPS = [1_000, 3_000, 5_000, 10_000, 15_000, 20_000] as const;
+
+export const PLATEAU_OPTIONS = [
+  {
+    plateau: 15_000,
+    label: "15.000 t/mes",
+    tag: "Plan declarado",
+    note: "Meseta de la rampa declarada en el análisis económico entregado.",
+  },
+  {
+    plateau: 20_000,
+    label: "20.000 t/mes",
+    tag: "Hipótesis de ampliación",
+    note: "Escenario ampliado sujeto al marco regulatorio y a permisos — por validar. No está autorizado.",
+  },
+] as const;
+
+export type FleetLine = {
+  spec: EquipmentSpec;
+  /** Unidades en producción, dimensionadas sobre capacidad efectiva. */
+  operatingUnits: number;
+  /** Unidades stand-by de respaldo. */
+  standbyUnits: number;
+  /** Total de unidades en faena (producción + respaldo). */
+  units: number;
+  operatingClp: number;
+  standbyClp: number;
+  monthlyClp: number;
+};
+
+/**
+ * Unidades y costo mensual de flota para sostener `rate` t/mes.
+ *
+ * Regla de respaldo: los equipos críticos suman una unidad stand-by desde su
+ * `standbyFromRate`; los no críticos sólo cuando el ritmo alcanza ese umbral y
+ * la redundancia no viene ya de tener varias unidades en producción.
+ */
+export function fleetForRate(rate: number): {
+  lines: FleetLine[];
+  operatingClp: number;
+  standbyClp: number;
+  monthlyClp: number;
+} {
+  const r = Math.max(0, rate);
+  const lines: FleetLine[] = FLEET_SPECS.map((spec) => {
+    const effective = spec.capacityTMonth * spec.availability;
+    const operatingUnits = Math.max(1, Math.ceil(r / effective));
+    const needsStandby = r >= spec.standbyFromRate && (spec.critical || operatingUnits < 2);
+    const standbyUnits = needsStandby ? 1 : 0;
+    const operatingClp = operatingUnits * spec.monthlyClp;
+    const standbyClp = standbyUnits * spec.standbyMonthlyClp;
+    return {
+      spec,
+      operatingUnits,
+      standbyUnits,
+      units: operatingUnits + standbyUnits,
+      operatingClp,
+      standbyClp,
+      monthlyClp: operatingClp + standbyClp,
+    };
+  });
+  return {
+    lines,
+    operatingClp: lines.reduce((a, l) => a + l.operatingClp, 0),
+    standbyClp: lines.reduce((a, l) => a + l.standbyClp, 0),
+    monthlyClp: lines.reduce((a, l) => a + l.monthlyClp, 0),
+  };
+}
+
 
 export type UnitCost = {
   rate: number;
