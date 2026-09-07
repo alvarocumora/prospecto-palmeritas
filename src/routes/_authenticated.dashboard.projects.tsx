@@ -64,13 +64,21 @@ function ProjectsPage() {
           <h1 className="text-2xl font-bold">Proyectos</h1>
           <p className="text-sm text-muted-foreground">Gestiona tus campañas de exploración.</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-gold text-background font-mono text-xs font-semibold hover:bg-gold-light"
-        >
-          <Plus className="w-3.5 h-3.5" /> Nuevo proyecto
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-border font-mono text-xs hover:bg-accent"
+          >
+            <Plus className="w-3.5 h-3.5" /> Rápido
+          </button>
+          <Link
+            to="/dashboard/projects/nuevo"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-gold text-background font-mono text-xs font-semibold hover:bg-gold-light"
+          >
+            <Plus className="w-3.5 h-3.5" /> Alta con antecedentes
+          </Link>
+        </div>
       </header>
 
       {loading ? (
