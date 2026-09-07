@@ -127,6 +127,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     requiresProjects: true,
     tabs: [
       { label: "Proyectos", to: "/dashboard/projects" },
+      { label: "Nuevo proyecto", to: "/dashboard/projects/nuevo" },
       { label: "Mission Control", to: "/dashboard/mission" },
       { label: "Mapa táctico", to: "/dashboard/map" },
       { label: "Campañas", to: "/dashboard/campaigns" },
