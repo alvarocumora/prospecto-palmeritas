@@ -156,6 +156,9 @@ function NuevoProyectoPage() {
         .eq("user_id", user.id)
         .limit(1)
         .maybeSingle();
+      if (!orgRow?.organization_id) {
+        throw new Error("No tienes una organización asignada. Pide acceso al administrador.");
+      }
 
       const { data: project, error: projErr } = await supabase
         .from("projects")
@@ -170,7 +173,7 @@ function NuevoProyectoPage() {
           center_lng: num(identidad.center_lng),
           status: identidad.status,
           created_by: user.id,
-          ...(orgRow?.organization_id ? { organization_id: orgRow.organization_id } : {}),
+          organization_id: orgRow.organization_id,
         })
         .select("id")
         .single();
