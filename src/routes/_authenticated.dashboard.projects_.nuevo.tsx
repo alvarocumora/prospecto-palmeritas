@@ -170,7 +170,7 @@ function NuevoProyectoPage() {
           center_lng: num(identidad.center_lng),
           status: identidad.status,
           created_by: user.id,
-          organization_id: orgRow?.organization_id ?? null,
+          ...(orgRow?.organization_id ? { organization_id: orgRow.organization_id } : {}),
         })
         .select("id")
         .single();
@@ -205,7 +205,7 @@ function NuevoProyectoPage() {
             project_id: pid,
             created_by: user.id,
             sample_code: m.sample_code.trim(),
-            sample_type: m.sample_type || null,
+            sample_type: m.sample_type || "grab",
             zone: m.zone || null,
             easting: num(m.easting),
             northing: num(m.northing),
