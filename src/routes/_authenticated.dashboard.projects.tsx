@@ -73,6 +73,12 @@ function ProjectsPage() {
             <Plus className="w-3.5 h-3.5" /> Rápido
           </button>
           <Link
+            to="/dashboard/projects/comparar"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded border border-border font-mono text-xs hover:bg-accent"
+          >
+            Comparar fichas
+          </Link>
+          <Link
             to="/dashboard/projects/nuevo"
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded bg-gold text-background font-mono text-xs font-semibold hover:bg-gold-light"
           >
