@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { FICHAS, getFicha, simulateInvestment } from "./fichas";
 
 describe("fichas de inversión", () => {
-  it("las 4 fichas showcase existen y son coherentes", () => {
-    for (const slug of ["palmeras", "losverdes", "tilama", "franco"] as const) {
+  it("las fichas canónicas existen y son coherentes", () => {
+    for (const slug of ["palmeras", "losverdes", "cholqui"] as const) {
       const f = getFicha(slug);
       expect(f).not.toBeNull();
       expect(f!.minTicketUsd).toBeGreaterThan(0);
@@ -19,6 +19,11 @@ describe("fichas de inversión", () => {
 
   it("getFicha devuelve null para slug desconocido", () => {
     expect(getFicha("nope")).toBeNull();
+  });
+
+  it("mantiene aliases históricos sin duplicar fichas", () => {
+    expect(getFicha("franco")).toBe(FICHAS.cholqui);
+    expect(getFicha("tilama")).toBe(FICHAS.losverdes);
   });
 });
 

@@ -12,7 +12,7 @@ import {
   CHOLQUI_ROUND,
 } from "@/features/franco/data/cholqui";
 
-export type FichaSlug = "palmeras" | "losverdes" | "tilama" | "franco";
+export type FichaSlug = "palmeras" | "losverdes" | "cholqui";
 
 export type InvestmentScenario = {
   key: "conservador" | "base" | "optimista";
@@ -143,45 +143,11 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
       { when: "T2 2027", what: "Estimación de recursos inicial" },
     ],
   },
-  tilama: {
-    slug: "tilama",
-    code: "TILAMA",
-    name: "Tilama Norte",
-    region: "Choapa · Coquimbo",
-    country: "Chile",
-    commodity: "Cu-Au",
-    stage: "Pre-feasibility activa",
-    stageDetail: "Catastro y boletines vigilados, geofísica MAG correlacionada.",
-    liveTo: "/live/tilama",
-    highlights: [
-      "Geofísica MAG correlacionada con estructuras",
-      "Vigilancia activa de catastro y boletín minero",
-      "Acceso por ruta pavimentada · agua y energía cercanas",
-    ],
-    valuationUsd: { low: 3_000_000, high: 5_000_000, method: "Comparables del distrito" },
-    roundSizeUsd: 800_000,
-    minTicketUsd: 20_000,
-    instrument: "Equity SpA",
-    equityOfferedPct: 18,
-    horizonYears: 4,
-    scenarios: SCENARIOS_STD,
-    useOfFunds: [
-      { label: "Geofísica complementaria", pct: 30 },
-      { label: "Perforación scout", pct: 40 },
-      { label: "Patentes y catastro", pct: 15 },
-      { label: "Estudios", pct: 10 },
-      { label: "Administración", pct: 5 },
-    ],
-    milestones: [
-      { when: "T3 2026", what: "Geofísica IP complementaria" },
-      { when: "T1 2027", what: "Perforación scout (4 sondajes)" },
-    ],
-  },
   // Cholqui: los términos vienen de la fuente única del proyecto
   // (src/features/franco/data/cholqui.ts), la misma que alimenta el live view
   // y el PDF de inversión — nunca duplicar cifras aquí.
-  franco: {
-    slug: "franco",
+  cholqui: {
+    slug: "cholqui",
     code: CHOLQUI.code,
     name: CHOLQUI.name,
     region: CHOLQUI.region,
@@ -209,7 +175,8 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
 };
 
 export function getFicha(slug: string): ProjectFicha | null {
-  return (FICHAS as Record<string, ProjectFicha>)[slug] ?? null;
+  const canonicalSlug = slug === "franco" ? "cholqui" : slug === "tilama" ? "losverdes" : slug;
+  return (FICHAS as Record<string, ProjectFicha>)[canonicalSlug] ?? null;
 }
 
 export type SimulationRow = {

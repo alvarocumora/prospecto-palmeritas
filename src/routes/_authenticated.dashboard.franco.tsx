@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// Consolidado en /dashboard/project-report (detecta proyecto activo).
+// Alias histórico: el nombre público y privado canónico es Cholqui.
 export const Route = createFileRoute("/_authenticated/dashboard/franco")({
   beforeLoad: () => {
-    throw redirect({ to: "/dashboard/project-report" });
+    throw redirect({ to: "/dashboard/cholqui", replace: true, statusCode: 301 });
   },
 });

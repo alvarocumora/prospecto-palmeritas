@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import {
   ArrowLeft,
   ArrowRight,
@@ -20,6 +20,17 @@ import { getFicha, simulateInvestment, fmtUsd0 } from "@/lib/investor/fichas";
 // El live map técnico queda como profundización, no como aterrizaje.
 
 export const Route = createFileRoute("/proyectos_/ficha/$slug")({
+  beforeLoad: ({ params }) => {
+    const ficha = getFicha(params.slug);
+    if (ficha && params.slug !== ficha.slug) {
+      throw redirect({
+        to: "/proyectos/ficha/$slug",
+        params: { slug: ficha.slug },
+        replace: true,
+        statusCode: 301,
+      });
+    }
+  },
   head: ({ params }) => {
     const f = getFicha(params.slug);
     return {
@@ -31,6 +42,15 @@ export const Route = createFileRoute("/proyectos_/ficha/$slug")({
             ? `${f.name} (${f.commodity}) — etapa, valorización referencial, ticket desde ${fmtUsd0(f.minTicketUsd)} y simulación de inversión.`
             : "Ficha de inversión de proyecto minero.",
         },
+        { property: "og:title", content: `${f?.name ?? "Proyecto"} · Ficha de inversión — Geocapitals` },
+        {
+          property: "og:description",
+          content: f
+            ? `${f.name} (${f.commodity}) — etapa, antecedentes verificables y términos referenciales.`
+            : "Ficha de inversión de proyecto minero.",
+        },
+        { property: "og:type", content: "website" },
+        { name: "twitter:card", content: "summary_large_image" },
       ],
     };
   },
