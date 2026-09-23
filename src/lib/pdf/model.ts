@@ -7,6 +7,9 @@ import type { BarDatum, MapPoint, Slice } from "./brand/kit";
 
 export type DocKpi = { label: string; value: string; note?: string };
 
+export type EvidenceStatus = "VERIFIED" | "OBSERVED" | "DECLARED" | "DERIVED" | "CONCEPTUAL" | "PENDING_DD";
+export type DataQualityFlag = { status: EvidenceStatus; label: string; detail: string };
+
 export type DocBlock =
   | { kind: "text"; body: string }
   | { kind: "bullets"; items: string[] }
@@ -57,8 +60,13 @@ export type ProjectDoc = {
     caption?: string;
     points: MapPoint[];
     valueUnit?: string;
-
+    captureSelector?: string;
+    imageDataUrl?: string;
+    source?: string;
+    crs?: string;
+    imagery?: string;
   };
+  dataQuality?: DataQualityFlag[];
   milestones?: Array<{ when: string; what: string }>;
   sections: DocSection[];
   disclaimers: string[];
