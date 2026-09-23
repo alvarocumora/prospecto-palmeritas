@@ -1,4 +1,6 @@
 import { Eye, MapPin, Mountain, Sparkles } from "lucide-react";
+import { VerificationBadge } from "@/components/brand";
+import { projectVerification } from "@/lib/verification";
 import type { PublicListing } from "@/lib/publicListings.functions";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
@@ -52,7 +54,7 @@ export function PublicListingCard({
         <h3 className="font-display text-[15px] text-content leading-snug line-clamp-2 group-hover:text-accent-brand transition-colors">
           {listing.title}
         </h3>
-        <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle flex-wrap">
+        <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle flex-wrap">\n          <VerificationBadge level={projectVerification(listing.project_id)} compact linked={false} />
           {listing.commodity && (
             <span className="px-1.5 py-0.5 rounded bg-accent-brand-subtle text-accent-brand border border-hairline">
               {listing.commodity}
@@ -83,7 +85,7 @@ export function PublicListingCard({
               : fmtUSD(listing.asking_price_usd)}
           </div>
           <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand group-hover:underline inline-flex items-center gap-1">
-            <Eye className="w-3 h-3" /> Ver detalle
+            <Eye className="w-3 h-3" /> Investment memo
           </span>
         </div>
       </div>
