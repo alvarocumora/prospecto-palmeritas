@@ -48,6 +48,7 @@ import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
 import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
 import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
 import { Route as LiveFrancoRouteImport } from './routes/live.franco'
+import { Route as LiveCholquiRouteImport } from './routes/live.cholqui'
 import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
 import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
@@ -370,6 +371,11 @@ const LiveLosverdesRoute = LiveLosverdesRouteImport.update({
 const LiveFrancoRoute = LiveFrancoRouteImport.update({
   id: '/live/franco',
   path: '/live/franco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveCholquiRoute = LiveCholquiRouteImport.update({
+  id: '/live/cholqui',
+  path: '/live/cholqui',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalTerminosRoute = LegalTerminosRouteImport.update({
@@ -1150,6 +1156,7 @@ export interface FileRoutesByFullPath {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
+  '/live/cholqui': typeof LiveCholquiRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -1319,6 +1326,7 @@ export interface FileRoutesByTo {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
+  '/live/cholqui': typeof LiveCholquiRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -1490,6 +1498,7 @@ export interface FileRoutesById {
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
+  '/live/cholqui': typeof LiveCholquiRoute
   '/live/franco': typeof LiveFrancoRoute
   '/live/losverdes': typeof LiveLosverdesRoute
   '/live/palmeras': typeof LivePalmerasRoute
@@ -1661,6 +1670,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
+    | '/live/cholqui'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -1830,6 +1840,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
+    | '/live/cholqui'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -2000,6 +2011,7 @@ export interface FileRouteTypes {
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
+    | '/live/cholqui'
     | '/live/franco'
     | '/live/losverdes'
     | '/live/palmeras'
@@ -2169,6 +2181,7 @@ export interface RootRouteChildren {
   InvitationsTokenRoute: typeof InvitationsTokenRoute
   LegalPrivacidadRoute: typeof LegalPrivacidadRoute
   LegalTerminosRoute: typeof LegalTerminosRoute
+  LiveCholquiRoute: typeof LiveCholquiRoute
   LiveFrancoRoute: typeof LiveFrancoRoute
   LiveLosverdesRoute: typeof LiveLosverdesRoute
   LivePalmerasRoute: typeof LivePalmerasRoute
@@ -2490,6 +2503,13 @@ declare module '@tanstack/react-router' {
       path: '/live/franco'
       fullPath: '/live/franco'
       preLoaderRoute: typeof LiveFrancoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/cholqui': {
+      id: '/live/cholqui'
+      path: '/live/cholqui'
+      fullPath: '/live/cholqui'
+      preLoaderRoute: typeof LiveCholquiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/terminos': {
@@ -3756,6 +3776,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvitationsTokenRoute: InvitationsTokenRoute,
   LegalPrivacidadRoute: LegalPrivacidadRoute,
   LegalTerminosRoute: LegalTerminosRoute,
+  LiveCholquiRoute: LiveCholquiRoute,
   LiveFrancoRoute: LiveFrancoRoute,
   LiveLosverdesRoute: LiveLosverdesRoute,
   LivePalmerasRoute: LivePalmerasRoute,
