@@ -102,10 +102,10 @@ export function MarketingLanding() {
 
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <a
-                href="#proyectos"
+                href="/inversionistas"
                 className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors"
               >
-                Ver proyectos
+                Explorar oportunidades
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </a>
               <a
@@ -200,7 +200,7 @@ export function MarketingLanding() {
               <div>
                 <Eyebrow className="mb-3">Marketplace de proyectos</Eyebrow>
                 <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
-                  Proyectos mineros publicados
+                  Oportunidades mineras para inversión
                 </h2>
                 <p className="mt-3 text-content-muted max-w-2xl">
                   Prospectos y activos operativos con ficha técnica, valorización automática y data
