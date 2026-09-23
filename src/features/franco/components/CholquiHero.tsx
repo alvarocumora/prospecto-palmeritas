@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Copy, Download, ExternalLink, MapPin, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
+import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
 import { publicUrl } from "@/lib/publicUrl";
 import { CHOLQUI, CHOLQUI_ASSAYS, CHOLQUI_ASSAY_REPORTS, LAS_MINITAS } from "../data/cholqui";
+
 
 type Props = {
   onDownload: () => void;
@@ -12,12 +15,8 @@ type Props = {
   downloadingTeaser?: boolean;
 };
 
-export function CholquiHero({
-  onDownload,
-  downloading,
-  onDownloadTeaser,
-  downloadingTeaser = false,
-}: Props) {
+export function CholquiHero({ onDownload, downloading }: Props) {
+
   const [qr, setQr] = useState<string | null>(null);
   const liveUrl = publicUrl(CHOLQUI.liveUrl);
   useEffect(() => {
@@ -59,41 +58,28 @@ export function CholquiHero({
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
+          <ProjectDocsMenu className="h-10 px-5" build={buildCholquiDoc} label="Descargar documentos" />
           <Button
             type="button"
             onClick={onDownload}
             disabled={downloading}
-            className="h-10 px-5"
+            variant="outline"
+            className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
           >
             {downloading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Download className="w-4 h-4" />
             )}
-            Descargar PDF de inversión
+            Informe extendido
           </Button>
-          {onDownloadTeaser ? (
-            <Button
-              type="button"
-              onClick={onDownloadTeaser}
-              disabled={downloadingTeaser}
-              variant="outline"
-              className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-            >
-              {downloadingTeaser ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <Download className="w-4 h-4" />
-              )}
-              Descargar teaser de inversión
-            </Button>
-          ) : null}
           <Button asChild variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
             <a href={`mailto:${CHOLQUI.contact.email}?subject=${encodeURIComponent(`${CHOLQUI.name} — interés de inversión`)}`}>
               <ExternalLink /> Contactar mesa de inversión
             </a>
           </Button>
         </div>
+
         </div>
         <aside className="self-end border border-primary-foreground/20 bg-primary-foreground/5 p-3">
           {qr ? <img src={qr} alt="QR del Live Map público de Cholqui" className="w-full aspect-square bg-primary-foreground p-2" /> : <div className="aspect-square grid place-items-center"><Loader2 className="animate-spin text-primary-foreground" /></div>}

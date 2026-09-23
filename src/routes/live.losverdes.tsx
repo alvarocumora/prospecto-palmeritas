@@ -45,6 +45,9 @@ import { getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
+import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
+import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
+
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
 import { generateConceptualModelFn } from "@/lib/conceptualModel.functions";
 import { onLosVerdesFocus } from "@/lib/losverdes-focus";
@@ -303,13 +306,19 @@ function LiveLosVerdesPage() {
             <h1 className="mt-4 font-serif text-4xl leading-tight text-primary-foreground md:text-6xl">Distrito Cuprífero Los Verdes–Tilama</h1>
             <p className="mt-4 max-w-2xl text-sm leading-6 text-primary-foreground/75">Catastro, evidencia geoquímica, targets y análisis geoespacial en una ficha técnica trazable para evaluación minera.</p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Button onClick={handlePdf} disabled={pdfBusy || !reportQ.data} className="h-10 px-5">
-                {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} Descargar PDF técnico
+              <ProjectDocsMenu
+                className="h-10 px-5"
+                disabled={!reportQ.data}
+                build={() => (reportQ.data ? buildLosVerdesDoc(reportQ.data) : null)}
+              />
+              <Button onClick={handlePdf} disabled={pdfBusy || !reportQ.data} variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+                {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} Informe extendido
               </Button>
               <Button variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={() => void navigator.clipboard.writeText(liveUrl).then(() => toast.success("Enlace copiado"))}>
                 <Copy /> Copiar enlace público
               </Button>
             </div>
+
           </div>
           <aside className="self-end border border-primary-foreground/20 bg-foreground/50 p-3 backdrop-blur-sm">
             {qr ? <img src={qr} alt="QR de la ficha pública Los Verdes–Tilama" className="aspect-square w-full bg-primary-foreground p-2" /> : <div className="grid aspect-square place-items-center"><Loader2 className="animate-spin text-primary-foreground" /></div>}
