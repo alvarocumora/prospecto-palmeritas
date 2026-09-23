@@ -16,6 +16,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { ProjectDoc, ProjectDocKind } from "@/lib/pdf/model";
+import { captureElement } from "@/lib/pdf/captureMap";
+import { downloadProjectDoc } from "@/lib/pdf/generateProjectDoc";
 
 const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
   { kind: "deck", title: "Deck de inversión (16:9)", hint: "Presentación para comités y family offices" },
@@ -51,11 +53,9 @@ export function ProjectDocsMenu({
       // Capture the real live GIS when available. A capture failure is non-fatal:
       // the document renderer keeps its analytical fallback instead of blanking.
       if (model.map?.captureSelector) {
-        const { captureElement } = await import("@/lib/pdf/captureMap");
         const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
         if (snapshot) model.map.imageDataUrl = snapshot;
       }
-      const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
       await downloadProjectDoc(model, kind);
       toast.success("Documento generado", { id });
     } catch (e) {
