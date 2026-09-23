@@ -48,6 +48,13 @@ export function ProjectDocsMenu({
     setBusy(kind);
     const id = toast.loading("Generando documento…");
     try {
+      // Capture the real live GIS when available. A capture failure is non-fatal:
+      // the document renderer keeps its analytical fallback instead of blanking.
+      if (model.map?.captureSelector) {
+        const { captureElement } = await import("@/lib/pdf/captureMap");
+        const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
+        if (snapshot) model.map.imageDataUrl = snapshot;
+      }
       const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
       await downloadProjectDoc(model, kind);
       toast.success("Documento generado", { id });
