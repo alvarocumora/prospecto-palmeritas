@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { CholquiDashboard } from "@/features/franco/FrancoDashboard";
 import { CholquiSatellitePanel } from "@/features/franco/components/CholquiSatellitePanel";
 import { CholquiSpvPanel } from "@/features/franco/components/CholquiSpvPanel";
 
@@ -74,7 +74,7 @@ function CholquiLivePage() {
         ))}
       </div>
 
-      {tab === "ficha" && <FrancoDashboard />}
+      {tab === "ficha" && <CholquiDashboard />}
       {tab !== "ficha" && (
         <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8">
           {tab === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel />}
