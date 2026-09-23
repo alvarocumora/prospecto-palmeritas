@@ -50,3 +50,28 @@ export const VERIFICATION_META: Record<
       "Datos revisados y firmados por una Qualified Person registrada bajo estándar NI 43-101 / JORC.",
   },
 };
+
+
+/**
+ * Public investment surfaces must never present demo projects as active deals.
+ * Demo remains available in product/showcase surfaces, but is excluded from
+ * investor deal-flow and conversion metrics.
+ */
+export function isInvestableProject(projectId: string | null | undefined): boolean {
+  return projectVerification(projectId) !== "demo";
+}
+
+export function verificationDisclosure(projectId: string | null | undefined): {
+  level: VerificationLevel;
+  label: string;
+  description: string;
+  investable: boolean;
+} {
+  const level = projectVerification(projectId);
+  return {
+    level,
+    label: VERIFICATION_META[level].label,
+    description: VERIFICATION_META[level].description,
+    investable: level !== "demo",
+  };
+}
