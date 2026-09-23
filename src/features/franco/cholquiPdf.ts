@@ -167,14 +167,24 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     y += 4;
   };
 
-  const table = (head: string[], body: (string | number)[][]) => {
+  const table = (
+    head: string[],
+    body: (string | number)[][],
+    compact = false,
+  ) => {
     autoTable(pdf, {
       startY: y,
       head: [head.map(safe)],
       body: body.map((row) => row.map((c) => safe(String(c)))) as never,
       margin: { left: M, right: M },
       theme: "grid",
-      styles: { font: "helvetica", fontSize: 8.4, cellPadding: 5, textColor: INK, lineColor: HAIR },
+      styles: {
+        font: "helvetica",
+        fontSize: compact ? 7.2 : 8.4,
+        cellPadding: compact ? 3.2 : 5,
+        textColor: INK,
+        lineColor: HAIR,
+      },
       headStyles: { fillColor: INK, textColor: PAPER, fontSize: 7.6, fontStyle: "bold" },
       alternateRowStyles: { fillColor: [250, 248, 244] },
       didDrawPage: () => {},
@@ -353,6 +363,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       p.lat.toFixed(5),
       p.lng.toFixed(5),
     ]),
+    true,
   );
 
   // ── Economía preliminar ──────────────────────────────────────────────────
