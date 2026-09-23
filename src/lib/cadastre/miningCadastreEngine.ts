@@ -39,8 +39,8 @@ export async function searchMiningCadastre(input: CadastreSearch = {}): Promise<
     outFields: "OBJECTID,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,DATUM,HUSO",
   });
 
-  const fc = features ?? { type: "FeatureCollection", features: [] };
-  return { features: fc, source: "SERNAGEOMIN", queriedAt: new Date().toISOString(), count: fc.features.length };
+  if (!features) throw new Error("SERNAGEOMIN_UNAVAILABLE");
+  return { features, source: "SERNAGEOMIN", queriedAt: new Date().toISOString(), count: features.features.length };
 }
 
 
