@@ -4,6 +4,7 @@
  * Toda la data viene de `./data/cholqui` (fuente única). Nada se infiere.
  */
 import { publicUrl } from "@/lib/publicUrl";
+import { getGeologicalEvidenceExport } from "@/lib/geospatial-export/evidenceExportStore";
 import {
   CHOLQUI,
   CHOLQUI_ARIDOS,
@@ -286,9 +287,30 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     "El proyecto NO cuenta con estimación de recursos ni reservas bajo un estándar reconocido. Toda cifra económica de este documento corresponde a escenarios ilustrativos de sensibilidad.",
   );
 
-  // ── Ubicación y propiedad ────────────────────────────────────────────────
+  // ── Live Map / evidencia geoespacial ───────────────────────────────────
   newPage();
-  h1("02 · Ubicación y propiedad", "Qué controla actualmente la compañía");
+  h1("02 · Live Map", "Catastro, evidencia y contexto geoespacial");
+  const evidenceExport = getGeologicalEvidenceExport();
+  if (evidenceExport) {
+    const img = pdf.getImageProperties(evidenceExport.mapPng);
+    const maxH = 360;
+    const renderH = Math.min(maxH, (CW * img.height) / img.width);
+    pdf.addImage(evidenceExport.mapPng, "PNG", M, y, CW, renderH, undefined, "FAST");
+    y += renderH + 12;
+    para(
+      `Snapshot del Live Map · EPSG:4326 · zoom ${evidenceExport.manifest.zoom} · generado ${evidenceExport.manifest.generatedAt}. Capas: ${evidenceExport.manifest.layers.join(", ")}.`,
+      SLATE,
+      7.4,
+    );
+    disclaimer(evidenceExport.disclaimer);
+  } else {
+    disclaimer(
+      "Snapshot del Live Map no disponible en esta sesión. GeoCapitals no sustituye evidencia geoespacial real por un mapa esquemático. Abra el Live Map y capture la vista antes de exportar el documento.",
+    );
+  }
+
+  // ── Ubicación y propiedad ────────────────────────────────────────────────
+  h1("02a · Ubicación y propiedad", "Qué controla actualmente la compañía");
   table(
     ["Campo", "Valor"],
     [
@@ -625,11 +647,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   pdf.setFontSize(8.6);
   pdf.setTextColor(190, 196, 204);
   pdf.text(`Correo: contacto@geocapitals.com · WhatsApp: +56 9 6218 4071`, M + 18, y + 70);
-  pdf.text(
-    `Titular del proyecto: ${CHOLQUI.contact.name} · ${CHOLQUI.contact.email} · ${CHOLQUI.contact.phone}`,
-    M + 18,
-    y + 86,
-  );
+  pdf.text("Contacto público único: GeoCapitals", M + 18, y + 86);
   pdf.text(`Live map verificable: ${CHOLQUI_LIVE_URL}`, M + 18, y + 102);
   pdf.addImage(qr, "PNG", W - M - 88, y + 22, 74, 74);
   y += 134;
