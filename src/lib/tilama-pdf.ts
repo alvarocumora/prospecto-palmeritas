@@ -4,18 +4,24 @@
 import { jsPDF } from "jspdf";
 import type { TilamaReport } from "@/lib/tilama.functions";
 import type { LosVerdesMining } from "@/lib/losverdes-veins.functions";
+import { publicUrl } from "@/lib/publicUrl";
+
+export const LOS_VERDES_PDF_VERSION = "v2.0";
+export const LOS_VERDES_LIVE_URL = publicUrl("/live/losverdes");
 
 function fmtNum(v: number | null | undefined, dec = 1): string {
   if (v == null || Number.isNaN(Number(v))) return "—";
   return Number(v).toLocaleString("es-CL", { maximumFractionDigits: dec });
 }
 
-export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining): jsPDF {
+export async function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining): Promise<jsPDF> {
+  const QR = await import("qrcode");
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
   const MARGIN = 56;
   let y = MARGIN;
+  const qr = await QR.toDataURL(LOS_VERDES_LIVE_URL, { width: 360, margin: 1 });
 
   const ensure = (need: number) => {
     if (y + need > pageH - MARGIN) {
@@ -67,29 +73,39 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   };
 
   // Portada
-  doc.setFillColor(15, 23, 42);
-  doc.rect(0, 0, pageW, 180, "F");
-  doc.setTextColor(217, 119, 6);
+  doc.setFillColor(18, 22, 26);
+  doc.rect(0, 0, pageW, 250, "F");
+  doc.setFillColor(36, 71, 214);
+  doc.rect(0, 250, pageW * 0.34, 4, "F");
+  doc.setTextColor(245, 242, 236);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
-  doc.text("GEOCAPITALS · INFORME GEOLÓGICO PRE-NI 43-101", MARGIN, 60);
+  doc.text("GEOCAPITALS · STANDARDIZED TECHNICAL REPORT", MARGIN, 54);
   doc.setTextColor(248, 250, 252);
-  doc.setFontSize(22);
-  doc.text("Distrito Cuprífero", MARGIN, 100);
-  doc.text("Los Verdes – Tilama", MARGIN, 128);
+  doc.setFont("times", "bold");
+  doc.setFontSize(29);
+  doc.text("Distrito Cuprífero", MARGIN, 108);
+  doc.text("Los Verdes – Tilama", MARGIN, 142);
   doc.setFontSize(10);
   doc.setTextColor(148, 163, 184);
   doc.text(
     `${report.project.commodity ?? "Cu-Au-Ag"} · ${report.project.region ?? "Coquimbo"} · ${report.project.country ?? "Chile"}`,
     MARGIN,
-    152,
+    174,
   );
-  doc.text(
-    `Código: ${report.project.code} · Emisión: ${new Date().toLocaleDateString("es-CL")}`,
-    MARGIN,
-    166,
-  );
-  y = 210;
+  doc.text(`Código: ${report.project.code} · ${LOS_VERDES_PDF_VERSION}`, MARGIN, 194);
+  doc.text(`Emisión: ${new Date().toLocaleDateString("es-CL")}`, MARGIN, 210);
+  doc.addImage(qr, "PNG", pageW - MARGIN - 116, 70, 116, 116);
+  doc.setFontSize(7);
+  doc.text("ESCANEAR PARA VER LIVE MAP", pageW - MARGIN, 200, { align: "right" });
+  doc.text("geocapitals.com/live/losverdes", pageW - MARGIN, 213, { align: "right" });
+  y = 286;
+
+  h1("Control documental");
+  kv("Referencia:", `${report.project.code}-TR-${LOS_VERDES_PDF_VERSION.replace(".", "-")}`);
+  kv("Fuente:", "Base técnica consolidada GeoCapitals");
+  kv("Estado de muestreo:", "Borrador · pendiente validación documental / QA-QC");
+  kv("Enlace verificable:", LOS_VERDES_LIVE_URL);
 
   // Resumen ejecutivo
   h1("1. Resumen Ejecutivo");
@@ -114,6 +130,8 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
     "Targets de exploración:",
     `${report.stats.targetsTotal} (${report.stats.targetsCritical} críticos · ${report.stats.targetsHigh} alta prioridad)`,
   );
+  kv("Muestras geoquímicas:", `${report.stats.samplesTotal} puntos georreferenciados`);
+  kv("Cobre:", `Promedio ${fmtNum(report.stats.cuAvgPct, 2)} % · máximo ${fmtNum(report.stats.cuMaxPct, 2)} %`);
   kv(
     "Mineralogía dominante:",
     "Calcopirita · bornita · covelina · calcosina · crisocola · atacamita",
@@ -195,6 +213,25 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
     y += 6;
   }
 
+  h1("4b. Evidencia Geoquímica de Superficie");
+  para(
+    `La base consolidada contiene ${report.stats.samplesTotal} muestras georreferenciadas. El cobre promedia ${fmtNum(report.stats.cuAvgPct, 2)} % y alcanza un máximo de ${fmtNum(report.stats.cuMaxPct, 2)} %; los máximos registrados de oro y plata son ${fmtNum(report.stats.auMaxGpt, 3)} g/t Au y ${fmtNum(report.stats.agMaxGpt, 1)} g/t Ag. Estos resultados están cargados en estado borrador y deben validarse contra certificados, cadena de custodia y QA/QC antes de cualquier uso regulatorio.`,
+  );
+  const topSamples = [...report.samples].sort((a, b) => Number(b.cu_pct ?? 0) - Number(a.cu_pct ?? 0)).slice(0, 15);
+  if (topSamples.length) {
+    h2("Muestras con mayor ley de cobre");
+    const x = { code: MARGIN, cu: MARGIN + 105, au: MARGIN + 185, ag: MARGIN + 270, lab: MARGIN + 355 };
+    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(71, 85, 105);
+    doc.text("Muestra", x.code, y); doc.text("Cu %", x.cu, y); doc.text("Au g/t", x.au, y); doc.text("Ag g/t", x.ag, y); doc.text("Laboratorio", x.lab, y);
+    y += 12; doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4); doc.setFont("helvetica", "normal"); doc.setTextColor(15, 23, 42);
+    for (const sample of topSamples) {
+      ensure(13);
+      doc.text(sample.sample_code, x.code, y); doc.text(fmtNum(sample.cu_pct, 3), x.cu, y); doc.text(fmtNum(sample.au_gpt, 3), x.au, y); doc.text(fmtNum(sample.ag_gpt, 2), x.ag, y); doc.text(String(sample.lab ?? "—").slice(0, 24), x.lab, y);
+      y += 12;
+    }
+    y += 8;
+  }
+
   // Targets
   h1("5. Portafolio de Targets de Exploración");
   para(
@@ -240,7 +277,7 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
   // Estructura 3D
   h1("6. Estructura 3D del Depósito");
   para(
-    "El modelo 3D activo en /live/tilama integra: (i) DEM Copernicus 30 m para el relieve, (ii) drape de imagen satelital Esri World Imagery, (iii) anomalías multiespectrales extruidas en altura proporcional al score (100–700 m visuales), (iv) polígonos catastrales superpuestos y (v) targets puntuales por prioridad. La extrusión es visual/analítica — no representa profundidad geológica real del cuerpo mineralizado.",
+    "El modelo 3D activo en /live/losverdes integra: (i) DEM Copernicus 30 m para el relieve, (ii) imagen satelital, (iii) anomalías multiespectrales extruidas con escala visual, (iv) polígonos catastrales y (v) targets por prioridad. La extrusión es visual/analítica y no representa profundidad geológica real del cuerpo mineralizado.",
   );
   para(
     "Sistemas estructurales mapeados: N-S (regional, eje principal), NNE-SSW (control vetiforme Cu-Au), NE-SW (riedel sintético) y NNW-SSE (riedel antitético). La intersección N-S × NE-SW define los nodos de mayor densidad de mineralización supergénica.",
@@ -340,6 +377,7 @@ export function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining
       pageH - 24,
     );
     doc.text(`Página ${i} de ${pageCount}`, pageW - MARGIN, pageH - 24, { align: "right" });
+    doc.text(LOS_VERDES_PDF_VERSION, pageW / 2, pageH - 24, { align: "center" });
   }
 
   return doc;
