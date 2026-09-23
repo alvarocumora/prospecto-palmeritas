@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { CholquiDashboard } from "@/features/franco/FrancoDashboard";
 
 export const Route = createFileRoute("/live/cholqui")({
   head: () => ({
@@ -23,5 +23,5 @@ export const Route = createFileRoute("/live/cholqui")({
 });
 
 function CholquiPublicPage() {
-  return <FrancoDashboard />;
+  return <CholquiDashboard />;
 }
