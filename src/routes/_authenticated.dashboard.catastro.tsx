@@ -2,9 +2,12 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
-import { Search, Database, MapPinned, ShieldCheck, Layers3, X } from "lucide-react";
+import { Search, Database, MapPinned, ShieldCheck, Layers3, X, Upload, ScanSearch } from "lucide-react";
 import { searchMiningCadastre, cadastreRecords, summarizeCadastre, type CadastreSearch, type CadastreFeatureRecord } from "@/lib/cadastre/miningCadastreEngine";
 import { buildOfficialCadastreLayer } from "@/components/map/miningCadastreLayers";
+import { buildReconciliationBundle, type ReconciliationBundle } from "@/lib/cadastre/reconciliationBundle";
+import { buildReconciliationLayer } from "@/lib/cadastre/reconciliationLayer";
+import { buildCadastreDueDiligence } from "@/lib/cadastre/dueDiligence";
 
 export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   component: MiningCadastrePage,
@@ -16,10 +19,16 @@ function MiningCadastrePage() {
   const mapNode = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const layerRef = useRef<LeafletGeoJSON | null>(null);
+  const projectLayerRef = useRef<LeafletGeoJSON | null>(null);
+  const reconciliationLayerRef = useRef<LeafletGeoJSON | null>(null);
   const [filters, setFilters] = useState<Filters>({});
   const [records, setRecords] = useState<CadastreFeatureRecord[]>([]);
   const [selected, setSelected] = useState<CadastreFeatureRecord | null>(null);
   const [portfolio, setPortfolio] = useState<string[]>([]);
+  const [officialFc, setOfficialFc] = useState<GeoJSON.FeatureCollection>({ type:"FeatureCollection", features:[] });
+  const [projectFc, setProjectFc] = useState<GeoJSON.FeatureCollection | null>(null);
+  const [projectName, setProjectName] = useState<string | null>(null);
+  const [reconciliation, setReconciliation] = useState<ReconciliationBundle | null>(null);
   const [queriedAt, setQueriedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("Mueva el mapa o aplique filtros para consultar el catastro oficial.");
@@ -55,6 +64,7 @@ function MiningCadastrePage() {
     const layer = buildOfficialCadastreLayer(L as never, result.features);
     layer.addTo(map);
     layerRef.current = layer as LeafletGeoJSON;
+    setOfficialFc(result.features);
     const normalized = cadastreRecords(result.features);
     setRecords(normalized);
     setQueriedAt(result.queriedAt);
@@ -74,6 +84,41 @@ function MiningCadastrePage() {
     });
   };
   const togglePortfolio = (id: string) => setPortfolio(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+
+  async function importGeoJSON(file: File) {
+    try {
+      const raw = JSON.parse(await file.text()) as GeoJSON.FeatureCollection | GeoJSON.Feature;
+      const fc: GeoJSON.FeatureCollection = raw.type === "FeatureCollection"
+        ? raw
+        : raw.type === "Feature" ? { type:"FeatureCollection", features:[raw] } : { type:"FeatureCollection", features:[] };
+      const polygons = fc.features.filter(f => f.geometry && ["Polygon","MultiPolygon"].includes(f.geometry.type));
+      if (!polygons.length) { setMessage("El archivo no contiene polígonos GeoJSON válidos."); return; }
+      const clean: GeoJSON.FeatureCollection = { type:"FeatureCollection", features:polygons };
+      setProjectFc(clean); setProjectName(file.name); setReconciliation(null);
+      const map = mapRef.current; if (!map) return;
+      const { default: L } = await import("leaflet");
+      projectLayerRef.current?.removeFrom(map);
+      reconciliationLayerRef.current?.removeFrom(map);
+      const layer = L.geoJSON(clean as never, { style:{ color:"#a855f7", weight:3, fillOpacity:0.08, dashArray:"7 4" } }).addTo(map);
+      projectLayerRef.current = layer;
+      map.fitBounds(layer.getBounds(), { padding:[50,50] });
+      setMessage(`${polygons.length} polígono(s) importados. Actualice el catastro en esta vista y ejecute reconciliación.`);
+    } catch { setMessage("No fue posible leer el GeoJSON. Verifique formato y geometrías."); }
+  }
+
+  async function runReconciliation() {
+    const map = mapRef.current;
+    if (!map || !projectFc || officialFc.features.length === 0) { setMessage("Importe una propiedad y consulte el catastro oficial del área antes de reconciliar."); return; }
+    const bundle = buildReconciliationBundle(projectFc, officialFc, 5);
+    setReconciliation(bundle);
+    const { default: L } = await import("leaflet");
+    reconciliationLayerRef.current?.removeFrom(map);
+    const layer = buildReconciliationLayer(L as never, bundle).addTo(map);
+    reconciliationLayerRef.current = layer as LeafletGeoJSON;
+    setMessage("Reconciliación completada. Revise matches, intersecciones, vecinos y geometrías sin correspondencia.");
+  }
+
+  const dueDiligence = reconciliation ? buildCadastreDueDiligence(reconciliation) : null;
 
   const set = (key: keyof Filters, value: string) => {
     const next = { ...filters, [key]: value || undefined } as Filters;
@@ -114,6 +159,11 @@ function MiningCadastrePage() {
             <div className="rounded border border-border p-3"><div className="text-[10px] text-muted-foreground">PROCEDENCIA</div><div className="mt-1 text-xs font-mono">OFICIAL</div></div>
           </div>
           <div className="rounded border border-border p-3 text-xs leading-relaxed text-muted-foreground"><ShieldCheck className="w-4 h-4 mb-2" />{message}</div>
+          {dueDiligence && <div className="rounded border border-border p-3 space-y-2">
+            <div className="text-[10px] font-mono uppercase">Due Diligence · hallazgos</div>
+            {dueDiligence.findings.map(f => <div key={f.code} className="text-[10px] leading-relaxed"><strong>{f.severity}</strong> · {f.message}</div>)}
+            <div className="text-[9px] text-muted-foreground">{dueDiligence.disclaimer}</div>
+          </div>}
           <div className="text-[10px] leading-relaxed text-muted-foreground">GeoCapitals conserva fuente y timestamp. Las geometrías se muestran en WGS84; la concesión puede tener datum/huso original distinto. El registro oficial no equivale por sí solo a verificación legal de dominio.</div>
         </aside>
 
