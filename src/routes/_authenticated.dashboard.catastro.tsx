@@ -22,6 +22,8 @@ function MiningCadastrePage() {
   const projectLayerRef = useRef<LeafletGeoJSON | null>(null);
   const reconciliationLayerRef = useRef<LeafletGeoJSON | null>(null);
   const [filters, setFilters] = useState<Filters>({});
+  const filtersRef = useRef<Filters>({});
+  const requestSeqRef = useRef(0);
   const [records, setRecords] = useState<CadastreFeatureRecord[]>([]);
   const [selected, setSelected] = useState<CadastreFeatureRecord | null>(null);
   const [portfolio, setPortfolio] = useState<string[]>([]);
@@ -43,8 +45,8 @@ function MiningCadastrePage() {
         attribution: "Imagery © Esri", maxZoom: 19,
       }).addTo(map);
       mapRef.current = map;
-      void refresh();
-      map.on("moveend", () => void refresh());
+      void refresh(filtersRef.current);
+      map.on("moveend", () => void refresh(filtersRef.current));
     });
     return () => { disposed = true; mapRef.current?.remove(); mapRef.current = null; };
   }, []);
@@ -52,6 +54,7 @@ function MiningCadastrePage() {
   async function refresh(nextFilters = filters) {
     const map = mapRef.current;
     if (!map) return;
+    const requestId = ++requestSeqRef.current;
     setLoading(true);
     const b = map.getBounds();
     const result = await searchMiningCadastre({
@@ -59,6 +62,7 @@ function MiningCadastrePage() {
       bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
       limit: 2000,
     });
+    if (requestId !== requestSeqRef.current) return;
     const { default: L } = await import("leaflet");
     layerRef.current?.removeFrom(map);
     const layer = buildOfficialCadastreLayer(L as never, result.features);
@@ -69,7 +73,7 @@ function MiningCadastrePage() {
     setRecords(normalized);
     setQueriedAt(result.queriedAt);
     setMessage(result.count === 2000 ? "Se alcanzó el límite de 2.000 registros: acerque el mapa para completar la consulta." : "Vista sincronizada con la fuente oficial consultada.");
-    setLoading(false);
+    if (requestId === requestSeqRef.current) setLoading(false);
   }
 
   const stats = summarizeCadastre(records);
@@ -122,6 +126,7 @@ function MiningCadastrePage() {
 
   const set = (key: keyof Filters, value: string) => {
     const next = { ...filters, [key]: value || undefined } as Filters;
+    filtersRef.current = next;
     setFilters(next);
   };
 
