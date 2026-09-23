@@ -117,11 +117,22 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     eyebrow(doc, M, y, "02 · Ubicación y puntos de control");
     y += 16;
     y += title(doc, M, y, model.map.title, 17, CW) + 12;
-    scatterMap(doc, { x: M, y, w: CW, h: 220, points: model.map.points, caption: model.map.caption, labelTop: 6 });
-    const capLines = model.map.caption
-      ? (doc.splitTextToSize(model.map.caption, CW) as string[]).length
-      : 0;
-    y += 220 + (capLines ? 6 + capLines * 9 + 14 : 14);
+    if (model.map.imageDataUrl) {
+      doc.addImage(model.map.imageDataUrl, "JPEG", M, y, CW, 220, undefined, "FAST");
+      stroke(doc, GC_COLOR.hairline);
+      doc.setLineWidth(0.7);
+      doc.rect(M, y, CW, 220);
+      y += 232;
+      const source = [model.map.imagery, model.map.source, model.map.crs].filter(Boolean).join(" · ");
+      y += paragraph(doc, M, y, source, CW, 6.8, GC_COLOR.slate) + 8;
+      if (model.map.caption) y += paragraph(doc, M, y, model.map.caption, CW, 8, GC_COLOR.slate) + 12;
+    } else {
+      scatterMap(doc, { x: M, y, w: CW, h: 220, points: model.map.points, caption: model.map.caption, labelTop: 6 });
+      const capLines = model.map.caption
+        ? (doc.splitTextToSize(model.map.caption, CW) as string[]).length
+        : 0;
+      y += 220 + (capLines ? 6 + capLines * 9 + 14 : 14);
+    }
 
   }
 
