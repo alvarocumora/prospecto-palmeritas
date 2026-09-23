@@ -54,7 +54,8 @@ export function PublicListingCard({
         <h3 className="font-display text-[15px] text-content leading-snug line-clamp-2 group-hover:text-accent-brand transition-colors">
           {listing.title}
         </h3>
-        <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle flex-wrap">\n          <VerificationBadge level={projectVerification(listing.project_id)} compact linked={false} />
+        <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle flex-wrap">
+          <VerificationBadge level={projectVerification(listing.project_id)} compact linked={false} />
           {listing.commodity && (
             <span className="px-1.5 py-0.5 rounded bg-accent-brand-subtle text-accent-brand border border-hairline">
               {listing.commodity}
