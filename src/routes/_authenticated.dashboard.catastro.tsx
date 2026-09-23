@@ -57,11 +57,20 @@ function MiningCadastrePage() {
     const requestId = ++requestSeqRef.current;
     setLoading(true);
     const b = map.getBounds();
-    const result = await searchMiningCadastre({
-      ...nextFilters,
-      bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
-      limit: 2000,
-    });
+    let result;
+    try {
+      result = await searchMiningCadastre({
+        ...nextFilters,
+        bbox: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()],
+        limit: 2000,
+      });
+    } catch {
+      if (requestId === requestSeqRef.current) {
+        setLoading(false);
+        setMessage("Fuente oficial SERNAGEOMIN no disponible. Se conserva la última vista válida; no se interpreta como cero concesiones.");
+      }
+      return;
+    }
     if (requestId !== requestSeqRef.current) return;
     const { default: L } = await import("leaflet");
     layerRef.current?.removeFrom(map);
