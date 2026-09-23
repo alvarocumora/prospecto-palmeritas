@@ -12,7 +12,7 @@ import {
   CHOLQUI_ROUND,
 } from "@/features/franco/data/cholqui";
 
-export type FichaSlug = "palmeras" | "losverdes" | "tilama" | "franco";
+export type FichaSlug = "palmeras" | "losverdes" | "tilama" | "cholqui";
 
 export type InvestmentScenario = {
   key: "conservador" | "base" | "optimista";
@@ -180,8 +180,8 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
   // Cholqui: los términos vienen de la fuente única del proyecto
   // (src/features/franco/data/cholqui.ts), la misma que alimenta el live view
   // y el PDF de inversión — nunca duplicar cifras aquí.
-  franco: {
-    slug: "franco",
+  cholqui: {
+    slug: "cholqui",
     code: CHOLQUI.code,
     name: CHOLQUI.name,
     region: CHOLQUI.region,
@@ -209,7 +209,8 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
 };
 
 export function getFicha(slug: string): ProjectFicha | null {
-  return (FICHAS as Record<string, ProjectFicha>)[slug] ?? null;
+  const canonicalSlug = slug === "franco" ? "cholqui" : slug;
+  return (FICHAS as Record<string, ProjectFicha>)[canonicalSlug] ?? null;
 }
 
 export type SimulationRow = {
