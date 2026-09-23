@@ -225,6 +225,7 @@ export function FrancoPertenenciasMap() {
       <div className="relative">
         <div
           ref={containerRef}
+          data-report-map="cholqui"
           className="w-full h-[460px] rounded border border-border overflow-hidden bg-bg-secondary"
         />
         {isLoading && (
