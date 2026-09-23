@@ -8,7 +8,7 @@ import {
   CHOLQUI,
   CHOLQUI_ARIDOS,
   CHOLQUI_ASSAYS,
-  CHOLQUI_ASSAY_REPORT,
+  CHOLQUI_ASSAY_REPORTS,
   CHOLQUI_ASSUMPTIONS,
   CHOLQUI_BASE_CASE,
   CHOLQUI_CAVEATS,
@@ -50,8 +50,8 @@ const COPPER: [number, number, number] = [192, 112, 58];
 export const CHOLQUI_LIVE_URL = publicUrl(CHOLQUI.liveUrl);
 
 /** Versión del documento: cambia con el contenido, se imprime en el pie. */
-export const CHOLQUI_DOC_VERSION = "v1.2";
-export const CHOLQUI_TEASER_VERSION = "v1.1";
+export const CHOLQUI_DOC_VERSION = "v2.0";
+export const CHOLQUI_TEASER_VERSION = "v2.0";
 
 type CholquiPdfKind = "brief" | "teaser";
 
@@ -208,7 +208,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(...PAPER);
-  pdf.text("GEOCAPITALS · INVESTMENT BRIEF", M, 62);
+  pdf.text("GEOCAPITALS · STANDARDIZED INVESTMENT REPORT", M, 62);
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(7.2);
   pdf.setTextColor(150, 158, 168);
@@ -258,6 +258,15 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   });
 
   y = 340;
+  table(
+    ["Control documental", "Valor"],
+    [
+      ["Referencia", `${CHOLQUI.code}-IR-${docVersion.replace(".", "-")}`],
+      ["Clasificación", "Documento informativo · Due diligence preliminar"],
+      ["Evidencia química", `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes firmados`],
+      ["Enlace canónico", CHOLQUI_LIVE_URL],
+    ],
+  );
   h1("01 · Resumen ejecutivo", "Qué es el Proyecto Cholqui");
   para(
     `${CHOLQUI.name} es un proyecto de exploración avanzada de cobre, oro y plata en ${CHOLQUI.location}. Controla aproximadamente ${CHOLQUI.areaHa.toLocaleString("es-CL")} hectáreas mediante ${CHOLQUI.pedimentos} pedimentos y ${CHOLQUI.pertenencias} pertenencias, que rodean a ${LAS_MINITAS.name}, una faena de un tercero en producción sobre la misma estructura geológica. Acceso: ${CHOLQUI.access}.`,
@@ -299,16 +308,16 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Mineralogía observada", CHOLQUI_GEOLOGY.mineralogia],
       ["Observaciones de terreno", `${CHOLQUI_GEOLOGY.observaciones} puntos`],
       ["Cuerpos mineralizados descritos", `${CHOLQUI_GEOLOGY.cuerpos}`],
-      ["Muestras a laboratorio certificado", `${CHOLQUI_GEOLOGY.muestrasLab} (Informe ${CHOLQUI_ASSAY_REPORT.id} · ${CHOLQUI_ASSAY_REPORT.lab})`],
+      ["Muestras con análisis firmado", `${CHOLQUI_GEOLOGY.muestrasLab} en ${CHOLQUI_ASSAY_REPORTS.length} informes (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(" · ")})`],
       ["Autores", CHOLQUI_GEOLOGY.autores],
       ["Potencial conceptual", `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t de ${CHOLQUI_CONCEPTUAL.product} en ${CHOLQUI_CONCEPTUAL.sector} — no es recurso`],
     ],
   );
   table(
-    ["Muestra", "Sector", "Cu total %", "Cu soluble %", "Sol./Total", "Au g/t", "Ag ppm"],
+    ["Muestra / código", "Informe / fecha", "Cu total %", "Cu soluble %", "Sol./Total", "Au g/t", "Ag g/t"],
     CHOLQUI_ASSAYS.map((a) => [
-      a.sample,
-      a.location,
+      `${a.sample}${a.laboratoryCode ? ` / ${a.laboratoryCode}` : ""}`,
+      `${a.reportId} / ${a.reportDate}`,
       a.cuTotalPct.toLocaleString("es-CL", { minimumFractionDigits: 3 }),
       a.cuSolublePct.toLocaleString("es-CL", { minimumFractionDigits: 3 }),
       `${solubleRatioPct(a).toFixed(0)} %`,
@@ -316,8 +325,19 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       `${a.agPpm}`,
     ]),
   );
+  table(
+    ["Informe", "Laboratorio", "Solicitante", "Ingreso / emisión", "Muestras", "Fuente"],
+    CHOLQUI_ASSAY_REPORTS.map((report) => [
+      report.id,
+      report.lab,
+      report.applicant,
+      `${report.receivedDate} / ${report.reportDate}`,
+      report.sampleCodes.join(", "),
+      report.source,
+    ]),
+  );
   disclaimer(
-    `Las observaciones mineralógicas de terreno no equivalen a leyes químicas. Los ensayos certificados corresponden a ${CHOLQUI_ASSAY_REPORT.samples} muestras puntuales de superficie y no permiten inferir tonelaje, continuidad, ley promedio de mina, dilución ni recuperación metalúrgica. No hay sondaje propio. La cifra conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t (${CHOLQUI_CONCEPTUAL.formula}) no es recurso ni reserva bajo CH 20235, NI 43-101, JORC ni S-K 1300.`,
+    `Las observaciones mineralógicas de terreno no equivalen a leyes químicas. Los ${CHOLQUI_ASSAYS.length} resultados corresponden a muestras puntuales de superficie documentadas en ${CHOLQUI_ASSAY_REPORTS.length} informes y no permiten inferir tonelaje, continuidad, ley promedio de mina, dilución ni recuperación metalúrgica. FGF indica que las muestras fueron tomadas por el solicitante. No hay sondaje propio. La cifra conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t (${CHOLQUI_CONCEPTUAL.formula}) no es recurso ni reserva bajo CH 20235, NI 43-101, JORC ni S-K 1300.`,
   );
 
   // ── Puntos de muestreo ───────────────────────────────────────────────────

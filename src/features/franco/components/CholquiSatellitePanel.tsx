@@ -55,7 +55,7 @@ export function CholquiSatellitePanel() {
 
   const assayByPoint = useMemo(() => {
     const m = new Map<string, (typeof CHOLQUI_ASSAYS)[number]>();
-    for (const a of CHOLQUI_ASSAYS) m.set(a.sample.replace(/\s/g, "").toUpperCase(), a);
+    for (const a of CHOLQUI_ASSAYS) m.set(a.sample.replace(/[-\s]/g, "").toUpperCase(), a);
     return m;
   }, []);
 
@@ -196,7 +196,9 @@ export function CholquiSatellitePanel() {
                     {r.distKm.toFixed(1)} km
                   </td>
                   <td className="py-2 text-content-subtle">
-                    {r.assay ? "Certificado (AG2463714)" : "Declarado (mapeo de terreno)"}
+                    {r.assay
+                      ? `Análisis firmado (${r.assay.lab} · ${r.assay.reportId})`
+                      : "Declarado (mapeo de terreno)"}
                   </td>
                 </tr>
               ))}
