@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, MapPin, Mountain, Clock, Sparkles, Filter } from "lucide-react";
 import { BrandButton, SectionHeading, VerificationBadge } from "@/components/brand";
-import { projectVerification } from "@/lib/verification";
+import { isInvestableProject, projectVerification } from "@/lib/verification";
 import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
@@ -43,7 +43,7 @@ export function InvestableProjects() {
     staleTime: 60_000,
   });
 
-  const listings = useMemo(() => (data?.listings ?? []).slice(0, MAX_ON_LANDING), [data?.listings]);
+  const listings = useMemo(() => (data?.listings ?? []).filter((p) => isInvestableProject(p.project_id)).slice(0, MAX_ON_LANDING), [data?.listings]);
   const filtered = useMemo(
     () => listings.filter((p) => matchFilter(p, activeFilter)),
     [listings, activeFilter],
@@ -58,14 +58,14 @@ export function InvestableProjects() {
     <section className="max-w-7xl mx-auto px-5 py-20">
       <div className="flex flex-col lg:flex-row lg:items-end gap-6 mb-10">
         <SectionHeading
-          eyebrow="Proyectos disponibles para invertir"
-          title="Oportunidades con datos trazables en minería activa"
-          description="Cada proyecto lleva un sello visible con su nivel de verificación — demo, trazable o verificado QP — junto a modelo económico y múltiples modalidades de entrada."
+          eyebrow="Investment Marketplace"
+          title="Oportunidades de inversión con procedencia de datos visible"
+          description="Esta superficie muestra solo oportunidades activas. Cada activo identifica su nivel de verificación y mantiene los proyectos demo fuera del deal-flow de inversión."
           className="flex-1"
         />
         <BrandButton asChild variant="outline" className="shrink-0">
           <Link to="/inversionistas">
-            Ver todos <ArrowRight className="w-4 h-4" />
+            Explorar oportunidades <ArrowRight className="w-4 h-4" />
           </Link>
         </BrandButton>
       </div>
