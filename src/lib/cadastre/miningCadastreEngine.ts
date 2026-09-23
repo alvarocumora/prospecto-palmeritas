@@ -42,3 +42,52 @@ export async function searchMiningCadastre(input: CadastreSearch = {}): Promise<
   const fc = features ?? { type: "FeatureCollection", features: [] };
   return { features: fc, source: "SERNAGEOMIN", queriedAt: new Date().toISOString(), count: fc.features.length };
 }
+
+
+export type CadastreFeatureRecord = {
+  id: string;
+  role: string;
+  name: string;
+  holder: string;
+  type: string;
+  status: string;
+  hectares: number | null;
+  commune: string;
+  datum: string;
+  zone: string;
+  feature: GeoJSON.Feature;
+};
+
+export function cadastreRecords(fc: GeoJSON.FeatureCollection): CadastreFeatureRecord[] {
+  return fc.features.map((feature, index) => {
+    const p = (feature.properties ?? {}) as Record<string, unknown>;
+    const number = String(p.NUMERO_ROL ?? "").trim();
+    const dv = String(p.DV_ROL ?? "").trim();
+    const rawHa = Number(p.HECTAREAS);
+    return {
+      id: String(p.OBJECTID ?? index),
+      role: dv ? `${number}-${dv}` : number || "—",
+      name: String(p.NOMBRE ?? "Sin nombre"),
+      holder: String(p.TITULAR_NOMBRE ?? "—"),
+      type: String(p.TIPO_CONCESION ?? "—"),
+      status: String(p.SITUACION_CONCESION ?? "—"),
+      hectares: Number.isFinite(rawHa) ? rawHa : null,
+      commune: String(p.COMUNA ?? "—"),
+      datum: String(p.DATUM ?? "—"),
+      zone: String(p.HUSO ?? "—"),
+      feature,
+    };
+  });
+}
+
+export function summarizeCadastre(records: CadastreFeatureRecord[]) {
+  const hectares = records.reduce((sum, r) => sum + (r.hectares ?? 0), 0);
+  return {
+    count: records.length,
+    hectares,
+    exploration: records.filter(r => r.type.toUpperCase() === "EXPLORACION").length,
+    exploitation: records.filter(r => r.type.toUpperCase() === "EXPLOTACION").length,
+    constituted: records.filter(r => r.status.toUpperCase() === "CONSTITUIDA").length,
+    pending: records.filter(r => r.status.toUpperCase() === "EN TRAMITE").length,
+  };
+}
