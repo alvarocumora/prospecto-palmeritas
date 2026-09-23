@@ -134,7 +134,8 @@ function InvPage() {
             Ver catálogo de activos <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">Estos casos son demostrativos y no representan oportunidades activas de inversión. El deal-flow real comienza en “Oportunidades activas”.</div>\n        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">Estos casos son demostrativos y no representan oportunidades activas de inversión. El deal-flow real comienza en “Oportunidades activas”.</div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.values(FICHAS).map((f) => (
             <Link
               key={f.slug}
