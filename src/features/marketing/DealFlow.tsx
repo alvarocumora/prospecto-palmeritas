@@ -7,6 +7,7 @@ import { Reveal } from "./Reveal";
 import { PublicListingDrawer } from "./PublicListingDrawer";
 import { Search, SlidersHorizontal, Inbox } from "lucide-react";
 import { MODALITY_LABEL } from "@/modules/deals/domain/constants";
+import { isInvestableProject } from "@/lib/verification";
 
 type Filters = {
   q: string;
@@ -24,7 +25,7 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
     queryFn: () => fetchListings(),
     staleTime: 60_000,
   });
-  const listings = useMemo(() => data?.listings ?? [], [data?.listings]);
+  const listings = useMemo(() => (data?.listings ?? []).filter((l) => isInvestableProject(l.project_id)), [data?.listings]);
 
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
   const [openId, setOpenId] = useState<string | null>(initialListingId ?? null);
