@@ -21,6 +21,9 @@ import {
   Sparkles,
   AlertTriangle,
   Box,
+  Copy,
+  CheckCircle2,
+  TestTube2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -45,6 +48,8 @@ import { generateTilamaPdf } from "@/lib/tilama-pdf";
 import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
 import { generateConceptualModelFn } from "@/lib/conceptualModel.functions";
 import { onLosVerdesFocus } from "@/lib/losverdes-focus";
+import { publicUrl } from "@/lib/publicUrl";
+import losVerdesImage from "@/assets/project-losverdes.jpg.asset.json";
 
 export const Route = createFileRoute("/live/losverdes")({
   head: () => ({
@@ -53,8 +58,12 @@ export const Route = createFileRoute("/live/losverdes")({
       {
         name: "description",
         content:
-          "Visor 3D del Distrito Los Verdes – Tilama: catastro, anomalías satelitales extruidas, vetas Cu-Au-Ag y plan de explotación conceptual con cubicación y NPV.",
+          "Ficha pública del Distrito Los Verdes–Tilama con catastro, 190 muestras geoquímicas, targets, anomalías y PDF técnico descargable.",
       },
+      { property: "og:title", content: "Los Verdes–Tilama · Live Map — Geocapitals" },
+      { property: "og:description", content: "Mapa interactivo, muestreo geoquímico y reporte técnico descargable del proyecto Los Verdes–Tilama." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex, nofollow" },
       { name: "theme-color", content: "#f5f1e8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
@@ -194,7 +203,18 @@ function LiveLosVerdesPage() {
   // Visor 3D gated on-demand: evita que un crash del monolito tumbe toda la página.
   const [engineOn, setEngineOn] = useState(false);
   const [engineKey, setEngineKey] = useState(0);
+  const [qr, setQr] = useState<string | null>(null);
   useEffect(() => setMounted(true), []);
+  const liveUrl = publicUrl("/live/losverdes");
+  useEffect(() => {
+    let active = true;
+    void import("qrcode").then((mod) =>
+      mod.toDataURL(liveUrl, { width: 320, margin: 1 }).then((value) => {
+        if (active) setQr(value);
+      }),
+    );
+    return () => { active = false; };
+  }, [liveUrl]);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
   const genConceptual = useServerFn(generateConceptualModelFn);
 
@@ -230,7 +250,7 @@ function LiveLosVerdesPage() {
     if (!reportQ.data) return;
     setPdfBusy(true);
     try {
-      const doc = generateTilamaPdf(reportQ.data, miningQ.data ?? undefined);
+      const doc = await generateTilamaPdf(reportQ.data, miningQ.data ?? undefined);
       doc.save(
         `Geocapitals-LosVerdes-${reportQ.data.project.code}-${new Date()
           .toISOString()
@@ -273,6 +293,37 @@ function LiveLosVerdesPage() {
 
   return (
     <div data-theme="im-light" className="bg-background text-foreground min-h-screen">
+
+      <section className="relative min-h-[520px] overflow-hidden bg-foreground text-background">
+        <img src={losVerdesImage.url} alt="Vista del Distrito Los Verdes–Tilama" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-foreground/60" />
+        <div className="relative mx-auto grid max-w-[1600px] gap-8 px-5 py-12 md:grid-cols-[minmax(0,1fr)_190px] md:px-10 md:py-16">
+          <div className="self-end max-w-4xl">
+            <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary-foreground/70">Geocapitals · Live map público · LV-TIL-001</div>
+            <h1 className="mt-4 font-serif text-4xl leading-tight text-primary-foreground md:text-6xl">Distrito Cuprífero Los Verdes–Tilama</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-primary-foreground/75">Catastro, evidencia geoquímica, targets y análisis geoespacial en una ficha técnica trazable para evaluación minera.</p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Button onClick={handlePdf} disabled={pdfBusy || !reportQ.data} className="h-10 px-5">
+                {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} Descargar PDF técnico
+              </Button>
+              <Button variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={() => void navigator.clipboard.writeText(liveUrl).then(() => toast.success("Enlace copiado"))}>
+                <Copy /> Copiar enlace público
+              </Button>
+            </div>
+          </div>
+          <aside className="self-end border border-primary-foreground/20 bg-foreground/50 p-3 backdrop-blur-sm">
+            {qr ? <img src={qr} alt="QR de la ficha pública Los Verdes–Tilama" className="aspect-square w-full bg-primary-foreground p-2" /> : <div className="grid aspect-square place-items-center"><Loader2 className="animate-spin text-primary-foreground" /></div>}
+            <div className="mt-3 font-mono text-[10px] uppercase text-primary-foreground/60">Enlace público verificable</div>
+            <div className="mt-1 break-all text-xs text-primary-foreground">geocapitals.com/live/losverdes</div>
+          </aside>
+        </div>
+        <div className="relative border-t border-primary-foreground/15 bg-foreground/70 px-5 py-4 backdrop-blur-sm md:px-10">
+          <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 text-xs text-primary-foreground/70">
+            <span className="inline-flex items-center gap-2 font-medium text-primary-foreground"><CheckCircle2 className="h-4 w-4" /> Evidencia geológica consolidada</span>
+            <span>{stats?.samplesTotal ?? "—"} muestras · {stats?.concessionsTotal ?? "—"} concesiones · {stats?.targetsTotal ?? "—"} targets</span>
+          </div>
+        </div>
+      </section>
 
       {/* Banner */}
       <div className="bg-gold/10 border-b border-gold/30 px-4 py-2 flex items-center justify-between gap-2">
@@ -318,20 +369,6 @@ function LiveLosVerdesPage() {
               </Button>
             </>
           )}
-          <Button
-            size="sm"
-            onClick={handlePdf}
-            disabled={pdfBusy || !reportQ.data}
-            variant="outline"
-            className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
-          >
-            {pdfBusy ? (
-              <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-            ) : (
-              <FileDown className="w-3 h-3 mr-1.5" />
-            )}
-            Informe rápido PDF
-          </Button>
           <a
             href="/reports/losverdes/pre43101"
             target="_blank"
@@ -347,7 +384,8 @@ function LiveLosVerdesPage() {
 
       <div className="p-3 md:p-4 space-y-4 max-w-[1600px] mx-auto">
         {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+          <KPI icon={<TestTube2 className="w-4 h-4" />} label="Muestras" value={stats?.samplesTotal ?? "—"} sub={stats?.cuAvgPct != null ? `Cu prom. ${stats.cuAvgPct.toFixed(2)}%` : ""} />
           <KPI
             icon={<Layers className="w-4 h-4" />}
             label="Concesiones"
@@ -380,11 +418,19 @@ function LiveLosVerdesPage() {
           />
         </div>
 
+        {stats && (
+          <section className="grid gap-px border border-border bg-border md:grid-cols-4">
+            {[["Cu promedio", `${stats.cuAvgPct?.toFixed(2) ?? "—"} %`], ["Cu máximo", `${stats.cuMaxPct?.toFixed(2) ?? "—"} %`], ["Au máximo", `${stats.auMaxGpt?.toFixed(3) ?? "—"} g/t`], ["Ag máximo", `${stats.agMaxGpt?.toFixed(1) ?? "—"} g/t`]].map(([label, value]) => (
+              <div key={label} className="bg-background px-5 py-4"><div className="font-mono text-[10px] uppercase text-muted-foreground">{label}</div><div className="mt-1 font-serif text-2xl text-foreground">{value}</div></div>
+            ))}
+          </section>
+        )}
+
         {/* Visor estratégico 2D — exploración + certificación */}
         <section>
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
-              Visor estratégico · Catastro · Targets · Anomalías
+              Visor estratégico · Catastro · Muestreo · Targets · Anomalías
             </h2>
             <div className="flex items-center gap-2">
               {(layersQ.isLoading || miningQ.isLoading) && (
@@ -548,7 +594,7 @@ function LiveLosVerdesPage() {
         )}
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
-          Geocapitals · Informe pre-NI 43-101 · Estimaciones conceptuales, no recursos informados.
+          Geocapitals · Ficha técnica pública · Muestreo cargado en estado borrador · Sin recursos ni reservas certificados.
         </footer>
       </div>
       <TargetExplainerDialog

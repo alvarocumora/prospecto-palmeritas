@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import proj4 from "proj4";
 
 const PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
@@ -25,17 +25,20 @@ export type LosVerdesMapData = {
   targets: FC;
   satAnomalies: FC;
   magAnomalies: FC;
+  samples: FC;
   counts: {
     concessions: number;
     concessionsWithGeom: number;
     targets: number;
     satAnomalies: number;
     magAnomalies: number;
+    samples: number;
   };
 };
 
 export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
   async (): Promise<LosVerdesMapData> => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     // 1) Concesiones
     const { data: cons, error: cErr } = await supabaseAdmin
       .from("mining_concessions")
@@ -198,6 +201,46 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       }),
     };
 
+    // 5) Muestreo geoquímico — UTM WGS84 19S a coordenadas geográficas.
+    const { data: sampleRows, error: sampleErr } = await supabaseAdmin
+      .from("sampling_results")
+      .select(
+        "id,sample_code,sample_type,easting,northing,cu_pct,au_gpt,ag_gpt,lab,certificate,record_status",
+      )
+      .eq("project_id", PROJECT_ID)
+      .limit(500);
+    if (sampleErr) throw new Error(`samples: ${sampleErr.message}`);
+    const samples: FC = {
+      type: "FeatureCollection",
+      features: (sampleRows ?? []).flatMap((sample): MapFeature[] => {
+        if (sample.easting == null || sample.northing == null) return [];
+        const [lng, lat] = proj4(
+          "+proj=utm +zone=19 +south +datum=WGS84 +units=m +no_defs",
+          "EPSG:4326",
+          [Number(sample.easting), Number(sample.northing)],
+        );
+        return [{
+          type: "Feature",
+          id: String(sample.id),
+          geometry: { type: "Point", coordinates: [lng, lat] },
+          properties: {
+            layer: "sample",
+            id: String(sample.id),
+            sample_code: sample.sample_code,
+            sample_type: sample.sample_type,
+            easting: Number(sample.easting),
+            northing: Number(sample.northing),
+            cu_pct: sample.cu_pct == null ? null : Number(sample.cu_pct),
+            au_gpt: sample.au_gpt == null ? null : Number(sample.au_gpt),
+            ag_gpt: sample.ag_gpt == null ? null : Number(sample.ag_gpt),
+            lab: sample.lab,
+            certificate: sample.certificate,
+            record_status: sample.record_status,
+          },
+        }];
+      }),
+    };
+
     // BBox
     const allCoords: Array<[number, number]> = [];
     const walk = (c: unknown) => {
@@ -205,7 +248,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       if (typeof c[0] === "number") allCoords.push([c[0], c[1]]);
       else for (const x of c) walk(x);
     };
-    for (const fc of [concessions, targets, satAnomalies, magAnomalies]) {
+    for (const fc of [concessions, targets, satAnomalies, magAnomalies, samples]) {
       for (const f of fc.features) {
         if ("coordinates" in f.geometry) walk((f.geometry as { coordinates: unknown }).coordinates);
       }
@@ -234,12 +277,14 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       targets,
       satAnomalies,
       magAnomalies,
+      samples,
       counts: {
         concessions: cons?.length ?? 0,
         concessionsWithGeom: concessions.features.length,
         targets: targets.features.length,
         satAnomalies: satAnomalies.features.length,
         magAnomalies: magAnomalies.features.length,
+        samples: samples.features.length,
       },
     };
   },
