@@ -1,5 +1,9 @@
-import { Download, ExternalLink, MapPin, Loader2 } from "lucide-react";
-import { CHOLQUI, LAS_MINITAS } from "../data/cholqui";
+import { useEffect, useState } from "react";
+import { CheckCircle2, Copy, Download, ExternalLink, MapPin, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { publicUrl } from "@/lib/publicUrl";
+import { CHOLQUI, CHOLQUI_ASSAYS, CHOLQUI_ASSAY_REPORTS, LAS_MINITAS } from "../data/cholqui";
 
 type Props = {
   onDownload: () => void;
@@ -14,6 +18,20 @@ export function CholquiHero({
   onDownloadTeaser,
   downloadingTeaser = false,
 }: Props) {
+  const [qr, setQr] = useState<string | null>(null);
+  const liveUrl = publicUrl(CHOLQUI.liveUrl);
+  useEffect(() => {
+    let active = true;
+    void import("qrcode").then((mod) =>
+      mod.toDataURL(liveUrl, { width: 320, margin: 1 }).then((value) => {
+        if (active) setQr(value);
+      }),
+    );
+    return () => {
+      active = false;
+    };
+  }, [liveUrl]);
+
   const kpis: Array<[string, string]> = [
     ["Superficie", `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`],
     ["Propiedad", `${CHOLQUI.pedimentos} pedimentos · ${CHOLQUI.pertenencias} pertenencias`],
@@ -23,7 +41,8 @@ export function CholquiHero({
 
   return (
     <section className="border border-hairline bg-white rounded-2xl overflow-hidden">
-      <div className="bg-surface-inverse px-6 md:px-10 py-10">
+      <div className="bg-surface-inverse px-6 md:px-10 py-10 grid gap-8 md:grid-cols-[minmax(0,1fr)_180px]">
+        <div>
         <div className="text-[11px] font-mono uppercase tracking-[0.25em] text-accent-brand-subtle">
           Geocapitals · Live map público · {CHOLQUI.code}
         </div>
@@ -40,11 +59,11 @@ export function CholquiHero({
         </p>
 
         <div className="mt-7 flex flex-wrap gap-3">
-          <button
+          <Button
             type="button"
             onClick={onDownload}
             disabled={downloading}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-accent-brand text-accent-brand-contrast text-sm font-medium disabled:opacity-60"
+            className="h-10 px-5"
           >
             {downloading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -52,13 +71,14 @@ export function CholquiHero({
               <Download className="w-4 h-4" />
             )}
             Descargar PDF de inversión
-          </button>
+          </Button>
           {onDownloadTeaser ? (
-            <button
+            <Button
               type="button"
               onClick={onDownloadTeaser}
               disabled={downloadingTeaser}
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/25 text-white text-sm disabled:opacity-60"
+              variant="outline"
+              className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
             >
               {downloadingTeaser ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -66,15 +86,37 @@ export function CholquiHero({
                 <Download className="w-4 h-4" />
               )}
               Descargar teaser de inversión
-            </button>
+            </Button>
           ) : null}
-          <a
-            href={`mailto:${CHOLQUI.contact.email}?subject=${encodeURIComponent(`${CHOLQUI.name} — interés de inversión`)}`}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/25 text-white text-sm"
+          <Button asChild variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+            <a href={`mailto:${CHOLQUI.contact.email}?subject=${encodeURIComponent(`${CHOLQUI.name} — interés de inversión`)}`}>
+              <ExternalLink /> Contactar mesa de inversión
+            </a>
+          </Button>
+        </div>
+        </div>
+        <aside className="self-end border border-primary-foreground/20 bg-primary-foreground/5 p-3">
+          {qr ? <img src={qr} alt="QR del Live Map público de Cholqui" className="w-full aspect-square bg-primary-foreground p-2" /> : <div className="aspect-square grid place-items-center"><Loader2 className="animate-spin text-primary-foreground" /></div>}
+          <div className="mt-3 text-[10px] font-mono uppercase text-primary-foreground/60">Enlace público verificable</div>
+          <div className="mt-1 text-xs text-primary-foreground break-all">geocapitals.com/live/cholqui</div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="mt-2 w-full text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+            onClick={() => void navigator.clipboard.writeText(liveUrl).then(() => toast.success("Enlace copiado"))}
           >
-            <ExternalLink className="w-4 h-4" />
-            Contactar mesa de inversión
-          </a>
+            <Copy /> Copiar enlace
+          </Button>
+        </aside>
+      </div>
+
+      <div className="grid gap-4 border-t border-hairline bg-surface px-5 py-4 md:grid-cols-[auto_1fr] md:items-center">
+        <div className="inline-flex items-center gap-2 text-sm font-medium text-content">
+          <CheckCircle2 className="h-4 w-4 text-accent-brand" /> Evidencia química actualizada
+        </div>
+        <div className="text-xs text-content-subtle md:text-right">
+          {CHOLQUI_ASSAYS.length} muestras · {CHOLQUI_ASSAY_REPORTS.length} informes · Andes Analytical + FGF Análisis Mineros
         </div>
       </div>
 
