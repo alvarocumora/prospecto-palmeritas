@@ -7,3 +7,10 @@
 - [x] Verificar `/live/cholqui` en vista previa y dominio público: 7 análisis, 3 informes y mapa real.
 - [x] Corregir la página casi vacía del PDF Cholqui y renovar la caché pública.
 - [ ] Consolidar rutas, fichas, fuentes y navegación de proyectos según el plan aprobado.
+  - [x] Definir Cholqui y Los Verdes como nombres y enlaces canónicos.
+  - [x] Mantener Franco y Tilama únicamente como alias con redirección permanente.
+  - [x] Consolidar el índice público en tres proyectos sin duplicar Los Verdes–Tilama.
+  - [x] Añadir registro único y pruebas automáticas para enlaces públicos.
+  - [ ] Migrar los antecedentes de Cholqui a las tablas canónicas.
+  - [ ] Unificar el expediente técnico y el generador PDF de ambos proyectos.
+  - [ ] Incorporar estados editoriales, trazabilidad y control previo a publicación.

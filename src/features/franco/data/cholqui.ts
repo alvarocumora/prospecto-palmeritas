@@ -2,7 +2,7 @@
  * PROYECTO CHOLQUI (ex "Gianfranco / Distrito Franco") — FUENTE ÚNICA DE VERDAD.
  *
  * Todo lo que se muestra en el live view (/live/cholqui), en la ficha de
- * inversión (/proyectos/ficha/franco) y en el PDF descargable sale de aquí.
+ * inversión (/proyectos/ficha/cholqui) y en el PDF descargable sale de aquí.
  *
  * Fuentes documentales reales (sin datos sintéticos):
  *  - Prospecto "Cholqui" (Juan Arcos Vidal Ph.D. / Andrés Leman Vargas):

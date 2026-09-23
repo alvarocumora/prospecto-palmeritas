@@ -1,7 +1,7 @@
 // Server function pública: devuelve el snapshot del proyecto Tilama
-// (Distrito Los Verdes – Tilama) para el live view /live/tilama.
+// (Distrito Los Verdes – Tilama) para el live view canónico /live/losverdes.
 // Usa el cliente admin con WHERE acotado al project_id — RLS bypass intencional
-// porque la ruta /live/tilama es pública y solo expone columnas seguras.
+// porque la ruta /live/losverdes es pública y solo expone columnas seguras.
 import { createServerFn } from "@tanstack/react-start";
 import proj4 from "proj4";
 

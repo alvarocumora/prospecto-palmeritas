@@ -14,7 +14,7 @@ import { CHOLQUI } from "./data/cholqui";
 /**
  * Live view público del Proyecto Cholqui. Toda la data proviene de
  * `data/cholqui.ts`, la misma fuente que alimenta el PDF de inversión y la
- * ficha /proyectos/ficha/franco.
+ * ficha /proyectos/ficha/cholqui.
  */
 export function FrancoDashboard() {
   const [downloading, setDownloading] = useState(false);

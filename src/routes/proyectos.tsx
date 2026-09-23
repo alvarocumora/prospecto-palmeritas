@@ -19,6 +19,8 @@ export const Route = createFileRoute("/proyectos")({
       },
       { property: "og:title", content: "Proyectos mineros — Geocapitals" },
       { property: "og:description", content: "Activos reales operando en la plataforma." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProyectosPage,
