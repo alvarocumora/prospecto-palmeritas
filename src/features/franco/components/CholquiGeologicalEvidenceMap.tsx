@@ -157,7 +157,7 @@ export function CholquiGeologicalEvidenceMap() {
           const [lng, lat] = feature.geometry.coordinates;
           const p = feature.properties;
           const s = candidateStyle(p.aloh_zscore);
-          L.circleMarker([lat, lng], {
+          const marker = L.circleMarker([lat, lng], {
             radius: s.radius,
             color: s.color,
             weight: 2,
