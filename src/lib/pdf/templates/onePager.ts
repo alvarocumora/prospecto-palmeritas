@@ -69,9 +69,16 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   y += 14;
   y += bullets(doc, M, y, model.thesis.slice(0, 3), CW, 8.6) + 16;
 
-  // Figura: gráfico si existe, si no mini-mapa
+  // Figura: prioriza evidencia territorial real; el gráfico analítico queda como fallback.
   const figH = 168;
-  if (model.chart) {
+  if (model.map?.imageDataUrl) {
+    eyebrow(doc, M, y, "Ubicación · GIS real");
+    y += 12;
+    doc.addImage(model.map.imageDataUrl, "JPEG", M, y, CW * 0.6, figH, undefined, "FAST");
+    stroke(doc, GC_COLOR.hairline);
+    doc.setLineWidth(0.6);
+    doc.rect(M, y, CW * 0.6, figH);
+  } else if (model.chart) {
     eyebrow(doc, M, y, "Análisis");
     y += 12;
     barChart(doc, {
