@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import { sha256Hex } from "@/lib/documents/signing";
 import {
   FUNDRAISE_INSTRUMENTS,
@@ -88,7 +88,7 @@ async function myRole(sb: SupabaseClient, projectId: string, me: string): Promis
 }
 
 export const getProjectFundraise = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => z.object({ projectId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<ProjectFundraiseView | null> => {
     const sb = asSb(context.supabase);
@@ -161,7 +161,7 @@ const UpsertInput = z.object({
 });
 
 export const upsertProjectFundraise = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => UpsertInput.parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const sb = asSb(context.supabase);
@@ -210,7 +210,7 @@ export const upsertProjectFundraise = createServerFn({ method: "POST" })
 
 // ---------- Compartir: genera el link público de la ficha (owner/admin) ----------
 export const generateFundraiseShareLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => z.object({ projectId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ token: string }> => {
     const sb = asSb(context.supabase);

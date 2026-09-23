@@ -2,7 +2,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 import type { Database } from "@/integrations/supabase/types";
 
 // ---------- Types ----------
@@ -205,7 +205,7 @@ const inquiryInput = z.object({
 });
 
 export const createCommodityInquiry = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => inquiryInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -279,7 +279,7 @@ export const createCommodityInquiry = createServerFn({ method: "POST" })
 // ---------- Verificación KYC del usuario actual ----------
 
 export const getMyVerificationStatus = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }): Promise<{ status: string | null }> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data } = await supabaseAdmin
@@ -330,7 +330,7 @@ export type MyLotInquiryRow = {
 
 /** Consultas recibidas sobre los lotes del seller autenticado. */
 export const listMyLotInquiries = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => z.object({ lotId: z.string().uuid().optional() }).parse(d ?? {}))
   .handler(async ({ data, context }): Promise<MyLotInquiryRow[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -382,7 +382,7 @@ export const listMyLotInquiries = createServerFn({ method: "GET" })
 
 /** Avanza una consulta por el pipeline (solo el seller dueño del lote). */
 export const updateMyLotInquiryStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -471,7 +471,7 @@ export type MyBuyerInquiryRow = {
 };
 
 export const listMyBuyerInquiries = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }): Promise<MyBuyerInquiryRow[]> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
@@ -550,7 +550,7 @@ async function assertInquiryParticipant(
 }
 
 export const listInquiryMessages = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) => z.object({ inquiryId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<InquiryMessage[]> => {
     await assertInquiryParticipant(data.inquiryId, context.userId);
@@ -573,7 +573,7 @@ export const listInquiryMessages = createServerFn({ method: "GET" })
   });
 
 export const sendInquiryMessage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .inputValidator((d: unknown) =>
     z.object({ inquiryId: z.string().uuid(), body: z.string().min(1).max(4000) }).parse(d),
   )
@@ -638,7 +638,7 @@ export type MyMarketplaceProfile = {
 };
 
 export const getMyMarketplaceProfile = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCapitalRole])
   .handler(async ({ context }): Promise<MyMarketplaceProfile> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const uid = context.userId;

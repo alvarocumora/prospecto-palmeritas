@@ -4,7 +4,7 @@
 // de solo-escritura: los leads entraban y nadie los veía.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminRole } from "@/lib/access/roleMiddleware";
 
 // Mismo patrón que investors.functions.ts: el rpc tipado del cliente de
 // usuario no acepta un genérico, así que se relaja aquí.
@@ -35,7 +35,7 @@ export type ContactMessageRow = {
 };
 
 export const listContactMessages = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ status: z.enum(["new", "handled", "all"]).default("new") }).parse(d ?? {}),
   )
@@ -54,7 +54,7 @@ export const listContactMessages = createServerFn({ method: "GET" })
   });
 
 export const setContactMessageStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ id: z.string().uuid(), status: z.enum(["new", "handled"]) }).parse(d),
   )
@@ -87,7 +87,7 @@ export type CommodityInquiryRow = {
 };
 
 export const listCommodityInquiries = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ status: z.enum(["new", "contacted", "all"]).default("new") }).parse(d ?? {}),
   )
@@ -135,7 +135,7 @@ export const listCommodityInquiries = createServerFn({ method: "GET" })
   });
 
 export const setCommodityInquiryStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ id: z.string().uuid(), status: z.enum(["new", "contacted"]) }).parse(d),
   )
@@ -164,7 +164,7 @@ export type DealInquiryRow = {
 };
 
 export const listDealInquiries = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const sb = await admin();
@@ -217,7 +217,7 @@ export type AdminListingRow = {
 };
 
 export const listAllListings = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const sb = await admin();
@@ -252,7 +252,7 @@ export const listAllListings = createServerFn({ method: "GET" })
   });
 
 export const setListingPublished = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ listingId: z.string().uuid(), published: z.boolean() }).parse(d),
   )
@@ -286,7 +286,7 @@ export type AdminCommodityLotRow = {
 };
 
 export const listAllCommodityLots = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }) => {
     await assertStaff(context.supabase, context.userId);
     const sb = await admin();
@@ -327,7 +327,7 @@ export const listAllCommodityLots = createServerFn({ method: "GET" })
  * archive: retira el lote del marketplace.
  */
 export const setCommodityLotStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z.object({ lotId: z.string().uuid(), action: z.enum(["publish", "archive"]) }).parse(d),
   )
@@ -361,7 +361,7 @@ export type AdminMarketplaceStats = {
 };
 
 export const getAdminMarketplaceStats = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }): Promise<AdminMarketplaceStats> => {
     await assertStaff(context.supabase, context.userId);
     const sb = await admin();
@@ -416,7 +416,7 @@ export type AdminSubscriptionRow = {
 };
 
 export const listSubscriptions = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .handler(async ({ context }): Promise<AdminSubscriptionRow[]> => {
     await assertStaff(context.supabase, context.userId);
     const sb = await admin();
@@ -447,7 +447,7 @@ export const listSubscriptions = createServerFn({ method: "GET" })
  * Es el write path a subscriptions que faltaba (nadie escribía la tabla).
  */
 export const setUserSubscription = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((d) =>
     z
       .object({

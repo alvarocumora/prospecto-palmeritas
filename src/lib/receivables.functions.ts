@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { effectivePaymentStatus, isValidPaymentAmount } from "@/lib/payments";
 import {
   classifyReceivable,
@@ -63,7 +63,7 @@ const emptySide = (): ReceivablesSide => ({
 });
 
 export const getReceivablesOverview = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }): Promise<ReceivablesOverview> => {
     const sb = asSb(context.supabase);
     const me = context.userId as string;

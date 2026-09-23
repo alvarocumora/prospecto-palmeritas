@@ -16,6 +16,7 @@ import {
   MapPin,
   Sparkles,
   ShieldCheck,
+  TestTube2,
   X,
 } from "lucide-react";
 
@@ -24,7 +25,7 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { getLosVerdesMapData, type LosVerdesMapData } from "@/lib/losverdes-map.functions";
 
-type LayerKey = "concessions" | "targets" | "sat" | "mag";
+type LayerKey = "concessions" | "targets" | "sat" | "mag" | "samples";
 
 const BASEMAPS = {
   satellite: {
@@ -112,6 +113,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     targets: true,
     sat: true,
     mag: true,
+    samples: true,
   });
   const [certificationMode, setCertificationMode] = useState(false);
   const [selected, setSelected] = useState<SelectedFeature | null>(null);
@@ -176,6 +178,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     addOrUpdate("src-targets", d.targets);
     addOrUpdate("src-sat", d.satAnomalies);
     addOrUpdate("src-mag", d.magAnomalies);
+    addOrUpdate("src-samples", d.samples);
 
     // Concession polygons (fill + outline)
     if (!map.getLayer("lyr-concessions-fill")) {
@@ -300,8 +303,41 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
       });
     }
 
+    if (!map.getLayer("lyr-samples")) {
+      map.addLayer({
+        id: "lyr-samples",
+        type: "circle",
+        source: "src-samples",
+        paint: {
+          "circle-color": [
+            "step",
+            ["coalesce", ["get", "cu_pct"], 0],
+            "#38bdf8",
+            0.5,
+            "#facc15",
+            1,
+            "#fb923c",
+            3,
+            "#ef4444",
+          ],
+          "circle-radius": [
+            "interpolate",
+            ["linear"],
+            ["coalesce", ["get", "cu_pct"], 0],
+            0,
+            3,
+            5,
+            8,
+          ],
+          "circle-stroke-color": "#fff7ed",
+          "circle-stroke-width": 1,
+          "circle-opacity": 0.9,
+        },
+      });
+    }
+
     // Click handler
-    const clickLayers = ["lyr-targets", "lyr-sat", "lyr-mag", "lyr-concessions-fill"];
+    const clickLayers = ["lyr-samples", "lyr-targets", "lyr-sat", "lyr-mag", "lyr-concessions-fill"];
     const onClick = (e: maplibregl.MapMouseEvent) => {
       const feats = map.queryRenderedFeatures(e.point, { layers: clickLayers });
       if (!feats.length) return;
@@ -349,6 +385,7 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     toggle("lyr-targets", visible.targets);
     toggle("lyr-sat", visible.sat);
     toggle("lyr-mag", visible.mag);
+    toggle("lyr-samples", visible.samples);
   }, [visible, mapReady, dataQ.data]);
 
   // Certification mode: filter targets by confidence_pct >= 60
@@ -412,6 +449,14 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
         <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-gold mb-1.5">
           <LayersIcon className="w-3 h-3" /> Capas
         </div>
+        <LayerToggle
+          icon={<TestTube2 className="w-3 h-3" />}
+          label="Muestras"
+          count={counts?.samples}
+          color="#fb923c"
+          checked={visible.samples}
+          onChange={(v) => setVisible((s) => ({ ...s, samples: v }))}
+        />
         <LayerToggle
           icon={<LayersIcon className="w-3 h-3" />}
           label="Concesiones"
@@ -531,7 +576,9 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
           ? `Anomalía satelital ${props.index_code ?? ""}`
           : layer === "mag_anomaly"
             ? "Anomalía magnética"
-            : "";
+             : layer === "sample"
+               ? `${props.sample_type ?? "muestra"} · ${props.lab ?? "laboratorio no informado"}`
+               : "";
 
   return (
     <div className="p-4 space-y-3">
@@ -615,6 +662,21 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
           <Metric label="Magnetismo" value={`${fmt(props.mag_nt, 1)} nT`} />
           <Metric label="Rank" value={fmt(props.rank, 0)} />
           <Metric label="Radio" value={`${fmt(props.radius_m, 0)} m`} />
+        </div>
+      )}
+
+      {layer === "sample" && (
+        <div className="space-y-2">
+          <Metric label="Código" value={props.sample_code ?? "—"} />
+          <Metric label="Cobre" value={`${fmt(props.cu_pct, 3)} % Cu`} />
+          <Metric label="Oro" value={`${fmt(props.au_gpt, 3)} g/t Au`} />
+          <Metric label="Plata" value={`${fmt(props.ag_gpt, 2)} g/t Ag`} />
+          <Metric label="Laboratorio" value={props.lab ?? "—"} />
+          <Metric label="Certificado" value={props.certificate ?? "No informado"} />
+          <Metric label="Estado" value={props.record_status ?? "—"} />
+          <div className="text-[10px] text-muted-foreground border-t border-border pt-2">
+            Antecedente geoquímico cargado. No constituye recurso ni reserva mineral.
+          </div>
         </div>
       )}
 

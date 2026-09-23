@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 
 // Trade Copilot: resume el estado del trade y sugiere el siguiente paso usando
 // exclusivamente evidencia de la BD (RLS del usuario). Nunca inventa cifras.
@@ -43,7 +43,7 @@ const SYSTEM =
   "Sé breve, ejecutivo, sin adornos. Español neutro (Chile).";
 
 export const getTradeCopilotBrief = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }): Promise<TradeCopilotBrief> => {
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -274,7 +274,7 @@ const BACKFILL_SYSTEM =
   "Si no aparece un valor, omite ese campo (no lo inventes). Responde JSON estricto.";
 
 export const suggestTradeTerms = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => BackfillInput.parse(d))
   .handler(async ({ data, context }): Promise<TradeTermsSuggestion> => {
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -377,7 +377,7 @@ const ApplyInput = z.object({
 });
 
 export const applyTradeTerms = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => ApplyInput.parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true; applied: string[] }> => {
     const sb = asSb(context.supabase);

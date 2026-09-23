@@ -232,12 +232,33 @@ export function MarketingFooter() {
               </Link>
             </li>
             <li>
+              <Link to="/satelital" className="hover:text-white">
+                Inteligencia satelital
+              </Link>
+            </li>
+            <li>
+              <Link to="/visor-3d" className="hover:text-white">
+                Visor 3D
+              </Link>
+            </li>
+            <li>
+              <Link to="/marketplace" className="hover:text-white">
+                Marketplace de commodities
+              </Link>
+            </li>
+            <li>
+              <Link to="/proyectos" className="hover:text-white">
+                Proyectos en venta
+              </Link>
+            </li>
+            <li>
               <Link to="/auth" className="hover:text-white">
                 Iniciar sesión
               </Link>
             </li>
           </ul>
         </div>
+
         <div>
           <div className="text-[11px] font-mono uppercase tracking-wider text-accent-brand-subtle mb-3">
             Compañía
@@ -249,10 +270,21 @@ export function MarketingFooter() {
               </Link>
             </li>
             <li>
+              <Link to="/empresas" className="hover:text-white">
+                Para empresas
+              </Link>
+            </li>
+            <li>
+              <Link to="/inscripcion" className="hover:text-white">
+                Inscripción de proveedores
+              </Link>
+            </li>
+            <li>
               <Link to="/contacto" className="hover:text-white">
                 Contacto
               </Link>
             </li>
+
             <li>
               <a href="mailto:info@geocapitals.com" className="hover:text-white">
                 info@geocapitals.com

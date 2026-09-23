@@ -4141,6 +4141,54 @@ export type Database = {
           },
         ]
       }
+      deal_stage_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          from_stage: string | null
+          id: string
+          inquiry_id: string
+          listing_id: string
+          note: string | null
+          to_stage: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_stage?: string | null
+          id?: string
+          inquiry_id: string
+          listing_id: string
+          note?: string | null
+          to_stage: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_stage?: string | null
+          id?: string
+          inquiry_id?: string
+          listing_id?: string
+          note?: string | null
+          to_stage?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_stage_events_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "property_deal_inquiries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deal_stage_events_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "property_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_target_markets: {
         Row: {
           deal_id: string
@@ -11799,6 +11847,54 @@ export type Database = {
         }
         Relationships: []
       }
+      project_certifications: {
+        Row: {
+          created_at: string
+          expires_on: string | null
+          file_url: string | null
+          id: string
+          issued_on: string | null
+          issuer: string | null
+          kind: string
+          notes: string | null
+          number: string | null
+          project_code: string
+          provenance: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          expires_on?: string | null
+          file_url?: string | null
+          id?: string
+          issued_on?: string | null
+          issuer?: string | null
+          kind: string
+          notes?: string | null
+          number?: string | null
+          project_code: string
+          provenance?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          expires_on?: string | null
+          file_url?: string | null
+          id?: string
+          issued_on?: string | null
+          issuer?: string | null
+          kind?: string
+          notes?: string | null
+          number?: string | null
+          project_code?: string
+          provenance?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_facts: {
         Row: {
           created_at: string
@@ -12084,6 +12180,93 @@ export type Database = {
           },
         ]
       }
+      project_operations_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          label: string
+          metric_key: string
+          period: string
+          project_code: string
+          provenance: string
+          recorded_at: string
+          source: string | null
+          unit: string | null
+          value: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label: string
+          metric_key: string
+          period: string
+          project_code: string
+          provenance?: string
+          recorded_at?: string
+          source?: string | null
+          unit?: string | null
+          value?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string
+          metric_key?: string
+          period?: string
+          project_code?: string
+          provenance?: string
+          recorded_at?: string
+          source?: string | null
+          unit?: string | null
+          value?: number | null
+        }
+        Relationships: []
+      }
+      project_stage_timeline: {
+        Row: {
+          completed_on: string | null
+          created_at: string
+          evidence: string | null
+          id: string
+          label: string
+          project_code: string
+          provenance: string
+          sort_order: number
+          stage_key: string
+          started_on: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_on?: string | null
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          label: string
+          project_code: string
+          provenance?: string
+          sort_order?: number
+          stage_key: string
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_on?: string | null
+          created_at?: string
+          evidence?: string | null
+          id?: string
+          label?: string
+          project_code?: string
+          provenance?: string
+          sort_order?: number
+          stage_key?: string
+          started_on?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       project_technical_brief: {
         Row: {
           conclusion: string | null
@@ -12286,6 +12469,8 @@ export type Database = {
           nda_ip: string | null
           nda_signature: string | null
           nda_signed_at: string | null
+          stage: string
+          stage_updated_at: string
           status: string
           updated_at: string
         }
@@ -12300,6 +12485,8 @@ export type Database = {
           nda_ip?: string | null
           nda_signature?: string | null
           nda_signed_at?: string | null
+          stage?: string
+          stage_updated_at?: string
           status?: string
           updated_at?: string
         }
@@ -12314,6 +12501,8 @@ export type Database = {
           nda_ip?: string | null
           nda_signature?: string | null
           nda_signed_at?: string | null
+          stage?: string
+          stage_updated_at?: string
           status?: string
           updated_at?: string
         }
@@ -15205,6 +15394,148 @@ export type Database = {
           },
         ]
       }
+      spv_entities: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          incorporated_on: string | null
+          legal_name: string
+          notes: string | null
+          project_code: string
+          rut: string | null
+          share_price: number | null
+          total_shares: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          incorporated_on?: string | null
+          legal_name: string
+          notes?: string | null
+          project_code: string
+          rut?: string | null
+          share_price?: number | null
+          total_shares?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          incorporated_on?: string | null
+          legal_name?: string
+          notes?: string | null
+          project_code?: string
+          rut?: string | null
+          share_price?: number | null
+          total_shares?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      spv_position_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          detail: Json
+          event_type: string
+          id: string
+          position_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type: string
+          id?: string
+          position_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          detail?: Json
+          event_type?: string
+          id?: string
+          position_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spv_position_events_position_id_fkey"
+            columns: ["position_id"]
+            isOneToOne: false
+            referencedRelation: "spv_positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      spv_positions: {
+        Row: {
+          amount_paid: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          document_url: string | null
+          id: string
+          instrument: string
+          investor_email: string | null
+          investor_name: string
+          investor_user_id: string | null
+          notes: string | null
+          shares: number
+          spv_id: string
+          status: string
+          subscribed_on: string
+          updated_at: string
+        }
+        Insert: {
+          amount_paid?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          document_url?: string | null
+          id?: string
+          instrument?: string
+          investor_email?: string | null
+          investor_name: string
+          investor_user_id?: string | null
+          notes?: string | null
+          shares?: number
+          spv_id: string
+          status?: string
+          subscribed_on?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_paid?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          document_url?: string | null
+          id?: string
+          instrument?: string
+          investor_email?: string | null
+          investor_name?: string
+          investor_user_id?: string | null
+          notes?: string | null
+          shares?: number
+          spv_id?: string
+          status?: string
+          subscribed_on?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "spv_positions_spv_id_fkey"
+            columns: ["spv_id"]
+            isOneToOne: false
+            referencedRelation: "spv_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stac_acquisitions: {
         Row: {
           acquisition_date: string
@@ -17401,6 +17732,438 @@ export type Database = {
         }
         Relationships: []
       }
+      water_assets: {
+        Row: {
+          asset_id: string
+          capture_system: string | null
+          commune: string
+          country: string
+          created_at: string
+          dga_resolution: string | null
+          dga_resolution_date: string | null
+          exercise: string
+          flow_eventual_ls: number | null
+          flow_notes: string | null
+          flow_permanent_ls: number
+          id: string
+          latitude: number
+          longitude: number
+          name: string
+          nature: string
+          province: string
+          quality_status: string
+          reference_value_clp: number | null
+          region: string
+          right_type: string
+          river: string
+          status: string
+          summary: string | null
+          unit_value_clp: number
+          updated_at: string
+          utm_datum: string | null
+          utm_east: number | null
+          utm_north: number | null
+          utm_zone: string | null
+          verification_status: string
+        }
+        Insert: {
+          asset_id: string
+          capture_system?: string | null
+          commune: string
+          country?: string
+          created_at?: string
+          dga_resolution?: string | null
+          dga_resolution_date?: string | null
+          exercise?: string
+          flow_eventual_ls?: number | null
+          flow_notes?: string | null
+          flow_permanent_ls?: number
+          id?: string
+          latitude: number
+          longitude: number
+          name: string
+          nature?: string
+          province: string
+          quality_status?: string
+          reference_value_clp?: number | null
+          region: string
+          right_type?: string
+          river: string
+          status?: string
+          summary?: string | null
+          unit_value_clp?: number
+          updated_at?: string
+          utm_datum?: string | null
+          utm_east?: number | null
+          utm_north?: number | null
+          utm_zone?: string | null
+          verification_status?: string
+        }
+        Update: {
+          asset_id?: string
+          capture_system?: string | null
+          commune?: string
+          country?: string
+          created_at?: string
+          dga_resolution?: string | null
+          dga_resolution_date?: string | null
+          exercise?: string
+          flow_eventual_ls?: number | null
+          flow_notes?: string | null
+          flow_permanent_ls?: number
+          id?: string
+          latitude?: number
+          longitude?: number
+          name?: string
+          nature?: string
+          province?: string
+          quality_status?: string
+          reference_value_clp?: number | null
+          region?: string
+          right_type?: string
+          river?: string
+          status?: string
+          summary?: string | null
+          unit_value_clp?: number
+          updated_at?: string
+          utm_datum?: string | null
+          utm_east?: number | null
+          utm_north?: number | null
+          utm_zone?: string | null
+          verification_status?: string
+        }
+        Relationships: []
+      }
+      water_documents: {
+        Row: {
+          asset_uuid: string
+          created_at: string
+          doc_date: string | null
+          doc_type: string
+          external_url: string | null
+          id: string
+          institution: string | null
+          is_public: boolean
+          status: string
+          storage_path: string | null
+          title: string
+        }
+        Insert: {
+          asset_uuid: string
+          created_at?: string
+          doc_date?: string | null
+          doc_type: string
+          external_url?: string | null
+          id?: string
+          institution?: string | null
+          is_public?: boolean
+          status?: string
+          storage_path?: string | null
+          title: string
+        }
+        Update: {
+          asset_uuid?: string
+          created_at?: string
+          doc_date?: string | null
+          doc_type?: string
+          external_url?: string | null
+          id?: string
+          institution?: string | null
+          is_public?: boolean
+          status?: string
+          storage_path?: string | null
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_documents_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_due_diligence: {
+        Row: {
+          asset_uuid: string
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          item: string
+          note: string | null
+          status: string
+        }
+        Insert: {
+          asset_uuid: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          item: string
+          note?: string | null
+          status?: string
+        }
+        Update: {
+          asset_uuid?: string
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          item?: string
+          note?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_due_diligence_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_hydrology: {
+        Row: {
+          asset_uuid: string
+          basin: string | null
+          created_at: string
+          dga_station: string | null
+          drought_risk: string | null
+          ecological_flow_ls: number | null
+          id: string
+          mean_monthly_flow: Json | null
+          notes: string | null
+          sub_basin: string | null
+        }
+        Insert: {
+          asset_uuid: string
+          basin?: string | null
+          created_at?: string
+          dga_station?: string | null
+          drought_risk?: string | null
+          ecological_flow_ls?: number | null
+          id?: string
+          mean_monthly_flow?: Json | null
+          notes?: string | null
+          sub_basin?: string | null
+        }
+        Update: {
+          asset_uuid?: string
+          basin?: string | null
+          created_at?: string
+          dga_station?: string | null
+          drought_risk?: string | null
+          ecological_flow_ls?: number | null
+          id?: string
+          mean_monthly_flow?: Json | null
+          notes?: string | null
+          sub_basin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_hydrology_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_legal_records: {
+        Row: {
+          asset_uuid: string
+          attribute: string
+          created_at: string
+          display_order: number
+          id: string
+          note: string | null
+          value: string | null
+          verification: string
+        }
+        Insert: {
+          asset_uuid: string
+          attribute: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          note?: string | null
+          value?: string | null
+          verification?: string
+        }
+        Update: {
+          asset_uuid?: string
+          attribute?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          note?: string | null
+          value?: string | null
+          verification?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_legal_records_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_portfolio_assets: {
+        Row: {
+          asset_uuid: string
+          portfolio_id: string
+        }
+        Insert: {
+          asset_uuid: string
+          portfolio_id: string
+        }
+        Update: {
+          asset_uuid?: string
+          portfolio_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_portfolio_assets_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "water_portfolio_assets_portfolio_id_fkey"
+            columns: ["portfolio_id"]
+            isOneToOne: false
+            referencedRelation: "water_portfolios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_portfolios: {
+        Row: {
+          code: string
+          color: string
+          created_at: string
+          description: string | null
+          display_order: number
+          id: string
+          name: string
+        }
+        Insert: {
+          code: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name: string
+        }
+        Update: {
+          code?: string
+          color?: string
+          created_at?: string
+          description?: string | null
+          display_order?: number
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      water_quality_tests: {
+        Row: {
+          asset_uuid: string
+          certification: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          laboratory: string | null
+          parameters: Json
+          sampling_date: string | null
+          status: string
+        }
+        Insert: {
+          asset_uuid: string
+          certification?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          laboratory?: string | null
+          parameters?: Json
+          sampling_date?: string | null
+          status?: string
+        }
+        Update: {
+          asset_uuid?: string
+          certification?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          laboratory?: string | null
+          parameters?: Json
+          sampling_date?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_quality_tests_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      water_valuations: {
+        Row: {
+          asset_uuid: string
+          created_at: string
+          currency: string
+          flow_ls: number
+          id: string
+          method: string
+          notes: string | null
+          reference_value_clp: number
+          unit_value_clp: number
+          valuation_date: string
+        }
+        Insert: {
+          asset_uuid: string
+          created_at?: string
+          currency?: string
+          flow_ls: number
+          id?: string
+          method?: string
+          notes?: string | null
+          reference_value_clp: number
+          unit_value_clp: number
+          valuation_date?: string
+        }
+        Update: {
+          asset_uuid?: string
+          created_at?: string
+          currency?: string
+          flow_ls?: number
+          id?: string
+          method?: string
+          notes?: string | null
+          reference_value_clp?: number
+          unit_value_clp?: number
+          valuation_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "water_valuations_asset_uuid_fkey"
+            columns: ["asset_uuid"]
+            isOneToOne: false
+            referencedRelation: "water_assets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       concession_change_summary: {
@@ -17739,6 +18502,31 @@ export type Database = {
           risk_band: string
           risk_score: number
         }[]
+      }
+      deal_advance: {
+        Args: { p_inquiry_id: string; p_note?: string; p_stage: string }
+        Returns: {
+          closed_at: string | null
+          closed_reason: string | null
+          created_at: string
+          id: string
+          inquirer_user_id: string
+          listing_id: string
+          message: string | null
+          nda_ip: string | null
+          nda_signature: string | null
+          nda_signed_at: string | null
+          stage: string
+          stage_updated_at: string
+          status: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "property_deal_inquiries"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -18592,12 +19380,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -18621,11 +19409,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -18646,11 +19434,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -18671,11 +19459,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -18688,11 +19476,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

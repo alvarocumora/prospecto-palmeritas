@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import {
   CONCESSION_TYPES,
   CONCESSION_STATUSES,
@@ -107,7 +107,7 @@ async function selectConcessions(
 }
 
 export const getProjectConcessions = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => z.object({ projectId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<ConcessionsView> => {
     const sb = asSb(context.supabase);
@@ -152,7 +152,7 @@ const SaveInput = z.object({
 });
 
 export const saveProjectConcessions = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => SaveInput.parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true; count: number }> => {
     const sb = asSb(context.supabase);

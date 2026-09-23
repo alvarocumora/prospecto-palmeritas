@@ -1,8 +1,9 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { DemoLiveBanner } from "@/features/marketing/DemoLiveBanner";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/live/franco")({
+  beforeLoad: () => {
+    throw redirect({ to: "/live/cholqui", replace: true, statusCode: 301 });
+  },
   head: () => ({
     meta: [
       { title: "Demo · Live Map · Proyecto Cholqui — Geocapitals" },
@@ -14,14 +15,5 @@ export const Route = createFileRoute("/live/franco")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: LiveMapFrancoPage,
+  component: () => null,
 });
-
-function LiveMapFrancoPage() {
-  return (
-    <div>
-      <DemoLiveBanner />
-      <FrancoDashboard />
-    </div>
-  );
-}

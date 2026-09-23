@@ -5,7 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import {
   mapOverlapRow,
   summarizeOverlaps,
@@ -38,7 +38,7 @@ export type TenureOverlapResult = {
 };
 
 export const checkTenureOverlaps = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => Input.parse(d))
   .handler(async ({ data, context }): Promise<TenureOverlapResult> => {
     const sb = asSb(context.supabase);

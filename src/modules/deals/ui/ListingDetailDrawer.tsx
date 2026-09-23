@@ -16,11 +16,13 @@ import {
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { usePropertyListing } from "@/hooks/usePropertyListings";
-import { getDataRoomDownloadUrl } from "@/lib/dataRoom.functions";
+import { getDataRoomDownloadUrl, signNdaAndGrantAccess } from "@/lib/dataRoom.functions";
 import { ValuationPanel } from "./ValuationPanel";
+import { DealStageTracker } from "./DealStageTracker";
 import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
-import { signListingNda, upsertInquiry } from "../application/inquiries";
+import { upsertInquiry } from "../application/inquiries";
+
 
 export function ListingDetailDrawer({
   listingId,
@@ -67,19 +69,20 @@ export function ListingDetailDrawer({
   const signNDA = async () => {
     if (!user || !listing) return;
     setSigning(true);
-    const { error } = await signListingNda({
-      listingId: listing.id,
-      userId: user.id,
-      signature: user.email ?? "signed",
-    });
-    setSigning(false);
-    if (error) {
-      toast.error(`No se pudo firmar el NDA: ${error.message}`);
-      return;
+    try {
+      // Firma NDA + avance de etapa + permiso de data room + bitácora (server)
+      await signNdaAndGrantAccess({
+        data: { listingId: listing.id, signature: user.email ?? "signed" },
+      });
+      toast.success("NDA firmado · acceso al data room habilitado");
+      refresh();
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "No se pudo firmar el NDA");
+    } finally {
+      setSigning(false);
     }
-    toast.success("NDA firmado · acceso al data room habilitado");
-    refresh();
   };
+
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
@@ -282,8 +285,9 @@ export function ListingDetailDrawer({
                                 onClick={async () => {
                                   try {
                                     const { url } = await getDataRoomDownloadUrl({
-                                      data: { fileId: f.id },
+                                      data: { listingId: listing.id, fileId: f.id },
                                     });
+
                                     window.open(url, "_blank", "noopener");
                                   } catch (e) {
                                     toast.error(
@@ -306,6 +310,15 @@ export function ListingDetailDrawer({
 
               {tab === "inquiry" && (
                 <div className="space-y-4">
+                  {inquiry && (
+                    <DealStageTracker
+                      listingId={listing.id}
+                      onAdvanced={() => {
+                        refresh();
+                        onMutated();
+                      }}
+                    />
+                  )}
                   {isOwner ? (
                     <div className="p-3 rounded border border-border bg-bg-elevated text-xs font-mono text-muted-foreground">
                       Eres el titular de este listing. Las consultas de interesados aparecerán en tu

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import { publicUrl } from "@/lib/publicUrl";
 
 // ---------------------------------------------------------------------------
@@ -36,7 +36,7 @@ const createSchema = z.object({
 });
 
 export const createOperation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) => createSchema.parse(raw))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -178,7 +178,7 @@ export const createOperation = createServerFn({ method: "POST" })
   });
 
 export const listOperations = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("operations")
@@ -192,7 +192,7 @@ export const listOperations = createServerFn({ method: "GET" })
   });
 
 export const getOperationDetail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { data: op, error } = await context.supabase
@@ -259,7 +259,7 @@ export const getOperationDetail = createServerFn({ method: "POST" })
   });
 
 export const regenerateInvitation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -352,7 +352,7 @@ export const regenerateInvitation = createServerFn({ method: "POST" })
   });
 
 export const revokeInvitation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) => z.object({ invitation_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -365,7 +365,7 @@ export const revokeInvitation = createServerFn({ method: "POST" })
   });
 
 export const createOperationTask = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z
       .object({
@@ -394,7 +394,7 @@ export const createOperationTask = createServerFn({ method: "POST" })
   });
 
 export const postOperationMessage = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((raw: unknown) =>
     z
       .object({

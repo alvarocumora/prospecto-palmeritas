@@ -6,7 +6,13 @@
 // y están sujetos a due diligence, NDA y acuerdo definitivo. Este archivo es
 // la única fuente: editar aquí actualiza ficha, simulador y cards.
 
-export type FichaSlug = "palmeras" | "losverdes" | "tilama" | "franco";
+import {
+  CHOLQUI,
+  CHOLQUI_HIGHLIGHTS,
+  CHOLQUI_ROUND,
+} from "@/features/franco/data/cholqui";
+
+export type FichaSlug = "palmeras" | "losverdes" | "cholqui";
 
 export type InvestmentScenario = {
   key: "conservador" | "base" | "optimista";
@@ -137,84 +143,40 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
       { when: "T2 2027", what: "Estimación de recursos inicial" },
     ],
   },
-  tilama: {
-    slug: "tilama",
-    code: "TILAMA",
-    name: "Tilama Norte",
-    region: "Choapa · Coquimbo",
-    country: "Chile",
-    commodity: "Cu-Au",
-    stage: "Pre-feasibility activa",
-    stageDetail: "Catastro y boletines vigilados, geofísica MAG correlacionada.",
-    liveTo: "/live/tilama",
-    highlights: [
-      "Geofísica MAG correlacionada con estructuras",
-      "Vigilancia activa de catastro y boletín minero",
-      "Acceso por ruta pavimentada · agua y energía cercanas",
-    ],
-    valuationUsd: { low: 3_000_000, high: 5_000_000, method: "Comparables del distrito" },
-    roundSizeUsd: 800_000,
-    minTicketUsd: 20_000,
-    instrument: "Equity SpA",
-    equityOfferedPct: 18,
-    horizonYears: 4,
-    scenarios: SCENARIOS_STD,
-    useOfFunds: [
-      { label: "Geofísica complementaria", pct: 30 },
-      { label: "Perforación scout", pct: 40 },
-      { label: "Patentes y catastro", pct: 15 },
-      { label: "Estudios", pct: 10 },
-      { label: "Administración", pct: 5 },
-    ],
-    milestones: [
-      { when: "T3 2026", what: "Geofísica IP complementaria" },
-      { when: "T1 2027", what: "Perforación scout (4 sondajes)" },
-    ],
-  },
-  franco: {
-    slug: "franco",
-    code: "CHOLQUI",
-    name: "Proyecto Cholqui",
-    region: "Melipilla · R. Metropolitana",
-    country: "Chile",
-    commodity: "Cu-Au-Ag",
-    stage: "Exploración avanzada",
+  // Cholqui: los términos vienen de la fuente única del proyecto
+  // (src/features/franco/data/cholqui.ts), la misma que alimenta el live view
+  // y el PDF de inversión — nunca duplicar cifras aquí.
+  cholqui: {
+    slug: "cholqui",
+    code: CHOLQUI.code,
+    name: CHOLQUI.name,
+    region: CHOLQUI.region,
+    country: CHOLQUI.country,
+    commodity: CHOLQUI.commodity,
+    stage: CHOLQUI.stage,
     stageDetail:
-      "Yacimiento Cu-Au-Ag con buenas leyes; faena vecina (Mina Las Minitas) en producción sobre la misma estructura. Muestreo de superficie a laboratorio certificado.",
-    liveTo: "/live/franco",
-    highlights: [
-      "Cu-Au-Ag con buenas leyes en zona central (30 min de la ruta 78)",
-      "~5.000 ha (20 pedimentos + 15 pertenencias) rodeando a Mina Las Minitas en producción",
-      "Colinda con pertenencias de Yamana Gold; sin comunidades cercanas",
-    ],
+      "Proyecto Cu-Au-Ag con muestreo de superficie a laboratorio certificado y faena vecina (Mina Las Minitas, de un tercero) en producción sobre la misma estructura. Sin estimación de recursos ni reservas bajo estándar reconocido.",
+    liveTo: CHOLQUI.liveUrl,
+    highlights: [...CHOLQUI_HIGHLIGHTS].slice(0, 3),
     valuationUsd: {
-      low: 4_000_000,
-      high: 6_000_000,
-      method: "Comparables + flujo a leyes 1,5–2,5% Cu",
+      low: CHOLQUI_ROUND.valuationLowUsd,
+      high: CHOLQUI_ROUND.valuationHighUsd,
+      method: CHOLQUI_ROUND.valuationMethod,
     },
-    roundSizeUsd: 1_000_000,
-    minTicketUsd: 25_000,
-    instrument: "Equity SpA",
-    equityOfferedPct: 15,
-    horizonYears: 4,
+    roundSizeUsd: CHOLQUI_ROUND.roundSizeUsd,
+    minTicketUsd: CHOLQUI_ROUND.minTicketUsd,
+    instrument: CHOLQUI_ROUND.instrument,
+    equityOfferedPct: CHOLQUI_ROUND.equityOfferedPct,
+    horizonYears: CHOLQUI_ROUND.horizonYears,
     scenarios: SCENARIOS_STD,
-    useOfFunds: [
-      { label: "Muestreo y sondaje de confirmación", pct: 40 },
-      { label: "Ingeniería y plan minero", pct: 25 },
-      { label: "Patentes y catastro", pct: 15 },
-      { label: "Estudios, permisos y QP", pct: 15 },
-      { label: "Administración", pct: 5 },
-    ],
-    milestones: [
-      { when: "T3 2026", what: "Sondaje de confirmación de leyes" },
-      { when: "T4 2026", what: "Estimación de recursos y plan minero" },
-      { when: "T2 2027", what: "Permisos e inicio de explotación" },
-    ],
+    useOfFunds: CHOLQUI_ROUND.useOfFunds.map((u) => ({ label: u.label, pct: u.pct })),
+    milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
   },
 };
 
 export function getFicha(slug: string): ProjectFicha | null {
-  return (FICHAS as Record<string, ProjectFicha>)[slug] ?? null;
+  const canonicalSlug = slug === "franco" ? "cholqui" : slug === "tilama" ? "losverdes" : slug;
+  return (FICHAS as Record<string, ProjectFicha>)[canonicalSlug] ?? null;
 }
 
 export type SimulationRow = {

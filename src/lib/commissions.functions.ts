@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { COMMISSION_STATUSES, commissionTotals, type CommissionTotals } from "@/lib/commissions";
 
 // Comisiones de asociados por deal (RLS owner-only). Degrada elegante si la
@@ -27,7 +27,7 @@ export type CommissionRow = {
 };
 
 export const listCommissions = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(
     async ({
       context,
@@ -88,7 +88,7 @@ const UpsertInput = z.object({
 });
 
 export const upsertCommission = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => UpsertInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -125,7 +125,7 @@ export const upsertCommission = createServerFn({ method: "POST" })
   });
 
 export const setCommissionStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ id: z.string().uuid(), status: z.enum(COMMISSION_STATUSES) }).parse(d),
   )
@@ -143,7 +143,7 @@ export const setCommissionStatus = createServerFn({ method: "POST" })
   });
 
 export const deleteCommission = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await asSb(context.supabase)

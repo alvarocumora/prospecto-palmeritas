@@ -19,6 +19,8 @@ export const Route = createFileRoute("/proyectos")({
       },
       { property: "og:title", content: "Proyectos mineros — Geocapitals" },
       { property: "og:description", content: "Activos reales operando en la plataforma." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: ProyectosPage,
@@ -48,23 +50,11 @@ const SHOWCASE = [
     ],
   },
   {
-    code: "TILAMA",
-    name: "Tilama Norte",
-    region: "Choapa · Coquimbo",
-    commodity: "Cu-Au",
-    to: "/proyectos/ficha/tilama",
-    bullets: [
-      "Catastro + boletines vigilados",
-      "Geofísica MAG correlacionada",
-      "Pre-feasibility activa",
-    ],
-  },
-  {
     code: "CHOLQUI",
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    to: "/proyectos/ficha/franco",
+    to: "/proyectos/ficha/cholqui",
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",

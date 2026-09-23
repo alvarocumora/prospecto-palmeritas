@@ -1,13 +1,13 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // ============================================================
 // listMyWatchlist
 // ============================================================
 export const listMyWatchlist = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data: items, error } = await supabase
@@ -53,7 +53,7 @@ export const listMyWatchlist = createServerFn({ method: "GET" })
 // addToWatchlist (con chequeo de límite por plan)
 // ============================================================
 export const addToWatchlist = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -99,7 +99,7 @@ export const addToWatchlist = createServerFn({ method: "POST" })
 // removeFromWatchlist
 // ============================================================
 export const removeFromWatchlist = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase.from("catastro_watchlist").delete().eq("id", data.id);
@@ -111,7 +111,7 @@ export const removeFromWatchlist = createServerFn({ method: "POST" })
 // listMyAlerts
 // ============================================================
 export const listMyAlerts = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("catastro_alerts")
@@ -126,7 +126,7 @@ export const listMyAlerts = createServerFn({ method: "GET" })
 // markAlertRead
 // ============================================================
 export const markAlertRead = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireCatastroRole])
   .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { error } = await context.supabase

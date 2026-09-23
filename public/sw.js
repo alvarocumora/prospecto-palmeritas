@@ -3,7 +3,7 @@
    - CacheFirst for map tiles (Esri + OSM) so terreno offline funciona en zonas ya vistas
    - Never caches /api/*, /_*, /~oauth, /sw.js, /version.json, JS/CSS assets
 */
-const VERSION = "geocap-sw-v1";
+const VERSION = "geocap-sw-v2";
 const TILE_CACHE = `geocap-tiles-${VERSION}`;
 const HTML_CACHE = `geocap-html-${VERSION}`;
 const MAX_TILES = 800;

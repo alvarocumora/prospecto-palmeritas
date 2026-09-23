@@ -17,6 +17,8 @@ import {
   Download,
   Printer,
   ExternalLink,
+  GitCompareArrows,
+  ScanSearch,
 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
@@ -123,6 +125,7 @@ function CatastroMap() {
   const [showFilters, setShowFilters] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [selected, setSelected] = useState<SelectedProps | null>(null);
+  const [analysisSelection, setAnalysisSelection] = useState<SelectedProps[]>([]);
 
   // Espejo del estado para escribir la URL desde eventos del mapa sin closures viejos.
   const stateRef = useRef({ tipo, situacion, basemap, showEliminadas, navigate });
@@ -598,7 +601,15 @@ function CatastroMap() {
           </div>
         )}
 
-        {/* Aviso: bajo el zoom mínimo la capa no se solicita */}
+        {analysisSelection.length > 0 && (
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[500] rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg px-3 py-2 flex items-center gap-3 print:hidden">
+            <div className="text-[10px] font-mono"><strong>{analysisSelection.length}</strong> concesión(es) en análisis</div>
+            <Link to="/dashboard/catastro" className="rounded bg-primary px-2 py-1 text-[10px] font-mono text-primary-foreground">Abrir Mining Intelligence</Link>
+            <button type="button" onClick={()=>setAnalysisSelection([])} className="text-[10px] font-mono text-muted-foreground">Limpiar</button>
+          </div>
+        )}
+
+                {/* Aviso: bajo el zoom mínimo la capa no se solicita */}
         {needsZoom && !mapError && (
           <div className="absolute top-16 sm:top-3 left-1/2 -translate-x-1/2 z-[400] px-3 py-2 rounded bg-background/95 border border-border text-[11px] font-mono text-foreground backdrop-blur shadow max-w-[90%] text-center print:hidden">
             Acércate (zoom {LAYER_MIN_ZOOM}+) para cargar las concesiones — la capa nacional tiene

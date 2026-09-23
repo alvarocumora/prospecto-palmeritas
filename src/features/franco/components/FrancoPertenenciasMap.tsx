@@ -12,6 +12,7 @@ import {
   getFrancoCadastreCross,
   type FrancoPertenenciaMatch,
 } from "@/lib/franco-cadastre.functions";
+import { CHOLQUI_ASSAYS, CHOLQUI_POINTS, LAS_MINITAS } from "../data/cholqui";
 
 type FCFeature = {
   type: "Feature";
@@ -61,6 +62,14 @@ export function FrancoPertenenciasMap() {
     }
     return m;
   }, [data]);
+
+  const assayByPoint = useMemo(
+    () =>
+      new Map(
+        CHOLQUI_ASSAYS.map((assay) => [assay.sample.replace(/[-\s]/g, "").toUpperCase(), assay]),
+      ),
+    [],
+  );
 
   // Init map once
   useEffect(() => {
@@ -138,6 +147,52 @@ export function FrancoPertenenciasMap() {
         },
       });
       layer.addTo(mapRef.current);
+
+      // Puntos de observación / muestreo del prospecto + faena vecina.
+      for (const p of CHOLQUI_POINTS) {
+        const assay = assayByPoint.get(p.code.replace(/[-\s]/g, "").toUpperCase());
+        const assayHtml = assay
+          ? `<div style="margin-top:6px;padding-top:6px;border-top:1px solid #D9D5CB">
+               <div style="font-weight:700;color:#2447D6">ANÁLISIS DISPONIBLE · ${assay.lab}</div>
+               <div>Cu total: <b>${assay.cuTotalPct.toLocaleString("es-CL")} %</b> · Cu soluble: <b>${assay.cuSolublePct.toLocaleString("es-CL")} %</b></div>
+               <div>Au: ${assay.auGpt.toLocaleString("es-CL")} g/t · Ag: ${assay.agPpm.toLocaleString("es-CL")} g/t</div>
+               <div>Informe ${assay.reportId}${assay.laboratoryCode ? ` · código ${assay.laboratoryCode}` : ""} · ${assay.reportDate}</div>
+             </div>`
+          : `<div style="margin-top:6px;color:#8A949C">Sin análisis químico asociado en los antecedentes disponibles</div>`;
+        L.circleMarker([p.lat, p.lng], {
+          radius: assay ? 7 : 5,
+          color: "#2447D6",
+          weight: 2,
+          fillColor: assay ? "#D4AF37" : "#2447D6",
+          fillOpacity: assay ? 0.95 : 0.65,
+        })
+          .bindPopup(
+            `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.4">
+               <div style="font-weight:700">${p.code} · ${p.name}</div>
+               <div>PSAD'56 19H: ${p.utmE} E / ${p.utmN} N</div>
+               <div>WGS84: ${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}</div>
+               <div style="color:#8A949C">Observación de terreno — no es ley media</div>
+               ${assayHtml}
+             </div>`,
+          )
+          .addTo(mapRef.current);
+      }
+      L.circleMarker([LAS_MINITAS.lat, LAS_MINITAS.lng], {
+        radius: 8,
+        color: "#C0703A",
+        weight: 3,
+        fillColor: "#C0703A",
+        fillOpacity: 0.5,
+      })
+        .bindPopup(
+          `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.4">
+             <div style="font-weight:700;color:#C0703A">${LAS_MINITAS.name}</div>
+             <div>${LAS_MINITAS.holder}</div>
+             <div>~${LAS_MINITAS.throughputTMonth.toLocaleString("es-CL")} t/mes · ~${LAS_MINITAS.areaHa} ha</div>
+             <div style="color:#8A949C">Faena de un tercero — no es producción del proyecto</div>
+           </div>`,
+        )
+        .addTo(mapRef.current);
       try {
         mapRef.current.fitBounds(layer.getBounds(), { padding: [20, 20] });
       } catch {
@@ -148,7 +203,7 @@ export function FrancoPertenenciasMap() {
     return () => {
       cancelled = true;
     };
-  }, [matchByName]);
+  }, [assayByPoint, matchByName]);
 
   return (
     <Card className="p-6" accent="gold">
@@ -164,11 +219,13 @@ export function FrancoPertenenciasMap() {
           <LegendDot color="#4fa3a3" label="Geom" />
           <LegendDot color="#b87333" label="Nombre" />
           <LegendDot color="#6b7280" label="Sin match" />
+          <LegendDot color="#d4af37" label="Muestra analizada" />
         </div>
       </div>
       <div className="relative">
         <div
           ref={containerRef}
+          data-report-map="cholqui"
           className="w-full h-[460px] rounded border border-border overflow-hidden bg-bg-secondary"
         />
         {isLoading && (

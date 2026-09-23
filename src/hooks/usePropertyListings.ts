@@ -3,6 +3,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { listDataRoomFiles } from "@/lib/dataRoom.functions";
+
 
 export interface PropertyListing {
   id: string;
@@ -37,15 +39,18 @@ export interface DataRoomFile {
   mime_type: string | null;
   category: string | null;
   requires_nda: boolean;
-  uploaded_by: string;
+  pending?: boolean;
   created_at: string;
 }
+
 
 export interface DealInquiry {
   id: string;
   listing_id: string;
   inquirer_user_id: string;
   status: string;
+  stage?: string | null;
+  stage_updated_at?: string | null;
   message: string | null;
   nda_signed_at: string | null;
   created_at: string;
@@ -96,13 +101,12 @@ export function usePropertyListing(id: string | null) {
     setLoading(true);
     const { data: u } = await supabase.auth.getUser();
     const uid = u.user?.id ?? null;
-    const [{ data: l }, { data: f }, { data: i }] = await Promise.all([
+    const [{ data: l }, dataRoomFiles, { data: i }] = await Promise.all([
       supabase.from("property_listings").select("*").eq("id", id).maybeSingle(),
-      supabase
-        .from("property_data_room_files")
-        .select("*")
-        .eq("listing_id", id)
-        .order("created_at", { ascending: false }),
+      // Data room canónico (data_rooms del proyecto) vía server function
+      uid
+        ? listDataRoomFiles({ data: { listingId: id } }).catch(() => [] as DataRoomFile[])
+        : Promise.resolve([] as DataRoomFile[]),
       uid
         ? supabase
             .from("property_deal_inquiries")
@@ -113,8 +117,9 @@ export function usePropertyListing(id: string | null) {
         : Promise.resolve({ data: null }),
     ]);
     setListing((l as PropertyListing) ?? null);
-    setFiles((f ?? []) as DataRoomFile[]);
+    setFiles(dataRoomFiles as DataRoomFile[]);
     setInquiry((i as DealInquiry) ?? null);
+
     setLoading(false);
   }, [id]);
 

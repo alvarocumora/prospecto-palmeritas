@@ -8,7 +8,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createHash } from "crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { publicUrl } from "@/lib/publicUrl";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
@@ -152,7 +152,7 @@ async function loadTradeCtx(sb: SupabaseClient, tradeId: string) {
 }
 
 export const generateTradePack = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -279,7 +279,7 @@ export const generateTradePack = createServerFn({ method: "POST" })
   });
 
 export const dispatchTradePack = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z
       .object({
@@ -389,7 +389,7 @@ export const dispatchTradePack = createServerFn({ method: "POST" })
 
 /** Lista todas las versiones históricas del pack de un trade, agrupadas por doc_type. */
 export const listTradePackVersions = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ tradeId: z.string().uuid() }).parse(d),
   )
@@ -418,7 +418,7 @@ export const listTradePackVersions = createServerFn({ method: "GET" })
 
 /** Firma la URL de una versión histórica específica y la devuelve por 60 días. */
 export const signTradePackVersion = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
     z.object({ versionId: z.string().uuid() }).parse(d),
   )

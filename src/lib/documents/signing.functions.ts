@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import type { GeneratedDoc } from "@/lib/documents/model";
 import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import {
@@ -51,7 +51,7 @@ const CreateInput = z.object({
 });
 
 export const createSignRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => CreateInput.parse(d))
   .handler(async ({ data, context }) => {
     const token = generateSignToken();
@@ -146,7 +146,7 @@ export type SignRequestRow = {
 };
 
 export const listMySignRequests = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .handler(async ({ context }): Promise<SignRequestRow[]> => {
     const sb = asSb(context.supabase);
     // select * tolera pre-migración de trade_id sin romper el listado.
@@ -188,7 +188,7 @@ export const listMySignRequests = createServerFn({ method: "GET" })
   });
 
 export const voidSignRequest = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => z.object({ id: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const { error } = await asSb(context.supabase)
@@ -558,7 +558,7 @@ const FlowInput = z.object({
 });
 
 export const createSignFlow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => FlowInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -684,7 +684,7 @@ function summarize(rows: Array<Record<string, unknown>>): SignFlowSummary | null
 }
 
 export const getMySignFlow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => z.object({ flowId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<SignFlowSummary | null> => {
     const { data: rows } = await asSb(context.supabase)
@@ -705,7 +705,7 @@ const RetryInput = z.object({
 });
 
 export const retrySigner = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => RetryInput.parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
@@ -774,7 +774,7 @@ export const retrySigner = createServerFn({ method: "POST" })
 // y hay que emitir uno nuevo alineado a las partes del contrato. Las filas ya
 // firmadas se conservan como evidencia auditable.
 export const voidSignFlow = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAnyModuleRole])
   .inputValidator((d: unknown) => z.object({ flowId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);

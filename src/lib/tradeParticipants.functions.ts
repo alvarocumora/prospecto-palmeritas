@@ -6,7 +6,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { type SupabaseClient } from "@supabase/supabase-js";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { sha256Hex } from "@/lib/documents/signing";
 import { publicUrl } from "@/lib/publicUrl";
 import { sendInternalEmail } from "@/lib/email/send-internal.server";
@@ -50,7 +50,7 @@ export type ParticipantRow = {
 const idInput = (d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d);
 
 export const listTradeParticipants = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator(idInput)
   .handler(async ({ data, context }): Promise<ParticipantRow[]> => {
     const sb = asSb(context.supabase);
@@ -82,7 +82,7 @@ const inviteInput = (d: unknown) =>
 
 /** Crea el participante, emite su enlace privado y (opcional) envía el correo. */
 export const inviteTradeParticipant = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator(inviteInput)
   .handler(async ({ data, context }): Promise<{ url: string; prefix: string }> => {
     const sb = asSb(context.supabase);
@@ -155,7 +155,7 @@ export const inviteTradeParticipant = createServerFn({ method: "POST" })
 
 /** Rota el enlace de un participante y devuelve la nueva URL. */
 export const rotateParticipantLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ participantId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ url: string; prefix: string }> => {
     const sb = asSb(context.supabase);
@@ -176,7 +176,7 @@ export const rotateParticipantLink = createServerFn({ method: "POST" })
 
 /** Revoca el acceso: el enlace deja de resolver de inmediato. */
 export const revokeTradeParticipant = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => z.object({ participantId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }): Promise<{ ok: true }> => {
     const sb = asSb(context.supabase);

@@ -4,7 +4,7 @@
 // certificaciones y cadena de custodia.
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireTradeRole } from "@/lib/access/roleMiddleware";
 
 const COMMODITY_KINDS = [
   "cu_concentrate",
@@ -80,7 +80,7 @@ export type MyCommodityLotRow = {
 };
 
 export const createCommodityLot = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .inputValidator((d: unknown) => CreateLotSchema.parse(d))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -145,7 +145,7 @@ export const createCommodityLot = createServerFn({ method: "POST" })
   });
 
 export const listMyCommodityLots = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireTradeRole])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
