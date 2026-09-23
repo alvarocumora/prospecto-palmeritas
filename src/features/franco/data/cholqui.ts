@@ -93,9 +93,9 @@ export const CHOLQUI = {
   access: "~30 min de la Ruta 78; sin comunidades cercanas según antecedentes del titular",
   liveUrl: "/live/cholqui",
   contact: {
-    name: "Ernesto Egert Errázuriz",
-    email: "egerternesto@gmail.com",
-    phone: "+56 9 6609 1332",
+    name: "GeoCapitals",
+    email: "contacto@geocapitals.com",
+    phone: "+56 9 6218 4071",
   },
 } as const;
 
