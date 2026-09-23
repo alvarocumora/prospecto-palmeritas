@@ -70,8 +70,8 @@ function InvPage() {
   return (
     <MarketingPage
       eyebrow="Inversionistas"
-      title="Deal-flow minero verificado, en una sola pantalla"
-      intro="Accede a oportunidades activas en venta, joint venture y royalty con due diligence acelerado y trazabilidad NI 43-101 sobre una capa de datos georreferenciada."
+      title="Oportunidades mineras, due diligence y acceso institucional en un solo flujo"
+      intro="Explora oportunidades activas separadas de los casos demo. Cada activo muestra procedencia, nivel de verificación y acceso progresivo a información técnica, legal y financiera."
     >
       {/* Cómo invertir — el flujo en 4 pasos, sin ambigüedad */}
       <div className="mb-16">
@@ -120,12 +120,12 @@ function InvPage() {
         </ol>
       </div>
 
-      {/* Fichas de inversión de los proyectos showcase (fuente única: fichas.ts) */}
+      {/* Sandbox educativo: separado explícitamente del deal-flow real */}
       <div className="mb-16">
         <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
           <div>
-            <Eyebrow className="mb-2">Empieza aquí</Eyebrow>
-            <h2 className="brand-display text-2xl text-content">Fichas de inversión</h2>
+            <Eyebrow className="mb-2">Sandbox · Datos demo</Eyebrow>
+            <h2 className="brand-display text-2xl text-content">Ejemplos de ficha y simulador</h2>
           </div>
           <Link
             to="/proyectos"
@@ -134,7 +134,7 @@ function InvPage() {
             Ver catálogo de activos <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">Estos casos son demostrativos y no representan oportunidades activas de inversión. El deal-flow real comienza en “Oportunidades activas”.</div>\n        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {Object.values(FICHAS).map((f) => (
             <Link
               key={f.slug}
