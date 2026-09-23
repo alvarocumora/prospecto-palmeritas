@@ -198,13 +198,12 @@ export function MarketingLanding() {
           <Reveal>
             <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
               <div>
-                <Eyebrow className="mb-3">Marketplace de proyectos</Eyebrow>
+                <Eyebrow className="mb-3">Investment Marketplace</Eyebrow>
                 <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
                   Oportunidades mineras para inversión
                 </h2>
                 <p className="mt-3 text-content-muted max-w-2xl">
-                  Prospectos y activos operativos con ficha técnica, valorización automática y data
-                  room público. Filtra por commodity, país o estado.
+                  Oportunidades activas con procedencia de datos visible, términos de entrada y acceso progresivo a due diligence. Los proyectos demo se mantienen fuera del deal-flow.
                 </p>
               </div>
               <Link
