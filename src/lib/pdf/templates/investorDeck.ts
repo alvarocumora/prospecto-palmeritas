@@ -135,9 +135,25 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
   /* ---------- 3. Ubicación y catastro ---------- */
   if (model.map) {
     newSlide("Ubicación", model.map.title);
-    scatterMap(doc, { x: M, y: 140, w: CW * 0.58, h: H - 140 - 70, points: model.map.points, labelTop: 6 });
-    const rx = M + CW * 0.58 + 30;
-    const rw = CW - CW * 0.58 - 30;
+    const mapX = M;
+    const mapY = 140;
+    const mapW = CW * 0.66;
+    const mapH = H - 140 - 82;
+    if (model.map.imageDataUrl) {
+      // The report uses the same satellite GIS rendered in the Live Map.
+      doc.addImage(model.map.imageDataUrl, "JPEG", mapX, mapY, mapW, mapH, undefined, "FAST");
+      stroke(doc, GC_COLOR.hairline);
+      doc.setLineWidth(0.8);
+      doc.rect(mapX, mapY, mapW, mapH);
+      font(doc, "body", "normal", 6.5);
+      ink(doc, GC_COLOR.slate);
+      const source = [model.map.imagery, model.map.source, model.map.crs].filter(Boolean).join(" · ");
+      doc.text(doc.splitTextToSize(source, mapW)[0], mapX, mapY + mapH + 12);
+    } else {
+      scatterMap(doc, { x: mapX, y: mapY, w: mapW, h: mapH, points: model.map.points, labelTop: 6 });
+    }
+    const rx = M + CW * 0.66 + 24;
+    const rw = CW - CW * 0.66 - 24;
     let ry = 150;
     if (model.map.caption) ry += paragraph(doc, rx, ry, model.map.caption, rw, 9) + 16;
     ry += bullets(

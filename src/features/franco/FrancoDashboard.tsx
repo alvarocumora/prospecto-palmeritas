@@ -10,6 +10,7 @@ import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
 import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
 import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
 import { CHOLQUI } from "./data/cholqui";
+import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from "./cholquiPdf";
 
 /**
  * Live view público del Proyecto Cholqui. Toda la data proviene de
@@ -23,7 +24,6 @@ export function FrancoDashboard() {
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
-      const { downloadCholquiInvestmentPdf } = await import("./cholquiPdf");
       await downloadCholquiInvestmentPdf();
       toast.success("PDF de inversión generado");
     } catch (e) {
@@ -36,7 +36,6 @@ export function FrancoDashboard() {
   const handleDownloadTeaser = useCallback(async () => {
     setDownloadingTeaser(true);
     try {
-      const { downloadCholquiInvestmentTeaserPdf } = await import("./cholquiPdf");
       await downloadCholquiInvestmentTeaserPdf();
       toast.success("Teaser de inversión generado");
     } catch (e) {

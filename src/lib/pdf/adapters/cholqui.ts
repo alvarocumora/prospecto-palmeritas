@@ -77,6 +77,10 @@ export function buildCholquiDoc(): ProjectDoc {
       title: "Puntos de observación y muestreo",
       caption: `${CHOLQUI_POINTS.length} puntos de control levantados en ${CHOLQUI.crs}. El tamaño del círculo representa la ley de Cu total cuando la muestra fue analizada en laboratorio.`,
       valueUnit: "% Cu total",
+      captureSelector: '[data-report-map="cholqui"]',
+      source: "GeoCapitals Live Map",
+      crs: "WGS84",
+      imagery: "Esri World Imagery",
       points: [
 
         ...CHOLQUI_POINTS.map((p) => {
