@@ -228,8 +228,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y += boxH + 18;
 
   // El bloque de contacto se ancla al pie de la última página con contenido.
-  if (y > BOTTOM - 30) need(30);
-  y = Math.max(y, BOTTOM - 30);
+  y = Math.min(Math.max(y, BOTTOM - 30), BOTTOM - 30);
+
   stroke(doc, GC_COLOR.hairline);
   doc.setLineWidth(0.6);
   doc.line(M, y, W - M, y);
