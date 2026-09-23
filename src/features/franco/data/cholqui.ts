@@ -1,7 +1,7 @@
 /**
  * PROYECTO CHOLQUI (ex "Gianfranco / Distrito Franco") — FUENTE ÚNICA DE VERDAD.
  *
- * Todo lo que se muestra en el live view (/live/franco), en la ficha de
+ * Todo lo que se muestra en el live view (/live/cholqui), en la ficha de
  * inversión (/proyectos/ficha/franco) y en el PDF descargable sale de aquí.
  *
  * Fuentes documentales reales (sin datos sintéticos):
@@ -49,11 +49,27 @@ export type CholquiScenario = {
 
 export type CholquiAssay = {
   sample: string;
+  laboratoryCode?: string;
   location: string;
   cuTotalPct: number;
   cuSolublePct: number;
   auGpt: number;
   agPpm: number;
+  reportId: string;
+  lab: string;
+  reportDate: string;
+};
+
+export type CholquiAssayReport = {
+  id: string;
+  lab: string;
+  applicant: string;
+  receivedDate: string;
+  reportDate: string;
+  samples: number;
+  sampleCodes: readonly string[];
+  source: string;
+  note: string;
 };
 
 export const CHOLQUI = {
@@ -75,7 +91,7 @@ export const CHOLQUI = {
   pedimentos: 20,
   pertenencias: 15,
   access: "~30 min de la Ruta 78; sin comunidades cercanas según antecedentes del titular",
-  liveUrl: "/live/franco",
+  liveUrl: "/live/cholqui",
   contact: {
     name: "Ernesto Egert Errázuriz",
     email: "egerternesto@gmail.com",
@@ -123,14 +139,54 @@ export const CHOLQUI_POINTS: CholquiPoint[] = [
 export const CHOLQUI_ASSAY_REPORT = {
   id: "AG2463714",
   lab: "Andes Analytical Assay",
+  applicant: "Antecedentes históricos Proyecto Cholqui",
+  receivedDate: "No informada en el antecedente disponible",
+  reportDate: "No informada en el antecedente disponible",
   samples: 3,
+  sampleCodes: ["P1", "P2", "P3"],
+  source: "Informe de Ensayo AG2463714",
   note: "Muestras puntuales de superficie del sector La Maza.",
-} as const;
+} as const satisfies CholquiAssayReport;
+
+/** Informes FGF recibidos el 23-09-2026 como capturas del documento firmado. */
+export const CHOLQUI_FGF_REPORTS = [
+  {
+    id: "74705",
+    lab: "FGF Análisis Mineros",
+    applicant: "Inversiones de Martino SpA",
+    receivedDate: "07-01-2025",
+    reportDate: "22-01-2025",
+    samples: 3,
+    sampleCodes: ["P-8", "P-9", "P-10"],
+    source: "Informe de Análisis FGF N.º 74705",
+    note: "Resultados firmados; las muestras fueron tomadas por el solicitante.",
+  },
+  {
+    id: "75299",
+    lab: "FGF Análisis Mineros",
+    applicant: "Inversiones de Martino SpA",
+    receivedDate: "04-02-2025",
+    reportDate: "07-02-2025",
+    samples: 1,
+    sampleCodes: ["P-20"],
+    source: "Informe de Análisis FGF N.º 75299",
+    note: "Resultado firmado; la muestra fue tomada por el solicitante.",
+  },
+] as const satisfies readonly CholquiAssayReport[];
+
+export const CHOLQUI_ASSAY_REPORTS: readonly CholquiAssayReport[] = [
+  CHOLQUI_ASSAY_REPORT,
+  ...CHOLQUI_FGF_REPORTS,
+];
 
 export const CHOLQUI_ASSAYS: CholquiAssay[] = [
-  { sample: "P1", location: "Manto La Maza", cuTotalPct: 1.781, cuSolublePct: 1.682, auGpt: 0.04, agPpm: 38 },
-  { sample: "P2", location: "Veta principal La Maza", cuTotalPct: 7.187, cuSolublePct: 6.054, auGpt: 0.08, agPpm: 15 },
-  { sample: "P3", location: "Veta principal La Maza", cuTotalPct: 16.227, cuSolublePct: 14.351, auGpt: 0.25, agPpm: 54 },
+  { sample: "P1", location: "Manto La Maza", cuTotalPct: 1.781, cuSolublePct: 1.682, auGpt: 0.04, agPpm: 38, reportId: "AG2463714", lab: "Andes Analytical Assay", reportDate: "No informada" },
+  { sample: "P2", location: "Veta principal La Maza", cuTotalPct: 7.187, cuSolublePct: 6.054, auGpt: 0.08, agPpm: 15, reportId: "AG2463714", lab: "Andes Analytical Assay", reportDate: "No informada" },
+  { sample: "P3", location: "Veta principal La Maza", cuTotalPct: 16.227, cuSolublePct: 14.351, auGpt: 0.25, agPpm: 54, reportId: "AG2463714", lab: "Andes Analytical Assay", reportDate: "No informada" },
+  { sample: "P-8", laboratoryCode: "830601", location: "Los Huevos — acarreo de veta cuarzosa", cuTotalPct: 0.96, cuSolublePct: 0.86, auGpt: 0.07, agPpm: 3, reportId: "74705", lab: "FGF Análisis Mineros", reportDate: "22-01-2025" },
+  { sample: "P-9", laboratoryCode: "830602", location: "Quebrada La Maza — veta cuarzosa", cuTotalPct: 2.62, cuSolublePct: 2.39, auGpt: 0.05, agPpm: 118, reportId: "74705", lab: "FGF Análisis Mineros", reportDate: "22-01-2025" },
+  { sample: "P-10", laboratoryCode: "830603", location: "Veta La Maza en quebrada La Maza", cuTotalPct: 4.18, cuSolublePct: 3.87, auGpt: 0.03, agPpm: 85, reportId: "74705", lab: "FGF Análisis Mineros", reportDate: "22-01-2025" },
+  { sample: "P-20", laboratoryCode: "833934", location: "Los Tres Morros — veta polimetálica", cuTotalPct: 4.97, cuSolublePct: 3.93, auGpt: 1, agPpm: 21, reportId: "75299", lab: "FGF Análisis Mineros", reportDate: "07-02-2025" },
 ];
 
 /** Razón Cu soluble / Cu total por muestra (favorable a ruta de lixiviación). */
@@ -159,7 +215,7 @@ export const CHOLQUI_GEOLOGY = {
   autores: "Juan Arcos Vidal Ph.D. · Andrés Leman Vargas",
   observaciones: 29,
   cuerpos: 5,
-  muestrasLab: 3,
+  muestrasLab: 7,
   cuerposDetalle: [
     "Las Minitas — mineralización en cuerpos lutíticos y ocoíticos",
     "La Maza — vetas cuarzosas con calcopirita, plata, menas grises y baritina",
@@ -305,9 +361,9 @@ export const CHOLQUI_FACTS: Array<{
   { section: "Legal", label: "Discrepancia de pertenencias", value: "Presentación: 15 pertenencias · Contrato comercial: 10", provenance: "A verificar", source: "Revisión legal 22-07-2026" },
   { section: "Geología", label: "Litología", value: "Fm. Veta Negra, Fm. Lo Prado, Fm. Horqueta e intrusivos granodioríticos", provenance: "Declarado", source: "Prospecto Cholqui (Arcos / Leman)" },
   { section: "Geología", label: "Potencial conceptual", value: "60.750 t de Cu oxidado inferidas en La Maza", provenance: "Declarado", source: "Prospecto Cholqui — no es recurso" },
-  { section: "Cobre", label: "Cu total (P1 / P2 / P3)", value: "1,781 % · 7,187 % · 16,227 %", provenance: "Certificado", source: "Informe de Ensayo AG2463714 · Andes Analytical Assay" },
-  { section: "Cobre", label: "Cu soluble (P1 / P2 / P3)", value: "1,682 % · 6,054 % · 14,351 % (razón soluble 94 / 84 / 88 %)", provenance: "Certificado", source: "Informe de Ensayo AG2463714" },
-  { section: "Oro-Plata", label: "Au / Ag en muestras", value: "Au 0,04–0,25 g/t · Ag 15–54 ppm", provenance: "Certificado", source: "Informe de Ensayo AG2463714" },
+  { section: "Cobre", label: "Cu total en 7 muestras", value: "0,960–16,227 % Cu total", provenance: "Certificado", source: "Informes AG2463714, FGF 74705 y FGF 75299" },
+  { section: "Cobre", label: "Cu soluble en 7 muestras", value: "0,860–14,351 % Cu soluble (razón soluble 79–94 %)", provenance: "Certificado", source: "Informes AG2463714, FGF 74705 y FGF 75299" },
+  { section: "Oro-Plata", label: "Au / Ag en muestras", value: "Au 0,03–1,00 g/t · Ag 3–118 g/t", provenance: "Certificado", source: "Informes AG2463714, FGF 74705 y FGF 75299" },
   { section: "Cobre", label: "Faena vecina en producción", value: "Las Minitas ~15.000 t/mes (tercero)", provenance: "Declarado", source: "Presentación del titular · RG Minerals SpA" },
   { section: "Económico", label: "Tarifa ENAMI 1,5 % Cu soluble", value: "CLP 89.571/tms", provenance: "Certificado", source: "Circular ENAMI N°27, julio 2026" },
   { section: "Económico", label: "Plan de producción", value: "166.500 t en 24 meses (1.500 → 15.000 t/mes)", provenance: "Declarado", source: "Análisis económico Proyecto Cholqui (ley 1,5 %)" },
@@ -317,7 +373,7 @@ export const CHOLQUI_FACTS: Array<{
 
 export const CHOLQUI_CAVEATS: string[] = [
   "No existe estimación de recursos ni reservas bajo un estándar reconocido (CH 20235 / NI 43-101 / JORC / S-K 1300). Las 60.750 t son potencial geológico conceptual del prospecto.",
-  "Las leyes certificadas provienen de tres muestras puntuales de superficie (Informe AG2463714): no permiten estimar ley media de mina, dilución, continuidad, recuperación metalúrgica ni variabilidad.",
+  "Las leyes provienen de siete muestras puntuales de superficie en tres informes (AG2463714, FGF 74705 y FGF 75299): no permiten estimar ley media de mina, dilución, continuidad, recuperación metalúrgica ni variabilidad.",
   "El plan económico de 166.500 t supera 2,74 veces el tonelaje conceptual informado; el inventario debe ampliarse con topografía, mapeo, canales, zanjas y sondajes antes de comprometer capital.",
   "La producción de Mina Las Minitas es de un tercero (RG Minerals SpA); se cita como evidencia de continuidad de la estructura, no como producción propia.",
   "La titularidad presenta discrepancia entre la presentación (15 pertenencias) y el contrato comercial (10 pertenencias); requiere matriz única de dominio, vigencia y patentes.",
@@ -353,7 +409,7 @@ export const CHOLQUI_ROUND = {
 
 export const CHOLQUI_HIGHLIGHTS: string[] = [
   "Cu-Au-Ag en zona central de Chile, a ~30 min de la Ruta 78 y sin comunidades cercanas",
-  "Leyes certificadas de superficie de 1,78 % a 16,23 % Cu total, con 84–94 % de cobre soluble (Informe AG2463714)",
+  "Siete análisis puntuales de superficie: 0,96–16,23 % Cu total, 0,86–14,35 % Cu soluble, Au hasta 1,00 g/t y Ag hasta 118 g/t",
   "~5.000 ha (20 pedimentos + 15 pertenencias) rodeando a Mina Las Minitas, faena de un tercero en producción",
   "Ruta de monetización directa a ENAMI: CLP 89.571/tms a 1,5 % Cu soluble (Circular N°27, julio 2026)",
 ];
