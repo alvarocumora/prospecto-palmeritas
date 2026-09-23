@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
 import { CholquiSatellitePanel } from "./components/CholquiSatellitePanel";
+import { CholquiGeologicalEvidenceMap } from "./components/CholquiGeologicalEvidenceMap";
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
@@ -54,6 +55,8 @@ export function FrancoDashboard() {
           onDownloadTeaser={handleDownloadTeaser}
           downloadingTeaser={downloadingTeaser}
         />
+
+        <CholquiGeologicalEvidenceMap />
 
         <div data-surface="canvas" className="rounded-2xl overflow-hidden">
           <FrancoPertenenciasMap />
