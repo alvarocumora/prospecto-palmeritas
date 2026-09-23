@@ -189,10 +189,11 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
         y += editorialTable(doc, {
           x: M,
           y,
-          w: CW * 0.7,
+          w: CW * 0.88,
           head: ["Concepto", "Detalle"],
           rows: block.items.map(([k, v]) => [k, v]),
-          widths: [CW * 0.26, CW * 0.44],
+          widths: [CW * 0.3, CW * 0.58],
+
           size: 8.2,
         }) + 14;
       }
