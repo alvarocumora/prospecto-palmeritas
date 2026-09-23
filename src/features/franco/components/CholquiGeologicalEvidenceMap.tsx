@@ -5,6 +5,7 @@ import type { Map as LeafletMap, Layer, LayerGroup } from "leaflet";
 import francoPertenenciasRaw from "@/data/geo/franco_pertenencias.geojson?raw";
 import { buildSatelliteLayers } from "@/components/map/satelliteLayers";
 import { buildSernageominLayers } from "@/components/map/sernageominLayers";
+import { buildOfficialCadastreLayer, normalizedProjectNames, queryOfficialCadastreByBounds } from "@/components/map/miningCadastreLayers";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import {
@@ -15,11 +16,12 @@ import {
   type CholquiAssay,
 } from "../data/cholqui";
 
-type LayerKey = "tenure" | "field" | "assays" | "neighbor" | "geology" | "mines" | "worldCover" | "dem";
+type LayerKey = "tenure" | "officialCadastre" | "field" | "assays" | "neighbor" | "geology" | "mines" | "worldCover" | "dem";
 type EvidenceState = "verified" | "observed" | "context";
 
 const LAYERS: Array<{ key: LayerKey; label: string; state: EvidenceState; defaultOn: boolean }> = [
-  { key: "tenure", label: "Pertenencias", state: "verified", defaultOn: true },
+  { key: "tenure", label: "Propiedad proyecto", state: "observed", defaultOn: true },
+  { key: "officialCadastre", label: "Catastro SERNAGEOMIN", state: "verified", defaultOn: true },
   { key: "field", label: "Puntos de terreno", state: "observed", defaultOn: true },
   { key: "assays", label: "Ensayes certificados", state: "verified", defaultOn: true },
   { key: "neighbor", label: "Faena vecina", state: "context", defaultOn: true },
@@ -126,10 +128,24 @@ export function CholquiGeologicalEvidenceMap() {
         )
         .addTo(neighbor);
 
+      const projectBounds = tenure.getBounds();
+      const padLat = Math.max(0.03, (projectBounds.getNorth() - projectBounds.getSouth()) * 0.5);
+      const padLng = Math.max(0.03, (projectBounds.getEast() - projectBounds.getWest()) * 0.5);
+      const officialFc = await queryOfficialCadastreByBounds({
+        west: projectBounds.getWest() - padLng,
+        south: projectBounds.getSouth() - padLat,
+        east: projectBounds.getEast() + padLng,
+        north: projectBounds.getNorth() + padLat,
+      });
+      const officialCadastre = officialFc
+        ? buildOfficialCadastreLayer(L, officialFc, normalizedProjectNames(FC_DATA))
+        : L.layerGroup();
+
       const sngm = buildSernageominLayers(L);
       const satellite = buildSatelliteLayers(L);
       layersRef.current = {
         tenure,
+        officialCadastre,
         field,
         assays,
         neighbor,
@@ -225,7 +241,7 @@ export function CholquiGeologicalEvidenceMap() {
       </div>
 
       <div className="px-5 py-3 border-t border-border text-[10px] font-mono text-muted-foreground">
-        {CHOLQUI_POINTS.length} observaciones · {CHOLQUI_ASSAYS.length} ensayes certificados · {FC_DATA.features.length} polígonos de pertenencias
+        {CHOLQUI_POINTS.length} observaciones · {CHOLQUI_ASSAYS.length} ensayes certificados · {FC_DATA.features.length} polígonos documentales · catastro oficial consultado por AOI
       </div>
     </Card>
   );
