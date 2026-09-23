@@ -10,20 +10,20 @@ import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
 import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
 import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
 import { CHOLQUI } from "./data/cholqui";
+import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from "./cholquiPdf";
 
 /**
  * Live view público del Proyecto Cholqui. Toda la data proviene de
  * `data/cholqui.ts`, la misma fuente que alimenta el PDF de inversión y la
  * ficha /proyectos/ficha/franco.
  */
-export function FrancoDashboard() {
+export function CholquiDashboard() {
   const [downloading, setDownloading] = useState(false);
   const [downloadingTeaser, setDownloadingTeaser] = useState(false);
 
   const handleDownload = useCallback(async () => {
     setDownloading(true);
     try {
-      const { downloadCholquiInvestmentPdf } = await import("./cholquiPdf");
       await downloadCholquiInvestmentPdf();
       toast.success("PDF de inversión generado");
     } catch (e) {
@@ -36,7 +36,6 @@ export function FrancoDashboard() {
   const handleDownloadTeaser = useCallback(async () => {
     setDownloadingTeaser(true);
     try {
-      const { downloadCholquiInvestmentTeaserPdf } = await import("./cholquiPdf");
       await downloadCholquiInvestmentTeaserPdf();
       toast.success("Teaser de inversión generado");
     } catch (e) {
@@ -79,3 +78,10 @@ export function FrancoDashboard() {
     </div>
   );
 }
+
+
+/**
+ * @deprecated Compatibility alias for legacy imports. The canonical project
+ * identity is Cholqui; Franco/Gianfranco is a former name only.
+ */
+export const FrancoDashboard = CholquiDashboard;
