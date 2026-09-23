@@ -1,0 +1,22 @@
+{
+  "run": {
+    "id": "09a2f79d-9887-43ae-aeac-e8099167c6b0",
+    "source": "SERNAGEOMIN",
+    "neighbor_km": 5,
+    "summary": { "EXACT_MATCH": 1, "INTERSECTS": 2, "NEIGHBOR": 3, "UNMATCHED": 1 },
+    "project_feature_count": 4,
+    "official_feature_count": 6,
+    "generated_at": "2026-09-23T22:12:53.927119+00:00",
+    "created_at": "2026-09-23T22:12:53.927119+00:00",
+    "created_by": "11111111-1111-1111-1111-111111111111",
+    "project_id": null
+  },
+  "has_snapshots": true,
+  "findings": [
+    { "severity": "HIGH",   "code": "UNMATCHED_PROJECT_GEOMETRY", "message": "1 geometría documental sin match oficial por identidad o intersección." },
+    { "severity": "REVIEW", "code": "SPATIAL_INTERSECTION",       "message": "2 relaciones presentan intersección espacial y requieren revisión de roles/límites." },
+    { "severity": "INFO",   "code": "NEIGHBORING_CONCESSIONS",    "message": "3 concesiones vecinas detectadas dentro del buffer configurado." },
+    { "severity": "INFO",   "code": "IDENTITY_MATCH",             "message": "1 coincidencia por rol o nombre normalizado detectada." }
+  ],
+  "disclaimer": "Análisis automatizado de apoyo. No constituye estudio de títulos, certificación de dominio ni opinión jurídica."
+}

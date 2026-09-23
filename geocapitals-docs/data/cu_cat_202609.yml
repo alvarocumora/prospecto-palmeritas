@@ -1,0 +1,65 @@
+# ============================================================================
+# Ficha de oferta — cátodos de cobre (ejemplo). NO inventar datos.
+# ============================================================================
+ref: CU-CAT-202609-ANF
+fecha: 2026-09-23
+estado: borrador
+titulo: Cátodos de cobre — Grado A LME
+commodity: Cátodos de cobre (Cu)
+idioma: es
+
+vendedor:
+  rol: Productor / fundición
+  pais: Chile
+  region: Antofagasta
+  nombre: null
+  contacto: null
+
+material:
+  descripcion: Cátodos de cobre electrolítico, grado A (LME)
+  forma: Cátodos (paquetes flejados)
+  humedad_pct: null
+  origen: Región de Antofagasta, Chile
+
+cantidad:
+  toneladas: 500
+  base: seca
+  periodicidad: mensual
+  recurrencia: null
+
+# Cátodos: ley en % Cu (metal base, contenido en toneladas, NO oz troy).
+ley:
+  unidad: "%"
+  metal: Cu
+escenarios_ley: [99.95, 99.99]
+
+comercial:
+  incoterm: FOB
+  punto_entrega: null
+  moneda: USD
+  base_precio: LME cash settlement (referencia)
+  pago_por: cobre pagable
+  payable_pct: null
+  deducciones:
+    - Premio/descuento de cátodo — por confirmar
+  condiciones_pago: null
+
+logistica:
+  puerto_referencia: null
+  transporte: null
+  plazo_estimado: null
+
+muestreo_ensaye:
+  protocolo: null
+  laboratorio: null
+  arbitraje: null
+
+documentacion_requerida:
+  - Certificado de calidad LME / registro de marca
+  - Certificado de análisis del lote
+  - Documentación de transporte y despacho
+  - Cumplimiento KYC de contraparte
+
+notas:
+  - Los escenarios de ley son supuestos de cálculo, no un ensaye confirmado.
+  - Documento referencial; no constituye oferta vinculante.

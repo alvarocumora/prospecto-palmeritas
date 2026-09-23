@@ -1,0 +1,68 @@
+# ============================================================================
+# Ficha de oferta — concentrado de antimonio (ejemplo). NO inventar datos.
+# ============================================================================
+ref: SB-CONC-202609-ATA
+fecha: 2026-09-23
+estado: borrador
+titulo: Concentrado de antimonio (estibina)
+commodity: Concentrado de antimonio (Sb)
+idioma: es
+
+vendedor:
+  rol: Productor / pequeña minería
+  pais: Chile
+  region: Atacama
+  nombre: null
+  contacto: null
+
+material:
+  descripcion: Concentrado de antimonio (estibina, Sb2S3)
+  forma: Concentrado (sacos / big-bags)
+  humedad_pct: null
+  origen: Región de Atacama, Chile
+
+cantidad:
+  toneladas: 60
+  base: seca
+  periodicidad: spot
+  recurrencia: null
+
+# Antimonio: ley en % Sb (metal contenido en toneladas).
+ley:
+  unidad: "%"
+  metal: Sb
+escenarios_ley: [45, 50, 55, 60]
+
+comercial:
+  incoterm: EXW
+  punto_entrega: null
+  moneda: USD
+  base_precio: Referencia de mercado Sb (por confirmar índice)
+  pago_por: antimonio pagable
+  payable_pct: null
+  deducciones:
+    - Cargo de tratamiento (TC) — por confirmar
+    - Penalidades por impurezas (As, Pb) — por confirmar
+    - Deducción por humedad — por confirmar
+  condiciones_pago: null
+
+logistica:
+  puerto_referencia: null
+  transporte: null
+  plazo_estimado: null
+
+muestreo_ensaye:
+  protocolo: null
+  laboratorio: null
+  arbitraje: null
+
+documentacion_requerida:
+  - Certificado de análisis (assay) incluyendo impurezas (As, Pb, Hg)
+  - Origen / trazabilidad del material
+  - Documentación de transporte y despacho
+  - Cumplimiento KYC de contraparte
+
+notas:
+  - Los escenarios de ley son supuestos de cálculo, no un ensaye confirmado.
+  - El antimonio suele penalizar arsénico y plomo; se define en términos.
+  - Documento referencial; no constituye oferta vinculante.
