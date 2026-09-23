@@ -124,7 +124,7 @@ export const getTilamaReport = createServerFn({ method: "GET" }).handler(
         )
         .eq("project_id", TILAMA_PROJECT_ID)
         .order("score", { ascending: false })
-        .limit(40),
+        .limit(200),
       supabaseAdmin
         .from("sampling_results")
         .select(

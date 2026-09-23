@@ -217,7 +217,7 @@ export async function generateTilamaPdf(report: TilamaReport, mining?: LosVerdes
   para(
     `La base consolidada contiene ${report.stats.samplesTotal} muestras georreferenciadas. El cobre promedia ${fmtNum(report.stats.cuAvgPct, 2)} % y alcanza un máximo de ${fmtNum(report.stats.cuMaxPct, 2)} %; los máximos registrados de oro y plata son ${fmtNum(report.stats.auMaxGpt, 3)} g/t Au y ${fmtNum(report.stats.agMaxGpt, 1)} g/t Ag. Estos resultados están cargados en estado borrador y deben validarse contra certificados, cadena de custodia y QA/QC antes de cualquier uso regulatorio.`,
   );
-  const topSamples = [...report.samples].sort((a, b) => Number(b.cu_pct ?? 0) - Number(a.cu_pct ?? 0)).slice(0, 15);
+  const topSamples = [...report.samples].sort((a, b) => Number(b.cu_pct ?? 0) - Number(a.cu_pct ?? 0)).slice(0, 8);
   if (topSamples.length) {
     h2("Muestras con mayor ley de cobre");
     const x = { code: MARGIN, cu: MARGIN + 105, au: MARGIN + 185, ag: MARGIN + 270, lab: MARGIN + 355 };
