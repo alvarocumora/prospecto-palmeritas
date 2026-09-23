@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { Layers3, MapPin } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import type { Map as LeafletMap, Layer, LayerGroup } from "leaflet";
 import francoPertenenciasRaw from "@/data/geo/franco_pertenencias.geojson?raw";
 import { buildSatelliteLayers } from "@/components/map/satelliteLayers";
 import { buildSernageominLayers } from "@/components/map/sernageominLayers";
+import { getCholquiRemoteCandidates } from "@/lib/cholquiRemoteSensing.functions";
+import { candidateStyle, CHOLQUI_REMOTE_DISCLAIMER } from "../data/remoteSensing";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import {
@@ -15,7 +19,7 @@ import {
   type CholquiAssay,
 } from "../data/cholqui";
 
-type LayerKey = "tenure" | "field" | "assays" | "neighbor" | "geology" | "mines" | "worldCover" | "dem";
+type LayerKey = "tenure" | "field" | "assays" | "neighbor" | "geology" | "mines" | "worldCover" | "dem" | "remoteCandidates";
 type EvidenceState = "verified" | "observed" | "context";
 
 const LAYERS: Array<{ key: LayerKey; label: string; state: EvidenceState; defaultOn: boolean }> = [
@@ -27,6 +31,7 @@ const LAYERS: Array<{ key: LayerKey; label: string; state: EvidenceState; defaul
   { key: "mines", label: "Faenas SERNAGEOMIN", state: "verified", defaultOn: false },
   { key: "worldCover", label: "ESA WorldCover", state: "context", defaultOn: false },
   { key: "dem", label: "DEM / hillshade", state: "context", defaultOn: false },
+  { key: "remoteCandidates", label: "Candidatos Sentinel-2", state: "context", defaultOn: false },
 ];
 
 const STATE_LABEL: Record<EvidenceState, string> = {
@@ -56,6 +61,12 @@ function assayPopup(a: CholquiAssay) {
  * contexto geoespacial en inferencias de mineralización.
  */
 export function CholquiGeologicalEvidenceMap() {
+  const remoteFn = useServerFn(getCholquiRemoteCandidates);
+  const remote = useQuery({
+    queryKey: ["cholqui-remote-candidates"],
+    queryFn: () => remoteFn({ data: {} }),
+    staleTime: 30 * 60_000,
+  });
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const layersRef = useRef<Partial<Record<LayerKey, Layer | LayerGroup>>>({});
@@ -137,7 +148,30 @@ export function CholquiGeologicalEvidenceMap() {
         mines: sngm.yacimientos,
         worldCover: satellite.worldCover,
         dem: satellite.copernicusDem,
+        remoteCandidates: L.layerGroup(),
       };
+
+      if (remote.data?.ok && remote.data.data) {
+        const group = layersRef.current.remoteCandidates as LayerGroup;
+        for (const feature of remote.data.data.features) {
+          const [lng, lat] = feature.geometry.coordinates;
+          const p = feature.properties;
+          const s = candidateStyle(p.aloh_zscore);
+          L.circleMarker([lat, lng], {
+            radius: s.radius,
+            color: s.color,
+            weight: 2,
+            fillColor: s.color,
+            fillOpacity: 0.32,
+          }).bindPopup(
+            `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.5">
+              <b>Candidato #${p.rank} · DERIVADO</b><br/>
+              Al-OH z-score <b>${p.aloh_zscore}</b> · percentil ${p.aloh_percentile}<br/>
+              <span style="opacity:.65">${p.legend}</span>
+            </div>`,
+          ).addTo(group);
+        }
+      }
 
       for (const item of LAYERS) {
         if (item.defaultOn) layersRef.current[item.key]?.addTo(map);
@@ -157,7 +191,7 @@ export function CholquiGeologicalEvidenceMap() {
       mapRef.current = null;
       layersRef.current = {};
     };
-  }, [assayByPoint]);
+  }, [assayByPoint, remote.data]);
 
   function toggle(key: LayerKey) {
     const map = mapRef.current;
@@ -207,8 +241,9 @@ export function CholquiGeologicalEvidenceMap() {
             </button>
           ))}
           <div className="pt-3 text-[10px] leading-relaxed text-muted-foreground">
-            Próxima fase: Sentinel-2 multiespectral derivado y motor de convergencia. Esas capas deben ingresar como
-            DERIVADO / INTERPRETADO, nunca como evidencia certificada.
+{remote.data?.ok
+              ? `Sentinel-2: ${remote.data.data.features.length} candidatos derivados publicados. ${CHOLQUI_REMOTE_DISCLAIMER}`
+              : "Sentinel-2 derivado aún no publicado. No se generan anomalías sintéticas. El motor de convergencia permanecerá desactivado hasta disponer del GeoJSON reproducible."}
           </div>
         </aside>
 
