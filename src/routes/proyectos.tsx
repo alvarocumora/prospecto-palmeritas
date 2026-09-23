@@ -48,23 +48,11 @@ const SHOWCASE = [
     ],
   },
   {
-    code: "TILAMA",
-    name: "Tilama Norte",
-    region: "Choapa · Coquimbo",
-    commodity: "Cu-Au",
-    to: "/proyectos/ficha/tilama",
-    bullets: [
-      "Catastro + boletines vigilados",
-      "Geofísica MAG correlacionada",
-      "Pre-feasibility activa",
-    ],
-  },
-  {
     code: "CHOLQUI",
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    to: "/proyectos/ficha/franco",
+    to: "/proyectos/ficha/cholqui",
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",

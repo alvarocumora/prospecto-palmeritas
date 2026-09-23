@@ -109,7 +109,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     tabs: [
       { label: "Concesiones", to: "/catastro/proyecto" },
       { label: "Boletín minero", to: "/dashboard/boletin" },
-      { label: "Terreno franco", to: "/dashboard/franco" },
+      { label: "Cholqui", to: "/dashboard/cholqui" },
       { label: "Mapa nacional", to: "/catastro/mapa" },
       { label: "Watchlist", to: "/catastro/app/watchlist" },
       { label: "Oportunidades IA", to: "/dashboard/opportunities" },
