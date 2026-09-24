@@ -9,7 +9,7 @@ type Props = Record<string, PropValue>;
 export type MapFeature = {
   type: "Feature";
   id?: string | number;
-  geometry: GeoJSON.Geometry;
+  geometry: GeoJSON.Geometry | null;
   properties: Props;
 };
 
@@ -50,20 +50,21 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
 
     const concessions: FC = {
       type: "FeatureCollection",
-      features: (cons ?? []).flatMap((c): MapFeature[] => {
-        if (!c.geometry_geojson) return [];
+      features: (cons ?? []).map((c): MapFeature => {
         let geom: GeoJSON.Geometry | null = null;
-        try {
-          geom =
-            typeof c.geometry_geojson === "string"
-              ? JSON.parse(c.geometry_geojson)
-              : (c.geometry_geojson as unknown as GeoJSON.Geometry);
-        } catch {
-          return [];
+        if (c.geometry_geojson) {
+          try {
+            geom =
+              typeof c.geometry_geojson === "string"
+                ? JSON.parse(c.geometry_geojson)
+                : (c.geometry_geojson as unknown as GeoJSON.Geometry);
+          } catch {
+            geom = null;
+          }
         }
-        if (!geom) return [];
         const props: Props = {
           layer: "concession",
+          hasGeometry: Boolean(geom),
           id: String(c.id),
           code: c.code ?? null,
           name: c.name ?? null,
@@ -76,7 +77,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
           granted_at: c.granted_at ?? null,
           expires_at: c.expires_at ?? null,
         };
-        return [{ type: "Feature", id: String(c.id), geometry: geom, properties: props }];
+        return { type: "Feature", id: String(c.id), geometry: geom, properties: props };
       }),
     };
 
@@ -250,7 +251,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     };
     for (const fc of [concessions, targets, satAnomalies, magAnomalies, samples]) {
       for (const f of fc.features) {
-        if ("coordinates" in f.geometry) walk((f.geometry as { coordinates: unknown }).coordinates);
+        if (f.geometry && "coordinates" in f.geometry) walk((f.geometry as { coordinates: unknown }).coordinates);
       }
     }
     let bbox: LosVerdesMapData["bbox"] = null;
@@ -280,7 +281,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       samples,
       counts: {
         concessions: cons?.length ?? 0,
-        concessionsWithGeom: concessions.features.length,
+        concessionsWithGeom: concessions.features.filter((f) => f.geometry != null).length,
         targets: targets.features.length,
         satAnomalies: satAnomalies.features.length,
         magAnomalies: magAnomalies.features.length,
