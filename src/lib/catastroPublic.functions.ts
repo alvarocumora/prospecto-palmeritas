@@ -47,6 +47,47 @@ function pick(props: Record<string, unknown>, ...keys: string[]): string | null 
   }
   return null;
 }
+
+type LiveCadastreRow = {
+  code: string;
+  concession_type: string;
+  name: string | null;
+  holder: string | null;
+  rut: string | null;
+  area_ha: number | null;
+  status: string | null;
+  region: string | null;
+  commune: string | null;
+  geometry?: GeoJSON.Geometry | null;
+  raw?: Record<string, unknown>;
+};
+
+async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
+  if (!rows.length) return;
+  const now = new Date().toISOString();
+  const payload = rows.map((r) => ({
+    source: "SERNAGEOMIN",
+    external_id: r.code,
+    rol: r.code,
+    name: r.name,
+    tipo: r.concession_type,
+    status: r.status,
+    holder_name: r.holder,
+    holder_rut: r.rut,
+    area_ha: r.area_ha,
+    region: r.region,
+    commune: r.commune,
+    geometry_geojson: r.geometry ?? null,
+    raw_properties: r.raw ?? {},
+    fetched_at: now,
+    archived_at: null,
+  }));
+  const { error } = await supabaseAdmin
+    .from("cadastre_national")
+    .upsert(payload, { onConflict: "source,external_id" });
+  if (error) throw new Error(`CADASTRE_WRITE_THROUGH_FAILED: ${error.message}`);
+}
+
 function pickNum(props: Record<string, unknown>, ...keys: string[]): number | null {
   const v = pick(props, ...keys);
   if (!v) return null;
@@ -72,7 +113,7 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
     String(p.TIPO_CONCESION ?? "").toUpperCase() === "EXPLOTACION" ? "explotacion" : "exploracion";
   const rutNum = pick(p, "TITULAR_RUT");
   const rutDv = pick(p, "TITULAR_DV");
-  return {
+  const live: PublicConcession = {
     code,
     concession_type: tipo,
     name: pick(p, "NOMBRE"),
@@ -91,6 +132,8 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
     source: "sernageomin",
     last_synced_at: null,
   };
+  await writeThroughCadastre([{ ...live, raw: p }]);
+  return live;
 }
 
 // ============================================================
@@ -175,7 +218,7 @@ async function searchConcessionsLive(
     limit,
     returnGeometry: false,
   });
-  return (fc?.features ?? []).map((f) => {
+  const rows = (fc?.features ?? []).map((f) => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
     const rolNum = p.NUMERO_ROL;
     const rolDv = p.DV_ROL;
@@ -197,6 +240,8 @@ async function searchConcessionsLive(
       commune: (p.COMUNA as string) ?? null,
     };
   });
+  await writeThroughCadastre(rows);
+  return rows;
 }
 
 // ============================================================
