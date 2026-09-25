@@ -65,6 +65,7 @@ type LiveCadastreRow = {
 async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
   if (!rows.length) return;
   const now = new Date().toISOString();
+  const cadastreDb = supabaseAdmin as unknown as SupabaseClient;
 
   for (const r of rows) {
     const payload = {
@@ -86,7 +87,7 @@ async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
       archived_at: null,
     };
 
-    const { data: existing, error: findError } = await supabaseAdmin
+    const { data: existing, error: findError } = await cadastreDb
       .from("cadastre_national")
       .select("id, geometry_geojson")
       .eq("source", "SERNAGEOMIN")
@@ -97,7 +98,7 @@ async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
     if (findError) throw new Error(`CADASTRE_WRITE_THROUGH_LOOKUP_FAILED: ${findError.message}`);
 
     if (existing) {
-      const { error } = await supabaseAdmin
+      const { error } = await cadastreDb
         .from("cadastre_national")
         .update({
           ...payload,
@@ -106,7 +107,7 @@ async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
         .eq("id", existing.id);
       if (error) throw new Error(`CADASTRE_WRITE_THROUGH_UPDATE_FAILED: ${error.message}`);
     } else {
-      const { error } = await supabaseAdmin.from("cadastre_national").insert(payload);
+      const { error } = await cadastreDb.from("cadastre_national").insert(payload);
       if (error) throw new Error(`CADASTRE_WRITE_THROUGH_INSERT_FAILED: ${error.message}`);
     }
   }
