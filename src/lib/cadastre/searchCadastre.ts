@@ -64,17 +64,18 @@ function unavailable(country: CadastreCountry, authority: string, error: unknown
  */
 export async function searchCadastre(input: SearchCadastreInput): Promise<GlobalCadastreResult> {
   const { scope } = input;
-  const connector = getCadastreConnector(scope.country);
+  const country = scope.kind === "country" ? scope.code : scope.country;
+  const connector = getCadastreConnector(country);
   const authority = connector?.institution ?? "UNKNOWN";
 
   try {
     if (scope.kind === "country") {
-      if (!connector) return unavailable(scope.country, authority, "CADASTRE_CONNECTOR_NOT_FOUND");
+      if (!connector) return unavailable(country, authority, "CADASTRE_CONNECTOR_NOT_FOUND");
       const concessions = await connector.search(scope.query, input.limit ?? 50);
       return {
         ok: true,
         sourceState: "available",
-        country: scope.country,
+        country,
         authority,
         queriedAt: new Date().toISOString(),
         concessions,
@@ -83,14 +84,14 @@ export async function searchCadastre(input: SearchCadastreInput): Promise<Global
     }
 
     if (scope.country !== "CL") {
-      if (!connector) return unavailable(scope.country, authority, "CADASTRE_CONNECTOR_NOT_FOUND");
+      if (!connector) return unavailable(country, authority, "CADASTRE_CONNECTOR_NOT_FOUND");
       const term = scope.kind === "role" ? scope.role : input.filters?.term;
-      if (!term) return unavailable(scope.country, authority, "SCOPE_NOT_SUPPORTED_BY_CONNECTOR");
+      if (!term) return unavailable(country, authority, "SCOPE_NOT_SUPPORTED_BY_CONNECTOR");
       const concessions = await connector.search(term, input.limit ?? 50);
       return {
         ok: true,
         sourceState: "available",
-        country: scope.country,
+        country,
         authority,
         queriedAt: new Date().toISOString(),
         concessions,
@@ -100,7 +101,7 @@ export async function searchCadastre(input: SearchCadastreInput): Promise<Global
 
     const bbox = scope.kind === "bbox" || scope.kind === "project" ? scope.bbox : undefined;
     if (scope.kind === "project" && !bbox) {
-      return unavailable(scope.country, authority, "PROJECT_SCOPE_REQUIRES_BBOX_UNTIL_PROJECT_GEOMETRY_ADAPTER");
+      return unavailable(country, authority, "PROJECT_SCOPE_REQUIRES_BBOX_UNTIL_PROJECT_GEOMETRY_ADAPTER");
     }
 
     const result = await searchMiningCadastre({
@@ -121,6 +122,6 @@ export async function searchCadastre(input: SearchCadastreInput): Promise<Global
       total: result.count,
     };
   } catch (error) {
-    return unavailable(scope.country, authority, error);
+    return unavailable(country, authority, error);
   }
 }
