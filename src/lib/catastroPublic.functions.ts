@@ -65,27 +65,51 @@ type LiveCadastreRow = {
 async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
   if (!rows.length) return;
   const now = new Date().toISOString();
-  const payload = rows.map((r) => ({
-    source: "SERNAGEOMIN",
-    external_id: r.code,
-    rol: r.code,
-    name: r.name,
-    tipo: r.concession_type,
-    status: r.status,
-    holder_name: r.holder,
-    holder_rut: r.rut,
-    area_ha: r.area_ha,
-    region: r.region,
-    commune: r.commune,
-    geometry_geojson: r.geometry ?? null,
-    raw_properties: r.raw ?? {},
-    fetched_at: now,
-    archived_at: null,
-  }));
-  const { error } = await supabaseAdmin
-    .from("cadastre_national")
-    .upsert(payload, { onConflict: "source,external_id" });
-  if (error) throw new Error(`CADASTRE_WRITE_THROUGH_FAILED: ${error.message}`);
+
+  for (const r of rows) {
+    const payload = {
+      source: "SERNAGEOMIN",
+      origen: "SERNAGEOMIN",
+      external_id: r.code,
+      rol: r.code,
+      name: r.name,
+      tipo: r.concession_type,
+      status: r.status,
+      holder_name: r.holder,
+      holder_rut: r.rut,
+      area_ha: r.area_ha,
+      region: r.region,
+      commune: r.commune,
+      geometry_geojson: r.geometry ?? null,
+      metadata: r.raw ?? {},
+      fetched_at: now,
+      archived_at: null,
+    };
+
+    const { data: existing, error: findError } = await supabaseAdmin
+      .from("cadastre_national")
+      .select("id, geometry_geojson")
+      .eq("source", "SERNAGEOMIN")
+      .eq("external_id", r.code)
+      .is("archived_at", null)
+      .limit(1)
+      .maybeSingle();
+    if (findError) throw new Error(`CADASTRE_WRITE_THROUGH_LOOKUP_FAILED: ${findError.message}`);
+
+    if (existing) {
+      const { error } = await supabaseAdmin
+        .from("cadastre_national")
+        .update({
+          ...payload,
+          geometry_geojson: r.geometry ?? existing.geometry_geojson ?? null,
+        })
+        .eq("id", existing.id);
+      if (error) throw new Error(`CADASTRE_WRITE_THROUGH_UPDATE_FAILED: ${error.message}`);
+    } else {
+      const { error } = await supabaseAdmin.from("cadastre_national").insert(payload);
+      if (error) throw new Error(`CADASTRE_WRITE_THROUGH_INSERT_FAILED: ${error.message}`);
+    }
+  }
 }
 
 function pickNum(props: Record<string, unknown>, ...keys: string[]): number | null {
