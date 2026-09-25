@@ -9,7 +9,7 @@ import { buildReconciliationBundle, type ReconciliationBundle } from "@/lib/cada
 import { buildReconciliationLayer } from "@/lib/cadastre/reconciliationLayer";
 import { buildCadastreDueDiligence } from "@/lib/cadastre/dueDiligence";
 
-export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
+export const Route = createFileRoute("/_authenticated/dashboard/catastro" as never)({
   component: MiningCadastrePage,
 });
 
