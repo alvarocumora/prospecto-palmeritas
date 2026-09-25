@@ -168,10 +168,11 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     if (!map || !mapReady || !dataQ.data) return;
     const d = dataQ.data;
 
-    const addOrUpdate = (id: string, data: LosVerdesMapData["concessions"]) => {
+    const addOrUpdate = (id: string, data: unknown) => {
+      const geojson = data as GeoJSON.FeatureCollection;
       const src = map.getSource(id) as maplibregl.GeoJSONSource | undefined;
-      if (src) src.setData(data);
-      else map.addSource(id, { type: "geojson", data });
+      if (src) src.setData(geojson);
+      else map.addSource(id, { type: "geojson", data: geojson });
     };
 
     const drawableConcessions = {
