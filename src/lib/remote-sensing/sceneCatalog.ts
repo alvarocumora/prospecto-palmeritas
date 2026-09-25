@@ -12,7 +12,9 @@ async function sign(href:string){const r=await fetch(`${SIGN}?href=${encodeURICo
 async function analysisAssets(f:Feature):Promise<SentinelAssets|null>{
  const a=f.assets??{}; const keys=["B02","B04","B08","B11","B12"] as const;
  if(keys.some(k=>!a[k]?.href))return null;
- const [b02,b04,b08,b11,b12,scl]=await Promise.all([...keys.map(k=>sign(a[k]!.href!)),a.SCL?.href?sign(a.SCL.href):Promise.resolve(undefined)]);
+ const signed=await Promise.all(keys.map(k=>sign(a[k]!.href!)));
+ const scl=a.SCL?.href?await sign(a.SCL.href):undefined;
+ const [b02,b04,b08,b11,b12]=signed as [string,string,string,string,string];
  return {b02,b04,b08,b11,b12,scl};
 }
 export async function searchSentinel2AnalysisScenes(input:{bbox:[number,number,number,number];from:string;to:string;maxCloudPct?:number;limit?:number}){
