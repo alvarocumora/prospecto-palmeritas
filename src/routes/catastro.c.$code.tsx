@@ -121,7 +121,7 @@ function ConcessionPage() {
 
           <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
             <Database className="w-3 h-3" />
-            Fuente: {c.source === "cache" ? "Cache Geocapitals" : "SERNAGEOMIN en vivo"}
+            Fuente: {c.source === "cadastre_national" ? "Catastro canónico Geocapitals" : "SERNAGEOMIN en vivo"}
             {c.last_synced_at &&
               ` · sincronizado ${new Date(c.last_synced_at).toLocaleString("es-CL")}`}
           </div>
@@ -135,7 +135,7 @@ function ConcessionPage() {
             <div className="rounded border border-border p-3"><GitCompareArrows className="w-4 h-4 mb-2"/><div className="text-[10px] font-mono text-muted-foreground">RECONCILIACIÓN</div><div className="text-xs font-semibold">Espacial + identidad</div></div>
             <div className="rounded border border-border p-3"><FileText className="w-4 h-4 mb-2"/><div className="text-[10px] font-mono text-muted-foreground">DUE DILIGENCE</div><div className="text-xs font-semibold">Hallazgos auditables</div></div>
           </div>
-          <Link to="/dashboard/catastro" className="mt-4 inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-xs font-mono text-primary-foreground"><ScanSearch className="w-3.5 h-3.5"/> Analizar en Mining Intelligence</Link>
+          <Link to={"/dashboard/catastro" as never} className="mt-4 inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-xs font-mono text-primary-foreground"><ScanSearch className="w-3.5 h-3.5"/> Analizar en Mining Intelligence</Link>
         </section>
 
                 <LegalPanel code={c.code} />

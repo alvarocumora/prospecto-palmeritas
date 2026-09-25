@@ -22,7 +22,7 @@ export type PublicConcession = {
   centroid_lat: number | null;
   centroid_lng: number | null;
   geometry: GeoJSON.Geometry | null;
-  source: "cache" | "sernageomin";
+  source: "cadastre_national" | "sernageomin";
   last_synced_at: string | null;
 };
 
@@ -47,6 +47,72 @@ function pick(props: Record<string, unknown>, ...keys: string[]): string | null 
   }
   return null;
 }
+
+type LiveCadastreRow = {
+  code: string;
+  concession_type: string;
+  name: string | null;
+  holder: string | null;
+  rut: string | null;
+  area_ha: number | null;
+  status: string | null;
+  region: string | null;
+  commune: string | null;
+  geometry?: GeoJSON.Geometry | null;
+  raw?: Record<string, unknown>;
+};
+
+async function writeThroughCadastre(rows: LiveCadastreRow[]): Promise<void> {
+  if (!rows.length) return;
+  const now = new Date().toISOString();
+  const cadastreDb = supabaseAdmin as unknown as SupabaseClient;
+
+  for (const r of rows) {
+    const payload = {
+      source: "SERNAGEOMIN",
+      origen: "SERNAGEOMIN",
+      external_id: r.code,
+      rol: r.code,
+      name: r.name,
+      tipo: r.concession_type,
+      status: r.status,
+      holder_name: r.holder,
+      holder_rut: r.rut,
+      area_ha: r.area_ha,
+      region: r.region,
+      commune: r.commune,
+      geometry_geojson: r.geometry ?? null,
+      metadata: r.raw ?? {},
+      fetched_at: now,
+      archived_at: null,
+    };
+
+    const { data: existing, error: findError } = await cadastreDb
+      .from("cadastre_national")
+      .select("id, geometry_geojson")
+      .eq("source", "SERNAGEOMIN")
+      .eq("external_id", r.code)
+      .is("archived_at", null)
+      .limit(1)
+      .maybeSingle();
+    if (findError) throw new Error(`CADASTRE_WRITE_THROUGH_LOOKUP_FAILED: ${findError.message}`);
+
+    if (existing) {
+      const { error } = await cadastreDb
+        .from("cadastre_national")
+        .update({
+          ...payload,
+          geometry_geojson: r.geometry ?? existing.geometry_geojson ?? null,
+        })
+        .eq("id", existing.id);
+      if (error) throw new Error(`CADASTRE_WRITE_THROUGH_UPDATE_FAILED: ${error.message}`);
+    } else {
+      const { error } = await cadastreDb.from("cadastre_national").insert(payload);
+      if (error) throw new Error(`CADASTRE_WRITE_THROUGH_INSERT_FAILED: ${error.message}`);
+    }
+  }
+}
+
 function pickNum(props: Record<string, unknown>, ...keys: string[]): number | null {
   const v = pick(props, ...keys);
   if (!v) return null;
@@ -72,7 +138,7 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
     String(p.TIPO_CONCESION ?? "").toUpperCase() === "EXPLOTACION" ? "explotacion" : "exploracion";
   const rutNum = pick(p, "TITULAR_RUT");
   const rutDv = pick(p, "TITULAR_DV");
-  return {
+  const live: PublicConcession = {
     code,
     concession_type: tipo,
     name: pick(p, "NOMBRE"),
@@ -91,6 +157,8 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
     source: "sernageomin",
     last_synced_at: null,
   };
+  await writeThroughCadastre([{ ...live, raw: p }]);
+  return live;
 }
 
 // ============================================================
@@ -98,48 +166,51 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
 // ============================================================
 export const searchConcessions = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z
-      .object({
-        q: z.string().trim().min(1).max(120),
-        limit: z.number().int().min(1).max(50).optional(),
-        region: z.string().trim().max(80).optional(),
-        type: z.enum(["explotacion", "exploracion", "mensura", "manifestacion"]).optional(),
-      })
-      .parse(input),
+    z.object({
+      q: z.string().trim().min(1).max(120),
+      limit: z.number().int().min(1).max(50).optional(),
+      region: z.string().trim().max(80).optional(),
+      type: z.enum(["explotacion", "exploracion", "mensura", "manifestacion"]).optional(),
+    }).parse(input),
   )
   .handler(async ({ data }) => {
     const limit = data.limit ?? 25;
-    let query = supabaseAdmin
-      .from("public_concessions_cache")
-      .select("code, concession_type, name, holder, rut, area_ha, status, region, commune")
-      .limit(limit);
-
-    // text matching across multiple fields
     const term = data.q.replace(/[%,]/g, " ");
-    query = query.or(
-      [
-        `holder.ilike.%${term}%`,
+    let query = supabaseAdmin
+      .from("cadastre_national")
+      .select("external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune")
+      .is("archived_at", null)
+      .or([
+        `holder_name.ilike.%${term}%`,
         `name.ilike.%${term}%`,
-        `code.ilike.%${term}%`,
-        `rut.ilike.%${term}%`,
+        `rol.ilike.%${term}%`,
+        `external_id.ilike.%${term}%`,
+        `holder_rut.ilike.%${term}%`,
         `commune.ilike.%${term}%`,
-      ].join(","),
-    );
-
-    if (data.region) query = query.eq("region_slug", data.region);
-    if (data.type) query = query.eq("concession_type", data.type);
+      ].join(","))
+      .limit(limit);
+    if (data.region) query = query.ilike("region", `%${data.region}%`);
+    if (data.type) query = query.ilike("tipo", `%${data.type}%`);
 
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-
-    // Fallback en vivo: el cache aún no se puebla en producción, así que si no
-    // hay resultados consultamos SERNAGEOMIN v2 directo por nombre/titular/rol.
-    if ((rows ?? []).length === 0) {
-      const live = await searchConcessionsLive(data.q, limit);
-      if (live.length > 0) return { results: live, total: live.length, source: "sernageomin" };
+    if ((rows ?? []).length > 0) {
+      const results = rows!.map((r) => ({
+        code: r.rol ?? r.external_id,
+        concession_type: r.tipo ?? "",
+        name: r.name,
+        holder: r.holder_name,
+        rut: r.holder_rut,
+        area_ha: r.area_ha == null ? null : Number(r.area_ha),
+        status: r.status,
+        region: r.region,
+        commune: r.commune,
+      }));
+      return { results, total: results.length, source: "cadastre_national" as const };
     }
 
-    return { results: rows ?? [], total: rows?.length ?? 0, source: "cache" as const };
+    const live = await searchConcessionsLive(data.q, limit);
+    return { results: live, total: live.length, source: "sernageomin" as const };
   });
 
 /** Búsqueda en vivo contra SERNAGEOMIN v2 (nombre, titular o rol). */
@@ -172,7 +243,7 @@ async function searchConcessionsLive(
     limit,
     returnGeometry: false,
   });
-  return (fc?.features ?? []).map((f) => {
+  const rows = (fc?.features ?? []).map((f) => {
     const p = (f.properties ?? {}) as Record<string, unknown>;
     const rolNum = p.NUMERO_ROL;
     const rolDv = p.DV_ROL;
@@ -194,6 +265,8 @@ async function searchConcessionsLive(
       commune: (p.COMUNA as string) ?? null,
     };
   });
+  await writeThroughCadastre(rows);
+  return rows;
 }
 
 // ============================================================
@@ -204,36 +277,35 @@ export const getConcessionByCode = createServerFn({ method: "GET" })
     z.object({ code: z.string().trim().min(1).max(60) }).parse(input),
   )
   .handler(async ({ data }): Promise<PublicConcession | null> => {
-    const { data: row } = await supabaseAdmin
-      .from("public_concessions_cache")
-      .select(
-        "code, concession_type, name, holder, rut, area_ha, status, region, commune, province, expires_at, granted_at, geometry, last_synced_at",
-      )
-      .eq("code", data.code)
+    const { data: row, error } = await supabaseAdmin
+      .from("cadastre_national")
+      .select("external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune, provincia, constituted_at, geometry_geojson, fetched_at")
+      .is("archived_at", null)
+      .or(`rol.eq.${data.code},external_id.eq.${data.code}`)
+      .limit(1)
       .maybeSingle();
-
+    if (error) throw new Error(error.message);
     if (row) {
       return {
-        code: row.code,
-        concession_type: row.concession_type,
+        code: row.rol ?? row.external_id,
+        concession_type: row.tipo ?? "",
         name: row.name,
-        holder: row.holder,
-        rut: row.rut,
-        area_ha: row.area_ha,
+        holder: row.holder_name,
+        rut: row.holder_rut,
+        area_ha: row.area_ha == null ? null : Number(row.area_ha),
         status: row.status,
         region: row.region,
         commune: row.commune,
-        province: row.province,
-        expires_at: row.expires_at,
-        granted_at: row.granted_at,
+        province: row.provincia,
+        expires_at: null,
+        granted_at: row.constituted_at,
         centroid_lat: null,
         centroid_lng: null,
-        geometry: (row.geometry ?? null) as GeoJSON.Geometry | null,
-        source: "cache",
-        last_synced_at: row.last_synced_at,
+        geometry: (row.geometry_geojson ?? null) as GeoJSON.Geometry | null,
+        source: "cadastre_national",
+        last_synced_at: row.fetched_at,
       };
     }
-
     return fetchArcgisByCode(data.code);
   });
 

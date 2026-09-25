@@ -2,7 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Download, Loader2, MapPin } from "lucide-react";
 import { Card } from "@/features/palmeras/components/primitives/Card";
-import { Badge } from "@/features/palmeras/components/primitives/Badge";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import {
   getFrancoCadastreCross,
@@ -19,9 +18,21 @@ function downloadJson(name: string, data: unknown) {
   URL.revokeObjectURL(url);
 }
 
+function canonicalRows(rows: FrancoPertenenciaMatch[]) {
+  const rank = { EXACT: 4, GEOM: 3, "NAME~": 2, NONE: 1 } as const;
+  const byId = new Map<string, FrancoPertenenciaMatch>();
+  for (const row of rows) {
+    if (!row.concessionId || !row.concessionCode) continue;
+    const prev = byId.get(row.concessionId);
+    if (!prev || rank[row.matchKind] > rank[prev.matchKind]) byId.set(row.concessionId, row);
+  }
+  return [...byId.values()].sort((a, b) =>
+    String(a.concessionName ?? "").localeCompare(String(b.concessionName ?? ""), "es"),
+  );
+}
+
 function downloadCsv(name: string, rows: FrancoPertenenciaMatch[]) {
   const keys: (keyof FrancoPertenenciaMatch)[] = [
-    "kmlName",
     "concessionCode",
     "concessionName",
     "holder",
@@ -30,10 +41,6 @@ function downloadCsv(name: string, rows: FrancoPertenenciaMatch[]) {
     "areaHaDb",
     "commune",
     "region",
-    "overlapHa",
-    "pctOfKml",
-    "pctOfConcession",
-    "matchKind",
   ];
   const esc = (v: unknown) => `"${String(v ?? "").replace(/"/g, '""')}"`;
   const csv = [keys.join(","), ...rows.map((r) => keys.map((k) => esc(r[k])).join(","))].join("\n");
@@ -58,7 +65,7 @@ export function FrancoPertenenciasPanel() {
     return (
       <Card className="p-6" accent="gold">
         <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cruzando KMZ × catastro real…
+          <Loader2 className="w-4 h-4 animate-spin" /> Cargando catastro Cholqui…
         </div>
       </Card>
     );
@@ -67,7 +74,7 @@ export function FrancoPertenenciasPanel() {
   if (error || !data) {
     return (
       <Card className="p-6" accent="copper">
-        <SectionTitle icon={MapPin}>Error en cruce KMZ × catastro</SectionTitle>
+        <SectionTitle icon={MapPin}>Error cargando catastro Cholqui</SectionTitle>
         <p className="text-sm text-muted-foreground">
           {error instanceof Error ? error.message : "Sin datos"}
         </p>
@@ -75,33 +82,33 @@ export function FrancoPertenenciasPanel() {
     );
   }
 
-  const exact = data.rows.filter((r) => r.matchKind === "EXACT");
-  const overlaps = data.rows.filter((r) => r.matchKind === "GEOM" && r.overlapHa > 0.5);
-  const noMatch = data.rows.filter((r) => r.matchKind === "NONE");
+  const concessions = canonicalRows(data.rows);
+  const canonicalAreaHa = concessions.reduce((sum, row) => sum + (row.areaHaDb ?? 0), 0);
+  const uniqueHolders = new Set(concessions.map((row) => row.holder).filter(Boolean)).size;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           {
-            label: "Pertenencias KMZ",
-            value: String(data.totalKmlPolygons),
-            sub: "polígonos importados",
+            label: "Concesiones catastro",
+            value: String(concessions.length),
+            sub: "registros únicos",
           },
           {
-            label: "Match en catastro",
-            value: `${data.matchedKmlPolygons}/${data.totalKmlPolygons}`,
-            sub: "con concesión real",
+            label: "Superficie catastro",
+            value: `${canonicalAreaHa.toLocaleString("es-CL", { maximumFractionDigits: 2 })} ha`,
+            sub: "suma de registros únicos",
           },
           {
-            label: "Concesiones únicas",
-            value: String(data.uniqueConcessions),
-            sub: "GF-CONC-* en DB",
+            label: "Titulares",
+            value: String(uniqueHolders),
+            sub: "titulares únicos en catastro",
           },
           {
-            label: "Superficie total",
-            value: `${data.totalAreaHa.toLocaleString("es-CL")} ha`,
-            sub: "matches exactos",
+            label: "Fuente",
+            value: "DB",
+            sub: "catastro canónico del proyecto",
           },
         ].map((m, i) => (
           <Card key={m.label} delay={i * 80} className="p-4" accent="gold">
@@ -121,18 +128,18 @@ export function FrancoPertenenciasPanel() {
               icon={MapPin}
               sub={`Proyecto: ${data.projectName ?? "—"} · ${new Date(data.generatedAt).toLocaleString("es-CL")}`}
             >
-              Pertenencias KMZ × Catastro real
+              Catastro minero · Cholqui
             </SectionTitle>
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => downloadCsv("franco_kmz_x_catastro.csv", data.rows)}
+              onClick={() => downloadCsv("cholqui_catastro.csv", concessions)}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-gold/40 text-gold hover:bg-gold/10 font-mono text-[11px] uppercase tracking-wider"
             >
               <Download className="w-3.5 h-3.5" /> CSV
             </button>
             <button
-              onClick={() => downloadJson("franco_kmz_x_catastro.json", data)}
+              onClick={() => downloadJson("cholqui_catastro.json", { projectId: data.projectId, projectName: data.projectName, generatedAt: data.generatedAt, concessions })}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-muted-foreground hover:text-foreground font-mono text-[11px] uppercase tracking-wider"
             >
               <Download className="w-3.5 h-3.5" /> JSON
@@ -144,21 +151,16 @@ export function FrancoPertenenciasPanel() {
           <table className="w-full text-xs font-mono">
             <thead>
               <tr className="text-left text-hint uppercase tracking-wider border-b border-border">
-                <th className="py-2 pr-3">KMZ</th>
-                <th className="py-2 pr-3">Concesión DB</th>
+                <th className="py-2 pr-3">Concesión</th>
                 <th className="py-2 pr-3">Código</th>
                 <th className="py-2 pr-3">Titular</th>
                 <th className="py-2 pr-3 text-right">Área DB (ha)</th>
-                <th className="py-2 pr-3 text-right">Overlap (ha)</th>
-                <th className="py-2 pr-3 text-right">% KML</th>
-                <th className="py-2 pr-3">Match</th>
                 <th className="py-2 pr-3">Status</th>
               </tr>
             </thead>
             <tbody>
-              {data.rows.map((r, i) => (
-                <tr key={i} className="border-b border-border/50 hover:bg-bg-secondary/50">
-                  <td className="py-1.5 pr-3 text-foreground">{r.kmlName}</td>
+              {concessions.map((r) => (
+                <tr key={r.concessionId ?? r.concessionCode ?? r.concessionName} className="border-b border-border/50 hover:bg-bg-secondary/50">
                   <td className="py-1.5 pr-3 text-foreground">{r.concessionName ?? "—"}</td>
                   <td className="py-1.5 pr-3 text-muted-foreground">{r.concessionCode ?? "—"}</td>
                   <td className="py-1.5 pr-3 text-muted-foreground truncate max-w-[180px]">
@@ -167,27 +169,6 @@ export function FrancoPertenenciasPanel() {
                   <td className="py-1.5 pr-3 text-right text-muted-foreground">
                     {r.areaHaDb?.toFixed(2) ?? "—"}
                   </td>
-                  <td className="py-1.5 pr-3 text-right text-foreground">
-                    {r.overlapHa.toFixed(2)}
-                  </td>
-                  <td className="py-1.5 pr-3 text-right text-muted-foreground">
-                    {r.pctOfKml.toFixed(1)}%
-                  </td>
-                  <td className="py-1.5 pr-3">
-                    <Badge
-                      tone={
-                        r.matchKind === "EXACT"
-                          ? "teal"
-                          : r.matchKind === "GEOM"
-                            ? "gold"
-                            : r.matchKind === "NAME~"
-                              ? "muted"
-                              : "alert"
-                      }
-                    >
-                      {r.matchKind}
-                    </Badge>
-                  </td>
                   <td className="py-1.5 pr-3 text-muted-foreground">{r.status ?? "—"}</td>
                 </tr>
               ))}
@@ -195,33 +176,10 @@ export function FrancoPertenenciasPanel() {
           </table>
         </div>
 
-        {overlaps.length > 0 && (
-          <div className="mt-4 p-3 rounded border border-gold/30 bg-gold/5">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-gold mb-1">
-              ⚠ Superposiciones internas
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {overlaps.length} cruces espaciales secundarios &gt;0.5 ha entre pertenencias
-              contiguas (revisar en QGIS).
-            </div>
-          </div>
-        )}
-        {noMatch.length > 0 && (
-          <div className="mt-2 p-3 rounded border border-alert/30 bg-alert/5">
-            <div className="font-mono text-[10px] uppercase tracking-widest text-alert mb-1">
-              Sin match
-            </div>
-            <div className="text-xs text-muted-foreground">
-              {noMatch.length} polígonos del KMZ sin contraparte en catastro DB (probables
-              geometrías auxiliares).
-            </div>
-          </div>
-        )}
 
         <div className="mt-4 text-[11px] font-mono uppercase tracking-wider text-hint">
           Resumen para informe pre NI 43-101 · Sec. 3 (Property Description) y Anexo A (Catastro) ·{" "}
-          {exact.length} pertenencias confirmadas · {data.totalAreaHa.toLocaleString("es-CL")} ha
-          totales.
+          {concessions.length} concesiones únicas · {canonicalAreaHa.toLocaleString("es-CL", { maximumFractionDigits: 2 })} ha totales.
         </div>
       </Card>
     </div>
