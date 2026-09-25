@@ -65,7 +65,7 @@ export function FrancoPertenenciasPanel() {
     return (
       <Card className="p-6" accent="gold">
         <div className="flex items-center gap-2 text-muted-foreground font-mono text-xs uppercase tracking-wider">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cruzando KMZ × catastro real…
+          <Loader2 className="w-4 h-4 animate-spin" /> Cargando catastro Cholqui…
         </div>
       </Card>
     );
@@ -74,7 +74,7 @@ export function FrancoPertenenciasPanel() {
   if (error || !data) {
     return (
       <Card className="p-6" accent="copper">
-        <SectionTitle icon={MapPin}>Error en cruce KMZ × catastro</SectionTitle>
+        <SectionTitle icon={MapPin}>Error cargando catastro Cholqui</SectionTitle>
         <p className="text-sm text-muted-foreground">
           {error instanceof Error ? error.message : "Sin datos"}
         </p>
@@ -84,16 +84,12 @@ export function FrancoPertenenciasPanel() {
 
   const concessions = canonicalRows(data.rows);
   const canonicalAreaHa = concessions.reduce((sum, row) => sum + (row.areaHaDb ?? 0), 0);
+  const uniqueHolders = new Set(concessions.map((row) => row.holder).filter(Boolean)).size;
 
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          {
-            label: "Pertenencias KMZ",
-            value: String(data.totalKmlPolygons),
-            sub: "polígonos importados",
-          },
           {
             label: "Concesiones catastro",
             value: String(concessions.length),
@@ -105,9 +101,14 @@ export function FrancoPertenenciasPanel() {
             sub: "suma de registros únicos",
           },
           {
-            label: "Fuente documental",
-            value: String(data.totalKmlPolygons),
-            sub: "polígonos KMZ de respaldo",
+            label: "Titulares",
+            value: String(uniqueHolders),
+            sub: "titulares únicos en catastro",
+          },
+          {
+            label: "Fuente",
+            value: "DB",
+            sub: "catastro canónico del proyecto",
           },
         ].map((m, i) => (
           <Card key={m.label} delay={i * 80} className="p-4" accent="gold">
