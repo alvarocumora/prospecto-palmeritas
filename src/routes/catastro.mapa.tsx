@@ -604,7 +604,7 @@ function CatastroMap() {
         {analysisSelection.length > 0 && (
           <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[500] rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg px-3 py-2 flex items-center gap-3 print:hidden">
             <div className="text-[10px] font-mono"><strong>{analysisSelection.length}</strong> concesión(es) en análisis</div>
-            <Link to="/dashboard/catastro" className="rounded bg-primary px-2 py-1 text-[10px] font-mono text-primary-foreground">Abrir Mining Intelligence</Link>
+            <Link to={"/dashboard/catastro" as never} className="rounded bg-primary px-2 py-1 text-[10px] font-mono text-primary-foreground">Abrir Mining Intelligence</Link>
             <button type="button" onClick={()=>setAnalysisSelection([])} className="text-[10px] font-mono text-muted-foreground">Limpiar</button>
           </div>
         )}
