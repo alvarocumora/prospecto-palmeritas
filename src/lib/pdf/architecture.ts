@@ -86,7 +86,8 @@ export const REPORT_ARCHITECTURES: Record<ReportProfile, ReportArchitecture> = {
   investment: {
     profile: "investment",
     title: "Investment Memorandum",
-    purpose: "Explain the investment thesis, evidence base, risks, capital need and de-risking path.",
+    purpose:
+      "Explain the investment thesis, evidence base, risks, capital need and de-risking path.",
     audience: "Investors, family offices, funds and investment committees",
     allowedEvidence: [
       "OFFICIAL",
@@ -118,7 +119,8 @@ export const REPORT_ARCHITECTURES: Record<ReportProfile, ReportArchitecture> = {
   technical: {
     profile: "technical",
     title: "Technical Report",
-    purpose: "State what is technically known, its provenance, quality, interpretation and remaining gaps.",
+    purpose:
+      "State what is technically known, its provenance, quality, interpretation and remaining gaps.",
     audience: "Geologists, technical reviewers, due-diligence teams and competent persons",
     allowedEvidence: [
       "OFFICIAL",
@@ -153,7 +155,8 @@ export const REPORT_ARCHITECTURES: Record<ReportProfile, ReportArchitecture> = {
   targeting: {
     profile: "targeting",
     title: "Exploration Targeting Report",
-    purpose: "Show the reproducible path from input datasets to anomalies, ranked targets and field validation.",
+    purpose:
+      "Show the reproducible path from input datasets to anomalies, ranked targets and field validation.",
     audience: "Exploration teams, geoscientists and technical reviewers",
     allowedEvidence: [
       "OFFICIAL",
