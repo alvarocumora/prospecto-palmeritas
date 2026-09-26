@@ -167,6 +167,8 @@ export function buildDrillGrid(
 
   return anomalies
     .filter((a) => !NON_DRILLABLE.has(a.indexCode))
+    // Guarda legal: nunca se propone perforación fuera de la tenencia conocida.
+    .filter((a) => a.withinTenure !== false)
     .filter((a) => (a.score ?? 0) >= minScore)
     .slice()
     .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.id.localeCompare(b.id))
