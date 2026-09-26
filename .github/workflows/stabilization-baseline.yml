@@ -1,9 +1,9 @@
-name: Stabilization baseline
+name: Stabilization validation
 on:
   push:
     branches: [chore/codebase-stabilization]
 jobs:
-  lint:
+  validate:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: --max-old-space-size=8192
@@ -14,5 +14,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - name: Typecheck
+        run: npm run typecheck
       - name: Lint
         run: npm run lint
+      - name: Test
+        run: npm run test
+      - name: Build
+        run: npm run build
