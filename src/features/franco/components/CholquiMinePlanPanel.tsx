@@ -6,6 +6,10 @@ import {
   auditDeclaredProductionPlan,
 } from "../data/commercialModel";
 import {
+  LOGISTICS_MARKET_REFERENCES,
+  logisticsScale,
+} from "../data/logisticsModel";
+import {
   CONTINGENCY_PCT,
   FIXED_COSTS,
   PLATEAU_OPTIONS,
@@ -35,6 +39,7 @@ export function CholquiMinePlanPanel() {
   );
   const option = PLATEAU_OPTIONS.find((o) => o.plateau === plateau) ?? PLATEAU_OPTIONS[0];
   const productionAudit = auditDeclaredProductionPlan();
+  const logistics = logisticsScale();
   const maxRate = Math.max(...plan.months.map((m) => m.rate));
   const cashMin = Math.min(...plan.months.map((m) => m.cumulativeCashflowClp));
   const cashMax = Math.max(...plan.months.map((m) => m.cumulativeCashflowClp));
@@ -147,6 +152,70 @@ export function CholquiMinePlanPanel() {
           {nf.format(LEGACY_FREIGHT_ASSUMPTION.clpPerTkm)}/t·km = CLP{" "}
           {nf.format(LEGACY_FREIGHT_ASSUMPTION.clpPerT)}/t. Es un supuesto de planificación, no una
           distancia vial ni una cotización verificadas.
+        </p>
+      </div>
+
+      <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-1">
+          Logística de mineral · benchmark 130 km one-way
+        </div>
+        <p className="text-[11px] text-content-subtle mb-3 max-w-4xl">
+          Modelo con 28 t útiles, 26 días/mes y 1,5 ciclos/camión/día. Diésel CLP{" "}
+          {nf.format(LOGISTICS_MARKET_REFERENCES.diesel.valueClpL)}/L; arriendo tolva 20 m³ desde
+          CLP {nf.format(LOGISTICS_MARKET_REFERENCES.truckRental20m3.valueClpMonth)}/mes; servicio
+          tercerizado benchmark CLP{" "}
+          {nf.format(LOGISTICS_MARKET_REFERENCES.thirdPartyTruck14m3.valueClpKm)}/km. Los 130 km
+          siguen PENDING_DD hasta validar ruta de camión desde portón de mina a planta.
+        </p>
+        <table className="w-full text-xs border-collapse min-w-[820px]">
+          <thead>
+            <tr className="border-b border-hairline text-content-subtle">
+              {[
+                "t/mes",
+                "Viajes/mes",
+                "Camiones",
+                "Litros/mes",
+                "Arriendo + diésel",
+                "$/t arriendo + diésel",
+                "$/t tercerizado",
+              ].map((h) => (
+                <th
+                  key={h}
+                  className="py-2 text-right font-mono uppercase tracking-wider text-[10px]"
+                >
+                  {h}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {logistics.map((row) => (
+              <tr key={row.tonnesPerMonth} className="border-b border-hairline">
+                <td className="py-1.5 text-right font-mono">{nf.format(row.tonnesPerMonth)}</td>
+                <td className="py-1.5 text-right font-mono">
+                  {nf.format(Math.ceil(row.tripsPerMonth))}
+                </td>
+                <td className="py-1.5 text-right font-mono">{row.trucksRequired}</td>
+                <td className="py-1.5 text-right font-mono">
+                  {nf.format(Math.round(row.dieselLitresPerMonth))}
+                </td>
+                <td className="py-1.5 text-right font-mono">
+                  {fmtClpM(row.rentalPlusDieselClpMonth)}
+                </td>
+                <td className="py-1.5 text-right font-mono">
+                  {fmtClp(Math.round(row.rentalPlusDieselClpT))}
+                </td>
+                <td className="py-1.5 text-right font-mono">
+                  {fmtClp(Math.round(row.thirdPartyClpT))}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="text-[10px] text-content-subtle mt-2">
+          Arriendo + diésel es un piso operativo: aún excluye conductor, peajes, neumáticos,
+          mantención, seguros, movilización y esperas. El benchmark tercerizado sí proviene de una
+          adjudicación pública por km, pero no es una cotización específica para Cholqui.
         </p>
       </div>
 
