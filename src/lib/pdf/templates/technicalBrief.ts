@@ -136,9 +136,31 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y += title(doc, M, y, "Tesis del proyecto", 17, CW) + 10;
   y += bullets(doc, M, y, model.thesis, CW, 9) + 18;
 
+  if (model.dataQuality?.length) {
+    need(150);
+    eyebrow(doc, M, y, "02 · Evidence & Confidence");
+    y += 16;
+    y += title(doc, M, y, "Qué sabemos y con qué nivel de confianza", 17, CW) + 10;
+    y +=
+      editorialTable(doc, {
+        x: M,
+        y,
+        w: CW,
+        head: ["Evidencia", "Clase", "Estado", "Detalle"],
+        rows: model.dataQuality.map((item) => [
+          item.label,
+          item.provenance ?? item.status,
+          item.confidence?.toUpperCase() ?? "—",
+          item.detail,
+        ]),
+        widths: [CW * 0.2, CW * 0.16, CW * 0.12, CW * 0.52],
+        size: 7.4,
+      }) + 18;
+  }
+
   if (model.map) {
     need(260);
-    eyebrow(doc, M, y, "02 · Ubicación y puntos de control");
+    eyebrow(doc, M, y, `${model.dataQuality?.length ? "03" : "02"} · Ubicación y puntos de control`);
     y += 16;
     y += title(doc, M, y, model.map.title, 17, CW) + 12;
     if (model.map.imageDataUrl) {
@@ -172,7 +194,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   if (model.chart) {
     need(260);
-    eyebrow(doc, M, y, "03 · Evidencia analítica");
+    eyebrow(doc, M, y, `${model.dataQuality?.length ? "04" : "03"} · Evidencia analítica`);
     y += 16;
     y += title(doc, M, y, model.chart.title, 17, CW) + 12;
     barChart(doc, {
@@ -190,7 +212,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       y += paragraph(doc, M, y, model.chart.caption, CW, 8.2, GC_COLOR.slate) + 14;
   }
 
-  let n = 4;
+  let n = model.dataQuality?.length ? 5 : 4;
   for (const section of model.sections) {
     need(120);
     eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · ${section.eyebrow}`);
@@ -234,7 +256,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     n += 1;
   }
 
-  if (model.allocation) {
+  if (model.allocation && model.reportProfile === "investment") {
     need(250);
     eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Estructura de la ronda`);
     y += 16;
@@ -254,7 +276,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     n += 1;
   }
 
-  if (model.milestones?.length) {
+  if (model.milestones?.length && model.reportProfile === "investment") {
     need(120);
     eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Hitos`);
     y += 16;
