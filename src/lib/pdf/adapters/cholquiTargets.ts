@@ -69,34 +69,41 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         note: `${summary.indexes.length} índices espectrales`,
       },
       {
-        label: "Puntaje máximo",
-        value: summary.maxScore != null ? summary.maxScore.toFixed(2).replace(".", ",") : "s/d",
-        note: "Realce relativo al fondo del AOI",
+        label: "Dentro de la tenencia",
+        value: `${summary.withinTenure} de ${summary.anomalies}`,
+        note: "Sólo estas generan plataforma propuesta",
       },
       {
         label: "Plataformas propuestas",
         value: String(summary.collars),
-        note: "Fase 1 conceptual, no comprometida",
+        note: `Fase 1 conceptual, ${num(summary.totalMeters)} m`,
+      },
+      {
+        label: "Superficie interpretable",
+        value:
+          data.coverage.typicalPct != null
+            ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+            : "s/d",
+        note:
+          data.coverage.bestCasePct != null
+            ? `Mejor caso ${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} % del AOI`
+            : "Cobertura sin vegetación del AOI",
+      },
+      {
+        label: "Puntaje máximo",
+        value: summary.maxScore != null ? summary.maxScore.toFixed(2).replace(".", ",") : "s/d",
+        note: "Realce relativo al fondo del AOI",
       },
       {
         label: "Metraje propuesto",
         value: `${num(summary.totalMeters)} m`,
         note: "Sondaje diamantino, inclinación -60°",
       },
-      {
-        label: "Anomalías perforables",
-        value: String(summary.drillable),
-        note: "Puntaje sobre 0,55 y no cobertura vegetal",
-      },
-      {
-        label: "Última detección",
-        value: data.runDate || "s/d",
-        note: "Corrida almacenada en la plataforma",
-      },
     ],
     thesis: [
-      `Se detectaron ${summary.anomalies} anomalías espectrales sobre el AOI de Cholqui, agrupadas en ${summary.indexes.length} índices (óxidos de hierro, arcillas Al-OH, alteración combinada y lineamientos estructurales).`,
-      `De ellas, ${summary.drillable} superan el umbral de puntaje y se traducen en ${summary.collars} plataformas propuestas por ${num(summary.totalMeters)} m de sondaje diamantino.`,
+      `Se detectaron ${summary.anomalies} anomalías espectrales reales sobre el AOI de Cholqui (${data.coverage.sensor}), agrupadas en ${summary.indexes.length} índices de alteración (arcillas Al-OH y alteración hidrotermal combinada).`,
+      `${summary.withinTenure} caen dentro de las concesiones conocidas y se traducen en ${summary.collars} plataformas propuestas por ${num(summary.totalMeters)} m de sondaje diamantino; las ${summary.outsideTenure} restantes son contexto regional y requieren verificar tenencia antes de considerar perforación.`,
+      `Superficie interpretable sin cubierta vegetal: ${data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"} típico y ${data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"} en el mejor escenario del AOI.`,
       "El azimut de perforación es perpendicular al rumbo dominante N20E documentado en La Maza, para cortar la estructura en ángulo y medir potencia real.",
       "Una anomalía espectral es un indicio, no mineralización: ningún target sustituye mapeo, canaleta ni ensaye de laboratorio.",
     ],
@@ -139,8 +146,12 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
       {
         status: "DERIVED",
         label: "Anomalías espectrales",
-        detail:
-          "Derivadas de razones de banda Sentinel-2. Indicio de alteración, sin verificación de terreno.",
+        detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
+      },
+      {
+        status: "PENDING_DD",
+        label: "Tenencia de las anomalías fuera del set conocido",
+        detail: `${summary.outsideTenure} anomalías caen fuera de las pertenencias conocidas: contexto regional, sin plataforma propuesta hasta verificar tenencia.`,
       },
       {
         status: "CONCEPTUAL",
@@ -169,8 +180,8 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         blocks: [
           {
             kind: "table",
-            head: ["ID", "Índice", "Severidad", "Puntaje", "Área ha", "Muestra más cercana"],
-            widths: [0.09, 0.32, 0.13, 0.12, 0.12, 0.22],
+            head: ["ID", "Índice", "Severidad", "Puntaje", "Tenencia", "Muestra más cercana"],
+            widths: [0.09, 0.32, 0.13, 0.12, 0.16, 0.18],
             rows: top.map((a, i) => {
               const near = nearestSample(a.lat, a.lng);
               return [
@@ -178,7 +189,7 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
                 indexLabel(a.indexCode),
                 a.severity,
                 a.score != null ? a.score.toFixed(2).replace(".", ",") : "s/d",
-                a.areaHa != null ? num(a.areaHa, 1) : "s/d",
+                a.withinTenure ? "Dentro" : "Verificar",
                 near ? `${near.code} a ${num(near.km, 1)} km` : "s/d",
               ];
             }),
@@ -186,6 +197,10 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
           {
             kind: "text",
             body: "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
+          },
+          {
+            kind: "text",
+            body: "Tenencia: la bandera dentro/fuera se calculó contra las pertenencias conocidas (TOKI, PALLOCABE, DOS MARIAS). Las anomalías marcadas como \u0022Verificar\u0022 quedan como contexto regional y no generan plataforma propuesta hasta confirmar la tenencia (ESPERANZA / EUROPA u otras).",
           },
         ],
       },
