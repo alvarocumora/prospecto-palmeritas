@@ -36,7 +36,10 @@ export function useMyModules() {
     enabled: !!user,
     staleTime: 5 * 60_000,
     queryFn: async () => {
-      const { data, error } = await (supabase.rpc as any)("get_my_modules");
+      const rpc = supabase.rpc as unknown as (
+        fn: string,
+      ) => PromiseLike<{ data: unknown; error: Error | null }>;
+      const { data, error } = await rpc("get_my_modules");
       if (error) throw error;
       return (data ?? {
         plan_code: null,
@@ -69,7 +72,9 @@ export function useSelectedModule(
         setSelected(keys[0]);
         try {
           window.localStorage.setItem(SELECTED_KEY, keys[0]);
-        } catch {}
+        } catch {
+          // localStorage may be unavailable in restricted browser contexts.
+        }
       }
       return;
     }
@@ -77,7 +82,9 @@ export function useSelectedModule(
       setSelected("all");
       try {
         window.localStorage.setItem(SELECTED_KEY, "all");
-      } catch {}
+      } catch {
+      // localStorage may be unavailable in restricted browser contexts.
+    }
     }
   }, [available, selected]);
 
