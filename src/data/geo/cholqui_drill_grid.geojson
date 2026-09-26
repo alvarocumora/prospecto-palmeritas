@@ -9,12 +9,10 @@
   },
   "metadata": {
     "tipo": "PROPUESTA CONCEPTUAL",
+    "tenencia_fuente": "SERNAGEOMIN (De Martino)",
     "rumbo_dominante_deg": 20,
-    "azimut_perp_deg": 110,
-    "dip_deg": -60,
-    "n_collares": 3,
-    "total_m": 470,
-    "nota": "Collares SOLO sobre anomalias dentro de las concesiones conocidas (TOKI/PALLOCABE/DOS MARIAS). Anomalias fuertes fuera del set conocido NO generan collar hasta verificar tenencia (ESPERANZA/EUROPA).",
+    "n_collares": 7,
+    "total_m": 1030,
     "disclaimer": "Propuesta de exploracion. No constituye recurso ni reserva (NI 43-101)."
   },
   "features": [
@@ -23,48 +21,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -71.021167,
-          -33.878745
+          -71.028967,
+          -33.874038
         ]
       },
       "properties": {
         "code": "CHQ-DDH-01",
         "index_code": "HYDROTHERMAL_ALTERATION",
-        "lat": -33.878745,
-        "lng": -71.021167,
-        "este_utm19s": 313070.0,
-        "norte_utm19s": 6249450.0,
-        "azimuth_deg": 290,
-        "dip_deg": -60,
-        "depth_m": 170,
-        "priority": "Alta",
-        "score": 0.919,
-        "objetivo": "Interceptar el nucleo alterado y su zonacion vertical",
-        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -71.008822,
-          -33.877865
-        ]
-      },
-      "properties": {
-        "code": "CHQ-DDH-02",
-        "index_code": "CLAY_MINERALS",
-        "lat": -33.877865,
-        "lng": -71.008822,
-        "este_utm19s": 314210.0,
-        "norte_utm19s": 6249570.0,
+        "lat": -33.874038,
+        "lng": -71.028967,
+        "este_utm": 312338.2,
+        "norte_utm": 6249957.8,
         "azimuth_deg": 290,
         "dip_deg": -60,
         "depth_m": 170,
         "priority": "Media",
-        "score": 0.756,
-        "objetivo": "Cortar el halo argilico-sericitico y su relacion con la estructura",
+        "score": 0.846,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -73,23 +45,142 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -71.022901,
-          -33.878897
+          -71.026311,
+          -33.880574
+        ]
+      },
+      "properties": {
+        "code": "CHQ-DDH-02",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.880574,
+        "lng": -71.026311,
+        "este_utm": 312598.2,
+        "norte_utm": 6249237.8,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 170,
+        "priority": "Media",
+        "score": 0.734,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.009206,
+          -33.897987
         ]
       },
       "properties": {
         "code": "CHQ-DDH-03",
-        "index_code": "HYDROTHERMAL_ALTERATION",
-        "lat": -33.878897,
-        "lng": -71.022901,
-        "este_utm19s": 312910.0,
-        "norte_utm19s": 6249430.0,
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.897987,
+        "lng": -71.009206,
+        "este_utm": 314218.1,
+        "norte_utm": 6247337.7,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 170,
+        "priority": "Media",
+        "score": 0.724,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.039714,
+          -33.862319
+        ]
+      },
+      "properties": {
+        "code": "CHQ-DDH-04",
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.862319,
+        "lng": -71.039714,
+        "este_utm": 311318.2,
+        "norte_utm": 6251237.8,
         "azimuth_deg": 290,
         "dip_deg": -60,
         "depth_m": 130,
         "priority": "Baja",
-        "score": 0.656,
-        "objetivo": "Interceptar el nucleo alterado y su zonacion vertical",
+        "score": 0.657,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.031976,
+          -33.873267
+        ]
+      },
+      "properties": {
+        "code": "CHQ-DDH-05",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.873267,
+        "lng": -71.031976,
+        "este_utm": 312058.1,
+        "norte_utm": 6250037.8,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.641,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.03464,
+          -33.867092
+        ]
+      },
+      "properties": {
+        "code": "CHQ-DDH-06",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.867092,
+        "lng": -71.03464,
+        "este_utm": 311798.2,
+        "norte_utm": 6250717.8,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.639,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.008413,
+          -33.901065
+        ]
+      },
+      "properties": {
+        "code": "CHQ-DDH-07",
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.901065,
+        "lng": -71.008413,
+        "este_utm": 314298.2,
+        "norte_utm": 6246997.8,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.634,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     }

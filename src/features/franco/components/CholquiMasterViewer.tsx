@@ -1,6 +1,7 @@
 import type { FeatureCollection } from "geojson";
 import { ProjectMasterViewer, type AssayPoint } from "@/components/geo/ProjectMasterViewer";
-import concessionsRaw from "@/data/geo/franco_pertenencias.geojson?raw";
+// Catastro OFICIAL directo de SERNAGEOMIN (no el KMZ del operador).
+import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
 import drillRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
