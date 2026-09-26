@@ -223,11 +223,7 @@ export function CholquiMinePlanPanel() {
               >
                 <div
                   className={
-                    plan.paybackMonth && m.month === plan.paybackMonth
-                      ? "bg-copper"
-                      : m.cumulativeCashflowClp >= 0
-                        ? "bg-content"
-                        : "bg-content/25"
+                    m.cumulativeCashflowClp >= 0 ? "bg-content" : "bg-content/25"
                   }
                   style={{ height: `${Math.max(2, h)}%` }}
                 />
@@ -236,9 +232,8 @@ export function CholquiMinePlanPanel() {
           })}
         </div>
         <div className="text-[10px] font-mono text-content-subtle mt-2">
-          {plan.paybackMonth
-            ? `Equilibrio acumulado en el mes ${plan.paybackMonth}.`
-            : "El flujo acumulado no cruza cero dentro del horizonte de 24 meses en este escenario."}
+          El cruce matemático de caja se conserva sólo como sensibilidad interna. El payback
+          comercial está bloqueado hasta cerrar la debida diligencia comercial y técnica.
         </div>
       </div>
 
@@ -274,9 +269,7 @@ export function CholquiMinePlanPanel() {
             {plan.months.map((m) => (
               <tr
                 key={m.month}
-                className={`border-b border-hairline ${
-                  plan.paybackMonth === m.month ? "bg-accent-brand/5" : ""
-                }`}
+                className="border-b border-hairline"
               >
                 <td className="py-1.5 font-mono text-content">{m.month}</td>
                 <td className="py-1.5 text-right font-mono text-content">{nf.format(m.rate)}</td>
