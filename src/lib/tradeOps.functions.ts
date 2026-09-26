@@ -365,7 +365,7 @@ export const requestOperacionUpload = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }): Promise<OperacionChecklistResult> => {
+  .handler(async ({ data }) => {
     const { requirePortalSession } = await import("@/lib/portalSession.server");
     await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
@@ -525,7 +525,7 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<OperacionChecklistResult> => {
     const { requirePortalSession } = await import("@/lib/portalSession.server");
     await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
