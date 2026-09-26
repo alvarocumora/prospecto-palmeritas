@@ -318,13 +318,14 @@ export function DocumentEditor({
 
   type FlowSignerInput = { role: string; name: string; email: string };
   const [flowSigners, setFlowSigners] = useState<FlowSignerInput[]>([]);
+  const posKeys = ["A", "B", "C", "D"] as const;
   useEffect(() => {
     // Precarga inputs con las partes del bloque de firma.
     // Para NCNDA (posiciones A/B/C) y plantillas con convención pX_name/pX_email,
     // rellena automáticamente nombre y email desde los datos del documento para
     // que el orden de la firma coincida SIEMPRE con las partes del contrato
     // (Parte A → firmante #1, Parte B → #2, …).
-      setFlowSigners((prev) =>
+    setFlowSigners((prev) =>
       parties.map((role, i) => {
         if (prev[i] && (prev[i].name || prev[i].email)) return prev[i];
         const p = posKeys[i];
@@ -1220,7 +1221,6 @@ function SignFlowPanel({
   // Detecta desalineación: si algún firmante pendiente no coincide (por nombre
   // o email) con los datos actuales de la parte del contrato, ofrecemos
   // re-sincronizar el flujo.
-  const posKeys = ["A", "B", "C", "D"] as const;
   const misaligned =
     started &&
     (summary?.signers ?? []).some((s) => {
