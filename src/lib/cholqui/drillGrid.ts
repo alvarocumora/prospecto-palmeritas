@@ -19,6 +19,11 @@ export type SatelliteAnomaly = {
   detectedAt: string | null;
   lat: number;
   lng: number;
+  /**
+   * La anomalía cae dentro de las concesiones conocidas del proyecto. Sólo
+   * estas generan collar: no se propone perforación fuera de la tenencia.
+   */
+  withinTenure?: boolean;
 };
 
 export type ProposedCollar = {
