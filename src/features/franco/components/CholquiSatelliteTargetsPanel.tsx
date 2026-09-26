@@ -189,9 +189,11 @@ export function CholquiSatelliteTargetsPanel() {
             Anomalías espectrales y malla de sondajes propuesta
           </h2>
           <p className="text-sm text-content-subtle mt-1 max-w-3xl">
-            Anomalías derivadas de razones de banda Sentinel-2 sobre el AOI de Cholqui y la malla de
-            sondajes que se desprende de ellas. Una anomalía es un indicio de alteración, no
-            mineralización; la malla es una propuesta de exploración, no un programa comprometido.
+            Anomalías derivadas de razones de banda Sentinel-2 L2A sobre el AOI de Cholqui y la
+            malla de sondajes que se desprende de ellas. Una anomalía es un indicio de alteración,
+            no mineralización; la malla es una propuesta de exploración, no un programa
+            comprometido. Sólo se proponen sondajes sobre anomalías dentro de las concesiones
+            conocidas: las de fuera quedan como contexto regional hasta verificar la tenencia.
           </p>
         </div>
         <ProjectDocsMenu
