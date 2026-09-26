@@ -47,7 +47,10 @@ export function TradeFilters({
           className="pl-7 h-8 w-64 text-xs"
         />
       </div>
-      <Select value={search.role} onValueChange={(v) => onChange({ role: v as BoardSearch["role"] })}>
+      <Select
+        value={search.role}
+        onValueChange={(v) => onChange({ role: v as BoardSearch["role"] })}
+      >
         <SelectTrigger className="h-8 w-32 text-xs">
           <SelectValue />
         </SelectTrigger>
@@ -92,9 +95,7 @@ export function TradeFilters({
           variant="ghost"
           size="sm"
           className="h-8 text-xs"
-          onClick={() =>
-            onChange({ q: "", role: "all", commodity: "all", min: null, max: null })
-          }
+          onClick={() => onChange({ q: "", role: "all", commodity: "all", min: null, max: null })}
         >
           <X className="w-3 h-3 mr-1" /> Limpiar
         </Button>

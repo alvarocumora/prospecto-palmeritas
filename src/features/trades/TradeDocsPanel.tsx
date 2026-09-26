@@ -71,7 +71,12 @@ export function TradeDocsPanel({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <button type="button" disabled={busy !== null} onClick={() => void emit("ficha")} className={btn}>
+        <button
+          type="button"
+          disabled={busy !== null}
+          onClick={() => void emit("ficha")}
+          className={btn}
+        >
           {busy === "ficha" ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (

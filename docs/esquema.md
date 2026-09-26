@@ -4,7 +4,7 @@
 
 Total de tablas detectadas: **160**
 
-## `advance_requests`  (19 col.)
+## `advance_requests` (19 col.)
 
 - `id` — uuid
 - `lot_id` — uuid
@@ -26,7 +26,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `alteration_zones`  (14 col.)
+## `alteration_zones` (14 col.)
 
 - `id` — UUID
 - `zone_code` — TEXT
@@ -43,7 +43,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `api_keys`  (13 col.)
+## `api_keys` (13 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -59,7 +59,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `app_roles`  (5 col.)
+## `app_roles` (5 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -67,7 +67,7 @@ Total de tablas detectadas: **160**
 - `granted_by` — uuid
 - `created_at` — timestamptz
 
-## `asset_offerings`  (17 col.)
+## `asset_offerings` (17 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -87,7 +87,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `audit_log`  (8 col.)
+## `audit_log` (8 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -98,10 +98,9 @@ Total de tablas detectadas: **160**
 - `payload` — jsonb
 - `created_at` — timestamptz
 
-## `billing_plans`  (0 col.)
+## `billing_plans` (0 col.)
 
-
-## `bulletin_alerts`  (9 col.)
+## `bulletin_alerts` (9 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -113,7 +112,7 @@ Total de tablas detectadas: **160**
 - `read_at` — timestamptz
 - `created_at` — timestamptz
 
-## `bulletin_watch_holders`  (8 col.)
+## `bulletin_watch_holders` (8 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -124,7 +123,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `bulletin_watches`  (10 col.)
+## `bulletin_watches` (10 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -137,7 +136,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `business_partners`  (14 col.)
+## `business_partners` (14 col.)
 
 - `id` — uuid
 - `owner_user_id` — uuid
@@ -154,7 +153,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `buyer_profiles`  (15 col.)
+## `buyer_profiles` (15 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -172,7 +171,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `cadastre_opportunities`  (25 col.)
+## `cadastre_opportunities` (25 col.)
 
 - `id` — uuid
 - `concession_id` — uuid
@@ -200,7 +199,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `campaign_budgets`  (9 col.)
+## `campaign_budgets` (9 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -212,7 +211,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `campaign_expenses`  (18 col.)
+## `campaign_expenses` (18 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -233,7 +232,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `catastro_alerts`  (10 col.)
+## `catastro_alerts` (10 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -246,7 +245,7 @@ Total de tablas detectadas: **160**
 - `read_at` — TIMESTAMPTZ
 - `created_at` — TIMESTAMPTZ
 
-## `catastro_aoi`  (8 col.)
+## `catastro_aoi` (8 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -257,7 +256,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `catastro_exports`  (9 col.)
+## `catastro_exports` (9 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -269,7 +268,7 @@ Total de tablas detectadas: **160**
 - `error_message` — TEXT
 - `created_at` — TIMESTAMPTZ
 
-## `catastro_watchlist`  (7 col.)
+## `catastro_watchlist` (7 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -279,7 +278,7 @@ Total de tablas detectadas: **160**
 - `notes` — TEXT
 - `created_at` — TIMESTAMPTZ
 
-## `commodity_certifications`  (10 col.)
+## `commodity_certifications` (10 col.)
 
 - `id` — UUID
 - `code` — TEXT
@@ -292,7 +291,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `commodity_inquiries`  (14 col.)
+## `commodity_inquiries` (14 col.)
 
 - `id` — UUID
 - `lot_id` — UUID
@@ -309,7 +308,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `commodity_inquiry_messages`  (6 col.)
+## `commodity_inquiry_messages` (6 col.)
 
 - `id` — uuid
 - `inquiry_id` — uuid
@@ -318,7 +317,7 @@ Total de tablas detectadas: **160**
 - `read_at` — timestamptz
 - `created_at` — timestamptz
 
-## `commodity_lot_certifications`  (8 col.)
+## `commodity_lot_certifications` (8 col.)
 
 - `id` — UUID
 - `lot_id` — UUID
@@ -329,7 +328,7 @@ Total de tablas detectadas: **160**
 - `verification_url` — TEXT
 - `created_at` — TIMESTAMPTZ
 
-## `commodity_lots`  (39 col.)
+## `commodity_lots` (39 col.)
 
 - `id` — UUID
 - `seller_user_id` — UUID
@@ -371,7 +370,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `commodity_prices`  (9 col.)
+## `commodity_prices` (9 col.)
 
 - `id` — uuid
 - `symbol` — text
@@ -383,7 +382,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — timestamptz
 - `created_at` — timestamptz
 
-## `commodity_trades`  (32 col.)
+## `commodity_trades` (32 col.)
 
 - `id` — uuid
 - `reference` — text
@@ -418,7 +417,7 @@ Total de tablas detectadas: **160**
 - `counterparty_seller_email` — text
 - `counterparty_buyer_email` — text
 
-## `community_events`  (13 col.)
+## `community_events` (13 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -434,7 +433,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `compliance_evaluations`  (12 col.)
+## `compliance_evaluations` (12 col.)
 
 - `id` — uuid
 - `report_id` — uuid
@@ -449,7 +448,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `compliance_rules`  (13 col.)
+## `compliance_rules` (13 col.)
 
 - `id` — uuid
 - `standard` — public.compliance_standard
@@ -465,7 +464,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `concession_alert_settings`  (11 col.)
+## `concession_alert_settings` (11 col.)
 
 - `project_id` — uuid
 - `status_change_enabled` — boolean
@@ -479,7 +478,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `concession_alerts`  (15 col.)
+## `concession_alerts` (15 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -497,7 +496,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `concession_field_changes`  (9 col.)
+## `concession_field_changes` (9 col.)
 
 - `id` — UUID
 - `concession_id` — UUID
@@ -509,7 +508,7 @@ Total de tablas detectadas: **160**
 - `changed_by` — UUID
 - `changed_at` — TIMESTAMPTZ
 
-## `concession_files`  (10 col.)
+## `concession_files` (10 col.)
 
 - `id` — UUID
 - `concession_id` — UUID
@@ -522,7 +521,7 @@ Total de tablas detectadas: **160**
 - `uploaded_by` — UUID
 - `uploaded_at` — TIMESTAMP WITH TIME
 
-## `concession_history`  (7 col.)
+## `concession_history` (7 col.)
 
 - `id` — uuid
 - `concession_id` — uuid
@@ -532,7 +531,7 @@ Total de tablas detectadas: **160**
 - `source` — text
 - `synced_at` — timestamptz
 
-## `concession_holders`  (19 col.)
+## `concession_holders` (19 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -554,7 +553,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `concession_overlaps`  (16 col.)
+## `concession_overlaps` (16 col.)
 
 - `id` — uuid
 - `concession_id` — uuid
@@ -573,7 +572,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `concession_patents`  (15 col.)
+## `concession_patents` (15 col.)
 
 - `id` — uuid
 - `concession_id` — uuid
@@ -591,7 +590,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `contact_messages`  (10 col.)
+## `contact_messages` (10 col.)
 
 - `id` — uuid
 - `name` — text
@@ -604,7 +603,7 @@ Total de tablas detectadas: **160**
 - `status` — text
 - `created_at` — timestamptz
 
-## `core_boxes`  (18 col.)
+## `core_boxes` (18 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -625,7 +624,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `court_case_alerts`  (9 col.)
+## `court_case_alerts` (9 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -637,7 +636,7 @@ Total de tablas detectadas: **160**
 - `read_by` — uuid
 - `created_at` — timestamptz
 
-## `deal_commissions`  (13 col.)
+## `deal_commissions` (13 col.)
 
 - `id` — uuid
 - `owner_user_id` — uuid
@@ -653,7 +652,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `deal_settlements`  (17 col.)
+## `deal_settlements` (17 col.)
 
 - `id` — uuid
 - `listing_id` — uuid
@@ -673,7 +672,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `dem_diffs`  (20 col.)
+## `dem_diffs` (20 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -696,7 +695,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `document_drafts`  (13 col.)
+## `document_drafts` (13 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -712,7 +711,7 @@ Total de tablas detectadas: **160**
 - `trade_id` — uuid
 - `inquiry_id` — uuid
 
-## `document_registry`  (9 col.)
+## `document_registry` (9 col.)
 
 - `reference` — text
 - `title` — text
@@ -724,7 +723,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — timestamptz
 - `metadata` — jsonb
 
-## `document_sign_requests`  (22 col.)
+## `document_sign_requests` (22 col.)
 
 - `id` — uuid
 - `created_by` — uuid
@@ -749,7 +748,7 @@ Total de tablas detectadas: **160**
 - `sign_order` — integer
 - `signer_role` — text
 
-## `document_signatures`  (16 col.)
+## `document_signatures` (16 col.)
 
 - `id` — uuid
 - `envelope_id` — uuid
@@ -768,7 +767,7 @@ Total de tablas detectadas: **160**
 - `user_agent` — text
 - `created_at` — timestamptz
 
-## `drill_core_logs`  (22 col.)
+## `drill_core_logs` (22 col.)
 
 - `id` — UUID
 - `created_by` — UUID
@@ -793,7 +792,7 @@ Total de tablas detectadas: **160**
 - `approved_by` — UUID
 - `approved_at` — TIMESTAMPTZ
 
-## `drill_hole_surveys`  (6 col.)
+## `drill_hole_surveys` (6 col.)
 
 - `id` — uuid
 - `hole_id` — uuid
@@ -802,7 +801,7 @@ Total de tablas detectadas: **160**
 - `dip` — numeric
 - `created_at` — timestamptz
 
-## `drill_hole_trajectories`  (6 col.)
+## `drill_hole_trajectories` (6 col.)
 
 - `id` — uuid
 - `hole_id` — uuid
@@ -811,7 +810,7 @@ Total de tablas detectadas: **160**
 - `engine_version` — text
 - `computed_at` — timestamptz
 
-## `drill_holes`  (18 col.)
+## `drill_holes` (18 col.)
 
 - `id` — UUID
 - `created_by` — UUID
@@ -832,7 +831,7 @@ Total de tablas detectadas: **160**
 - `project_id` — UUID
 - `campaign_id` — uuid
 
-## `drone_flights`  (14 col.)
+## `drone_flights` (14 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -849,7 +848,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `drone_rasters`  (23 col.)
+## `drone_rasters` (23 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -875,7 +874,7 @@ Total de tablas detectadas: **160**
 - `file_size_bytes` — bigint
 - `processing` — boolean
 
-## `economic_scenarios`  (42 col.)
+## `economic_scenarios` (42 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -920,7 +919,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — timestamptz
 - `created_by` — uuid
 
-## `economic_schedule`  (15 col.)
+## `economic_schedule` (15 col.)
 
 - `id` — uuid
 - `scenario_id` — uuid
@@ -938,7 +937,7 @@ Total de tablas detectadas: **160**
 - `cumulative_cashflow_usd` — numeric
 - `created_at` — timestamptz
 
-## `email_delivery_events`  (8 col.)
+## `email_delivery_events` (8 col.)
 
 - `id` — UUID
 - `message_id` — TEXT
@@ -949,7 +948,7 @@ Total de tablas detectadas: **160**
 - `metadata` — JSONB
 - `occurred_at` — TIMESTAMPTZ
 
-## `email_send_log`  (8 col.)
+## `email_send_log` (8 col.)
 
 - `id` — UUID
 - `message_id` — TEXT
@@ -960,7 +959,7 @@ Total de tablas detectadas: **160**
 - `metadata` — JSONB
 - `created_at` — TIMESTAMPTZ
 
-## `email_send_state`  (7 col.)
+## `email_send_state` (7 col.)
 
 - `id` — INT
 - `retry_after_until` — TIMESTAMPTZ
@@ -970,7 +969,7 @@ Total de tablas detectadas: **160**
 - `transactional_email_ttl_minutes` — INTEGER
 - `updated_at` — TIMESTAMPTZ
 
-## `email_unsubscribe_tokens`  (5 col.)
+## `email_unsubscribe_tokens` (5 col.)
 
 - `id` — UUID
 - `token` — TEXT
@@ -978,7 +977,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `used_at` — TIMESTAMPTZ
 
-## `engine_ai_interpretations`  (9 col.)
+## `engine_ai_interpretations` (9 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -990,7 +989,7 @@ Total de tablas detectadas: **160**
 - `created_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `engine_audit_events`  (8 col.)
+## `engine_audit_events` (8 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1001,7 +1000,7 @@ Total de tablas detectadas: **160**
 - `payload` — JSONB
 - `created_at` — TIMESTAMPTZ
 
-## `engine_block_model_versions`  (13 col.)
+## `engine_block_model_versions` (13 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1017,7 +1016,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `engine_comments`  (11 col.)
+## `engine_comments` (11 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1031,7 +1030,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `engine_drill_targets`  (18 col.)
+## `engine_drill_targets` (18 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1052,7 +1051,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `engine_qaqc_reports`  (9 col.)
+## `engine_qaqc_reports` (9 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1064,7 +1063,7 @@ Total de tablas detectadas: **160**
 - `created_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `engine_reports_generated`  (9 col.)
+## `engine_reports_generated` (9 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1076,7 +1075,7 @@ Total de tablas detectadas: **160**
 - `created_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `exploration_campaigns`  (13 col.)
+## `exploration_campaigns` (13 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1092,7 +1091,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `exploration_targets`  (29 col.)
+## `exploration_targets` (29 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1124,7 +1123,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `field_pois`  (14 col.)
+## `field_pois` (14 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1141,7 +1140,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `freight_rates`  (12 col.)
+## `freight_rates` (12 col.)
 
 - `id` — UUID
 - `port_origin` — TEXT
@@ -1156,7 +1155,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `geo_copilot_conversations`  (8 col.)
+## `geo_copilot_conversations` (8 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -1167,7 +1166,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `geo_references`  (13 col.)
+## `geo_references` (13 col.)
 
 - `id` — UUID
 - `citation_key` — TEXT
@@ -1183,7 +1182,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `geochem_analyses`  (16 col.)
+## `geochem_analyses` (16 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1202,7 +1201,7 @@ Total de tablas detectadas: **160**
 - `signature_confidence` — NUMERIC
 - `notes` — TEXT
 
-## `geological_features`  (18 col.)
+## `geological_features` (18 col.)
 
 - `id` — UUID
 - `feature_code` — TEXT
@@ -1223,7 +1222,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `geology_wireframes`  (19 col.)
+## `geology_wireframes` (19 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1245,7 +1244,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `geophysics_anomalies`  (28 col.)
+## `geophysics_anomalies` (28 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1276,7 +1275,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMP WITH TIME
 - `updated_at` — TIMESTAMP WITH TIME
 
-## `geophysics_lines`  (11 col.)
+## `geophysics_lines` (11 col.)
 
 - `id` — UUID
 - `survey_id` — UUID
@@ -1290,7 +1289,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `geophysics_stations`  (14 col.)
+## `geophysics_stations` (14 col.)
 
 - `id` — UUID
 - `survey_id` — UUID
@@ -1307,7 +1306,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `geophysics_surveys`  (15 col.)
+## `geophysics_surveys` (15 col.)
 
 - `id` — UUID
 - `name` — TEXT
@@ -1325,7 +1324,7 @@ Total de tablas detectadas: **160**
 - `project_id` — UUID
 - `campaign_id` — uuid
 
-## `holder_files`  (10 col.)
+## `holder_files` (10 col.)
 
 - `id` — uuid
 - `holder_id` — uuid
@@ -1338,7 +1337,7 @@ Total de tablas detectadas: **160**
 - `uploaded_by` — uuid
 - `uploaded_at` — timestamptz
 
-## `holder_links`  (12 col.)
+## `holder_links` (12 col.)
 
 - `id` — uuid
 - `holder_id` — uuid
@@ -1353,7 +1352,7 @@ Total de tablas detectadas: **160**
 - `linked_by` — uuid
 - `linked_at` — timestamptz
 
-## `hse_incidents`  (15 col.)
+## `hse_incidents` (15 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1371,7 +1370,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `hse_permits`  (14 col.)
+## `hse_permits` (14 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1388,7 +1387,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `hyperspectral_products`  (25 col.)
+## `hyperspectral_products` (25 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1416,7 +1415,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `insar_alert_actions`  (12 col.)
+## `insar_alert_actions` (12 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1431,7 +1430,7 @@ Total de tablas detectadas: **160**
 - `created_by` — uuid
 - `created_at` — timestamptz
 
-## `insar_displacement`  (22 col.)
+## `insar_displacement` (22 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1456,11 +1455,11 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `investor_profiles`  (1 col.)
+## `investor_profiles` (1 col.)
 
 - `terms_accepted_at` — timestamptz
 
-## `lithology_units`  (15 col.)
+## `lithology_units` (15 col.)
 
 - `id` — UUID
 - `unit_code` — TEXT
@@ -1478,7 +1477,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `mag_target_revalidation_diffs`  (17 col.)
+## `mag_target_revalidation_diffs` (17 col.)
 
 - `id` — uuid
 - `revalidation_id` — uuid
@@ -1498,7 +1497,7 @@ Total de tablas detectadas: **160**
 - `rank_delta` — integer
 - `created_at` — timestamptz
 
-## `mag_target_revalidations`  (22 col.)
+## `mag_target_revalidations` (22 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1523,7 +1522,7 @@ Total de tablas detectadas: **160**
 - `created_by` — uuid
 - `created_at` — timestamptz
 
-## `mag_targets`  (13 col.)
+## `mag_targets` (13 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1539,7 +1538,7 @@ Total de tablas detectadas: **160**
 - `created_by` — uuid
 - `created_at` — timestamptz
 
-## `map_annotations`  (16 col.)
+## `map_annotations` (16 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1558,7 +1557,7 @@ Total de tablas detectadas: **160**
 - `resolved_by` — uuid
 - `resolved_at` — timestamptz
 
-## `map_views`  (10 col.)
+## `map_views` (10 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -1571,7 +1570,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `market_comparables`  (22 col.)
+## `market_comparables` (22 col.)
 
 - `id` — uuid
 - `source` — text
@@ -1596,7 +1595,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `marketplace_layer_reviews`  (7 col.)
+## `marketplace_layer_reviews` (7 col.)
 
 - `id` — uuid
 - `layer_key` — text
@@ -1606,7 +1605,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `mine_plan_phases`  (20 col.)
+## `mine_plan_phases` (20 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1629,7 +1628,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `mineralogy`  (15 col.)
+## `mineralogy` (15 col.)
 
 - `id` — UUID
 - `mineral` — TEXT
@@ -1647,7 +1646,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — TIMESTAMPTZ
 - `project_id` — UUID
 
-## `mining_bulletins`  (22 col.)
+## `mining_bulletins` (22 col.)
 
 - `id` — uuid
 - `source` — text
@@ -1672,7 +1671,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `mining_concessions`  (26 col.)
+## `mining_concessions` (26 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1701,7 +1700,7 @@ Total de tablas detectadas: **160**
 - `parcel_ids` — text
 - `geom` — extensions.geometry(Geometry, 4326)
 
-## `mining_court_cases`  (20 col.)
+## `mining_court_cases` (20 col.)
 
 - `id` — uuid
 - `source` — text
@@ -1724,7 +1723,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `offering_subscriptions`  (9 col.)
+## `offering_subscriptions` (9 col.)
 
 - `id` — uuid
 - `offering_id` — uuid
@@ -1736,7 +1735,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `partner_invitation_events`  (5 col.)
+## `partner_invitation_events` (5 col.)
 
 - `id` — uuid
 - `invitation_id` — uuid
@@ -1744,7 +1743,7 @@ Total de tablas detectadas: **160**
 - `metadata` — jsonb
 - `created_at` — timestamptz
 
-## `partner_invitations`  (22 col.)
+## `partner_invitations` (22 col.)
 
 - `id` — uuid
 - `token` — text
@@ -1769,7 +1768,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `patent_remates`  (23 col.)
+## `patent_remates` (23 col.)
 
 - `id` — uuid
 - `year` — integer
@@ -1795,7 +1794,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `payment_orders`  (11 col.)
+## `payment_orders` (11 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -1809,7 +1808,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `paid_at` — timestamptz
 
-## `pit_shells`  (13 col.)
+## `pit_shells` (13 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1825,7 +1824,7 @@ Total de tablas detectadas: **160**
 - `is_conceptual` — BOOLEAN
 - `created_at` — TIMESTAMPTZ
 
-## `profiles`  (11 col.)
+## `profiles` (11 col.)
 
 - `id` — UUID
 - `user_id` — UUID
@@ -1839,7 +1838,7 @@ Total de tablas detectadas: **160**
 - `phone` — text
 - `country` — text
 
-## `project_facts`  (13 col.)
+## `project_facts` (13 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1855,7 +1854,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `project_fundraises`  (23 col.)
+## `project_fundraises` (23 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1881,7 +1880,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `project_invitations`  (11 col.)
+## `project_invitations` (11 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -1895,7 +1894,7 @@ Total de tablas detectadas: **160**
 - `accepted_by` — uuid
 - `created_at` — timestamptz
 
-## `project_member_capabilities`  (7 col.)
+## `project_member_capabilities` (7 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1905,7 +1904,7 @@ Total de tablas detectadas: **160**
 - `granted_at` — TIMESTAMPTZ
 - `expires_at` — TIMESTAMPTZ
 
-## `project_members`  (6 col.)
+## `project_members` (6 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -1914,7 +1913,7 @@ Total de tablas detectadas: **160**
 - `invited_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `projects`  (14 col.)
+## `projects` (14 col.)
 
 - `id` — UUID
 - `code` — TEXT
@@ -1931,7 +1930,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `property_data_room_files`  (10 col.)
+## `property_data_room_files` (10 col.)
 
 - `id` — uuid
 - `listing_id` — uuid
@@ -1944,7 +1943,7 @@ Total de tablas detectadas: **160**
 - `uploaded_by` — uuid
 - `created_at` — timestamptz
 
-## `property_deal_inquiries`  (12 col.)
+## `property_deal_inquiries` (12 col.)
 
 - `id` — uuid
 - `listing_id` — uuid
@@ -1959,7 +1958,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `property_deal_messages`  (6 col.)
+## `property_deal_messages` (6 col.)
 
 - `id` — uuid
 - `inquiry_id` — uuid
@@ -1968,7 +1967,7 @@ Total de tablas detectadas: **160**
 - `read_at` — timestamptz
 - `created_at` — timestamptz
 
-## `property_listings`  (21 col.)
+## `property_listings` (21 col.)
 
 - `id` — uuid
 - `owner_user_id` — uuid
@@ -1992,7 +1991,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `prospectivity_cells`  (10 col.)
+## `prospectivity_cells` (10 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2005,7 +2004,7 @@ Total de tablas detectadas: **160**
 - `generated_at` — timestamptz
 - `generated_by` — uuid
 
-## `prospectivity_runs`  (9 col.)
+## `prospectivity_runs` (9 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2017,7 +2016,7 @@ Total de tablas detectadas: **160**
 - `weights` — jsonb
 - `notes` — text
 
-## `public_concessions_cache`  (21 col.)
+## `public_concessions_cache` (21 col.)
 
 - `id` — uuid
 - `code` — text
@@ -2041,7 +2040,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `public_holders`  (9 col.)
+## `public_holders` (9 col.)
 
 - `id` — uuid
 - `rut` — text
@@ -2053,7 +2052,7 @@ Total de tablas detectadas: **160**
 - `last_updated` — timestamptz
 - `created_at` — timestamptz
 
-## `qaqc_results`  (19 col.)
+## `qaqc_results` (19 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2075,7 +2074,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `qaqc_standards`  (13 col.)
+## `qaqc_standards` (13 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2091,7 +2090,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `qualified_persons`  (13 col.)
+## `qualified_persons` (13 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -2107,7 +2106,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `report_evidence_links`  (10 col.)
+## `report_evidence_links` (10 col.)
 
 - `id` — uuid
 - `report_id` — uuid
@@ -2120,7 +2119,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `created_by` — uuid
 
-## `report_section_cache`  (8 col.)
+## `report_section_cache` (8 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2131,7 +2130,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `resource_block_economics`  (12 col.)
+## `resource_block_economics` (12 col.)
 
 - `id` — uuid
 - `scenario_id` — uuid
@@ -2146,7 +2145,7 @@ Total de tablas detectadas: **160**
 - `extraction_year` — integer
 - `created_at` — timestamptz
 
-## `resource_blocks`  (15 col.)
+## `resource_blocks` (15 col.)
 
 - `id` — uuid
 - `model_id` — uuid
@@ -2164,7 +2163,7 @@ Total de tablas detectadas: **160**
 - `classification` — text
 - `created_at` — timestamptz
 
-## `resource_composites`  (13 col.)
+## `resource_composites` (13 col.)
 
 - `id` — uuid
 - `model_id` — uuid
@@ -2180,7 +2179,7 @@ Total de tablas detectadas: **160**
 - `z` — numeric
 - `created_at` — timestamptz
 
-## `resource_models`  (35 col.)
+## `resource_models` (35 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2218,7 +2217,7 @@ Total de tablas detectadas: **160**
 - `updated_at` — timestamptz
 - `estimated_at` — timestamptz
 
-## `sample_custody`  (16 col.)
+## `sample_custody` (16 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2237,7 +2236,7 @@ Total de tablas detectadas: **160**
 - `created_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `sampling_results`  (29 col.)
+## `sampling_results` (29 col.)
 
 - `id` — UUID
 - `created_by` — UUID
@@ -2269,7 +2268,7 @@ Total de tablas detectadas: **160**
 - `approved_by` — UUID
 - `approved_at` — TIMESTAMPTZ
 
-## `satellite_analysis_runs`  (5 col.)
+## `satellite_analysis_runs` (5 col.)
 
 - `version` — integer
 - `parent_run_id` — uuid
@@ -2277,10 +2276,9 @@ Total de tablas detectadas: **160**
 - `pipeline_version` — text
 - `last_modified_by` — uuid
 
-## `satellite_anomalies`  (0 col.)
+## `satellite_anomalies` (0 col.)
 
-
-## `satellite_run_status_events`  (10 col.)
+## `satellite_run_status_events` (10 col.)
 
 - `id` — uuid
 - `run_id` — uuid
@@ -2293,7 +2291,7 @@ Total de tablas detectadas: **160**
 - `metadata` — jsonb
 - `created_at` — timestamptz
 
-## `shared_layers`  (12 col.)
+## `shared_layers` (12 col.)
 
 - `id` — uuid
 - `name` — text
@@ -2308,7 +2306,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `signature_audit_trail`  (9 col.)
+## `signature_audit_trail` (9 col.)
 
 - `id` — uuid
 - `envelope_id` — uuid
@@ -2320,7 +2318,7 @@ Total de tablas detectadas: **160**
 - `hash_chain` — text
 - `created_at` — timestamptz
 
-## `signature_envelopes`  (16 col.)
+## `signature_envelopes` (16 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2339,7 +2337,7 @@ Total de tablas detectadas: **160**
 - `completed_at` — timestamptz
 - `metadata` — jsonb
 
-## `sourcing_dispatches`  (13 col.)
+## `sourcing_dispatches` (13 col.)
 
 - `id` — uuid
 - `owner_user_id` — uuid
@@ -2355,7 +2353,7 @@ Total de tablas detectadas: **160**
 - `note` — text
 - `created_at` — timestamptz
 
-## `sourcing_requests`  (17 col.)
+## `sourcing_requests` (17 col.)
 
 - `id` — uuid
 - `owner_user_id` — uuid
@@ -2375,7 +2373,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `sourcing_share_token_views`  (8 col.)
+## `sourcing_share_token_views` (8 col.)
 
 - `id` — uuid
 - `submission_id` — uuid
@@ -2386,7 +2384,7 @@ Total de tablas detectadas: **160**
 - `outcome` — text
 - `viewed_at` — timestamptz
 
-## `sourcing_submissions`  (28 col.)
+## `sourcing_submissions` (28 col.)
 
 - `id` — uuid
 - `request_id` — uuid
@@ -2417,7 +2415,7 @@ Total de tablas detectadas: **160**
 - `share_token_revoked_at` — timestamptz
 - `ficha_detail` — jsonb
 
-## `stac_acquisitions`  (12 col.)
+## `stac_acquisitions` (12 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2432,7 +2430,7 @@ Total de tablas detectadas: **160**
 - `properties` — JSONB
 - `cached_at` — TIMESTAMPTZ
 
-## `stockpile_volumes`  (19 col.)
+## `stockpile_volumes` (19 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2454,7 +2452,7 @@ Total de tablas detectadas: **160**
 - `created_at` — TIMESTAMPTZ
 - `updated_at` — TIMESTAMPTZ
 
-## `subscriptions`  (9 col.)
+## `subscriptions` (9 col.)
 
 - `id` — uuid
 - `user_id` — uuid
@@ -2466,7 +2464,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `suppressed_emails`  (5 col.)
+## `suppressed_emails` (5 col.)
 
 - `id` — UUID
 - `email` — TEXT
@@ -2474,7 +2472,7 @@ Total de tablas detectadas: **160**
 - `metadata` — JSONB
 - `created_at` — TIMESTAMPTZ
 
-## `synthetic_assays`  (11 col.)
+## `synthetic_assays` (11 col.)
 
 - `id` — UUID
 - `hole_id` — UUID
@@ -2488,7 +2486,7 @@ Total de tablas detectadas: **160**
 - `alteration` — TEXT
 - `mineralized` — BOOLEAN
 
-## `synthetic_block_model`  (13 col.)
+## `synthetic_block_model` (13 col.)
 
 - `id` — BIGSERIAL
 - `project_id` — UUID
@@ -2504,7 +2502,7 @@ Total de tablas detectadas: **160**
 - `method` — TEXT
 - `version` — INT
 
-## `synthetic_drillholes`  (16 col.)
+## `synthetic_drillholes` (16 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2523,7 +2521,7 @@ Total de tablas detectadas: **160**
 - `meta` — JSONB
 - `created_at` — TIMESTAMPTZ
 
-## `technical_report_sections`  (16 col.)
+## `technical_report_sections` (16 col.)
 
 - `id` — uuid
 - `report_id` — uuid
@@ -2542,7 +2540,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `technical_report_versions`  (10 col.)
+## `technical_report_versions` (10 col.)
 
 - `id` — uuid
 - `report_id` — uuid
@@ -2555,7 +2553,7 @@ Total de tablas detectadas: **160**
 - `generated_by` — uuid
 - `generated_at` — timestamptz
 
-## `technical_reports`  (16 col.)
+## `technical_reports` (16 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2574,7 +2572,7 @@ Total de tablas detectadas: **160**
 - `compliance_score_cached` — integer
 - `compliance_evaluated_at` — timestamptz
 
-## `trade_board_prefs`  (6 col.)
+## `trade_board_prefs` (6 col.)
 
 - `user_id` — UUID
 - `hidden_stages` — TEXT[]
@@ -2583,7 +2581,7 @@ Total de tablas detectadas: **160**
 - `preferred_view` — TEXT
 - `updated_at` — TIMESTAMPTZ
 
-## `trade_documents`  (14 col.)
+## `trade_documents` (14 col.)
 
 - `id` — uuid
 - `trade_id` — uuid
@@ -2600,7 +2598,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `trade_events`  (7 col.)
+## `trade_events` (7 col.)
 
 - `id` — uuid
 - `trade_id` — uuid
@@ -2610,7 +2608,7 @@ Total de tablas detectadas: **160**
 - `doc_type` — text
 - `created_at` — timestamptz
 
-## `trade_pack_versions`  (10 col.)
+## `trade_pack_versions` (10 col.)
 
 - `id` — UUID
 - `trade_id` — UUID
@@ -2623,7 +2621,7 @@ Total de tablas detectadas: **160**
 - `generated_by` — UUID
 - `created_at` — TIMESTAMPTZ
 
-## `trade_payments`  (17 col.)
+## `trade_payments` (17 col.)
 
 - `id` — uuid
 - `trade_id` — uuid
@@ -2643,7 +2641,7 @@ Total de tablas detectadas: **160**
 - `last_reminder_at` — timestamptz
 - `reminder_count` — integer
 
-## `trade_shipments`  (18 col.)
+## `trade_shipments` (18 col.)
 
 - `id` — uuid
 - `trade_id` — uuid
@@ -2664,7 +2662,7 @@ Total de tablas detectadas: **160**
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
 
-## `validation_snapshots`  (7 col.)
+## `validation_snapshots` (7 col.)
 
 - `id` — UUID
 - `project_id` — UUID
@@ -2674,7 +2672,7 @@ Total de tablas detectadas: **160**
 - `created_by` — UUID
 - `created_at` — TIMESTAMP WITH TIME
 
-## `veins`  (19 col.)
+## `veins` (19 col.)
 
 - `id` — uuid
 - `project_id` — uuid
@@ -2695,4 +2693,3 @@ Total de tablas detectadas: **160**
 - `notes` — text
 - `created_at` — timestamptz
 - `updated_at` — timestamptz
-

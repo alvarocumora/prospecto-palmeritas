@@ -29,7 +29,10 @@ export type Commodity =
    Fuente: benchmarks públicos SERNAGEOMIN (remates + patentes),
    S&P Capital IQ ranges 2020–2024, TSX-V option agreements.
 ———————————————————————————————————————— */
-export const REPLACEMENT_COST_USD_PER_HA: Record<Stage, { low: number; mid: number; high: number }> = {
+export const REPLACEMENT_COST_USD_PER_HA: Record<
+  Stage,
+  { low: number; mid: number; high: number }
+> = {
   greenfield: { low: 50, mid: 100, high: 250 },
   early_stage: { low: 300, mid: 600, high: 1200 },
   drilling: { low: 2000, mid: 4000, high: 8000 },
@@ -43,13 +46,9 @@ export const REPLACEMENT_COST_USD_PER_HA: Record<Stage, { low: number; mid: numb
   production: { low: 400000, mid: 600000, high: 1000000 },
 };
 
-export function replacementCostValuation(input: {
-  area_ha: number | null;
-  stage: Stage | string;
-}) {
-  const stageKey = (input.stage as Stage) in REPLACEMENT_COST_USD_PER_HA
-    ? (input.stage as Stage)
-    : "early_stage";
+export function replacementCostValuation(input: { area_ha: number | null; stage: Stage | string }) {
+  const stageKey =
+    (input.stage as Stage) in REPLACEMENT_COST_USD_PER_HA ? (input.stage as Stage) : "early_stage";
   const bench = REPLACEMENT_COST_USD_PER_HA[stageKey];
   const area = Math.max(input.area_ha ?? 0, 0);
   if (!area) return null;
@@ -83,7 +82,10 @@ export type MarketComp = {
 
 function percentile(sortedValues: number[], p: number): number {
   if (!sortedValues.length) return 0;
-  const idx = Math.min(sortedValues.length - 1, Math.max(0, Math.floor((sortedValues.length - 1) * p)));
+  const idx = Math.min(
+    sortedValues.length - 1,
+    Math.max(0, Math.floor((sortedValues.length - 1) * p)),
+  );
   return sortedValues[idx];
 }
 
@@ -198,8 +200,10 @@ export function insituValuation(input: {
   if (commodity === "gold" || commodity === "silver") {
     // grade en g/t → oz totales
     const gramsPerTonne = grade;
-    const totalOz = (tonnes * gramsPerTonne) / OZ_PER_TONNE * OZ_PER_TONNE / 31.1035; // grams to oz
-    const spot = input.spot_override ?? (commodity === "gold" ? SPOT_PRICES_USD.gold.per_oz : SPOT_PRICES_USD.silver.per_oz);
+    const totalOz = (((tonnes * gramsPerTonne) / OZ_PER_TONNE) * OZ_PER_TONNE) / 31.1035; // grams to oz
+    const spot =
+      input.spot_override ??
+      (commodity === "gold" ? SPOT_PRICES_USD.gold.per_oz : SPOT_PRICES_USD.silver.per_oz);
     containedValueUsd = totalOz * spot;
     spotUsed = spot;
     unit = "oz";
@@ -217,9 +221,10 @@ export function insituValuation(input: {
 
   if (!containedValueUsd) return null;
 
-  const confKey = (input.confidence as keyof typeof INSITU_FACTORS) in INSITU_FACTORS
-    ? (input.confidence as keyof typeof INSITU_FACTORS)
-    : "inferred";
+  const confKey =
+    (input.confidence as keyof typeof INSITU_FACTORS) in INSITU_FACTORS
+      ? (input.confidence as keyof typeof INSITU_FACTORS)
+      : "inferred";
   const factor = INSITU_FACTORS[confKey];
   const mid = containedValueUsd * factor;
 
@@ -231,7 +236,8 @@ export function insituValuation(input: {
     inputs: {
       tonnes,
       grade,
-      grade_unit: input.grade_unit ?? (commodity === "gold" || commodity === "silver" ? "g/t" : "%"),
+      grade_unit:
+        input.grade_unit ?? (commodity === "gold" || commodity === "silver" ? "g/t" : "%"),
       contained_value_usd: Math.round(containedValueUsd),
       spot_price_usd: spotUsed,
       spot_unit: `US$/${unit}`,
@@ -247,7 +253,11 @@ export function insituValuation(input: {
 /* ————————————————————————————————————————
    4) DCF / NPV — trae escenario económico existente
 ———————————————————————————————————————— */
-export function dcfValuation(input: { npv_usd?: number | null; irr_pct?: number | null; scenario_name?: string | null }) {
+export function dcfValuation(input: {
+  npv_usd?: number | null;
+  irr_pct?: number | null;
+  scenario_name?: string | null;
+}) {
   const npv = input.npv_usd ?? 0;
   if (!npv || npv <= 0) return null;
   return {
@@ -295,7 +305,12 @@ export function consolidateMethods(
       currency: "USD",
       methods: [],
       consolidated: null,
-      gap_vs_asking: { asking_usd: asking_price_usd, delta_mid_usd: null, delta_pct: null, verdict: "unknown" },
+      gap_vs_asking: {
+        asking_usd: asking_price_usd,
+        delta_mid_usd: null,
+        delta_pct: null,
+        verdict: "unknown",
+      },
     };
   }
   // Ponderación: DCF>Comps>InSitu>Replacement cuando existen

@@ -8,14 +8,14 @@
 
 ## Tablas del dominio (quién las escribe / quién las lee)
 
-| Tabla | Origen | Rol | Estado en el repo |
-|---|---|---|---|
-| `cadastre_national` | Lovable | **Catastro nacional canónico** que lee el front | Estaba **sin CREATE versionado** (drift) → **versionada aquí** |
-| `cadastre_sync_runs` | Lovable | Bitácora del sync de catastro | Drift → **versionada aquí** |
-| `mining_concessions` + `concession_history` | Lovable (edge fn `sync-sernageomin`) | Store del sync SERNAGEOMIN | Migración propia de Lovable |
-| `bulletin_sync_runs` | Lovable | Bitácora del sync del Boletín | Drift (solo cloud) → **versionada aquí** |
-| `catastro_concesiones` (B2) | Claude Code | Store versionado con historial temporal | Migrado, **no consumido por el front** |
-| `boletin_ediciones/registros/alertas` (B3) | Claude Code | Boletín parseado + cruce espacial | Migrado, **no consumido por el front** |
+| Tabla                                       | Origen                               | Rol                                             | Estado en el repo                                              |
+| ------------------------------------------- | ------------------------------------ | ----------------------------------------------- | -------------------------------------------------------------- |
+| `cadastre_national`                         | Lovable                              | **Catastro nacional canónico** que lee el front | Estaba **sin CREATE versionado** (drift) → **versionada aquí** |
+| `cadastre_sync_runs`                        | Lovable                              | Bitácora del sync de catastro                   | Drift → **versionada aquí**                                    |
+| `mining_concessions` + `concession_history` | Lovable (edge fn `sync-sernageomin`) | Store del sync SERNAGEOMIN                      | Migración propia de Lovable                                    |
+| `bulletin_sync_runs`                        | Lovable                              | Bitácora del sync del Boletín                   | Drift (solo cloud) → **versionada aquí**                       |
+| `catastro_concesiones` (B2)                 | Claude Code                          | Store versionado con historial temporal         | Migrado, **no consumido por el front**                         |
+| `boletin_ediciones/registros/alertas` (B3)  | Claude Code                          | Boletín parseado + cruce espacial               | Migrado, **no consumido por el front**                         |
 
 ## Qué versiona este baseline
 
@@ -57,7 +57,7 @@ segundo store de catastro. Propuesta:
 1. **Canónico = `cadastre_national`.** Los motores/ETL leen de ahí (no de
    `catastro_concesiones`).
 2. Exponer los motores como **RPC** que el front pueda invocar sobre `cadastre_national`.
-3. `catastro_concesiones` (B2) se degrada a *staging* del ETL versionado o se retira;
+3. `catastro_concesiones` (B2) se degrada a _staging_ del ETL versionado o se retira;
    `boletin_*` (B3) alimenta/−complementa el pipeline de `bulletin_sync_runs`.
 
 Esto se hace **después** de versionar el esquema drifteado (este bloque) y con

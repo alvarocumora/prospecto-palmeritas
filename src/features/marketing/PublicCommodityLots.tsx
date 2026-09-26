@@ -121,10 +121,7 @@ export function PublicCommodityLots() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       {isLoading &&
         Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="border border-hairline bg-white animate-pulse aspect-[16/12]"
-          />
+          <div key={i} className="border border-hairline bg-white animate-pulse aspect-[16/12]" />
         ))}
       {!isLoading && lots.length === 0 && (
         <div className="col-span-full border border-hairline bg-white p-10 text-center text-content-muted text-sm">

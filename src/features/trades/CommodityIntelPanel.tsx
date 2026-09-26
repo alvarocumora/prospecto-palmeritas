@@ -16,7 +16,8 @@ function fmtUsd(n: number | null | undefined, digits = 0): string {
 }
 
 function Sparkline({ points }: { points: number[] }) {
-  if (points.length < 2) return <div className="text-[10px] text-muted-foreground">Sin histórico</div>;
+  if (points.length < 2)
+    return <div className="text-[10px] text-muted-foreground">Sin histórico</div>;
   const w = 200;
   const h = 40;
   const min = Math.min(...points);
@@ -29,7 +30,12 @@ function Sparkline({ points }: { points: number[] }) {
   const up = points[points.length - 1] >= points[0];
   return (
     <svg width={w} height={h} className="overflow-visible">
-      <path d={d} fill="none" stroke={up ? "hsl(var(--accent-brand))" : "hsl(var(--destructive))"} strokeWidth={1.5} />
+      <path
+        d={d}
+        fill="none"
+        stroke={up ? "hsl(var(--accent-brand))" : "hsl(var(--destructive))"}
+        strokeWidth={1.5}
+      />
     </svg>
   );
 }
@@ -62,14 +68,20 @@ export function CommodityIntelPanel({ commodity, quantityT }: CommodityIntelPane
   const [insurancePct, setInsurancePct] = useState<number>(0.5);
 
   const dests = useMemo(
-    () => [...new Set(routes.filter((r) => !origin || r.port_origin === origin).map((r) => r.port_destination))].sort(),
+    () =>
+      [
+        ...new Set(
+          routes.filter((r) => !origin || r.port_origin === origin).map((r) => r.port_destination),
+        ),
+      ].sort(),
     [routes, origin],
   );
 
   const rate = useMemo(() => {
     if (!origin || !dest) return null;
     const matches = routes.filter(
-      (r) => r.port_origin === origin && r.port_destination === dest && r.container_type === container,
+      (r) =>
+        r.port_origin === origin && r.port_destination === dest && r.container_type === container,
     );
     return matches.sort((a, b) => (a.valid_from < b.valid_from ? 1 : -1))[0] ?? null;
   }, [routes, origin, dest, container]);
@@ -267,7 +279,9 @@ export function CommodityIntelPanel({ commodity, quantityT }: CommodityIntelPane
 
 function Kpi({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`rounded border p-2 ${accent ? "border-accent-brand bg-accent-brand/5" : "border-hairline"}`}>
+    <div
+      className={`rounded border p-2 ${accent ? "border-accent-brand bg-accent-brand/5" : "border-hairline"}`}
+    >
       <div className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground">
         {label}
       </div>

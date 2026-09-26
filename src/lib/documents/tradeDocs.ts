@@ -44,7 +44,8 @@ export const TRADE_DOC_LABELS: Record<TradeDocKind, { es: string; en: string }> 
   imfpa: { es: "Acuerdo de pago de comisiones", en: "Irrevocable Master Fee Protection Agreement" },
 };
 
-const v = (s: string | null | undefined, fb: string) => (s && String(s).trim() ? String(s).trim() : fb);
+const v = (s: string | null | undefined, fb: string) =>
+  s && String(s).trim() ? String(s).trim() : fb;
 
 function today(): string {
   return new Date().toISOString().slice(0, 10);
@@ -75,7 +76,10 @@ function commonRows(i: TradeDocInput, lang: DocLang): Array<[string, string]> {
       `${v(i.incoterm, "CIF")}${i.destination ? ` ${i.destination}` : ""}`,
     ],
     [biline("Precio", "Price", lang), v(i.price, "—")],
-    [biline("Instrumento de pago", "Payment instrument", lang), v(i.paymentInstrument, "DLC / SBLC")],
+    [
+      biline("Instrumento de pago", "Payment instrument", lang),
+      v(i.paymentInstrument, "DLC / SBLC"),
+    ],
   ];
 }
 
@@ -230,7 +234,10 @@ export function buildTradeDoc(
         rows: [
           [biline("Pagador", "Payer", lang), seller],
           [biline("Beneficiario", "Beneficiary", lang), intermediary],
-          [biline("Operación", "Transaction", lang), `${product}${input.reference ? ` · ${input.reference}` : ""}`],
+          [
+            biline("Operación", "Transaction", lang),
+            `${product}${input.reference ? ` · ${input.reference}` : ""}`,
+          ],
           [biline("Incoterm", "Incoterm", lang), incoterm],
           [biline("Comisión", "Fee", lang), commission],
           [biline("Instrumento de pago", "Payment instrument", lang), pay],

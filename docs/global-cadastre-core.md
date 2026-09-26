@@ -18,6 +18,7 @@ relationship between documentary/project evidence and official evidence.
 All new consumers use `searchCadastre({ scope })`.
 
 Supported scopes:
+
 - country
 - bbox
 - project

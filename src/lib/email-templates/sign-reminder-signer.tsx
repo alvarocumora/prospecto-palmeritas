@@ -38,8 +38,8 @@ const Email = ({
       <Text style={styles.p}>
         {signerName ? `${signerName}: ` : ""}
         aún no completas la firma electrónica del documento enviado por{" "}
-        {senderCompany ?? "la contraparte"}. Este es el recordatorio{" "}
-        {reminderNumber ?? 1} · el flujo queda anulado si expira la vigencia.
+        {senderCompany ?? "la contraparte"}. Este es el recordatorio {reminderNumber ?? 1} · el
+        flujo queda anulado si expira la vigencia.
       </Text>
       <KeyValueBlock
         rows={[

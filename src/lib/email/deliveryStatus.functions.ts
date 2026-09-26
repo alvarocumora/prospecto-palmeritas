@@ -22,7 +22,12 @@ const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 const InputSchema = z.object({
   recipients: z.array(z.string().email()).min(1).max(20),
   templateNames: z.array(z.string().min(1)).min(1).max(10),
-  sinceHours: z.number().int().min(1).max(24 * 30).default(72),
+  sinceHours: z
+    .number()
+    .int()
+    .min(1)
+    .max(24 * 30)
+    .default(72),
 });
 
 export const getEmailDeliveryStatus = createServerFn({ method: "POST" })
@@ -88,7 +93,7 @@ export const getEmailDeliveryStatus = createServerFn({ method: "POST" })
       .map((r) => r?.message_id)
       .filter((x): x is string => !!x);
 
-    let opens: Map<string, string> = new Map();
+    const opens: Map<string, string> = new Map();
     if (messageIds.length > 0) {
       const { data: events } = await sb
         .from("email_delivery_events")

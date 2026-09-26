@@ -20,7 +20,11 @@ import { captureElement } from "@/lib/pdf/captureMap";
 import { downloadProjectDoc } from "@/lib/pdf/generateProjectDoc";
 
 const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
-  { kind: "deck", title: "Deck de inversión (16:9)", hint: "Presentación para comités y family offices" },
+  {
+    kind: "deck",
+    title: "Deck de inversión (16:9)",
+    hint: "Presentación para comités y family offices",
+  },
   { kind: "onepager", title: "Resumen de una página", hint: "Para enviar por correo o WhatsApp" },
   { kind: "technical", title: "Dossier técnico", hint: "Antecedentes completos para revisión" },
 ];

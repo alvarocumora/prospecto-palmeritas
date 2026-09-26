@@ -342,7 +342,13 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     }
 
     // Click handler
-    const clickLayers = ["lyr-samples", "lyr-targets", "lyr-sat", "lyr-mag", "lyr-concessions-fill"];
+    const clickLayers = [
+      "lyr-samples",
+      "lyr-targets",
+      "lyr-sat",
+      "lyr-mag",
+      "lyr-concessions-fill",
+    ];
     const onClick = (e: maplibregl.MapMouseEvent) => {
       const feats = map.queryRenderedFeatures(e.point, { layers: clickLayers });
       if (!feats.length) return;
@@ -480,7 +486,10 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
             </div>
             <div className="mt-1 space-y-0.5 max-h-20 overflow-y-auto">
               {concessionsWithoutGeometry.map((f) => (
-                <div key={String(f.id)} className="text-[9px] font-mono text-muted-foreground truncate">
+                <div
+                  key={String(f.id)}
+                  className="text-[9px] font-mono text-muted-foreground truncate"
+                >
                   {String(f.properties.code ?? f.properties.name ?? f.id ?? "Concesión")}
                 </div>
               ))}
@@ -597,9 +606,9 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
           ? `Anomalía satelital ${props.index_code ?? ""}`
           : layer === "mag_anomaly"
             ? "Anomalía magnética"
-             : layer === "sample"
-               ? `${props.sample_type ?? "muestra"} · ${props.lab ?? "laboratorio no informado"}`
-               : "";
+            : layer === "sample"
+              ? `${props.sample_type ?? "muestra"} · ${props.lab ?? "laboratorio no informado"}`
+              : "";
 
   return (
     <div className="p-4 space-y-3">

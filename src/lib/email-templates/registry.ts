@@ -35,7 +35,6 @@ import { template as operationPortalInvitation } from "./operation-portal-invita
 import { template as tradeFichaInternal } from "./trade-ficha-internal";
 import { template as tradeParticipantInvitation } from "./trade-participant-invitation";
 
-
 export interface TemplateEntry {
   component: ComponentType<Record<string, unknown>>;
   subject: string | ((data: Record<string, unknown>) => string);
@@ -85,4 +84,3 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "trade-ficha-internal": tradeFichaInternal,
   "trade-participant-invitation": tradeParticipantInvitation,
 };
-

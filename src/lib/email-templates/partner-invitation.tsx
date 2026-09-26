@@ -44,8 +44,8 @@ const Email = ({
       {invitedByName ? `${invitedByName} de ` : ""}
       Geocapitals te habilitó acceso institucional a nuestra plataforma de operaciones mineras y
       trading de commodities. Puedes registrarte como <b>broker</b> o como{" "}
-      <b>cliente / inversionista</b>: al firmar el NCNDA se activan de inmediato los data rooms y
-      la operación en curso listados abajo.
+      <b>cliente / inversionista</b>: al firmar el NCNDA se activan de inmediato los data rooms y la
+      operación en curso listados abajo.
     </Text>
 
     {personalMessage ? (
@@ -66,10 +66,7 @@ const Email = ({
         ["Documento adjunto", "NCNDA firmado por Geocapitals (falta tu firma)"],
         ["Rol sugerido", "Broker o Cliente/Inversionista (eliges al activar)"],
         ["Proyectos con data room", projects.map((p) => p.name).join(" · ") || "—"],
-        [
-          "Trade activo",
-          trades.map((t) => `${t.commodity} · ${t.reference}`).join(" · ") || "—",
-        ],
+        ["Trade activo", trades.map((t) => `${t.commodity} · ${t.reference}`).join(" · ") || "—"],
       ]}
     />
 

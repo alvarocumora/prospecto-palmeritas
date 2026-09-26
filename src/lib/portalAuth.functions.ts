@@ -7,9 +7,8 @@ import { z } from "zod";
 export const getOperacionAccessInfo = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ token: z.string().min(10).max(120) }).parse(d))
   .handler(async ({ data }) => {
-    const { resolveTradeByOpsToken, allowedEmailsFor, maskEmail } = await import(
-      "@/lib/portalSession.server"
-    );
+    const { resolveTradeByOpsToken, allowedEmailsFor, maskEmail } =
+      await import("@/lib/portalSession.server");
     const t = await resolveTradeByOpsToken(data.token);
     if (!t) return { valid: false as const };
     const emails = await allowedEmailsFor(t);
@@ -32,9 +31,8 @@ export const requestPortalOtp = createServerFn({ method: "POST" })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { resolveTradeByOpsToken, createOtpChallenge } = await import(
-      "@/lib/portalSession.server"
-    );
+    const { resolveTradeByOpsToken, createOtpChallenge } =
+      await import("@/lib/portalSession.server");
     const t = await resolveTradeByOpsToken(data.token);
     // Respuesta uniforme: no revelamos si el correo está o no habilitado.
     if (!t) return { ok: true as const };
@@ -67,14 +65,16 @@ export const verifyPortalOtp = createServerFn({ method: "POST" })
       .object({
         token: z.string().min(10).max(120),
         email: z.string().trim().email().max(200),
-        code: z.string().trim().regex(/^\d{6}$/),
+        code: z
+          .string()
+          .trim()
+          .regex(/^\d{6}$/),
       })
       .parse(d),
   )
   .handler(async ({ data }) => {
-    const { resolveTradeByOpsToken, consumeOtpChallenge } = await import(
-      "@/lib/portalSession.server"
-    );
+    const { resolveTradeByOpsToken, consumeOtpChallenge } =
+      await import("@/lib/portalSession.server");
     const t = await resolveTradeByOpsToken(data.token);
     if (!t) return { ok: false as const, error: "Enlace no válido." };
     const res = await consumeOtpChallenge(t, data.email, data.code);

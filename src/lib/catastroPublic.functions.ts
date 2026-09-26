@@ -166,28 +166,34 @@ async function fetchArcgisByCode(code: string): Promise<PublicConcession | null>
 // ============================================================
 export const searchConcessions = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      q: z.string().trim().min(1).max(120),
-      limit: z.number().int().min(1).max(50).optional(),
-      region: z.string().trim().max(80).optional(),
-      type: z.enum(["explotacion", "exploracion", "mensura", "manifestacion"]).optional(),
-    }).parse(input),
+    z
+      .object({
+        q: z.string().trim().min(1).max(120),
+        limit: z.number().int().min(1).max(50).optional(),
+        region: z.string().trim().max(80).optional(),
+        type: z.enum(["explotacion", "exploracion", "mensura", "manifestacion"]).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const limit = data.limit ?? 25;
     const term = data.q.replace(/[%,]/g, " ");
     let query = supabaseAdmin
       .from("cadastre_national")
-      .select("external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune")
+      .select(
+        "external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune",
+      )
       .is("archived_at", null)
-      .or([
-        `holder_name.ilike.%${term}%`,
-        `name.ilike.%${term}%`,
-        `rol.ilike.%${term}%`,
-        `external_id.ilike.%${term}%`,
-        `holder_rut.ilike.%${term}%`,
-        `commune.ilike.%${term}%`,
-      ].join(","))
+      .or(
+        [
+          `holder_name.ilike.%${term}%`,
+          `name.ilike.%${term}%`,
+          `rol.ilike.%${term}%`,
+          `external_id.ilike.%${term}%`,
+          `holder_rut.ilike.%${term}%`,
+          `commune.ilike.%${term}%`,
+        ].join(","),
+      )
       .limit(limit);
     if (data.region) query = query.ilike("region", `%${data.region}%`);
     if (data.type) query = query.ilike("tipo", `%${data.type}%`);
@@ -279,7 +285,9 @@ export const getConcessionByCode = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<PublicConcession | null> => {
     const { data: row, error } = await supabaseAdmin
       .from("cadastre_national")
-      .select("external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune, provincia, constituted_at, geometry_geojson, fetched_at")
+      .select(
+        "external_id, rol, name, tipo, status, holder_name, holder_rut, area_ha, region, commune, provincia, constituted_at, geometry_geojson, fetched_at",
+      )
       .is("archived_at", null)
       .or(`rol.eq.${data.code},external_id.eq.${data.code}`)
       .limit(1)

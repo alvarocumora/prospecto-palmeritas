@@ -44,24 +44,24 @@ prensa financiera (FT / Stripe) más que de terminal técnica.
 
 ### Paleta
 
-| Rol            | Hex       | OKLCH                  | Uso                            |
-| -------------- | --------- | ---------------------- | ------------------------------ |
-| Papel hueso    | `#F7F5F0` | `oklch(0.965 0.006 85)`| fondo de página (cálido)       |
-| Tinta          | `#1A1A2E` | `oklch(0.23 0.03 285)` | texto primario                 |
-| Cobalto        | `#2B4ACB` | `oklch(0.47 0.17 267)` | acento / acción primaria       |
-| Gris cálido    | `#6B6B7B` | `oklch(0.52 0.012 285)`| texto sutil / terciario        |
-| Línea arena    | `#E3E0D8` | `oklch(0.91 0.008 85)` | hairlines y bordes             |
+| Rol         | Hex       | OKLCH                   | Uso                      |
+| ----------- | --------- | ----------------------- | ------------------------ |
+| Papel hueso | `#F7F5F0` | `oklch(0.965 0.006 85)` | fondo de página (cálido) |
+| Tinta       | `#1A1A2E` | `oklch(0.23 0.03 285)`  | texto primario           |
+| Cobalto     | `#2B4ACB` | `oklch(0.47 0.17 267)`  | acento / acción primaria |
+| Gris cálido | `#6B6B7B` | `oklch(0.52 0.012 285)` | texto sutil / terciario  |
+| Línea arena | `#E3E0D8` | `oklch(0.91 0.008 85)`  | hairlines y bordes       |
 
 El acento cobalto es **un único color de marca**, usado con medida. No hay oro
 ni señales cromáticas decorativas: el color comunica acción y estado, no adorno.
 
 ### Tipografía
 
-| Rol     | Familia                              | Uso                                           |
-| ------- | ------------------------------------ | --------------------------------------------- |
-| Display | **serif** (Lora / Tiempos / Source Serif) | titulares con autoridad editorial        |
-| Cuerpo  | **Inter** (sans neutra)              | texto corrido, UI                             |
-| Datos   | **mono** discreta (JetBrains Mono)   | cifras, tablas, etiquetas técnicas            |
+| Rol     | Familia                                   | Uso                                |
+| ------- | ----------------------------------------- | ---------------------------------- |
+| Display | **serif** (Lora / Tiempos / Source Serif) | titulares con autoridad editorial  |
+| Cuerpo  | **Inter** (sans neutra)                   | texto corrido, UI                  |
+| Datos   | **mono** discreta (JetBrains Mono)        | cifras, tablas, etiquetas técnicas |
 
 La jerarquía se construye por **escala y aire**, no por peso ni mayúsculas
 agresivas. El serif aparece solo en display; el cuerpo es siempre sans.
@@ -100,19 +100,19 @@ retiran al migrarla.
 Roles que cambian según el contexto/theme. **Aquí se elimina el 90% de los hex y
 las arbitrary utilities.** Apuntan a la paleta Institutional Modernist:
 
-| Token                                 | Rol                     | Valor (Institutional Modernist) |
-| ------------------------------------- | ----------------------- | ------------------------------- |
-| `--surface`                           | fondo de página         | papel hueso                     |
-| `--surface-2`                         | panel                   | papel cálido                    |
-| `--surface-3`                         | elevado / card          | casi blanco + sombra            |
-| `--content`                           | texto primario          | tinta                           |
-| `--content-muted`                     | texto secundario        | tinta suave                     |
-| `--content-subtle`                    | texto terciario / hints | gris cálido                     |
-| `--accent-brand`                      | acción primaria         | cobalto                         |
-| `--accent-brand-contrast`             | texto sobre accent      | blanco                          |
-| `--hairline`                          | líneas                  | línea arena                     |
-| `--hairline-strong`                   | líneas marcadas         | arena +1                        |
-| `--brand-{success,warn,danger,info}`  | estados funcionales     | afinado para papel cálido       |
+| Token                                | Rol                     | Valor (Institutional Modernist) |
+| ------------------------------------ | ----------------------- | ------------------------------- |
+| `--surface`                          | fondo de página         | papel hueso                     |
+| `--surface-2`                        | panel                   | papel cálido                    |
+| `--surface-3`                        | elevado / card          | casi blanco + sombra            |
+| `--content`                          | texto primario          | tinta                           |
+| `--content-muted`                    | texto secundario        | tinta suave                     |
+| `--content-subtle`                   | texto terciario / hints | gris cálido                     |
+| `--accent-brand`                     | acción primaria         | cobalto                         |
+| `--accent-brand-contrast`            | texto sobre accent      | blanco                          |
+| `--hairline`                         | líneas                  | línea arena                     |
+| `--hairline-strong`                  | líneas marcadas         | arena +1                        |
+| `--brand-{success,warn,danger,info}` | estados funcionales     | afinado para papel cálido       |
 
 ### Capa 3 — Primitivas React
 
@@ -135,13 +135,13 @@ font-serif                      →   display editorial
 
 ## 5. Plan de migración (incremental, sin big-bang)
 
-| Fase  | Entregable                                                                                                     | Riesgo |
-| ----- | -------------------------------------------------------------------------------------------------------------- | ------ |
-| **0** | Este RFC + inventario de tokens + dirección Institutional Modernist                                            | nulo   |
-| **1** | Capa 1 (primitivos `--im-*`) + Capa 2 semántica + utilidades Tailwind (aditivo)                                | bajo   |
-| **2** | Primitivas compartidas + rediseño de landing y páginas públicas al lenguaje nuevo (piloto); retiro de `--brand-*` legacy | bajo |
-| **3** | Migración del app shell (dashboard/terminal) módulo a módulo al lenguaje claro; superficies canvas como excepción | medio |
-| **4** | Pulido sistémico: foco accesible, `prefers-reduced-motion`, densidad, contraste, espaciado                     | bajo   |
+| Fase  | Entregable                                                                                                               | Riesgo |
+| ----- | ------------------------------------------------------------------------------------------------------------------------ | ------ |
+| **0** | Este RFC + inventario de tokens + dirección Institutional Modernist                                                      | nulo   |
+| **1** | Capa 1 (primitivos `--im-*`) + Capa 2 semántica + utilidades Tailwind (aditivo)                                          | bajo   |
+| **2** | Primitivas compartidas + rediseño de landing y páginas públicas al lenguaje nuevo (piloto); retiro de `--brand-*` legacy | bajo   |
+| **3** | Migración del app shell (dashboard/terminal) módulo a módulo al lenguaje claro; superficies canvas como excepción        | medio  |
+| **4** | Pulido sistémico: foco accesible, `prefers-reduced-motion`, densidad, contraste, espaciado                               | bajo   |
 
 **Regla de oro de cada fase:** ningún cambio rompe lo existente. Las arbitrary
 utilities y tokens legacy siguen compilando hasta que su módulo se migra. En

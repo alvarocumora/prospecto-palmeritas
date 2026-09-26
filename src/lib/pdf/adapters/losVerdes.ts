@@ -9,7 +9,9 @@ import type { ProjectDoc } from "../model";
 export const LOS_VERDES_DOC_VERSION = "v3.0";
 
 const num = (v: number | null | undefined, dec = 2) =>
-  v == null || Number.isNaN(Number(v)) ? "—" : Number(v).toLocaleString("es-CL", { maximumFractionDigits: dec });
+  v == null || Number.isNaN(Number(v))
+    ? "—"
+    : Number(v).toLocaleString("es-CL", { maximumFractionDigits: dec });
 
 export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
   const { project, stats, samples, targets, concessions, satAnomalies } = report;
@@ -38,12 +40,36 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
       project.region ?? "Chile",
     ],
     kpis: [
-      { label: "Muestras geoquímicas", value: String(stats.samplesTotal), note: labs.length ? `Laboratorio: ${labs.join(", ")}` : undefined },
-      { label: "Cu máximo en muestra", value: `${num(stats.cuMaxPct)} %`, note: `Promedio ${num(stats.cuAvgPct)} % Cu` },
-      { label: "Targets definidos", value: String(stats.targetsTotal), note: `${stats.targetsCritical} críticos · ${stats.targetsHigh} altos` },
-      { label: "Superficie catastral", value: `${Math.round(stats.concessionsHa).toLocaleString("es-CL")} ha`, note: `${stats.concessionsTotal} concesiones` },
-      { label: "Anomalías satelitales", value: String(stats.satTotal), note: `${stats.satHigh} severidad alta` },
-      { label: "Au / Ag máximos", value: `${num(stats.auMaxGpt, 3)} g/t · ${num(stats.agMaxGpt, 1)} g/t`, note: "Valores puntuales de superficie" },
+      {
+        label: "Muestras geoquímicas",
+        value: String(stats.samplesTotal),
+        note: labs.length ? `Laboratorio: ${labs.join(", ")}` : undefined,
+      },
+      {
+        label: "Cu máximo en muestra",
+        value: `${num(stats.cuMaxPct)} %`,
+        note: `Promedio ${num(stats.cuAvgPct)} % Cu`,
+      },
+      {
+        label: "Targets definidos",
+        value: String(stats.targetsTotal),
+        note: `${stats.targetsCritical} críticos · ${stats.targetsHigh} altos`,
+      },
+      {
+        label: "Superficie catastral",
+        value: `${Math.round(stats.concessionsHa).toLocaleString("es-CL")} ha`,
+        note: `${stats.concessionsTotal} concesiones`,
+      },
+      {
+        label: "Anomalías satelitales",
+        value: String(stats.satTotal),
+        note: `${stats.satHigh} severidad alta`,
+      },
+      {
+        label: "Au / Ag máximos",
+        value: `${num(stats.auMaxGpt, 3)} g/t · ${num(stats.agMaxGpt, 1)} g/t`,
+        note: "Valores puntuales de superficie",
+      },
     ],
     thesis: [
       `Distrito con ${stats.samplesTotal} muestras de superficie georreferenciadas y trazables a laboratorio.`,
@@ -85,7 +111,13 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
             widths: [0.16, 0.34, 0.16, 0.18, 0.16],
             rows: concessions
               .slice(0, 20)
-              .map((c) => [c.code, c.name, c.concession_type ?? "—", c.status ?? "—", num(c.area_ha, 1)]),
+              .map((c) => [
+                c.code,
+                c.name,
+                c.concession_type ?? "—",
+                c.status ?? "—",
+                num(c.area_ha, 1),
+              ]),
           },
         ],
       },
@@ -118,7 +150,12 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
             widths: [0.3, 0.24, 0.22, 0.24],
             rows: satAnomalies
               .slice(0, 12)
-              .map((a) => [a.index_code, a.severity ?? "—", a.score == null ? "—" : num(a.score, 2), num(a.area_ha, 1)]),
+              .map((a) => [
+                a.index_code,
+                a.severity ?? "—",
+                a.score == null ? "—" : num(a.score, 2),
+                num(a.area_ha, 1),
+              ]),
           },
         ],
       },

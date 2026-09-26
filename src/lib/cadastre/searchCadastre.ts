@@ -5,7 +5,12 @@ import { searchMiningCadastre, type CadastreSearch } from "@/lib/cadastre/mining
 export type GlobalCadastreScope =
   | { kind: "country"; code: CadastreCountry; query: string }
   | { kind: "bbox"; country: CadastreCountry; bbox: [number, number, number, number] }
-  | { kind: "project"; country: CadastreCountry; projectId: string; bbox?: [number, number, number, number] }
+  | {
+      kind: "project";
+      country: CadastreCountry;
+      projectId: string;
+      bbox?: [number, number, number, number];
+    }
   | { kind: "role"; country: CadastreCountry; role: string };
 
 export type GlobalCadastreSourceState = "available" | "unavailable";
@@ -38,7 +43,11 @@ export type SearchCadastreInput = {
   filters?: Pick<CadastreSearch, "term" | "holder" | "type" | "status">;
 };
 
-function unavailable(country: CadastreCountry, authority: string, error: unknown): GlobalCadastreResult {
+function unavailable(
+  country: CadastreCountry,
+  authority: string,
+  error: unknown,
+): GlobalCadastreResult {
   return {
     ok: false,
     sourceState: "unavailable",
@@ -101,7 +110,11 @@ export async function searchCadastre(input: SearchCadastreInput): Promise<Global
 
     const bbox = scope.kind === "bbox" || scope.kind === "project" ? scope.bbox : undefined;
     if (scope.kind === "project" && !bbox) {
-      return unavailable(country, authority, "PROJECT_SCOPE_REQUIRES_BBOX_UNTIL_PROJECT_GEOMETRY_ADAPTER");
+      return unavailable(
+        country,
+        authority,
+        "PROJECT_SCOPE_REQUIRES_BBOX_UNTIL_PROJECT_GEOMETRY_ADAPTER",
+      );
     }
 
     const result = await searchMiningCadastre({

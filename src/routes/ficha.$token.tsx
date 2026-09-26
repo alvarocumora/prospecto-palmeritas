@@ -16,7 +16,6 @@ import { TradeDocsPanel } from "@/features/trades/TradeDocsPanel";
 import { renderGeocapitalsPdf, triggerPdfDownload } from "@/lib/documents/pdf";
 import { buildTradeFichaDoc, type TradeDocInput } from "@/lib/documents/tradeDocs";
 
-
 export const Route = createFileRoute("/ficha/$token")({
   loader: async ({ params }) => {
     const ficha = await getPublicFicha({ data: { token: params.token } });
@@ -62,7 +61,11 @@ export const Route = createFileRoute("/ficha/$token")({
   component: FichaPublica,
 });
 
-function money(n: number | null | undefined, currency: string | null | undefined, unit?: string | null) {
+function money(
+  n: number | null | undefined,
+  currency: string | null | undefined,
+  unit?: string | null,
+) {
   if (n == null) return "—";
   const cur = currency === "USD" ? "US$" : "$";
   return `${cur} ${Math.round(n).toLocaleString("es-CL")}${unit ? ` / ${unit}` : ""}`;
@@ -147,7 +150,6 @@ function FichaPublica() {
     }
   };
 
-
   return (
     <main className="min-h-screen bg-[#F7F5EF] px-4 py-10">
       <div className="mx-auto max-w-2xl bg-white border border-neutral-200 shadow-sm">
@@ -155,7 +157,9 @@ function FichaPublica() {
           <p className="text-[11px] uppercase tracking-[0.2em] text-neutral-500">
             Geocapitals · Ficha de operación
           </p>
-          <h1 className="mt-1 font-serif text-3xl text-neutral-900">{f.commodity ?? "Operación"}</h1>
+          <h1 className="mt-1 font-serif text-3xl text-neutral-900">
+            {f.commodity ?? "Operación"}
+          </h1>
           {f.reference ? (
             <p className="mt-1 text-xs text-neutral-500">Referencia {f.reference}</p>
           ) : null}
@@ -170,7 +174,8 @@ function FichaPublica() {
             <p className="mt-1 text-2xl font-semibold text-neutral-900">{priceLabel}</p>
             {p?.qty_per_order != null ? (
               <p className="mt-1 text-xs text-neutral-600">
-                Cantidad por pedido: {Number(p.qty_per_order).toLocaleString("es-CL")} {p.unit ?? ""}
+                Cantidad por pedido: {Number(p.qty_per_order).toLocaleString("es-CL")}{" "}
+                {p.unit ?? ""}
                 {p.order_frequency ? ` · ${p.order_frequency}` : ""}
                 {p.contract_months ? ` · contrato ${p.contract_months} meses` : ""}
               </p>
@@ -231,15 +236,10 @@ function FichaPublica() {
               Descargar ficha en PDF
             </button>
           </div>
-          <TradeDocsPanel
-            compact
-            title="Documentos comerciales (ES/EN)"
-            input={docInput}
-          />
+          <TradeDocsPanel compact title="Documentos comerciales (ES/EN)" input={docInput} />
         </section>
 
         <footer className="flex flex-wrap gap-2 border-t border-neutral-200 px-6 py-4 text-xs">
-
           <a
             href={wsp}
             target="_blank"

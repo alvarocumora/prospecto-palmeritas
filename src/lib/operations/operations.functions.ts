@@ -93,7 +93,12 @@ export const createOperation = createServerFn({ method: "POST" })
     });
 
     // Genera invitaciones si hay correos
-    const invitations: Array<{ role: "buyer" | "seller"; url: string; token: string; emailed: boolean }> = [];
+    const invitations: Array<{
+      role: "buyer" | "seller";
+      url: string;
+      token: string;
+      emailed: boolean;
+    }> = [];
     const { sendPortalInvitationEmail } = await import("./dispatch.server");
     // Nombre del emisor (para el correo)
     const { data: inviter } = await supabaseAdmin
@@ -207,7 +212,9 @@ export const getOperationDetail = createServerFn({ method: "POST" })
       context.supabase.from("operation_participants").select("*").eq("operation_id", data.id),
       context.supabase
         .from("operation_invitations")
-        .select("id, participant_type, invited_email, invited_name, secure_token, status, expires_at, accepted_at, revoked_at, created_at")
+        .select(
+          "id, participant_type, invited_email, invited_name, secure_token, status, expires_at, accepted_at, revoked_at, created_at",
+        )
         .eq("operation_id", data.id)
         .order("created_at", { ascending: false }),
       context.supabase
@@ -274,7 +281,11 @@ export const regenerateInvitation = createServerFn({ method: "POST" })
     // Revoca todas las invitaciones activas del rol
     await supabaseAdmin
       .from("operation_invitations")
-      .update({ status: "revoked", revoked_at: new Date().toISOString(), revoked_by: context.userId })
+      .update({
+        status: "revoked",
+        revoked_at: new Date().toISOString(),
+        revoked_by: context.userId,
+      })
       .eq("operation_id", data.operation_id)
       .eq("participant_type", data.role)
       .eq("status", "pending");
@@ -306,7 +317,9 @@ export const regenerateInvitation = createServerFn({ method: "POST" })
     // Envío inmediato del correo con el nuevo link
     const { data: fullOp } = await supabaseAdmin
       .from("operations")
-      .select("code, name, commodity, incoterm, quantity_monthly, quantity_total, unit, origin_country, destination_country")
+      .select(
+        "code, name, commodity, incoterm, quantity_monthly, quantity_total, unit, origin_country, destination_country",
+      )
       .eq("id", data.operation_id)
       .maybeSingle();
     let emailed = false;
@@ -358,7 +371,11 @@ export const revokeInvitation = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
       .from("operation_invitations")
-      .update({ status: "revoked", revoked_at: new Date().toISOString(), revoked_by: context.userId })
+      .update({
+        status: "revoked",
+        revoked_at: new Date().toISOString(),
+        revoked_by: context.userId,
+      })
       .eq("id", data.invitation_id);
     if (error) throw error;
     return { ok: true };

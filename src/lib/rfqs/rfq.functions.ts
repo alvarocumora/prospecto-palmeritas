@@ -76,7 +76,9 @@ export const listMyRfqs = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("rfqs")
-      .select("id, public_ref, buyer_company, buyer_name, status, destination_country, incoterm, created_at, is_public")
+      .select(
+        "id, public_ref, buyer_company, buyer_name, status, destination_country, incoterm, created_at, is_public",
+      )
       .eq("created_by", context.userId)
       .order("created_at", { ascending: false });
     if (error) throw error;
@@ -87,10 +89,17 @@ export const getRfqDetail = createServerFn({ method: "POST" })
   .middleware([requireTradeRole])
   .inputValidator((raw: unknown) => z.object({ id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
-    const { data: rfq, error } = await context.supabase.from("rfqs").select("*").eq("id", data.id).maybeSingle();
+    const { data: rfq, error } = await context.supabase
+      .from("rfqs")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
     if (error) throw error;
     if (!rfq) throw new Error("RFQ no encontrado o sin acceso");
-    const { data: products } = await context.supabase.from("rfq_products").select("*").eq("rfq_id", data.id);
+    const { data: products } = await context.supabase
+      .from("rfq_products")
+      .select("*")
+      .eq("rfq_id", data.id);
     const { data: apps } = await context.supabase
       .from("rfq_applications")
       .select("id, supplier_id, status, application_score, notes, created_at")
@@ -105,12 +114,22 @@ export const getRfqDetail = createServerFn({ method: "POST" })
           .from("suppliers")
           .select("id, folio, legal_name, country, status")
           .in("id", ids)
-      : { data: [] as Array<{ id: string; folio: string; legal_name: string; country: string; status: string }> };
+      : {
+          data: [] as Array<{
+            id: string;
+            folio: string;
+            legal_name: string;
+            country: string;
+            status: string;
+          }>,
+        };
     const supMap = new Map((suppliers ?? []).map((s) => [s.id, s]));
 
     const enriched = await Promise.all(
       (apps ?? []).map(async (a) => {
-        const { data: risk } = await supabaseAdmin.rpc("compute_supplier_risk_score", { _supplier_id: a.supplier_id });
+        const { data: risk } = await supabaseAdmin.rpc("compute_supplier_risk_score", {
+          _supplier_id: a.supplier_id,
+        });
         const r = Array.isArray(risk) ? risk[0] : risk;
         return { ...a, supplier: supMap.get(a.supplier_id), risk: r ?? null };
       }),
@@ -122,10 +141,18 @@ export const getRfqDetail = createServerFn({ method: "POST" })
 export const closeRfq = createServerFn({ method: "POST" })
   .middleware([requireTradeRole])
   .inputValidator((raw: unknown) =>
-    z.object({ id: z.string().uuid(), status: z.enum(["publicado", "en_evaluacion", "adjudicado", "cerrado", "cancelado"]) }).parse(raw),
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["publicado", "en_evaluacion", "adjudicado", "cerrado", "cancelado"]),
+      })
+      .parse(raw),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("rfqs").update({ status: data.status }).eq("id", data.id);
+    const { error } = await context.supabase
+      .from("rfqs")
+      .update({ status: data.status })
+      .eq("id", data.id);
     if (error) throw error;
     return { ok: true };
   });
@@ -163,7 +190,8 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
     global: {
       fetch: (input, init) => {
         const h = new Headers(init?.headers);
-        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`) h.delete("Authorization");
+        if (key.startsWith("sb_") && h.get("Authorization") === `Bearer ${key}`)
+          h.delete("Authorization");
         h.set("apikey", key);
         return fetch(input, { ...init, headers: h });
       },
@@ -171,7 +199,9 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
   });
   const { data: rfqs, error } = await anon
     .from("rfqs")
-    .select("id, public_ref, buyer_company, buyer_name, destination_country, incoterm, currency, created_at, validity_date, status")
+    .select(
+      "id, public_ref, buyer_company, buyer_name, destination_country, incoterm, currency, created_at, validity_date, status",
+    )
     .eq("is_public", true)
     .in("status", ["publicado", "en_evaluacion"])
     .order("created_at", { ascending: false })
@@ -179,9 +209,19 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
   if (error) throw error;
   const ids = (rfqs ?? []).map((r) => r.id);
   const { data: products } = ids.length
-    ? await anon.from("rfq_products").select("rfq_id, product_name, qty_monthly_mt, qty_total_mt, incoterm, port_destination").in("rfq_id", ids)
+    ? await anon
+        .from("rfq_products")
+        .select("rfq_id, product_name, qty_monthly_mt, qty_total_mt, incoterm, port_destination")
+        .in("rfq_id", ids)
     : { data: [] };
-  type ProductRow = { rfq_id: string; product_name: string; qty_monthly_mt: number | null; qty_total_mt: number | null; incoterm: string | null; port_destination: string | null };
+  type ProductRow = {
+    rfq_id: string;
+    product_name: string;
+    qty_monthly_mt: number | null;
+    qty_total_mt: number | null;
+    incoterm: string | null;
+    port_destination: string | null;
+  };
   const byRfq = new Map<string, ProductRow[]>();
   for (const p of (products ?? []) as ProductRow[]) {
     const arr = byRfq.get(p.rfq_id) ?? [];
@@ -194,7 +234,13 @@ export const listPublicRfqs = createServerFn({ method: "GET" }).handler(async ()
 export const applyToRfq = createServerFn({ method: "POST" })
   .middleware([requireTradeRole])
   .inputValidator((raw: unknown) =>
-    z.object({ rfq_id: z.string().uuid(), supplier_id: z.string().uuid(), notes: z.string().optional() }).parse(raw),
+    z
+      .object({
+        rfq_id: z.string().uuid(),
+        supplier_id: z.string().uuid(),
+        notes: z.string().optional(),
+      })
+      .parse(raw),
   )
   .handler(async ({ data, context }) => {
     // owner check
@@ -203,10 +249,13 @@ export const applyToRfq = createServerFn({ method: "POST" })
       .select("id, owner_user_id")
       .eq("id", data.supplier_id)
       .maybeSingle();
-    if (!sup || sup.owner_user_id !== context.userId) throw new Error("No autorizado sobre este proveedor");
+    if (!sup || sup.owner_user_id !== context.userId)
+      throw new Error("No autorizado sobre este proveedor");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: risk } = await supabaseAdmin.rpc("compute_supplier_risk_score", { _supplier_id: data.supplier_id });
+    const { data: risk } = await supabaseAdmin.rpc("compute_supplier_risk_score", {
+      _supplier_id: data.supplier_id,
+    });
     const r = Array.isArray(risk) ? risk[0] : risk;
 
     const { data: app, error } = await supabaseAdmin

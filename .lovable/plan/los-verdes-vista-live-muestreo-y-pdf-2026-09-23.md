@@ -1,9 +1,11 @@
 # Los Verdes: vista live, muestreo y PDF
 
 ## Objetivo
+
 Convertir la ficha de Los Verdes–Tilama en una presentación pública equivalente a Cholqui, usando exclusivamente los antecedentes ya cargados y manteniendo trazabilidad entre mapa, indicadores y PDF.
 
 ## Implementación
+
 1. **Fuente pública unificada**
    - Extender la lectura pública acotada al proyecto `LV-TIL-001` con sus 190 resultados de muestreo.
    - Convertir las coordenadas UTM 19S a WGS84 para presentar cada punto en el mapa.
@@ -30,4 +32,5 @@ Convertir la ficha de Los Verdes–Tilama en una presentación pública equivale
    - Confirmar que el mapa, los indicadores y el documento usan la misma fuente.
 
 ## Resultado esperado
+
 Una URL pública única (`/live/losverdes`) con mapa, 190 puntos de muestreo y PDF descargable con QR, coherente con la presentación de Cholqui y sin requerir autenticación.

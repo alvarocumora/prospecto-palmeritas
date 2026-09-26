@@ -288,9 +288,7 @@ function Metric({
       <div className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-content-subtle">
         <Icon className="w-3 h-3" /> {label}
       </div>
-      <div
-        className={`mt-1 text-content ${small ? "text-[13px]" : "text-2xl font-display"}`}
-      >
+      <div className={`mt-1 text-content ${small ? "text-[13px]" : "text-2xl font-display"}`}>
         {value}
       </div>
     </div>

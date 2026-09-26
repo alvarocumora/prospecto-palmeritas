@@ -59,11 +59,19 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   const heroFit = doc.splitTextToSize(heroLine, CW * 0.72) as string[];
   doc.text(heroFit.length > 1 ? `${heroFit[0].replace(/[,\s·]+$/, "")}…` : heroFit[0], M, 110);
 
-
   let y = 164;
   eyebrow(doc, M, y, "Cifras clave");
   y += 14;
-  y += kpiGrid(doc, { x: M, y, w: CW, items: model.kpis.slice(0, 6), cols: 3, rowH: 66, valueSize: 15 }) + 26;
+  y +=
+    kpiGrid(doc, {
+      x: M,
+      y,
+      w: CW,
+      items: model.kpis.slice(0, 6),
+      cols: 3,
+      rowH: 66,
+      valueSize: 15,
+    }) + 26;
 
   eyebrow(doc, M, y, "Tesis");
   y += 14;
@@ -112,9 +120,14 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   doc.text("VER LIVE MAP", rx + rw / 2, y + 134, { align: "center" });
   font(doc, "body", "normal", 6.6);
   ink(doc, GC_COLOR.slate);
-  doc.text(doc.splitTextToSize(model.liveUrl.replace(/^https?:\/\//, ""), rw - 16)[0], rx + rw / 2, y + 146, {
-    align: "center",
-  });
+  doc.text(
+    doc.splitTextToSize(model.liveUrl.replace(/^https?:\/\//, ""), rw - 16)[0],
+    rx + rw / 2,
+    y + 146,
+    {
+      align: "center",
+    },
+  );
 
   y += figH + 24;
   if (model.chart?.caption) {
@@ -131,19 +144,28 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   doc.text("CONTACTO", M + 14, y + 17);
   font(doc, "body", "normal", 8.4);
   ink(doc, GC_COLOR.inkSoft);
-  const contactLine = [model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join("  ·  ");
+  const contactLine = [model.contact?.name, model.contact?.email, model.contact?.phone]
+    .filter(Boolean)
+    .join("  ·  ");
   doc.text(contactLine || `${GC_BRAND.email}`, M + 14, y + 33);
-  doc.text(`${GC_BRAND.site}  ·  ${GC_BRAND.email}  ·  WhatsApp ${GC_BRAND.whatsapp}`, M + 14, y + 47);
+  doc.text(
+    `${GC_BRAND.site}  ·  ${GC_BRAND.email}  ·  WhatsApp ${GC_BRAND.whatsapp}`,
+    M + 14,
+    y + 47,
+  );
   y += 70;
 
   // Advertencia condensada
   font(doc, "body", "normal", 6.8);
   ink(doc, GC_COLOR.slate);
   const legal = model.disclaimers[0] ?? "";
-  doc.splitTextToSize(
-    `Advertencia: ${legal} Documento de trabajo; no constituye oferta pública de valores.`,
-    CW
-  ).slice(0, 3).forEach((l: string, i: number) => doc.text(l, M, Math.min(y + i * 9, H - 52)));
+  doc
+    .splitTextToSize(
+      `Advertencia: ${legal} Documento de trabajo; no constituye oferta pública de valores.`,
+      CW,
+    )
+    .slice(0, 3)
+    .forEach((l: string, i: number) => doc.text(l, M, Math.min(y + i * 9, H - 52)));
 
   stroke(doc, GC_COLOR.hairline);
   doc.setLineWidth(0.6);

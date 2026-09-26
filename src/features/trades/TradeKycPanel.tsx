@@ -112,8 +112,8 @@ export function TradeKycPanel({ tradeId }: { tradeId: string }) {
         </div>
       </div>
       <p className="mt-1 text-xs text-muted-foreground">
-        {approved} de {items.length} documentos aprobados. Los archivos se guardan cifrados y solo se
-        entregan con enlaces firmados de 5 minutos.
+        {approved} de {items.length} documentos aprobados. Los archivos se guardan cifrados y solo
+        se entregan con enlaces firmados de 5 minutos.
       </p>
 
       <div className="mt-4 space-y-2">

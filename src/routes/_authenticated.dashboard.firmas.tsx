@@ -167,7 +167,6 @@ function FirmasPage() {
                       ) : null}
                     </td>
 
-
                     <td className="px-4 py-3">
                       {r.signed_by_name ?? r.signer_name_expected ?? (
                         <span className="text-muted-foreground">—</span>

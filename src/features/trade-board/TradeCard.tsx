@@ -33,7 +33,9 @@ export function TradeCard({ card }: { card: BoardCard }) {
           {...listeners}
           {...attributes}
           className={`shrink-0 p-0.5 -ml-1 rounded text-muted-foreground ${
-            isCancelled ? "cursor-not-allowed" : "cursor-grab active:cursor-grabbing hover:text-foreground"
+            isCancelled
+              ? "cursor-not-allowed"
+              : "cursor-grab active:cursor-grabbing hover:text-foreground"
           }`}
           aria-label="Arrastrar"
           onClick={(e) => e.preventDefault()}
@@ -69,9 +71,7 @@ export function TradeCard({ card }: { card: BoardCard }) {
             {card.daysInStage != null && (
               <div
                 className={`text-[9px] font-mono px-1 rounded ${
-                  card.stuck
-                    ? "bg-amber-500/20 text-amber-700"
-                    : "text-muted-foreground"
+                  card.stuck ? "bg-amber-500/20 text-amber-700" : "text-muted-foreground"
                 }`}
                 title={card.stuck ? "Excede SLA" : "Días en etapa"}
               >

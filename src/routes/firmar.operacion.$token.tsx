@@ -113,9 +113,7 @@ function SignOperationPage() {
       const res = await signFn({
         data: { token, signer_name: name.trim(), accepted: true },
       });
-      toast.success(
-        res.completed ? "Firma registrada · flujo completado" : "Firma registrada",
-      );
+      toast.success(res.completed ? "Firma registrada · flujo completado" : "Firma registrada");
       qc.invalidateQueries({ queryKey: ["op-sign-request", token] });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "No se pudo firmar.");
@@ -158,21 +156,16 @@ function SignOperationPage() {
         ) : error || !data ? (
           <div className="text-center py-20">
             <Ban className="w-8 h-8 text-content-subtle mx-auto mb-3" />
-            <h1 className="font-display text-2xl text-content">
-              Enlace de firma inválido
-            </h1>
+            <h1 className="font-display text-2xl text-content">Enlace de firma inválido</h1>
             <p className="text-sm text-content-subtle mt-2">
-              El enlace no existe, fue anulado o ha expirado. Pide uno nuevo a la
-              contraparte.
+              El enlace no existe, fue anulado o ha expirado. Pide uno nuevo a la contraparte.
             </p>
           </div>
         ) : (
           <>
             <div className="flex items-center gap-2 mb-1">
               <FileSignature className="w-5 h-5 text-accent-brand" />
-              <h1 className="font-display text-2xl text-content">
-                Firma electrónica de operación
-              </h1>
+              <h1 className="font-display text-2xl text-content">Firma electrónica de operación</h1>
             </div>
             <p className="text-xs text-content-subtle mb-6">
               {data.operation && (
@@ -194,9 +187,7 @@ function SignOperationPage() {
               <div className="mt-1 text-sm text-content">
                 <strong>{data.signer.name}</strong> · rol {data.signer.role}
               </div>
-              <div className="text-[11px] text-content-subtle mt-1">
-                {data.envelope.title}
-              </div>
+              <div className="text-[11px] text-content-subtle mt-1">{data.envelope.title}</div>
             </div>
 
             {/* Panel de firmantes */}
@@ -206,24 +197,16 @@ function SignOperationPage() {
               </div>
               <ul className="space-y-1.5">
                 {data.signers.map((s, i) => (
-                  <li
-                    key={i}
-                    className="flex items-center justify-between gap-3 text-sm"
-                  >
+                  <li key={i} className="flex items-center justify-between gap-3 text-sm">
                     <span className="truncate">
-                      <span className="text-content-subtle text-xs mr-2">
-                        #{s.signing_order}
-                      </span>
+                      <span className="text-content-subtle text-xs mr-2">#{s.signing_order}</span>
                       <strong>{s.signer_name}</strong>{" "}
-                      <span className="text-content-subtle text-xs">
-                        · {s.signer_role}
-                      </span>
+                      <span className="text-content-subtle text-xs">· {s.signer_role}</span>
                     </span>
                     {s.status === "signed" ? (
                       <span className="inline-flex items-center gap-1 text-emerald-700 text-xs font-medium">
                         <CheckCircle2 className="w-3.5 h-3.5" />{" "}
-                        {s.signed_at &&
-                          new Date(s.signed_at).toLocaleDateString("es-CL")}
+                        {s.signed_at && new Date(s.signed_at).toLocaleDateString("es-CL")}
                       </span>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-content-subtle text-xs">
@@ -289,9 +272,8 @@ function SignOperationPage() {
                   <ShieldCheck className="w-5 h-5" /> Firma registrada
                 </div>
                 <div className="mt-1 text-sm text-content">
-                  Firmaste el {" "}
-                  {data.signer.signed_at &&
-                    new Date(data.signer.signed_at).toLocaleString("es-CL")}
+                  Firmaste el{" "}
+                  {data.signer.signed_at && new Date(data.signer.signed_at).toLocaleString("es-CL")}
                   .
                 </div>
               </div>
@@ -324,9 +306,9 @@ function SignOperationPage() {
                     className="mt-0.5"
                   />
                   <span>
-                    Declaro que soy quien firma y acepto que este acto constituye
-                    firma electrónica simple con validez legal, vinculada al hash
-                    SHA-256 del documento congelado mostrado arriba.
+                    Declaro que soy quien firma y acepto que este acto constituye firma electrónica
+                    simple con validez legal, vinculada al hash SHA-256 del documento congelado
+                    mostrado arriba.
                   </span>
                 </label>
                 <button

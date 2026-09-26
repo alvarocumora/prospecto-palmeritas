@@ -126,7 +126,9 @@ const Email = ({
       en bodega. Estándar de análisis GB/T 1599-2014. Trial Shipment opcional por mutuo acuerdo.
     </Text>
 
-    <SectionH>Composición química — Certificados independientes {badge("success", "Sb ≥ 99.75%")}</SectionH>
+    <SectionH>
+      Composición química — Certificados independientes {badge("success", "Sb ≥ 99.75%")}
+    </SectionH>
     <Text style={styles.muted}>
       Columna A: CoA interno del productor (JH2601 · Pallets 26–50 y 301–320). Columna B: SGS
       Reporte 2025-2002470-001 · muestra 14 g, muestreo 22-Aug-2025.
@@ -136,7 +138,11 @@ const Email = ({
       <table
         cellPadding={0}
         cellSpacing={0}
-        style={{ width: "100%", borderCollapse: "collapse", borderTop: `1px solid ${colors.border}` }}
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          borderTop: `1px solid ${colors.border}`,
+        }}
       >
         <thead>
           <tr>
@@ -209,8 +215,8 @@ const Email = ({
     <SectionH>Transaction Procedure</SectionH>
     <Text style={styles.p}>
       1. Buyer emite ICPO/LOI + Company Profile · 2. Seller emite FCO + CIS · 3. Buyer firma y
-      devuelve FCO · 4. Seller emite Draft SPA · 5. Buyer firma y devuelve · 6. Seller contrafirma
-      · 7. Commercial Invoice · 8. Confirmación de PO y cronograma · 9. Preparación de carga · 10.
+      devuelve FCO · 4. Seller emite Draft SPA · 5. Buyer firma y devuelve · 6. Seller contrafirma ·
+      7. Commercial Invoice · 8. Confirmación de PO y cronograma · 9. Preparación de carga · 10.
       Inspección SGS/CCIC · 11. Embarque según cronograma · 12. Set completo de documentos · 13.
       <b> Pago SWIFT MT103</b> según SPA · 14. Arribo a Florida · 15. Inspección de destino (si
       aplica).
@@ -300,7 +306,6 @@ const Email = ({
     </Text>
   </EmailLayout>
 );
-
 
 export const template = {
   component: Email,

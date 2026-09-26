@@ -12,11 +12,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type Row = Record<string, unknown> | null;
 
-function tradeIdFromPayload(payload: {
-  table: string;
-  new: Row;
-  old: Row;
-}): string | null {
+function tradeIdFromPayload(payload: { table: string; new: Row; old: Row }): string | null {
   const row = (payload.new ?? payload.old) as Row;
   if (!row) return null;
   if (payload.table === "commodity_trades") {
@@ -42,16 +38,8 @@ export function useTradeBoardRealtime() {
     };
     const channel = supabase
       .channel("trade-board-live")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "commodity_trades" },
-        handle,
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "trade_documents" },
-        handle,
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "commodity_trades" }, handle)
+      .on("postgres_changes", { event: "*", schema: "public", table: "trade_documents" }, handle)
       .subscribe();
     return () => {
       supabase.removeChannel(channel);

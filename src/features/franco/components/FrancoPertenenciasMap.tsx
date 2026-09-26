@@ -215,7 +215,9 @@ export function FrancoPertenenciasMap() {
         )}
       </div>
       <div className="mt-2 text-[11px] font-mono uppercase tracking-wider text-hint">
-        {data ? `${data.uniqueConcessions} concesiones en catastro · ${FC_DATA.features.length} polígonos KMZ documentales` : "—"}
+        {data
+          ? `${data.uniqueConcessions} concesiones en catastro · ${FC_DATA.features.length} polígonos KMZ documentales`
+          : "—"}
       </div>
     </Card>
   );

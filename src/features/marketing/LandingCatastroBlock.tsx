@@ -32,9 +32,6 @@ async function loadMaplibre() {
   return _ml!;
 }
 
-
-
-
 const STYLE: StyleSpecification = {
   version: 8,
   glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
@@ -119,7 +116,6 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
     };
   }, []);
 
-
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !ready) return;
@@ -150,11 +146,16 @@ function CadastreHeatMap({ points }: { points: Array<[number, number]> }) {
           "interpolate",
           ["linear"],
           ["heatmap-density"],
-          0, "rgba(0,0,0,0)",
-          0.2, "rgba(59,130,246,0.55)",
-          0.5, "rgba(234,179,8,0.75)",
-          0.8, "rgba(239,68,68,0.85)",
-          1, "rgba(255,255,255,0.95)",
+          0,
+          "rgba(0,0,0,0)",
+          0.2,
+          "rgba(59,130,246,0.55)",
+          0.5,
+          "rgba(234,179,8,0.75)",
+          0.8,
+          "rgba(239,68,68,0.85)",
+          1,
+          "rgba(255,255,255,0.95)",
         ],
       },
     });
@@ -410,7 +411,6 @@ export function LandingCatastroBlock() {
         </div>
       </div>
 
-
       {/* Plans mini */}
       <div className="border border-hairline rounded-sm bg-white">
         <div className="px-5 py-4 border-b border-hairline flex items-center justify-between gap-4">
@@ -435,10 +435,7 @@ export function LandingCatastroBlock() {
           {plans.slice(0, 3).map((p, idx) => {
             const isPopular = idx === 1;
             return (
-              <div
-                key={p.code}
-                className={`relative p-5 ${isPopular ? "bg-surface" : ""}`}
-              >
+              <div key={p.code} className={`relative p-5 ${isPopular ? "bg-surface" : ""}`}>
                 {isPopular && (
                   <span className="absolute -top-2 left-5 px-2 py-0.5 bg-accent-brand text-white text-[9px] font-mono uppercase tracking-[0.22em] rounded-sm">
                     Más popular
@@ -451,7 +448,9 @@ export function LandingCatastroBlock() {
                   </div>
                 </div>
                 {p.description && (
-                  <p className="text-[12px] text-content-muted mb-3 leading-snug">{p.description}</p>
+                  <p className="text-[12px] text-content-muted mb-3 leading-snug">
+                    {p.description}
+                  </p>
                 )}
                 <ul className="space-y-1.5">
                   {p.features.slice(0, 4).map((f) => (
@@ -478,7 +477,6 @@ export function LandingCatastroBlock() {
           </Link>
         </div>
       </div>
-
     </div>
   );
 }

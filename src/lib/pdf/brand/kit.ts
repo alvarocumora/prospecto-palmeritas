@@ -20,7 +20,12 @@ export function ink(doc: jsPDF, c: RGB) {
   doc.setTextColor(c[0], c[1], c[2]);
 }
 
-export function font(doc: jsPDF, family: "display" | "body", style: "normal" | "bold" | "italic", size: number) {
+export function font(
+  doc: jsPDF,
+  family: "display" | "body",
+  style: "normal" | "bold" | "italic",
+  size: number,
+) {
   doc.setFont(GC_FONT[family], style);
   doc.setFontSize(size);
 }
@@ -50,7 +55,10 @@ export function drawMark(doc: jsPDF, x: number, y: number, height: number): numb
 }
 
 /** Cabecera institucional: marca + wordmark + referencia a la derecha. */
-export function drawHeader(doc: jsPDF, opts: { w: number; m: number; left: string; right: string }) {
+export function drawHeader(
+  doc: jsPDF,
+  opts: { w: number; m: number; left: string; right: string },
+) {
   const { w, m, left, right } = opts;
   const markW = drawMark(doc, m, 20, 20);
   font(doc, "body", "bold", 9);
@@ -70,7 +78,7 @@ export function drawHeader(doc: jsPDF, opts: { w: number; m: number; left: strin
 /** Pie institucional con paginación y versión del documento. */
 export function drawFooter(
   doc: jsPDF,
-  opts: { w: number; h: number; m: number; left: string; page: number; total?: number }
+  opts: { w: number; h: number; m: number; left: string; page: number; total?: number },
 ) {
   const { w, h, m, left, page, total } = opts;
   stroke(doc, GC_COLOR.hairline);
@@ -93,7 +101,14 @@ export function eyebrow(doc: jsPDF, x: number, y: number, label: string) {
 }
 
 /** Título display serif. Devuelve el alto consumido. */
-export function title(doc: jsPDF, x: number, y: number, text: string, size = 26, maxW?: number): number {
+export function title(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  text: string,
+  size = 26,
+  maxW?: number,
+): number {
   font(doc, "display", "bold", size);
   ink(doc, GC_COLOR.ink);
   const lines = maxW ? doc.splitTextToSize(text, maxW) : [text];
@@ -109,7 +124,7 @@ export function paragraph(
   text: string,
   maxW: number,
   size = 9.5,
-  color: RGB = GC_COLOR.inkSoft
+  color: RGB = GC_COLOR.inkSoft,
 ): number {
   font(doc, "body", "normal", size);
   ink(doc, color);
@@ -120,7 +135,14 @@ export function paragraph(
 }
 
 /** Lista de viñetas con cuadrado cobalto. Devuelve alto consumido. */
-export function bullets(doc: jsPDF, x: number, y: number, items: string[], maxW: number, size = 9.5): number {
+export function bullets(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  items: string[],
+  maxW: number,
+  size = 9.5,
+): number {
   let cy = y;
   for (const item of items) {
     fill(doc, GC_COLOR.cobalt);
@@ -136,7 +158,15 @@ export type Kpi = { label: string; value: string; note?: string };
 /** Rejilla de métricas protagonistas (cifras grandes en serif). */
 export function kpiGrid(
   doc: jsPDF,
-  opts: { x: number; y: number; w: number; items: Kpi[]; cols?: number; rowH?: number; valueSize?: number }
+  opts: {
+    x: number;
+    y: number;
+    w: number;
+    items: Kpi[];
+    cols?: number;
+    rowH?: number;
+    valueSize?: number;
+  },
 ): number {
   const { x, y, w, items } = opts;
   const cols = opts.cols ?? Math.min(4, items.length || 1);
@@ -188,7 +218,7 @@ export function barChart(
     unit?: string;
     colorA?: RGB;
     colorB?: RGB;
-  }
+  },
 ) {
   const { x, y, w, h, data } = opts;
   const colorA = opts.colorA ?? GC_COLOR.cobalt;
@@ -207,7 +237,9 @@ export function barChart(
   for (let i = 0; i <= 4; i++) {
     const gy = plotBottom - (plotH * i) / 4;
     doc.line(x + 26, gy, x + w, gy);
-    doc.text(((niceMax * i) / 4).toFixed(niceMax < 5 ? 1 : 0), x + 22, gy + 2.2, { align: "right" });
+    doc.text(((niceMax * i) / 4).toFixed(niceMax < 5 ? 1 : 0), x + 22, gy + 2.2, {
+      align: "right",
+    });
   }
 
   const slot = (w - 26) / data.length;
@@ -260,7 +292,15 @@ export type Slice = { label: string; pct: number; color?: RGB };
 /** Anillo de distribución (uso de fondos, estructura de capital). */
 export function donutChart(
   doc: jsPDF,
-  opts: { cx: number; cy: number; r: number; inner?: number; slices: Slice[]; centerTop?: string; centerSub?: string }
+  opts: {
+    cx: number;
+    cy: number;
+    r: number;
+    inner?: number;
+    slices: Slice[];
+    centerTop?: string;
+    centerSub?: string;
+  },
 ) {
   const { cx, cy, r, slices } = opts;
   const inner = opts.inner ?? r * 0.58;
@@ -282,7 +322,9 @@ export function donutChart(
       const a = angle + (sweep * k) / steps;
       pts.push([cx + Math.cos(a) * r, cy + Math.sin(a) * r]);
     }
-    const deltas = pts.slice(1).map((p, k) => [p[0] - pts[k][0], p[1] - pts[k][1]] as [number, number]);
+    const deltas = pts
+      .slice(1)
+      .map((p, k) => [p[0] - pts[k][0], p[1] - pts[k][1]] as [number, number]);
     fill(doc, s.color ?? palette[i % palette.length]);
     doc.lines(deltas, pts[0][0], pts[0][1], [1, 1], "F", true);
     angle += sweep;
@@ -327,7 +369,13 @@ export function donutLegend(doc: jsPDF, x: number, y: number, w: number, slices:
   return cy - y;
 }
 
-export type MapPoint = { label: string; lat: number; lng: number; value?: number; highlight?: boolean };
+export type MapPoint = {
+  label: string;
+  lat: number;
+  lng: number;
+  value?: number;
+  highlight?: boolean;
+};
 
 /**
  * Mini-mapa cartográfico vectorial: dispersión georreferenciada de puntos
@@ -335,7 +383,15 @@ export type MapPoint = { label: string; lat: number; lng: number; value?: number
  */
 export function scatterMap(
   doc: jsPDF,
-  opts: { x: number; y: number; w: number; h: number; points: MapPoint[]; caption?: string; labelTop?: number }
+  opts: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+    points: MapPoint[];
+    caption?: string;
+    labelTop?: number;
+  },
 ) {
   const { x, y, w, h, points } = opts;
   fill(doc, GC_COLOR.white);
@@ -395,7 +451,11 @@ export function scatterMap(
   const spanKm = (maxLng - minLng) * kmPerLng;
   font(doc, "body", "normal", 6.2);
   ink(doc, GC_COLOR.slate);
-  doc.text(`Ancho del encuadre: aprox. ${spanKm.toFixed(1).replace(".", ",")} km`, x + 6, y + h - 6);
+  doc.text(
+    `Ancho del encuadre: aprox. ${spanKm.toFixed(1).replace(".", ",")} km`,
+    x + 6,
+    y + h - 6,
+  );
   // Rosa de los vientos (vectorial, sin glifos especiales)
   const nx = x + w - 14;
   const ny = y + 14;
@@ -416,7 +476,14 @@ export function scatterMap(
 }
 
 /** Caja de advertencia / disclaimer con borde cobre. */
-export function noticeBox(doc: jsPDF, x: number, y: number, w: number, lines: string[], heading?: string): number {
+export function noticeBox(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  w: number,
+  lines: string[],
+  heading?: string,
+): number {
   const inner = w - 26;
   font(doc, "body", "normal", 7.6);
   let textH = 0;
@@ -447,7 +514,15 @@ export function noticeBox(doc: jsPDF, x: number, y: number, w: number, lines: st
 /** Tabla editorial ligera: sin bordes verticales, cabecera en tinta. */
 export function editorialTable(
   doc: jsPDF,
-  opts: { x: number; y: number; w: number; head: string[]; rows: string[][]; widths?: number[]; size?: number }
+  opts: {
+    x: number;
+    y: number;
+    w: number;
+    head: string[];
+    rows: string[][];
+    widths?: number[];
+    size?: number;
+  },
 ): number {
   const { x, y, w, head, rows } = opts;
   const size = opts.size ?? 7.8;
@@ -488,7 +563,15 @@ export function editorialTable(
 /** Bloque QR con leyenda: puerta de entrada al live map / data room. */
 export function qrBlock(
   doc: jsPDF,
-  opts: { x: number; y: number; size: number; qr: string; caption: string; sub?: string; align?: "left" | "center" }
+  opts: {
+    x: number;
+    y: number;
+    size: number;
+    qr: string;
+    caption: string;
+    sub?: string;
+    align?: "left" | "center";
+  },
 ) {
   const { x, y, size, qr } = opts;
   fill(doc, GC_COLOR.white);

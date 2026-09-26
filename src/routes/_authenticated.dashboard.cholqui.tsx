@@ -11,7 +11,6 @@ const TABS = [
   ["spv", "Inversionistas & SPV"],
 ] as const;
 
-
 export const Route = createFileRoute("/_authenticated/dashboard/cholqui")({
   head: () => ({
     meta: [
@@ -83,4 +82,3 @@ function CholquiLivePage() {
     </div>
   );
 }
-

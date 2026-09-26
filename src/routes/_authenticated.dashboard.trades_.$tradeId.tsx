@@ -195,9 +195,7 @@ function TrackingPage() {
       <TradeCopilotPanel
         tradeId={trade.id}
         hasMissingTerms={
-          trade.quantity_t == null ||
-          trade.incoterm == null ||
-          trade.unit_price_usd == null
+          trade.quantity_t == null || trade.incoterm == null || trade.unit_price_usd == null
         }
       />
 
@@ -205,8 +203,6 @@ function TrackingPage() {
       {trade.commodity && (
         <CommodityIntelPanel commodity={trade.commodity} quantityT={trade.quantity_t ?? null} />
       )}
-
-
 
       {/* Carga activa */}
       {activeShipment && (
@@ -379,8 +375,6 @@ function TrackingPage() {
           </div>
         );
       })()}
-
-
 
       {/* Finanzas del trade: cronograma de pagos */}
       <PaymentsSection tradeId={trade.id} />

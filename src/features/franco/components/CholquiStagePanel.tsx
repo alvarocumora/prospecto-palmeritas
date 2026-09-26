@@ -34,9 +34,7 @@ export function CholquiStagePanel({
         <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-accent-brand">
           Estado del activo
         </div>
-        <h2 className="font-display text-2xl mt-1 text-content">
-          Etapa, faena y certificaciones
-        </h2>
+        <h2 className="font-display text-2xl mt-1 text-content">Etapa, faena y certificaciones</h2>
       </header>
 
       <ol className="px-6 py-5 space-y-3">
@@ -44,7 +42,8 @@ export function CholquiStagePanel({
           <li className="text-sm text-content-subtle">Sin etapas registradas.</li>
         )}
         {stages.map((s) => {
-          const Icon = STAGE_ICON[(s.status as keyof typeof STAGE_ICON) ?? "pending"] ?? CircleDashed;
+          const Icon =
+            STAGE_ICON[(s.status as keyof typeof STAGE_ICON) ?? "pending"] ?? CircleDashed;
           return (
             <li key={s.id} className="flex gap-3 items-start">
               <Icon
@@ -59,9 +58,7 @@ export function CholquiStagePanel({
                     {STAGE_LABEL[s.status] ?? s.status} · {s.provenance}
                   </span>
                 </div>
-                {s.evidence && (
-                  <div className="text-xs text-content-subtle mt-1">{s.evidence}</div>
-                )}
+                {s.evidence && <div className="text-xs text-content-subtle mt-1">{s.evidence}</div>}
               </div>
             </li>
           );
@@ -123,9 +120,7 @@ export function CholquiStagePanel({
                   <td className="py-2 pr-3 text-content">{c.kind}</td>
                   <td className="py-2 pr-3 text-content-subtle">{c.issuer ?? "—"}</td>
                   <td className="py-2 pr-3 font-mono text-content-subtle">{c.number ?? "—"}</td>
-                  <td className="py-2 pr-3 font-mono text-content-subtle">
-                    {c.expires_on ?? "—"}
-                  </td>
+                  <td className="py-2 pr-3 font-mono text-content-subtle">{c.expires_on ?? "—"}</td>
                   <td className="py-2 text-content">{CERT_LABEL[c.status] ?? c.status}</td>
                 </tr>
               ))}

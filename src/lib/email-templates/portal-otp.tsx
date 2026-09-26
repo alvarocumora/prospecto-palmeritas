@@ -13,7 +13,9 @@ interface Props {
 }
 
 const Email = ({ code, reference, minutes = 15 }: Props) => (
-  <EmailLayout preview={`Código de acceso al panel de la operación${reference ? ` ${reference}` : ""}`}>
+  <EmailLayout
+    preview={`Código de acceso al panel de la operación${reference ? ` ${reference}` : ""}`}
+  >
     <Heading style={styles.h1}>Código de acceso</Heading>
     <Text style={styles.p}>
       Usa este código para abrir el panel privado de la operación

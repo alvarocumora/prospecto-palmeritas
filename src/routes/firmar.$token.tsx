@@ -212,12 +212,13 @@ function SignPage() {
     }
   };
 
-
-
   const expired = req && req.status === "pending" && new Date(req.expiresAt) < new Date();
 
   return (
-    <div data-theme="im-light" className="brand-light min-h-screen flex flex-col bg-surface text-content">
+    <div
+      data-theme="im-light"
+      className="brand-light min-h-screen flex flex-col bg-surface text-content"
+    >
       <MarketingHeader />
       <main className="flex-1 max-w-3xl mx-auto w-full px-5 py-10">
         {isLoading ? (
@@ -347,7 +348,8 @@ function SignPage() {
                           <div className="mt-2 flex items-start gap-1.5 rounded border border-rose-500/30 bg-rose-500/5 px-2 py-1.5 text-[10px] text-rose-700">
                             <ShieldAlert className="w-3 h-3 mt-0.5 shrink-0" />
                             <span>
-                              {!v.hashMatch && "El hash almacenado no coincide con el recalculado. "}
+                              {!v.hashMatch &&
+                                "El hash almacenado no coincide con el recalculado. "}
                               {!v.orderMatch &&
                                 "El signOrder del firmante está fuera del rango de partes del documento."}
                             </span>
@@ -359,8 +361,8 @@ function SignPage() {
                 </ul>
                 <p className="mt-3 text-[10px] text-content-subtle">
                   El hash de cada firmante se recalcula en el servidor a partir del documento
-                  congelado, su nombre y el momento de la firma. Cualquier modificación posterior
-                  se detecta aquí.
+                  congelado, su nombre y el momento de la firma. Cualquier modificación posterior se
+                  detecta aquí.
                 </p>
               </div>
             )}
@@ -447,7 +449,6 @@ function SignPage() {
                   </div>
                 )}
               </div>
-
             ) : req.status === "void" ? (
               <div className="rounded-xl border border-hairline bg-slate-50 p-5 text-sm text-content-subtle">
                 Esta solicitud de firma fue anulada por el emisor.

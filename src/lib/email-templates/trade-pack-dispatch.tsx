@@ -41,9 +41,8 @@ const Email = ({
   >
     <Heading style={styles.h1}>Document Pack — {commodity ?? "Operación"}</Heading>
     <Text style={styles.p}>
-      Le compartimos el <b>paquete oficial de documentos</b> para la operación
-      indicada. Cada archivo está firmado por Geocapitals con sello de
-      confidencialidad y QR de validación.
+      Le compartimos el <b>paquete oficial de documentos</b> para la operación indicada. Cada
+      archivo está firmado por Geocapitals con sello de confidencialidad y QR de validación.
     </Text>
 
     {customMessage ? (
@@ -101,8 +100,8 @@ const Email = ({
     )}
 
     <Text style={styles.muted}>
-      Consultas técnicas o comerciales: info@geocapitals.com · WhatsApp +56 9
-      6218 4071. Este envío está cubierto por el NCNDA suscrito entre las Partes.
+      Consultas técnicas o comerciales: info@geocapitals.com · WhatsApp +56 9 6218 4071. Este envío
+      está cubierto por el NCNDA suscrito entre las Partes.
     </Text>
 
     <Text
@@ -115,10 +114,9 @@ const Email = ({
         borderLeft: "3px solid #E8C765",
       }}
     >
-      CONFIDENCIAL — Los PDFs adjuntos son propiedad de Geocapitals y de las
-      Partes identificadas. Prohibida su reproducción, distribución o
-      divulgación a terceros sin autorización escrita. Estos documentos no
-      constituyen oferta vinculante; la obligación de compra nace con el SPA
+      CONFIDENCIAL — Los PDFs adjuntos son propiedad de Geocapitals y de las Partes identificadas.
+      Prohibida su reproducción, distribución o divulgación a terceros sin autorización escrita.
+      Estos documentos no constituyen oferta vinculante; la obligación de compra nace con el SPA
       definitivo firmado por ambas Partes.
     </Text>
   </EmailLayout>

@@ -213,7 +213,7 @@ function SupplierPortalPage() {
                 value={
                   profile?.account_type === "mining_owner"
                     ? "Productor / titular minero"
-                    : profile?.account_type ?? "—"
+                    : (profile?.account_type ?? "—")
                 }
               />
             </dl>

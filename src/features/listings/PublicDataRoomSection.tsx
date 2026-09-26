@@ -17,7 +17,6 @@ import {
   type DataRoomFileRow,
 } from "@/lib/dataRoom.functions";
 
-
 type Aggregate = {
   totalFiles: number;
   ndaFiles: number;
@@ -79,7 +78,6 @@ export function PublicDataRoomSection({
       toast.error(e instanceof Error ? e.message : "Error al descargar");
     }
   };
-
 
   return (
     <section className="rounded-xl border border-hairline bg-white p-5">
@@ -250,14 +248,11 @@ function NdaModal({
     }
   };
 
-
   return (
     <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
       <div className="w-full max-w-lg rounded-xl bg-white border border-hairline shadow-xl">
         <header className="flex items-center justify-between p-4 border-b border-hairline">
-          <h3 className="text-sm font-semibold text-content">
-            NDA · {listingTitle}
-          </h3>
+          <h3 className="text-sm font-semibold text-content">NDA · {listingTitle}</h3>
           <button type="button" onClick={onClose} aria-label="Cerrar">
             <X className="w-4 h-4 text-content-subtle" />
           </button>

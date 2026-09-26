@@ -9,7 +9,10 @@ export const Route = createFileRoute("/_authenticated/dashboard/rfqs/$id")({
   head: () => ({
     meta: [
       { title: "Detalle de RFQ — Geocapitals" },
-      { name: "description", content: "Revisa postulaciones de proveedores calificados a tu RFQ y adjudica." },
+      {
+        name: "description",
+        content: "Revisa postulaciones de proveedores calificados a tu RFQ y adjudica.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -55,7 +58,8 @@ function DetailPage() {
     void refresh();
   }, [refresh]);
 
-  if (loading || !data) return <div className="p-8 text-sm text-[hsl(var(--content-subtle))]">Cargando…</div>;
+  if (loading || !data)
+    return <div className="p-8 text-sm text-[hsl(var(--content-subtle))]">Cargando…</div>;
   const { rfq, products, applications } = data;
 
   return (
@@ -64,7 +68,10 @@ function DetailPage() {
       className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]"
     >
       <div className="mx-auto max-w-5xl px-4 py-8">
-        <Link to="/dashboard/rfqs" className="mb-6 inline-flex items-center gap-1 text-xs text-[hsl(var(--content-subtle))]">
+        <Link
+          to="/dashboard/rfqs"
+          className="mb-6 inline-flex items-center gap-1 text-xs text-[hsl(var(--content-subtle))]"
+        >
           <ArrowLeft className="h-3 w-3" /> Mis RFQ
         </Link>
 
@@ -75,7 +82,8 @@ function DetailPage() {
             </div>
             <h1 className="mt-1 font-serif text-3xl">{rfq.buyer_company ?? rfq.buyer_name}</h1>
             <p className="mt-1 text-sm text-[hsl(var(--content-subtle))]">
-              {rfq.incoterm ?? "—"} · Publicado {new Date(rfq.created_at).toLocaleDateString("es-CL")}
+              {rfq.incoterm ?? "—"} · Publicado{" "}
+              {new Date(rfq.created_at).toLocaleDateString("es-CL")}
               {rfq.is_public ? " · Marketplace público" : " · Privado"}
             </p>
           </div>
@@ -134,9 +142,18 @@ function DetailPage() {
             <div className="mt-4 space-y-3">
               {applications.map((a) => {
                 const s = a.supplier;
-                const r = a.risk as { risk_score: number; risk_band: string; mining_score: number; corporate_score: number; compliance_score: number } | null;
+                const r = a.risk as {
+                  risk_score: number;
+                  risk_band: string;
+                  mining_score: number;
+                  corporate_score: number;
+                  compliance_score: number;
+                } | null;
                 return (
-                  <div key={a.id} className="rounded border border-[hsl(var(--hairline))] bg-white p-4">
+                  <div
+                    key={a.id}
+                    className="rounded border border-[hsl(var(--hairline))] bg-white p-4"
+                  >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <div className="font-medium">{s?.legal_name ?? "Proveedor"}</div>
@@ -146,11 +163,15 @@ function DetailPage() {
                         </div>
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${APP_COLOR[a.status] ?? "bg-gray-100"}`}>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${APP_COLOR[a.status] ?? "bg-gray-100"}`}
+                        >
                           {APP_LABEL[a.status] ?? a.status}
                         </span>
                         {r && (
-                          <span className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${RISK_COLOR[r.risk_band] ?? "bg-gray-100"}`}>
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs uppercase tracking-wide ${RISK_COLOR[r.risk_band] ?? "bg-gray-100"}`}
+                          >
                             Riesgo {r.risk_band} · {r.risk_score}
                           </span>
                         )}
@@ -210,7 +231,9 @@ function DetailPage() {
 function Metric({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
-      <div className="text-[10px] uppercase tracking-wide text-[hsl(var(--content-subtle))]">{label}</div>
+      <div className="text-[10px] uppercase tracking-wide text-[hsl(var(--content-subtle))]">
+        {label}
+      </div>
       <div className="font-mono">{value}</div>
     </div>
   );

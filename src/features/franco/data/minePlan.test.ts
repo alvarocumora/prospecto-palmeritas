@@ -11,7 +11,13 @@ import {
 
 describe("buildRamp", () => {
   it("parte en startRate y llega a la meseta", () => {
-    const r = buildRamp({ startRate: 1000, plateau: 15000, rampMonths: 12, totalMonths: 24, gradePct: 1.5 });
+    const r = buildRamp({
+      startRate: 1000,
+      plateau: 15000,
+      rampMonths: 12,
+      totalMonths: 24,
+      gradePct: 1.5,
+    });
     expect(r).toHaveLength(24);
     expect(r[0]).toBe(1000);
     expect(r[11]).toBe(15000);
@@ -19,7 +25,13 @@ describe("buildRamp", () => {
   });
 
   it("es monótona no decreciente", () => {
-    const r = buildRamp({ startRate: 1000, plateau: 20000, rampMonths: 10, totalMonths: 24, gradePct: 2 });
+    const r = buildRamp({
+      startRate: 1000,
+      plateau: 20000,
+      rampMonths: 10,
+      totalMonths: 24,
+      gradePct: 2,
+    });
     for (let i = 1; i < r.length; i++) expect(r[i]).toBeGreaterThanOrEqual(r[i - 1]);
   });
 });
@@ -44,7 +56,10 @@ describe("unitCosts", () => {
 
   it("descompone el costo sin residuo", () => {
     const c = unitCosts(10000);
-    expect(c.variableClpT + c.fixedClpT + c.fleetClpT + c.contingencyClpT).toBeCloseTo(c.totalClpT, 6);
+    expect(c.variableClpT + c.fixedClpT + c.fleetClpT + c.contingencyClpT).toBeCloseTo(
+      c.totalClpT,
+      6,
+    );
   });
 });
 

@@ -44,7 +44,12 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   const chrome = () => {
     fill(doc, GC_COLOR.paper);
     doc.rect(0, 0, W, H, "F");
-    drawHeader(doc, { w: W, m: M, left: `${model.code} · ${model.name}`, right: `Dossier técnico ${model.docVersion}` });
+    drawHeader(doc, {
+      w: W,
+      m: M,
+      left: `${model.code} · ${model.name}`,
+      right: `Dossier técnico ${model.docVersion}`,
+    });
     drawFooter(doc, { w: W, h: H, m: M, left: `${issued} · Documento confidencial`, page });
   };
 
@@ -77,7 +82,9 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   font(doc, "display", "bold", 30);
   ink(doc, GC_COLOR.paper);
-  doc.splitTextToSize(model.name, CW).forEach((l: string, i: number) => doc.text(l, M, 150 + i * 32));
+  doc
+    .splitTextToSize(model.name, CW)
+    .forEach((l: string, i: number) => doc.text(l, M, 150 + i * 32));
   font(doc, "body", "normal", 9);
   ink(doc, GC_COLOR.cobaltSoft);
   doc.text(doc.splitTextToSize(model.subtitle, CW)[0], M, 200);
@@ -86,18 +93,35 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   doc.text(model.location, M, 218);
 
   y = 280;
-  y += kpiGrid(doc, { x: M, y, w: CW, items: model.kpis.slice(0, 4), cols: 2, rowH: 66, valueSize: 16 }) + 28;
+  y +=
+    kpiGrid(doc, {
+      x: M,
+      y,
+      w: CW,
+      items: model.kpis.slice(0, 4),
+      cols: 2,
+      rowH: 66,
+      valueSize: 16,
+    }) + 28;
   eyebrow(doc, M, y, "Alcance");
   y += 14;
-  y += paragraph(
-    doc,
-    M,
+  y +=
+    paragraph(
+      doc,
+      M,
+      y,
+      "Este documento reúne los antecedentes disponibles del proyecto, distinguiendo hechos verificados, resultados de muestreo, interpretación geológica, hipótesis y escenarios. No sustituye un informe bajo un estándar reconocido.",
+      CW,
+      9,
+    ) + 20;
+  qrBlock(doc, {
+    x: M,
     y,
-    "Este documento reúne los antecedentes disponibles del proyecto, distinguiendo hechos verificados, resultados de muestreo, interpretación geológica, hipótesis y escenarios. No sustituye un informe bajo un estándar reconocido.",
-    CW,
-    9
-  ) + 20;
-  qrBlock(doc, { x: M, y, size: 96, qr, caption: "Live map público", sub: model.liveUrl.replace(/^https?:\/\//, "") });
+    size: 96,
+    qr,
+    caption: "Live map público",
+    sub: model.liveUrl.replace(/^https?:\/\//, ""),
+  });
   font(doc, "body", "normal", 7.4);
   ink(doc, GC_COLOR.slate);
   doc.text(`${model.docVersion} · emitido el ${issued}`, M + 120, y + 20);
@@ -123,17 +147,27 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       doc.setLineWidth(0.7);
       doc.rect(M, y, CW, 220);
       y += 232;
-      const source = [model.map.imagery, model.map.source, model.map.crs].filter(Boolean).join(" · ");
+      const source = [model.map.imagery, model.map.source, model.map.crs]
+        .filter(Boolean)
+        .join(" · ");
       y += paragraph(doc, M, y, source, CW, 6.8, GC_COLOR.slate) + 8;
-      if (model.map.caption) y += paragraph(doc, M, y, model.map.caption, CW, 8, GC_COLOR.slate) + 12;
+      if (model.map.caption)
+        y += paragraph(doc, M, y, model.map.caption, CW, 8, GC_COLOR.slate) + 12;
     } else {
-      scatterMap(doc, { x: M, y, w: CW, h: 220, points: model.map.points, caption: model.map.caption, labelTop: 6 });
+      scatterMap(doc, {
+        x: M,
+        y,
+        w: CW,
+        h: 220,
+        points: model.map.points,
+        caption: model.map.caption,
+        labelTop: 6,
+      });
       const capLines = model.map.caption
         ? (doc.splitTextToSize(model.map.caption, CW) as string[]).length
         : 0;
       y += 220 + (capLines ? 6 + capLines * 9 + 14 : 14);
     }
-
   }
 
   if (model.chart) {
@@ -152,7 +186,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       unit: model.chart.unit,
     });
     y += 212;
-    if (model.chart.caption) y += paragraph(doc, M, y, model.chart.caption, CW, 8.2, GC_COLOR.slate) + 14;
+    if (model.chart.caption)
+      y += paragraph(doc, M, y, model.chart.caption, CW, 8.2, GC_COLOR.slate) + 14;
   }
 
   let n = 4;
@@ -173,25 +208,27 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       }
       if (block.kind === "kv") {
         need(70);
-        y += editorialTable(doc, {
-          x: M,
-          y,
-          w: CW,
-          head: ["Concepto", "Detalle"],
-          rows: block.items.map(([k, v]) => [k, v]),
-          widths: [CW * 0.34, CW * 0.66],
-        }) + 16;
+        y +=
+          editorialTable(doc, {
+            x: M,
+            y,
+            w: CW,
+            head: ["Concepto", "Detalle"],
+            rows: block.items.map(([k, v]) => [k, v]),
+            widths: [CW * 0.34, CW * 0.66],
+          }) + 16;
       }
       if (block.kind === "table") {
         need(80);
-        y += editorialTable(doc, {
-          x: M,
-          y,
-          w: CW,
-          head: block.head,
-          rows: block.rows,
-          widths: block.widths?.map((p) => CW * p),
-        }) + 16;
+        y +=
+          editorialTable(doc, {
+            x: M,
+            y,
+            w: CW,
+            head: block.head,
+            rows: block.rows,
+            widths: block.widths?.map((p) => CW * p),
+          }) + 16;
       }
     }
     n += 1;
@@ -212,7 +249,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     });
     donutLegend(doc, M + 200, y + 34, CW - 200, model.allocation.slices);
     y += 190;
-    if (model.allocation.caption) y += paragraph(doc, M, y, model.allocation.caption, CW, 8.2, GC_COLOR.slate) + 12;
+    if (model.allocation.caption)
+      y += paragraph(doc, M, y, model.allocation.caption, CW, 8.2, GC_COLOR.slate) + 12;
     n += 1;
   }
 
@@ -220,14 +258,15 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     need(120);
     eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Hitos`);
     y += 16;
-    y += editorialTable(doc, {
-      x: M,
-      y,
-      w: CW,
-      head: ["Plazo", "Hito"],
-      rows: model.milestones.map((ms) => [ms.when, ms.what]),
-      widths: [CW * 0.22, CW * 0.78],
-    }) + 18;
+    y +=
+      editorialTable(doc, {
+        x: M,
+        y,
+        w: CW,
+        head: ["Plazo", "Hito"],
+        rows: model.milestones.map((ms) => [ms.when, ms.what]),
+        widths: [CW * 0.22, CW * 0.78],
+      }) + 18;
     n += 1;
   }
 
@@ -246,10 +285,13 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   doc.line(M, y, W - M, y);
   y += 12;
 
-
   font(doc, "body", "normal", 8);
   ink(doc, GC_COLOR.slate);
-  doc.text(`Contacto: ${[model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ")}`, M, y);
+  doc.text(
+    `Contacto: ${[model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ")}`,
+    M,
+    y,
+  );
   doc.text(`${GC_BRAND.site} · ${GC_BRAND.email} · WhatsApp ${GC_BRAND.whatsapp}`, M, y + 13);
 
   // Renumerar pies con el total real

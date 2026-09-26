@@ -42,7 +42,6 @@ function termsFingerprintCtx(ctx: Awaited<ReturnType<typeof loadTradeCtx>>) {
   };
 }
 
-
 export const TRADE_PACK_DOCS = ["ficha", "loi", "ncnda", "icpo", "spa"] as const;
 export type TradePackDoc = (typeof TRADE_PACK_DOCS)[number];
 
@@ -108,7 +107,15 @@ async function loadTradeCtx(sb: SupabaseClient, tradeId: string) {
     .select("user_id, display_name, email")
     .in("user_id", ids.length ? ids : ["00000000-0000-0000-0000-000000000000"]);
   const profOf = (uid: string | null) =>
-    uid ? ((profs ?? []) as Array<{ user_id: string; display_name: string | null; email: string | null }>).find((p) => p.user_id === uid) : undefined;
+    uid
+      ? (
+          (profs ?? []) as Array<{
+            user_id: string;
+            display_name: string | null;
+            email: string | null;
+          }>
+        ).find((p) => p.user_id === uid)
+      : undefined;
 
   const buyerInternal = profOf(trade.buyer_user_id);
   const sellerInternal = profOf(trade.seller_user_id);
@@ -120,13 +127,21 @@ async function loadTradeCtx(sb: SupabaseClient, tradeId: string) {
   };
 
   const buyer = buyerInternal
-    ? { role: "Buyer", name: buyerInternal.display_name ?? buyerInternal.email ?? "Buyer", email: buyerInternal.email ?? undefined }
+    ? {
+        role: "Buyer",
+        name: buyerInternal.display_name ?? buyerInternal.email ?? "Buyer",
+        email: buyerInternal.email ?? undefined,
+      }
     : trade.counterparty_role === "buyer"
       ? { role: "Buyer", name: cp.name || "Buyer externo", company: cp.company, email: cp.email }
       : { role: "Buyer", name: "Buyer (por confirmar)" };
 
   const seller = sellerInternal
-    ? { role: "Seller", name: sellerInternal.display_name ?? sellerInternal.email ?? "Seller", email: sellerInternal.email ?? undefined }
+    ? {
+        role: "Seller",
+        name: sellerInternal.display_name ?? sellerInternal.email ?? "Seller",
+        email: sellerInternal.email ?? undefined,
+      }
     : trade.counterparty_role === "seller"
       ? { role: "Seller", name: cp.name || "Seller externo", company: cp.company, email: cp.email }
       : { role: "Seller", name: "Seller (por confirmar)" };
@@ -251,7 +266,6 @@ export const generateTradePack = createServerFn({ method: "POST" })
         errors.push({ type, error: e instanceof Error ? e.message : String(e) });
       }
     }
-
 
     // Registrar evento en el timeline del trade
     try {
@@ -378,7 +392,11 @@ export const dispatchTradePack = createServerFn({ method: "POST" })
         trade_id: data.tradeId,
         actor_user_id: context.userId,
         kind: "pack_dispatched",
-        detail: JSON.stringify({ recipients: data.recipients, docs: docs.map((d) => d.type), results }),
+        detail: JSON.stringify({
+          recipients: data.recipients,
+          docs: docs.map((d) => d.type),
+          results,
+        }),
       });
     } catch {
       /* no bloquea */
@@ -390,9 +408,7 @@ export const dispatchTradePack = createServerFn({ method: "POST" })
 /** Lista todas las versiones históricas del pack de un trade, agrupadas por doc_type. */
 export const listTradePackVersions = createServerFn({ method: "GET" })
   .middleware([requireTradeRole])
-  .inputValidator((d: unknown) =>
-    z.object({ tradeId: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: unknown) => z.object({ tradeId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
     const { data: rows, error } = await sb
@@ -419,9 +435,7 @@ export const listTradePackVersions = createServerFn({ method: "GET" })
 /** Firma la URL de una versión histórica específica y la devuelve por 60 días. */
 export const signTradePackVersion = createServerFn({ method: "POST" })
   .middleware([requireTradeRole])
-  .inputValidator((d: unknown) =>
-    z.object({ versionId: z.string().uuid() }).parse(d),
-  )
+  .inputValidator((d: unknown) => z.object({ versionId: z.string().uuid() }).parse(d))
   .handler(async ({ data, context }) => {
     const sb = asSb(context.supabase);
     // RLS ya restringe a participantes del trade
@@ -440,4 +454,3 @@ export const signTradePackVersion = createServerFn({ method: "POST" })
     if (sErr) throw sErr;
     return { url: signed.signedUrl, filename: r.filename };
   });
-

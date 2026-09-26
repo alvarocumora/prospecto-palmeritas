@@ -40,13 +40,13 @@ const Email = ({
   operacionUrl,
   fichaUrl,
 }: Props) => (
-  <EmailLayout preview={`Ficha de operación · ${commodity ?? "Commodity"}${reference ? ` · ${reference}` : ""}`}>
-    <Heading style={styles.h1}>
-      Ficha de operación · {commodity ?? "Commodity"}
-    </Heading>
+  <EmailLayout
+    preview={`Ficha de operación · ${commodity ?? "Commodity"}${reference ? ` · ${reference}` : ""}`}
+  >
+    <Heading style={styles.h1}>Ficha de operación · {commodity ?? "Commodity"}</Heading>
     <Text style={styles.p}>
-      Resumen comercial de la operación {reference ? <b>{reference}</b> : null}. Contiene
-      únicamente condiciones públicas de venta y especificaciones del producto.
+      Resumen comercial de la operación {reference ? <b>{reference}</b> : null}. Contiene únicamente
+      condiciones públicas de venta y especificaciones del producto.
     </Text>
 
     <KeyValueBlock
@@ -79,8 +79,8 @@ const Email = ({
 
     <Hr style={styles.hr} />
     <Text style={styles.muted}>
-      Geocapitals · info@geocapitals.com · WhatsApp +56 9 6218 4071. Documento comercial
-      preliminar, no constituye oferta vinculante.
+      Geocapitals · info@geocapitals.com · WhatsApp +56 9 6218 4071. Documento comercial preliminar,
+      no constituye oferta vinculante.
     </Text>
   </EmailLayout>
 );

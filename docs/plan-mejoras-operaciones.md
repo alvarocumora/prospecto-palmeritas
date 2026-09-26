@@ -9,15 +9,15 @@
 Coexisten **dos** implementaciones del mismo caso de uso (crear operación → invitar
 contraparte por token → data room → firmar), en **tablas distintas**:
 
-| | **Trades** (cableado al menú) | **Operaciones** (huérfano, más completo) |
-|---|---|---|
-| Entrada UI | Sidebar "Trade Desk" (`_authenticated.tsx:169`) | **ninguna** (solo URL/correo) |
-| Backend | `lib/tradeOps.functions` | `lib/operations/operations.functions` + `portal.functions` |
-| Tablas | `commodity_trades`, `trade_documents` | `operations`, `operation_documents`, `operation_invitations` |
-| Contraparte | `/operacion/$token` | `/portal/buyer\|seller/$token` (portal tripartito) |
-| Firmas | — | `signature_envelopes` / `document_signatures` |
-| Integración comercial | **sí** (sourcing, clientes, partners, anticipos, cobranza, envíos) | **no** (isla) |
-| Checklist de documentos (REICON) | — | **sí** (`operation_document_structure`, ya construido) |
+|                                  | **Trades** (cableado al menú)                                      | **Operaciones** (huérfano, más completo)                     |
+| -------------------------------- | ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| Entrada UI                       | Sidebar "Trade Desk" (`_authenticated.tsx:169`)                    | **ninguna** (solo URL/correo)                                |
+| Backend                          | `lib/tradeOps.functions`                                           | `lib/operations/operations.functions` + `portal.functions`   |
+| Tablas                           | `commodity_trades`, `trade_documents`                              | `operations`, `operation_documents`, `operation_invitations` |
+| Contraparte                      | `/operacion/$token`                                                | `/portal/buyer\|seller/$token` (portal tripartito)           |
+| Firmas                           | —                                                                  | `signature_envelopes` / `document_signatures`                |
+| Integración comercial            | **sí** (sourcing, clientes, partners, anticipos, cobranza, envíos) | **no** (isla)                                                |
+| Checklist de documentos (REICON) | —                                                                  | **sí** (`operation_document_structure`, ya construido)       |
 
 **Consecuencia:** el sistema que la gente alcanza (Trades) no tiene el modelo de
 compliance (KYC/checklist/portal/firmas) que exige la intermediación real; y el que

@@ -83,7 +83,12 @@ function resolveSymbol(input: string): string {
 export const getCommodityIntel = createServerFn({ method: "GET" })
   .middleware([requireTradeRole])
   .inputValidator((d: unknown) =>
-    z.object({ commodity: z.string().min(1), limitComps: z.number().int().min(1).max(50).optional() }).parse(d),
+    z
+      .object({
+        commodity: z.string().min(1),
+        limitComps: z.number().int().min(1).max(50).optional(),
+      })
+      .parse(d),
   )
   .handler(async ({ data, context }): Promise<IntelResult> => {
     const sb = asSb(context.supabase);

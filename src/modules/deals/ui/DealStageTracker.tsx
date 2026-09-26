@@ -15,7 +15,6 @@ import { cn } from "@/lib/utils";
 
 const EXIT_STAGES: DealStage[] = ["retirado", "rechazado", "descartado", "expirado"];
 
-
 /** Traza el avance del deal (interesado → NDA → data room → oferta → DD → cierre). */
 export function DealStageTracker({
   listingId,
@@ -79,8 +78,6 @@ export function DealStageTracker({
           {DEAL_STAGE_LABEL[data.stage]}
         </span>
       </div>
-
-
 
       {/* Línea de etapas */}
       <ol className="flex flex-wrap items-center gap-1">
@@ -172,7 +169,6 @@ export function DealStageTracker({
           )}
         </div>
       )}
-
 
       {data.events.length > 0 && (
         <div>
