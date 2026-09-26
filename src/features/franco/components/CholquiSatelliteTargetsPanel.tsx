@@ -80,8 +80,9 @@ export function CholquiSatelliteTargetsPanel() {
               `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.5">
                 <strong>${code} · ${indexLabel(a.indexCode)}</strong><br/>
                 Puntaje <b>${a.score != null ? a.score.toFixed(2) : "s/d"}</b> · severidad ${a.severity}<br/>
-                Área ${a.areaHa != null ? `${num(a.areaHa, 1)} ha` : "s/d"}<br/>
-                <span style="opacity:.65">Detección satelital derivada — no verificada en terreno</span>
+                ${a.zScore != null ? `z-score ${a.zScore.toFixed(2)}<br/>` : ""}
+                Tenencia: <b>${a.withinTenure ? "dentro de concesión conocida" : "fuera — requiere verificar tenencia"}</b><br/>
+                <span style="opacity:.65">${a.provenance}</span>
               </div>`,
             )
             .addTo(anomalyGroup);
@@ -188,9 +189,11 @@ export function CholquiSatelliteTargetsPanel() {
             Anomalías espectrales y malla de sondajes propuesta
           </h2>
           <p className="text-sm text-content-subtle mt-1 max-w-3xl">
-            Anomalías derivadas de razones de banda Sentinel-2 sobre el AOI de Cholqui y la malla de
-            sondajes que se desprende de ellas. Una anomalía es un indicio de alteración, no
-            mineralización; la malla es una propuesta de exploración, no un programa comprometido.
+            Anomalías derivadas de razones de banda Sentinel-2 L2A sobre el AOI de Cholqui y la
+            malla de sondajes que se desprende de ellas. Una anomalía es un indicio de alteración,
+            no mineralización; la malla es una propuesta de exploración, no un programa
+            comprometido. Sólo se proponen sondajes sobre anomalías dentro de las concesiones
+            conocidas: las de fuera quedan como contexto regional hasta verificar la tenencia.
           </p>
         </div>
         <ProjectDocsMenu
@@ -224,10 +227,15 @@ export function CholquiSatelliteTargetsPanel() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-b border-hairline bg-surface-2">
             {[
-              ["Anomalías", String(data.summary.anomalies)],
               [
-                "Puntaje máximo",
-                data.summary.maxScore != null ? data.summary.maxScore.toFixed(2) : "s/d",
+                "Anomalías",
+                `${data.summary.anomalies} · ${data.summary.withinTenure} en tenencia`,
+              ],
+              [
+                "Superficie interpretable",
+                data.coverage.typicalPct != null
+                  ? `${num(data.coverage.typicalPct, 1)} % (mejor caso ${data.coverage.bestCasePct != null ? num(data.coverage.bestCasePct, 1) : "s/d"} %)`
+                  : "s/d",
               ],
               ["Plataformas propuestas", String(data.summary.collars)],
               ["Metraje propuesto", `${num(data.summary.totalMeters)} m`],

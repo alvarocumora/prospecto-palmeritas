@@ -1,9 +1,13 @@
 /**
  * Anomalías satelitales de Cholqui + malla de sondajes propuesta.
- * Lectura pública: sólo el proyecto Cholqui, sólo campos no sensibles.
+ *
+ * FUENTE: capa real derivada de Sentinel-2 L2A (motor Nivel 0, lecturas STAC
+ * reales) publicada en `src/data/geo/cholqui_satellite_candidates.geojson`,
+ * en EPSG:4326 (CRS84) — no se reproyecta. Procedencia DERIVADO / INTERPRETADO:
+ * no es evidencia verificada en terreno ni identifica mineralización.
  */
 import { createServerFn } from "@tanstack/react-start";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import candidatesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
 import {
   buildDrillGrid,
   distanceM,
@@ -13,7 +17,6 @@ import {
   type SatelliteAnomaly,
 } from "./drillGrid";
 
-const CHOLQUI_PROJECT_ID = "e5360f13-1647-4e44-bb13-c0614e6f39fe";
 const CHOLQUI_CENTER = { lat: -33.8543, lng: -71.043 };
 
 export type AnomalyRing = Array<[number, number]>;
@@ -23,14 +26,31 @@ export type CholquiAnomaly = SatelliteAnomaly & {
   ring: AnomalyRing;
   /** Distancia al centro del distrito, en metros. */
   distanceToCenterM: number;
+  /** Realce estadístico sobre el fondo del AOI. */
+  zScore: number | null;
+  /** Etiqueta de procedencia que viaja con el dato. */
+  provenance: string;
+};
+
+export type CholquiCoverage = {
+  typicalPct: number | null;
+  bestCasePct: number | null;
+  conclusive: boolean;
+  sensor: string;
+  scenesUsed: number | null;
+  headline: string;
+  tenureNote: string;
 };
 
 export type CholquiSatelliteTargets = {
   runDate: string;
+  coverage: CholquiCoverage;
   anomalies: CholquiAnomaly[];
   collars: ProposedCollar[];
   summary: {
     anomalies: number;
+    withinTenure: number;
+    outsideTenure: number;
     drillable: number;
     collars: number;
     totalMeters: number;
@@ -39,41 +59,79 @@ export type CholquiSatelliteTargets = {
   };
 };
 
+type RawFeature = {
+  geometry?: { type?: string; coordinates?: unknown } | null;
+  properties?: Record<string, unknown> | null;
+};
+
+type RawCollection = {
+  metadata?: Record<string, unknown> | null;
+  features?: RawFeature[];
+};
+
+const collection = JSON.parse(candidatesRaw) as RawCollection;
+
+function str(value: unknown, fallback: string): string {
+  return typeof value === "string" && value.trim() ? value : fallback;
+}
+
+function numOrNull(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function readCoverage(): CholquiCoverage {
+  const meta = (collection.metadata ?? {}) as Record<string, unknown>;
+  const cov = (meta["coverage"] ?? {}) as Record<string, unknown>;
+  return {
+    typicalPct: numOrNull(cov["interpretable_typical_pct"]),
+    bestCasePct: numOrNull(cov["interpretable_bestcase_pct"]),
+    conclusive: cov["spectral_conclusive"] === true,
+    sensor: str(meta["sensor"], "Sentinel-2 L2A"),
+    scenesUsed: numOrNull(meta["scenes_used"]),
+    headline: str(cov["headline"], ""),
+    tenureNote: str(meta["nota_espacial"], ""),
+  };
+}
+
+function readAnomalies(): CholquiAnomaly[] {
+  const out: CholquiAnomaly[] = [];
+  const features = Array.isArray(collection.features) ? collection.features : [];
+  features.forEach((f, i) => {
+    const centroid = polygonCentroid(f.geometry);
+    if (!centroid) return;
+    const p = (f.properties ?? {}) as Record<string, unknown>;
+    const ring = (Array.isArray(f.geometry?.coordinates) ? f.geometry?.coordinates[0] : []) as AnomalyRing;
+    out.push({
+      id: `CHQ-SAT-${String(i + 1).padStart(2, "0")}`,
+      indexCode: str(p["index_code"], "SIN_INDICE"),
+      severity: str(p["severity"], "s/d"),
+      score: numOrNull(p["score"]),
+      areaHa: numOrNull(p["area_ha"]),
+      notes: typeof p["notes"] === "string" ? (p["notes"] as string) : null,
+      detectedAt: typeof p["detected_at"] === "string" ? (p["detected_at"] as string) : null,
+      withinTenure: p["dentro_concesion"] === true,
+      lat: centroid.lat,
+      lng: centroid.lng,
+      ring: Array.isArray(ring) ? ring : [],
+      zScore: numOrNull(p["z_score"]),
+      provenance: str(p["procedencia"], "DERIVADO / INTERPRETADO — no verificado en terreno"),
+      distanceToCenterM: distanceM(
+        CHOLQUI_CENTER.lat,
+        CHOLQUI_CENTER.lng,
+        centroid.lat,
+        centroid.lng,
+      ),
+    });
+  });
+  return out.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+}
+
 export const getCholquiSatelliteTargets = createServerFn({ method: "GET" }).handler(
   async (): Promise<CholquiSatelliteTargets> => {
-    const { data, error } = await supabaseAdmin
-      .from("satellite_anomalies")
-      .select("id, index_code, severity, score, area_ha, notes, detected_at, geometry")
-      .eq("project_id", CHOLQUI_PROJECT_ID)
-      .order("score", { ascending: false, nullsFirst: false });
-    if (error) throw new Error(error.message);
+    const coverage = readCoverage();
+    const anomalies = readAnomalies();
 
-    const anomalies: CholquiAnomaly[] = [];
-    for (const row of data ?? []) {
-      const centroid = polygonCentroid(row.geometry);
-      if (!centroid) continue;
-      const g = row.geometry as { coordinates?: unknown } | null;
-      const ring = (Array.isArray(g?.coordinates) ? g?.coordinates[0] : []) as AnomalyRing;
-      anomalies.push({
-        id: row.id,
-        indexCode: row.index_code ?? "SIN_INDICE",
-        severity: row.severity ?? "s/d",
-        score: row.score != null ? Number(row.score) : null,
-        areaHa: row.area_ha != null ? Number(row.area_ha) : null,
-        notes: row.notes ?? null,
-        detectedAt: row.detected_at ?? null,
-        lat: centroid.lat,
-        lng: centroid.lng,
-        ring: Array.isArray(ring) ? ring : [],
-        distanceToCenterM: distanceM(
-          CHOLQUI_CENTER.lat,
-          CHOLQUI_CENTER.lng,
-          centroid.lat,
-          centroid.lng,
-        ),
-      });
-    }
-
+    // Sólo se propone perforación dentro de la tenencia conocida.
     const collars = buildDrillGrid(anomalies, CHOLQUI_CENTER);
 
     const counts = new Map<string, number>();
@@ -81,14 +139,18 @@ export const getCholquiSatelliteTargets = createServerFn({ method: "GET" }).hand
 
     const dates = anomalies.map((a) => a.detectedAt).filter((d): d is string => Boolean(d));
     const scores = anomalies.map((a) => a.score).filter((s): s is number => s != null);
+    const within = anomalies.filter((a) => a.withinTenure);
 
     return {
       runDate: dates.length ? dates.slice().sort().reverse()[0]!.slice(0, 10) : "",
+      coverage,
       anomalies,
       collars,
       summary: {
         anomalies: anomalies.length,
-        drillable: anomalies.filter((a) => (a.score ?? 0) >= 0.55 && a.indexCode !== "NDVI").length,
+        withinTenure: within.length,
+        outsideTenure: anomalies.length - within.length,
+        drillable: within.filter((a) => (a.score ?? 0) >= 0.55 && a.indexCode !== "NDVI").length,
         collars: collars.length,
         totalMeters: totalMeters(collars),
         maxScore: scores.length ? Math.max(...scores) : null,
