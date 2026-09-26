@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ org_name }} — Ficha de oferta {{ d.ref }}</title>
+<style>{{ css }}</style>
+</head>
+<body>
+
+{% macro head() %}
+<div class="topbar"><i class="t-navy"></i><i class="t-blue"></i><i class="t-gold"></i></div>
+<div class="doc-head">
+  <div class="mark">{% if logo %}<img src="{{ logo }}" alt="{{ org_name }}">{% else %}GC{% endif %}</div>
+  <div class="titles">
+    <div class="brand">{{ org_name }}</div>
+    <div class="subtitle">{{ tagline }}</div>
+  </div>
+  <div class="docmeta">
+    <div><b>Ficha de oferta</b></div>
+    <div>Ref: {{ d.ref | tbc }}</div>
+    <div>Fecha: {{ d.fecha | tbc }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+{# ============================ PÁGINA 1 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h1>{{ d.titulo | tbc }}</h1>
+  <p class="lead">
+    <span class="badge navy">{{ d.commodity | tbc }}</span>
+    {% if d.estado %}<span class="badge gold">{{ d.estado | upper }}</span>{% endif %}
+  </p>
+
+  <div class="cols">
+    <div>
+      <h3>Material</h3>
+      <div class="kv"><div class="k">Descripción</div><div class="v">{{ d.material.descripcion | tbc }}</div></div>
+      <div class="kv"><div class="k">Forma</div><div class="v">{{ d.material.forma | tbc }}</div></div>
+      <div class="kv"><div class="k">Origen</div><div class="v">{{ d.material.origen | tbc }}</div></div>
+      <div class="kv"><div class="k">Humedad (%)</div><div class="v">{{ d.material.humedad_pct | tbc }}</div></div>
+    </div>
+    <div>
+      <h3>Cantidad</h3>
+      <div class="kv"><div class="k">Toneladas</div><div class="v">{{ d.cantidad.toneladas | num(0) }}</div></div>
+      <div class="kv"><div class="k">Base</div><div class="v">{{ d.cantidad.base | tbc }}</div></div>
+      <div class="kv"><div class="k">Periodicidad</div><div class="v">{{ d.cantidad.periodicidad | tbc }}</div></div>
+      <div class="kv"><div class="k">Recurrencia</div><div class="v">{{ d.cantidad.recurrencia | tbc }}</div></div>
+    </div>
+  </div>
+
+  <h2>Contenido por escenario de ley</h2>
+  <div class="box gold">
+    <div class="box-t">Supuesto de cálculo — no es un ensaye</div>
+    <div class="small">Las leyes son <b>escenarios supuestos</b> para dimensionar el contenido.
+      El contenido real se determina por assay de laboratorio acreditado sobre el lote.
+      {% if fino_cap %}{{ fino_cap }}{% endif %}</div>
+  </div>
+  {% if fino_rows %}
+  <table>
+    <thead><tr>
+      {% for key, label, dec in fino_cols %}
+      <th{% if not loop.first %} class="num"{% endif %}>{{ label }}</th>
+      {% endfor %}
+    </tr></thead>
+    <tbody>
+      {% for row in fino_rows %}
+      <tr>
+        {% for key, label, dec in fino_cols %}
+        <td{% if not loop.first %} class="num"{% endif %}>{{ row[key] | num(dec) }}</td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="tbc">Por confirmar (faltan tonelaje o escenarios de ley).</p>
+  {% endif %}
+
+  <div class="disc">
+    {{ org_name }} · Documento referencial, no vinculante. Cifras de fino calculadas sobre
+    supuestos de ley; el valor comercial depende del assay, la humedad y las deducciones.
+  </div>
+</div>
+
+{# ============================ PÁGINA 2 ============================ #}
+<div class="page">
+  {{ head() }}
+  <h2>Condiciones comerciales</h2>
+  <div class="cols">
+    <div>
+      <div class="kv"><div class="k">Incoterm</div><div class="v">{{ d.comercial.incoterm | tbc }}</div></div>
+      <div class="kv"><div class="k">Punto de entrega</div><div class="v">{{ d.comercial.punto_entrega | tbc }}</div></div>
+      <div class="kv"><div class="k">Moneda</div><div class="v">{{ d.comercial.moneda | tbc }}</div></div>
+      <div class="kv"><div class="k">Base de precio</div><div class="v">{{ d.comercial.base_precio | tbc }}</div></div>
+    </div>
+    <div>
+      <div class="kv"><div class="k">Pago por</div><div class="v">{{ d.comercial.pago_por | tbc }}</div></div>
+      <div class="kv"><div class="k">% pagable</div><div class="v">{{ d.comercial.payable_pct | tbc }}</div></div>
+      <div class="kv"><div class="k">Condiciones de pago</div><div class="v">{{ d.comercial.condiciones_pago | tbc }}</div></div>
+    </div>
+  </div>
+
+  <h3>Deducciones (por confirmar en términos)</h3>
+  {% if d.comercial.deducciones %}
+  <ul>{% for x in d.comercial.deducciones %}<li>{{ x }}</li>{% endfor %}</ul>
+  {% else %}<p class="tbc">Por confirmar</p>{% endif %}
+
+  <h2>Logística</h2>
+  <div class="cols">
+    <div>
+      <div class="kv"><div class="k">Puerto referencia</div><div class="v">{{ d.logistica.puerto_referencia | tbc }}</div></div>
+      <div class="kv"><div class="k">Transporte</div><div class="v">{{ d.logistica.transporte | tbc }}</div></div>
+    </div>
+    <div>
+      <div class="kv"><div class="k">Plazo estimado</div><div class="v">{{ d.logistica.plazo_estimado | tbc }}</div></div>
+    </div>
+  </div>
+
+  <h2>Muestreo y ensaye</h2>
+  <div class="kv"><div class="k">Protocolo</div><div class="v">{{ d.muestreo_ensaye.protocolo | tbc }}</div></div>
+  <div class="kv"><div class="k">Laboratorio</div><div class="v">{{ d.muestreo_ensaye.laboratorio | tbc }}</div></div>
+  <div class="kv"><div class="k">Arbitraje</div><div class="v">{{ d.muestreo_ensaye.arbitraje | tbc }}</div></div>
+
+  <h2>Documentación requerida</h2>
+  {% if d.documentacion_requerida %}
+  <ul>{% for x in d.documentacion_requerida %}<li>{{ x }}</li>{% endfor %}</ul>
+  {% else %}<p class="tbc">Por confirmar</p>{% endif %}
+
+  {% if d.notas %}
+  <div class="box">
+    <div class="box-t">Notas</div>
+    <ul class="mb0">{% for n in d.notas %}<li class="small">{{ n }}</li>{% endfor %}</ul>
+  </div>
+  {% endif %}
+
+  <div class="disc">
+    {{ org_name }}{% if contact_email %} · {{ contact_email }}{% endif %}{% if contact_phone %} · {{ contact_phone }}{% endif %}
+    <br>Documento confidencial y referencial. No constituye oferta vinculante ni asesoría.
+    Los datos marcados como <span class="tbc">Por confirmar</span> se validan antes de cerrar la operación.
+  </div>
+</div>
+
+</body>
+</html>

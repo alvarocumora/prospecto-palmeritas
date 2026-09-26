@@ -1,0 +1,76 @@
+# ============================================================================
+# Ficha de oferta — concentrado de oro (ejemplo)
+# Regla inviolable: NO inventar datos. Todo campo sin dato confirmado se deja
+# vacío (null) o se omite; el generador lo renderiza como "Por confirmar".
+# Los escenarios de ley son SUPUESTOS de cálculo, rotulados como tales.
+# ============================================================================
+
+ref: AU-CONC-202608-CQB
+fecha: 2026-08-13
+estado: borrador                     # borrador | en_revision | publicada
+titulo: Concentrado de oro — Región de Coquimbo
+commodity: Concentrado de oro (Au)
+idioma: es
+
+vendedor:
+  rol: Productor / faenas de pequeña minería
+  pais: Chile
+  region: Coquimbo
+  # nombre y datos de identificación: se completan al validar contraparte
+  nombre: null
+  contacto: null
+
+material:
+  descripcion: Concentrado de flotación de oro
+  forma: Concentrado (sacos / big-bags)
+  humedad_pct: null                  # por confirmar con análisis
+  origen: Región de Coquimbo, Chile
+
+cantidad:
+  toneladas: 16
+  base: seca                         # seca | húmeda — a confirmar en contrato
+  periodicidad: spot                 # spot | mensual | trimestral
+  recurrencia: null
+
+# Ley: unidad y metal pagable. g/t con metal precioso -> se reporta en oz troy.
+ley:
+  unidad: g/t
+  metal: Au
+# Escenarios de ley: SON SUPUESTOS para el cálculo de fino, no un ensaye.
+escenarios_ley: [300, 400, 475, 550]
+
+comercial:
+  incoterm: EXW                      # EXW | FOB | CIF — por confirmar
+  punto_entrega: null
+  moneda: USD
+  # Precio: referenciado a fixing LBMA menos deducciones metalúrgicas y cargos.
+  # NO se fija un precio inventado; se declara la base y las deducciones pendientes.
+  base_precio: LBMA AM fixing (referencia)
+  pago_por: contenido fino pagable
+  payable_pct: null                  # % pagable — por confirmar en términos
+  deducciones:
+    - Cargo de tratamiento (TC) — por confirmar
+    - Cargo de refinación (RC) — por confirmar
+    - Deducción por humedad — por confirmar
+  condiciones_pago: null             # p.ej. 90% provisional / 10% final
+
+logistica:
+  puerto_referencia: null
+  transporte: null
+  plazo_estimado: null
+
+muestreo_ensaye:
+  protocolo: null                    # p.ej. norma de muestreo acordada
+  laboratorio: null
+  arbitraje: null
+
+documentacion_requerida:
+  - Certificado de análisis (assay) de laboratorio acreditado
+  - Origen del material / trazabilidad
+  - Guía de despacho y documentación de transporte
+  - Cumplimiento KYC de contraparte
+
+notas:
+  - Los escenarios de ley son supuestos de cálculo, no un ensaye confirmado.
+  - Precio final sujeto a assay, humedad y deducciones metalúrgicas.
+  - Documento referencial; no constituye oferta vinculante.
