@@ -17,8 +17,6 @@ import {
   Download,
   Printer,
   ExternalLink,
-  GitCompareArrows,
-  ScanSearch,
 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
