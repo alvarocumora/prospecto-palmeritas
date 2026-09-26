@@ -1,6 +1,11 @@
 import { useMemo, useState } from "react";
 import { CHOLQUI_SCENARIOS, fmtClp, fmtClpM } from "../data/cholqui";
 import {
+  CHOLQUI_COMMERCIAL_DESTINATIONS,
+  LEGACY_FREIGHT_ASSUMPTION,
+  auditDeclaredProductionPlan,
+} from "../data/commercialModel";
+import {
   CONTINGENCY_PCT,
   FIXED_COSTS,
   PLATEAU_OPTIONS,
@@ -29,6 +34,7 @@ export function CholquiMinePlanPanel() {
     [plateau, grade],
   );
   const option = PLATEAU_OPTIONS.find((o) => o.plateau === plateau) ?? PLATEAU_OPTIONS[0];
+  const productionAudit = auditDeclaredProductionPlan();
   const maxRate = Math.max(...plan.months.map((m) => m.rate));
   const cashMin = Math.min(...plan.months.map((m) => m.cumulativeCashflowClp));
   const cashMax = Math.max(...plan.months.map((m) => m.cumulativeCashflowClp));
@@ -113,6 +119,37 @@ export function CholquiMinePlanPanel() {
         {option.note}
       </div>
 
+      <div className="px-6 py-4 border-b border-hairline bg-surface-2">
+        <div className="text-[10px] font-mono uppercase tracking-wider text-copper">
+          Control de consistencia comercial · PENDING_DD
+        </div>
+        <p className="text-xs text-content-subtle mt-2 max-w-4xl">
+          El documento declara {nf.format(productionAudit.declaredTonnes)} t en 24 meses, mientras
+          la rampa matemática 1.000→15.000 t/mes genera{" "}
+          {nf.format(productionAudit.mathematicalRampTonnes)} t (+{nf.format(productionAudit.deltaTonnes)} t).
+          El payback de esta simulación queda bloqueado como KPI de decisión hasta reconciliar
+          inventario, metalurgia, aceptación comercial, distancia vial, flete y liquidación.
+        </p>
+        <div className="mt-3 grid md:grid-cols-2 gap-2 text-[11px] text-content-subtle">
+          {CHOLQUI_COMMERCIAL_DESTINATIONS.map((destination) => (
+            <div key={destination.id} className="border border-hairline rounded-lg p-3 bg-white">
+              <span className="font-mono text-content">{destination.operator}</span> ·{" "}
+              {destination.facility}
+              <div className="mt-1">
+                Producto: {destination.productFit === "OXIDE_CONFIRMED" ? "óxidos confirmados" : "aceptación por confirmar"}
+                {" · "}Distancia vial: por verificar{" · "}Cotización: pendiente
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-[10px] text-content-subtle mt-3">
+          Flete histórico del modelo: {LEGACY_FREIGHT_ASSUMPTION.distanceKm} km × CLP{" "}
+          {nf.format(LEGACY_FREIGHT_ASSUMPTION.clpPerTkm)}/t·km = CLP{" "}
+          {nf.format(LEGACY_FREIGHT_ASSUMPTION.clpPerT)}/t. Es un supuesto de planificación, no una
+          distancia vial ni una cotización verificadas.
+        </p>
+      </div>
+
       <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-b border-hairline bg-surface-2">
         {(
           [
@@ -121,7 +158,9 @@ export function CholquiMinePlanPanel() {
             ["Superávit operacional", fmtClpM(plan.operatingSurplusClp)],
             [
               "Equilibrio acumulado",
-              plan.paybackMonth ? `Mes ${plan.paybackMonth}` : "No alcanzado en 24 meses",
+              plan.decisionGradePaybackMonth
+                ? `Mes ${plan.decisionGradePaybackMonth}`
+                : "Bloqueado · DD comercial",
             ],
             ["Tarifa aplicada", `${fmtClp(plan.tariffClpTms)}/tms`],
             ["Costo medio del ciclo", `${fmtClp(Math.round(plan.avgUnitCostClpT))}/t`],
@@ -363,7 +402,9 @@ export function CholquiMinePlanPanel() {
                   {fmtClpM(s.run.netAfterCapexClp)}
                 </td>
                 <td className="py-1.5 text-right font-mono text-content-muted">
-                  {s.run.paybackMonth ? `Mes ${s.run.paybackMonth}` : "> 24 m"}
+                  {s.run.decisionGradePaybackMonth
+                    ? `Mes ${s.run.decisionGradePaybackMonth}`
+                    : "Bloqueado"}
                 </td>
               </tr>
             ))}
