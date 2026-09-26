@@ -3,7 +3,11 @@ import { SNGM_CONCESIONES_URL, sngmQueryGeoJSON } from "@/lib/sngm";
 
 export type CadastreMatch = "official" | "project_exact" | "project_candidate";
 
-const esc = (v: unknown) => String(v ?? "—").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+const esc = (v: unknown) =>
+  String(v ?? "—").replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  );
 
 function roleOf(p: Record<string, unknown>) {
   const n = String(p.NUMERO_ROL ?? "").trim();
@@ -12,12 +16,16 @@ function roleOf(p: Record<string, unknown>) {
 }
 
 export async function queryOfficialCadastreByBounds(bounds: {
-  west: number; south: number; east: number; north: number;
+  west: number;
+  south: number;
+  east: number;
+  north: number;
 }) {
   return sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
     bbox: [bounds.west, bounds.south, bounds.east, bounds.north],
     limit: 2000,
-    outFields: "OBJECTID,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,DATUM,HUSO",
+    outFields:
+      "OBJECTID,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,DATUM,HUSO",
   });
 }
 
@@ -29,11 +37,18 @@ export function buildOfficialCadastreLayer(
   return L.geoJSON(fc as never, {
     style: (feature) => {
       const p = (feature?.properties ?? {}) as Record<string, unknown>;
-      const name = String(p.NOMBRE ?? "").trim().toUpperCase();
+      const name = String(p.NOMBRE ?? "")
+        .trim()
+        .toUpperCase();
       const exact = projectNames.has(name);
       const exploration = String(p.TIPO_CONCESION ?? "").toUpperCase() === "EXPLORACION";
       const color = exact ? "#22c55e" : exploration ? "#38bdf8" : "#f59e0b";
-      return { color, weight: exact ? 2.8 : 1.4, fillColor: color, fillOpacity: exact ? 0.16 : 0.055 };
+      return {
+        color,
+        weight: exact ? 2.8 : 1.4,
+        fillColor: color,
+        fillOpacity: exact ? 0.16 : 0.055,
+      };
     },
     onEachFeature: (feature, layer) => {
       const p = (feature.properties ?? {}) as Record<string, unknown>;
@@ -58,7 +73,8 @@ export function buildOfficialCadastreLayer(
       });
       layer.bindPopup(el);
     },
-    attribution: 'Catastro de Concesiones Mineras &copy; <a href="https://www.sernageomin.cl">SERNAGEOMIN</a>',
+    attribution:
+      'Catastro de Concesiones Mineras &copy; <a href="https://www.sernageomin.cl">SERNAGEOMIN</a>',
   });
 }
 

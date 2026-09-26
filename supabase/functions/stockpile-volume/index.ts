@@ -118,7 +118,6 @@ Deno.serve(async (req) => {
     const memRes = await requireProjectMember(sb, userId, projectId);
     if ("error" in memRes) return memRes.error;
 
-
     const { data: row, error } = await sb
       .from("drone_rasters")
       .select("id,name,storage_path,pixel_size_m,crs")

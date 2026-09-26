@@ -194,7 +194,11 @@ export const VARIABLE_COSTS: Array<{ key: string; label: string; clpPerT: number
 /** Costos fijos mensuales independientes del tonelaje, CLP/mes. */
 export const FIXED_COSTS: Array<{ key: string; label: string; clpPerMonth: number }> = [
   { key: "admin", label: "Administración y supervisión", clpPerMonth: 38_000_000 },
-  { key: "legal", label: "Permisos, patentes, seguros y provisión de cierre", clpPerMonth: 12_000_000 },
+  {
+    key: "legal",
+    label: "Permisos, patentes, seguros y provisión de cierre",
+    clpPerMonth: 12_000_000,
+  },
   { key: "campamento", label: "Campamento, servicios y comunicaciones", clpPerMonth: 9_000_000 },
 ];
 
@@ -273,7 +277,6 @@ export function fleetForRate(rate: number): {
     monthlyClp: lines.reduce((a, l) => a + l.monthlyClp, 0),
   };
 }
-
 
 export type UnitCost = {
   rate: number;

@@ -154,10 +154,7 @@ async function ensureFolders(sb: Admin, roomId: string, createdBy: string) {
 }
 
 async function folderMap(sb: Admin, roomId: string) {
-  const { data } = await sb
-    .from("data_room_folders")
-    .select("id, name")
-    .eq("data_room_id", roomId);
+  const { data } = await sb.from("data_room_folders").select("id, name").eq("data_room_id", roomId);
   const byId = new Map<string, string>();
   const byCode = new Map<string, string>();
   for (const r of data ?? []) {

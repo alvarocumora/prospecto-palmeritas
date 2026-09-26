@@ -12,7 +12,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/rfqs/nuevo")({
   head: () => ({
     meta: [
       { title: "Nuevo RFQ — Geocapitals" },
-      { name: "description", content: "Crea una solicitud de cotización (RFQ) minera y publícala a proveedores verificados." },
+      {
+        name: "description",
+        content:
+          "Crea una solicitud de cotización (RFQ) minera y publícala a proveedores verificados.",
+      },
     ],
   }),
   component: NewRfq,
@@ -134,7 +138,11 @@ function NewRfq() {
             </Field>
             <Field label="Publicación">
               <label className="mt-2 flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={is_public} onChange={(e) => setIsPublic(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={is_public}
+                  onChange={(e) => setIsPublic(e.target.checked)}
+                />
                 Visible en el marketplace público
               </label>
             </Field>
@@ -144,15 +152,16 @@ function NewRfq() {
         <div className="mt-6 space-y-4 rounded border border-[hsl(var(--hairline))] bg-white p-5">
           <div className="flex items-center justify-between">
             <h2 className="font-serif text-lg">Productos solicitados</h2>
-            <Button size="sm" variant="outline" onClick={() => setProducts((p) => [...p, emptyProduct()])}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setProducts((p) => [...p, emptyProduct()])}
+            >
               <Plus className="mr-1 h-3 w-3" /> Añadir producto
             </Button>
           </div>
           {products.map((p, idx) => (
-            <div
-              key={idx}
-              className="rounded border border-[hsl(var(--hairline))] p-3"
-            >
+            <div key={idx} className="rounded border border-[hsl(var(--hairline))] p-3">
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-xs font-mono uppercase tracking-wider text-[hsl(var(--content-subtle))]">
                   Producto {idx + 1}
@@ -172,7 +181,11 @@ function NewRfq() {
                   <Input
                     value={p.product_name}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, product_name: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) =>
+                          i === idx ? { ...x, product_name: e.target.value } : x,
+                        ),
+                      )
                     }
                     placeholder="Ej: Cátodos de cobre grado A"
                   />
@@ -181,7 +194,9 @@ function NewRfq() {
                   <Input
                     value={p.purity}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, purity: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) => (i === idx ? { ...x, purity: e.target.value } : x)),
+                      )
                     }
                     placeholder="99.99% Cu"
                   />
@@ -190,7 +205,9 @@ function NewRfq() {
                   <Input
                     value={p.packaging}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, packaging: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) => (i === idx ? { ...x, packaging: e.target.value } : x)),
+                      )
                     }
                     placeholder="Bundles 2 t"
                   />
@@ -200,7 +217,11 @@ function NewRfq() {
                     type="number"
                     value={p.qty_monthly_mt}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, qty_monthly_mt: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) =>
+                          i === idx ? { ...x, qty_monthly_mt: e.target.value } : x,
+                        ),
+                      )
                     }
                   />
                 </Field>
@@ -209,7 +230,11 @@ function NewRfq() {
                     type="number"
                     value={p.qty_total_mt}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, qty_total_mt: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) =>
+                          i === idx ? { ...x, qty_total_mt: e.target.value } : x,
+                        ),
+                      )
                     }
                   />
                 </Field>
@@ -219,7 +244,9 @@ function NewRfq() {
                     value={p.target_price_usd}
                     onChange={(e) =>
                       setProducts((prev) =>
-                        prev.map((x, i) => (i === idx ? { ...x, target_price_usd: e.target.value } : x)),
+                        prev.map((x, i) =>
+                          i === idx ? { ...x, target_price_usd: e.target.value } : x,
+                        ),
                       )
                     }
                     placeholder="USD/t"
@@ -229,7 +256,9 @@ function NewRfq() {
                   <Input
                     value={p.incoterm}
                     onChange={(e) =>
-                      setProducts((prev) => prev.map((x, i) => (i === idx ? { ...x, incoterm: e.target.value } : x)))
+                      setProducts((prev) =>
+                        prev.map((x, i) => (i === idx ? { ...x, incoterm: e.target.value } : x)),
+                      )
                     }
                     placeholder={incoterm}
                   />
@@ -239,7 +268,9 @@ function NewRfq() {
                     value={p.port_destination}
                     onChange={(e) =>
                       setProducts((prev) =>
-                        prev.map((x, i) => (i === idx ? { ...x, port_destination: e.target.value } : x)),
+                        prev.map((x, i) =>
+                          i === idx ? { ...x, port_destination: e.target.value } : x,
+                        ),
                       )
                     }
                   />
@@ -251,7 +282,12 @@ function NewRfq() {
 
         <div className="mt-6 rounded border border-[hsl(var(--hairline))] bg-white p-5">
           <Field label="Notas comerciales">
-            <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Condiciones especiales, pagos, plazos, etc." />
+            <Textarea
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Condiciones especiales, pagos, plazos, etc."
+            />
           </Field>
         </div>
 
@@ -262,10 +298,7 @@ function NewRfq() {
         )}
 
         <div className="mt-6 flex justify-end gap-2">
-          <Button
-            disabled={!buyer_name || !products[0]?.product_name || busy}
-            onClick={submit}
-          >
+          <Button disabled={!buyer_name || !products[0]?.product_name || busy} onClick={submit}>
             {busy ? "Publicando…" : "Publicar RFQ"}
           </Button>
         </div>

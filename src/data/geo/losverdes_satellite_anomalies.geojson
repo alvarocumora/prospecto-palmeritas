@@ -1,0 +1,626 @@
+{
+  "type": "FeatureCollection",
+  "name": "losverdes_satellite_anomalies",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "project": "Los Verdes-Tilama",
+    "sensor": "Sentinel-2 L2A",
+    "provenance": "DERIVADO / INTERPRETADO",
+    "coverage": {
+      "interpretable_typical_pct": 92.3,
+      "interpretable_bestcase_pct": 96.2,
+      "spectral_conclusive": true
+    },
+    "n": 15,
+    "dentro_catastro": 14,
+    "config_sha256": "52d8451e0541aa6b254e33747adafa13dc9e7aa669f1ba16e0965efb0ff4f994",
+    "nota": "dentro_concesion = dentro de catastro oficial SERNAGEOMIN. Tenencia del proyecto pendiente (export DB). Malla de sondajes NO generada hasta confirmar tenencia."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0953996231919,
+              -32.03352254054054
+            ],
+            [
+              -71.09412437680811,
+              -32.03352254054054
+            ],
+            [
+              -71.09412437680811,
+              -32.032441459459456
+            ],
+            [
+              -71.0953996231919,
+              -32.032441459459456
+            ],
+            [
+              -71.0953996231919,
+              -32.03352254054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "alta",
+        "score": 0.879,
+        "z_score": 7.91,
+        "gossan": 1.834,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=7.91 (gossan 1.83). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.11880359285806,
+              -32.02916554054054
+            ],
+            [
+              -71.11752840714195,
+              -32.02916554054054
+            ],
+            [
+              -71.11752840714195,
+              -32.02808445945946
+            ],
+            [
+              -71.11880359285806,
+              -32.02808445945946
+            ],
+            [
+              -71.11880359285806,
+              -32.02916554054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.627,
+        "z_score": 5.64,
+        "gossan": 4.062,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.64 (gossan 4.06). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09493461068718,
+              -32.03172654054054
+            ],
+            [
+              -71.09365938931282,
+              -32.03172654054054
+            ],
+            [
+              -71.09365938931282,
+              -32.03064545945946
+            ],
+            [
+              -71.09493461068718,
+              -32.03064545945946
+            ],
+            [
+              -71.09493461068718,
+              -32.03172654054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.598,
+        "z_score": 5.38,
+        "gossan": 1.685,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.38 (gossan 1.69). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.11921078003425,
+              -32.05603554054054
+            ],
+            [
+              -71.11793521996574,
+              -32.05603554054054
+            ],
+            [
+              -71.11793521996574,
+              -32.05495445945946
+            ],
+            [
+              -71.11921078003425,
+              -32.05495445945946
+            ],
+            [
+              -71.11921078003425,
+              -32.05603554054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.577,
+        "z_score": 5.19,
+        "gossan": 3.724,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.19 (gossan 3.72). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08974564268226,
+              -32.03632154054054
+            ],
+            [
+              -71.08847035731773,
+              -32.03632154054054
+            ],
+            [
+              -71.08847035731773,
+              -32.03524045945946
+            ],
+            [
+              -71.08974564268226,
+              -32.03524045945946
+            ],
+            [
+              -71.08974564268226,
+              -32.03632154054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.567,
+        "z_score": 5.1,
+        "gossan": 3.734,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.1 (gossan 3.73). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09971658376685,
+              -32.02785954054054
+            ],
+            [
+              -71.09844141623316,
+              -32.02785954054054
+            ],
+            [
+              -71.09844141623316,
+              -32.02677845945946
+            ],
+            [
+              -71.09971658376685,
+              -32.02677845945946
+            ],
+            [
+              -71.09971658376685,
+              -32.02785954054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.55,
+        "z_score": 4.95,
+        "gossan": 1.589,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.95 (gossan 1.59). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09593959424338,
+              -32.02936454054054
+            ],
+            [
+              -71.09466440575663,
+              -32.02936454054054
+            ],
+            [
+              -71.09466440575663,
+              -32.02828345945946
+            ],
+            [
+              -71.09593959424338,
+              -32.02828345945946
+            ],
+            [
+              -71.09593959424338,
+              -32.02936454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.524,
+        "z_score": 4.72,
+        "gossan": 6.506,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.72 (gossan 6.51). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09183363365048,
+              -32.03502454054054
+            ],
+            [
+              -71.09055836634951,
+              -32.03502454054054
+            ],
+            [
+              -71.09055836634951,
+              -32.03394345945946
+            ],
+            [
+              -71.09183363365048,
+              -32.03394345945946
+            ],
+            [
+              -71.09183363365048,
+              -32.03502454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.523,
+        "z_score": 4.71,
+        "gossan": 4.757,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.71 (gossan 4.76). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.119608516186,
+              -32.018148540540544
+            ],
+            [
+              -71.118333483814,
+              -32.018148540540544
+            ],
+            [
+              -71.118333483814,
+              -32.01706745945946
+            ],
+            [
+              -71.119608516186,
+              -32.01706745945946
+            ],
+            [
+              -71.119608516186,
+              -32.018148540540544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.522,
+        "z_score": 4.7,
+        "gossan": 3.741,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.7 (gossan 3.74). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12278251581726,
+              -32.01809554054054
+            ],
+            [
+              -71.12150748418274,
+              -32.01809554054054
+            ],
+            [
+              -71.12150748418274,
+              -32.01701445945946
+            ],
+            [
+              -71.12278251581726,
+              -32.01701445945946
+            ],
+            [
+              -71.12278251581726,
+              -32.01809554054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.512,
+        "z_score": 4.61,
+        "gossan": 3.066,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.61 (gossan 3.07). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0993587974271,
+              -32.05853054054054
+            ],
+            [
+              -71.0980832025729,
+              -32.05853054054054
+            ],
+            [
+              -71.0980832025729,
+              -32.057449459459455
+            ],
+            [
+              -71.0993587974271,
+              -32.057449459459455
+            ],
+            [
+              -71.0993587974271,
+              -32.05853054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.511,
+        "z_score": 4.6,
+        "gossan": 2.861,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.6 (gossan 2.86). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12881167333337,
+              -32.04072254054054
+            ],
+            [
+              -71.12753632666663,
+              -32.04072254054054
+            ],
+            [
+              -71.12753632666663,
+              -32.03964145945946
+            ],
+            [
+              -71.12881167333337,
+              -32.03964145945946
+            ],
+            [
+              -71.12881167333337,
+              -32.04072254054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.506,
+        "z_score": 4.55,
+        "gossan": 2.815,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.55 (gossan 2.81). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12801281547054,
+              -32.06111854054054
+            ],
+            [
+              -71.12673718452946,
+              -32.06111854054054
+            ],
+            [
+              -71.12673718452946,
+              -32.06003745945946
+            ],
+            [
+              -71.12801281547054,
+              -32.06003745945946
+            ],
+            [
+              -71.12801281547054,
+              -32.06111854054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.494,
+        "z_score": 4.45,
+        "gossan": 4.672,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.45 (gossan 4.67). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.10029263016187,
+              -32.03452354054054
+            ],
+            [
+              -71.09901736983812,
+              -32.03452354054054
+            ],
+            [
+              -71.09901736983812,
+              -32.03344245945946
+            ],
+            [
+              -71.10029263016187,
+              -32.03344245945946
+            ],
+            [
+              -71.10029263016187,
+              -32.03452354054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.49,
+        "z_score": 4.41,
+        "gossan": 2.497,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.41 (gossan 2.5). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1296728052145,
+              -32.05964754054054
+            ],
+            [
+              -71.1283971947855,
+              -32.05964754054054
+            ],
+            [
+              -71.1283971947855,
+              -32.058566459459456
+            ],
+            [
+              -71.1296728052145,
+              -32.058566459459456
+            ],
+            [
+              -71.1296728052145,
+              -32.05964754054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.486,
+        "z_score": 4.37,
+        "gossan": 2.142,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.37 (gossan 2.14). DERIVADO Sentinel-2. Tenencia del proyecto por confirmar."
+      }
+    }
+  ]
+}

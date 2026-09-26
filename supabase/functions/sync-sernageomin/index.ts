@@ -92,7 +92,6 @@ Deno.serve(async (req) => {
     const memRes = await requireProjectMember(supabase, authRes.userId, projectId);
     if ("error" in memRes) return memRes.error;
 
-
     const { data: rows, error } = await supabase
       .from("mining_concessions")
       .select("id, code, name, holder, area_ha, expires_at, status")

@@ -3,10 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { X, Copy, Check, ExternalLink, ShieldCheck, Loader2 } from "lucide-react";
-import {
-  createSignFlow,
-  createSignRequest,
-} from "@/lib/documents/signing.functions";
+import { createSignFlow, createSignRequest } from "@/lib/documents/signing.functions";
 import { signUrl } from "@/lib/publicUrl";
 import {
   SPECIAL_DOCS,
@@ -120,8 +117,8 @@ export function SpecialDocSignDialog({ docId, onClose }: Props) {
           <div className="px-6 py-5 space-y-4">
             <p className="text-sm text-content-subtle">
               Configura los firmantes. Cada uno recibirá su propio enlace único bajo{" "}
-              <span className="font-mono">/firmar/…</span>. El estado (pendiente, firmado,
-              vencido) queda en <span className="font-mono">/dashboard/firmas</span>.
+              <span className="font-mono">/firmar/…</span>. El estado (pendiente, firmado, vencido)
+              queda en <span className="font-mono">/dashboard/firmas</span>.
             </p>
 
             <div className="space-y-3">
@@ -221,10 +218,7 @@ export function SpecialDocSignDialog({ docId, onClose }: Props) {
             </div>
             <div className="space-y-2">
               {issued.map((link) => (
-                <div
-                  key={link.url}
-                  className="rounded-xl border border-hairline bg-surface-2 p-3"
-                >
+                <div key={link.url} className="rounded-xl border border-hairline bg-surface-2 p-3">
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <div className="text-xs font-mono uppercase tracking-wider text-content-subtle">
                       {link.role}

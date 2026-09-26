@@ -7,7 +7,13 @@ import type { BarDatum, MapPoint, Slice } from "./brand/kit";
 
 export type DocKpi = { label: string; value: string; note?: string };
 
-export type EvidenceStatus = "VERIFIED" | "OBSERVED" | "DECLARED" | "DERIVED" | "CONCEPTUAL" | "PENDING_DD";
+export type EvidenceStatus =
+  | "VERIFIED"
+  | "OBSERVED"
+  | "DECLARED"
+  | "DERIVED"
+  | "CONCEPTUAL"
+  | "PENDING_DD";
 export type DataQualityFlag = { status: EvidenceStatus; label: string; detail: string };
 
 export type DocBlock =

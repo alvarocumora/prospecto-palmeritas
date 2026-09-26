@@ -23,14 +23,21 @@ async function validatePortalToken(token: string, role: "buyer" | "seller") {
   const sb = await admin();
   const { data } = await sb
     .from("operation_invitations")
-    .select("id, operation_id, participant_type, status, expires_at, revoked_at, invited_email, invited_name")
+    .select(
+      "id, operation_id, participant_type, status, expires_at, revoked_at, invited_email, invited_name",
+    )
     .eq("secure_token", token)
     .maybeSingle();
   if (!data) throw new Error("Enlace inválido");
   if (data.participant_type !== role) throw new Error("Enlace no corresponde a este portal");
   if (data.revoked_at || data.status === "revoked") throw new Error("El enlace fue revocado");
   if (new Date(data.expires_at) < new Date()) throw new Error("El enlace ha expirado");
-  return data as { id: string; operation_id: string; invited_email: string; invited_name: string | null };
+  return data as {
+    id: string;
+    operation_id: string;
+    invited_email: string;
+    invited_name: string | null;
+  };
 }
 
 function sanitizeFilename(name: string) {
@@ -51,7 +58,10 @@ const uploadSchema = z.object({
 });
 
 async function computeSha256(bytes: Uint8Array): Promise<string> {
-  const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+  const ab = bytes.buffer.slice(
+    bytes.byteOffset,
+    bytes.byteOffset + bytes.byteLength,
+  ) as ArrayBuffer;
   const buf = await crypto.subtle.digest("SHA-256", ab);
   return Array.from(new Uint8Array(buf))
     .map((b) => b.toString(16).padStart(2, "0"))
@@ -66,7 +76,7 @@ export const uploadOperationDocument = createServerFn({ method: "POST" })
 
     let operationId = data.operation_id;
     let uploaderId: string | null = null;
-    let uploaderRole: Role = data.role;
+    const uploaderRole: Role = data.role;
 
     if (data.token) {
       if (data.role === "geocapitals") throw new Error("Rol no válido para portal externo");
@@ -113,7 +123,6 @@ export const uploadOperationDocument = createServerFn({ method: "POST" })
     if (uploaderRole === "buyer") visibility = "buyer_shared";
     else if (uploaderRole === "seller") visibility = "seller_shared";
     else visibility = data.visibility ?? "all_parties";
-
 
     const { data: doc, error: docErr } = await sb
       .from("operation_documents")
@@ -173,9 +182,7 @@ export const getOperationDocumentUrl = createServerFn({ method: "POST" })
       const inv = await validatePortalToken(data.token, data.role);
       if (inv.operation_id !== doc.operation_id) throw new Error("No autorizado");
       const allowed =
-        data.role === "buyer"
-          ? ["buyer_shared", "all_parties"]
-          : ["seller_shared", "all_parties"];
+        data.role === "buyer" ? ["buyer_shared", "all_parties"] : ["seller_shared", "all_parties"];
       if (!allowed.includes(doc.visibility as string)) throw new Error("Documento no visible");
     } else {
       const { requireSupabaseAuthDirect } = await import("./portal.helpers.server");

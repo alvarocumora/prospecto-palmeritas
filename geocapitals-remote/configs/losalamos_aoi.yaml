@@ -1,0 +1,19 @@
+name: losalamos
+# AOI de los paños Arcillas (Los Álamos / Nahuelbuta, Arauco). WGS84.
+aoi:
+  crs: EPSG:4326
+  bbox: [-73.325, -37.695, -73.070, -37.585]
+output_crs: EPSG:32718   # WGS84 / UTM huso 18S
+seasons:
+  months: [1, 2, 3, 4]     # verano-otoño (zona húmeda: ampliar ventana)
+  years: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  max_cloud_pct: 20        # región lluviosa: umbral de nubes más alto
+masks:
+  ndvi_threshold: 0.25
+  ndvi_sensitivity: [0.20, 0.25, 0.30]
+structure:
+  known_strikes_deg: []
+  min_lineament_length_m: 150
+cadastre:
+  source: sernageomin_wfs
+  buffer_m: 60

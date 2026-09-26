@@ -21,11 +21,18 @@ Recomendación: **A** para instrumentos que firman ambas partes (NCNDA, ICPO, FC
 IMFPA, contrato de suministro); **B** para declaraciones internas del proveedor.
 
 ### Cambio de modelo sugerido (`model.ts`)
+
 Agregar un campo opcional de traducción a las cláusulas y un helper de render:
 
 ```ts
 // En ClauseDef, opcional:
-export type ClauseDef = { key: string; label: string; text: string; textEn?: string; defaultOn?: boolean };
+export type ClauseDef = {
+  key: string;
+  label: string;
+  text: string;
+  textEn?: string;
+  defaultOn?: boolean;
+};
 
 // Helper para emitir bilingüe (ES sobre EN) cuando lang === 'both':
 export function biline(es: string, en: string, lang: "es" | "en" | "both" = "both"): string {
@@ -103,11 +110,13 @@ build: (val, active, ctx, lang: "es" | "en" | "both" = "both"): GeneratedDoc => 
 ```
 
 ## Cláusula de prevalencia (importante en bilingüe)
+
 En todo documento bilingüe, agregar que **una versión prevalece** ante discrepancia
 (normalmente la del derecho aplicable). En el ejemplo, la cláusula de ley indica que
 prevalece la versión en español. Ajustar según la operación.
 
 ## Alcance
+
 - **Prioridad bilingüe (firman ambas partes):** NCNDA, ICPO, FCO, IMFPA, contrato de
   suministro, LOI, term sheet.
 - **Declaraciones del proveedor / políticas:** bilingüe opcional (útil si la debida
@@ -116,6 +125,7 @@ prevalece la versión en español. Ajustar según la operación.
   `biline()`.
 
 ## Nota legal
+
 Las traducciones EN son de referencia operativa, **no** traducción jurada. Para uso
 contractual real, validar con abogado y traductor certificado si la jurisdicción lo
 exige.

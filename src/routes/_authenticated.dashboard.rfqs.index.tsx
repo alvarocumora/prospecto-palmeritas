@@ -96,7 +96,9 @@ function RfqIndex() {
                     <td className="p-3 font-mono text-xs">{r.public_ref}</td>
                     <td className="p-3">
                       <div className="font-medium">{r.buyer_company ?? r.buyer_name}</div>
-                      <div className="text-xs text-[hsl(var(--content-subtle))]">{r.buyer_name}</div>
+                      <div className="text-xs text-[hsl(var(--content-subtle))]">
+                        {r.buyer_name}
+                      </div>
                     </td>
                     <td className="p-3">{r.destination_country ?? "—"}</td>
                     <td className="p-3">{r.incoterm ?? "—"}</td>

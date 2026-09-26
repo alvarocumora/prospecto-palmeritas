@@ -29,13 +29,17 @@ async function validateToken(token: string, expectedRole: "buyer" | "seller") {
   const admin = await getAdmin();
   const { data: inv } = await admin
     .from("operation_invitations")
-    .select("id, operation_id, participant_type, invited_email, invited_name, status, expires_at, revoked_at, accepted_at, accepted_by")
+    .select(
+      "id, operation_id, participant_type, invited_email, invited_name, status, expires_at, revoked_at, accepted_at, accepted_by",
+    )
     .eq("secure_token", token)
     .maybeSingle();
   if (!inv) throw new Error("Enlace inválido");
   const invitation = inv as unknown as InvitationRow;
-  if (invitation.participant_type !== expectedRole) throw new Error("Enlace no corresponde a este portal");
-  if (invitation.status === "revoked" || invitation.revoked_at) throw new Error("El enlace fue revocado");
+  if (invitation.participant_type !== expectedRole)
+    throw new Error("Enlace no corresponde a este portal");
+  if (invitation.status === "revoked" || invitation.revoked_at)
+    throw new Error("El enlace fue revocado");
   if (new Date(invitation.expires_at) < new Date()) throw new Error("El enlace ha expirado");
   return invitation;
 }
@@ -64,9 +68,7 @@ export const getPortalView = createServerFn({ method: "POST" })
     if (!op) throw new Error("Operación no disponible");
 
     const visibilityFilter: Array<"buyer_shared" | "seller_shared" | "all_parties"> =
-      data.role === "buyer"
-        ? ["buyer_shared", "all_parties"]
-        : ["seller_shared", "all_parties"];
+      data.role === "buyer" ? ["buyer_shared", "all_parties"] : ["seller_shared", "all_parties"];
 
     const messageChannels: Array<"buyer_gc" | "seller_gc" | "tripartite"> =
       data.role === "buyer" ? ["buyer_gc", "tripartite"] : ["seller_gc", "tripartite"];
@@ -74,7 +76,9 @@ export const getPortalView = createServerFn({ method: "POST" })
     const [docs, tasks, messages] = await Promise.all([
       admin
         .from("operation_documents")
-        .select("id, kind, title, description, version, visibility, review_status, review_notes, created_at, uploaded_by_role, is_frozen")
+        .select(
+          "id, kind, title, description, version, visibility, review_status, review_notes, created_at, uploaded_by_role, is_frozen",
+        )
         .eq("operation_id", inv.operation_id)
         .in("visibility", visibilityFilter)
         .order("created_at", { ascending: false }),
@@ -122,7 +126,9 @@ export const claimPortalInvitation = createServerFn({ method: "POST" })
     const admin = await getAdmin();
 
     if (email && email.toLowerCase() !== inv.invited_email.toLowerCase()) {
-      throw new Error(`El enlace fue emitido para ${inv.invited_email}. Inicia sesión con ese correo.`);
+      throw new Error(
+        `El enlace fue emitido para ${inv.invited_email}. Inicia sesión con ese correo.`,
+      );
     }
 
     // Upsert participante
@@ -150,12 +156,17 @@ export const claimPortalInvitation = createServerFn({ method: "POST" })
 
     // Actualiza estado de contraparte a access_created si aún era invitation_sent/not_invited
     const patch: Record<string, string> =
-      data.role === "buyer" ? { buyer_status: "access_created" } : { seller_status: "access_created" };
+      data.role === "buyer"
+        ? { buyer_status: "access_created" }
+        : { seller_status: "access_created" };
     await admin
       .from("operations")
       .update(patch as never)
       .eq("id", inv.operation_id)
-      .in(data.role === "buyer" ? "buyer_status" : "seller_status", ["not_invited", "invitation_sent"]);
+      .in(data.role === "buyer" ? "buyer_status" : "seller_status", [
+        "not_invited",
+        "invitation_sent",
+      ]);
 
     await admin.from("operation_access_logs").insert({
       operation_id: inv.operation_id,

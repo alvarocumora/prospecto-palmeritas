@@ -47,8 +47,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
   component: Consent,
   errorComponent: ({ error }) => (
     <main className="min-h-screen flex items-center justify-center p-6 text-sm">
-      No se pudo cargar la solicitud de autorización:{" "}
-      {String((error as Error)?.message ?? error)}
+      No se pudo cargar la solicitud de autorización: {String((error as Error)?.message ?? error)}
     </main>
   ),
 });
@@ -90,8 +89,8 @@ function Consent() {
           </p>
           <h1 className="text-xl font-bold">Conectar {clientName} a tu cuenta</h1>
           <p className="text-sm text-muted-foreground">
-            {clientName} podrá usar las herramientas de Geocapitals en tu nombre
-            (marketplace de commodities y deal flow de proyectos publicados).
+            {clientName} podrá usar las herramientas de Geocapitals en tu nombre (marketplace de
+            commodities y deal flow de proyectos publicados).
           </p>
         </div>
         {error && (

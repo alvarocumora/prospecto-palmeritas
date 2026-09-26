@@ -97,7 +97,6 @@ const CreateInput = z.object({
   notes: z.string().trim().max(1000).optional(),
 });
 
-
 export const createTradePayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => CreateInput.parse(d))
@@ -182,9 +181,13 @@ export const cancelTradePayment = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .neq("status", "pagado");
     if (error) throw new Error(error.message);
-    const b = before as
-      | { trade_id: string; kind: string; label: string | null; amount_usd: number | null; status: string }
-      | null;
+    const b = before as {
+      trade_id: string;
+      kind: string;
+      label: string | null;
+      amount_usd: number | null;
+      status: string;
+    } | null;
     if (b && b.status !== "cancelado" && b.status !== "pagado") {
       await logEvent(
         sb,
@@ -196,4 +199,3 @@ export const cancelTradePayment = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
-

@@ -447,10 +447,7 @@ export function DocumentEditor({
         const next = { ...flowTokens, [order]: res.token };
         setFlowTokens(next);
         try {
-          window.localStorage.setItem(
-            flowStorageKey,
-            JSON.stringify({ flowId, tokens: next }),
-          );
+          window.localStorage.setItem(flowStorageKey, JSON.stringify({ flowId, tokens: next }));
         } catch {}
         await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
         toast.success("Link regenerado y copiado.");
@@ -538,7 +535,6 @@ export function DocumentEditor({
       setFlowBusy(false);
     }
   };
-
 
   const requestSignature = async () => {
     if (!user) {
@@ -1224,8 +1220,7 @@ function SignFlowPanel({
       if (!expected) return false;
       const nameMismatch =
         expected.name && s.signerNameExpected && expected.name !== s.signerNameExpected;
-      const emailMismatch =
-        expected.email && s.signerEmail && expected.email !== s.signerEmail;
+      const emailMismatch = expected.email && s.signerEmail && expected.email !== s.signerEmail;
       return Boolean(nameMismatch || emailMismatch);
     });
 
@@ -1237,8 +1232,8 @@ function SignFlowPanel({
           <div>
             <div className="text-[13px] font-medium text-content">Firma en orden</div>
             <div className="text-[11px] text-content-subtle">
-              {parties.length} firmantes · cada uno recibe su propio link. El siguiente sólo
-              puede firmar una vez que firmó el anterior.
+              {parties.length} firmantes · cada uno recibe su propio link. El siguiente sólo puede
+              firmar una vez que firmó el anterior.
             </div>
           </div>
         </div>
@@ -1274,13 +1269,12 @@ function SignFlowPanel({
         </div>
       ) : null}
 
-
       {!started ? (
         <>
           <div className="rounded-md border border-amber-300/60 bg-amber-50/60 px-3 py-2 text-[11px] text-amber-800 mb-3">
             El orden de firma sigue exactamente a las partes del contrato:
-            <b> #1 = Parte A</b>, #2 = Parte B, #3 = Parte C. Los datos se toman de los
-            campos «Firmante» del documento — edítalos ahí para no descuadrar el orden.
+            <b> #1 = Parte A</b>, #2 = Parte B, #3 = Parte C. Los datos se toman de los campos
+            «Firmante» del documento — edítalos ahí para no descuadrar el orden.
           </div>
           <div className="space-y-2">
             {parties.map((role, i) => {

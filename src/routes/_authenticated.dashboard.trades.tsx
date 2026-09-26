@@ -66,8 +66,6 @@ import {
 import { TradePackPanel } from "@/features/trades/TradePackPanel";
 import { useTradeDetailRealtime } from "@/features/trade-board/useTradeBoardRealtime";
 
-
-
 export const Route = createFileRoute("/_authenticated/dashboard/trades")({
   head: () => ({ meta: [{ title: "Trade Desk — Geocapitals" }] }),
   component: TradesPage,
@@ -211,7 +209,9 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             "Pureza mín. 99.65% Sb (CoA muestra 99.75–99.90%). Origen: Seller's Option. Inspección: SGS / CCIC / Alex Stewart. Trial opcional por mutuo acuerdo. NCNDA firmado por las 3 partes.",
         },
       });
-      toast.success("Operación de Antimonio creada (1,500 MT/mes · MT103). Emite el link a las contrapartes.");
+      toast.success(
+        "Operación de Antimonio creada (1,500 MT/mes · MT103). Emite el link a las contrapartes.",
+      );
       void qc.invalidateQueries({ queryKey: ["my-trades"] });
       onOpen(id);
     } catch (e) {
@@ -256,7 +256,6 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
     }
   };
 
-
   const dispatchFn = useServerFn(dispatchAntimonyPackage);
   const dispatchCopperFn = useServerFn(dispatchCopperPackage);
   const deliveryFn = useServerFn(getEmailDeliveryStatus);
@@ -264,17 +263,10 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
   const [dispatchingCopper, setDispatchingCopper] = useState(false);
 
   const antimonyRecipients = useMemo(
-    () => [
-      "ana.rojo67@gmail.com",
-      "ciminomarcela@gmail.com",
-      "carpio@carpiokaddu.com",
-    ],
+    () => ["ana.rojo67@gmail.com", "ciminomarcela@gmail.com", "carpio@carpiokaddu.com"],
     [],
   );
-  const antimonyTemplates = useMemo(
-    () => ["supplier-onboarding", "antimony-product-sheet"],
-    [],
-  );
+  const antimonyTemplates = useMemo(() => ["supplier-onboarding", "antimony-product-sheet"], []);
 
   const {
     data: deliveryStatus,
@@ -303,7 +295,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
       const detail = res.results
         .map((r) => `${r.kind} → ${r.to}: ${r.ok ? "ok" : (r.reason ?? "error")}`)
         .join("\n");
-      if (failCount === 0) toast.success(`Paquete Antimonio enviado (${okCount})`, { description: detail });
+      if (failCount === 0)
+        toast.success(`Paquete Antimonio enviado (${okCount})`, { description: detail });
       else toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
       // Refresca el panel de estado tras el envío.
       setTimeout(() => void refetchDelivery(), 1500);
@@ -381,9 +374,13 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                       "No hay trade de cobre o falta contraparte. Crea el trade y agrega email de contraparte.",
                     );
                   } else if (failCount === 0) {
-                    toast.success(`Purchase Terms Cobre enviado (${okCount})`, { description: detail });
+                    toast.success(`Purchase Terms Cobre enviado (${okCount})`, {
+                      description: detail,
+                    });
                   } else {
-                    toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, { description: detail });
+                    toast.warning(`Enviados ${okCount} · fallidos ${failCount}`, {
+                      description: detail,
+                    });
                   }
                 } catch (e) {
                   toast.error(e instanceof Error ? e.message : "No se pudo despachar Cobre.");
@@ -402,9 +399,6 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               )}
               Enviar Purchase Terms Cobre (PDF)
             </button>
-
-
-
           </div>
         </div>
         <AntimonyDeliveryPanel
@@ -413,8 +407,6 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
           onRefresh={() => void refetchDelivery()}
         />
       </div>
-
-
 
       {(() => {
         const allIds = tradeIds;
@@ -455,9 +447,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               <input
                 type="checkbox"
                 checked={allChecked}
-                onChange={(e) =>
-                  setChecked(e.target.checked ? new Set(allIds) : new Set())
-                }
+                onChange={(e) => setChecked(e.target.checked ? new Set(allIds) : new Set())}
                 className="accent-primary"
               />
               {someChecked ? `${checked.size} seleccionados` : "Seleccionar todos"}
@@ -640,106 +630,109 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
         <Loading />
       ) : (data ?? []).length === 0 ? (
         <Empty>Sin trades todavía. Crea el primero para gestionar su ciclo documental.</Empty>
-      ) : (() => {
-        const q = query.trim().toLowerCase();
-        const filtered = (data ?? []).filter((t) => {
-          if (!showCancelled && (t.status === "cancelled" || t.stage === "cancelled")) return false;
-          if (!q) return true;
-          return (
-            (t.reference ?? "").toLowerCase().includes(q) ||
-            (t.commodity ?? "").toLowerCase().includes(q) ||
-            (t.form ?? "").toLowerCase().includes(q)
-          );
-        });
-        const cancelledCount = (data ?? []).filter((t) => t.status === "cancelled" || t.stage === "cancelled").length;
-        return (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pb-1">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filtrar por ref, commodity…"
-              className="flex-1 min-w-0 px-2 py-1 rounded border border-border bg-transparent text-xs"
-            />
-            <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
-              <input
-                type="checkbox"
-                checked={showCancelled}
-                onChange={(e) => setShowCancelled(e.target.checked)}
-                className="accent-[#0F2A6B]"
-              />
-              Ver cancelados{cancelledCount ? ` (${cancelledCount})` : ""}
-            </label>
-            <span className="shrink-0">{filtered.length}/{(data ?? []).length}</span>
-          </div>
-          {filtered.map((t) => {
-            const prog = tradeProgress(t.docs);
-            const status = onboardingStatus?.status?.[t.id];
-            const isChecked = checked.has(t.id);
+      ) : (
+        (() => {
+          const q = query.trim().toLowerCase();
+          const filtered = (data ?? []).filter((t) => {
+            if (!showCancelled && (t.status === "cancelled" || t.stage === "cancelled"))
+              return false;
+            if (!q) return true;
             return (
-              <div
-                key={t.id}
-                className={`w-full rounded-lg border p-3 transition-colors ${
-                  isChecked
-                    ? "border-[#0F2A6B] bg-[#0F2A6B]/5"
-                    : "border-border bg-bg-secondary/30 hover:border-primary/50"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <label className="flex items-center pr-1 cursor-pointer shrink-0">
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={(e) => {
-                        setChecked((prev) => {
-                          const next = new Set(prev);
-                          if (e.target.checked) next.add(t.id);
-                          else next.delete(t.id);
-                          return next;
-                        });
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="accent-[#0F2A6B]"
-                    />
-                  </label>
-                  <button
-                    onClick={() => onOpen(t.id)}
-                    className="flex-1 min-w-0 text-left"
+              (t.reference ?? "").toLowerCase().includes(q) ||
+              (t.commodity ?? "").toLowerCase().includes(q) ||
+              (t.form ?? "").toLowerCase().includes(q)
+            );
+          });
+          const cancelledCount = (data ?? []).filter(
+            (t) => t.status === "cancelled" || t.stage === "cancelled",
+          ).length;
+          return (
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pb-1">
+                <input
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Filtrar por ref, commodity…"
+                  className="flex-1 min-w-0 px-2 py-1 rounded border border-border bg-transparent text-xs"
+                />
+                <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
+                  <input
+                    type="checkbox"
+                    checked={showCancelled}
+                    onChange={(e) => setShowCancelled(e.target.checked)}
+                    className="accent-[#0F2A6B]"
+                  />
+                  Ver cancelados{cancelledCount ? ` (${cancelledCount})` : ""}
+                </label>
+                <span className="shrink-0">
+                  {filtered.length}/{(data ?? []).length}
+                </span>
+              </div>
+              {filtered.map((t) => {
+                const prog = tradeProgress(t.docs);
+                const status = onboardingStatus?.status?.[t.id];
+                const isChecked = checked.has(t.id);
+                return (
+                  <div
+                    key={t.id}
+                    className={`w-full rounded-lg border p-3 transition-colors ${
+                      isChecked
+                        ? "border-[#0F2A6B] bg-[#0F2A6B]/5"
+                        : "border-border bg-bg-secondary/30 hover:border-primary/50"
+                    }`}
                   >
-                    <div className="font-semibold text-sm truncate">
-                      {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
-                      <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
-                        {t.role === "buyer" ? "compra" : "venta"}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-muted-foreground font-mono">
-                      {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
-                      {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
-                    </div>
-                  </button>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <OnboardingBadge s={status} />
-                    <StagePill stage={t.stage} />
-                    <div className="w-16 text-right">
-                      <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
-                      <div className="h-1 rounded bg-muted/40 overflow-hidden mt-0.5">
-                        <div
-                          className="h-full bg-primary"
-                          style={{ width: `${prog.overall.pct}%` }}
+                    <div className="flex items-center justify-between gap-3">
+                      <label className="flex items-center pr-1 cursor-pointer shrink-0">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={(e) => {
+                            setChecked((prev) => {
+                              const next = new Set(prev);
+                              if (e.target.checked) next.add(t.id);
+                              else next.delete(t.id);
+                              return next;
+                            });
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="accent-[#0F2A6B]"
                         />
+                      </label>
+                      <button onClick={() => onOpen(t.id)} className="flex-1 min-w-0 text-left">
+                        <div className="font-semibold text-sm truncate">
+                          {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
+                          <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
+                            {t.role === "buyer" ? "compra" : "venta"}
+                          </span>
+                        </div>
+                        <div className="text-[11px] text-muted-foreground font-mono">
+                          {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
+                          {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
+                        </div>
+                      </button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <OnboardingBadge s={status} />
+                        <StagePill stage={t.stage} />
+                        <div className="w-16 text-right">
+                          <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
+                          <div className="h-1 rounded bg-muted/40 overflow-hidden mt-0.5">
+                            <div
+                              className="h-full bg-primary"
+                              style={{ width: `${prog.overall.pct}%` }}
+                            />
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                       </div>
                     </div>
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
                   </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        );
-      })()}
+                );
+              })}
+            </div>
+          );
+        })()
+      )}
     </>
-
   );
 }
 
@@ -753,7 +746,6 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
     queryFn: () => detailFn({ data: { id } }),
   });
   useTradeDetailRealtime(id);
-
 
   const progress = useMemo(
     () =>
@@ -1862,8 +1854,6 @@ function SupplierPanel({
     }
   };
 
-
-
   return (
     <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
       <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
@@ -2068,7 +2058,8 @@ function AntimonyDeliveryPanel({
   if (rows.length === 0 && !loading) {
     return (
       <div className="mt-3 text-[11px] font-mono text-muted-foreground border-t border-gold/20 pt-2">
-        Aún no se ha despachado el paquete. Al enviarlo aparecerá aquí el estado (enviado / abierto).
+        Aún no se ha despachado el paquete. Al enviarlo aparecerá aquí el estado (enviado /
+        abierto).
       </div>
     );
   }
@@ -2092,7 +2083,10 @@ function AntimonyDeliveryPanel({
           const opened = !!r.openedAt;
           const sentOk = r.status === "sent" || r.status === "pending" || opened;
           const failed =
-            r.status === "failed" || r.status === "dlq" || r.status === "bounced" || r.status === "complained";
+            r.status === "failed" ||
+            r.status === "dlq" ||
+            r.status === "bounced" ||
+            r.status === "complained";
           return (
             <div
               key={`${r.templateName}::${r.recipient}`}
@@ -2108,13 +2102,7 @@ function AntimonyDeliveryPanel({
                 <StatusBadge
                   ok={sentOk && !failed}
                   fail={failed}
-                  label={
-                    failed
-                      ? "Falló"
-                      : r.status === "pending"
-                        ? "En cola"
-                        : "Enviado"
-                  }
+                  label={failed ? "Falló" : r.status === "pending" ? "En cola" : "Enviado"}
                   time={r.sentAt}
                 />
                 <StatusBadge

@@ -64,7 +64,11 @@ export const Route = createFileRoute("/live/losverdes")({
           "Ficha pública del Distrito Los Verdes–Tilama con catastro, 190 muestras geoquímicas, targets, anomalías y PDF técnico descargable.",
       },
       { property: "og:title", content: "Los Verdes–Tilama · Live Map — Geocapitals" },
-      { property: "og:description", content: "Mapa interactivo, muestreo geoquímico y reporte técnico descargable del proyecto Los Verdes–Tilama." },
+      {
+        property: "og:description",
+        content:
+          "Mapa interactivo, muestreo geoquímico y reporte técnico descargable del proyecto Los Verdes–Tilama.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex, nofollow" },
@@ -75,7 +79,10 @@ export const Route = createFileRoute("/live/losverdes")({
   }),
   component: LiveLosVerdesPage,
   pendingComponent: () => (
-    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center">
+    <div
+      data-theme="im-light"
+      className="min-h-screen bg-background flex items-center justify-center"
+    >
       <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
         <Loader2 className="w-4 h-4 animate-spin text-primary" />
         Cargando Los Verdes…
@@ -83,7 +90,10 @@ export const Route = createFileRoute("/live/losverdes")({
     </div>
   ),
   errorComponent: ({ error, reset }) => (
-    <div data-theme="im-light" className="min-h-screen bg-background flex items-center justify-center p-6">
+    <div
+      data-theme="im-light"
+      className="min-h-screen bg-background flex items-center justify-center p-6"
+    >
       <div className="max-w-md text-center space-y-3">
         <AlertTriangle className="w-8 h-8 text-amber-500 mx-auto" />
         <h1 className="text-lg font-semibold text-foreground">
@@ -92,13 +102,16 @@ export const Route = createFileRoute("/live/losverdes")({
         <p className="text-xs font-mono text-muted-foreground break-words">
           {error instanceof Error ? error.message : String(error)}
         </p>
-        <Button size="sm" onClick={reset} className="bg-primary text-primary-foreground hover:bg-primary/90">
+        <Button
+          size="sm"
+          onClick={reset}
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+        >
           Reintentar
         </Button>
       </div>
     </div>
   ),
-
 });
 
 /** ErrorBoundary local para aislar el visor 3D del resto de la página. */
@@ -216,7 +229,9 @@ function LiveLosVerdesPage() {
         if (active) setQr(value);
       }),
     );
-    return () => { active = false; };
+    return () => {
+      active = false;
+    };
   }, [liveUrl]);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
   const genConceptual = useServerFn(generateConceptualModelFn);
@@ -296,40 +311,81 @@ function LiveLosVerdesPage() {
 
   return (
     <div data-theme="im-light" className="bg-background text-foreground min-h-screen">
-
       <section className="relative min-h-[520px] overflow-hidden bg-foreground text-background">
-        <img src={losVerdesImage.url} alt="Vista del Distrito Los Verdes–Tilama" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <img
+          src={losVerdesImage.url}
+          alt="Vista del Distrito Los Verdes–Tilama"
+          className="absolute inset-0 h-full w-full object-cover opacity-35"
+        />
         <div className="absolute inset-0 bg-foreground/60" />
         <div className="relative mx-auto grid max-w-[1600px] gap-8 px-5 py-12 md:grid-cols-[minmax(0,1fr)_190px] md:px-10 md:py-16">
           <div className="self-end max-w-4xl">
-            <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary-foreground/70">Geocapitals · Live map público · LV-TIL-001</div>
-            <h1 className="mt-4 font-serif text-4xl leading-tight text-primary-foreground md:text-6xl">Distrito Cuprífero Los Verdes–Tilama</h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-primary-foreground/75">Catastro, evidencia geoquímica, targets y análisis geoespacial en una ficha técnica trazable para evaluación minera.</p>
+            <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary-foreground/70">
+              Geocapitals · Live map público · LV-TIL-001
+            </div>
+            <h1 className="mt-4 font-serif text-4xl leading-tight text-primary-foreground md:text-6xl">
+              Distrito Cuprífero Los Verdes–Tilama
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-primary-foreground/75">
+              Catastro, evidencia geoquímica, targets y análisis geoespacial en una ficha técnica
+              trazable para evaluación minera.
+            </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <ProjectDocsMenu
                 className="h-10 px-5"
                 disabled={!reportQ.data}
                 build={() => (reportQ.data ? buildLosVerdesDoc(reportQ.data) : null)}
               />
-              <Button onClick={handlePdf} disabled={pdfBusy || !reportQ.data} variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground">
+              <Button
+                onClick={handlePdf}
+                disabled={pdfBusy || !reportQ.data}
+                variant="outline"
+                className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+              >
                 {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} Informe extendido
               </Button>
-              <Button variant="outline" className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={() => void navigator.clipboard.writeText(liveUrl).then(() => toast.success("Enlace copiado"))}>
+              <Button
+                variant="outline"
+                className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
+                onClick={() =>
+                  void navigator.clipboard
+                    .writeText(liveUrl)
+                    .then(() => toast.success("Enlace copiado"))
+                }
+              >
                 <Copy /> Copiar enlace público
               </Button>
             </div>
-
           </div>
           <aside className="self-end border border-primary-foreground/20 bg-foreground/50 p-3 backdrop-blur-sm">
-            {qr ? <img src={qr} alt="QR de la ficha pública Los Verdes–Tilama" className="aspect-square w-full bg-primary-foreground p-2" /> : <div className="grid aspect-square place-items-center"><Loader2 className="animate-spin text-primary-foreground" /></div>}
-            <div className="mt-3 font-mono text-[10px] uppercase text-primary-foreground/60">Enlace público verificable</div>
-            <div className="mt-1 break-all text-xs text-primary-foreground">geocapitals.com/live/losverdes</div>
+            {qr ? (
+              <img
+                src={qr}
+                alt="QR de la ficha pública Los Verdes–Tilama"
+                className="aspect-square w-full bg-primary-foreground p-2"
+              />
+            ) : (
+              <div className="grid aspect-square place-items-center">
+                <Loader2 className="animate-spin text-primary-foreground" />
+              </div>
+            )}
+            <div className="mt-3 font-mono text-[10px] uppercase text-primary-foreground/60">
+              Enlace público verificable
+            </div>
+            <div className="mt-1 break-all text-xs text-primary-foreground">
+              geocapitals.com/live/losverdes
+            </div>
           </aside>
         </div>
         <div className="relative border-t border-primary-foreground/15 bg-foreground/70 px-5 py-4 backdrop-blur-sm md:px-10">
           <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 text-xs text-primary-foreground/70">
-            <span className="inline-flex items-center gap-2 font-medium text-primary-foreground"><CheckCircle2 className="h-4 w-4" /> Evidencia geológica consolidada</span>
-            <span>{stats?.samplesTotal ?? "—"} muestras · {stats?.concessionsTotal ?? "—"} concesiones · {stats?.targetsTotal ?? "—"} targets</span>
+            <span className="inline-flex items-center gap-2 font-medium text-primary-foreground">
+              <CheckCircle2 className="h-4 w-4" /> Evidencia geológica consolidada
+            </span>
+            <span>
+              {stats?.samplesTotal ?? "—"} muestras · {stats?.concessionsTotal ?? "—"} concesiones ·{" "}
+              {stats?.targetsTotal ?? "—"} targets
+            </span>
           </div>
         </div>
       </section>
@@ -394,7 +450,12 @@ function LiveLosVerdesPage() {
       <div className="p-3 md:p-4 space-y-4 max-w-[1600px] mx-auto">
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <KPI icon={<TestTube2 className="w-4 h-4" />} label="Muestras" value={stats?.samplesTotal ?? "—"} sub={stats?.cuAvgPct != null ? `Cu prom. ${stats.cuAvgPct.toFixed(2)}%` : ""} />
+          <KPI
+            icon={<TestTube2 className="w-4 h-4" />}
+            label="Muestras"
+            value={stats?.samplesTotal ?? "—"}
+            sub={stats?.cuAvgPct != null ? `Cu prom. ${stats.cuAvgPct.toFixed(2)}%` : ""}
+          />
           <KPI
             icon={<Layers className="w-4 h-4" />}
             label="Concesiones"
@@ -429,8 +490,16 @@ function LiveLosVerdesPage() {
 
         {stats && (
           <section className="grid gap-px border border-border bg-border md:grid-cols-4">
-            {[["Cu promedio", `${stats.cuAvgPct?.toFixed(2) ?? "—"} %`], ["Cu máximo", `${stats.cuMaxPct?.toFixed(2) ?? "—"} %`], ["Au máximo", `${stats.auMaxGpt?.toFixed(3) ?? "—"} g/t`], ["Ag máximo", `${stats.agMaxGpt?.toFixed(1) ?? "—"} g/t`]].map(([label, value]) => (
-              <div key={label} className="bg-background px-5 py-4"><div className="font-mono text-[10px] uppercase text-muted-foreground">{label}</div><div className="mt-1 font-serif text-2xl text-foreground">{value}</div></div>
+            {[
+              ["Cu promedio", `${stats.cuAvgPct?.toFixed(2) ?? "—"} %`],
+              ["Cu máximo", `${stats.cuMaxPct?.toFixed(2) ?? "—"} %`],
+              ["Au máximo", `${stats.auMaxGpt?.toFixed(3) ?? "—"} g/t`],
+              ["Ag máximo", `${stats.agMaxGpt?.toFixed(1) ?? "—"} g/t`],
+            ].map(([label, value]) => (
+              <div key={label} className="bg-background px-5 py-4">
+                <div className="font-mono text-[10px] uppercase text-muted-foreground">{label}</div>
+                <div className="mt-1 font-serif text-2xl text-foreground">{value}</div>
+              </div>
             ))}
           </section>
         )}
@@ -603,7 +672,8 @@ function LiveLosVerdesPage() {
         )}
 
         <footer className="text-[10px] text-muted-foreground font-mono uppercase tracking-wider text-center py-4 border-t border-border">
-          Geocapitals · Ficha técnica pública · Muestreo cargado en estado borrador · Sin recursos ni reservas certificados.
+          Geocapitals · Ficha técnica pública · Muestreo cargado en estado borrador · Sin recursos
+          ni reservas certificados.
         </footer>
       </div>
       <TargetExplainerDialog

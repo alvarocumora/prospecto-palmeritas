@@ -37,11 +37,22 @@ type Readiness = {
   ready: boolean;
 };
 
-const STATUS_STYLE: Record<ChecklistRow["status"], { label: string; cls: string; Icon: typeof CheckCircle2 }> = {
+const STATUS_STYLE: Record<
+  ChecklistRow["status"],
+  { label: string; cls: string; Icon: typeof CheckCircle2 }
+> = {
   falta: { label: "Falta", cls: "border-neutral-300 bg-white text-neutral-500", Icon: Circle },
   subido: { label: "Subido", cls: "border-blue-300 bg-blue-50 text-blue-700", Icon: Clock },
-  aprobado: { label: "Aprobado", cls: "border-emerald-400 bg-emerald-50 text-emerald-700", Icon: CheckCircle2 },
-  observado: { label: "Observado", cls: "border-amber-400 bg-amber-50 text-amber-800", Icon: AlertTriangle },
+  aprobado: {
+    label: "Aprobado",
+    cls: "border-emerald-400 bg-emerald-50 text-emerald-700",
+    Icon: CheckCircle2,
+  },
+  observado: {
+    label: "Observado",
+    cls: "border-amber-400 bg-amber-50 text-amber-800",
+    Icon: AlertTriangle,
+  },
   firmado: { label: "Firmado", cls: "border-neutral-800 bg-neutral-900 text-white", Icon: Lock },
 };
 
@@ -79,7 +90,8 @@ export function TradeComplianceChecklist({
   const [busy, setBusy] = useState<string | null>(null);
 
   const usingFetcher = typeof fetcher === "function";
-  const key = queryKey ?? (usingFetcher ? ["trade-checklist-public"] : ["trade-checklist", tradeId]);
+  const key =
+    queryKey ?? (usingFetcher ? ["trade-checklist-public"] : ["trade-checklist", tradeId]);
 
   const dataQ = useQuery({
     queryKey: key,
@@ -103,9 +115,13 @@ export function TradeComplianceChecklist({
     refetchInterval: 60_000,
   });
 
-  const checklistQ = { data: dataQ.data?.rows, isLoading: dataQ.isLoading, error: dataQ.error, refetch: dataQ.refetch };
+  const checklistQ = {
+    data: dataQ.data?.rows,
+    isLoading: dataQ.isLoading,
+    error: dataQ.error,
+    refetch: dataQ.refetch,
+  };
   const readinessQ = { data: dataQ.data?.readiness ?? null, refetch: dataQ.refetch };
-
 
   const groups = useMemo(() => {
     const rows = checklistQ.data ?? [];
@@ -117,11 +133,16 @@ export function TradeComplianceChecklist({
     }
     return Array.from(bySection.entries())
       .sort(([a], [b]) => a - b)
-      .map(([n, g]) => ({ n, section: g.section, items: g.items.sort((x, y) => x.sequence - y.sequence) }));
+      .map(([n, g]) => ({
+        n,
+        section: g.section,
+        items: g.items.sort((x, y) => x.sequence - y.sequence),
+      }));
   }, [checklistQ.data]);
 
   const r = readinessQ.data;
-  const pct = r && r.mandatory_total > 0 ? Math.round((r.mandatory_ok / r.mandatory_total) * 100) : 0;
+  const pct =
+    r && r.mandatory_total > 0 ? Math.round((r.mandatory_ok / r.mandatory_total) * 100) : 0;
 
   useEffect(() => {
     onReadinessChange?.(r ?? null);
@@ -149,7 +170,8 @@ export function TradeComplianceChecklist({
   if (checklistQ.error) {
     return (
       <div className="rounded-md border border-amber-300 bg-amber-50 p-4 text-sm text-amber-800">
-        No se pudo cargar el checklist ({(checklistQ.error as Error).message}). Verifica que las migraciones del catálogo REICON estén aplicadas.
+        No se pudo cargar el checklist ({(checklistQ.error as Error).message}). Verifica que las
+        migraciones del catálogo REICON estén aplicadas.
       </div>
     );
   }
@@ -168,7 +190,8 @@ export function TradeComplianceChecklist({
         <div>
           <h2 className="font-serif text-xl">{title}</h2>
           <p className="text-xs text-muted-foreground">
-            Catálogo REICON aplicado por commodity. Los ítems obligatorios habilitan la evaluación comercial.
+            Catálogo REICON aplicado por commodity. Los ítems obligatorios habilitan la evaluación
+            comercial.
           </p>
         </div>
         {r && (
@@ -198,12 +221,11 @@ export function TradeComplianceChecklist({
               </span>
             ) : (
               <span className="inline-flex items-center gap-1 rounded-full border border-amber-400 bg-amber-50 px-2 py-0.5 text-amber-800">
-                <AlertTriangle className="w-3 h-3" /> Faltan {r.mandatory_missing} documento(s) obligatorio(s)
+                <AlertTriangle className="w-3 h-3" /> Faltan {r.mandatory_missing} documento(s)
+                obligatorio(s)
               </span>
             )}
-            <span className="text-muted-foreground">
-              · Opcionales: {r.optional_total}
-            </span>
+            <span className="text-muted-foreground">· Opcionales: {r.optional_total}</span>
           </div>
         </div>
       )}
@@ -263,7 +285,11 @@ export function TradeComplianceChecklist({
                         ) : (
                           <Upload className="w-3 h-3" />
                         )}
-                        {busy === it.doc_kind ? "Subiendo…" : it.status === "falta" ? "Subir" : "Reemplazar"}
+                        {busy === it.doc_kind
+                          ? "Subiendo…"
+                          : it.status === "falta"
+                            ? "Subir"
+                            : "Reemplazar"}
                         <input
                           type="file"
                           className="hidden"

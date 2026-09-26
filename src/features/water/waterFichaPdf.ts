@@ -120,7 +120,13 @@ export async function downloadWaterFicha(
       startY: y,
       margin: { left: M, right: M },
       theme: "grid",
-      styles: { font: "helvetica", fontSize: 8.6, cellPadding: 5, textColor: [26, 32, 44], lineColor: HAIR },
+      styles: {
+        font: "helvetica",
+        fontSize: 8.6,
+        cellPadding: 5,
+        textColor: [26, 32, 44],
+        lineColor: HAIR,
+      },
       columnStyles: { 0: { cellWidth: 170, fontStyle: "bold", textColor: SLATE } },
       body: rows,
     });
@@ -142,7 +148,10 @@ export async function downloadWaterFicha(
       "Caudal eventual",
       asset.flow_eventual_ls ? `Hasta ${fmtFlow(asset.flow_eventual_ls)}` : "No informado",
     ],
-    ["Sistema de captación", asset.capture_system === "gravitacional" ? "Gravitacional" : (asset.capture_system ?? "—")],
+    [
+      "Sistema de captación",
+      asset.capture_system === "gravitacional" ? "Gravitacional" : (asset.capture_system ?? "—"),
+    ],
     [
       "Coordenadas",
       opts.mode === "investor"
@@ -171,11 +180,7 @@ export async function downloadWaterFicha(
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(8.6);
     pdf.setTextColor(...SLATE);
-    pdf.text(
-      "Ficha jurídica disponible en el Investor Data Room (acceso autenticado).",
-      M,
-      y,
-    );
+    pdf.text("Ficha jurídica disponible en el Investor Data Room (acceso autenticado).", M, y);
     y += 24;
   } else {
     autoTable(pdf, {

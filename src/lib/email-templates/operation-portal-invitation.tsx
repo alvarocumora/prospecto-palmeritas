@@ -45,15 +45,17 @@ const Email = ({
     trackingPixelUrl={trackingPixelUrl}
   >
     <Heading style={styles.h1}>
-      {fullName ? `Hola ${fullName},` : "Hola,"} tu portal {roleLabel(role).toLowerCase()} está listo
+      {fullName ? `Hola ${fullName},` : "Hola,"} tu portal {roleLabel(role).toLowerCase()} está
+      listo
     </Heading>
 
     <Text style={styles.p}>
       {invitedByName ? `${invitedByName} de ` : ""}Geocapitals ha creado un espacio privado y seguro
-      para la operación <b>{operationCode}</b>{operationName ? ` — ${operationName}` : ""}. Desde tu
-      portal puedes revisar el checklist, subir documentación (KYC / LOI / PoF / permisos / ensayes)
-      y coordinar directamente con nuestro equipo. Solo tú y Geocapitals ven este canal — la
-      contraparte tiene su propio portal separado.
+      para la operación <b>{operationCode}</b>
+      {operationName ? ` — ${operationName}` : ""}. Desde tu portal puedes revisar el checklist,
+      subir documentación (KYC / LOI / PoF / permisos / ensayes) y coordinar directamente con
+      nuestro equipo. Solo tú y Geocapitals ven este canal — la contraparte tiene su propio portal
+      separado.
     </Text>
 
     <KeyValueBlock

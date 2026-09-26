@@ -99,4 +99,3 @@ export function summarizePayments(rows: PaymentLike[], now: Date): PaymentsSumma
   const progressPct = scheduledUsd > 0 ? Math.round((paidUsd / scheduledUsd) * 100) : 0;
   return { scheduledUsd, paidUsd, outstandingUsd, overdueUsd, nextDue, progressPct };
 }
-

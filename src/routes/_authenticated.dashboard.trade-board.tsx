@@ -45,7 +45,6 @@ export const Route = createFileRoute("/_authenticated/dashboard/trade-board")({
   component: TradeBoardPage,
 });
 
-
 function TradeBoardPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/dashboard/trade-board" });
@@ -56,7 +55,6 @@ function TradeBoardPage() {
       replace: true,
     });
   };
-
 
   // Esc sale del fullscreen
   useEffect(() => {

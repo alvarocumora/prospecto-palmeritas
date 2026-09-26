@@ -244,6 +244,29 @@ table.compact th, table.compact td { padding: 1.2mm 1.8mm; }
   line-height: 1.4;
 }
 
+/* severidad de hallazgos de due diligence */
+.sev {
+  display: inline-block;
+  height: 5.2mm; line-height: 5.2mm;
+  padding: 0 2.2mm;
+  font-size: 7.4pt; font-weight: bold;
+  border-radius: 1pt; color: #fff;
+  text-transform: uppercase; letter-spacing: 0.3pt;
+}
+.sev.high   { background: #a4262c; }   /* rojo */
+.sev.review { background: #a8752a; }   /* ámbar */
+.sev.info   { background: #48586a; }   /* neutro */
+tr.row-high   td:first-child { border-left: 2.2pt solid #a4262c; }
+tr.row-review td:first-child { border-left: 2.2pt solid #a8752a; }
+tr.row-info   td:first-child { border-left: 2.2pt solid #48586a; }
+
+/* estados de reconciliación */
+.state { font-weight: bold; font-size: 8.4pt; }
+.state.exact  { color: #2e7d46; }
+.state.inter  { color: #a8752a; }
+.state.neigh  { color: #14506b; }
+.state.unmatch{ color: #a4262c; }
+
 /* utilidades */
 .mt0 { margin-top: 0; }
 .mb0 { margin-bottom: 0; }

@@ -24,25 +24,33 @@ function clause(field: string, raw?: string) {
 }
 
 export async function searchMiningCadastre(input: CadastreSearch = {}): Promise<CadastreSummary> {
-  const where = [
-    clause("NOMBRE", input.term),
-    clause("TITULAR_NOMBRE", input.holder),
-    clause("NUMERO_ROL", input.role),
-    input.type ? `TIPO_CONCESION='${input.type}'` : null,
-    input.status ? `SITUACION_CONCESION='${input.status}'` : null,
-  ].filter(Boolean).join(" AND ") || "1=1";
+  const where =
+    [
+      clause("NOMBRE", input.term),
+      clause("TITULAR_NOMBRE", input.holder),
+      clause("NUMERO_ROL", input.role),
+      input.type ? `TIPO_CONCESION='${input.type}'` : null,
+      input.status ? `SITUACION_CONCESION='${input.status}'` : null,
+    ]
+      .filter(Boolean)
+      .join(" AND ") || "1=1";
 
   const features = await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
     where,
     bbox: input.bbox,
     limit: Math.min(input.limit ?? 1000, 2000),
-    outFields: "OBJECTID,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,DATUM,HUSO",
+    outFields:
+      "OBJECTID,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TIPO_CONCESION,COMUNA,TITULAR_NOMBRE,TITULAR_RUT,TITULAR_DV,DATUM,HUSO",
   });
 
   if (!features) throw new Error("SERNAGEOMIN_UNAVAILABLE");
-  return { features, source: "SERNAGEOMIN", queriedAt: new Date().toISOString(), count: features.features.length };
+  return {
+    features,
+    source: "SERNAGEOMIN",
+    queriedAt: new Date().toISOString(),
+    count: features.features.length,
+  };
 }
-
 
 export type CadastreFeatureRecord = {
   id: string;
@@ -85,9 +93,9 @@ export function summarizeCadastre(records: CadastreFeatureRecord[]) {
   return {
     count: records.length,
     hectares,
-    exploration: records.filter(r => r.type.toUpperCase() === "EXPLORACION").length,
-    exploitation: records.filter(r => r.type.toUpperCase() === "EXPLOTACION").length,
-    constituted: records.filter(r => r.status.toUpperCase() === "CONSTITUIDA").length,
-    pending: records.filter(r => r.status.toUpperCase() === "EN TRAMITE").length,
+    exploration: records.filter((r) => r.type.toUpperCase() === "EXPLORACION").length,
+    exploitation: records.filter((r) => r.type.toUpperCase() === "EXPLOTACION").length,
+    constituted: records.filter((r) => r.status.toUpperCase() === "CONSTITUIDA").length,
+    pending: records.filter((r) => r.status.toUpperCase() === "EN TRAMITE").length,
   };
 }

@@ -11,14 +11,7 @@ import {
 } from "@/lib/suppliers/inbox.functions";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  Download,
-  FileText,
-  Sparkles,
-  XCircle,
-} from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, FileText, Sparkles, XCircle } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/dashboard/proveedores/$id")({
   head: () => ({
@@ -35,11 +28,46 @@ export const Route = createFileRoute("/_authenticated/dashboard/proveedores/$id"
   component: DetailPage,
 });
 
-type Sup = { id: string; folio: string; legal_name: string; country: string; status: string; contact_name: string; email: string; phone_e164: string; supplier_role: string };
-type Off = { id: string; product: string; presentation: string | null; tonnage_available_t: number | null; grade_value: number | null; grade_unit: string | null; port_or_delivery: string | null; incoterm: string | null; price_ask: string | null; status: string };
-type Doc = { id: string; doc_type: string; storage_path: string; mime_type: string | null; review_status: string; uploaded_at: string; signed_url: string | null };
+type Sup = {
+  id: string;
+  folio: string;
+  legal_name: string;
+  country: string;
+  status: string;
+  contact_name: string;
+  email: string;
+  phone_e164: string;
+  supplier_role: string;
+};
+type Off = {
+  id: string;
+  product: string;
+  presentation: string | null;
+  tonnage_available_t: number | null;
+  grade_value: number | null;
+  grade_unit: string | null;
+  port_or_delivery: string | null;
+  incoterm: string | null;
+  price_ask: string | null;
+  status: string;
+};
+type Doc = {
+  id: string;
+  doc_type: string;
+  storage_path: string;
+  mime_type: string | null;
+  review_status: string;
+  uploaded_at: string;
+  signed_url: string | null;
+};
 type Note = { id: string; body: string; visibility: string; created_at: string };
-type Ext = { id: string; document_id: string; created_at: string; fields: Record<string, unknown>; raw_text: string | null };
+type Ext = {
+  id: string;
+  document_id: string;
+  created_at: string;
+  fields: Record<string, unknown>;
+  raw_text: string | null;
+};
 
 function DetailPage() {
   const { id } = Route.useParams();
@@ -82,7 +110,8 @@ function DetailPage() {
   const notes = data.notes as unknown as Note[];
   const extractions = data.extractions as unknown as Ext[];
   const extractionByDoc = new Map<string, Ext>();
-  for (const e of extractions) if (!extractionByDoc.has(e.document_id)) extractionByDoc.set(e.document_id, e);
+  for (const e of extractions)
+    if (!extractionByDoc.has(e.document_id)) extractionByDoc.set(e.document_id, e);
 
   return (
     <div
@@ -148,17 +177,26 @@ function DetailPage() {
           <h2 className="font-serif text-xl">Oferta declarada</h2>
           <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
             {offers.length === 0 && (
-              <div className="text-sm text-[hsl(var(--content-subtle))]">Sin ofertas registradas.</div>
+              <div className="text-sm text-[hsl(var(--content-subtle))]">
+                Sin ofertas registradas.
+              </div>
             )}
             {offers.map((o) => (
               <div key={o.id} className="rounded border border-[hsl(var(--hairline))] bg-white p-4">
                 <div className="font-serif text-lg">{o.product}</div>
                 <div className="mt-1 text-xs text-[hsl(var(--content-subtle))]">
-                  {o.presentation ?? "—"} · {o.incoterm ?? "sin incoterm"} · {o.port_or_delivery ?? "—"}
+                  {o.presentation ?? "—"} · {o.incoterm ?? "sin incoterm"} ·{" "}
+                  {o.port_or_delivery ?? "—"}
                 </div>
                 <div className="mt-3 grid grid-cols-3 gap-2 text-xs">
-                  <Metric label="Ley" value={o.grade_value != null ? `${o.grade_value} ${o.grade_unit ?? ""}` : "—"} />
-                  <Metric label="Toneladas" value={o.tonnage_available_t != null ? `${o.tonnage_available_t}` : "—"} />
+                  <Metric
+                    label="Ley"
+                    value={o.grade_value != null ? `${o.grade_value} ${o.grade_unit ?? ""}` : "—"}
+                  />
+                  <Metric
+                    label="Toneladas"
+                    value={o.tonnage_available_t != null ? `${o.tonnage_available_t}` : "—"}
+                  />
                   <Metric label="Precio pedido" value={o.price_ask ?? "—"} />
                 </div>
               </div>
@@ -176,7 +214,11 @@ function DetailPage() {
             <div className="mt-4 space-y-3">
               {documents.map((d) => {
                 const ext = extractionByDoc.get(d.id);
-                const canExtract = d.doc_type === "certificado_analisis" || d.doc_type === "assay" || d.mime_type?.includes("pdf") || d.mime_type?.startsWith("image/");
+                const canExtract =
+                  d.doc_type === "certificado_analisis" ||
+                  d.doc_type === "assay" ||
+                  d.mime_type?.includes("pdf") ||
+                  d.mime_type?.startsWith("image/");
                 return (
                   <div
                     key={d.id}
@@ -362,7 +404,8 @@ function ExtractionCard({ ext }: { ext: Ext }) {
   return (
     <div className="mt-4 rounded border border-[hsl(var(--hairline))] bg-[hsl(var(--surface))] p-3 text-sm">
       <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wider text-[hsl(var(--content-subtle))]">
-        <Sparkles className="h-3 w-3" /> Extracción IA · {new Date(ext.created_at).toLocaleString("es-CL")}
+        <Sparkles className="h-3 w-3" /> Extracción IA ·{" "}
+        {new Date(ext.created_at).toLocaleString("es-CL")}
       </div>
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         <Metric label="Laboratorio" value={f.laboratory ?? "—"} />

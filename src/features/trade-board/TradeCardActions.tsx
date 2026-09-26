@@ -1,6 +1,15 @@
 // Menú de acciones rápidas por tarjeta: avanzar/retroceder etapa, cerrar,
 // cancelar/reabrir y copiar referencia. Sin salir del tablero.
-import { MoreHorizontal, ChevronLeft, ChevronRight, CheckCircle2, XCircle, RotateCcw, Copy, ExternalLink } from "lucide-react";
+import {
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Copy,
+  ExternalLink,
+} from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
@@ -90,7 +99,9 @@ export function TradeCardActions({ card }: { card: BoardCard }) {
         <DropdownMenuItem
           onClick={() => {
             if (card.reference) {
-              navigator.clipboard.writeText(card.reference).then(() => toast.success("Referencia copiada"));
+              navigator.clipboard
+                .writeText(card.reference)
+                .then(() => toast.success("Referencia copiada"));
             }
           }}
         >

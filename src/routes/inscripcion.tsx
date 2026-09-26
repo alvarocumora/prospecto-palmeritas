@@ -34,14 +34,17 @@ export const Route = createFileRoute("/inscripcion")({
   component: InscripcionWizard,
 });
 
-const COUNTRIES: Array<{ code: "CL" | "PE" | "AR" | "BO" | "OTRO"; name: string; taxLabel: string }> =
-  [
-    { code: "CL", name: "Chile", taxLabel: "RUT" },
-    { code: "PE", name: "Perú", taxLabel: "RUC" },
-    { code: "AR", name: "Argentina", taxLabel: "CUIT" },
-    { code: "BO", name: "Bolivia", taxLabel: "NIT" },
-    { code: "OTRO", name: "Otro", taxLabel: "Identificador tributario" },
-  ];
+const COUNTRIES: Array<{
+  code: "CL" | "PE" | "AR" | "BO" | "OTRO";
+  name: string;
+  taxLabel: string;
+}> = [
+  { code: "CL", name: "Chile", taxLabel: "RUT" },
+  { code: "PE", name: "Perú", taxLabel: "RUC" },
+  { code: "AR", name: "Argentina", taxLabel: "CUIT" },
+  { code: "BO", name: "Bolivia", taxLabel: "NIT" },
+  { code: "OTRO", name: "Otro", taxLabel: "Identificador tributario" },
+];
 
 const PRODUCTS = [
   "Mineral de hierro",
@@ -246,7 +249,10 @@ function InscripcionWizard() {
   }
 
   return (
-    <div data-theme="im-light" className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]">
+    <div
+      data-theme="im-light"
+      className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]"
+    >
       <header className="border-b border-[hsl(var(--hairline))] bg-[hsl(var(--surface))]">
         <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-4">
           <Link to="/" className="font-serif text-xl">
@@ -361,7 +367,10 @@ function Paso1({
       </div>
       <div>
         <Label>Razón social o nombre</Label>
-        <Input value={form.legalName} onChange={(e) => setForm({ ...form, legalName: e.target.value })} />
+        <Input
+          value={form.legalName}
+          onChange={(e) => setForm({ ...form, legalName: e.target.value })}
+        />
       </div>
       <div>
         <Label>{country.taxLabel}</Label>
@@ -456,11 +465,17 @@ function Paso2({ form, setForm }: { form: FormState; setForm: (f: FormState) => 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
           <Label>Nombre de la mina, faena o acopio</Label>
-          <Input value={form.mineName} onChange={(e) => setForm({ ...form, mineName: e.target.value })} />
+          <Input
+            value={form.mineName}
+            onChange={(e) => setForm({ ...form, mineName: e.target.value })}
+          />
         </div>
         <div>
           <Label>Región o provincia</Label>
-          <Input value={form.region} onChange={(e) => setForm({ ...form, region: e.target.value })} />
+          <Input
+            value={form.region}
+            onChange={(e) => setForm({ ...form, region: e.target.value })}
+          />
         </div>
       </div>
       <div>
@@ -659,7 +674,10 @@ function Paso3({ form, setForm }: { form: FormState; setForm: (f: FormState) => 
       </div>
 
       <div>
-        <Label>Elementos penalizables (define el descuento del comprador; omitirlos hace que la oferta no sea evaluable)</Label>
+        <Label>
+          Elementos penalizables (define el descuento del comprador; omitirlos hace que la oferta no
+          sea evaluable)
+        </Label>
         <div className="mt-2 grid grid-cols-2 gap-2 md:grid-cols-4">
           {PENALIZABLES.map((el) => {
             const idx = form.penalizables.findIndex((p) => p.element === el);
@@ -688,7 +706,9 @@ function Paso3({ form, setForm }: { form: FormState; setForm: (f: FormState) => 
       </div>
 
       <div>
-        <Label>¿Acepta inspección y muestreo por empresa independiente designada por el comprador?</Label>
+        <Label>
+          ¿Acepta inspección y muestreo por empresa independiente designada por el comprador?
+        </Label>
         <div className="mt-2 flex gap-2">
           {(["si", "no", "depende"] as const).map((v) => (
             <button

@@ -30,7 +30,8 @@ export async function captureLiveMapSnapshot(
     scale: Math.min(2, window.devicePixelRatio || 1),
     logging: false,
   });
-  if (!canvas.width || !canvas.height) throw new Error("Live Map snapshot produced an empty canvas.");
+  if (!canvas.width || !canvas.height)
+    throw new Error("Live Map snapshot produced an empty canvas.");
   const b = map.getBounds();
   const c = map.getCenter();
   return {
@@ -38,7 +39,10 @@ export async function captureLiveMapSnapshot(
     manifest: {
       projectCode,
       generatedAt: new Date().toISOString(),
-      bounds: [[b.getSouth(), b.getWest()], [b.getNorth(), b.getEast()]],
+      bounds: [
+        [b.getSouth(), b.getWest()],
+        [b.getNorth(), b.getEast()],
+      ],
       center: [c.lat, c.lng],
       zoom: map.getZoom(),
       crs: "EPSG:4326",

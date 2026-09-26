@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { getPortalView, claimPortalInvitation, postPortalMessage } from "@/lib/operations/portal.functions";
+import {
+  getPortalView,
+  claimPortalInvitation,
+  postPortalMessage,
+} from "@/lib/operations/portal.functions";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { OperationDocumentsPanel, type OperationDocLike } from "@/features/operations/OperationDocumentsPanel";
+import {
+  OperationDocumentsPanel,
+  type OperationDocLike,
+} from "@/features/operations/OperationDocumentsPanel";
 import { CheckCircle2, Clock, FileText, Lock, MessageCircle, ShieldCheck } from "lucide-react";
 
 type Role = "buyer" | "seller";
@@ -15,12 +22,14 @@ const ROLE_COPY: Record<Role, { title: string; eyebrow: string; description: str
   buyer: {
     title: "Portal del Comprador",
     eyebrow: "Buyer Workspace",
-    description: "Completa perfil KYC, sube LOI/ICPO/PoF y firma acuerdos para avanzar tu operación.",
+    description:
+      "Completa perfil KYC, sube LOI/ICPO/PoF y firma acuerdos para avanzar tu operación.",
   },
   seller: {
     title: "Portal del Vendedor",
     eyebrow: "Seller Workspace",
-    description: "Adjunta licencias mineras, ensayes, permisos de exportación y firma acuerdos comerciales.",
+    description:
+      "Adjunta licencias mineras, ensayes, permisos de exportación y firma acuerdos comerciales.",
   },
 };
 
@@ -76,7 +85,10 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
 
   if (error) {
     return (
-      <div data-theme="im-light" className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]">
+      <div
+        data-theme="im-light"
+        className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]"
+      >
         <div className="mx-auto max-w-2xl px-4 py-24">
           <div className="rounded-xl border border-[hsl(var(--hairline))] bg-white p-8 text-center shadow-sm">
             <Lock className="mx-auto h-8 w-8 text-[hsl(var(--content-subtle))]" />
@@ -84,7 +96,10 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
             <p className="mt-2 text-sm text-[hsl(var(--content-subtle))]">{error}</p>
             <p className="mt-6 text-xs text-[hsl(var(--content-subtle))]">
               Contacta a tu ejecutivo de Geocapitals o escribe a{" "}
-              <a className="underline" href="mailto:info@geocapitals.com">info@geocapitals.com</a>.
+              <a className="underline" href="mailto:info@geocapitals.com">
+                info@geocapitals.com
+              </a>
+              .
             </p>
           </div>
         </div>
@@ -107,16 +122,23 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
   const alreadyLinked = data.invitation.accepted || claimed;
 
   return (
-    <div data-theme="im-light" className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]">
+    <div
+      data-theme="im-light"
+      className="min-h-screen bg-[hsl(var(--surface-paper))] text-[hsl(var(--content))]"
+    >
       {/* Header */}
       <header className="border-b border-[hsl(var(--hairline))] bg-white/70 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
           <div>
-            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">{copy.eyebrow}</div>
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">
+              {copy.eyebrow}
+            </div>
             <div className="mt-1 font-serif text-lg">{copy.title}</div>
           </div>
           <div className="text-right">
-            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">Operación</div>
+            <div className="text-[10px] uppercase tracking-[0.24em] text-[hsl(var(--content-subtle))]">
+              Operación
+            </div>
             <div className="mt-1 font-mono text-sm">{op.code}</div>
           </div>
         </div>
@@ -126,8 +148,16 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
         <section>
           <p className="max-w-2xl text-sm text-[hsl(var(--content-subtle))]">{copy.description}</p>
           <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Card label="Producto" value={`${op.commodity}${op.subproduct ? " · " + op.subproduct : ""}`} />
-            <Card label="Cantidad mensual" value={op.quantity_monthly ? `${op.quantity_monthly} ${op.unit ?? "MT"}` : "Por definir"} />
+            <Card
+              label="Producto"
+              value={`${op.commodity}${op.subproduct ? " · " + op.subproduct : ""}`}
+            />
+            <Card
+              label="Cantidad mensual"
+              value={
+                op.quantity_monthly ? `${op.quantity_monthly} ${op.unit ?? "MT"}` : "Por definir"
+              }
+            />
             <Card label="Destino" value={op.destination_country ?? "Por definir"} />
             <Card label="Incoterm" value={op.incoterm ?? "Por definir"} />
           </div>
@@ -141,14 +171,18 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
               <div className="flex-1">
                 <div className="font-serif text-lg">Vincula tu acceso</div>
                 <p className="mt-1 text-sm text-[hsl(var(--content-subtle))]">
-                  Este enlace fue emitido para <b>{data.invitation.email}</b>. Debes iniciar sesión con ese correo para
-                  quedar vinculado a la operación.
+                  Este enlace fue emitido para <b>{data.invitation.email}</b>. Debes iniciar sesión
+                  con ese correo para quedar vinculado a la operación.
                 </p>
                 {needsAuth ? (
                   <div className="mt-4 flex gap-2">
                     <Link
                       to="/auth"
-                      search={{ redirect: typeof window !== "undefined" ? window.location.pathname : "/" } as never}
+                      search={
+                        {
+                          redirect: typeof window !== "undefined" ? window.location.pathname : "/",
+                        } as never
+                      }
                       className="inline-flex items-center rounded-md bg-[hsl(var(--accent-brand))] px-4 py-2 text-sm font-medium text-white hover:opacity-90"
                     >
                       Iniciar sesión / registrarme
@@ -172,7 +206,8 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-serif text-xl">Documentación</h2>
             <span className="text-xs text-[hsl(var(--content-subtle))]">
-              {data.documents.length} documento{data.documents.length === 1 ? "" : "s"} compartido{data.documents.length === 1 ? "" : "s"}
+              {data.documents.length} documento{data.documents.length === 1 ? "" : "s"} compartido
+              {data.documents.length === 1 ? "" : "s"}
             </span>
           </div>
           <OperationDocumentsPanel
@@ -187,23 +222,36 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-serif text-xl">Próximas acciones</h2>
-            <span className="text-xs text-[hsl(var(--content-subtle))]">{data.tasks.length} tarea(s)</span>
+            <span className="text-xs text-[hsl(var(--content-subtle))]">
+              {data.tasks.length} tarea(s)
+            </span>
           </div>
           {data.tasks.length === 0 ? (
             <EmptyState icon={CheckCircle2} text="No hay tareas pendientes por ahora." />
           ) : (
             <div className="grid gap-3">
               {data.tasks.map((t) => (
-                <div key={t.id} className="rounded-lg border border-[hsl(var(--hairline))] bg-white p-4">
+                <div
+                  key={t.id}
+                  className="rounded-lg border border-[hsl(var(--hairline))] bg-white p-4"
+                >
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <div className="text-sm font-medium">{t.title}</div>
-                      {t.description && <div className="mt-1 text-xs text-[hsl(var(--content-subtle))]">{t.description}</div>}
+                      {t.description && (
+                        <div className="mt-1 text-xs text-[hsl(var(--content-subtle))]">
+                          {t.description}
+                        </div>
+                      )}
                     </div>
                     <StatusPill status={t.status} />
                   </div>
                   <div className="mt-2 flex items-center gap-3 text-xs text-[hsl(var(--content-subtle))]">
-                    {t.due_date && <span className="inline-flex items-center gap-1"><Clock className="h-3 w-3" /> {t.due_date}</span>}
+                    {t.due_date && (
+                      <span className="inline-flex items-center gap-1">
+                        <Clock className="h-3 w-3" /> {t.due_date}
+                      </span>
+                    )}
                     <span>Prioridad: {t.priority}</span>
                   </div>
                 </div>
@@ -223,7 +271,10 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
                 </div>
               ) : (
                 data.messages.map((m) => (
-                  <div key={m.id} className={`flex ${m.author_role === role ? "justify-end" : "justify-start"}`}>
+                  <div
+                    key={m.id}
+                    className={`flex ${m.author_role === role ? "justify-end" : "justify-start"}`}
+                  >
                     <div
                       className={`max-w-[80%] rounded-lg px-3 py-2 text-sm ${
                         m.author_role === role
@@ -249,7 +300,9 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
                     placeholder="Escribe un mensaje a tu ejecutivo Geocapitals…"
                     className="min-h-[60px] flex-1"
                   />
-                  <Button onClick={send} disabled={!msg.trim()}>Enviar</Button>
+                  <Button onClick={send} disabled={!msg.trim()}>
+                    Enviar
+                  </Button>
                 </div>
               </div>
             )}
@@ -267,7 +320,9 @@ export default function PortalPage({ token, role }: { token: string; role: Role 
 function Card({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-lg border border-[hsl(var(--hairline))] bg-white p-4">
-      <div className="text-[10px] uppercase tracking-[0.2em] text-[hsl(var(--content-subtle))]">{label}</div>
+      <div className="text-[10px] uppercase tracking-[0.2em] text-[hsl(var(--content-subtle))]">
+        {label}
+      </div>
       <div className="mt-1 text-sm">{value}</div>
     </div>
   );
@@ -294,5 +349,9 @@ function StatusPill({ status }: { status: string }) {
     under_review: { label: "En revisión", cls: "bg-blue-100 text-blue-800" },
   };
   const item = map[status] ?? { label: status, cls: "bg-neutral-100 text-neutral-700" };
-  return <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${item.cls}`}>{item.label}</span>;
+  return (
+    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium ${item.cls}`}>
+      {item.label}
+    </span>
+  );
 }

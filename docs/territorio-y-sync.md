@@ -8,15 +8,15 @@
 
 ## Mapa de propiedad (regla v2, inviolable)
 
-| Ruta | Dueño | Regla |
-|---|---|---|
-| `/src` | **Lovable** | **No editar.** Claude Code solo lo lee, para conocer los contratos de datos. |
-| `/supabase/migrations` | **Claude Code** | Migraciones versionadas. |
-| `/etl` | **Claude Code** | Pipelines de ingesta. |
-| `/packages/reglas` | **Claude Code** | Motores de cálculo (librerías). |
-| `/tests` | **Claude Code** | Suite de pruebas. |
-| `/docs` | **Claude Code** | Fuentes y supuestos. |
-| `/supabase/functions` | Lovable | Edge functions (TypeScript/Deno). |
+| Ruta                   | Dueño           | Regla                                                                        |
+| ---------------------- | --------------- | ---------------------------------------------------------------------------- |
+| `/src`                 | **Lovable**     | **No editar.** Claude Code solo lo lee, para conocer los contratos de datos. |
+| `/supabase/migrations` | **Claude Code** | Migraciones versionadas.                                                     |
+| `/etl`                 | **Claude Code** | Pipelines de ingesta.                                                        |
+| `/packages/reglas`     | **Claude Code** | Motores de cálculo (librerías).                                              |
+| `/tests`               | **Claude Code** | Suite de pruebas.                                                            |
+| `/docs`                | **Claude Code** | Fuentes y supuestos.                                                         |
+| `/supabase/functions`  | Lovable         | Edge functions (TypeScript/Deno).                                            |
 
 Excepción conocida: los tipos generados `src/integrations/supabase/types.ts` son la
 **fuente autoritativa** del esquema cloud de Lovable — Claude Code los lee (nunca los
@@ -39,7 +39,7 @@ borrado en un commit, fue una regeneración del árbol.
    - Requerir Pull Request para mergear a `main` (prohibir push directo).
    - **Prohibir force-push** a `main`.
    - Requerir revisión de **CODEOWNERS** (ver abajo).
-   Con esto, un sync que intente pisar `main` por fuera de un PR queda **bloqueado**.
+     Con esto, un sync que intente pisar `main` por fuera de un PR queda **bloqueado**.
 2. **`.github/CODEOWNERS` (en este repo).** Hace la propiedad **visible y exigible**:
    todo PR que toque rutas de Claude Code requiere la aprobación del dueño humano
    (`@alvarocumora`). No frena un force-push, pero sí un merge por PR sin revisión.

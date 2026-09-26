@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>{{ org_name }} — Due diligence catastral {{ run.id_short }}</title>
+<style>{{ css }}</style>
+</head>
+<body>
+
+{% macro head() %}
+<div class="topbar"><i class="t-navy"></i><i class="t-blue"></i><i class="t-gold"></i></div>
+<div class="doc-head">
+  <div class="mark">{% if logo %}<img src="{{ logo }}" alt="{{ org_name }}">{% else %}GC{% endif %}</div>
+  <div class="titles">
+    <div class="brand">{{ org_name }}</div>
+    <div class="subtitle">{{ tagline }}</div>
+  </div>
+  <div class="docmeta">
+    <div><b>Due diligence catastral</b></div>
+    <div>Fuente: {{ run.source | tbc }}</div>
+    <div>Corrida: {{ run.id_short | tbc }}</div>
+  </div>
+</div>
+{% endmacro %}
+
+<div class="page">
+  {{ head() }}
+  <h1>Reconciliación catastral</h1>
+  <p class="lead">
+    Contraste entre las geometrías documentales del proyecto y el registro oficial
+    <b>{{ run.source | tbc }}</b>. Análisis automatizado de apoyo.
+  </p>
+
+  <div class="kpi">
+    <div class="cell"><div class="n">{{ run.project_feature_count | num(0) }}</div><div class="l">Geometrías del proyecto</div></div>
+    <div class="cell"><div class="n">{{ run.official_feature_count | num(0) }}</div><div class="l">Registros oficiales</div></div>
+    <div class="cell"><div class="n">{{ run.neighbor_km | num(0) }} km</div><div class="l">Buffer de vecindad</div></div>
+  </div>
+
+  <h2>Estados de reconciliación</h2>
+  <table>
+    <thead><tr><th>Estado</th><th class="num">Conteo</th><th>Significado</th></tr></thead>
+    <tbody>
+      <tr><td><span class="state exact">EXACT_MATCH</span></td><td class="num">{{ summary.EXACT_MATCH | default(0) }}</td><td>Coincidencia por rol o nombre normalizado.</td></tr>
+      <tr><td><span class="state inter">INTERSECTS</span></td><td class="num">{{ summary.INTERSECTS | default(0) }}</td><td>Las geometrías intersectan; requiere revisión de roles/límites.</td></tr>
+      <tr><td><span class="state neigh">NEIGHBOR</span></td><td class="num">{{ summary.NEIGHBOR | default(0) }}</td><td>Concesión vecina dentro del buffer configurado.</td></tr>
+      <tr><td><span class="state unmatch">UNMATCHED</span></td><td class="num">{{ summary.UNMATCHED | default(0) }}</td><td>Sin coincidencia oficial por identidad ni intersección.</td></tr>
+    </tbody>
+  </table>
+
+  <h2>Hallazgos de due diligence</h2>
+  {% if findings %}
+  <table>
+    <thead><tr><th>Severidad</th><th>Código</th><th>Detalle</th></tr></thead>
+    <tbody>
+      {% for f in findings %}
+      {% set sev = (f.severity | lower) %}
+      <tr class="row-{{ sev }}">
+        <td><span class="sev {{ sev }}">{{ f.severity }}</span></td>
+        <td class="nowrap">{{ f.code | tbc }}</td>
+        <td>{{ f.message | tbc }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="tbc">Sin hallazgos registrados en esta corrida.</p>
+  {% endif %}
+
+  <div class="box gold">
+    <div class="box-t">Alcance</div>
+    <div class="small">{{ disclaimer }}</div>
+  </div>
+
+  <div class="disc">
+    {{ org_name }} · Corrida {{ run.id | tbc }}
+    {% if run.created_at %}· Generado {{ run.created_at }}{% endif %}
+    {% if not run.has_snapshots %}<br><span class="tbc">Sin snapshots de entrada almacenados: esta corrida no es reproducible byte a byte.</span>{% endif %}
+    <br>Documento de evidencia. No constituye estudio de títulos, certificación de dominio ni opinión jurídica.
+  </div>
+</div>
+
+</body>
+</html>

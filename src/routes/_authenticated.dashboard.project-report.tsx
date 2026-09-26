@@ -1,9 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { lazy } from "react";
+import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
 import { useProjects } from "@/hooks/useProjects";
 import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
-import { Lv5Page5Preview } from "@/features/lv5/Lv5Page5Preview";
 import { FileText } from "lucide-react";
+
+// react-leaflet toca `window` al importarse: cargar solo en cliente (evita crash SSR).
+const Lv5Page5Preview = lazy(() =>
+  import("@/features/lv5/Lv5Page5Preview").then((m) => ({ default: m.Lv5Page5Preview })),
+);
 
 // Punto único de entrada a los reportes de proyecto piloto.
 // Detecta el proyecto activo y monta el feature correspondiente.
@@ -53,7 +58,12 @@ function ProjectReportPage() {
   if (code.includes("CHOLQUI") || code.includes("FRC") || code.includes("FRANCO")) {
     return <FrancoDashboard />;
   }
-  if (code.includes("LV5") || code.includes("VERDES") || code.includes("TILAMA") || code.includes("LV-TIL")) {
+  if (
+    code.includes("LV5") ||
+    code.includes("VERDES") ||
+    code.includes("TILAMA") ||
+    code.includes("LV-TIL")
+  ) {
     return (
       <div className="h-[calc(100vh-4rem)] w-full p-4 flex flex-col">
         <header className="mb-3">
@@ -63,7 +73,9 @@ function ProjectReportPage() {
           </p>
         </header>
         <div className="flex-1 min-h-0">
-          <Lv5Page5Preview />
+          <ClientOnly fallback={<div className="h-full w-full animate-pulse bg-muted/20" />}>
+            <Lv5Page5Preview />
+          </ClientOnly>
         </div>
       </div>
     );

@@ -44,8 +44,7 @@ export type ResolvedTrade = {
   counterpartyName: string | null;
 };
 
-const TRADE_SEL =
-  "id, reference, commodity, counterparty_email, counterparty_name";
+const TRADE_SEL = "id, reference, commodity, counterparty_email, counterparty_name";
 
 export async function resolveTradeByOpsToken(token: string): Promise<ResolvedTrade | null> {
   if (!isOpsTokenFormat(token)) return null;
@@ -132,9 +131,13 @@ export async function consumeOtpChallenge(
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
-  const row = data as
-    | { id: string; code_hash: string; attempts: number; expires_at: string; consumed_at: string | null }
-    | null;
+  const row = data as {
+    id: string;
+    code_hash: string;
+    attempts: number;
+    expires_at: string;
+    consumed_at: string | null;
+  } | null;
   if (!row) return null;
   if (row.consumed_at) return null;
   if (new Date(row.expires_at).getTime() < Date.now()) return null;

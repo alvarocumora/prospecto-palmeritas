@@ -52,5 +52,21 @@ def candidates(config: str, out: str = "./out", max_scenes: int = 18,
     typer.echo("  " + fc["metadata"]["disclaimer"])
 
 
+@app.command()
+def report(out: str = "./out", config: str = "", prospecto: str = ""):
+    """Reporte HTML de Nivel 0 desde coverage.json (+ sampling_candidates.geojson)."""
+    from . import report as rep
+    out_dir = Path(out)
+    if config:
+        out_dir = out_dir / Config.from_yaml(config).name
+    cov = out_dir / "coverage.json"
+    if not cov.exists():
+        raise typer.Exit(typer.echo(f"no existe {cov}; corre 'coverage' primero."))
+    cand = out_dir / "sampling_candidates.geojson"
+    html = rep.build_report(cov, cand if cand.exists() else None,
+                            out_dir / "nivel0_report.html", prospecto=prospecto or None)
+    typer.echo(f"reporte -> {html}")
+
+
 if __name__ == "__main__":
     app()

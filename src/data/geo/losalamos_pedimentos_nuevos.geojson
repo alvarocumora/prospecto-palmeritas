@@ -1,0 +1,145 @@
+{
+  "type": "FeatureCollection",
+  "name": "losalamos_pedimentos_nuevos",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "tipo": "PROPUESTA / BORRADOR",
+    "criterio": "vacante sobre meseta favorable, este de los 34 panos",
+    "datum": "WGS84/UTM18S (SIRGAS)",
+    "n": 2,
+    "disclaimer": "Vacancia indicativa; favorabilidad geomorfologica (no mide ley REE). Requiere verificacion legal + geoquimica."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.01444005454682,
+              -37.63344214002503
+            ],
+            [
+              -73.01575721431651,
+              -37.58389771180467
+            ],
+            [
+              -73.07801530250431,
+              -37.58492823833564
+            ],
+            [
+              -73.07673940716924,
+              -37.63447449987525
+            ],
+            [
+              -73.01444005454682,
+              -37.63344214002503
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-LA-01",
+        "area_ha": 3025.0,
+        "meseta_pct": 33.1,
+        "lados_m": {
+          "E-W": 5500,
+          "N-S": 5500
+        },
+        "corners_utm": {
+          "NW": [
+            669700,
+            5838500
+          ],
+          "NE": [
+            675200,
+            5838500
+          ],
+          "SE": [
+            675200,
+            5833000
+          ],
+          "SW": [
+            669700,
+            5833000
+          ]
+        },
+        "cara_norte_utm": {
+          "E_centro": 672450.0,
+          "N": 5838500
+        },
+        "datum": "WGS84/UTM18S",
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.00443838996014,
+              -37.66842027461189
+            ],
+            [
+              -73.00533042117421,
+              -37.6350908374157
+            ],
+            [
+              -73.10048138228161,
+              -37.636661700355546
+            ],
+            [
+              -73.09963183930618,
+              -37.669993016232524
+            ],
+            [
+              -73.00443838996014,
+              -37.66842027461189
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-LA-02",
+        "area_ha": 3108.0,
+        "meseta_pct": 31.2,
+        "lados_m": {
+          "E-W": 8400,
+          "N-S": 3700
+        },
+        "corners_utm": {
+          "NW": [
+            667600,
+            5832800
+          ],
+          "NE": [
+            676000,
+            5832800
+          ],
+          "SE": [
+            676000,
+            5829100
+          ],
+          "SW": [
+            667600,
+            5829100
+          ]
+        },
+        "cara_norte_utm": {
+          "E_centro": 671800.0,
+          "N": 5832800
+        },
+        "datum": "WGS84/UTM18S",
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    }
+  ]
+}

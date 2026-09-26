@@ -14,7 +14,10 @@ function fmtNum(v: number | null | undefined, dec = 1): string {
   return Number(v).toLocaleString("es-CL", { maximumFractionDigits: dec });
 }
 
-export async function generateTilamaPdf(report: TilamaReport, mining?: LosVerdesMining): Promise<jsPDF> {
+export async function generateTilamaPdf(
+  report: TilamaReport,
+  mining?: LosVerdesMining,
+): Promise<jsPDF> {
   const QR = await import("qrcode");
   const doc = new jsPDF({ unit: "pt", format: "letter" });
   const pageW = doc.internal.pageSize.getWidth();
@@ -131,7 +134,10 @@ export async function generateTilamaPdf(report: TilamaReport, mining?: LosVerdes
     `${report.stats.targetsTotal} (${report.stats.targetsCritical} críticos · ${report.stats.targetsHigh} alta prioridad)`,
   );
   kv("Muestras geoquímicas:", `${report.stats.samplesTotal} puntos georreferenciados`);
-  kv("Cobre:", `Promedio ${fmtNum(report.stats.cuAvgPct, 2)} % · máximo ${fmtNum(report.stats.cuMaxPct, 2)} %`);
+  kv(
+    "Cobre:",
+    `Promedio ${fmtNum(report.stats.cuAvgPct, 2)} % · máximo ${fmtNum(report.stats.cuMaxPct, 2)} %`,
+  );
   kv(
     "Mineralogía dominante:",
     "Calcopirita · bornita · covelina · calcosina · crisocola · atacamita",
@@ -217,16 +223,37 @@ export async function generateTilamaPdf(report: TilamaReport, mining?: LosVerdes
   para(
     `La base consolidada contiene ${report.stats.samplesTotal} muestras georreferenciadas. El cobre promedia ${fmtNum(report.stats.cuAvgPct, 2)} % y alcanza un máximo de ${fmtNum(report.stats.cuMaxPct, 2)} %; los máximos registrados de oro y plata son ${fmtNum(report.stats.auMaxGpt, 3)} g/t Au y ${fmtNum(report.stats.agMaxGpt, 1)} g/t Ag. Estos resultados están cargados en estado borrador y deben validarse contra certificados, cadena de custodia y QA/QC antes de cualquier uso regulatorio.`,
   );
-  const topSamples = [...report.samples].sort((a, b) => Number(b.cu_pct ?? 0) - Number(a.cu_pct ?? 0)).slice(0, 8);
+  const topSamples = [...report.samples]
+    .sort((a, b) => Number(b.cu_pct ?? 0) - Number(a.cu_pct ?? 0))
+    .slice(0, 8);
   if (topSamples.length) {
     h2("Muestras con mayor ley de cobre");
-    const x = { code: MARGIN, cu: MARGIN + 105, au: MARGIN + 185, ag: MARGIN + 270, lab: MARGIN + 355 };
-    doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(71, 85, 105);
-    doc.text("Muestra", x.code, y); doc.text("Cu %", x.cu, y); doc.text("Au g/t", x.au, y); doc.text("Ag g/t", x.ag, y); doc.text("Laboratorio", x.lab, y);
-    y += 12; doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4); doc.setFont("helvetica", "normal"); doc.setTextColor(15, 23, 42);
+    const x = {
+      code: MARGIN,
+      cu: MARGIN + 105,
+      au: MARGIN + 185,
+      ag: MARGIN + 270,
+      lab: MARGIN + 355,
+    };
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8.5);
+    doc.setTextColor(71, 85, 105);
+    doc.text("Muestra", x.code, y);
+    doc.text("Cu %", x.cu, y);
+    doc.text("Au g/t", x.au, y);
+    doc.text("Ag g/t", x.ag, y);
+    doc.text("Laboratorio", x.lab, y);
+    y += 12;
+    doc.line(MARGIN, y - 4, pageW - MARGIN, y - 4);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(15, 23, 42);
     for (const sample of topSamples) {
       ensure(13);
-      doc.text(sample.sample_code, x.code, y); doc.text(fmtNum(sample.cu_pct, 3), x.cu, y); doc.text(fmtNum(sample.au_gpt, 3), x.au, y); doc.text(fmtNum(sample.ag_gpt, 2), x.ag, y); doc.text(String(sample.lab ?? "—").slice(0, 24), x.lab, y);
+      doc.text(sample.sample_code, x.code, y);
+      doc.text(fmtNum(sample.cu_pct, 3), x.cu, y);
+      doc.text(fmtNum(sample.au_gpt, 3), x.au, y);
+      doc.text(fmtNum(sample.ag_gpt, 2), x.ag, y);
+      doc.text(String(sample.lab ?? "—").slice(0, 24), x.lab, y);
       y += 12;
     }
     y += 8;

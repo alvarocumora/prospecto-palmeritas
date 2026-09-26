@@ -52,7 +52,10 @@ function PrivacyPanel() {
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const reload = () => list({}).then((r) => setRows(r as Dsr[])).catch(() => setRows([]));
+  const reload = () =>
+    list({})
+      .then((r) => setRows(r as Dsr[]))
+      .catch(() => setRows([]));
   useEffect(() => {
     reload();
   }, []);
@@ -185,7 +188,10 @@ function PrivacyPanel() {
         </section>
 
         <footer className="text-xs text-content-subtle border-t border-hairline pt-4">
-          Contacto DPO: <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">privacy@geocapitals.com</a>
+          Contacto DPO:{" "}
+          <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">
+            privacy@geocapitals.com
+          </a>
         </footer>
       </div>
     </div>

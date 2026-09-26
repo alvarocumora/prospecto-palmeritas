@@ -1,0 +1,49 @@
+name: SimPEG Magnetics
+
+on:
+  pull_request:
+    paths:
+      - "services/simpeg-magnetics/**"
+      - "src/lib/geoscience-compute/simpegMagnetics.ts"
+      - "src/lib/geoscience-compute/simpegMagnetics.test.ts"
+      - ".github/workflows/simpeg-magnetics.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "services/simpeg-magnetics/**"
+      - "src/lib/geoscience-compute/simpegMagnetics.ts"
+      - "src/lib/geoscience-compute/simpegMagnetics.test.ts"
+      - ".github/workflows/simpeg-magnetics.yml"
+
+jobs:
+  worker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: services/simpeg-magnetics/requirements.txt
+      - name: Install worker dependencies
+        run: pip install -r services/simpeg-magnetics/requirements.txt
+      - name: Python contract tests
+        working-directory: services/simpeg-magnetics
+        run: python -m unittest -v test_runner.py
+
+  contract:
+    runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: --max-old-space-size=8192
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: SimPEG TypeScript contract tests
+        run: npx vitest run src/lib/geoscience-compute/simpegMagnetics.test.ts
+      - name: Typecheck
+        run: npm run typecheck

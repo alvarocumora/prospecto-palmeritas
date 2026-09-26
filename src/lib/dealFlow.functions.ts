@@ -92,7 +92,6 @@ function nextStagesFor(stage: DealStage, resumeStage: DealStage | null): DealSta
   return [...(forward ? [forward] : []), "pausado", "retirado", "rechazado"];
 }
 
-
 /** Etapa + bitácora del deal del usuario actual (o del titular) para un listing. */
 export const getDealFlow = createServerFn({ method: "GET" })
   .middleware([requireCapitalRole])
@@ -138,7 +137,6 @@ export const getDealFlow = createServerFn({ method: "GET" })
       nextStages: nextStagesFor(stage, resumeStage),
       events: (events ?? []) as DealStageEvent[],
     };
-
   });
 
 /** Avanza la etapa del deal; el RPC valida transición y autorización. */

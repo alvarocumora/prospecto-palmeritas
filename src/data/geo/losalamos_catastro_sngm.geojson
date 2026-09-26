@@ -1,0 +1,203 @@
+{
+  "type": "FeatureCollection",
+  "name": "losalamos_catastro_sngm",
+  "metadata": {
+    "fuente": "SERNAGEOMIN",
+    "n": 5
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.2703426369999,
+              -37.612359936
+            ],
+            [
+              -73.259017822,
+              -37.612193369
+            ],
+            [
+              -73.2588077089999,
+              -37.621202325
+            ],
+            [
+              -73.270133889,
+              -37.621368946
+            ],
+            [
+              -73.2703426369999,
+              -37.612359936
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "CERRO NEGRO 1/10",
+        "titular": "ESCOBAR SIERRA VICTOR MANUEL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "fuente": "SERNAGEOMIN catastro_SNGM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.321874282,
+              -37.5877799799999
+            ],
+            [
+              -73.3094207519999,
+              -37.587602234
+            ],
+            [
+              -73.3092780659999,
+              -37.593908698
+            ],
+            [
+              -73.317203695,
+              -37.594021987
+            ],
+            [
+              -73.3171834029999,
+              -37.5949229129999
+            ],
+            [
+              -73.3217124079999,
+              -37.594987413
+            ],
+            [
+              -73.321874282,
+              -37.5877799799999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "HAMN 1/12",
+        "titular": "MUNOZ MUNOZ DANILO ALFONSO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "fuente": "SERNAGEOMIN catastro_SNGM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.155240882,
+              -37.629442264
+            ],
+            [
+              -73.143914191,
+              -37.6292645849999
+            ],
+            [
+              -73.143017039,
+              -37.6652979369999
+            ],
+            [
+              -73.154349198,
+              -37.6654758459999
+            ],
+            [
+              -73.155240882,
+              -37.629442264
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "MINERA LOS ALAMOS",
+        "titular": "CLAUDIO ALEJANDRO GONZALEZ GONZALEZ",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "fuente": "SERNAGEOMIN catastro_SNGM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.2862370289999,
+              -37.6108705679999
+            ],
+            [
+              -73.270382497,
+              -37.610639213
+            ],
+            [
+              -73.270236396,
+              -37.616945524
+            ],
+            [
+              -73.286092265,
+              -37.617176931
+            ],
+            [
+              -73.2862370289999,
+              -37.6108705679999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "KOLIKO 1/10",
+        "titular": "CARCAMO LOPEZ HERNAN PATRICIO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "fuente": "SERNAGEOMIN catastro_SNGM"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.307607068,
+              -37.5926771169999
+            ],
+            [
+              -73.284963053,
+              -37.5923501939999
+            ],
+            [
+              -73.284859647,
+              -37.596854751
+            ],
+            [
+              -73.307505025,
+              -37.597181727
+            ],
+            [
+              -73.307607068,
+              -37.5926771169999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "LA MARRE 1/10",
+        "titular": "SLM SOC MINERA LA MARRE 1/10",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "fuente": "SERNAGEOMIN catastro_SNGM"
+      }
+    }
+  ]
+}

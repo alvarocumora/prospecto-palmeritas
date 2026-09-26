@@ -32,9 +32,12 @@ cantidad:
   periodicidad: spot                 # spot | mensual | trimestral
   recurrencia: null
 
+# Ley: unidad y metal pagable. g/t con metal precioso -> se reporta en oz troy.
+ley:
+  unidad: g/t
+  metal: Au
 # Escenarios de ley: SON SUPUESTOS para el cálculo de fino, no un ensaye.
-# El fino se calcula en Python: gramos = t * 1000 * (g/t) ... oz_troy = g / 31.1034768
-escenarios_ley_gpt: [300, 400, 475, 550]
+escenarios_ley: [300, 400, 475, 550]
 
 comercial:
   incoterm: EXW                      # EXW | FOB | CIF — por confirmar

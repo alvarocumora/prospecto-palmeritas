@@ -21,10 +21,10 @@ export const Route = createFileRoute("/api/public/hooks/signature-reminders")({
         const url = import.meta.env.VITE_SUPABASE_URL as string;
         const key = process.env.SUPABASE_SERVICE_ROLE_KEY as string;
         if (!url || !key) {
-          return new Response(
-            JSON.stringify({ ok: false, error: "missing_env" }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: "missing_env" }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         const sb = createClient(url, key, {
           auth: { autoRefreshToken: false, persistSession: false },
@@ -35,24 +35,21 @@ export const Route = createFileRoute("/api/public/hooks/signature-reminders")({
         // 1) Sobres vigentes de operaciones aún pendientes
         const { data: envelopes, error: envErr } = await sb
           .from("signature_envelopes")
-          .select(
-            "id, operation_id, document_title, expires_at, status, metadata",
-          )
+          .select("id, operation_id, document_title, expires_at, status, metadata")
           .eq("status", "pending")
           .not("operation_id", "is", null)
           .not("expires_at", "is", null)
           .gt("expires_at", nowIso);
         if (envErr) {
-          return new Response(
-            JSON.stringify({ ok: false, error: envErr.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: envErr.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
         if (!envelopes || envelopes.length === 0) {
-          return new Response(
-            JSON.stringify({ ok: true, envelopes: 0, sent: 0 }),
-            { headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: true, envelopes: 0, sent: 0 }), {
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         const opIds = Array.from(
@@ -75,10 +72,10 @@ export const Route = createFileRoute("/api/public/hooks/signature-reminders")({
           .not("signer_email", "is", null)
           .not("access_token", "is", null);
         if (sigErr) {
-          return new Response(
-            JSON.stringify({ ok: false, error: sigErr.message }),
-            { status: 500, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: false, error: sigErr.message }), {
+            status: 500,
+            headers: { "Content-Type": "application/json" },
+          });
         }
 
         const envById = new Map(envelopes.map((e) => [e.id, e]));
@@ -92,16 +89,10 @@ export const Route = createFileRoute("/api/public/hooks/signature-reminders")({
           const env = envById.get(s.envelope_id);
           if (!env?.expires_at) continue;
           const expiresMs = new Date(env.expires_at).getTime();
-          const hoursRemaining = Math.max(
-            0,
-            Math.round((expiresMs - now) / 3_600_000),
-          );
-          const cadenceHours =
-            hoursRemaining <= 48 ? 8 : hoursRemaining <= 24 * 7 ? 24 : 72;
+          const hoursRemaining = Math.max(0, Math.round((expiresMs - now) / 3_600_000));
+          const cadenceHours = hoursRemaining <= 48 ? 8 : hoursRemaining <= 24 * 7 ? 24 : 72;
           const lastAt = s.last_reminder_at ?? s.emailed_at;
-          const hoursSinceLast = lastAt
-            ? (now - new Date(lastAt).getTime()) / 3_600_000
-            : Infinity;
+          const hoursSinceLast = lastAt ? (now - new Date(lastAt).getTime()) / 3_600_000 : Infinity;
           if ((s.reminder_count ?? 0) >= MAX_REMINDERS) {
             skipped++;
             continue;
@@ -112,14 +103,13 @@ export const Route = createFileRoute("/api/public/hooks/signature-reminders")({
           }
 
           const op = env.operation_id ? opsById.get(env.operation_id) : null;
-          const signUrl = publicUrl(
-            `/firmar/operacion/${encodeURIComponent(s.access_token!)}`,
-          );
+          const signUrl = publicUrl(`/firmar/operacion/${encodeURIComponent(s.access_token!)}`);
           const reminderNumber = (s.reminder_count ?? 0) + 1;
-          const expiresAtLabel = new Date(env.expires_at).toLocaleDateString(
-            "es-CL",
-            { day: "numeric", month: "long", year: "numeric" },
-          );
+          const expiresAtLabel = new Date(env.expires_at).toLocaleDateString("es-CL", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          });
 
           try {
             const res = await sendInternalEmail({

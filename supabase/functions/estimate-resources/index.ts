@@ -292,7 +292,6 @@ Deno.serve(async (req) => {
     const memRes = await requireProjectMember(supabase, authRes.userId, model.project_id);
     if ("error" in memRes) return memRes.error;
 
-
     await supabase.from("resource_models").update({ status: "running" }).eq("id", model_id);
 
     // 2) Fetch holes for project (optionally filtered by campaign)

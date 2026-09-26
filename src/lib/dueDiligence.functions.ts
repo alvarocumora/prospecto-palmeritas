@@ -69,7 +69,10 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
     const pid = data.projectId;
 
     const count = async (table: string, extra?: (q: any) => any) => {
-      let q = sb.from(table as never).select("id", { count: "exact", head: true }).eq("project_id", pid);
+      let q = sb
+        .from(table as never)
+        .select("id", { count: "exact", head: true })
+        .eq("project_id", pid);
       if (extra) q = extra(q);
       const { count: c } = await q;
       return c ?? 0;
@@ -115,10 +118,7 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
         .eq("project_id", pid)
         .order("updated_at", { ascending: false })
         .limit(1),
-      sb
-        .from("property_listings")
-        .select("id,is_published,asking_price_usd")
-        .eq("project_id", pid),
+      sb.from("property_listings").select("id,is_published,asking_price_usd").eq("project_id", pid),
     ]);
 
     const room = rooms?.[0] ?? null;
@@ -151,7 +151,13 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
           "Sin mensura el título no es de explotación.",
           2,
         ),
-        item("ped", "Pedimentos vigentes", pedimentos > 0, String(pedimentos), "Registra pedimentos en trámite."),
+        item(
+          "ped",
+          "Pedimentos vigentes",
+          pedimentos > 0,
+          String(pedimentos),
+          "Registra pedimentos en trámite.",
+        ),
         item(
           "overlap",
           "Sin superposiciones críticas",
@@ -169,14 +175,56 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
         ),
       ]),
       dim("geologia", "Evidencia geológica", [
-        item("holes", "Sondajes registrados", holes > 0, String(holes), "Carga la base de sondajes (collar/survey/assay).", 3),
-        item("geoq", "Muestreo geoquímico", geochem > 0, String(geochem), "Sube análisis de geoquímica de superficie.", 2),
-        item("geof", "Campañas geofísicas", geophys > 0, String(geophys), "Agrega magnetometría / IP / gravimetría.", 2),
-        item("targets", "Targets definidos", targets > 0, String(targets), "Define targets de exploración priorizados.", 2),
+        item(
+          "holes",
+          "Sondajes registrados",
+          holes > 0,
+          String(holes),
+          "Carga la base de sondajes (collar/survey/assay).",
+          3,
+        ),
+        item(
+          "geoq",
+          "Muestreo geoquímico",
+          geochem > 0,
+          String(geochem),
+          "Sube análisis de geoquímica de superficie.",
+          2,
+        ),
+        item(
+          "geof",
+          "Campañas geofísicas",
+          geophys > 0,
+          String(geophys),
+          "Agrega magnetometría / IP / gravimetría.",
+          2,
+        ),
+        item(
+          "targets",
+          "Targets definidos",
+          targets > 0,
+          String(targets),
+          "Define targets de exploración priorizados.",
+          2,
+        ),
       ]),
       dim("tecnico", "Modelo y datos técnicos", [
-        item("bm", "Modelo de bloques", blockModels > 0, String(blockModels), "Sin modelo no hay estimación de recursos.", 3),
-        item("brief", "Brief técnico", !!brief, brief ? "cargado" : "—", "Completa el brief técnico del proyecto.", 2),
+        item(
+          "bm",
+          "Modelo de bloques",
+          blockModels > 0,
+          String(blockModels),
+          "Sin modelo no hay estimación de recursos.",
+          3,
+        ),
+        item(
+          "brief",
+          "Brief técnico",
+          !!brief,
+          brief ? "cargado" : "—",
+          "Completa el brief técnico del proyecto.",
+          2,
+        ),
         item(
           "geo",
           "Centroide oficial",
@@ -186,18 +234,70 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
         ),
       ]),
       dim("dataroom", "Data room", [
-        item("room", "Data room creado", !!room, room ? "sí" : "no", "Crea el data room canónico (carpetas 00–10).", 2),
-        item("docs", "Documentos base (≥8)", roomFiles >= 8, String(roomFiles), "Carga legal, geología, títulos y ambiental.", 3),
-        item("nda", "NDA requerido", !!room?.nda_required, room?.nda_required ? "sí" : "no", "Activa NDA para material confidencial."),
+        item(
+          "room",
+          "Data room creado",
+          !!room,
+          room ? "sí" : "no",
+          "Crea el data room canónico (carpetas 00–10).",
+          2,
+        ),
+        item(
+          "docs",
+          "Documentos base (≥8)",
+          roomFiles >= 8,
+          String(roomFiles),
+          "Carga legal, geología, títulos y ambiental.",
+          3,
+        ),
+        item(
+          "nda",
+          "NDA requerido",
+          !!room?.nda_required,
+          room?.nda_required ? "sí" : "no",
+          "Activa NDA para material confidencial.",
+        ),
       ]),
       dim("valorizacion", "Valorización", [
-        item("npv", "NPV calculado", scenario?.npv_usd != null, scenario?.npv_usd != null ? "sí" : "—", "Corre un escenario económico (DCF).", 2),
-        item("irr", "TIR estimada", scenario?.irr_pct != null, scenario?.irr_pct != null ? `${Number(scenario.irr_pct).toFixed(1)}%` : "—", "Completa el escenario para obtener TIR."),
+        item(
+          "npv",
+          "NPV calculado",
+          scenario?.npv_usd != null,
+          scenario?.npv_usd != null ? "sí" : "—",
+          "Corre un escenario económico (DCF).",
+          2,
+        ),
+        item(
+          "irr",
+          "TIR estimada",
+          scenario?.irr_pct != null,
+          scenario?.irr_pct != null ? `${Number(scenario.irr_pct).toFixed(1)}%` : "—",
+          "Completa el escenario para obtener TIR.",
+        ),
       ]),
       dim("comercial", "Comercial", [
-        item("listing", "Ficha comercial", !!listing, listing ? "sí" : "no", "Crea la ficha en Vitrina.", 2),
-        item("pub", "Publicada", !!listing?.is_published, listing?.is_published ? "sí" : "no", "Publica la ficha para exponerla a inversionistas."),
-        item("price", "Precio definido", listing?.asking_price_usd != null, listing?.asking_price_usd != null ? "sí" : "—", "Sin precio el deal no avanza a oferta."),
+        item(
+          "listing",
+          "Ficha comercial",
+          !!listing,
+          listing ? "sí" : "no",
+          "Crea la ficha en Vitrina.",
+          2,
+        ),
+        item(
+          "pub",
+          "Publicada",
+          !!listing?.is_published,
+          listing?.is_published ? "sí" : "no",
+          "Publica la ficha para exponerla a inversionistas.",
+        ),
+        item(
+          "price",
+          "Precio definido",
+          listing?.asking_price_usd != null,
+          listing?.asking_price_usd != null ? "sí" : "—",
+          "Sin precio el deal no avanza a oferta.",
+        ),
       ]),
     ];
 

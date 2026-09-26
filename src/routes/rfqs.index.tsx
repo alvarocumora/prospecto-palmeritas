@@ -13,7 +13,10 @@ export const Route = createFileRoute("/rfqs/")({
           "Solicitudes de cotización activas de compradores globales de mineral: cobre, oro, antimonio, tierras raras. Postúlate como proveedor verificado.",
       },
       { property: "og:title", content: "Marketplace de RFQ mineros — Geocapitals" },
-      { property: "og:description", content: "Compradores buscando concentrados y minerales verificados en LatAm." },
+      {
+        property: "og:description",
+        content: "Compradores buscando concentrados y minerales verificados en LatAm.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -90,7 +93,9 @@ function Marketplace() {
                   <div className="text-[11px] font-mono uppercase tracking-wider text-[hsl(var(--content-subtle))]">
                     {r.public_ref}
                   </div>
-                  <h3 className="font-serif text-xl">{r.buyer_company ?? "Comprador confidencial"}</h3>
+                  <h3 className="font-serif text-xl">
+                    {r.buyer_company ?? "Comprador confidencial"}
+                  </h3>
                   <div className="mt-1 text-xs text-[hsl(var(--content-subtle))]">
                     {r.destination_country ?? "Destino confidencial"} ·{" "}
                     {r.incoterm ?? "Incoterm por acordar"}
@@ -106,17 +111,16 @@ function Marketplace() {
                     <span className="font-medium">{p.product_name}</span>
                     <span className="text-xs text-[hsl(var(--content-subtle))]">
                       {p.qty_monthly_mt ? `${p.qty_monthly_mt} t/mes` : ""}
-                      {p.qty_total_mt ? `${p.qty_monthly_mt ? " · " : ""}${p.qty_total_mt} t total` : ""}
+                      {p.qty_total_mt
+                        ? `${p.qty_monthly_mt ? " · " : ""}${p.qty_total_mt} t total`
+                        : ""}
                       {p.port_destination ? ` · ${p.port_destination}` : ""}
                     </span>
                   </li>
                 ))}
               </ul>
               <div className="mt-4 flex justify-end">
-                <Link
-                  to="/inscripcion"
-                  className="text-sm text-[hsl(var(--accent-brand))]"
-                >
+                <Link to="/inscripcion" className="text-sm text-[hsl(var(--accent-brand))]">
                   Postular a este RFQ →
                 </Link>
               </div>

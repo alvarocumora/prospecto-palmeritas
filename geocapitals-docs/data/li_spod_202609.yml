@@ -1,0 +1,68 @@
+# ============================================================================
+# Ficha de oferta — concentrado de espodumeno (litio) (ejemplo). NO inventar datos.
+# ============================================================================
+ref: LI-SPOD-202609-TAR
+fecha: 2026-09-23
+estado: borrador
+titulo: Concentrado de espodumeno (Li2O)
+commodity: Concentrado de litio — espodumeno (Li2O)
+idioma: es
+
+vendedor:
+  rol: Productor / planta de concentración
+  pais: Chile
+  region: null
+  nombre: null
+  contacto: null
+
+material:
+  descripcion: Concentrado de espodumeno (mineral de litio)
+  forma: Concentrado granel
+  humedad_pct: null
+  origen: null
+
+cantidad:
+  toneladas: 5000
+  base: seca
+  periodicidad: mensual
+  recurrencia: null
+
+# Litio en espodumeno: ley en % Li2O (contenido en toneladas de Li2O).
+ley:
+  unidad: "%"
+  metal: Li2O
+escenarios_ley: [5.0, 5.5, 6.0]
+
+comercial:
+  incoterm: FOB
+  punto_entrega: null
+  moneda: USD
+  base_precio: Referencia CIF China 6% Li2O (por confirmar índice)
+  pago_por: contenido de Li2O pagable
+  payable_pct: null
+  deducciones:
+    - Ajuste por ley respecto a base 6% Li2O — por confirmar
+    - Penalidades por Fe2O3 / mica — por confirmar
+    - Deducción por humedad — por confirmar
+  condiciones_pago: null
+
+logistica:
+  puerto_referencia: null
+  transporte: null
+  plazo_estimado: null
+
+muestreo_ensaye:
+  protocolo: null
+  laboratorio: null
+  arbitraje: null
+
+documentacion_requerida:
+  - Certificado de análisis (Li2O, Fe2O3, impurezas)
+  - Origen / trazabilidad del material
+  - Documentación de transporte y despacho
+  - Cumplimiento KYC de contraparte
+
+notas:
+  - Los escenarios de ley son supuestos de cálculo, no un ensaye confirmado.
+  - El precio de espodumeno se ajusta a base 6% Li2O; se define en términos.
+  - Documento referencial; no constituye oferta vinculante.

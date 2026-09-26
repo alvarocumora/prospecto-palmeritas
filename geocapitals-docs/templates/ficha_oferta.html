@@ -49,28 +49,26 @@
     </div>
   </div>
 
-  <h2>Contenido fino por escenario de ley</h2>
+  <h2>Contenido por escenario de ley</h2>
   <div class="box gold">
     <div class="box-t">Supuesto de cálculo — no es un ensaye</div>
-    <div class="small">Las leyes son <b>escenarios supuestos</b> para dimensionar el fino.
-      El contenido fino real se determina por assay de laboratorio acreditado sobre el lote.
-      Cálculo: g&nbsp;=&nbsp;t&nbsp;×&nbsp;1000&nbsp;×&nbsp;(g/t); oz&nbsp;troy&nbsp;=&nbsp;g&nbsp;/&nbsp;{{ troy_oz_g }}.</div>
+    <div class="small">Las leyes son <b>escenarios supuestos</b> para dimensionar el contenido.
+      El contenido real se determina por assay de laboratorio acreditado sobre el lote.
+      {% if fino_cap %}{{ fino_cap }}{% endif %}</div>
   </div>
-  {% if fino %}
+  {% if fino_rows %}
   <table>
     <thead><tr>
-      <th>Escenario de ley (g/t)</th>
-      <th class="num">Fino (g)</th>
-      <th class="num">Fino (kg)</th>
-      <th class="num">Fino (oz troy)</th>
+      {% for key, label, dec in fino_cols %}
+      <th{% if not loop.first %} class="num"{% endif %}>{{ label }}</th>
+      {% endfor %}
     </tr></thead>
     <tbody>
-      {% for f in fino %}
+      {% for row in fino_rows %}
       <tr>
-        <td>{{ f.ley_gpt | num(0) }}</td>
-        <td class="num">{{ f.gramos | num(0) }}</td>
-        <td class="num">{{ f.kg | num(2) }}</td>
-        <td class="num">{{ f.oz_troy | num(1) }}</td>
+        {% for key, label, dec in fino_cols %}
+        <td{% if not loop.first %} class="num"{% endif %}>{{ row[key] | num(dec) }}</td>
+        {% endfor %}
       </tr>
       {% endfor %}
     </tbody>

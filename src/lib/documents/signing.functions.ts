@@ -309,7 +309,6 @@ export const getSignRequest = createServerFn({ method: "POST" })
     };
   });
 
-
 const SignInput = z.object({
   token: z.string().trim().min(10).max(120),
   signerName: z.string().trim().min(3).max(120),

@@ -1,6 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { FileText, ArrowRight, ShieldCheck, Clock, CloudOff, Plus, User2, Download, Sparkles, PenLine } from "lucide-react";
+import {
+  FileText,
+  ArrowRight,
+  ShieldCheck,
+  Clock,
+  CloudOff,
+  Plus,
+  User2,
+  Download,
+  Sparkles,
+  PenLine,
+} from "lucide-react";
 import { TEMPLATES, TEMPLATE_BY_ID, CATEGORY_LABEL } from "@/lib/documents/templates";
 import { SPECIAL_DOCS, downloadSpecialDoc, type SpecialDocId } from "@/lib/documents/specialDocs";
 import { SpecialDocSignDialog } from "@/features/documents/SpecialDocSignDialog";
@@ -134,9 +145,7 @@ function DocumentsGallery() {
             Tus documentos
           </div>
           {drafts.length > 0 && (
-            <span className="text-[10px] font-mono text-content-subtle">
-              {drafts.length} total
-            </span>
+            <span className="text-[10px] font-mono text-content-subtle">{drafts.length} total</span>
           )}
         </div>
         {drafts.length === 0 && !loading ? (
@@ -207,8 +216,8 @@ function DocumentsGallery() {
           Crear un documento nuevo
         </div>
         <p className="text-sm text-content-subtle mt-1">
-          Cada vez que abres una plantilla se crea un borrador independiente asociado al cliente
-          que indiques.
+          Cada vez que abres una plantilla se crea un borrador independiente asociado al cliente que
+          indiques.
         </p>
       </div>
       {Array.from(byCategory.entries()).map(([cat, list]) => (
@@ -265,7 +274,10 @@ function StatusBadge({ status }: { status: string }) {
     draft: { label: "Borrador", cls: "bg-surface-3 text-content-subtle border border-hairline" },
     sent: { label: "Enviado", cls: "bg-amber-500/15 text-amber-600" },
     signed: { label: "Firmado", cls: "bg-emerald-500/15 text-emerald-600" },
-    archived: { label: "Archivado", cls: "bg-surface-3 text-content-subtle border border-hairline" },
+    archived: {
+      label: "Archivado",
+      cls: "bg-surface-3 text-content-subtle border border-hairline",
+    },
   };
   const meta = map[status] ?? map.draft;
   return (
@@ -325,10 +337,10 @@ function SpecialDocsSection() {
         </Link>
       </div>
       <p className="text-sm text-content-subtle mb-3 max-w-3xl">
-        Fichas y adendas de operaciones activas generadas con el mismo motor Institutional
-        Modernist que NDA, LOI y NCNDA: papel hueso, tabulación estándar, QR de verificación en
-        cabecera y pie, y contacto oficial de Geocapitals. Puedes descargarlas o enviarlas a firma
-        electrónica multi-parte con trazabilidad SHA-256.
+        Fichas y adendas de operaciones activas generadas con el mismo motor Institutional Modernist
+        que NDA, LOI y NCNDA: papel hueso, tabulación estándar, QR de verificación en cabecera y
+        pie, y contacto oficial de Geocapitals. Puedes descargarlas o enviarlas a firma electrónica
+        multi-parte con trazabilidad SHA-256.
       </p>
       {error ? (
         <div className="mb-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700">
@@ -337,10 +349,7 @@ function SpecialDocsSection() {
       ) : null}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {SPECIAL_DOCS.map((d) => (
-          <div
-            key={d.id}
-            className="rounded-2xl border border-hairline bg-white p-5 flex flex-col"
-          >
+          <div key={d.id} className="rounded-2xl border border-hairline bg-white p-5 flex flex-col">
             <div className="flex items-center justify-between mb-2">
               <span className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-mono uppercase tracking-wider bg-accent-brand-subtle text-accent-brand">
                 <FileText className="w-3 h-3" /> {d.acronym}
@@ -350,9 +359,7 @@ function SpecialDocsSection() {
               </span>
             </div>
             <div className="font-display text-lg text-content leading-snug">{d.label}</div>
-            <p className="text-sm text-content-subtle mt-1.5 leading-relaxed flex-1">
-              {d.summary}
-            </p>
+            <p className="text-sm text-content-subtle mt-1.5 leading-relaxed flex-1">{d.summary}</p>
             <div className="mt-4 grid grid-cols-2 gap-2">
               <button
                 type="button"
@@ -375,9 +382,7 @@ function SpecialDocsSection() {
           </div>
         ))}
       </div>
-      {signing && (
-        <SpecialDocSignDialog docId={signing} onClose={() => setSigning(null)} />
-      )}
+      {signing && <SpecialDocSignDialog docId={signing} onClose={() => setSigning(null)} />}
     </section>
   );
 }

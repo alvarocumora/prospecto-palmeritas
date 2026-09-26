@@ -23,7 +23,6 @@ import { MODALITY_LABEL, STAGE_LABEL } from "../domain/constants";
 import { fmtUSD } from "../domain/format";
 import { upsertInquiry } from "../application/inquiries";
 
-
 export function ListingDetailDrawer({
   listingId,
   onClose,
@@ -82,7 +81,6 @@ export function ListingDetailDrawer({
       setSigning(false);
     }
   };
-
 
   return (
     <div className="fixed inset-0 z-[100] flex justify-end">
@@ -233,8 +231,6 @@ export function ListingDetailDrawer({
               )}
 
               {tab === "valuation" && <ValuationPanel listingId={listing.id} />}
-
-
 
               {tab === "dataroom" && (
                 <div>

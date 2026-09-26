@@ -245,19 +245,47 @@ def css_inline() -> str:
     return (BRAND / "geocapitals.css").read_text(encoding="utf-8")
 
 
-def fino_por_escenario(toneladas: float, leyes_gpt: list[float]) -> list[dict]:
-    """Calcula el fino (g y oz troy) por escenario de ley. Cálculo, no ensaye."""
-    out = []
-    for g in leyes_gpt:
-        gramos = float(toneladas) * 1000.0 * float(g)
-        oz = gramos / TROY_OZ_G
-        out.append({
-            "ley_gpt": g,
-            "gramos": round(gramos, 0),
-            "kg": round(gramos / 1000.0, 2),
-            "oz_troy": round(oz, 1),
-        })
-    return out
+# Metales preciosos: se reportan en onza troy además de masa.
+PRECIOUS = {"AU", "AG", "PT", "PD", "ORO", "PLATA"}
+
+
+def compute_fino(toneladas, leyes, unidad="g/t", metal="Au"):
+    """Contenido fino por escenario de ley. Devuelve (filas, columnas, caption).
+
+    unidad 'g/t'  -> gramos = t·1000·(g/t); oz troy si es metal precioso.
+    unidad '%'    -> metal contenido (t) = t·(%/100); base para metales base
+                     (Cu, Sb) y para compuestos (Li como Li2CO3, etc.).
+    Es un cálculo sobre supuestos de ley, NO un ensaye.
+    """
+    if not toneladas or not leyes:
+        return [], [], ""
+    t = float(toneladas)
+    u = (unidad or "g/t").strip().lower()
+    m = (metal or "").strip().upper()
+    rows = []
+    if u in ("%", "pct", "porcentaje"):
+        for ley in leyes:
+            cont_t = t * float(ley) / 100.0
+            rows.append({"ley": ley, "cont_t": round(cont_t, 3), "cont_kg": round(cont_t * 1000, 1)})
+        cols = [("ley", f"Escenario de ley (% {metal})", 2),
+                ("cont_t", "Metal contenido (t)", 3),
+                ("cont_kg", "Metal contenido (kg)", 1)]
+        cap = "Contenido = t × (%/100). Supuesto de cálculo; el contenido real se fija por assay."
+    else:  # g/t
+        precious = m in PRECIOUS
+        for ley in leyes:
+            gramos = t * 1000.0 * float(ley)
+            row = {"ley": ley, "gramos": round(gramos, 0), "kg": round(gramos / 1000.0, 2)}
+            if precious:
+                row["oz_troy"] = round(gramos / TROY_OZ_G, 1)
+            rows.append(row)
+        cols = [("ley", f"Escenario de ley (g/t {metal})", 0),
+                ("gramos", "Fino (g)", 0), ("kg", "Fino (kg)", 2)]
+        if precious:
+            cols.append(("oz_troy", "Fino (oz troy)", 1))
+        cap = ("g = t × 1000 × (g/t); oz troy = g / 31.1034768. "
+               "Supuesto de cálculo; el fino real se fija por assay.")
+    return rows, cols, cap
 
 
 # --------------------------------------------------------------------------
@@ -313,14 +341,40 @@ def render_html_to_pdf(html: str, pdf_path: Path) -> None:
 
 
 def pdf_page_count(pdf_path: Path) -> int:
+    """Cuenta páginas. Usa pdfinfo (poppler) si está; si no, parsea el PDF en
+    Python puro (no todos los contenedores traen poppler; pypdf está roto acá)."""
     try:
         out = subprocess.run(["pdfinfo", str(pdf_path)], capture_output=True, text=True)
         for line in out.stdout.splitlines():
             if line.lower().startswith("pages:"):
                 return int(line.split(":")[1].strip())
-    except FileNotFoundError:
+    except (FileNotFoundError, ValueError):
         pass
-    return -1
+    return _page_count_pure(pdf_path)
+
+
+def _page_count_pure(pdf_path: Path) -> int:
+    import re
+    import zlib
+    data = Path(pdf_path).read_bytes()
+    m = re.findall(rb'/Type\s*/Pages\b[^>]*?/Count\s+(\d+)', data) \
+        or re.findall(rb'/Count\s+(\d+)[^>]*?/Type\s*/Pages\b', data)
+    if m:
+        return max(int(x) for x in m)
+    n = len(re.findall(rb'/Type\s*/Page[^s]', data))
+    if n:
+        return n
+    total = 0
+    for obj in re.findall(rb'stream\r?\n(.*?)\r?\nendstream', data, re.S):
+        try:
+            d = zlib.decompress(obj)
+        except Exception:
+            continue
+        mm = re.findall(rb'/Type\s*/Pages\b[^>]*?/Count\s+(\d+)', d)
+        if mm:
+            return max(int(x) for x in mm)
+        total += len(re.findall(rb'/Type\s*/Page[^s]', d))
+    return total or -1
 
 
 # --------------------------------------------------------------------------
@@ -347,14 +401,46 @@ def build_kyc(lang: str = "es") -> Path:
     return pdf
 
 
+def build_dd(json_path: Path) -> Path:
+    """Reporte PDF de due diligence catastral desde el JSON de
+    get_cadastre_reconciliation ({run, has_snapshots, findings})."""
+    import json as _json
+    data = _json.loads(json_path.read_text(encoding="utf-8"))
+    run = dict(data.get("run") or {})
+    run["has_snapshots"] = data.get("has_snapshots", False)
+    rid = str(run.get("id") or "")
+    run["id_short"] = (rid[:8] if rid else None)
+    summary = run.get("summary") or {}
+    findings = data.get("findings") or []
+    disclaimer = data.get("disclaimer") or (
+        "Análisis automatizado de apoyo. No constituye estudio de títulos, "
+        "certificación de dominio ni opinión jurídica.")
+
+    env = jinja_env()
+    tpl = env.get_template("dd_catastro.html")
+    html = tpl.render(
+        org_name=ORG_NAME, tagline=ORG_TAGLINE_ES, css=css_inline(), logo=logo_ref(),
+        run=run, summary=summary, findings=findings, disclaimer=disclaimer,
+        contact_email=CONTACT_EMAIL, contact_phone=CONTACT_PHONE,
+    )
+    tag = run["id_short"] or "SIN_ID"
+    pdf = OUT / f"GEOCAPITALS_DueDiligence_Catastro_{tag}.pdf"
+    render_html_to_pdf(html, pdf)
+    return pdf
+
+
 def build_ficha(yml_path: Path) -> Path:
     data = yaml.safe_load(yml_path.read_text(encoding="utf-8"))
     env = jinja_env()
     tpl = env.get_template("ficha_oferta.html")
 
     toneladas = (data.get("cantidad") or {}).get("toneladas")
-    leyes = data.get("escenarios_ley_gpt") or []
-    fino = fino_por_escenario(toneladas, leyes) if (toneladas and leyes) else []
+    ley_block = data.get("ley") or {}
+    unidad = ley_block.get("unidad", "g/t")
+    metal = ley_block.get("metal", "Au")
+    # Compatibilidad: acepta 'escenarios_ley' o el antiguo 'escenarios_ley_gpt'.
+    leyes = data.get("escenarios_ley") or data.get("escenarios_ley_gpt") or []
+    fino_rows, fino_cols, fino_cap = compute_fino(toneladas, leyes, unidad, metal)
 
     ctx = {
         "org_name": ORG_NAME,
@@ -362,7 +448,9 @@ def build_ficha(yml_path: Path) -> Path:
         "css": css_inline(),
         "logo": logo_ref(),
         "d": data,
-        "fino": fino,
+        "fino_rows": fino_rows,
+        "fino_cols": fino_cols,
+        "fino_cap": fino_cap,
         "troy_oz_g": TROY_OZ_G,
         "contact_email": CONTACT_EMAIL,
         "contact_phone": CONTACT_PHONE,
@@ -388,7 +476,10 @@ def main() -> None:
     p_ficha = sub.add_parser("ficha", help="Ficha de oferta desde YAML (2 pp)")
     p_ficha.add_argument("yml", type=Path)
 
-    sub.add_parser("all", help="KYC (es) + ficha del YAML de ejemplo")
+    p_dd = sub.add_parser("dd", help="Reporte de due diligence catastral desde JSON")
+    p_dd.add_argument("json", type=Path)
+
+    sub.add_parser("all", help="KYC (es) + ficha + due diligence de los ejemplos")
 
     args = ap.parse_args()
 
@@ -398,11 +489,18 @@ def main() -> None:
     elif args.cmd == "ficha":
         pdf = build_ficha(args.yml)
         print(f"[ficha] {pdf}  ->  {pdf_page_count(pdf)} páginas")
+    elif args.cmd == "dd":
+        pdf = build_dd(args.json)
+        print(f"[dd]    {pdf}  ->  {pdf_page_count(pdf)} páginas")
     elif args.cmd == "all":
         k = build_kyc("es")
         print(f"[kyc]   {k}  ->  {pdf_page_count(k)} páginas")
         f = build_ficha(ROOT / "data" / "au_conc_202608.yml")
         print(f"[ficha] {f}  ->  {pdf_page_count(f)} páginas")
+        dd_json = ROOT / "data" / "dd_catastro_ejemplo.json"
+        if dd_json.exists():
+            d = build_dd(dd_json)
+            print(f"[dd]    {d}  ->  {pdf_page_count(d)} páginas")
 
 
 if __name__ == "__main__":
