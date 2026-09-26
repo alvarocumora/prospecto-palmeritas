@@ -55,16 +55,14 @@ const Email = ({
     }`}
     trackingPixelUrl={trackingPixelUrl}
   >
-    <Heading style={styles.h1}>
-      Ficha de proveedor bajo NCNDA · {commodity ?? "Commodity"}
-    </Heading>
+    <Heading style={styles.h1}>Ficha de proveedor bajo NCNDA · {commodity ?? "Commodity"}</Heading>
     <Text style={styles.p}>
       {recipientName ? `${recipientName}` : "Estimado(a)"}
       {recipientCompany ? ` — ${recipientCompany}` : ""}: {senderCompany ?? "Geocapitals"} le
       comparte la ficha del proveedor preseleccionado para el requerimiento{" "}
-      <b>{requestReference ?? "en curso"}</b>. Este envío se realiza bajo el{" "}
-      <b>NCNDA vigente</b> entre las Partes: la información es confidencial y su uso queda
-      limitado a la evaluación de la operación.
+      <b>{requestReference ?? "en curso"}</b>. Este envío se realiza bajo el <b>NCNDA vigente</b>{" "}
+      entre las Partes: la información es confidencial y su uso queda limitado a la evaluación de la
+      operación.
     </Text>
 
     <KeyValueBlock
@@ -97,9 +95,7 @@ const Email = ({
           borderLeft: `3px solid ${colors.primary}`,
         }}
       >
-        <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>
-          Abrir ficha completa
-        </Text>
+        <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>Abrir ficha completa</Text>
         <Text style={styles.muted}>
           Documento electrónico con QR de verificación · optimizado para escritorio y móvil.
         </Text>
@@ -126,8 +122,8 @@ const Email = ({
     <Hr style={styles.hr} />
     <Text style={styles.muted}>
       Consultas comerciales: info@geocapitals.com · WhatsApp +56 9 6218 4071. Este envío está
-      cubierto por el NCNDA suscrito entre las Partes. Prohibida su reproducción o divulgación
-      a terceros sin autorización escrita.
+      cubierto por el NCNDA suscrito entre las Partes. Prohibida su reproducción o divulgación a
+      terceros sin autorización escrita.
     </Text>
   </EmailLayout>
 );

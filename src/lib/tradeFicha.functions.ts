@@ -139,9 +139,12 @@ export const getPublicFicha = createServerFn({ method: "POST" })
     const resolved = await resolveTrade(data.token);
     if (!resolved) return null;
     const { sb, tradeId, role, permissions } = resolved;
-    const { data: ficha, error } = await sb.rpc("get_trade_public_ficha" as never, {
-      p_trade_id: tradeId,
-    } as never);
+    const { data: ficha, error } = await sb.rpc(
+      "get_trade_public_ficha" as never,
+      {
+        p_trade_id: tradeId,
+      } as never,
+    );
     if (error || !ficha) return null;
     const f = ficha as unknown as {
       trade_id: string;
@@ -164,7 +167,11 @@ export const getPublicFicha = createServerFn({ method: "POST" })
     };
   });
 
-function money(n: number | null | undefined, currency: string | null | undefined, unit?: string | null) {
+function money(
+  n: number | null | undefined,
+  currency: string | null | undefined,
+  unit?: string | null,
+) {
   if (n == null) return "—";
   const cur = currency === "USD" ? "US$" : "$";
   return `${cur} ${Math.round(n).toLocaleString("es-CL")}${unit ? ` / ${unit}` : ""}`;
@@ -177,9 +184,12 @@ export const emailFichaToGeocapitals = createServerFn({ method: "POST" })
     const resolved = await resolveTrade(data.token);
     if (!resolved) return { ok: false, error: "Enlace no válido" };
     const { sb, tradeId } = resolved;
-    const { data: ficha } = await sb.rpc("get_trade_public_ficha" as never, {
-      p_trade_id: tradeId,
-    } as never);
+    const { data: ficha } = await sb.rpc(
+      "get_trade_public_ficha" as never,
+      {
+        p_trade_id: tradeId,
+      } as never,
+    );
     if (!ficha) return { ok: false, error: "Ficha no disponible" };
     const f = ficha as unknown as {
       commodity: string | null;
@@ -209,7 +219,11 @@ export const emailFichaToGeocapitals = createServerFn({ method: "POST" })
               : "",
         frequency: f.pricing?.order_frequency ?? "",
         contractMonths: f.pricing?.contract_months ?? "",
-        price: money(f.pricing?.sale_price ?? null, f.pricing?.currency ?? null, f.pricing?.unit ?? null),
+        price: money(
+          f.pricing?.sale_price ?? null,
+          f.pricing?.currency ?? null,
+          f.pricing?.unit ?? null,
+        ),
         operacionUrl: publicUrl(`/operacion/${data.token}`),
         fichaUrl: publicUrl(`/ficha/${data.token}`),
       },

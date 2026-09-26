@@ -27,7 +27,10 @@ function PrivacyPage() {
         <p>
           Geocapitals SpA (Santiago, Chile) es responsable del tratamiento. El Delegado de
           Protección de Datos puede ser contactado en{" "}
-          <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">privacy@geocapitals.com</a>.
+          <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">
+            privacy@geocapitals.com
+          </a>
+          .
         </p>
 
         <h2 className="text-content">2. Datos que tratamos</h2>
@@ -40,15 +43,27 @@ function PrivacyPage() {
 
         <h2 className="text-content">3. Base legal y finalidad</h2>
         <ul>
-          <li><strong>Ejecución de contrato</strong>: onboarding, matching, firma electrónica, trazabilidad de operaciones.</li>
-          <li><strong>Obligación legal</strong>: KYC/AML, tributaria, prevención de fraude.</li>
-          <li><strong>Interés legítimo</strong>: seguridad, prevención de abuso, mejora del servicio.</li>
-          <li><strong>Consentimiento</strong>: comunicaciones comerciales, inclusión en dataroom compartido con terceros bajo NDA.</li>
+          <li>
+            <strong>Ejecución de contrato</strong>: onboarding, matching, firma electrónica,
+            trazabilidad de operaciones.
+          </li>
+          <li>
+            <strong>Obligación legal</strong>: KYC/AML, tributaria, prevención de fraude.
+          </li>
+          <li>
+            <strong>Interés legítimo</strong>: seguridad, prevención de abuso, mejora del servicio.
+          </li>
+          <li>
+            <strong>Consentimiento</strong>: comunicaciones comerciales, inclusión en dataroom
+            compartido con terceros bajo NDA.
+          </li>
         </ul>
 
         <h2 className="text-content">4. Retención</h2>
         <ul>
-          <li>Cuenta y operaciones: mientras exista relación + 5 años (obligaciones tributarias).</li>
+          <li>
+            Cuenta y operaciones: mientras exista relación + 5 años (obligaciones tributarias).
+          </li>
           <li>Consentimientos: 5 años tras revocación (prueba de licitud).</li>
           <li>Bitácora de correos y hits de formularios: 180 días.</li>
           <li>Bitácora de auditoría: 365 días.</li>
@@ -76,11 +91,17 @@ function PrivacyPage() {
         <ul>
           <li>
             Usuarios autenticados:{" "}
-            <Link to="/panel/privacidad" className="text-accent-brand">panel de privacidad</Link>{" "}
+            <Link to="/panel/privacidad" className="text-accent-brand">
+              panel de privacidad
+            </Link>{" "}
             (exporta tu JSON y crea solicitudes).
           </li>
           <li>
-            No autenticados: <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">privacy@geocapitals.com</a>.
+            No autenticados:{" "}
+            <a className="text-accent-brand" href="mailto:privacy@geocapitals.com">
+              privacy@geocapitals.com
+            </a>
+            .
           </li>
           <li>
             Reclamos ante la Agencia de Protección de Datos Personales (Chile) una vez esté
@@ -98,7 +119,9 @@ function PrivacyPage() {
         <p>Publicamos versiones fechadas. La versión activa se registra en cada consentimiento.</p>
 
         <p className="text-xs">
-          <Link to="/legal/terminos" className="text-accent-brand">Términos de servicio</Link>
+          <Link to="/legal/terminos" className="text-accent-brand">
+            Términos de servicio
+          </Link>
         </p>
       </article>
     </MarketingPage>

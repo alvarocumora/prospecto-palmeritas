@@ -68,7 +68,6 @@ export function FrancoDashboard() {
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
 
-
         <div data-surface="canvas" className="rounded-2xl overflow-hidden">
           <FrancoPertenenciasPanel />
         </div>

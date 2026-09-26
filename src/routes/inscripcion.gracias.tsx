@@ -36,8 +36,8 @@ function Gracias() {
         )}
         <p className="mx-auto mt-6 max-w-lg text-sm">
           Guarda este folio. Para subir el certificado de análisis, el título o mandato y las fotos
-          de la faena, crea tu cuenta con el mismo correo que usaste en la inscripción y entra a
-          tu panel de proveedor.
+          de la faena, crea tu cuenta con el mismo correo que usaste en la inscripción y entra a tu
+          panel de proveedor.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
@@ -51,8 +51,14 @@ function Gracias() {
           </Link>
         </div>
         <p className="mt-10 text-xs text-[hsl(var(--content-subtle))]">
-          Dudas: <a href="mailto:info@geocapitals.com" className="underline">info@geocapitals.com</a>{" "}
-          · WhatsApp <a href="https://wa.me/56962184071" className="underline">+56 9 6218 4071</a>
+          Dudas:{" "}
+          <a href="mailto:info@geocapitals.com" className="underline">
+            info@geocapitals.com
+          </a>{" "}
+          · WhatsApp{" "}
+          <a href="https://wa.me/56962184071" className="underline">
+            +56 9 6218 4071
+          </a>
         </p>
       </main>
     </div>

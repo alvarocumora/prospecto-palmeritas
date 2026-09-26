@@ -78,11 +78,11 @@ export const computeListingValuation = createServerFn({ method: "POST" })
           (rmAny.average_grade as number | undefined) ??
           (rmAny.grade as number | undefined) ??
           (rmAny.avg_grade as number | undefined) ??
-          (rm.cutoff_grade ?? null);
+          rm.cutoff_grade ??
+          null;
         const confidenceGuess =
-          ((rmAny.confidence_category as string) ??
-            (rmAny.category as string) ??
-            "inferred") || "inferred";
+          ((rmAny.confidence_category as string) ?? (rmAny.category as string) ?? "inferred") ||
+          "inferred";
         if (tonnesGuess && gradeGuess) {
           resourceRow = {
             commodity: rm.commodity,
@@ -97,8 +97,11 @@ export const computeListingValuation = createServerFn({ method: "POST" })
     }
 
     // 4. Escenario económico
-    let scenario: { npv_usd?: number | null; irr_pct?: number | null; name?: string | null } | null =
-      null;
+    let scenario: {
+      npv_usd?: number | null;
+      irr_pct?: number | null;
+      name?: string | null;
+    } | null = null;
     if (listing.project_id) {
       const { data: sc } = await supabase
         .from("economic_scenarios")
@@ -116,10 +119,11 @@ export const computeListingValuation = createServerFn({ method: "POST" })
             (scAny.npv as number | undefined) ??
             null,
           irr_pct:
-            (scAny.irr_pct as number | undefined) ??
-            (scAny.irr as number | undefined) ??
+            (scAny.irr_pct as number | undefined) ?? (scAny.irr as number | undefined) ?? null,
+          name:
+            (scAny.name as string | undefined) ??
+            (scAny.scenario_name as string | undefined) ??
             null,
-          name: (scAny.name as string | undefined) ?? (scAny.scenario_name as string | undefined) ?? null,
         };
       }
     }

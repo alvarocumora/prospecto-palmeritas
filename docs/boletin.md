@@ -22,14 +22,14 @@
 
 `packages/reglas/boletin_parser.py` · `PESOS` (suman 1,0):
 
-| Factor | Peso | Señal |
-|---|---|---|
-| `tipo_acto` reconocido | 0,20 | pedimento/manifestación/mensura/sentencia |
-| `rol` presente | 0,15 | rol de la concesión |
-| `coords_validas` | 0,30 | Este/Norte en rango UTM plausible de Chile |
-| `huso` (18/19) | 0,10 | huso declarado |
-| `comuna` presente | 0,10 | |
-| `titular` presente | 0,15 | solicitante publicado (dato de registro público) |
+| Factor                 | Peso | Señal                                            |
+| ---------------------- | ---- | ------------------------------------------------ |
+| `tipo_acto` reconocido | 0,20 | pedimento/manifestación/mensura/sentencia        |
+| `rol` presente         | 0,15 | rol de la concesión                              |
+| `coords_validas`       | 0,30 | Este/Norte en rango UTM plausible de Chile       |
+| `huso` (18/19)         | 0,10 | huso declarado                                   |
+| `comuna` presente      | 0,10 |                                                  |
+| `titular` presente     | 0,15 | solicitante publicado (dato de registro público) |
 
 - **Umbral de auto-aprobación:** `UMBRAL_AUTO = 0.75`. Bajo eso → cola de revisión.
 - **Geolocalización:** solo si hay coords válidas **y** huso. Si no, `geom` queda

@@ -117,9 +117,14 @@ export const ensureCounterpartyLink = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }): Promise<{ url: string; prefix: string }> => {
     const sb = asSb(context.supabase);
-    const hashCol = data.party === "buyer" ? "counterparty_buyer_token_hash" : "counterparty_seller_token_hash";
-    const prefCol = data.party === "buyer" ? "counterparty_buyer_token_prefix" : "counterparty_seller_token_prefix";
-    const emailCol = data.party === "buyer" ? "counterparty_buyer_email" : "counterparty_seller_email";
+    const hashCol =
+      data.party === "buyer" ? "counterparty_buyer_token_hash" : "counterparty_seller_token_hash";
+    const prefCol =
+      data.party === "buyer"
+        ? "counterparty_buyer_token_prefix"
+        : "counterparty_seller_token_prefix";
+    const emailCol =
+      data.party === "buyer" ? "counterparty_buyer_email" : "counterparty_seller_email";
 
     const { data: existing } = await sb
       .from("commodity_trades")
@@ -146,7 +151,10 @@ export const ensureCounterpartyLink = createServerFn({ method: "POST" })
     } else {
       prefix = row[prefCol] ?? "";
       if (data.email) {
-        await sb.from("commodity_trades").update({ [emailCol]: data.email }).eq("id", data.tradeId);
+        await sb
+          .from("commodity_trades")
+          .update({ [emailCol]: data.email })
+          .eq("id", data.tradeId);
       }
     }
 
@@ -257,7 +265,10 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
         .select("reference, vessel_name, port_loading, port_discharge, eta, status")
         .eq("trade_id", tradeId)
         .order("created_at", { ascending: false }),
-      sb.from("trade_documents").select("id", { count: "exact", head: true }).eq("trade_id", tradeId),
+      sb
+        .from("trade_documents")
+        .select("id", { count: "exact", head: true })
+        .eq("trade_id", tradeId),
       sb
         .from("trade_documents")
         .select("doc_type, status, file_url, reference, updated_at")
@@ -265,19 +276,21 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
         .order("updated_at", { ascending: false }),
     ]);
 
-    const documents = ((docsList.data ?? []) as Array<{
-      doc_type: string;
-      status: string;
-      file_url: string | null;
-      reference: string | null;
-      updated_at: string;
-    }>).map((d) => ({
+    const documents = (
+      (docsList.data ?? []) as Array<{
+        doc_type: string;
+        status: string;
+        file_url: string | null;
+        reference: string | null;
+        updated_at: string;
+      }>
+    ).map((d) => ({
       doc_type: d.doc_type,
       status: d.status,
       reference: d.reference,
       updated_at: d.updated_at,
       // Solo exponemos el nombre de archivo, no la ruta interna del bucket.
-      file_name: d.file_url ? d.file_url.split("/").pop() ?? null : null,
+      file_name: d.file_url ? (d.file_url.split("/").pop() ?? null) : null,
     }));
 
     return {
@@ -309,9 +322,7 @@ export const getOperacionByToken = createServerFn({ method: "POST" })
 
 const TRADE_BUCKET_PUB = "trade-docs";
 
-async function resolveTradeByToken(
-  token: string,
-): Promise<{
+async function resolveTradeByToken(token: string): Promise<{
   tradeId: string;
   role: "buyer" | "seller";
   ownerId: string;
@@ -341,7 +352,6 @@ async function resolveTradeByToken(
   }
   return null;
 }
-
 
 /** Prepara URL firmada para que la contraparte externa suba un archivo al bucket
  *  privado `trade-docs` sin necesitar cuenta. */
@@ -500,12 +510,7 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     if (r.error) throw new Error(r.error.message);
     const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
     return {
-      rows: ((c.data ?? []) as unknown) as any[],
+      rows: (c.data ?? []) as unknown as any[],
       readiness: (readinessRow ?? null) as any,
     };
   });
-
-
-
-
-

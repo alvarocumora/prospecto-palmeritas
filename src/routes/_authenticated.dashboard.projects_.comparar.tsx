@@ -116,9 +116,7 @@ function CompararPage() {
           <Row
             label="Cu (prom / máx)"
             items={items}
-            render={(p) =>
-              `${val(p.samples.cuAvgPct, " %")} / ${val(p.samples.cuMaxPct, " %")}`
-            }
+            render={(p) => `${val(p.samples.cuAvgPct, " %")} / ${val(p.samples.cuMaxPct, " %")}`}
           />
           <Row
             label="Au máx / Ag máx"

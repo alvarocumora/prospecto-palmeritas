@@ -79,7 +79,6 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
         .limit(1),
     ]);
 
-
   const projectRows = projectsRes.data ?? [];
   const concessionRows = (concessions.data as Array<{ area_ha: number | null }> | null) ?? [];
   const hectares = concessionRows.reduce((acc, r) => acc + (Number(r.area_ha) || 0), 0);

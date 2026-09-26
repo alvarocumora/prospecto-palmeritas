@@ -26,19 +26,19 @@ HSE · Costos · Aprobaciones · Validación · Perfil · Admin
 
 ## 2. Fusión de pantallas (una canónica por concepto)
 
-| Canónica | Absorbe como pestañas |
-|---|---|
-| Mesa de operaciones (`/dashboard/trades`) | tablero kanban, negociación, compliance, productos, accesos, reparto |
-| Requerimientos (`/dashboard/sourcing`) | rfqs, my-inquiries |
-| Clientes & Proveedores (`/dashboard/clientes`) | proveedores, proveedor, inscripción, invitaciones, enlaces |
-| Documentos & Firmas (`/dashboard/documentos`) | firmas, plantillas |
-| Finanzas & Logística (`/dashboard/finance`) | cobranza, anticipos, envíos, fletes, precios |
-| Catastro (`/catastro/proyecto`) | boletín, terreno franco, watchlist |
-| Proyectos (`/dashboard/projects`) | mission control, mapa táctico, campañas |
-| Exploración (`/dashboard/exploration`) | geofísica, sondajes, drones, muestreo, QA/QC, targets, sección, estimación, inventario |
-| Reportes & 43-101 (`/dashboard/ni43101`) | reports, project-report, qps, validación |
-| Inteligencia satelital (`/dashboard/satellite-intel`) | sat3d, mag-revalidations |
-| Visor 3D (`/dashboard/geology3d`) | visor-3d, 3d-pro |
+| Canónica                                              | Absorbe como pestañas                                                                  |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Mesa de operaciones (`/dashboard/trades`)             | tablero kanban, negociación, compliance, productos, accesos, reparto                   |
+| Requerimientos (`/dashboard/sourcing`)                | rfqs, my-inquiries                                                                     |
+| Clientes & Proveedores (`/dashboard/clientes`)        | proveedores, proveedor, inscripción, invitaciones, enlaces                             |
+| Documentos & Firmas (`/dashboard/documentos`)         | firmas, plantillas                                                                     |
+| Finanzas & Logística (`/dashboard/finance`)           | cobranza, anticipos, envíos, fletes, precios                                           |
+| Catastro (`/catastro/proyecto`)                       | boletín, terreno franco, watchlist                                                     |
+| Proyectos (`/dashboard/projects`)                     | mission control, mapa táctico, campañas                                                |
+| Exploración (`/dashboard/exploration`)                | geofísica, sondajes, drones, muestreo, QA/QC, targets, sección, estimación, inventario |
+| Reportes & 43-101 (`/dashboard/ni43101`)              | reports, project-report, qps, validación                                               |
+| Inteligencia satelital (`/dashboard/satellite-intel`) | sat3d, mag-revalidations                                                               |
+| Visor 3D (`/dashboard/geology3d`)                     | visor-3d, 3d-pro                                                                       |
 
 Las pestañas se implementan con estado en query param (`?tab=`) para que los enlaces profundos sigan funcionando y no se pierda SEO/compartibilidad interna.
 

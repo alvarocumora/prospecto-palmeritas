@@ -586,7 +586,8 @@ function LessonPlayer({
 function CourseSection() {
   const [activeMod, setActiveMod] = useState<number>(1);
   const [activeLesson, setActiveLesson] = useState<number>(0);
-  const { markDone, reset, isDone, pct, doneCount, totalLessons, moduleStats } = useCourseProgress();
+  const { markDone, reset, isDone, pct, doneCount, totalLessons, moduleStats } =
+    useCourseProgress();
 
   const mod = COURSE.find((m) => m.n === activeMod) ?? COURSE[0];
 
@@ -595,7 +596,9 @@ function CourseSection() {
     setActiveLesson(i);
     // scroll suave al player
     setTimeout(() => {
-      document.getElementById("course-player")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      document
+        .getElementById("course-player")
+        ?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 30);
   };
 
@@ -827,8 +830,6 @@ function DocumentTemplatesSection() {
   );
 }
 
-
-
 function RecursosPage() {
   return (
     <MarketingPage
@@ -949,9 +950,7 @@ function RecursosPage() {
                       <span
                         className="text-[9px] font-mono uppercase tracking-wider px-1.5 py-0.5 rounded"
                         style={{
-                          background: isLive
-                            ? "oklch(0.78 0.14 82 / 0.15)"
-                            : "oklch(1 0 0 / 0.05)",
+                          background: isLive ? "oklch(0.78 0.14 82 / 0.15)" : "oklch(1 0 0 / 0.05)",
                           color: isLive ? GOLD : "oklch(0.7 0.02 260)",
                         }}
                       >

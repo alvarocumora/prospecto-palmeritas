@@ -3,15 +3,17 @@
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  DndContext,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
+import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
 import { toast } from "sonner";
-import { LayoutGrid, Maximize2, Minimize2, Rows3, GanttChart, Download, AlertTriangle } from "lucide-react";
+import {
+  LayoutGrid,
+  Maximize2,
+  Minimize2,
+  Rows3,
+  GanttChart,
+  Download,
+  AlertTriangle,
+} from "lucide-react";
 import { listMyTrades, setTradeStage } from "@/lib/trades.functions";
 import {
   buildTradeBoard,

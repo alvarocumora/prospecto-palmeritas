@@ -5,7 +5,6 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { listDataRoomFiles } from "@/lib/dataRoom.functions";
 
-
 export interface PropertyListing {
   id: string;
   owner_user_id: string;
@@ -42,7 +41,6 @@ export interface DataRoomFile {
   pending?: boolean;
   created_at: string;
 }
-
 
 export interface DealInquiry {
   id: string;

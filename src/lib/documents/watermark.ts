@@ -95,7 +95,10 @@ export async function stampSignerWatermark(
   }
 
   const bytes = await pdf.save();
-  return new Blob([bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer], { type: "application/pdf" });
+  return new Blob(
+    [bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer],
+    { type: "application/pdf" },
+  );
 }
 
 function roleLabel(role: string): string {
@@ -121,10 +124,7 @@ export function triggerBlobDownload(blob: Blob, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
-export async function fetchAndStamp(
-  url: string,
-  signer: SignerWatermark,
-): Promise<Blob> {
+export async function fetchAndStamp(url: string, signer: SignerWatermark): Promise<Blob> {
   const res = await fetch(url);
   if (!res.ok) throw new Error(`No se pudo descargar el PDF (${res.status})`);
   const buf = await res.arrayBuffer();

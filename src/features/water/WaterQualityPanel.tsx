@@ -118,7 +118,9 @@ export function WaterQualityPanel({
               onClick={onRequestInfo}
               className="mt-3 rounded bg-[#04122a] px-3 py-1.5 text-[11.5px] font-medium text-white"
             >
-              {mode === "public" ? "Solicitar plan de muestreo" : "Solicitar análisis de laboratorio"}
+              {mode === "public"
+                ? "Solicitar plan de muestreo"
+                : "Solicitar análisis de laboratorio"}
             </button>
           )}
         </div>
@@ -126,8 +128,8 @@ export function WaterQualityPanel({
 
       <p className="text-[11px] italic leading-relaxed text-slate-500">
         Referencias: NCh 409/1 (agua potable) y NCh 1333 (agua para riego). Los resultados
-        históricos aportados por el titular se clasifican como "Historical Analysis Available"
-        hasta contar con certificado de laboratorio acreditado validado por Geocapitals.
+        históricos aportados por el titular se clasifican como "Historical Analysis Available" hasta
+        contar con certificado de laboratorio acreditado validado por Geocapitals.
       </p>
     </div>
   );

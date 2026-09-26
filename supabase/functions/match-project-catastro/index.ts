@@ -62,7 +62,6 @@ Deno.serve(async (req) => {
     const memRes = await requireProjectMember(supabase, authRes.userId, projectId);
     if ("error" in memRes) return memRes.error;
 
-
     const { data: proj, error: pErr } = await supabase
       .from("projects")
       .select("id, name, center_lat, center_lng")

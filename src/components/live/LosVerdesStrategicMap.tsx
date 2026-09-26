@@ -168,13 +168,18 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     if (!map || !mapReady || !dataQ.data) return;
     const d = dataQ.data;
 
-    const addOrUpdate = (id: string, data: LosVerdesMapData["concessions"]) => {
+    const addOrUpdate = (id: string, data: unknown) => {
+      const geojson = data as GeoJSON.FeatureCollection;
       const src = map.getSource(id) as maplibregl.GeoJSONSource | undefined;
-      if (src) src.setData(data);
-      else map.addSource(id, { type: "geojson", data });
+      if (src) src.setData(geojson);
+      else map.addSource(id, { type: "geojson", data: geojson });
     };
 
-    addOrUpdate("src-concessions", d.concessions);
+    const drawableConcessions = {
+      ...d.concessions,
+      features: d.concessions.features.filter((f) => f.geometry != null),
+    };
+    addOrUpdate("src-concessions", drawableConcessions);
     addOrUpdate("src-targets", d.targets);
     addOrUpdate("src-sat", d.satAnomalies);
     addOrUpdate("src-mag", d.magAnomalies);
@@ -337,7 +342,13 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
     }
 
     // Click handler
-    const clickLayers = ["lyr-samples", "lyr-targets", "lyr-sat", "lyr-mag", "lyr-concessions-fill"];
+    const clickLayers = [
+      "lyr-samples",
+      "lyr-targets",
+      "lyr-sat",
+      "lyr-mag",
+      "lyr-concessions-fill",
+    ];
     const onClick = (e: maplibregl.MapMouseEvent) => {
       const feats = map.queryRenderedFeatures(e.point, { layers: clickLayers });
       if (!feats.length) return;
@@ -401,6 +412,8 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
   }, [certificationMode, mapReady, dataQ.data]);
 
   const counts = dataQ.data?.counts;
+  const concessionsWithoutGeometry =
+    dataQ.data?.concessions.features.filter((f) => !f.geometry) ?? [];
 
   const certifReady = useMemo(() => {
     if (!dataQ.data) return { total: 0, ok: 0, gap: 0 };
@@ -466,6 +479,23 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
           checked={visible.concessions}
           onChange={(v) => setVisible((s) => ({ ...s, concessions: v }))}
         />
+        {concessionsWithoutGeometry.length > 0 && (
+          <div className="mt-1 mb-1 px-1.5 py-1.5 rounded border border-amber-500/30 bg-amber-500/10">
+            <div className="text-[10px] font-mono text-amber-400">
+              {concessionsWithoutGeometry.length} sin polígono
+            </div>
+            <div className="mt-1 space-y-0.5 max-h-20 overflow-y-auto">
+              {concessionsWithoutGeometry.map((f) => (
+                <div
+                  key={String(f.id)}
+                  className="text-[9px] font-mono text-muted-foreground truncate"
+                >
+                  {String(f.properties.code ?? f.properties.name ?? f.id ?? "Concesión")}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         <LayerToggle
           icon={<Target className="w-3 h-3" />}
           label="Targets"
@@ -576,9 +606,9 @@ function FeaturePanel({ feature, onClose }: { feature: SelectedFeature; onClose:
           ? `Anomalía satelital ${props.index_code ?? ""}`
           : layer === "mag_anomaly"
             ? "Anomalía magnética"
-             : layer === "sample"
-               ? `${props.sample_type ?? "muestra"} · ${props.lab ?? "laboratorio no informado"}`
-               : "";
+            : layer === "sample"
+              ? `${props.sample_type ?? "muestra"} · ${props.lab ?? "laboratorio no informado"}`
+              : "";
 
   return (
     <div className="p-4 space-y-3">

@@ -22,10 +22,21 @@ type ScreeningRow = {
 
 const LISTS = ["OFAC", "UN", "EU", "UK"] as const;
 
-const OUTCOME_STYLE: Record<ScreeningRow["outcome"], { label: string; cls: string; Icon: typeof ShieldCheck }> = {
-  clear: { label: "Clear", cls: "border-emerald-400 bg-emerald-50 text-emerald-700", Icon: ShieldCheck },
+const OUTCOME_STYLE: Record<
+  ScreeningRow["outcome"],
+  { label: string; cls: string; Icon: typeof ShieldCheck }
+> = {
+  clear: {
+    label: "Clear",
+    cls: "border-emerald-400 bg-emerald-50 text-emerald-700",
+    Icon: ShieldCheck,
+  },
   hit: { label: "Hit", cls: "border-red-400 bg-red-50 text-red-700", Icon: ShieldAlert },
-  pending: { label: "Pending", cls: "border-neutral-300 bg-neutral-50 text-neutral-600", Icon: ShieldQuestion },
+  pending: {
+    label: "Pending",
+    cls: "border-neutral-300 bg-neutral-50 text-neutral-600",
+    Icon: ShieldQuestion,
+  },
 };
 
 const TYPE_LABEL: Record<ScreeningRow["subject_type"], string> = {
@@ -114,8 +125,8 @@ export function TradeScreeningPanel({ tradeId }: { tradeId: string }) {
         <div>
           <h2 className="font-serif text-xl">Screening de sanciones</h2>
           <p className="text-xs text-muted-foreground">
-            OFAC · UN · EU · UK. Satisface el ítem obligatorio del checklist (rol Geocapitals).
-            Un solo "hit" bloquea la operación.
+            OFAC · UN · EU · UK. Satisface el ítem obligatorio del checklist (rol Geocapitals). Un
+            solo "hit" bloquea la operación.
           </p>
         </div>
         <button
@@ -231,8 +242,8 @@ export function TradeScreeningPanel({ tradeId }: { tradeId: string }) {
         <div className="text-sm text-muted-foreground">Cargando screenings…</div>
       ) : rows.length === 0 ? (
         <div className="rounded border border-dashed border-[hsl(var(--im-hairline,var(--border)))] p-4 text-sm text-muted-foreground text-center">
-          Sin screenings registrados. El ítem "Screening de sanciones" del checklist queda en
-          estado "falta" hasta que registres al menos un chequeo con outcome clear.
+          Sin screenings registrados. El ítem "Screening de sanciones" del checklist queda en estado
+          "falta" hasta que registres al menos un chequeo con outcome clear.
         </div>
       ) : (
         <ul className="divide-y divide-[hsl(var(--im-hairline,var(--border)))]">

@@ -101,7 +101,9 @@ function ResetPasswordPage() {
                 maxLength={100}
                 aria-invalid={!!errors.password}
                 className={`w-full px-3 py-2 rounded border bg-background text-foreground text-sm focus:outline-none ${
-                  errors.password ? "border-red-500/60 focus:border-red-500" : "border-border focus:border-gold"
+                  errors.password
+                    ? "border-red-500/60 focus:border-red-500"
+                    : "border-border focus:border-gold"
                 }`}
                 placeholder="Nueva contraseña"
                 autoComplete="new-password"
@@ -146,7 +148,9 @@ function ResetPasswordPage() {
                 maxLength={100}
                 aria-invalid={!!errors.confirm}
                 className={`w-full px-3 py-2 rounded border bg-background text-foreground text-sm focus:outline-none ${
-                  errors.confirm ? "border-red-500/60 focus:border-red-500" : "border-border focus:border-gold"
+                  errors.confirm
+                    ? "border-red-500/60 focus:border-red-500"
+                    : "border-border focus:border-gold"
                 }`}
                 placeholder="Confirmar contraseña"
                 autoComplete="new-password"

@@ -53,7 +53,12 @@ function ProjectReportPage() {
   if (code.includes("CHOLQUI") || code.includes("FRC") || code.includes("FRANCO")) {
     return <FrancoDashboard />;
   }
-  if (code.includes("LV5") || code.includes("VERDES") || code.includes("TILAMA") || code.includes("LV-TIL")) {
+  if (
+    code.includes("LV5") ||
+    code.includes("VERDES") ||
+    code.includes("TILAMA") ||
+    code.includes("LV-TIL")
+  ) {
     return (
       <div className="h-[calc(100vh-4rem)] w-full p-4 flex flex-col">
         <header className="mb-3">

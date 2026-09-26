@@ -124,12 +124,20 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
   doc.text(
     "Documento de trabajo. No constituye oferta pública de valores ni estimación de recursos o reservas.",
     M,
-    H - 26
+    H - 26,
   );
 
   /* ---------- 2. Resumen ejecutivo ---------- */
   newSlide("Resumen ejecutivo", "La oportunidad en cuatro cifras");
-  const kpiH = kpiGrid(doc, { x: M, y: 140, w: CW, items: model.kpis.slice(0, 4), cols: 4, rowH: 96, valueSize: 24 });
+  const kpiH = kpiGrid(doc, {
+    x: M,
+    y: 140,
+    w: CW,
+    items: model.kpis.slice(0, 4),
+    cols: 4,
+    rowH: 96,
+    valueSize: 24,
+  });
   bullets(doc, M, 140 + kpiH + 42, model.thesis.slice(0, 4), CW * 0.72, 10);
 
   /* ---------- 3. Ubicación y catastro ---------- */
@@ -147,10 +155,19 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
       doc.rect(mapX, mapY, mapW, mapH);
       font(doc, "body", "normal", 6.5);
       ink(doc, GC_COLOR.slate);
-      const source = [model.map.imagery, model.map.source, model.map.crs].filter(Boolean).join(" · ");
+      const source = [model.map.imagery, model.map.source, model.map.crs]
+        .filter(Boolean)
+        .join(" · ");
       doc.text(doc.splitTextToSize(source, mapW)[0], mapX, mapY + mapH + 12);
     } else {
-      scatterMap(doc, { x: mapX, y: mapY, w: mapW, h: mapH, points: model.map.points, labelTop: 6 });
+      scatterMap(doc, {
+        x: mapX,
+        y: mapY,
+        w: mapW,
+        h: mapH,
+        points: model.map.points,
+        labelTop: 6,
+      });
     }
     const rx = M + CW * 0.66 + 24;
     const rw = CW - CW * 0.66 - 24;
@@ -165,13 +182,20 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
         .map((p) =>
           p.value != null
             ? `${p.label} — ${p.value.toFixed(2).replace(".", ",")} ${model.map?.valueUnit ?? "% Cu total"}`
-            : `${p.label} — punto de control`
+            : `${p.label} — punto de control`,
         ),
 
       rw,
-      8.4
+      8.4,
     );
-    qrBlock(doc, { x: rx, y: Math.min(ry + 10, H - 160), size: 92, qr, caption: "Ver live map", sub: "Mapa interactivo y data room" });
+    qrBlock(doc, {
+      x: rx,
+      y: Math.min(ry + 10, H - 160),
+      size: 92,
+      qr,
+      caption: "Ver live map",
+      sub: "Mapa interactivo y data room",
+    });
   }
 
   /* ---------- 4. Análisis / gráfico ---------- */
@@ -202,27 +226,29 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
       if (block.kind === "text") y += paragraph(doc, M, y, block.body, CW * 0.78, 9.5) + 12;
       if (block.kind === "bullets") y += bullets(doc, M, y, block.items, CW * 0.78, 9.5) + 8;
       if (block.kind === "kv") {
-        y += editorialTable(doc, {
-          x: M,
-          y,
-          w: CW * 0.88,
-          head: ["Concepto", "Detalle"],
-          rows: block.items.map(([k, v]) => [k, v]),
-          widths: [CW * 0.3, CW * 0.58],
+        y +=
+          editorialTable(doc, {
+            x: M,
+            y,
+            w: CW * 0.88,
+            head: ["Concepto", "Detalle"],
+            rows: block.items.map(([k, v]) => [k, v]),
+            widths: [CW * 0.3, CW * 0.58],
 
-          size: 8.2,
-        }) + 14;
+            size: 8.2,
+          }) + 14;
       }
       if (block.kind === "table") {
-        y += editorialTable(doc, {
-          x: M,
-          y,
-          w: CW,
-          head: block.head,
-          rows: block.rows.slice(0, 8),
-          widths: block.widths?.map((p) => CW * p),
-          size: 8,
-        }) + 14;
+        y +=
+          editorialTable(doc, {
+            x: M,
+            y,
+            w: CW,
+            head: block.head,
+            rows: block.rows.slice(0, 8),
+            widths: block.widths?.map((p) => CW * p),
+            size: 8,
+          }) + 14;
       }
     }
   }
@@ -241,7 +267,8 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
     const lx = M + 310;
     const lw = 280;
     const legendH = donutLegend(doc, lx, 200, lw, model.allocation.slices);
-    if (model.allocation.caption) paragraph(doc, lx, 200 + legendH + 16, model.allocation.caption, lw, 8.4);
+    if (model.allocation.caption)
+      paragraph(doc, lx, 200 + legendH + 16, model.allocation.caption, lw, 8.4);
     if (model.milestones?.length) {
       const mx = lx + lw + 40;
       const mw = W - M - mx;
@@ -259,7 +286,14 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
 
   /* ---------- Cierre: advertencias y contacto ---------- */
   newSlide("Advertencias", "Base de información y limitaciones");
-  const boxH = noticeBox(doc, M, 146, CW * 0.62, model.disclaimers.slice(0, 6), "Limitaciones materiales");
+  const boxH = noticeBox(
+    doc,
+    M,
+    146,
+    CW * 0.62,
+    model.disclaimers.slice(0, 6),
+    "Limitaciones materiales",
+  );
   const cx = M + CW * 0.62 + 30;
   eyebrow(doc, cx, 160, "Contacto");
   let cy = 180;
@@ -278,5 +312,12 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
     cy += 14;
   }
   doc.text(`${GC_BRAND.email} · WhatsApp ${GC_BRAND.whatsapp}`, cx, cy + 6);
-  qrBlock(doc, { x: cx, y: Math.max(cy + 30, 146 + boxH - 130), size: 104, qr, caption: "Live map y data room", sub: model.liveUrl.replace(/^https?:\/\//, "") });
+  qrBlock(doc, {
+    x: cx,
+    y: Math.max(cy + 30, 146 + boxH - 130),
+    size: 104,
+    qr,
+    caption: "Live map y data room",
+    sub: model.liveUrl.replace(/^https?:\/\//, ""),
+  });
 }

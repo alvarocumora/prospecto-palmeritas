@@ -3,7 +3,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "./useAuth";
 
-
 export type Project = {
   id: string;
   code: string;
@@ -200,7 +199,6 @@ export function useProjects() {
     // así el cambio de selector se ve reflejado sin recargar la página.
     void queryClient.invalidateQueries();
   }, []);
-
 
   const active = store.projects.find((project) => project.id === store.activeId) ?? null;
 

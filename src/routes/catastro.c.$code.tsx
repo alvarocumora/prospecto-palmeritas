@@ -121,24 +121,51 @@ function ConcessionPage() {
 
           <div className="mt-6 pt-4 border-t border-border flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
             <Database className="w-3 h-3" />
-            Fuente: {c.source === "cache" ? "Cache Geocapitals" : "SERNAGEOMIN en vivo"}
+            Fuente:{" "}
+            {c.source === "cadastre_national"
+              ? "Catastro canónico Geocapitals"
+              : "SERNAGEOMIN en vivo"}
             {c.last_synced_at &&
               ` · sincronizado ${new Date(c.last_synced_at).toLocaleString("es-CL")}`}
           </div>
         </div>
 
         <section className="mt-6 border border-border rounded-md bg-bg-secondary/20 p-6">
-          <div className="flex items-center gap-2 mb-2"><ScanSearch className="w-4 h-4 text-primary"/><h2 className="text-sm font-mono uppercase tracking-wider">Mining Intelligence</h2></div>
-          <p className="text-xs text-muted-foreground leading-relaxed">Analiza esta concesión contra geometrías documentales, concesiones vecinas e intersecciones espaciales. El resultado conserva procedencia y métricas de reconciliación y no sustituye un estudio jurídico de títulos.</p>
-          <div className="mt-4 grid sm:grid-cols-3 gap-2">
-            <div className="rounded border border-border p-3"><ShieldCheck className="w-4 h-4 mb-2"/><div className="text-[10px] font-mono text-muted-foreground">FUENTE</div><div className="text-xs font-semibold">SERNAGEOMIN</div></div>
-            <div className="rounded border border-border p-3"><GitCompareArrows className="w-4 h-4 mb-2"/><div className="text-[10px] font-mono text-muted-foreground">RECONCILIACIÓN</div><div className="text-xs font-semibold">Espacial + identidad</div></div>
-            <div className="rounded border border-border p-3"><FileText className="w-4 h-4 mb-2"/><div className="text-[10px] font-mono text-muted-foreground">DUE DILIGENCE</div><div className="text-xs font-semibold">Hallazgos auditables</div></div>
+          <div className="flex items-center gap-2 mb-2">
+            <ScanSearch className="w-4 h-4 text-primary" />
+            <h2 className="text-sm font-mono uppercase tracking-wider">Mining Intelligence</h2>
           </div>
-          <Link to="/dashboard/catastro" className="mt-4 inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-xs font-mono text-primary-foreground"><ScanSearch className="w-3.5 h-3.5"/> Analizar en Mining Intelligence</Link>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Analiza esta concesión contra geometrías documentales, concesiones vecinas e
+            intersecciones espaciales. El resultado conserva procedencia y métricas de
+            reconciliación y no sustituye un estudio jurídico de títulos.
+          </p>
+          <div className="mt-4 grid sm:grid-cols-3 gap-2">
+            <div className="rounded border border-border p-3">
+              <ShieldCheck className="w-4 h-4 mb-2" />
+              <div className="text-[10px] font-mono text-muted-foreground">FUENTE</div>
+              <div className="text-xs font-semibold">SERNAGEOMIN</div>
+            </div>
+            <div className="rounded border border-border p-3">
+              <GitCompareArrows className="w-4 h-4 mb-2" />
+              <div className="text-[10px] font-mono text-muted-foreground">RECONCILIACIÓN</div>
+              <div className="text-xs font-semibold">Espacial + identidad</div>
+            </div>
+            <div className="rounded border border-border p-3">
+              <FileText className="w-4 h-4 mb-2" />
+              <div className="text-[10px] font-mono text-muted-foreground">DUE DILIGENCE</div>
+              <div className="text-xs font-semibold">Hallazgos auditables</div>
+            </div>
+          </div>
+          <Link
+            to={"/dashboard/catastro" as never}
+            className="mt-4 inline-flex items-center gap-1.5 rounded bg-primary px-3 py-2 text-xs font-mono text-primary-foreground"
+          >
+            <ScanSearch className="w-3.5 h-3.5" /> Analizar en Mining Intelligence
+          </Link>
         </section>
 
-                <LegalPanel code={c.code} />
+        <LegalPanel code={c.code} />
 
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <WatchlistButton code={c.code} />

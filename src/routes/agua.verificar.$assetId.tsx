@@ -60,7 +60,10 @@ function VerifyWaterFicha() {
                     ["Ubicación", `${asset.commune} · ${asset.province} · ${asset.region}`],
                     ["Caudal permanente", fmtFlow(asset.flow_permanent_ls)],
                     ["Ejercicio", EXERCISE_LABEL[asset.exercise] ?? asset.exercise],
-                    ["Resolución DGA", `${asset.dga_resolution ?? "—"} (${asset.dga_resolution_date ?? "s/f"})`],
+                    [
+                      "Resolución DGA",
+                      `${asset.dga_resolution ?? "—"} (${asset.dga_resolution_date ?? "s/f"})`,
+                    ],
                     ["Valor referencial", fmtCLPFull(asset.reference_value_clp)],
                   ].map(([k, v]) => (
                     <div key={k} className="flex justify-between border-b border-slate-100 py-2">
@@ -71,7 +74,8 @@ function VerifyWaterFicha() {
                 </dl>
                 <p className="mt-4 text-[11px] italic text-slate-500">
                   La información legal se clasifica como Declarada, Documentada o Verificada. Esta
-                  verificación confirma la vigencia de la ficha, no la validez registral del derecho.
+                  verificación confirma la vigencia de la ficha, no la validez registral del
+                  derecho.
                 </p>
                 <Link
                   to="/agua"

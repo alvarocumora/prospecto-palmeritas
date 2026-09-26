@@ -122,8 +122,7 @@ export function useWaterAssets() {
         flow_permanent_ls: Number(r.flow_permanent_ls),
         flow_eventual_ls: r.flow_eventual_ls == null ? null : Number(r.flow_eventual_ls),
         unit_value_clp: Number(r.unit_value_clp),
-        reference_value_clp:
-          r.reference_value_clp == null ? null : Number(r.reference_value_clp),
+        reference_value_clp: r.reference_value_clp == null ? null : Number(r.reference_value_clp),
       }));
     },
   });
@@ -214,10 +213,7 @@ export const RIGHT_TYPE_LABEL: Record<string, string> = {
   groundwater: "Groundwater Right",
 };
 
-export const VERIFICATION_META: Record<
-  string,
-  { label: string; tone: string }
-> = {
+export const VERIFICATION_META: Record<string, { label: string; tone: string }> = {
   verified: { label: "Verified", tone: "bg-emerald-50 text-emerald-700 border-emerald-200" },
   document_provided: {
     label: "Document Provided",
@@ -305,7 +301,6 @@ export const QUALITY_PARAM_META: Record<
   temperature: { label: "Temperatura", unit: "°C" },
   dissolved_oxygen: { label: "Oxígeno disuelto", unit: "mg/L" },
 };
-
 
 export const UNIT_VALUE_CLP = 750_000;
 

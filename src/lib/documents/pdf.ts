@@ -138,7 +138,6 @@ function sanitize(text: string): string {
   return out;
 }
 
-
 function clampText(text: string, max = 1200): string {
   const clean = sanitize(text).replace(/\s+/g, " ").trim();
   return clean.length > max ? `${clean.slice(0, max - 1)}...` : clean;
@@ -148,7 +147,6 @@ function ellipsize(text: string, max = 160): string {
   const clean = sanitize(text).replace(/\s+/g, " ").trim();
   return clean.length > max ? `${clean.slice(0, max - 1)}...` : clean;
 }
-
 
 export async function renderGeocapitalsPdf(
   doc: GeneratedDoc,
@@ -273,7 +271,6 @@ export async function renderGeocapitalsPdf(
     });
   }
 
-
   y = firstTopY;
   pdf.setDrawColor(...HAIRLINE);
   pdf.setLineWidth(0.5);
@@ -357,7 +354,6 @@ export async function renderGeocapitalsPdf(
     });
     y += bandH + 14;
   }
-
 
   const ensure = (needed: number) => {
     if (y + needed > safeBottom) y = addPage();
@@ -467,7 +463,12 @@ export async function renderGeocapitalsPdf(
         alternateRowStyles: { fillColor: PAPER_ALT },
         didParseCell: (data) => {
           // Hairline inferior en cada fila para calzar con el estilo `table`.
-          data.cell.styles.lineWidth = { top: 0, right: 0, bottom: 0.4, left: 0 } as unknown as number;
+          data.cell.styles.lineWidth = {
+            top: 0,
+            right: 0,
+            bottom: 0.4,
+            left: 0,
+          } as unknown as number;
         },
         willDrawPage: ({ pageNumber }: { pageNumber: number }) => {
           if (pageNumber > tableStartPage) {
@@ -538,7 +539,8 @@ export async function renderGeocapitalsPdf(
           // Tamaño de la firma manuscrita: escala inversa al largo del nombre
           // para no invadir la caja "FIRMADO" a la derecha.
           const nameLen = stamp.name.length;
-          const sigFontSize = nameLen > 70 ? 8.5 : nameLen > 50 ? 9.5 : nameLen > 32 ? 11 : nameLen > 22 ? 13 : 15;
+          const sigFontSize =
+            nameLen > 70 ? 8.5 : nameLen > 50 ? 9.5 : nameLen > 32 ? 11 : nameLen > 22 ? 13 : 15;
           const sigMaxW = slotW - 92;
           pdf.setFont("helvetica", "bolditalic");
           pdf.setFontSize(sigFontSize);
@@ -554,8 +556,6 @@ export async function renderGeocapitalsPdf(
           const sigLines = lines.slice(0, 3);
           const sigLineH = fs * 0.85;
           pdf.text(sigLines, x + 6, lineY - 10 - (sigLines.length - 1) * sigLineH);
-
-
 
           const bw = 74;
           const bh = 24;

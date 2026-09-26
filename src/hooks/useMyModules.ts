@@ -38,13 +38,20 @@ export function useMyModules() {
     queryFn: async () => {
       const { data, error } = await (supabase.rpc as any)("get_my_modules");
       if (error) throw error;
-      return (data ?? { plan_code: null, unrestricted: true, modules: [], features: [] }) as MyModulesResult;
+      return (data ?? {
+        plan_code: null,
+        unrestricted: true,
+        modules: [],
+        features: [],
+      }) as MyModulesResult;
     },
   });
 }
 
 /** Persisted selected module (falls back to first available). */
-export function useSelectedModule(available: ModuleInfo[] | undefined): [ModuleKey | "all", (m: ModuleKey | "all") => void] {
+export function useSelectedModule(
+  available: ModuleInfo[] | undefined,
+): [ModuleKey | "all", (m: ModuleKey | "all") => void] {
   const [selected, setSelected] = useState<ModuleKey | "all">("all");
 
   useEffect(() => {

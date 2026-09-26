@@ -68,8 +68,7 @@ const STATUS_STYLE: Record<NegotiationRow["status"], { label: string; cls: strin
 
 const usd = (n: number | null) =>
   n != null ? `US$ ${Number(n).toLocaleString("es-CL", { maximumFractionDigits: 2 })}/t` : "—";
-const tons = (n: number | null) =>
-  n != null ? `${Number(n).toLocaleString("es-CL")} t` : "—";
+const tons = (n: number | null) => (n != null ? `${Number(n).toLocaleString("es-CL")} t` : "—");
 const fdate = (s: string | null) => (s ? new Date(s).toLocaleDateString("es-CL") : "—");
 
 type ProposeArgs = {
@@ -138,7 +137,8 @@ export function TradeNegotiationPanel({
   };
 
   const respond = async (offer: NegotiationRow, action: "accept" | "reject") => {
-    const note = action === "reject" ? window.prompt("Motivo del rechazo (opcional)") ?? null : null;
+    const note =
+      action === "reject" ? (window.prompt("Motivo del rechazo (opcional)") ?? null) : null;
     if (action === "accept") {
       const ok = window.confirm(
         "¿Aceptar esta propuesta? Los términos (precio, cantidad, Incoterm, pago) se aplicarán al trade y se superarán otras ofertas abiertas.",
@@ -175,8 +175,8 @@ export function TradeNegotiationPanel({
             Negociación de términos
           </h2>
           <p className="text-xs text-muted-foreground">
-            Oferta / contra-oferta con precio, cantidad, Incoterm, puertos, fechas, pago y envío.
-            Al aceptar, los términos se vuelcan al trade.
+            Oferta / contra-oferta con precio, cantidad, Incoterm, puertos, fechas, pago y envío. Al
+            aceptar, los términos se vuelcan al trade.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -296,9 +296,7 @@ export function TradeNegotiationPanel({
                       wide
                     />
                   )}
-                  {r.shipping_notes && (
-                    <Field label="Envío" value={r.shipping_notes} wide />
-                  )}
+                  {r.shipping_notes && <Field label="Envío" value={r.shipping_notes} wide />}
                 </div>
 
                 {r.message && (
@@ -390,7 +388,13 @@ function ProposeForm({
   onSubmit: (args: ProposeArgs) => void;
 }) {
   const [party, setParty] = useState<Party>(
-    replyTo ? (replyTo.party === "buyer" ? "seller" : replyTo.party === "seller" ? "buyer" : defaultParty) : defaultParty,
+    replyTo
+      ? replyTo.party === "buyer"
+        ? "seller"
+        : replyTo.party === "seller"
+          ? "buyer"
+          : defaultParty
+      : defaultParty,
   );
   const [price, setPrice] = useState<string>(replyTo?.price_usd_t?.toString() ?? "");
   const [quantity, setQuantity] = useState<string>(replyTo?.quantity_t?.toString() ?? "");

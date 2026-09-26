@@ -47,9 +47,12 @@ function guardText(doc: { text: (...args: never[]) => unknown }) {
 export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
   const { default: JsPDF } = await import("jspdf");
 
-
   if (kind === "deck") {
-    const doc = new JsPDF({ unit: "pt", format: [GC_PAGE.deck.w, GC_PAGE.deck.h], orientation: "landscape" });
+    const doc = new JsPDF({
+      unit: "pt",
+      format: [GC_PAGE.deck.w, GC_PAGE.deck.h],
+      orientation: "landscape",
+    });
     guardText(doc);
     const { renderInvestorDeck } = await import("./templates/investorDeck");
     await renderInvestorDeck(doc, model);

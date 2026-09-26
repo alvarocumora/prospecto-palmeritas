@@ -56,7 +56,10 @@ export function WaterAssetsPage({ mode }: { mode: "public" | "investor" }) {
   const filtered = useMemo(() => {
     const needle = q.trim().toLowerCase();
     return assets.filter((a) => {
-      if (needle && !`${a.asset_id} ${a.name} ${a.river} ${a.commune}`.toLowerCase().includes(needle))
+      if (
+        needle &&
+        !`${a.asset_id} ${a.name} ${a.river} ${a.commune}`.toLowerCase().includes(needle)
+      )
         return false;
       if (commune !== "all" && a.commune !== commune) return false;
       if (exercise !== "all" && a.exercise !== exercise) return false;
@@ -131,7 +134,10 @@ export function WaterAssetsPage({ mode }: { mode: "public" | "investor" }) {
                 <Kpi label="Total Water Assets" value={String(assets.length)} />
                 <Kpi label="Permanent Flow" value={fmtFlow(totals.flow)} />
                 <Kpi label="Reference Value" value={fmtCLP(totals.value)} />
-                <Kpi label="Communes / DGA Res." value={`${totals.communes} / ${totals.resolutions}`} />
+                <Kpi
+                  label="Communes / DGA Res."
+                  value={`${totals.communes} / ${totals.resolutions}`}
+                />
               </div>
               <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.18em] text-sky-300/70">
                 Provincia de Osorno · Los Lagos · Chile
@@ -341,14 +347,23 @@ function AssetRow({
     >
       <div className="flex items-start justify-between gap-3">
         <button type="button" onClick={onSelect} className="min-w-0 text-left">
-          <div className="font-mono text-[9.5px] tracking-[0.16em] text-sky-700">{asset.asset_id}</div>
-          <div className="mt-0.5 truncate text-[13px] font-semibold text-slate-900">{asset.river}</div>
+          <div className="font-mono text-[9.5px] tracking-[0.16em] text-sky-700">
+            {asset.asset_id}
+          </div>
+          <div className="mt-0.5 truncate text-[13px] font-semibold text-slate-900">
+            {asset.river}
+          </div>
           <div className="text-[11px] text-slate-500">
             {asset.commune} · {asset.province}
           </div>
         </button>
         <label className="flex shrink-0 items-center gap-1 text-[10px] text-slate-500">
-          <input type="checkbox" className="accent-sky-600" checked={checked} onChange={onToggleCompare} />
+          <input
+            type="checkbox"
+            className="accent-sky-600"
+            checked={checked}
+            onChange={onToggleCompare}
+          />
           Comparar
         </label>
       </div>
@@ -370,7 +385,10 @@ function CompareModal({ assets, onClose }: { assets: WaterAsset[]; onClose: () =
     ["Right Type", (a) => (a.nature === "consuntivo" ? "Consumptive" : "Non-consumptive")],
     ["Exercise", (a) => EXERCISE_LABEL[a.exercise] ?? a.exercise],
     ["DGA Resolution", (a) => `${a.dga_resolution ?? "—"} (${a.dga_resolution_date ?? "s/f"})`],
-    ["Registry Status", (a) => (a.verification_status === "documented" ? "Documented" : "Declared")],
+    [
+      "Registry Status",
+      (a) => (a.verification_status === "documented" ? "Documented" : "Declared"),
+    ],
     ["Reference Value", (a) => fmtCLP(a.reference_value_clp)],
   ];
   return (

@@ -58,7 +58,7 @@ export function ModuleSwitcher({
               key={m.key}
               type="button"
               onClick={() => onSelect(m.key)}
-              title={locale === "es" ? m.description_es ?? "" : m.description_en ?? ""}
+              title={locale === "es" ? (m.description_es ?? "") : (m.description_en ?? "")}
               className={cn(
                 "flex items-center gap-2 h-7 px-2 rounded-[2px] text-[11px] font-mono transition-colors text-left",
                 active

@@ -3,12 +3,7 @@ import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { TEMPLATE_BY_ID, buildReference } from "@/lib/documents/templates";
-import {
-  generateSignToken,
-  signTokenPrefix,
-  sha256Hex,
-  docHash,
-} from "@/lib/documents/signing";
+import { generateSignToken, signTokenPrefix, sha256Hex, docHash } from "@/lib/documents/signing";
 import { signUrl as buildSignUrl, publicUrl } from "@/lib/publicUrl";
 import { OWN_PARTY_LINE } from "@/lib/documents/company";
 
@@ -86,22 +81,14 @@ async function insertSignRequest(
     .select("id, expires_at")
     .single();
   if (ins.error && /trade_id|schema cache|column/i.test(ins.error.message)) {
-    ins = await sb
-      .from("document_sign_requests")
-      .insert(base)
-      .select("id, expires_at")
-      .single();
+    ins = await sb.from("document_sign_requests").insert(base).select("id, expires_at").single();
   }
   if (ins.error) throw new Error(ins.error.message);
   const row = ins.data as { id: string; expires_at: string | null };
   return { id: row.id, token, expiresAt: row.expires_at };
 }
 
-function buildDoc(
-  templateId: "nda" | "loi",
-  trade: TradeRow,
-  partnerLine: string,
-) {
+function buildDoc(templateId: "nda" | "loi", trade: TradeRow, partnerLine: string) {
   const tpl = TEMPLATE_BY_ID[templateId];
   if (!tpl) throw new Error(`Plantilla '${templateId}' no encontrada.`);
   const values: Record<string, string> =
@@ -178,8 +165,7 @@ async function runOnboardingForTrade(
     if (!signerEmail) {
       throw new Error("Sin email de contraparte — vincula un partner o pasá overrideEmail.");
     }
-    const signerName =
-      data.overrideName ?? partner?.name ?? trade.counterparty_name ?? undefined;
+    const signerName = data.overrideName ?? partner?.name ?? trade.counterparty_name ?? undefined;
     const partnerLine =
       [
         partner?.name ?? trade.counterparty_name ?? signerName ?? "",
@@ -218,9 +204,8 @@ async function runOnboardingForTrade(
     let loiPdfUrl: string | undefined;
     try {
       // Generar y subir NDA + LOI oficiales (server-side, PDF real).
-      const { buildNdaPdf, buildLoiPdf, uploadPdfSigned } = await import(
-        "@/lib/documents/officialPdfs.server"
-      );
+      const { buildNdaPdf, buildLoiPdf, uploadPdfSigned } =
+        await import("@/lib/documents/officialPdfs.server");
       const counterparty = {
         role: "Proveedor",
         name: signerName ?? partnerLine,
@@ -293,7 +278,6 @@ async function runOnboardingForTrade(
       console.error("[onboarding] email failed", e);
     }
 
-
     try {
       await sb.from("trade_events").insert({
         trade_id: trade.id,
@@ -357,9 +341,7 @@ export const sendSupplierOnboardingBatch = createServerFn({ method: "POST" })
     const sb = asSb(context.supabase);
     const results: Awaited<ReturnType<typeof runOnboardingForTrade>>[] = [];
     for (const tradeId of data.tradeIds) {
-      results.push(
-        await runOnboardingForTrade(sb, context.userId as string, { tradeId }),
-      );
+      results.push(await runOnboardingForTrade(sb, context.userId as string, { tradeId }));
     }
     const summary = {
       total: results.length,
@@ -401,7 +383,12 @@ export const listOnboardingStatusForTrades = createServerFn({ method: "POST" })
       if (!prev || prev < e.created_at) sentAt.set(e.trade_id, e.created_at);
     }
 
-    type SR = { trade_id: string; template_id: string; status: string | null; signed_at: string | null };
+    type SR = {
+      trade_id: string;
+      template_id: string;
+      status: string | null;
+      signed_at: string | null;
+    };
     const byTrade = new Map<string, { nda?: SR; loi?: SR }>();
     for (const r of (signs.data ?? []) as SR[]) {
       const slot = byTrade.get(r.trade_id) ?? {};

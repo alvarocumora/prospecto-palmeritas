@@ -107,9 +107,8 @@ export const dispatchCopperPackage = createServerFn({ method: "POST" })
     }
 
     const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
-    const { buildCopperSheetPdf, uploadPdfSigned } = await import(
-      "@/lib/documents/officialPdfs.server"
-    );
+    const { buildCopperSheetPdf, uploadPdfSigned } =
+      await import("@/lib/documents/officialPdfs.server");
     const operationUrl = tradeId ? publicUrl(`/operacion/${tradeId}`) : undefined;
     const results: Array<{ to: string; kind: string; ok: boolean; reason?: string }> = [];
 

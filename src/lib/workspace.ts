@@ -115,7 +115,6 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Oportunidades IA", to: "/dashboard/opportunities" },
       { label: "Capas GIS", to: "/dashboard/marketplace" },
     ],
-
   },
   {
     to: "/dashboard/projects",
@@ -232,7 +231,6 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Bandeja de proveedores", to: "/dashboard/proveedores" },
       { label: "Hub proveedor", to: "/dashboard/proveedor" },
       { label: "Mi panel proveedor", to: "/panel" },
-
     ],
   },
   {
@@ -285,9 +283,6 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     group: "CAPITAL & DEALS",
     module: "capital",
   },
-
-
-
 
   // ─────────────── ADMINISTRACIÓN (transversal) ───────────────
   {

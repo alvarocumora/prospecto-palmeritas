@@ -5,6 +5,7 @@ Hoy el módulo Cholqui muestra un único plan fijo (166.500 t en 24 meses, rampa
 ## Qué se construye
 
 **1. Modelo de plan minero (nueva fuente de cálculo, no otra fuente de datos)**
+
 - Rampa mensual configurable: capacidad inicial 1.000 t/mes, meseta objetivo 15.000 o 20.000 t/mes, meses de rampa y duración total.
 - Producción mes a mes, acumulada, y tonelaje total resultante del escenario.
 - Punto de equilibrio (~2.341 t/mes hoy documentado) recalculado con la estructura de costos del escenario.
@@ -20,6 +21,7 @@ Ingreso mensual = tonelaje × tarifa según ley de Cu soluble (1,5 / 2,0 / 2,5 /
 
 **5. Panel en la plataforma**
 Nuevo panel "Plan minero y escalamiento" dentro de la ficha Cholqui (`/dashboard/cholqui` y live público `/live/franco`), en estilo Institutional Modernist:
+
 - Selector de meseta (15.000 / 20.000 t/mes) y de ley de Cu soluble.
 - Gráfico de rampa de producción mensual.
 - Tabla de flota por escalón con costo mensual.

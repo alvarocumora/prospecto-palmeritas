@@ -6,6 +6,7 @@
 > compartir son de Lovable (`/src`). Aquí el contrato y el patrón.
 
 ## Patrón común: link tokenizado + compartir por WhatsApp
+
 - El token vive HASHEADO (como en `commodity_trades.counterparty_*_token_*` /
   `sourcing_requests.submit_token_hash`); el server fn valida el token y opera con
   **service client** (sin sesión del tercero).
@@ -14,6 +15,7 @@
   tarjeta en WhatsApp.
 
 ## A) Ficha de REGISTRO DE PRODUCTO
+
 Flujo: el usuario genera un link → lo manda al proveedor → el proveedor abre una ficha
 pública y **registra su producto** (specs, cantidad, precio, origen, packaging, docs).
 
@@ -28,6 +30,7 @@ pública y **registra su producto** (specs, cantidad, precio, origen, packaging,
   `get_trade_products`). Así "sube documentación y da seguimiento".
 
 ## B) Ficha de OFERTA / NEGOCIACIÓN (portal para negociar)
+
 Flujo: el usuario manda la ficha del producto/operación al comprador → el comprador
 abre el portal (War Room) y **hace una oferta o negocia** precio, fecha, Incoterm,
 puertos, envío — sin cuenta.
@@ -38,17 +41,18 @@ puertos, envío — sin cuenta.
 - **Negociar (NUEVO backend habilitado para link):** server fn valida el token →
   llama vía service client:
   - `propose_trade_terms(p_trade_id, p_party, p_price_usd_t, p_quantity_t, p_incoterm,
-     p_port_loading, p_port_discharge, p_delivery_from, p_delivery_to, p_payment_terms,
-     p_shipping_notes, p_valid_until, p_message, p_replies_to)` — oferta/contraoferta.
+ p_port_loading, p_port_discharge, p_delivery_from, p_delivery_to, p_payment_terms,
+ p_shipping_notes, p_valid_until, p_message, p_replies_to)` — oferta/contraoferta.
   - `respond_trade_terms(p_offer_id, 'accept'|'reject', p_note)` — al aceptar vuelca los
     términos al trade.
   - `get_trade_negotiation(trade)` — hilo para mostrar la negociación en el portal.
-  El `p_party` sale del token (buyer/seller). **Ya no exigen sesión** (migración
-  20260726030000): el server fn es el gatekeeper del token; los RPC siguen sin grant a
-  `anon`.
+    El `p_party` sale del token (buyer/seller). **Ya no exigen sesión** (migración
+    20260726030000): el server fn es el gatekeeper del token; los RPC siguen sin grant a
+    `anon`.
 - **Subir documentos y firmar:** `attachOperacionDoc` + checklist/screening ya existentes.
 
 ## Seguridad
+
 - Los RPC de negociación se otorgan a `authenticated` y `service_role`, **nunca a
   `anon`**. El tercero sin cuenta NO llama los RPC directo: pasa por el server fn que
   validó el token. `created_by` queda `null` en el flujo por link (auditable por
@@ -57,6 +61,7 @@ puertos, envío — sin cuenta.
   (`ensureCounterpartyLink`, `get_trade_access_links` para gobernanza).
 
 ## Prompt para Lovable
+
 ```text
 Crea dos flujos de link compartible (WhatsApp):
 1) /registro/producto/$token — ficha pública donde el proveedor registra su producto y

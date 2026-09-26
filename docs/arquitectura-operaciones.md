@@ -11,14 +11,15 @@
 Revisando el repo, cuatro dominios hacen partes del mismo ciclo comprador↔vendedor,
 cada uno con sus tablas —y algunos **duplican** invitaciones y documentos:
 
-| Dominio | Tablas núcleo | Qué hace | Solapa con |
-|---|---|---|---|
-| **Operaciones** | `operations`, `operation_participants`, `operation_invitations`, `operation_documents`, `operation_tasks`, `operation_messages`, `signature_envelopes`, `document_signatures`, `operation_status_history` | Deal room tripartito (comprador/vendedor/GC): link seguro, subida+revisión+**firma** de docs, tareas, chat por canal, historial de estado | — (el más completo) |
-| **Trades** | `commodity_trades`, `trade_documents`, `trade_events`, `trade_shipments`, `commodity_lots`, `commodity_inquiries` | Ejecución del negocio: etapas (`icpo`→…), **checklist de docs por fase** (`trade_documents.doc_type/phase`), embarques | `operations.linked_trade_id → commodity_trades` |
-| **Suppliers / RFQ** | `suppliers`, `supplier_offers`, `offer_elements`, `supplier_documents`, `rfqs`, `rfq_products`, `rfq_applications`, `supplier_scores`, `risk_assessments`, **`invitation_links`** | Requerimientos de compra (RFQ) + registro de proveedores + ofertas + scoring/riesgo | **`invitation_links`** duplica `operation_invitations`; `rfq_products`/`supplier_offers` son "requerimiento" y "productos del proveedor" |
-| **Offerings** | `asset_offerings`, `offering_subscriptions` | Inversión tokenizada sobre proyectos | (tangencial) |
+| Dominio             | Tablas núcleo                                                                                                                                                                                             | Qué hace                                                                                                                                  | Solapa con                                                                                                                               |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **Operaciones**     | `operations`, `operation_participants`, `operation_invitations`, `operation_documents`, `operation_tasks`, `operation_messages`, `signature_envelopes`, `document_signatures`, `operation_status_history` | Deal room tripartito (comprador/vendedor/GC): link seguro, subida+revisión+**firma** de docs, tareas, chat por canal, historial de estado | — (el más completo)                                                                                                                      |
+| **Trades**          | `commodity_trades`, `trade_documents`, `trade_events`, `trade_shipments`, `commodity_lots`, `commodity_inquiries`                                                                                         | Ejecución del negocio: etapas (`icpo`→…), **checklist de docs por fase** (`trade_documents.doc_type/phase`), embarques                    | `operations.linked_trade_id → commodity_trades`                                                                                          |
+| **Suppliers / RFQ** | `suppliers`, `supplier_offers`, `offer_elements`, `supplier_documents`, `rfqs`, `rfq_products`, `rfq_applications`, `supplier_scores`, `risk_assessments`, **`invitation_links`**                         | Requerimientos de compra (RFQ) + registro de proveedores + ofertas + scoring/riesgo                                                       | **`invitation_links`** duplica `operation_invitations`; `rfq_products`/`supplier_offers` son "requerimiento" y "productos del proveedor" |
+| **Offerings**       | `asset_offerings`, `offering_subscriptions`                                                                                                                                                               | Inversión tokenizada sobre proyectos                                                                                                      | (tangencial)                                                                                                                             |
 
 **Duplicaciones a consolidar:**
+
 - **Dos sistemas de invitación por link:** `operation_invitations.secure_token` vs
   `invitation_links`. → Unificar en `operation_invitations`.
 - **Dos modelos de "documento con estado/fase":** `operation_documents` (subida+firma)
@@ -43,14 +44,14 @@ flowchart LR
 por parte, invitación con link, docs, firma). Se le enganchan las piezas que hoy
 viven sueltas:
 
-| Concepto del flujo | Hoy vive en | En el modelo canónico |
-|---|---|---|
-| **Requerimiento** (lo que pide el comprador) | `rfqs` + `rfq_products` / campos de `operations` | `operations` (spec) **+** líneas de producto del requerimiento enlazadas por `operation_id` |
-| **Link al comprador/proveedor** | `operation_invitations` (✔) y `invitation_links` (dup) | **`operation_invitations`** únicamente |
-| **Productos del proveedor** | `supplier_offers` + `offer_elements` + `rfq_applications` | tabla/vista **de productos por operación** (`operation_id`, oferta del `seller`) |
-| **Documentos requeridos** | `operation_documents` + `trade_documents` | `operation_documents` (instancias) **+ checklist de estructura** (nuevo, esta capa) |
-| **Firma** | `signature_envelopes` / `document_signatures` (✔) | igual, sin cambios |
-| **Ejecución / embarques** | `commodity_trades` + `trade_shipments` (✔, ya enlazado) | continúa vía `operations.linked_trade_id` |
+| Concepto del flujo                           | Hoy vive en                                               | En el modelo canónico                                                                       |
+| -------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Requerimiento** (lo que pide el comprador) | `rfqs` + `rfq_products` / campos de `operations`          | `operations` (spec) **+** líneas de producto del requerimiento enlazadas por `operation_id` |
+| **Link al comprador/proveedor**              | `operation_invitations` (✔) y `invitation_links` (dup)    | **`operation_invitations`** únicamente                                                      |
+| **Productos del proveedor**                  | `supplier_offers` + `offer_elements` + `rfq_applications` | tabla/vista **de productos por operación** (`operation_id`, oferta del `seller`)            |
+| **Documentos requeridos**                    | `operation_documents` + `trade_documents`                 | `operation_documents` (instancias) **+ checklist de estructura** (nuevo, esta capa)         |
+| **Firma**                                    | `signature_envelopes` / `document_signatures` (✔)         | igual, sin cambios                                                                          |
+| **Ejecución / embarques**                    | `commodity_trades` + `trade_shipments` (✔, ya enlazado)   | continúa vía `operations.linked_trade_id`                                                   |
 
 ## 4. La capa que construyo yo (backend) — sin tocar `/src`
 
@@ -59,6 +60,7 @@ La UI de "un solo sistema con un link" la unifica Lovable; yo entrego la espina 
 datos y los RPC que consume.
 
 ### 4.1 Checklist de documentos requeridos (primer motor, alcance elegido)
+
 - **Tabla `operation_document_structure`** (versionada, **editable**): por cada
   etapa (`operation_status`) y `rol` requerido (buyer/seller/geocapitals), qué
   `doc_kind` es obligatorio y en qué orden. Se siembra una estructura base derivada
@@ -74,11 +76,13 @@ datos y los RPC que consume.
   mapea a `trade_documents.doc_type/phase` para no crear un tercer catálogo.
 
 ### 4.2 Productos del proveedor (siguiente)
+
 - Modelo de **productos por operación** (specs/cantidad/precio/calidad/origen) que el
   proveedor sube por su link, reconciliando `supplier_offers`/`offer_elements`/
   `rfq_products` hacia `operation_id`.
 
 ### 4.3 Ciclo del requerimiento (siguiente)
+
 - Transiciones explícitas (borrador→enviado→completado→bloqueado) como RPC con
   validación, sobre `operations` (+ `rfqs` plegado).
 

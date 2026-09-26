@@ -225,7 +225,6 @@ export const getListingDetail = createServerFn({ method: "GET" })
       }
     }
 
-
     // Contador de interesados (inquiries) — señal social de tracción
     let inquiriesCount = 0;
     {

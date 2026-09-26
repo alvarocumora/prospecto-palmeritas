@@ -6,11 +6,7 @@
 // y están sujetos a due diligence, NDA y acuerdo definitivo. Este archivo es
 // la única fuente: editar aquí actualiza ficha, simulador y cards.
 
-import {
-  CHOLQUI,
-  CHOLQUI_HIGHLIGHTS,
-  CHOLQUI_ROUND,
-} from "@/features/franco/data/cholqui";
+import { CHOLQUI, CHOLQUI_HIGHLIGHTS, CHOLQUI_ROUND } from "@/features/franco/data/cholqui";
 
 export type FichaSlug = "palmeras" | "losverdes" | "cholqui";
 

@@ -46,22 +46,17 @@ function SupplierPanel() {
   }, [claim, load]);
 
   if (loading) {
-    return (
-      <div className="p-8 text-sm text-[hsl(var(--content-subtle))]">Cargando tu panel…</div>
-    );
+    return <div className="p-8 text-sm text-[hsl(var(--content-subtle))]">Cargando tu panel…</div>;
   }
 
   if (!supplier) {
     return (
-      <div
-        data-theme="im-light"
-        className="min-h-screen bg-[hsl(var(--surface-paper))] px-4 py-12"
-      >
+      <div data-theme="im-light" className="min-h-screen bg-[hsl(var(--surface-paper))] px-4 py-12">
         <div className="mx-auto max-w-xl text-center">
           <h1 className="font-serif text-3xl">Aún no tienes inscripción</h1>
           <p className="mt-4 text-sm text-[hsl(var(--content-subtle))]">
-            No encontramos una inscripción de proveedor asociada a tu correo. Completa el
-            formulario público con el mismo correo con el que iniciaste sesión.
+            No encontramos una inscripción de proveedor asociada a tu correo. Completa el formulario
+            público con el mismo correo con el que iniciaste sesión.
           </p>
           <Link
             to="/inscripcion"

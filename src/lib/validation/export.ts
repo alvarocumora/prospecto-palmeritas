@@ -254,6 +254,9 @@ export function exportValidationPdf(report: ValidationReport, projectName: strin
   }
 
   import("@/lib/documents/pdf").then(({ triggerPdfDownload }) =>
-    triggerPdfDownload(doc.output("blob"), `validacion-${projectName.replace(/\s+/g, "_")}-${ts()}.pdf`),
+    triggerPdfDownload(
+      doc.output("blob"),
+      `validacion-${projectName.replace(/\s+/g, "_")}-${ts()}.pdf`,
+    ),
   );
 }

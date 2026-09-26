@@ -24,7 +24,6 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
   const [requiresNda, setRequiresNda] = useState(true);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -94,7 +93,6 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
       toast.error(e instanceof Error ? e.message : "Error al descargar");
     }
   };
-
 
   return (
     <div className="mt-3 pt-3 border-t border-border">
@@ -174,7 +172,6 @@ export function DataRoomManager({ listingId }: { listingId: string }) {
                   {f.requires_nda ? " · requiere NDA" : " · público al deal"}
                   {f.pending ? " · pendiente de carga" : ""}
                 </span>
-
               </button>
               <button
                 type="button"

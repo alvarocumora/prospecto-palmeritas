@@ -42,7 +42,10 @@ export const Route = createFileRoute("/proyectos_/ficha/$slug")({
             ? `${f.name} (${f.commodity}) — etapa, valorización referencial, ticket desde ${fmtUsd0(f.minTicketUsd)} y simulación de inversión.`
             : "Ficha de inversión de proyecto minero.",
         },
-        { property: "og:title", content: `${f?.name ?? "Proyecto"} · Ficha de inversión — Geocapitals` },
+        {
+          property: "og:title",
+          content: `${f?.name ?? "Proyecto"} · Ficha de inversión — Geocapitals`,
+        },
         {
           property: "og:description",
           content: f

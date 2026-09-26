@@ -31,8 +31,16 @@ export const dispatchAntimonyPackage = createServerFn({ method: "POST" })
             }),
           )
           .default([
-            { name: "Marcela Cimino", company: "Carpio & Kaddu Group", email: "ciminomarcela@gmail.com" },
-            { name: "Vincent Carpio", company: "Carpio & Kaddu Group", email: "carpio@carpiokaddu.com" },
+            {
+              name: "Marcela Cimino",
+              company: "Carpio & Kaddu Group",
+              email: "ciminomarcela@gmail.com",
+            },
+            {
+              name: "Vincent Carpio",
+              company: "Carpio & Kaddu Group",
+              email: "carpio@carpiokaddu.com",
+            },
           ]),
       })
       .parse(d ?? {}),
@@ -67,7 +75,7 @@ export const dispatchAntimonyPackage = createServerFn({ method: "POST" })
     if (tradeId) {
       onboarding = await runOnboarding(sb, context.userId as string, tradeId);
       results.push({
-        to: onboarding.ok ? onboarding.recipient ?? "" : "ana.rojo67@gmail.com",
+        to: onboarding.ok ? (onboarding.recipient ?? "") : "ana.rojo67@gmail.com",
         kind: "supplier-onboarding",
         ok: onboarding.ok,
         reason: onboarding.ok ? undefined : onboarding.error,
@@ -76,16 +84,20 @@ export const dispatchAntimonyPackage = createServerFn({ method: "POST" })
 
     // 2) Ficha técnica del antimonio a los buyers — con PDF oficial adjunto (signed URL).
     const { sendInternalEmail } = await import("@/lib/email/send-internal.server");
-    const { buildAntimonySheetPdf, uploadPdfSigned } = await import(
-      "@/lib/documents/officialPdfs.server"
-    );
+    const { buildAntimonySheetPdf, uploadPdfSigned } =
+      await import("@/lib/documents/officialPdfs.server");
     const operationUrl = tradeId ? publicUrl(`/operacion/${tradeId}`) : undefined;
     for (const buyer of data.buyers) {
       let sheetPdfUrl: string | undefined;
       try {
         const bytes = await buildAntimonySheetPdf({
           reference: `SHEET-${reference}`,
-          recipient: { role: "Buyer", name: buyer.name, company: buyer.company, email: buyer.email },
+          recipient: {
+            role: "Buyer",
+            name: buyer.name,
+            company: buyer.company,
+            email: buyer.email,
+          },
         });
         sheetPdfUrl = await uploadPdfSigned({
           bytes,

@@ -62,10 +62,7 @@ export const getTradeCopilotBrief = createServerFn({ method: "POST" })
     if (!trade) throw new Error("Trade no encontrado o sin acceso.");
 
     const [docsQ, paysQ, shipsQ, eventsQ, packQ] = await Promise.all([
-      sb
-        .from("trade_documents")
-        .select("doc_type, status, signed_at")
-        .eq("trade_id", data.tradeId),
+      sb.from("trade_documents").select("doc_type, status, signed_at").eq("trade_id", data.tradeId),
       sb
         .from("trade_payments")
         .select("kind, amount_usd, status, due_date, paid_at, instrument, label")
@@ -128,8 +125,7 @@ export const getTradeCopilotBrief = createServerFn({ method: "POST" })
     const missingTerms: string[] = [];
     if (trade.quantity_t == null) missingTerms.push("cantidad (t)");
     if (trade.incoterm == null) missingTerms.push("Incoterm");
-    if (trade.unit_price_usd == null && trade.total_value_usd == null)
-      missingTerms.push("precio");
+    if (trade.unit_price_usd == null && trade.total_value_usd == null) missingTerms.push("precio");
     if (trade.payment_instrument == null) missingTerms.push("instrumento de pago");
 
     // Contexto compacto para el modelo (solo datos, ninguna instrucción).
@@ -188,7 +184,7 @@ export const getTradeCopilotBrief = createServerFn({ method: "POST" })
   },
   "risks": ["riesgo 1", "riesgo 2"]
 }\n` +
-      "Reglas duras: si falta información, dilo (ej. \"falta cantidad\"). No agregues campos. No uses cifras ausentes del contexto.";
+      'Reglas duras: si falta información, dilo (ej. "falta cantidad"). No agregues campos. No uses cifras ausentes del contexto.';
 
     const res = await fetch(AI_GATEWAY, {
       method: "POST",
@@ -299,7 +295,11 @@ export const suggestTradeTerms = createServerFn({ method: "POST" })
       .limit(1)
       .maybeSingle();
 
-    const packRow = pack as { version_number?: number; ctx_snapshot?: unknown; doc_type?: string } | null;
+    const packRow = pack as {
+      version_number?: number;
+      ctx_snapshot?: unknown;
+      doc_type?: string;
+    } | null;
     const packSnapshot = packRow?.ctx_snapshot ?? null;
 
     const userPrompt =
@@ -307,7 +307,9 @@ export const suggestTradeTerms = createServerFn({ method: "POST" })
       JSON.stringify(trade, null, 2) +
       "\n```\n" +
       (packSnapshot
-        ? "Términos del " + (packRow?.doc_type ?? "pack") + " v" +
+        ? "Términos del " +
+          (packRow?.doc_type ?? "pack") +
+          " v" +
           (packRow?.version_number ?? "?") +
           " (fuente de verdad si contradice al trade):\n```json\n" +
           JSON.stringify(packSnapshot, null, 2) +

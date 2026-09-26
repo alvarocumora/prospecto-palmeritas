@@ -224,9 +224,7 @@ function OperacionMirror() {
               token={token}
               session={session as string}
               role={data.role}
-              alreadyAccepted={data.events.some(
-                (e) => e.kind === "terms_accepted_by_counterparty",
-              )}
+              alreadyAccepted={data.events.some((e) => e.kind === "terms_accepted_by_counterparty")}
               defaultName={data.counterparty.name ?? ""}
             />
 
@@ -259,7 +257,11 @@ function ComplianceChecklistPublic({ token, session }: { token: string; session:
       return;
     }
     try {
-      const { path, token: upToken, bucket } = await reqFn({
+      const {
+        path,
+        token: upToken,
+        bucket,
+      } = await reqFn({
         data: { token, session, fileName: file.name },
       });
       const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, upToken, file);
@@ -288,7 +290,6 @@ function ComplianceChecklistPublic({ token, session }: { token: string; session:
 }
 
 const isProvided = (s: string) => s === "uploaded" || s === "signed" || s === "verified";
-
 
 function DocsUpload({
   token,
@@ -514,7 +515,9 @@ function AcceptTermsPanel({
             />
           </label>
           <label className="text-xs">
-            <span className="block text-[hsl(var(--im-ink-soft))] mb-1">Cargo / representación</span>
+            <span className="block text-[hsl(var(--im-ink-soft))] mb-1">
+              Cargo / representación
+            </span>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}

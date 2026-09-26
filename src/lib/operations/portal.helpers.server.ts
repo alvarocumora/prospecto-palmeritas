@@ -6,7 +6,10 @@
 import { getRequest } from "@tanstack/react-start/server";
 import { createClient } from "@supabase/supabase-js";
 
-export async function requireSupabaseAuthDirect(): Promise<{ userId: string; email: string | null }> {
+export async function requireSupabaseAuthDirect(): Promise<{
+  userId: string;
+  email: string | null;
+}> {
   const req = getRequest();
   const auth = req.headers.get("authorization") ?? req.headers.get("Authorization");
   if (!auth || !auth.toLowerCase().startsWith("bearer ")) {

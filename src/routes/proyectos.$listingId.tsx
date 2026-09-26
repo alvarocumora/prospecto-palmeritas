@@ -194,11 +194,7 @@ function ListingDetailPage() {
           )}
 
           {/* Data room real — con flujo NDA + descargas para inversionistas verificados */}
-          <PublicDataRoomSection
-            listingId={l.id}
-            listingTitle={l.title}
-            aggregate={l.dataRoom}
-          />
+          <PublicDataRoomSection listingId={l.id} listingTitle={l.title} aggregate={l.dataRoom} />
 
           {/* Data disponible */}
           {l.data_available && l.data_available.length > 0 && (

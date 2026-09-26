@@ -1,4 +1,8 @@
-import { reconcileCadastre, type ReconciliationResult, type ReconciliationState } from "./reconcileCadastre";
+import {
+  reconcileCadastre,
+  type ReconciliationResult,
+  type ReconciliationState,
+} from "./reconcileCadastre";
 
 export type ReconciliationBundle = {
   generatedAt: string;
@@ -16,18 +20,29 @@ export function buildReconciliationBundle(
 ): ReconciliationBundle {
   const results = reconcileCadastre(project, official, neighborKm);
   const summary: Record<ReconciliationState, number> = {
-    EXACT_MATCH: 0, INTERSECTS: 0, NEIGHBOR: 0, UNMATCHED: 0,
+    EXACT_MATCH: 0,
+    INTERSECTS: 0,
+    NEIGHBOR: 0,
+    UNMATCHED: 0,
   };
-  results.forEach(r => summary[r.state]++);
-  return { generatedAt: new Date().toISOString(), source: "SERNAGEOMIN", project, official, results, summary };
+  results.forEach((r) => summary[r.state]++);
+  return {
+    generatedAt: new Date().toISOString(),
+    source: "SERNAGEOMIN",
+    project,
+    official,
+    results,
+    summary,
+  };
 }
 
 export function reconciliationGeoJSON(bundle: ReconciliationBundle): GeoJSON.FeatureCollection {
   const features: GeoJSON.Feature[] = [];
   bundle.results.forEach((r, index) => {
-    const base = r.officialFeatureIndex == null
-      ? bundle.project.features[r.projectFeatureIndex ?? -1]
-      : bundle.official.features[r.officialFeatureIndex];
+    const base =
+      r.officialFeatureIndex == null
+        ? bundle.project.features[r.projectFeatureIndex ?? -1]
+        : bundle.official.features[r.officialFeatureIndex];
     if (!base?.geometry) return;
     features.push({
       type: "Feature",

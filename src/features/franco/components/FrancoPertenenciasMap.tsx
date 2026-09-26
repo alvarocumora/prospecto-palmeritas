@@ -4,7 +4,6 @@ import { useServerFn } from "@tanstack/react-start";
 import { Loader2, MapPin } from "lucide-react";
 import "leaflet/dist/leaflet.css";
 import type { Map as LeafletMap, GeoJSON as LeafletGeoJSON } from "leaflet";
-import type { Feature } from "geojson";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import francoPertenenciasRaw from "@/data/geo/franco_pertenencias.geojson?raw";
@@ -23,22 +22,6 @@ type FC = { type: "FeatureCollection"; features: FCFeature[] };
 
 const FC_DATA: FC = JSON.parse(francoPertenenciasRaw);
 
-function colorFor(matchKind: FrancoPertenenciaMatch["matchKind"] | undefined): {
-  color: string;
-  fillColor: string;
-} {
-  switch (matchKind) {
-    case "EXACT":
-      return { color: "#d4af37", fillColor: "#d4af37" }; // gold
-    case "GEOM":
-      return { color: "#4fa3a3", fillColor: "#4fa3a3" }; // teal
-    case "NAME~":
-      return { color: "#b87333", fillColor: "#b87333" }; // copper
-    default:
-      return { color: "#6b7280", fillColor: "#6b7280" }; // muted
-  }
-}
-
 export function FrancoPertenenciasMap() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
@@ -51,7 +34,7 @@ export function FrancoPertenenciasMap() {
     staleTime: 60_000,
   });
 
-  // Build a name -> best match map (prefer EXACT > GEOM > NAME~ > NONE)
+  // Internal reconciliation is retained only to enrich documentary polygons with cadastre attributes.
   const matchByName = useMemo(() => {
     const m = new Map<string, FrancoPertenenciaMatch>();
     if (!data) return m;
@@ -113,35 +96,31 @@ export function FrancoPertenenciasMap() {
         layerRef.current = null;
       }
       const layer = L.geoJSON(FC_DATA as never, {
-        style: (feat?: Feature) => {
-          const name = (feat?.properties as { name?: string } | undefined)?.name?.trim() ?? "";
-          const match = matchByName.get(name);
-          const c = colorFor(match?.matchKind);
-          return {
-            color: c.color,
-            weight: 2,
-            fillColor: c.fillColor,
-            fillOpacity: 0.18,
-            opacity: 0.9,
-          };
-        },
+        style: () => ({
+          color: "#d4af37",
+          weight: 2,
+          fillColor: "#d4af37",
+          fillOpacity: 0.14,
+          opacity: 0.9,
+        }),
         onEachFeature: (feat, lyr) => {
           const name = (feat.properties as { name?: string } | undefined)?.name?.trim() ?? "(s/n)";
           const m = matchByName.get(name);
           const html =
-            m && m.matchKind !== "NONE"
+            m && m.concessionCode
               ? `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.35">
                  <div style="font-weight:700;color:#d4af37">${name}</div>
-                 <div>Concesión: <b>${m.concessionName ?? "—"}</b></div>
+                 <div>Catastro: <b>${m.concessionName ?? "—"}</b></div>
                  <div>Código: ${m.concessionCode ?? "—"}</div>
                  <div>Titular: ${m.holder ?? "—"}</div>
-                 <div>Área DB: ${m.areaHaDb?.toFixed(2) ?? "—"} ha</div>
-                 <div>Overlap: ${m.overlapHa.toFixed(2)} ha (${m.pctOfKml.toFixed(1)}%)</div>
-                 <div>Match: <b>${m.matchKind}</b> · ${m.status ?? ""}</div>
+                 <div>Área: ${m.areaHaDb?.toFixed(2) ?? "—"} ha</div>
+                 <div>Estado: ${m.status ?? "—"}</div>
+                 <div style="color:#8A949C;margin-top:4px">Polígono KMZ documental; el catastro es la referencia canónica.</div>
                </div>`
               : `<div style="font-family:ui-monospace,monospace;font-size:11px">
-                 <div style="font-weight:700;color:#9ca3af">${name}</div>
-                 <div>Sin match en catastro</div>
+                 <div style="font-weight:700;color:#d4af37">${name}</div>
+                 <div>Polígono documental KMZ</div>
+                 <div style="color:#8A949C">Sin registro catastral asociado en esta consulta.</div>
                </div>`;
           lyr.bindPopup(html);
         },
@@ -210,16 +189,15 @@ export function FrancoPertenenciasMap() {
       <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
         <SectionTitle
           icon={MapPin}
-          sub="Pertenencias KMZ sobre satélite · color = estado de match con catastro real"
+          sub="Catastro como referencia canónica · KMZ conservado sólo como respaldo documental"
         >
           Live map · Pertenencias Cholqui
         </SectionTitle>
         <div className="flex items-center gap-3 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-          <LegendDot color="#d4af37" label="Match exacto" />
-          <LegendDot color="#4fa3a3" label="Geom" />
-          <LegendDot color="#b87333" label="Nombre" />
-          <LegendDot color="#6b7280" label="Sin match" />
+          <LegendDot color="#d4af37" label="Pertenencia documental" />
+          <LegendDot color="#2447D6" label="Punto de terreno" />
           <LegendDot color="#d4af37" label="Muestra analizada" />
+          <LegendDot color="#C0703A" label="Faena vecina" />
         </div>
       </div>
       <div className="relative">
@@ -231,15 +209,14 @@ export function FrancoPertenenciasMap() {
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-sm pointer-events-none">
             <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-gold">
-              <Loader2 className="w-4 h-4 animate-spin" /> Cruzando con catastro…
+              <Loader2 className="w-4 h-4 animate-spin" /> Cargando catastro…
             </div>
           </div>
         )}
       </div>
       <div className="mt-2 text-[11px] font-mono uppercase tracking-wider text-hint">
-        {FC_DATA.features.length} polígonos KMZ ·{" "}
         {data
-          ? `${data.matchedKmlPolygons} con match · ${data.uniqueConcessions} concesiones únicas`
+          ? `${data.uniqueConcessions} concesiones en catastro · ${FC_DATA.features.length} polígonos KMZ documentales`
           : "—"}
       </div>
     </Card>

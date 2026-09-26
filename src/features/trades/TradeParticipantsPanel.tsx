@@ -168,7 +168,11 @@ export function TradeParticipantsPanel({ tradeId }: { tradeId: string }) {
             disabled={busy}
             className="inline-flex items-center gap-1.5 rounded bg-primary px-3 py-1.5 text-primary-foreground disabled:opacity-50"
           >
-            {busy ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Plus className="h-3.5 w-3.5" />}
+            {busy ? (
+              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            ) : (
+              <Plus className="h-3.5 w-3.5" />
+            )}
             Crear acceso
           </button>
         </div>
@@ -205,7 +209,9 @@ export function TradeParticipantsPanel({ tradeId }: { tradeId: string }) {
                 {p.status === "active" ? "Activo" : "Revocado"}
               </span>
               {p.token_prefix ? (
-                <span className="font-mono text-[10px] text-muted-foreground">{p.token_prefix}…</span>
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {p.token_prefix}…
+                </span>
               ) : null}
               <div className="ml-auto flex items-center gap-1.5">
                 <button
