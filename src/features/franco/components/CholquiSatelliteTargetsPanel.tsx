@@ -80,8 +80,9 @@ export function CholquiSatelliteTargetsPanel() {
               `<div style="font-family:ui-monospace,monospace;font-size:11px;line-height:1.5">
                 <strong>${code} · ${indexLabel(a.indexCode)}</strong><br/>
                 Puntaje <b>${a.score != null ? a.score.toFixed(2) : "s/d"}</b> · severidad ${a.severity}<br/>
-                Área ${a.areaHa != null ? `${num(a.areaHa, 1)} ha` : "s/d"}<br/>
-                <span style="opacity:.65">Detección satelital derivada — no verificada en terreno</span>
+                ${a.zScore != null ? `z-score ${a.zScore.toFixed(2)}<br/>` : ""}
+                Tenencia: <b>${a.withinTenure ? "dentro de concesión conocida" : "fuera — requiere verificar tenencia"}</b><br/>
+                <span style="opacity:.65">${a.provenance}</span>
               </div>`,
             )
             .addTo(anomalyGroup);
