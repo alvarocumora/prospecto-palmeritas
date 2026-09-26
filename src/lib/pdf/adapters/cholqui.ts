@@ -214,6 +214,7 @@ export function buildCholquiDoc(): ProjectDoc {
         eyebrow: "Escenario operacional",
         title: "Ruta de monetización a ENAMI",
         deck: true,
+        profiles: ["investment"],
         lead: `Escenario base entregado por el titular: ${CHOLQUI_BASE_CASE.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses con rampa ${CHOLQUI_BASE_CASE.ramp}, a ${CHOLQUI_BASE_CASE.gradePct} % de Cu soluble. Cifras ilustrativas, sin VAN ni TIR auditados.`,
         blocks: [{ kind: "kv", items: CHOLQUI_ASSUMPTIONS }],
       },
