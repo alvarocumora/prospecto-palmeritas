@@ -1,4 +1,5 @@
 import type { ProjectSpatialContext } from "@/lib/spatial/projectSpatialContext";
+import type { CadastreCountry } from "@/lib/cadastre/types";
 import { searchCadastre, type GlobalCadastreResult } from "@/lib/cadastre/searchCadastre";
 
 export type ProjectCadastreContext = {
@@ -13,7 +14,7 @@ export async function resolveProjectCadastre(
 ): Promise<ProjectCadastreContext> {
   if (context.countryCode !== "CL") {
     const result = await searchCadastre({
-      scope: { kind: "bbox", country: context.countryCode as any, bbox: context.bboxWgs84 },
+      scope: { kind: "bbox", country: context.countryCode as CadastreCountry, bbox: context.bboxWgs84 },
     });
     return { projectId: context.projectId, result, queriedAt: new Date().toISOString() };
   }
