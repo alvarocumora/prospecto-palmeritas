@@ -1,11 +1,9 @@
-import { assertDatasetReadyForInterpretation, type GeoscienceDataset } from "../geoscience-registry/types";
+import {
+  assertDatasetReadyForInterpretation,
+  type GeoscienceDataset,
+} from "../geoscience-registry/types";
 
-export type GeoscienceComputeEngine =
-  | "simpeg"
-  | "gempy"
-  | "pygimli"
-  | "gstools"
-  | "custom";
+export type GeoscienceComputeEngine = "simpeg" | "gempy" | "pygimli" | "gstools" | "custom";
 
 export type GeoscienceComputeJobType =
   | "magnetic_inversion"
@@ -72,7 +70,10 @@ export type GeoscienceComputeJob = {
   updatedAt: string;
 };
 
-export function buildDatasetInputRef(dataset: GeoscienceDataset, role: string): GeoscienceDatasetInputRef {
+export function buildDatasetInputRef(
+  dataset: GeoscienceDataset,
+  role: string,
+): GeoscienceDatasetInputRef {
   assertDatasetReadyForInterpretation(dataset);
   return {
     datasetId: dataset.id,
@@ -102,7 +103,9 @@ export function assertComputeInputsReady(
   }
 }
 
-export function computeJobRunKey(job: Pick<GeoscienceComputeJob, "jobType" | "engine" | "engineVersion" | "inputs" | "parameters">): string {
+export function computeJobRunKey(
+  job: Pick<GeoscienceComputeJob, "jobType" | "engine" | "engineVersion" | "inputs" | "parameters">,
+): string {
   const normalizedInputs = [...job.inputs]
     .sort((a, b) => `${a.role}:${a.datasetId}`.localeCompare(`${b.role}:${b.datasetId}`))
     .map((input) => ({
