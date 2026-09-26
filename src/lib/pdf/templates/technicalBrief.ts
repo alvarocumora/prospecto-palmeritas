@@ -213,7 +213,10 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   }
 
   let n = model.dataQuality?.length ? 5 : 4;
-  for (const section of model.sections) {
+  const technicalProfile = model.reportProfile ?? "technical";
+  for (const section of model.sections.filter(
+    (item) => !item.profiles || item.profiles.includes(technicalProfile),
+  )) {
     need(120);
     eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · ${section.eyebrow}`);
     y += 16;
