@@ -69,7 +69,7 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
     const pid = data.projectId;
 
     const count = async (table: string) => {
-      let q = sb
+      const q = sb
         .from(table as never)
         .select("id", { count: "exact", head: true })
         .eq("project_id", pid);
