@@ -36,9 +36,7 @@ export const listInvitationLinks = createServerFn({ method: "GET" })
 
 export const createInvitationLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((raw: unknown) =>
-    z.object({ label: z.string().min(1).max(120) }).parse(raw),
-  )
+  .inputValidator((raw: unknown) => z.object({ label: z.string().min(1).max(120) }).parse(raw))
   .handler(async ({ data, context }): Promise<InvitationLink> => {
     const token = randomToken(8);
     const { data: row, error } = await context.supabase

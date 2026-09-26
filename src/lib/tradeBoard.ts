@@ -191,8 +191,7 @@ export type BoardFilters = {
 export function filterTrades(trades: BoardTrade[], f: BoardFilters): BoardTrade[] {
   const q = (f.q ?? "").trim().toLowerCase();
   const role = f.role && f.role !== "all" ? f.role : null;
-  const commodity =
-    f.commodity && f.commodity !== "all" ? f.commodity.trim().toLowerCase() : null;
+  const commodity = f.commodity && f.commodity !== "all" ? f.commodity.trim().toLowerCase() : null;
   const min = typeof f.minUsd === "number" && !Number.isNaN(f.minUsd) ? f.minUsd : null;
   const max = typeof f.maxUsd === "number" && !Number.isNaN(f.maxUsd) ? f.maxUsd : null;
 
@@ -203,12 +202,7 @@ export function filterTrades(trades: BoardTrade[], f: BoardFilters): BoardTrade[
     if (min != null && v < min) return false;
     if (max != null && v > max) return false;
     if (q) {
-      const hay = [
-        t.reference,
-        t.commodity,
-        t.counterparty_name,
-        t.counterparty_company,
-      ]
+      const hay = [t.reference, t.commodity, t.counterparty_name, t.counterparty_company]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -289,5 +283,3 @@ export function tradesToCsv(trades: BoardTrade[]): string {
   });
   return "\uFEFF" + cols.join(",") + "\n" + rows.join("\n");
 }
-
-

@@ -81,9 +81,11 @@ function VerifyEntry() {
   const [error, setError] = useState<string | null>(null);
   const [cameraOn, setCameraOn] = useState(false);
   const [detectorSupported, setDetectorSupported] = useState<boolean | null>(null);
-  const [fileInfo, setFileInfo] = useState<{ name: string; ref: string | null; hash: string } | null>(
-    null,
-  );
+  const [fileInfo, setFileInfo] = useState<{
+    name: string;
+    ref: string | null;
+    hash: string;
+  } | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const scanRafRef = useRef<number | null>(null);
@@ -162,7 +164,9 @@ function VerifyEntry() {
     setStatus("Analizando imagen…");
     const detector = getBarcodeDetector();
     if (!detector) {
-      setError("Este navegador no puede decodificar QR desde imagen. Pega la referencia manualmente.");
+      setError(
+        "Este navegador no puede decodificar QR desde imagen. Pega la referencia manualmente.",
+      );
       setStatus(null);
       return;
     }
@@ -230,9 +234,7 @@ function VerifyEntry() {
           <div className="text-[11px] font-mono uppercase tracking-[0.25em] text-accent-brand">
             Validación de documento
           </div>
-          <h1 className="font-display text-3xl lg:text-4xl mt-2 text-content">
-            Verificar QR
-          </h1>
+          <h1 className="font-display text-3xl lg:text-4xl mt-2 text-content">Verificar QR</h1>
           <p className="text-sm text-content-subtle mt-2 max-w-2xl">
             Confirma que el documento que recibiste (NDA, LOI, NCNDA, ficha o adenda) coincide con
             el registro oficial en Geocapitals. Puedes escanear el QR, subir el PDF, o pegar la
@@ -275,12 +277,7 @@ function VerifyEntry() {
 
             {cameraOn ? (
               <div className="mt-4 relative rounded-lg overflow-hidden border border-hairline bg-black aspect-video">
-                <video
-                  ref={videoRef}
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover"
-                />
+                <video ref={videoRef} playsInline muted className="w-full h-full object-cover" />
                 <button
                   type="button"
                   onClick={stopCamera}
@@ -402,8 +399,8 @@ function VerifyEntry() {
             <li>Estado del documento: borrador, pendiente de firma, firmado, vencido o anulado.</li>
             <li>Plantilla, título, fechas de emisión y actualización, y firmante cuando aplica.</li>
             <li>
-              Huella SHA-256 del PDF (opcional): comparable out-of-band con el emisor para
-              descartar manipulación del archivo.
+              Huella SHA-256 del PDF (opcional): comparable out-of-band con el emisor para descartar
+              manipulación del archivo.
             </li>
           </ul>
         </div>

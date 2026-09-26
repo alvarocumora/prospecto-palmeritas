@@ -39,7 +39,6 @@ type Version = {
   created_at: string;
 };
 
-
 type Trade = {
   buyerEmail?: string | null;
   sellerEmail?: string | null;
@@ -73,10 +72,7 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tradeId]);
 
-
-  const [selected, setSelected] = useState<Set<TradePackDoc>>(
-    () => new Set(TRADE_PACK_DOCS),
-  );
+  const [selected, setSelected] = useState<Set<TradePackDoc>>(() => new Set(TRADE_PACK_DOCS));
   const [docs, setDocs] = useState<Doc[]>([]);
   const [busy, setBusy] = useState(false);
   const [sending, setSending] = useState(false);
@@ -123,7 +119,6 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           (reused ? ` (${reused} reutilizado${reused !== 1 ? "s" : ""})` : ""),
       );
       await loadVersions();
-
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Error generando paquete");
     } finally {
@@ -197,9 +192,8 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
       </div>
 
       <div className="text-xs text-muted-foreground mb-3">
-        Genera el set completo con los datos reales del trade — Ficha Técnica,
-        LOI, NCNDA, ICPO y SPA (draft). Comparte por email o WhatsApp con un
-        clic.
+        Genera el set completo con los datos reales del trade — Ficha Técnica, LOI, NCNDA, ICPO y
+        SPA (draft). Comparte por email o WhatsApp con un clic.
       </div>
 
       {/* Selector de documentos */}
@@ -227,7 +221,11 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           disabled={busy || selected.size === 0}
           className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-primary text-primary-foreground disabled:opacity-50"
         >
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Package className="w-3.5 h-3.5" />}
+          {busy ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Package className="w-3.5 h-3.5" />
+          )}
           Generar paquete PDF
         </button>
         {docs.length > 0 && (
@@ -368,7 +366,6 @@ export function TradePackPanel({ tradeId, trade }: { tradeId: string; trade: Tra
           </div>
         </div>
       )}
-
 
       {errors.length > 0 && (
         <div className="text-[11px] text-destructive font-mono mb-3">

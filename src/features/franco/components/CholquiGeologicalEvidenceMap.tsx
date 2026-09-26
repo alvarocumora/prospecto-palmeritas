@@ -5,7 +5,11 @@ import type { Map as LeafletMap, Layer, LayerGroup } from "leaflet";
 import francoPertenenciasRaw from "@/data/geo/franco_pertenencias.geojson?raw";
 import { buildSatelliteLayers } from "@/components/map/satelliteLayers";
 import { buildSernageominLayers } from "@/components/map/sernageominLayers";
-import { buildOfficialCadastreLayer, normalizedProjectNames, queryOfficialCadastreByBounds } from "@/components/map/miningCadastreLayers";
+import {
+  buildOfficialCadastreLayer,
+  normalizedProjectNames,
+  queryOfficialCadastreByBounds,
+} from "@/components/map/miningCadastreLayers";
 import { Card } from "@/features/palmeras/components/primitives/Card";
 import { SectionTitle } from "@/features/palmeras/components/primitives/SectionTitle";
 import {
@@ -16,7 +20,16 @@ import {
   type CholquiAssay,
 } from "../data/cholqui";
 
-type LayerKey = "tenure" | "officialCadastre" | "field" | "assays" | "neighbor" | "geology" | "mines" | "worldCover" | "dem";
+type LayerKey =
+  | "tenure"
+  | "officialCadastre"
+  | "field"
+  | "assays"
+  | "neighbor"
+  | "geology"
+  | "mines"
+  | "worldCover"
+  | "dem";
 type EvidenceState = "verified" | "observed" | "context";
 
 const LAYERS: Array<{ key: LayerKey; label: string; state: EvidenceState; defaultOn: boolean }> = [
@@ -62,8 +75,8 @@ export function CholquiGeologicalEvidenceMap() {
   const mapRef = useRef<LeafletMap | null>(null);
   const layersRef = useRef<Partial<Record<LayerKey, Layer | LayerGroup>>>({});
   const [ready, setReady] = useState(false);
-  const [active, setActive] = useState<Record<LayerKey, boolean>>(() =>
-    Object.fromEntries(LAYERS.map((l) => [l.key, l.defaultOn])) as Record<LayerKey, boolean>,
+  const [active, setActive] = useState<Record<LayerKey, boolean>>(
+    () => Object.fromEntries(LAYERS.map((l) => [l.key, l.defaultOn])) as Record<LayerKey, boolean>,
   );
 
   const assayByPoint = useMemo(
@@ -78,10 +91,10 @@ export function CholquiGeologicalEvidenceMap() {
       const L = (await import("leaflet")).default;
       if (cancelled || !containerRef.current) return;
 
-      const map = L.map(containerRef.current, { zoomControl: true, attributionControl: true }).setView(
-        [CHOLQUI.center.lat, CHOLQUI.center.lng],
-        13,
-      );
+      const map = L.map(containerRef.current, {
+        zoomControl: true,
+        attributionControl: true,
+      }).setView([CHOLQUI.center.lat, CHOLQUI.center.lng], 13);
       L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
         { attribution: "Imagery © Esri", maxZoom: 19 },
@@ -90,8 +103,12 @@ export function CholquiGeologicalEvidenceMap() {
       const tenure = L.geoJSON(FC_DATA as never, {
         style: { color: "#d4af37", weight: 2, fillColor: "#d4af37", fillOpacity: 0.08 },
         onEachFeature: (f, layer) => {
-          const name = String((f.properties as Record<string, unknown> | null)?.name ?? "Pertenencia");
-          layer.bindPopup(`<b>${name}</b><br/><small>Pertenencia del proyecto · geometría documental</small>`);
+          const name = String(
+            (f.properties as Record<string, unknown> | null)?.name ?? "Pertenencia",
+          );
+          layer.bindPopup(
+            `<b>${name}</b><br/><small>Pertenencia del proyecto · geometría documental</small>`,
+          );
         },
       });
 
@@ -191,12 +208,15 @@ export function CholquiGeologicalEvidenceMap() {
     <Card className="p-0 overflow-hidden" accent="gold">
       <div className="p-5 border-b border-border flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
         <div>
-          <SectionTitle icon={Layers3} sub="Catastro + terreno + laboratorio + geología oficial + contexto satelital">
+          <SectionTitle
+            icon={Layers3}
+            sub="Catastro + terreno + laboratorio + geología oficial + contexto satelital"
+          >
             Geological Evidence Map
           </SectionTitle>
           <p className="mt-2 max-w-3xl text-xs text-muted-foreground">
-            Vista analítica del proyecto. Cada capa conserva su procedencia; contexto satelital o regional no se presenta
-            como mineralización ni como recurso.
+            Vista analítica del proyecto. Cada capa conserva su procedencia; contexto satelital o
+            regional no se presenta como mineralización ni como recurso.
           </p>
         </div>
         <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
@@ -217,19 +237,27 @@ export function CholquiGeologicalEvidenceMap() {
               onClick={() => toggle(item.key)}
               className="w-full flex items-center gap-2 rounded border border-border px-2.5 py-2 text-left hover:bg-muted/30 disabled:opacity-50"
             >
-              <span className={`h-2.5 w-2.5 rounded-sm ${active[item.key] ? "bg-gold" : "bg-muted"}`} />
+              <span
+                className={`h-2.5 w-2.5 rounded-sm ${active[item.key] ? "bg-gold" : "bg-muted"}`}
+              />
               <span className="min-w-0 flex-1 text-xs">{item.label}</span>
-              <span className="text-[8px] font-mono text-muted-foreground">{STATE_LABEL[item.state]}</span>
+              <span className="text-[8px] font-mono text-muted-foreground">
+                {STATE_LABEL[item.state]}
+              </span>
             </button>
           ))}
           <div className="pt-3 text-[10px] leading-relaxed text-muted-foreground">
-            Próxima fase: Sentinel-2 multiespectral derivado y motor de convergencia. Esas capas deben ingresar como
-            DERIVADO / INTERPRETADO, nunca como evidencia certificada.
+            Próxima fase: Sentinel-2 multiespectral derivado y motor de convergencia. Esas capas
+            deben ingresar como DERIVADO / INTERPRETADO, nunca como evidencia certificada.
           </div>
         </aside>
 
         <div className="relative min-h-[580px]">
-          <div ref={containerRef} data-report-map="cholqui-evidence" className="absolute inset-0 bg-bg-secondary" />
+          <div
+            ref={containerRef}
+            data-report-map="cholqui-evidence"
+            className="absolute inset-0 bg-bg-secondary"
+          />
           {!ready && (
             <div className="absolute inset-0 grid place-items-center bg-background/50 pointer-events-none">
               <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-wider">
@@ -241,7 +269,8 @@ export function CholquiGeologicalEvidenceMap() {
       </div>
 
       <div className="px-5 py-3 border-t border-border text-[10px] font-mono text-muted-foreground">
-        {CHOLQUI_POINTS.length} observaciones · {CHOLQUI_ASSAYS.length} ensayes certificados · {FC_DATA.features.length} polígonos documentales · catastro oficial consultado por AOI
+        {CHOLQUI_POINTS.length} observaciones · {CHOLQUI_ASSAYS.length} ensayes certificados ·{" "}
+        {FC_DATA.features.length} polígonos documentales · catastro oficial consultado por AOI
       </div>
     </Card>
   );

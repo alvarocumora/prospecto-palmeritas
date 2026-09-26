@@ -18,7 +18,14 @@ export function CholquiMinePlanPanel() {
   const [grade, setGrade] = useState<number>(1.5);
 
   const plan = useMemo(
-    () => projectCashflow({ plateau, gradePct: grade, startRate: 1_000, rampMonths: 12, totalMonths: 24 }),
+    () =>
+      projectCashflow({
+        plateau,
+        gradePct: grade,
+        startRate: 1_000,
+        rampMonths: 12,
+        totalMonths: 24,
+      }),
     [plateau, grade],
   );
   const option = PLATEAU_OPTIONS.find((o) => o.plateau === plateau) ?? PLATEAU_OPTIONS[0];
@@ -27,7 +34,11 @@ export function CholquiMinePlanPanel() {
   const cashMax = Math.max(...plan.months.map((m) => m.cumulativeCashflowClp));
   const cashSpan = Math.max(1, cashMax - cashMin);
 
-  const stepFleet = RATE_STEPS.map((r) => ({ rate: r, fleet: fleetForRate(r), cost: unitCosts(r) }));
+  const stepFleet = RATE_STEPS.map((r) => ({
+    rate: r,
+    fleet: fleetForRate(r),
+    cost: unitCosts(r),
+  }));
 
   /** Sensibilidad a 24 meses: cada meseta × cada ley de Cu soluble. */
   const sensitivity = useMemo(
@@ -58,10 +69,10 @@ export function CholquiMinePlanPanel() {
           Escalamiento de 1.000 a {nf.format(plateau)} t/mes
         </h2>
         <p className="text-sm text-content-subtle mt-1 max-w-3xl">
-          Proyección mes a mes de producción, flota, costos y venta a ENAMI partiendo de 1.000 t/mes.
-          La flota se dimensiona a partir del tonelaje —no de un dato suelto— y los costos separan
-          componentes variables por tonelada de costos fijos mensuales, de modo que el costo unitario
-          baja al escalar. Cifras de ingeniería preliminar, no cotizaciones cerradas.
+          Proyección mes a mes de producción, flota, costos y venta a ENAMI partiendo de 1.000
+          t/mes. La flota se dimensiona a partir del tonelaje —no de un dato suelto— y los costos
+          separan componentes variables por tonelada de costos fijos mensuales, de modo que el costo
+          unitario baja al escalar. Cifras de ingeniería preliminar, no cotizaciones cerradas.
         </p>
       </header>
 
@@ -108,18 +119,25 @@ export function CholquiMinePlanPanel() {
             ["Mineral del ciclo", `${nf.format(plan.totalTonnes)} t / 24 meses`],
             ["Ingresos a tarifa ENAMI", fmtClpM(plan.totalRevenueClp)],
             ["Superávit operacional", fmtClpM(plan.operatingSurplusClp)],
-            ["Equilibrio acumulado", plan.paybackMonth ? `Mes ${plan.paybackMonth}` : "No alcanzado en 24 meses"],
+            [
+              "Equilibrio acumulado",
+              plan.paybackMonth ? `Mes ${plan.paybackMonth}` : "No alcanzado en 24 meses",
+            ],
             ["Tarifa aplicada", `${fmtClp(plan.tariffClpTms)}/tms`],
             ["Costo medio del ciclo", `${fmtClp(Math.round(plan.avgUnitCostClpT))}/t`],
             ["Margen medio", `${fmtClp(Math.round(plan.marginClpT))}/t`],
             [
               "Punto de equilibrio",
-              plan.breakevenRate ? `${nf.format(plan.breakevenRate)} t/mes` : "No alcanzable ≤ 30.000 t/mes",
+              plan.breakevenRate
+                ? `${nf.format(plan.breakevenRate)} t/mes`
+                : "No alcanzable ≤ 30.000 t/mes",
             ],
           ] as Array<[string, string]>
         ).map(([k, v]) => (
           <div key={k} className="px-5 py-4">
-            <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">{k}</div>
+            <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+              {k}
+            </div>
             <div className="mt-1 text-base font-display text-content">{v}</div>
           </div>
         ))}
@@ -132,7 +150,11 @@ export function CholquiMinePlanPanel() {
         </div>
         <div className="flex items-end gap-[3px] h-40">
           {plan.months.map((m) => (
-            <div key={m.month} className="flex-1 flex flex-col justify-end h-full" title={`Mes ${m.month}: ${nf.format(m.rate)} t`}>
+            <div
+              key={m.month}
+              className="flex-1 flex flex-col justify-end h-full"
+              title={`Mes ${m.month}: ${nf.format(m.rate)} t`}
+            >
               <div
                 className={m.marginClp >= 0 ? "bg-accent-brand" : "bg-content/30"}
                 style={{ height: `${(m.rate / maxRate) * 100}%` }}
@@ -184,21 +206,29 @@ export function CholquiMinePlanPanel() {
       {/* Proyección mensual de ventas, costos y caja */}
       <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
         <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
-          Proyección mensual a 24 meses · meseta {nf.format(plateau)} t/mes · ley {grade.toString().replace(".", ",")} % Cu soluble
+          Proyección mensual a 24 meses · meseta {nf.format(plateau)} t/mes · ley{" "}
+          {grade.toString().replace(".", ",")} % Cu soluble
         </div>
         <table className="w-full text-xs border-collapse min-w-[860px]">
           <thead>
             <tr className="border-b border-hairline text-content-subtle">
-              {["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acumulada"].map(
-                (h, i) => (
-                  <th
-                    key={h}
-                    className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i === 0 ? "text-left" : "text-right"}`}
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+              {[
+                "Mes",
+                "t/mes",
+                "Acum. t",
+                "Precio CLP/tms",
+                "Ingresos",
+                "Costo total",
+                "Margen",
+                "Caja acumulada",
+              ].map((h, i) => (
+                <th
+                  key={h}
+                  className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i === 0 ? "text-left" : "text-right"}`}
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -211,12 +241,18 @@ export function CholquiMinePlanPanel() {
               >
                 <td className="py-1.5 font-mono text-content">{m.month}</td>
                 <td className="py-1.5 text-right font-mono text-content">{nf.format(m.rate)}</td>
-                <td className="py-1.5 text-right font-mono text-content-muted">{nf.format(m.cumulativeT)}</td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {nf.format(m.cumulativeT)}
+                </td>
                 <td className="py-1.5 text-right font-mono text-content-muted">
                   {nf.format(Math.round(plan.tariffClpTms))}
                 </td>
-                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(m.revenueClp)}</td>
-                <td className="py-1.5 text-right font-mono text-content-muted">{fmtClpM(m.costClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content">
+                  {fmtClpM(m.revenueClp)}
+                </td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {fmtClpM(m.costClp)}
+                </td>
                 <td
                   className={`py-1.5 text-right font-mono ${m.marginClp >= 0 ? "text-accent-brand" : "text-copper"}`}
                 >
@@ -232,16 +268,28 @@ export function CholquiMinePlanPanel() {
               </tr>
             ))}
             <tr className="bg-surface-2">
-              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle">Total 24 m</td>
+              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle">
+                Total 24 m
+              </td>
               <td className="py-2 text-right font-mono text-content">—</td>
-              <td className="py-2 text-right font-mono text-content">{nf.format(plan.totalTonnes)}</td>
+              <td className="py-2 text-right font-mono text-content">
+                {nf.format(plan.totalTonnes)}
+              </td>
               <td className="py-2 text-right font-mono text-content-muted">
                 {nf.format(Math.round(plan.tariffClpTms))}
               </td>
-              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.totalRevenueClp)}</td>
-              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.totalCostClp)}</td>
-              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.operatingSurplusClp)}</td>
-              <td className="py-2 text-right font-mono text-content">{fmtClpM(plan.netAfterCapexClp)}</td>
+              <td className="py-2 text-right font-mono text-content">
+                {fmtClpM(plan.totalRevenueClp)}
+              </td>
+              <td className="py-2 text-right font-mono text-content">
+                {fmtClpM(plan.totalCostClp)}
+              </td>
+              <td className="py-2 text-right font-mono text-content">
+                {fmtClpM(plan.operatingSurplusClp)}
+              </td>
+              <td className="py-2 text-right font-mono text-content">
+                {fmtClpM(plan.netAfterCapexClp)}
+              </td>
             </tr>
           </tbody>
         </table>
@@ -260,16 +308,24 @@ export function CholquiMinePlanPanel() {
         <table className="w-full text-xs border-collapse min-w-[820px]">
           <thead>
             <tr className="border-b border-hairline text-content-subtle">
-              {["Escenario", "Ley Cu sol.", "Mineral", "Precio CLP/tms", "Ingresos", "Costos", "Margen", "Caja neta", "Equilibrio"].map(
-                (h, i) => (
-                  <th
-                    key={h}
-                    className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i < 2 ? "text-left" : "text-right"}`}
-                  >
-                    {h}
-                  </th>
-                ),
-              )}
+              {[
+                "Escenario",
+                "Ley Cu sol.",
+                "Mineral",
+                "Precio CLP/tms",
+                "Ingresos",
+                "Costos",
+                "Margen",
+                "Caja neta",
+                "Equilibrio",
+              ].map((h, i) => (
+                <th
+                  key={h}
+                  className={`py-2 font-mono uppercase tracking-wider text-[10px] ${i < 2 ? "text-left" : "text-right"}`}
+                >
+                  {h}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
@@ -290,8 +346,12 @@ export function CholquiMinePlanPanel() {
                 <td className="py-1.5 text-right font-mono text-content-muted">
                   {nf.format(Math.round(s.run.tariffClpTms))}
                 </td>
-                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(s.run.totalRevenueClp)}</td>
-                <td className="py-1.5 text-right font-mono text-content-muted">{fmtClpM(s.run.totalCostClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content">
+                  {fmtClpM(s.run.totalRevenueClp)}
+                </td>
+                <td className="py-1.5 text-right font-mono text-content-muted">
+                  {fmtClpM(s.run.totalCostClp)}
+                </td>
                 <td
                   className={`py-1.5 text-right font-mono ${
                     s.run.operatingSurplusClp >= 0 ? "text-accent-brand" : "text-copper"
@@ -299,7 +359,9 @@ export function CholquiMinePlanPanel() {
                 >
                   {fmtClpM(s.run.operatingSurplusClp)}
                 </td>
-                <td className="py-1.5 text-right font-mono text-content">{fmtClpM(s.run.netAfterCapexClp)}</td>
+                <td className="py-1.5 text-right font-mono text-content">
+                  {fmtClpM(s.run.netAfterCapexClp)}
+                </td>
                 <td className="py-1.5 text-right font-mono text-content-muted">
                   {s.run.paybackMonth ? `Mes ${s.run.paybackMonth}` : "> 24 m"}
                 </td>
@@ -317,7 +379,9 @@ export function CholquiMinePlanPanel() {
         <table className="w-full text-xs border-collapse min-w-[760px]">
           <thead>
             <tr className="border-b border-hairline text-content-subtle">
-              <th className="text-left py-2 font-mono uppercase tracking-wider text-[10px]">Equipo</th>
+              <th className="text-left py-2 font-mono uppercase tracking-wider text-[10px]">
+                Equipo
+              </th>
               <th className="text-right py-2 font-mono text-[10px]">Disp.</th>
               {RATE_STEPS.map((r) => (
                 <th key={r} className="text-right py-2 font-mono text-[10px]">
@@ -355,7 +419,10 @@ export function CholquiMinePlanPanel() {
               </tr>
             ))}
             <tr className="border-b border-hairline">
-              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+              <td
+                className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle"
+                colSpan={2}
+              >
                 Costo de equipos operativos (CLP/mes)
               </td>
               {stepFleet.map((s) => (
@@ -365,7 +432,10 @@ export function CholquiMinePlanPanel() {
               ))}
             </tr>
             <tr className="border-b border-hairline">
-              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+              <td
+                className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle"
+                colSpan={2}
+              >
                 Costo de equipos de respaldo (CLP/mes)
               </td>
               {stepFleet.map((s) => (
@@ -375,7 +445,10 @@ export function CholquiMinePlanPanel() {
               ))}
             </tr>
             <tr className="bg-surface-2">
-              <td className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle" colSpan={2}>
+              <td
+                className="py-2 font-mono text-[10px] uppercase tracking-wider text-content-subtle"
+                colSpan={2}
+              >
                 Costo total de flota (CLP/mes)
               </td>
               {stepFleet.map((s) => (
@@ -388,14 +461,12 @@ export function CholquiMinePlanPanel() {
         </table>
         <p className="text-[10px] text-content-subtle mt-3 max-w-3xl">
           Las unidades operativas se dimensionan sobre capacidad efectiva (capacidad nominal ×
-          disponibilidad mecánica). Los equipos críticos suman una unidad de respaldo desde su umbral
-          de ritmo, de modo que una falla no detiene la cadena; el stand-by se tarifa a valor
+          disponibilidad mecánica). Los equipos críticos suman una unidad de respaldo desde su
+          umbral de ritmo, de modo que una falla no detiene la cadena; el stand-by se tarifa a valor
           reducido por no operar a plena carga. Estimación de ingeniería preliminar, no cotizaciones
           cerradas.
         </p>
       </div>
-
-
 
       {/* Costos unitarios */}
       <div className="px-6 py-6 border-b border-hairline overflow-x-auto">
@@ -405,7 +476,9 @@ export function CholquiMinePlanPanel() {
         <table className="w-full text-xs border-collapse min-w-[720px]">
           <thead>
             <tr className="border-b border-hairline text-content-subtle">
-              <th className="text-left py-2 font-mono uppercase tracking-wider text-[10px]">Componente</th>
+              <th className="text-left py-2 font-mono uppercase tracking-wider text-[10px]">
+                Componente
+              </th>
               {RATE_STEPS.map((r) => (
                 <th key={r} className="text-right py-2 font-mono text-[10px]">
                   {nf.format(r)} t
@@ -419,7 +492,10 @@ export function CholquiMinePlanPanel() {
                 ["Variable de operación", (c: ReturnType<typeof unitCosts>) => c.variableClpT],
                 ["Fijo mensual prorrateado", (c: ReturnType<typeof unitCosts>) => c.fixedClpT],
                 ["Flota prorrateada", (c: ReturnType<typeof unitCosts>) => c.fleetClpT],
-                [`Contingencia ${CONTINGENCY_PCT} %`, (c: ReturnType<typeof unitCosts>) => c.contingencyClpT],
+                [
+                  `Contingencia ${CONTINGENCY_PCT} %`,
+                  (c: ReturnType<typeof unitCosts>) => c.contingencyClpT,
+                ],
               ] as Array<[string, (c: ReturnType<typeof unitCosts>) => number]>
             ).map(([label, pick]) => (
               <tr key={label} className="border-b border-hairline">
@@ -493,8 +569,8 @@ export function CholquiMinePlanPanel() {
           referenciales y deben validarse con cotizaciones y ensayos metalúrgicos. La meseta de
           15.000 t/mes corresponde al plan declarado; la de 20.000 t/mes es una hipótesis de
           ampliación sujeta al marco regulatorio y a permisos, no autorizada a la fecha. Ningún
-          escenario implica recursos ni reservas certificadas: el tonelaje del plan excede 2,74 veces
-          el potencial conceptual de 60.750 t informado, y no existe VAN ni TIR auditados.
+          escenario implica recursos ni reservas certificadas: el tonelaje del plan excede 2,74
+          veces el potencial conceptual de 60.750 t informado, y no existe VAN ni TIR auditados.
         </p>
       </div>
     </section>

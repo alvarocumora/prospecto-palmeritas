@@ -21,9 +21,7 @@ function pointFromGeoJSON(g: unknown): [number, number] | null {
   // Polygon: [[[lng,lat],...]] — first ring, average of unique vertices for a rough centroid.
   if (geom.type === "Polygon" || geom.type === "MultiPolygon") {
     const ring =
-      geom.type === "Polygon"
-        ? (c as unknown[])[0]
-        : ((c as unknown[])[0] as unknown[])?.[0];
+      geom.type === "Polygon" ? (c as unknown[])[0] : ((c as unknown[])[0] as unknown[])?.[0];
     if (!Array.isArray(ring) || ring.length === 0) return null;
     let sx = 0;
     let sy = 0;

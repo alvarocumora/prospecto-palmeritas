@@ -49,13 +49,37 @@ export function buildCholquiDoc(): ProjectDoc {
       CHOLQUI.region,
     ],
     kpis: [
-      { label: "Superficie", value: `${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`, note: `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias` },
-      { label: "Cu total en muestras", value: `${cuMin.toFixed(2).replace(".", ",")}–${cuMax.toFixed(2).replace(".", ",")} %`, note: `${CHOLQUI_ASSAYS.length} muestras puntuales de superficie` },
-      { label: "Razón Cu soluble", value: `${ratioMin.toFixed(0)}–${ratioMax.toFixed(0)} %`, note: "Favorable a ruta de lixiviación" },
+      {
+        label: "Superficie",
+        value: `${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`,
+        note: `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias`,
+      },
+      {
+        label: "Cu total en muestras",
+        value: `${cuMin.toFixed(2).replace(".", ",")}–${cuMax.toFixed(2).replace(".", ",")} %`,
+        note: `${CHOLQUI_ASSAYS.length} muestras puntuales de superficie`,
+      },
+      {
+        label: "Razón Cu soluble",
+        value: `${ratioMin.toFixed(0)}–${ratioMax.toFixed(0)} %`,
+        note: "Favorable a ruta de lixiviación",
+      },
 
-      { label: "Ronda referencial", value: `${fmtUsd(CHOLQUI_ROUND.roundSizeUsd)}`, note: `${CHOLQUI_ROUND.equityOfferedPct} % equity · ticket mínimo ${fmtUsd(CHOLQUI_ROUND.minTicketUsd)}` },
-      { label: "Tarifa ENAMI 1,5 % Cu sol.", value: `${fmtClp(89_571)}/tms`, note: CHOLQUI_ENAMI.circular },
-      { label: "Faena vecina (tercero)", value: `${LAS_MINITAS.throughputTMonth.toLocaleString("es-CL")} t/mes`, note: LAS_MINITAS.name },
+      {
+        label: "Ronda referencial",
+        value: `${fmtUsd(CHOLQUI_ROUND.roundSizeUsd)}`,
+        note: `${CHOLQUI_ROUND.equityOfferedPct} % equity · ticket mínimo ${fmtUsd(CHOLQUI_ROUND.minTicketUsd)}`,
+      },
+      {
+        label: "Tarifa ENAMI 1,5 % Cu sol.",
+        value: `${fmtClp(89_571)}/tms`,
+        note: CHOLQUI_ENAMI.circular,
+      },
+      {
+        label: "Faena vecina (tercero)",
+        value: `${LAS_MINITAS.throughputTMonth.toLocaleString("es-CL")} t/mes`,
+        note: LAS_MINITAS.name,
+      },
     ],
     thesis: CHOLQUI_HIGHLIGHTS,
     chart: {
@@ -63,7 +87,11 @@ export function buildCholquiDoc(): ProjectDoc {
       labelA: "Cu total (%)",
       labelB: "Cu soluble (%)",
       unit: "% en peso",
-      data: CHOLQUI_ASSAYS.map((a) => ({ label: a.sample.replace(/^P-?/, "P-"), a: a.cuTotalPct, b: a.cuSolublePct })),
+      data: CHOLQUI_ASSAYS.map((a) => ({
+        label: a.sample.replace(/^P-?/, "P-"),
+        a: a.cuTotalPct,
+        b: a.cuSolublePct,
+      })),
       caption: `Siete muestras puntuales de superficie certificadas en ${CHOLQUI_ASSAY_REPORTS.length} informes de laboratorio (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(", ")}). La razón soluble/total de ${ratioMin.toFixed(0)}–${ratioMax.toFixed(0)} % es el argumento metalúrgico central: no permite estimar ley media de mina, dilución, continuidad ni recuperación.`,
     },
     allocation: {
@@ -82,9 +110,10 @@ export function buildCholquiDoc(): ProjectDoc {
       crs: "WGS84",
       imagery: "Esri World Imagery",
       points: [
-
         ...CHOLQUI_POINTS.map((p) => {
-          const assay = CHOLQUI_ASSAYS.find((a) => a.sample === p.code || a.sample === p.code.replace("-", ""));
+          const assay = CHOLQUI_ASSAYS.find(
+            (a) => a.sample === p.code || a.sample === p.code.replace("-", ""),
+          );
           return {
             label: p.code,
             lat: p.lat,
@@ -120,7 +149,13 @@ export function buildCholquiDoc(): ProjectDoc {
             kind: "table",
             head: ["Informe", "Laboratorio", "Solicitante", "Muestras", "Fecha informe"],
             widths: [0.16, 0.24, 0.26, 0.14, 0.2],
-            rows: CHOLQUI_ASSAY_REPORTS.map((r) => [r.id, r.lab, r.applicant, String(r.samples), r.reportDate]),
+            rows: CHOLQUI_ASSAY_REPORTS.map((r) => [
+              r.id,
+              r.lab,
+              r.applicant,
+              String(r.samples),
+              r.reportDate,
+            ]),
           },
           {
             kind: "table",
@@ -134,7 +169,6 @@ export function buildCholquiDoc(): ProjectDoc {
               a.auGpt.toFixed(2).replace(".", ","),
               String(a.agPpm),
             ]),
-
           },
         ],
       },
@@ -152,6 +186,10 @@ export function buildCholquiDoc(): ProjectDoc {
       },
     ],
     disclaimers: CHOLQUI_CAVEATS,
-    contact: { name: CHOLQUI.contact.name, email: CHOLQUI.contact.email, phone: CHOLQUI.contact.phone },
+    contact: {
+      name: CHOLQUI.contact.name,
+      email: CHOLQUI.contact.email,
+      phone: CHOLQUI.contact.phone,
+    },
   };
 }

@@ -5,6 +5,7 @@ Hoy los datos de Cholqui están repartidos en tres lugares que no se hablan: la 
 ## 1. Una sola fuente de verdad
 
 Crear un módulo de datos de Cholqui con todo lo verificado del prospecto:
+
 - Identidad: código CHOLQUI, Cu-Au-Ag, ~5.000 ha (20 pedimentos + 15 pertenencias), Volcania Minerals SpA, Melipilla / R.M.
 - Ubicación y CRS: UTM PSAD'56 19H reproyectado a WGS84.
 - Puntos de muestreo/observación del prospecto, con su procedencia (Declarado / A verificar / Certificado).
@@ -17,6 +18,7 @@ La ficha de inversión y el dashboard pasan a leer de aquí; se eliminan los dup
 ## 2. Live view real en `/live/franco`
 
 Reemplazar el placeholder por una vista pública con la colorimetría Geocapitals (papel hueso, tinta, cobalto, serif display):
+
 - Hero con estado, superficie, commodity y coordenadas.
 - Mapa con el polígono de pertenencias, Las Minitas destacada y los puntos de muestreo clicables (ficha por punto con procedencia).
 - Panel de evidencia geológica (litología, estilo de mineralización, observaciones de los geólogos).
@@ -27,6 +29,7 @@ Reemplazar el placeholder por una vista pública con la colorimetría Geocapital
 ## 3. PDF de inversión + flujo, con marca y QR
 
 Generar el PDF **dentro de la app** (mismo motor de las fichas actuales, no un script externo), con la identidad Geocapitals:
+
 - Portada con logo, código CHOLQUI, sello de estado y fecha de emisión.
 - Resumen ejecutivo, ubicación y propiedad, evidencia de mineralización, actividad vecina, upside de exploración.
 - Tabla y gráfico de los cuatro escenarios + curva de flujo acumulado y payback.

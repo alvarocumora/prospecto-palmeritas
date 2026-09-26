@@ -27,7 +27,15 @@ import {
 import { downloadWaterFicha } from "./waterFichaPdf";
 import { WaterQualityPanel } from "./WaterQualityPanel";
 
-const TABS = ["Overview", "Legal", "Hydrology", "Quality", "Location", "Documents", "Valuation"] as const;
+const TABS = [
+  "Overview",
+  "Legal",
+  "Hydrology",
+  "Quality",
+  "Location",
+  "Documents",
+  "Valuation",
+] as const;
 type Tab = (typeof TABS)[number];
 
 function Row({ label, value }: { label: string; value: React.ReactNode }) {
@@ -42,7 +50,9 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
 function StatusChip({ verification }: { verification: string }) {
   const meta = VERIFICATION_META[verification] ?? VERIFICATION_META.pending;
   return (
-    <span className={cn("inline-block rounded border px-2 py-0.5 text-[10px] font-medium", meta.tone)}>
+    <span
+      className={cn("inline-block rounded border px-2 py-0.5 text-[10px] font-medium", meta.tone)}
+    >
       {meta.label}
     </span>
   );
@@ -74,7 +84,10 @@ export function WaterAssetCard({
     ["FLOW", fmtFlow(asset.flow_permanent_ls)],
     ["TYPE", asset.nature === "consuntivo" ? "Consumptive" : "Non-consumptive"],
     ["SOURCE", RIGHT_TYPE_LABEL[asset.right_type] ?? asset.right_type],
-    ["CAPTURE", asset.capture_system === "gravitacional" ? "Gravity" : (asset.capture_system ?? "—")],
+    [
+      "CAPTURE",
+      asset.capture_system === "gravitacional" ? "Gravity" : (asset.capture_system ?? "—"),
+    ],
     ["VALUE", fmtCLP(asset.reference_value_clp)],
     ["LOCATION", `${asset.commune} · ${asset.region}`],
   ];
@@ -84,7 +97,9 @@ export function WaterAssetCard({
       <header className="border-b border-slate-200 bg-[#04122a] px-5 py-4 text-white">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <div className="font-mono text-[10px] tracking-[0.18em] text-sky-300">{asset.asset_id}</div>
+            <div className="font-mono text-[10px] tracking-[0.18em] text-sky-300">
+              {asset.asset_id}
+            </div>
             <h2 className="mt-1 text-lg font-semibold">{asset.river}</h2>
             <span className="mt-2 inline-block rounded border border-sky-400/50 bg-sky-500/15 px-2 py-0.5 text-[10px] text-sky-200">
               {EXERCISE_LABEL[asset.exercise] ?? asset.exercise}
@@ -124,7 +139,9 @@ export function WaterAssetCard({
       <div className="flex-1 overflow-y-auto px-5 py-4">
         {tab === "Overview" && (
           <div>
-            {asset.summary && <p className="mb-3 text-[13px] leading-relaxed text-slate-600">{asset.summary}</p>}
+            {asset.summary && (
+              <p className="mb-3 text-[13px] leading-relaxed text-slate-600">{asset.summary}</p>
+            )}
             <Row label="Asset ID" value={asset.asset_id} />
             <Row label="Fuente hídrica" value={asset.river} />
             <Row label="Comuna" value={asset.commune} />
@@ -136,9 +153,16 @@ export function WaterAssetCard({
             <Row label="Caudal permanente" value={fmtFlow(asset.flow_permanent_ls)} />
             <Row
               label="Caudal eventual"
-              value={asset.flow_eventual_ls ? `Hasta ${fmtFlow(asset.flow_eventual_ls)}` : "No informado"}
+              value={
+                asset.flow_eventual_ls ? `Hasta ${fmtFlow(asset.flow_eventual_ls)}` : "No informado"
+              }
             />
-            <Row label="Sistema de captación" value={asset.capture_system === "gravitacional" ? "Gravitacional" : asset.capture_system} />
+            <Row
+              label="Sistema de captación"
+              value={
+                asset.capture_system === "gravitacional" ? "Gravitacional" : asset.capture_system
+              }
+            />
             <Row
               label="Coordenadas"
               value={
@@ -173,12 +197,14 @@ export function WaterAssetCard({
                       </span>
                       <StatusChip verification={r.verification} />
                     </div>
-                    <div className="mt-1 text-[13px] text-slate-900">{r.value ?? "No informado"}</div>
+                    <div className="mt-1 text-[13px] text-slate-900">
+                      {r.value ?? "No informado"}
+                    </div>
                   </div>
                 ))}
                 <p className="pt-2 text-[11px] italic text-slate-500">
-                  "Declared" = informado por el titular en ficha comercial. Sólo se marca
-                  "Verified" con documento oficial validado por Geocapitals.
+                  "Declared" = informado por el titular en ficha comercial. Sólo se marca "Verified"
+                  con documento oficial validado por Geocapitals.
                 </p>
               </div>
             )}
@@ -192,11 +218,20 @@ export function WaterAssetCard({
             <Row label="Estación DGA" value={hydrology?.dga_station ?? "Pendiente de carga"} />
             <Row
               label="Caudal ecológico"
-              value={hydrology?.ecological_flow_ls ? fmtFlow(hydrology.ecological_flow_ls) : "Pendiente de verificación"}
+              value={
+                hydrology?.ecological_flow_ls
+                  ? fmtFlow(hydrology.ecological_flow_ls)
+                  : "Pendiente de verificación"
+              }
             />
-            <Row label="Riesgo de sequía" value={hydrology?.drought_risk ?? "Sin dataset cargado"} />
+            <Row
+              label="Riesgo de sequía"
+              value={hydrology?.drought_risk ?? "Sin dataset cargado"}
+            />
 
-            <h4 className="mt-5 text-[11px] uppercase tracking-[0.14em] text-slate-500">Water Quality</h4>
+            <h4 className="mt-5 text-[11px] uppercase tracking-[0.14em] text-slate-500">
+              Water Quality
+            </h4>
             <div className="mt-2 rounded border border-slate-200 p-3">
               <div className="text-[13px] font-medium text-slate-900">
                 {QUALITY_STATUS_META[resolveQualityStatus(asset, quality)].label}
@@ -231,7 +266,10 @@ export function WaterAssetCard({
               <>
                 <Row label="Latitud" value={asset.latitude.toFixed(6)} />
                 <Row label="Longitud" value={asset.longitude.toFixed(6)} />
-                <Row label="Datum / Huso" value={`${asset.utm_datum ?? "—"} · Huso ${asset.utm_zone ?? "—"}`} />
+                <Row
+                  label="Datum / Huso"
+                  value={`${asset.utm_datum ?? "—"} · Huso ${asset.utm_zone ?? "—"}`}
+                />
                 <Row label="UTM Norte" value={asset.utm_north?.toLocaleString("es-CL") ?? "—"} />
                 <Row label="UTM Este" value={asset.utm_east?.toLocaleString("es-CL") ?? "—"} />
               </>
@@ -253,7 +291,10 @@ export function WaterAssetCard({
               </div>
             ) : (
               documents.map((d) => (
-                <div key={d.id} className="flex items-center gap-3 rounded border border-slate-200 p-3">
+                <div
+                  key={d.id}
+                  className="flex items-center gap-3 rounded border border-slate-200 p-3"
+                >
                   <FileText className="h-4 w-4 shrink-0 text-sky-600" />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] text-slate-900">{d.title}</div>
@@ -281,7 +322,10 @@ export function WaterAssetCard({
         {tab === "Valuation" && (
           <div>
             <Row label="Permanent Flow" value={fmtFlow(asset.flow_permanent_ls)} />
-            <Row label="Unit Value" value={`${fmtCLPFull(asset.unit_value_clp || UNIT_VALUE_CLP)} / L/s`} />
+            <Row
+              label="Unit Value"
+              value={`${fmtCLPFull(asset.unit_value_clp || UNIT_VALUE_CLP)} / L/s`}
+            />
             <Row label="Reference Asset Value" value={fmtCLPFull(asset.reference_value_clp)} />
             <Row label="Caudal eventual" value="No valorizado" />
             <p className="mt-3 rounded border border-slate-200 bg-slate-50 p-3 text-[11px] italic text-slate-600">

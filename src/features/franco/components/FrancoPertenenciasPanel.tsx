@@ -139,7 +139,14 @@ export function FrancoPertenenciasPanel() {
               <Download className="w-3.5 h-3.5" /> CSV
             </button>
             <button
-              onClick={() => downloadJson("cholqui_catastro.json", { projectId: data.projectId, projectName: data.projectName, generatedAt: data.generatedAt, concessions })}
+              onClick={() =>
+                downloadJson("cholqui_catastro.json", {
+                  projectId: data.projectId,
+                  projectName: data.projectName,
+                  generatedAt: data.generatedAt,
+                  concessions,
+                })
+              }
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-border text-muted-foreground hover:text-foreground font-mono text-[11px] uppercase tracking-wider"
             >
               <Download className="w-3.5 h-3.5" /> JSON
@@ -160,7 +167,10 @@ export function FrancoPertenenciasPanel() {
             </thead>
             <tbody>
               {concessions.map((r) => (
-                <tr key={r.concessionId ?? r.concessionCode ?? r.concessionName} className="border-b border-border/50 hover:bg-bg-secondary/50">
+                <tr
+                  key={r.concessionId ?? r.concessionCode ?? r.concessionName}
+                  className="border-b border-border/50 hover:bg-bg-secondary/50"
+                >
                   <td className="py-1.5 pr-3 text-foreground">{r.concessionName ?? "—"}</td>
                   <td className="py-1.5 pr-3 text-muted-foreground">{r.concessionCode ?? "—"}</td>
                   <td className="py-1.5 pr-3 text-muted-foreground truncate max-w-[180px]">
@@ -176,10 +186,10 @@ export function FrancoPertenenciasPanel() {
           </table>
         </div>
 
-
         <div className="mt-4 text-[11px] font-mono uppercase tracking-wider text-hint">
           Resumen para informe pre NI 43-101 · Sec. 3 (Property Description) y Anexo A (Catastro) ·{" "}
-          {concessions.length} concesiones únicas · {canonicalAreaHa.toLocaleString("es-CL", { maximumFractionDigits: 2 })} ha totales.
+          {concessions.length} concesiones únicas ·{" "}
+          {canonicalAreaHa.toLocaleString("es-CL", { maximumFractionDigits: 2 })} ha totales.
         </div>
       </Card>
     </div>

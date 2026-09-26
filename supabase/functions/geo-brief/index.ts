@@ -43,7 +43,6 @@ Deno.serve(async (req) => {
     const memRes = await requireProjectMember(admin, authRes.userId, project_id);
     if ("error" in memRes) return memRes.error;
 
-
     const [proj, holes, targets, samples, permits, conc, litho, alter] = await Promise.all([
       admin
         .from("projects")

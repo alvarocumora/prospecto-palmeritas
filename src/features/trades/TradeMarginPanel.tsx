@@ -60,10 +60,12 @@ export function TradeMarginPanel({ tradeId }: { tradeId: string }) {
     enabled: isAdmin && !!tradeId,
     staleTime: 15_000,
     queryFn: async (): Promise<MarginResult | null> => {
-      const { data, error } = await (supabase.rpc as never as (
-        fn: string,
-        args: Record<string, unknown>,
-      ) => Promise<{ data: unknown; error: { message: string } | null }>)("get_trade_margin_split", {
+      const { data, error } = await (
+        supabase.rpc as never as (
+          fn: string,
+          args: Record<string, unknown>,
+        ) => Promise<{ data: unknown; error: { message: string } | null }>
+      )("get_trade_margin_split", {
         p_trade_id: tradeId,
       });
       if (error) throw new Error(error.message);
@@ -103,7 +105,10 @@ export function TradeMarginPanel({ tradeId }: { tradeId: string }) {
 
   const removeSplit = async (id?: string) => {
     if (!id) return;
-    const { error } = await supabase.from("trade_commission_splits" as never).delete().eq("id", id);
+    const { error } = await supabase
+      .from("trade_commission_splits" as never)
+      .delete()
+      .eq("id", id);
     if (error) {
       toast.error(error.message);
       return;
@@ -115,7 +120,8 @@ export function TradeMarginPanel({ tradeId }: { tradeId: string }) {
     <div className="rounded-md border border-[hsl(var(--im-hairline,var(--border)))] bg-white p-4">
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-sm font-semibold inline-flex items-center gap-2">
-          <Coins className="h-4 w-4" /> Margen y reparto <span className="text-[10px] uppercase tracking-wider text-neutral-500">interno</span>
+          <Coins className="h-4 w-4" /> Margen y reparto{" "}
+          <span className="text-[10px] uppercase tracking-wider text-neutral-500">interno</span>
         </h3>
         <button
           type="button"
@@ -147,7 +153,9 @@ export function TradeMarginPanel({ tradeId }: { tradeId: string }) {
               ["Remanente", r.remaining],
             ].map(([label, val]) => (
               <div key={String(label)} className="rounded border border-neutral-200 p-2">
-                <p className="text-[10px] uppercase tracking-wider text-neutral-500">{String(label)}</p>
+                <p className="text-[10px] uppercase tracking-wider text-neutral-500">
+                  {String(label)}
+                </p>
                 <p className="font-medium">{fmt(val as number | null, currency)}</p>
               </div>
             ))}
@@ -167,7 +175,8 @@ export function TradeMarginPanel({ tradeId }: { tradeId: string }) {
                 <tr key={d.id ?? i} className="border-t border-neutral-200">
                   <td className="py-1.5">{d.name}</td>
                   <td className="py-1.5 text-neutral-600">
-                    {SHARE_KINDS.find((k) => k.v === d.share_kind)?.l ?? d.share_kind} · {d.share_value}
+                    {SHARE_KINDS.find((k) => k.v === d.share_kind)?.l ?? d.share_kind} ·{" "}
+                    {d.share_value}
                   </td>
                   <td className="py-1.5 text-right font-medium">{fmt(d.amount, currency)}</td>
                   <td className="py-1.5 text-right">

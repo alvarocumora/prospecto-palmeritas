@@ -147,9 +147,7 @@ describe("flujo e2e sourcing → trade → firma → pago", () => {
     const sr = e.createSignRequest(trade.id);
     e.signSignRequest(sr.id, "J. Pérez");
     expect(sr.status).toBe("signed");
-    expect(
-      e.events.some((ev) => ev.trade_id === trade.id && ev.kind === "doc_signed"),
-    ).toBe(true);
+    expect(e.events.some((ev) => ev.trade_id === trade.id && ev.kind === "doc_signed")).toBe(true);
 
     // 3. Pago sin monto es rechazado (no infla el progreso).
     expect(() =>
@@ -182,11 +180,9 @@ describe("flujo e2e sourcing → trade → firma → pago", () => {
     e.cancelPayment(balance.id);
 
     // Trazabilidad: la cancelación queda en el feed del trade.
-    expect(
-      e.events.some(
-        (ev) => ev.trade_id === trade.id && ev.kind === "payment_cancelled",
-      ),
-    ).toBe(true);
+    expect(e.events.some((ev) => ev.trade_id === trade.id && ev.kind === "payment_cancelled")).toBe(
+      true,
+    );
 
     // Resumen financiero: progreso 100% porque el único pago vivo fue cobrado.
     const summary = summarizePayments(e.payments, NOW);

@@ -104,7 +104,6 @@ const Email = ({
       ) : null}
     </Section>
 
-
     <Section style={{ margin: "16px 0" }}>
       <Text style={{ ...styles.p, fontWeight: 700, marginBottom: 4 }}>
         3 · Subir documentación en el Portal Proveedor
@@ -121,14 +120,22 @@ const Email = ({
       Todos los enlaces son personales e intransferibles. Cualquier consulta: info@geocapitals.com ·
       WhatsApp +56 9 6218 4071.
     </Text>
-    <Text style={{ ...styles.muted, fontSize: 11, marginTop: 12, padding: "8px 10px", background: "#FFF7E6", borderLeft: "3px solid #E8C765" }}>
+    <Text
+      style={{
+        ...styles.muted,
+        fontSize: 11,
+        marginTop: 12,
+        padding: "8px 10px",
+        background: "#FFF7E6",
+        borderLeft: "3px solid #E8C765",
+      }}
+    >
       CONFIDENCIAL — Este mensaje y los documentos adjuntos son propiedad de Geocapitals y de las
       Partes identificadas. Contienen información sensible cubierta por acuerdo de confidencialidad.
       Prohibida su reproducción, distribución o divulgación a terceros sin autorización escrita.
     </Text>
   </EmailLayout>
 );
-
 
 export const template = {
   component: Email,

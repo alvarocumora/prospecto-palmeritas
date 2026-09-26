@@ -7,16 +7,16 @@
 
 ## 1. Códigos EPSG (verificados)
 
-| CRS | EPSG | Estado / fuente |
-|---|---|---|
-| PSAD56 / UTM 18S | **24877** | epsg.io (par estándar de 24879) |
-| PSAD56 / UTM 19S | **24879** | epsg.io: "PSAD56 / UTM zone 19S", datum PSAD56, Chile N de 45°S |
-| WGS84 / UTM 18S | **32718** | estándar global WGS84 UTM 18S sur |
-| WGS84 / UTM 19S | **32719** | estándar global WGS84 UTM 19S sur |
-| WGS84 geográfico (canónico) | **4326** | — |
-| SIRGAS-Chile 2002 / UTM 19S | 5361 | epsg.io |
-| SIRGAS-Chile 2016 / UTM 19S | 9155 | epsg.io |
-| SIRGAS-Chile 2021 / UTM 19S | 20049 | epsg.io |
+| CRS                         | EPSG      | Estado / fuente                                                 |
+| --------------------------- | --------- | --------------------------------------------------------------- |
+| PSAD56 / UTM 18S            | **24877** | epsg.io (par estándar de 24879)                                 |
+| PSAD56 / UTM 19S            | **24879** | epsg.io: "PSAD56 / UTM zone 19S", datum PSAD56, Chile N de 45°S |
+| WGS84 / UTM 18S             | **32718** | estándar global WGS84 UTM 18S sur                               |
+| WGS84 / UTM 19S             | **32719** | estándar global WGS84 UTM 19S sur                               |
+| WGS84 geográfico (canónico) | **4326**  | —                                                               |
+| SIRGAS-Chile 2002 / UTM 19S | 5361      | epsg.io                                                         |
+| SIRGAS-Chile 2016 / UTM 19S | 9155      | epsg.io                                                         |
+| SIRGAS-Chile 2021 / UTM 19S | 20049     | epsg.io                                                         |
 
 Detección de huso por longitud: **huso 18 al oeste de 72°W, huso 19 al este**.
 
@@ -61,5 +61,6 @@ Corre en CI y **falla el build** si un punto se sale de tolerancia (`.github/wor
 5. **Detección de huso** por longitud, con test en la frontera 18S/19S (72°W).
 
 ### Error del camino cliente (proj4js)
+
 Se mide en CI (test 2) y queda registrado en la salida del test. La UI que use proj4js para
 **previsualizar** debe declarar ese margen; la conversión que toca la base usa PROJ (PostGIS).

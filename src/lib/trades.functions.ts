@@ -58,7 +58,6 @@ export type TradeRow = {
   created_at: string;
 };
 
-
 export type TradeDocRow = {
   id: string;
   trade_id: string;
@@ -116,7 +115,6 @@ export const listMyTrades = createServerFn({ method: "GET" })
     }));
   });
 
-
 /** Detalle de un trade + documentos. */
 export const getTradeDetail = createServerFn({ method: "GET" })
   .middleware([requireTradeRole])
@@ -171,17 +169,18 @@ export const getTradeDetail = createServerFn({ method: "GET" })
               ? ("seller" as const)
               : ("desk" as const),
         buyerName:
-          nameOf(t.buyer_user_id) ??
-          (t.counterparty_role === "buyer" ? externalName : null),
+          nameOf(t.buyer_user_id) ?? (t.counterparty_role === "buyer" ? externalName : null),
         sellerName:
-          nameOf(t.seller_user_id) ??
-          (t.counterparty_role === "seller" ? externalName : null),
-        buyerEmail: profOf(t.buyer_user_id)?.email ?? (t.counterparty_role === "buyer" ? t.counterparty_email : null),
-        sellerEmail: profOf(t.seller_user_id)?.email ?? (t.counterparty_role === "seller" ? t.counterparty_email : null),
+          nameOf(t.seller_user_id) ?? (t.counterparty_role === "seller" ? externalName : null),
+        buyerEmail:
+          profOf(t.buyer_user_id)?.email ??
+          (t.counterparty_role === "buyer" ? t.counterparty_email : null),
+        sellerEmail:
+          profOf(t.seller_user_id)?.email ??
+          (t.counterparty_role === "seller" ? t.counterparty_email : null),
       },
       documents: (docs ?? []) as TradeDocRow[],
     };
-
   });
 
 const CreateTrade = z.object({
@@ -229,8 +228,7 @@ export const createTrade = createServerFn({ method: "POST" })
     // Sin usuario: se admite si venimos con al menos email o nombre+empresa para
     // dejar registrada la contraparte externa.
     const hasExternalIdentity =
-      Boolean(data.counterpartyEmail) ||
-      Boolean(data.counterpartyName && data.counterpartyCompany);
+      Boolean(data.counterpartyEmail) || Boolean(data.counterpartyName && data.counterpartyCompany);
     if (!counterparty && !hasExternalIdentity) {
       throw new Error(
         "Indica la contraparte: email de usuario existente o al menos nombre + empresa.",
@@ -276,7 +274,6 @@ export const createTrade = createServerFn({ method: "POST" })
     await logEvent(sb, id, context.userId, "created", "Trade creado");
     return { id };
   });
-
 
 /** El comprador (usuario actual) inicia un trade desde un lote del marketplace,
  * heredando producto y cantidad. El vendedor es el dueño del lote. */
@@ -363,7 +360,6 @@ export const setTradeStatus = createServerFn({ method: "POST" })
     await logEvent(sb, data.id, context.userId, "status_changed", data.status);
     return { ok: true };
   });
-
 
 const UpsertDoc = z.object({
   tradeId: z.string().uuid(),

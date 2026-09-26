@@ -5,9 +5,7 @@
   "auth": {
     "type": "oauth",
     "issuer": "https://klfabvnblrcqubvjrzku.supabase.co/auth/v1",
-    "accepted_audiences": [
-      "authenticated"
-    ]
+    "accepted_audiences": ["authenticated"]
   },
   "mcp": {
     "server": {
@@ -79,9 +77,7 @@
               "description": "Lot UUID (from search_commodity_lots)."
             }
           },
-          "required": [
-            "id"
-          ]
+          "required": ["id"]
         },
         "outputSchema": null
       },

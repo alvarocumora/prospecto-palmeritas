@@ -8,15 +8,7 @@ import {
 } from "@/lib/operations/documents.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  CheckCircle2,
-  Download,
-  FileText,
-  Lock,
-  Upload,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
+import { CheckCircle2, Download, FileText, Lock, Upload, AlertCircle, Loader2 } from "lucide-react";
 
 type Role = "buyer" | "seller" | "geocapitals";
 
@@ -273,7 +265,10 @@ export function OperationDocumentsPanel({
                         variant="ghost"
                         title="Solicitar ajustes"
                         onClick={async () => {
-                          const notes = window.prompt("Notas para el firmante:", d.review_notes ?? "");
+                          const notes = window.prompt(
+                            "Notas para el firmante:",
+                            d.review_notes ?? "",
+                          );
                           if (notes == null) return;
                           await review({
                             data: {

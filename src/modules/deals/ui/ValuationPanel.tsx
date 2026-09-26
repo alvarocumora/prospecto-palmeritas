@@ -308,7 +308,10 @@ export function ValuationPanel({ listingId }: { listingId: string }) {
                 <tbody>
                   {compsUsed.map((c) => (
                     <tr key={c.id} className="border-t border-border/50">
-                      <td className="px-2 py-1.5 text-foreground truncate max-w-[160px]" title={c.project_name}>
+                      <td
+                        className="px-2 py-1.5 text-foreground truncate max-w-[160px]"
+                        title={c.project_name}
+                      >
                         {c.project_name}
                       </td>
                       <td className="px-2 py-1.5 text-muted-foreground">{c.country}</td>
@@ -344,9 +347,9 @@ export function ValuationPanel({ listingId }: { listingId: string }) {
         <Info className="w-3 h-3 inline mr-1 text-gold" />
         <strong>Valuación referencial no vinculante.</strong> Se calcula con datos públicos
         verificables (área concesionada, etapa, recurso NI 43-101 si existe, escenario económico
-        cargado y comparables de mercado). Ponderación: DCF &gt; Comps &gt; In-situ &gt;
-        Reemplazo. Un veredicto "precio bajo" no obliga al titular a subir precio; es un input
-        para negociación.
+        cargado y comparables de mercado). Ponderación: DCF &gt; Comps &gt; In-situ &gt; Reemplazo.
+        Un veredicto "precio bajo" no obliga al titular a subir precio; es un input para
+        negociación.
       </div>
     </div>
   );
@@ -368,9 +371,7 @@ function RangeBox({
       }`}
     >
       <div className="text-[9px] font-mono uppercase text-muted-foreground">{label}</div>
-      <div
-        className={`text-xs font-mono font-bold ${highlight ? "text-gold" : "text-foreground"}`}
-      >
+      <div className={`text-xs font-mono font-bold ${highlight ? "text-gold" : "text-foreground"}`}>
         {fmtUSD(value)}
       </div>
     </div>

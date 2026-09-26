@@ -142,15 +142,12 @@ export const dispatchInitialPartners = createServerFn({ method: "POST" })
 
     // 1) Localiza los 4 proyectos y el trade de cobre
     const [projRes, tradeRes] = await Promise.all([
-      sb
-        .from("projects")
-        .select("id, name")
-        .in("id", [
-          "8dc8e288-b22c-4bd4-9626-bb7fb85d1745", // Palmeras
-          "7a499b02-ecdf-447b-8956-b106fe4ec087", // Los Verdes
-          "e5360f13-1647-4e44-bb13-c0614e6f39fe", // Gianfranco (Franco)
-          "eacd71bc-6872-4a11-ba14-cca630401682", // La Cornellana
-        ]),
+      sb.from("projects").select("id, name").in("id", [
+        "8dc8e288-b22c-4bd4-9626-bb7fb85d1745", // Palmeras
+        "7a499b02-ecdf-447b-8956-b106fe4ec087", // Los Verdes
+        "e5360f13-1647-4e44-bb13-c0614e6f39fe", // Gianfranco (Franco)
+        "eacd71bc-6872-4a11-ba14-cca630401682", // La Cornellana
+      ]),
       sb
         .from("commodity_trades")
         .select("id")

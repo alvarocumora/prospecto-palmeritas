@@ -5,10 +5,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAdminRole } from "@/lib/access/roleMiddleware";
-import {
-  createLovableAiGatewayProvider,
-  getLovableApiKeyOrThrow,
-} from "@/lib/ai-gateway.server";
+import { createLovableAiGatewayProvider, getLovableApiKeyOrThrow } from "@/lib/ai-gateway.server";
 import { generateText, Output, NoObjectGeneratedError } from "ai";
 
 async function assertStaff(userId: string) {
@@ -59,7 +56,12 @@ export const listInboxSuppliers = createServerFn({ method: "GET" })
     if (data.status)
       q = q.eq(
         "status",
-        data.status as "nuevo" | "en_revision" | "verificado" | "descartado" | "documentos_incompletos",
+        data.status as
+          | "nuevo"
+          | "en_revision"
+          | "verificado"
+          | "descartado"
+          | "documentos_incompletos",
       );
     if (data.country) q = q.eq("country", data.country as "CL" | "PE" | "AR" | "BO" | "OTRO");
     if (data.search && data.search.length > 1) {
@@ -74,14 +76,8 @@ export const listInboxSuppliers = createServerFn({ method: "GET" })
 
     const ids = rows.map((r) => r.id);
     const [{ data: offers }, { data: docs }] = await Promise.all([
-      supabaseAdmin
-        .from("supplier_offers")
-        .select("supplier_id, product")
-        .in("supplier_id", ids),
-      supabaseAdmin
-        .from("supplier_documents")
-        .select("supplier_id")
-        .in("supplier_id", ids),
+      supabaseAdmin.from("supplier_offers").select("supplier_id, product").in("supplier_id", ids),
+      supabaseAdmin.from("supplier_documents").select("supplier_id").in("supplier_id", ids),
     ]);
 
     const offersBy = new Map<string, { count: number; product: string | null }>();
@@ -119,30 +115,35 @@ export const getInboxDetail = createServerFn({ method: "GET" })
     await assertStaff(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const [{ data: supplier }, { data: offers }, { data: documents }, { data: notes }, { data: extractions }] =
-      await Promise.all([
-        supabaseAdmin.from("suppliers").select("*").eq("id", data.id).maybeSingle(),
-        supabaseAdmin
-          .from("supplier_offers")
-          .select("*")
-          .eq("supplier_id", data.id)
-          .order("created_at", { ascending: false }),
-        supabaseAdmin
-          .from("supplier_documents")
-          .select("*")
-          .eq("supplier_id", data.id)
-          .order("uploaded_at", { ascending: false }),
-        supabaseAdmin
-          .from("supplier_notes")
-          .select("*")
-          .eq("supplier_id", data.id)
-          .order("created_at", { ascending: false }),
-        supabaseAdmin
-          .from("supplier_doc_extractions")
-          .select("*, supplier_documents!inner(supplier_id)")
-          .eq("supplier_documents.supplier_id", data.id)
-          .order("created_at", { ascending: false }),
-      ]);
+    const [
+      { data: supplier },
+      { data: offers },
+      { data: documents },
+      { data: notes },
+      { data: extractions },
+    ] = await Promise.all([
+      supabaseAdmin.from("suppliers").select("*").eq("id", data.id).maybeSingle(),
+      supabaseAdmin
+        .from("supplier_offers")
+        .select("*")
+        .eq("supplier_id", data.id)
+        .order("created_at", { ascending: false }),
+      supabaseAdmin
+        .from("supplier_documents")
+        .select("*")
+        .eq("supplier_id", data.id)
+        .order("uploaded_at", { ascending: false }),
+      supabaseAdmin
+        .from("supplier_notes")
+        .select("*")
+        .eq("supplier_id", data.id)
+        .order("created_at", { ascending: false }),
+      supabaseAdmin
+        .from("supplier_doc_extractions")
+        .select("*, supplier_documents!inner(supplier_id)")
+        .eq("supplier_documents.supplier_id", data.id)
+        .order("created_at", { ascending: false }),
+    ]);
 
     if (!supplier) throw new Error("Supplier not found");
 
@@ -173,7 +174,13 @@ export const updateSupplierStatus = createServerFn({ method: "POST" })
     z
       .object({
         id: z.string().uuid(),
-        status: z.enum(["nuevo", "en_revision", "verificado", "descartado", "documentos_incompletos"]),
+        status: z.enum([
+          "nuevo",
+          "en_revision",
+          "verificado",
+          "descartado",
+          "documentos_incompletos",
+        ]),
       })
       .parse(raw),
   )
@@ -261,9 +268,7 @@ export type ExtractionResult = z.infer<typeof CertSchema>;
 
 export const extractCertificate = createServerFn({ method: "POST" })
   .middleware([requireAdminRole])
-  .inputValidator((raw: unknown) =>
-    z.object({ document_id: z.string().uuid() }).parse(raw),
-  )
+  .inputValidator((raw: unknown) => z.object({ document_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     await assertStaff(context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -289,8 +294,7 @@ export const extractCertificate = createServerFn({ method: "POST" })
     }
     const base64 = btoa(bin);
     const mime =
-      (doc as { mime_type: string | null }).mime_type ??
-      (file.type || "application/octet-stream");
+      (doc as { mime_type: string | null }).mime_type ?? (file.type || "application/octet-stream");
     const isPdf = mime.includes("pdf");
     const isImg = mime.startsWith("image/");
     if (!isPdf && !isImg) {

@@ -96,7 +96,10 @@ export function ListingsMap({ listings }: { listings: PublicListing[] }) {
             </div>
             <div style="font-weight:600;font-size:14px;color:#0f172a;line-height:1.3;margin-bottom:4px">${escapeHtml(l.title)}</div>
             <div style="font-size:11px;color:#64748b;margin-bottom:8px">
-              ${[l.region, l.country].filter((x): x is string => !!x).map(escapeHtml).join(", ")}${l.commodity ? " · " + escapeHtml(l.commodity) : ""}
+              ${[l.region, l.country]
+                .filter((x): x is string => !!x)
+                .map(escapeHtml)
+                .join(", ")}${l.commodity ? " · " + escapeHtml(l.commodity) : ""}
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px solid #e2e8f0">
               <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;font-weight:600;color:#0f172a">${price}</span>
@@ -155,7 +158,6 @@ export function ListingsMap({ listings }: { listings: PublicListing[] }) {
 function escapeHtml(s: string): string {
   return s.replace(
     /[&<>"']/g,
-    (c) =>
-      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string,
   );
 }

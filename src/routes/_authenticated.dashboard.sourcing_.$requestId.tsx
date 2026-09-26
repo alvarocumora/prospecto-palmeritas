@@ -40,7 +40,6 @@ import {
   type SubmissionStatus,
 } from "@/lib/sourcing";
 
-
 export const Route = createFileRoute("/_authenticated/dashboard/sourcing_/$requestId")({
   head: () => ({ meta: [{ title: "Requerimiento — Geocapitals" }] }),
   component: RequestDetail,
@@ -570,11 +569,7 @@ function DispatchPanel({ submissionId }: { submissionId: string }) {
               key={b.id}
               className="flex items-center gap-2 text-xs rounded border border-border/60 bg-white/60 px-2 py-1 cursor-pointer hover:border-cobalt/50"
             >
-              <input
-                type="checkbox"
-                checked={!!selected[b.id]}
-                onChange={() => toggle(b.id)}
-              />
+              <input type="checkbox" checked={!!selected[b.id]} onChange={() => toggle(b.id)} />
               <div className="min-w-0">
                 <div className="font-medium truncate">{b.name}</div>
                 <div className="text-[10px] text-muted-foreground truncate">
@@ -609,8 +604,8 @@ function DispatchPanel({ submissionId }: { submissionId: string }) {
         </div>
         <div className="flex items-center justify-between">
           <div className="text-[10px] text-muted-foreground">
-            Se enviará bajo el formato estándar de documentos de plataforma con link a la ficha
-            en https://geocapitals.com. Cada envío queda auditado.
+            Se enviará bajo el formato estándar de documentos de plataforma con link a la ficha en
+            https://geocapitals.com. Cada envío queda auditado.
           </div>
           <button
             onClick={() => void submit()}
@@ -629,10 +624,7 @@ function DispatchPanel({ submissionId }: { submissionId: string }) {
           </div>
           <div className="space-y-1">
             {history.dispatches.slice(0, 6).map((d) => (
-              <div
-                key={d.id}
-                className="flex items-center gap-2 text-[11px] text-foreground/80"
-              >
+              <div key={d.id} className="flex items-center gap-2 text-[11px] text-foreground/80">
                 {d.status === "sent" ? (
                   <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                 ) : (
@@ -653,4 +645,3 @@ function DispatchPanel({ submissionId }: { submissionId: string }) {
     </div>
   );
 }
-

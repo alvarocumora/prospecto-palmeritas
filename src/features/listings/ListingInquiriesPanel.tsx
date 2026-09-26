@@ -62,10 +62,7 @@ export function ListingInquiriesPanel({ listingId }: { listingId: string }) {
       ) : (
         <ul className="space-y-2">
           {rows.map((r) => (
-            <li
-              key={r.id}
-              className="rounded border border-border bg-background/40 p-3 text-xs"
-            >
+            <li key={r.id} className="rounded border border-border bg-background/40 p-3 text-xs">
               <div className="flex items-start justify-between gap-3 flex-wrap">
                 <div className="min-w-0">
                   <div className="font-semibold text-foreground truncate">

@@ -6,7 +6,7 @@ aoi:
 output_crs: EPSG:32719
 
 seasons:
-  months: [2, 3, 4]        # fin de verano austral
+  months: [2, 3, 4] # fin de verano austral
   years: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
   max_cloud_pct: 10
 

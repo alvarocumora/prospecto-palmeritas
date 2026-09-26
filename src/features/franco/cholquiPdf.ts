@@ -168,11 +168,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     y += 4;
   };
 
-  const table = (
-    head: string[],
-    body: (string | number)[][],
-    compact = false,
-  ) => {
+  const table = (head: string[], body: (string | number)[][], compact = false) => {
     autoTable(pdf, {
       startY: y,
       head: [head.map(safe)],
@@ -251,7 +247,10 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   const kpis: Array<[string, string]> = [
     ["SUPERFICIE", `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`],
     ["PROPIEDAD", `${CHOLQUI.pedimentos} pedimentos · ${CHOLQUI.pertenencias} pertenencias`],
-    ["VECINO EN PRODUCCIÓN", `${LAS_MINITAS.name} ~${LAS_MINITAS.throughputTMonth.toLocaleString("es-CL")} t/mes`],
+    [
+      "VECINO EN PRODUCCIÓN",
+      `${LAS_MINITAS.name} ~${LAS_MINITAS.throughputTMonth.toLocaleString("es-CL")} t/mes`,
+    ],
     ["RONDA", `${fmtUsd(CHOLQUI_ROUND.roundSizeUsd)} · ${CHOLQUI_ROUND.equityOfferedPct}% equity`],
   ];
   let ky = 244;
@@ -274,7 +273,10 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     [
       ["Referencia", `${CHOLQUI.code}-IR-${docVersion.replace(".", "-")}`],
       ["Clasificación", "Documento informativo · Due diligence preliminar"],
-      ["Evidencia química", `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes firmados`],
+      [
+        "Evidencia química",
+        `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes firmados`,
+      ],
       ["Enlace canónico", CHOLQUI_LIVE_URL],
     ],
   );
@@ -318,10 +320,16 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Centroide (WGS84)", `${CHOLQUI.center.lat}, ${CHOLQUI.center.lng}`],
       ["Sistema de referencia", CHOLQUI.crs],
       ["Superficie", `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`],
-      ["Estructura de propiedad", `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias`],
+      [
+        "Estructura de propiedad",
+        `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias`,
+      ],
       ["Titular", `${CHOLQUI.operator} (dominio a verificar contra acreditación)`],
       ["Acceso", CHOLQUI.access],
-      ["Vecindad", `${LAS_MINITAS.name} (${LAS_MINITAS.holder}) · ~${LAS_MINITAS.areaHa} ha · pertenencias colindantes de Yamana Gold`],
+      [
+        "Vecindad",
+        `${LAS_MINITAS.name} (${LAS_MINITAS.holder}) · ~${LAS_MINITAS.areaHa} ha · pertenencias colindantes de Yamana Gold`,
+      ],
     ],
   );
   para(
@@ -340,13 +348,27 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Mineralogía observada", CHOLQUI_GEOLOGY.mineralogia],
       ["Observaciones de terreno", `${CHOLQUI_GEOLOGY.observaciones} puntos`],
       ["Cuerpos mineralizados descritos", `${CHOLQUI_GEOLOGY.cuerpos}`],
-      ["Muestras con análisis firmado", `${CHOLQUI_GEOLOGY.muestrasLab} en ${CHOLQUI_ASSAY_REPORTS.length} informes (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(" · ")})`],
+      [
+        "Muestras con análisis firmado",
+        `${CHOLQUI_GEOLOGY.muestrasLab} en ${CHOLQUI_ASSAY_REPORTS.length} informes (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(" · ")})`,
+      ],
       ["Autores", CHOLQUI_GEOLOGY.autores],
-      ["Potencial conceptual", `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t de ${CHOLQUI_CONCEPTUAL.product} en ${CHOLQUI_CONCEPTUAL.sector} — no es recurso`],
+      [
+        "Potencial conceptual",
+        `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t de ${CHOLQUI_CONCEPTUAL.product} en ${CHOLQUI_CONCEPTUAL.sector} — no es recurso`,
+      ],
     ],
   );
   table(
-    ["Muestra / código", "Informe / fecha", "Cu total %", "Cu soluble %", "Sol./Total", "Au g/t", "Ag g/t"],
+    [
+      "Muestra / código",
+      "Informe / fecha",
+      "Cu total %",
+      "Cu soluble %",
+      "Sol./Total",
+      "Au g/t",
+      "Ag g/t",
+    ],
     CHOLQUI_ASSAYS.map((a) => [
       `${a.sample}${a.laboratoryCode ? ` / ${a.laboratoryCode}` : ""}`,
       `${a.reportId} / ${a.reportDate}`,
@@ -395,7 +417,14 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     `El modelo entregado considera la venta de mineral oxidado a ENAMI sobre un plan de ${CHOLQUI_PLAN_TONNES.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses (${CHOLQUI_BASE_CASE.ramp}). Los escenarios comparten plan minero y costos: sólo cambia la tarifa por ley de cobre soluble según la ${CHOLQUI_ENAMI.circular}. El caso efectivamente modelado es 1,5 % Cu soluble.`,
   );
   table(
-    ["Escenario", "Tarifa (CLP/tms)", "Ingresos brutos", "Costos operac.", "Superávit", "Equilibrio"],
+    [
+      "Escenario",
+      "Tarifa (CLP/tms)",
+      "Ingresos brutos",
+      "Costos operac.",
+      "Superávit",
+      "Equilibrio",
+    ],
     CHOLQUI_SCENARIOS.map((s) => [
       s.label,
       s.tariffClpTms.toLocaleString("es-CL"),
@@ -431,7 +460,10 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   y += 8;
 
   h1("06 · Supuestos", "Supuestos comunes a los escenarios");
-  table(["Supuesto", "Valor"], CHOLQUI_ASSUMPTIONS.map(([k, v]) => [k, v]));
+  table(
+    ["Supuesto", "Valor"],
+    CHOLQUI_ASSUMPTIONS.map(([k, v]) => [k, v]),
+  );
   disclaimer(
     "Escenarios ilustrativos, sujetos a validación geológica, metalúrgica, de ingeniería y económica. Las leyes de 1,5 % a 3,0 % Cu soluble son hipótesis de sensibilidad tarifaria y NO corresponden a leyes promedio comprobadas ni a recursos minerales. El modelo no incorpora impuestos, financiamiento, cierre de faena, seguros ni permisos, y no contiene VAN ni TIR.",
   );
@@ -447,7 +479,15 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     `Proyección de ingeniería preliminar partiendo de 1.000 t/mes con rampa lineal de 12 meses y meseta sostenida hasta el mes 24. La meseta de 15.000 t/mes corresponde al plan declarado; la de 20.000 t/mes es una hipótesis de ampliación sujeta al marco regulatorio y a permisos, no autorizada a la fecha. La flota se dimensiona desde el tonelaje y los costos separan componentes variables (CLP ${nfCl(VARIABLE_CLP_T)}/t) de fijos mensuales (CLP ${nfCl(FIXED_CLP_MONTH)}/mes), con ${CONTINGENCY_PCT} % de contingencia.`,
   );
   table(
-    ["Meseta", "Mineral 24 meses", "Ingresos ENAMI", "Costos", "Superávit", "Equilibrio", "Costo medio"],
+    [
+      "Meseta",
+      "Mineral 24 meses",
+      "Ingresos ENAMI",
+      "Costos",
+      "Superávit",
+      "Equilibrio",
+      "Costo medio",
+    ],
     [plan15, plan20].map((p) => [
       `${nfCl(p.params.plateau)} t/mes`,
       `${nfCl(p.totalTonnes)} t`,
@@ -459,7 +499,11 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     ]),
   );
 
-  para("Maquinaria por escalón de producción — operativas + respaldo (arriendo con operador)", COBALT, 8.4);
+  para(
+    "Maquinaria por escalón de producción — operativas + respaldo (arriendo con operador)",
+    COBALT,
+    8.4,
+  );
   table(
     ["Equipo", "Disp.", ...RATE_STEPS.map((r) => `${nfCl(r)} t`)],
     [
@@ -468,12 +512,26 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
         `${Math.round(line.spec.availability * 100)} %`,
         ...RATE_STEPS.map((r) => {
           const l = fleetForRate(r).lines[idx];
-          return l.standbyUnits > 0 ? `${l.operatingUnits} + ${l.standbyUnits}` : String(l.operatingUnits);
+          return l.standbyUnits > 0
+            ? `${l.operatingUnits} + ${l.standbyUnits}`
+            : String(l.operatingUnits);
         }),
       ]),
-      ["Equipos operativos (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).operatingClp))],
-      ["Equipos de respaldo (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).standbyClp))],
-      ["Costo total de flota (CLP/mes)", "", ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).monthlyClp))],
+      [
+        "Equipos operativos (CLP/mes)",
+        "",
+        ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).operatingClp)),
+      ],
+      [
+        "Equipos de respaldo (CLP/mes)",
+        "",
+        ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).standbyClp)),
+      ],
+      [
+        "Costo total de flota (CLP/mes)",
+        "",
+        ...RATE_STEPS.map((r) => fmtClpM(fleetForRate(r).monthlyClp)),
+      ],
     ],
   );
   para(
@@ -487,7 +545,10 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Variable de operación", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).variableClpT))],
       ["Fijo prorrateado", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).fixedClpT))],
       ["Flota prorrateada", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).fleetClpT))],
-      [`Contingencia ${CONTINGENCY_PCT} %`, ...RATE_STEPS.map((r) => nfCl(unitCosts(r).contingencyClpT))],
+      [
+        `Contingencia ${CONTINGENCY_PCT} %`,
+        ...RATE_STEPS.map((r) => nfCl(unitCosts(r).contingencyClpT)),
+      ],
       ["Costo total", ...RATE_STEPS.map((r) => nfCl(unitCosts(r).totalClpT))],
       [
         `Margen vs tarifa ${fmtClp(plan15.tariffClpTms)}/tms`,
@@ -498,7 +559,9 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   para(
     `Punto de equilibrio operacional a 1,5 % Cu soluble: ${
-      plan15.breakevenRate ? `${nfCl(plan15.breakevenRate)} t/mes` : "no alcanzable bajo 30.000 t/mes"
+      plan15.breakevenRate
+        ? `${nfCl(plan15.breakevenRate)} t/mes`
+        : "no alcanzable bajo 30.000 t/mes"
     }. Inversión inicial considerada: ${fmtClpM(plan15.capexClp)}.`,
   );
   disclaimer(
@@ -512,7 +575,16 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     "Proyección mensual de ingeniería preliminar para los dos ritmos de meseta. El precio aplicado es la tarifa ENAMI asociada a 1,5 % Cu soluble; el caso de 20.000 t/mes se presenta como hipótesis de ampliación sujeta a regulación y permisos.",
   );
   table(
-    ["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acum."],
+    [
+      "Mes",
+      "t/mes",
+      "Acum. t",
+      "Precio CLP/tms",
+      "Ingresos",
+      "Costo total",
+      "Margen",
+      "Caja acum.",
+    ],
     plan15.months.map((m) => [
       `15k · ${m.month}`,
       nfCl(m.rate),
@@ -525,7 +597,16 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     ]),
   );
   table(
-    ["Mes", "t/mes", "Acum. t", "Precio CLP/tms", "Ingresos", "Costo total", "Margen", "Caja acum."],
+    [
+      "Mes",
+      "t/mes",
+      "Acum. t",
+      "Precio CLP/tms",
+      "Ingresos",
+      "Costo total",
+      "Margen",
+      "Caja acum.",
+    ],
     plan20.months.map((m) => [
       `20k · ${m.month}`,
       nfCl(m.rate),
@@ -547,7 +628,17 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     "Matriz de sensibilidad combinando las mesetas de 15.000 y 20.000 t/mes con las cuatro leyes tarifarias del antecedente ENAMI. El costo de cada escenario se recalcula con la flota y los costos unitarios derivados del ritmo.",
   );
   table(
-    ["Meseta", "Cu sol.", "Mineral", "Precio", "Ingresos", "Costos", "Superávit", "Caja neta", "Payback"],
+    [
+      "Meseta",
+      "Cu sol.",
+      "Mineral",
+      "Precio",
+      "Ingresos",
+      "Costos",
+      "Superávit",
+      "Caja neta",
+      "Payback",
+    ],
     [15_000, 20_000].flatMap((r) =>
       CHOLQUI_SCENARIOS.map((s) => {
         const run = projectCashflow({ plateau: r, gradePct: s.grade });
@@ -597,7 +688,10 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   table(
     ["Término", "Valor referencial"],
     [
-      ["Valorización del activo", `${fmtUsd(CHOLQUI_ROUND.valuationLowUsd)} – ${fmtUsd(CHOLQUI_ROUND.valuationHighUsd)} (${CHOLQUI_ROUND.valuationMethod})`],
+      [
+        "Valorización del activo",
+        `${fmtUsd(CHOLQUI_ROUND.valuationLowUsd)} – ${fmtUsd(CHOLQUI_ROUND.valuationHighUsd)} (${CHOLQUI_ROUND.valuationMethod})`,
+      ],
       ["Ronda", fmtUsd(CHOLQUI_ROUND.roundSizeUsd)],
       ["Ticket mínimo", fmtUsd(CHOLQUI_ROUND.minTicketUsd)],
       ["Instrumento", CHOLQUI_ROUND.instrument],

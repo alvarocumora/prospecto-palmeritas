@@ -49,7 +49,11 @@ function InboxPage() {
     setLoading(true);
     const t = setTimeout(async () => {
       const data = await load({
-        data: { status: status || undefined, country: country || undefined, search: search || undefined },
+        data: {
+          status: status || undefined,
+          country: country || undefined,
+          search: search || undefined,
+        },
       });
       if (!cancelled) {
         setRows(data);
@@ -163,7 +167,10 @@ function InboxPage() {
                 </tr>
               ) : (
                 rows.map((r) => (
-                  <tr key={r.id} className="border-t border-[hsl(var(--hairline))] hover:bg-[hsl(var(--surface))]/40">
+                  <tr
+                    key={r.id}
+                    className="border-t border-[hsl(var(--hairline))] hover:bg-[hsl(var(--surface))]/40"
+                  >
                     <td className="p-3 font-mono text-xs">{r.folio}</td>
                     <td className="p-3">
                       <div className="font-medium">{r.legal_name}</div>

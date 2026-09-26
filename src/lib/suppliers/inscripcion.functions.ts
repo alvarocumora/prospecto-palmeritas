@@ -26,9 +26,7 @@ const OfferSchema = z.object({
   hasExportPermit: z.string().optional(),
   chainOfCustody: z.string().optional(),
   materialAvailability: z.string().optional(),
-  penalizables: z
-    .array(z.object({ element: z.string(), value: z.number().nullable() }))
-    .optional(),
+  penalizables: z.array(z.object({ element: z.string(), value: z.number().nullable() })).optional(),
 });
 
 const InputSchema = z.object({

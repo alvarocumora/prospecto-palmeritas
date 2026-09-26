@@ -13,7 +13,8 @@ export const Route = createFileRoute("/live/cholqui")({
       { property: "og:title", content: "Proyecto Cholqui · Live Map — Geocapitals" },
       {
         property: "og:description",
-        content: "Mapa, evidencia química trazable e informe de inversión descargable del Proyecto Cholqui.",
+        content:
+          "Mapa, evidencia química trazable e informe de inversión descargable del Proyecto Cholqui.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

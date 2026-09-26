@@ -11,7 +11,10 @@ import { fmtCLP, fmtFlow, type WaterAsset, type WaterPortfolio } from "./data";
 
 export type BasemapKey = "satellite" | "terrain" | "streets" | "hydrology";
 
-const BASEMAPS: Record<BasemapKey, { label: string; url: string; attribution: string; overlay?: string }> = {
+const BASEMAPS: Record<
+  BasemapKey,
+  { label: string; url: string; attribution: string; overlay?: string }
+> = {
   satellite: {
     label: "Satellite",
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
@@ -136,7 +139,11 @@ export function WaterLiveMap({
       baseRef.current.forEach((l) => map.removeLayer(l));
       baseRef.current = [];
       const cfg = BASEMAPS[basemap];
-      const base = L.tileLayer(cfg.url, { maxZoom: 18, attribution: cfg.attribution, subdomains: "abcd" });
+      const base = L.tileLayer(cfg.url, {
+        maxZoom: 18,
+        attribution: cfg.attribution,
+        subdomains: "abcd",
+      });
       base.addTo(map);
       base.bringToBack();
       baseRef.current.push(base);

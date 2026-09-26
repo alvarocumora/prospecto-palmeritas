@@ -220,25 +220,27 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
           "EPSG:4326",
           [Number(sample.easting), Number(sample.northing)],
         );
-        return [{
-          type: "Feature",
-          id: String(sample.id),
-          geometry: { type: "Point", coordinates: [lng, lat] },
-          properties: {
-            layer: "sample",
+        return [
+          {
+            type: "Feature",
             id: String(sample.id),
-            sample_code: sample.sample_code,
-            sample_type: sample.sample_type,
-            easting: Number(sample.easting),
-            northing: Number(sample.northing),
-            cu_pct: sample.cu_pct == null ? null : Number(sample.cu_pct),
-            au_gpt: sample.au_gpt == null ? null : Number(sample.au_gpt),
-            ag_gpt: sample.ag_gpt == null ? null : Number(sample.ag_gpt),
-            lab: sample.lab,
-            certificate: sample.certificate,
-            record_status: sample.record_status,
+            geometry: { type: "Point", coordinates: [lng, lat] },
+            properties: {
+              layer: "sample",
+              id: String(sample.id),
+              sample_code: sample.sample_code,
+              sample_type: sample.sample_type,
+              easting: Number(sample.easting),
+              northing: Number(sample.northing),
+              cu_pct: sample.cu_pct == null ? null : Number(sample.cu_pct),
+              au_gpt: sample.au_gpt == null ? null : Number(sample.au_gpt),
+              ag_gpt: sample.ag_gpt == null ? null : Number(sample.ag_gpt),
+              lab: sample.lab,
+              certificate: sample.certificate,
+              record_status: sample.record_status,
+            },
           },
-        }];
+        ];
       }),
     };
 
@@ -251,7 +253,8 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     };
     for (const fc of [concessions, targets, satAnomalies, magAnomalies, samples]) {
       for (const f of fc.features) {
-        if (f.geometry && "coordinates" in f.geometry) walk((f.geometry as { coordinates: unknown }).coordinates);
+        if (f.geometry && "coordinates" in f.geometry)
+          walk((f.geometry as { coordinates: unknown }).coordinates);
       }
     }
     let bbox: LosVerdesMapData["bbox"] = null;

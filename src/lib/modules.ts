@@ -10,9 +10,7 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
   const seg = p.split("/")[0];
 
   // Capital & Deals de Minas
-  if (
-    ["deals", "investments", "listings", "offerings", "agua"].includes(seg)
-  ) {
+  if (["deals", "investments", "listings", "offerings", "agua"].includes(seg)) {
     return "capital";
   }
   // Commodities & Trading

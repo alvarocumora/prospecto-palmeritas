@@ -61,9 +61,8 @@ function PricesPage() {
         <h1 className="text-xl font-semibold">Precios de referencia</h1>
       </div>
       <p className="text-xs text-muted-foreground max-w-2xl">
-        Registra la lectura de precio que vas a usar en las fichas y en la
-        calculadora CIF/FOB. Puedes empujar valores manuales (broker, prensa,
-        LME) o dejar el default de mercado.
+        Registra la lectura de precio que vas a usar en las fichas y en la calculadora CIF/FOB.
+        Puedes empujar valores manuales (broker, prensa, LME) o dejar el default de mercado.
       </p>
 
       <div className="rounded-md border border-hairline bg-surface p-3 space-y-3 max-w-3xl">
@@ -150,14 +149,17 @@ function PricesPage() {
               </tr>
             </thead>
             <tbody>
-              {[...intel.history].reverse().slice(0, 20).map((h, i) => (
-                <tr key={i} className="border-b border-hairline/50">
-                  <td className="py-1 font-mono text-muted-foreground">
-                    {new Date(h.updated_at).toLocaleString("es-CL")}
-                  </td>
-                  <td className="py-1 font-mono text-right">{h.price}</td>
-                </tr>
-              ))}
+              {[...intel.history]
+                .reverse()
+                .slice(0, 20)
+                .map((h, i) => (
+                  <tr key={i} className="border-b border-hairline/50">
+                    <td className="py-1 font-mono text-muted-foreground">
+                      {new Date(h.updated_at).toLocaleString("es-CL")}
+                    </td>
+                    <td className="py-1 font-mono text-right">{h.price}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         ) : (

@@ -64,7 +64,8 @@ export const createOperationSignatureFlow = createServerFn({ method: "POST" })
       .eq("id", data.document_id)
       .maybeSingle();
     if (!doc) throw new Error("Documento no encontrado");
-    if (doc.operation_id !== data.operation_id) throw new Error("Documento no pertenece a la operación");
+    if (doc.operation_id !== data.operation_id)
+      throw new Error("Documento no pertenece a la operación");
     if (!doc.sha256 || !doc.storage_path) throw new Error("Documento sin archivo o hash");
 
     if (!doc.is_frozen) {
@@ -83,7 +84,8 @@ export const createOperationSignatureFlow = createServerFn({ method: "POST" })
       .eq("document_type", `operation_${data.template.toLowerCase()}`)
       .in("status", ["pending", "in_progress"])
       .maybeSingle();
-    if (existing) throw new Error("Ya existe un flujo de firma activo para este documento y plantilla");
+    if (existing)
+      throw new Error("Ya existe un flujo de firma activo para este documento y plantilla");
 
     // 4) Crear envelope
     const expiresAt = new Date(Date.now() + data.expires_in_days * 86_400_000).toISOString();
@@ -200,9 +202,7 @@ export const createOperationSignatureFlow = createServerFn({ method: "POST" })
 /** Lista los flujos de firma de una operación. */
 export const listOperationSignatureFlows = createServerFn({ method: "POST" })
   .middleware([requireAnyModuleRole])
-  .inputValidator((raw: unknown) =>
-    z.object({ operation_id: z.string().uuid() }).parse(raw),
-  )
+  .inputValidator((raw: unknown) => z.object({ operation_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();
     // Verifica acceso vía RLS del context.supabase, pero leemos con admin para joinear
@@ -215,7 +215,9 @@ export const listOperationSignatureFlows = createServerFn({ method: "POST" })
 
     const { data: envelopes } = await sb
       .from("signature_envelopes")
-      .select("id, document_type, document_title, document_hash, status, required_signers, completed_signers, expires_at, created_at, completed_at, operation_document_id, signed_document_id, metadata")
+      .select(
+        "id, document_type, document_title, document_hash, status, required_signers, completed_signers, expires_at, created_at, completed_at, operation_document_id, signed_document_id, metadata",
+      )
       .eq("operation_id", data.operation_id)
       .order("created_at", { ascending: false });
 
@@ -223,7 +225,9 @@ export const listOperationSignatureFlows = createServerFn({ method: "POST" })
     const { data: signatures } = envIds.length
       ? await sb
           .from("document_signatures")
-          .select("id, envelope_id, signer_name, signer_email, signer_role, signing_order, status, signed_at, access_token, emailed_at")
+          .select(
+            "id, envelope_id, signer_name, signer_email, signer_role, signing_order, status, signed_at, access_token, emailed_at",
+          )
           .in("envelope_id", envIds)
           .order("signing_order", { ascending: true })
       : { data: [] as Array<Record<string, unknown>> };
@@ -259,14 +263,18 @@ export const getOperationSignatureRequest = createServerFn({ method: "POST" })
     const sb = await admin();
     const { data: sig } = await sb
       .from("document_signatures")
-      .select("id, envelope_id, signer_name, signer_email, signer_role, signing_order, status, signed_at")
+      .select(
+        "id, envelope_id, signer_name, signer_email, signer_role, signing_order, status, signed_at",
+      )
       .eq("access_token", data.token)
       .maybeSingle();
     if (!sig) throw new Error("Enlace inválido o revocado");
 
     const { data: env } = await sb
       .from("signature_envelopes")
-      .select("id, operation_id, operation_document_id, signed_document_id, document_title, document_hash, status, required_signers, completed_signers, expires_at, metadata")
+      .select(
+        "id, operation_id, operation_document_id, signed_document_id, document_title, document_hash, status, required_signers, completed_signers, expires_at, metadata",
+      )
       .eq("id", sig.envelope_id)
       .maybeSingle();
     if (!env) throw new Error("Sobre no encontrado");
@@ -353,7 +361,9 @@ export const submitOperationSignature = createServerFn({ method: "POST" })
 
     const { data: env } = await sb
       .from("signature_envelopes")
-      .select("id, document_hash, required_signers, completed_signers, status, expires_at, operation_id, operation_document_id")
+      .select(
+        "id, document_hash, required_signers, completed_signers, status, expires_at, operation_id, operation_document_id",
+      )
       .eq("id", sig.envelope_id)
       .maybeSingle();
     if (!env) throw new Error("Sobre no encontrado");
@@ -402,8 +412,7 @@ export const submitOperationSignature = createServerFn({ method: "POST" })
       await sb.from("operation_access_logs").insert({
         operation_id: env.operation_id,
         actor_user_id: null,
-        actor_role:
-          sig.signer_name && sig.signing_order === 1 ? "buyer" : "seller",
+        actor_role: sig.signer_name && sig.signing_order === 1 ? "buyer" : "seller",
         action: isDone ? "signature_flow_completed" : "signature_submitted",
         metadata: {
           envelope_id: env.id,
@@ -434,10 +443,7 @@ export const voidOperationSignatureFlow = createServerFn({ method: "POST" })
     if (!env) throw new Error("Sobre no encontrado");
     if (env.status === "completed") throw new Error("El flujo ya está completado");
 
-    await sb
-      .from("signature_envelopes")
-      .update({ status: "void" })
-      .eq("id", data.envelope_id);
+    await sb.from("signature_envelopes").update({ status: "void" }).eq("id", data.envelope_id);
     await sb
       .from("document_signatures")
       .update({ status: "rejected", rejection_reason: data.reason ?? "envelope anulado" })

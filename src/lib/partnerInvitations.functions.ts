@@ -79,9 +79,7 @@ export const createPartnerInvitation = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-    await sb
-      .from("partner_invitation_events")
-      .insert({ invitation_id: row.id, event: "created" });
+    await sb.from("partner_invitation_events").insert({ invitation_id: row.id, event: "created" });
 
     return row as PartnerInvitationRow;
   });
@@ -123,21 +121,33 @@ export const getInvitationByToken = createServerFn({ method: "GET" })
     const [projRes, tradeRes] = await Promise.all([
       inv.project_ids?.length
         ? sb.from("projects").select("id, name, commodity, country").in("id", inv.project_ids)
-        : Promise.resolve({ data: [] as { id: string; name: string; commodity: string | null; country: string | null }[] }),
+        : Promise.resolve({
+            data: [] as {
+              id: string;
+              name: string;
+              commodity: string | null;
+              country: string | null;
+            }[],
+          }),
       inv.trade_ids?.length
-        ? sb
-            .from("commodity_trades")
-            .select("id, reference, commodity")
-            .in("id", inv.trade_ids)
+        ? sb.from("commodity_trades").select("id, reference, commodity").in("id", inv.trade_ids)
         : Promise.resolve({ data: [] as { id: string; reference: string; commodity: string }[] }),
     ]);
 
     // Marca como "opened" (best-effort)
-    await sb.rpc("mark_partner_invitation_opened", { _token: data.token }).then(() => null, () => null);
+    await sb.rpc("mark_partner_invitation_opened", { _token: data.token }).then(
+      () => null,
+      () => null,
+    );
 
     return {
       invitation: inv,
-      projects: (projRes.data ?? []) as Array<{ id: string; name: string; commodity: string | null; country: string | null }>,
+      projects: (projRes.data ?? []) as Array<{
+        id: string;
+        name: string;
+        commodity: string | null;
+        country: string | null;
+      }>,
       trades: (tradeRes.data ?? []) as Array<{ id: string; reference: string; commodity: string }>,
     };
   });

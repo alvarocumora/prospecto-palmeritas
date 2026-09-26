@@ -113,7 +113,9 @@ export const compareProjects = createServerFn({ method: "GET" })
         concessions: { count: pc.length, areaHa: pc.length ? Number(areaHa.toFixed(1)) : null },
         samples: {
           count: ps.length,
-          cuAvgPct: cu.length ? Number((cu.reduce((a, v) => a + v, 0) / cu.length).toFixed(2)) : null,
+          cuAvgPct: cu.length
+            ? Number((cu.reduce((a, v) => a + v, 0) / cu.length).toFixed(2))
+            : null,
           cuMaxPct: cu.length ? Number(Math.max(...cu).toFixed(2)) : null,
           auMaxGpt: au.length ? Number(Math.max(...au).toFixed(2)) : null,
           agMaxGpt: ag.length ? Number(Math.max(...ag).toFixed(1)) : null,
@@ -132,8 +134,7 @@ export const compareProjects = createServerFn({ method: "GET" })
               roundSizeUsd: r.round_size_usd != null ? Number(r.round_size_usd) : null,
               minTicketUsd: r.min_ticket_usd != null ? Number(r.min_ticket_usd) : null,
               instrument: r.instrument,
-              equityOfferedPct:
-                r.equity_offered_pct != null ? Number(r.equity_offered_pct) : null,
+              equityOfferedPct: r.equity_offered_pct != null ? Number(r.equity_offered_pct) : null,
               valuationLowUsd: r.valuation_low_usd != null ? Number(r.valuation_low_usd) : null,
               valuationHighUsd: r.valuation_high_usd != null ? Number(r.valuation_high_usd) : null,
               valuationMethod: r.valuation_method,

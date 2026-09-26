@@ -6,7 +6,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Loader2, Check, Building2, Handshake, TrendingUp, FileSignature, ExternalLink } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  Building2,
+  Handshake,
+  TrendingUp,
+  FileSignature,
+  ExternalLink,
+} from "lucide-react";
 import {
   getInvitationByToken,
   acceptPartnerInvitation,
@@ -97,14 +105,20 @@ function OnboardingPage() {
 
   if (loading) {
     return (
-      <div data-theme="im-light" className="min-h-screen flex items-center justify-center bg-surface-page">
+      <div
+        data-theme="im-light"
+        className="min-h-screen flex items-center justify-center bg-surface-page"
+      >
         <Loader2 className="w-6 h-6 animate-spin text-accent-brand" />
       </div>
     );
   }
   if (error || !data) {
     return (
-      <div data-theme="im-light" className="min-h-screen flex items-center justify-center bg-surface-page p-6">
+      <div
+        data-theme="im-light"
+        className="min-h-screen flex items-center justify-center bg-surface-page p-6"
+      >
         <div className="max-w-md text-center space-y-3">
           <div className="text-2xl font-serif text-content-primary">Invitación no válida</div>
           <p className="text-sm text-content-secondary">
@@ -119,14 +133,18 @@ function OnboardingPage() {
 
   if (done) {
     return (
-      <div data-theme="im-light" className="min-h-screen flex items-center justify-center bg-surface-page p-6">
+      <div
+        data-theme="im-light"
+        className="min-h-screen flex items-center justify-center bg-surface-page p-6"
+      >
         <div className="max-w-lg w-full bg-surface-card border border-hairline p-8 space-y-5 text-center">
           <div className="w-14 h-14 rounded-full bg-accent-brand/10 flex items-center justify-center mx-auto">
             <Check className="w-7 h-7 text-accent-brand" />
           </div>
           <h1 className="text-2xl font-serif text-content-primary">Acceso activado</h1>
           <p className="text-sm text-content-secondary">
-            NCNDA firmado y acceso otorgado a {inv.project_ids.length} proyecto(s) y {inv.trade_ids.length} operación(es).
+            NCNDA firmado y acceso otorgado a {inv.project_ids.length} proyecto(s) y{" "}
+            {inv.trade_ids.length} operación(es).
           </p>
           <a
             href="/auth"
@@ -150,7 +168,8 @@ function OnboardingPage() {
             Activa tu acceso, {inv.full_name ?? inv.email}
           </h1>
           <p className="text-sm text-content-secondary max-w-lg mx-auto">
-            3 pasos: confirma identidad, elige tu rol y firma el NCNDA. Luego tendrás acceso a los data rooms de proyectos y operaciones activas.
+            3 pasos: confirma identidad, elige tu rol y firma el NCNDA. Luego tendrás acceso a los
+            data rooms de proyectos y operaciones activas.
           </p>
         </div>
 
@@ -174,7 +193,12 @@ function OnboardingPage() {
               <div className="grid gap-4">
                 <Field label="Nombre completo" value={fullName} onChange={setFullName} />
                 <Field label="Empresa (opcional)" value={company} onChange={setCompany} />
-                <Field label="Correo (invitación)" value={inv.email} onChange={() => null} disabled />
+                <Field
+                  label="Correo (invitación)"
+                  value={inv.email}
+                  onChange={() => null}
+                  disabled
+                />
               </div>
               <div className="flex justify-end">
                 <button
@@ -255,14 +279,17 @@ function OnboardingPage() {
 
               <div className="border border-hairline bg-surface-page p-4 text-xs text-content-secondary space-y-2 max-h-40 overflow-y-auto">
                 <p>
-                  <b>NCNDA (Non-Circumvention, Non-Disclosure)</b> — Al firmar aceptas que la información
-                  compartida sobre proyectos, contrapartes, precios y estructuras de deal es confidencial
-                  por 24 meses; no circunvalarás a Geocapitals ni contactarás directamente a las
-                  contrapartes presentadas.
+                  <b>NCNDA (Non-Circumvention, Non-Disclosure)</b> — Al firmar aceptas que la
+                  información compartida sobre proyectos, contrapartes, precios y estructuras de
+                  deal es confidencial por 24 meses; no circunvalarás a Geocapitals ni contactarás
+                  directamente a las contrapartes presentadas.
                 </p>
                 <p>
-                  Acceso otorgado a: <b>{data.projects.map((p) => p.name).join(", ") || "sin proyectos"}</b>
-                  {data.trades.length ? ` · Operaciones: ${data.trades.map((t) => `${t.commodity} (${t.reference})`).join(", ")}` : ""}
+                  Acceso otorgado a:{" "}
+                  <b>{data.projects.map((p) => p.name).join(", ") || "sin proyectos"}</b>
+                  {data.trades.length
+                    ? ` · Operaciones: ${data.trades.map((t) => `${t.commodity} (${t.reference})`).join(", ")}`
+                    : ""}
                 </p>
               </div>
 
@@ -292,7 +319,11 @@ function OnboardingPage() {
                   disabled={submitting}
                   className="px-5 py-2 bg-accent-brand text-white text-sm font-medium hover:opacity-90 disabled:opacity-40 inline-flex items-center gap-2"
                 >
-                  {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  {submitting ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
                   Firmar y activar acceso
                 </button>
               </div>

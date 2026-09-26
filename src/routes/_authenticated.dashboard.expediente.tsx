@@ -99,9 +99,7 @@ function ExpedientePage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 text-sm">
                 <Metric
                   label="Ficha comercial"
-                  value={
-                    r.listing ? (r.listing.published ? "Publicada" : "Borrador") : "Sin ficha"
-                  }
+                  value={r.listing ? (r.listing.published ? "Publicada" : "Borrador") : "Sin ficha"}
                 />
                 <Metric label="Precio pedido" value={fmtUsd(r.listing?.askingPriceUsd ?? null)} />
                 <Metric
@@ -145,9 +143,7 @@ function ExpedientePage() {
                         )}
                         <span className={c.ok ? "text-muted-foreground" : ""}>
                           {c.label}
-                          {!c.ok && (
-                            <span className="text-muted-foreground"> — {c.hint}</span>
-                          )}
+                          {!c.ok && <span className="text-muted-foreground"> — {c.hint}</span>}
                         </span>
                       </li>
                     ))}

@@ -139,8 +139,12 @@ export function TradeCopilotPanel({ tradeId, hasMissingTerms }: Props) {
 
           {/* Evidence footer */}
           <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-mono uppercase tracking-wider text-ink/50 border-t border-hairline pt-2">
-            <span>{brief.evidence.signedDocs}/{brief.evidence.docs} docs firmados</span>
-            <span>{brief.evidence.paidPayments}/{brief.evidence.payments} pagos</span>
+            <span>
+              {brief.evidence.signedDocs}/{brief.evidence.docs} docs firmados
+            </span>
+            <span>
+              {brief.evidence.paidPayments}/{brief.evidence.payments} pagos
+            </span>
             <span>{brief.evidence.shipments} embarques</span>
             <span>{brief.evidence.packVersions} versiones pack</span>
             {brief.evidence.daysSinceLastEvent != null && (

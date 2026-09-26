@@ -54,39 +54,43 @@ export const claimMySupplier = createServerFn({ method: "POST" })
 
 export const getMySupplier = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{
-    supplier: MySupplier | null;
-    offers: MyOffer[];
-    documents: MyDocument[];
-  }> => {
-    const { data: supplier } = await context.supabase
-      .from("suppliers")
-      .select(
-        "id, folio, legal_name, country, contact_name, phone_e164, email, status, created_at",
-      )
-      .eq("owner_user_id", context.userId)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
-    if (!supplier) return { supplier: null, offers: [], documents: [] };
-
-    const [{ data: offers }, { data: documents }] = await Promise.all([
-      context.supabase
-        .from("supplier_offers")
+  .handler(
+    async ({
+      context,
+    }): Promise<{
+      supplier: MySupplier | null;
+      offers: MyOffer[];
+      documents: MyDocument[];
+    }> => {
+      const { data: supplier } = await context.supabase
+        .from("suppliers")
         .select(
-          "id, product, status, tonnage_available_t, grade_value, grade_unit, port_or_delivery, created_at",
+          "id, folio, legal_name, country, contact_name, phone_e164, email, status, created_at",
         )
-        .eq("supplier_id", supplier.id)
-        .order("created_at", { ascending: false }),
-      context.supabase
-        .from("supplier_documents")
-        .select("id, doc_type, review_status, uploaded_at, storage_path")
-        .eq("supplier_id", supplier.id)
-        .order("uploaded_at", { ascending: false }),
-    ]);
-    return {
-      supplier: supplier as MySupplier,
-      offers: (offers ?? []) as MyOffer[],
-      documents: (documents ?? []) as MyDocument[],
-    };
-  });
+        .eq("owner_user_id", context.userId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (!supplier) return { supplier: null, offers: [], documents: [] };
+
+      const [{ data: offers }, { data: documents }] = await Promise.all([
+        context.supabase
+          .from("supplier_offers")
+          .select(
+            "id, product, status, tonnage_available_t, grade_value, grade_unit, port_or_delivery, created_at",
+          )
+          .eq("supplier_id", supplier.id)
+          .order("created_at", { ascending: false }),
+        context.supabase
+          .from("supplier_documents")
+          .select("id, doc_type, review_status, uploaded_at, storage_path")
+          .eq("supplier_id", supplier.id)
+          .order("uploaded_at", { ascending: false }),
+      ]);
+      return {
+        supplier: supplier as MySupplier,
+        offers: (offers ?? []) as MyOffer[],
+        documents: (documents ?? []) as MyDocument[],
+      };
+    },
+  );

@@ -165,7 +165,15 @@ function MineDescentPanel() {
                 />
               ))}
               {/* Cable */}
-              <line x1="48" y1="0" x2="48" y2="380" stroke="#e0a742" strokeOpacity="0.5" strokeDasharray="2 4" />
+              <line
+                x1="48"
+                y1="0"
+                x2="48"
+                y2="380"
+                stroke="#e0a742"
+                strokeOpacity="0.5"
+                strokeDasharray="2 4"
+              />
               {/* Elevator car */}
               <g
                 style={{
@@ -192,9 +200,7 @@ function MineDescentPanel() {
                 Profundidad de acceso
               </div>
               <div className="mt-1 font-mono text-6xl font-bold text-white tabular-nums leading-none">
-                {Math.floor(depth)
-                  .toString()
-                  .padStart(4, "0")}
+                {Math.floor(depth).toString().padStart(4, "0")}
                 <span className="text-[#e0a742] text-2xl align-top ml-1">m</span>
               </div>
               <div className="mt-2 h-1 rounded bg-white/5 overflow-hidden">
@@ -513,8 +519,7 @@ function AuthPage() {
                     value={displayName}
                     onChange={(e) => {
                       setDisplayName(e.target.value);
-                      if (errors.displayName)
-                        setErrors((p) => ({ ...p, displayName: undefined }));
+                      if (errors.displayName) setErrors((p) => ({ ...p, displayName: undefined }));
                     }}
                     aria-invalid={!!errors.displayName}
                     className={inputCls(!!errors.displayName)}
@@ -631,8 +636,7 @@ function AuthPage() {
 }
 
 function CornerBrackets() {
-  const cls =
-    "absolute w-3 h-3 border-[#e0a742]/60 pointer-events-none";
+  const cls = "absolute w-3 h-3 border-[#e0a742]/60 pointer-events-none";
   return (
     <>
       <span className={`${cls} -top-px -left-px border-t border-l`} />

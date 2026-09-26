@@ -50,7 +50,9 @@ export async function buildNdaPdf(input: {
         " meses desde la fecha de emisión y sobrevivirá al término de las negociaciones respecto a la información recibida durante su vigencia.",
       "5 · NO-CIRCUMVENTION. Ninguna de las Partes contactará ni cerrará operaciones con las contrapartes, proveedores o clientes finales identificados por la otra Parte, sin su consentimiento escrito, por el mismo plazo de vigencia.",
       "6 · DEVOLUCIÓN Y DESTRUCCIÓN. A solicitud escrita, la Información Confidencial deberá devolverse o destruirse, con constancia por email a info@geocapitals.com.",
-      "7 · LEY APLICABLE. Este acuerdo se rige por las leyes de " + jur + ". Cualquier controversia se someterá al arbitraje del Centro de Arbitraje de la Cámara de Comercio respectiva.",
+      "7 · LEY APLICABLE. Este acuerdo se rige por las leyes de " +
+        jur +
+        ". Cualquier controversia se someterá al arbitraje del Centro de Arbitraje de la Cámara de Comercio respectiva.",
       "---",
       "Este PDF es la copia oficial para archivo. La firma electrónica de este NDA se realiza en el enlace personal enviado por Geocapitals; una vez firmado por ambas Partes, quedará registrado con sello de tiempo y hash SHA-256 en la plataforma.",
     ],
@@ -96,11 +98,14 @@ export async function buildLoiPdf(input: {
         ". Cronograma y puerto de embarque se acordarán en el contrato definitivo.",
       "3 · CALIDAD. La calidad se determinará mediante análisis independiente (SGS / Bureau Veritas / Alfred H. Knight) sobre muestreo en origen, con derecho a re-muestreo en destino. Los CoA y SGS ya intercambiados sirven como referencia técnica preliminar.",
       "4 · PAGO. " +
-        (input.paymentInstrument ?? "SBLC MT760 irrevocable, confirmada por banco de primer nivel") +
+        (input.paymentInstrument ??
+          "SBLC MT760 irrevocable, confirmada por banco de primer nivel") +
         ". Emisión y confirmación sujetas a wording MT799 previo (POF/RWA).",
       "5 · DILIGENCIA. El Buyer podrá realizar visita a bodega, verificación de origen legal del material, KYC/AML del Seller y validación de documentación de exportación antes de la firma del SPA.",
       "6 · CONFIDENCIALIDAD. Esta LOI se emite bajo el NDA suscrito entre las Partes y no constituye obligación de compra hasta la firma del SPA definitivo. Cualquier comunicación con contrapartes finales requiere consentimiento escrito.",
-      "7 · VIGENCIA. Esta LOI tiene validez por " + validity + " días desde su emisión. Vencido el plazo sin firma de SPA, quedará sin efecto salvo prórroga escrita.",
+      "7 · VIGENCIA. Esta LOI tiene validez por " +
+        validity +
+        " días desde su emisión. Vencido el plazo sin firma de SPA, quedará sin efecto salvo prórroga escrita.",
       "---",
       "Documento no vinculante en cuanto a la obligación de compra. Sí es vinculante en materia de confidencialidad y no-circumvention, en los términos del NDA suscrito.",
     ],
@@ -235,7 +240,9 @@ export type TradePackContext = {
 const fmtQty = (q?: number | null) =>
   q == null ? "A definir en SPA" : `${Number(q).toLocaleString("en-US")} MT`;
 const fmtPrice = (p?: number | null) =>
-  p == null ? "Referencia LME/LMU + premio a acordar" : `US$ ${Number(p).toLocaleString("en-US")} / MT`;
+  p == null
+    ? "Referencia LME/LMU + premio a acordar"
+    : `US$ ${Number(p).toLocaleString("en-US")} / MT`;
 
 /** Ficha técnica / Purchase Terms genérica poblada con datos reales del trade. */
 export async function buildTradeFichaPdf(ctx: TradePackContext): Promise<Uint8Array> {
@@ -247,7 +254,12 @@ export async function buildTradeFichaPdf(ctx: TradePackContext): Promise<Uint8Ar
     reference: ctx.reference,
     parties: [
       { role: "Buyer", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
-      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+      {
+        role: "Seller",
+        name: ctx.seller.name,
+        company: ctx.seller.company,
+        email: ctx.seller.email,
+      },
     ],
     body: [
       `§1 · COMMODITY. ${ctx.commodity}${ctx.form ? ` · Forma: ${ctx.form}` : ""}. Origen: Seller's Option. Inspección independiente por SGS / CCIC / Alex Stewart o equivalente internacional.`,
@@ -298,8 +310,18 @@ export async function buildTradeIcpoPdf(ctx: TradePackContext): Promise<Uint8Arr
       "Orden de compra corporativa irrevocable emitida por el Buyer al Seller, sujeta a firma de SPA y verificación bancaria del instrumento de pago.",
     reference: `ICPO-${ctx.reference}`,
     parties: [
-      { role: "Buyer (Emisor)", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
-      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+      {
+        role: "Buyer (Emisor)",
+        name: ctx.buyer.name,
+        company: ctx.buyer.company,
+        email: ctx.buyer.email,
+      },
+      {
+        role: "Seller",
+        name: ctx.seller.name,
+        company: ctx.seller.company,
+        email: ctx.seller.email,
+      },
     ],
     body: [
       `1 · PRODUCTO. ${ctx.commodity}${ctx.form ? ` · ${ctx.form}` : ""}.`,
@@ -326,7 +348,12 @@ export async function buildTradeSpaDraftPdf(ctx: TradePackContext): Promise<Uint
       "Borrador del contrato de compraventa internacional para la operación indicada. Documento sujeto a revisión legal por las Partes; la versión definitiva se firmará electrónicamente en la War Room.",
     reference: `SPA-${ctx.reference}`,
     parties: [
-      { role: "Seller", name: ctx.seller.name, company: ctx.seller.company, email: ctx.seller.email },
+      {
+        role: "Seller",
+        name: ctx.seller.name,
+        company: ctx.seller.company,
+        email: ctx.seller.email,
+      },
       { role: "Buyer", name: ctx.buyer.name, company: ctx.buyer.company, email: ctx.buyer.email },
     ],
     body: [
@@ -349,4 +376,3 @@ export async function buildTradeSpaDraftPdf(ctx: TradePackContext): Promise<Uint
 }
 
 export { uploadPdfSigned };
-

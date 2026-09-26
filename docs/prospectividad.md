@@ -12,11 +12,11 @@ Asigna a cada celda un **score 0–100** de favorabilidad para arcillas iónicas
 como suma ponderada y **explicable** de tres factores. Cada componente reporta su
 aporte; no hay caja negra.
 
-| Factor | Señal favorable | Peso (editable) |
-|---|---|---|
-| **Litología** | granitoides tipo I / tonalitas de biotita ± anfíbola | 0,50 |
-| **Proximidad a contactos** | cerca de contacto intrusivo/basamento | 0,30 |
-| **Pendiente** | suave (preserva el regolito/laterita) | 0,20 |
+| Factor                     | Señal favorable                                      | Peso (editable) |
+| -------------------------- | ---------------------------------------------------- | --------------- |
+| **Litología**              | granitoides tipo I / tonalitas de biotita ± anfíbola | 0,50            |
+| **Proximidad a contactos** | cerca de contacto intrusivo/basamento                | 0,30            |
+| **Pendiente**              | suave (preserva el regolito/laterita)                | 0,20            |
 
 - `score = 100 · Σ (peso_i · favorabilidad_i)`, pesos normalizados a suma 1.
 - **Litología:** favorabilidad 0–1 por clase (tabla). Clase no tabulada → aporte 0

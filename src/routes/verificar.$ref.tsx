@@ -17,13 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Logo } from "@/components/Logo";
 import { PUBLIC_APP_HOST, verifyDocUrl } from "@/lib/publicUrl";
 
-type VerifyStatus =
-  | "not_found"
-  | "draft"
-  | "pending_signature"
-  | "signed"
-  | "expired"
-  | "void";
+type VerifyStatus = "not_found" | "draft" | "pending_signature" | "signed" | "expired" | "void";
 
 type VerifyResult = {
   status: VerifyStatus;
@@ -39,7 +33,13 @@ type VerifyResult = {
 
 const STATUS_META: Record<
   VerifyStatus,
-  { label: string; tone: string; icon: typeof CheckCircle2; description: string; validated: boolean }
+  {
+    label: string;
+    tone: string;
+    icon: typeof CheckCircle2;
+    description: string;
+    validated: boolean;
+  }
 > = {
   signed: {
     label: "Documento validado",
@@ -140,7 +140,11 @@ function VerifyPage() {
 
   useEffect(() => {
     let cancelled = false;
-    QRCode.toDataURL(canonicalUrl, { width: 220, margin: 1, color: { dark: "#0B2545", light: "#FAF7F1" } })
+    QRCode.toDataURL(canonicalUrl, {
+      width: 220,
+      margin: 1,
+      color: { dark: "#0B2545", light: "#FAF7F1" },
+    })
       .then((url) => {
         if (!cancelled) setQrDataUrl(url);
       })
@@ -244,7 +248,9 @@ function VerifyPage() {
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-10 h-10 rounded-full grid place-items-center ${
-                        meta?.validated ? "bg-emerald-600 text-white" : "bg-neutral-300 text-neutral-700"
+                        meta?.validated
+                          ? "bg-emerald-600 text-white"
+                          : "bg-neutral-300 text-neutral-700"
                       }`}
                     >
                       <Icon className="w-5 h-5" />
@@ -253,7 +259,9 @@ function VerifyPage() {
                       <div className="font-display text-lg text-content">
                         {meta?.validated ? "VALIDADO" : "NO VALIDADO"}
                       </div>
-                      <p className="text-[13px] text-content-subtle max-w-2xl">{meta?.description}</p>
+                      <p className="text-[13px] text-content-subtle max-w-2xl">
+                        {meta?.description}
+                      </p>
                     </div>
                   </div>
                 </div>

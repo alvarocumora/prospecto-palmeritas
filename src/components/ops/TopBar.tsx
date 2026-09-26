@@ -35,7 +35,6 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard/satellite-intel": "Inteligencia Satelital",
 };
 
-
 function breadcrumb(path: string): string {
   const exact = ROUTE_LABELS[path];
   if (exact) return exact;

@@ -3,7 +3,11 @@ import { Link } from "@tanstack/react-router";
 
 import { Check, Minus, ArrowRight } from "lucide-react";
 
-type Cell = { kind: "yes"; note?: string } | { kind: "no" } | { kind: "partial"; note?: string } | { kind: "text"; value: string };
+type Cell =
+  | { kind: "yes"; note?: string }
+  | { kind: "no" }
+  | { kind: "partial"; note?: string }
+  | { kind: "text"; value: string };
 
 const OPERATORS = [
   { key: "geo", name: "Geocapitals", tag: "Plataforma completa", highlight: true },
@@ -105,15 +109,29 @@ export function CatastroComparison() {
   // en días distintos (husos horarios) y eso rompía la hidratación.
   const [today, setToday] = useState<string>("");
   useEffect(() => {
-    const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+    const MESES = [
+      "ene",
+      "feb",
+      "mar",
+      "abr",
+      "may",
+      "jun",
+      "jul",
+      "ago",
+      "sep",
+      "oct",
+      "nov",
+      "dic",
+    ];
     const d = new Date();
     setToday(`${String(d.getDate()).padStart(2, "0")} ${MESES[d.getMonth()]} ${d.getFullYear()}`);
   }, []);
 
-
-
   return (
-    <div data-theme="im-light" className="border border-hairline rounded-sm bg-white overflow-hidden">
+    <div
+      data-theme="im-light"
+      className="border border-hairline rounded-sm bg-white overflow-hidden"
+    >
       <div className="px-5 py-4 border-b border-hairline flex flex-col md:flex-row md:items-end md:justify-between gap-3">
         <div>
           <div className="text-[10px] font-mono uppercase tracking-[0.22em] text-content-muted">
@@ -168,7 +186,11 @@ export function CatastroComparison() {
             {ROWS.map((row, i) => (
               <tr
                 key={row.label}
-                className={i % 2 === 1 ? "bg-surface/40 border-b border-hairline" : "border-b border-hairline"}
+                className={
+                  i % 2 === 1
+                    ? "bg-surface/40 border-b border-hairline"
+                    : "border-b border-hairline"
+                }
               >
                 <td className="px-5 py-3 text-[12px] text-content">{row.label}</td>
                 {OPERATORS.map((op) => (

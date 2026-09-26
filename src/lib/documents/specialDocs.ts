@@ -14,8 +14,7 @@ export function buildGoldNda(): GeneratedDoc {
     docType: "NDA",
     reference: "GC-NDA-AU-202607-9001",
     date: today(),
-    title:
-      "Acuerdo de Confidencialidad — Proyecto Aurífero (4.000.000 oz Au · NI 43-101)",
+    title: "Acuerdo de Confidencialidad — Proyecto Aurífero (4.000.000 oz Au · NI 43-101)",
     blocks: [
       {
         kind: "fields",
@@ -114,8 +113,7 @@ export function buildTrentoAdenda(): GeneratedDoc {
     docType: "ADENDA",
     reference: "GC-ADENDA-REE-TRENTO-202607-1",
     date: today(),
-    title:
-      "Adenda técnica — Proyecto TRENTO · Mineralogía objetivo: monacita / bastnasita",
+    title: "Adenda técnica — Proyecto TRENTO · Mineralogía objetivo: monacita / bastnasita",
     blocks: [
       {
         kind: "fields",
@@ -138,8 +136,18 @@ export function buildTrentoAdenda(): GeneratedDoc {
         head: ["Mineral", "Fórmula", "Densidad", "Respuesta metalúrgica"],
         rows: [
           ["Monacita", "(Ce,La,Nd,Th)PO₄", "5,0", "Gravimétrica + magnética (paramagnética)"],
-          ["Bastnasita", "(Ce,La)CO₃F", "4,9", "Gravimétrica + flotación (colectores de ácido graso)"],
-          ["Xenotima (descartada)", "YPO₄", "4,4-5,1", "HREE-dominante — no coincide con firma TRENTO"],
+          [
+            "Bastnasita",
+            "(Ce,La)CO₃F",
+            "4,9",
+            "Gravimétrica + flotación (colectores de ácido graso)",
+          ],
+          [
+            "Xenotima (descartada)",
+            "YPO₄",
+            "4,4-5,1",
+            "HREE-dominante — no coincide con firma TRENTO",
+          ],
         ],
       },
       {
@@ -167,8 +175,7 @@ export function buildTrentoMonaBastFicha(): GeneratedDoc {
     docType: "FICHA",
     reference: "GC-FICHA-REE-TRENTO-MB-202607-1",
     date: today(),
-    title:
-      "Ficha comercial — Proyecto TRENTO · Concentrado LREE (Monacita / Bastnasita)",
+    title: "Ficha comercial — Proyecto TRENTO · Concentrado LREE (Monacita / Bastnasita)",
     blocks: [
       {
         kind: "fields",
@@ -206,8 +213,18 @@ export function buildTrentoMonaBastFicha(): GeneratedDoc {
         head: ["Escenario", "Concentrado", "Precio canasta", "Valor USD/t roca"],
         rows: [
           ["Base — ley cabeza 0,21% TREO", "in-situ", "USD 8-12/kg TREO", "USD 16-24"],
-          ["Upgrade gravimétrico 30% TREO", "30% TREO", "USD 8-12/kg TREO", "USD 2.400-3.600 /t conc."],
-          ["Upgrade flotación 60% TREO", "60% TREO", "USD 8-12/kg TREO", "USD 4.800-7.200 /t conc."],
+          [
+            "Upgrade gravimétrico 30% TREO",
+            "30% TREO",
+            "USD 8-12/kg TREO",
+            "USD 2.400-3.600 /t conc.",
+          ],
+          [
+            "Upgrade flotación 60% TREO",
+            "60% TREO",
+            "USD 8-12/kg TREO",
+            "USD 4.800-7.200 /t conc.",
+          ],
           ["Referencia peers", "Mountain Pass 7%", "—", "Standalone REE viable"],
         ],
       },
@@ -242,18 +259,30 @@ export function buildSingularxNcnda(): GeneratedDoc {
       {
         kind: "fields",
         rows: [
-          ["Parte A · Advisor / Operador", "Geocapitals SpA · info@geocapitals.com · +56 9 6218 4071"],
+          [
+            "Parte A · Advisor / Operador",
+            "Geocapitals SpA · info@geocapitals.com · +56 9 6218 4071",
+          ],
           ["Parte B · Broker / Buy-side", "SingularX — Eduardo · eduardo@singularx.io"],
-          ["Parte C · Broker / Buy-side", "ZBALA LATAM — Joaquín Belmar · joaquin.belmar@zbalatam.com"],
-          ["Objeto", "Ofertas de compra de concentrados (Cu, Au, Sb, REE) y compra/venta de minas en Chile"],
-          ["Alcance data room", "Proyectos de oro, cobre, antimonio y tierras raras coordinados por Geocapitals"],
+          [
+            "Parte C · Broker / Buy-side",
+            "ZBALA LATAM — Joaquín Belmar · joaquin.belmar@zbalatam.com",
+          ],
+          [
+            "Objeto",
+            "Ofertas de compra de concentrados (Cu, Au, Sb, REE) y compra/venta de minas en Chile",
+          ],
+          [
+            "Alcance data room",
+            "Proyectos de oro, cobre, antimonio y tierras raras coordinados por Geocapitals",
+          ],
           ["Vigencia / Term", "24 meses desde la firma · No-elusión 12 meses adicionales"],
           ["Jurisdicción / Governing law", "República de Chile · CAM Santiago"],
         ],
       },
       {
         kind: "paragraph",
-        text: "Between Geocapitals SpA (Party A), SingularX (Party B) and ZBALA LATAM (Party C) — collectively \"The Parties\" — this Non-Circumvention Non-Disclosure Agreement (NCNDA) is executed to enable the exchange of technical, commercial and financial information regarding purchase offers of mineral concentrates and mining assets in Chile. — Entre Geocapitals SpA (Parte A), SingularX (Parte B) y ZBALA LATAM (Parte C) — en conjunto, \"Las Partes\" — se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) para permitir el intercambio de información técnica, comercial y financiera relativa a ofertas de compra de concentrados minerales y activos mineros en Chile.",
+        text: 'Between Geocapitals SpA (Party A), SingularX (Party B) and ZBALA LATAM (Party C) — collectively "The Parties" — this Non-Circumvention Non-Disclosure Agreement (NCNDA) is executed to enable the exchange of technical, commercial and financial information regarding purchase offers of mineral concentrates and mining assets in Chile. — Entre Geocapitals SpA (Parte A), SingularX (Parte B) y ZBALA LATAM (Parte C) — en conjunto, "Las Partes" — se celebra el presente Acuerdo de No Elusión y No Divulgación (NCNDA) para permitir el intercambio de información técnica, comercial y financiera relativa a ofertas de compra de concentrados minerales y activos mineros en Chile.',
       },
       {
         kind: "clauses",
@@ -314,8 +343,7 @@ export function buildAntimonyBrenaFicha(): GeneratedDoc {
     docType: "FICHA",
     reference: "GC-FICHA-SB-BRENA-202607-1",
     date: today(),
-    title:
-      "Ficha comercial — Antimonio en breña triturada (Sb 35–77% · Honduras · FOB)",
+    title: "Ficha comercial — Antimonio en breña triturada (Sb 35–77% · Honduras · FOB)",
     blocks: [
       {
         kind: "fields",
@@ -328,14 +356,20 @@ export function buildAntimonyBrenaFicha(): GeneratedDoc {
           ["Volumen disponible", "100 MT/mes o más (escalable)"],
           ["Periodo de contrato", "12 meses renovables"],
           ["Incoterm", "FOB puerto Honduras"],
-          ["Puertos de embarque", "Puerto Cortés · Puerto Castilla (Atlántico) · San Lorenzo (Pacífico)"],
-          ["Pago", "SBLC 100% irrevocable, transferible y divisible · SWIFT MT103 contra inspección"],
+          [
+            "Puertos de embarque",
+            "Puerto Cortés · Puerto Castilla (Atlántico) · San Lorenzo (Pacífico)",
+          ],
+          [
+            "Pago",
+            "SBLC 100% irrevocable, transferible y divisible · SWIFT MT103 contra inspección",
+          ],
           ["Acceso", "Bajo NDA / NCNDA · Data room controlado por Geocapitals"],
         ],
       },
       {
         kind: "paragraph",
-        text: "Oferta corporativa suave (SCO) originada por Corporación Minera A&D S.A. (Honduras) y canalizada por Geocapitals como advisor de la operación. Producto: antimonio en breña triturada, granulometría 1\" a finos, con escala de precio FOB en función de la ley Sb (35% a 77%). La operación se estructura para compradores directos con proof of funds y capacidad de emisión de SBLC 100% irrevocable, transferible y divisible, con pago en puerto de carga contra informes de inspección y documentos de embarque vía SWIFT MT103.",
+        text: 'Oferta corporativa suave (SCO) originada por Corporación Minera A&D S.A. (Honduras) y canalizada por Geocapitals como advisor de la operación. Producto: antimonio en breña triturada, granulometría 1" a finos, con escala de precio FOB en función de la ley Sb (35% a 77%). La operación se estructura para compradores directos con proof of funds y capacidad de emisión de SBLC 100% irrevocable, transferible y divisible, con pago en puerto de carga contra informes de inspección y documentos de embarque vía SWIFT MT103.',
       },
       {
         kind: "table",
@@ -368,7 +402,10 @@ export function buildAntimonyBrenaFicha(): GeneratedDoc {
       {
         kind: "fields",
         rows: [
-          ["Representante legal (origen)", "Delmer Francisco Munguía Pagoada — Corporación Minera A&D S.A."],
+          [
+            "Representante legal (origen)",
+            "Delmer Francisco Munguía Pagoada — Corporación Minera A&D S.A.",
+          ],
           ["Gerente general (origen)", "César González Díaz — Corporación Minera A&D S.A."],
           ["Advisor comercial", "Geocapitals SpA — info@geocapitals.com · +56 9 6218 4071"],
           ["Fecha SCO base", "24 de junio de 2026"],
@@ -410,10 +447,7 @@ export const SPECIAL_DOCS: Array<{
     summary:
       "Confidencialidad mutua para due diligence del proyecto aurífero NI 43-101 (4,0 Moz Au · USD 900 M).",
     build: buildGoldNda,
-    signers: [
-      { role: "Por Geocapitals SpA" },
-      { role: "Por el Receptor" },
-    ],
+    signers: [{ role: "Por Geocapitals SpA" }, { role: "Por el Receptor" }],
   },
   {
     id: "gold-ficha",
@@ -464,9 +498,7 @@ export const SPECIAL_DOCS: Array<{
     build: buildAntimonyBrenaFicha,
     signers: [{ role: "Acuse de recibo" }],
   },
-
 ];
-
 
 export async function downloadSpecialDoc(id: SpecialDocId): Promise<void> {
   const entry = SPECIAL_DOCS.find((d) => d.id === id);
