@@ -179,6 +179,57 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
     ],
     sections: [
       {
+        eyebrow: "Datos de entrada",
+        title: "Datasets, procedencia y cobertura",
+        blocks: [
+          {
+            kind: "kv",
+            items: [
+              ["Sensor", data.coverage.sensor],
+              ["Fecha de corrida", data.runDate || "s/d"],
+              ["Escenas utilizadas", data.coverage.scenesUsed != null ? String(data.coverage.scenesUsed) : "s/d"],
+              ["CRS de salida", "WGS84 / EPSG:4326"],
+              ["Fuente", "Corrida satelital almacenada en GeoCapitals"],
+              ["Procedencia", "DERIVED / INTERPRETED — no verificado en terreno"],
+            ],
+          },
+        ],
+      },
+      {
+        eyebrow: "Calidad de datos",
+        title: "Cobertura y límites de interpretación",
+        blocks: [
+          {
+            kind: "kv",
+            items: [
+              ["Superficie interpretable típica", data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"],
+              ["Mejor caso", data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"],
+              ["Conclusivo", data.coverage.conclusive ? "Sí" : "No"],
+              ["Tenencia", data.coverage.tenureNote || "Requiere verificación contra catastro vigente"],
+            ],
+          },
+          {
+            kind: "text",
+            body: data.coverage.headline || "La cobertura espectral debe interpretarse como screening regional y no como identificación mineral.",
+          },
+        ],
+      },
+      {
+        eyebrow: "Metodología",
+        title: "Cómo se generan y priorizan las anomalías",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "Screening Sentinel-2 L2A mediante razones de banda y realces relativos al fondo del área de interés.",
+              "Ranking determinista por puntaje de anomalía; el puntaje no representa ley ni concentración.",
+              "Cruce espacial con la tenencia conocida: sólo anomalías dentro de la tenencia pueden originar una plataforma conceptual.",
+              "La propuesta de collar es una salida de planificación y permanece PROPOSED hasta completar ground truth y revisión técnica.",
+            ],
+          },
+        ],
+      },
+      {
         eyebrow: "Detección",
         title: "Anomalías espectrales sobre el AOI",
         deck: true,
@@ -210,6 +261,23 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
           },
         ],
       },
+      {
+        eyebrow: "Antes de perforar",
+        title: "Trabajos previos obligatorios",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "Topografía de detalle y replanteo en terreno de cada collar propuesto.",
+              "Mapeo geológico-estructural y canaletas sobre las anomalías de mayor puntaje.",
+              "Verificación de servidumbres, accesos y permisos sectoriales de cada plataforma.",
+              "Protocolo QA/QC definido y laboratorio acreditado contratado antes del primer metro.",
+              "Revisión de la malla por persona competente una vez incorporado el mapeo de terreno.",
+            ],
+          },
+        ],
+      },
+
       {
         eyebrow: "Propuesta",
         title: "Malla de sondajes de fase 1",
@@ -244,22 +312,6 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
             head: ["Sondaje", "Índice que la origina", "Objetivo geológico"],
             widths: [0.15, 0.33, 0.52],
             rows: collars.map((c) => [c.code, indexLabel(c.indexCode), c.objective]),
-          },
-        ],
-      },
-      {
-        eyebrow: "Antes de perforar",
-        title: "Trabajos previos obligatorios",
-        blocks: [
-          {
-            kind: "bullets",
-            items: [
-              "Topografía de detalle y replanteo en terreno de cada collar propuesto.",
-              "Mapeo geológico-estructural y canaletas sobre las anomalías de mayor puntaje.",
-              "Verificación de servidumbres, accesos y permisos sectoriales de cada plataforma.",
-              "Protocolo QA/QC definido y laboratorio acreditado contratado antes del primer metro.",
-              "Revisión de la malla por persona competente una vez incorporado el mapeo de terreno.",
-            ],
           },
         ],
       },
