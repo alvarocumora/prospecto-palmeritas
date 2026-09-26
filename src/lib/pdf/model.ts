@@ -4,6 +4,7 @@
  * (deck de inversión 16:9, one-pager y dossier técnico) leen de aquí.
  */
 import type { BarDatum, MapPoint, Slice } from "./brand/kit";
+import type { EvidenceClass, ReportProfile } from "./architecture";
 
 export type DocKpi = { label: string; value: string; note?: string };
 
@@ -14,7 +15,15 @@ export type EvidenceStatus =
   | "DERIVED"
   | "CONCEPTUAL"
   | "PENDING_DD";
-export type DataQualityFlag = { status: EvidenceStatus; label: string; detail: string };
+export type DataQualityFlag = {
+  status: EvidenceStatus;
+  label: string;
+  detail: string;
+  /** Canonical provenance class used by Report Architecture v4. */
+  provenance?: EvidenceClass;
+  source?: string;
+  confidence?: "high" | "medium" | "low";
+};
 
 export type DocBlock =
   | { kind: "text"; body: string }
@@ -33,6 +42,8 @@ export type DocSection = {
 };
 
 export type ProjectDoc = {
+  /** Narrative contract. Defaults to technical for backwards compatibility. */
+  reportProfile?: ReportProfile;
   code: string;
   name: string;
   subtitle: string;
