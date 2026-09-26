@@ -10,7 +10,7 @@ import type { LeafletNS } from "./types";
  */
 export function buildGeophysicsOverlays(L: LeafletNS) {
   const emag2 = L.tileLayer.wms(
-    "https://gis.ngdc.noaa.gov/arcgis/services/EMAG2_V3/MapServer/WMSServer",
+    "https://gis.ngdc.noaa.gov/arcgis/services/EMAG2v3/ImageServer/WMSServer",
     {
       layers: "0",
       format: "image/png",
@@ -40,8 +40,8 @@ export function buildGeophysicsOverlays(L: LeafletNS) {
   );
 
   return {
-    "Magnetometría EMAG2 (regional)": emag2,
-    "Gravimetría Bouguer WGM2012 (regional)": wgm2012,
-    "Hillshade SRTM (Esri)": hillshade,
+    "Anomalía magnética EMAG2 v3 · regional": emag2,
+    "Anomalía Bouguer WGM2012 · regional": wgm2012,
+    "Relieve / hillshade": hillshade,
   };
 }
