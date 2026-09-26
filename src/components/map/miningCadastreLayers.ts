@@ -3,12 +3,6 @@ import { SNGM_CONCESIONES_URL, sngmQueryGeoJSON } from "@/lib/sngm";
 
 export type CadastreMatch = "official" | "project_exact" | "project_candidate";
 
-const esc = (v: unknown) =>
-  String(v ?? "—").replace(
-    /[&<>"']/g,
-    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
-  );
-
 function roleOf(p: Record<string, unknown>) {
   const n = String(p.NUMERO_ROL ?? "").trim();
   const dv = String(p.DV_ROL ?? "").trim();
