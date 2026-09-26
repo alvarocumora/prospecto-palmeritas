@@ -48,6 +48,7 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
   const top = anomalies.slice(0, 12);
 
   return {
+    reportProfile: "targeting",
     code: `${CHOLQUI.code}-SAT`,
     name: `${CHOLQUI.name} — Targets satelitales`,
     subtitle: "Anomalías espectrales y malla de sondajes propuesta",
@@ -145,27 +146,32 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
     dataQuality: [
       {
         status: "DERIVED",
+        provenance: "DERIVED",
         label: "Anomalías espectrales",
         detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
       },
       {
         status: "PENDING_DD",
+        provenance: "PENDING_DD",
         label: "Tenencia de las anomalías fuera del set conocido",
         detail: `${summary.outsideTenure} anomalías caen fuera de las pertenencias conocidas: contexto regional, sin plataforma propuesta hasta verificar tenencia.`,
       },
       {
         status: "CONCEPTUAL",
+        provenance: "PROPOSED",
         label: "Malla de sondajes",
         detail:
           "Propuesta de exploración calculada sobre las anomalías. No es un programa comprometido ni una estimación de recursos.",
       },
       {
         status: "VERIFIED",
+        provenance: "CERTIFIED",
         label: "Ensayes de superficie",
         detail: `${CHOLQUI_ASSAYS.length} muestras puntuales con informe de laboratorio firmado.`,
       },
       {
         status: "PENDING_DD",
+        provenance: "PENDING_DD",
         label: "Topografía y permisos",
         detail:
           "Las coordenadas de collar son preliminares: requieren topografía, acceso, servidumbres y permisos sectoriales.",
