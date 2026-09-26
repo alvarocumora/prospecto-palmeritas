@@ -3,6 +3,8 @@ import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
 import { CholquiSatellitePanel } from "./components/CholquiSatellitePanel";
 import { CholquiGeologicalEvidenceMap } from "./components/CholquiGeologicalEvidenceMap";
+import { CholquiSatelliteTargetsPanel } from "./components/CholquiSatelliteTargetsPanel";
+
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
@@ -65,6 +67,8 @@ export function FrancoDashboard() {
         <CholquiScenariosPanel />
         <CholquiMinePlanPanel />
         <CholquiSatellitePanel />
+        <CholquiSatelliteTargetsPanel />
+
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
 
