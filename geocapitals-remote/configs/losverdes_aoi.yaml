@@ -1,0 +1,19 @@
+name: losverdes
+# AOI de los frentes La Guanaca / Los Verdes / Castellana (Tilama, Coquimbo). WGS84.
+aoi:
+  crs: EPSG:4326
+  bbox: [-71.128, -32.062, -71.088, -32.018]
+output_crs: EPSG:32719
+seasons:
+  months: [2, 3, 4]
+  years: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  max_cloud_pct: 10
+masks:
+  ndvi_threshold: 0.25
+  ndvi_sensitivity: [0.20, 0.25, 0.30]
+structure:
+  known_strikes_deg: []
+  min_lineament_length_m: 150
+cadastre:
+  source: sernageomin_wfs
+  buffer_m: 60
