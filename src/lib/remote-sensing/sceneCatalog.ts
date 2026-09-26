@@ -49,33 +49,48 @@ export async function searchSentinel2AnalysisScenes(input: {
   to: string;
   maxCloudPct?: number;
   limit?: number;
+  withAssets?: boolean;
 }) {
-  const res = await fetch(`${STAC}/search`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      collections: ["sentinel-2-l2a"],
-      bbox: input.bbox,
-      datetime: `${input.from}/${input.to}`,
-      query: { "eo:cloud_cover": { lt: input.maxCloudPct ?? 25 } },
-      limit: input.limit ?? 12,
-    }),
-  });
+  const withAssets = input.withAssets ?? true;
+  let res: Response;
+  try {
+    res = await fetch(`${STAC}/search`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        collections: ["sentinel-2-l2a"],
+        bbox: input.bbox,
+        datetime: `${input.from}/${input.to}`,
+        query: { "eo:cloud_cover": { lt: input.maxCloudPct ?? 25 } },
+        limit: input.limit ?? 12,
+      }),
+    });
+  } catch {
+    return { ok: false, error: "STAC_UNREACHABLE", scenes: [] as AnalysisScene[] };
+  }
   if (!res.ok) return { ok: false, error: `STAC ${res.status}`, scenes: [] as AnalysisScene[] };
   const j = (await res.json()) as { features?: Feature[] };
-  const scenes = await Promise.all(
-    (j.features ?? []).map(async (f): Promise<AnalysisScene> => {
-      const p = f.properties ?? {};
-      return {
-        id: String(f.id ?? ""),
-        sensor: "sentinel-2-l2a",
-        datetime: String(p.datetime ?? ""),
-        cloudPct: typeof p["eo:cloud_cover"] === "number" ? (p["eo:cloud_cover"] as number) : null,
-        sourceUrl: (f.links ?? []).find((l) => l.rel === "self")?.href ?? null,
-        assets: await analysisAssets(f),
-      };
-    }),
-  );
+  const scenes: AnalysisScene[] = [];
+  // Sequential signing avoids Planetary Computer rate limits (HTTP 429).
+  for (const f of j.features ?? []) {
+    const p = f.properties ?? {};
+    let assets: SentinelAssets | null = null;
+    if (withAssets) {
+      try {
+        assets = await analysisAssets(f);
+      } catch {
+        assets = null;
+      }
+    }
+    scenes.push({
+      id: String(f.id ?? ""),
+      sensor: "sentinel-2-l2a",
+      datetime: String(p.datetime ?? ""),
+      cloudPct: typeof p["eo:cloud_cover"] === "number" ? (p["eo:cloud_cover"] as number) : null,
+      sourceUrl: (f.links ?? []).find((l) => l.rel === "self")?.href ?? null,
+      assets,
+    });
+  }
   scenes.sort((a, b) => (a.datetime < b.datetime ? 1 : -1));
   return { ok: true, error: null, scenes };
 }
@@ -86,34 +101,10 @@ export async function searchSentinel2Scenes(input: {
   maxCloudPct?: number;
   limit?: number;
 }) {
-  // Listado de escenas para la UI: NO firma assets (se descartaban igual). Evita
-  // la ráfaga de ~72 firmas por carga que disparaba PC_SIGN_429.
-  const res = await fetch(`${STAC}/search`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      collections: ["sentinel-2-l2a"],
-      bbox: input.bbox,
-      datetime: `${input.from}/${input.to}`,
-      query: { "eo:cloud_cover": { lt: input.maxCloudPct ?? 25 } },
-      limit: input.limit ?? 12,
-    }),
-  });
-  if (!res.ok)
-    return { ok: false, error: `STAC ${res.status}`, scenes: [] as RemoteSensingScene[] };
-  const j = (await res.json()) as { features?: Feature[] };
-  const scenes: RemoteSensingScene[] = (j.features ?? []).map((f) => {
-    const p = f.properties ?? {};
-    return {
-      id: String(f.id ?? ""),
-      sensor: "sentinel-2-l2a",
-      datetime: String(p.datetime ?? ""),
-      cloudPct: typeof p["eo:cloud_cover"] === "number" ? (p["eo:cloud_cover"] as number) : null,
-      sourceUrl: (f.links ?? []).find((l) => l.rel === "self")?.href ?? null,
-    };
-  });
-  scenes.sort((a, b) => (a.datetime < b.datetime ? 1 : -1));
-  return { ok: true, error: null, scenes };
+  // Listado para la UI: sin firmar assets (withAssets:false) -> evita la ráfaga
+  // de firmas que disparaba PC_SIGN_429. La firma resiliente cubre el path de análisis.
+  const r = await searchSentinel2AnalysisScenes({ ...input, withAssets: false });
+  return { ok: r.ok, error: r.error, scenes: r.scenes.map(({ assets: _, ...s }) => s) };
 }
 export async function searchScenesForContext(
   context: ProjectSpatialContext,
