@@ -280,6 +280,18 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Enlace canónico", CHOLQUI_LIVE_URL],
     ],
   );
+  table(
+    ["Ruta de lectura", "Secciones"],
+    [
+      ["Tesis", "01 Resumen ejecutivo"],
+      ["Evidencia", "02 Evidencia y confianza · 03 Contexto geoespacial · 04–05 evidencia técnica"],
+      ["Economía", "06 Economía preliminar · 07 Plan minero y sensibilidades"],
+      ["Decisión", "08 Brechas críticas · 09 Estructura de inversión"],
+      ["Control", "10 Procedencia del dato · 11 Riesgos"],
+    ],
+    true,
+  );
+
   h1("01 · Resumen ejecutivo", "Qué es el Proyecto Cholqui");
   para(
     `${CHOLQUI.name} es un proyecto de exploración avanzada de cobre, oro y plata en ${CHOLQUI.location}. Controla aproximadamente ${CHOLQUI.areaHa.toLocaleString("es-CL")} hectáreas mediante ${CHOLQUI.pedimentos} pedimentos y ${CHOLQUI.pertenencias} pertenencias, que rodean a ${LAS_MINITAS.name}, una faena de un tercero en producción sobre la misma estructura geológica. Acceso: ${CHOLQUI.access}.`,
