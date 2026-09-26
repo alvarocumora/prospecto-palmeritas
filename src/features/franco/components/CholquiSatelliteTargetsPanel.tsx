@@ -224,10 +224,15 @@ export function CholquiSatelliteTargetsPanel() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-b border-hairline bg-surface-2">
             {[
-              ["Anomalías", String(data.summary.anomalies)],
               [
-                "Puntaje máximo",
-                data.summary.maxScore != null ? data.summary.maxScore.toFixed(2) : "s/d",
+                "Anomalías",
+                `${data.summary.anomalies} · ${data.summary.withinTenure} en tenencia`,
+              ],
+              [
+                "Superficie interpretable",
+                data.coverage.typicalPct != null
+                  ? `${num(data.coverage.typicalPct, 1)} % (mejor caso ${data.coverage.bestCasePct != null ? num(data.coverage.bestCasePct, 1) : "s/d"} %)`
+                  : "s/d",
               ],
               ["Plataformas propuestas", String(data.summary.collars)],
               ["Metraje propuesto", `${num(data.summary.totalMeters)} m`],
