@@ -25,7 +25,8 @@
     "candidatos_dentro_concesion": 3,
     "candidatos_fuera_concesion": 12,
     "nota_espacial": "Bandera dentro/fuera calculada SOLO contra las pertenencias de franco_pertenencias.geojson (TOKI/PALLOCABE/DOS MARIAS). Si el proyecto incluye ESPERANZA/EUROPA u otras que no están en ese archivo, recalcular contra el set completo de concesiones. 3/15 dentro de las conocidas; las de fuera son contexto regional (no se puede perforar fuera de la tenencia).",
-    "schema": "lovable-compatible (index_code/score/Polygon)"
+    "schema": "lovable-compatible (index_code/score/Polygon)",
+    "tenencia_fuente": "SERNAGEOMIN (titular De Martino/Gianfranco, 29 concesiones)"
   },
   "features": [
     {
@@ -62,7 +63,7 @@
         "severity": "alta",
         "score": 0.919,
         "z_score": 8.27,
-        "dentro_concesion": true,
+        "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=8.27 (gossan 3.5). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -140,7 +141,7 @@
         "severity": "alta",
         "score": 0.846,
         "z_score": 7.61,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=7.61 (gossan 4.36). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -218,7 +219,7 @@
         "severity": "alta",
         "score": 0.756,
         "z_score": 6.8,
-        "dentro_concesion": true,
+        "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=6.8 (gossan 2.59). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -335,7 +336,7 @@
         "severity": "alta",
         "score": 0.734,
         "z_score": 6.61,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=6.61 (gossan 3.95). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -374,7 +375,7 @@
         "severity": "alta",
         "score": 0.724,
         "z_score": 6.52,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=6.52 (gossan 2.51). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -452,7 +453,7 @@
         "severity": "media",
         "score": 0.657,
         "z_score": 5.91,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.91 (gossan 2.94). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -491,7 +492,7 @@
         "severity": "media",
         "score": 0.656,
         "z_score": 5.9,
-        "dentro_concesion": true,
+        "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.9 (gossan 3.24). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -530,7 +531,7 @@
         "severity": "media",
         "score": 0.641,
         "z_score": 5.77,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.77 (gossan 3.11). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -569,7 +570,7 @@
         "severity": "media",
         "score": 0.639,
         "z_score": 5.75,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.75 (gossan 4.51). DERIVADO Sentinel-2, no verificado en terreno."
       }
@@ -608,7 +609,7 @@
         "severity": "media",
         "score": 0.634,
         "z_score": 5.71,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.71 (gossan 2.82). DERIVADO Sentinel-2, no verificado en terreno."
       }

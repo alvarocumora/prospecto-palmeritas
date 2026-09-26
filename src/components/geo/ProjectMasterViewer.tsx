@@ -108,10 +108,21 @@ export function ProjectMasterViewer({
 
       const sel = (kind: LayerKey, props: Record<string, unknown>) => setSelected({ kind, props });
 
-      // --- Tenencia (concesiones)
+      // --- Tenencia (catastro SERNAGEOMIN: tenencia del proyecto vs contexto oficial)
       if (concessions?.features?.length) {
         const g = L.geoJSON(concessions as never, {
-          style: { color: "#e8a33d", weight: 1.4, fillOpacity: 0.04 },
+          style: (f?: Feature) => {
+            const own = Boolean(f?.properties?.es_tenencia_proyecto);
+            return own
+              ? { color: "#e8a33d", weight: 1.6, fillOpacity: 0.06 }
+              : {
+                  color: "#94a3b8",
+                  weight: 0.8,
+                  opacity: 0.6,
+                  dashArray: "3 3",
+                  fillOpacity: 0.02,
+                };
+          },
           onEachFeature: (f: Feature, layer) =>
             layer.on("click", () =>
               sel("tenencia", (f.properties ?? {}) as Record<string, unknown>),
@@ -289,7 +300,7 @@ export function ProjectMasterViewer({
           <div className="mb-1 px-1 font-semibold text-content">Capas</div>
           {(
             [
-              ["tenencia", "Tenencia (concesiones)"],
+              ["tenencia", "Catastro SERNAGEOMIN (tenencia + oficial)"],
               ["halos", "Halos espectrales (Sentinel-2)"],
               ["sondajes", "Malla de sondajes (propuesta)"],
               ["ensayes", "Ensayes certificados"],
@@ -418,12 +429,16 @@ function Inspector({
       ["Objetivo", p.objetivo],
     ];
   } else {
-    title = `Concesión ${p.code ?? p.name ?? ""}`;
-    prov = "certificado";
+    title = `Concesión ${p.nombre ?? ""}`;
+    prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
     rows = [
-      ["Nombre", p.name],
-      ["Rol/código", p.code],
-      ["Titular", p.holder],
+      ["Rol", p.rol],
+      ["Titular", p.titular],
+      ["Situación", p.situacion],
+      ["Tipo", p.tipo],
+      ["Hectáreas", p.hectareas],
+      ["Comuna", p.comuna],
+      ["Tenencia del proyecto", p.es_tenencia_proyecto ? "Sí" : "No (catastro oficial)"],
     ];
   }
 
