@@ -123,7 +123,7 @@ export function TradeNegotiationPanel({
     refetchInterval: 45_000,
   });
 
-  const rows = data ?? [];
+  const rows = useMemo(() => data ?? [], [data]);
   const openOffers = useMemo(() => rows.filter((r) => r.status === "proposed"), [rows]);
 
   const submitPropose = async (args: ProposeArgs) => {
