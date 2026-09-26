@@ -80,8 +80,8 @@ export function useSelectedModule(
       try {
         window.localStorage.setItem(SELECTED_KEY, "all");
       } catch {
-          // localStorage may be unavailable in restricted browser contexts.
-        }
+        // localStorage may be unavailable in restricted browser contexts.
+      }
     }
   }, [available, selected]);
 
@@ -90,8 +90,8 @@ export function useSelectedModule(
     try {
       window.localStorage.setItem(SELECTED_KEY, m);
     } catch {
-          // localStorage may be unavailable in restricted browser contexts.
-        }
+      // localStorage may be unavailable in restricted browser contexts.
+    }
   };
 
   return [selected, change];
