@@ -40,6 +40,16 @@ const r = await supabase.rpc("report_readiness", { p_project_id: projectId });
 PDF con identidad GeoCapitals reutilizando el motor `geocapitals-docs/` (mismos tokens de marca,
 "Por confirmar" en ámbar, marca de agua para secciones modeladas/sintéticas).
 
-## Próximo (Fase 1)
-Validación de intake (CRS de muestras/estaciones — hoy `sampling_results` no versiona CRS del
-easting/northing; declararlo) y enlace muestra↔concesión para el marco catastral.
+## Fase 1 — intake (hecho, migración `20260926160000`)
+`sampling_results` ahora tiene `crs_epsg` (CRS declarado del easting/northing; NULL = sin
+declarar, no se adivina). `sample_intake(project_id)` reporta cobertura de posición/CRS,
+reproyecta a WGS84 solo con CRS declarado y válido, y **enlaza cada muestra a la concesión que
+la contiene** (marco catastral del informe). Problemas que marca: muestras con posición pero sin
+CRS, CRS inválido, muestras fuera de toda concesión.
+
+Uso en la UI de carga: al importar muestras, exigir `crs_epsg`; mostrar `sample_intake` como
+checklist de calidad antes de habilitar el informe (junto con `report_readiness`).
+
+## Próximo (Fase 2)
+Procesamiento: rotular las salidas de inversión (SimPEG, `geoscience_compute_jobs`) como
+"modelo", interpolación de leyes con incertidumbre, y Nivel 0 satelital.
