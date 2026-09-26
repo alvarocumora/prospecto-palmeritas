@@ -174,7 +174,7 @@ export function buildDrillGrid(
         indexCode: a.indexCode,
         lat: a.lat,
         lng: a.lng,
-        azimuthDeg: azimuthFor(a.lng, center.lng),
+        azimuthDeg: azimuthFor(a.lat, a.lng, center),
         dipDeg: -60,
         depthM: depthFor(score),
         priority: priorityOf(score),
