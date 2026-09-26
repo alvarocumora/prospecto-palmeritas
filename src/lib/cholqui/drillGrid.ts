@@ -113,15 +113,38 @@ function priorityOf(score: number): ProposedCollar["priority"] {
   return "Baja";
 }
 
+/** Rumbo (bearing) de un punto hacia otro, en grados desde el norte. */
+export function bearingDeg(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const dx = (bLng - aLng) * Math.cos((((aLat + bLat) / 2) * Math.PI) / 180);
+  const dy = bLat - aLat;
+  const deg = (Math.atan2(dx, dy) * 180) / Math.PI;
+  return (deg + 360) % 360;
+}
+
+function angularGap(a: number, b: number): number {
+  const d = Math.abs(((a - b + 540) % 360) - 180);
+  return d;
+}
+
 /**
  * Perforar en ángulo a la estructura: el azimut es perpendicular al rumbo
- * dominante (N20E), orientado hacia el centro del distrito para cortar el
- * cuerpo interpretado y no seguirlo.
+ * dominante (N20E). De las dos perpendiculares posibles se elige la que
+ * apunta hacia el eje del distrito, para cortar el cuerpo interpretado y no
+ * seguirlo.
  */
-function azimuthFor(lng: number, centerLng: number): number {
+function azimuthFor(
+  lat: number,
+  lng: number,
+  center: { lat: number; lng: number },
+): number {
   const perpendicular = (DOMINANT_STRIKE_DEG + 90) % 360; // 110 grados
-  return lng >= centerLng ? perpendicular : (perpendicular + 180) % 360;
+  const opposite = (perpendicular + 180) % 360; // 290 grados
+  const toCenter = bearingDeg(lat, lng, center.lat, center.lng);
+  return angularGap(perpendicular, toCenter) <= angularGap(opposite, toCenter)
+    ? perpendicular
+    : opposite;
 }
+
 
 /** Profundidad propuesta: 120 m base más el realce por puntaje, en tramos de 10 m. */
 function depthFor(score: number): number {
