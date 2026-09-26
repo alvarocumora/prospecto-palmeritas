@@ -34,6 +34,7 @@ export type MasterViewerProps = {
   concessions?: FeatureCollection | null;
   anomalies?: FeatureCollection | null;
   drillGrid?: FeatureCollection | null;
+  pedimentos?: FeatureCollection | null;
   assays?: AssayPoint[];
   coverage?: { typicalPct?: number; bestcasePct?: number; conclusive?: boolean } | null;
   height?: number;
@@ -52,7 +53,7 @@ const ALTERATION_LABEL: Record<string, string> = {
   STRUCTURAL_LINEAMENTS: "Lineamiento estructural",
 };
 
-type LayerKey = "tenencia" | "halos" | "sondajes" | "ensayes";
+type LayerKey = "tenencia" | "halos" | "sondajes" | "ensayes" | "pedimentos";
 type Selected = { kind: LayerKey; props: Record<string, unknown> } | null;
 
 type ProvKind = "certificado" | "derivado" | "conceptual" | "contexto";
@@ -69,6 +70,7 @@ export function ProjectMasterViewer({
   concessions,
   anomalies,
   drillGrid,
+  pedimentos,
   assays = [],
   coverage,
   height = 620,
@@ -83,6 +85,7 @@ export function ProjectMasterViewer({
     halos: true,
     sondajes: true,
     ensayes: true,
+    pedimentos: true,
   });
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
@@ -203,6 +206,24 @@ export function ProjectMasterViewer({
         groups.current.ensayes = L.layerGroup(items).addTo(map);
       }
 
+      // --- Pedimentos propuestos (rectángulo dorado punteado)
+      if (pedimentos?.features?.length) {
+        const g = L.geoJSON(pedimentos as never, {
+          style: {
+            color: "#b98a2f",
+            weight: 2,
+            dashArray: "6 4",
+            fillColor: "#b98a2f",
+            fillOpacity: 0.1,
+          },
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () =>
+              sel("pedimentos", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+        });
+        groups.current.pedimentos = L.layerGroup([g]).addTo(map);
+      }
+
       // Encuadrar a lo que exista
       try {
         const bounds = L.latLngBounds([]);
@@ -304,6 +325,7 @@ export function ProjectMasterViewer({
               ["halos", "Halos espectrales (Sentinel-2)"],
               ["sondajes", "Malla de sondajes (propuesta)"],
               ["ensayes", "Ensayes certificados"],
+              ["pedimentos", "Pedimentos propuestos"],
             ] as [LayerKey, string][]
           ).map(([k, label]) => (
             <label key={k} className="flex cursor-pointer items-center gap-2 px-1 py-0.5">
@@ -428,6 +450,17 @@ function Inspector({
       ["Este/Norte (UTM)", `${num(p.este_utm, 0)} / ${num(p.norte_utm, 0)}`],
       ["Objetivo", p.objetivo],
     ];
+  } else if (selected.kind === "pedimentos") {
+    const cn = (p.cara_norte_utm ?? {}) as Record<string, unknown>;
+    const lados = (p.lados_m ?? {}) as Record<string, unknown>;
+    title = `Pedimento ${p.code ?? ""}`;
+    prov = "conceptual";
+    rows = [
+      ["Superficie", p.area_ha != null ? `${p.area_ha} ha` : undefined],
+      ["Lados (m)", `${lados["E-W"] ?? "—"} × ${lados["N-S"] ?? "—"}`],
+      ["Cara norte", cn.N != null ? `E ${cn.E_centro} · N ${cn.N}` : undefined],
+      ["Datum", p.datum ?? "UTM 19S (SIRGAS)"],
+    ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
     prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
@@ -456,11 +489,15 @@ function Inspector({
       {rows.map(([k, v]) => (
         <Row key={k} k={k} v={v} />
       ))}
-      {(selected.kind === "halos" || selected.kind === "sondajes") && (
+      {(selected.kind === "halos" ||
+        selected.kind === "sondajes" ||
+        selected.kind === "pedimentos") && (
         <div className="mt-3 rounded bg-surface-2 p-2 text-[10px] text-content-subtle">
           {selected.kind === "halos"
             ? "Detección satelital (Sentinel-2). Anomalía espectral, no identificación mineral ni extensión medida. Requiere verificación de terreno."
-            : "Plataforma propuesta (conceptual). No perforada; no estima recursos ni reservas (NI 43-101)."}
+            : selected.kind === "sondajes"
+              ? "Plataforma propuesta (conceptual). No perforada; no estima recursos ni reservas (NI 43-101)."
+              : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
         </div>
       )}
     </div>
