@@ -68,13 +68,11 @@ export const getProjectDueDiligence = createServerFn({ method: "GET" })
     const sb = context.supabase;
     const pid = data.projectId;
 
-    const count = async (table: string, extra?: (q: any) => any) => {
-      let q = sb
+    const count = async (table: string) => {
+      const { count: c } = await sb
         .from(table as never)
         .select("id", { count: "exact", head: true })
         .eq("project_id", pid);
-      if (extra) q = extra(q);
-      const { count: c } = await q;
       return c ?? 0;
     };
 
