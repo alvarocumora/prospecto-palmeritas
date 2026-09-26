@@ -172,7 +172,9 @@ function VerifyPage() {
       await navigator.clipboard.writeText(canonicalUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {}
+    } catch {
+      // Clipboard access can be denied by the browser; verification remains usable.
+    }
   };
 
   return (
