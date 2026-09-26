@@ -86,11 +86,7 @@ export function assertSimpegMagneticsPayload(payload: SimpegMagneticsPayload): v
   finite(payload.mesh.cell_size_m, "mesh.cell_size_m");
   finite(payload.mesh.padding_m, "mesh.padding_m");
   finite(payload.mesh.depth_m, "mesh.depth_m");
-  if (
-    payload.mesh.cell_size_m <= 0 ||
-    payload.mesh.padding_m < 0 ||
-    payload.mesh.depth_m <= 0
-  ) {
+  if (payload.mesh.cell_size_m <= 0 || payload.mesh.padding_m < 0 || payload.mesh.depth_m <= 0) {
     throw new Error("SIMPEG_MAGNETICS_MESH_INVALID");
   }
 
