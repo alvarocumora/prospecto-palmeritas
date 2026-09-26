@@ -14,7 +14,11 @@ export async function resolveProjectCadastre(
 ): Promise<ProjectCadastreContext> {
   if (context.countryCode !== "CL") {
     const result = await searchCadastre({
-      scope: { kind: "bbox", country: context.countryCode as CadastreCountry, bbox: context.bboxWgs84 },
+      scope: {
+        kind: "bbox",
+        country: context.countryCode as CadastreCountry,
+        bbox: context.bboxWgs84,
+      },
     });
     return { projectId: context.projectId, result, queriedAt: new Date().toISOString() };
   }
