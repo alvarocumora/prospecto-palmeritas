@@ -23,7 +23,6 @@ import {
   TestTube2,
   ShieldCheck,
   Satellite,
-  Box,
   Activity,
   RefreshCw,
   Wallet,
@@ -448,4 +447,3 @@ function renderKpis(accountType: AccountType, k: ExecutiveKpis | null, loading: 
 }
 
 // re-export helper icon used above to avoid unused-import lint when tree-shaking
-export const __unused = Box;
