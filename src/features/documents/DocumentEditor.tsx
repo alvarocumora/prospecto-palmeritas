@@ -357,7 +357,9 @@ export function DocumentEditor({
         if (parsed.flowId) setFlowId(parsed.flowId);
         if (parsed.tokens) setFlowTokens(parsed.tokens);
       }
-    } catch {}
+    } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
   }, [flowStorageKey, user]);
 
   const refreshFlow = useCallback(async () => {
@@ -415,7 +417,9 @@ export function DocumentEditor({
           flowStorageKey,
           JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
         );
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       toast.success(
         `Flujo creado con ${res.tokens.length} firmantes en orden. Link del primero copiado.`,
       );
@@ -448,7 +452,9 @@ export function DocumentEditor({
         setFlowTokens(next);
         try {
           window.localStorage.setItem(flowStorageKey, JSON.stringify({ flowId, tokens: next }));
-        } catch {}
+        } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
         await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
         toast.success("Link regenerado y copiado.");
       } else {
@@ -490,7 +496,9 @@ export function DocumentEditor({
       setFlowSummary(null);
       try {
         window.localStorage.removeItem(flowStorageKey);
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       // Reconstruye los inputs desde las partes actuales del documento.
       const posKeys = ["A", "B", "C", "D"] as const;
       const fresh = parties.map((role, i) => {
@@ -523,7 +531,9 @@ export function DocumentEditor({
           flowStorageKey,
           JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
         );
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       await navigator.clipboard.writeText(buildSignUrl(res.tokens[0].token)).catch(() => {});
       toast.success(
         `Flujo re-sincronizado. #1 = ${fresh[0]?.name || fresh[0]?.role || "Parte A"}. Link del primero copiado.`,
