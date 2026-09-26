@@ -1,11 +1,28 @@
 export type MiningProvenance =
-  | "OFFICIAL" | "CERTIFIED" | "DOCUMENTARY" | "DECLARED" | "DERIVED" | "INTERPRETED";
+  | "OFFICIAL"
+  | "CERTIFIED"
+  | "DOCUMENTARY"
+  | "DECLARED"
+  | "DERIVED"
+  | "INTERPRETED";
 
 export type MiningAssetNodeType =
-  | "project" | "concession" | "target" | "geological_body" | "sample" | "assay"
-  | "drillhole" | "geophysics_dataset" | "geochemistry_dataset" | "interpretation"
-  | "resource_model" | "economic_model" | "investment_asset" | "production_batch"
-  | "commodity_lot" | "mineral_passport";
+  | "project"
+  | "concession"
+  | "target"
+  | "geological_body"
+  | "sample"
+  | "assay"
+  | "drillhole"
+  | "geophysics_dataset"
+  | "geochemistry_dataset"
+  | "interpretation"
+  | "resource_model"
+  | "economic_model"
+  | "investment_asset"
+  | "production_batch"
+  | "commodity_lot"
+  | "mineral_passport";
 
 export type MiningAssetNode = {
   id: string;
@@ -47,9 +64,20 @@ export type MineralPassport = {
 };
 
 export type TraceabilityEventType =
-  | "EXTRACTED" | "STOCKPILED" | "SAMPLED" | "ASSAYED" | "PROCESSED"
-  | "BLENDED" | "SPLIT" | "TRANSFERRED" | "SHIPPED" | "RECEIVED"
-  | "SMELTED" | "REFINED" | "RECYCLED" | "CERTIFIED";
+  | "EXTRACTED"
+  | "STOCKPILED"
+  | "SAMPLED"
+  | "ASSAYED"
+  | "PROCESSED"
+  | "BLENDED"
+  | "SPLIT"
+  | "TRANSFERRED"
+  | "SHIPPED"
+  | "RECEIVED"
+  | "SMELTED"
+  | "REFINED"
+  | "RECYCLED"
+  | "CERTIFIED";
 
 export type TraceabilityEventPayload = {
   passportId: string;
