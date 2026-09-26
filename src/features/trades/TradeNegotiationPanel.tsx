@@ -107,9 +107,12 @@ export function TradeNegotiationPanel({
   const { data, isLoading, refetch } = useQuery({
     queryKey,
     queryFn: async (): Promise<NegotiationRow[]> => {
-      const { data, error } = await supabase.rpc("get_trade_negotiation" as never, {
-        p_trade_id: tradeId,
-      } as never);
+      const { data, error } = await supabase.rpc(
+        "get_trade_negotiation" as never,
+        {
+          p_trade_id: tradeId,
+        } as never,
+      );
       if (error) throw new Error(error.message);
       return (data ?? []) as unknown as NegotiationRow[];
     },
@@ -147,11 +150,14 @@ export function TradeNegotiationPanel({
     }
     setBusy(offer.id);
     try {
-      const { error } = await supabase.rpc("respond_trade_terms" as never, {
-        p_offer_id: offer.id,
-        p_action: action,
-        p_note: note,
-      } as never);
+      const { error } = await supabase.rpc(
+        "respond_trade_terms" as never,
+        {
+          p_offer_id: offer.id,
+          p_action: action,
+          p_note: note,
+        } as never,
+      );
       if (error) throw new Error(error.message);
       toast.success(action === "accept" ? "Propuesta aceptada" : "Propuesta rechazada");
       await refetch();
