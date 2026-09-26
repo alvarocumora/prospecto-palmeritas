@@ -13,9 +13,9 @@ export function geophysicsRegistration(
     const synthetic = stations.length > 0 && stations.every((station) => station.is_synthetic);
     const methods = new Set<string>();
     if (stations.some((station) => station.mag_nt != null)) methods.add("magnetics");
-    if (stations.some((station) => station.ip_chargeability_mvv != null)) methods.add("induced_polarization");
-    if (stations.some((station) => station.ip_resistivity_ohmm != null))
-      methods.add("resistivity");
+    if (stations.some((station) => station.ip_chargeability_mvv != null))
+      methods.add("induced_polarization");
+    if (stations.some((station) => station.ip_resistivity_ohmm != null)) methods.add("resistivity");
     return {
       projectId,
       datasetType: "geophysics",
