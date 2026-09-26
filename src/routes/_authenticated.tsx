@@ -31,7 +31,8 @@ function AuthenticatedLayout() {
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
   const [selectedModule, setSelectedModule] = useSelectedModule(myModules?.modules);
-  const locale: "es" | "en" = (profile as { language?: string } | null)?.language === "en" ? "en" : "es";
+  const locale: "es" | "en" =
+    (profile as { language?: string } | null)?.language === "en" ? "en" : "es";
   const navigate = useNavigate();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
