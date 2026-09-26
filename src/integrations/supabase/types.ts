@@ -13992,6 +13992,7 @@ export type Database = {
           certificate: string | null
           created_at: string
           created_by: string
+          crs_epsg: number | null
           cu_pct: number | null
           depth_from: number | null
           depth_to: number | null
@@ -14024,6 +14025,7 @@ export type Database = {
           certificate?: string | null
           created_at?: string
           created_by: string
+          crs_epsg?: number | null
           cu_pct?: number | null
           depth_from?: number | null
           depth_to?: number | null
@@ -14056,6 +14058,7 @@ export type Database = {
           certificate?: string | null
           created_at?: string
           created_by?: string
+          crs_epsg?: number | null
           cu_pct?: number | null
           depth_from?: number | null
           depth_to?: number | null
@@ -19000,10 +19003,15 @@ export type Database = {
       refresh_all_projects_catastro: { Args: never; Returns: number }
       refresh_all_projects_satellite: { Args: never; Returns: number }
       refresh_precios_global: { Args: never; Returns: number }
+      report_readiness: { Args: { p_project_id: string }; Returns: Json }
       requeue_stuck_jobs: { Args: { _older_than?: string }; Returns: number }
       respond_trade_terms: {
         Args: { p_action: string; p_note?: string; p_offer_id: string }
         Returns: undefined
+      }
+      sample_intake: {
+        Args: { p_limit?: number; p_project_id: string }
+        Returns: Json
       }
       schedule_compliance_evaluations: { Args: never; Returns: number }
       schedule_gold_spot_fetch: { Args: never; Returns: string }
