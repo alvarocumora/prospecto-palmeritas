@@ -1,17 +1,22 @@
-import type { DemTile } from "@/engine3d/terrain/dem.functions";
 import type { DrillholesDataset } from "@/engine3d/data/drillholes.functions";
+import type { DemTile } from "@/engine3d/terrain/dem.functions";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { GeophysicsData } from "@/types/geophysics";
 import type { DatasetRegistration } from "./types";
 
-export function geophysicsRegistration(projectId: string, data: GeophysicsData): DatasetRegistration[] {
+export function geophysicsRegistration(
+  projectId: string,
+  data: GeophysicsData,
+): DatasetRegistration[] {
   return data.surveys.map((survey) => {
     const stations = data.stations.filter((station) => station.survey_id === survey.id);
     const synthetic = stations.length > 0 && stations.every((station) => station.is_synthetic);
     const methods = new Set<string>();
     if (stations.some((station) => station.mag_nt != null)) methods.add("magnetics");
-    if (stations.some((station) => station.ip_chargeability_mvv != null)) methods.add("induced_polarization");
-    if (stations.some((station) => station.ip_resistivity_ohmm != null)) methods.add("resistivity");
+    if (stations.some((station) => station.ip_chargeability_mvv != null))
+      methods.add("induced_polarization");
+    if (stations.some((station) => station.ip_resistivity_ohmm != null))
+      methods.add("resistivity");
     return {
       projectId,
       datasetType: "geophysics",
@@ -32,7 +37,11 @@ export function geophysicsRegistration(projectId: string, data: GeophysicsData):
       resolution: { stationSpacingM: survey.station_spacing_m ?? "unknown" },
       version: "1",
       contentHash: null,
-      metadata: { surveyId: survey.id, status: survey.status, expectedDepthM: survey.expected_depth_m },
+      metadata: {
+        surveyId: survey.id,
+        status: survey.status,
+        expectedDepthM: survey.expected_depth_m,
+      },
     };
   });
 }
@@ -49,7 +58,17 @@ export function assayRegistration(projectId: string, rows: SamplingResult[]): Da
     crs: null,
     verticalDatum: null,
     geometryType: null,
-    units: { Au: "g/t", Ag: "g/t", Cu: "%", As: "ppm", Sb: "ppm", Hg: "ppm", Pb: "ppm", Zn: "ppm", Mo: "ppm" },
+    units: {
+      Au: "g/t",
+      Ag: "g/t",
+      Cu: "%",
+      As: "ppm",
+      Sb: "ppm",
+      Hg: "ppm",
+      Pb: "ppm",
+      Zn: "ppm",
+      Mo: "ppm",
+    },
     bboxWgs84: null,
     provenance: certified.length === rows.length && rows.length > 0 ? "CERTIFIED" : "DOCUMENTARY",
     qaStatus: rows.some((row) => row.record_status === "rejected") ? "warning" : "unreviewed",
@@ -89,7 +108,10 @@ export function demRegistration(projectId: string, tile: DemTile): DatasetRegist
   };
 }
 
-export function drillingRegistration(projectId: string, data: DrillholesDataset): DatasetRegistration {
+export function drillingRegistration(
+  projectId: string,
+  data: DrillholesDataset,
+): DatasetRegistration {
   const synthetic = data.source === "planned-from-targets";
   return {
     projectId,
@@ -105,7 +127,11 @@ export function drillingRegistration(projectId: string, data: DrillholesDataset)
     bboxWgs84: null,
     provenance: synthetic ? "INTERPRETED" : "DOCUMENTARY",
     qaStatus: synthetic ? "synthetic" : "warning",
-    qaSummary: { holeCount: data.count, source: data.source, requiresExplicitSourceCrs: data.source === "server" },
+    qaSummary: {
+      holeCount: data.count,
+      source: data.source,
+      requiresExplicitSourceCrs: data.source === "server",
+    },
     acquisitionStart: null,
     acquisitionEnd: null,
     resolution: {},
