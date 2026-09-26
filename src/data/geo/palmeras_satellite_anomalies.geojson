@@ -17,7 +17,8 @@
       "spectral_conclusive": false
     },
     "config_sha256": "cd668581303cd2aefde96ade66c48ba89a5219ffe7a6c6a43a7d41a3032e3b9f",
-    "n": 15
+    "n": 15,
+    "tenencia_fuente": "SERNAGEOMIN (catastro oficial; tenencia del proyecto por confirmar)"
   },
   "features": [
     {
@@ -54,7 +55,7 @@
         "severity": "alta",
         "score": 0.767,
         "z_score": 6.9,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=6.9 (gossan 2.22). DERIVADO Sentinel-2."
       }
@@ -93,7 +94,7 @@
         "severity": "alta",
         "score": 0.741,
         "z_score": 6.67,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=6.67 (gossan 3.75). DERIVADO Sentinel-2."
       }
@@ -132,7 +133,7 @@
         "severity": "media",
         "score": 0.536,
         "z_score": 4.82,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=4.82 (gossan 2.01). DERIVADO Sentinel-2."
       }
@@ -171,7 +172,7 @@
         "severity": "media",
         "score": 0.509,
         "z_score": 4.58,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=4.58 (gossan 2.47). DERIVADO Sentinel-2."
       }
@@ -249,7 +250,7 @@
         "severity": "baja",
         "score": 0.408,
         "z_score": 3.67,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=3.67 (gossan 1.49). DERIVADO Sentinel-2."
       }
@@ -327,7 +328,7 @@
         "severity": "baja",
         "score": 0.4,
         "z_score": 3.6,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=3.6 (gossan 1.53). DERIVADO Sentinel-2."
       }
@@ -405,7 +406,7 @@
         "severity": "baja",
         "score": 0.287,
         "z_score": 2.58,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=2.58 (gossan 1.78). DERIVADO Sentinel-2."
       }
@@ -444,7 +445,7 @@
         "severity": "baja",
         "score": 0.28,
         "z_score": 2.52,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=2.52 (gossan 1.43). DERIVADO Sentinel-2."
       }
@@ -483,7 +484,7 @@
         "severity": "baja",
         "score": 0.268,
         "z_score": 2.41,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=2.41 (gossan 1.51). DERIVADO Sentinel-2."
       }
@@ -561,7 +562,7 @@
         "severity": "baja",
         "score": 0.26,
         "z_score": 2.34,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=2.34 (gossan 1.7). DERIVADO Sentinel-2."
       }
@@ -600,7 +601,7 @@
         "severity": "baja",
         "score": 0.259,
         "z_score": 2.33,
-        "dentro_concesion": false,
+        "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=2.33 (gossan 1.66). DERIVADO Sentinel-2."
       }

@@ -1,0 +1,501 @@
+{
+  "type": "FeatureCollection",
+  "name": "palmeras_catastro_sngm",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "fuente": "SERNAGEOMIN catastro_SNGM",
+    "n_total": 11,
+    "titulares": "fragmentados (Lecaros, Macaya, Pavez Becker Luis)",
+    "nota": "Sin titular dominante; tenencia del proyecto pendiente export DB."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.102717935,
+              -33.884000046
+            ],
+            [
+              -71.089750322,
+              -33.8842207289999
+            ],
+            [
+              -71.0899262089999,
+              -33.8914309429999
+            ],
+            [
+              -71.102894912,
+              -33.891210201
+            ],
+            [
+              -71.102717935,
+              -33.884000046
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010672-8",
+        "nombre": "TANTEHUE 37 1/12",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 96,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1030719519999,
+              -33.898420346
+            ],
+            [
+              -71.098748703,
+              -33.898494098
+            ],
+            [
+              -71.0988370649999,
+              -33.902099177
+            ],
+            [
+              -71.1031604949999,
+              -33.902025415
+            ],
+            [
+              -71.1030719519999,
+              -33.898420346
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010774-0",
+        "nombre": "TANTEHUE 1/16",
+        "titular": "MACAYA DANUS GONZALO NICOLAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 16,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127751196,
+              -33.890783299
+            ],
+            [
+              -71.10937921,
+              -33.8910993179999
+            ],
+            [
+              -71.1095567949999,
+              -33.898309433
+            ],
+            [
+              -71.127930324,
+              -33.897993329
+            ],
+            [
+              -71.127751196,
+              -33.890783299
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010664-7",
+        "nombre": "TANTEHUE 30 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1672487069999,
+              -33.8973076679999
+            ],
+            [
+              -71.14022962,
+              -33.8977801949999
+            ],
+            [
+              -71.140207097,
+              -33.896878949
+            ],
+            [
+              -71.1358840299999,
+              -33.896954002
+            ],
+            [
+              -71.136041399,
+              -33.903262738
+            ],
+            [
+              -71.13496055,
+              -33.903281482
+            ],
+            [
+              -71.135027975,
+              -33.905985226
+            ],
+            [
+              -71.167454021,
+              -33.9054187319999
+            ],
+            [
+              -71.1672487069999,
+              -33.8973076679999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010755-4",
+        "nombre": "AVE 1/30",
+        "titular": "MORAN OVALLE JOSE",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 268,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12739313,
+              -33.876363211
+            ],
+            [
+              -71.109024231,
+              -33.876679059
+            ],
+            [
+              -71.109201689,
+              -33.883889193
+            ],
+            [
+              -71.127572131,
+              -33.8835732599999
+            ],
+            [
+              -71.12739313,
+              -33.876363211
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010661-2",
+        "nombre": "TANTEHUE 28 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127572131,
+              -33.8835732599999
+            ],
+            [
+              -71.109201689,
+              -33.883889193
+            ],
+            [
+              -71.10937921,
+              -33.8910993179999
+            ],
+            [
+              -71.127751196,
+              -33.890783299
+            ],
+            [
+              -71.127572131,
+              -33.8835732599999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010662-0",
+        "nombre": "TANTEHUE 29 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.102541022,
+              -33.876789882
+            ],
+            [
+              -71.0895744969999,
+              -33.877010506
+            ],
+            [
+              -71.089750322,
+              -33.8842207289999
+            ],
+            [
+              -71.102717935,
+              -33.884000046
+            ],
+            [
+              -71.102541022,
+              -33.876789882
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010673-6",
+        "nombre": "TANTEHUE 38 1/12",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 96,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127345154,
+              -33.8962001579999
+            ],
+            [
+              -71.100325714,
+              -33.89666392
+            ],
+            [
+              -71.100436244,
+              -33.901170266
+            ],
+            [
+              -71.127457103,
+              -33.900706425
+            ],
+            [
+              -71.127345154,
+              -33.8962001579999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010638-8",
+        "nombre": "LAS ARENAS 1/25",
+        "titular": "PAVEZ BECKER LUIS HERNAN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 125,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1345498279999,
+              -33.903288602
+            ],
+            [
+              -71.109690025,
+              -33.9037170139999
+            ],
+            [
+              -71.109778864,
+              -33.907322064
+            ],
+            [
+              -71.1032933399999,
+              -33.9074330139999
+            ],
+            [
+              -71.103138358,
+              -33.901124148
+            ],
+            [
+              -71.0923298659999,
+              -33.901308263
+            ],
+            [
+              -71.092550148,
+              -33.9103209899999
+            ],
+            [
+              -71.134707136,
+              -33.909597338
+            ],
+            [
+              -71.1345498279999,
+              -33.903288602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010756-2",
+        "nombre": "FENIX 1/39",
+        "titular": "MORAN OVALLE JOSE",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 279,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.124598522,
+              -33.89444429
+            ],
+            [
+              -71.1029834239999,
+              -33.8948152749999
+            ],
+            [
+              -71.103204773,
+              -33.9038279489999
+            ],
+            [
+              -71.124822141,
+              -33.903456838
+            ],
+            [
+              -71.124598522,
+              -33.89444429
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200107016-1",
+        "nombre": "PLACILLA 2",
+        "titular": "MACAYA DANUS GONZALO NICOLAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.135405922,
+              -33.894257376
+            ],
+            [
+              -71.124598522,
+              -33.89444429
+            ],
+            [
+              -71.124822141,
+              -33.903456838
+            ],
+            [
+              -71.1356306769999,
+              -33.9032698619999
+            ],
+            [
+              -71.135405922,
+              -33.894257376
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200107015-3",
+        "nombre": "PLACILLA 1",
+        "titular": "MACAYA DANUS GONZALO NICOLAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+      }
+    }
+  ]
+}
