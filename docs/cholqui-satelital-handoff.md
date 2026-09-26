@@ -50,3 +50,25 @@ rotulada "Propuesta de campaña (interpretado)".
 `cholqui_satellite_candidates.geojson` (map-ready), `scenes_manifest.json` (escenas congeladas).
 Config: `geocapitals-remote/configs/cholqui_aoi.yaml`. Regenerar:
 `python -m gc_remote ... coverage/candidates configs/cholqui_aoi.yaml`.
+
+## ACTUALIZACIÓN — datos regenerados en formato consumible + malla real
+
+Tras ver que `getCholquiSatelliteTargets` lee de la tabla `satellite_anomalies` (origen no
+verificado) y no de la capa real, regeneré ambas capas **en el esquema que ya consume Lovable**:
+
+- `src/data/geo/cholqui_satellite_candidates.geojson` — 15 anomalías reales, ahora con
+  `index_code` (CLAY_MINERALS / HYDROTHERMAL_ALTERATION), `score` 0-1, geometría **Polygon**
+  (compatible con `polygonCentroid`), `severity`, `z_score`, `dentro_concesion`, procedencia.
+- `src/data/geo/cholqui_drill_grid.geojson` — malla PROPUESTA (3 collares) derivada **solo de
+  anomalías dentro de la tenencia conocida**, azimut 290° (perp. a N20E hacia el eje), dip -60°,
+  con `este/norte` UTM19S, prioridad, objetivo y disclaimer NI 43-101.
+
+### Cambio requerido en `/src` (Lovable)
+1. En `satelliteTargets.functions.ts`: **cambiar la fuente** de la tabla `satellite_anomalies`
+   al geojson real `src/data/geo/cholqui_satellite_candidates.geojson` (import estático). Así el
+   panel, el `drillGrid` y el PDF ya construidos muestran **dato real**, sin cambiar su lógica.
+2. **Borrar/marcar** las anomalías de `satellite_anomalies` para Cholqui (`project_id
+   e5360f13...`) que no provengan de este pipeline: eran de origen no verificado.
+3. En `drillGrid.ts`: **filtrar collares a los que caen dentro de las concesiones** (no proponer
+   perforación fuera de la tenencia). Hoy propone hasta 8 sin ese filtro → con dato real y filtro,
+   son 3 (o más si se cargan las concesiones ESPERANZA/EUROPA que faltan en el geojson).
