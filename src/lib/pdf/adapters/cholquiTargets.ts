@@ -146,8 +146,12 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
       {
         status: "DERIVED",
         label: "Anomalías espectrales",
-        detail:
-          "Derivadas de razones de banda Sentinel-2. Indicio de alteración, sin verificación de terreno.",
+        detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
+      },
+      {
+        status: "PENDING_DD",
+        label: "Tenencia de las anomalías fuera del set conocido",
+        detail: `${summary.outsideTenure} anomalías caen fuera de las pertenencias conocidas: contexto regional, sin plataforma propuesta hasta verificar tenencia.`,
       },
       {
         status: "CONCEPTUAL",
