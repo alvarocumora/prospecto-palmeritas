@@ -27,7 +27,7 @@ import {
 import { buildReconciliationLayer } from "@/lib/cadastre/reconciliationLayer";
 import { buildCadastreDueDiligence } from "@/lib/cadastre/dueDiligence";
 
-export const Route = createFileRoute("/_authenticated/dashboard/catastro" as never)({
+export const Route = createFileRoute("/_authenticated/dashboard/catastro")({
   component: MiningCadastrePage,
 });
 
