@@ -365,7 +365,7 @@ export const requestOperacionUpload = createServerFn({ method: "POST" })
       })
       .parse(d),
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<OperacionChecklistResult> => {
     const { requirePortalSession } = await import("@/lib/portalSession.server");
     await requirePortalSession(data.token, data.session);
     const ctx = await resolveTradeByToken(data.token);
@@ -488,6 +488,34 @@ export const acceptOperacionTerms = createServerFn({ method: "POST" })
 /** Público (por token): checklist REICON + readiness resueltos server-side para
  *  la War Room de contraparte. Reusa los RPCs `trade_documents_checklist` y
  *  `trade_documents_readiness` con el service client (bypass RLS/grants). */
+type OperacionChecklistRow = {
+  section_no: number;
+  section: string;
+  doc_kind: string;
+  title: string;
+  description: string | null;
+  obligation: "mandatory" | "conditional" | "if_available";
+  condition: string | null;
+  required_from_role: "buyer" | "seller" | "geocapitals";
+  sequence: number;
+  status: "falta" | "subido" | "aprobado" | "observado" | "firmado";
+  document_id: string | null;
+  uploaded_at: string | null;
+};
+
+type OperacionReadiness = {
+  mandatory_total: number;
+  mandatory_ok: number;
+  mandatory_missing: number;
+  optional_total: number;
+  ready: boolean;
+};
+
+type OperacionChecklistResult = {
+  rows: OperacionChecklistRow[];
+  readiness: OperacionReadiness | null;
+};
+
 export const getOperacionChecklist = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) =>
     z
@@ -510,7 +538,7 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     if (r.error) throw new Error(r.error.message);
     const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
     return {
-      rows: (c.data ?? []) as unknown as any[],
-      readiness: (readinessRow ?? null) as any,
+      rows: (c.data ?? []) as unknown as OperacionChecklistRow[],
+      readiness: (readinessRow ?? null) as unknown as OperacionReadiness | null,
     };
   });
