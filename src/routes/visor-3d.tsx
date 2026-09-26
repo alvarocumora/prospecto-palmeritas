@@ -601,7 +601,7 @@ function Visor3DPage() {
     staleTime: 60_000,
   });
 
-  const projects: PublicSatProject[] = data ?? [];
+  const projects = useMemo<PublicSatProject[]>(() => data ?? [], [data]);
   const sites = useMemo(() => projectsToSites(projects), [projects]);
   const [selectedSiteId, setSelectedSiteId] = useState<string | null>(null);
   const [selectedAnomalyId, setSelectedAnomalyId] = useState<string | null>(null);
