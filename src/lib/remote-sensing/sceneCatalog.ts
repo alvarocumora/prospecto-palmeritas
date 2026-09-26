@@ -13,21 +13,35 @@ type Feature = {
 };
 export type AnalysisScene = RemoteSensingScene & { assets: SentinelAssets | null };
 
-async function sign(href: string) {
-  const r = await fetch(`${SIGN}?href=${encodeURIComponent(href)}`);
-  if (!r.ok) throw new Error(`PC_SIGN_${r.status}`);
-  const j = (await r.json()) as { href?: string };
-  if (!j.href) throw new Error("PC_SIGN_NO_HREF");
-  return j.href;
+// Firma resiliente: reintenta con backoff ante 429/5xx y DEGRADA a null en vez de
+// lanzar. Firmar en vivo el endpoint de PC tiene rate limit; una excepción aquí
+// tumbaba la página (PC_SIGN_429 -> blank screen).
+async function sign(href: string): Promise<string | null> {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const r = await fetch(`${SIGN}?href=${encodeURIComponent(href)}`);
+      if (r.ok) {
+        const j = (await r.json()) as { href?: string };
+        return j.href ?? null;
+      }
+      // 429 / 5xx: reintentar; otros errores no son recuperables
+      if (r.status !== 429 && r.status < 500) return null;
+    } catch {
+      // error de red: reintentar
+    }
+    await new Promise((res) => setTimeout(res, 300 * 2 ** attempt));
+  }
+  return null;
 }
 async function analysisAssets(f: Feature): Promise<SentinelAssets | null> {
   const a = f.assets ?? {};
   const keys = ["B02", "B04", "B08", "B11", "B12"] as const;
   if (keys.some((k) => !a[k]?.href)) return null;
   const signed = await Promise.all(keys.map((k) => sign(a[k]!.href!)));
+  if (signed.some((s) => s == null)) return null; // firma incompleta: degradar sin romper
   const scl = a.SCL?.href ? await sign(a.SCL.href) : undefined;
   const [b02, b04, b08, b11, b12] = signed as [string, string, string, string, string];
-  return { b02, b04, b08, b11, b12, scl };
+  return { b02, b04, b08, b11, b12, scl: scl ?? undefined };
 }
 export async function searchSentinel2AnalysisScenes(input: {
   bbox: [number, number, number, number];
@@ -87,7 +101,8 @@ export async function searchSentinel2Scenes(input: {
   maxCloudPct?: number;
   limit?: number;
 }) {
-  // Listing only: no asset signing needed.
+  // Listado para la UI: sin firmar assets (withAssets:false) -> evita la ráfaga
+  // de firmas que disparaba PC_SIGN_429. La firma resiliente cubre el path de análisis.
   const r = await searchSentinel2AnalysisScenes({ ...input, withAssets: false });
   return { ok: r.ok, error: r.error, scenes: r.scenes.map(({ assets: _, ...s }) => s) };
 }
