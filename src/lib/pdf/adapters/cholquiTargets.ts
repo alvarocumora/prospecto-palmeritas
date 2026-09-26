@@ -84,19 +84,26 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         note: "Sondaje diamantino, inclinación -60°",
       },
       {
-        label: "Anomalías perforables",
-        value: String(summary.drillable),
-        note: "Puntaje sobre 0,55 y no cobertura vegetal",
+        label: "Dentro de la tenencia",
+        value: `${summary.withinTenure} de ${summary.anomalies}`,
+        note: "Sólo estas generan plataforma propuesta",
       },
       {
-        label: "Última detección",
-        value: data.runDate || "s/d",
-        note: "Corrida almacenada en la plataforma",
+        label: "Superficie interpretable",
+        value:
+          data.coverage.typicalPct != null
+            ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+            : "s/d",
+        note:
+          data.coverage.bestCasePct != null
+            ? `Mejor caso ${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} % del AOI`
+            : "Cobertura sin vegetación del AOI",
       },
     ],
     thesis: [
-      `Se detectaron ${summary.anomalies} anomalías espectrales sobre el AOI de Cholqui, agrupadas en ${summary.indexes.length} índices (óxidos de hierro, arcillas Al-OH, alteración combinada y lineamientos estructurales).`,
-      `De ellas, ${summary.drillable} superan el umbral de puntaje y se traducen en ${summary.collars} plataformas propuestas por ${num(summary.totalMeters)} m de sondaje diamantino.`,
+      `Se detectaron ${summary.anomalies} anomalías espectrales reales sobre el AOI de Cholqui (${data.coverage.sensor}), agrupadas en ${summary.indexes.length} índices de alteración (arcillas Al-OH y alteración hidrotermal combinada).`,
+      `${summary.withinTenure} caen dentro de las concesiones conocidas y se traducen en ${summary.collars} plataformas propuestas por ${num(summary.totalMeters)} m de sondaje diamantino; las ${summary.outsideTenure} restantes son contexto regional y requieren verificar tenencia antes de considerar perforación.`,
+      `Superficie interpretable sin cubierta vegetal: ${data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"} típico y ${data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"} en el mejor escenario del AOI.`,
       "El azimut de perforación es perpendicular al rumbo dominante N20E documentado en La Maza, para cortar la estructura en ángulo y medir potencia real.",
       "Una anomalía espectral es un indicio, no mineralización: ningún target sustituye mapeo, canaleta ni ensaye de laboratorio.",
     ],
