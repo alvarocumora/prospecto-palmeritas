@@ -1,0 +1,24 @@
+name: cholqui
+# AOI derivado de las pertenencias REALES (src/data/geo/franco_pertenencias.geojson:
+# TOKI, PALLOCABE, DOS MARIAS, etc.), con buffer ~500 m. WGS84 geográfico.
+aoi:
+  crs: EPSG:4326
+  bbox: [-71.098, -33.900, -70.997, -33.809]
+output_crs: EPSG:32719   # WGS84 / UTM 19S para operaciones métricas
+
+seasons:
+  months: [2, 3, 4]        # fin de verano austral (máxima exposición de suelo)
+  years: [2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026]
+  max_cloud_pct: 10
+
+masks:
+  ndvi_threshold: 0.25
+  ndvi_sensitivity: [0.20, 0.25, 0.30]
+
+structure:
+  known_strikes_deg: [350, 20, 352, 45, 15, 55, 50, 295, 250]
+  min_lineament_length_m: 150
+
+cadastre:
+  source: sernageomin_wfs
+  buffer_m: 60

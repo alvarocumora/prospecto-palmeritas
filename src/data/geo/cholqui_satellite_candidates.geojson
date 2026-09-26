@@ -1,0 +1,421 @@
+{
+  "type": "FeatureCollection",
+  "name": "cholqui_satellite_candidates",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "project": "Cholqui",
+    "sensor": "Sentinel-2 L2A",
+    "primary_index": "aloh",
+    "provenance": "DERIVADO / INTERPRETADO",
+    "coverage": {
+      "interpretable_typical_pct": 40.4,
+      "interpretable_bestcase_pct": 79.3,
+      "spectral_conclusive": true,
+      "headline": "Superficie sin cubierta vegetal interpretable: 40.4% del área."
+    },
+    "scenes_used": 14,
+    "config_sha256": "50df4da94ba2bba835b48348a19ccc17e287eb53e7326d185ecfb0a9ad112d25",
+    "n": 15,
+    "disclaimer": "Screening satelital Nivel 0. No constituye recurso ni identificación mineral. Las anomalías son indicios que requieren verificación de terreno.",
+    "candidatos_dentro_concesion": 3,
+    "candidatos_fuera_concesion": 12,
+    "nota_espacial": "Bandera dentro/fuera calculada SOLO contra las pertenencias de franco_pertenencias.geojson (TOKI/PALLOCABE/DOS MARIAS). Si el proyecto incluye ESPERANZA/EUROPA u otras que no están en ese archivo, recalcular contra el set completo de concesiones. 3/15 dentro de las conocidas; las de fuera son contexto regional (no se puede perforar fuera de la tenencia)."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.021167,
+          -33.878745
+        ]
+      },
+      "properties": {
+        "rank": 1,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 8.27,
+        "percentil": 100.0,
+        "gossan": 3.4977,
+        "fe_oxides": 2.042,
+        "ferrous": 1.0086,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0912,
+          -33.886773
+        ]
+      },
+      "properties": {
+        "rank": 2,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 7.76,
+        "percentil": 100.0,
+        "gossan": 2.209,
+        "fe_oxides": 1.3125,
+        "ferrous": 0.9448,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.028837,
+          -33.87393
+        ]
+      },
+      "properties": {
+        "rank": 3,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 7.61,
+        "percentil": 100.0,
+        "gossan": 4.3565,
+        "fe_oxides": 2.6027,
+        "ferrous": 1.2807,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.090392,
+          -33.897968
+        ]
+      },
+      "properties": {
+        "rank": 4,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 7.15,
+        "percentil": 100.0,
+        "gossan": 2.3801,
+        "fe_oxides": 1.4452,
+        "ferrous": 0.9335,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.008822,
+          -33.877865
+        ]
+      },
+      "properties": {
+        "rank": 5,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.8,
+        "percentil": 100.0,
+        "gossan": 2.5899,
+        "fe_oxides": 1.5926,
+        "ferrous": 1.9007,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.088769,
+          -33.893487
+        ]
+      },
+      "properties": {
+        "rank": 6,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.75,
+        "percentil": 100.0,
+        "gossan": 5.6177,
+        "fe_oxides": 3.4615,
+        "ferrous": 2.3065,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.090864,
+          -33.890747
+        ]
+      },
+      "properties": {
+        "rank": 7,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.64,
+        "percentil": 100.0,
+        "gossan": 1.3296,
+        "fe_oxides": 0.8226,
+        "ferrous": 0.9937,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.026181,
+          -33.880466
+        ]
+      },
+      "properties": {
+        "rank": 8,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.61,
+        "percentil": 100.0,
+        "gossan": 3.9475,
+        "fe_oxides": 2.4446,
+        "ferrous": 0.9424,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.009076,
+          -33.897879
+        ]
+      },
+      "properties": {
+        "rank": 9,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.52,
+        "percentil": 100.0,
+        "gossan": 2.5084,
+        "fe_oxides": 1.5586,
+        "ferrous": 1.218,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.08846,
+          -33.898542
+        ]
+      },
+      "properties": {
+        "rank": 10,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 6.21,
+        "percentil": 100.0,
+        "gossan": 3.8529,
+        "fe_oxides": 2.4216,
+        "ferrous": 1.7824,
+        "severidad": "alta",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.039584,
+          -33.862211
+        ]
+      },
+      "properties": {
+        "rank": 11,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 5.91,
+        "percentil": 100.0,
+        "gossan": 2.936,
+        "fe_oxides": 1.8663,
+        "ferrous": 1.1869,
+        "severidad": "media",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.022901,
+          -33.878897
+        ]
+      },
+      "properties": {
+        "rank": 12,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 5.9,
+        "percentil": 100.0,
+        "gossan": 3.2369,
+        "fe_oxides": 2.0581,
+        "ferrous": 1.0531,
+        "severidad": "media",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": true
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.031846,
+          -33.873159
+        ]
+      },
+      "properties": {
+        "rank": 13,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 5.77,
+        "percentil": 100.0,
+        "gossan": 3.1061,
+        "fe_oxides": 1.9847,
+        "ferrous": 1.0317,
+        "severidad": "media",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.03451,
+          -33.866984
+        ]
+      },
+      "properties": {
+        "rank": 14,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 5.75,
+        "percentil": 100.0,
+        "gossan": 4.5149,
+        "fe_oxides": 2.8877,
+        "ferrous": 1.1397,
+        "severidad": "media",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.008283,
+          -33.900957
+        ]
+      },
+      "properties": {
+        "rank": 15,
+        "tipo": "Anomalía de alteración (Al-OH)",
+        "alteracion": "Absorción SWIR compatible con Al-OH (arcillas/sericita)",
+        "index_code": "aloh",
+        "z_score": 5.71,
+        "percentil": 100.0,
+        "gossan": 2.8234,
+        "fe_oxides": 1.8085,
+        "ferrous": 1.0443,
+        "severidad": "media",
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "sensor": "Sentinel-2 L2A (bandas anchas)",
+        "disclaimer": "Detección satelital. Anomalía espectral, NO identificación mineral ni mineralización económica. Requiere verificación de terreno. No sustituye mapeo de campo.",
+        "dentro_concesion": false
+      }
+    }
+  ]
+}
