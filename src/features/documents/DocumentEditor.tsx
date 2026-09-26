@@ -358,8 +358,8 @@ export function DocumentEditor({
         if (parsed.tokens) setFlowTokens(parsed.tokens);
       }
     } catch {
-        // Best-effort UI persistence; failure is intentionally non-fatal.
-      }
+      // Best-effort UI persistence; failure is intentionally non-fatal.
+    }
   }, [flowStorageKey, user]);
 
   const refreshFlow = useCallback(async () => {
@@ -453,8 +453,8 @@ export function DocumentEditor({
         try {
           window.localStorage.setItem(flowStorageKey, JSON.stringify({ flowId, tokens: next }));
         } catch {
-        // Best-effort UI persistence; failure is intentionally non-fatal.
-      }
+          // Best-effort UI persistence; failure is intentionally non-fatal.
+        }
         await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
         toast.success("Link regenerado y copiado.");
       } else {
