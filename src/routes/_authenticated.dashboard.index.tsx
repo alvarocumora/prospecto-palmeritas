@@ -62,7 +62,7 @@ function BusinessHome() {
   const { isComplete: onboardingComplete, refresh: refreshOnboarding } = useOnboardingStatus();
   const { locked } = Route.useSearch();
   const { data: myModules } = useMyModules();
-  const locale: "es" | "en" = (profile as any)?.language === "en" ? "en" : "es";
+  const locale: "es" | "en" = (profile as { language?: string } | null)?.language === "en" ? "en" : "es";
   const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "";
   const needsOnboarding = !profile?.account_type || !onboardingComplete;
   const isInvestor = profile?.account_type === "investor";
