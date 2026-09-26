@@ -1,0 +1,28 @@
+{
+  "type": "FeatureCollection",
+  "name": "elara1_vecinos_sngm",
+  "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "metadata": {
+    "fuente": "Visor Catastro Minero Online SERNAGEOMIN (captura del operador, 2026-09-26)",
+    "nota": "Registro VERIFICADO de atributos del vecino. La geometría es SOLO el vértice V1 leído del visor (punto), NO el polígono completo: el polígono oficial queda por confirmar/descargar. No se fabricó la envolvente del campo BHP Ladera."
+  },
+  "features": [{
+    "type": "Feature",
+    "properties": {
+      "nombre": "LADERA 85",
+      "rol": "03201Q434-5",
+      "situacion": "EN TRAMITE",
+      "titular": "BHP EXPLORATION CHILE SPA",
+      "tipo_concesion": "Exploración",
+      "comuna": "COPIAPO",
+      "hectareas": 300,
+      "vencimiento": "2028-07-11",
+      "vertice_v1_psad56_utm19s": [443000, 7002776],
+      "geometria": "solo vértice V1 (punto); polígono completo por confirmar"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [-69.57687, -27.09961]
+    }
+  }]
+}
