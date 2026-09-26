@@ -2,14 +2,21 @@
   "type": "FeatureCollection",
   "name": "ELARA_1_AOI",
   "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+  "metadata": {
+    "nota_datum": "Geometría WGS84 DERIVADA de los vértices oficiales PSAD56/UTM-19S (EPSG:24879) del visor SERNAGEOMIN. Las coordenadas WGS84 decimales entregadas inicialmente por el operador estaban corridas ~5,5 km al norte y se descartaron.",
+    "vertices_psad56_utm19s": {
+      "NW": [437000, 7002000], "NE": [441000, 7002000],
+      "SE": [441000, 6997000], "SW": [437000, 6997000]
+    }
+  },
   "features": [{
     "type": "Feature",
     "properties": {
       "nombre": "ELARA 1",
       "titular": "Álvaro Oliva Herrera",
       "mineral": "Au-Ag",
-      "distrito": "Cinturón Maricunga, Atacama",
-      "datum_original": "PSAD56 UTM H19S",
+      "distrito": "Cinturón Maricunga, Copiapó, Atacama",
+      "datum_original": "PSAD56 UTM H19S (EPSG:24879)",
       "pertenencias": 2000,
       "area_ha": 2000,
       "fuente": "SERNAGEOMIN",
@@ -18,11 +25,11 @@
     "geometry": {
       "type": "Polygon",
       "coordinates": [[
-        [-69.6380, -27.0510],
-        [-69.6019, -27.0510],
-        [-69.6019, -27.0961],
-        [-69.6380, -27.0961],
-        [-69.6380, -27.0510]
+        [-69.63743, -27.10635],
+        [-69.59708, -27.10653],
+        [-69.59732, -27.15167],
+        [-69.63769, -27.15149],
+        [-69.63743, -27.10635]
       ]]
     }
   }]

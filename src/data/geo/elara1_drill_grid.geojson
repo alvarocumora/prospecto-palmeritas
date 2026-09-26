@@ -10,8 +10,8 @@
   "metadata": {
     "tipo": "PROPUESTA CONCEPTUAL",
     "rumbo_dominante_deg": 20.0,
-    "n_collares": 8,
-    "total_m": 1240,
+    "n_collares": 6,
+    "total_m": 780,
     "disclaimer": "Propuesta de exploracion. No constituye recurso ni reserva (NI 43-101)."
   },
   "features": [
@@ -20,22 +20,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.602138,
-          -27.060239
+          -69.610747,
+          -27.123038
         ]
       },
       "properties": {
         "code": "ELA-DDH-01",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.060239,
-        "lng": -69.602138,
-        "este_utm": 440290.0,
-        "norte_utm": 7006750.0,
+        "lat": -27.123038,
+        "lng": -69.610747,
+        "este_utm": 439470.0,
+        "norte_utm": 6999790.0,
         "azimuth_deg": 110,
         "dip_deg": -60,
-        "depth_m": 170,
-        "priority": "Alta",
-        "score": 0.98,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.593,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -44,22 +44,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.602703,
-          -27.090571
+          -69.634999,
+          -27.12943
         ]
       },
       "properties": {
         "code": "ELA-DDH-02",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.090571,
-        "lng": -69.602703,
-        "este_utm": 440250.0,
-        "norte_utm": 7003390.0,
-        "azimuth_deg": 290,
+        "lat": -27.12943,
+        "lng": -69.634999,
+        "este_utm": 437070.0,
+        "norte_utm": 6999070.0,
+        "azimuth_deg": 110,
         "dip_deg": -60,
-        "depth_m": 170,
-        "priority": "Media",
-        "score": 0.712,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.518,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -68,22 +68,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.603564,
-          -27.062941
+          -69.59735,
+          -27.146207
         ]
       },
       "properties": {
         "code": "ELA-DDH-03",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.062941,
-        "lng": -69.603564,
-        "este_utm": 440150.0,
-        "norte_utm": 7006450.0,
-        "azimuth_deg": 110,
+        "lat": -27.146207,
+        "lng": -69.59735,
+        "este_utm": 440810.0,
+        "norte_utm": 6997230.0,
+        "azimuth_deg": 290,
         "dip_deg": -60,
-        "depth_m": 170,
+        "depth_m": 130,
         "priority": "Baja",
-        "score": 0.686,
+        "score": 0.467,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -92,22 +92,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.611105,
-          -27.077354
+          -69.634778,
+          -27.126001
         ]
       },
       "properties": {
         "code": "ELA-DDH-04",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.077354,
-        "lng": -69.611105,
-        "este_utm": 439410.0,
-        "norte_utm": 7004850.0,
+        "lat": -27.126001,
+        "lng": -69.634778,
+        "este_utm": 437090.0,
+        "norte_utm": 6999450.0,
         "azimuth_deg": 110,
         "dip_deg": -60,
-        "depth_m": 170,
+        "depth_m": 130,
         "priority": "Baja",
-        "score": 0.676,
+        "score": 0.429,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -116,22 +116,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.602313,
-          -27.055363
+          -69.613302,
+          -27.110387
         ]
       },
       "properties": {
         "code": "ELA-DDH-05",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.055363,
-        "lng": -69.602313,
-        "este_utm": 440270.0,
-        "norte_utm": 7007290.0,
+        "lat": -27.110387,
+        "lng": -69.613302,
+        "este_utm": 439210.0,
+        "norte_utm": 7001190.0,
         "azimuth_deg": 110,
         "dip_deg": -60,
-        "depth_m": 170,
+        "depth_m": 130,
         "priority": "Baja",
-        "score": 0.672,
+        "score": 0.388,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     },
@@ -140,70 +140,22 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -69.609307,
-          -27.080612
+          -69.63448,
+          -27.14478
         ]
       },
       "properties": {
         "code": "ELA-DDH-06",
         "index_code": "CLAY_MINERALS",
-        "lat": -27.080612,
-        "lng": -69.609307,
-        "este_utm": 439590.0,
-        "norte_utm": 7004490.0,
-        "azimuth_deg": 290,
-        "dip_deg": -60,
-        "depth_m": 130,
-        "priority": "Baja",
-        "score": 0.66,
-        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.603989,
-          -27.066912
-        ]
-      },
-      "properties": {
-        "code": "ELA-DDH-07",
-        "index_code": "CLAY_MINERALS",
-        "lat": -27.066912,
-        "lng": -69.603989,
-        "este_utm": 440110.0,
-        "norte_utm": 7006010.0,
+        "lat": -27.14478,
+        "lng": -69.63448,
+        "este_utm": 437130.0,
+        "norte_utm": 6997370.1,
         "azimuth_deg": 110,
         "dip_deg": -60,
         "depth_m": 130,
         "priority": "Baja",
-        "score": 0.557,
-        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.606152,
-          -27.094167
-        ]
-      },
-      "properties": {
-        "code": "ELA-DDH-08",
-        "index_code": "CLAY_MINERALS",
-        "lat": -27.094167,
-        "lng": -69.606152,
-        "este_utm": 439910.0,
-        "norte_utm": 7002990.1,
-        "azimuth_deg": 290,
-        "dip_deg": -60,
-        "depth_m": 130,
-        "priority": "Baja",
-        "score": 0.553,
+        "score": 0.369,
         "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
       }
     }
