@@ -48,7 +48,10 @@ export function assertDatasetReadyForInterpretation(dataset: GeoscienceDataset):
   if (!isTechnicalEvidence(dataset)) {
     throw new Error(`DATASET_NOT_TECHNICAL_EVIDENCE:${dataset.id}:${dataset.qaStatus}`);
   }
-  if (!dataset.crs && ["geophysics", "drilling", "dem", "geology", "structure"].includes(dataset.datasetType)) {
+  if (
+    !dataset.crs &&
+    ["geophysics", "drilling", "dem", "geology", "structure"].includes(dataset.datasetType)
+  ) {
     throw new Error(`DATASET_CRS_REQUIRED:${dataset.id}`);
   }
 }
