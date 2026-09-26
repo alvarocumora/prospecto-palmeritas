@@ -3,26 +3,54 @@
   "name": "elara1_vecinos_sngm",
   "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
   "metadata": {
-    "fuente": "Visor Catastro Minero Online SERNAGEOMIN (captura del operador, 2026-09-26)",
-    "nota": "Registro VERIFICADO de atributos del vecino. La geometría es SOLO el vértice V1 leído del visor (punto), NO el polígono completo: el polígono oficial queda por confirmar/descargar. No se fabricó la envolvente del campo BHP Ladera."
+    "fuente": "Visor Catastro Minero Online SERNAGEOMIN (appsngmaz.sernageomin.cl), capturas del operador 2026-09-26 (catastro actualizado 2026-09-26 03:08)",
+    "nota_geometria": "Cada feature es un PUNTO en un vértice/lectura del visor, NO el polígono oficial. Los marcados 'ubicacion_aprox' son lectura de cursor, no vértice. No se fabricaron polígonos.",
+    "campo_bhp_ladera": "Al E/NE de ELARA 1 hay una grilla contigua de decenas de concesiones verdes rol 03201Q4xx (y 03203I0xx), paños de 300 ha. LADERA 85 (03201Q434-5) está CONFIRMADA como BHP EXPLORATION CHILE SPA, EN TRAMITE, Exploración; el resto del campo se INFIERE del mismo titular/campaña por contigüidad y patrón (confirmar rol por rol en el visor)."
   },
-  "features": [{
-    "type": "Feature",
-    "properties": {
-      "nombre": "LADERA 85",
-      "rol": "03201Q434-5",
-      "situacion": "EN TRAMITE",
-      "titular": "BHP EXPLORATION CHILE SPA",
-      "tipo_concesion": "Exploración",
-      "comuna": "COPIAPO",
-      "hectareas": 300,
-      "vencimiento": "2028-07-11",
-      "vertice_v1_psad56_utm19s": [443000, 7002776],
-      "geometria": "solo vértice V1 (punto); polígono completo por confirmar"
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "LADERA 85", "rol": "03201Q434-5", "situacion": "EN TRAMITE",
+        "titular": "BHP EXPLORATION CHILE SPA", "tipo_concesion": "Exploración",
+        "comuna": "COPIAPO", "hectareas": 300, "vencimiento": "2028-07-11",
+        "posicion_rel_elara": "NE (borde oriental)", "vertice_v1_psad56_utm19s": [443000, 7002776],
+        "geometria": "vértice V1 (punto); polígono por confirmar", "verificado": true
+      },
+      "geometry": { "type": "Point", "coordinates": [-69.57687, -27.09961] }
     },
-    "geometry": {
-      "type": "Point",
-      "coordinates": [-69.57687, -27.09961]
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "LUCKY 2", "rol": "200110464-3", "situacion": "EN TRAMITE",
+        "titular": "HUIDOBRO CARRERE SEBASTIAN", "tipo_concesion": "Exploración",
+        "comuna": "COPIAPO", "hectareas": 200,
+        "posicion_rel_elara": "SW", "vertice_v1_psad56_utm19s": [433300, 6992000],
+        "geometria": "vértice V1 (punto); polígono por confirmar", "verificado": true
+      },
+      "geometry": { "type": "Point", "coordinates": [-69.67530, -27.19646] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "PALOMITA 1/16", "rol": "032037096-5", "situacion": "CONSTITUIDA",
+        "titular": "SLM PALOMITA 1 LLANO EL LEONCI", "tipo_concesion": "Explotación código 1983",
+        "comuna": "TIERRA AMARILLA",
+        "posicion_rel_elara": "distrito regional sur (~35 km S, zona Laguna del Negro Francisco)",
+        "ubicacion_aprox": true, "geometria": "ubicación aproximada (lectura de cursor del visor), no es vértice", "verificado": true
+      },
+      "geometry": { "type": "Point", "coordinates": [-69.37976, -27.42780] }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "nombre": "SCL 9A 1/300", "rol": null, "situacion": "Explotación (código 1983)",
+        "titular": "LAGUNA NEGRO FRANCISCO SPA", "tipo_concesion": "Explotación código 1983",
+        "comuna": "TIERRA AMARILLA", "hectareas": 300,
+        "posicion_rel_elara": "distrito regional sur (~35 km SE, zona Laguna del Negro Francisco)",
+        "ubicacion_aprox": true, "geometria": "ubicación aproximada (lectura de cursor del visor), no es vértice", "verificado": true
+      },
+      "geometry": { "type": "Point", "coordinates": [-69.22329, -27.43407] }
     }
-  }]
+  ]
 }
