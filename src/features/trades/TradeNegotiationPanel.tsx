@@ -88,6 +88,12 @@ type ProposeArgs = {
   p_replies_to: string | null;
 };
 
+type RpcResult = { data: unknown; error: { message: string } | null };
+const tradeRpc = supabase.rpc as unknown as (
+  fn: string,
+  args?: unknown,
+) => PromiseLike<RpcResult>;
+
 export function TradeNegotiationPanel({
   tradeId,
   defaultParty = "geocapitals",
@@ -107,7 +113,7 @@ export function TradeNegotiationPanel({
   const { data, isLoading, refetch } = useQuery({
     queryKey,
     queryFn: async (): Promise<NegotiationRow[]> => {
-      const { data, error } = await (supabase.rpc as any)("get_trade_negotiation", {
+      const { data, error } = await tradeRpc("get_trade_negotiation", {
         p_trade_id: tradeId,
       });
       if (error) throw new Error(error.message);
@@ -123,7 +129,7 @@ export function TradeNegotiationPanel({
   const submitPropose = async (args: ProposeArgs) => {
     setBusy("propose");
     try {
-      const { error } = await (supabase.rpc as any)("propose_trade_terms", args);
+      const { error } = await tradeRpc("propose_trade_terms", args);
       if (error) throw new Error(error.message);
       toast.success(args.p_replies_to ? "Contra-oferta enviada" : "Oferta enviada");
       setFormOpen(false);
@@ -147,7 +153,7 @@ export function TradeNegotiationPanel({
     }
     setBusy(offer.id);
     try {
-      const { error } = await (supabase.rpc as any)("respond_trade_terms", {
+      const { error } = await tradeRpc("respond_trade_terms", {
         p_offer_id: offer.id,
         p_action: action,
         p_note: note,
