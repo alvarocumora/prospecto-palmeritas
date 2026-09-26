@@ -324,8 +324,7 @@ export function DocumentEditor({
     // rellena automáticamente nombre y email desde los datos del documento para
     // que el orden de la firma coincida SIEMPRE con las partes del contrato
     // (Parte A → firmante #1, Parte B → #2, …).
-    const posKeys = ["A", "B", "C", "D"] as const;
-    setFlowSigners((prev) =>
+      setFlowSigners((prev) =>
       parties.map((role, i) => {
         if (prev[i] && (prev[i].name || prev[i].email)) return prev[i];
         const p = posKeys[i];
