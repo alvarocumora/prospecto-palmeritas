@@ -22,7 +22,14 @@ export function geoscienceDatasetNode(dataset: GeoscienceDataset): MiningAssetNo
     label: dataset.name,
     commodity: typeof dataset.metadata.commodity === "string" ? dataset.metadata.commodity : null,
     provenance: dataset.provenance,
-    confidence: dataset.qaStatus === "passed" ? 1 : dataset.qaStatus === "warning" ? 0.5 : dataset.qaStatus === "failed" || dataset.qaStatus === "synthetic" ? 0 : null,
+    confidence:
+      dataset.qaStatus === "passed"
+        ? 1
+        : dataset.qaStatus === "warning"
+          ? 0.5
+          : dataset.qaStatus === "failed" || dataset.qaStatus === "synthetic"
+            ? 0
+            : null,
     status: dataset.qaStatus,
     sourceRef: dataset.sourceRef,
     metadata: {
