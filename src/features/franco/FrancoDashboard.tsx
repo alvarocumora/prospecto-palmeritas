@@ -1,16 +1,12 @@
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
-import { CholquiSatellitePanel } from "./components/CholquiSatellitePanel";
-import { CholquiGeologicalEvidenceMap } from "./components/CholquiGeologicalEvidenceMap";
-import { CholquiSatelliteTargetsPanel } from "./components/CholquiSatelliteTargetsPanel";
-
+import { CholquiMasterViewer } from "./components/CholquiMasterViewer";
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
 import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
 import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
-import { FrancoPertenenciasMap } from "./components/FrancoPertenenciasMap";
 import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
 import { CHOLQUI } from "./data/cholqui";
 import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from "./cholquiPdf";
@@ -58,16 +54,13 @@ export function FrancoDashboard() {
           downloadingTeaser={downloadingTeaser}
         />
 
-        <CholquiGeologicalEvidenceMap />
-
-        <div data-surface="canvas" className="rounded-2xl overflow-hidden">
-          <FrancoPertenenciasMap />
-        </div>
+        {/* Visor maestro unificado: reemplaza los 3 mapas apilados (evidencia +
+            pertenencias + targets) por una sola vista con capas conmutables e
+            inspector de procedencia. */}
+        <CholquiMasterViewer />
 
         <CholquiScenariosPanel />
         <CholquiMinePlanPanel />
-        <CholquiSatellitePanel />
-        <CholquiSatelliteTargetsPanel />
 
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
