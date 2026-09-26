@@ -51,7 +51,9 @@ export function brokeredPreviewStorage() {
     new Promise((resolve) => {
       const requestId = newId();
       let done = false;
-      let timer: ReturnType<typeof setTimeout>;
+      const timer: ReturnType<typeof setTimeout> = setTimeout(() => {
+        finish(null);
+      }, timeoutMs);
       const finish = (r: { ok: boolean; value?: string | null } | null) => {
         if (done) return;
         done = true;
