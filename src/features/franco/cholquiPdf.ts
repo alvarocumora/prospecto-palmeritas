@@ -76,7 +76,6 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   });
 
   let y = 0;
-  let page = 0;
 
   const paperBg = () => {
     pdf.setFillColor(...PAPER);
@@ -110,7 +109,6 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   };
 
   const newPage = () => {
-    page += 1;
     pdf.addPage();
     paperBg();
     y = M + 8;
